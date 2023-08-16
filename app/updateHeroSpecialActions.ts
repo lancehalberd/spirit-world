@@ -166,14 +166,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.d = hero.safeD;
             hero.x = hero.safeX;
             hero.y = hero.safeY;
+            hero.justRespawned = true;
             let damage = 1;
             if (hero.action === 'sankInLava') {
                 damage = 8;
-                if (hero.passiveTools.fireBlessing) {
+                if (hero.savedData.passiveTools.fireBlessing) {
                     damage /= 2;
                 }
             }
             hero.takeDamage(state, damage);
+            destroyClone(state, hero);
             // stop updating this hero if it was a clone that got destroyed by taking damage.
             if (!hero.area) {
                 return;
@@ -290,7 +292,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.d = hero.safeD;
                 hero.x = hero.safeX;
                 hero.y = hero.safeY;
+                hero.justRespawned = true;
                 hero.takeDamage(state, 1);
+                destroyClone(state, hero);
                 hero.action = null;
                 return;
             }
@@ -426,21 +430,21 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
                 if (towerLocation && onTowerMarker) {
                     state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
-                    state.hero.activeTools.staff = 1;
+                    state.hero.savedData.activeTools.staff = 1;
                     refreshAreaLogic(state, hero.area);
                     saveGame(state);
                     return;
                 }
             }
             hero.z = Math.max(hero.z + hero.vz, minZ);
-            const staffLevel = state.hero.activeTools.staff;
+            const staffLevel = state.hero.savedData.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
             const staff = new Staff(state, {
                 x: hero.x,
                 y: hero.y,
                 damage: 4 * staffLevel,
                 direction: hero.d,
-                element: hero.element,
+                element: hero.savedData.element,
                 maxLength,
             });
             let baseTarget: Rect = staff.getAttackHitbox();
@@ -522,7 +526,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'roll') {
         // Double pressing roll performs a quick somersault.
         if (wasGameKeyPressed(state, GAME_KEY.ROLL)
-            && hero.passiveTools.roll > 1
+            && hero.savedData.passiveTools.roll > 1
             && hero.actionFrame > 4
             && state.hero.magic > 0
         ) {
@@ -531,7 +535,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         // Holding roll performs a normal somersaul with preparation.
         if (isGameKeyDown(state, GAME_KEY.ROLL)
-            && hero.passiveTools.roll > 1
+            && hero.savedData.passiveTools.roll > 1
             && hero.actionFrame === 11
             && state.hero.magic > 0
         ) {
@@ -624,7 +628,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
                 lastOpenPosition.x = hero.x;
                 lastOpenPosition.y = hero.y;
             }
-            addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
+            addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.savedData.element });
             continue;
         }
         hero.area = alternateArea;
@@ -642,13 +646,13 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
             lastOpenPosition.x = hero.x;
             lastOpenPosition.y = hero.y;
         }
-        addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
+        addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.savedData.element });
     }
     hitbox = hero.getHitbox();
     const endPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
     const teleportHit: HitProperties = {
         damage: 5,
-        element: hero.element,
+        element: hero.savedData.element,
         hitRay: {
             x1: startPosition.x, y1: startPosition.y,
             x2: endPosition.x, y2: endPosition.y,
@@ -659,7 +663,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         hitObjects: true,
     };
     hitTargets(state, hero.area, teleportHit);
-    if (hero.element === 'lightning') {
+    if (hero.savedData.element === 'lightning') {
         addEffectToArea(state, hero.area, new LightningAnimationEffect({
             ray: teleportHit.hitRay,
             duration: 100,
@@ -667,7 +671,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
     }
     const landingHit: HitProperties = {
         damage: 5,
-        element: hero.element,
+        element: hero.savedData.element,
         hitCircle: {
             x: endPosition.x, y: endPosition.y,
             r: 24,
@@ -684,11 +688,11 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
                 y: endPosition.y + 19 * Math.sin(theta) - 3,
                 w: 6, h: 6,
             },
-            { element: hero.element }
+            { element: hero.savedData.element }
         );
     }
     hitTargets(state, hero.area, landingHit);
-    if (hero.element === 'lightning') {
+    if (hero.savedData.element === 'lightning') {
         addEffectToArea(state, hero.area, new LightningAnimationEffect({
             circle: landingHit.hitCircle,
             duration: 200,

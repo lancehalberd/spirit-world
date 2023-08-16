@@ -153,7 +153,7 @@ enemyDefinitions.floorEye = {
             return;
         }
         if (isUnderTile(state, enemy)) {
-            if (state.hero.passiveTools.trueSight) {
+            if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, enemy.getHitbox(), enemy.animationTime);
             }
             return;

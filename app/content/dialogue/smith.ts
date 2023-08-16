@@ -6,13 +6,13 @@ dialogueHash.citySmith = {
     key: 'citySmith',
     mappedOptions: {
         upgrade: (state: GameState) => {
-            if (state.hero.weaponUpgrades.normalRange) {
+            if (state.hero.savedData.weaponUpgrades.normalRange) {
                 return `{@citySmith.damage}`;
             }
-            if (state.hero.weaponUpgrades.normalDamage) {
+            if (state.hero.savedData.weaponUpgrades.normalDamage) {
                 return `{@citySmith.range}`;
             }
-            if (state.hero.weapon > 1) {
+            if (state.hero.savedData.weapon > 1) {
                 return `I can upgrade your old Chakram with the right materials.
                     {choice:Upgrade Chakram?|Range:citySmith.range|Damage:citySmith.damage|No:citySmith.no}`;
             }
@@ -26,28 +26,28 @@ dialogueHash.citySmith = {
             {choice:Upgrade Damage?|Yes:citySmith.craftDamage|No:citySmith.no}
         `,
         craftRange: (state: GameState) => {
-            if (state.hero.silverOre < 2) {
+            if (state.hero.savedData.silverOre < 2) {
                 return `I'll need at least 2 Silver Ore to upgrade your damage.`;
             }
-            if (state.hero.money < 100) {
+            if (state.hero.savedData.money < 100) {
                 return `{@citySmith.fail}`;
             }
-            state.hero.silverOre -= 2;
-            state.hero.money -= 100;
-            state.hero.weaponUpgrades.normalRange = true;
+            state.hero.savedData.silverOre -= 2;
+            state.hero.savedData.money -= 100;
+            state.hero.savedData.weaponUpgrades.normalRange = true;
             saveGame(state);
             return `Excellent! Your Chakram is faster than ever!`;
         },
         craftDamage: (state: GameState) => {
-            if (state.hero.silverOre < 3) {
+            if (state.hero.savedData.silverOre < 3) {
                 return `I'll need at least 3 Silver Ore to upgrade your damage.`;
             }
-            if (state.hero.money < 100) {
+            if (state.hero.savedData.money < 100) {
                 return `{@citySmith.fail}`;
             }
-            state.hero.silverOre -= 3;
-            state.hero.money -= 100;
-            state.hero.weaponUpgrades.normalDamage = true;
+            state.hero.savedData.silverOre -= 3;
+            state.hero.savedData.money -= 100;
+            state.hero.savedData.weaponUpgrades.normalDamage = true;
             saveGame(state);
             return `Excellent! Your Chakram is more powerful than ever!`;
         },
@@ -107,10 +107,10 @@ dialogueHash.forgeSmith = {
     key: 'forgeSmith',
     mappedOptions: {
         upgrade: (state: GameState) => {
-            if (state.hero.weaponUpgrades.spiritRange) {
+            if (state.hero.savedData.weaponUpgrades.spiritRange) {
                 return `{@forgeSmith.damage}`;
             }
-            if (state.hero.weaponUpgrades.spiritDamage) {
+            if (state.hero.savedData.weaponUpgrades.spiritDamage) {
                 return `{@forgeSmith.range}`;
             }
             return `I can upgrade your Spirit Chakram if you can find Gold Ore.
@@ -123,36 +123,36 @@ dialogueHash.forgeSmith = {
             {choice:Upgrade Damage?|Yes:forgeSmith.craftDamage|No:forgeSmith.no}
         `,
         craftRange: (state: GameState) => {
-            if (state.hero.goldOre < 1) {
+            if (state.hero.savedData.goldOre < 1) {
                 return `I'll need some Gold Ore to upgrade your range.`;
             }
-            if (state.hero.silverOre < 2) {
+            if (state.hero.savedData.silverOre < 2) {
                 return `I'll need at least 2 Silver Ore to upgrade your damage.`;
             }
-            if (state.hero.money < 200) {
+            if (state.hero.savedData.money < 200) {
                 return `{@forgeSmith.fail}`;
             }
-            state.hero.goldOre -= 1;
-            state.hero.silverOre -= 2;
-            state.hero.money -= 200;
-            state.hero.weaponUpgrades.spiritRange = true;
+            state.hero.savedData.goldOre -= 1;
+            state.hero.savedData.silverOre -= 2;
+            state.hero.savedData.money -= 200;
+            state.hero.savedData.weaponUpgrades.spiritRange = true;
             saveGame(state);
             return `Excellent! Your Chakram is faster than ever!`;
         },
         craftDamage: (state: GameState) => {
-            if (state.hero.goldOre < 1) {
+            if (state.hero.savedData.goldOre < 1) {
                 return `I'll need some Gold Ore to upgrade your range.`;
             }
-            if (state.hero.silverOre < 3) {
+            if (state.hero.savedData.silverOre < 3) {
                 return `I'll need at least 3 Silver Ore to upgrade your damage.`;
             }
-            if (state.hero.money < 200) {
+            if (state.hero.savedData.money < 200) {
                 return `{@forgeSmith.fail}`;
             }
-            state.hero.goldOre -= 1;
-            state.hero.silverOre -= 3;
-            state.hero.money -= 200;
-            state.hero.weaponUpgrades.spiritDamage = true;
+            state.hero.savedData.goldOre -= 1;
+            state.hero.savedData.silverOre -= 3;
+            state.hero.savedData.money -= 200;
+            state.hero.savedData.weaponUpgrades.spiritDamage = true;
             saveGame(state);
             return `Excellent! Your Chakram is more powerful than ever!`;
         },

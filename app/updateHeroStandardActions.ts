@@ -54,10 +54,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isActionBlocked =
         isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject ||
-        (hero.action === 'attack' && (hero.weapon < 2 || hero.actionFrame < 6)) ||
+        (hero.action === 'attack' && (hero.savedData.weapon < 2 || hero.actionFrame < 6)) ||
         hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || hero.action === 'climbing';
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
-    const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
+    const canAttack = canCharge && hero.savedData.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
     hero.isRunning = canCharge && isPassiveButtonDown;
 
@@ -264,9 +264,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (hero.isUncontrollable
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
-            } else if (hero.passiveTools.spiritSight) {
+            } else if (hero.savedData.passiveTools.spiritSight) {
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, MAX_SPIRIT_RADIUS);
-                if (hero.passiveTools.astralProjection && hero.area.alternateArea) {
+                if (hero.savedData.passiveTools.astralProjection && hero.area.alternateArea) {
                     if (!hero.astralProjection) {
                         hero.astralProjection = new AstralProjection(hero);
                         addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
@@ -291,11 +291,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (hero.chargeTime >= 400) {
                 hero.burstBarrier(state);
                 state.hero.magic -= 10;
-                if (state.hero.element) {
+                if (state.hero.savedData.element) {
                     state.hero.magic -= 10;
                 }
                 state.hero.increaseMagicRegenCooldown(500);
-                if (hero.activeTools.cloak >= 2) {
+                if (hero.savedData.activeTools.cloak >= 2) {
                     hero.isInvisible = true;
                 }
                 hero.chargeTime = 0;
@@ -303,15 +303,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.chargingLeftTool = hero.chargingRightTool = false;
             }
         } else if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
-            useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
+            useTool(state, hero, hero.savedData.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
             hero.action = null;
         } else if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
-            useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
+            useTool(state, hero, hero.savedData.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
             hero.action = null;
         } else {
-            const tool = hero.chargingLeftTool ? hero.leftTool : hero.rightTool;
+            const tool = hero.chargingLeftTool ? hero.savedData.leftTool : hero.savedData.rightTool;
             const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
             if (chargeLevel > 0 && state.time % 100 === 0) {
                 let skipSparkle = false;
@@ -500,7 +500,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
         if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-            if (state.hero.passiveTools.teleportation && state.hero.magic > 0
+            if (state.hero.savedData.passiveTools.teleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.magic -= 10;
@@ -519,7 +519,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         && (wasGameKeyPressed(state, GAME_KEY.WEAPON) || (hero.attackBufferTime > state.fieldTime - 200))
     ) {
         const usedChakrams = hero.thrownChakrams.length + (hero.heldChakram ? 1 : 0);
-        if (state.hero.weapon - usedChakrams > 0) {
+        if (state.hero.savedData.weapon - usedChakrams > 0) {
             hero.action = 'charging';
             hero.chargeTime = 0;
             hero.animationTime = 0;
@@ -531,11 +531,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 vx: directionMap[direction][0],
                 vy: directionMap[direction][1],
                 source: hero,
-                level: Math.min(state.hero.weapon, hero.thrownChakrams[0]?.level === 2 ? 1 : 2),
+                level: Math.min(state.hero.savedData.weapon, hero.thrownChakrams[0]?.level === 2 ? 1 : 2),
             });
             addEffectToArea(state, hero.area, hero.heldChakram);
             return;
-        } else if (wasGameKeyPressed(state, GAME_KEY.WEAPON) && state.hero.weapon) {
+        } else if (wasGameKeyPressed(state, GAME_KEY.WEAPON) && state.hero.savedData.weapon) {
             hero.attackBufferTime = state.fieldTime;
         }
     }
@@ -543,31 +543,31 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // Check to start charging/preparing a tool for use.
     if (canCharge && hero.toolCooldown <= 0 && !hero.chargingRightTool && !hero.chargingLeftTool && !hero.heldChakram) {
         const controllableClones = state.hero.clones.filter(clone => !clone.isUncontrollable);
-        if (state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
-            && (state.hero.leftTool !== 'clone' || !controllableClones.length)
+        if (state.hero.savedData.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            && (state.hero.savedData.leftTool !== 'clone' || !controllableClones.length)
         ) {
             // Currently only the bow tool can be charged.
-            if (state.hero.leftTool === 'bow'
+            if (state.hero.savedData.leftTool === 'bow'
                 // "charging" the cloak while it is active is used to activate barrier burst/invisibility
-                || (hero.hasBarrier && state.hero.leftTool === 'cloak')
+                || (hero.hasBarrier && state.hero.savedData.leftTool === 'cloak')
             ) {
                 hero.chargingLeftTool = true;
             } else {
                 const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
-                useTool(state, hero, state.hero.leftTool, directionMap[direction][0], directionMap[direction][1]);
+                useTool(state, hero, state.hero.savedData.leftTool, directionMap[direction][0], directionMap[direction][1]);
             }
-        } else if (state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
-            && (state.hero.rightTool !== 'clone' || !controllableClones.length)
+        } else if (state.hero.savedData.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+            && (state.hero.savedData.rightTool !== 'clone' || !controllableClones.length)
         ) {
             // Currently only the bow tool can be charged.
-            if (state.hero.rightTool === 'bow'
+            if (state.hero.savedData.rightTool === 'bow'
                 // "charging" the cloak while it is active is used to activate barrier burst/invisibility
-                || (hero.hasBarrier && state.hero.rightTool === 'cloak')
+                || (hero.hasBarrier && state.hero.savedData.rightTool === 'cloak')
             ) {
                 hero.chargingRightTool = true;
             } else {
                 const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
-                useTool(state, hero, state.hero.rightTool, directionMap[direction][0], directionMap[direction][1]);
+                useTool(state, hero, state.hero.savedData.rightTool, directionMap[direction][0], directionMap[direction][1]);
             }
         }
         if (hero.chargingRightTool || hero.chargingLeftTool) {
@@ -590,7 +590,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = 'grabbing';
                 hero.grabTile = target;
             }
-            if (hero.passiveTools.gloves >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
+            if (hero.savedData.passiveTools.gloves >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
                 // This is an unusual distance, but should do what we want still.
                 const distance = (
                     Math.abs(target.x * 16 - hero.x) +
@@ -631,7 +631,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             for (const layer of hero.area.layers) {
                 const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                 const behavior = tile?.behaviors;
-                if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
+                if (behavior?.pickupWeight <= state.hero.savedData.passiveTools.gloves) {
                     hero.pickUpTile = tile;
                     playAreaSound(state, hero.area, 'pickUpObject');
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
@@ -662,7 +662,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)
         && !isActionBlocked
         && !hero.isAstralProjection
-        && hero.passiveTools.roll > 0
+        && hero.savedData.passiveTools.roll > 0
         && state.hero.magic > 0
         && hero.rollCooldown <= 0
     ) {
@@ -689,10 +689,14 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.actionDy = directionMap[direction][1];
         return;
     }
-    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
+    if (
+        // Meditation only applies to either the main hero or to all clones, but not both at once.
+        ((!isCloneToolDown && hero === state.hero) || (isCloneToolDown && hero !== state.hero))
+        && wasGameKeyPressed(state, GAME_KEY.MEDITATE)
+    ) {
         if (!hero.clones.length && (hero.swimming || isUnderwater(state, hero))) {
             // The meditate key can be used to quickly toggle iron boots in/under water.
-            if (hero.equipment.ironBoots) {
+            if (hero.savedData.equipment.ironBoots) {
                 if (hero.equippedBoots !== 'ironBoots') {
                     setEquippedBoots(state, 'ironBoots');
                 } else {
@@ -700,7 +704,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
         } else if (!hero.isAstralProjection
-            && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
+            && !isActionBlocked && (hero.savedData.passiveTools.spiritSight || hero.clones.length)
             && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
         ) {
             if (!hero.clones.length) {

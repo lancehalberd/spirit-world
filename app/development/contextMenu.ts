@@ -157,15 +157,15 @@ function getAssistanceMenuOption(): MenuOption {
                     label: 'Full Life',
                     onSelect() {
                         const state = getState();
-                        state.hero.life = state.hero.maxLife;
+                        state.hero.life = state.hero.savedData.maxLife;
                     }
                 },
                 {
                     label: 'More Life',
                     onSelect() {
                         const state = getState();
-                        state.hero.maxLife++;
-                        state.hero.life = state.hero.maxLife;
+                        state.hero.savedData.maxLife++;
+                        state.hero.life = state.hero.savedData.maxLife;
                     }
                 },
                 {
@@ -180,7 +180,7 @@ function getAssistanceMenuOption(): MenuOption {
                     label: '200 Jade',
                     onSelect() {
                         const state = getState();
-                        state.hero.money += 200;
+                        state.hero.savedData.money += 200;
                     }
                 },
                 {

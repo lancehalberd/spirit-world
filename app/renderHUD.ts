@@ -29,7 +29,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     // Draw heart backs, and fillings
     let x = 26;
     let y = 5;
-    for (let i = 0; i < state.hero.maxLife; i++) {
+    for (let i = 0; i < state.hero.savedData.maxLife; i++) {
         if (i === 10) {
             y += 11;
             x = 26;
@@ -76,25 +76,25 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     renderSpiritBar(context, state);
 
-    let frame = getLootFrame(state, {lootType: state.hero.leftTool, lootLevel: state.hero.activeTools[state.hero.leftTool]});
+    let frame = getLootFrame(state, {lootType: state.hero.savedData.leftTool, lootLevel: state.hero.savedData.activeTools[state.hero.savedData.leftTool]});
     let target = {w: frameSize, h: frameSize, x: CANVAS_WIDTH - 50, y: 4};
     //fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
     //fillRect(context, target, 'black');
     drawFrameAt(context, blueFrame, target);
-    if (state.hero.leftTool) {
+    if (state.hero.savedData.leftTool) {
         drawFrameCenteredAt(context, frame, target)
     }
-    frame = getLootFrame(state, {lootType: state.hero.rightTool, lootLevel: state.hero.activeTools[state.hero.rightTool]});
+    frame = getLootFrame(state, {lootType: state.hero.savedData.rightTool, lootLevel: state.hero.savedData.activeTools[state.hero.savedData.rightTool]});
     target = {w: frameSize, h: frameSize, x: CANVAS_WIDTH - 25, y: 4};
     //fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
     //fillRect(context, target, 'black');
     drawFrameAt(context, yellowFrame, target);
-    if (state.hero.rightTool) {
+    if (state.hero.savedData.rightTool) {
         drawFrameCenteredAt(context, frame, target);
     }
 
     drawFrame(context, coin, {...coin, x: CANVAS_WIDTH - 110, y: 4});
-    let moneyText = `${state.hero.money}`;
+    let moneyText = `${state.hero.savedData.money}`;
     while (moneyText.length < 4) moneyText = '0' + moneyText;
     drawText(context, moneyText, CANVAS_WIDTH - 90, 14, {
         textBaseline: 'middle',
@@ -163,7 +163,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     if (isRandomizer) {
         // Freeze on the display of the win time once the game is completed.
-        let seconds = (state.hero.winTime || state.hero.playTime) / 1000;
+        let seconds = (state.hero.savedData.winTime || state.hero.savedData.playTime) / 1000;
         const hours = (seconds / 3600) | 0;
         const minutes = ((seconds - hours * 3600) / 60) | 0;
         seconds = seconds % 60;
@@ -172,7 +172,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         const timeString = `${hours}:${minutesString}:${secondsString}`;
         const info = getCheckInfo(state);
         if (randomizerGoalType === 'victoryPoints') {
-            drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
+            drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
                 textBaseline: 'middle',
                 textAlign: 'left',
                 size: 16,

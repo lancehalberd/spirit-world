@@ -10,49 +10,49 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
         activeTools.push('return');
     }
     // Active tools
-    if (state.hero.activeTools.bow) {
+    if (state.hero.savedData.activeTools.bow) {
         activeTools.push('bow');
     }
-    if (state.hero.activeTools.staff) {
+    if (state.hero.savedData.activeTools.staff) {
         activeTools.push('staff');
     }
-    if (state.hero.activeTools.cloak) {
+    if (state.hero.savedData.activeTools.cloak) {
         activeTools.push('cloak');
     }
-    if (state.hero.activeTools.clone) {
+    if (state.hero.savedData.activeTools.clone) {
         activeTools.push('clone');
     }
     menuRows.push(activeTools);
 
     const equipment: MenuOptionType[] = ['leatherBoots'];
-    if (state.hero.equipment.ironBoots) {
+    if (state.hero.savedData.equipment.ironBoots) {
         equipment.push('ironBoots');
     }
-    if (state.hero.equipment.cloudBoots) {
+    if (state.hero.savedData.equipment.cloudBoots) {
         equipment.push('cloudBoots');
     }
     menuRows.push(equipment);
 
     const elements: MenuOptionType[] = [];
-    if (state.hero.elements.fire || state.hero.elements.ice || state.hero.elements.lightning) {
+    if (state.hero.savedData.elements.fire || state.hero.savedData.elements.ice || state.hero.savedData.elements.lightning) {
         elements.push('neutral');
     }
-    if (state.hero.elements.fire) {
+    if (state.hero.savedData.elements.fire) {
         elements.push('fire');
     }
-    if (state.hero.elements.ice) {
+    if (state.hero.savedData.elements.ice) {
         elements.push('ice');
     }
-    if (state.hero.elements.lightning) {
+    if (state.hero.savedData.elements.lightning) {
         elements.push('lightning');
     }
     menuRows.push(elements);
 
     let passiveToolRow: MenuOptionType[] = [];
-    for (let key in state.hero.passiveTools) {
-        if (!state.hero.passiveTools[key]) continue;
+    for (let key in state.hero.savedData.passiveTools) {
+        if (!state.hero.savedData.passiveTools[key]) continue;
         // Don't show cat eyes once true sight is obtained.
-        if (key === 'catEyes' && state.hero.passiveTools.trueSight) continue;
+        if (key === 'catEyes' && state.hero.savedData.passiveTools.trueSight) continue;
         passiveToolRow.push(key as MenuOptionType);
         if (passiveToolRow.length >= 7) {
             menuRows.push(passiveToolRow);
@@ -89,14 +89,14 @@ export function getMenuHelpMessage(state: GameState, type: MenuOptionType): stri
 // Function to set the left tool on all copies of the hero.
 export function setLeftTool(state: GameState, tool: ActiveTool): void {
     for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.leftTool = tool;
+        hero.savedData.leftTool = tool;
     }
 }
 
 // Function to set the right tool on all copies of the hero.
 export function setRightTool(state: GameState, tool: ActiveTool): void {
     for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.rightTool = tool;
+        hero.savedData.rightTool = tool;
     }
 }
 

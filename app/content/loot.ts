@@ -34,7 +34,7 @@ function getChargeMessage(state: GameState) {
 
 export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
     if (!lootLevel) {
-        lootLevel = state.hero.activeTools[lootType] || state.hero.passiveTools[lootType] || 1;
+        lootLevel = state.hero.savedData.activeTools[lootType] || state.hero.savedData.passiveTools[lootType] || 1;
     }
     switch (lootType) {
         case 'bow':
@@ -68,10 +68,10 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             }
             return 'Magical Bracers';
         case 'spiritPower':
-            if (!state.hero.passiveTools.spiritSight) {
+            if (!state.hero.savedData.passiveTools.spiritSight) {
                 return 'Spirit Sight';
             }
-            if (!state.hero.passiveTools.astralProjection) {
+            if (!state.hero.savedData.passiveTools.astralProjection) {
                 return 'Astral Projection';
             }
             return 'Teleportation';
@@ -155,7 +155,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
             return 'Use the Iron Boots to explore under water but watch your breath!'
                 + '{|}Iron boots slow you down but keep you from slipping and being knocked back.';
         case 'weapon':
-            if (state.hero.weapon === 1) {
+            if (state.hero.savedData.weapon === 1) {
                 return `Press [B_WEAPON] to throw the Chakram.
                     {|}Use it to defeat enemies or destroy some obstacles.`;
             }
@@ -164,7 +164,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 {|}After throwing the Spirit Chakram, quickly press [B_WEAPON] again
                 to throw your normal Chakram at the same time!`;
         case 'bow':
-            if (state.hero.activeTools.bow === 1) {
+            if (state.hero.savedData.activeTools.bow === 1) {
                 return 'Press [B_TOOL] to shoot a magic arrow.'
                     + '{|}Use the bow to hit distant enemies and objects.';
             }
@@ -172,14 +172,14 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                     {|}This magical bow applies your equipped element to every shot.
                     {|}Charge the bow to shoot multiple arrows at once.`;
         case 'clone':
-            if (state.hero.activeTools.clone === 1) {
+            if (state.hero.savedData.activeTools.clone === 1) {
                 return 'Press [B_TOOL] to create a clone or switch between clones.'
                     + '{|}Hold [B_TOOL] to control all clones at once!'
                     + '{|}Hold [B_MEDITATE] to make a clone explode!';
             }
             return `Your clone technique now creates two clones!`;
         case 'cloak':
-            if (state.hero.activeTools.cloak === 1) {
+            if (state.hero.savedData.activeTools.cloak === 1) {
                 return 'Press [B_TOOL] to create a Spirit Barrier around you.'
                     + '{|}The barrier will damage enemies and reflect projectiles at the cost of your Spirit Energy!'
                     + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
@@ -194,21 +194,21 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Invisibility makes you undetectable and invulnerable to most damage.'
                 + '{|}Your Spirit Energy will drain faster the longer you remain invisible.';
         case 'staff':
-            if (state.hero.activeTools.staff === 1) {
+            if (state.hero.savedData.activeTools.staff === 1) {
                 return 'Press [B_TOOL] to summon the staff and slam it to the ground.'
                     + '{|}You can use the staff as a weapon and a bridge!'
                     + '{|}Press [B_TOOL] again to summon the staff back to you.';
             }
             return 'This Staff is unbelievably large and powerful!';
         case 'gloves':
-            if (state.hero.passiveTools.gloves === 1) {
+            if (state.hero.savedData.passiveTools.gloves === 1) {
                 return 'Now you can lift heavier objects.'
                     + '{|}Face an object and use [B_PASSIVE] to try to lift it.';
             }
             return 'Now you can lift even heavier objects.'
                 + '{|}Face an object and use [B_PASSIVE] to try to lift it.';
         case 'roll':
-            if (state.hero.passiveTools.roll === 1) {
+            if (state.hero.savedData.passiveTools.roll === 1) {
                 return 'Press [B_ROLL] to do a quick roll forward.'
                     + '{|}You can avoid most damage while rolling and cross small gaps.'
             }
@@ -270,11 +270,11 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
 export function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     // Skip instructions during the randomizer.
     if (state.randomizer?.seed) {
-        if (lootType === 'peachOfImmortalityPiece' && state.hero.peachQuarters === 0) {
+        if (lootType === 'peachOfImmortalityPiece' && state.hero.savedData.peachQuarters === 0) {
             showMessage(state, '{item:peachOfImmortality}');
             return;
         }
-        if (lootType === 'peachOfImmortality' && !state.hero.passiveTools.catEyes) {
+        if (lootType === 'peachOfImmortality' && !state.hero.savedData.passiveTools.catEyes) {
             showMessage(state, '{item:catEyes}');
             return;
         }
@@ -295,7 +295,7 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
             return showMessage(state, getMessage
                 + '{|}Press [B_MAP] to see the full map of this area!');
         case 'peachOfImmortality':
-            if (!state.hero.passiveTools.catEyes) {
+            if (!state.hero.savedData.passiveTools.catEyes) {
                 return showMessage(state, `
                     ${getMessage}
                     {|} Your health has increased and you feel a strange energy...
@@ -304,20 +304,20 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
             }
             return showMessage(state, `${getMessage}{|} Your maximum health has increased!`);
         case 'peachOfImmortalityPiece':
-            if (state.hero.peachQuarters === 1) {
+            if (state.hero.savedData.peachQuarters === 1) {
                 return showMessage(state, getMessage + '{|}Find three more to increase your health!');
             }
-            if (state.hero.peachQuarters === 2) {
+            if (state.hero.savedData.peachQuarters === 2) {
                 return showMessage(state, getMessage + '{|}Find two more to increase your health!');
             }
-            if (state.hero.peachQuarters === 3) {
+            if (state.hero.savedData.peachQuarters === 3) {
                 return showMessage(state, getMessage + '{|}Find one more to increase your health!');
             }
             // Finding the 4th slice grants a full peach of immortality.
             return showMessage(state, getMessage + '{item:peachOfImmortality}');
         
         case 'staff':
-            if (state.hero.activeTools.staff === 2) {
+            if (state.hero.savedData.activeTools.staff === 2) {
                 // Refresh the location to hide the tower.
                 //enterLocation(state, state.location);
                 state.areaInstance.needsLogicRefresh = true;
@@ -472,52 +472,52 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         return wholeCoin;
     }
     if (lootType === 'weapon') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.weapon)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.weapon)){
             return silverChakram;
         }
         return goldChakram;
     }
     if (lootType === 'bow') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.bow)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.bow)){
             return bow;
         }
         return goldBow;
     }
     if (lootType === 'cloak') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.cloak)){
             return lootFrames.spiritCloak;
         }
         return lootFrames.invisibilityCloak;
     }
     if (lootType === 'staff') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.staff)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.staff)){
             return lootFrames.staff;
         }
         return lootFrames.towerStaff;
     }
     if (lootType === 'clone') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.clone)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.clone)){
             return lootFrames.clone;
         }
         return lootFrames.clone2;
     }
     if (lootType === 'roll') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.passiveTools.roll)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.passiveTools.roll)){
             return lootFrames.roll;
         }
         return lootFrames.somersault;
     }
     if (lootType === 'gloves') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.passiveTools.gloves)){
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.passiveTools.gloves)){
             return lootFrames.gloves;
         }
         return lootFrames.bracelet;
     }
     if (lootType === 'spiritPower') {
-        if (!state.hero.passiveTools.spiritSight) {
+        if (!state.hero.savedData.passiveTools.spiritSight) {
             return lootFrames.spiritSight;
         }
-        if (!state.hero.passiveTools.astralProjection) {
+        if (!state.hero.savedData.passiveTools.astralProjection) {
             return lootFrames.astralProjection;
         }
         return lootFrames.teleportation;

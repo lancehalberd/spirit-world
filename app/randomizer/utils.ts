@@ -269,8 +269,8 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     } catch (e) {
         debugger;
     }
-    if (!stateCopy.hero.passiveTools.catEyes && stateCopy.hero.maxLife > 4) {
-        stateCopy.hero.passiveTools.catEyes = 1;
+    if (!stateCopy.hero.savedData.passiveTools.catEyes && stateCopy.hero.savedData.maxLife > 4) {
+        stateCopy.hero.savedData.passiveTools.catEyes = 1;
     }
     return stateCopy;
 }
@@ -473,8 +473,8 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
 }
 
 function debugState(state: GameState) {
-    console.log(state.hero.activeTools);
-    console.log(state.hero.passiveTools);
+    console.log(state.hero.savedData.activeTools);
+    console.log(state.hero.savedData.passiveTools);
     console.log(Object.keys(state.savedState.objectFlags));
 }
 
@@ -588,31 +588,31 @@ window['showRandomizerSolution'] = function () {
 
 function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState) {
     if (lootType === 'spiritPower') {
-        if (state.hero.passiveTools.astralProjection) {
+        if (state.hero.savedData.passiveTools.astralProjection) {
             return 'Teleportation';
         }
-        if (state.hero.passiveTools.spiritSight) {
+        if (state.hero.savedData.passiveTools.spiritSight) {
             return 'Astral Projection';
         }
         return 'Spirit Sight';
     }
     if (lootType === 'weapon') {
-        if (state.hero.weapon) {
+        if (state.hero.savedData.weapon) {
             return 'Spirit Chakram';
         }
         return 'Chakram';
     }
     if (lootType === 'cloak') {
-        return state.hero.activeTools.cloak ? 'Invisibility Cloak' : 'Spirit Cloak';
+        return state.hero.savedData.activeTools.cloak ? 'Invisibility Cloak' : 'Spirit Cloak';
     }
     if (lootType === 'staff') {
-        return state.hero.activeTools.staff ? 'Tower Staff' : 'Tree Staff';
+        return state.hero.savedData.activeTools.staff ? 'Tower Staff' : 'Tree Staff';
     }
     if (lootType === 'gloves') {
-        return state.hero.passiveTools.gloves ? 'Magical Bracers' : 'Spirit Bracers';
+        return state.hero.savedData.passiveTools.gloves ? 'Magical Bracers' : 'Spirit Bracers';
     }
     if (lootType === 'roll') {
-        return state.hero.passiveTools.roll ? 'Cloud Somersault': 'Mist Roll';
+        return state.hero.savedData.passiveTools.roll ? 'Cloud Somersault': 'Mist Roll';
     }
     if (lootType === 'peachOfImmortality') {
         return 'Golden Peach';
@@ -621,7 +621,7 @@ function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState
         return 'Peach Piece';
     }
     if (lootType === 'victoryPoint') {
-        return `${lootAmount}x VP(${state.hero.victoryPoints + lootAmount})`;
+        return `${lootAmount}x VP(${state.hero.savedData.victoryPoints + lootAmount})`;
     }
 
     return lootType;
@@ -639,7 +639,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
             continue;
         }
         if (check.lootObject.lootType !== 'money' && check.lootObject.lootType !== 'empty') {
-            if (state.hero.maxLife < 7 || (
+            if (state.hero.savedData.maxLife < 7 || (
                 check.lootObject.lootType !== 'peachOfImmortality'
                 && check.lootObject.lootType !== 'peachOfImmortalityPiece'
             )) {
@@ -657,7 +657,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
         for (const flag of (check.progressFlags || [])) {
             state.savedState.objectFlags[flag] = true;
         }
-        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.victoryPoints >= randomizerGoal) {
+        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.savedData.victoryPoints >= randomizerGoal) {
             console.log('');
             console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             console.log('Talk to mom to win.');

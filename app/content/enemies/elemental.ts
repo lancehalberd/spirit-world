@@ -37,7 +37,7 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
         }
     },
     alternateRender(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>) {
-        if (state.hero.passiveTools.trueSight > 0 && !enemy.params.possessedTarget) {
+        if (state.hero.savedData.passiveTools.trueSight > 0 && !enemy.params.possessedTarget) {
             context.save();
                 context.globalAlpha *= (0.1 + 0.05 * Math.sin(enemy.time / 200));
                 enemy.defaultRender(context, state);

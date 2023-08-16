@@ -23,7 +23,7 @@ export function useTool(
             if (state.hero.magic <= 0) {
                 return;
             }
-            const isUpgradedBow = state.hero.activeTools.bow >= 2;
+            const isUpgradedBow = state.hero.savedData.activeTools.bow >= 2;
             let speed = isUpgradedBow ? 6 : 4;
             let damage = isUpgradedBow ? 4 : 2;
             damage *= (2 ** chargeLevel);
@@ -35,12 +35,12 @@ export function useTool(
                 speed += 4;
                 magicCost += 25;
             }
-            if (state.hero.element && isUpgradedBow && chargeLevel === 0) {
+            if (state.hero.savedData.element && isUpgradedBow && chargeLevel === 0) {
                 // Upgraded bow always uses the equiped element
                 // and uses less magic to do so.
-                element = state.hero.element;
+                element = state.hero.savedData.element;
                 magicCost += 5;
-            } else if (state.hero.element && chargeLevel > 0) {
+            } else if (state.hero.savedData.element && chargeLevel > 0) {
                 // Adding an element to a charged attack costs 10 spirit energy.
                 magicCost += 10;
             }
@@ -173,7 +173,7 @@ export function useTool(
                 return;
             }
             if (isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)
-                && state.hero.clones.length < state.hero.activeTools.clone
+                && state.hero.clones.length < state.hero.savedData.activeTools.clone
             ) {
                 state.hero.magic -= 10;
                 state.hero.increaseMagicRegenCooldown(1000 * 10 / 10);
@@ -200,7 +200,7 @@ export function useTool(
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
-                for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
+                for (let i = 0; i < state.hero.savedData.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
                     state.hero.clones.push(clone);
                     addObjectToArea(state, state.areaInstance, clone);
@@ -232,14 +232,14 @@ export function useTool(
 }
 
 export function wasToolButtonPressed(state: GameState, tool: ActiveTool): boolean {
-    return (state.hero.leftTool === tool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL))
-        || (state.hero.rightTool === tool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL));
+    return (state.hero.savedData.leftTool === tool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.savedData.rightTool === tool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL));
 }
 export function wasToolButtonPressedAndReleased(state: GameState, tool: ActiveTool): boolean {
-    return (state.hero.leftTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
-        || (state.hero.rightTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL));
+    return (state.hero.savedData.leftTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.savedData.rightTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL));
 }
 export function isToolButtonPressed(state: GameState, tool: ActiveTool): boolean {
-    return (state.hero.leftTool === tool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
-        || (state.hero.rightTool === tool && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
+    return (state.hero.savedData.leftTool === tool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.savedData.rightTool === tool && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
 }

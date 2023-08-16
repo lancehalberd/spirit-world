@@ -28,20 +28,20 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         return isRandomizer;
     }
     if (itemFlag === 'weapon') {
-        return state.hero.weapon >= level;
+        return state.hero.savedData.weapon >= level;
     }
     if (itemFlag === 'maxLife') {
-        return state.hero.maxLife >= level;
+        return state.hero.savedData.maxLife >= level;
     }
     if (itemFlag === 'silverOre') {
-        return state.hero.silverOre >= level;
+        return state.hero.savedData.silverOre >= level;
     }
     if (itemFlag === 'goldOre') {
-        return state.hero.goldOre >= level;
+        return state.hero.savedData.goldOre >= level;
     }
-    return state.hero.activeTools[itemFlag] >= level || state.hero.passiveTools[itemFlag] >= level
-        || state.hero.elements[itemFlag] >= level || state.hero.equipment[itemFlag] >= level
-        || state.hero.weaponUpgrades[itemFlag];
+    return state.hero.savedData.activeTools[itemFlag] >= level || state.hero.savedData.passiveTools[itemFlag] >= level
+        || state.hero.savedData.elements[itemFlag] >= level || state.hero.savedData.equipment[itemFlag] >= level
+        || state.hero.savedData.weaponUpgrades[itemFlag];
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {
@@ -254,13 +254,13 @@ export const logicHash: {[key: string]: LogicCheck} = {
         excludedFlags: ['stormBeast'],
     },
     desertTower: (state: GameState) => {
-        return state.hero.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'desert';
+        return state.hero.savedData.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'desert';
     },
     forestTower: (state: GameState) => {
-        return state.hero.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'forest';
+        return state.hero.savedData.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'forest';
     },
     mountainTower: (state: GameState) => {
-        return state.hero.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'mountain';
+        return state.hero.savedData.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'mountain';
     },
     towerStaff: {
         requiredFlags: ['$staff:2'],

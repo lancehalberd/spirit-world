@@ -92,7 +92,7 @@ export class FloorSwitch implements ObjectInstance {
         } else {
             drawFrame(context, upFrame, {...upFrame, x: this.x, y: this.y});
         }
-        if (this.definition.isInvisible && state.hero.passiveTools.trueSight) {
+        if (this.definition.isInvisible && state.hero.savedData.passiveTools.trueSight) {
             renderIndicator(context, this.getHitbox(), state.fieldTime);
         }
     }

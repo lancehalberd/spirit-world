@@ -30,7 +30,7 @@ import { boxesIntersect } from 'app/utils/index';
 
 const throwSpeed = 6;
 
-export class Hero implements Actor, SavedHeroData {
+export class Hero implements Actor {
     isAstralProjection = false;
     isClone = false;
     isAllyTarget = true;
@@ -123,6 +123,9 @@ export class Hero implements Actor, SavedHeroData {
     safeD: Direction;
     safeX: number;
     safeY: number;
+    // This gets set when the player respawns at a location and is currently used
+    // to disable teleporters that they respawn on top of.
+    justRespawned: boolean;
     chargingLeftTool?: boolean;
     chargingRightTool?: boolean;
     chargingHeldObject?: boolean;
@@ -130,26 +133,6 @@ export class Hero implements Actor, SavedHeroData {
     spiritRadius: number = 0;
     status: ObjectStatus = 'normal';
 
-    // SavedHeroData fields
-    maxLife: number = 4;
-    money: number;
-    silverOre: number;
-    goldOre: number;
-    peachQuarters: number;
-    spiritTokens: number;
-    victoryPoints: number;
-    playTime: number;
-    winTime: number;
-    activeTools: {[key in ActiveTool]: number};
-    equipment: {[key in Equipment]: number};
-    passiveTools: {[key in PassiveTool]: number};
-    elements: {[key in MagicElement]: number};
-    weapon: number;
-    weaponUpgrades: {[key in WeaponUpgrades]?: boolean} = {};
-    leftTool?: ActiveTool;
-    rightTool?: ActiveTool;
-    element?: MagicElement;
-    spawnLocation: ZoneLocation;
     // Heroes have special handling for pits and shouldn't use the object pit logic.
     ignorePits = true;
     // Clones that are automatically blowing up are marked with this flag.
@@ -165,65 +148,52 @@ export class Hero implements Actor, SavedHeroData {
     // and prevents it from being placed. This is useful for attacking quickly.
     canceledStaffPlacement?: boolean;
 
+    savedData: SavedHeroData;
+
     constructor() {
-        this.life = this.maxLife;
         this.clones = [];
         this.equippedBoots = 'leatherBoots';
     }
 
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
-        for (let i in defaultSavedHeroData) {
-            this[i] = defaultSavedHeroData[i];
-        }
+        this.savedData = {...defaultSavedHeroData};
         if (savedHeroData) {
             for (let i in savedHeroData) {
-                this[i] = savedHeroData[i];
+                this.savedData[i] = savedHeroData[i];
             }
         }
-        this.passiveTools = {
+        this.savedData.passiveTools = {
             ...defaultSavedHeroData.passiveTools,
             ...savedHeroData?.passiveTools,
         };
-        this.activeTools = {
+        this.savedData.activeTools = {
             ...defaultSavedHeroData.activeTools,
             ...savedHeroData?.activeTools,
         };
-        this.elements = {
+        this.savedData.elements = {
             ...defaultSavedHeroData.elements,
             ...savedHeroData?.elements,
         };
-        this.equipment = {
+        this.savedData.equipment = {
             ...defaultSavedHeroData.equipment,
             ...savedHeroData?.equipment,
         };
-        this.weaponUpgrades = {
+        this.savedData.weaponUpgrades = {
             ...defaultSavedHeroData.weaponUpgrades,
             ...savedHeroData?.weaponUpgrades,
         };
+        this.life = this.savedData.maxLife;
     }
 
     exportSavedHeroData(): SavedHeroData {
         return {
-            playTime: this.playTime,
-            winTime: this.winTime,
-            maxLife: this.maxLife,
-            hasRevive: this.hasRevive,
-            money: this.money,
-            silverOre: this.silverOre,
-            goldOre: this.goldOre,
-            peachQuarters: this.peachQuarters,
-            spiritTokens: this.spiritTokens,
-            victoryPoints: this.victoryPoints,
-            weapon: this.weapon,
-            weaponUpgrades: {...this.weaponUpgrades},
-            leftTool: this.leftTool,
-            rightTool: this.rightTool,
-            element: this.element,
-            spawnLocation: this.spawnLocation,
-            activeTools: {...this.activeTools},
-            elements: {...this.elements},
-            equipment: {...this.equipment},
-            passiveTools: {...this.passiveTools},
+            ...this.savedData,
+            weaponUpgrades: {...this.savedData.weaponUpgrades},
+            spawnLocation: this.savedData.spawnLocation,
+            activeTools: {...this.savedData.activeTools},
+            elements: {...this.savedData.elements},
+            equipment: {...this.savedData.equipment},
+            passiveTools: {...this.savedData.passiveTools},
         };
     }
 
@@ -232,21 +202,7 @@ export class Hero implements Actor, SavedHeroData {
         for (let i in this) {
             copy[i] = this[i];
         }
-        copy.passiveTools = {
-            ...this.passiveTools,
-        };
-        copy.activeTools = {
-            ...this.activeTools,
-        };
-        copy.elements = {
-            ...this.elements,
-        };
-        copy.equipment = {
-            ...this.equipment,
-        };
-        copy.weaponUpgrades = {
-            ...this.weaponUpgrades,
-        };
+        copy.savedData = this.exportSavedHeroData();
         return copy;
     }
 
@@ -299,14 +255,14 @@ export class Hero implements Actor, SavedHeroData {
                 // The barrier prevents burning damage entirely (normally a 2x multiplier)
                 // so to balance this out the barrier takes a flat 50% more damage from fire elements.
                 spiritDamage *= 1.5;
-                if (state.hero.passiveTools.fireBlessing) {
+                if (state.hero.savedData.passiveTools.fireBlessing) {
                     spiritDamage /= 2;
                 }
             }
-            if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
+            if (hit.element === 'ice' && state.hero.savedData.passiveTools.waterBlessing) {
                 spiritDamage /= 2;
             }
-            if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
+            if (hit.element === 'lightning' && state.hero.savedData.passiveTools.lightningBlessing) {
                 spiritDamage /= 2;
                 iframeMultiplier *= 0.5;
             }
@@ -351,20 +307,20 @@ export class Hero implements Actor, SavedHeroData {
             if (hit.element === 'fire') {
                 let burnDuration = 2000;
                 const burnDamage = damage / 2;
-                if (state.hero.passiveTools.fireBlessing) {
+                if (state.hero.savedData.passiveTools.fireBlessing) {
                     damage /= 2;
                     burnDuration /= 2;
                 }
                 this.applyBurn(burnDamage, burnDuration);
             }
-            if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
+            if (hit.element === 'ice' && state.hero.savedData.passiveTools.waterBlessing) {
                 damage /= 2;
             }
-            if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
+            if (hit.element === 'lightning' && state.hero.savedData.passiveTools.lightningBlessing) {
                 damage /= 2;
                 iframeMultiplier *= 0.5;
             }
-            if (state.hero.passiveTools.goldMail) {
+            if (state.hero.savedData.passiveTools.goldMail) {
                 damage /= 2;
                 iframeMultiplier *= 1.2;
             }
@@ -378,7 +334,7 @@ export class Hero implements Actor, SavedHeroData {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && !(this.ironSkinLife > 0)) {
             // Getting hit by ice freezes you unless you have iron skin up.
-            if (this.passiveTools.waterBlessing) {
+            if (this.savedData.passiveTools.waterBlessing) {
                 this.frozenDuration = 1000;
             } else {
                 this.frozenDuration = 1500;
@@ -404,8 +360,8 @@ export class Hero implements Actor, SavedHeroData {
         }
         this.hasBarrier = false;
         this.activeBarrierBurst = new BarrierBurstEffect({
-            element: this.element,
-            level: this.activeTools.cloak,
+            element: this.savedData.element,
+            level: this.savedData.activeTools.cloak,
             source: this,
         });
         addEffectToArea(state, this.area, this.activeBarrierBurst);
@@ -437,8 +393,8 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     setElement(nextElement: MagicElement): void {
-        if (this.element !== nextElement) {
-            this.element = nextElement;
+        if (this.savedData.element !== nextElement) {
+            this.savedData.element = nextElement;
             // Reduce charge time to 500ms when switching between elements,
             // as if it takes some effort to change elements.
             this.chargeTime = Math.min(this.chargeTime, 500);
@@ -449,18 +405,20 @@ export class Hero implements Actor, SavedHeroData {
         if (state.scriptEvents.blockPlayerInput) {
             return;
         }
-        if (this.ironSkinLife) {
-            this.ironSkinCooldown = 3000;
-            if (this.ironSkinLife > damage / 2) {
-                this.ironSkinLife -= damage / 2;
-                state.hero.invulnerableFrames = 50 * iframeMultiplier;
-                if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
-                    destroyClone(state, this);
-                }
+        // Iron Skin is shared across all clones, so use the values from the main hero
+        if (state.hero.ironSkinLife) {
+            state.hero.ironSkinCooldown = 3000;
+            if (state.hero.ironSkinLife > damage / 2) {
+                state.hero.ironSkinLife -= damage / 2;
+                // Iframes are only for the clone taking the damage.
+                this.invulnerableFrames = 50 * iframeMultiplier;
+                //if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
+                //    destroyClone(state, this);
+                //}
                 return;
             } else {
-                damage -= 2 * this.ironSkinLife;
-                this.ironSkinLife = 0;
+                damage -= 2 * state.hero.ironSkinLife;
+                state.hero.ironSkinLife = 0;
             }
         }
         // If any controllable clones are in use,
@@ -506,7 +464,7 @@ export class Hero implements Actor, SavedHeroData {
         } else if (directionMap[bowDirection][1] > 0) {
             arrowYOffset += directionMap[bowDirection][0] === 0 ? 8 : 4;
         }
-        const animations = this.activeTools.bow >= 2 ? goldBowAnimations : bowAnimations;
+        const animations = this.savedData.activeTools.bow >= 2 ? goldBowAnimations : bowAnimations;
         const frame = getFrame(animations[bowDirection], bowAnimationTime);
         drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
         if (isChargingBow && state.hero.magic > 0) {
@@ -593,8 +551,8 @@ export class Hero implements Actor, SavedHeroData {
             this.renderChargingFront(context, state);
             return;
         }
-        const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
-                || (hero.chargingLeftTool && hero.leftTool === 'bow');
+        const isChargingBow = (hero.chargingRightTool && hero.savedData.rightTool === 'bow')
+                || (hero.chargingLeftTool && hero.savedData.leftTool === 'bow');
         const shouldDrawBow = isChargingBow || hero.toolOnCooldown === 'bow';
         const bowDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
         const drawBowUnderHero = bowDirection === 'up' || bowDirection === 'upleft' || bowDirection === 'upright';
@@ -638,10 +596,10 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     getMaxChargeLevel(this: Hero, state: GameState): number {
-        if (state.hero.elements.fire && state.hero.elements.ice && state.hero.elements.lightning) {
+        if (state.hero.savedData.elements.fire && state.hero.savedData.elements.ice && state.hero.savedData.elements.lightning) {
             return 2;
         }
-        if (state.hero.elements.fire || state.hero.elements.ice || state.hero.elements.lightning) {
+        if (state.hero.savedData.elements.fire || state.hero.savedData.elements.ice || state.hero.savedData.elements.lightning) {
             return 1;
         }
         return 0;
@@ -676,7 +634,7 @@ export class Hero implements Actor, SavedHeroData {
         const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
             && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
-            const element = isUnderwater(state, this) ? null : this.element;
+            const element = isUnderwater(state, this) ? null : this.savedData.element;
             const animation = !element
                 ? chargeFrontAnimation
                 : {

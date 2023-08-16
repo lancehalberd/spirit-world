@@ -61,10 +61,10 @@ export class AstralProjection extends Hero {
         this.h = hero.h;
         this.d = hero.d;
         this.invulnerableFrames = 0;
-        this.leftTool = this.rightTool = null;
+        this.savedData.leftTool = this.savedData.rightTool = null;
         this.z = 4;
-        this.passiveTools = {
-            ...hero.passiveTools,
+        this.savedData.passiveTools = {
+            ...hero.savedData.passiveTools,
             gloves: 0,
             roll: 0,
         };

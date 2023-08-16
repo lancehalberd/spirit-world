@@ -50,18 +50,18 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
 
     function renderSelectableTool(tool: ActiveTool): void {
-        const frame = getLootFrame(state, { lootType: tool, lootLevel: state.hero.activeTools[tool] });
+        const frame = getLootFrame(state, { lootType: tool, lootLevel: state.hero.savedData.activeTools[tool] });
         const target = {w: frameSize, h: frameSize, x, y};
-        if (state.hero.leftTool === tool) {
+        if (state.hero.savedData.leftTool === tool) {
             drawFrame(context, blueFrame, target);
         }
-        if (state.hero.rightTool === tool) {
+        if (state.hero.savedData.rightTool === tool) {
             drawFrame(context, yellowFrame, target);
         }
         drawFrameCenteredAt(context, frame, target);
     }
     function renderBoots(equipment: Equipment): void {
-        const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.equipment[equipment] });
+        const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.savedData.equipment[equipment] });
         const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.equippedBoots === equipment) {
             fillRect(context, target, 'white');
@@ -70,9 +70,9 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         drawFrameCenteredAt(context, frame, target);
     }
     function renderElement(element: MagicElement): void {
-        const frame = getLootFrame(state, { lootType: element, lootLevel: state.hero.elements[element] });
+        const frame = getLootFrame(state, { lootType: element, lootLevel: state.hero.savedData.elements[element] });
         const target = {w: frameSize, h: frameSize, x, y};
-        if (state.hero.element === element) {
+        if (state.hero.savedData.element === element) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
         }
@@ -91,16 +91,16 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
                 drawFrameCenteredAt(context, characterMap['?'], {w: frameSize, h: frameSize, x, y});
             } else if (menuItem === 'return') {
                 renderLoot('nimbusCloud', 1);
-            } else if (state.hero.activeTools[menuItem]) {
+            } else if (state.hero.savedData.activeTools[menuItem]) {
                 renderSelectableTool(menuItem as ActiveTool);
-            } else if (state.hero.equipment[menuItem]) {
+            } else if (state.hero.savedData.equipment[menuItem]) {
                 renderBoots(menuItem as Equipment);
             } else if (menuItem === 'neutral') {
                 drawFrameCenteredAt(context, neutralElement, {x, y, w: frameSize, h: frameSize});
-            } else if (state.hero.elements[menuItem]) {
+            } else if (state.hero.savedData.elements[menuItem]) {
                 renderElement(menuItem as MagicElement);
-            } else if (state.hero.passiveTools[menuItem as PassiveTool]) {
-                renderLoot(menuItem as LootType, state.hero.passiveTools[menuItem]);
+            } else if (state.hero.savedData.passiveTools[menuItem as PassiveTool]) {
+                renderLoot(menuItem as LootType, state.hero.savedData.passiveTools[menuItem]);
             }
             x += rowWidth;
         }
@@ -126,30 +126,30 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     }
 
     // Weapon isn't currently part of the selectable menu rows.
-    if (state.hero.weapon === 1) {
+    if (state.hero.savedData.weapon === 1) {
         const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
-    } else if (state.hero.weapon >= 2) {
+    } else if (state.hero.savedData.weapon >= 2) {
         let frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         drawFrameCenteredAt(context, frame, {x: r.x + 150, y: r.y, w: frameSize, h: frameSize});
-        frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.savedData.weapon });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
     }
-    if (state.hero.silverOre) {
+    if (state.hero.savedData.silverOre) {
         const frame = getLootFrame(state, {lootType: 'silverOre'});
         const x = r.x + 140, y = r.y + 26;
         drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
-        drawText(context, `${state.hero.silverOre}`, x + 24, y + frameSize / 2, {
+        drawText(context, `${state.hero.savedData.silverOre}`, x + 24, y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
             size: 16,
         });
     }
-    if (state.hero.goldOre) {
+    if (state.hero.savedData.goldOre) {
         const frame = getLootFrame(state, {lootType: 'goldOre'});
         const x = r.x + 140, y = r.y + 50;
         drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
-        drawText(context, `${state.hero.goldOre}`, x + 24, y + frameSize / 2, {
+        drawText(context, `${state.hero.savedData.goldOre}`, x + 24, y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
             size: 16,
@@ -162,11 +162,11 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         context.globalAlpha = 0.3;
         drawFrame(context, peachFrame, peachRect);
     context.restore();
-    if (state.hero.peachQuarters === 3) {
+    if (state.hero.savedData.peachQuarters === 3) {
         drawFrame(context, threeQuartersPeach, peachRect);
-    } else if (state.hero.peachQuarters === 2) {
+    } else if (state.hero.savedData.peachQuarters === 2) {
         drawFrame(context, halfPeach, peachRect);
-    } else if (state.hero.peachQuarters === 1) {
+    } else if (state.hero.savedData.peachQuarters === 1) {
         drawFrame(context, quarterPeach, peachRect);
     }
 }

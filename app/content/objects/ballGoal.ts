@@ -46,7 +46,7 @@ export class BallGoal implements ObjectInstance {
         } else {
             drawFrame(context, emptyFrame, target);
         }
-        if (this.showTrueSightIndicator && state.hero.passiveTools.trueSight) {
+        if (this.showTrueSightIndicator && state.hero.savedData.passiveTools.trueSight) {
             renderIndicator(context, this.getHitbox(), state.fieldTime);
         }
     }

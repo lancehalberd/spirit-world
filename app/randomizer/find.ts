@@ -98,10 +98,10 @@ export function findObjectById(
     const cacheKey = zone.key + ':' + id;
     const cachedResult = findObjectByIdCache[cacheKey];
     if (cachedResult) {
-        if (state && !state.hero.passiveTools.trueSight && cachedResult.needsTrueSight) {
+        if (state && !state.hero.savedData.passiveTools.trueSight && cachedResult.needsTrueSight) {
             return {object: null, location: null};
         }
-        if (state && !(state.hero.passiveTools.catEyes || state.hero.passiveTools.trueSight) && cachedResult.needsCatEyes) {
+        if (state && !(state.hero.savedData.passiveTools.catEyes || state.hero.savedData.passiveTools.trueSight) && cachedResult.needsCatEyes) {
             return {object: null, location: null};
         }
         return {object: cachedResult.object, location: cachedResult.location};
@@ -127,10 +127,10 @@ export function findObjectById(
                                 d: null,
                             });
                             findObjectByIdCache[cacheKey] = {object, location, needsCatEyes, needsTrueSight: object.isInvisible};
-                            if (state && !state.hero.passiveTools.trueSight && findObjectByIdCache[cacheKey].needsTrueSight) {
+                            if (state && !state.hero.savedData.passiveTools.trueSight && findObjectByIdCache[cacheKey].needsTrueSight) {
                                 return {object: null, location: null};
                             }
-                            if (state && !(state.hero.passiveTools.catEyes || state.hero.passiveTools.trueSight) && findObjectByIdCache[cacheKey].needsCatEyes) {
+                            if (state && !(state.hero.savedData.passiveTools.catEyes || state.hero.savedData.passiveTools.trueSight) && findObjectByIdCache[cacheKey].needsCatEyes) {
                                 return {object: null, location: null};
                             }
                             return findObjectByIdCache[cacheKey];
@@ -223,7 +223,7 @@ function canOpenDoor(location: FullZoneLocation, state: GameState, door: Entranc
         return false;
     }
     if (door.type === 'teleporter') {
-        return state.hero.passiveTools.spiritSight > 0 || state.hero.passiveTools.trueSight > 0;
+        return state.hero.savedData.passiveTools.spiritSight > 0 || state.hero.savedData.passiveTools.trueSight > 0;
     }
     // Only pass through
     if (door.status === 'locked') {
@@ -235,7 +235,7 @@ function canOpenDoor(location: FullZoneLocation, state: GameState, door: Entranc
         return dungeonInventory?.bigKey;
     }
     if (door.status === 'cracked') {
-        return state.hero.activeTools.clone > 0;
+        return state.hero.savedData.activeTools.clone > 0;
     }
     return true;
 }

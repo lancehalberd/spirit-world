@@ -2,7 +2,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 
 
 export function returnToSpawnLocation(state: GameState) {
-    state.hero.life = state.hero.maxLife;
+    state.hero.life = state.hero.savedData.maxLife;
     // Only fill the magic bar if the hero has some magic regen.
     if (state.hero.magicRegen) {
         state.hero.magic = state.hero.maxMagic;
@@ -23,7 +23,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;
-    state.hero.d = state.hero.spawnLocation.d;
-    enterLocation(state, state.hero.spawnLocation, true, null, true);
+    state.hero.d = state.hero.savedData.spawnLocation.d;
+    enterLocation(state, state.hero.savedData.spawnLocation, true, null, true);
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
 }

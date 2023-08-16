@@ -2,7 +2,7 @@ import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 
 
 function getReviveCost(state: GameState): number {
-    return Math.max(5, Math.min(50, (state.hero.money / 5) | 0 ));
+    return Math.max(5, Math.min(50, (state.hero.savedData.money / 5) | 0 ));
 }
 
 dialogueHash.saveStatue = {

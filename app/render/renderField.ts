@@ -135,7 +135,7 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
     for (const object of [...area?.objects || [], ...area?.effects || []]) {
         for (const part of [object, ...(object.getParts?.(state) || [])]) {
             // Invisible objects are not rendered unless the hero has true sight.
-            if (!editingState.isEditing && !state.hero.passiveTools.trueSight && object.definition?.isInvisible) {
+            if (!editingState.isEditing && !state.hero.savedData.passiveTools.trueSight && object.definition?.isInvisible) {
                 continue;
             }
             if (part.render || part.renderShadow || part.renderForeground) {
@@ -156,7 +156,7 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
     for (const object of [...area?.alternateArea?.objects || [], ...area?.alternateArea?.effects || []]) {
         for (const part of [object, ...(object.getParts?.(state) || [])]) {
             // Invisible objects are not rendered unless the hero has true sight.
-            if (!editingState.isEditing && !state.hero.passiveTools.trueSight && object.definition?.isInvisible) {
+            if (!editingState.isEditing && !state.hero.savedData.passiveTools.trueSight && object.definition?.isInvisible) {
                 continue;
             }
             if (part.alternateRender || part.alternateRenderShadow || part.alternateRenderForeground) {

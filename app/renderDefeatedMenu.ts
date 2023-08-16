@@ -30,7 +30,7 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
     let x = r.x + 20, y = r.y + r.h / 4 - 2;
     if (state.defeatState.reviving) {
         context.save();
-            const missingLife = state.hero.maxLife - state.hero.life;
+            const missingLife = state.hero.savedData.maxLife - state.hero.life;
             if (missingLife < 3) {
                 context.globalAlpha *= missingLife / 3;
             }

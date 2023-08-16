@@ -65,7 +65,7 @@ const missions: Mission[] = [
             return true;
         },
         isResolved(state: GameState) {
-            return state.hero.weapon > 0;
+            return state.hero.savedData.weapon > 0;
         },
     },
     {
@@ -81,10 +81,10 @@ const missions: Mission[] = [
             }
         },
         isAvailable(state: GameState) {
-            return state.hero.weapon > 0;
+            return state.hero.savedData.weapon > 0;
         },
         isResolved(state: GameState) {
-            return state.hero.passiveTools.catEyes > 0;
+            return state.hero.savedData.passiveTools.catEyes > 0;
         },
     },
     {
@@ -93,7 +93,7 @@ const missions: Mission[] = [
             return `Now that I can see in the dark I should have no trouble finding a way out of this cave.`;
         },
         isAvailable(state: GameState) {
-            return state.hero.passiveTools.catEyes > 0;
+            return state.hero.savedData.passiveTools.catEyes > 0;
         },
         isResolved(state: GameState) {
             return !!state.savedState.objectFlags.homeInstructions || state.location.zoneKey !== 'peachCave';
@@ -119,7 +119,7 @@ const missions: Mission[] = [
             // if you talk to the Vanara Elder or Vanara Guardian first.
             return !!state.savedState.objectFlags.momElder
                 || !!state.savedState.objectFlags.elderTomb
-                || state.hero.passiveTools.spiritSight > 0;
+                || state.hero.savedData.passiveTools.spiritSight > 0;
         },
     },
     {
@@ -135,7 +135,7 @@ const missions: Mission[] = [
         isResolved(state: GameState) {
             // Talking to the Vanara Guardian will also resolve this mission.
             return !!state.savedState.objectFlags.elderTomb
-                || state.hero.passiveTools.spiritSight > 0;
+                || state.hero.savedData.passiveTools.spiritSight > 0;
         },
     },
     {
@@ -150,8 +150,8 @@ const missions: Mission[] = [
         },
         isResolved(state: GameState) {
             // Talking to the Vanara Guardian will also resolve this mission.
-            return state.hero.activeTools.bow > 0
-                || state.hero.passiveTools.spiritSight > 0;
+            return state.hero.savedData.activeTools.bow > 0
+                || state.hero.savedData.passiveTools.spiritSight > 0;
         },
     },
     {
@@ -168,7 +168,7 @@ const missions: Mission[] = [
             return !!state.savedState.objectFlags.elderTomb;
         },
         isResolved(state: GameState) {
-            return state.hero.passiveTools.spiritSight > 0;
+            return state.hero.savedData.passiveTools.spiritSight > 0;
         },
     },
     {
@@ -184,13 +184,13 @@ const missions: Mission[] = [
             }
         },
         isAvailable(state: GameState) {
-            return state.hero.passiveTools.spiritSight > 0;
+            return state.hero.savedData.passiveTools.spiritSight > 0;
         },
         isResolved(state: GameState) {
             // This will automatically resolve if the player obtains the Summoner's Circlet even if they
             // never talk to their mom about the ruins.
             return !!state.savedState.objectFlags.momRuins
-                || state.hero.passiveTools.astralProjection > 0;
+                || state.hero.savedData.passiveTools.astralProjection > 0;
         },
     },
     {
@@ -215,7 +215,7 @@ const missions: Mission[] = [
             return !!state.savedState.objectFlags.momRuins && !!state.savedState.objectFlags.warTempleEntrance;
         },
         isResolved(state: GameState) {
-            return !!state.hero.passiveTools.astralProjection;
+            return !!state.hero.savedData.passiveTools.astralProjection;
         },
     },
     {
@@ -229,7 +229,7 @@ const missions: Mission[] = [
             }
         },
         isAvailable(state: GameState) {
-            return !!state.hero.passiveTools.astralProjection;
+            return !!state.hero.savedData.passiveTools.astralProjection;
         },
         isResolved(state: GameState) {
             return !!state.savedState.objectFlags.tombExit;
@@ -251,7 +251,7 @@ const missions: Mission[] = [
             return !!state.savedState.objectFlags.tombExit;
         },
         isResolved(state: GameState) {
-            return !!state.hero.passiveTools.teleportation;
+            return !!state.hero.savedData.passiveTools.teleportation;
         },
     },
     {
@@ -265,7 +265,7 @@ const missions: Mission[] = [
             }
         },
         isAvailable(state: GameState) {
-            return !!state.hero.passiveTools.teleportation;
+            return !!state.hero.savedData.passiveTools.teleportation;
         },
         isResolved(state: GameState) {
             return !!state.savedState.objectFlags.vanaraCommanderBeasts;
@@ -318,7 +318,7 @@ const missions: Mission[] = [
             return !!state.savedState.objectFlags.spiritKingForestTemple;
         },
         isResolved(state: GameState) {
-            return !!state.hero.activeTools.clone && !!state.hero.equipment.cloudBoots;
+            return !!state.hero.savedData.activeTools.clone && !!state.hero.savedData.equipment.cloudBoots;
         },
     },
     {
@@ -329,11 +329,11 @@ const missions: Mission[] = [
         },
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
-                && !!state.hero.activeTools.staff
-                && !!state.hero.activeTools.clone && !!state.hero.equipment.cloudBoots;
+                && !!state.hero.savedData.activeTools.staff
+                && !!state.hero.savedData.activeTools.clone && !!state.hero.savedData.equipment.cloudBoots;
         },
         isResolved(state: GameState) {
-            return !!state.hero.passiveTools.trueSight;
+            return !!state.hero.savedData.passiveTools.trueSight;
         },
     },
     {
@@ -343,10 +343,10 @@ const missions: Mission[] = [
         },
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
-                && !!state.hero.passiveTools.trueSight;
+                && !!state.hero.savedData.passiveTools.trueSight;
         },
         isResolved(state: GameState) {
-            return state.hero.activeTools.cloak >= 2;
+            return state.hero.savedData.activeTools.cloak >= 2;
         },
     },
     {
@@ -357,10 +357,10 @@ const missions: Mission[] = [
         },
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
-                && !!state.hero.equipment.cloudBoots;
+                && !!state.hero.savedData.equipment.cloudBoots;
         },
         isResolved(state: GameState) {
-            return !!state.hero.passiveTools.goldMail;
+            return !!state.hero.savedData.passiveTools.goldMail;
         },
     },
     {
@@ -371,15 +371,15 @@ const missions: Mission[] = [
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
                 && (
-                    !!state.hero.passiveTools.lightningBlessing
-                    || state.hero.passiveTools.gloves >= 2
-                    || state.hero.activeTools.cloak >= 2
-                    || state.hero.activeTools.clone >= 1
-                    || state.hero.elements.lightning >= 1
+                    !!state.hero.savedData.passiveTools.lightningBlessing
+                    || state.hero.savedData.passiveTools.gloves >= 2
+                    || state.hero.savedData.activeTools.cloak >= 2
+                    || state.hero.savedData.activeTools.clone >= 1
+                    || state.hero.savedData.elements.lightning >= 1
                 );
         },
         isResolved(state: GameState) {
-            return !!state.hero.passiveTools.nimbusCloud;
+            return !!state.hero.savedData.passiveTools.nimbusCloud;
         },
     },
     {
@@ -391,13 +391,13 @@ const missions: Mission[] = [
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
                 && (
-                    state.hero.elements.lightning >= 1
-                    || state.hero.elements.ice >= 1
-                    || (state.hero.elements.fire >= 1 && state.hero.passiveTools.fireBlessing >= 1)
+                    state.hero.savedData.elements.lightning >= 1
+                    || state.hero.savedData.elements.ice >= 1
+                    || (state.hero.savedData.elements.fire >= 1 && state.hero.savedData.passiveTools.fireBlessing >= 1)
                 );
         },
         isResolved(state: GameState) {
-            return state.hero.activeTools.bow >= 2;
+            return state.hero.savedData.activeTools.bow >= 2;
         },
     },
     {
@@ -408,10 +408,10 @@ const missions: Mission[] = [
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
                 && (
-                    state.hero.equipment.cloudBoots >= 1
-                    || state.hero.elements.ice >= 1
-                    || state.hero.activeTools.cloak >= 2
-                    || state.hero.passiveTools.gloves >= 2
+                    state.hero.savedData.equipment.cloudBoots >= 1
+                    || state.hero.savedData.elements.ice >= 1
+                    || state.hero.savedData.activeTools.cloak >= 2
+                    || state.hero.savedData.passiveTools.gloves >= 2
                 );
         },
         isResolved(state: GameState) {
@@ -426,10 +426,10 @@ const missions: Mission[] = [
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
                 && (
-                    state.hero.equipment.ironBoots >= 1
+                    state.hero.savedData.equipment.ironBoots >= 1
                     || (
-                        (state.hero.elements.lightning >= 1 || state.hero.elements.fire >= 1)
-                        && (state.hero.activeTools.clone >= 1 || state.hero.passiveTools.nimbusCloud >= 1)
+                        (state.hero.savedData.elements.lightning >= 1 || state.hero.savedData.elements.fire >= 1)
+                        && (state.hero.savedData.activeTools.clone >= 1 || state.hero.savedData.passiveTools.nimbusCloud >= 1)
                     )
                 );
         },
@@ -445,10 +445,10 @@ const missions: Mission[] = [
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elementalBeastsEscaped
                 && (
-                    state.hero.equipment.cloudBoots >= 1
-                    || state.hero.elements.ice >= 1
-                    || state.hero.activeTools.cloak >= 2
-                    || state.hero.activeTools.clone >= 1
+                    state.hero.savedData.equipment.cloudBoots >= 1
+                    || state.hero.savedData.elements.ice >= 1
+                    || state.hero.savedData.activeTools.cloak >= 2
+                    || state.hero.savedData.activeTools.clone >= 1
                 );
         },
         isResolved(state: GameState) {
@@ -462,13 +462,13 @@ const missions: Mission[] = [
                 {|}There is a door to the Sanctum at the back of the Jade Palace in the Spirit World.`
         },
         isAvailable(state: GameState) {
-            return state.hero.activeTools.bow >= 2
-                && state.hero.elements.lightning >= 1
-                && state.hero.elements.ice >= 1
-                && state.hero.elements.fire >= 1 && state.hero.passiveTools.fireBlessing >= 1;
+            return state.hero.savedData.activeTools.bow >= 2
+                && state.hero.savedData.elements.lightning >= 1
+                && state.hero.savedData.elements.ice >= 1
+                && state.hero.savedData.elements.fire >= 1 && state.hero.savedData.passiveTools.fireBlessing >= 1;
         },
         isResolved(state: GameState) {
-            return state.hero.passiveTools.phoenixCrown >= 1;
+            return state.hero.savedData.passiveTools.phoenixCrown >= 1;
         },
     },
     {
@@ -478,9 +478,9 @@ const missions: Mission[] = [
                 {|}The War Palace is to the southeast in the Spirit World.`
         },
         isAvailable(state: GameState) {
-            return state.hero.elements.lightning >= 1
-                && state.hero.elements.ice >= 1
-                && state.hero.elements.fire >= 1;
+            return state.hero.savedData.elements.lightning >= 1
+                && state.hero.savedData.elements.ice >= 1
+                && state.hero.savedData.elements.fire >= 1;
         },
         isResolved(state: GameState) {
             return !!state.savedState.objectFlags.voidTree;

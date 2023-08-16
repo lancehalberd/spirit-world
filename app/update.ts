@@ -197,13 +197,13 @@ function updateTitle(state: GameState) {
                 state.hero.applySavedHeroData(state.savedState.savedHeroData);
                 if (state.menuIndex === 0) {
                     // Full Game
-                    state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+                    state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;
                     state.scene = 'game';
                     updateHeroMagicStats(state);
                     returnToSpawnLocation(state);
                 } else if (state.menuIndex === 1) {
                     // Demo
-                    state.hero.spawnLocation = SPAWN_LOCATION_DEMO;
+                    state.hero.savedData.spawnLocation = SPAWN_LOCATION_DEMO;
                     state.scene = 'game';
                     updateHeroMagicStats(state);
                     returnToSpawnLocation(state);
@@ -276,21 +276,21 @@ function updateMenu(state: GameState) {
             showMessage(state, '{@nimbusCloud.returnMenu}');
             return;
         }
-        if (state.hero.activeTools[menuItem]) {
+        if (state.hero.savedData.activeTools[menuItem]) {
             if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-                if (state.hero.leftTool === menuItem) {
-                    setLeftTool(state, state.hero.rightTool);
+                if (state.hero.savedData.leftTool === menuItem) {
+                    setLeftTool(state, state.hero.savedData.rightTool);
                 }
                 setRightTool(state, menuItem as ActiveTool);
             } else {
                 // Assign to left tool as default action.
                 // If a generic confirm key was pressed, cycle the current left tool
                 // over to the right tool slot.
-                if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.leftTool !== menuItem) {
-                    setRightTool(state, state.hero.leftTool);
+                if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.savedData.leftTool !== menuItem) {
+                    setRightTool(state, state.hero.savedData.leftTool);
                 }
-                if (state.hero.rightTool === menuItem) {
-                    setRightTool(state, state.hero.leftTool);
+                if (state.hero.savedData.rightTool === menuItem) {
+                    setRightTool(state, state.hero.savedData.leftTool);
                 }
                 setLeftTool(state, menuItem as ActiveTool);
             }
@@ -300,10 +300,10 @@ function updateMenu(state: GameState) {
             setEquippedBoots(state, menuItem);
             return;
         }
-        if (menuItem === 'neutral' || state.hero.element === menuItem) {
+        if (menuItem === 'neutral' || state.hero.savedData.element === menuItem) {
             setEquippedElement(state, null);
             return;
-        } else if (state.hero.elements[menuItem]) {
+        } else if (state.hero.savedData.elements[menuItem]) {
             setEquippedElement(state, menuItem as MagicElement);
             return;
         }
@@ -313,10 +313,10 @@ function updateMenu(state: GameState) {
             showMessage(state, '{@nimbusCloud.chooseDestination}');
             return;
         }
-        if (state.hero.passiveTools[menuItem as PassiveTool]) {
+        if (state.hero.savedData.passiveTools[menuItem as PassiveTool]) {
             state.paused = false;
             updateSoundSettings(state);
-            const helpMessage = getLootHelpMessage(state, menuItem, state.hero.passiveTools[menuItem]);
+            const helpMessage = getLootHelpMessage(state, menuItem, state.hero.savedData.passiveTools[menuItem]);
             showMessage(state, helpMessage);
         }
     }
@@ -365,8 +365,8 @@ function updateDefeated(state: GameState) {
         // reviving.
         state.reviveTime -= FRAME_LENGTH;
         if (state.defeatState.time % 200 === 0) {
-            state.hero.life = Math.min(state.hero.maxLife, state.hero.life + 0.5);
-            if (state.hero.life === state.hero.maxLife) {
+            state.hero.life = Math.min(state.hero.savedData.maxLife, state.hero.life + 0.5);
+            if (state.hero.life === state.hero.savedData.maxLife) {
                 state.defeatState.defeated = false;
                 saveGame(state);
             }
@@ -442,7 +442,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
     let savedGame = state.savedGames[state.savedGameIndex];
     if (!savedGame) {
         // For now go directly to starting the full game when selecting "New Game".
-        state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+        state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;
         state.scene = 'game';
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
@@ -464,7 +464,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
         // Adjust the current state so we can show the correct background preview.
         state.hero = new Hero();
         state.hero.applySavedHeroData(getDefaultSavedState().savedHeroData);
-        state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+        state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;
         fixSpawnLocationOnLoad(state);
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
@@ -473,7 +473,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
     setSaveFileToState(savedGameIndex);
     state.scene = 'game';
     // Hack to prevent showing the falling animation a second time on loading a game in the peach cave.
-    if (!state.hero.weapon) {
+    if (!state.hero.savedData.weapon) {
         state.hero.z = 0;
     }
     if (!isRandomizer) {

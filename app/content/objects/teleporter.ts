@@ -97,7 +97,7 @@ export class Teleporter implements ObjectInstance {
             }
             return;
         }
-        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
+        if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
         if (this.isUnderObject(state)) {
@@ -122,6 +122,10 @@ export class Teleporter implements ObjectInstance {
         if (hero.actionTarget === this || this.area !== hero.area || !this.isHeroInPortal(state)) {
             return;
         }
+        if (hero.justRespawned) {
+            this.disabledUntilHeroLeaves = true;
+            return;
+        }
         if (!this.definition.targetZone) {
             enterLocation(state, {
                 ...state.location,
@@ -140,13 +144,13 @@ export class Teleporter implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && !editingState.isEditing) {
-            if (state.hero.passiveTools.trueSight) {
+            if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);
             }
             return;
         }
         if (this.isUnderObject(state) && !editingState.isEditing) {
-            if (state.hero.passiveTools.trueSight) {
+            if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);
             }
             return;
@@ -154,7 +158,7 @@ export class Teleporter implements ObjectInstance {
         if (!this.definition.targetZone || !this.definition.targetObjectId) {
             return;
         }
-        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
+        if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
         const gradient = context.createLinearGradient(0, 0, 0, 16);
@@ -176,7 +180,7 @@ export class Teleporter implements ObjectInstance {
         if (this.definition.targetZone && this.definition.targetObjectId) {
             return;
         }
-        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
+        if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
         const hitbox = this.getRenderBox(state);

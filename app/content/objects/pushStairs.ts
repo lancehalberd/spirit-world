@@ -67,7 +67,7 @@ export class PushStairs implements ObjectInstance {
         this.pushInDirection(state, direction, hero);
     }
     pushInDirection(state: GameState, direction: 'left' | 'right', hero: Hero = null): void {
-        if (state.hero.passiveTools.gloves < 2) {
+        if (state.hero.savedData.passiveTools.gloves < 2) {
             showMessage(state, 'It feels like you could move this if you were a little stronger.');
             return;
         }

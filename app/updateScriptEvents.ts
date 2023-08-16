@@ -186,8 +186,8 @@ export function updateScriptEvents(state: GameState): void {
                 state.scriptEvents.blockEventQueue = true;
                 break;
             case 'attemptPurchase':
-                if (event.cost <= state.hero.money) {
-                    state.hero.money -= event.cost;
+                if (event.cost <= state.hero.savedData.money) {
+                    state.hero.savedData.money -= event.cost;
                     followMessagePointer(state, event.successScript);
                 } else {
                     followMessagePointer(state, event.failScript);
@@ -198,7 +198,7 @@ export function updateScriptEvents(state: GameState): void {
             case 'rest':
                 state.transitionState = {
                     callback() {
-                        state.hero.life = state.hero.maxLife;
+                        state.hero.life = state.hero.savedData.maxLife;
                     },
                     nextLocation: state.location,
                     time: 0,

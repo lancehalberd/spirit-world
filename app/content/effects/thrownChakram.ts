@@ -297,7 +297,7 @@ export class HeldChakram implements EffectInstance {
         this.sparkles = [];
         this.level = level;
         // The Spirit Chakram deals two damage when held if it has been upgraded.
-        if (this.level > 1 && this.hero.weaponUpgrades.spiritDamage) {
+        if (this.level > 1 && this.hero.savedData.weaponUpgrades.spiritDamage) {
             this.damage++;
         }
     }
@@ -309,17 +309,17 @@ export class HeldChakram implements EffectInstance {
         let throwDamage = this.level;
         let throwSpeed = 1 + 2 * this.level;
         if (this.level === 1) {
-            if (this.hero.weaponUpgrades.normalDamage) {
+            if (this.hero.savedData.weaponUpgrades.normalDamage) {
                 throwDamage++;
             }
-            if (this.hero.weaponUpgrades.normalRange) {
+            if (this.hero.savedData.weaponUpgrades.normalRange) {
                 throwSpeed += 2;
             }
         } else {
-            if (this.hero.weaponUpgrades.spiritDamage) {
+            if (this.hero.savedData.weaponUpgrades.spiritDamage) {
                 throwDamage += 2;
             }
-            if (this.hero.weaponUpgrades.spiritRange) {
+            if (this.hero.savedData.weaponUpgrades.spiritRange) {
                 throwSpeed += 3;
             }
         }
@@ -327,7 +327,7 @@ export class HeldChakram implements EffectInstance {
             throwSpeed = 12;
             throwDamage += 2;
             state.hero.magic -= 10;
-            if (state.hero.element) {
+            if (state.hero.savedData.element) {
                 state.hero.magic -= 10;
             }
         } else if (state.hero.getMaxChargeLevel(state) >= 1) {
@@ -414,7 +414,7 @@ export class HeldChakram implements EffectInstance {
             return;
         }
         if (state.hero.magic > 0 && this.animationTime >= 1000 && maxChargeLevel && this.animationTime % 200 === 0) {
-            this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.element }));
+            this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.savedData.element }));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);
         for (const sparkle of this.sparkles) {

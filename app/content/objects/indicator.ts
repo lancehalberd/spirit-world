@@ -54,7 +54,7 @@ export class Indicator implements ObjectInstance {
         if (this.definition.targetObjectId && (!this.target || this.animationTime <= 20)) {
             return;
         }
-        if (this.status !== 'normal' || !(state.hero.passiveTools.trueSight || editingState.isEditing)) {
+        if (this.status !== 'normal' || !(state.hero.savedData.passiveTools.trueSight || editingState.isEditing)) {
             return;
         }
         renderIndicator(context, this.getHitbox(), this.animationTime);

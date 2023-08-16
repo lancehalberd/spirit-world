@@ -43,10 +43,10 @@ function getInventoryProperties() {
         },
     }, {
         name: '/',
-        value: state.hero.maxLife || 1,
+        value: state.hero.savedData.maxLife || 1,
         onChange(value: number) {
-            state.hero.maxLife = value >= 1 ? value : 1;
-            return state.hero.maxLife;
+            state.hero.savedData.maxLife = value >= 1 ? value : 1;
+            return state.hero.savedData.maxLife;
         },
     }, {
         name: 'magic',
@@ -65,24 +65,24 @@ function getInventoryProperties() {
     }]);
     rows.push([{
         name: 'money',
-        value: state.hero.money || 0,
+        value: state.hero.savedData.money || 0,
         onChange(money: number) {
-            state.hero.money = money >= 0 ? money : 0;
-            return state.hero.money;
+            state.hero.savedData.money = money >= 0 ? money : 0;
+            return state.hero.savedData.money;
         },
     }, {
         name: 'silver',
-        value: state.hero.silverOre || 0,
+        value: state.hero.savedData.silverOre || 0,
         onChange(silverOre: number) {
-            state.hero.silverOre = silverOre >= 0 ? silverOre : 0;
-            return state.hero.silverOre;
+            state.hero.savedData.silverOre = silverOre >= 0 ? silverOre : 0;
+            return state.hero.savedData.silverOre;
         },
     }, {
         name: 'gold',
-        value: state.hero.goldOre || 0,
+        value: state.hero.savedData.goldOre || 0,
         onChange(goldOre: number) {
-            state.hero.goldOre = goldOre >= 0 ? goldOre : 0;
-            return state.hero.goldOre;
+            state.hero.savedData.goldOre = goldOre >= 0 ? goldOre : 0;
+            return state.hero.savedData.goldOre;
         },
     }]);
     let row: PropertyRow = [];
@@ -102,24 +102,24 @@ function getInventoryProperties() {
         }
     }
     addTool(state.hero, 'weapon');
-    for (let tool in state.hero.activeTools) {
-        addTool(state.hero.activeTools, tool);
+    for (let tool in state.hero.savedData.activeTools) {
+        addTool(state.hero.savedData.activeTools, tool);
     }
-    for (let tool in state.hero.passiveTools) {
-        addTool(state.hero.passiveTools, tool);
+    for (let tool in state.hero.savedData.passiveTools) {
+        addTool(state.hero.savedData.passiveTools, tool);
     }
-    for (let tool in state.hero.elements) {
-        addTool(state.hero.elements, tool);
+    for (let tool in state.hero.savedData.elements) {
+        addTool(state.hero.savedData.elements, tool);
     }
-    for (let tool in state.hero.equipment) {
-        addTool(state.hero.equipment, tool);
+    for (let tool in state.hero.savedData.equipment) {
+        addTool(state.hero.savedData.equipment, tool);
     }
     for (let upgrade of ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange']) {
         row.push({
             name: upgrade,
-            value: state.hero.weaponUpgrades[upgrade] || false,
+            value: state.hero.savedData.weaponUpgrades[upgrade] || false,
             onChange(value: boolean) {
-                state.hero.weaponUpgrades[upgrade] = value;
+                state.hero.savedData.weaponUpgrades[upgrade] = value;
             },
         });
         if (row.length === 2) {

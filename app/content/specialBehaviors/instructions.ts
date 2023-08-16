@@ -8,9 +8,9 @@ specialBehaviorsHash.barrierBurstInstructions = {
     update(state: GameState, object: ObjectInstance) {
         let helpText = 'Return here when you obtain the Spirit Cloak';
         let toolButton: string;
-        if (state.hero.leftTool === 'cloak') {
+        if (state.hero.savedData.leftTool === 'cloak') {
             toolButton = '[B_LEFT_TOOL]';
-        } else if (state.hero.rightTool === 'cloak') {
+        } else if (state.hero.savedData.rightTool === 'cloak') {
             toolButton = '[B_RIGHT_TOOL]';
         }
         if (toolButton) {
@@ -19,7 +19,7 @@ specialBehaviorsHash.barrierBurstInstructions = {
             } else {
                 helpText = `Press ${toolButton} to create a Spirit Barrier`;
             }
-        } else if (state.hero.activeTools.cloak) {
+        } else if (state.hero.savedData.activeTools.cloak) {
             helpText = `Press [B_MENU] to open your inventory and assign Spirit Cloak to [B_TOOL]`;
         }
         // Stop showing this help text once the player has successfully opened the cocoon back teleporter.

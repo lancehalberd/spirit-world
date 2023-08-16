@@ -14,7 +14,7 @@ dialogueHash.rival = {
             state.savedState.objectFlags.tombRivalFightStarted = true;
             saveGame(state);
             // This is the typical text as the bow is the easiest way to start the fight.
-            if (state.hero.activeTools.bow) {
+            if (state.hero.savedData.activeTools.bow) {
                 return `Is that the Elder's Spirit Bow?{|}I can't let you leave with that!`;
             }
             return `Now you've done it!{|}Maybe a beating will knock some sense into you!`;

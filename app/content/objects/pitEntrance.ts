@@ -95,7 +95,7 @@ export class PitEntrance implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' || this.isUnderObject(state)) {
-            if (state.hero.passiveTools.trueSight) {
+            if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);
             }
             return;

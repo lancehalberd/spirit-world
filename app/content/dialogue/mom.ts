@@ -10,20 +10,20 @@ dialogueHash.mom = {
         yesRest: 'Sweet dreams! {rest}',
         noRest: 'Be careful out there!',
         randomizer:(state: GameState) => {
-            if (state.hero.winTime) {
+            if (state.hero.savedData.winTime) {
                 return 'You did great!{|}Feel free to keep exploring if you like!';
             }
             if (randomizerGoalType === 'finalBoss') {
                 if (state.location.zoneKey === 'void') {
-                    state.hero.winTime = state.hero.playTime;
+                    state.hero.savedData.winTime = state.hero.savedData.playTime;
                     saveGame(state);
                     return 'Finished!'
                 }
                 return `You must talk to me after defeating the final boss to finish.`;
             }
             if (randomizerGoalType === 'victoryPoints') {
-                if (state.hero.victoryPoints >= state.randomizer.goal) {
-                    state.hero.winTime = state.hero.playTime;
+                if (state.hero.savedData.victoryPoints >= state.randomizer.goal) {
+                    state.hero.savedData.winTime = state.hero.savedData.playTime;
                     saveGame(state);
                     return 'Finished!'
                 }

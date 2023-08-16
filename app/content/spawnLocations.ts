@@ -354,28 +354,28 @@ export const SPAWN_FINAL_BOSS_1: ZoneLocation = {
 };
 
 export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation): void {
-    state.hero.spawnLocation = spawnLocation;
+    state.hero.savedData.spawnLocation = spawnLocation;
     saveGame(state);
 }
 
 export function fixSpawnLocationOnLoad(state: GameState): void {
     // Rather than fix individual spawn locations like this, we should force the loaded spawn location to
     // be in an enumeration of defined spawn locations, and just have logic to choose the best one.
-    if (state.hero.spawnLocation.zoneKey === 'newPeachCave') {
-        state.hero.spawnLocation.zoneKey = 'peachCave';
+    if (state.hero.savedData.spawnLocation.zoneKey === 'newPeachCave') {
+        state.hero.savedData.spawnLocation.zoneKey = 'peachCave';
     }
     // The player restarts at the defeated boss if they haven't made it to the overworld yet.
-    if (state.hero.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags.peachCaveBoss) {
-        state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
+    if (state.hero.savedData.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags.peachCaveBoss) {
+        state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
     }
     // Once the elavator has been dropped, the player spawns in the elevator until it is fixed,
     // otherwise they have no path back to the basement.
     if (state.savedState.objectFlags.elevatorDropped && !state.savedState.objectFlags.elevatorFixed) {
-        state.hero.spawnLocation = SPAWN_STAFF_ELEVATOR;
+        state.hero.savedData.spawnLocation = SPAWN_STAFF_ELEVATOR;
     }
-    if (state.hero.spawnLocation.zoneKey === 'staffTower' && state.hero.activeTools.staff >= 2) {
+    if (state.hero.savedData.spawnLocation.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff >= 2) {
         // Do not spawn inside the tower if the tower is not currently placed anywhere.
-        state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
+        state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
     }
 }
 
@@ -410,7 +410,7 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     }
     // This spawn point cannot be used unless the war temple entrance is opened.
     /*if (state.location.zoneKey === 'warTemple' && state.savedState.objectFlags['warTempleEntrance']) {
-        if (state.hero.spawnLocation.zoneKey !== 'warTemple') {
+        if (state.hero.savedData.spawnLocation.zoneKey !== 'warTemple') {
             setSpawnLocation(state, SPAWN_WAR_TEMPLE_ENTRANCE);
         }
         return;
@@ -429,7 +429,7 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
             return setSpawnLocation(state, SPAWN_STAFF_LOWER_ENTRANCE);
         }
         // This should only apply when using the editor to bypass the normal entrances.
-        if (state.hero.spawnLocation.zoneKey !== 'staffTower') {
+        if (state.hero.savedData.spawnLocation.zoneKey !== 'staffTower') {
             return setSpawnLocation(state, SPAWN_STAFF_LOWER_ENTRANCE);
         }
     }
@@ -444,8 +444,8 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
             }
         }
         // This should only apply when using the editor to bypass the normal entrances.
-        if (state.hero.spawnLocation.zoneKey !== 'riverTempleWater'
-            && state.hero.spawnLocation.zoneKey !== 'riverTemple'
+        if (state.hero.savedData.spawnLocation.zoneKey !== 'riverTempleWater'
+            && state.hero.savedData.spawnLocation.zoneKey !== 'riverTemple'
         ) {
             return setSpawnLocation(state, RIVER_TEMPLE_UPPER_ENTRANCE);
         }

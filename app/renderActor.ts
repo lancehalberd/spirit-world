@@ -135,8 +135,8 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'climbing':
             return getFrame(heroAnimations.climbing.up, hero.animationTime);
         case 'charging':
-            const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
-                || (hero.chargingLeftTool && hero.leftTool === 'bow');
+            const isChargingBow = (hero.chargingRightTool && hero.savedData.rightTool === 'bow')
+                || (hero.chargingLeftTool && hero.savedData.leftTool === 'bow');
             const animationSet = isChargingBow ? heroChargeBowAnimations : heroChargeChakramAnimations;
             let direction = hero.d;
             if (!isChargingBow) {
@@ -183,8 +183,8 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
     //if (hero.invulnerableFrames) {
     //    context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
     //}
-    const isChargingBurst = (hero.chargingLeftTool && hero.leftTool === 'cloak')
-        || (hero.chargingRightTool && hero.rightTool === 'cloak');
+    const isChargingBurst = (hero.chargingLeftTool && hero.savedData.leftTool === 'cloak')
+        || (hero.chargingRightTool && hero.savedData.rightTool === 'cloak');
     if (state.hero.magic < 10 || (isChargingBurst && state.hero.chargeTime >= 300)) {
         frame = getFrame(spiritBarrierLargeCracksAnimation, state.fieldTime);
     } else if (state.hero.magic < 15 || state.hero.magic < state.hero.maxMagic * 0.2

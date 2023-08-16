@@ -1,7 +1,6 @@
 import {
     getAreaFromLocation,
     scrollToArea,
-    swapHeroStates,
 } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
@@ -25,6 +24,7 @@ import { removeObjectFromArea } from 'app/utils/objects';
 
 export function updateAllHeroes(this: void, state: GameState) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
+        state.hero.justRespawned = false;
         updateHeroSpecialActions(state, state.hero);
         return;
     }
@@ -84,7 +84,34 @@ export function updateAllHeroes(this: void, state: GameState) {
     checkToStartScreenTransition(state, state.hero);
 }
 
+function swapHeroStates(heroA: Hero, heroB: Hero) {
+    const allKeys = [...new Set([...Object.keys(heroA), ...Object.keys(heroB)])];
+    for (const key of allKeys) {
+        if (key === 'behaviors' || key === 'magic'
+            || key === 'isUncontrollable' || key === 'explosionTime'
+        ) {
+            continue;
+        }
+        const temp = heroA[key];
+        heroA[key] = heroB[key];
+        heroB[key] = temp;
+    }
+    // Update chakrams to match their correct owner.
+    for (const hero of [heroA, heroB]) {
+        if (hero.heldChakram) {
+            hero.heldChakram.hero = hero;
+        }
+        if (hero.activeBarrierBurst) {
+            hero.activeBarrierBurst.source = hero;
+        }
+        for (const chakram of hero.thrownChakrams) {
+            chakram.source = hero;
+        }
+    }
+}
+
 export function updateHero(this: void, state: GameState, hero: Hero) {
+    hero.justRespawned = false;
     // If the hero is performing some special action with logic that overrides default actions,
     // for example, falling into a pit, or transitioning between screens, this function will handle
     // the update and return `true`, indicating that normal behavior should be suspended.
@@ -113,7 +140,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         hero.invulnerableFrames--;
     }
     // Remove barrier/invisibility if the hero does not have the cloak equipped.
-    if ((hero.hasBarrier || hero.isInvisible) && hero.leftTool !== 'cloak' && hero.rightTool !== 'cloak') {
+    if ((hero.hasBarrier || hero.isInvisible) && hero.savedData.leftTool !== 'cloak' && hero.savedData.rightTool !== 'cloak') {
         hero.shatterBarrier(state);
         hero.isInvisible = false;
     }
@@ -121,10 +148,10 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
         hero.isInvisible = false;
     }
-    if (hero.activeStaff && hero.leftTool !== 'staff' && hero.rightTool !== 'staff') {
+    if (hero.activeStaff && hero.savedData.leftTool !== 'staff' && hero.savedData.rightTool !== 'staff') {
         hero.activeStaff.recall(state);
     }
-    if (hero.clones?.length && hero.leftTool !== 'clone' && hero.rightTool !== 'clone') {
+    if (hero.clones?.length && hero.savedData.leftTool !== 'clone' && hero.savedData.rightTool !== 'clone') {
         removeAllClones(state);
     }
     if (hero.frozenDuration > 0) {
@@ -134,7 +161,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
-        if (hero.passiveTools.ironSkin && hero.magic >= hero.maxMagic) {
+        if (hero.savedData.passiveTools.ironSkin && hero.magic >= hero.maxMagic) {
             hero.ironSkinCooldown -= FRAME_LENGTH;
             // Iron skin restored twice as quickly when still.
             if (!hero.action || hero.action === 'meditating') {
@@ -144,7 +171,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
                 hero.ironSkinCooldown = 1000;
                 // Iron skin life can be increased over the normal max using shielding units, so don't reduce
                 // iron skin life here it is over the max.
-                hero.ironSkinLife = Math.max(hero.ironSkinLife, Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4));
+                hero.ironSkinLife = Math.max(hero.ironSkinLife, Math.min(hero.ironSkinLife + 0.25, hero.savedData.maxLife / 4));
             }
         }
     }
@@ -158,7 +185,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.wading) {
             hero.burnDuration -= FRAME_LENGTH;
         }
-        if (hero.passiveTools.phoenixCrown > 0) {
+        if (hero.savedData.passiveTools.phoenixCrown > 0) {
             // If the hero has the phoenix crown, burning causes them to gain spirit instead of draining it an causing damage.
             state.hero.magic += 5 * FRAME_LENGTH / 1000;
         } else if (hero.ironSkinLife > 0) {
@@ -212,7 +239,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
 
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
     // Hero takes one damage every half second while in a hot room without the fire blessing.
-    if (!editingState.isEditing && state.areaSection?.isHot && !hero.passiveTools.fireBlessing) {
+    if (!editingState.isEditing && state.areaSection?.isHot && !hero.savedData.passiveTools.fireBlessing) {
         hero.applyBurn(0.5, 500);
     }
     let activeAirBubbles: AirBubbles = null;
@@ -224,7 +251,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             }
         }
         if (object.definition?.type === 'shieldingUnit' && hero.overlaps(object.getHitbox())) {
-            hero.ironSkinLife = Math.min(hero.maxLife, hero.ironSkinLife + 2 * FRAME_LENGTH / 1000);
+            hero.ironSkinLife = Math.min(hero.savedData.maxLife, hero.ironSkinLife + 2 * FRAME_LENGTH / 1000);
         }
     }
     if (hero.life <= 0
@@ -280,9 +307,9 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
         }
     }
-    const isHoldingBreath = !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
+    const isHoldingBreath = !state.hero.savedData.passiveTools.waterBlessing && state.zone.surfaceKey;
     // Corrosive areas drain mana unless you have the water blessing.
-    const isWaterDrainingMagic = !state.hero.passiveTools.waterBlessing && hero.area.isCorrosive;
+    const isWaterDrainingMagic = !state.hero.savedData.passiveTools.waterBlessing && hero.area.isCorrosive;
     if (activeAirBubbles) {
         // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
         state.hero.magic = Math.max(0, state.hero.magic);
@@ -305,7 +332,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
     const preventRegeneration = state.hero.actualMagicRegen < 0
         || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
-        || (!state.hero.passiveTools.phoenixCrown && state.hero.burnDuration > 0);
+        || (!state.hero.savedData.passiveTools.phoenixCrown && state.hero.burnDuration > 0);
     if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
         state.hero.magicRegenCooldown -= FRAME_LENGTH;
     }
@@ -343,12 +370,12 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         if (hero.area.dark) {
             const coefficient = 100 / hero.area.dark;
             minLightRadius *= coefficient;
-            if (state.hero.passiveTools.trueSight > 0) {
+            if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
                 state.hero.magic -= drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient;
                 targetLightRadius = 320 * coefficient;
                 minLightRadius += 20 * coefficient;
-            } else if (state.hero.passiveTools.catEyes > 0) {
+            } else if (state.hero.savedData.passiveTools.catEyes > 0) {
                 state.hero.magic -= drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient;
                 targetLightRadius = 80 * coefficient;
                 minLightRadius += 10 * coefficient;

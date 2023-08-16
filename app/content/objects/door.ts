@@ -432,11 +432,11 @@ export class Door implements ObjectInstance {
             this.definition.d === 'up' && this.status === 'closed' && this.definition.price
         ) {
             state.hero.action = null;
-            if (this.definition.price > state.hero.money) {
+            if (this.definition.price > state.hero.savedData.money) {
                 showMessage(state, 'You need more Jade to open this door.');
                 return;
             }
-            state.hero.money -= this.definition.price;
+            state.hero.savedData.money -= this.definition.price;
             this.changeStatus(state, 'normal');
         }
         if (!this.tryToUnlock(state)) {

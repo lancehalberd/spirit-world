@@ -83,7 +83,7 @@ enemyDefinitions.lightningDrone = {
                 element: 'lightning',
                 hitbox,
                 // Hack to prevent damage from this attack when the hero has lightning blessing.
-                hitAllies: !state.hero.passiveTools.lightningBlessing,
+                hitAllies: !state.hero.savedData.passiveTools.lightningBlessing,
                 hitObjects: true,
                 hitTiles: true,
                 hitEnemies: true,

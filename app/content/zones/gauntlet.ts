@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -266,6 +265,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 96, y: 128, type: "pushPull"},
         {status: "normal", id: "gauntletStairs", x: 240, y: 16, type: "door", style: "woodenUpstairs", targetZone: "gauntlet", targetObjectId: "gauntletStairs", d: "up", locationCue: "Gauntlet 1F"},
         {status: "normal", id: "gauntletPitMarker", linked: true, spirit: false, x: 248, y: 312, locationCue: "Gauntlet 1F", type: "marker"},
+        {status: "normal", id: "", linked: true, x: 400, y: 104, style: "short", type: "sign", message: "Experiment with tools to overcome obstacles.\n{|}Did you know you can pick up your clone?"},
+        {status: "normal", id: "", linked: true, x: 128, y: 104, style: "short", type: "sign", message: "Cracked pots can be destroyed by  powerful explosions."},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 355, mapId: 'gauntlet', floorId: '1F', mapX: 1, mapY: 1},
@@ -536,6 +537,7 @@ const f0_0x1: AreaDefinition = {
         {status: "locked", id: "gauntletKeyBlockA", x: 144, y: 112, type: "keyBlock"},
         {status: "locked", id: "gauntletFirstLock", x: 240, y: 272, type: "door", style: "wooden", d: "up"},
         {status: "hiddenSwitch", id: "gauntletPortal", x: 248, y: 400, type: "teleporter", saveStatus: "forever", linked: true},
+        {status: "normal", id: "", linked: true, x: 304, y: 296, style: "short", type: "sign", message: "Some of your tools can be used to press switches."},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 356, mapId: 'gauntlet', floorId: '1F', mapX: 1, mapY: 3},
@@ -807,6 +809,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x0-crystalBat-0", x: 196, y: 108, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x0-crystalBat-1", x: 288, y: 108, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x0-crystalGuardian-0", x: 192, y: 72, type: "enemy", enemyType: "crystalGuardian", d: "down", params: {}},
+        {status: "normal", id: "", linked: true, x: 400, y: 104, style: "short", type: "sign", message: "", spirit: true},
+        {status: "normal", id: "", linked: true, x: 128, y: 104, style: "short", type: "sign", message: "", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 358, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 1},
@@ -1089,6 +1093,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-2", x: 272, y: 144, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-3", x: 320, y: 112, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "gauntletSave", x: 48, y: 304, type: "saveStatue"},
+        {status: "normal", id: "", linked: true, x: 304, y: 296, style: "short", type: "sign", message: "", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 359, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 3},
@@ -1678,6 +1683,7 @@ const sf1_0x0: AreaDefinition = {
 };
 zones.gauntlet = {
     key: 'gauntlet',
+    areaSize: {w: 32, h: 32},
     underwaterKey: 'gauntletWater',
     floors: [
         {

@@ -41,6 +41,11 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
+    - Add automatic door cue messages when possible:
+        - Use expicit floor cues if defined.
+        - Only do if a Map Label is defined.
+        - Show a map cue any time the floor changes when entering a new area section.
+
     - Allow freezing tiles behind foreground walls
         - This should be okay since the solid/solidMap is applied on top of the frozen layer
         - Test that this doesn't break unfreezing the tile.
@@ -156,10 +161,6 @@ Current tasks:
         - This is a little tricky because currently we only calculate whether the current section is hot rather than all active sections.
         - It would be good to do this though as the status quo makes sections the hero isn't in behave inconsistently (as if they match the current section).
         - This will gradually kill enemies that aren't immune to fire damage.
-
-    - lose money when collecting money loot as clone?
-        - lose most progress this way.
-        - Add both list of copied and not copied props, log warning if a property is not on a list and copy.
 
     - Make sure door open/close sound effects are playing
         - Check tomb crystal switch doors specifically.
@@ -521,6 +522,9 @@ Minigame Ideas:
 
 
 Staff Improvements:
+    - Level 1 staff destroys bushes
+    - Level 2 staff destroys light rocks+cracked pots
+        - Bonk to open cracked walls.
     - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer
         - This should start at 4x1, 5x1 then 6x2->10x2, 11x3->15x3, 16x4->20x4
         - Preview will only show the max size that will fit in the current space

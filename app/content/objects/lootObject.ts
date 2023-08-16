@@ -205,12 +205,12 @@ export class LootObject implements ObjectInstance {
 
 function getActualLootDefinition(this: void, state: GameState, definition: AnyLootDefinition): AnyLootDefinition {
     if (definition.lootType === 'spiritPower') {
-        if (!state.hero.passiveTools.spiritSight) {
+        if (!state.hero.savedData.passiveTools.spiritSight) {
             return {
                 ...definition,
                 lootType: 'spiritSight',
             };
-        } else if (!state.hero.passiveTools.astralProjection) {
+        } else if (!state.hero.savedData.passiveTools.astralProjection) {
             return {
                 ...definition,
                 lootType: 'astralProjection',
@@ -353,7 +353,7 @@ export class ChestObject implements ObjectInstance {
             return;
         }
         // The hero cannot open chests that they cannot see.
-        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
+        if (this.definition.isInvisible && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
@@ -386,7 +386,7 @@ export class ChestObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
-            if (state.hero.passiveTools.trueSight) {
+            if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);
             }
             return;
@@ -400,7 +400,7 @@ export class ChestObject implements ObjectInstance {
                 ...chestClosedFrame, x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y
             });
         }
-        if (this.definition.isInvisible && state.hero.passiveTools.trueSight) {
+        if (this.definition.isInvisible && state.hero.savedData.passiveTools.trueSight) {
             renderIndicator(context, this.getHitbox(), state.fieldTime);
         }
     }
@@ -430,7 +430,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
             return;
         }
         // The hero cannot open chests that they cannot see.
-        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
+        if (this.definition.isInvisible && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
@@ -487,15 +487,15 @@ export class ShopObject extends LootObject implements ObjectInstance {
             return;
         }
         // The hero cannot purchase items that they cannot see.
-        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
+        if (this.definition.isInvisible && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
-        if (state.hero.money < this.price) {
+        if (state.hero.savedData.money < this.price) {
             showMessage(state, 'You need more Jade for this one.');
             return;
         }
-        state.hero.money -= this.price;
+        state.hero.savedData.money -= this.price;
         removeObjectFromArea(state, this);
         state.savedState.objectFlags[this.definition.id] = true;
         getLoot(state, this.definition);

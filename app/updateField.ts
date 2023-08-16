@@ -19,7 +19,7 @@ export function updateField(this: void, state: GameState) {
         return;
     }
     state.fieldTime += FRAME_LENGTH;
-    state.hero.playTime += FRAME_LENGTH;
+    state.hero.savedData.playTime += FRAME_LENGTH;
     // Remove completed screenshakes. If this is not checked each time the fieldTime is advanced
     // then the shakes will appear to oscillate out of control when fieldTime exceeds their endTime.
     for (let i = 0; i < state.screenShakes.length; i++) {
@@ -177,11 +177,11 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
 function switchElement(state: GameState, delta: number): void {
     const allElements: MagicElement[] = [null];
     for (const element of ['fire', 'ice', 'lightning'] as MagicElement[]) {
-        if (state.hero.elements[element]) {
+        if (state.hero.savedData.elements[element]) {
             allElements.push(element);
         }
     }
-    const index = allElements.indexOf(state.hero.element);
+    const index = allElements.indexOf(state.hero.savedData.element);
     setEquippedElement(state, allElements[(index + delta + allElements.length) % allElements.length]);
 }
 

@@ -37,40 +37,40 @@ function updateDungeonInventory(state: GameState, inventory: DungeonInventory, s
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: AnyLootDefinition, simulate?: boolean) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'weapon') {
-            state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
+            state.hero.savedData.weapon = applyUpgrade(state.hero.savedData.weapon, loot);
         } else if (['bow', 'staff', 'clone', 'cloak'].includes(loot.lootType)) {
-            if (!state.hero.leftTool && state.hero.rightTool !== loot.lootType) {
+            if (!state.hero.savedData.leftTool && state.hero.savedData.rightTool !== loot.lootType) {
                 setLeftTool(state, loot.lootType as ActiveTool);
-            } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
+            } else if (!state.hero.savedData.rightTool && state.hero.savedData.leftTool !== loot.lootType) {
                 setRightTool(state, loot.lootType as ActiveTool);
             }
-            //console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
-            state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
-            //console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
+            //console.log(loot.lootType, state.hero.savedData.activeTools[loot.lootType]);
+            state.hero.savedData.activeTools[loot.lootType] = applyUpgrade(state.hero.savedData.activeTools[loot.lootType], loot);
+            //console.log('->', loot.lootType, state.hero.savedData.activeTools[loot.lootType]);
         } else if ([
             'gloves', 'roll', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing', 'lightningBlessing',
         ].includes(loot.lootType)) {
-            //console.log(loot.lootType, state.hero.passiveTools[loot.lootType]);
-            state.hero.passiveTools[loot.lootType] = applyUpgrade(state.hero.passiveTools[loot.lootType], loot);
-            //console.log('->', loot.lootType, state.hero.passiveTools[loot.lootType]);
+            //console.log(loot.lootType, state.hero.savedData.passiveTools[loot.lootType]);
+            state.hero.savedData.passiveTools[loot.lootType] = applyUpgrade(state.hero.savedData.passiveTools[loot.lootType], loot);
+            //console.log('->', loot.lootType, state.hero.savedData.passiveTools[loot.lootType]);
         } else if ([
             'fire', 'lightning', 'ice'
         ].includes(loot.lootType)) {
-            state.hero.elements[loot.lootType] = applyUpgrade(state.hero.elements[loot.lootType], loot);
+            state.hero.savedData.elements[loot.lootType] = applyUpgrade(state.hero.savedData.elements[loot.lootType], loot);
         }  else if ([
             'cloudBoots', 'ironBoots'
         ].includes(loot.lootType)) {
-            state.hero.equipment[loot.lootType] = applyUpgrade(state.hero.equipment[loot.lootType], loot);
+            state.hero.savedData.equipment[loot.lootType] = applyUpgrade(state.hero.savedData.equipment[loot.lootType], loot);
         } else if (loot.lootType === 'money') {
-            state.hero.money += (loot.lootAmount || 1);
+            state.hero.savedData.money += (loot.lootAmount || 1);
         } else if (loot.lootType === 'silverOre') {
-            state.hero.silverOre++;
+            state.hero.savedData.silverOre++;
         } else if (loot.lootType === 'goldOre') {
-            state.hero.goldOre++;
+            state.hero.savedData.goldOre++;
         } else if (loot.lootType === 'victoryPoint') {
-            state.hero.victoryPoints += (loot.lootAmount || 1);
+            state.hero.savedData.victoryPoints += (loot.lootAmount || 1);
         }  else {
             console.error('Unhandled loot type:', loot.lootType);
             // throw new Error('Unhandled loot type: ' + loot.lootType);
@@ -94,18 +94,18 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         updateDungeonInventory(state, inventory, false);
     },
     peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
+        state.hero.life = Math.min(state.hero.life + 1, state.hero.savedData.maxLife);
     },
     peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.maxLife++;
-        state.hero.life = state.hero.maxLife;
+        state.hero.savedData.maxLife++;
+        state.hero.life = state.hero.savedData.maxLife;
     },
     peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.peachQuarters++;
-        if (state.hero.peachQuarters >= 4) {
-            state.hero.peachQuarters -= 4;
+        state.hero.savedData.peachQuarters++;
+        if (state.hero.savedData.peachQuarters >= 4) {
+            state.hero.savedData.peachQuarters -= 4;
             if (simulate) {
-                state.hero.maxLife++;
+                state.hero.savedData.maxLife++;
             }
             // You will gain the full peach from the dialogue effect.
         }
@@ -116,12 +116,12 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
     },
     spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'spiritPower') {
-            if (!state.hero.passiveTools.spiritSight) {
-                state.hero.passiveTools.spiritSight = 1;
-            } else if (!state.hero.passiveTools.astralProjection) {
-                state.hero.passiveTools.astralProjection = 1;
+            if (!state.hero.savedData.passiveTools.spiritSight) {
+                state.hero.savedData.passiveTools.spiritSight = 1;
+            } else if (!state.hero.savedData.passiveTools.astralProjection) {
+                state.hero.savedData.passiveTools.astralProjection = 1;
             } else {
-                state.hero.passiveTools.teleportation = 1;
+                state.hero.savedData.passiveTools.teleportation = 1;
             }
         }
     }
