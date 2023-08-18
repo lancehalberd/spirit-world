@@ -82,7 +82,7 @@ export class ShockWave implements EffectInstance, Props {
 
 export function addRadialShockWaves(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Point, count: number, thetaOffset = 0
+    [x, y]: Coords, count: number, thetaOffset = 0
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
@@ -101,7 +101,7 @@ export function addRadialShockWaves(this: void,
 
 export function addArcOfShockWaves(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Point, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
+    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = count === 1

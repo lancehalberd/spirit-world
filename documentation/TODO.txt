@@ -41,6 +41,46 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
+    - Extract air stream effect so it can be used as an enemy ability
+        - Add a warmup time that can be used as a tell (ramps up from 0-100% effect over N ms).
+
+    - Add chunk objects to editor
+        - Choose w/h, style, then any additional properties from the style parameters.
+        - Have an excavatedBuilding style we can use in summoner ruins
+            - parameters doorId and spiritDoorId for optional entrance that can be added to it.
+            - Using ids of existing doors will allow us to freely configure the doors.
+        - This is a bit tricky to implement because we want the chunk to modify tiles/object properties (like doors) but
+            we don't want it to change the definition, otherwise changes from the chunk will get saved in the base map
+            but we want those applied on load.
+            Because of this, we probably just want the chunk to apply to the area instance after it is created but this means
+            that to display the correct state, chunks will have to constantly be reapplied during editing.
+            Perhaps this can work like minimap generation where chunks autorefresh by default, but
+
+    - Allow editing tiles in adjacent areas.
+
+    - Fix: Do not allow dying due to burn when boss is defeated
+        - Set hero life to at least 1 and remove any burns on boss completion.
+
+    - Forest temple dialogue:
+
+        Head Native Scientist:
+        - Greetings 817H, we have been looking forward to testing you.
+        - You have questions, yes? Complete these simple tests and we may have answers.
+        - More tests means more answers, yes? But don't worry if you can't complete them all.
+        - You can always come back later to try again.
+        - This was the only test 817V failed to complete.
+
+        Native Scientists:
+        - We have to monitor the nutrition of the Vanara very closely.
+            - Vanara with too much or too little nurishment have to be returned to stasis.
+            - ...{|}Maybe you should talk withe one of the Vanara scientists instead.
+        - Vanara upset the balance of the Spirit World. Humans and Vanara are both unpredictable, but Vanara can touch the Spirit World with too much ease.
+
+        Vanaran Scientists:
+        - Our Vanaran ecosystem is invasive. {|} Without proper management it will overrun these lands.
+            - Vanaran life has evolved to take root in alien worlds and make life habitable for us,{|} but we are supposed to avoid living worlds.
+            - We were supposed to leave when we detected life here, but there was an accident and our ship crashed.
+
     - Add automatic door cue messages when possible:
         - Use expicit floor cues if defined.
         - Only do if a Map Label is defined.

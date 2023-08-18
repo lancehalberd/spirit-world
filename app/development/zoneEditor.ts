@@ -17,6 +17,7 @@ import { setAreaSection } from 'app/utils/area';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { everyAreaInZone } from 'app/utils/every';
+import { fixCamera } from 'app/utils/fixCamera';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
@@ -84,16 +85,25 @@ function jumpToMinimapLocation() {
     if (gridRow >= state.areaGrid.length && gridColumn >= state.areaGrid[0].length) {
         return;
     }
-    enterLocation(state, {
-      zoneKey: state.location.zoneKey,
-      floor: state.location.floor,
-      isSpiritWorld: state.location.isSpiritWorld,
-      d: state.location.d,
-      areaGridCoords: {x: gridColumn, y: gridRow},
-      x: pixelX,
-      y: pixelY,
-      z: 0,
-    });
+    if (state.location.areaGridCoords.x !== gridColumn || state.location.areaGridCoords.y !== gridRow) {
+        enterLocation(state, {
+          zoneKey: state.location.zoneKey,
+          floor: state.location.floor,
+          isSpiritWorld: state.location.isSpiritWorld,
+          d: state.location.d,
+          areaGridCoords: {x: gridColumn, y: gridRow},
+          x: pixelX,
+          y: pixelY,
+          z: 0,
+        });
+    } else {
+        state.location.x = pixelX;
+        state.location.y = pixelY;
+        state.hero.x = pixelX;
+        state.hero.y = pixelY;
+        fixCamera(state);
+        setAreaSection(state, false);
+    }
 }
 
 const minimapContainer = tagElement('div');

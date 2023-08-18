@@ -142,8 +142,8 @@ const staffAbility: EnemyAbility<Direction> = {
 };
 
 // This is hardcoded for the area outside of the tomb.
-const midPoint: Point = [128, 176];
-function getTargetLocation(state: GameState, enemy: Enemy): Point {
+const midPoint: Coords = [128, 176];
+function getTargetLocation(state: GameState, enemy: Enemy): Coords {
     for (const target of enemy.area.allyTargets) {
         if (!isTargetVisible(state, enemy, target)) {
             continue;

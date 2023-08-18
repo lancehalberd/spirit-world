@@ -25,17 +25,27 @@ function onMouseMove(event) {
     // console.log(mousePosition);
 }
 function onMouseDown(event) {
-    if (event.which === 1) mouseIsDown = true;
+    if (event.which === 1) {
+        mouseIsDown = true;
+    }
 }
 function onMouseUp(event) {
-    if (event.which === 1) mouseIsDown = false;
+    if (event.which === 1) {
+        mouseIsDown = false;
+    }
     unlockAudio();
+}
+function onDragEnd(event) {
+    mouseIsDown = false;
 }
 
 export function bindMouseListeners() {
     document.addEventListener('mousemove', onMouseMove);
     document.addEventListener('mousedown', onMouseDown);
     document.addEventListener('mouseup', onMouseUp);
+    // Chrome does not fire mouseup event if the user starts a drag operation,
+    // so we also need to clear `mouseIsDown` whenever a drag event completes.
+    document.addEventListener('dragend', onDragEnd);
 }
 /* This would in theory be used if we ever cleaned up the application
 export function unbindMouseListeners() {

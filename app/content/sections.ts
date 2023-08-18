@@ -9,7 +9,7 @@ interface SectionData {
     zoneKey: string
     floor: number
     isSpiritWorld: boolean
-    coords: Point
+    coords: Coords
 }
 
 interface DungeonMap {

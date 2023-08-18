@@ -294,9 +294,9 @@ export function getTilesInRectangle(area: AreaInstance, rect: Rect): TileCoords[
     const t = Math.floor(rect.y / tileSize);
     const b = Math.floor((rect.y + rect.h - 1) / tileSize);
     for (let y = t; y <= b; y++) {
-        if (y < 0 || y >= 32) continue;
+        if (y < 0 || y >= area.h) continue;
         for (let x = l; x <= r; x++) {
-            if (x < 0 || x >= 32) continue;
+            if (x < 0 || x >= area.w) continue;
             tiles.push({x, y});
         }
     }
@@ -312,7 +312,7 @@ export function getTilesInCircle(area: AreaInstance, {x, y, r}: {x: number, y: n
     // console.log({x, y, r});
     // console.log({T, B});
     for (let ty = T; ty <= B; ty++) {
-        if (ty < 0 || ty >= 32) continue;
+        if (ty < 0 || ty >= area.h) continue;
         const my = ty * tileSize + tileSize / 2;
         const dy = my - y;
         const dx = Math.sqrt(r2 - dy * dy);
@@ -320,7 +320,7 @@ export function getTilesInCircle(area: AreaInstance, {x, y, r}: {x: number, y: n
         const R = Math.round((x + dx) / tileSize) - 1;
         // console.log({my, dy, dx, L, R});
         for (let tx = L; tx <= R; tx++) {
-            if (tx < 0 || tx >= 32) continue;
+            if (tx < 0 || tx >= area.w) continue;
             tiles.push({x: tx, y: ty});
         }
     }

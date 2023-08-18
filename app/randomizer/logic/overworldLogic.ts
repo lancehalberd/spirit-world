@@ -271,7 +271,11 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'forestTempleNWArea',
         entranceIds: ['forestTempleLadder4', 'forestTempleLadder5'],
-        exits: [{ objectId: 'forestTempleLadder4' }, { objectId: 'forestTempleLadder5' }],
+        exits: [
+            { objectId: 'forestTempleLadder4' },
+            { objectId: 'forestTempleLadder5' },
+            { objectId: 'forestTempleBigKeyEntrance' },
+        ],
     },
     {
         zoneId,

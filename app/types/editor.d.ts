@@ -71,6 +71,7 @@ interface EditingState {
     needsRefresh?: boolean
     paletteKey: string
     tileChunkKey: string
+    recentAreas: AreaInstance[]
     selectedLayerKey?: string
     refreshMinimap?: boolean
     replacePercentage: number
@@ -78,6 +79,8 @@ interface EditingState {
     spirit: boolean
     dragOffset?: {x: number, y: number}
     selectedSections: number[]
+    // Can set to 0.5
+    areaScale: number
     sectionDragData?: {
         x: number
         y: number

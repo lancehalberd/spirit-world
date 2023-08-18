@@ -42,8 +42,10 @@ export function updateCamera(state: GameState, speed?: number): void {
         }
         if (finished) {
             // Null out references to canvas/context in case that helps GC them faster.
-            state.areaInstance.canvas = null;
-            state.areaInstance.context = null;
+            if (!editingState.isEditing) {
+                state.areaInstance.canvas = null;
+                state.areaInstance.context = null;
+            }
             // The held chakram can transition between areas with the hero.
             for (const object of state.areaInstance.objects) {
                 if (object.changesAreas) {

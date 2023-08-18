@@ -4,11 +4,11 @@ import { arrMod } from 'app/utils/index';
 export const tolerance = .000001;
 
 export class Polygon {
-    points: Array<Point>;
+    points: Array<Coords>;
     color: Color;
     angles: Array<number>;
     lengths: Array<number>;
-    center: Point;
+    center: Coords;
     _scale: number;
     currentAngle: number;
 
@@ -113,7 +113,7 @@ export function allPoints(shapes: Array<Polygon>) {
     return points;
 }
 
-export function isPointInPoints(point: Point, points: Point[]): boolean {
+export function isPointInPoints(point: Coords, points: Coords[]): boolean {
     for (var i = 0; i < points.length; i++) {
         var A = [point[0] - points[i][0], point[1] - points[i][1]];
         if (A[0] * A[0] + A[1] * A[1] < tolerance) {
@@ -166,10 +166,10 @@ function isSeparatingLine(shapeA, shapeB, vector) {
     }
     return maxB < minA + tolerance || maxA < minB + tolerance;
 }
-export function translateShapes(shapes: Array<Polygon>, vector: Point): void {
+export function translateShapes(shapes: Array<Polygon>, vector: Coords): void {
     shapes.forEach(shape => shape.translate(vector[0], vector[1]));
 }
-export function rotateShapes(shapes: Array<Polygon>, center: Point, radians: number): void {
+export function rotateShapes(shapes: Array<Polygon>, center: Coords, radians: number): void {
     const cos = Math.cos(radians), sin = Math.sin(radians);
     shapes.forEach(shape => {
         shape.points[0] = [shape.points[0][0] - center[0], shape.points[0][1] - center[1]];
@@ -180,38 +180,38 @@ export function rotateShapes(shapes: Array<Polygon>, center: Point, radians: num
         shape.resetPoints();
     });
 }
-export function rotatePoint(point: Point, center: Point, radians: number): Point {
+export function rotatePoint(point: Coords, center: Coords, radians: number): Coords {
     const cos = Math.cos(radians), sin = Math.sin(radians);
     point = [point[0] - center[0], point[1] - center[1]];
     point = [point[0] * cos - point[1] * sin, point[0] * sin + point[1] * cos];
     return [point[0] + center[0], point[1] + center[1]];
 }
 
-export function distanceSquared(p1: Point, p2: Point): number {
+export function distanceSquared(p1: Coords, p2: Coords): number {
     return (p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]);
 }
-export function vector(p1: Point, p2: Point): Point {
+export function vector(p1: Coords, p2: Coords): Coords {
     return [p2[0] - p1[0], p2[1] - p1[1]];
 }
-/*function dot2d(v1: Point, v2: Point): number {
+/*function dot2d(v1: Coords, v2: Coords): number {
     return v1[0] * v2[0] + v1[1] * v2[1];
 }
-export function cross2d(v1: Point, v2: Point): number {
+export function cross2d(v1: Coords, v2: Coords): number {
     return v1[0] * v2[1] - v1[1] * v2[0];
 }*/
-export function magnitude(vector: Point) {
+export function magnitude(vector: Coords) {
     return Math.sqrt(vector[0] * vector[0] + vector[1] * vector[1]);
 }
-export function averagePoint(points: Array<Point>): Point {
+export function averagePoint(points: Array<Coords>): Coords {
     let x = 0, y = 0;
     points.forEach(point => { x += point[0]; y += point[1];});
     return [x / points.length, y / points.length];
 }
-export function normalize(vector: Point) {
+export function normalize(vector: Coords) {
     const mag = magnitude(vector);
     return [vector[0] / mag, vector[1] / mag];
 }
-export function getBounds(points: Array<Point>) {
+export function getBounds(points: Array<Coords>) {
     let left = points[0][0], top = points[0][1];
     let right = left, bottom = top;
     for (let i = 1; i < points.length; i++) {
@@ -283,7 +283,7 @@ export function computeArea(shape) {
     return area / 2;
 }
 // derived from http://jsfiddle.net/justin_c_rounds/Gd2S2/
-function computeLineIntersection(p1: Point, p2: Point, q1: Point, q2: Point): Point {
+function computeLineIntersection(p1: Coords, p2: Coords, q1: Coords, q2: Coords): Coords {
     const dx1 = p2[0] - p1[0];
     const dy1 = p2[1] - p1[1];
     const dx2 = q2[0] - q1[0];
@@ -296,7 +296,7 @@ function computeLineIntersection(p1: Point, p2: Point, q1: Point, q2: Point): Po
     return [p1[0] + a * dx1, p1[1] + a * dy1];
 };
 //console.log(computeLineIntersection([0,0],[2,2],[0,0],[1,0]).join(','));
-function isPointRightOfEdge(point: Point, p1: Point, p2: Point): boolean {
+function isPointRightOfEdge(point: Coords, p1: Coords, p2: Coords): boolean {
     const A = [point[0] - p1[0], point[1] - p1[1]];
     /*if (A[0] * A[0] + A[1] * A[1] < tolerance) {
         return false;

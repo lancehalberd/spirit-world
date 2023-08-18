@@ -88,7 +88,7 @@ export function packSprite(key: string, image: HTMLImageElement, packedImage: Pa
     return false;
 }
 
-export function addSpriteToLocation(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, [x, y]: Point): boolean {
+export function addSpriteToLocation(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, [x, y]: Coords): boolean {
     const cellHeight = Math.ceil(image.height / gridSize);
     const cellWidth = Math.ceil(image.width / gridSize);
     const { grid } = packedImage;

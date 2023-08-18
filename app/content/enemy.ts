@@ -184,7 +184,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             h: (frame.content?.h ?? frame.h) * this.scale,
         };
     }
-    distanceToPoint(p: Point): number {
+    distanceToPoint(p: Coords): number {
         const hitbox = this.getHitbox();
         const dx = hitbox.x + hitbox.w / 2 - p[0];
         const dy = hitbox.y + hitbox.h / 2 - p[1];

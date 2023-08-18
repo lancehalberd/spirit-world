@@ -54,7 +54,7 @@ export type ProjectileDefinition
 
 export function addRadialProjectiles(this: void,
     state: GameState, area: AreaInstance, definition: ProjectileDefinition,
-    [x, y]: Point, count: number, thetaOffset = 0,
+    [x, y]: Coords, count: number, thetaOffset = 0,
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
@@ -68,7 +68,7 @@ export function addRadialProjectiles(this: void,
 
 export function addArcOfProjectiles(this: void,
     state: GameState, area: AreaInstance, definition: ProjectileDefinition,
-    [x, y]: Point, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
+    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = count === 1
@@ -89,7 +89,7 @@ export function addArcOfProjectiles(this: void,
 
 export function shootProjectile(
     state: GameState, area: AreaInstance, definition: ProjectileDefinition,
-    [x, y]: Point, theta: number
+    [x, y]: Coords, theta: number
 ) {
     const dx = Math.cos(theta), dy = Math.sin(theta);
     const commonProps = {

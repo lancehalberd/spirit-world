@@ -123,7 +123,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
             ...state.location,
             floor: zones[state.zone.underwaterKey].floors.length - 1,
             zoneKey: state.zone.underwaterKey,
-        })
+        });
         if (!underwaterArea) {
             debugger;
         }
@@ -297,6 +297,28 @@ export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][]
     return fullTiles;
 }
 
+export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation): AreaInstance {
+    const definition = getAreaFromLocation(location);
+    for (const area of editingState.recentAreas) {
+        if (area.definition === definition) {
+            return area;
+        }
+    }
+    return createAreaInstance(state, definition);
+}
+
+export function addRecentArea(areaInstance: AreaInstance): void {
+    const index = editingState.recentAreas.findIndex(area => area.definition === areaInstance.definition);
+    if (index >= 0) {
+        editingState.recentAreas.splice(index, 1, areaInstance);
+    } else {
+        editingState.recentAreas.unshift(areaInstance);
+        while(editingState.recentAreas.length > 20) {
+            editingState.recentAreas.pop();
+        }
+    }
+}
+
 export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
     const [canvas, context] = createCanvasAndContext(
@@ -415,6 +437,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
         specialBehavior?.apply(state, instance);
     }
+    addRecentArea(instance);
     return instance;
 }
 

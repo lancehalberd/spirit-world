@@ -3,6 +3,7 @@ import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { getSelectionBounds } from 'app/development/brushSelection';
 import { contextMenuState, editingState } from 'app/development/editingState';
+import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
 import { addMissingLayer } from 'app/utils/layers';
 import {
     createObjectDefinition,
@@ -16,7 +17,6 @@ import {
 } from 'app/development/objectEditor';
 import { updateBrushCanvas } from 'app/development/propertyPanel';
 import { setEditingTool } from 'app/development/toolTab';
-import { CANVAS_SCALE } from 'app/gameConstants';
 import { getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords } from 'app/render/renderMap';
 import { getState } from 'app/state';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
@@ -24,7 +24,7 @@ import { mainCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { initializeAreaLayerTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
-import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
+import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 export * from 'app/development/packSprites';
@@ -41,12 +41,20 @@ function roundMapCoords(coords: {x: number, y: number}): {x: number, y: number} 
     };
 }
 
+mainCanvas.addEventListener('wheel', (event: WheelEvent) => {
+    if (event.deltaY < 0) {
+        editingState.areaScale = 1;
+    } else if (event.deltaY > 0) {
+        editingState.areaScale = 0.5;
+    }
+});
+
 mainCanvas.addEventListener('mousemove', function () {
     if (!editingState.isEditing || !isMouseDown() || contextMenuState.contextMenu) {
         return;
     }
     const state = getState();
-    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getAreaMousePosition();
     if (state.paused) {
         if (editingState.sectionDragData && state.showMap && isMouseDown() && editingState.selectedSections.length) {
             const sectionIndex = editingState.sectionDragData.sectionIndex;
@@ -89,7 +97,7 @@ mainCanvas.addEventListener('mousedown', function (event) {
         return;
     }
     const state = getState();
-    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getAreaMousePosition();
     if (state.paused) {
         if (state.showMap) {
             if (editingState.selectedSections.length && !isKeyboardKeyDown(KEY.SHIFT)) {
@@ -144,7 +152,7 @@ document.addEventListener('mouseup', (event) => {
     }
     if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
         const state = getState();
-        const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getAreaMousePosition();
         const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
         editingState.dragOffset = null;
         const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};
@@ -501,7 +509,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     if (event.which === KEY.BACK_SPACE) {
         if (editingState.tool === 'brush') {
-            const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getAreaMousePosition();
             deleteTile(x, y);
         } else if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
             deleteObject(state, editingState.selectedObject);

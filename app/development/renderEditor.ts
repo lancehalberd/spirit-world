@@ -8,14 +8,13 @@ import {
 } from 'app/development/objectEditor';
 import { getSelectionBounds } from 'app/development/brushSelection';
 import { renderZoneEditor } from 'app/development/zoneEditor';
-import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { translateContextForAreaAndCamera } from 'app/render/renderField';
 import { drawFrame } from 'app/utils/animations';
-import { mainCanvas } from 'app/utils/canvas';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { mapTile } from 'app/utils/mapTile';
-import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
+import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
+import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
 
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -38,7 +37,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
     if (state.paused) {
         return;
     }
-    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getAreaMousePosition();
     context.save();
         translateContextForAreaAndCamera(context, state, area);
         context.globalAlpha = 0.6;

@@ -1,5 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { zones } from 'app/content/zones/zoneHash';
+import { isRandomizer } from 'app/gameConstants';
 
 
 interface DialogueData {
@@ -9,7 +10,7 @@ interface DialogueData {
         zoneKey: string
         floor: number
         isSpiritWorld: boolean
-        coords: Point
+        coords: Coords
     }
     // Used for dialogue stored on the dialogue hash as an indexed option.
     hashData?: {
@@ -137,7 +138,7 @@ export function populateAllDialogue() {
     }
     for (let index = 0; index < allDialogue.length; index++) {
         const dialogue = allDialogue[index];
-        if (dialogue?.wasMoved) {
+        if (!isRandomizer && dialogue?.wasMoved) {
             console.log(dialogue.hashData
                 ? dialogue.hashData
                 : `Zone dialogue from ${dialogue.objectData.zoneKey}`,

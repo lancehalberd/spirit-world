@@ -117,8 +117,8 @@ export class GroundSpike implements EffectInstance, Props {
 interface LineProps {
     state: GameState
     area: AreaInstance
-    source: Point
-    target: Point
+    source: Coords
+    target: Coords
     spacing?: number
     length?: number
     spikeProps?: Props

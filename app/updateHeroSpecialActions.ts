@@ -3,6 +3,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { LightningAnimationEffect } from 'app/content/effects/lightningAnimationEffect';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
+import { zones } from 'app/content/zones/zoneHash';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { editingState } from 'app/development/editingState';
 import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/userInput';
@@ -36,6 +37,32 @@ const rollSpeed = [
 ];
 
 let sommersaultCount = 0;
+
+function moveToClosestSpawnMarker(state: GameState, hero: Hero) {
+    const { section } = getAreaSize(state);
+    let best: ObjectInstance = null, bestDistance: number;
+    for (const object of state.areaInstance.objects) {
+        if (object.definition?.type !== 'spawnMarker') {
+            continue;
+        }
+        // Only consider markers in the current section.
+        if (object.x < section.x || object.x > section.x + section.w ||
+            object.y < section.y || object.y > section.y + section.h
+        ) {
+            continue;
+        }
+        const { mag } = getVectorToTarget(state, object, hero);
+        if (!best || mag < bestDistance) {
+            best = object;
+            bestDistance = mag;
+        }
+    }
+    if (best) {
+        hero.x = best.x;
+        hero.y = best.y;
+        fixCamera(state);
+    }
+}
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
     const isPrimaryHero = hero === state.hero;
@@ -98,8 +125,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Set this high to end the roll immediately on disabling edit mode.
         hero.actionFrame = 1000;
         const [dx, dy] = getCloneMovementDeltas(state, hero);
-        hero.x += 4 * dx;
-        hero.y += 4 * dy;
+        hero.x += 4 * dx / editingState.areaScale;
+        hero.y += 4 * dy / editingState.areaScale;
         // These probably need to be set to trigger screen transitions correctly.
         hero.vx = dx;
         hero.vy = dy;
@@ -121,6 +148,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'fallen' || hero.action === 'sankInLava') {
+        // Special logic for falling from the sky to the overworld.
         if (hero === state.hero && hero.action === 'fallen' && state.location.zoneKey === 'sky') {
             enterLocation(state, {
                 zoneKey: 'overworld',
@@ -134,29 +162,46 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }, false, () => {
                 hero.action = 'knocked';
                 hero.isAirborn = true;
-                const { section } = getAreaSize(state);
-                let best: ObjectInstance = null, bestDistance: number;
-                for (const object of state.areaInstance.objects) {
-                    if (object.definition?.type !== 'spawnMarker') {
-                        continue;
-                    }
-                    // Only consider markers in the current section.
-                    if (object.x < section.x || object.x > section.x + section.w ||
-                        object.y < section.y || object.y > section.y + section.h
-                    ) {
-                        continue;
-                    }
-                    const { mag } = getVectorToTarget(state, object, hero);
-                    if (!best || mag < bestDistance) {
-                        best = object;
-                        bestDistance = mag;
-                    }
-                }
-                if (best) {
-                    hero.x = best.x;
-                    hero.y = best.y;
-                    fixCamera(state);
-                }
+                moveToClosestSpawnMarker(state, hero);
+            });
+            return true;
+        }
+        // Special logic for falling from the forst temple overworld area into
+        // the forest temple dungeon.
+        if (hero === state.hero && hero.action === 'fallen'
+            && state.location.zoneKey === 'overworld'
+            && state.location.isSpiritWorld
+            && state.location.areaGridCoords.x === 0
+            && state.location.areaGridCoords.y === 2
+        ) {
+            // Map the characters x/y coordinates from this section to
+            // the x/y coordinates across the entire dungeon floor.
+            // These px/py values are scaled to be 0-1 over the area that you can actually fall through
+            // in order to maximally cover possible locations to fall in the dungeon.
+            const px = (hero.x - 48) / (state.areaInstance.w * 16 - 80);
+            const py = (hero.y - 48) / (state.areaInstance.h * 16 - 112);
+            const {w, h} = zones.forestTemple.areaSize ?? {w: 32, h: 32};
+            const templeAreaWidth = w * 16, templeAreaHeight = h * 16;
+            const templeWidth = templeAreaWidth * zones.forestTemple.floors[0].grid[0].length;
+            const templeHeight = templeAreaHeight * zones.forestTemple.floors[0].grid.length;
+            const tx = px * templeWidth;
+            const ty = py * templeHeight;
+            enterLocation(state, {
+                zoneKey: 'forestTemple',
+                floor: 0,
+                areaGridCoords: {
+                    x: Math.floor(tx / templeAreaWidth),
+                    y: Math.floor(ty / templeAreaHeight),
+                },
+                x: tx % templeAreaWidth,
+                y: ty % templeAreaHeight,
+                z: CANVAS_HEIGHT,
+                d: hero.d,
+                isSpiritWorld: state.location.isSpiritWorld,
+            }, false, () => {
+                hero.action = 'knocked';
+                hero.isAirborn = true;
+                // moveToClosestSpawnMarker(state, hero);
             });
             return true;
         }

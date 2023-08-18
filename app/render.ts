@@ -21,6 +21,20 @@ export function render() {
     if (state.lastTimeRendered >= state.time) {
         return;
     }
+    if (editingState.isEditing) {
+        context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.save();
+            context.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+            context.scale(editingState.areaScale, editingState.areaScale);
+            context.translate(-CANVAS_WIDTH / 2, -CANVAS_HEIGHT / 2);
+            renderInternal(context, state);
+        context.restore();
+    } else {
+        renderInternal(context, state);
+    }
+}
+
+export function renderInternal(context: CanvasRenderingContext2D, state: GameState) {
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
         renderTransition(context, state);
         renderHUD(context, state);

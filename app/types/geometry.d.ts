@@ -1,5 +1,5 @@
 
-type Point = [number, number];
+type Point = {x: number, y: number};
 type Coords = [number, number];
 
 interface FullRectangle {

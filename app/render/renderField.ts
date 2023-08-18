@@ -1,3 +1,4 @@
+import { getOrCreateAreaInstance } from 'app/content/areas';
 import { editingState } from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
@@ -9,8 +10,7 @@ import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 
-
-// This is the max size of the s
+// This is the max size of the spirit sight circle.
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
 
 //let spiritCanvasRadius: number;
@@ -213,6 +213,42 @@ export function renderField(
 
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
+
+    if (editingState.isEditing) {
+        // Draw adjacent areas when editing for additional context.
+        for (let dy = -1; dy <= 1; dy++) {
+            const y = state.location.areaGridCoords.y + dy;
+            if (y < 0 || y > state.zone.floors[state.location.floor].grid.length - 1) {
+                continue;
+            }
+            for (let dx = -1; dx <= 1; dx++) {
+                if (dx === 0 && dy === 0) {
+                    continue;
+                }
+                const x = state.location.areaGridCoords.x + dx;
+                if (x < 0 || x > state.zone.floors[state.location.floor].grid[y].length - 1) {
+                    continue;
+                }
+                // This will use cached area instances if available.
+                const area = getOrCreateAreaInstance(state, {
+                    ...state.location,
+                    areaGridCoords: {x, y},
+                });
+                if (!area) {
+                    continue;
+                }
+                area.cameraOffset = {
+                    x: dx * area.w * 16 + (state.nextAreaInstance?.cameraOffset.x || 0),
+                    y: dy * area.h * 16 + (state.nextAreaInstance?.cameraOffset.y || 0),
+                };
+                if (area?.checkToRedrawTiles) {
+                    checkToRedrawTiles(area);
+                }
+                renderAreaBackground(context, state, area);
+                renderAreaForeground(context, state, area);
+            }
+        }
+    }
 }
 
 export function renderHero(context: CanvasRenderingContext2D, state: GameState) {
@@ -297,21 +333,17 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
     if (!area) {
         return;
     }
+    // Render the entire area while editing. We can make this more specific if we notice performance issues.
+    const rect = editingState.isEditing ?
+        {x: 0, y: 0, w: area.w * 16, h: area.h * 16} : {
+            x: (state.camera.x - area.cameraOffset.x) | 0,
+            y: (state.camera.y - area.cameraOffset.y) | 0,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
+        };
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        const source = {
-            x: (state.camera.x - area.cameraOffset.x) | 0,
-            y: (state.camera.y - area.cameraOffset.y) | 0,
-            w: CANVAS_WIDTH,
-            h: CANVAS_HEIGHT,
-        }
-        const target = {
-            x: (state.camera.x - area.cameraOffset.x) | 0,
-            y: (state.camera.y - area.cameraOffset.y) | 0,
-            w: CANVAS_WIDTH,
-            h: CANVAS_HEIGHT,
-        }
-        drawCanvas(context, area.canvas, source, target);
+        drawCanvas(context, area.canvas, rect, rect);
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
                 if (object.area === area) {
@@ -328,23 +360,30 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
     if (!area?.foregroundCanvas) {
         return;
     }
+    // Render the entire area while editing. We can make this more specific if we notice performance issues.
+    const rect = editingState.isEditing ?
+        {x: 0, y: 0, w: area.w * 16, h: area.h * 16} : {
+            x: (state.camera.x - area.cameraOffset.x) | 0,
+            y: (state.camera.y - area.cameraOffset.y) | 0,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
+        };
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        const source = {
-            x: (state.camera.x - area.cameraOffset.x) | 0,
-            y: (state.camera.y - area.cameraOffset.y) | 0,
-            w: CANVAS_WIDTH,
-            h: CANVAS_HEIGHT,
-        }
-        const target = {
-            x: (state.camera.x - area.cameraOffset.x) | 0,
-            y: (state.camera.y - area.cameraOffset.y) | 0,
-            w: CANVAS_WIDTH,
-            h: CANVAS_HEIGHT,
-        }
-        drawCanvas(context, area.foregroundCanvas, source, target);
+        drawCanvas(context, area.foregroundCanvas, rect, rect);
     context.restore();
     renderForegroundObjects(context, state, area);
+
+    if (editingState.isEditing) {
+        context.strokeStyle = 'white';
+        context.save();
+            translateContextForAreaAndCamera(context, state, area);
+            for (const section of area.definition.sections) {
+                context.strokeRect(section.x * 16, section.y * 16, section.w * 16, section.h * 16);
+            }
+        context.restore();
+        context.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    }
 }
 
 export function renderAreaObjectsBeforeHero(
