@@ -1,10 +1,10 @@
 import {
     BITMAP_MIDDLE_DOWN_RIGHT, BITMAP_MIDDLE_UP_RIGHT,
-    BITMAP_BOTTOM, BITMAP_BOTTOM_6,
+    BITMAP_BOTTOM, BITMAP_BOTTOM_2,
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
     BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
-    BITMAP_LEFT_6,
-    BITMAP_RIGHT_6,
+    BITMAP_LEFT_2,
+    BITMAP_RIGHT_2, BITMAP_TOP_2,
 } from 'app/content/bitMasks';
 import {
     bottomLeftCeiling,
@@ -731,7 +731,7 @@ const shadows: TileSource = {
 
 const caveCeiling: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
         '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,
@@ -749,7 +749,7 @@ const caveCeiling: TileSource = {
 
 const caveCeilingTopAngles: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 80}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         '8x2': ceilingBehavior, '9x2': ceilingBehavior,
         '10x2': ceilingBehavior, '11x2': ceilingBehavior,
@@ -761,7 +761,7 @@ const caveCeilingTopAngles: TileSource = {
 
 const caveWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 80}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
         '12x3': topRightWall, '13x3': topRightWall,
@@ -777,7 +777,7 @@ const caveWalls: TileSource = {
 
 const caveStairs: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field' },
     },
@@ -792,28 +792,32 @@ const caveStairs: TileSource = {
 
 const caveLedges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
-        '8x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false },
-        '9x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false },
 
-        '8x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false },
-        '9x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false },
-        '10x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false },
-        '11x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false },
-        '12x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6, low: true, isGround: false },
-        '13x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6, low: true, isGround: false },
+        // Set groundHeight to 1 for ledges so that lava effects do not apply when standing over the
+        // ledge adjacent to lava tiles. This is a bit of a hack because we only check the height of
+        // the actor when looking for collisions, but not for floor hazards.
+        '8x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false, groundHeight: 1 },
+        '9x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false, groundHeight: 1 },
 
-        '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6, isGround: false },
-        '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6, isGround: false },
+        '8x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false, groundHeight: 1 },
+        '9x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false, groundHeight: 1 },
+        '10x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false, groundHeight: 1 },
+        '11x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false, groundHeight: 1 },
+        '12x9': { defaultLayer: 'floor2', ledges: {up: true}, isGround: false, groundHeight: 1 },
+        '13x9': { defaultLayer: 'floor2', ledges: {up: true}, isGround: false, groundHeight: 1 },
 
-        '8x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6, isGround: false },
-        '9x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6, isGround: false },
-        '10x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
-        '11x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
-        '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
-        '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
+        '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_2, isGround: false },
+        '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_2, isGround: false },
+
+        '8x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_2, isGround: false },
+        '9x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_2, isGround: false },
+        '10x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_2, isGround: false },
+        '11x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_2, isGround: false },
+        '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_2, isGround: false },
+        '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_2, isGround: false },
 
         '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright', isGround: false },
         '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft', isGround: false },
@@ -857,7 +861,7 @@ const caveLedges: TileSource = {
 
 const caveFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -878,7 +882,7 @@ const caveFloorDecorations: TileSource = {
 
 const caveFloor: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         '12x5': { defaultLayer: 'floor', linkedOffset: 339 /* 775 -> 1114 */},
         '12x6': { defaultLayer: 'floor', linkedOffset: 338 /* 776 -> 1114 */},
@@ -890,7 +894,7 @@ const caveFloor: TileSource = {
 };
 const caveFloorEdgesGreen: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2', linkedOffset: 339 },
     },
@@ -902,7 +906,7 @@ const caveFloorEdgesGreen: TileSource = {
 };
 const caveFloorEdgesRed: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         // Index 785 should map to 1116
         'all': { defaultLayer: 'floor2', linkedOffset: 331 },
@@ -1039,7 +1043,7 @@ addTiles([
     deletedTiles(2),
     // This is the 'Abyss' tile for the southern edge of walls, it uses bitmap bottom so the player can
     // go behind it a bit.
-    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
+    singleTileSource('gfx/tiles/cavearranged2.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
     solidPitSource,
     stampTileSource(rockWallFrame, [
             [0,0], [1,0], [2, 0],
@@ -1050,7 +1054,7 @@ addTiles([
     }),
     caveFloorPalette,
     // 'Abyss' between walls.
-    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solid: true }, 0, 240),
+    singleTileSource('gfx/tiles/cavearranged2.png', { defaultLayer: 'foreground', isVeryTall: true, solid: true }, 0, 240),
     caveWallsPalette,
     caveCornersPalette,
     spiritPlantsPalette,

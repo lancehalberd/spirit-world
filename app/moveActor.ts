@@ -147,6 +147,8 @@ function moveActorInDirection(
                 actor.jumpingVz = 3;
                 actor.animationTime = 0;
             }
+            // Actor shouldn't be touching the ground when they start jumping down.
+            actor.z = Math.max(actor.z, 1);
             actor.isAirborn = true;
         }
     }

@@ -265,7 +265,7 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
     }
 }
 
-const cavernImage = 'gfx/tiles/cavearranged.png';
+const cavernImage = 'gfx/tiles/cavearranged2.png';
 const cavernCrackedBackground: Frame = requireFrame(cavernImage, {x: 0, y: 240, w: 16, h: 16});
 const cavernEastCrackedWall: Frame = requireFrame(cavernImage, {x: 304, y: 64, w: 16, h: 16});
 const cavernWestCrackedWall: Frame = requireFrame(cavernImage, {x: 320, y: 64, w: 16, h: 16});
@@ -273,26 +273,26 @@ const cavernWestCrackedWall: Frame = requireFrame(cavernImage, {x: 320, y: 64, w
 const cavernSouthCrackedWall: Frame = requireFrame(cavernImage, {x: 320, y: 80, w: 16, h: 16});
 const [
     cavernSouthDoorClosed, cavernSouthDoorOpen, cavernSouthDoorEmpty
-] = createAnimation('gfx/tiles/cavearranged.png', {w: 64, h: 16},
+] = createAnimation('gfx/tiles/cavearranged2.png', {w: 64, h: 16},
     {left: 432, y: 9, cols: 1, rows: 3}).frames;
 const [
     cavernWestDoorClosed, cavernEastDoorClosed, cavernWestDoorOpen, cavernEastDoorOpen,
     /* */, /* */, cavernWestDoorEmpty, cavernEastDoorEmpty,
-] = createAnimation('gfx/tiles/cavearranged.png', {w: 16, h: 64},
+] = createAnimation('gfx/tiles/cavearranged2.png', {w: 16, h: 64},
     {left: 432, y: 0, cols: 4, rows: 2}).frames;
 const [
     cavernWestDoorOpenForeground, cavernEastDoorOpenForeground,
     cavernWestDoorEmptyForeground, cavernEastDoorEmptyForeground,
-] = createAnimation('gfx/tiles/cavearranged.png', {w: 16, h: 64},
+] = createAnimation('gfx/tiles/cavearranged2.png', {w: 16, h: 64},
     {left: 432, top: 192, cols: 4, rows: 1}).frames;
 const [
     cavernStairsUp, cavernStairsDown, cavernNorthDoorway, cavernNorthBlownup,
     /*cavernStairs*/, cavernNorthCrack,
-] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
+] = createAnimation('gfx/tiles/cavearranged2.png', {w: 32, h: 32},
     {left: 304, y: 0, cols: 4, rows: 2}).frames;
 const [
     blockedDoorCover, lockedDoorCover, bigLockedDoorCover,
-] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
+] = createAnimation('gfx/tiles/cavearranged2.png', {w: 32, h: 32},
     {left: 304, top: 224, cols: 3, rows: 1}).frames;
 
 debugCanvas;//(blockedDoorCover);
