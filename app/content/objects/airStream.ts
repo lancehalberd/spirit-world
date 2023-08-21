@@ -14,13 +14,14 @@ import Random from 'app/utils/Random';
 const underFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}).frames[0];
 const overFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}, {x: 1}).frames[0];
 
-const maxLength = 256;
+const maxLength = 192;
 
 export class AirStream implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: AirStreamDefinition = null;
     isObject = <const>true;
+    ignorePits = true;
     x: number;
     y: number;
     d: Direction;
@@ -44,10 +45,9 @@ export class AirStream implements ObjectInstance {
         let blockedPoint: {x: number, y: number};
         const [dx, dy] = directionMap[this.d];
         const cx = this.x + 8, cy = this.y + 8;
-        let x = cx + 8 * dx, y = cy + 8 * dy;
-        for (let i = 0; i < maxLength / 8 - 1; i++) {
-            x += 8 * dx;
-            y += 8 * dy;
+        for (length = 16; length < maxLength; length += 8) {
+            const x = cx + length * dx;
+            const y = cy + length * dy;
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y});
             if (tileBehavior?.solid && !tileBehavior?.low && !tileBehavior?.isSouthernWall) {
                 blockedPoint = {x, y};
@@ -57,11 +57,12 @@ export class AirStream implements ObjectInstance {
                 // 18 seems to work well. If we run into problems with this, we should reduce this to +8 and the
                 // change the calculation for windForce to be based on the amount of edge exposed to the airFlow
                 // rather than the overlapping area.
-                x += 18 * dx;
-                y += 18 * dy;
+                length = Math.min(maxLength, length + 18);
                 break;
             }
         }
+        const x = cx + length * dx;
+        const y = cy + length * dy;
         return {
             effectHitbox: {
                 x: Math.min(x, this.x),
@@ -111,23 +112,27 @@ export class AirStream implements ObjectInstance {
         }
         const [dx, dy] = directionMap[this.d];
         for (const actor of actors) {
-            const actorHitbox = actor.getHitbox(state);
+            const actorHitbox = actor.getHitbox();
             const overlapArea = intersectArea(actorHitbox, effectHitbox);
             const windForce = overlapArea / (actorHitbox.w * actorHitbox.h);
             if (windForce > 0.1) {
                 let speed = 4 * windForce;
                 if (actor.isAirborn) {
-                    speed *= 1.5;
+                    speed *= 1.25;
                 }
                 // Push the actor aloft slightly.
                 // This is intended to be small enough that players still fall with normal boots
                 // but large enough to keep players with cloud boots in the air.
-                actor.z = Math.max(actor.z, Math.min(actor.z + 0.9 * windForce, 2));
+                actor.z = Math.max(actor.z, Math.min(actor.z + 0.3 * windForce, 2));
                 moveActor(state, actor, speed * dx, speed * dy, {
                     canFall: true,
                     canJump: true,
                     canSwim: true,
+                    canPush: false,
                 });
+                // Reduce player velocity if it is against the air stream.
+                if (actor.vx * dx < 0) actor.vx += dx;
+                if (actor.vy * dy < 0) actor.vy += dy;
             }
         }
     }

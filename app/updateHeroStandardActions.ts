@@ -138,8 +138,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         let fallSpeed = 1;
-        if (hero.equippedBoots === 'cloudBoots' || hero.action === 'roll') fallSpeed = 0.2;
+        if (hero.equippedBoots === 'cloudBoots') fallSpeed = 0.2;
         else if (hero.equippedBoots === 'ironBoots') fallSpeed = 2;
+        // else if (hero.action === 'roll') fallSpeed = 0.5;
         hero.z = Math.max(minZ, hero.z - fallSpeed);
         if (hero.z <= minZ) {
             hero.isAirborn = hero.isAstralProjection;
@@ -465,7 +466,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
                     // You can only push if you are moving the direction you are trying to move.
-                    && hero.vx * dx >= 0 && hero.vy * dy >= 0,
+                    // Neither dimension can be negative, and one dimension must be positive.
+                    && (hero.vx * dx >= 0 && hero.vy * dy >= 0) && (hero.vx * dx > 0 || hero.vy * dy > 0),
                 canClimb: !encumbered && !hero.bounce && !isCharging && !hero.isAstralProjection,
                 canCrossLedges: hero.action === 'climbing',
                 // This doesn't mean the player will fall, just that they can move into tiles/objects marked as pits.
