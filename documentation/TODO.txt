@@ -41,9 +41,7 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - Fix broken basement room in tree village.
     - Fix spawn markers in wall of north forest temple.
-    - Fix broken door in elder spirit world.
     - Fix you can somehow fall into the boss room in forest temple.
     - Fix cloud boots don't allow running across multiple tiles any more.
 
