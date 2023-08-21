@@ -41,10 +41,6 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - Fix spawn markers in wall of north forest temple.
-    - Fix you can somehow fall into the boss room in forest temple.
-    - Fix cloud boots don't allow running across multiple tiles any more.
-
     - Extract air stream effect so it can be used as an enemy ability
         - Add a warmup time that can be used as a tell (ramps up from 0-100% effect over N ms).
 

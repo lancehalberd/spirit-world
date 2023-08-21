@@ -201,7 +201,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }, false, () => {
                 hero.action = 'knocked';
                 hero.isAirborn = true;
-                // moveToClosestSpawnMarker(state, hero);
+                moveToClosestSpawnMarker(state, hero);
             });
             return true;
         }

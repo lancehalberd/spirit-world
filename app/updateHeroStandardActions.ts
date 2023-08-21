@@ -138,7 +138,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         let fallSpeed = 1;
-        if (hero.equippedBoots === 'cloudBoots' || hero.action === 'roll') fallSpeed = 0.5;
+        if (hero.equippedBoots === 'cloudBoots' || hero.action === 'roll') fallSpeed = 0.2;
         else if (hero.equippedBoots === 'ironBoots') fallSpeed = 2;
         hero.z = Math.max(minZ, hero.z - fallSpeed);
         if (hero.z <= minZ) {
