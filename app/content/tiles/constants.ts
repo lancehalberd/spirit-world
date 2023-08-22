@@ -124,7 +124,7 @@ export const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: 
 export const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_BOTTOM_LEFT_8};
 export const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_BOTTOM_RIGHT_8};
 
-export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true};
-export const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true};
-export const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, isSouthernWall: true};
-export const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, isSouthernWall: true};
+export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false};
+export const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false};
+export const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, isSouthernWall: true, isGround: false};
+export const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, isSouthernWall: true, isGround: false};

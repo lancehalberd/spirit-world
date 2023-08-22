@@ -41,6 +41,55 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
+    - Make sure door open/close sound effects are playing
+        - Check tomb crystal switch doors specifically.
+
+    - Tasks before next major release
+        - Update save statue dialog
+            - outside waterfall cave
+            - city
+            - jade city
+            - summoner ruins
+            - war palace
+            - lab
+            - forest
+            - spirit forest
+            - sky
+            - spirit sky
+            - gauntlet
+            - holy sanctum
+            - sky palace
+            - forge
+
+        - Fix old cave tiles in peach cave 2F.
+
+        - When hero/clone is falling into a pit, draw it behind all other sprites (on top of the background).
+            - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
+            - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
+
+    - Allow sneaking into grand temple with invisibility
+        - Replace door with open arch guarded by a warrior monk
+        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
+        - Make sure rolling doesn't let you pass
+
+    - Replace inventory tab with editor UI that uses the main inventory screen
+        - Missing items are drawn faded when editing is on.
+        - Clicking an item cycles from 0 -> 1 -> 2 -> 0
+        - Click on big/small keys/map to get dungeon items
+        - Click on chakrams to add upgrades
+        - Click on ores to increase ore count
+
+    - Overworld project
+        - Add lake
+            - Should have two waterfalls/rivers entering from the northwest+northeast on opposite sides of a divide
+            - The lake temple should be near the northwest on what would have been the banks of the river going to the summoner ruins before the crater wascreated
+                - The lake temple should be near the edge of the crater so that it is plausible that it wasn't completely destroyed when the crater was made.
+                - The direction of the creater is west southwest with most of the rim of the crater built up on the south and west.
+                    - The northern rim is mostly the natural elevation of the mountains it ran into
+                    - The lake drains to the east towards the holy city on what was previously a fairly small water shed, but is now much larger due to diverting water from the west water shed.
+            - Add cliffs around parts of the lake.
+                - Maybe we can reduce the exits out of the lake to make pathing more interesting and to help push the player towards the waterfall initially.
+
     - Extract air stream effect so it can be used as an enemy ability
         - Add a warmup time that can be used as a tell (ramps up from 0-100% effect over N ms).
 
@@ -194,15 +243,13 @@ Current tasks:
             - possibly switch the order of tiles to prevent any changes
             - identify and update maps where tiles change
         - crystal
-        - cave
+        - stone
 
     - Hot rooms should burn enemies.
         - This is a little tricky because currently we only calculate whether the current section is hot rather than all active sections.
         - It would be good to do this though as the status quo makes sections the hero isn't in behave inconsistently (as if they match the current section).
         - This will gradually kill enemies that aren't immune to fire damage.
 
-    - Make sure door open/close sound effects are playing
-        - Check tomb crystal switch doors specifically.
 
     - Add respawn flag to objects that causes them to respawn if destroyed.
 
@@ -234,43 +281,6 @@ Current tasks:
         - War God convinces Rival to summon the beasts to the material world to distract the Spirit Gods from his plan
         - While they are "missing" they are actually being given their Vanaran Hearts
 
-    - Tasks before next major release
-        - Update save statue dialog
-            - outside waterfall cave
-            - city
-            - jade city
-            - summoner ruins
-            - war palace
-            - lab
-            - forest
-            - spirit forest
-            - sky
-            - spirit sky
-            - gauntlet
-            - holy sanctum
-            - sky palace
-            - forge
-
-        - Support multiple active missions
-            - On map, highlight the first mission and display a location name
-            - If the user confirms, show them the help text for the mission.
-
-        - When hero/clone is falling, draw it behind all other sprites (on top of the background).
-            - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
-            - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
-
-        - Fix old cave tiles in peach cave 2F.
-
-        - Hint signs:
-            "Want a hint?" or "20 Jade for a hint?"
-
-    - Replace inventory tab with editor UI that uses the main inventory screen
-        - Missing items are drawn faded when editing is on.
-        - Clicking an item cycles from 0 -> 1 -> 2 -> 0
-        - Click on big/small keys/map to get dungeon items
-        - Click on chakrams to add upgrades
-        - Click on ores to increase ore count
-
     - Forge
         - Gold mail offered by NPC if you bring gold ore and 500 money
 
@@ -293,15 +303,10 @@ Current tasks:
     - Flame wall improvement
         - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
 
-    - Mechanic: Windstream
-        - Pushes player back unless they are using iron boots or holding on to a solid object.
-        - Player can push pots to move through wind streams.
-        - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
-        - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
-    - Allow sneaking into grand temple with invisibility
-        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
-        - Make sure rolling doesn't let you pass
+    - Support multiple active missions
+        - On map, highlight the first mission and display a location name
+        - If the user confirms, show them the help text for the mission.
 
     - Idea to fix small hit immunity from preventing larger damage:
         - When setting iframes, record the damage that caused it.
