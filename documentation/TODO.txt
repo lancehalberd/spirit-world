@@ -41,9 +41,6 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - Make sure door open/close sound effects are playing
-        - Check tomb crystal switch doors specifically.
-
     - Tasks before next major release
         - Update save statue dialog
             - outside waterfall cave
