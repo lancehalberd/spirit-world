@@ -23,9 +23,7 @@ dialogueHash.saveStatue = {
     },
     options: [
         {
-            logicCheck: {
-                zones: ['peachCave'],
-            },
+            objectId: 'peachCaveSave',
             text: [
                 {
                     dialogueIndex: 38,
@@ -37,6 +35,35 @@ dialogueHash.saveStatue = {
                         {item:secondChance}
                         Come back if you ever need another Chance.
                         {flag:peachCave:stairsUp}
+                    `
+                },
+            ],
+        },
+        {
+            objectId: 'waterfallCaveSave',
+            text: [
+                {
+                    dialogueType: 'hint',
+                    text: `
+                        The cave hidden behind this waterfall is a
+                        convenient place to hide for Vanara and Humans who
+                        wish to coexist.
+                        {|}Sadly, not many are so open minded.
+                        {item:secondChance}
+                    `
+                },
+            ],
+        },
+        {
+            objectId: 'citySave',
+            text: [
+                {
+                    dialogueType: 'hint',
+                    text: `
+                        Pilgrims come from all across the land to worship at
+                        the Grand Temple in the Holy City.
+                        {|}Although they say all are welcome, one like you won't find it easy to gain entrance.
+                        {item:secondChance}
                     `
                 },
             ],

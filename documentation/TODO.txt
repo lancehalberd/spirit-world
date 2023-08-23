@@ -43,8 +43,6 @@ Pending Graphics From Jon:
 Current tasks:
     - Tasks before next major release
         - Update save statue dialog
-            - outside waterfall cave
-            - city
             - jade city
             - summoner ruins
             - war palace

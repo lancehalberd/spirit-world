@@ -6,13 +6,18 @@ export function getDialogue(dialogueKey: string): DialogueSet {
     return dialogueHash[dialogueKey];
 }
 
-export function selectDialogueOption(state: GameState, dialogueKey: string): DialogueOption {
+export function selectDialogueOption(state: GameState, dialogueKey: string, object?: ObjectInstance): DialogueOption {
     const dialogueSet = getDialogue(dialogueKey);
     if (!dialogueSet) {
         return null;
     }
     for (const dialogueOption of dialogueSet.options) {
-        if (!isLogicValid(state, dialogueOption.logicCheck)) continue;
+        if (dialogueOption.objectId && dialogueOption.objectId !== object?.definition?.id) {
+            continue;
+        }
+        if (dialogueOption.logicCheck && !isLogicValid(state, dialogueOption.logicCheck)) {
+            continue;
+        }
         return dialogueOption;
     }
     return null;
