@@ -12,7 +12,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
-import { getTileBehaviors } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
@@ -76,7 +76,8 @@ export class Teleporter implements ObjectInstance {
         if (!this.area) {
             return false;
         }
-        const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
+        const heroAndClones = new Set([state.hero, ...(state.hero.clones || [])]);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, this.area, {x: this.x + 8, y: this.y + 8}, heroAndClones);
         return tileBehavior.solid;
     }
 

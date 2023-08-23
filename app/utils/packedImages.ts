@@ -61,7 +61,8 @@ const imagePacks: PackedImageData[] = [
         {x:912,y:448,w:96,h:48,originalSource:'gfx/tiles/crystalbeadpiles.png'},
         {x:864,y:640,w:128,h:80,originalSource:'gfx/tiles/lava.png'},
         {x:0,y:784,w:128,h:80,originalSource:'gfx/tiles/lavaStone.png'},
-        {x:912,y:496,w:80,h:64,originalSource:'gfx/tiles/spiritfloor.png'},
+        // This has been updated.
+        //{x:912,y:496,w:80,h:64,originalSource:'gfx/tiles/spiritfloor.png'},
         {x:928,y:112,w:80,h:16,originalSource:'gfx/tiles/cactussheet.png'},
         {x:928,y:80,w:16,h:16,originalSource:'gfx/tiles/pit.png'},
         {x:128,y:784,w:224,h:16,originalSource:'gfx/tiles/grassspirit.png'},
