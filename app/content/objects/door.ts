@@ -253,7 +253,7 @@ export class Door implements ObjectInstance {
         }
         if (!wasOpen && isOpen) {
             playAreaSound(state, this.area, 'doorOpen');
-        } else if (wasOpen && !isOpen) {
+        } else if (wasOpen && !isOpen && !this.renderOpen(state)) {
             playAreaSound(state, this.area, 'doorClose');
         }
         this.applyDoorBehaviorsToArea();
