@@ -43,15 +43,17 @@ Pending Graphics From Jon:
 Current tasks:
     - Tasks before next major release
         - Update save statue dialog
-            - jade city
             - summoner ruins
+            - forest
+            - sky
+            - jade city
+            - spirit forest
+            - gauntlet
+
+
             - war palace
             - lab
-            - forest
-            - spirit forest
-            - sky
             - spirit sky
-            - gauntlet
             - holy sanctum
             - sky palace
             - forge

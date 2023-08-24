@@ -9,6 +9,15 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'peachCave:markerA',
+        paths: [
+            { nodeId: 'peachCavePiece', logic: hasIronBoots },
+            { nodeId: 'peachCaveBottom'},
+        ],
+        entranceIds: ['peachCave:markerA'],
+    },
+    {
+        zoneId,
+        nodeId: 'peachCaveBottom',
         checks: [{ objectId: 'peachCave:0:0x0-weapon-0' }],
         paths: [
             { nodeId: 'peachCaveWaterEntrance', logic: hasIronBoots },
@@ -22,7 +31,7 @@ export const peachCaveNodes: LogicNode[] = [
         nodeId: 'peachCave:stairsUp',
         checks: [{ objectId: 'peachCave:0:0x0-money-0' }],
         paths: [
-            { nodeId: 'peachCave:markerA' },
+            { nodeId: 'peachCaveBottom' },
         ],
         entranceIds: ['peachCave:stairsUp'],
         exits: [{ objectId: 'peachCave:stairsUp' }],
@@ -82,6 +91,8 @@ export const peachCaveNodes: LogicNode[] = [
         paths: [
             { nodeId: 'peachCaveTopEntrance', logic: hasCatEyes },
             { nodeId: 'peachCave:upperSilver', logic: hasClone },
+            // Falling into the pit and holding south allows you to reach the peach piece without iron boots.
+            { nodeId: 'peachCavePiece' },
         ],
         exits: [{ objectId: 'peachCave:pitA' }],
     },
@@ -102,7 +113,8 @@ export const peachCaveNodes: LogicNode[] = [
         nodeId: 'peachCavePiece',
         checks: [{ objectId: 'peachCavePiece' }],
         paths: [
-            { nodeId: 'peachCave:markerA', logic: hasIronBoots },
+            // There is a vortext that allows you to fall under water here.
+            { nodeId: 'peachCave:markerA' },
             { nodeId: 'peachCave:markerB' },
         ],
     },
@@ -112,7 +124,7 @@ export const peachCaveNodes: LogicNode[] = [
         paths: [
             { nodeId: 'peachCave:markerA' },
             { nodeId: 'peachCave:markerB' },
-            { nodeId: 'peachCavePiece' },
+            { nodeId: 'peachCavePiece', logic: hasIronBoots },
         ],
         entranceIds: ['peachCaveUnderwaterEntrance'],
         exits: [
