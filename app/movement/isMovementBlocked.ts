@@ -132,7 +132,7 @@ export function isMovementBlocked(
     if (behaviors?.water && !(movementProperties.canSwim || movementProperties.mustSwim)) {
         return {};
     }
-    if (!(behaviors?.water || behaviors?.shallowWater) && movementProperties.mustSwim) {
+    if (!(behaviors?.water /*|| behaviors?.shallowWater*/) && movementProperties.mustSwim) {
         return {};
     }
     if (behaviors?.pit && !movementProperties.canFall) {

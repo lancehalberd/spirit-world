@@ -71,6 +71,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     groundHeight = 0;
     canBeKnockedBack: boolean = true;
     canBeKnockedDown: boolean = true;
+    canSwim: boolean = false;
     flying: boolean;
     isImmortal: boolean = false;
     isInvulnerable: boolean = false;
@@ -158,6 +159,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.healthBarColor = this.enemyDefinition.healthBarColor;
         this.enemyDefinition.initialize?.(state, this);
         this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
+        this.canSwim = this.enemyDefinition.canSwim;
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);

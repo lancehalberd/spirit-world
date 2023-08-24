@@ -9,16 +9,16 @@ import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 export { directionMap, getDirection } from 'app/utils/direction';
 
-export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
+export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
     return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
 }
 
-export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
+export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
     return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
 }
 window['canSomersaultToCoords'] = canSomersaultToCoords;
 
-export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Tile, movementProperties: MovementProperties): boolean {
+export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Point, movementProperties: MovementProperties): boolean {
    /* return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
         isPointOpen(state, area, {x: x + 13, y: y + 2}, movementProperties) &&
         isPointOpen(state, area, {x: x + 2, y: y + 13}, movementProperties) &&

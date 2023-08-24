@@ -59,6 +59,7 @@ enemyDefinitions.frostHeart = {
     },
     immunities: ['ice'],
     elementalMultipliers: {'fire': 2, 'lightning': 1.5},
+    canSwim: true,
     renderOver: renderIceShield,
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
@@ -97,6 +98,7 @@ enemyDefinitions.frostHeart = {
 };
 enemyDefinitions.frostBeast = {
     animations: snakeAnimations, life: 36, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
+    canSwim: true,
     acceleration: 0.3, speed: 2,
     immunities: ['ice'],
     elementalMultipliers: {'fire': 2, 'lightning': 1.5},

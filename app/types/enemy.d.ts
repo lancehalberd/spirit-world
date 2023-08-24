@@ -53,6 +53,7 @@ interface EnemyDefinition<Params> {
     tileBehaviors?: TileBehaviors
     canBeKnockedBack?: boolean
     canBeKnockedDown?: boolean
+    canSwim?: boolean
     flipLeft?: boolean
     flipRight?: boolean
     flying?: boolean

@@ -84,6 +84,7 @@ Current tasks:
                     - The lake drains to the east towards the holy city on what was previously a fairly small water shed, but is now much larger due to diverting water from the west water shed.
             - Add cliffs around parts of the lake.
                 - Maybe we can reduce the exits out of the lake to make pathing more interesting and to help push the player towards the waterfall initially.
+            - Add cliffs underwater in the lake that bottom out at the location of the helix
 
     - Extract air stream effect so it can be used as an enemy ability
         - Add a warmup time that can be used as a tell (ramps up from 0-100% effect over N ms).
@@ -226,10 +227,6 @@ Current tasks:
 
     - Allow lookind underwater with R2 when you do not have iron boots.
         - Use same effect as spirit sight
-    - Falling in water with high enough velocity transitions you underwater with slightly reduced velocity
-        - Make transition to underwater quicker so it is less annoying.
-        - Allows you to peak underwater, but not really do anything.
-        - Might have a peach piece you can by falling fast enough into the water.
 
     - Forest temple boss should provide a golden peach in addition to the clone tool.
 

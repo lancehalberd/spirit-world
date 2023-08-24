@@ -187,7 +187,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
         const { tileBehavior } = getTileBehaviorsAndObstacles(state, enemy.area, {x, y});
         if (tileBehavior?.pit) {
             makeEnemyFallIntoPit(state, enemy);
-        } else if (tileBehavior?.water) {
+        } else if (tileBehavior?.water && !enemy.canSwim) {
             makeEnemyFallIntoWater(state, enemy);
         }
     }

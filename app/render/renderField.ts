@@ -4,6 +4,7 @@ import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
+    WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
 import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
 import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
@@ -594,7 +595,7 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
 export function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
     if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
         const dz = state.transitionState.nextLocation.z - state.hero.z;
-        if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+        if (state.transitionState.time <= WATER_TRANSITION_DURATION) {
             context.fillStyle = 'black';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             if (!state.transitionState.patternCanvas) {
@@ -611,7 +612,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
-            const p = Math.min(1, state.transitionState.time / CIRCLE_WIPE_OUT_DURATION);
+            const p = Math.min(1, state.transitionState.time / WATER_TRANSITION_DURATION);
             if (state.transitionState.type === 'surfacing') {
                 context.save();
                     context.translate(0, dz + 24);

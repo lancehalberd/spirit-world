@@ -21,6 +21,7 @@ import {
     getDirection,
     getTileBehaviorsAndObstacles,
     hitTargets,
+    isTileOpen,
 } from 'app/utils/field';
 import { fixCamera } from 'app/utils/fixCamera';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -62,6 +63,30 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero) {
         hero.y = best.y;
         fixCamera(state);
     }
+}
+
+export function checkToFallUnderWater(this: void, state: GameState, vz : number): boolean {
+    if (vz > -2 || state.hero.equippedBoots === 'cloudBoots') {
+        return false;
+    }
+    const hero = state.hero;
+    if (hero.swimming && state.underwaterAreaInstance &&
+        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
+    ) {
+        enterLocation(state, {
+            ...state.location,
+            floor: zones[state.zone.underwaterKey].floors.length - 1,
+            zoneKey: state.zone.underwaterKey,
+            x: hero.x,
+            y: hero.y,
+            z: 24,
+        }, false);
+        hero.swimming = false;
+        hero.wading = false;
+        hero.vz = Math.min(-2, vz + 1.5);
+        return true;
+    }
+    return false;
 }
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
@@ -346,6 +371,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 return;
             }
             checkForFloorEffects(state, hero);
+            // This has to be done after checking floor effects to set `hero.isSwimming` correctly.
+            checkToFallUnderWater(state, hero.jumpingVz);
         }
         // Make sure vx/vy are updated for screen transition/slipping logic on landing.
         hero.vx = hero.jumpingVx;
@@ -418,11 +445,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = minZ;
             hero.isAirborn = hero.isAstralProjection;
             hero.action = null;
-            hero.vz = 0;
             // If the hero is at 0 life, they will show the death sequence on top of pits,
             // so we immediately apply floor effects so that they will apply pits before
             // starting the death sequence.
             checkForFloorEffects(state, hero);
+            // Only clear the hero's vz value if they hit solid ground, leave it if they fell underwater.
+            if (!checkToFallUnderWater(state, hero.vz)) {
+                hero.vz = 0;
+            }
         }
         return true;
     }

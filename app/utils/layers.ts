@@ -78,3 +78,10 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
     area.layers.map(initializeAreaLayerTiles);
     return area;
 }
+
+export function getDrawPriority(layer: AreaLayerDefinition): DrawPriority {
+    if (layer.drawPriority) {
+        return layer.drawPriority;
+    }
+    return layer.key.startsWith('foreground') ? 'foreground' : 'background';
+}

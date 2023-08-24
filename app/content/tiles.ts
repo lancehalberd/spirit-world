@@ -804,8 +804,11 @@ const caveLedges: TileSource = {
 
         '8x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false, groundHeight: 1 },
         '9x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false, groundHeight: 1 },
-        '10x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false, groundHeight: 1 },
-        '11x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false, groundHeight: 1 },
+        // Specifically avoid setting groundHeight to 1 for the down direction because we sometimes use this
+        // on water tiles which prevents swimming in those tiles, and we currently don't place lava
+        // directly south of ledge tiles.
+        '10x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false},
+        '11x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false},
         '12x9': { defaultLayer: 'floor2', ledges: {up: true}, isGround: false, groundHeight: 1 },
         '13x9': { defaultLayer: 'floor2', ledges: {up: true}, isGround: false, groundHeight: 1 },
 
@@ -1032,8 +1035,8 @@ addTiles([
         w: 16, h: 16,
         source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
         behaviors: {
-            'all': { linkedOffset: 179, defaultLayer: 'floor2'},
-            '0x0': { linkedOffset: 179, defaultLayer: 'floor'},
+            'all': { linkedOffset: 179, defaultLayer: 'floor2', isGround: false},
+            '0x0': { linkedOffset: 179, defaultLayer: 'floor', isGround: true},
         }
     },
     singleTileSource('gfx/tiles/bush.png', null, 16),

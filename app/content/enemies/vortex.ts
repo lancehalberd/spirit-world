@@ -2,6 +2,7 @@ import { FieldAnimationEffect, splashAnimation } from 'app/content/effects/anima
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { Hero } from 'app/content/hero';
+import { zones } from 'app/content/zones/zoneHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/moveActor';
 import { isUnderwater } from 'app/utils/actor';
@@ -11,6 +12,8 @@ import {
     accelerateInDirection,
     moveEnemy,
 } from 'app/utils/enemies';
+import { enterLocation } from 'app/utils/enterLocation';
+import { isTileOpen } from 'app/utils/field';
 import { removeObjectFromArea } from 'app/utils/objects';
 import {
     getVectorToNearbyTarget,
@@ -23,6 +26,7 @@ const poolAnimation = createAnimation('gfx/tiles/deeptoshallowwater.png', {w: 16
 enemyDefinitions.vortex = {
     animations: {idle: omniAnimation(poolAnimation)},
     acceleration: 0.2, aggroRadius: 88, speed: 1.2,
+    canSwim: true,
     params: {chaseCooldown: 0},
     life: 4,
     update(this: void, state: GameState, enemy: Enemy) {
@@ -65,18 +69,36 @@ enemyDefinitions.vortex = {
                 if (hero.action !== 'falling' && hero.action !== 'fallen') {
                     hero.throwHeldObject(state);
                     hero.heldChakram?.throw(state);
-                    hero.action = 'falling';
-                    hero.animationTime = 400;
-                    hero.x = enemy.x + 4;
-                    hero.y = enemy.y + 4;
-                    enemy.params.chaseCooldown = 1500;
-                    const animation = new FieldAnimationEffect({
-                        animation: splashAnimation,
-                        drawPriority: 'sprites',
-                        // increase y+z by 4 to make this draw in front of the hero fall animation.
-                        x: hero.x, y: hero.y + 4, z: 4
-                    });
-                    addEffectToArea(state, hero.area, animation);
+                    // The vortex will send the player down into the underwater instance if one is defined for this area.
+                    if (hero === state.hero
+                        && state.underwaterAreaInstance
+                        && isTileOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canSwim: true, canFall: true})
+                    ) {
+                        enterLocation(state, {
+                            ...state.location,
+                            floor: zones[state.zone.underwaterKey].floors.length - 1,
+                            zoneKey: state.zone.underwaterKey,
+                            x: hero.x,
+                            y: hero.y,
+                            z: 24,
+                        }, false);
+                        hero.swimming = false;
+                        hero.wading = false;
+                        hero.vz = -3;
+                    } else {
+                        hero.action = 'falling';
+                        hero.animationTime = 400;
+                        hero.x = enemy.x + 4;
+                        hero.y = enemy.y + 4;
+                        enemy.params.chaseCooldown = 1500;
+                        const animation = new FieldAnimationEffect({
+                            animation: splashAnimation,
+                            drawPriority: 'sprites',
+                            // increase y+z by 4 to make this draw in front of the hero fall animation.
+                            x: hero.x, y: hero.y + 4, z: 4
+                        });
+                        addEffectToArea(state, hero.area, animation);
+                    }
                 }
             } else if (mag < 40) {
                 if (hero.z > 0) {

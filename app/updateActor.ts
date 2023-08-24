@@ -328,6 +328,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
     } else if (!isInvisible && !hasBarrier) {
         state.hero.actualMagicRegen = !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen;
+        // Even if the hero has 0 magicRegen, they are still able to regenerate magic up to 0.
+        if (state.hero.magic < 0) {
+            state.hero.actualMagicRegen = Math.max(1, state.hero.actualMagicRegen);
+        }
     }
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
     const preventRegeneration = state.hero.actualMagicRegen < 0
@@ -403,7 +407,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.y = hero.y;
             removeAllClones(state);
         }*/
-        if (isHoldingBreath) {
+        if (state.hero.magic <= -2 && isHoldingBreath) {
             hero.onHit(state, {damage: 1});
         }
     }

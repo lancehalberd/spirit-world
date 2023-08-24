@@ -43,6 +43,7 @@ dialogueHash.saveStatue = {
             objectId: 'waterfallCaveSave',
             text: [
                 {
+                    dialogueIndex: 102,
                     dialogueType: 'hint',
                     text: `
                         The cave hidden behind this waterfall is a
@@ -58,9 +59,10 @@ dialogueHash.saveStatue = {
             objectId: 'citySave',
             text: [
                 {
+                    dialogueIndex: 106,
                     dialogueType: 'hint',
                     text: `
-                        Pilgrims come from all across the land to worship at
+                        Pilgrims come from all across the land to worship here at
                         the Grand Temple in the Holy City.
                         {|}Although they say all are welcome, one like you won't find it easy to gain entrance.
                         {item:secondChance}

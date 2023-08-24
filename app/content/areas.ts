@@ -9,7 +9,7 @@ import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
-import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
+import { getDrawPriority, initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
@@ -254,7 +254,7 @@ export function switchToNextAreaSection(state: GameState): void {
 
 export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition, parentLayer: AreaLayerDefinition): void {
     const tiles = layer.grid.tiles;
-    const isForeground = layer.drawPriority === 'foreground';
+    const isForeground = getDrawPriority(layer) === 'foreground';
     for (let y = 0; y < tiles.length; y++) {
         if (!behaviorGrid[y]) {
             behaviorGrid[y] = [];

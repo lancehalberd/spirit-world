@@ -25,6 +25,7 @@ import {
     directionMap,
     getDirection,
     isPointOpen,
+    isTileOpen,
 } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
@@ -109,10 +110,17 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.z = Math.max(hero.groundHeight, Math.min(hero.z + 1, minZ));
     }
     if (isHeroSinking(state, hero)) {
-        hero.z = Math.max(hero.z - 2, minZ);
+        hero.z = Math.max(hero.z - 1.5, minZ);
     } else if (isHeroFloating(state, hero)) {
-        hero.z = Math.min(24, hero.z + 1);
-        if (hero.z >= 24 && state.surfaceAreaInstance && !state.nextAreaInstance && !state.nextAreaSection) {
+        hero.vz = Math.min(1, hero.vz + 0.2);
+        hero.z = Math.min(24, hero.z + hero.vz);
+        if (hero.z < minZ) {
+            hero.z = Math.max(hero.groundHeight, Math.min(hero.z + 1, minZ));
+            // Setting this allows the hero to hug the bottom for a little while before rising again.
+            // The larger this negative value, the more they can "stick" to the bottom if they fall very fast.
+            hero.vz = Math.max(hero.vz, -2);
+        }
+        if (hero.z >= 24 && hero.vz >= 0 && state.surfaceAreaInstance && !state.nextAreaInstance && !state.nextAreaSection) {
             // You can only surface in areas of deep water, that is, where you would be swimming.
             const testHero = hero.getCopy();
             testHero.z = 0;
@@ -121,7 +129,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             testHero.equippedBoots = 'leatherBoots';
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
-            if (testHero.swimming) {
+            if (testHero.swimming
+                && isTileOpen(state, state.surfaceAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
+            ) {
                 enterLocation(state, {
                     ...state.location,
                     zoneKey: state.zone.surfaceKey,
@@ -149,13 +159,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
 
-    // The astral projection uses the weapon tool as the passive tool button
-    // since you have to hold the normal passive tool button down to meditate.
-
     if (hero.swimming && hero.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
-        isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canSwim: true})
+        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
     ) {
-        const mx = hero.x % 16;
+        /*const mx = hero.x % 16;
         if (mx > 0 && mx < 8) {
             hero.x = Math.max(hero.x - mx, hero.x - 1);
         } else if (mx >= 8) {
@@ -178,7 +185,19 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }, false);
             hero.swimming = false;
             hero.wading = false;
-        }
+        }*/
+        // Previously we only allowed transition on exact tiles, but now we are
+        // experimenting with transitioning immediately.
+        enterLocation(state, {
+            ...state.location,
+            floor: zones[state.zone.underwaterKey].floors.length - 1,
+            zoneKey: state.zone.underwaterKey,
+            x: hero.x,
+            y: hero.y,
+            z: 24,
+        }, false);
+        hero.swimming = false;
+        hero.wading = false;
         return;
     }
     if (hero.action === 'grabbing') {

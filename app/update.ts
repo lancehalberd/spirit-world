@@ -21,7 +21,7 @@ import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
-    MUTATE_DURATION,
+    MUTATE_DURATION, WATER_TRANSITION_DURATION,
     isRandomizer, randomizerGoal, randomizerTotal, randomizerGoalType,
 } from 'app/gameConstants';
 import { initializeGame } from 'app/initialize';
@@ -395,11 +395,11 @@ function updateTransition(state: GameState) {
     state.transitionState.time += FRAME_LENGTH;
     if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
         if (state.hero.z > state.transitionState.nextLocation.z) {
-            state.hero.z = Math.max(state.transitionState.nextLocation.z, state.hero.z - 1);
+            state.hero.z = Math.max(state.transitionState.nextLocation.z, state.hero.z - 2.5);
         } else if (state.hero.z < state.transitionState.nextLocation.z) {
-            state.hero.z = Math.min(state.transitionState.nextLocation.z, state.hero.z + 1);
+            state.hero.z = Math.min(state.transitionState.nextLocation.z, state.hero.z + 2.5);
         }
-        if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
+        if (state.transitionState.time === WATER_TRANSITION_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, true);
             state.transitionState.callback?.();
             updateCamera(state);

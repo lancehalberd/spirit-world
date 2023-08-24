@@ -1,3 +1,4 @@
+import { getDrawPriority } from 'app/utils/layers';
 
 // This resets the tile behavior for a specific tile to whatever the combined behavior of the layers are.
 // This is useful when an object in a tile was overriding the tile behavior beneath it and we need to
@@ -9,7 +10,7 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
         if (!tile) {
             continue;
         }
-        const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
+        const isForeground = getDrawPriority(layer.definition) === 'foreground';
         // Masked tiles are assumed not to set any behaviors as they are mostly hidden by the mask.
         if (layer.definition.mask?.tiles?.[y]?.[x]) {
             continue;
