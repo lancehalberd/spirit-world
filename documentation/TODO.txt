@@ -40,16 +40,26 @@ Pending Graphics From Jon:
     - Eye graphics for looking into the spirit world
     - Storm Beast Statue animations
 
+Holy Sanctum Rhymes form Leon:
+Burst alight if this path thou seek
+And here decide: Do ye be bold or meek?
+
+Bursting crack of lighting we will heed
+Your passage henceforth we shall not impede
+
+
+And passage forth is yours to take
+
+Twins of flesh with cold affinity
+Their crystal might in perfect symmetry
+
+
 Current tasks:
     - Tasks before next major release
         - Update save statue dialog
-            - summoner ruins
-            - forest
-            - sky
             - jade city
             - spirit forest
             - gauntlet
-
 
             - war palace
             - lab

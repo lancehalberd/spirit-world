@@ -71,9 +71,22 @@ dialogueHash.saveStatue = {
             ],
         },
         {
-            logicCheck: {
-                zones: ['tomb'],
-            },
+            objectId: 'forestSave',
+            text: [
+                {
+                    dialogueIndex: 113,
+                    dialogueType: 'hint',
+                    text: `
+                        Humans have agreed to leave the Vanara alone as long as they keep to these woods.
+                        {|}The Vanara seemed satisfied with this arrangement for many years,
+                        but then one day a certain Vanara decided to go on an adventure.
+                        {item:secondChance}
+                    `,
+                },
+            ],
+        },
+        {
+            objectId: 'tombSave',
             text: [
                 {
                     dialogueIndex: 39,
@@ -82,6 +95,20 @@ dialogueHash.saveStatue = {
                         This "Tomb" is just a facade.
                         {|}The Vanara have hidden something important under
                         it where even the Spirit Gods cannot reach.
+                        {item:secondChance}
+                    `,
+                },
+            ],
+        },
+        {
+            objectId: 'summonerRuinsSave',
+            text: [
+                {
+                    dialogueIndex: 114,
+                    dialogueType: 'hint',
+                    text: `
+                        This was once the Capitol of a powerful and prosperous nation.
+                        {|}They say the Summoners who lived here made pacts with spirits to give them great powers.
                         {item:secondChance}
                     `,
                 },
@@ -99,6 +126,24 @@ dialogueHash.saveStatue = {
                         Long ago the God of the Summoners was the uncontested ruler of all realms.
                         {|}With the power of the "Three Calamaties" no nation could stand against the Summoners.
                         {|}But the Summoners' thirst for power would be their undoing, or so the story goes.
+                        {item:secondChance}
+                    `,
+                },
+            ],
+        },
+        {
+            logicCheck: {
+                zones: ['peaksSave'],
+            },
+            text: [
+                {
+                    dialogueIndex: 125,
+                    dialogueType: 'hint',
+                    text: `
+                        There is a legend that long ago a mighty beast of eternal fire errupted from
+                        the top of this mountain and threatened to consume the world.
+                        {|}The threat was so great that in order to defeat it, the Spirit Gods
+                        forged a weapon that could even kill a God.
                         {item:secondChance}
                     `,
                 },
