@@ -38,31 +38,11 @@ Graphics:
 
 
 Current tasks:
-    - Don't show Staff Tower instructions multiple times.
 
     - Tasks before next major release
-        - Update save statue dialog
-            - jade city
-            - spirit forest
-            - gauntlet
-
-            - war palace
-            - lab
-            - spirit sky
-            - holy sanctum
-            - sky palace
-            - forge
-
-        - Fix old cave tiles in peach cave 2F.
-
         - When hero/clone is falling into a pit, draw it behind all other sprites (on top of the background).
             - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
             - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
-
-    - Allow sneaking into grand temple with invisibility
-        - Replace door with open arch guarded by a warrior monk
-        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
-        - Make sure rolling doesn't let you pass
 
     - Replace inventory tab with editor UI that uses the main inventory screen
         - Missing items are drawn faded when editing is on.
@@ -70,6 +50,24 @@ Current tasks:
         - Click on big/small keys/map to get dungeon items
         - Click on chakrams to add upgrades
         - Click on ores to increase ore count
+
+    - Save statues missing dialog:
+        - jade city
+        - spirit forest
+        - gauntlet
+
+        - war palace
+        - lab
+        - spirit sky
+        - holy sanctum
+        - sky palace
+        - forge
+
+    - Allow sneaking into grand temple with invisibility
+        - Replace door with open arch guarded by a warrior monk
+        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
+        - Make sure rolling doesn't let you pass
+
 
     - Leon respawned at a door and kept going up/down the entrance stairs to the lightning sanctum.
         - I could not reproduce however and couldn't see anything suspicious in the code.
