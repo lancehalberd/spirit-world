@@ -159,6 +159,9 @@ export function isMovementBlocked(
         return false;
     }
     if (behaviors?.solid) {
+        if (behaviors.pickupWeight <= movementProperties.crushingPower) {
+            return false;
+        }
         return {};
     }
     if (behaviors?.solidMap) {

@@ -612,6 +612,17 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             combinedResult.hit = true;
             continue;
         }
+        if (behavior?.pickupWeight <= hit.crushingPower) {
+            // We need to find the specific liftable layers that can be destroyed.
+            for (const layer of area.layers) {
+                const tile = layer.tiles[target.y][target.x];
+                if (tile?.behaviors?.pickupWeight <= hit.crushingPower) {
+                    destroyTile(state, area, {...target, layerKey: layer.key});
+                }
+            }
+            combinedResult.hit = true;
+            continue;
+        }
         if (
             (
                 (behavior?.cuttable > hit.damage || behavior?.solid)

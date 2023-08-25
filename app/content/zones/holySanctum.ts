@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -902,9 +901,9 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 160, y: 288, type: "crystalSwitch", element: "fire", timer: 100, targetObjectId: "fireSanctumEntrance"},
         {status: "normal", id: "", x: 304, y: 48, type: "crystalSwitch", element: "lightning", timer: 100, targetObjectId: "lightningSanctumEntrance"},
         {status: "normal", id: "", x: 192, y: 48, type: "crystalSwitch", element: "lightning", timer: 300, targetObjectId: "lightningSanctumEntrance"},
-        {status: "normal", id: "", x: 64, y: 304, style: "short", type: "sign", message: "A burst of flame will light the way."},
-        {status: "normal", id: "", x: 432, y: 304, style: "short", type: "sign", message: "Two must wield ice in perfect harmony."},
-        {status: "normal", id: "", x: 128, y: 48, style: "short", type: "sign", message: "A lightning fast shot completes the circuit."},
+        {status: "normal", id: "", x: 64, y: 304, style: "short", type: "sign", message: "Erupting flames will never fail\n[-]For those intent on blazing trails."},
+        {status: "normal", id: "", x: 432, y: 304, style: "short", type: "sign", message: "Twins of flesh with cold affinity\n[-]Their crystal might in perfect symmetry."},
+        {status: "normal", id: "", x: 128, y: 48, style: "short", type: "sign", message: "Blinding crack of lightning make\n[-]And passage forth is yours to take."},
         {status: "normal", id: "holySanctumSave", x: 208, y: 72, type: "saveStatue"},
     ],
     sections: [
@@ -917,6 +916,7 @@ const sf1_0x0: AreaDefinition = null;
 const sf1_0x1: AreaDefinition = null;
 zones.holySanctum = {
     key: 'holySanctum',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [

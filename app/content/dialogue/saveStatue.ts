@@ -115,9 +115,7 @@ dialogueHash.saveStatue = {
             ],
         },
         {
-            logicCheck: {
-                zones: ['warTemple'],
-            },
+            objectId: 'warTempleSave',
             text: [
                 {
                     dialogueIndex: 40,
@@ -132,9 +130,7 @@ dialogueHash.saveStatue = {
             ],
         },
         {
-            logicCheck: {
-                zones: ['peaksSave'],
-            },
+            objectId: 'peaksSave',
             text: [
                 {
                     dialogueIndex: 125,

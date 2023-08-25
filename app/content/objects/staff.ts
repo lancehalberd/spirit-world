@@ -18,11 +18,12 @@ debugCanvas;//(leftAnimation.frames[0]);
 
 interface Props {
     x?: number
-    y?: number,
-    damage?: number,
-    direction: Direction,
-    element: MagicElement,
-    maxLength: number,
+    y?: number
+    damage?: number
+    direction: Direction
+    crushingPower: number
+    element: MagicElement
+    maxLength: number
 }
 
 export class Staff implements ObjectInstance {
@@ -50,7 +51,7 @@ export class Staff implements ObjectInstance {
     recalling: boolean = false;
     // Used to track which hero to assign this staff to if it is switched to a new area.
     hero: Hero;
-    constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props) {
+    constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4, crushingPower }: Props) {
         // Note this assumes the staff is always added to the area the hero is in.
         this.area = state.areaInstance;
         x = x | 0;
@@ -76,6 +77,7 @@ export class Staff implements ObjectInstance {
         const movementProperties: MovementProperties = {
             boundingBox: getSectionBoundingBox(state, this),
             canFall: true, canSwim: true, canWiggle: true, dx, dy,
+            crushingPower,
         };
         for (let i = 0; i < maxLength * 4; i++) {
             const {mx, my} = moveObject(state, this, dx, dy, movementProperties);

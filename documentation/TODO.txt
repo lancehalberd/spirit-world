@@ -36,23 +36,6 @@ Graphics:
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
-Pending Graphics From Jon:
-    - Eye graphics for looking into the spirit world
-    - Storm Beast Statue animations
-
-Holy Sanctum Rhymes form Leon:
-Burst alight if this path thou seek
-And here decide: Do ye be bold or meek?
-
-Bursting crack of lighting we will heed
-Your passage henceforth we shall not impede
-
-
-And passage forth is yours to take
-
-Twins of flesh with cold affinity
-Their crystal might in perfect symmetry
-
 
 Current tasks:
     - Tasks before next major release
@@ -85,6 +68,9 @@ Current tasks:
         - Click on big/small keys/map to get dungeon items
         - Click on chakrams to add upgrades
         - Click on ores to increase ore count
+
+    - Leon respawned at a door and kept going up/down the entrance stairs to the lightning sanctum.
+        - I could not reproduce however and couldn't see anything suspicious in the code.
 
     - Overworld project
         - Add lake
@@ -144,6 +130,7 @@ Current tasks:
         - Show a map cue any time the floor changes when entering a new area section.
 
     - Allow freezing tiles behind foreground walls
+        - Also allow freezing water tiles underneath masks so the ice appears under the shore line.
         - This should be okay since the solid/solidMap is applied on top of the frozen layer
         - Test that this doesn't break unfreezing the tile.
         - In particular there are water tiles behind southern foreground walls that cannot be frozen which is unintuitive and annoying
@@ -570,9 +557,6 @@ Minigame Ideas:
 
 
 Staff Improvements:
-    - Level 1 staff destroys bushes
-    - Level 2 staff destroys light rocks+cracked pots
-        - Bonk to open cracked walls.
     - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer
         - This should start at 4x1, 5x1 then 6x2->10x2, 11x3->15x3, 16x4->20x4
         - Preview will only show the max size that will fit in the current space

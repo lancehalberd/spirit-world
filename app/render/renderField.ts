@@ -70,7 +70,7 @@ function applyScreenShakes(context: CanvasRenderingContext2D, state: GameState) 
             ? ( 1 - t / (screenShake.endTime - screenShake.startTime))
             : 1;
         const amplitude = p * Math.sin(t / 20);
-        context.translate(screenShake.dx * amplitude, screenShake.dy * amplitude);
+        context.translate(Math.round(screenShake.dx * amplitude), Math.round(screenShake.dy * amplitude));
     }
 }
 

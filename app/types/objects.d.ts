@@ -231,6 +231,10 @@ interface MovementProperties {
     // The delta for the complete movement.
     dx?: number
     dy?: number
+    // If this is set, allow moving through objects that can be lifted with this power level:
+    // 0 - bushes, 1 - light stones, 2 - heavy stones.
+    // This was added to support the staff destroying bushes/small rocks, but might be used for enemies as well.
+    crushingPower?: number
 }
 
 interface Projectile {
@@ -289,6 +293,8 @@ interface HitProperties {
     canPush?: boolean
     // Whether this can cut ground tiles like thorns.
     cutsGround?: boolean
+    // Describes the heavyness of liftable tiles that this hit can destroy.
+    crushingPower?: number
     // Whether this can destroy destructible objects like pots and cracked doorways.
     destroysObjects?: boolean
     // If this is true, the hit will knock targets away from the hit itself based on the geometry.

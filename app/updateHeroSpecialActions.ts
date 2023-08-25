@@ -247,11 +247,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }
             hero.takeDamage(state, damage);
             destroyClone(state, hero);
+            hero.action = null;
             // stop updating this hero if it was a clone that got destroyed by taking damage.
             if (!hero.area) {
                 return;
             }
-            hero.action = null;
         }
         return true;
     }
@@ -287,7 +287,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Check if the hero is done moving through the door meaning:
         // They are no longer intersecting the door object
         // They are in an open tile.
-        const touchingTarget = hero.actionTarget && boxesIntersect(hero, hero.actionTarget.getHitbox(state));
+        const touchingTarget = hero.actionTarget && boxesIntersect(hero, hero.actionTarget.getHitbox());
         if (!touchingTarget && isHeroOnOpenTile(state, hero)) {
             hero.actionTarget = null;
             hero.isUsingDoor = false;
@@ -520,6 +520,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }
             const staffLevel = state.hero.savedData.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
+            const crushingPower = staffLevel > 1 ? 2 : 1;
             const staff = new Staff(state, {
                 x: hero.x,
                 y: hero.y,
@@ -527,6 +528,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 direction: hero.d,
                 element: hero.savedData.element,
                 maxLength,
+                crushingPower,
             });
             let baseTarget: Rect = staff.getAttackHitbox();
             if (!staff.isInvalid && !hero.canceledStaffPlacement) {
@@ -571,6 +573,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             });
             hitTargets(state, state.areaInstance, {
                 hitbox: baseTarget,
+                hitTiles: true,
+                crushingPower,
                 hitObjects: true,
                 isStaff: true,
                 isBonk: staff.staffBonked,
