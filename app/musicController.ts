@@ -30,9 +30,6 @@ export const updateMusic = (state: GameState): void => {
     // The modeTime check her is to make sure that the boss music plays long enough to continue
     // if one boss is defeated and spawns a second boss, like with the Balloon Megapede boss.
     const livingBosses = bosses.filter(boss => !boss.isDefeated || boss.modeTime <= 100);
-    if (bosses.length && !livingBosses.length) {
-        console.log(bosses);
-    }
     const location = getFullZoneLocation(state.location);
     if (bosses.length) {
         if (!livingBosses.length) {
