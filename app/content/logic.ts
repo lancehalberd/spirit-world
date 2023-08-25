@@ -183,6 +183,9 @@ export const canBeatGolem = andLogic(hasBossWeapon, canAvoidBossAttacks);
 export const canBeatIdols = andLogic(hasBossWeapon, canAvoidBossAttacks);
 export const canDefeatBalloonMegapede = andLogic(hasBossWeapon, canAvoidBossAttacks);
 
+export const canRemoveLightStones = orLogic(hasGloves, hasStaff);
+export const canRemoveHeavyStones = orLogic(hasMitts, canHasTowerStaff);
+
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot
 // stand still at the edge of the gap.

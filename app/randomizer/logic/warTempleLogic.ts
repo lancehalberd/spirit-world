@@ -1,6 +1,6 @@
 import {
     orLogic,
-    hasGloves, canBeatIdols,
+    canRemoveLightStones, canBeatIdols,
     hasSpiritSight, hasTrueSight, hasWeapon,
     logicHash
 } from 'app/content/logic';
@@ -81,7 +81,7 @@ export const warTempleNodes: LogicNode[] = [
         nodeId: 'warTempleMainEntrance',
         paths: [
             {nodeId: 'warTempleKeyDoor'},
-            {nodeId: 'warTemple:0:1x0-smallKey-0', logic: hasGloves},
+            {nodeId: 'warTemple:0:1x0-smallKey-0', logic: canRemoveLightStones},
         ],
         entranceIds: ['warTempleMainEntrance', 'warTempleLock1'],
         exits: [
@@ -96,11 +96,11 @@ export const warTempleNodes: LogicNode[] = [
             {objectId: 'warTemple:0:1x0-smallKey-0'},
             // The player can defeat all these enemies using stones now that enemies stay
             // defeated when leaving and returning to rooms.
-            {objectId: 'warTemple:0:0x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
-            {objectId: 'warTempleMap', logic: orLogic(hasWeapon, hasGloves)},
+            {objectId: 'warTemple:0:0x0-money-0', logic: orLogic(hasWeapon, canRemoveLightStones)},
+            {objectId: 'warTempleMap', logic: orLogic(hasWeapon, canRemoveLightStones)},
         ],
         paths: [
-            {nodeId: 'warTempleMainEntrance', logic: hasGloves},
+            {nodeId: 'warTempleMainEntrance', logic: canRemoveLightStones},
         ],
     },
     {

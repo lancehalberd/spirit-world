@@ -1,7 +1,7 @@
 import {
     andLogic, orLogic,
     canCross2Gaps, hasSpiritSight, hasTrueSight,
-    hasAstralProjection, hasClone, canBeatGolem, hasGloves, hasMediumRange,
+    hasAstralProjection, hasClone, canBeatGolem, canRemoveLightStones, hasMediumRange,
     hasRangedPush, hasWeapon,
 } from 'app/content/logic';
 
@@ -45,7 +45,7 @@ export const tombNodes: LogicNode[] = [
             {nodeId: 'tombMiddleHallway'},
             {nodeId: 'tombBeforeBigKey', doorId: 'tombLock2'},
             {nodeId: 'tombBigKey', doorId: 'tombBigLock3'},
-            {nodeId: 'tombSilverRoom', logic: andLogic(hasMediumRange, orLogic(canCross2Gaps, hasGloves))},
+            {nodeId: 'tombSilverRoom', logic: andLogic(hasMediumRange, orLogic(canCross2Gaps, canRemoveLightStones))},
         ],
         entranceIds: ['tombBasementEntrance'],
         exits: [{ objectId: 'tombBasementEntrance'}],
@@ -70,14 +70,14 @@ export const tombNodes: LogicNode[] = [
         nodeId: 'tombSilverRoom',
         checks: [{objectId: 'tombSilver', logic: hasWeapon}],
         paths: [
-            {nodeId: 'tombBigChest', logic: orLogic(canCross2Gaps, hasGloves)},
+            {nodeId: 'tombBigChest', logic: orLogic(canCross2Gaps, canRemoveLightStones)},
         ],
     },
     {
         zoneId,
         nodeId: 'tombBasementEntrance',
         paths: [
-            {nodeId: 'beforeTombBoss', logic: orLogic(canCross2Gaps, hasGloves)},
+            {nodeId: 'beforeTombBoss', logic: orLogic(canCross2Gaps, canRemoveLightStones)},
         ],
         entranceIds: ['tombBasementEntrance'],
         exits: [{ objectId: 'tombBasementEntrance'}],
@@ -86,7 +86,7 @@ export const tombNodes: LogicNode[] = [
         zoneId,
         nodeId: 'beforeTombBoss',
         paths: [
-            {nodeId: 'tombBasementEntrance', logic: orLogic(canCross2Gaps, hasGloves)},
+            {nodeId: 'tombBasementEntrance', logic: orLogic(canCross2Gaps, canRemoveLightStones)},
             {nodeId: 'tombBoss', doorId: 'tombBossDoor'},
         ],
     },
@@ -104,7 +104,7 @@ export const tombNodes: LogicNode[] = [
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'tomb:0:1x0-npc-0', lootType: 'spiritSight'}, progressFlags: ['tombTeleporter']},
         ],
-        paths: [{ nodeId: 'tombCocoonEntrance', logic: hasGloves}],
+        paths: [{ nodeId: 'tombCocoonEntrance', logic: canRemoveLightStones}],
         entranceIds: ['tombTeleporter'],
         exits: [
             {objectId: 'tombTeleporter', logic: orLogic(hasSpiritSight, hasTrueSight)},

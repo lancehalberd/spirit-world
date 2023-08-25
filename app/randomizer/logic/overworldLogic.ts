@@ -1,8 +1,10 @@
 import {
     andLogic,
+    canCross2Gaps, hasGloves,
     canCross4Gaps, canUseTeleporters, hasReleasedBeasts, canTravelFarUnderWater,
-    hasCloudBoots, hasIronBoots, hasFire, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
-    hasMediumRange, hasNimbusCloud, hasSpiritSight, hasTrueSight, orLogic,
+    hasCloudBoots, hasIronBoots, hasFire, canRemoveHeavyStones, canRemoveLightStones,
+    hasIce, hasSomersault, hasTeleportation,
+    hasMediumRange, hasNimbusCloud, hasSpiritSight, hasStaff, hasTrueSight, orLogic,
     hasInvisibility, hasLightningBlessing, hasLightning,
 } from 'app/content/logic';
 
@@ -16,11 +18,11 @@ export const mainOverworldNode: LogicNode = {
         {dialogueKey: 'streetVendor', optionKey: 'purchase2', logic: hasReleasedBeasts},
     ],
     paths: [
-        { nodeId: 'overworldMountain', logic: hasGloves },
+        { nodeId: 'overworldMountain', logic: canRemoveLightStones },
         { nodeId: 'forestArea' },
         { nodeId: 'warTempleArea' },
         { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
-        { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
+        { nodeId: 'overworldLakeTunnel', logic: orLogic(canRemoveLightStones, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
         { nodeId: 'forestTowerSky', logic: andLogic({requiredFlags: ['stormBeast']})},
@@ -87,7 +89,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'overworldLakeTunnel',
         entranceIds: ['lakeTunnelEntrance'],
         paths: [
-            { nodeId: 'overworldMain', logic: orLogic(hasGloves, hasTeleportation) },
+            { nodeId: 'overworldMain', logic: orLogic(canRemoveLightStones, hasTeleportation) },
         ],
         exits: [
             { objectId: 'lakeTunnelEntrance'}
@@ -138,11 +140,11 @@ export const overworldNodes: LogicNode[] = [
         ],
         exits: [
             { objectId: 'warTempleChestEntrance' },
-            { objectId: 'warTempleEastEntrance', logic: hasGloves },
+            { objectId: 'warTempleEastEntrance', logic: canRemoveLightStones },
             { objectId: 'warTempleEntrance', logic: orLogic(hasSpiritSight, hasTrueSight) },
             { objectId: 'warTempleNortheastEntrance' },
             { objectId: 'warTempleNorthEntrance' },
-            { objectId: 'warTemplePeachEntrance', logic: hasGloves },
+            { objectId: 'warTemplePeachEntrance', logic: canRemoveLightStones },
             { objectId: 'warTempleKeyDoor', logic: {requiredFlags: ['warTempleKeyDoor']} },
         ],
     },
@@ -155,7 +157,10 @@ export const overworldNodes: LogicNode[] = [
         ],
         paths: [
             { nodeId: 'overworldMain' },
-            { nodeId: 'overworldWaterfall', logic: orLogic(hasSomersault, hasTeleportation, hasMitts) },
+            {
+                nodeId: 'overworldWaterfall',
+                logic: orLogic(hasStaff, hasSomersault, hasTeleportation, canRemoveHeavyStones)
+            },
             { nodeId: 'overworldMountainWater', logic: hasIronBoots },
         ],
         entranceIds: ['caves-ascentEntrance'],
@@ -165,7 +170,7 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'overworldWaterfall',
         paths: [
-            { nodeId: 'overworldMountain', logic: orLogic(hasSomersault, hasTeleportation, hasIronBoots, hasMitts) },
+            { nodeId: 'overworldMountain', logic: orLogic(andLogic(hasGloves, canCross2Gaps), hasSomersault, hasStaff, hasTeleportation, hasIronBoots, canRemoveHeavyStones) },
         ],
         entranceIds: ['waterfallTowerEntrance'],
         exits: [{ objectId: 'waterfallTowerEntrance' }],
@@ -183,11 +188,11 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'mainSpiritWorld',
         checks: [],
         paths: [
-            { nodeId: 'spiritWorldMountain', logic: hasGloves },
+            { nodeId: 'spiritWorldMountain', logic: canRemoveLightStones },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'overworldLakePiece', logic: canUseTeleporters },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
-            { nodeId: 'warTempleSpiritArea', logic: hasMitts },
+            { nodeId: 'warTempleSpiritArea', logic: canRemoveHeavyStones },
         ],
         entranceIds: [
             'fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance', 'jadeCitySoutheastDoor',
@@ -241,7 +246,7 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleSpiritArea',
         paths: [
-            { nodeId: 'mainSpiritWorld', logic: hasMitts },
+            { nodeId: 'mainSpiritWorld', logic: canRemoveHeavyStones },
         ],
         entranceIds: [
             'warTempleEntranceSpirit',
@@ -463,7 +468,7 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'waterfallTowerSky', logic: orLogic(hasCloudBoots, canCross4Gaps) },
         ],
-        exits: [{ objectId: 'skyPalacePitEntrance', logic: hasMitts}],
+        exits: [{ objectId: 'skyPalacePitEntrance', logic: canRemoveHeavyStones}],
     },
     {
         zoneId,

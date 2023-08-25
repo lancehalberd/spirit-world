@@ -1,7 +1,7 @@
 import {
     canCross2Gaps, canDefeatBalloonMegapede,
     hasBossWeapon, hasClone, hasIce, hasInvisibility,
-    hasLightning, hasLightningBlessing, hasMitts,
+    hasLightning, hasLightningBlessing, canRemoveHeavyStones,
     hasSomersault, hasTowerStaff, hasTrueSight,
     orLogic,
 } from 'app/content/logic';
@@ -30,7 +30,7 @@ export const skyPalaceNodes: LogicNode[] = [
             { nodeId: 'skyPalaceKeyArea', logic: hasSomersault},
             { nodeId: 'skyPalaceNorthwestLedge', logic: orLogic(hasLightningBlessing, hasLightning, hasInvisibility)},
             { nodeId: 'skyPalaceSouthwestLedge', logic: orLogic(hasIce, hasClone)},
-            { nodeId: 'skyPalaceEastLedge', logic: hasMitts},
+            { nodeId: 'skyPalaceEastLedge', logic: canRemoveHeavyStones},
         ],
         entranceIds: ['skyPalaceEntrance'],
         exits: [

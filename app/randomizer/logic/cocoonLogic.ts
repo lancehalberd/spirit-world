@@ -6,7 +6,7 @@ import {
     hasAstralProjection,
     hasBossWeapon,
     hasSpiritBarrier,
-    hasGloves,
+    canRemoveLightStones,
     hasSomersault,
     hasTeleportation,
 } from 'app/content/logic';
@@ -50,7 +50,7 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon4SE',
-        checks: [{objectId: 'cocoonBigKey', logic: andLogic(hasAstralProjection, hasGloves)}],
+        checks: [{objectId: 'cocoonBigKey', logic: andLogic(hasAstralProjection, canRemoveLightStones)}],
         paths: [{nodeId: 'cocoonEntrance', logic: canUseTeleporters}],
         entranceIds: ['cocoonSealedLockedDoor'],
     },
@@ -71,7 +71,7 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon3NE',
-        checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, hasGloves)}],
+        checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, canRemoveLightStones)}],
         paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonLadderNE'],
     },

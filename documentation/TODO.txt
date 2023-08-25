@@ -38,6 +38,8 @@ Graphics:
 
 
 Current tasks:
+    - Don't show Staff Tower instructions multiple times.
+
     - Tasks before next major release
         - Update save statue dialog
             - jade city

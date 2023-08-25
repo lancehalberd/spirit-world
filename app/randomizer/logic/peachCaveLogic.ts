@@ -1,6 +1,6 @@
 import {
     canTravelFarUnderWater, hasBossWeapon, hasCatEyes,
-    hasClone, hasIronBoots, hasGloves, hasWeapon,
+    hasClone, hasIronBoots, canRemoveLightStones, hasWeapon,
 } from 'app/content/logic';
 
 
@@ -61,7 +61,7 @@ export const peachCaveNodes: LogicNode[] = [
         nodeId: 'peachCave:pitB',
         paths: [
             // Need mitts to lift rocks at the top of the stairs.
-            { nodeId: 'peachCave:upperSilver', logic: hasGloves },
+            { nodeId: 'peachCave:upperSilver', logic: canRemoveLightStones },
             { nodeId: 'peachCaveBoss' },
         ],
         exits: [{ objectId: 'peachCave:pitB' }],
