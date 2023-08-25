@@ -499,8 +499,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                         const objectHitbox = {...object.getHitbox()};
                         // Make the effective hitbox slightly south of the mark so that
                         // the player won't be inside the door when they activate the tower.
-                        objectHitbox.y += 6;
-                        if (isObjectInsideTarget(hitbox, pad(objectHitbox, 6))) {
+                        objectHitbox.y += 8;
+                        if (isObjectInsideTarget(hitbox, pad(objectHitbox, 8))) {
                             onTowerMarker = true;
                             break;
                         }

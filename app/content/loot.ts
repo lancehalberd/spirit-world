@@ -123,8 +123,13 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         // obtained tools
         case 'bow':
         case 'cloak':
-        case 'staff':
             return `You have obtained the ${lootName}!` + equipToolMessage;
+        case 'staff':
+            if (!state.savedState.objectFlags.readTowerStaffMessage) {
+                return `You have obtained the ${lootName}!` + equipToolMessage;
+            } else {
+                return `You have obtained the ${lootName}!`;
+            }
         // blessed with passives
         case 'catEyes':
         case 'ironSkin':
@@ -199,6 +204,11 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                     + '{|}You can use the staff as a weapon and a bridge!'
                     + '{|}Press [B_TOOL] again to summon the staff back to you.';
             }
+            // Only show this message the first time the tower staff is obtained.
+            if (state.savedState.objectFlags.readTowerStaffMessage) {
+                return;
+            }
+            state.savedState.objectFlags.readTowerStaffMessage = true;
             return 'This Staff is unbelievably large and powerful!';
         case 'gloves':
             if (state.hero.savedData.passiveTools.gloves === 1) {
