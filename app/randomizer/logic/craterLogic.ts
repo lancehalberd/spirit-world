@@ -1,13 +1,18 @@
 import {
     andLogic,
+    canRemoveLightStones,
     hasFireBlessing,
+    hasIce,
     hasInvisibility,
     hasBossWeapon,
     hasPhoenixCrown,
     hasRoll,
+    hasSomersault,
     orLogic,
 } from 'app/content/logic';
 
+
+const canCrossLava = orLogic(hasSomersault, hasInvisibility, hasIce);
 
 // This logic does not appropriately support traversing the tower in reverse.
 const zoneId = 'crater';
@@ -24,35 +29,34 @@ export const craterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'craterEntrance',
+        checks: [{objectId: 'craterMap'}],
         paths: [
             // Eventually this will also require the staff.
             {nodeId: 'craterLevel2', logic: hasBossWeapon},
+            {nodeId: 'craterNorthLedge', logic: canCrossLava},
         ],
-        entranceIds: ['craterEntrance',],
-        exits: [{objectId: 'craterEntrance'}],
+        entranceIds: ['craterEntrance', 'craterRightDoor'],
+        exits: [{objectId: 'craterEntrance'}, {objectId: 'craterRightDoor'}],
     },
     {
         zoneId,
         nodeId: 'craterLevel2',
-        checks: [{objectId: 'craterMap'}],
+        checks: [{objectId: 'craterSilver'}],
         paths: [
             // Eventually this will also require the staff.
-            {nodeId: 'craterLevel3'},
+            {nodeId: 'craterLevel3', doorId: 'craterLava2'},
         ],
-        entranceIds: ['craterLockedDoor',],
-        exits: [{objectId: 'craterLockedDoor'}],
+        entranceIds: ['craterLockedDoor', 'craterMidDoor', 'craterStairs'],
+        exits: [{objectId: 'craterLockedDoor'}, {objectId: 'craterMidDoor'}, {objectId: 'craterStairs'}],
     },
     {
         zoneId,
         nodeId: 'craterLevel3',
         checks: [
             {objectId: 'craterBigMoney'},
-            {objectId: 'craterKey', logic: hasBossWeapon}
+            {objectId: 'craterKey2', logic: hasBossWeapon}
         ],
-        paths: [
-            // Eventually this will also require the staff.
-            {nodeId: 'craterLevel3'},
-        ],
+        paths: [],
         entranceIds: ['craterLowerDoor', 'craterEastDoor'],
         exits: [{objectId: 'craterLowerDoor'}, {objectId: 'craterEastDoor'}],
     },
@@ -65,7 +69,7 @@ export const craterNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'craterPassageUp',
+        nodeId: 'craterWestPassage',
         entranceIds: ['craterLowerDoor', 'craterUpperDoor'],
         exits: [
             {objectId: 'craterLowerDoor'},
@@ -83,10 +87,66 @@ export const craterNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'craterRiverCave',
-        entranceIds: ['craterEastDoor', 'craterLavaDoor'],
+        nodeId: 'craterMiddlePassage',
+        entranceIds: ['craterMidDoor', 'craterInnerLeftDoor'],
         exits: [
-            {objectId: 'craterEastDoor'},
+            {objectId: 'craterMidDoor'},
+            {objectId: 'craterInnerLeftDoor'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'craterNorthLedge',
+        entranceIds: ['craterInnerLeftDoor', 'craterInnerRightDoor'],
+        exits: [
+            {objectId: 'craterInnerLeftDoor'},
+            {objectId: 'craterInnerRightDoor'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'craterEastPassageTop',
+        checks: [{objectId: 'craterKey1'}],
+        paths: [
+            {nodeId: 'craterEastPassageBottom'},
+        ],
+        entranceIds: ['craterInnerRightDoor'],
+        exits: [
+            {objectId: 'craterInnerRightDoor'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'craterEastPassageBottom',
+        entranceIds: ['craterRightDoor'],
+        exits: [
+            {objectId: 'craterRightDoor'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'createKeyPuzzle',
+        checks: [{objectId: 'craterKey3', logic: andLogic(orLogic(hasFireBlessing, hasPhoenixCrown), canRemoveLightStones)}],
+        entranceIds: ['craterStairs'],
+        exits: [{objectId: 'craterStairs'}],
+    },
+    {
+        zoneId,
+        nodeId: 'craterRiverCaveTop',
+        paths: [
+            {nodeId: 'craterRiverCaveBottom', doorId: 'craterLava3', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)},
+        ],
+        entranceIds: ['craterEastDoor'],
+        exits: [{objectId: 'craterEastDoor'}],
+    },
+    {
+        zoneId,
+        nodeId: 'craterRiverCaveBottom',
+        paths: [
+            {nodeId: 'craterRiverCaveTop', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)},
+        ],
+        entranceIds: ['craterLavaDoor'],
+        exits: [
             {objectId: 'craterLavaDoor', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)},
         ],
     },

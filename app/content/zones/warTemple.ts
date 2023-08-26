@@ -6481,7 +6481,7 @@ const sf2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTemple:s2:0x0-floorSwitch-0", spirit: true, x: 176, y: 64, type: "floorSwitch", toggleOnRelease: true, targetObjectId: "warTempleSpiritExit"},
         {status: "normal", id: "warTemple:s2:0x0-pushPull-0", spirit: true, x: 160, y: 64, type: "pushPull"},
-        {status: "closedSwitch", id: "warTempleSpiritExit", x: 112, y: 16, type: "door", style: "stoneDownstairs", d: "up", linked: true, spirit: true, targetZone: "overworld", targetObjectId: "warTempleEntrance"},
+        {status: "closedSwitch", id: "warTempleSpiritExit", x: 112, y: 16, type: "door", style: "stoneDownstairs", d: "up", linked: true, spirit: true, targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit"},
         {status: "normal", id: "warTemple:s2:0x0-elementalFlame-0", x: 360, y: 328, type: "enemy", enemyType: "elementalFlame", d: "down", params: {}},
         {status: "normal", id: "warTemple:s2:0x0-elementalFrost-0", x: 376, y: 328, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},
         {status: "normal", id: "warTemple:s2:0x0-elementalStorm-0", x: 392, y: 328, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},

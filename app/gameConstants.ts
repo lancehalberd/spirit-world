@@ -60,10 +60,11 @@ export const entranceSeed = readGetParameterAsInt('entranceSeed');
 export const randomizerSeed = readGetParameterAsInt('seed') || entranceSeed;
 export const isRandomizer = !!randomizerSeed;
 // Limit randomizer total to 999 to avoid having the victory point display get too large.
-export const randomizerTotal = Math.min(readGetParameterAsInt('total') || 20, 999);
+export const randomizerTotal = Math.min(readGetParameterAsInt('total') || 30, 999);
 const isBossGoal = readGetParameter('goal') === 'boss';
 export const randomizerGoalType: 'victoryPoints' | 'finalBoss' = isBossGoal ? 'finalBoss' : 'victoryPoints';
-export const randomizerGoal = Math.min(randomizerTotal, readGetParameterAsInt('goal') || 10);
+const defaultGoalCount = (randomizerTotal * 2 / 3) | 0;
+export const randomizerGoal = Math.min(randomizerTotal, readGetParameterAsInt('goal') || defaultGoalCount);
 export const enemySeed = readGetParameterAsInt('enemySeed');
 
 export const allLootTypes: LootType[] = [

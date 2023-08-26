@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-
     - Tasks before next major release
         - When hero/clone is falling into a pit, draw it behind all other sprites (on top of the background).
             - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
