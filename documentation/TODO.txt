@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix bad jump in forest temple where you can land on a chest.
     - bad lava tile in first floor of forge
 
     - Tasks before next major release
