@@ -34,37 +34,37 @@ specialBehaviorsHash.craterLavaSwitch = {
                         return true;
                     }
                     if (state.savedState.objectFlags.craterLavaAnimation1_1) {
-                        state.savedState.objectFlags.craterLavaAnimation1_1 = false;
+                        delete state.savedState.objectFlags.craterLavaAnimation1_1;
                         state.savedState.objectFlags.craterLavaAnimation1_2 = true;
                         object.area.needsLogicRefresh = true;
                         return true;
                     }
                     if (state.savedState.objectFlags.craterLavaAnimation1_2) {
-                        state.savedState.objectFlags.craterLavaAnimation1_2 = false;
+                        delete state.savedState.objectFlags.craterLavaAnimation1_2;
                         state.savedState.objectFlags.craterLavaAnimation1_3 = true;
                         object.area.needsLogicRefresh = true;
                         return true;
                     }
                     if (state.savedState.objectFlags.craterLavaAnimation1_3) {
-                        state.savedState.objectFlags.craterLavaAnimation1_3 = false;
+                        delete state.savedState.objectFlags.craterLavaAnimation1_3;
                         state.savedState.objectFlags.craterLavaAnimation1_4 = true;
                         object.area.needsLogicRefresh = true;
                         return true;
                     }
                     if (state.savedState.objectFlags.craterLavaAnimation1_4) {
-                        state.savedState.objectFlags.craterLavaAnimation1_4 = false;
+                        delete state.savedState.objectFlags.craterLavaAnimation1_4;
                         state.savedState.objectFlags.craterLavaAnimation1_5 = true;
                         object.area.needsLogicRefresh = true;
                         return true;
                     }
                     if (state.savedState.objectFlags.craterLavaAnimation1_5) {
-                        state.savedState.objectFlags.craterLavaAnimation1_5 = false;
+                        delete state.savedState.objectFlags.craterLavaAnimation1_5;
                         state.savedState.objectFlags.craterLavaAnimation1_6 = true;
                         object.area.needsLogicRefresh = true;
                         return true;
                     }
                     if (state.savedState.objectFlags.craterLavaAnimation1_6) {
-                        state.savedState.objectFlags.craterLavaAnimation1_6 = false;
+                        delete state.savedState.objectFlags.craterLavaAnimation1_6;
                         state.savedState.objectFlags.craterLava1Objects = true;
                         object.area.needsLogicRefresh = true;
                         return true;

@@ -344,7 +344,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {id: "peachCave:0:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 336, y: 96, type: "waterPot", hasCustomLogic: true, customLogic: "peachCaveBoss", invertLogic: true},
         {id: "peachCave:0:0x0-door-0", linked: false, spirit: false, status: "normal", x: 64, y: 272, type: "door", d: "up", style: "cavern"},
-        {id: "peachCave:0:0x0-weapon-0", linked: false, spirit: false, status: "normal", x: 176, y: 80, type: "chest", lootType: "weapon", lootLevel: 0},
+        {id: "peachCaveWeapon", linked: false, spirit: false, status: "normal", x: 176, y: 80, type: "chest", lootType: "weapon", lootLevel: 0},
         {id: "peachCave:stairsUp", linked: false, spirit: false, status: "closed", x: 272, y: 32, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsDown", d: "left", style: "cavern", openLogic: {"logicKey":"isRandomizer","isInverted":false}},
         {id: "peachCave:0:0x0-beetle-0", linked: false, spirit: false, status: "normal", x: 48, y: 80, type: "enemy", enemyType: "beetle", logicKey: "hasWeapon"},
         {id: "peachCave:0:0x0-beetle-1", linked: false, spirit: false, status: "normal", x: 64, y: 144, type: "enemy", enemyType: "beetle", logicKey: "hasWeapon"},

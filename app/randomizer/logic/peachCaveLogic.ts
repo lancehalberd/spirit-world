@@ -18,7 +18,7 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'peachCaveBottom',
-        checks: [{ objectId: 'peachCave:0:0x0-weapon-0' }],
+        checks: [{ objectId: 'peachCaveWeapon' }],
         paths: [
             { nodeId: 'peachCaveWaterEntrance', logic: hasIronBoots },
             { nodeId: 'peachCave:markerB', logic: hasClone },

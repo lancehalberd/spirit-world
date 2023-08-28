@@ -37,7 +37,7 @@ export const tombNodes: LogicNode[] = [
         nodeId: 'tombBigChest',
         checks: [
             {objectId: 'tombKey2', logic: orLogic(hasRangedPush, canCross2Gaps)},
-            {objectId: 'tomb:1:1x0-roll-0'},
+            {objectId: 'tombRoll'},
         ],
         paths: [
             // This path isn't necessary since we can just walk around

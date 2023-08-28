@@ -458,7 +458,7 @@ const f1_0x0: AreaDefinition = {
         {id: "treeVillage:1:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 144, y: 496, type: "floorSwitch", targetObjectId: "elderPeachPiece", toggleOnRelease: false},
         {id: "elderPeachPiece", linked: false, spirit: false, status: "hiddenSwitch", x: 128, y: 432, type: "chest", lootType: "peachOfImmortalityPiece"},
         {id: "treeVillage:1:0x0-door-0", spirit: false, status: "normal", x: 304, y: 432, type: "door", style: "cavern", d: "right"},
-        {id: "treeVillage:1:0x0-bow-0", linked: false, spirit: false, status: "normal", x: 384, y: 416, type: "chest", lootType: "bow", lootLevel: 1},
+        {id: "treeVillageBow", linked: false, spirit: false, status: "normal", x: 384, y: 416, type: "chest", lootType: "bow", lootLevel: 1},
         {id: "bowSwitch1", spirit: false, status: "normal", x: 496, y: 416, type: "crystalSwitch", timer: 0, targetObjectId: "bowDoor"},
         {id: "bowSwitch2", spirit: false, status: "normal", x: 496, y: 512, type: "crystalSwitch", timer: 0, targetObjectId: "bowDoor"},
         {id: "bowDoor", spirit: false, status: "closedSwitch", x: 320, y: 432, type: "door", style: "cavern", d: "left", invertLogic: true, saveStatus: "forever", openLogic: {"logicKey":"hasMediumRange","isInverted":true}},

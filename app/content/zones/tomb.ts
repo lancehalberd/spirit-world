@@ -848,7 +848,7 @@ const f1_1x0: AreaDefinition = {
         {id: "tombBigKeyExit", linked: false, spirit: false, status: "normal", x: 480, y: 368, type: "door", style: "cave", d: "right"},
         {id: "tomb:1:1x0-door-4", linked: false, spirit: false, status: "normal", x: 0, y: 368, type: "door", style: "cave", d: "left"},
         {id: "tombBasementEntrance", linked: false, spirit: false, status: "bigKeyLocked", x: 240, y: 0, type: "door", style: "cave", targetZone: "tomb", targetObjectId: "tombBasementEntrance", d: "up", locationCue: "Tomb 1F"},
-        {id: "tomb:1:1x0-roll-0", linked: false, spirit: false, status: "normal", x: 240, y: 224, type: "bigChest", lootType: "roll", lootLevel: 1},
+        {id: "tombRoll", linked: false, spirit: false, status: "normal", x: 240, y: 224, type: "bigChest", lootType: "roll", lootLevel: 1},
         {status: "normal", linked: false, spirit: false, x: 160, y: 144, type: "enemy", style: "cave", d: "up", enemyType: "beetleHorned", id: "tomb:1:1x0-beetleHorned-0"},
         {status: "normal", linked: false, spirit: false, x: 336, y: 320, type: "enemy", style: "cave", d: "up", enemyType: "beetleHorned", id: "tomb:1:1x0-beetleHorned-1"},
         {status: "normal", id: "", x: 112, y: 232, type: "spawnMarker"},
