@@ -345,15 +345,6 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
     context.save();
         translateContextForAreaAndCamera(context, state, area);
         drawCanvas(context, area.canvas, rect, rect);
-        for (const object of area.objectsToRender) {
-            if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
-                if (object.area?.definition === area.definition) {
-                    object.render?.(context, state);
-                } else {
-                    object.alternateRender?.(context, state);
-                }
-            }
-        }
     context.restore();
 }
 
@@ -396,6 +387,8 @@ export function renderAreaObjectsBeforeHero(
     if (!area) {
         return;
     }
+    const backgroundDepth: number|undefined = state.hero.getDrawPriority(state) === 'background'
+        ? state.hero.drawPriorityIndex : undefined;
     context.save();
         if (!doNotTranslate) {
             translateContextForAreaAndCamera(context, state, area);
@@ -413,6 +406,7 @@ export function renderAreaObjectsBeforeHero(
                 object.alternateRenderShadow?.(context, state);
             }
         }
+        const backgroundObjects: (EffectInstance | ObjectInstance)[] = [];
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
         // Currently the jumping down logic uses hero y value to simulate a z value.
         // Because of this, to render the hero in the correct order we need to pretend the
@@ -421,14 +415,32 @@ export function renderAreaObjectsBeforeHero(
         const heroYDepth = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
             ? state.hero.y + 48 : state.hero.y + 16;
         for (const object of area.objectsToRender) {
-            if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && object.yDepth <= heroYDepth
-            ) {
+            const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
+            if (drawPriority === 'background') {
+                if (backgroundDepth !== undefined && backgroundDepth < (object.drawPriorityIndex || 0)) {
+                    continue;
+                }
+                if (object.area?.definition === area.definition && object.render) {
+                    backgroundObjects.push(object);
+                } else if (object.area?.definition !== area.definition && object.alternateRender) {
+                    backgroundObjects.push(object);
+                }
+            }
+            if (drawPriority === 'sprites' && object.yDepth <= heroYDepth) {
                 if (object.area?.definition === area.definition && object.render) {
                     spriteObjects.push(object);
                 } else if (object.area?.definition !== area.definition && object.alternateRender) {
                     spriteObjects.push(object);
                 }
+            }
+        }
+        // Background objects are rendered in order of their drawPriorityIndex value.
+        backgroundObjects.sort((A, B) => (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0));
+        for (const objectOrEffect of backgroundObjects) {
+            if (objectOrEffect.area.definition === area.definition) {
+                objectOrEffect.render?.(context, state);
+            } else {
+                objectOrEffect.alternateRender?.(context, state);
             }
         }
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
@@ -455,7 +467,10 @@ export function renderAreaObjectsAfterHero(
         if (!doNotTranslate) {
             translateContextForAreaAndCamera(context, state, area);
         }
+        const backgroundObjects: (EffectInstance | ObjectInstance)[] = [];
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
+        const backgroundDepth: number|undefined = state.hero.getDrawPriority(state) === 'background'
+            ? state.hero.drawPriorityIndex : undefined;
         // Currently the jumping down logic uses hero y value to simulate a z value.
         // Because of this, to render the hero in the correct order we need to pretend the
         // y value is greater than it actually is. Otherwise they will be rendered behind
@@ -463,14 +478,33 @@ export function renderAreaObjectsAfterHero(
         const heroYDepth = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
             ? state.hero.y + 48 : state.hero.y + 16;
         for (const object of area.objectsToRender) {
-            if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && (object.yDepth) > heroYDepth
+            const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
+            if (backgroundDepth !== undefined
+                && (drawPriority === 'background')
+                && backgroundDepth < (object.drawPriorityIndex || 0)
             ) {
+                if (object.area?.definition === area.definition && object.render) {
+                    backgroundObjects.push(object);
+                } else if (object.area?.definition !== area.definition && object.alternateRender) {
+                    backgroundObjects.push(object);
+                }
+                continue;
+            }
+            if (drawPriority === 'sprites'  && (object.yDepth) > heroYDepth) {
                 if (object.area?.definition === area.definition && object.render) {
                     spriteObjects.push(object);
                 } else if (object.area?.definition !== area.definition && object.alternateRender) {
                     spriteObjects.push(object);
                 }
+            }
+        }
+        // Background objects are rendered in order of their drawPriorityIndex value.
+        backgroundObjects.sort((A, B) => (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0));
+        for (const objectOrEffect of backgroundObjects) {
+            if (objectOrEffect.area.definition === area.definition) {
+                objectOrEffect.render?.(context, state);
+            } else {
+                objectOrEffect.alternateRender?.(context, state);
             }
         }
         // Sprite objects are rendered in order of their y positions.

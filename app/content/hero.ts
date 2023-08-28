@@ -38,7 +38,15 @@ export class Hero implements Actor {
     canPressSwitches = true;
     // These aren't used by the Hero itself since it has special handling,
     // but these are used on objects that inherit from hero: AstralProjection and Clone.
-    drawPriority: DrawPriority = 'sprites';
+    getDrawPriority(state: GameState): DrawPriority {
+        if (this.action === 'falling') {
+            return 'background';
+        }
+        return 'sprites';
+    }
+    // This is only used when falling. The hero should be drawn on top of default background elements
+    // like pits, but underneath high background elements like moving platforms.
+    drawPriorityIndex = 1;
     x: number = 0;
     y: number = 0;
     z: number = 0;

@@ -75,16 +75,7 @@ export class PitEntrance implements ObjectInstance {
             && isObjectInsideTarget(hero.getMovementHitbox(), pad(this.getHitbox(), 2))
         ) {
             if (hero.action === 'fallen') {
-                if (enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false)) {
-                    hero.action = 'knocked';
-                    hero.animationTime = 0;
-                    hero.z = CANVAS_HEIGHT;
-                    hero.vx = hero.vy = 0;
-                    hero.vz = -1;
-                    hero.safeD = hero.d;
-                    hero.safeX = hero.x;
-                    hero.safeY = hero.y;
-                }
+                enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, onEnterZoneFromPit);
             } else if (hero.action !== 'falling') {
                 hero.throwHeldObject(state);
                 hero.heldChakram?.throw(state);
@@ -104,3 +95,15 @@ export class PitEntrance implements ObjectInstance {
     }
 }
 objectHash.pitEntrance = PitEntrance;
+
+function onEnterZoneFromPit(state: GameState): void {
+    const hero = state.hero;
+    hero.action = 'knocked';
+    hero.animationTime = 0;
+    hero.z = CANVAS_HEIGHT;
+    hero.vx = hero.vy = 0;
+    hero.vz = -1;
+    hero.safeD = hero.d;
+    hero.safeX = hero.x;
+    hero.safeY = hero.y;
+}

@@ -20,7 +20,7 @@ export function enterZoneByTarget(
     targetObjectId: string,
     skipObject: ObjectDefinition,
     instant: boolean = true,
-    callback: () => void = null
+    callback: (state: GameState) => void = null
 ): boolean {
     const zone = zones[zoneKey];
     if (!zone) {
@@ -54,7 +54,7 @@ export function enterZoneByTarget(
         } else if (definition.type === 'teleporter') {
             enterZoneByTeleporterCallback(state, targetObjectId);
         }
-        callback?.();
+        callback?.(state);
     });
     return true;
 }

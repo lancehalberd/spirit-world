@@ -17,6 +17,7 @@ export class MovingPlatform implements ObjectInstance {
     };
     definition: MovingPlatformDefinition;
     drawPriority: DrawPriority = 'background';
+    drawPriorityIndex = 2;
     isObject = <const>true;
     vx: number = 0;
     vy: number = 0;

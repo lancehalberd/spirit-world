@@ -38,11 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Tasks before next major release
-        - When hero/clone is falling into a pit, draw it behind all other sprites (on top of the background).
-            - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
-            - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
-
     - Replace inventory tab with editor UI that uses the main inventory screen
         - Missing items are drawn faded when editing is on.
         - Clicking an item cycles from 0 -> 1 -> 2 -> 0
