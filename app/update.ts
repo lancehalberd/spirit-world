@@ -406,7 +406,7 @@ function updateTransition(state: GameState) {
             state.transitionState = null;
         }
     } else if (state.transitionState.type === 'mutating') {
-        if (state.transitionState.time === MUTATE_DURATION) {
+        if (state.transitionState.time === (state.mutationDuration || MUTATE_DURATION)) {
             enterLocation(state, state.transitionState.nextLocation, true, null, false, true);
             state.transitionState.callback?.();
             updateCamera(state);

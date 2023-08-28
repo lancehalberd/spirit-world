@@ -1,5 +1,6 @@
 import { renderIndicator } from 'app/content/objects/indicator';
 import { objectHash } from 'app/content/objects/objectHash';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
@@ -54,6 +55,10 @@ export class FloorSwitch implements ObjectInstance {
             if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
                 // Refresh the area to update layer logic, for example drainging lava in the crater.
                 state.areaInstance.needsLogicRefresh = true;
+            }
+            if (this.definition.specialBehaviorKey) {
+                const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSwitchBehavior;
+                specialBehavior?.onActivate(state, this);
             }
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {

@@ -79,6 +79,7 @@ interface GameState {
         // The targetZ value for the hero after the transition.
         targetZ?: number
     }
+    mutationDuration?: number
     paused: boolean
     showMap: boolean
     menuIndex: number

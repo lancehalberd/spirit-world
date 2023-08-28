@@ -7,4 +7,5 @@ export * from 'app/content/specialBehaviors/elevator';
 export * from 'app/content/specialBehaviors/peachCave';
 export * from 'app/content/specialBehaviors/gauntlet';
 export * from 'app/content/specialBehaviors/instructions';
+export * from 'app/content/specialBehaviors/crater';
 export * from 'app/content/specialBehaviors/staffTower';

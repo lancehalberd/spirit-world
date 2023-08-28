@@ -64,7 +64,7 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
 function applyScreenShakes(context: CanvasRenderingContext2D, state: GameState) {
     context.save();
     for (const screenShake of state.screenShakes) {
-        const t = state.fieldTime - screenShake.startTime;
+        const t = state.fieldTime + (state.transitionState?.time || 0) - screenShake.startTime;
         // If endTime is falsey, p stays at 1 the entire time.
         const p = screenShake.endTime
             ? ( 1 - t / (screenShake.endTime - screenShake.startTime))
@@ -730,9 +730,11 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             }
         }*/
         context.save();
+            applyScreenShakes(context, state);
             context.drawImage(state.transitionState.underCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.globalAlpha *= Math.max(0, (MUTATE_DURATION - state.transitionState.time) / MUTATE_DURATION);
             context.drawImage(state.transitionState.patternCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            removeScreenShakes(context, state);
         context.restore();
         return;
     }
