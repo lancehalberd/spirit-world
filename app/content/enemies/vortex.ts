@@ -93,7 +93,8 @@ enemyDefinitions.vortex = {
                         enemy.params.chaseCooldown = 1500;
                         const animation = new FieldAnimationEffect({
                             animation: splashAnimation,
-                            drawPriority: 'sprites',
+                            drawPriority: 'background',
+                            drawPriorityIndex: 1,
                             // increase y+z by 4 to make this draw in front of the hero fall animation.
                             x: hero.x, y: hero.y + 4, z: 4
                         });

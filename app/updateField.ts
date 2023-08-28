@@ -143,6 +143,8 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             if (tileBehavior?.pit  && !(object.z > 0)) {
                 const animation = new FieldAnimationEffect({
                     animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
+                    drawPriority: 'background',
+                    drawPriorityIndex: 1,
                     x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });
                 addEffectToArea(state, object.area, animation);
@@ -150,6 +152,8 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             } else if (tileBehavior?.water  && !(object.z > 0)) {
                 const animation = new FieldAnimationEffect({
                     animation: splashAnimation,
+                    drawPriority: 'background',
+                    drawPriorityIndex: 1,
                     x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });
                 addEffectToArea(state, object.area, animation);

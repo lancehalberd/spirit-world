@@ -9,6 +9,7 @@ import Random from 'app/utils/Random';
 interface AnimationProps {
     animation: FrameAnimation
     drawPriority?: DrawPriority
+    drawPriorityIndex?: number;
     alpha?: number
     // If defined, animations will be removed if they are outside of this box.
     boundingBox?: Rect
@@ -37,6 +38,7 @@ export class FieldAnimationEffect implements EffectInstance {
     delay: number = 0;
     done = false;
     drawPriority: DrawPriority;
+    drawPriorityIndex?: number;
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
@@ -57,7 +59,7 @@ export class FieldAnimationEffect implements EffectInstance {
     target?: ObjectInstance | EffectInstance;
     ttl: number;
     constructor({
-        animation, boundingBox, drawPriority = 'background',
+        animation, boundingBox, drawPriority = 'background', drawPriorityIndex,
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
         ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
@@ -68,6 +70,7 @@ export class FieldAnimationEffect implements EffectInstance {
         this.animationTime = 0;
         this.boundingBox = boundingBox;
         this.drawPriority = drawPriority;
+        this.drawPriorityIndex = drawPriorityIndex;
         this.friction = friction;
         this.x = x;
         this.y = y;

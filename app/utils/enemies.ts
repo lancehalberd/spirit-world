@@ -197,6 +197,8 @@ function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     const hitbox = enemy.getHitbox(state);
     const pitAnimation = new FieldAnimationEffect({
         animation: enemyFallAnimation,
+        drawPriority: 'background',
+        drawPriorityIndex: 1,
         x: Math.floor(hitbox.x / 16) * 16, y: Math.floor(hitbox.y / 16) * 16,
     });
     addEffectToArea(state, enemy.area, pitAnimation);
@@ -209,6 +211,8 @@ function makeEnemyFallIntoWater(state: GameState, enemy: Enemy) {
     const y = hitbox.y + hitbox.h / 2;
     const animation = new FieldAnimationEffect({
         animation: splashAnimation,
+        drawPriority: 'background',
+        drawPriorityIndex: 1,
         x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
     });
     addEffectToArea(state, enemy.area, animation);
