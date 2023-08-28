@@ -733,7 +733,7 @@ const caveCeiling: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/cavearranged2.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
-        'all': { defaultLayer: 'foreground2' },
+        'all': { defaultLayer: 'foreground2', isGround: false },
         '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,
         '2x12': bottomRightCeiling, '3x12': bottomRightCeiling,
     },

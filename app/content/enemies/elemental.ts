@@ -29,8 +29,12 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
         if (enemy.params.possessedTarget) {
             // The possessed target becomes faintly visible in the spirit world.
             context.save();
-                context.globalAlpha *= (0.1 + 0.05 * Math.sin(enemy.time / 200));
+                context.globalAlpha *= (0.25 + 0.05 * Math.sin(enemy.time / 200));
                 enemy.params.possessedTarget.defaultRender(context, state);
+            context.restore();
+            context.save();
+                context.globalAlpha *= (0.5 + 0.1 * Math.sin(enemy.time / 100));
+                enemy.defaultRender(context, state);
             context.restore();
         } else {
             enemy.defaultRender(context, state);
