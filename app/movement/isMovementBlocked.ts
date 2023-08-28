@@ -78,6 +78,10 @@ export function isMovementBlocked(
         if (isAbove && !behaviors?.isVeryTall) {
             return false;
         }
+        // Prevent walking over ledges onto tiles that are marked very tall unless they are also marked as southern walls.
+        if (isAbove && behaviors?.isVeryTall && !behaviors.isSouthernWall) {
+            return {};
+        }
         if (actor
             && (!movementProperties.canPassMediumWalls || !(behaviors?.low || behaviors?.midHeight))
             && behaviors?.solid

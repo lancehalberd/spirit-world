@@ -150,7 +150,7 @@ export class Door implements ObjectInstance {
         // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
         // door where the enemies are already defeated (or there are not yet enemies).
         if (this.definition.status === 'closedEnemy') {
-            this.changeStatus(state, !this.area?.enemies.length ? 'normal' : 'closedEnemy');
+            this.changeStatus(state, 'normal');
         }
         this.refreshIsHot(state);
     }

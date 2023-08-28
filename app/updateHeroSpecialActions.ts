@@ -66,7 +66,7 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero) {
 }
 
 export function checkToFallUnderWater(this: void, state: GameState, vz : number): boolean {
-    if (vz > -2 || state.hero.equippedBoots === 'cloudBoots') {
+    if (vz > -3 || state.hero.equippedBoots === 'cloudBoots') {
         return false;
     }
     const hero = state.hero;

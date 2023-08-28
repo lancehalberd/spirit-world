@@ -17,7 +17,7 @@ enemyDefinitions.beetleBoss = {
     animations: beetleWingedAnimations, flying: true, scale: 4,
     acceleration: 0.5, speed: 2,
     initialMode: 'hidden',
-    life: 16, touchDamage: 1, update: updateBeetleBoss,
+    life: 10, touchDamage: 1, update: updateBeetleBoss,
 };
 enemyDefinitions.beetleBossWingedMinionDefinition = {
     // Despawn these if you leave the boss arena.

@@ -486,6 +486,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                     originalTiles: mapTileNumbersToFullTiles(definition.grid.tiles),
                 }
                 instance.layers.splice(lastLayerIndex + 1, 0, newLayer);
+                lastLayerIndex++;
             }
             refreshBehavior = true;
         }

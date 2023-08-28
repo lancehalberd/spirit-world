@@ -116,13 +116,14 @@ export const spiritPlantBehavior: TileBehaviors = {
 
 
 // use `foreground2` as default so that it can appear on top of walls that might be on `foreground`
-// All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
-export const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solid: true};
-export const bottomCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solidMap: BITMAP_BOTTOM};
-export const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false, solidMap: BITMAP_TOP_LEFT_8_STRIP};
-export const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_TOP_RIGHT_8_STRIP};
-export const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_BOTTOM_LEFT_8};
-export const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_BOTTOM_RIGHT_8};
+export const baseCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, isGround: false};
+
+export const ceilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solid: true};
+export const bottomCeilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM};
+export const topLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP};
+export const topRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
+export const bottomLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
+export const bottomRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
 
 export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false};
 export const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false};
