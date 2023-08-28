@@ -347,7 +347,7 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
         drawCanvas(context, area.canvas, rect, rect);
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
-                if (object.area.definition === area.definition) {
+                if (object.area?.definition === area.definition) {
                     object.render?.(context, state);
                 } else {
                     object.alternateRender?.(context, state);
@@ -407,7 +407,7 @@ export function renderAreaObjectsBeforeHero(
         }
         // Render shadows before anything else.
         for (const object of area.objectsToRender) {
-            if (object.area.definition === area.definition) {
+            if (object.area?.definition === area.definition) {
                 object.renderShadow?.(context, state);
             } else {
                 object.alternateRenderShadow?.(context, state);
@@ -424,9 +424,9 @@ export function renderAreaObjectsBeforeHero(
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
                 && object.yDepth <= heroYDepth
             ) {
-                if (object.area.definition === area.definition && object.render) {
+                if (object.area?.definition === area.definition && object.render) {
                     spriteObjects.push(object);
-                } else if (object.area.definition !== area.definition && object.alternateRender) {
+                } else if (object.area?.definition !== area.definition && object.alternateRender) {
                     spriteObjects.push(object);
                 }
             }
@@ -466,9 +466,9 @@ export function renderAreaObjectsAfterHero(
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
                 && (object.yDepth) > heroYDepth
             ) {
-                if (object.area.definition === area.definition && object.render) {
+                if (object.area?.definition === area.definition && object.render) {
                     spriteObjects.push(object);
-                } else if (object.area.definition !== area.definition && object.alternateRender) {
+                } else if (object.area?.definition !== area.definition && object.alternateRender) {
                     spriteObjects.push(object);
                 }
             }
@@ -500,8 +500,8 @@ export function renderForegroundObjects(
         }
         const foregroundObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objectsToRender) {
-            if ((object.area.definition === area.definition && object.renderForeground)
-                || (object.area.definition !== area.definition && object.alternateRenderForeground)
+            if ((object.area?.definition === area.definition && object.renderForeground)
+                || (object.area?.definition !== area.definition && object.alternateRenderForeground)
             ) {
                 foregroundObjects.push(object);
             } else {
@@ -512,7 +512,7 @@ export function renderForegroundObjects(
             }
         }
         for (const object of foregroundObjects) {
-            if (object.area.definition === area.definition) {
+            if (object.area?.definition === area.definition) {
                 if (object.renderForeground) {
                     object.renderForeground(context, state);
                 } else {
