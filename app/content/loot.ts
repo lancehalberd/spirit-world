@@ -117,9 +117,10 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'peachOfImmortalityPiece': return 'You found a Golden Peach Slice!';
         // Learned techniques
         case 'roll':
-        case 'clone':
         case 'teleportation':
             return `You learned the ${lootName} Techique!`;
+        case 'clone':
+            return `You learned the ${lootName} Techique!` + equipToolMessage;
         // obtained tools
         case 'bow':
         case 'cloak':

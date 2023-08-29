@@ -38,10 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Before next release:
-        - Repack images
-        - Test game once.
-
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
     - Replace inventory tab with editor UI that uses the main inventory screen

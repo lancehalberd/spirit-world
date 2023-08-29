@@ -58,7 +58,7 @@ export class FloorSwitch implements ObjectInstance {
             }
             if (this.definition.specialBehaviorKey) {
                 const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSwitchBehavior;
-                specialBehavior?.onActivate(state, this);
+                specialBehavior?.onActivate?.(state, this);
             }
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {

@@ -593,7 +593,8 @@ export class Door implements ObjectInstance {
                     }
                 }
             } else {
-                const shouldChangezones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox));
+                const shouldChangezones = this.definition.targetZone && this.definition.targetObjectId
+                    && (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox));
                 if (shouldChangezones && !this.travelToZone(state)) {
                     hero.isExitingDoor = true;
                     hero.actionDx = -directionMap[this.definition.d][0];
