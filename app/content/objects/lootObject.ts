@@ -282,7 +282,7 @@ export class LootDropObject extends LootObject {
             const bigHitbox = pad(this.getHitbox(), 2);
             for (const hero of [state.hero, ...state.hero.clones]) {
                 if (hero.overlaps(bigHitbox)
-                    || (this.animationTime >= 300 && state.hero.thrownChakrams.some(chakram => boxesIntersect(chakram, bigHitbox)))
+                    || (this.animationTime >= 400 && state.hero.thrownChakrams.some(chakram => boxesIntersect(chakram, bigHitbox)))
                 ) {
                     const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                     onPickup(state, this.definition);

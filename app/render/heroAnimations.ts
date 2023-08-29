@@ -5,7 +5,7 @@ import { debugCanvas } from 'app/utils/canvas';
 export const Y_OFF = -4;
 
 
-const heroIconGeometry: FrameDimensions = {w: 17, h: 16};
+const heroIconGeometry: FrameDimensions = {w: 16, h: 16};
 export const heroIcon: Frame = createAnimation('gfx/hud/mcIcon.png', heroIconGeometry).frames[0];
 
 const heroGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 15 + Y_OFF, w: 16, h: 16}};
