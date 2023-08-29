@@ -568,13 +568,11 @@ export class Door implements ObjectInstance {
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
             const hitbox = this.getHitbox();
-            let changedZones = false;
             if (this.style === 'ladderUp') {
                 const reachedTop = hero.y <= this.y;
                 if (reachedTop) {
-                    changedZones = this.travelToZone(state);
                     // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.
-                    if (!changedZones) {
+                    if (!this.travelToZone(state)) {
                         hero.isExitingDoor = true;
                         // Go back down the ladder if this was a missing target object.
                         // Otherwise keep going up so the ladder can be used to climb short walls.
@@ -587,16 +585,20 @@ export class Door implements ObjectInstance {
             } else if (this.style === 'ladderDown') {
                 const reachedBottom = hero.y >= this.y;
                 if (reachedBottom) {
-                    changedZones = this.travelToZone(state);
                     // 'ladderDown' is only for changing zones so make the hero climb back up if changing zones fails.
-                    if (!changedZones) {
+                    if (!this.travelToZone(state)) {
                         hero.isExitingDoor = true;
                         hero.actionDx = -directionMap[this.definition.d][0];
                         hero.actionDy = -directionMap[this.definition.d][1];
                     }
                 }
             } else {
-                changedZones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox)) && this.travelToZone(state);
+                const shouldChangezones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox));
+                if (shouldChangezones && !this.travelToZone(state)) {
+                    hero.isExitingDoor = true;
+                    hero.actionDx = -directionMap[this.definition.d][0];
+                    hero.actionDy = -directionMap[this.definition.d][1];
+                }
             }
         }
     }

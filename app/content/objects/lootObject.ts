@@ -257,6 +257,7 @@ export class LootDropObject extends LootObject {
     vx: number;
     vy: number;
     vz: number;
+    animationTime = 0;
     constructor(state: GameState, definition: LootDropDefinition) {
         super(state, definition);
         this.vx = definition.vx || 0;
@@ -267,6 +268,7 @@ export class LootDropObject extends LootObject {
     alwaysReset = true;
     isObject = <const>true;
     update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
         if (this.z > (this.groundHeight || 0) || this.vz > 0) {
             this.x += this.vx;
             this.y += this.vy;
@@ -280,7 +282,7 @@ export class LootDropObject extends LootObject {
             const bigHitbox = pad(this.getHitbox(), 2);
             for (const hero of [state.hero, ...state.hero.clones]) {
                 if (hero.overlaps(bigHitbox)
-                    || state.hero.thrownChakrams.some(chakram => boxesIntersect(chakram, bigHitbox))
+                    || (this.animationTime >= 300 && state.hero.thrownChakrams.some(chakram => boxesIntersect(chakram, bigHitbox)))
                 ) {
                     const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                     onPickup(state, this.definition);

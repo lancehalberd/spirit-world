@@ -532,7 +532,7 @@ const sf0_1x0: AreaDefinition = {
     parentDefinition: f0_1x0,
     layers: null,
     objects: [
-        {status: "closedSwitch", id: "tombSpiritExit", x: 112, y: 0, type: "door", style: "cave", targetObjectId: "cocoonEntrance", d: "up", linked: true, spirit: true},
+        {status: "closedSwitch", id: "tombSpiritExit", x: 112, y: 0, type: "door", style: "cave", targetObjectId: "tombSpiritExit", d: "up", linked: true, spirit: true, targetZone: "tomb"},
         {status: "normal", id: "tomb:s0:1x0-pushPull-0", x: 80, y: 64, type: "pushPull", spirit: true},
         {status: "normal", id: "tomb:s0:1x0-pushPull-1", x: 160, y: 64, type: "pushPull", spirit: true},
         {status: "normal", id: "tomb:s0:1x0-floorSwitch-0", x: 176, y: 64, toggleOnRelease: true, type: "floorSwitch", spirit: true, targetObjectId: "tombSpiritExit"},
@@ -770,7 +770,7 @@ const f1_1x0: AreaDefinition = {
                     [1,1,1,2,2,1,1,1,1,1,1,1,1,53,1,53,53,1,53,1,1,1,1,1,1,1,2,2,1,1,1,1],
                     [1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1],
                     [1,1,1,53,1,53,53,1,53,1,1,1,1,53,1,53,53,1,53,1,1,1,1,53,1,53,53,1,53,1,1,1],
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,53,1,53,53,1,53,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,1,1,1,1,1,1,0,1,1,53,1,53,53,1,53,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,53,1,53,53,1,417,418,418,418,418,418,417,1,1,417,418,418,418,418,418,417,1,53,53,1,53,1,1,1],
                     [1,1,1,53,1,53,53,1,416,1,1,1,1,1,1,1,1,1,1,1,1,1,1,416,1,53,53,1,53,1,1,1],
                     [1,1,1,1,1,1,1,1,416,1,1,1,1,1,1,1,1,1,1,1,1,1,1,416,1,1,1,1,1,1,1,1],
