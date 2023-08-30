@@ -38,9 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix dialogue not displaying when falling into water in cave exit. Maybe trigger it faster?
-    - Fix can screen transition too soon after scrolling?
-
     - Finish replacing bad walls in the overworld (south and east of the lake, south and east edges of the map)
 
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
