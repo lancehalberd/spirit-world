@@ -7,7 +7,7 @@ export const FRAME_LENGTH = 20;
 export const CANVAS_WIDTH = 256;
 export const CANVAS_HEIGHT = 224;
 // Scale of canvas pixels relative to document pixels.
-export const CANVAS_SCALE = 3;
+export const CANVAS_SCALE = 5;
 
 // Dimensions of the game in document pixels.
 export const DOM_WIDTH = CANVAS_WIDTH * CANVAS_SCALE;
