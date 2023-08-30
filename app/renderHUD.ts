@@ -72,7 +72,8 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 28});
     }
     for (let i = 0; i < dungeonInventory?.smallKeys; i++) {
-        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 32});
+        //drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 34});
+        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 3 * (i % 2), y: 30 + 3 * i});
     }
     renderSpiritBar(context, state);
 

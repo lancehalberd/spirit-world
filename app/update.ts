@@ -254,6 +254,8 @@ function updateMenu(state: GameState) {
             state.menuRow = (state.menuRow + 1) % menuRows.length;
         } while (!menuRows[state.menuRow].length)
     }
+    // Make sure menuRow stays in bounds. This can get out of bounds when closing the editor.
+    state.menuRow = Math.min(state.menuRow, menuRows.length - 1);
     const menuRow = menuRows[state.menuRow];
     state.menuIndex = Math.min(menuRow.length - 1, state.menuIndex);
     if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {

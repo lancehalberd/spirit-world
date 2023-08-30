@@ -38,14 +38,12 @@ Graphics:
 
 
 Current tasks:
-    - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
+    - Fix dialogue not displaying when falling into water in cave exit. Maybe trigger it faster?
+    - Fix can screen transition too soon after scrolling?
 
-    - Replace inventory tab with editor UI that uses the main inventory screen
-        - Missing items are drawn faded when editing is on.
-        - Clicking an item cycles from 0 -> 1 -> 2 -> 0
-        - Click on big/small keys/map to get dungeon items
-        - Click on chakrams to add upgrades
-        - Click on ores to increase ore count
+    - Finish replacing bad walls in the overworld (south and east of the lake, south and east edges of the map)
+
+    - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
     - Save statues missing dialog:
         - jade city

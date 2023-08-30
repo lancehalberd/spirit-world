@@ -141,20 +141,13 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
 
 export function updateHeroMagicStats(state: GameState) {
     state.hero.magicRegenCooldownLimit = 2000;
-    // Normally, Hero has no spirit energy until they have eaten a golden peach,
-    // which automatically gives them magic + catEyes.
-    // During randomizer seeds, Hero always has access to spirit energy.
-    if (!state.hero.savedData.passiveTools.catEyes && !state.randomizer?.seed) {
-        state.hero.maxMagic = 20;
-        state.hero.magic = 0;
-        state.hero.magicRegen = 0;
-        return;
-    }
     state.hero.maxMagic = 20;
     state.hero.magicRegen = 4;
-    // Cloak increases max magic but not magic regen.
+    if (state.hero.savedData.passiveTools.catEyes) {
+        state.hero.maxMagic += 5;
+    }
     if (state.hero.savedData.activeTools.cloak) {
-        state.hero.maxMagic += 15;
+        state.hero.maxMagic += 10;
         state.hero.magicRegenCooldownLimit -= 100;
     }
     if (state.hero.savedData.elements.fire) {
@@ -176,6 +169,12 @@ export function updateHeroMagicStats(state: GameState) {
         state.hero.maxMagic += 20;
         state.hero.magicRegen += 6;
         state.hero.magicRegenCooldownLimit /= 2;
+    }
+    // During a normal game, magic regen is 0 until you get at least one magic item.
+    // During randomizer seeds, Hero always has access to spirit energy.
+    if (!state.randomizer?.seed && state.hero.maxMagic <= 20) {
+        state.hero.magic = 0;
+        state.hero.magicRegen = 0;
     }
 }
 

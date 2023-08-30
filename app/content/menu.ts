@@ -1,5 +1,6 @@
 import { getLootHelpMessage, getLootName } from 'app/content/loot';
 import { isRandomizer } from 'app/gameConstants';
+import { editingState } from 'app/development/editingState';
 
 
 
@@ -10,49 +11,51 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
         activeTools.push('return');
     }
     // Active tools
-    if (state.hero.savedData.activeTools.bow) {
+    if (state.hero.savedData.activeTools.bow || editingState.isEditing) {
         activeTools.push('bow');
     }
-    if (state.hero.savedData.activeTools.staff) {
+    if (state.hero.savedData.activeTools.staff || editingState.isEditing) {
         activeTools.push('staff');
     }
-    if (state.hero.savedData.activeTools.cloak) {
+    if (state.hero.savedData.activeTools.cloak || editingState.isEditing) {
         activeTools.push('cloak');
     }
-    if (state.hero.savedData.activeTools.clone) {
+    if (state.hero.savedData.activeTools.clone || editingState.isEditing) {
         activeTools.push('clone');
     }
     menuRows.push(activeTools);
 
     const equipment: MenuOptionType[] = ['leatherBoots'];
-    if (state.hero.savedData.equipment.ironBoots) {
+    if (state.hero.savedData.equipment.ironBoots || editingState.isEditing) {
         equipment.push('ironBoots');
     }
-    if (state.hero.savedData.equipment.cloudBoots) {
+    if (state.hero.savedData.equipment.cloudBoots || editingState.isEditing) {
         equipment.push('cloudBoots');
     }
     menuRows.push(equipment);
 
     const elements: MenuOptionType[] = [];
-    if (state.hero.savedData.elements.fire || state.hero.savedData.elements.ice || state.hero.savedData.elements.lightning) {
+    if (state.hero.savedData.elements.fire || state.hero.savedData.elements.ice || state.hero.savedData.elements.lightning || editingState.isEditing) {
         elements.push('neutral');
     }
-    if (state.hero.savedData.elements.fire) {
+    if (state.hero.savedData.elements.fire || editingState.isEditing) {
         elements.push('fire');
     }
-    if (state.hero.savedData.elements.ice) {
+    if (state.hero.savedData.elements.ice || editingState.isEditing) {
         elements.push('ice');
     }
-    if (state.hero.savedData.elements.lightning) {
+    if (state.hero.savedData.elements.lightning || editingState.isEditing) {
         elements.push('lightning');
     }
-    menuRows.push(elements);
+    if (elements.length) {
+        menuRows.push(elements);
+    }
 
     let passiveToolRow: MenuOptionType[] = [];
     for (let key in state.hero.savedData.passiveTools) {
-        if (!state.hero.savedData.passiveTools[key]) continue;
+        if (!state.hero.savedData.passiveTools[key] && !editingState.isEditing) continue;
         // Don't show cat eyes once true sight is obtained.
-        if (key === 'catEyes' && state.hero.savedData.passiveTools.trueSight) continue;
+        if (key === 'catEyes' && state.hero.savedData.passiveTools.trueSight && !editingState.isEditing) continue;
         passiveToolRow.push(key as MenuOptionType);
         if (passiveToolRow.length >= 7) {
             menuRows.push(passiveToolRow);
