@@ -11,7 +11,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { mainCanvas } from 'app/utils/canvas';
 import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
-import { isPointInShortRect, rectanglesOverlap, pad } from 'app/utils/index';
+import { isPointInShortRect, boxesIntersect, pad } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 import { isSectionExplored } from 'app/utils/sections';
 import { drawText } from 'app/utils/simpleWhiteFont';
@@ -23,6 +23,7 @@ const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols
 const borderSize = 4;
 const worldSize = 192;
 const questMarker = requireFrame('gfx/hud/questMarker.png', {x: 0, y: 0, w: 9, h: 18});
+const [doorFrame, chestFrame, downFrame, upFrame] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 4}).frames;
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (overworldKeys.includes(state.location.zoneKey)) {
@@ -110,9 +111,6 @@ const cursor = createAnimation('gfx/hud/cursortemp.png', {w: frameSize, h: frame
 
 const [mapCanvas, mapContext] = createCanvasAndContext(192, 192);
 
-const [sectionCanvas, sectionContext] = createCanvasAndContext(64, 64);
-
-
 function refreshWorldMap(state: GameState, zoneKey: string): void {
     const floorId = state.location.isSpiritWorld ? 'spirit' : 'material';
     // It is expensive to render the world map, so only re-render if it has important changes.
@@ -131,8 +129,18 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
             const areaInstance = createAreaInstance(state, grid[row][column]);
             renderActualMapTile(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
+            renderMapObjects(mapContext, state, areaInstance,
+                {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16},
+                state.hero.savedData.passiveTools.trueSight >= 1);
         }
     }
+}
+
+interface SectionRenderData {
+    alpha: number
+    source: Rect
+    target: Rect
+    area: AreaInstance
 }
 
 function refreshDungeonMap(state: GameState, mapId: string, floorId: string): void {
@@ -150,6 +158,9 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
     const sections = dungeonMaps[mapId].floors[floorId].sections;
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+
+    // Compute shared date for rendering the sections for this map.
+    const sectionRenderData: SectionRenderData[] = [];
     for (let sectionIndex of sections) {
         const sectionData = allSections[sectionIndex];
         if (!sectionData) {
@@ -162,25 +173,41 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             //mapContext.fillStyle = 'red';
             continue;
         }
+        const {area, section} = sectionData;
+        sectionRenderData.push({
+            alpha: isHidden ? 0.2 : (!isExplored ? 0.6 : 1),
+            source: {
+                x: section.x * 16,
+                y: section.y * 16,
+                w: section.w * 16,
+                h: section.h * 16,
+            },
+            target: {
+                x: section.mapX * 32,
+                y: section.mapY * 32,
+                w: section.w * 16 * 4 / w,
+                h: section.h * 16 * 4 / h,
+            },
+            area: createAreaInstance(state, area),
+        });
+    }
+
+    // Draw the area tiles first:
+    for (const data of sectionRenderData) {
         mapContext.save();
-            if (isHidden) {
-                mapContext.globalAlpha *= 0.2;
-            } else if (!isExplored) {
-                mapContext.globalAlpha *= 0.6;
-            }
-            const {area, section} = sectionData;
-            //mapContext.fillRect(column * 32, row * 32, section.w * 2, section.h * 2);
-            //mapContext.fillStyle = 'white'
-            //mapContext.fillRect(column * 32, row * 32, 8, 8);
-            const areaInstance = createAreaInstance(state, area);
-            // Draw the full tile first.
-            sectionContext.clearRect(0, 0, 64, 64);
-            renderActualMapTile(sectionContext, state, areaInstance,
-                {x: 0, w: 64, y: 0, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
-            mapContext.drawImage(sectionCanvas,
-                section.x * 16 * 4 / w, section.y * 16 * 4 / h, section.w * 16 * 4 / w, section.h * 16 * 4 / h,
-                section.mapX * 32, section.mapY * 32, section.w * 16 * 4 / w, section.h * 16 * 4 / h,
-            );
+            mapContext.globalAlpha *= data.alpha;
+            renderActualMapTile(mapContext, state, data.area,
+                data.target,  data.source);
+        mapContext.restore();
+    }
+    // Then draw objects on top:
+    // (possible drawback is objects being drawn on top of foreground tiles, but so far this isn't a problem.)
+    // (technically we should draw: background tiles, background objects, foreground tiles, foreground objects, then map icons)
+    for (const data of sectionRenderData) {
+        mapContext.save();
+            mapContext.globalAlpha *= data.alpha;
+            renderMapObjects(mapContext, state, data.area,
+                data.target,  data.source, hasMap);
         mapContext.restore();
     }
 }
@@ -301,7 +328,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
 
 const mapObjectTypes: ObjectType[] = [
-    'waterfall', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter'
+    'waterfall', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest'
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
@@ -317,34 +344,67 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
             target.x, target.y, target.w, target.h,
         );
     }
+}
+
+export function renderMapObjects(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect, drawChests: boolean = false) {
+    const xScale = 4 / area.w, yScale = 4 / area.h;
     // Draw additional objects that we want to show on the map.
     context.save();
         context.translate(target.x, target.y);
-        context.scale(4 / area.w, 4 / area.h);
+        // context.scale(4 / area.w, 4 / area.h);
         for (const object of area.objects) {
             if (!mapObjectTypes.includes(object.definition?.type)) {
                 continue;
             }
-            const hitbox = object.getHitbox();
-            if (!rectanglesOverlap(hitbox, source)) {
+            let hitbox = object.getHitbox();
+            if (!boxesIntersect(hitbox, source)) {
                 continue;
             }
-            for(const part of [object, ...(object.getParts?.(state) || [])]) {
-                part.render(context, state);
-                part.renderForeground?.(context, state);
+            hitbox = {...hitbox, x: hitbox.x - source.x, y: hitbox.y - source.y};
+            /*if (object.definition.id === 'warTempleNorthEntrance') {
+                debugger;
+            }*/
+            if (object.definition?.type === 'chest' || object.definition?.type === 'bigChest') {
+                // Only render graphics for chests if drawChests is true.
+                if (drawChests && !state.savedState.objectFlags[object.definition.id] && object.definition.lootType !== 'empty') {
+                    drawFrame(context, chestFrame, {...chestFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - chestFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - chestFrame.h / 2,
+                    });
+                }
+            } else {
+                context.save();
+                    context.scale(4 / area.w, 4 / area.h);
+                    context.translate(-source.x, -source.y);
+                    for(const part of [object, ...(object.getParts?.(state) || [])]) {
+                        part.render(context, state);
+                        part.renderForeground?.(context, state);
+                    }
+                context.restore();
             }
 
             if (object.definition?.type === 'door'
                 && object.definition.targetZone && object.definition.targetObjectId
                 && object.status !== 'cracked'
             ) {
-                context.fillStyle = 'rgba(0, 255, 255, 1)';
-                context.fillRect(
-                    hitbox.x,
-                    hitbox.y,
-                    Math.max(hitbox.w, 8),
-                    Math.max(hitbox.h, 8),
-                );
+                if (object.definition.style === 'wideEntrance' && object.definition.d === 'up') {
+                    drawFrame(context, upFrame, {...upFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - upFrame.w / 2,
+                        y: Math.round((hitbox.y) * yScale),
+                    });
+                } else if (object.definition.style === 'wideEntrance' && object.definition.d === 'down') {
+                    drawFrame(context, downFrame, {...downFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - downFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h) * yScale) - downFrame.h,
+                    });
+                } else {
+                    drawFrame(context, doorFrame, {...doorFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - doorFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - doorFrame.h / 2
+                            // Render southern doors further up.
+                            + (object.definition.d === 'down' ? -2 : 0),
+                    });
+                }
             }
         }
     context.restore();
