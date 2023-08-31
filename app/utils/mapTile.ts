@@ -14,17 +14,14 @@ const explicitIndexMapping: number[] = [];
 explicitIndexMapping[5] = 0;
 // Map grass to spirit dust
 explicitIndexMapping[11] = spiritDustGround;
-// Currently minor material world plants don't persist
-explicitIndexMapping[12] = 0;
-explicitIndexMapping[13] = 0;
-explicitIndexMapping[14] = 0;
-explicitIndexMapping[15] = 0;
-explicitIndexMapping[16] = 0;
-explicitIndexMapping[17] = 0;
-explicitIndexMapping[18] = 0;
-explicitIndexMapping[19] = 0;
-explicitIndexMapping[20] = 0;
-explicitIndexMapping[21] = 0;
+// Grass plants
+for (let i = 12; i <= 21; i++) {
+    explicitIndexMapping[i] = 0
+}
+// Desert plants
+for (let i = 1420; i <= 1432; i++) {
+    explicitIndexMapping[i] = 0
+}
 
 // Sky
 explicitIndexMapping[262] = spiritCrystalGround;
