@@ -38,9 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix pushing pots in waterfall village is sometimes harder than it should be
-        - Maybe it is prioritizing grabbing the wall instead of the pot sometimes?
-
     - Map improvements
         - Add door icon for normal cave entrances.
         - Add arrow icon for open entrances.
