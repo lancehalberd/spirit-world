@@ -8,7 +8,7 @@ import { fillRect, isPointInShortRect, pad } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { contextMenuState, editingState } from 'app/development/editingState';
-import { getState } from 'app/state';
+import { getState, shouldHideMenu } from 'app/state';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 
 const MARGIN = 20;
@@ -231,6 +231,10 @@ mainCanvas.addEventListener('click', function (event) {
         return;
     }
     const state = getState();
+    // Only process inventory editing when the inventory is actually being displayed.
+    if (!state.paused || state.showMap || shouldHideMenu(state)) {
+        return;
+    }
     const rowHeight = 25, rowWidth = 26;
     const [mouseX, mouseY] = getMousePosition(mainCanvas, CANVAS_SCALE);
     let {x, y} = innerMenuFrame;

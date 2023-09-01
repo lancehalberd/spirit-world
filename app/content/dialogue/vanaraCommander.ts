@@ -35,6 +35,7 @@ dialogueHash.vanaraCommander = {
                     text: `I know you have many questions, but we will have to talk more later.`,
                 },
             ],
+            repeatIndex: 0,
         },
         {
             logicCheck: {
@@ -48,8 +49,8 @@ dialogueHash.vanaraCommander = {
                     dialogueIndex: 73,
                     dialogueType: 'quest',
                     text: `I'm impressed that you've made it here already!
-                    {|}You might have already realized this, but we Vanara aren't from this world,
-                    we traveled the stars on this ship, but there was an accident and we crashed here.
+                    {|}You might have already realized this, but we Vanara aren't from this world.
+                    {|}We traveled the stars on this ship, but there was an accident and we crashed here.
                     {|}I'm sure you have many questions, but we detected a big problem while you were climbing the Helix.
                     {|}Several powerful Spirit Beasts have escaped into the Material Realm and are attacking the Holy City.
                     {|}Unfortunately, it appears another Vanara is responsible for releasing them.

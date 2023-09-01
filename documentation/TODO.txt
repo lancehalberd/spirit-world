@@ -38,11 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Map improvements
-        - Add door icon for normal cave entrances.
-        - Add arrow icon for open entrances.
-        - Add closed chest icon for unopened chests.
-
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
     - Save statues missing dialog:
@@ -57,11 +52,42 @@ Current tasks:
         - sky palace
         - forge
 
+    - Brainstorm ideas for rival fight 2
+        -   "So you're here just like the Commander said."
+            "I can't believe they just invited you here while I had to force my way in."
+            "All my life I've tried to be good and follow the rules while you outcasts just go about doing whatever you want!"
+            "The Elder said the rules are to keep our village safe from the humans, but it was all a lie."
+            "You've seen how powerful the Vanara truly are haven't you?"
+            "The Humans and there so-called Gods should be hiding in fear from us!"
+            "Well I've had it with these stupid rules, both Human and Vanaran."
+            "They said you have special permission to climb the Helix, but you don't have mine!"
+            "A half-blood like you has no right to be here."
+            "You shouldn't even exist!"
+
+            Combat
+            "Let me show you the power of a real Vanara!"
+            ""
+            "How did you?"
+
+            "Bah I don't have time for this!"
+            "If I'd had a little longer to train you'd be no match for me."
+            "Go ahead and find the Commander. Just don't embarrass me by dying before our next match."
+
     - Allow sneaking into grand temple with invisibility
         - Replace door with open arch guarded by a warrior monk
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
         - Make sure rolling doesn't let you pass
 
+    - Bug: one snake can become two elemental snakes if possessed near the same time (perhaps the same frame).
+    - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
+        - To fix this, when a portal is revealed, we will only reveal the connected object if it does not have defined logic setting it to be hidden.
+
+    - Add a task for a generic enemy transformation animation I can use for upgrading enemies to elemental versions.
+        - Having them instantly change looks buggy in some cases, and for the flies it is hard to tell when it even happened.
+
+    - Fade out any text cues during screen transitions. Right now it just abruptly disappears.
+
+    - Add button indicator for bow instructions, similar to what we do for spirit cloak.
 
     - Leon respawned at a door and kept going up/down the entrance stairs to the lightning sanctum.
         - I could not reproduce however and couldn't see anything suspicious in the code.
@@ -592,7 +618,6 @@ Improve Staff Tower Setup:
 
 High level list of things left to do:
     Areas missing significant content:
-        Forest Temple
         Lab
         World Tree
     Missing Bosses for existing areas:
@@ -614,6 +639,7 @@ High level list of things left to do:
             Heals MC or restores MC spirit energy periodically
         Rival during last elemental beast fight
         Spirit Gates + Spirit Keys
+            - Probably do beanstalks instead of this.
         Spirit shop + Jade Idols
         Treasure Hunter Shop
         Fertility shrine donations
