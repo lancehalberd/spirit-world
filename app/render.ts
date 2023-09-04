@@ -64,7 +64,7 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
             if (state.defeatState.reviving) {
                 context.globalAlpha *= 0.7 * (1 - state.hero.life / state.hero.savedData.maxLife);
             } else {
-                context.globalAlpha *= (state.hero.hasRevive ? 0.7 : 1) * Math.min(1, state.defeatState.time / 1000);
+                context.globalAlpha *= (state.hero.savedData.hasRevive ? 0.7 : 1) * Math.min(1, state.defeatState.time / 1000);
             }
             context.fillStyle = '#000';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);

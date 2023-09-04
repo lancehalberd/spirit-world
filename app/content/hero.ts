@@ -69,7 +69,6 @@ export class Hero implements Actor {
     bounce?: {vx: number; vy: number; frames: number};
     equippedBoots: Equipment = 'leatherBoots';
     hasBarrier?: boolean = false;
-    hasRevive: boolean = false;
     isInvisible?: boolean = false;
     isAirborn = false;
     jumpingVx?: number;

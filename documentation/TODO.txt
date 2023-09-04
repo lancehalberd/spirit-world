@@ -74,6 +74,7 @@ Current tasks:
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
         - Make sure rolling doesn't let you pass
 
+    - Bug: elder renders with dialogue indicator during cut scene.
     - Bug: Back of hype cave is in logic when you don't have enough magic to reach it.
     - Bug: one snake can become two elemental snakes if possessed near the same time (perhaps the same frame).
     - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.

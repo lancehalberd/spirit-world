@@ -46,7 +46,7 @@ const spiritFrame: Frame = {
 let lastFrameHeight: number, hadRevive: boolean = false;
 function updateSpiritBarFrame(state: GameState): void {
     const reviveAnimationTime = state.fieldTime - state.reviveTime;
-    const hasRevive = state.hero.hasRevive && !state.defeatState.defeated;
+    const hasRevive = state.hero.savedData.hasRevive && !state.defeatState.defeated;
     if (lastFrameHeight === state.hero.maxMagic
         && hadRevive === hasRevive
         && reviveAnimationTime >= reviveAnimation.duration) {
@@ -80,7 +80,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
     drawFrame(context, spiritFrame, {...spiritFrame, x: x - 8, y});
     // Draw the glow effect on top of the top cap if appropriate.
     const reviveAnimationTime = state.fieldTime - state.reviveTime;
-    const hasRevive = state.hero.hasRevive && !state.defeatState.defeated;
+    const hasRevive = state.hero.savedData.hasRevive && !state.defeatState.defeated;
     if (hasRevive && reviveAnimationTime >= 400) {
         let animationTime = reviveAnimationTime - 400;
         // Start with the initial glow animation that plays with the top revive animation intro.

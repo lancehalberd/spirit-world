@@ -25,7 +25,7 @@ import {
 import { directionMap, getDirection, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addObjectToArea } from 'app/utils/objects';
-import Random from 'app/utils/random';
+import Random from 'app/utils/Random';
 import { saveGame } from 'app/utils/saveGame';
 import {
     getVectorToNearbyTarget,

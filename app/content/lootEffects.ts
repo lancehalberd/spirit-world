@@ -111,7 +111,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         }
     },
     secondChance: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.hasRevive = true;
+        state.hero.savedData.hasRevive = true;
         state.reviveTime = state.fieldTime;
     },
     spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {

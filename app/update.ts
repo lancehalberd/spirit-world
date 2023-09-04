@@ -350,9 +350,9 @@ function updateDefeated(state: GameState) {
     if (state.defeatState.time < 2000) {
         return;
     }
-    if (state.hero.hasRevive) {
+    if (state.hero.savedData.hasRevive) {
         state.defeatState.reviving = true;
-        state.hero.hasRevive = false;
+        state.hero.savedData.hasRevive = false;
         state.hero.frozenDuration = 0;
         state.hero.burnDuration = 0;
     }

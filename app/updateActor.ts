@@ -281,7 +281,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
                 removeEffectFromArea(state, hero.activeBarrierBurst);
                 delete hero.activeBarrierBurst;
             }
-            if (state.hero.hasRevive) {
+            if (state.hero.savedData.hasRevive) {
                 state.reviveTime = state.fieldTime;
             }
             state.menuIndex = 0;

@@ -59,7 +59,7 @@ export class SaveStatue implements ObjectInstance {
             state.hero.magicRegenCooldown = 0;
         }
         if (getObjectStatus(state, this.definition)) {
-            if (!state.hero.hasRevive) {
+            if (!state.hero.savedData.hasRevive) {
                 showMessage(state, '{@saveStatue.reviveChoice}');
             } else {
                 showMessage(state, `You will return here if defeated.`);

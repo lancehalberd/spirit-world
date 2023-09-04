@@ -221,7 +221,7 @@ function getActualLootDefinition(this: void, state: GameState, definition: AnyLo
             lootType: 'teleportation',
         };
     }
-    if (definition.lootType === 'secondChance' && state.hero.hasRevive) {
+    if (definition.lootType === 'secondChance' && state.hero.savedData.hasRevive) {
         return {
             ...definition,
             lootType: 'money',
