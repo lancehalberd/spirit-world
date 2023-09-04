@@ -27,6 +27,7 @@ createFlameAnimation();
 export const flameAnimation = createAnimation(flameCanvas, flameGeometry, {cols: 2});
 
 interface Props {
+    delay?: number
     x: number
     y: number
     z?: number
@@ -35,6 +36,8 @@ interface Props {
     vy?: number
     vz?: number
     minVz ?: number
+    ax?: number
+    ay?: number
     az?: number
     scale?: number
     ttl?: number
@@ -54,6 +57,7 @@ export class Flame implements EffectInstance, Props {
     frame: Frame;
     damage: number;
     scale: number;
+    delay = 0;
     x: number;
     y: number;
     z: number = 0;
@@ -61,6 +65,8 @@ export class Flame implements EffectInstance, Props {
     minVz = -8;
     vx: number;
     vy: number;
+    ax: number;
+    ay: number;
     az: number;
     w: number = 12;
     h: number = 12;
@@ -73,8 +79,9 @@ export class Flame implements EffectInstance, Props {
     reflected = false;
     isEnemyTarget: boolean = true;
     groundFriction = 0;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8}: Props) {
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, delay = 0, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8}: Props) {
         this.damage = damage;
+        this.delay = delay;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -82,6 +89,8 @@ export class Flame implements EffectInstance, Props {
         this.vy = vy;
         this.vz = vz;
         this.minVz = minVz;
+        this.ax = ax;
+        this.ay = ay;
         this.az = az;
         this.ttl = ttl;
         this.scale = scale;
@@ -108,9 +117,19 @@ export class Flame implements EffectInstance, Props {
         return {};
     }
     update(state: GameState) {
+        if (this.delay > 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
         this.x += this.vx;
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
+        if (this.ax) {
+            this.vx += this.ax;
+        }
+        if (this.ay) {
+            this.vy += this.ay;
+        }
         this.vz = Math.max(this.minVz, this.vz + this.az);
         this.w = 12 * this.scale;
         this.h = 12 * this.scale;
@@ -155,6 +174,8 @@ export class Flame implements EffectInstance, Props {
                 });
                 if (hitResult.reflected) {
                     this.reflected = true;
+                    this.ax = -this.ax;
+                    this.ay = -this.ay;
                     this.vx = -this.vx;
                     this.vy = -this.vy;
                     this.time = 0;

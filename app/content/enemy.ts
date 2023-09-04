@@ -253,12 +253,14 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // since we increment modeTime by FRAME_LENGTH between each update.
         this.modeTime = -FRAME_LENGTH;
     }
-    knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}) {
-        if (!this.canBeKnockedBack) {
+    knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}, force = false) {
+        if (!this.canBeKnockedBack && !force) {
             return;
         }
-        // Interrupt any abilities underway.
-        this.activeAbility = null;
+        // Interrupt any abilities underway if this was a normal knockback.
+        if (this.canBeKnockedBack) {
+            this.activeAbility = null;
+        }
         this.changeToAnimation('hurt');
         this.action = 'knocked';
         this.isAirborn = true;
@@ -536,6 +538,32 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }
         }
     }
+    // Use a taunt from the list of given taunt keys if possible and applies a global cooldown
+    // to all taunts on the list based on the cooldown of the selected taunt.
+    useTauntFromList(state: GameState, tauntKeys: string[], shuffle = true): string|undefined {
+        let usedTaunt: string|undefined;
+        for (const tauntKey of (shuffle ? Random.shuffle(tauntKeys) : tauntKeys)) {
+            if(this.useTaunt(state, tauntKey)) {
+                usedTaunt = tauntKey;
+                break;
+            }
+        }
+        if (!usedTaunt) {
+            return;
+        }
+        const baseCooldown = this.taunts[usedTaunt].definition.cooldown || 3000;
+        for (const tauntKey of tauntKeys) {
+            const tauntInstance = this.taunts[tauntKey];
+            if (tauntInstance) {
+                tauntInstance.cooldown = Math.max(tauntInstance.cooldown, baseCooldown);
+            }
+        }
+        // The cooldown for the selected taunt is set high enough that it won't be selected again
+        // until other taunts are used if they run continuously.
+        const tauntInstance = this.taunts[usedTaunt];
+        tauntInstance.cooldown = Math.max(tauntInstance.cooldown, baseCooldown * tauntKeys.length);
+        return usedTaunt;
+    }
     useTaunt(state: GameState, tauntKey: string): boolean {
         const tauntInstance = this.taunts[tauntKey];
         if (!tauntInstance) {
@@ -699,7 +727,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.animationTime = 0;
                 this.checkIfDefeated(state);
             }
-            return;
+            // Normally enemies do not update when knocked. But forced knockbacks
+            // currently continue running update code on enemies like bosses that
+            // can only be knocked back in special circumstances.
+            if (this.canBeKnockedBack) {
+                return;
+            }
         } else if (
             (this.az > 0 || this.vz > 0 || this.z > minZ)
             && !this.flying && !this.enemyDefinition.floating && !this.activeAbility

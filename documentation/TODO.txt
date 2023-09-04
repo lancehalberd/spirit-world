@@ -52,32 +52,29 @@ Current tasks:
         - sky palace
         - forge
 
-    - Brainstorm ideas for rival fight 2
-        -   "So you're here just like the Commander said."
-            "I can't believe they just invited you here while I had to force my way in."
-            "All my life I've tried to be good and follow the rules while you outcasts just go about doing whatever you want!"
-            "The Elder said the rules are to keep our village safe from the humans, but it was all a lie."
-            "You've seen how powerful the Vanara truly are haven't you?"
-            "The Humans and there so-called Gods should be hiding in fear from us!"
-            "Well I've had it with these stupid rules, both Human and Vanaran."
-            "They said you have special permission to climb the Helix, but you don't have mine!"
-            "A half-blood like you has no right to be here."
-            "You shouldn't even exist!"
+    - Helix Rival improvements
+        - Add level 2 ice attack that he uses only after being frozen once:
+            - "Think you can reflect this?"
+            - Shoots an ice spike object at the player which comes to rest near the edge of the battlefield
+            - After this ice attace, move to center then shoots 3 large fire balls one after another at the player that knock the rival back on cast.
+                - If the player positions themselves correctly they can knock the rival back into the ice spike and stagger/freeze the rival.
+                - Either way the ice spike disappears after the fire ball attack to prevent accumulation.
 
-            Combat
-            "Let me show you the power of a real Vanara!"
-            ""
-            "How did you?"
+    - Why is the music soft sometimes?
+    - Allow holding cloak to use barrier burst from scratch
+    - Add a tutorial for reflecting projectiles in cocoon
+        - Replace trees in b2 with puzzle where you have to push rolling balls with a weapon to defeat an enemy.
+    - Hide empty map floors
+    - Allow hitting through shields with stones.
 
-            "Bah I don't have time for this!"
-            "If I'd had a little longer to train you'd be no match for me."
-            "Go ahead and find the Commander. Just don't embarrass me by dying before our next match."
+    - Get drain graphics for forge?
 
     - Allow sneaking into grand temple with invisibility
         - Replace door with open arch guarded by a warrior monk
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
         - Make sure rolling doesn't let you pass
 
+    - Bug: Back of hype cave is in logic when you don't have enough magic to reach it.
     - Bug: one snake can become two elemental snakes if possessed near the same time (perhaps the same frame).
     - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
         - To fix this, when a portal is revealed, we will only reveal the connected object if it does not have defined logic setting it to be hidden.
@@ -303,6 +300,7 @@ Current tasks:
 
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
+        - We can fix this by tracking totalSmallKeys independent of current small keys and have the logic be based on the total.
 
     - Add vertical tiles in between sky and ground:
         - Could give a greater feeling of vertical depth to the world

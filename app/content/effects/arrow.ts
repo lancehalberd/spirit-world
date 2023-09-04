@@ -160,6 +160,8 @@ interface Props {
     y?: number
     vx?: number
     vy?: number
+    ax?: number
+    ay?: number
     chargeLevel?: number;
     damage?: number
     spiritCloakDamage?: number
@@ -170,6 +172,7 @@ interface Props {
     element?: MagicElement
     reflected?: boolean
     style?: ArrowStyle
+    hybridWorlds?: boolean
 }
 
 export class Arrow implements EffectInstance, Projectile {
@@ -191,10 +194,13 @@ export class Arrow implements EffectInstance, Projectile {
     h: number;
     vx: number;
     vy: number;
+    ax = 0;
+    ay = 0;
     animationTime = 0;
     direction: Direction;
     blocked = false;
     reflected: boolean = false;
+    hybridWorlds: boolean;
     stuckFrames: number = 0;
     stuckTo: {
         dx: number
@@ -205,14 +211,16 @@ export class Arrow implements EffectInstance, Projectile {
     isPlayerAttack = true;
     isHigh = false;
     constructor({
-        x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, 
-        spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
+        x = 0, y = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
+        spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
         ignoreWallsDuration = 0,
     }: Props) {
         this.x = x | 0;
         this.y = y | 0;
         this.vx = vx;
         this.vy = vy;
+        this.ax = ax;
+        this.ay = ay
         this.direction = getDirection(this.vx, this.vy, true);
         this.damage = damage;
         this.spiritCloakDamage = spiritCloakDamage;
@@ -226,6 +234,7 @@ export class Arrow implements EffectInstance, Projectile {
         this.y -= this.h / 2 ;
         this.style = style;
         this.reflected = reflected;
+        this.hybridWorlds = hybridWorlds;
     }
     getHitbox() {
         return this;
@@ -267,6 +276,12 @@ export class Arrow implements EffectInstance, Projectile {
             this.delay -= FRAME_LENGTH;
             return;
         }
+        if (this.ax) {
+            this.vx += this.ax;
+        }
+        if (this.ay) {
+            this.vy += this.ay;
+        }
         if (this.stuckTo) {
             this.x = this.stuckTo.object.x + this.stuckTo.dx;
             this.y = this.stuckTo.object.y + this.stuckTo.dy;
@@ -303,10 +318,13 @@ export class Arrow implements EffectInstance, Projectile {
         }
         if (!this.stuckFrames && this.damage > 2 && this.animationTime % 60 === 0) {
             addSparkleAnimation(state, this.area, this, { element: this.element });
+            if (this.hybridWorlds) {
+                addSparkleAnimation(state, this.area.alternateArea, this, { element: this.element });
+            }
         }
         if (this.element === 'lightning') {
             const r = this.chargeLevel > 1 ? 24 : 16;
-            hitTargets(state, this.area, {
+            const hitProps = {
                 direction: this.direction,
                 damage: this.damage,
                 spiritCloakDamage: this.spiritCloakDamage,
@@ -322,40 +340,55 @@ export class Arrow implements EffectInstance, Projectile {
                 // arrow itself, which would disable arrow weakness on enemies if using
                 // lightning element, which seems undesirable.
                 isArrow: true,
-            });
-        }
-        const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
-        if (hitResult.reflected) {
-            this.vx = -this.vx;
-            this.vy = -this.vy;
-            this.reflected = !this.reflected;
-            playAreaSound(state, this.area, 'blockAttack');
-            this.direction = getDirection(this.vx, this.vy, true);
-            return;
-        }
-        if (hitResult.blocked || hitResult.stopped) {
-            this.stuckFrames = 1;
-            this.blocked = true;
-            this.vz = 1;
-            this.animationTime = 0;
-            return;
-        }
-        if (hitResult.hit && !hitResult.pierced) {
-            this.stuckFrames = 1;
-            this.animationTime = 0;
-            if (hitResult.hitTargets.size) {
-                const object = [...hitResult.hitTargets.values()][0];
-                this.stuckTo = {
-                    object,
-                    dx: this.x - object.x,
-                    dy: this.y - object.y,
-                };
             }
-            return;
+            hitTargets(state, this.area, hitProps);
+            if (this.hybridWorlds) {
+                hitTargets(state, this.area.alternateArea, hitProps);
+            }
         }
-        // This is used to make torches light arrows on fire.
-        if (hitResult.setElement) {
-            this.element = hitResult.setElement;
+        const hitResults: HitResult[] = [];
+        const hitProps = this.getHitProperties(state);
+        hitResults.push(hitTargets(state, this.area, hitProps));
+        if (this.hybridWorlds) {
+            hitResults.push(hitTargets(state, this.area.alternateArea, hitProps));
+        }
+        for (const hitResult of hitResults) {
+            if (hitResult.reflected) {
+                this.vx = -this.vx;
+                this.vy = -this.vy;
+                this.reflected = !this.reflected;
+                if (this.hybridWorlds) {
+                    playAreaSound(state, state.areaInstance, 'blockAttack');
+                } else {
+                    playAreaSound(state, this.area, 'blockAttack');
+                }
+                this.direction = getDirection(this.vx, this.vy, true);
+                return;
+            }
+            if (hitResult.blocked || hitResult.stopped) {
+                this.stuckFrames = 1;
+                this.blocked = true;
+                this.vz = 1;
+                this.animationTime = 0;
+                return;
+            }
+            if (hitResult.hit && !hitResult.pierced) {
+                this.stuckFrames = 1;
+                this.animationTime = 0;
+                if (hitResult.hitTargets.size) {
+                    const object = [...hitResult.hitTargets.values()][0];
+                    this.stuckTo = {
+                        object,
+                        dx: this.x - object.x,
+                        dy: this.y - object.y,
+                    };
+                }
+                return;
+            }
+            // This is used to make torches light arrows on fire.
+            if (hitResult.setElement) {
+                this.element = hitResult.setElement;
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -385,6 +418,11 @@ export class Arrow implements EffectInstance, Projectile {
                 context.fill();
             context.restore();*/
             renderLightningCircle(context, {x, y, r});
+        }
+    }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.hybridWorlds) {
+            this.render(context, state);
         }
     }
 }
@@ -485,7 +523,7 @@ export class CrystalSpike extends Arrow {
             },
             vx: this.vx,
             vy: this.vy,
-            element: null,
+            element: this.element,
             hitAllies: !this.reflected,
             hitEnemies: this.reflected,
             hitObjects: true,

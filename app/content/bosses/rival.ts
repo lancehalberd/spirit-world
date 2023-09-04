@@ -1,6 +1,6 @@
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { rivalAnimations } from 'app/content/enemyAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
 import { appendScript } from 'app/scriptEvents';
@@ -261,7 +261,9 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
                 blockPlayerInput: true,
                 duration: 1000,
             });
-            appendScript(state, '{@rival.lostFirstFight}');
+            if (!isRandomizer && !state.savedState.objectFlags.skipRivalTombStory) {
+                appendScript(state, '{@rival.lostFirstFight}');
+            }
             enemy.setMode('escaping');
             state.savedState.objectFlags[enemy.definition.id] = true;
             saveGame(state);

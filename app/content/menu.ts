@@ -47,9 +47,7 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
     if (state.hero.savedData.elements.lightning || editingState.isEditing) {
         elements.push('lightning');
     }
-    if (elements.length) {
-        menuRows.push(elements);
-    }
+    menuRows.push(elements);
 
     let passiveToolRow: MenuOptionType[] = [];
     for (let key in state.hero.savedData.passiveTools) {

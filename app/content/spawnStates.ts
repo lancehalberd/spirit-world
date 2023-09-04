@@ -73,13 +73,14 @@ const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50, seco
 const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},
     ['peachCaveBoss', 'peachCave:fullPeach', 'homeInstructions']
 );
-const tombRivalState = applyItems(peachCaveExitState, {bow: 1},
+const tombRivalStateStory = applyItems(peachCaveExitState, {bow: 1},
     ['momElder', 'treeVillageBow', 'closedBowDoor', 'elderTomb']
 );
-tombRivalState.savedHeroData.leftTool = 'bow';
-const tombRivalDefeatState = applyItems(tombRivalState, {}, ['tombRivalEnraged']);
+tombRivalStateStory.savedHeroData.leftTool = 'bow';
+const tombRivalStateBoss = applyItems(tombRivalStateStory, {}, ['tombRivalEnraged', 'tombRivalFightStarted', 'skipRivalTombStory']);
+const tombRivalDefeatState = applyItems(tombRivalStateStory, {}, ['tombRivalEnraged', 'tombRivalFightStarted']);
 tombRivalDefeatState.savedHeroData.life = 0.25;
-const tombStartState = applyItems(tombRivalState, {},
+const tombStartState = applyItems(tombRivalStateStory, {},
     ['tombEntrance', 'enteredTomb']
 );
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, 'tomb:map': 1, silverOre: 1},
@@ -92,8 +93,11 @@ const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection
     ['warTempleBoss', 'tombExit']);
 const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
-const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
-    ['cocoonTeleporter', 'lakeTunneBoss']);
+const helixRivalStateStory = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
+    ['cocoonTeleporter']);
+const helixRivalStateBoss = applyItems(helixRivalStateStory, {}, ['skipRivalHelixStory']);
+const helixStartState = applyItems(helixRivalStateStory, {},
+    ['helixRivalBoss']);
 const helixEndState = applyItems(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
     ['elementalBeastsEscaped', 'vanaraCommanderBeasts']);
 const forestStartState = applyItems(helixEndState, {}, ['spiritKingForestTemple']);
@@ -181,6 +185,10 @@ export const easyBossSpawnLocations: SpawnLocationOptions = {
         location: spawnLocations.SPAWN_LOCATION_PEACH_CAVE_BOSS,
         savedState: peachBossState,
     },
+    'Tomb Rival': {
+        location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
+        savedState: tombRivalStateBoss,
+    },
     'Golem': {
         location: spawnLocations.SPAWN_LOCATION_TOMB_BOSS,
         savedState: tombBossState,
@@ -192,6 +200,10 @@ export const easyBossSpawnLocations: SpawnLocationOptions = {
     'Vanara Guardian': {
         location: spawnLocations.SPAWN_COCOON_BOSS,
         savedState: cocoonBossState,
+    },
+    'Helix Rival': {
+        location: spawnLocations.SPAWN_LOCATION_HELIX_RIVAL,
+        savedState: helixRivalStateBoss,
     },
     'Forest Back': {
         location: spawnLocations.SPAWN_FOREST_BACK,
@@ -220,14 +232,19 @@ export const easyBossSpawnLocations: SpawnLocationOptions = {
 };
 
 export const storySpawnLocations: SpawnLocationOptions = {
-    'Rival Fight': {
+    'Tomb Rival Fight': {
         location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
-        savedState: tombRivalState,
+        savedState: tombRivalStateStory,
     },
-    'Rival Defeat': {
+    'Tomb Rival Defeat': {
         location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
         savedState: tombRivalDefeatState,
     },
+    'Helix Rival Fight': {
+        location: spawnLocations.SPAWN_LOCATION_HELIX_RIVAL,
+        savedState: helixRivalStateStory,
+    },
+
 };
 
 export const earlyDungeonSpawnLocations: SpawnLocationOptions = {

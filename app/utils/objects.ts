@@ -22,7 +22,6 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
     } else {
         area.objects.push(object);
     }
-
     if (object.definition?.specialBehaviorKey) {
         try {
             specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);

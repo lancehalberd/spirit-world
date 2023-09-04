@@ -5,6 +5,7 @@ export * from 'app/content/bosses/rival';
 export * from 'app/content/bosses/golem';
 export * from 'app/content/bosses/idols';
 export * from 'app/content/bosses/guardian';
+export * from 'app/content/bosses/rival2';
 export * from 'app/content/bosses/crystalCollector';
 export * from 'app/content/bosses/balloonMegapede';
 export * from 'app/content/bosses/flameBeast';
@@ -14,7 +15,7 @@ export * from 'app/content/bosses/voidTree';
 
 export const bossTypes = <const>[
     'beetleBoss',
-    'rival',
+    'rival', 'rival2',
     'golem',
     'stormIdol', 'flameIdol', 'frostIdol',
     'guardian',

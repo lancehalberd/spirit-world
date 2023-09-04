@@ -30,6 +30,16 @@ export const updateMusic = (state: GameState): void => {
     // The modeTime check her is to make sure that the boss music plays long enough to continue
     // if one boss is defeated and spawns a second boss, like with the Balloon Megapede boss.
     const livingBosses = bosses.filter(boss => !boss.isDefeated || boss.modeTime <= 100);
+    /*
+    // The logic for playing the boss music is a bit brittle and will sometimes restart if
+    // a boss changes from material to spirit world. Uncomment these lines if this happens
+    // to inspect what the state is when the boss music is restarting.
+    if (isTrackPlaying('bossIntro') || isTrackPlaying('bossA') || isTrackPlaying('bossB')) {
+        if (!bosses.length || !livingBosses.length) {
+            debugger;
+        }
+    }
+    */
     const location = getFullZoneLocation(state.location);
     if (bosses.length) {
         if (!livingBosses.length) {

@@ -64,7 +64,7 @@ export class FieldAnimationEffect implements EffectInstance {
         ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
         friction = 0,
-        target, ttl, delay = 0
+        target, ttl, delay = 0,
      }: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;

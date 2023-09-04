@@ -2,6 +2,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderLightningCircle, renderLightningRay } from 'app/render/renderLightning'
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
+import { getVectorToTarget, isTargetVisible } from 'app/utils/target';
 
 
 interface Props {
@@ -12,11 +13,19 @@ interface Props {
     vx?: number
     vy?: number
     vz?: number
+    ax?: number
+    ay?: number
     az?: number
     friction?: number
     ttl?: number
     hitCircle?: Circle
     hitRay?: Ray
+    extraHitProps?: Partial<HitProperties>
+    finalRadius?: number
+    delay?: number
+    target?: ObjectInstance | EffectInstance
+    hybridWorlds?: boolean
+    onHit?: (state: GameState, spark: Spark) => void
 }
 
 export class Spark implements EffectInstance, Props {
@@ -32,12 +41,15 @@ export class Spark implements EffectInstance, Props {
     vx: number = this.props.vx ?? 0;
     vy: number = this.props.vy ?? 0;
     vz: number = this.props.vz ?? 0;
+    ax: number = this.props.ax ?? 0;
+    ay: number = this.props.ay ?? 0;
     az: number = this.props.az ?? -0.3;
     friction = this.props.friction ?? 0;
     hitCircle: Circle;
     hitRay: Ray;
     animationTime = 0;
     ttl: number = this.props.ttl ?? 2000;
+    delay = this.props.delay;
     constructor(readonly props: Props) {
         this.hitCircle = this.props.hitCircle;
         this.hitRay = this.props.hitRay;
@@ -50,12 +62,17 @@ export class Spark implements EffectInstance, Props {
             }
         }
     }
+    // This is just used for targeting, so all we need is for the center to be at (x, y).
+    getHitbox() {
+        return {x: this.x, y: this.y, w: 0, h: 0};
+    }
     getHitProperties(): HitProperties {
         const hitProperties: HitProperties = {
             damage: this.damage,
             element: 'lightning',
             hitAllies: true,
             knockAwayFrom: {x: this.x, y: this.y},
+            ...this.props.extraHitProps,
         }
         if (this.hitRay) {
             hitProperties.hitRay = {
@@ -75,9 +92,24 @@ export class Spark implements EffectInstance, Props {
         return hitProperties;
     }
     update(state: GameState) {
+        if (this.hitCircle?.r < this.props.finalRadius) {
+            this.hitCircle.r++;
+        }
+        if (this.delay > 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
+        if (this.props.target && isTargetVisible(state, this, this.props.target)) {
+            const {x, y} = getVectorToTarget(state, this, this.props.target);
+            this.ax = x / 2;
+            this.ay = y / 2;
+
+        }
         this.x += this.vx;
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
+        this.vx = this.vx + this.ax;
+        this.vy = this.vy + this.ay;
         this.vz = Math.max(-8, this.vz + this.az);
         if (this.friction > 0) {
             this.vx *= (1 - this.friction);
@@ -89,7 +121,13 @@ export class Spark implements EffectInstance, Props {
         if (this.animationTime >= this.ttl) {
             removeEffectFromArea(state, this);
         } else {
-            hitTargets(state, this.area, this.getHitProperties());
+            let hit = hitTargets(state, this.area, this.getHitProperties()).hit;
+            if (this.props.hybridWorlds) {
+                hit = hit || hitTargets(state, this.area.alternateArea, this.getHitProperties()).hit;
+            }
+            if (hit) {
+                this.props.onHit?.(state, this);
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -112,6 +150,11 @@ export class Spark implements EffectInstance, Props {
                 y: this.y + this.hitCircle.y,
                 r: this.hitCircle.r + 2
             }, 2, 20);
+        }
+    }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.props.hybridWorlds) {
+            this.render(context, state);
         }
     }
 }

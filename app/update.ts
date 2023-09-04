@@ -254,8 +254,12 @@ function updateMenu(state: GameState) {
             state.menuRow = (state.menuRow + 1) % menuRows.length;
         } while (!menuRows[state.menuRow].length)
     }
-    // Make sure menuRow stays in bounds. This can get out of bounds when closing the editor.
-    state.menuRow = Math.min(state.menuRow, menuRows.length - 1);
+    // Make sure menuRow always pointed to a populated row in bounds.
+    // This value might be in a bad place when toggling the editor off while viewing the inventory,
+    // for example when selecting an element and turning the editor off when no elements are owned.
+    while (menuRows.length && !menuRows[state.menuRow]?.length) {
+        state.menuRow = (state.menuRow + 1) % menuRows.length;
+    }
     const menuRow = menuRows[state.menuRow];
     state.menuIndex = Math.min(menuRow.length - 1, state.menuIndex);
     if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {

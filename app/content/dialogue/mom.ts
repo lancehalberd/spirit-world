@@ -35,7 +35,7 @@ dialogueHash.mom = {
     options: [
         {
             logicCheck: {
-                requiredFlags: ['isRandomizer'],
+                requiredFlags: ['$randomizer'],
             },
             text: [{
                 dialogueIndex: 19,

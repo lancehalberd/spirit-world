@@ -3,7 +3,7 @@ import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { sample } from 'app/utils/index';
-import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget } from 'app/utils/target';
+import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 
 
@@ -71,6 +71,11 @@ export function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: num
             enemy.vy = enemy.speed * enemy.vy / mag;
         }
     }
+}
+
+export function faceTarget(state: GameState, enemy: Enemy, target: ObjectInstance) {
+    const vector = getVectorToTarget(state, enemy, target);
+    enemy.d = getDirection(vector.x, vector.y);
 }
 
 export function scurryAndChase(state: GameState, enemy: Enemy) {

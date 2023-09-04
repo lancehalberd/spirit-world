@@ -60,7 +60,7 @@ export const SPAWN_LOCATION_TOMB_RIVAL: ZoneLocation = {
     zoneKey: 'overworld',
     floor: 0,
     x: 130,
-    y: 200,
+    y: 180,
     z: 0,
     d: 'up',
     areaGridCoords: {x: 0, y: 1},
@@ -138,6 +138,18 @@ export const SPAWN_COCOON_BOSS: ZoneLocation = {
     areaGridCoords: {x: 0, y: 0},
     isSpiritWorld: true,
 };
+
+export const SPAWN_LOCATION_HELIX_RIVAL: ZoneLocation = {
+    zoneKey: 'lakeTunnel',
+    floor: 0,
+    x: 120,
+    y: 128,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
+
 export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     zoneKey: 'helix',
     floor: 0,
