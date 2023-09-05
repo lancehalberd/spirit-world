@@ -372,6 +372,7 @@ export class ChestObject implements ObjectInstance {
             state.savedState.objectFlags[this.linkedObject.definition.id] = true;
         }
         getLoot(state, this.definition);
+        state.map.needsRefresh = true;
     }
     update(state: GameState) {
         // Make sure empty chests are recorded as opened for the randomizer, since some logic
@@ -454,6 +455,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
                 state.savedState.objectFlags[this.linkedObject.definition.id] = true;
             }
             getLoot(state, this.definition);
+            state.map.needsRefresh = true;
         }
     }
     render(context, state: GameState) {
