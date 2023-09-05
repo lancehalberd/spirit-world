@@ -322,8 +322,13 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.enemyDefinition.immunities?.includes(hit.element)) {
             return {};
         }
-        if (this.shielded) {
-            return this.defaultBlockHit(state, hit);
+        if (this.shielded && !(hit.isThrownObject && hit.damage > 1)) {
+            // Thrown objects with more than 1 damage still do half damage through shields.
+            if (hit.isThrownObject && hit.damage > 1) {
+                hit = {...hit, damage: Math.ceil(hit.damage / 2)};
+            } else {
+                return this.defaultBlockHit(state, hit);
+            }
         }
         if (hit.knockback) {
             this.knockBack(state, hit.knockback);

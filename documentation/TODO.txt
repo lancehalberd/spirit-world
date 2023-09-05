@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Allow hitting through shields with stones.
     - Bug: elder renders with dialogue indicator during cut scene.
     - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
         - To fix this, when a portal is revealed, we will only reveal the connected object if it does not have defined logic setting it to be hidden.
