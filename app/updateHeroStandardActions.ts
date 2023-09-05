@@ -592,7 +592,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // Check to start charging/preparing a tool for use.
     if (canCharge && hero.toolCooldown <= 0 && !hero.chargingRightTool && !hero.chargingLeftTool && !hero.heldChakram) {
         const controllableClones = state.hero.clones.filter(clone => !clone.isUncontrollable);
-        if (state.hero.savedData.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+        if (state.hero.savedData.leftTool
+            && (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+                // Automatically switch to charging if the player continues to hold the cloak button down after creating a barrier.
+                || isGameKeyDown(state, GAME_KEY.LEFT_TOOL) && state.hero.savedData.leftTool === 'cloak' && hero.hasBarrier)
             && (state.hero.savedData.leftTool !== 'clone' || !controllableClones.length)
         ) {
             // Currently only the bow tool can be charged.
@@ -605,7 +608,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
                 useTool(state, hero, state.hero.savedData.leftTool, directionMap[direction][0], directionMap[direction][1]);
             }
-        } else if (state.hero.savedData.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+        } else if (state.hero.savedData.rightTool
+            && (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+                // Automatically switch to charging if the player continues to hold the cloak button down after creating a barrier.
+                || isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) && state.hero.savedData.rightTool === 'cloak' && hero.hasBarrier)
             && (state.hero.savedData.rightTool !== 'clone' || !controllableClones.length)
         ) {
             // Currently only the bow tool can be charged.

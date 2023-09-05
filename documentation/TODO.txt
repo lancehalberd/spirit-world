@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Allow holding cloak to use barrier burst from scratch
     - Hide empty map floors
     - Allow hitting through shields with stones.
     - Bug: elder renders with dialogue indicator during cut scene.
