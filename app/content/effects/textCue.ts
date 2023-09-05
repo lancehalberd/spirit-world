@@ -23,7 +23,8 @@ export class TextCue implements EffectInstance {
     isEffect = <const>true;
     x: number;
     y: number;
-    time: number = 0;
+    // Add a slight delay to fading in text cues to prevent them from showing ahead of text dialogue when the two are triggered at the same time.
+    time: number = -2 * FRAME_LENGTH;
     priority: number = this.props.priority ?? 0;
     duration: number = this.props.duration ?? 3000;
     textFrames: Frame[][];
@@ -48,7 +49,7 @@ export class TextCue implements EffectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
         context.save();
             if (this.time < fadeDuration) {
-                context.globalAlpha = Math.min(1, this.time / fadeDuration);
+                context.globalAlpha = Math.min(1, Math.max(0, this.time / fadeDuration));
             } else if (this.duration > 0 && this.time > this.duration - fadeDuration) {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }

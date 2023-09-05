@@ -38,8 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Add button indicator for bow instructions, similar to what we do for spirit cloak.
-
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
     - Save statues missing dialog:

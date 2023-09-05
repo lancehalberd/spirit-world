@@ -69,3 +69,32 @@ specialBehaviorsHash.barrierReflectInstructions = {
         }
     }
 };
+
+specialBehaviorsHash.bowInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        let toolButton: string;
+        if (state.hero.savedData.leftTool === 'bow') {
+            toolButton = '[B_LEFT_TOOL]';
+        } else if (state.hero.savedData.rightTool === 'bow') {
+            toolButton = '[B_RIGHT_TOOL]';
+        }
+        if (toolButton) {
+            helpText = `Face a target and press ${toolButton} to shoot an arrow.`;
+        } else if (state.hero.savedData.activeTools.bow) {
+            helpText = `Press [B_MENU] to open your inventory and assign the Bow to [B_TOOL]`;
+        }
+        // Stop showing this help text once the player has successfully defeated the enemies.
+        // Do not show the text again in the future if the boss teleporter is already unlocked.
+        if (state.savedState.objectFlags.bowDoor) {
+            helpText = '';
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    }
+};
