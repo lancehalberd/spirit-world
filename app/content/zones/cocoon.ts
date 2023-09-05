@@ -726,6 +726,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "cocoon:1:0x0-arrowTurret-0", x: 64, y: 64, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "normal", id: "cocoon:1:0x0-arrowTurret-2", x: 432, y: 432, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "hidden", id: "cocoonBossTeleporter", x: 320, y: 176, type: "teleporter", linked: true, spirit: true},
+        {status: "normal", id: "", x: 312, y: 168, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, customLogic: "", saveStatus: "never", specialBehaviorKey: "barrierReflectInstructions"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 253, mapId: 'cocoon', floorId: 'B2', mapX: 1, mapY: 2},

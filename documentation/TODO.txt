@@ -38,10 +38,7 @@ Graphics:
 
 
 Current tasks:
-    - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
-        - To fix this, when a portal is revealed, we will only reveal the connected object if it does not have defined logic setting it to be hidden.
-    - Add barrier reflect tutorial to cocoon
-        - Remove portals from b2 cocoon in NW and SE corner, instead spawn balls when the enemies are defeated that must be used to kill enemies in the spirit world.
+    - Add puzzle requiring the use of balls to defeat spirit enemies in cocoon B2.
 
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 

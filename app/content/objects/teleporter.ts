@@ -48,6 +48,15 @@ export class Teleporter implements ObjectInstance {
             saveObjectStatus(state, this.definition);
         }
         if (this.linkedObject && this.linkedObject.status !== status) {
+            const linkedId = this.linkedObject.definition.id;
+            // Do not activate a linked teleporter if it has an explicit
+            // distinct ID.
+            if (linkedId || linkedId !== this.definition.id) {
+                return;
+            }
+            // TODO: We may also need to check if the linked object has special logic preventing its
+            // display and also not change its status if that logic is still false.
+            // I don't think this currently applies to anything, so I'll do this later if necessary.
             this.linkedObject.changeStatus(state, status);
         }
     }
