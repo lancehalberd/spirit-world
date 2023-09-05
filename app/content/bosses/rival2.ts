@@ -52,7 +52,7 @@ const rollAbility: EnemyAbility<RollTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: RollTargetType): void {
         let theta = Math.atan2(target.y, target.x);
         theta += (Math.random() < 0.5 ? 1 : -1) * Math.PI / 2;
-        enemy.d = getDirection(Math.cos(theta), Math.sin(theta), true);
+        enemy.d = getDirection(Math.cos(theta), Math.sin(theta));
         enemy.changeToAnimation('roll');
     },
     cooldown: 4000,

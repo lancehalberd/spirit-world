@@ -49,7 +49,17 @@ export function createAnimation(
     return {frames, frameDuration: duration, ...props, duration: FRAME_LENGTH * frames.length * duration};
 };
 
+
+const [errorCanvas, errorContext] = createCanvasAndContext(16, 16);
+errorContext.fillStyle = 'red';
+errorContext.fillRect(0, 0, 16, 16);
+
 export function getFrame(animation: FrameAnimation, animationTime: number): Frame {
+    if (!animation) {
+        console.error(new Error('Encountered falsey animation in getFrame'));
+        debugger;
+        return {image: errorCanvas, x: 0, y: 0, w: 16, h: 16};
+    }
     animationTime = Math.max(animationTime, 0);
     let frameIndex = Math.floor(animationTime / (FRAME_LENGTH * (animation.frameDuration || 1)));
     if (animation.loop === false) { // You can set this to prevent an animation from looping.
