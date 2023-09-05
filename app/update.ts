@@ -51,6 +51,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
+import { isSectionExplored } from 'app/utils/sections';
 
 let isGameInitialized = false;
 export function update() {
@@ -226,14 +227,22 @@ function updateTitle(state: GameState) {
     }
 }
 
+
 function updateMenu(state: GameState) {
     if (state.showMap) {
         const floorKeys = Object.keys(dungeonMaps[state.areaSection?.definition.mapId]?.floors || {});
+        const showFullMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map || editingState.isEditing;
         if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-            state.menuIndex = (state.menuIndex + 1) % floorKeys.length;
+            do {
+                state.menuIndex = (state.menuIndex + 1) % floorKeys.length;
+            } while (!showFullMap
+                && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorKeys[state.menuIndex]].sections?.find(section => isSectionExplored(state, section)));
             editingState.selectedSections = [];
         } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-            state.menuIndex = (state.menuIndex + floorKeys.length - 1) % floorKeys.length;
+            do {
+                state.menuIndex = (state.menuIndex + floorKeys.length - 1) % floorKeys.length;
+            } while (!showFullMap
+                && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorKeys[state.menuIndex]]?.sections?.find(section => isSectionExplored(state, section)));
             editingState.selectedSections = [];
         }
         if (wasMenuConfirmKeyPressed(state)) {

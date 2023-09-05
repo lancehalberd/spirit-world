@@ -305,8 +305,15 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     const rowHeight = 24;
     const floorIds = Object.keys(dungeonMaps[state.areaSection?.definition.mapId].floors || {});
     const selectedFloorIndex = state.menuIndex % floorIds.length;
+    const hasMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map;
+    let y = r.y + r.h;
     for (let floor = 0; floor < floorIds.length; floor++) {
-        drawText(context, floorIds[floor], r.x + 12, r.y + r.h - rowHeight * floor - rowHeight / 2, {
+        if (!hasMap
+            && !editingState.isEditing
+            && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorIds[floor]].sections?.find(section => isSectionExplored(state, section))) {
+            continue;
+        }
+        drawText(context, floorIds[floor], r.x + 12, y - rowHeight / 2, {
             textBaseline: 'middle',
             textAlign: 'center',
             size: 16,
@@ -315,15 +322,18 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
             drawFrame(context, heroIcon, {
                 ...heroIcon,
                 x: r.x + 20 - (heroIcon.w / 2) | 0,
-                y: r.y + r.h - rowHeight * floor - 8 - (heroIcon.h / 2) | 0,
+                y: y - 8 - (heroIcon.h / 2) | 0,
             });
         }
+        if (selectedFloorIndex === floor) {
+            drawFrame(context, cursor, {
+                ...cursor,
+                x: r.x,
+                y: y - 24,
+            });
+        }
+        y -= rowHeight;
     }
-    drawFrame(context, cursor, {
-        ...cursor,
-        x: r.x,
-        y: r.y + r.h - rowHeight * selectedFloorIndex - 24,
-    });
 }
 
 

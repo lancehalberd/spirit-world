@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Hide empty map floors
     - Allow hitting through shields with stones.
     - Bug: elder renders with dialogue indicator during cut scene.
     - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
