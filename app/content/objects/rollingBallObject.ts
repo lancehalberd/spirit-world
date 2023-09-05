@@ -5,7 +5,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound, stopSound } from 'app/musicController';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
-import { removeObjectFromArea } from 'app/utils/objects';
+import { getObjectStatus, removeObjectFromArea, saveObjectStatus } from 'app/utils/objects';
 
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
@@ -24,6 +24,8 @@ export class RollingBallObject implements ObjectInstance {
     x: number;
     y: number;
     z: number = 0;
+    vz: number = 0;
+    az: number = -0.2;
     isObject = <const>true;
     linkedObject: RollingBallObject;
     rollDirection: Direction;
@@ -37,6 +39,25 @@ export class RollingBallObject implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        this.status = this.definition.status;
+        if (getObjectStatus(state, this.definition)) {
+            this.status = 'normal';
+        }
+    }
+    changeStatus(state: GameState, status: ObjectStatus): void {
+        if (status === 'normal') {
+            saveObjectStatus(state, this.definition, true);
+            if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+                this.z = 128;
+                if (this.linkedObject) {
+                    this.linkedObject.z = 128;
+                }
+            }
+        }
+        this.status = status;
+        if (this.linkedObject) {
+            this.linkedObject.status = status;
+        }
     }
     cleanup() {
         this.stopRollingSound();
@@ -99,6 +120,9 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         if (this.z <= 0) {
             for (const object of this.area.objects) {
                 if (object.definition?.type !== 'ballGoal' || object.status === 'active') {
@@ -125,6 +149,18 @@ export class RollingBallObject implements ObjectInstance {
                     }
                     return;
                 }
+            }
+        } else {
+            this.vz = Math.max(-8, this.vz + this.az);
+            this.z = Math.max(0, this.z + this.vz);
+            if (this.z === 0 && this.vz <= -4) {
+                state.screenShakes.push({
+                    dx: 0,
+                    dy: 2,
+                    startTime: state.fieldTime,
+                    endTime: state.fieldTime + 200,
+                });
+                playAreaSound(state, this.area, 'bossDeath');
             }
         }
         if (this.rollDirection) {
@@ -189,8 +225,16 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+        if (this.status !== 'normal') {
+            return;
+        }
+        context.save();
+            if (this.z > 100) {
+                context.globalAlpha *= Math.max(0, 1 - (this.z - 100) / 28);
+            }
+            const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
+            drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+        context.restore();
     }
 }
 objectHash.rollingBall = RollingBallObject;

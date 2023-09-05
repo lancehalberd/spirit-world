@@ -566,6 +566,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'beadGrate':
         case 'cathode':
         case 'pitEntrance':
+        case 'rollingBall':
             return ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
         case 'torch':
             return ['normal', 'active', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];

@@ -38,7 +38,10 @@ Graphics:
 
 
 Current tasks:
-    - Add puzzle requiring the use of balls to defeat spirit enemies in cocoon B2.
+    - Bug: rolling balls in front of the player hit their spirit barrier because of the alrger hitbox.
+        - Maybe decrease the ball hitbox by enough to avoid this, it really only needs to hit towards the front of the direction it is moving.
+
+    - Bug: Cocoon Guardian fight seems to progress before you enter the portal sometimes.
 
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 

@@ -116,7 +116,11 @@ const basePlantDefinition: Partial<EnemyDefinition<any>> = {
     alwaysReset: true,
     speed: 0.7,
     aggroRadius: 112,
-    life: 5, touchDamage: 1,
+    // Before changing this, consider the plant is used in Cocoon as an enemy
+    // that will be defeated by rolling over it with a rollingBall twice and we
+    // don't want to make this too tedious.
+    life: 4,
+    touchDamage: 1,
     canBeKnockedBack: false,
     update(state: GameState, enemy: Enemy): void {
         if (!enemy.activeAbility) {
