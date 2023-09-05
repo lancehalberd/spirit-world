@@ -375,25 +375,29 @@ export class NPC implements Actor, ObjectInstance  {
             });
         }
         //drawFrameAt(context, frame, this);
-        const dialogue = this.getNextDialogue(state);
-        if (dialogue) {
-            context.save();
-                if (dialogue.dialogueType === 'reminder' || isDialogueHeard(state, dialogue.dialogueIndex)) {
-                    context.globalAlpha *= 0.5;
-                }
-                const w = (frame.content?.w ?? frame.w) * scale;
-                const x = this.x + w / 2, y = this.y - (frame?.content?.y || 0) * scale - this.z - 12;
-                drawFrame(context, speechBubble, {...speechBubble, x, y });
-                if (dialogue.dialogueType === 'quest') {
-                    drawFrame(context, yellowQuest, {...yellowQuest, x, y });
-                } else if (dialogue.dialogueType === 'subquest') {
-                    drawFrame(context, blueQuest, {...blueQuest, x, y });
-                } else if (dialogue.dialogueType === 'hint' || dialogue.dialogueType === 'reminder') {
-                    drawFrame(context, blueQuest, {...greenHint, x, y });
-                } else {
-                    drawFrame(context, speechDots, {...speechDots, x, y });
-                }
-            context.restore();
+        // Dialogue indicators should not be drawn while script events are running since they are
+        // distracting during cut scenes, and you cannot usually interract with NPCs while events are running.
+        if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length) {
+            const dialogue = this.getNextDialogue(state);
+            if (dialogue) {
+                context.save();
+                    if (dialogue.dialogueType === 'reminder' || isDialogueHeard(state, dialogue.dialogueIndex)) {
+                        context.globalAlpha *= 0.5;
+                    }
+                    const w = (frame.content?.w ?? frame.w) * scale;
+                    const x = this.x + w / 2, y = this.y - (frame?.content?.y || 0) * scale - this.z - 12;
+                    drawFrame(context, speechBubble, {...speechBubble, x, y });
+                    if (dialogue.dialogueType === 'quest') {
+                        drawFrame(context, yellowQuest, {...yellowQuest, x, y });
+                    } else if (dialogue.dialogueType === 'subquest') {
+                        drawFrame(context, blueQuest, {...blueQuest, x, y });
+                    } else if (dialogue.dialogueType === 'hint' || dialogue.dialogueType === 'reminder') {
+                        drawFrame(context, blueQuest, {...greenHint, x, y });
+                    } else {
+                        drawFrame(context, speechDots, {...speechDots, x, y });
+                    }
+                context.restore();
+            }
         }
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
