@@ -238,6 +238,7 @@ function updateMenu(state: GameState) {
         }
         if (wasMenuConfirmKeyPressed(state)) {
             state.paused = false;
+            updateSoundSettings(state);
             editingState.selectedSections = [];
         }
         return;
