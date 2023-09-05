@@ -611,10 +611,15 @@ function teleportToNextMarker(this: void, state: GameState, guardian: Enemy<Guar
     }
 }
 function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
+    // Do not begin updating the guardian until the hero is in the other world.
+    if (state.hero.area === enemy.area) {
+        enemy.healthBarTime = 0;
+        return;
+    }
     if (!enemy.params.lastDamaged) {
         enemy.params.lastDamaged = state.fieldTime;
     }
-    if (enemy.params.lastDamaged - state.fieldTime === 2000) {
+    if (state.fieldTime - enemy.params.lastDamaged === 2000) {
         enemy.useTaunt(state, 'intro');
     }
     const projection = enemy.area.alternateArea.enemies.find(o =>
@@ -631,17 +636,13 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.indicator.target = enemy;
     }
     if (!enemy.params.usedMarkers?.size) {
-        enemy.healthBarTime = 0;
         enemy.params.usedMarkers = new Set();
         // Don't teleport until the hero is in the material world (otherwise they might appear next to them).
-        if (state.hero.area !== enemy.area) {
-            teleportToNextMarker(state, enemy);
-            // Move the projection to match the position of the guardian at the start of battle.
-            const vector = getVectorToTarget(state, projection, enemy);
-            projection.x += vector.mag * vector.x;
-            projection.y += vector.mag * vector.y;
-        }
-        return;
+        teleportToNextMarker(state, enemy);
+        // Move the projection to match the position of the guardian at the start of battle.
+        const vector = getVectorToTarget(state, projection, enemy);
+        projection.x += vector.mag * vector.x;
+        projection.y += vector.mag * vector.y;
     }
 }
 

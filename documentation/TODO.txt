@@ -38,10 +38,7 @@ Graphics:
 
 
 Current tasks:
-    - Bug: rolling balls in front of the player hit their spirit barrier because of the alrger hitbox.
-        - Maybe decrease the ball hitbox by enough to avoid this, it really only needs to hit towards the front of the direction it is moving.
-
-    - Bug: Cocoon Guardian fight seems to progress before you enter the portal sometimes.
+    - Add button indicator for bow instructions, similar to what we do for spirit cloak.
 
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
@@ -81,7 +78,6 @@ Current tasks:
 
     - Fade out any text cues during screen transitions. Right now it just abruptly disappears.
 
-    - Add button indicator for bow instructions, similar to what we do for spirit cloak.
 
     - Leon respawned at a door and kept going up/down the entrance stairs to the lightning sanctum.
         - I could not reproduce however and couldn't see anything suspicious in the code.

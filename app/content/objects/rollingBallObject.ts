@@ -187,10 +187,28 @@ export class RollingBallObject implements ObjectInstance {
                 hitEnemies: true,
                 knockAwayFrom: {x: this.x + 8, y: this.y + 8},
             });
-            // This is a little bit of a hack.
-            // When rolling, shorten the hitbox so that it doesn't the player when they
-            // are pushing into it or less than a full pixel overlapping the ball.
-            const smallHitbox = { x: this.x + 1 + dx / 2, y: this.y + 1 + dy / 2, w: 14, h: 14 };
+            // Create a slightly smaller hitbox then adjust it so it only covers the front half
+            // of the actual ball. This is to prevent the ball hitting things following behind it,
+            // in particular a player with the spirit barrier on will overlap the back few pixels
+            // of a ball when they push on it to make it roll.
+            const smallHitbox = {
+                x: this.x + 1,
+                y: this.y + 1,
+                w: 14,
+                h: 14,
+            };
+            if (dx < 0) {
+                smallHitbox.w = 7;
+            } else if (dx > 0) {
+                smallHitbox.x += 7;
+                smallHitbox.w = 7;
+            }
+            if (dy < 0) {
+                smallHitbox.h = 7;
+            } else if (dy > 0) {
+                smallHitbox.y += 7;
+                smallHitbox.h = 7;
+            }
             hitTargets(state, this.area, {
                 canPush: true,
                 damage: 2,
