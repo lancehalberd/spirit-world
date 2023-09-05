@@ -477,7 +477,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 384, y: 160, type: "tippable"},
         {status: "normal", id: "", x: 400, y: 144, type: "pushPull"},
         {status: "normal", id: "", x: 400, y: 128, type: "tippable"},
-        {status: "normal", id: "", x: 368, y: 416, type: "narration", message: "", w: 48, h: 48, delay: 100, customLogic: "$bow", specialBehaviorKey: "bowInstructions"},
+        {status: "normal", id: "", x: 368, y: 416, type: "narration", message: "", w: 48, h: 48, delay: 100, customLogic: "$bow", specialBehaviorKey: "bowInstructions", saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 20, h: 20, index: 136, mapId: 'treeVillage', floorId: '2F', mapX: 0, mapY: 0},

@@ -891,7 +891,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "peachCaveFinalNarration", x: 344, y: 384, type: "narration", message: "Hey I know this place...\n{|}This is the cave by the lake, I can swim out over there!", delay: 800, w: 80, h: 80},
         {status: "normal", id: "jumpInstructions1", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}If I jump down I could use that vine to climb up over there.", w: 48, h: 64, delay: 500},
         {status: "normal", id: "peachCave:0:0x1-vortex-0", x: 192, y: 392, type: "enemy", enemyType: "vortex", d: "down", params: {}},
-        {status: "normal", id: "", x: 352, y: 480, type: "narration", message: "{flag:peachCaveFinalNarration}", trigger: "touch", delay: 0, w: 64, h: 32},
+        {status: "normal", id: "", x: 352, y: 480, type: "narration", message: "{flag:peachCaveFinalNarration}", trigger: "touch", delay: 0, w: 64, h: 32, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 155, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 3},
