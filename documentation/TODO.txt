@@ -38,6 +38,16 @@ Graphics:
 
 
 Current tasks:
+    - Why is the music soft sometimes?
+    - Allow holding cloak to use barrier burst from scratch
+    - Hide empty map floors
+    - Allow hitting through shields with stones.
+    - Bug: elder renders with dialogue indicator during cut scene.
+    - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
+        - To fix this, when a portal is revealed, we will only reveal the connected object if it does not have defined logic setting it to be hidden.
+    - Add barrier reflect tutorial to cocoon
+        - Remove portals from b2 cocoon in NW and SE corner, instead spawn balls when the enemies are defeated that must be used to kill enemies in the spirit world.
+
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
     - Save statues missing dialog:
@@ -60,12 +70,6 @@ Current tasks:
                 - If the player positions themselves correctly they can knock the rival back into the ice spike and stagger/freeze the rival.
                 - Either way the ice spike disappears after the fire ball attack to prevent accumulation.
 
-    - Why is the music soft sometimes?
-    - Allow holding cloak to use barrier burst from scratch
-    - Add a tutorial for reflecting projectiles in cocoon
-        - Replace trees in b2 with puzzle where you have to push rolling balls with a weapon to defeat an enemy.
-    - Hide empty map floors
-    - Allow hitting through shields with stones.
 
     - Get drain graphics for forge?
 
@@ -74,11 +78,8 @@ Current tasks:
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
         - Make sure rolling doesn't let you pass
 
-    - Bug: elder renders with dialogue indicator during cut scene.
-    - Bug: Back of hype cave is in logic when you don't have enough magic to reach it.
     - Bug: one snake can become two elemental snakes if possessed near the same time (perhaps the same frame).
-    - Bug: the return portal after the barrier burst tutorial appears too early probably because of link behavior when revealing a portal.
-        - To fix this, when a portal is revealed, we will only reveal the connected object if it does not have defined logic setting it to be hidden.
+    - Bug: Back of hype cave is in logic when you don't have enough magic to reach it.
 
     - Add a task for a generic enemy transformation animation I can use for upgrading enemies to elemental versions.
         - Having them instantly change looks buggy in some cases, and for the flies it is hard to tell when it even happened.

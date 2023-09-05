@@ -93,7 +93,7 @@ export class Spark implements EffectInstance, Props {
     }
     update(state: GameState) {
         if (this.hitCircle?.r < this.props.finalRadius) {
-            this.hitCircle.r++;
+            this.hitCircle.r += 0.5;
         }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;

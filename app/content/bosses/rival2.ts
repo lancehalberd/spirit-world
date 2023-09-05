@@ -129,7 +129,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
 };
 
 
-const spiritThrowAbility: EnemyAbility<ThrowTargetType> = {
+const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): ThrowTargetType|null {
         return getVectorToNearbyTarget(state, enemy, 512, [...state.hero.area.allyTargets, ...state.hero.area.alternateArea.allyTargets]);
     },
@@ -154,24 +154,25 @@ const spiritThrowAbility: EnemyAbility<ThrowTargetType> = {
         for (let i = 0; i < 3; i++) {
             const theta = baseTheta + i * Math.PI / 6;
             const dx = Math.cos(theta), dy = Math.sin(theta);
+            const speed = i === iceIndex ? 1.5 : 2.5;
             CrystalSpike.spawn(state, enemy.area, {
                 delay: 100,
                 x: enemy.x + enemy.w / 2 + enemy.w / 4 * dx,
                 y: enemy.y + enemy.h / 2 + enemy.h / 4 * dy,
                 damage: 1,
                 element: i === iceIndex ? 'ice' : null,
-                vx: 3 * dx,
-                vy: 3 * dy,
+                vx: speed * dx,
+                vy: speed * dy,
                 hybridWorlds: true,
             });
         }
-        enemy.knockBack(state, {vx: -3 * target.x, vy: -3 * target.y, vz: 3}, true);
+        enemy.knockBack(state, {vx: -1 * target.x, vy: -1 * target.y, vz: 2}, true);
         enemy.setMode('knocked');
     },
     cooldown: 4000,
     charges: 1,
     prepTime: 800,
-    recoverTime: 1500,
+    recoverTime: 2000,
 };
 
 const flameRingAbility: EnemyAbility<true> = {
@@ -226,7 +227,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
         enemy.changeToAnimation('kneel');
         const dx = target.x, dy = target.y;
         const spark = new Spark({
-            delay: 600,
+            delay: 1200,
             x: enemy.x + enemy.w / 2 + (13 + enemy.w / 2) * dx,
             y: enemy.y + enemy.h / 2 + (13 + enemy.h / 2) * dy,
             damage: 2,
@@ -236,7 +237,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
                 x: 0, y: 0, r: 2,
             },
             hybridWorlds: true,
-            finalRadius: 12,
+            finalRadius: 10,
             target: target.target,
             extraHitProps: {
                 hitEnemies: true,
@@ -250,12 +251,12 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
         addEffectToArea(state, state.hero.area, spark);
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
-        enemy.knockBack(state, {vx: -3 * target.x, vy: -3 * target.y, vz: 3}, true);
+        enemy.knockBack(state, {vx: -3 * target.x, vy: -3 * target.y, vz: 2}, true);
         enemy.setMode('knocked');
     },
     cooldown: 6000,
     charges: 1,
-    prepTime: 600,
+    prepTime: 1200,
     recoverTime: 3000,
 };
 
@@ -344,7 +345,7 @@ enemyDefinitions.rival2 = {
     animations: rivalAnimations,
     abilities: [
         rollAbility, staffAbility, throwAbility,
-        spiritThrowAbility, flameRingAbility, chasingSparkAbility,
+        iceSpikeAbility, flameRingAbility, chasingSparkAbility,
     ],
     taunts: {
         attackIntro: { text: 'Should I go easy on you?', priority: 5, limit: 1},
@@ -428,7 +429,7 @@ enemyDefinitions.rival2 = {
         }
     },
     alternateRender(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
-        if (enemy.activeAbility?.definition === spiritThrowAbility
+        if (enemy.activeAbility?.definition === iceSpikeAbility
             && !enemy.activeAbility.used
             && enemy.activeAbility.time >= enemy.activeAbility.definition.prepTime - 400) {
             const animation = chargeIceBackAnimation;
@@ -469,7 +470,7 @@ enemyDefinitions.rival2 = {
                 renderVanaraSpirit(context, state, afterFrames[i]);
             context.restore();
         }
-        if (enemy.activeAbility?.definition === spiritThrowAbility && !enemy.activeAbility.used) {
+        if (enemy.activeAbility?.definition === iceSpikeAbility && !enemy.activeAbility.used) {
             const animation = chargeIceFrontAnimation;
             context.save();
                 context.globalAlpha *= 0.8;
@@ -572,7 +573,7 @@ function updateSpiritRival(this: void, state: GameState, enemy: Enemy): void {
             }
             if (!moveEnemyToTargetLocation(state, enemy, enemy.params.targetLocation.x, enemy.params.targetLocation.y)) {
                 delete enemy.params.targetLocation;
-                usePrioritizedAbility(state, enemy, Random.shuffle([chasingSparkAbility, spiritThrowAbility, flameRingAbility]));
+                usePrioritizedAbility(state, enemy, Random.shuffle([chasingSparkAbility, iceSpikeAbility, flameRingAbility]));
             }
         }
     }
