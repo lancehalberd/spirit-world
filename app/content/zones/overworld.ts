@@ -5737,7 +5737,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "spiritShopLightningBlessing", x: 176, y: 144, type: "shopItem", lootType: "lightningBlessing", price: 500, lootLevel: 1},
         {status: "normal", id: "", x: 112, y: 112, d: "down", behavior: "none", style: "zoro", type: "npc", dialogue: "Welcome to my humble shop.", dialogueIndex: 100},
         {status: "normal", id: "spiritShopPeach", x: 128, y: 144, type: "shopItem", lootType: "peachOfImmortality", price: 300, lootLevel: 1},
-        {status: "normal", id: "spiritShopMarker", x: 112, y: 208, type: "marker"},
+        {status: "normal", id: "spiritShopMarker", x: 56, y: 200, type: "marker"},
         {status: "normal", id: "overworld:s0:0x1-luckyBeetle-0", x: 144, y: 320, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-elementalFrost-0", logicKey: "frozenLake", x: 360, y: 64, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-elementalFrost-1", logicKey: "frozenLake", x: 404, y: 396, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},

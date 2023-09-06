@@ -36,6 +36,16 @@ Graphics:
 
 
 Current tasks:
+    Changes blocking production release:
+        - Bolder creates landing effect constantly when rolling over a staff.
+        - Golem boss isn't using hand slam attack
+        - Check jade chest in cocoon is out of logic without gloves.
+
+
+    - Fix: Tree Village dialogue text shuold be replaced in randomizer if possible.
+    - Destroy bushes that the clone lands on.
+    - Fix flames can go up ledges.
+
     - Improve helix
         - Switch to wooden graphics
         - Make area size at least 40x40 if not 48x48
