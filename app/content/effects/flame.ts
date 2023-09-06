@@ -174,6 +174,7 @@ export class Flame implements EffectInstance, Props {
                 });
                 if (hitResult.reflected) {
                     this.reflected = true;
+                    this.damage *= (hitResult.returnHit?.damage || 1);
                     this.ax = -this.ax;
                     this.ay = -this.ay;
                     this.vx = -this.vx;
