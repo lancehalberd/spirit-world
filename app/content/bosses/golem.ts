@@ -227,9 +227,9 @@ enemyDefinitions.golem = {
         }
         const hitbox = enemy.getHitbox(state);
         const innerHitbox = {
-            x: hitbox.x + hitbox.w / 2 - 8,
+            x: hitbox.x + hitbox.w / 2 - 10,
             y: hitbox.y + hitbox.h - 20,
-            w: 16,
+            w: 20,
             h: 20,
         };
         // If they miss the vulnerable section, the attack is blocked.
