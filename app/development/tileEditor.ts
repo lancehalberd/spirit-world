@@ -49,6 +49,7 @@ mainCanvas.addEventListener('wheel', (event: WheelEvent) => {
     }
 });
 
+let wasSelectingTiles = false;
 mainCanvas.addEventListener('mousemove', function () {
     if (!editingState.isEditing || !isMouseDown() || contextMenuState.contextMenu) {
         return;
@@ -82,8 +83,9 @@ mainCanvas.addEventListener('mousemove', function () {
             break;
         case 'brush':
             if (isKeyboardKeyDown(KEY.SHIFT) && editingState.dragOffset) {
+                wasSelectingTiles = true;
                 updateBrushSelection(x, y);
-            } else {
+            } else if (!wasSelectingTiles) {
                 drawBrush(x, y);
             }
             break;
@@ -134,9 +136,11 @@ mainCanvas.addEventListener('mousedown', function (event) {
             break;
         case 'brush':
             if (isKeyboardKeyDown(KEY.SHIFT)) {
+                wasSelectingTiles = true;
                 editingState.dragOffset = {x, y};
                 updateBrushSelection(x, y);
             } else {
+                wasSelectingTiles = false;
                 drawBrush(x, y);
             }
             break;

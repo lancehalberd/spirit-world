@@ -614,7 +614,6 @@ High level list of things left to do:
         Phoenix boss in Holy Sanctum
         Eight Trigram Furnace at the end of the Gauntlet
         Crater midboss
-        Rival fight before Helix
         Helix Boss
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
             - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
