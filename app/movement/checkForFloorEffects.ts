@@ -79,7 +79,24 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 }
             }
             if (behaviors.climbable) {
-                startClimbing = true;
+                // Originall this code just sart `startClimbing = true` with no checks, but there is an ugly edge case where you
+                // could start climbing down while off of the tile enough that you wouldn't wiggle to line up with the ladder.
+                // This change will cause you to just jump down the ledge rather than start climbing if your alignment with the
+                // climbable tile is too far to fix by wiggling.
+                const tileIsDown = row > topRow;
+                if (tileIsDown) {
+                    const tileIsLeft = column < rightColumn;
+                    const tileIsRight = column > leftColumn;
+                    // Don't start climbing when the climbable tile is too far to the bottom left or right corner of the character.
+                    if ((tileIsLeft && hero.x % 16 < 8)
+                        || (tileIsRight && hero.x % 16 > 8)
+                        || (!tileIsLeft && !tileIsRight)
+                    ) {
+                        startClimbing = true;
+                    }
+                } else {
+                    startClimbing = true;
+                }
             }
             if (behaviors.touchHit && hero.onHit) {
                 if (!behaviors.touchHit.isGroundHit || hero.z <= 0) {
