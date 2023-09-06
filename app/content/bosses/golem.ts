@@ -434,7 +434,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     const shouldMoveToPlayer =
         (enemy.mode === 'choose' || enemy.mode === 'chargeLaser' ||  enemy.mode === 'slamHands')
         && ((enemy.mode === 'slamHands' && enemy.modeTime < SLAM_HANDS_DURATION) || !hands.some(hand => hand.mode !== 'choose'))
-        && !(enemy.mode === 'chargeLaser' && enemy.modeTime > LASER_CHARGE_TIME - 400)
+        && !(enemy.mode === 'chargeLaser' && enemy.modeTime > LASER_CHARGE_TIME - 600)
         && (!enemy.params.mouthLaser || enemy.params.mouthLaser.done);
 
     const hitbox = enemy.getHitbox(state);
@@ -537,12 +537,12 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.useTaunt(state, 'flurry');
             } else {
                 enemy.setMode('chargeLaser');
+                if (hands.length) {
+                    enemy.useTaunt(state, 'protect');
+                }
             }
         }
     } else if (enemy.mode === 'chargeLaser') {
-        if (hands.length) {
-            enemy.useTaunt(state, 'protect');
-        }
         enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
         if (enemy.modeTime >= LASER_CHARGE_TIME) {
             enemy.setMode('fireLaser');
