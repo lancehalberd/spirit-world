@@ -149,7 +149,6 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 128, y: 176, type: "spawnMarker"},
         {status: "normal", id: "", x: 128, y: 224, type: "spawnMarker"},
         {status: "normal", id: "", x: 144, y: 224, type: "spawnMarker"},
-        {status: "normal", id: "helixSave", x: 272, y: 96, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 267, mapId: 'helix', floorId: '1F', mapX: 1, mapY: 2},

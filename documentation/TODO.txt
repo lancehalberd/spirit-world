@@ -47,7 +47,6 @@ Current tasks:
                 {|}Maybe you can find a way to turn your opponent's attacks against them.
             `
 
-
     - Fix: Tree Village dialogue text shuold be replaced in randomizer if possible.
     - Destroy bushes that the clone lands on.
     - Fix flames can go up ledges.

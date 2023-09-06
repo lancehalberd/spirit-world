@@ -78,6 +78,7 @@ export function getShortZoneName(location: ZoneLocation): string {
         case 'tomb': return 'Vanara Tomb';
         case 'warTemple': return 'War Temple';
         case 'cocoon': return 'Cocoon';
+        case 'lakeTunnel': return 'Lake Tunnel';
         case 'helix': return 'Helix';
         case 'forestTemple': return 'F. Temple';
         case 'waterfallTower': return 'W. Tower';

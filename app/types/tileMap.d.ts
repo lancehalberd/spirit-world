@@ -235,7 +235,7 @@ type LogicalZoneKey =
     | 'holyCityInterior' | 'grandTemple'
     // Material world sub areas
     | 'ascentCave' | 'fertilityShrine'
-    | 'peachCave' | 'bushCave'
+    | 'peachCave' | 'bushCave' | 'lakeTunnel'
     // Spirit world
     | 'spiritWorld' | 'spiritSky'
     // Spirit world towns

@@ -163,17 +163,14 @@ dialogueHash.saveStatue = {
             ],
         },
         {
-            logicCheck: {
-                zones: ['helix'],
-            },
+            objectId: 'lakeTunnelSave',
             text: [
                 {
                     dialogueIndex: 42,
                     dialogueType: 'hint',
                     text: `
-                        A long time ago a star fell from the heavens and changed this land.
-                        {|}The crater it left filled with water and became a lake.
-                        {|}This "Helix" is all that remains from the fallen star.
+                        A long time ago a star fell from the heavens scarring the land.
+                        {|}This "Helix" that lies ahead is all that remains from the fallen star.
                         {item:secondChance}
                     `
                 },
