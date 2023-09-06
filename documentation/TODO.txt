@@ -36,9 +36,6 @@ Graphics:
 
 
 Current tasks:
-    - Player is rendered behind ceiling when climbing ladders
-        - Possible solution: render player on foreground layer when climbing ladders.
-
     - Improve helix
         - Switch to wooden graphics
         - Make area size at least 40x40 if not 48x48
