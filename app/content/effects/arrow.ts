@@ -357,6 +357,10 @@ export class Arrow implements EffectInstance, Projectile {
                 this.vx = -this.vx;
                 this.vy = -this.vy;
                 this.reflected = !this.reflected;
+                // Currently spirit cloak return hit damage is 1 or 2 so this just doubles
+                // the damage if the reflect is well timed. If these values change
+                // we should update this logic to make sure it is balanced.
+                this.damage *= (hitResult.returnHit?.damage || 1);
                 if (this.hybridWorlds) {
                     playAreaSound(state, state.areaInstance, 'blockAttack');
                 } else {

@@ -716,6 +716,7 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
         combinedResult.setElement ||= result.setElement;
         combinedResult.knockback ||= result.knockback;
         combinedResult.reflected ||= result.reflected;
+        combinedResult.returnHit ||= result.returnHit;
         if (result.hit || result.blocked) {
             combinedResult.hitTargets.add(object);
         }

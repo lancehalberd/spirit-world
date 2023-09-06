@@ -258,7 +258,6 @@ export class Hero implements Actor {
             if (!this.barrierElement) {
                 reflectDamage++;
             }
-            //
             if (hit.element === 'fire') {
                 // The barrier prevents burning damage entirely (normally a 2x multiplier)
                 // so to balance this out the barrier takes a flat 50% more damage from fire elements.

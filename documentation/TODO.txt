@@ -8,8 +8,6 @@ Known Bugs:
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
         - Probably stop grabbing with projection when teleporting.
-    - Player is rendered behind ceiling when climbing ladders
-        - Possible solution: render player on foreground layer when climbing ladders.
     - Enemies hit in the spirit world make noise when taking damage
         - this might be nice to keep for the cocoon boss
         - when players can actively hit enemies in the spirit world we should play a sound. For example, hitting an enemy with a linked bush shouldn't be silent.
@@ -38,6 +36,14 @@ Graphics:
 
 
 Current tasks:
+    - Player is rendered behind ceiling when climbing ladders
+        - Possible solution: render player on foreground layer when climbing ladders.
+
+    - Improve helix
+        - Switch to wooden graphics
+        - Make area size at least 40x40 if not 48x48
+        - Add additional checks
+
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
     - Save statues missing dialog:

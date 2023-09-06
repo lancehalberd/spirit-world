@@ -3,6 +3,7 @@ import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehavi
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { isObjectInCurrentSection } from 'app/utils/sections';
 
 
 export class Narration implements ObjectInstance {
@@ -51,7 +52,7 @@ export class Narration implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.status === 'gone') {
-            if (this.definition.specialBehaviorKey) {
+            if (this.definition.specialBehaviorKey && !isRandomizer && isObjectInCurrentSection(state, this)) {
                 const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNarrationBehavior;
                 specialBehavior?.update(state, this);
             }
