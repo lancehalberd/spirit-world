@@ -3,6 +3,8 @@ Test at http://localhost:81/alttp/public/
 Known Bugs:
     - Enemies can get trapped inside the Staff Tower graphics if they are in the are it occupies when it is created.
         - Should probably kill enemies in this area when setting up the tower.
+    - Map crashed the game in Brave browser.
+        - Seems to happen after a while of switching between areas and opening the map.
 
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
@@ -37,8 +39,17 @@ Graphics:
 
 Current tasks:
     Changes blocking production release:
-        - Bolder creates landing effect constantly when rolling over a staff.
         - Golem boss isn't using hand slam attack
+
+    - Add save point before Rival 2 fight.
+        - Add hint mechanic when reviving at statues based on current game state
+        - Suppress Rival 2 fight intro dialogue after the first time you encounter them.
+            - If this flag is set but the rival is not defeated, then show the hint on reviving at the lake tunnel statue.
+            - `
+                None of your attacks can reach the Spirit World.
+                {|}Maybe you can find a way to turn your opponent's attacks against them.
+            `
+
 
     - Fix: Tree Village dialogue text shuold be replaced in randomizer if possible.
     - Destroy bushes that the clone lands on.
@@ -64,6 +75,7 @@ Current tasks:
         - forge
 
     - Helix Rival improvements
+        - Maybe make lightning attack slower
         - Add level 2 ice attack that he uses only after being frozen once:
             - "Think you can reflect this?"
             - Shoots an ice spike object at the player which comes to rest near the edge of the battlefield

@@ -121,10 +121,6 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         object.update?.(state);
         if (object.area && !object.ignorePits && object.getHitbox) {
             object.groundHeight = 0;
-            // Objects that can fall in pits are assumed to fall to the ground when not supported.
-            if (object.z > 0) {
-                object.z = Math.max(0, object.z - 1);
-            }
             const hitbox = object.getHitbox();
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
@@ -138,7 +134,12 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
                     //console.log(hitbox, otherObject.getHitbox());
                 }
             }
-            object.z = Math.max(object.z, object.groundHeight);
+            // Objects that can fall in pits are assumed to fall to the ground when not supported.
+            if (object.z > object.groundHeight) {
+                object.z = Math.max(object.groundHeight, object.z - 1);
+            } else {
+                object.z = Math.max(object.z, object.groundHeight);
+            }
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
             if (tileBehavior?.pit  && !(object.z > 0)) {
                 const animation = new FieldAnimationEffect({

@@ -35,6 +35,7 @@ export class RollingBallObject implements ObjectInstance {
     animationTime = 0;
     stuck: boolean = false;
     soundReference;
+    groundHeight = 0;
     constructor(state: GameState, definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -150,10 +151,11 @@ export class RollingBallObject implements ObjectInstance {
                     return;
                 }
             }
-        } else {
+        } else if (this.z > this.groundHeight) {
             this.vz = Math.max(-8, this.vz + this.az);
-            this.z = Math.max(0, this.z + this.vz);
-            if (this.z === 0 && this.vz <= -4) {
+            this.z = Math.max(this.groundHeight, this.z + this.vz);
+            if (this.z === this.groundHeight && this.vz <= -4) {
+                this.vz = 0;
                 state.screenShakes.push({
                     dx: 0,
                     dy: 2,
