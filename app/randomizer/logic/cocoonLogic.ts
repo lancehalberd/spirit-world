@@ -5,6 +5,7 @@ import {
     orLogic,
     hasAstralProjection,
     hasBossWeapon,
+    hasGloves,
     hasSpiritBarrier,
     canRemoveLightStones,
     hasSomersault,
@@ -71,7 +72,9 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon3NE',
-        checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, canRemoveLightStones)}],
+        // This puzzle requires gloves specifically because destroying the stones with the staff
+        // doesn't remove them in the material world.
+        checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, hasGloves)}],
         paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonLadderNE'],
     },
