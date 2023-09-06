@@ -38,9 +38,6 @@ Graphics:
 
 
 Current tasks:
-    Changes blocking production release:
-        - Golem boss isn't using hand slam attack
-
     - Add save point before Rival 2 fight.
         - Add hint mechanic when reviving at statues based on current game state
         - Suppress Rival 2 fight intro dialogue after the first time you encounter them.

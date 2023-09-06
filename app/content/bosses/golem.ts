@@ -766,7 +766,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             const target = getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);
             if (!target || Math.random() < 0.6) {
                 enemy.setMode('raiseHand');
-            } else if (otherHands.length && Math.random() < 0.5) {
+            } else if (Math.random() < 0.5) {
                 enemy.setMode('hoverOverTarget');
             } else {
                 golem.useTaunt(state, 'punch');
