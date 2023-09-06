@@ -257,11 +257,13 @@ const missions: Mission[] = [
     {
         getMarkerLocation: getLakeTunnelLocation,
         getScript(state: GameState) {
-            if (state.location.zoneKey !== 'helix') {
+            if (state.location.zoneKey === 'helix') {
+                return `The Guardian said I should seek answers at the top of this Helix.`;
+            } else if (state.location.zoneKey === 'lakeTunnel') {
+                return `The Guardian said there is something called the Helix beyond this tunnel.`;
+            } else {
                 return `The Guardian said there is something called the Helix beyond the Lake Tunnel.
                     {|}With all my spirit abilities, I should be able to get through now.`;
-            } else {
-                return `The Guardian said I should seek answers at the top of this Helix.`;
             }
         },
         isAvailable(state: GameState) {
@@ -503,6 +505,11 @@ const missions: Mission[] = [
 
 
 export function showHint(state: GameState): void {
+    // Don't show hints while an active script is running.
+    // In particular, don't show hints when a respawn hint is showing, which has higher priority than mission hints.
+    if (state.scriptEvents.activeEvents.length || state.scriptEvents.queue.length) {
+        return;
+    }
     if (isRandomizer) {
         setScript(state, getRandomizerHint(state));
         return;

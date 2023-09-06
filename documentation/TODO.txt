@@ -38,14 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Add hint mechanic when reviving at statues based on current game state
-    - Suppress Rival 2 fight intro dialogue after the first time you encounter them.
-        - If this flag is set but the rival is not defeated, then show the hint on reviving at the lake tunnel statue.
-        - `
-            None of your attacks can reach the Spirit World.
-            {|}Maybe you can find a way to turn your opponent's attacks against them.
-        `
-
     - Fix: Tree Village dialogue text should be replaced in randomizer if possible.
     - Destroy bushes that the clone lands on.
     - Fix flames can go up ledges.

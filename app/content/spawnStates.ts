@@ -241,7 +241,7 @@ export const storySpawnLocations: SpawnLocationOptions = {
         savedState: tombRivalDefeatState,
     },
     'Helix Rival Fight': {
-        location: spawnLocations.SPAWN_LOCATION_HELIX_RIVAL,
+        location: spawnLocations.SPAWN_LOCATION_LAKE_TUNNEL,
         savedState: helixRivalStateStory,
     },
 

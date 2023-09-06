@@ -1,7 +1,8 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
-import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
+import { getAreaSize } from 'app/utils/getAreaSize';
 import { fillRect, pad } from 'app/utils/index';
+import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -195,7 +196,8 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         w,
         h,
     };
-    if (state.hero.y - state.areaInstance.cameraOffset.y >= 128) {
+    const {section} = getAreaSize(state);
+    if (state.hero.y - section.y >= 128) {
         r.y = 32;
     }
     if (state.messagePage) {

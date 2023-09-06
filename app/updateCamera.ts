@@ -17,7 +17,7 @@ export function updateCamera(state: GameState, speed?: number): void {
         if (state.hero.action === 'jumpingDown' && !state.nextAreaSection && !state.nextAreaInstance) {
             speed = 4;
         } else {
-            speed = cameraSpeed;
+            speed = editingState.isEditing ? 20 : cameraSpeed;
         }
     }
     const { w, h, section } = getAreaSize(state);

@@ -69,13 +69,13 @@ dialogueHash.rival = {
                 blockFieldUpdates: true,
             });
             wait(state, 500);
-            if (isRandomizer || state.savedState.objectFlags.skipRivalHelixStory) {
+            if (state.savedState.objectFlags.helixRivalIntro || isRandomizer || state.savedState.objectFlags.skipRivalHelixStory) {
                 return '';
             }
             appendScript(state, `
                 So you're here just like the Commander said.
-                {|}I can't believe they just invited you here while I had to force my way in.
-                {|}All my life I've tried to be good and follow the rules while you outcasts just go about doing whatever you want...
+                {|}They practically invited you here while I had to sneak in like a thief.
+                {|}I've tried so hard to follow the rules while you just do whatever you want...
             `);
             wait(state, 500);
             appendCallback(state, (state: GameState) => {
@@ -83,7 +83,7 @@ dialogueHash.rival = {
             });
             wait(state, 200);
             appendScript(state, `
-                {|}The Elder said the rules are to keep our village safe from the Humans, but it was all a lie.
+                The Elder said the rules are to keep our village safe from the Humans, but it was all a lie.
                 {|}You've seen how powerful the Vanara truly are haven't you?
                 {|}It's the Humans and their so-called Gods that should be cowering in fear!
             `);
@@ -93,12 +93,16 @@ dialogueHash.rival = {
             });
             wait(state, 200);
             appendScript(state, `
-                {|}Well I've had it with these stupid rules, both Human and Vanaran.
+                Well I've had it with these stupid rules, both Human and Vanaran.
                 {|}Even if you have the Elder's permission, you still don't have mine!
                 {|}A half-blood like you has no right to be here.
                 {|}You shouldn't even exist!
             `);
-
+            // Record that the intro was completed so we can skip it on subsequent attempts.
+            appendCallback(state, (state: GameState) => {
+                state.savedState.objectFlags.helixRivalIntro = true;
+                saveGame(state);
+            });
             return '';
         },
         lostSecondFight: `

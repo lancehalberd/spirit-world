@@ -139,6 +139,18 @@ export const SPAWN_COCOON_BOSS: ZoneLocation = {
     isSpiritWorld: true,
 };
 
+
+export const SPAWN_LOCATION_LAKE_TUNNEL: ZoneLocation = {
+    zoneKey: 'lakeTunnel',
+    floor: 0,
+    x: 120,
+    y: 320,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
+
 export const SPAWN_LOCATION_HELIX_RIVAL: ZoneLocation = {
     zoneKey: 'lakeTunnel',
     floor: 0,

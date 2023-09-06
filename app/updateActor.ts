@@ -497,6 +497,7 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'left');
         state.location = getFullZoneLocation(state.location);
+        return;
     } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
         state.location.areaGridCoords = {
             x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
@@ -504,10 +505,13 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'right');
         state.location = getFullZoneLocation(state.location);
+        return;
     } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
         setNextAreaSection(state, 'left');
+        return;
     } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
         setNextAreaSection(state, 'right');
+        return;
     }
     //const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
     const isHeroMovingDown = hero.vy > 0 || hero.actionDy > 0;

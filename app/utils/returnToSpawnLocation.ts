@@ -1,3 +1,5 @@
+import { isRandomizer } from 'app/gameConstants';
+import { appendScript, wait } from 'app/scriptEvents';
 import { enterLocation } from 'app/utils/enterLocation';
 
 
@@ -26,4 +28,25 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.d = state.hero.savedData.spawnLocation.d;
     enterLocation(state, state.hero.savedData.spawnLocation, true, null, true);
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
+
+    // Clear any script events that may have lingered from a previous state.
+    state.scriptEvents.queue = [];
+    state.scriptEvents.activeEvents = [];
+
+    // Don't display hints in randomizer mode.
+    if (isRandomizer) {
+        return;
+    }
+
+    // Ad hoc system for displaying hints when defeated by the Helix Rival.
+    if (state.location.zoneKey === 'lakeTunnel'
+        && state.savedState.objectFlags.helixRivalIntro
+        && !state.savedState.objectFlags.helixRivalBoss
+    ) {
+        wait(state, 40);
+        appendScript(state, `
+             None of your attacks can reach the Spirit World.
+            {|}You must find a way to turn your opponent's attacks against them!
+        `);
+    }
 }
