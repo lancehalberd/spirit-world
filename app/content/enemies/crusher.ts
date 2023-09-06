@@ -9,7 +9,7 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
 enemyDefinitions.crusher = {
-    animations: golemHandAnimations, life: 10, scale: 1,
+    animations: golemHandAnimations, life: 8, scale: 1,
     floating: true,
     flipRight: true,
     canBeKnockedBack: false, canBeKnockedDown: false,
