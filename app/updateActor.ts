@@ -191,6 +191,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         } else if (hero.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
             hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+            hero.ironSkinCooldown = 1000;
         } else if (hero.magic > 0) {
             // If the hero has magic, half of burning damage applies to magic and half applies to their life.
             const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
@@ -240,7 +241,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
     // Hero takes one damage every half second while in a hot room without the fire blessing.
     if (!editingState.isEditing && state.areaSection?.isHot && !hero.savedData.passiveTools.fireBlessing) {
-        hero.applyBurn(0.5, 500);
+        hero.applyBurn(1, 500);
     }
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
