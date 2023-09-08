@@ -289,7 +289,9 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.speakWhenTombOpens = true;
     }
     if (enemy.params.speakWhenTombOpens && state.savedState.objectFlags.tombEntrance) {
-        appendScript(state, '{@rival.tombOpened}');
+        if (!isRandomizer) {
+            appendScript(state, '{@rival.tombOpened}');
+        }
         enemy.params.speakWhenTombOpens = false;
     }
 
