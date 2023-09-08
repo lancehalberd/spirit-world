@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Destroy bushes that the clone lands on.
     - Unfreezing doors should not play the door opening sound effect.
     - Fix flames can go up ledges.
 

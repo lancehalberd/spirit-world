@@ -418,7 +418,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         });
         // The astral projection stays 4px off the ground.
         if (!isFloating && hero.z <= minZ) {
-            if (hero.vz <= -8) {
+            if (hero.vz <= -8 || hero.action === 'thrown') {
                 const landingHit: HitProperties = {
                     damage: 1,
                     hitbox: pad(hero.getHitbox(), 4),
@@ -426,7 +426,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 };
                 hitTargets(state, hero.area, landingHit);
                 const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y: hero.y }, excludedObjects, state.nextAreaInstance);
-                if (!tileBehavior?.water && !tileBehavior?.pit) {
+                if (hero.vz <= -8 && !tileBehavior?.water && !tileBehavior?.pit) {
                     state.screenShakes.push({
                         dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
                     });
