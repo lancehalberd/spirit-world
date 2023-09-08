@@ -318,6 +318,14 @@ export const underwaterNodes: LogicNode[] = [
         ],
     },
     {
+        // This is a special node for capturing the fact that you can fall from the sky
+        // to reach this entrance without iron boots.
+        zoneId,
+        nodeId: 'overworldMountainWaterPitEntrance',
+        paths: [],
+        exits: [{ objectId: 'waterfallCavePitEntrance' }],
+    },
+    {
         zoneId,
         nodeId: 'underCity',
         checks: [{objectId: 'underwaterMoney'}],
@@ -352,6 +360,9 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'outsideHelix', logic: hasCloudBoots },
             { nodeId: 'skyTreasure', logic: hasCloudBoots },
             { nodeId: 'desertTowerSky', logic: hasCloudBoots },
+            // If you fall in the correct place, you can enter the pit entrance
+            // underwater above the waterfall village.
+            { nodeId: 'overworldMountainWaterPitEntrance', logic: hasCloudBoots}
         ],
     },
     {
