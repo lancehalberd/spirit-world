@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix: Tree Village dialogue text should be replaced in randomizer if possible.
     - Remove Rival dialogue during first encounter when randomizer is enabled.
         "Don't make me get the Elder" still displays when opening the door.
 

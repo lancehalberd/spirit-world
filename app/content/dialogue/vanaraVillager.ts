@@ -1,4 +1,5 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { isRandomizer } from 'app/gameConstants';
 
 dialogueHash.vanaraVillager = {
     key: 'vanaraVillager',
@@ -85,8 +86,8 @@ dialogueHash.storageVanara = {
             text: [
                 {
                     dialogueIndex: 87,
-                    dialogueType: 'quest',
-                    text: `Wait you got rid of all those bugs in the basement?
+                    dialogueType: 'subquest',
+                    text: isRandomizer ? 'Thanks!{@storageVanara.peachReward}' : `Wait you got rid of all those bugs in the basement?
                     {|}When did you get so helpful?
                     {|}Nevermind, go ahead and take this, I found it in
                     one of the storage chests, it seemed to be attracting those things.
