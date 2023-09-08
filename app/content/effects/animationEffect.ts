@@ -221,6 +221,8 @@ export const iceSparkleAnimation = createAnimation('gfx/effects/aura_particles.p
 const fireSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 4, duration: 6,  frameMap: [0,1,0,0]}, {loop: false});
 const lightningSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 6, duration: 6, frameMap: [0, 1, 0]}, {loop: false});
 
+export const burstAnimation = createAnimation('gfx/effects/45radiusburst.png', {w: 90, h: 90}, {cols: 9, duration: 2}, {loop: false});
+
 interface SparkleProps {
     delay?: number
     element?: MagicElement

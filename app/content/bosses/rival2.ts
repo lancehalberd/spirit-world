@@ -1,7 +1,7 @@
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { DelayedEffect } from 'app/content/effects/delayedEffect';
 import { Flame } from 'app/content/effects/flame';
-import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
@@ -14,7 +14,7 @@ import {
 } from 'app/render/heroAnimations';
 import { appendScript } from 'app/scriptEvents';
 import { removeTextCue } from 'app/content/effects/textCue';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
+import { drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import {
@@ -32,9 +32,6 @@ import {
     getVectorToTarget,
     isTargetVisible,
 } from 'app/utils/target';
-
-
-const burstAnimation = createAnimation('gfx/effects/45radiusburst.png', {w: 90, h: 90}, {cols: 9, duration: 2}, {loop: false});
 
 const rollSpeed = [
     5, 5, 5, 5,

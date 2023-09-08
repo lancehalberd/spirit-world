@@ -1,5 +1,7 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { CANVAS_HEIGHT } from 'app/gameConstants';
+
+import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addEffectToArea } from 'app/utils/effects';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
@@ -53,20 +55,30 @@ export const zoneEntranceMap = {
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
     if (enterZoneByTarget(state, zoneKey, markerId, null, true)) {
-        fallIntoLocation(state);
+        burstIntoLocation(state);
     }
     return '';
 }
-function fallIntoLocation(state: GameState) {
-    state.hero.action = 'knocked';
+function burstIntoLocation(state: GameState) {
+    state.hero.action = null;
     state.hero.isAirborn = true;
     state.hero.animationTime = 0;
-    state.hero.z = CANVAS_HEIGHT;
+    state.hero.z = 4;
     state.hero.vx = state.hero.vy = 0;
     state.hero.vz = -1;
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
+
+    const hitbox = state.hero.getHitbox();
+    const animation = new FieldAnimationEffect({
+        animation: burstAnimation,
+        drawPriority: 'background',
+        drawPriorityIndex: 1,
+        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
+        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
+    });
+    addEffectToArea(state, state.hero.area, animation);
 }
 
 dialogueHash.nimbusCloud = {
@@ -76,7 +88,7 @@ dialogueHash.nimbusCloud = {
         returnToHome: (state: GameState) => travelToLocation(state, 'overworld', 'waterfallMarker'),
         returnToLastSave: (state: GameState) => {
             returnToSpawnLocation(state);
-            fallIntoLocation(state);
+            burstIntoLocation(state);
             return '';
         },
         chooseDestination: (state: GameState) => {
