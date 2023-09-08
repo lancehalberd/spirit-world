@@ -489,8 +489,9 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
     setSaveFileToState(savedGameIndex);
     state.scene = 'game';
     // Hack to prevent showing the falling animation a second time on loading a game in the peach cave.
-    if (!state.hero.savedData.weapon) {
+    if (state.location.zoneKey === 'peachCave' && state.hero.z > 100) {
         state.hero.z = 0;
+        state.hero.swimming = true;
     }
     if (!isRandomizer) {
         showHint(state);
