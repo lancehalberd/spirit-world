@@ -14,16 +14,16 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 enemyDefinitions.beetleBoss = {
     // Reset the boss to its starting position if you leave the arena.
     alwaysReset: true,
-    animations: beetleWingedAnimations, flying: true, scale: 4,
-    acceleration: 0.5, speed: 2,
+    animations: beetleWingedAnimations, flying: true, scale: 3,
+    acceleration: 0.5, speed: 1.5,
     initialMode: 'hidden',
-    life: 10, touchDamage: 1, update: updateBeetleBoss,
+    life: 12, touchDamage: 1, update: updateBeetleBoss,
 };
 enemyDefinitions.beetleBossWingedMinionDefinition = {
     // Despawn these if you leave the boss arena.
     alwaysReset: true,
     animations: beetleWingedAnimations,
-    flying: true, acceleration: 0.5, speed: 3,
+    flying: true, acceleration: 0.5, speed: 2.5,
     life: 1, touchDamage: 1, update: flyBy,
     lootTable: certainLifeLootTable,
 };
@@ -51,8 +51,10 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (enemy.life <= 8) {
+    if (enemy.life <= enemy.enemyDefinition.life / 2) {
         enemy.speed = enemyDefinitions.beetleBoss.speed + 1;
+    } else {
+        enemy.speed = enemyDefinitions.beetleBoss.speed;
     }
     if (enemy.mode === 'choose' && enemy.modeTime > 500) {
         enemy.vx = enemy.vy = 0;
@@ -63,7 +65,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             enemy.params.summonedRecently = true;
             enemy.setMode('retreat');
             enemy.params.summonTheta = Math.random() * 2 * Math.PI;
-        } else if (Math.random() < 0.3) {
+        } else if (Math.random() < 0.4) {
             enemy.setMode('circle');
             enemy.params.summonedRecently = false;
         } else {
@@ -76,14 +78,19 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             }
         }
     } else if (enemy.mode === 'circle') {
+        enemy.speed += 1;
         // In theory the enemy circles the center of the area moving clockwise.
+        const dy = (section.y + section.h / 2) - (hitbox.y + hitbox.h / 2);
+        const dx = (section.x + section.w / 2) - (hitbox.x + hitbox.w / 2);
+        const theta = Math.atan2(dy, dx);
         accelerateInDirection(state, enemy, {
-            x: section.y + section.h / 2 - (hitbox.y + hitbox.h / 2),
-            y: (hitbox.x + hitbox.w / 2) - (section.x + section.w / 2),
+            x: Math.cos(theta - Math.PI / 2 + Math.PI / 12),
+            y: Math.sin(theta - Math.PI / 2 + Math.PI / 12),
         });
         enemy.x += enemy.vx;
         enemy.y += enemy.vy;
-        if (enemy.modeTime > 10000 / enemy.speed) {
+        // Stop once the beetle has circled back towards the top of the screen again.
+        if ((enemy.modeTime > 2000 && dy >= 32) || enemy.modeTime >= 4000) {
             enemy.setMode('return');
         }
     } else if (enemy.mode === 'return') {
@@ -119,8 +126,10 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
                 console.log('could not find nearby hero to target');
             }
         }
-        if (enemy.modeTime > 3000) {
-            enemy.setMode('choose');
+        if (enemy.modeTime > 2500) {
+            if (moveEnemyToTargetLocation(state, enemy, enemy.definition.x + hitbox.w / 2, enemy.definition.y + hitbox.h / 2) === 0) {
+                enemy.setMode('choose');
+            }
         }
     } else if (enemy.mode === 'rush') {
         // Just accelerate in the direction the boss chose when it entered this mode.
