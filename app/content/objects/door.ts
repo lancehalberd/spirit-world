@@ -222,6 +222,7 @@ export class Door implements ObjectInstance {
     changeStatus(state: GameState, status: ObjectStatus): void {
         const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
         let isOpen = status === 'normal' || status === 'blownOpen';
+        const wasFrozen = this.status === 'frozen';
         const wasOpen = this.status === 'normal' || this.status === 'blownOpen';
         this.wasOpened = isOpen;
 
@@ -251,7 +252,7 @@ export class Door implements ObjectInstance {
         if (!this.area) {
             return;
         }
-        if (!wasOpen && isOpen) {
+        if (!wasOpen && isOpen && !wasFrozen) {
             playAreaSound(state, this.area, 'doorOpen');
         } else if (wasOpen && !isOpen && !this.renderOpen(state)) {
             playAreaSound(state, this.area, 'doorClose');
