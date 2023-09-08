@@ -2,10 +2,10 @@ import { editingState } from 'app/development/editingState';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/editor';
 import { updateObjectInstance } from 'app/development/objectEditor';
-import { getState, saveSettings } from 'app/state';
+import { getState } from 'app/state';
 import { isKeyboardKeyDown, KEY } from 'app/userInput'
 import { enterLocation } from 'app/utils/enterLocation';
-import { updateSoundSettings } from 'app/utils/sounds';
+import { toggleAllSounds } from 'app/utils/soundSettings';
 
 
 export function addKeyboardShortcuts() {
@@ -60,10 +60,7 @@ export function addKeyboardShortcuts() {
             toggleEditing(getState());
         }
         if (isShiftDown && keyCode === KEY.M) {
-            const state = getState();
-            state.settings.muteAllSounds = !state.settings.muteAllSounds;
-            updateSoundSettings(state);
-            saveSettings(state);
+            toggleAllSounds(getState());
         }
         if (keyCode === KEY.R && editingState.isEditing && isShiftDown) {
             // Reset the entire zone if command is down.

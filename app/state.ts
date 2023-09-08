@@ -24,6 +24,8 @@ export function loadSavedData(): boolean {
             ...JSON.parse(importedSettings),
         };
     }
+    // This window variable should be set on page load from the users stored preferences.
+    state.settings.muteAllSounds = window['muteAllSounds'] ?? state.settings.muteAllSounds;
 
     if (randomizerSeed) {
         state.randomizer = {
@@ -55,9 +57,6 @@ export function loadSavedData(): boolean {
     return false;
 }
 
-export function saveSettings(state: GameState) {
-    window.localStorage.setItem('settings', JSON.stringify(state.settings));
-}
 export function eraseAllSaves(): void {
     window.localStorage.clear()
 }

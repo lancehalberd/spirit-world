@@ -1,7 +1,6 @@
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import {
     fadeOutPlayingTracks,
-    getSoundSettings,
     isATrackFadingOut,
     isATrackPlaying,
     isTrackPlaying,
@@ -9,7 +8,8 @@ import {
     playTrack,
 } from 'app/utils/sounds';
 
-export { stopSound, updateSoundSettings } from 'app/utils/sounds';
+export { stopSound } from 'app/utils/sounds';
+import { getSoundSettings } from 'app/utils/soundSettings';
 export const updateMusic = (state: GameState): void => {
     if (!state?.gameHasBeenInitialized) {
         return;

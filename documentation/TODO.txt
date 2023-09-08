@@ -40,7 +40,6 @@ Graphics:
 Current tasks:
     - Adjust beetle boss to not leave the screen as much.
         - Reduce the scale by 1?
-    - Add mute button somewhere, possibly in the page outside of the game.
 
     - Check ice puts top left gauntlet room in logic (by freezing pots).
     - Change teleportation in randomizer to use barrier burst effect and just appearing instead of falling.

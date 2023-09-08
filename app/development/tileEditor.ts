@@ -154,9 +154,12 @@ document.addEventListener('mouseup', (event) => {
         editingState.dragOffset = null;
         return;
     }
+    const state = getState();
+    if (!state) {
+        return;
+    }
     if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
-        const state = getState();
-    const [x, y] = getAreaMousePosition();
+        const [x, y] = getAreaMousePosition();
         const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
         editingState.dragOffset = null;
         const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};

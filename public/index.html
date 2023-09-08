@@ -82,5 +82,33 @@
         </div>
     </div>
 </div>
+    <div id="muteIcon" style="position: absolute; left: 4px; top:4px; font-size: 36px; cursor: pointer;">
+    </div>
+    <script>
+        const muteButton = document.getElementById('muteIcon');
+        // Special handling for mute button.
+        const importedSettings = JSON.parse(window.localStorage.getItem('settings') || '{}');
+        let muteAllSounds = importedSettings.muteAllSounds || false;
+        function refreshMuteButton(newValue) {
+            muteAllSounds = newValue;
+            muteButton.innerHTML = muteAllSounds ? '🔇' : '🔊';
+        }
+        muteButton.onclick = function () {
+            // Use toggleAllSounds once everything is loaded.
+            if (window.getState && window.toggleAllSounds) {
+                const state = getState();
+                if (state && state.settings) {
+                    window.toggleAllSounds(state);
+                }
+                return;
+            }
+            // Update muteAllSounds directly if still loading.
+            refreshMuteButton(!muteAllSounds);
+            window.localStorage.setItem('settings', JSON.stringify(
+                {...importedSettings, muteAllSounds}
+            ));
+        }
+        refreshMuteButton(muteAllSounds);
+    </script>
 </body>
 </html>

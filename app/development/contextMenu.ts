@@ -12,7 +12,8 @@ import { mainCanvas } from 'app/utils/canvas';
 import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
-import { updateSoundSettings } from 'app/utils/sounds';
+import { saveSettings } from 'app/utils/saveSettings';
+import { toggleAllSounds, updateSoundSettings } from 'app/utils/soundSettings';
 
 
 
@@ -207,10 +208,7 @@ function getSettingsMenuOption(): MenuOption {
                 {
                     label: state.settings.muteAllSounds ? 'Unmute All' : 'Mute All',
                     onSelect() {
-                        state.settings.muteAllSounds = !state.settings.muteAllSounds;
-                        state.settings.muteMusic = false;
-                        state.settings.muteSounds = false;
-                        updateSoundSettings(state);
+                        toggleAllSounds(state);
                     }
                 },
                 {
@@ -224,6 +222,7 @@ function getSettingsMenuOption(): MenuOption {
                             state.settings.muteMusic = true;
                         }
                         updateSoundSettings(state);
+                        saveSettings(state);
                     }
                 },
                 {
@@ -237,6 +236,7 @@ function getSettingsMenuOption(): MenuOption {
                             state.settings.muteSounds = true;
                         }
                         updateSoundSettings(state);
+                        saveSettings(state);
                     }
                 },
                 {

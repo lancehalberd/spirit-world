@@ -210,6 +210,9 @@ window['stopSound'] = stopSound;
 
 
 let playingTracks: GameSound[] = [];
+export function getPlayingTracks(): GameSound[] {
+    return playingTracks;
+}
 const fadingTracks: GameSound[] = [];
 function removeFadingTrack(track: GameSound) {
     const index = fadingTracks.indexOf(track);
@@ -330,32 +333,6 @@ export function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
     }
     playingTracks = keepPlayingTracks;
     window['playingTracks'] = playingTracks;
-}
-
-export function getSoundSettings(state: GameState): SoundSettings {
-    const muteTracks = (state.settings.muteAllSounds || state.settings.muteMusic || false);
-    const muteSounds = (state.settings.muteAllSounds || state.settings.muteSounds || false);
-    return {
-        muteTracks,
-        muteSounds,
-        globalVolume: state.paused ? 0.3 : 1,
-    };
-}
-
-export function setSoundSettings(soundSettings: SoundSettings) {
-    for (const playingTrack of playingTracks) {
-        //console.log('Stopping from stopTrack ', playingTrack.props.src);
-        playingTrack.soundSettings = soundSettings;
-        playingTrack.howl.mute(soundSettings.muteTracks);
-        // In case the last mute interrupted a fade in, set the track to its full volume on unmute.
-        if (!soundSettings.muteTracks) {
-            playingTrack.howl.volume(playingTrack.props.volume * soundSettings.globalVolume);
-        }
-    }
-}
-
-export function updateSoundSettings(state: GameState) {
-    setSoundSettings(getSoundSettings(state));
 }
 
 export function stopTrack() {

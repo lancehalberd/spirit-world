@@ -33,7 +33,7 @@ import {
     wasConfirmKeyPressed,
     wasMenuConfirmKeyPressed,
 } from 'app/userInput';
-import { playSound, updateSoundSettings } from 'app/musicController';
+import { playSound } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getDefaultSavedState } from 'app/savedState'
 import { parseScriptText, setScript, showMessage } from 'app/scriptEvents';
@@ -52,6 +52,7 @@ import { areAllImagesLoaded } from 'app/utils/images';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
 import { isSectionExplored } from 'app/utils/sections';
+import { updateSoundSettings } from 'app/utils/soundSettings';
 
 let isGameInitialized = false;
 export function update() {
