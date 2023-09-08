@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Check ice puts top left gauntlet room in logic (by freezing pots).
     - Change teleportation in randomizer to use barrier burst effect and just appearing instead of falling.
     - Hero should be in foreground when falling from the sky until they are < ~48 pixels off the ground.
         - Use the lowest z-value that still looks good when falling in front of tree foreground layers.

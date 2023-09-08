@@ -2,7 +2,8 @@
 import {
     andLogic, canUseTeleporters, orLogic, canHasTowerStaff, canTravelFarUnderWater,
     hasAstralProjection, hasBossWeapon,
-    hasInvisibility, hasCloudBoots, canRemoveHeavyStones, hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
+    hasIce, hasInvisibility, hasCloudBoots, canRemoveHeavyStones,
+    hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
 } from 'app/content/logic';
 
 const zoneId = 'gauntlet';
@@ -41,7 +42,7 @@ export const gauntletNodes: LogicNode[] = [
         exits: [
             {
                 objectId: 'gauntletLeftStairs',
-                logic: orLogic(canRemoveHeavyStones, hasClone)
+                logic: orLogic(canRemoveHeavyStones, hasClone, hasIce)
             },
             {
                 objectId: 'gauntletStairs',
