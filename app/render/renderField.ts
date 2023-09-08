@@ -255,7 +255,7 @@ export function renderField(
 export function renderHero(context: CanvasRenderingContext2D, state: GameState) {
     context.save();
         translateContextForAreaAndCamera(context, state, state.areaInstance);
-        state.hero.render(context, state);
+        renderObjectWithEffects(context, state, state.hero, () => state.hero.render(context, state));
     context.restore();
 }
 
@@ -323,7 +323,7 @@ export function renderArea(context: CanvasRenderingContext2D, state: GameState, 
     if (renderHero === true || (renderHero !== false && state.hero.area === area)) {
         context.save();
             translateContextForAreaAndCamera(context, state, area);
-            state.hero.render(context, state);
+            renderObjectWithEffects(context, state, state.hero, () => state.hero.render(context, state));
         context.restore();
     }
     renderAreaObjectsAfterHero(context, state, area);
@@ -378,6 +378,23 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
     }
 }
 
+function renderObjectWithEffects(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    object: ObjectInstance | EffectInstance,
+    callback: () => void
+): void {
+
+        if (object.z > 100) {
+            context.save();
+            context.globalAlpha *= Math.max(0, 1 - (object.z - 100) / 28);
+        }
+        callback();
+        if (object.z > 100) {
+            context.restore();
+        }
+}
+
 export function renderAreaObjectsBeforeHero(
     context: CanvasRenderingContext2D,
     state: GameState,
@@ -394,16 +411,16 @@ export function renderAreaObjectsBeforeHero(
             translateContextForAreaAndCamera(context, state, area);
         }
         if (area === state.areaInstance && !editingState.isEditing) {
-            renderHeroShadow(context, state, state.hero);
+            renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
         } else if (state.transitionState?.type === 'mutating' && area === state.transitionState.nextAreaInstance) {
-            renderHeroShadow(context, state, state.hero);
+            renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
         }
         // Render shadows before anything else.
         for (const object of area.objectsToRender) {
             if (object.area?.definition === area.definition) {
-                object.renderShadow?.(context, state);
+                renderObjectWithEffects(context, state, object, () => object.renderShadow?.(context, state));
             } else {
-                object.alternateRenderShadow?.(context, state);
+                renderObjectWithEffects(context, state, object, () => object.alternateRenderShadow?.(context, state));
             }
         }
         const backgroundObjects: (EffectInstance | ObjectInstance)[] = [];
@@ -438,17 +455,17 @@ export function renderAreaObjectsBeforeHero(
         backgroundObjects.sort((A, B) => (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0));
         for (const objectOrEffect of backgroundObjects) {
             if (objectOrEffect.area.definition === area.definition) {
-                objectOrEffect.render?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
-                objectOrEffect.alternateRender?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
             }
         }
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
             if (objectOrEffect.area.definition === area.definition) {
-                objectOrEffect.render?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
-                objectOrEffect.alternateRender?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
             }
         }
     context.restore();
@@ -502,18 +519,18 @@ export function renderAreaObjectsAfterHero(
         backgroundObjects.sort((A, B) => (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0));
         for (const objectOrEffect of backgroundObjects) {
             if (objectOrEffect.area.definition === area.definition) {
-                objectOrEffect.render?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
-                objectOrEffect.alternateRender?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
             }
         }
         // Sprite objects are rendered in order of their y positions.
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
             if (objectOrEffect.area.definition === area.definition) {
-                objectOrEffect.render?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
-                objectOrEffect.alternateRender?.(context, state);
+                renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
             }
         }
     context.restore();
@@ -548,19 +565,19 @@ export function renderForegroundObjects(
         for (const object of foregroundObjects) {
             if (object.area?.definition === area.definition) {
                 if (object.renderForeground) {
-                    object.renderForeground(context, state);
+                    renderObjectWithEffects(context, state, object, () => object.renderForeground(context, state));
                 } else {
-                    object.render?.(context, state);
+                    renderObjectWithEffects(context, state, object, () => object.render?.(context, state));
                 }
             } else {
                 if (object.alternateRenderForeground) {
-                    object.alternateRenderForeground(context, state);
+                    renderObjectWithEffects(context, state, object, () => object.alternateRenderForeground(context, state));
                 } else {
-                    object.alternateRender?.(context, state);
+                    renderObjectWithEffects(context, state, object, () => object.alternateRender?.(context, state));
                 }
             }
         }
-        state.hero.renderForeground?.(context, state);
+        renderObjectWithEffects(context, state, state.hero, () => state.hero.renderForeground?.(context, state));
     context.restore();
 }
 

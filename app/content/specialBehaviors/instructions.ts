@@ -81,7 +81,7 @@ specialBehaviorsHash.bowInstructions = {
             toolButton = '[B_RIGHT_TOOL]';
         }
         if (toolButton) {
-            helpText = `Face a target and press ${toolButton} to shoot an arrow.`;
+            helpText = `Face a target and press ${toolButton} to shoot an arrow`;
         } else if (state.hero.savedData.activeTools.bow) {
             helpText = `Press [B_MENU] to open your inventory and assign the Bow to [B_TOOL]`;
         }
@@ -89,6 +89,24 @@ specialBehaviorsHash.bowInstructions = {
         // Do not show the text again in the future if the boss teleporter is already unlocked.
         if (state.savedState.objectFlags.bowDoor) {
             helpText = '';
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    }
+};
+
+specialBehaviorsHash.chestAndChakramInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        if (!state.hero.savedData.weapon) {
+            helpText = 'Face a chest from the south and press [B_PASSIVE] to open it';
+        } else if (state.areaInstance.enemies.filter(e => e.isFromCurrentSection(state) && !e.isDefeated && e.status !== 'gone').length) {
+            helpText = 'Press [B_WEAPON] to throw the chakram at enemies';
         }
         const textCue = findTextCue(state);
         if (!textCue && helpText && object.area === state.areaInstance) {

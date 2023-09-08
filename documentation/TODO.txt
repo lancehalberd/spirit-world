@@ -38,7 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Change chakram cue to use a tutorial.
     - Adjust beetle boss to not leave the screen as much.
         - Reduce the scale by 1?
     - Add mute button somewhere, possibly in the page outside of the game.

@@ -126,7 +126,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.canBeKnockedDown = this.enemyDefinition.canBeKnockedDown ?? this.definition.type !== 'boss';
         this.flying = this.enemyDefinition.flying;
         this.isImmortal = this.enemyDefinition.isImmortal;
-        this.z = 0;//this.flying ? 12 : 0;
+        this.z = this.definition.z ?? 0;
         this.scale = this.enemyDefinition.scale ?? 1;
         this.w = (frame.content?.w ?? frame.w) * this.scale;
         this.h = (frame.content?.h ?? frame.h) * this.scale;

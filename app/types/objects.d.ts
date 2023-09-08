@@ -579,12 +579,14 @@ interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
     params?: {[key: string]: any},
+    z?: number
 }
 
 type BossObjectDefinition = BaseObjectDefinition & LootData & {
     type: 'boss',
     enemyType: BossType,
     params?: {[key: string]: any},
+    z?: number
 }
 
 type ObjectDefinition = SimpleObjectDefinition

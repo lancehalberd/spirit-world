@@ -322,6 +322,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                z: definition.z,
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
                 d: definition.d || 'down',
@@ -1258,6 +1259,14 @@ function getEnemyFields(state: GameState, editingState: EditingState, object: Ob
             },
         });
     }
+    rows.push({
+        name: 'z',
+        value: object.z || 0,
+        onChange(z: number) {
+            object.z = z;
+            updateObjectInstance(state, object);
+        },
+    });
     return rows;
 }
 

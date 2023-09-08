@@ -3,13 +3,14 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { lightStoneParticles } from 'app/content/tiles/constants';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound, stopSound } from 'app/musicController';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
 import { getObjectStatus, removeObjectFromArea, saveObjectStatus } from 'app/utils/objects';
 
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 const rollingAnimationSpirit = createAnimation('gfx/tiles/rollingboulderspirit.png', {w: 16, h: 16}, {cols:4});
+const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 
 export class RollingBallObject implements ObjectInstance {
     area: AreaInstance;
@@ -42,6 +43,12 @@ export class RollingBallObject implements ObjectInstance {
         this.y = definition.y;
         this.status = this.definition.status;
         if (getObjectStatus(state, this.definition)) {
+            if (this.definition.status !== 'normal') {
+                this.z = 128;
+                if (this.linkedObject) {
+                    this.linkedObject.z = 128;
+                }
+            }
             this.status = 'normal';
         }
     }
@@ -63,7 +70,7 @@ export class RollingBallObject implements ObjectInstance {
     cleanup() {
         this.stopRollingSound();
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, {canPush, direction, isBonk, isStaff}: HitProperties): HitResult {
@@ -163,6 +170,18 @@ export class RollingBallObject implements ObjectInstance {
                     endTime: state.fieldTime + 200,
                 });
                 playAreaSound(state, this.area, 'bossDeath');
+                hitTargets(state, this.area, {
+                    damage: 2,
+                    direction: this.rollDirection,
+                    hitbox: this.getHitbox(),
+                    hitAllies: true,
+                    hitObjects: true,
+                    hitEnemies: true,
+                    hitTiles: true,
+                    // Falling balls can destroy even some unliftable tiles.
+                    crushingPower: 3,
+                    knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+                });
             }
         }
         if (this.rollDirection) {
@@ -248,13 +267,16 @@ export class RollingBallObject implements ObjectInstance {
         if (this.status !== 'normal') {
             return;
         }
-        context.save();
-            if (this.z > 100) {
-                context.globalAlpha *= Math.max(0, 1 - (this.z - 100) / 28);
-            }
-            const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
-            drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
-        context.restore();
+        const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+    }
+    renderShadow(context, state: GameState) {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy'
+            || this.status === 'hiddenSwitch' || this.status === 'gone'
+        ) {
+            return;
+        }
+        drawFrameAt(context, smallShadowFrame, {x: this.x, y: this.y});
     }
 }
 objectHash.rollingBall = RollingBallObject;

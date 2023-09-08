@@ -15,7 +15,6 @@ import {
     deepWaterBehavior,
     heavyStoneBehavior,
     lightStoneBehavior,
-    lowWallBehavior,
     pitBehavior,
     southernWallBehavior,
     spiritPlantBehavior,
@@ -26,6 +25,7 @@ import {
     thornBehavior,
     topLeftWall,
     topRightWall,
+    unliftableStoneBehavior,
 } from 'app/content/tiles/constants';
 import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
@@ -1027,10 +1027,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior, 16),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 96),
-    singleTileSource('gfx/tiles/rocks.png', {
-        ...lowWallBehavior,
-           linkedOffset: 179,
-        }, 160),
+    singleTileSource('gfx/tiles/rocks.png', unliftableStoneBehavior, 160),
     {
         w: 16, h: 16,
         source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
@@ -1077,7 +1074,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior, 16),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 96),
-    singleTileSource('gfx/tiles/rocksspirit.png', lowWallBehavior, 160),
+    singleTileSource('gfx/tiles/rocksspirit.png', unliftableStoneBehavior, 160),
     {
         w: 16, h: 16,
         source: requireFrame('gfx/tiles/grassspirit.png', {x: 0, y: 0, w: 11 * 16, h: 16}),

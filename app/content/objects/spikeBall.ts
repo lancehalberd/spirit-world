@@ -8,7 +8,7 @@ import { hitTargets } from 'app/utils/field';
 
 // The key block sticks up until it reaches frame 9.
 const spikeBallAnimation = createAnimation('gfx/objects/iceSpikeBall.png', {w: 16, h: 16});
-export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
+const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 
 export class SpikeBall implements ObjectInstance {
     // Normal hit detection won't take into account z-position still so we have to do a custom check for this.

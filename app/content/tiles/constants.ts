@@ -52,17 +52,27 @@ export const heavyStoneBehavior: TileBehaviors = {
     linkableTiles: [187, 188],
     linkedOffset: 179,
 };
+export const lowWallBehavior: TileBehaviors = {
+    defaultLayer: 'field',
+    low: true,
+    solid: true,
+};
+export const unliftableStoneBehavior: TileBehaviors = {
+    ...lowWallBehavior,
+    // This is too heavy to pick up without modding the game,
+    // but falling rolling stones can still destroy these tiles.
+    pickupWeight: 3,
+    throwDamage: 8,
+    particles: heavyStoneParticles,
+    breakSound: 'rockShatter',
+    linkedOffset: 179,
+};
 export const southernWallBehavior: TileBehaviors = {
     solid: true,
     // Wall appear behind the player except over doorways.
     defaultLayer: 'field',
     isSouthernWall: true,
 }
-export const lowWallBehavior: TileBehaviors = {
-    defaultLayer: 'field',
-    low: true,
-    solid: true,
-};
 export const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true };
 export const thornBehavior: TileBehaviors = {
     defaultLayer: 'field',
