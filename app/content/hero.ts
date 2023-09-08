@@ -522,8 +522,11 @@ export class Hero implements Actor {
     renderForeground(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
         // Start drawing the hero in the foreground when they are most of the way up a ladder.
         // This prevents them from rendering under foreground ceiling tiles at the top of ladders.
-        if ((this.actionTarget?.style === 'ladderUp' || this.actionTarget?.style === 'ladderUpTall')
-            && this.y < this.actionTarget.y + 24
+        const isClimbingLadder = (this.actionTarget?.style === 'ladderUp' || this.actionTarget?.style === 'ladderUpTall');
+        if (
+            (isClimbingLadder && this.y < this.actionTarget.y + 24)
+            // Render hero in the foreground when they are high enough (occurs when falling into an area).
+            || this.z > 24
         ) {
             this.render(context, state);
         }
