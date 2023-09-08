@@ -62,7 +62,6 @@ Current tasks:
         - forge
 
     - Helix Rival improvements
-        - Maybe make lightning attack slower
         - Add level 2 ice attack that he uses only after being frozen once:
             - "Think you can reflect this?"
             - Shoots an ice spike object at the player which comes to rest near the edge of the battlefield

@@ -239,7 +239,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
             extraHitProps: {
                 hitEnemies: true,
             },
-            friction: 0.15,
+            friction: 0.2,
             onHit(state: GameState, spark: Spark) {
                 removeEffectFromArea(state, spark);
             },
