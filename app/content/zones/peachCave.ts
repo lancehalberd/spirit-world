@@ -2435,13 +2435,14 @@ const f1_0x1: AreaDefinition = {
     objects: [
         {id: "peachCaveUpperCrackedDoor", linked: false, spirit: false, status: "cracked", x: 272, y: 80, type: "door", d: "left", style: "cavern"},
         {id: "peachCave:pitB", linked: false, spirit: false, status: "normal", x: 368, y: 416, type: "pitEntrance", targetZone: "peachCave", targetObjectId: "peachCave:markerB", style: "default"},
-        {id: "peachCave:pitA", linked: false, spirit: false, status: "normal", x: 112, y: 160, type: "pitEntrance", targetZone: "peachCave", targetObjectId: "peachCave:markerA"},
+        {id: "peachCave:pitA", linked: false, spirit: false, status: "normal", x: 112, y: 160, type: "pitEntrance", targetZone: "peachCave", targetObjectId: "peachCave:markerA", style: "default"},
         {id: "peachCaveTopEntrance", linked: false, spirit: false, status: "normal", x: 96, y: 496, type: "door", targetZone: "overworld", targetObjectId: "peachCaveTopEntrance", d: "down", style: "cavern"},
         {id: "peachCave:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 96, y: 240, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "down", style: "cavern"},
         {id: "peachCave:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 112, y: 272, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "up", style: "cavern"},
         {id: "peachCaveUpperCrackedDoor", linked: false, spirit: false, status: "cracked", x: 240, y: 80, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "right", style: "cavern"},
         {status: "normal", id: "pitInstructions", x: 336, y: 384, type: "narration", message: "It looks like jumping down this hole is my only option.\n{|}Here we go again...\n{addCue: Fall into the large hole to drop down to somewhere new}", delay: 0, w: 80, h: 80},
         {status: "normal", id: "peachCaveSilver", x: 342, y: 74, type: "loot", lootType: "silverOre", lootLevel: 1},
+        {status: "normal", id: "peachCaveWarning", x: 96, y: 144, type: "narration", message: "This is where I fell down in the dark before.\n{|}If I fall down it might take me a while to get out again.", w: 64, h: 64, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 170, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 3},

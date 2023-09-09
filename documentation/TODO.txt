@@ -38,8 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix flames can go up ledges.
-
     - Improve helix
         - Switch to wooden graphics
         - Make area size at least 40x40 if not 48x48

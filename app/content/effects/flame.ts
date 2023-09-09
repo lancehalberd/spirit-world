@@ -3,7 +3,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
+import { getDirection, getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 
 
@@ -166,11 +166,16 @@ export class Flame implements EffectInstance, Props {
                 const hitResult = hitTargets(state, this.area, {
                     canPush: false,
                     damage: this.damage,
+                    direction: getDirection(this.vx, this.vy),
                     hitbox: this.getHitbox(),
                     element: 'fire',
                     hitAllies: !this.reflected,
                     hitEnemies: this.reflected,
+                    hitObjects: true,
                     hitTiles: true,
+                    vx: this.vx,
+                    vy: this.vy,
+                    projectile: this,
                 });
                 if (hitResult.reflected) {
                     this.reflected = true;
@@ -180,6 +185,21 @@ export class Flame implements EffectInstance, Props {
                     this.vx = -this.vx;
                     this.vy = -this.vy;
                     this.time = 0;
+                } else  if (hitResult.blocked || hitResult.stopped || (hitResult.hit && !hitResult.pierced)) {
+                    const hitbox = this.getHitbox();
+                    const count = 4;
+                    for (let i = 0; i < count; i++) {
+                        const theta = 2 * Math.PI * i / count;
+                        const dx = Math.cos(theta), dy = Math.sin(theta);
+                        addSparkleAnimation(state, this.area, {
+                                ...hitbox,
+                                x: hitbox.x + dx,
+                                y: hitbox.y + dy,
+                                z: this.z
+                            }, { element: 'fire' }, { vx: dx / 2, vy: dy / 2});
+                    }
+                    removeEffectFromArea(state, this);
+                    return;
                 }
             }
             // Create sparks less often when the flame is still.
