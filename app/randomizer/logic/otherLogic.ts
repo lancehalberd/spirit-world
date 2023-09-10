@@ -1,5 +1,5 @@
 import {
-    andLogic, canCross2Gaps, canHasTowerStaff, hasClone,
+    andLogic, canCross2Gaps, canHasTowerStaff, hasSpiritBarrier, hasClone,
     hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
@@ -261,6 +261,7 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'lakeTunnel',
         nodeId: 'lakeTunnelBack',
+        checks: [{objectId: 'helixRivalBoss', logic: hasSpiritBarrier}],
         paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasBossWeapon)}],
         entranceIds: ['helixEntrance'],
         exits: [
