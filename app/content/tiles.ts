@@ -22,6 +22,7 @@ import {
     spiritThornBehavior,
     spiritLightStoneBehavior,
     spiritHeavyStoneBehavior,
+    spiritUnliftableStoneBehavior,
     thornBehavior,
     topLeftWall,
     topRightWall,
@@ -1074,7 +1075,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior, 16),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 96),
-    singleTileSource('gfx/tiles/rocksspirit.png', unliftableStoneBehavior, 160),
+    singleTileSource('gfx/tiles/rocksspirit.png', spiritUnliftableStoneBehavior, 160),
     {
         w: 16, h: 16,
         source: requireFrame('gfx/tiles/grassspirit.png', {x: 0, y: 0, w: 11 * 16, h: 16}),

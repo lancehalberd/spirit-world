@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps, canHasTowerStaff, hasSpiritBarrier, hasClone,
-    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility,
+    hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -252,7 +252,7 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'lakeTunnel',
         nodeId: 'lakeTunnelFront',
-        paths: [{ nodeId: 'lakeTunnelBack', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasBossWeapon)}],
+        paths: [{ nodeId: 'lakeTunnelBack', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasSpiritBarrier)}],
         entranceIds: ['lakeTunnelEntrance'],
         exits: [
             { objectId: 'lakeTunnelEntrance' },
@@ -262,7 +262,7 @@ export const cavesNodes: LogicNode[] = [
         zoneId: 'lakeTunnel',
         nodeId: 'lakeTunnelBack',
         checks: [{objectId: 'helixRivalBoss', logic: hasSpiritBarrier}],
-        paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasBossWeapon)}],
+        paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasSpiritBarrier)}],
         entranceIds: ['helixEntrance'],
         exits: [
             { objectId: 'helixEntrance' },

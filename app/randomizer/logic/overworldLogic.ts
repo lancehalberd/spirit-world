@@ -444,7 +444,6 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'westSpiritWorldMountain' },
             { nodeId: 'waterfallTowerSky'},
-            { nodeId: 'skyPalaceCourtyard'},
         ],
         entranceIds: ['caves-ascentExitSpirit', 'forgeEntrance'],
         exits: [

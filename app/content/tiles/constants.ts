@@ -108,6 +108,15 @@ export const spiritHeavyStoneBehavior: TileBehaviors = {
     ...heavyStoneBehavior, particles: spiritHeavyStoneParticles,
     linkableTiles: [8, 9],
 };
+export const spiritUnliftableStoneBehavior: TileBehaviors = {
+    ...lowWallBehavior,
+    // This is too heavy to pick up without modding the game,
+    // but falling rolling stones can still destroy these tiles.
+    pickupWeight: 3,
+    throwDamage: 8,
+    particles: heavyStoneParticles,
+    breakSound: 'rockShatter',
+};
 export const spiritThornBehavior: TileBehaviors = {
     ...thornBehavior,
     underTile: 202,

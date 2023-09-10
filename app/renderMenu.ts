@@ -164,7 +164,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     }
 
     // Weapon isn't currently part of the selectable menu rows.
-    if (state.hero.savedData.weapon === 1 || editingState.isEditing) {
+    if (state.hero.savedData.weapon >= 1 || editingState.isEditing) {
         const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         renderFaded(context, !state.hero.savedData.weapon,
             () => drawFrameCenteredAt(context, frame, weapon1Rect));

@@ -1553,7 +1553,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forestTempleLadder5", x: 48, y: 320, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder5", d: "up"},
         {status: "normal", id: "forestTempleBigKey", x: 56, y: 56, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "normal", id: "", x: 464, y: 88, type: "spawnMarker"},
-        {status: "normal", id: "", x: 432, y: 440, type: "spawnMarker"},
+        {status: "normal", id: "", x: 464, y: 424, type: "spawnMarker"},
         {status: "normal", id: "", x: 224, y: 520, type: "spawnMarker"},
         {status: "normal", id: "", x: 120, y: 120, type: "spawnMarker"},
         {status: "normal", id: "", x: 48, y: 232, type: "spawnMarker"},
@@ -1563,7 +1563,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 384, type: "spawnMarker"},
         {status: "normal", id: "", x: 72, y: 416, type: "spawnMarker"},
         {status: "normal", id: "", x: 392, y: 296, type: "spawnMarker"},
-        {status: "normal", id: "", x: 544, y: 560, type: "spawnMarker"},
+        {status: "normal", id: "", x: 376, y: 568, type: "spawnMarker"},
         {status: "normal", id: "", x: 536, y: 136, type: "spawnMarker"},
         {status: "normal", id: "", x: 536, y: 200, type: "spawnMarker"},
         {status: "normal", id: "forestTempleMap", x: 448, y: 64, type: "chest", lootType: "map", lootAmount: 50},
@@ -1574,9 +1574,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forestTemple:s0:0x0-snakeFlame-0", x: 236, y: 436, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}},
         {status: "normal", id: "forestTemple:s0:0x0-snakeFlame-1", x: 156, y: 508, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}},
         {status: "normal", id: "", x: 64, y: 544, type: "spawnMarker"},
+        {status: "normal", id: "", x: 544, y: 560, type: "spawnMarker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 20, h: 40, index: 286, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 20, h: 40, index: 286, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 0, mapY: 0.5},
         {x: 20, y: 0, w: 20, h: 40, index: 287, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
@@ -1913,7 +1914,7 @@ const sf0_1x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 40, h: 20, index: 288, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 0},
         {x: 0, y: 20, w: 20, h: 20, index: 289, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 1},
-        {x: 20, y: 20, w: 20, h: 20, index: 290, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3.5, mapY: 1},
+        {x: 20, y: 20, w: 20, h: 20, index: 290, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 0.5},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -2232,17 +2233,17 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "forestTempleBoss", x: 384, y: 416, type: "boss", enemyType: "stormIdol", lootType: "clone", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "forestTempleBoss", x: 544, y: 560, type: "boss", enemyType: "stormIdol", lootType: "clone", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "closed", id: "", x: 320, y: 464, type: "door", style: "cavern", targetObjectId: "forestTempleBackDoor", d: "left"},
-        {status: "normal", id: "", x: 200, y: 144, type: "spawnMarker"},
+        {status: "normal", id: "", x: 208, y: 184, type: "spawnMarker"},
         {status: "normal", id: "", x: 32, y: 240, type: "spawnMarker"},
         {status: "normal", id: "", x: 72, y: 104, type: "spawnMarker"},
         {status: "bigKeyLocked", id: "forestTempleBigLock", x: 208, y: 48, type: "keyBlock"},
         {status: "normal", id: "forestTempleBigMoney", x: 544, y: 208, type: "chest", lootType: "money", lootAmount: 100},
     ],
     sections: [
-        {x: 0, y: 0, w: 20, h: 20, index: 291, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 0, mapY: 2},
-        {x: 20, y: 0, w: 20, h: 20, index: 292, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 1, mapY: 2},
-        {x: 0, y: 20, w: 20, h: 20, index: 293, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 4},
-        {x: 20, y: 20, w: 20, h: 20, index: 294, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3, mapY: 4},
+        {x: 0, y: 0, w: 20, h: 20, index: 291, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 0, mapY: 2.5},
+        {x: 20, y: 0, w: 20, h: 20, index: 292, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 1, mapY: 2.5},
+        {x: 0, y: 20, w: 20, h: 20, index: 293, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2.5, mapY: 4},
+        {x: 20, y: 20, w: 20, h: 20, index: 294, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3.5, mapY: 4},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -2554,7 +2555,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "forestTempleLadder1", x: 336, y: 336, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder1", d: "up"},
         {status: "normal", id: "forestTemple:s0:1x1-ent-2", x: 432, y: 108, type: "enemy", enemyType: "ent", d: "down", saveStatus: "forever", params: {}},
         {status: "normal", id: "", x: 472, y: 432, type: "spawnMarker"},
-        {status: "normal", id: "", x: 336, y: 400, type: "spawnMarker"},
+        {status: "normal", id: "", x: 48, y: 568, type: "spawnMarker"},
         {status: "normal", id: "", x: 24, y: 160, type: "spawnMarker"},
         {status: "normal", id: "", x: 464, y: 168, type: "spawnMarker"},
         {status: "normal", id: "", x: 264, y: 496, type: "spawnMarker"},
@@ -2576,10 +2577,11 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "forestTemple:s0:1x1-plantStorm-1", x: 84, y: 544, type: "enemy", enemyType: "plantStorm", d: "down", params: {}},
         {status: "normal", id: "forestTemple:s0:1x1-plantFrost-1", x: 392, y: 76, type: "enemy", enemyType: "plantFrost", d: "down", params: {}},
         {status: "normal", id: "forestTemple:s0:1x1-plantFlame-1", x: 480, y: 76, type: "enemy", enemyType: "plantFlame", d: "down", params: {}},
+        {status: "normal", id: "", x: 336, y: 400, type: "spawnMarker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 20, index: 295, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2.5, mapY: 2},
-        {x: 0, y: 20, w: 40, h: 20, index: 296, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2.5, mapY: 3},
+        {x: 0, y: 0, w: 40, h: 20, index: 295, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3, mapY: 1.5},
+        {x: 0, y: 20, w: 40, h: 20, index: 296, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3, mapY: 2.5},
     ],
 };
 zones.forestTemple = {

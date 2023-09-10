@@ -75,6 +75,12 @@ export class KeyBlock implements ObjectInstance {
             if (this.definition.targetObjectId) {
                 state.savedState.objectFlags[this.definition.targetObjectId] = true;
             }
+            state.scriptEvents.activeEvents.push({
+                type: 'wait',
+                time: state.time,
+                duration: blockedDuration,
+                blockPlayerInput: true,
+            });
         } else {
             console.error('Keyblock was missing an id', this);
             debugger;

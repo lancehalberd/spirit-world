@@ -12,6 +12,7 @@ import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { playAreaSound } from 'app/musicController';
 import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
+import { setAreaSection } from 'app/utils/area';
 import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
@@ -39,7 +40,7 @@ const rollSpeed = [
 
 let sommersaultCount = 0;
 
-function moveToClosestSpawnMarker(state: GameState, hero: Hero) {
+function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true) {
     const { section } = getAreaSize(state);
     let best: ObjectInstance = null, bestDistance: number;
     for (const object of state.areaInstance.objects) {
@@ -47,8 +48,8 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero) {
             continue;
         }
         // Only consider markers in the current section.
-        if (object.x < section.x || object.x > section.x + section.w ||
-            object.y < section.y || object.y > section.y + section.h
+        if (inSection && (object.x < section.x || object.x > section.x + section.w ||
+            object.y < section.y || object.y > section.y + section.h)
         ) {
             continue;
         }
@@ -61,6 +62,9 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero) {
     if (best) {
         hero.x = best.x;
         hero.y = best.y;
+        if (!inSection) {
+            setAreaSection(state);
+        }
         fixCamera(state);
     }
 }
@@ -226,7 +230,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }, false, () => {
                 hero.action = 'knocked';
                 hero.isAirborn = true;
-                moveToClosestSpawnMarker(state, hero);
+                moveToClosestSpawnMarker(state, hero, false);
             });
             return true;
         }
