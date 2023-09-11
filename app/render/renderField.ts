@@ -349,21 +349,21 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
 }
 
 export function renderAreaForeground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
-    if (!area?.foregroundCanvas) {
-        return;
+    // Render the tiles foreground if it exists.
+    if (area?.foregroundCanvas) {
+        // Render the entire area while editing. We can make this more specific if we notice performance issues.
+        const rect = editingState.isEditing ?
+            {x: 0, y: 0, w: area.w * 16, h: area.h * 16} : {
+                x: (state.camera.x - area.cameraOffset.x) | 0,
+                y: (state.camera.y - area.cameraOffset.y) | 0,
+                w: CANVAS_WIDTH,
+                h: CANVAS_HEIGHT,
+            };
+        context.save();
+            translateContextForAreaAndCamera(context, state, area);
+            drawCanvas(context, area.foregroundCanvas, rect, rect);
+        context.restore();
     }
-    // Render the entire area while editing. We can make this more specific if we notice performance issues.
-    const rect = editingState.isEditing ?
-        {x: 0, y: 0, w: area.w * 16, h: area.h * 16} : {
-            x: (state.camera.x - area.cameraOffset.x) | 0,
-            y: (state.camera.y - area.cameraOffset.y) | 0,
-            w: CANVAS_WIDTH,
-            h: CANVAS_HEIGHT,
-        };
-    context.save();
-        translateContextForAreaAndCamera(context, state, area);
-        drawCanvas(context, area.foregroundCanvas, rect, rect);
-    context.restore();
     renderForegroundObjects(context, state, area);
 
     if (editingState.isEditing) {

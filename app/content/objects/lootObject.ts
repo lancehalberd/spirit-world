@@ -28,6 +28,11 @@ function rollItem(table: LootTable) {
 }
 
 export function dropItemFromTable(state: GameState, area: AreaInstance, lootTable: LootTable, x: number, y: number) {
+    // Items only drop in the current area.
+    // Dropping items that the player cannot pick up gives a lot of people FOMO.
+    if (area !== state.areaInstance) {
+        return;
+    }
     const item = rollItem(lootTable);
     if (item) {
         const theta = 2 * Math.PI * Math.random();
