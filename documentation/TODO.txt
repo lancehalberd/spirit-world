@@ -38,6 +38,10 @@ Graphics:
 
 
 Current tasks:
+    - fix: game sometimes crashes while showing the map.
+    - prevent random loot from spawning in the alternate world
+        - Players find it frustrating that they cannot pick it up with spirit sight/astral projection.
+
     - Improve helix
         - Switch to wooden graphics
         - Make area size at least 40x40 if not 48x48
