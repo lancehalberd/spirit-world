@@ -148,12 +148,12 @@ dialogueHash.mom = {
                     dialogueIndex: 27,
                     dialogueType: 'quest',
                     text: `Welcome home son!
-                    {|}You were gone so long I was worried you got into some kind of trouble again!
+                    {|}You were gone so long I was worried you got into trouble again!
                     {|}...
                     {|}You ate a strange fruit in a cave and now you can see in the dark?
                     {|}Your father said that the Vanara Elder had some kind of magic power but he
                     said it was dangerous and they had to keep it secret.
-                    {|}If you have the same kind of power you should go talk to the Elder just to be safe.
+                    {|}If you have the same kind of power you should talk to the Elder just in case.
                     {|}The Elder lives in the Forest Village to the Southwest, just try not to bother them too much.
                     {flag:momElder}`,
                 },
