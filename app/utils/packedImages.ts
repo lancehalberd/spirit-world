@@ -60,7 +60,6 @@ const imagePacks: PackedImageData[] = [
         {x:880,y:64,w:48,h:16,originalSource:'gfx/tiles/clifffloors.png'},
         {x:912,y:448,w:48,h:64,originalSource:'gfx/tiles/exteriorstairs.png'},
         {x:736,y:1216,w:176,h:96,originalSource:'gfx/tiles/shadowtiles.png'},
-        {x:256,y:1392,w:496,h:256,originalSource:'gfx/tiles/cavearranged2.png'},
         {x:928,y:64,w:16,h:16,originalSource:'gfx/tiles/eyemonsterbase.png'},
         {x:880,y:80,w:30,h:3,originalSource:'gfx/effects/particles_beads.png'},
         {x:912,y:512,w:96,h:48,originalSource:'gfx/tiles/crystalbeadpiles.png'},

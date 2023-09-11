@@ -1,8 +1,6 @@
 import { addTextCue, findTextCue } from 'app/content/effects/textCue';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 
-
-
 specialBehaviorsHash.barrierBurstInstructions = {
     type: 'narration',
     update(state: GameState, object: ObjectInstance) {
@@ -32,7 +30,7 @@ specialBehaviorsHash.barrierBurstInstructions = {
         } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
             textCue.fadeOut();
         }
-    }
+    },
 };
 
 specialBehaviorsHash.barrierReflectInstructions = {
@@ -67,7 +65,7 @@ specialBehaviorsHash.barrierReflectInstructions = {
         } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
             textCue.fadeOut();
         }
-    }
+    },
 };
 
 specialBehaviorsHash.bowInstructions = {
@@ -96,7 +94,7 @@ specialBehaviorsHash.bowInstructions = {
         } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
             textCue.fadeOut();
         }
-    }
+    },
 };
 
 specialBehaviorsHash.chestAndChakramInstructions = {
@@ -114,5 +112,5 @@ specialBehaviorsHash.chestAndChakramInstructions = {
         } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
             textCue.fadeOut();
         }
-    }
+    },
 };

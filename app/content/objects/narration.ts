@@ -26,6 +26,7 @@ export class Narration implements ObjectInstance {
         this.y = definition.y;
         if (isRandomizer || getObjectStatus(state, this.definition)) {
             this.status = 'gone';
+            saveObjectStatus(state, this.definition);
         }
         this.time = 0;
     }
