@@ -3,8 +3,6 @@ Test at http://localhost:81/alttp/public/
 Known Bugs:
     - Enemies can get trapped inside the Staff Tower graphics if they are in the are it occupies when it is created.
         - Should probably kill enemies in this area when setting up the tower.
-    - Map crashed the game in Brave browser.
-        - Seems to happen after a while of switching between areas and opening the map.
 
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
@@ -38,7 +36,6 @@ Graphics:
 
 
 Current tasks:
-    - fix: game sometimes crashes while showing the map.
     - prevent random loot from spawning in the alternate world
         - Players find it frustrating that they cannot pick it up with spirit sight/astral projection.
 

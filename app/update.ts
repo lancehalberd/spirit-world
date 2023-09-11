@@ -233,18 +233,23 @@ function updateMenu(state: GameState) {
     if (state.showMap) {
         const floorKeys = Object.keys(dungeonMaps[state.areaSection?.definition.mapId]?.floors || {});
         const showFullMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map || editingState.isEditing;
-        if (wasGameKeyPressed(state, GAME_KEY.UP)) {
+        let safety = 0;
+        if (floorKeys.length && wasGameKeyPressed(state, GAME_KEY.UP)) {
             do {
                 state.menuIndex = (state.menuIndex + 1) % floorKeys.length;
-            } while (!showFullMap
+            } while (++safety < 1000 && !showFullMap
                 && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorKeys[state.menuIndex]].sections?.find(section => isSectionExplored(state, section)));
             editingState.selectedSections = [];
-        } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+        } else if (floorKeys.length && wasGameKeyPressed(state, GAME_KEY.DOWN)) {
             do {
                 state.menuIndex = (state.menuIndex + floorKeys.length - 1) % floorKeys.length;
-            } while (!showFullMap
+            } while (++safety < 1000 && !showFullMap
                 && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorKeys[state.menuIndex]]?.sections?.find(section => isSectionExplored(state, section)));
             editingState.selectedSections = [];
+        }
+        if (safety > 500) {
+            console.log('infinite loop warning');
+            debugger;
         }
         if (wasMenuConfirmKeyPressed(state)) {
             state.paused = false;
