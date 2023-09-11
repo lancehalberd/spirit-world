@@ -20,7 +20,7 @@ export const RIGHT_TOOL_COLOR = 'yellow';
 
 export const MAX_SPIRIT_RADIUS = 80;
 
-export const EXPLOSION_RADIUS = 30;
+export const EXPLOSION_RADIUS = 32;
 export const EXPLOSION_TIME = 600;
 
 export const GAME_KEY = {

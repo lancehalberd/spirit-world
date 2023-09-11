@@ -564,6 +564,7 @@ export class Hero implements Actor {
         if (hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
+        renderExplosionRing(context, state, hero);
         this.renderChargingBehind(context, state);
         if (this.isInvisible) {
             this.renderChargingFront(context, state);
@@ -609,7 +610,6 @@ export class Hero implements Actor {
                 );
             context.restore();
         }
-        renderExplosionRing(context, state, hero);
         this.renderChargingFront(context, state);
     }
 

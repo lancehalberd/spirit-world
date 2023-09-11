@@ -294,7 +294,7 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
     context.strokeStyle = 'red';
     context.stroke();
     context.save();
-        context.globalAlpha *= (hero.explosionTime / EXPLOSION_TIME);
+        context.globalAlpha *= 0.4;
         context.beginPath();
         context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2, r, 0, 2 * Math.PI);
         context.fillStyle = 'red';

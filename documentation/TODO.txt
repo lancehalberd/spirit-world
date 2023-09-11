@@ -36,6 +36,9 @@ Graphics:
 
 
 Current tasks:
+    - Fix bad tiles on bottom right of sky palace.
+    - Fix audio restarts when going under water during the frost beast fight.
+
     - Improve helix
         - Switch to wooden graphics
         - Make area size at least 40x40 if not 48x48
