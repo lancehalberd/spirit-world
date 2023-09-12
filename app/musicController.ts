@@ -191,6 +191,14 @@ export function playSound(state: GameState, key: string) {
 }
 
 export function playAreaSound(state: GameState, area: AreaInstance, key: string): any {
+    // Do not play area sound effects during the various title scenes. We run updated code
+    // during these scenes to render the location in the background, but we shouldn't be
+    // playing any sound effects.
+    if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
+        state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
+    ) {
+        return;
+    }
     if (!key || state.areaInstance !== area) {
         return;
     }

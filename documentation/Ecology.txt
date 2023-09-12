@@ -50,3 +50,76 @@ Order is:
     Heaven - NPC with "Iron Skin" reward
 
 Spiral clockwise starting in southwest ending in the center
+
+
+
+
+
+Dungeon flavor philosophy:
+    All Vanara structures are part of the Vanara ship and related to some functionality, such as the regeneration pods.
+    All Native structures are built to native spirit gods who functioned as servants to the old native spirit beings and were created for specific purposes like resource harvesting, processing and crafting.
+
+
+Ability Locations:
+# Prologue
+    weapon 1            Peach Cave Chest
+    catEyes             Peach Cave Boss
+# Starting Dungeons
+    bow                 Vanara Village
+    roll                Vanara Tomb Chest
+    spiritSight         Vanara Tomb Boss
+    gloves              Summoner Ruins Chest
+    astralProjection    Summoner Ruins Boss
+    spiritCloak         Cocoon Chest
+    teleportation       Cocoon Boss
+# Treasure Dungeons
+    cloudBoots          Forest Temple Chest
+    clone               Forest Temple Boss
+    ironBoots           Waterfall Tower Chest
+    spiritCloak 2       Waterfall Tower Boss
+    True Sight          Gauntlet Chest
+    ironSkin            Gauntlet Boss
+    gloves 2            Forge Chest
+    goldMail            Forge Boss
+    roll 2              Cloud Temple Chest
+    nimbusCloud         Cloud Temple Boss
+    bow 2               Holy Sanctum Chest
+    phoenixCrown        Holy Sanctum Boss
+# First Quest Dungeon
+    staff               Helix Chest
+    weapon 2            Helix Boss
+# Middle Quest Dungeons
+    fireBlessing        Crater Big Chest
+    fire                Crater Boss Flame Beast
+    waterBlessing       River Temple Big Chest
+    ice                 River Temple Boss Frost Beast
+    lightning           Staff Tower Boss Storm Beast
+    staff 2             Staff Tower "Chest" (after boss)
+    charge 1            Acquired with first Element
+    charge 2            Acquired with third Element
+# Final Quest Dungeon
+    clone 2             Hidden Lab
+
+Dungeon 1: Vanara Tomb (fortress around the Cocoon)
+    - Traps+locks to keep intruders away. Need to use bow to enter
+        - Someone was stealing Vanara remains
+    - Built around a suspended animation capsule
+        - The Vanara population is too large so they rotate members in and out of suspended animation.
+        - Suspension pods erase Vanara memories to prevent then from becoming restless.
+        - Pods also regenerate Vanara bodies, which would break down without nurishment from the spirit world.
+        - Vanara village population is 20-30 individuals at a time. There are 100-300 total, most suspended.
+    - The goal of the dungeon is to meet with the care taker who looks after and maintains the suspended Vanara.
+        - The original Vanara crew rotate members into the care taker role once every X years.
+    - A facade is built aroaund the structure to disguise it as a mundane structure
+        - The Vanara village posts guards in addition to the traps to keep people out
+    - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
+
+Jade Palace:
+    - Boss Reward: Phoenix Feather
+        Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.
+        The War God wants to combine science and Vanara biology to make a new "Void Phoenix" to replicate the old beast.
+        An ancestor of the MC+Hero defeated the original Phoenix
+        The feather is kept in the Jade palace, too dangerous to use but too precious to destroy
+
+River Temple:
+    - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Vanara Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).

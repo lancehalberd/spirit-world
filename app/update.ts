@@ -102,7 +102,7 @@ export function update() {
                     )
                 )
             ) {
-                state.showMap = !state.showMap;
+                state.showMap = !state.showMap || !state.paused;
                 const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
                 if (state.showMap && dungeonMap) {
                     state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
