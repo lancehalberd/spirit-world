@@ -29,3 +29,9 @@ export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: Act
     }
     return { chargeLevel, element};
 }
+
+// Returns the effective element for the hero, taking into account
+// that only the default element can be used underwater.
+export function getElement(state: GameState, hero: Hero): MagicElement {
+    return isUnderwater(state, hero) ? null : state.hero.savedData.element;
+}

@@ -5,7 +5,7 @@ import { Clone }  from 'app/content/objects/clone';
 import { GAME_KEY } from 'app/gameConstants';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
+import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea } from 'app/utils/objects';
 
 
@@ -35,12 +35,14 @@ export function useTool(
                 speed += 4;
                 magicCost += 25;
             }
-            if (state.hero.savedData.element && isUpgradedBow && chargeLevel === 0) {
-                // Upgraded bow always uses the equiped element
-                // and uses less magic to do so.
-                element = state.hero.savedData.element;
-                magicCost += 5;
-            } else if (state.hero.savedData.element && chargeLevel > 0) {
+            if (isUpgradedBow && chargeLevel === 0) {
+                // Upgraded bow always uses the equiped element and uses less magic to do so.
+                element = getElement(state, hero);
+                // Only increase the cost if an element is actually used.
+                if (element) {
+                    magicCost += 5;
+                }
+            } else if (element && chargeLevel > 0) {
                 // Adding an element to a charged attack costs 10 spirit energy.
                 magicCost += 10;
             }

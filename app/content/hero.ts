@@ -21,11 +21,10 @@ import {
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
-import { isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
-import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
+import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';
 
 const throwSpeed = 6;
@@ -367,7 +366,7 @@ export class Hero implements Actor {
         }
         this.hasBarrier = false;
         this.activeBarrierBurst = new BarrierBurstEffect({
-            element: this.savedData.element,
+            element: getElement(state, this),
             level: this.savedData.activeTools.cloak,
             source: this,
         });
@@ -652,7 +651,7 @@ export class Hero implements Actor {
         const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
             && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
-            const element = isUnderwater(state, this) ? null : this.savedData.element;
+            const element = getElement(state, this);
             const animation = !element
                 ? chargeFrontAnimation
                 : {
