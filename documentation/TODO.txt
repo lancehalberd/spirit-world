@@ -34,6 +34,8 @@ Graphics:
 
 
 Current tasks:
+    - Fix push/pull interactions with ledges.
+
     - Fix doors closed as you walk into them.
         - Good example is walking into the key room NW from the big chest in tomb.
         - I think we update doors once on creating the area, let's go ahead and detect if the hero is walking into a door then
@@ -56,6 +58,9 @@ Current tasks:
             [-]
 
     - Improve helix
+        - Allow throwing rocks diagonally.
+        - Make sure turrets render correctly when damaged (they are missing the top for some reason).
+            - Instead of using an animation effect, just call the regular render of the enemy using 0.3 alpha in `alternateRender` if enemyInvulnerableFrames > 0.
         - Switch to wooden graphics
         - Make area size at least 40x40 if not 48x48
         - Add additional checks
