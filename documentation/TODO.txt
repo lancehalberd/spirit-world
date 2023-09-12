@@ -36,7 +36,11 @@ Graphics:
 
 
 Current tasks:
-    - Fix bad tiles on bottom right of sky palace.
+    - Fix elements underwater:
+        - level 2 bow normal attack
+        - barrier burst
+        - invisibility
+
     - Fix audio restarts when going under water during the frost beast fight.
 
     - Improve helix
