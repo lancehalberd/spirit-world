@@ -34,19 +34,10 @@ Graphics:
 
 
 Current tasks:
-    - Fix soft lock in cocoon, add better hint for killing plants.
-    - Fix rolling balls sometimes fail to socket when they socket in the alternate world.
-        - Let's also go through and link any unlinked sockets so balls always socket together.
-    - Replace hint with new hint about rolling rocks to damage enemies.
-        "You can roll bolders over enemies to damage them."
-
     - Fix grabbing objects that you are standing over
         - This happens when standing over a ledge and facing either direction along the edge towards a tile/object that is down from the ledge.
         - fix for objects
         - fix for tiles
-
-    - Minor issue with ledges
-        - Should be able to grab ledges when below them just like you can grab solid tiles.
 
     - Fix push/pull interactions with ledges.
         - Blockers:
@@ -83,6 +74,14 @@ Current tasks:
                 - The issue is that if the player's subpixel doesn't match the pot, when the pot can no longer move forward, the player is stuck at
                   the subpixel distance. The attempt to wiggle, but the pot has no wiggle room(it is flush with the wall), so the player's movement is aborted.
 
+    - Improve helix
+        - Allow throwing rocks diagonally.
+        - Make sure turrets render correctly when damaged (they are missing the top for some reason).
+            - Instead of using an animation effect, just call the regular render of the enemy using 0.3 alpha in `alternateRender` if enemyInvulnerableFrames > 0.
+        - Switch to wooden graphics
+        - Make area size at least 40x40 if not 48x48
+        - Add additional checks
+
     - Fix doors closed as you walk into them.
         - Good example is walking into the key room NW from the big chest in tomb.
         - I think we update doors once on creating the area, let's go ahead and detect if the hero is walking into a door then
@@ -90,6 +89,9 @@ Current tasks:
         - Play door open/closed sounds FX when it changes whether it is open based on the player being over it.
 
     - Fix audio restarts when going under water during the frost beast fight.
+
+    - Fix rolling balls sometimes fail to socket when they socket in the alternate world.
+        - Let's also go through and link any unlinked sockets so balls always socket together.
 
     - Improve dialogue display
         - animate lines in one at a time every ~40ms
@@ -104,13 +106,8 @@ Current tasks:
             {|}Thank you for saving me.
             [-]
 
-    - Improve helix
-        - Allow throwing rocks diagonally.
-        - Make sure turrets render correctly when damaged (they are missing the top for some reason).
-            - Instead of using an animation effect, just call the regular render of the enemy using 0.3 alpha in `alternateRender` if enemyInvulnerableFrames > 0.
-        - Switch to wooden graphics
-        - Make area size at least 40x40 if not 48x48
-        - Add additional checks
+    - Minor issue with ledges
+        - Should be able to grab ledges when below them just like you can grab solid tiles.
 
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 
