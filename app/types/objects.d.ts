@@ -223,6 +223,9 @@ interface MovementProperties {
     // Whether the mover can pass over solid walls that are low to medium height.
     // Used when throwing a clone, and maybe low flying enemies.
     canPassMediumWalls?: boolean
+    // Whether the mover can pass through solid tiles. Does not allow passing across ledges.
+    // Used when determining whether a ledge is being crossed in `getActorTarget`.
+    canPassWalls?: boolean
     // The direction of the movement, can effect whether a tile is considered open,
     // for example edges the player can jump off of in one or two directions.
     direction?: Direction

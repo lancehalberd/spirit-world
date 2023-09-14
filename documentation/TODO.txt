@@ -34,10 +34,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix grabbing objects that you are standing over
-        - This happens when standing over a ledge and facing either direction along the edge towards a tile/object that is down from the ledge.
-        - fix for objects
-
     - Fix push/pull interactions with ledges.
         - Blockers:
             - Fix pot sometimes fails to move all but down(?), logging : console.log('Failed to move object');
@@ -47,6 +43,10 @@ Current tasks:
                         - The pot is blocked by the player being in the way and then wiggles down
                         - The players movement is swapped to follow the wiggle, since this is valid for the player.
         - Minor issues:
+            - Pot can render in front of you when standing on ledge above it.
+                - Not sure if this is fixable as it seems to require a real z value to correct.
+                - We should probably just avoid allowing objects to be next to vertical ledges to prevent this.
+
             - Pot will not wiggle around objects when pulling it sideways
                 - Perhaps we can solve this by doing a single move using the combined hit box of the player+pot
                     - Make a fake object with the combined hitbox of the two (rectangle containing both hitboxes)

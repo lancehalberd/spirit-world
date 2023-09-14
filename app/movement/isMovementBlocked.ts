@@ -32,7 +32,7 @@ export function isMovementBlocked(
                 continue;
             }
             const behaviors = getObjectBehaviors(state, object);
-            if (object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
+            if (!movementProperties.canPassWalls && object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     blockingSolidObject = object;
                     blockingPitObject = null;
@@ -158,7 +158,7 @@ export function isMovementBlocked(
     const canClimbTile = behaviors?.climbable && movementProperties.canClimb;
     // Moving over a tile when thrown allows you to ignore solid pixels on low to mid height tiles.
     const moveOverTile = movementProperties.canPassMediumWalls && (behaviors?.low || behaviors?.midHeight);
-    const ignoreSolidPixels = moveOverTile || canClimbTile;
+    const ignoreSolidPixels = movementProperties.canPassWalls || moveOverTile || canClimbTile;
     if (ignoreSolidPixels) {
         return false;
     }

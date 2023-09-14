@@ -220,38 +220,41 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (pulldx || pulldy) {
                 const direction = getDirection(pulldx, pulldy);
                 hero.grabObject.onPull(state, direction, hero);
-                // Wiggle the hero in line with the object as they move it
-                const wiggleDistance = 14;
-                // If the player is not positioned correctly to pull the object, instead of pulling,
-                // attempt to wiggle them in better alignment with the object.
-                if (hero.x > hero.grabObject.x - wiggleDistance && hero.x < hero.grabObject.x) {
-                    dx = Math.min(1, hero.grabObject.x - hero.x);
-                    // Movement code will be ignored for dx values < 0.2, so just snap the character
-                    if (dx <= 0.25) {
-                        hero.x = hero.grabObject.x;
-                        dx = 0
+                // grabObject may be removed during the onPull operation, so confirm it is still set first.
+                if (hero.grabObject) {
+                    // Wiggle the hero in line with the object as they move it
+                    const wiggleDistance = 14;
+                    // If the player is not positioned correctly to pull the object, instead of pulling,
+                    // attempt to wiggle them in better alignment with the object.
+                    if ( hero.x > hero.grabObject.x - wiggleDistance && hero.x < hero.grabObject.x) {
+                        dx = Math.min(1, hero.grabObject.x - hero.x);
+                        // Movement code will be ignored for dx values < 0.2, so just snap the character
+                        if (dx <= 0.25) {
+                            hero.x = hero.grabObject.x;
+                            dx = 0
+                        }
+                    } else if (hero.x < hero.grabObject.x + wiggleDistance && hero.x > hero.grabObject.x) {
+                        dx = Math.max(-1, hero.grabObject.x - hero.x);
+                        // Movement code will be ignored for dx values < 0.2, so just snap the character
+                        if (dx >= -0.25) {
+                            hero.x = hero.grabObject.x;
+                            dx = 0
+                        }
                     }
-                } else if (hero.x < hero.grabObject.x + wiggleDistance && hero.x > hero.grabObject.x) {
-                    dx = Math.max(-1, hero.grabObject.x - hero.x);
-                    // Movement code will be ignored for dx values < 0.2, so just snap the character
-                    if (dx >= -0.25) {
-                        hero.x = hero.grabObject.x;
-                        dx = 0
-                    }
-                }
-                if (hero.y > hero.grabObject.y - wiggleDistance && hero.y < hero.grabObject.y) {
-                    dy = Math.min(1, hero.grabObject.y - hero.y);
-                    // Movement code will be ignored for dx values < 0.2, so just snap the character
-                    if (dy <= 0.25) {
-                        hero.y = hero.grabObject.y;
-                        dy = 0
-                    }
-                } else if (hero.y < hero.grabObject.y + wiggleDistance && hero.y > hero.grabObject.y) {
-                    dy = Math.max(-1, hero.grabObject.y - hero.y);
-                    // Movement code will be ignored for dx values < 0.2, so just snap the character
-                    if (dy >= -0.25) {
-                        hero.y = hero.grabObject.y;
-                        dy = 0
+                    if (hero.y > hero.grabObject.y - wiggleDistance && hero.y < hero.grabObject.y) {
+                        dy = Math.min(1, hero.grabObject.y - hero.y);
+                        // Movement code will be ignored for dx values < 0.2, so just snap the character
+                        if (dy <= 0.25) {
+                            hero.y = hero.grabObject.y;
+                            dy = 0
+                        }
+                    } else if (hero.y < hero.grabObject.y + wiggleDistance && hero.y > hero.grabObject.y) {
+                        dy = Math.max(-1, hero.grabObject.y - hero.y);
+                        // Movement code will be ignored for dx values < 0.2, so just snap the character
+                        if (dy >= -0.25) {
+                            hero.y = hero.grabObject.y;
+                            dy = 0
+                        }
                     }
                 }
 

@@ -9,7 +9,10 @@ const anchors = [
 export function getJumpVector(
     state: GameState,
     area: AreaInstance,
-    hitbox: Rect,): number[] {
+    hitbox: Rect
+): number[] {
+    // Uncomment this to disable jumping.
+    //return [0, 0];
     const sum = [0, 0];
 
     // pixel aligned edges of the hitbox
