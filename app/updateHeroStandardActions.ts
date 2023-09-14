@@ -553,6 +553,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 canFall: true,
                 canJump: !hero.isAstralProjection,
                 canSwim: !encumbered,
+                // This prevents the movement for trying to line up with the grab object from resulting in extra movement
+                // that moves the hero way from the object and causes them to stop grabbing it.
+                // This doesn't prevent the hero from wiggling with a push pu
+                canWiggle: !hero.grabObject,
                 direction: hero.d,
                 boundingBox: (hero.isAstralProjection || hero.bounce) ? getSectionBoundingBox(state, hero) : undefined,
                 actor: hero,
@@ -752,6 +756,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
             hero.grabObject = closestObject;
             hero.lastTouchedObject = closestObject;
+            // TODO: check if we can make the hero hug grabbed objects to always fit through tight spaces.
+            /*const [dx, dy] = directionMap[hero.d];
+            const {mx, my} = moveActor(state, hero, dx, dy, {canFall: true, canSwim: true});
+            console.log('moving towards grabbed object', {mx, my});*/
         }
     }
     if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)

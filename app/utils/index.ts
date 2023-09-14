@@ -37,6 +37,13 @@ export function intersectArea(A: Rect, B: Rect): number {
     return Math.max(0, r - l) * Math.max(0, b - t)
 }
 
+// Get the smallest rectangle that contains both rectangles.
+export function getBoundingRect(A: Rect, B: Rect): Rect {
+    const l = Math.min(A.x, B.x), r = Math.max(A.x + A.w, B.x + B.w);
+    const t = Math.min(A.y, B.y), b = Math.max(A.y + A.h, B.y + B.h);
+    return {x: l, y: t, w: r - l, h: b - t};
+}
+
 export function rectanglesOverlap(A: Rect, B: Rect) {
     return !(A.y + A.h <= B.y || A.y >= B.y + B.h || A.x + A.w <= B.x || A.x >= B.x + B.w);
 }

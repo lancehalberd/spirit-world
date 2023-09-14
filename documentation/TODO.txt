@@ -35,40 +35,12 @@ Graphics:
 
 Current tasks:
     - Fix push/pull interactions with ledges.
-        - Blockers:
-            - Fix pot sometimes fails to move all but down(?), logging : console.log('Failed to move object');
-                ***  ( this appears to be fixed by pixel snapping hitboxes, but that may have unintended consequences)
-                - This appears to happen if the player's hitbox overlaps the pot
-                    - The player successfully moves right
-                        - The pot is blocked by the player being in the way and then wiggles down
-                        - The players movement is swapped to follow the wiggle, since this is valid for the player.
+        - Blockers
+            - Can no longer grab push/pull stairs
         - Minor issues:
             - Pot can render in front of you when standing on ledge above it.
                 - Not sure if this is fixable as it seems to require a real z value to correct.
                 - We should probably just avoid allowing objects to be next to vertical ledges to prevent this.
-
-            - Pot will not wiggle around objects when pulling it sideways
-                - Perhaps we can solve this by doing a single move using the combined hit box of the player+pot
-                    - Make a fake object with the combined hitbox of the two (rectangle containing both hitboxes)
-                        - Move the fake object with the correct rules ignoring both the player+pot as obstacles
-                            - If an object is linked, apply the resulting move to the linked object with no wiggle and use that move result instead
-                            - Apply the final move dx/dy to both the player and the pot.
-                        - Move order should be:
-                            combined object with wiggle
-                                - linked object
-                                    no? apply to pot+hero
-                                    yes? -> try on linked object with wiggle, does result match original move
-                                        yes? -> apply to pot+hero+linked object
-                                        no? -> try new result on combined object without wiggle, does result match linked move
-                                            yes? -> apply to pot/hero/linked object
-                                            no? -> move nothing
-                    - This could run into issues if my movement code does not support larger objects correctly.
-                        - However it appears to be working for 32x32 moving platforms, which should be sufficient for this case.
-
-                - Player moves, but then pot wiggles into the player, which blocks the movement.
-                    - Ideally the player would wiggle with the put instead of blocking the movement, but that would require very different behavior.
-                    - Perhaps we can solve this by: if movement fails normally, rerun the movement with the pot first then the player
-                        - This probably would work because the player can wiggle when moving sideways while pushing the pot.
             - Moving sideways can be blocked in a passage that is exactly 32px wide even though ideally everything would wiggle into place.
                 - The issue is that if the player's subpixel doesn't match the pot, when the pot can no longer move forward, the player is stuck at
                   the subpixel distance. The attempt to wiggle, but the pot has no wiggle room(it is flush with the wall), so the player's movement is aborted.

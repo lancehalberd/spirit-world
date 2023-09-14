@@ -30,9 +30,10 @@ export function canMoveUp(
     let leftCheck: number = L + ((hitbox.w / 2) | 0) - 1;
     let rightCheck: number = leftCheck + 1;
 
-
-    // This limit is here for safety, only ~23 iterations should ever actually run.
-    for (let i = 0; i <= 32; i++) {
+    // The expected max needed is ~1.5x but we use 2x just to be safe.
+    const maxLoops = 2 * (R - L);
+    let i = 0;
+    for (; i <= maxLoops; i++) {
         let x: number;
         let checkingLeft = true;
         if (leftBlock !== undefined && rightBlock !== undefined) {
@@ -292,6 +293,9 @@ export function canMoveUp(
             }
         }
         //console.log(x, isAbove, isUnder);
+    }
+    if (i >= maxLoops) {
+        console.log('canMoveUp: did not finish movement checks');
     }
 
     return true;
