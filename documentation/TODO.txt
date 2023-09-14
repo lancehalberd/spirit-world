@@ -37,7 +37,6 @@ Current tasks:
     - Fix grabbing objects that you are standing over
         - This happens when standing over a ledge and facing either direction along the edge towards a tile/object that is down from the ledge.
         - fix for objects
-        - fix for tiles
 
     - Fix push/pull interactions with ledges.
         - Blockers:

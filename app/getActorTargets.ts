@@ -101,15 +101,32 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
              && actor.area.behaviorGrid[top]?.[column]?.ledges?.left === undefined
              && actor.area.behaviorGrid[top]?.[column - 1]?.ledges?.right === undefined)
         ) {
-            tiles.push({x: column, y: top});
+            if (top === bottom
+                || (actor.d === 'left'
+                     && actor.area.behaviorGrid[top]?.[column + 1]?.ledges?.down !== false
+                     && actor.area.behaviorGrid[bottom]?.[column + 1]?.ledges?.up !== true
+                     )
+                || (actor.d === 'right'
+                     && actor.area.behaviorGrid[top]?.[column - 1]?.ledges?.down !== false
+                     && actor.area.behaviorGrid[bottom]?.[column - 1]?.ledges?.up !== true
+                     )
+            ) {
+                tiles.push({x: column, y: top});
+            }
         }
         if (top !== bottom) {
             if ((actor.d === 'left'
                  && actor.area.behaviorGrid[bottom]?.[column]?.ledges?.right === undefined
-                 && actor.area.behaviorGrid[bottom]?.[column + 1]?.ledges?.left === undefined)
+                 && actor.area.behaviorGrid[bottom]?.[column + 1]?.ledges?.left === undefined
+                 && actor.area.behaviorGrid[top]?.[column + 1]?.ledges?.down !== true
+                 && actor.area.behaviorGrid[bottom]?.[column + 1]?.ledges?.up !== false
+                 )
                 || (actor.d === 'right'
                  && actor.area.behaviorGrid[bottom]?.[column]?.ledges?.left === undefined
-                 && actor.area.behaviorGrid[bottom]?.[column - 1]?.ledges?.right === undefined)
+                 && actor.area.behaviorGrid[bottom]?.[column - 1]?.ledges?.right === undefined
+                 && actor.area.behaviorGrid[top]?.[column - 1]?.ledges?.down !== true
+                 && actor.area.behaviorGrid[bottom]?.[column - 1]?.ledges?.up !== false
+                 )
             ) {
                 tiles.push({x: column, y: bottom});
             }
@@ -125,15 +142,32 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
              && actor.area.behaviorGrid[row]?.[left]?.ledges?.up === undefined
              && actor.area.behaviorGrid[row - 1]?.[left]?.ledges?.down === undefined)
         ) {
-            tiles.push({x: left, y: row});
+            if (left === right
+                || (actor.d === 'up'
+                     && actor.area.behaviorGrid[row + 1]?.[left]?.ledges?.right !== false
+                     && actor.area.behaviorGrid[row +1]?.[right]?.ledges?.left !== true
+                     )
+                || (actor.d === 'down'
+                     && actor.area.behaviorGrid[row -1]?.[left]?.ledges?.right !== false
+                     && actor.area.behaviorGrid[row -1]?.[right]?.ledges?.left !== true
+                     )
+            ) {
+                tiles.push({x: left, y: row});
+            }
         }
         if (left !== right) {
             if ((actor.d === 'up'
                  && actor.area.behaviorGrid[row]?.[right]?.ledges?.down === undefined
-                 && actor.area.behaviorGrid[row + 1]?.[right]?.ledges?.up === undefined)
+                 && actor.area.behaviorGrid[row + 1]?.[right]?.ledges?.up === undefined
+                 && actor.area.behaviorGrid[row + 1]?.[left]?.ledges?.right !== true
+                 && actor.area.behaviorGrid[row + 1]?.[right]?.ledges?.left !== false
+                 )
                 || (actor.d === 'down'
                  && actor.area.behaviorGrid[row]?.[right]?.ledges?.up === undefined
-                 && actor.area.behaviorGrid[row - 1]?.[right]?.ledges?.down === undefined)
+                 && actor.area.behaviorGrid[row - 1]?.[right]?.ledges?.down === undefined
+                 && actor.area.behaviorGrid[row - 1]?.[left]?.ledges?.right !== true
+                 && actor.area.behaviorGrid[row - 1]?.[right]?.ledges?.left !== false
+                 )
             ) {
                 tiles.push({x: right, y: row});
             }
