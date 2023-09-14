@@ -216,12 +216,12 @@ export class Hero implements Actor {
     getHitbox(state?: GameState): Rect {
         if (this.hasBarrier) {
             const p = 4;
-            return { x: this.x - p, y: this.y - p, w: this.w + 2 * p, h: this.h + 2 * p };
+            return { x: (this.x - p) | 0, y: (this.y - p) | 0, w: this.w + 2 * p, h: this.h + 2 * p };
         }
-        return { x: this.x, y: this.y, w: this.w, h: this.h };
+        return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
     }
     getMovementHitbox(this: Hero, state?: GameState): Rect {
-        return { x: this.x, y: this.y, w: this.w, h: this.h };
+        return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
     }
 
     overlaps(this: Hero, target: Rect | {getHitbox: () => Rect}) {

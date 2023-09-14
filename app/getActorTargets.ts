@@ -1,27 +1,75 @@
 import { Hero } from 'app/content/hero';
-import { isPointInShortRect } from 'app/utils/index';
+import { getTileBehaviors } from 'app/utils/field';
+import { isPixelInShortRect } from 'app/utils/index';
 
 export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoords[], objects: ObjectInstance[]} {
     const tileSize = 16;
     const objects: ObjectInstance[] = []
     const tiles: TileCoords[] = []
+    const hitbox = actor.getHitbox();
 
-    const checkPoints: {x: number, y: number}[] = [];
+    // ax/ay are an alternate point that get checked for a ledge. We have to check
+    // for ledges on both the x/y and ax/ay tiles to see if a ledge is blocking grabbing.
+    const checkPoints: {x: number, y: number, ax: number, ay: number}[] = [];
+    // Adds check points for a given direction provided there are no ledges in the way.
+    function addCheckPoint(d: Direction, point: {x: number, y: number, ax: number, ay: number}) {
+        let behaviors = getTileBehaviors(state, actor.area, {x: point.x, y: point.y}).tileBehavior;
+        // Cannot have opposite ledge of the tile we are facing into.
+        if (d === 'left' && behaviors?.ledges?.right !== undefined) {
+            return;
+        }
+        if (d === 'right' && behaviors?.ledges?.left !== undefined) {
+            return;
+        }
+        if (d === 'up' && behaviors?.ledges?.down !== undefined) {
+            return;
+        }
+        if (d === 'down' && behaviors?.ledges?.up !== undefined) {
+            return;
+        }
+        behaviors = getTileBehaviors(state, actor.area, {x: point.ax, y: point.ay}).tileBehavior;
+        // Cannot have the same ledge of the tile we are facing out of.
+        if (d === 'left' && behaviors?.ledges?.left !== undefined) {
+            return;
+        }
+        if (d === 'right' && behaviors?.ledges?.right !== undefined) {
+            return;
+        }
+        if (d === 'up' && behaviors?.ledges?.up !== undefined) {
+            return;
+        }
+        if (d === 'down' && behaviors?.ledges?.down !== undefined) {
+            return;
+        }
+        checkPoints.push(point);
+    }
     if (actor.d === 'left') {
-        checkPoints.push({x: actor.x - 2, y: actor.y});
-        checkPoints.push({x: actor.x - 2, y: actor.y + actor.h - 1});
+        let x = hitbox.x - 2;
+        let y = hitbox.y + 3;
+        addCheckPoint('left', {x, y, ax: x + 8, ay: y});
+        y = hitbox.y + hitbox.h - 4;
+        addCheckPoint('left', {x, y, ax: x + 8, ay: y});
     }
     if (actor.d === 'right') {
-        checkPoints.push({x: actor.x + actor.w + 1, y: actor.y});
-        checkPoints.push({x: actor.x + actor.w + 1, y: actor.y + actor.h - 1});
+        let x = hitbox.x + hitbox.w + 1;
+        let y = hitbox.y + 3;
+        addCheckPoint('right', {x, y, ax: x - 8, ay: y});
+        y = hitbox.y + hitbox.h - 4;
+        addCheckPoint('right', {x, y, ax: x - 8, ay: y});
     }
     if (actor.d === 'up') {
-        checkPoints.push({x: actor.x, y: actor.y - 2});
-        checkPoints.push({x: actor.x + actor.w - 1, y: actor.y - 2});
+        let x = hitbox.x + 3;
+        let y = hitbox.y - 2;
+        addCheckPoint('up', {x, y, ax: x, ay: y + 8});
+        x = hitbox.x + hitbox.w - 4;
+        addCheckPoint('up', {x, y, ax: x, ay: y + 8});
     }
     if (actor.d === 'down') {
-        checkPoints.push({x: actor.x, y: actor.y + actor.h + 1});
-        checkPoints.push({x: actor.x + actor.w - 1, y: actor.y + actor.h + 1});
+        let x = hitbox.x + 3;
+        let y = hitbox.y + hitbox.h + 1;
+        addCheckPoint('down', {x, y, ax: x, ay: y - 8});
+        x = hitbox.x + hitbox.w - 4;
+        addCheckPoint('down', {x, y, ax: x, ay: y - 8});
     }
 
     for (const object of actor.area.objects.filter(o => o.getHitbox)) {
@@ -34,7 +82,8 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         }
         const hitbox = object.getHitbox(state);
         for (const point of checkPoints) {
-            if (isPointInShortRect(point.x, point.y, hitbox)) {
+
+            if (isPixelInShortRect(point.x, point.y, hitbox)) {
                 objects.push(object);
             }
         }
@@ -44,7 +93,16 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         const column = Math.floor((actor.d === 'left' ? (actor.x - 2) : (actor.x + actor.w + 2)) / tileSize);
         const top = Math.floor(actor.y / tileSize);
         const bottom = Math.floor((actor.y + actor.h - 1) / tileSize);
-        tiles.push({x: column, y: top});
+        // TODO: Repeat this 3 more times below
+        if ((actor.d === 'left'
+             && actor.area.behaviorGrid[top]?.[column]?.ledges?.right === undefined
+             && actor.area.behaviorGrid[top]?.[column + 1]?.ledges?.left === undefined)
+            || (actor.d === 'right'
+             && actor.area.behaviorGrid[top]?.[column]?.ledges?.left === undefined
+             && actor.area.behaviorGrid[top]?.[column - 1]?.ledges?.right === undefined)
+        ) {
+            tiles.push({x: column, y: top});
+        }
         if (top !== bottom) {
             tiles.push({x: column, y: bottom});
         }

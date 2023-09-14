@@ -6,65 +6,69 @@ import { pad } from 'app/utils/index';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     let sx = dx;
-    if (sx < -1){
-        sx = -1;
-    } else if(sx > 1) {
-        sx = 1;
-    }
     let sy = dy;
-    if (sy < -1){
-        sy = -1;
-    } else if(sy > 1) {
-        sy = 1;
-    }
     let mx = 0, my = 0;
     let s = 0;
     const fullDirection = getDirection(dx, dy, true);
     while (s < 100) {
-        let movedX = false, movedY = false;
+        let moved = false;
         if (sx) {
             // You can't push when moving diagonally.
+            // To support this we would need to:
+            // 1. Set the direction to match which way they are pushing.
+            // 2. Make sure the push is smooth
+            // 3. Make sure the push animation is continuous.
+            // Even solving all problems, the player will slide against the pushed objects which isn't great.
+            // A better solution is probably to allow pushing diagonally if the player can only move in one direction anyway,
+            // but this is tricky because we don't have the information to determine this when we are moving in a single dimension.
             const d = (sx < 0) ? 'left' : 'right';
-            movedX = moveActorInDirection(state, actor, sx, d, {
+            // Move at most one pixel at a time.
+            const amount = (sx < -1) ? -1 : (sx > 1 ? 1 : sx);
+            const result = moveActorInDirection(state, actor, amount, d, {
                 ...movementProperties,
                 canPush: movementProperties.canPush && d === fullDirection,
                 canWiggle: (movementProperties.canWiggle ?? true) && !dy,
                 excludedObjects: movementProperties.excludedObjects || new Set()
             });
-            if (movedX) {
-                mx += sx;
-                if (sx > -1 && sx < 1) {
-                    sx = 0;
+            if (result.mx || result.my) {
+                moved = true;
+                mx += result.mx;
+                my += result.my;
+                if (sx <= -1) {
+                    sx++;
+                } else if(sx >= 1) {
+                    sx--;
                 } else {
-                    const delta = Math.abs(dx - mx);
-                    if (delta < 1) {
-                        sx *= delta;
-                    }
+                    sx = 0;
                 }
             }
         }
         if (sy) {
             // You can't push when moving diagonally.
+            // See above for details.
             const d = (sy < 0) ? 'up' : 'down';
-            movedY = moveActorInDirection(state, actor, sy, d, {
+            // Move at most one pixel at a time.
+            const amount = (sy < -1) ? -1 : (sy > 1 ? 1 : sy);
+            const result = moveActorInDirection(state, actor, amount, d, {
                 ...movementProperties,
                 canPush: movementProperties.canPush && d === fullDirection,
                 canWiggle: (movementProperties.canWiggle ?? true) && !dx,
                 excludedObjects: movementProperties.excludedObjects || new Set()
             });
-            if (movedY) {
-                my += sy;
-                if (sy > -1 && sy < 1) {
-                    sy = 0;
+            if (result.mx || result.my) {
+                moved = true;
+                mx += result.mx;
+                my += result.my;
+                if (sy <= -1) {
+                    sy++;
+                } else if(sy >= 1) {
+                    sy--;
                 } else {
-                    const delta = Math.abs(dy - my);
-                    if (delta < 1) {
-                        sy *= delta;
-                    }
+                    sy = 0;
                 }
             }
         }
-        if (!movedX && !movedY) {
+        if (!moved) {
             return {mx, my};
         }
     }
@@ -80,9 +84,9 @@ function moveActorInDirection(
     amount: number,
     direction: Direction,
     movementProperties: MovementProperties
-): boolean {
+): {mx: number, my: number} {
     if (actor.action === 'jumpingDown') {
-        return false;
+        return {mx: 0, my: 0};
     }
     const excludedObjects = new Set<any>([...movementProperties.excludedObjects, actor]);
     if (actor.pickUpObject) {
@@ -109,18 +113,18 @@ function moveActorInDirection(
             || (hitbox.y < boundingBox.y && direction === 'up')
             || (hitbox.y + hitbox.h > boundingBox.y + boundingBox.h && direction === 'down')
         ) {
-            return false;
+            return {mx: 0, my: 0};
         }
     }
     actor.ignoreLedges = false;
-    let result = false;
+    let result = {mx: 0, my: 0};
     if (direction === 'up') {
         result = moveUp(state, actor, movementProperties, -amount);
     }
     if (direction === 'left') {
         result = moveLeft(state, actor, movementProperties, -amount);
     }
-    if (direction === 'down') {
+    if (direction === 'down' ) {
         result = moveDown(state, actor, movementProperties, amount);
     }
     if (direction === 'right') {
@@ -150,6 +154,7 @@ function moveActorInDirection(
             // Actor shouldn't be touching the ground when they start jumping down.
             actor.z = Math.max(actor.z, 1);
             actor.isAirborn = true;
+            actor.grabObject = null;
         }
     }
     return result;

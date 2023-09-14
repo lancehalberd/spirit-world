@@ -48,12 +48,12 @@ dialogueHash.rival = {
                     hero.d = 'up';
                     hero.action = 'walking';
                     hero.animationTime += FRAME_LENGTH;
-                    const {my} = moveActor(state, hero, 0, -1, {
+                    const {mx, my} = moveActor(state, hero, 0, -1, {
                         canSwim: true,
                         canJump: true,
                         direction: 'up',
                     });
-                    if (!my || hero.y <= 96) {
+                    if ((!mx && !my) || hero.y <= 96) {
                         hero.action = null;
                         return false;
                     }

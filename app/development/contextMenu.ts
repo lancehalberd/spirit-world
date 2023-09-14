@@ -10,7 +10,7 @@ import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
 import { mainCanvas } from 'app/utils/canvas';
 import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
-import { getElementRectangle } from 'app/utils/index';
+import { getElementRectangle, isPointInShortRect } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { saveSettings } from 'app/utils/saveSettings';
 import { toggleAllSounds, updateSoundSettings } from 'app/utils/soundSettings';
@@ -140,6 +140,19 @@ export function getContextMenu(): MenuOption[] {
                 const sx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
                 const sy = Math.floor((state.camera.y + lastContextClick[1]) / 16);
                 console.log(state.areaInstance.behaviorGrid?.[sy]?.[sx]);
+            }
+        });
+        options.push({
+            label: 'Log Object',
+            onSelect() {
+                const state = getState();
+                const x = (state.camera.x + lastContextClick[0]);
+                const y = (state.camera.y + lastContextClick[1]);
+                for (const object of state.areaInstance.objects) {
+                    if (isPointInShortRect(x, y, object.getHitbox())) {
+                        console.log(object);
+                    }
+                }
             }
         });
     }

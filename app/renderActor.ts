@@ -93,6 +93,9 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
                 // are grabbing even though it won't move.
                 animations = hero.wading ? heroShallowAnimations.pull : heroAnimations.pull;
                 return getFrame(animations[hero.d], hero.animationTime);
+            } else if (kdx || kdy) {
+                lastPullAnimation = hero.wading ? heroShallowAnimations.push : heroAnimations.push;
+                return getFrame(lastPullAnimation[hero.d], hero.animationTime);
             }
             // If the player continously pushes/pulls there is one frame that isn't set correctly,
             // so we use this to play that last animation for an extra frame.

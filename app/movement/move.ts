@@ -9,7 +9,7 @@ export function moveUp(
     object: ObjectInstance | EffectInstance,
     movementProperties: MovementProperties,
     amount: number
-): boolean {
+): {mx: number, my: number} {
     const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.y | 0) === ((hitbox.y - amount) | 0)) {
@@ -17,31 +17,39 @@ export function moveUp(
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
-        return true;
+        return {mx: 0, my: -amount};
     }
     const result = canMoveUp(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.y -= amount;
         checkToStopPushing(state, object);
-        return true;
+        return {mx: 0, my: -amount};
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
         checkToPushObject(state, object as Hero, result.pushedObjects, 'up', movementProperties);
-        return false;
+        return {mx: 0, my: 0};
     }
     if (result.wiggle === 'right') {
-        return moveRight(state, object, {
+        const wiggleResult = moveRight(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'up', movementProperties);
     }
     if (result.wiggle === 'left') {
-        return moveLeft(state, object, {
+        const wiggleResult = moveLeft(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'up', movementProperties);
     }
-    return false;
+    return {mx: 0, my: 0};
 }
 
 export function moveLeft(
@@ -49,7 +57,7 @@ export function moveLeft(
     object: ObjectInstance | EffectInstance,
     movementProperties: MovementProperties,
     amount: number
-): boolean {
+): {mx: number, my: number} {
     const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.x | 0) === ((hitbox.x - amount) | 0)) {
@@ -57,31 +65,39 @@ export function moveLeft(
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
-        return true;
+        return {mx: -amount, my: 0};
     }
     const result = canMoveLeft(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.x -= amount;
         checkToStopPushing(state, object);
-        return true;
+        return {mx: -amount, my: 0};
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
         checkToPushObject(state, object as Hero, result.pushedObjects, 'left', movementProperties);
-        return false;
+        return {mx: 0, my: 0};
     }
     if (result.wiggle === 'down') {
-        return moveDown(state, object, {
+        const wiggleResult = moveDown(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'left', movementProperties);
     }
     if (result.wiggle === 'up') {
-        return moveUp(state, object, {
+        const wiggleResult = moveUp(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'left', movementProperties);
     }
-    return false;
+    return {mx: 0, my: 0};
 }
 
 export function moveDown(
@@ -89,7 +105,7 @@ export function moveDown(
     object: ObjectInstance | EffectInstance,
     movementProperties: MovementProperties,
     amount: number
-): boolean {
+): {mx: number, my: number} {
     const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.y | 0) === ((hitbox.y + amount) | 0)) {
@@ -97,31 +113,39 @@ export function moveDown(
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
-        return true;
+        return {mx: 0, my: amount};
     }
     const result = canMoveDown(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.y += amount;
         checkToStopPushing(state, object);
-        return true;
+        return {mx: 0, my: amount};
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
         checkToPushObject(state, object as Hero, result.pushedObjects, 'down', movementProperties);
-        return false;
+        return {mx: 0, my: 0};
     }
     if (result.wiggle === 'right') {
-        return moveRight(state, object, {
+        const wiggleResult = moveRight(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'down', movementProperties);
     }
     if (result.wiggle === 'left') {
-        return moveLeft(state, object, {
+        const wiggleResult = moveLeft(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'down', movementProperties);
     }
-    return false;
+    return {mx: 0, my: 0};
 }
 
 export function moveRight(
@@ -129,7 +153,7 @@ export function moveRight(
     object: ObjectInstance | EffectInstance,
     movementProperties: MovementProperties,
     amount: number
-): boolean {
+): {mx: number, my: number} {
     const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.x | 0) === ((hitbox.x + amount) | 0)) {
@@ -137,31 +161,39 @@ export function moveRight(
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
-        return true;
+        return {mx: amount, my: 0};
     }
     const result = canMoveRight(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.x += amount;
         checkToStopPushing(state, object);
-        return true;
+        return {mx: amount, my: 0};
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
         checkToPushObject(state, object as Hero, result.pushedObjects, 'right', movementProperties);
-        return false;
+        return {mx: 0, my: 0};
     }
     if (result.wiggle === 'down') {
-        return moveDown(state, object, {
+        const wiggleResult = moveDown(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'right', movementProperties);
     }
     if (result.wiggle === 'up') {
-        return moveUp(state, object, {
+        const wiggleResult = moveUp(state, object, {
             ...movementProperties,
             canWiggle: false,
         }, amount);
+        if (wiggleResult.my || wiggleResult.mx) {
+            return wiggleResult;
+        }
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'right', movementProperties);
     }
-    return false;
+    return {mx: 0, my: 0};
 }
 
 function checkToStopPushing(
@@ -185,7 +217,7 @@ function checkToPushObject(
     }
     if (!actorObject.action || actorObject.action === 'walking') {
         actorObject.action = 'pushing';
-        actorObject.animationTime = 0;
+        // actorObject.animationTime = 0;
     }
     if (!pushedObjects || actorObject.action !== 'pushing') {
         return;
