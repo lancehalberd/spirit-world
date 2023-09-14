@@ -54,6 +54,8 @@ export const FALLING_HEIGHT = MAX_FLOAT_HEIGHT + MAX_FLOOR_HEIGHT + 1;
 
 export const RIVAL_NAME = 'Saru';
 
+export const CHAKRAM_2_NAME = 'Golden Chakram';
+
 export const entranceSeed = readGetParameterAsInt('entranceSeed');
 // Entrance randomizer may not be completable with randomized items, so item randomizer
 // defaults to the entrance seed if one is not set.

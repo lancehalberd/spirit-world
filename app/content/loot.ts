@@ -1,3 +1,4 @@
+import { CHAKRAM_2_NAME } from 'app/gameConstants';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -79,7 +80,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             if (lootLevel === 1) {
                 return 'Chakram';
             }
-            return 'Golden Chakram';
+            return CHAKRAM_2_NAME;
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
@@ -165,9 +166,9 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 return `Press [B_WEAPON] to throw the Chakram.
                     {|}Use it to defeat enemies or destroy some obstacles.`;
             }
-            return `The Spirit Chakram has improved range and damage.
+            return `The ${CHAKRAM_2_NAME} has improved range and damage.
                 {|}But don't throw away your old Chakram just yet!
-                {|}After throwing the Spirit Chakram, quickly press [B_WEAPON] again
+                {|}After throwing the ${CHAKRAM_2_NAME}, quickly press [B_WEAPON] again
                 to throw your normal Chakram at the same time!`;
         case 'bow':
             if (state.hero.savedData.activeTools.bow === 1) {

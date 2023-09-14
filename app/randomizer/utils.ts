@@ -4,7 +4,7 @@ import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/lootEffects';
 import { getZone, zones } from 'app/content/zones';
 
-import { randomizerGoal, randomizerGoalType, randomizerTotal } from 'app/gameConstants';
+import { CHAKRAM_2_NAME, randomizerGoal, randomizerGoalType, randomizerTotal } from 'app/gameConstants';
 
 import { allNodes } from 'app/randomizer/allNodes';
 import { addCheck } from 'app/randomizer/checks';
@@ -598,7 +598,7 @@ function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState
     }
     if (lootType === 'weapon') {
         if (state.hero.savedData.weapon) {
-            return 'Spirit Chakram';
+            return CHAKRAM_2_NAME;
         }
         return 'Chakram';
     }

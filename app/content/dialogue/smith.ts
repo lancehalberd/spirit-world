@@ -1,6 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { CHAKRAM_2_NAME } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
-
 
 dialogueHash.citySmith = {
     key: 'citySmith',
@@ -113,7 +113,7 @@ dialogueHash.forgeSmith = {
             if (state.hero.savedData.weaponUpgrades.spiritDamage) {
                 return `{@forgeSmith.range}`;
             }
-            return `I can upgrade your Spirit Chakram if you can find Gold Ore.
+            return `I can upgrade your ${CHAKRAM_2_NAME} if you can find Gold Ore.
                 {choice:Upgrade Chakram?|Range:forgeSmith.range|Damage:forgeSmith.damage|No:forgeSmith.no}`;
         },
         range: `I need 200 Jade, 1 Gold Ore and 2 Silver Ore to upgrade your range.
