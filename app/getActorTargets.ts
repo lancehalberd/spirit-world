@@ -78,18 +78,21 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         }
     }
 
-    for (const object of actor.area.objects.filter(o => o.getHitbox)) {
-        if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-            continue;
-        }
-        // thrown clones are not interactive or solid.
-        if (object instanceof Hero && object.action === 'thrown') {
-            continue;
-        }
-        const hitbox = object.getHitbox(state);
-        for (const point of usedCheckPoints) {
-            if (isPixelInShortRect(point.x, point.y, hitbox)) {
-                objects.push(object);
+    for (const baseObject of actor.area.objects) {
+        for (const object of [baseObject, ...(baseObject.getParts?.(state) || [])].filter(o => o.getHitbox)) {
+            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                continue;
+            }
+            // thrown clones are not interactive or solid.
+            if (object instanceof Hero && object.action === 'thrown') {
+                continue;
+            }
+            const hitbox = object.getHitbox();
+            for (const point of usedCheckPoints) {
+                if (isPixelInShortRect(point.x, point.y, hitbox)) {
+                    objects.push(object);
+                    break;
+                }
             }
         }
     }

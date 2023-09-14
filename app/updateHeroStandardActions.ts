@@ -207,6 +207,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.vy = 0;
         if (hero.grabObject && (hero.grabObject.area !== hero.area || !getActorTargets(state, hero).objects.includes(hero.grabObject))) {
             hero.action = null;
+            // console.log(hero.grabObject);
+            // console.log('grab object no longer a target', hero.x, hero.y, hero.d);
             hero.grabObject = null;
         } else if (hero.grabObject?.pullingHeroDirection) {
             dx = directionMap[hero.grabObject.pullingHeroDirection][0];
@@ -257,54 +259,6 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                         }
                     }
                 }
-
-
-                /*const points = [0, 5, 10, 15];
-                // There is special logic for pushing in the direction the hero is facing since we expect that
-                // direction to be blocked by the object they are grabbing.
-                const excludedObjects = new Set([hero.grabObject]);
-                if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
-                    || points.every(x => points.every(y => isPointOpen(state, hero.area,
-                        {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] },
-                        { canFall: true, canSwim: true, excludedObjects },
-                    )))
-                ) {
-                    hero.grabObject.onPull(state, direction, hero);
-                } else {
-                    const wiggleDistance = 14;
-                    // If the player is not positioned correctly to pull the object, instead of pulling,
-                    // attempt to wiggle them in better alignment with the object.
-                    if (hero.x > hero.grabObject.x - wiggleDistance && hero.x < hero.grabObject.x) {
-                        dx = Math.min(1, hero.grabObject.x - hero.x);
-                        // Movement code will be ignored for dx values < 0.2, so just snap the character
-                        if (dx <= 0.25) {
-                            hero.x = hero.grabObject.x;
-                            dx = 0
-                        }
-                    } else if (hero.x < hero.grabObject.x + wiggleDistance && hero.x > hero.grabObject.x) {
-                        dx = Math.max(-1, hero.grabObject.x - hero.x);
-                        // Movement code will be ignored for dx values < 0.2, so just snap the character
-                        if (dx >= -0.25) {
-                            hero.x = hero.grabObject.x;
-                            dx = 0
-                        }
-                    }
-                    if (hero.y > hero.grabObject.y - wiggleDistance && hero.y < hero.grabObject.y) {
-                        dy = Math.min(1, hero.grabObject.y - hero.y);
-                        // Movement code will be ignored for dx values < 0.2, so just snap the character
-                        if (dy <= 0.25) {
-                            hero.y = hero.grabObject.y;
-                            dy = 0
-                        }
-                    } else if (hero.y < hero.grabObject.y + wiggleDistance && hero.y > hero.grabObject.y) {
-                        dy = Math.max(-1, hero.grabObject.y - hero.y);
-                        // Movement code will be ignored for dx values < 0.2, so just snap the character
-                        if (dy >= -0.25) {
-                            hero.y = hero.grabObject.y;
-                            dy = 0
-                        }
-                    }
-                }*/
             }
         }
     }
@@ -701,27 +655,25 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
         }
-        for (const baseObject of objects) {
-            for (const object of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
-                if (object === hero) {
-                    continue;
-                }
-                const behavior = getObjectBehaviors(state, object);
-                if (behavior?.solid) {
-                    hero.action = 'grabbing';
-                }
-                if (object.getHitbox && (behavior?.solid || object.onGrab)) {
-                    const frame = object.getHitbox(state);
-                    // This is an unusual distance, but should do what we want still.
-                    const distance = (
-                        Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
-                        Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
-                    );
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestObject = object;
-                        closestLiftableTileCoords = null;
-                    }
+        for (const object of objects) {
+            if (object === hero) {
+                continue;
+            }
+            const behavior = getObjectBehaviors(state, object);
+            if (behavior?.solid) {
+                hero.action = 'grabbing';
+            }
+            if (object.getHitbox && (behavior?.solid || object.onGrab)) {
+                const frame = object.getHitbox(state);
+                // This is an unusual distance, but should do what we want still.
+                const distance = (
+                    Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
+                    Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
+                );
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestObject = object;
+                    closestLiftableTileCoords = null;
                 }
             }
         }
