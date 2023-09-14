@@ -104,15 +104,39 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
             tiles.push({x: column, y: top});
         }
         if (top !== bottom) {
-            tiles.push({x: column, y: bottom});
+            if ((actor.d === 'left'
+                 && actor.area.behaviorGrid[bottom]?.[column]?.ledges?.right === undefined
+                 && actor.area.behaviorGrid[bottom]?.[column + 1]?.ledges?.left === undefined)
+                || (actor.d === 'right'
+                 && actor.area.behaviorGrid[bottom]?.[column]?.ledges?.left === undefined
+                 && actor.area.behaviorGrid[bottom]?.[column - 1]?.ledges?.right === undefined)
+            ) {
+                tiles.push({x: column, y: bottom});
+            }
         }
     } else if (actor.d === 'up' || actor.d === 'down') {
         const row = Math.floor((actor.d === 'up' ? (actor.y - 2) : (actor.y + actor.h + 2)) / tileSize);
         const left = Math.floor((actor.x) / tileSize);
         const right = Math.floor((actor.x + actor.w - 1) / tileSize);
-        tiles.push({x: left, y: row});
+        if ((actor.d === 'up'
+             && actor.area.behaviorGrid[row]?.[left]?.ledges?.down === undefined
+             && actor.area.behaviorGrid[row + 1]?.[left]?.ledges?.up === undefined)
+            || (actor.d === 'down'
+             && actor.area.behaviorGrid[row]?.[left]?.ledges?.up === undefined
+             && actor.area.behaviorGrid[row - 1]?.[left]?.ledges?.down === undefined)
+        ) {
+            tiles.push({x: left, y: row});
+        }
         if (left !== right) {
-            tiles.push({x: right, y: row});
+            if ((actor.d === 'up'
+                 && actor.area.behaviorGrid[row]?.[right]?.ledges?.down === undefined
+                 && actor.area.behaviorGrid[row + 1]?.[right]?.ledges?.up === undefined)
+                || (actor.d === 'down'
+                 && actor.area.behaviorGrid[row]?.[right]?.ledges?.up === undefined
+                 && actor.area.behaviorGrid[row - 1]?.[right]?.ledges?.down === undefined)
+            ) {
+                tiles.push({x: right, y: row});
+            }
         }
     }
 

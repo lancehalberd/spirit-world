@@ -40,8 +40,13 @@ Current tasks:
     - Replace hint with new hint about rolling rocks to damage enemies.
         "You can roll bolders over enemies to damage them."
 
-    - Fix grabbing across ledges
-        - Prevent picking up tiles across ledges.
+    - Fix grabbing objects that you are standing over
+        - This happens when standing over a ledge and facing either direction along the edge towards a tile/object that is down from the ledge.
+        - fix for objects
+        - fix for tiles
+
+    - Minor issue with ledges
+        - Should be able to grab ledges when below them just like you can grab solid tiles.
 
     - Fix push/pull interactions with ledges.
         - Blockers:
