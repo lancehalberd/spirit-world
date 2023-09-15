@@ -27,12 +27,14 @@ export class AirStream implements ObjectInstance {
     d: Direction;
     status: ObjectStatus = 'normal';
     animationTime = 0;
+    airLength: number;
     constructor(state: GameState, definition: AirStreamDefinition) {
         this.definition = definition;
         this.status = this.definition.status || 'normal';
         this.x = definition.x;
         this.y = definition.y;
         this.d = definition.d;
+        this.airLength = definition.length || maxLength;
         // Activating an air stream will toggle it from its default behavior.
         if (getObjectStatus(state, this.definition)) {
             this.status = (this.definition.status === 'normal') ? 'off' : 'normal';
@@ -45,7 +47,7 @@ export class AirStream implements ObjectInstance {
         let blockedPoint: {x: number, y: number};
         const [dx, dy] = directionMap[this.d];
         const cx = this.x + 8, cy = this.y + 8;
-        for (length = 16; length < maxLength; length += 8) {
+        for (length = 16; length < this.airLength; length += 8) {
             const x = cx + length * dx;
             const y = cy + length * dy;
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y});
@@ -57,7 +59,7 @@ export class AirStream implements ObjectInstance {
                 // 18 seems to work well. If we run into problems with this, we should reduce this to +8 and the
                 // change the calculation for windForce to be based on the amount of edge exposed to the airFlow
                 // rather than the overlapping area.
-                length = Math.min(maxLength, length + 18);
+                length = Math.min(this.airLength, length + 18);
                 break;
             }
         }
@@ -87,7 +89,7 @@ export class AirStream implements ObjectInstance {
         // This makes the number of particles proportional to the size of the air stream, which
         // makes the particle density consistent across different sized air streams.
         // It is based on 1 particle every 20ms for a max length air stream.
-        /*const interval = ((20 * 16 * maxLength / effectHitbox.h / effectHitbox.w / 20) | 0) * 20;
+        /*const interval = ((20 * 16 * this.airLength / effectHitbox.h / effectHitbox.w / 20) | 0) * 20;
         if (this.animationTime % interval === 0) {
             addWindParticle(state, this.area, this);
         }*/

@@ -28,6 +28,7 @@ export * from 'app/content/objects/spikeBall';
 export * from 'app/content/objects/teleporter';
 export * from 'app/content/objects/tippableObject';
 export * from 'app/content/objects/torch';
+export * from 'app/content/objects/trampoline';
 export * from 'app/content/objects/vineSprout';
 export * from 'app/content/objects/wallTurret';
 export * from 'app/content/objects/waterfall';

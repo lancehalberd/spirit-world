@@ -433,6 +433,7 @@ interface TurretDefinition extends BaseObjectDefinition {
 }
 interface AirStreamDefinition extends BaseObjectDefinition {
     type: 'airStream'
+    length?: number
     onInterval?: number
     offInterval?: number
 }
@@ -509,7 +510,7 @@ interface NPCDefinition extends BaseObjectDefinition {
 type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret'
     | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
-    | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
+    | 'tippable' | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';
 
 interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType

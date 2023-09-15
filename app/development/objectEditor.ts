@@ -171,7 +171,8 @@ export function getObjectTypeProperties(): PanelRows {
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
+    'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall',
+    'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
 
@@ -215,6 +216,7 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 type: definition.type,
                 d: definition.d || 'down',
+                length: definition.length || 192,
                 offInterval: definition.offInterval,
                 onInterval: definition.onInterval,
             };
@@ -419,6 +421,7 @@ export function createObjectDefinition(
         case 'shieldingUnit':
         case 'tippable':
         case 'torch':
+        case 'trampoline':
         case 'vineSprout':
         case 'waterPot':
             return {
@@ -966,6 +969,15 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             break;
         case 'airStream':
             rows.push(getDirectionFields(state, object));
+            rows.push({
+                name: 'length',
+                value: object.length || 192,
+                onChange(length: number) {
+                    length = Math.min(length, 192);
+                    object.length = length;
+                    updateObjectInstance(state, object);
+                },
+            });
             rows.push({
                 name: 'onInterval',
                 value: object.onInterval || 0,

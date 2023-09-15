@@ -17,7 +17,7 @@ import {
 } from 'app/render/heroAnimations';
 import {
     getHeroFrame, renderCarriedTile,
-    renderExplosionRing, renderHeroBarrier,
+    renderExplosionRing, renderHeroBarrier, renderHeroShadow,
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
@@ -529,6 +529,12 @@ export class Hero implements Actor {
         ) {
             this.render(context, state);
         }
+        const isOverTrampoline = (this.action === 'jumpingDown' && this.area.objects.find(o => o.definition?.type === 'trampoline' && this.overlaps((o as Trampoline).getFrameHitbox()) ));
+        if (isOverTrampoline) {
+            renderHeroShadow(context, state, this);
+            this.render(context, state);
+        }
+
     }
 
     renderHeroFrame(this: Hero, context: CanvasRenderingContext2D, state: GameState): Frame {

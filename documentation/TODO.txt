@@ -34,24 +34,32 @@ Graphics:
 
 
 Current tasks:
+    - Improvements prioritized for new helix dungeon:
+        - Allow hitting crusher enemies with thrown stones.
+        - Make sure turrets render correctly when damaged (they are missing the top for some reason).
+            - Instead of using an animation effect, just call the regular render of the enemy using 0.3 alpha in `alternateRender` if enemyInvulnerableFrames > 0.
+        - Allow throwing rocks diagonally.
+        - Fix jumping south to only land on the next immediate tile if southernFacingWall is < 32px
+        - Fix jumping north into a southern facing wall should stop the movement and not land inside the wall.
+
+    - Bug fixes
+        - Move money prize to larger platform so you don't fall in pits
+        - different sliding on ice with roll depending on where you start/land
+            -Was from stationary in War Temple with patches of ice.
+        - astral projection skip for iron skin
+            - Should make dialogue unavailable unless it has a specific astral projection flag.
+
+    - Move railing connector bits to `field2` by default.
+
     - Fix push/pull interactions with ledges.
-        - Blockers
-            - Can no longer grab push/pull stairs
         - Minor issues:
             - Pot can render in front of you when standing on ledge above it.
                 - Not sure if this is fixable as it seems to require a real z value to correct.
                 - We should probably just avoid allowing objects to be next to vertical ledges to prevent this.
             - Moving sideways can be blocked in a passage that is exactly 32px wide even though ideally everything would wiggle into place.
+                - This is pretty uncommon but can still happen even with code to move the player towards objects on grab.
                 - The issue is that if the player's subpixel doesn't match the pot, when the pot can no longer move forward, the player is stuck at
                   the subpixel distance. The attempt to wiggle, but the pot has no wiggle room(it is flush with the wall), so the player's movement is aborted.
-
-    - Improve helix
-        - Allow throwing rocks diagonally.
-        - Make sure turrets render correctly when damaged (they are missing the top for some reason).
-            - Instead of using an animation effect, just call the regular render of the enemy using 0.3 alpha in `alternateRender` if enemyInvulnerableFrames > 0.
-        - Switch to wooden graphics
-        - Make area size at least 40x40 if not 48x48
-        - Add additional checks
 
     - Fix doors closed as you walk into them.
         - Good example is walking into the key room NW from the big chest in tomb.

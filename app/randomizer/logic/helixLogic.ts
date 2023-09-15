@@ -1,12 +1,15 @@
 import {
     andLogic,
-    canCross2Gaps,
     canCross6Gaps,
-    hasAstralProjection,
+    hasGloves,
+    hasStaff,
     canRemoveLightStones,
+    hasMediumRange,
+    hasFire,
     hasSomersault,
     canUseTeleporters,
     hasTeleportation,
+    hasWeapon,
     orLogic,
 } from 'app/content/logic';
 
@@ -16,116 +19,119 @@ const zoneId = 'helix';
 export const helixNodes: LogicNode[] = [
     {
         zoneId,
-        nodeId: 'helixEntrance',
+        nodeId: 'helix1',
+        checks: [{objectId: 'helixBigChest'}],
         paths: [
-            {nodeId: 'helixEntranceStaff', logic: andLogic(canCross6Gaps, canRemoveLightStones)},
-            {nodeId: 'helixEntrancePortal', logic: andLogic(canCross6Gaps, canRemoveLightStones)},
+            // You must stand on the staff while picking up stones to reach the portal to the spirit world.
+            {nodeId: 'spiritHelix1', logic: andLogic(canUseTeleporters, hasStaff, hasGloves)},
         ],
         entranceIds: ['helixEntrance', 'helixStairs1'],
         exits: [
             {objectId: 'helixEntrance'},
-            {objectId: 'helixStairs1', logic: canCross2Gaps},
+            {objectId: 'helixStairs1'},
         ],
     },
     {
         zoneId,
-        nodeId: 'helix2',
-        checks: [],
-        entranceIds: ['helixStairs1', 'helixStairs2'],
+        nodeId: 'helix2Stairs',
+        paths: [
+            {nodeId: 'helix2Ladder', logic: andLogic(hasTeleportation, canRemoveLightStones, hasGloves)},
+        ],
+        entranceIds: ['helixStairs1'],
         exits: [
             {objectId: 'helixStairs1'},
-            {objectId: 'helixStairs2', logic: orLogic(hasTeleportation,
-                // The pot puzzle can be passed by moving pots with astral projection
-                // then teleporting across with the somersault.
-                andLogic(hasAstralProjection, hasSomersault)
-            )}
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'helix2Ladder',
+        paths: [
+            {nodeId: 'helix2Stairs', logic: andLogic(hasTeleportation, canRemoveLightStones, hasGloves)},
+        ],
+        entranceIds: ['helixLadder'],
+        exits: [
+            {objectId: 'helixLadder'},
         ],
     },
     {
         zoneId,
         nodeId: 'helix3',
         checks: [],
-        entranceIds: ['helixStairs2'],
+        entranceIds: ['helixLadder'],
         exits: [
-            {objectId: 'helixStairs2'},
-            {objectId: 'helix:2:0x0-pitEntrance-0', logic: orLogic(hasTeleportation,
-                // astral projection is required to lift bushes/move pots.
-                andLogic(hasAstralProjection, hasSomersault)
-            )}
+            {objectId: 'helixLadder'},
+            {objectId: 'helixPitEntrance', logic: andLogic(canRemoveLightStones, orLogic(hasSomersault, hasTeleportation))}
         ],
     },
     {
         zoneId,
-        nodeId: 'helixEntranceStaff',
-        checks: [{objectId: 'helix:0:0x0-staff-0'}],
+        nodeId: 'helixBigKey',
+        checks: [{objectId: 'helixBigKey'}],
         entranceIds: ['helixMarker'],
-        paths: [{nodeId: 'helixEntrance', logic: andLogic(canCross6Gaps, canRemoveLightStones)}],
+        paths: [{nodeId: 'helix1'}],
     },
     {
         zoneId,
-        nodeId: 'helixEntrancePortal',
+        nodeId: 'spiritHelix1',
+        checks: [{objectId: 'helixMap', logic: hasWeapon}],
         paths: [
-            {nodeId: 'helixEntrance', logic: andLogic(canCross6Gaps, canRemoveLightStones)},
-            {nodeId: 'helixEntranceSpiritPortal', logic: canUseTeleporters}
+            {nodeId: 'helix1', logic: andLogic(canCross6Gaps, canRemoveLightStones)},
         ],
-    },
-    {
-        zoneId,
-        nodeId: 'helixEntranceSpiritPortal',
-        paths: [
-            {nodeId: 'helixEntrancePortal', logic: canUseTeleporters},
-            {nodeId: 'helixEntranceSpirit', logic: andLogic(canCross6Gaps, canRemoveLightStones)}
-        ],
-    },
-    {
-        zoneId,
-        nodeId: 'helixEntranceSpirit',
-        paths: [{nodeId: 'helixEntranceSpiritPortal', logic: andLogic(canCross6Gaps, canRemoveLightStones)}],
         entranceIds: ['helixSpiritDoor1'],
         exits: [
-            {objectId: 'helixSpiritDoor1', logic: canCross2Gaps},
+            {objectId: 'helixSpiritDoor1'},
         ],
     },
     {
         zoneId,
-        nodeId: 'helix2Spirit',
-        entranceIds: ['helixSpiritDoor1', 'helixSpiritDoor2'],
+        nodeId: 'spiritHelix2',
+        checks: [{objectId: 'helixBigMoney', logic: hasStaff}],
+        entranceIds: ['helixSpiritDoor1', 'helixSpiritLadder'],
         exits: [
-            {objectId: 'helixSpiritDoor1', logic: orLogic(hasTeleportation, hasSomersault)},
-            {objectId: 'helixSpiritDoor2', logic: orLogic(hasTeleportation, hasSomersault)},
+            {objectId: 'helixSpiritDoor1', logic: hasStaff},
+            {objectId: 'helixSpiritLadder', logic: hasStaff},
         ],
     },
     {
         zoneId,
-        nodeId: 'helix3Spirit',
-        entranceIds: ['helixSpiritDoor2'],
+        nodeId: 'spiritHelix3',
+        checks: [{objectId: 'helixSmallMoney', logic: orLogic(hasMediumRange, hasFire)}],
+        entranceIds: ['helixSpiritLadder'],
         exits: [
-            {objectId: 'helixSpiritDoor2', logic: orLogic(hasTeleportation,
-                // astral projection is required to lift bushes/move pots.
-                andLogic(hasAstralProjection, hasSomersault)
-            )},
+            {objectId: 'helixSpiritLadder'},
+            {objectId: 'helixSpiritPitEntrance', logic: andLogic(hasWeapon, canRemoveLightStones)},
         ],
-        paths: [{nodeId: 'helix4Spirit', logic: orLogic(hasTeleportation, hasSomersault)}],
     },
     {
         zoneId,
-        nodeId: 'helix4Spirit',
+        nodeId: 'spiritHelixPortalToBridge',
+        paths: [{nodeId: 'spiritHelix1'}],
+        entranceIds: ['helixSpiritMarker', 'helixBridgeTeleporter'],
+        exits: [
+            {objectId: 'helixBridgeTeleporter', logic: canUseTeleporters},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'spiritHelixBridge',
         npcs: [
             {
-                loot: {type: 'dialogueLoot', id: 'helix:s3:0x0-npc-0', lootType: 'weapon'},
+                loot: {type: 'dialogueLoot', id: 'helixVanaraCommander', lootType: 'weapon'},
                 progressFlags: ['elementalBeastsEscaped']
             },
         ],
-        paths: [{nodeId: 'helix4', logic: canUseTeleporters}, {nodeId: 'helix3Spirit'}],
-        entranceIds: ['helixSkySpiritEntrance'],
+        paths: [{nodeId: 'helixBridge', logic: canUseTeleporters}],
+        entranceIds: ['helixBridgeTeleporter', 'helixSkySpiritEntrance'],
         exits: [
+            {objectId: 'helixBridgeTeleporter'},
             {objectId: 'helixSkySpiritEntrance'},
         ],
     },
     {
         zoneId,
-        nodeId: 'helix4',
-        paths: [{nodeId: 'helix4Spirit', logic: canUseTeleporters}],
+        nodeId: 'helixBridge',
+        checks: [{objectId: 'helixSilver'}],
+        paths: [{nodeId: 'spiritHelixBridge', logic: canUseTeleporters}],
         entranceIds: ['helixSkyEntrance'],
         exits: [
             {objectId: 'helixSkyEntrance'},

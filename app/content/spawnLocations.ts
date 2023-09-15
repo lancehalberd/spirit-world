@@ -165,8 +165,8 @@ export const SPAWN_LOCATION_HELIX_RIVAL: ZoneLocation = {
 export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     zoneKey: 'helix',
     floor: 0,
-    x: 248,
-    y: 440,
+    x: 310,
+    y: 530,
     z: 0,
     d: 'up',
     areaGridCoords: {x: 0, y: 0},

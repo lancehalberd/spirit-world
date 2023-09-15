@@ -475,7 +475,14 @@ export class Door implements ObjectInstance {
         } else if (this.style === 'ladderUp') {
             resetTileBehavior(this.area, {x, y});
             resetTileBehavior(this.area, {x, y: y + 1});
-        } else if (doorStyle.w === 64) {
+        } else if (this.style === 'ladderUpTall') {
+            resetTileBehavior(this.area, {x, y});
+            resetTileBehavior(this.area, {x, y: y + 1});
+            resetTileBehavior(this.area, {x, y: y + 2});
+            resetTileBehavior(this.area, {x, y: y + 3});
+            resetTileBehavior(this.area, {x, y: y + 4});
+            resetTileBehavior(this.area, {x, y: y + 5});
+        }  else if (doorStyle.w === 64) {
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 resetTileBehavior(this.area, {x, y});
                 resetTileBehavior(this.area, {x: x + 1, y});
@@ -540,7 +547,7 @@ export class Door implements ObjectInstance {
         }
         // For some reason this can trigger when the door is closed after recent movement changes
         // so we reduce the
-        const heroIsTouchingDoor = boxesIntersect(pad(hero.getMovementHitbox(), 0), this.getHitbox());
+        const heroIsTouchingDoor = boxesIntersect(hero.getMovementHitbox(), this.getHitbox());
         if (heroIsTouchingDoor &&
             // If the hero has no action target, have the door control them as soon as they touch it
             (!hero.actionTarget || (hero.actionTarget !== this && !hero.isExitingDoor))
@@ -569,7 +576,7 @@ export class Door implements ObjectInstance {
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
             const hitbox = this.getHitbox();
-            if (this.style === 'ladderUp') {
+            if (this.style === 'ladderUp' || this.style === 'ladderUpTall') {
                 const reachedTop = hero.y <= this.y;
                 if (reachedTop) {
                     // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.

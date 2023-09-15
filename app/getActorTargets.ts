@@ -18,6 +18,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         checkPoints.push({x, y});
         y = hitbox.y + hitbox.h - 4;
         checkPoints.push({x, y});
+        checkPoints.push({x, y: cy});
     }
     if (actor.d === 'right') {
         let x = hitbox.x + hitbox.w + 1;
@@ -25,6 +26,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         checkPoints.push({x, y});
         y = hitbox.y + hitbox.h - 4;
         checkPoints.push({x, y});
+        checkPoints.push({x, y: cy});
     }
     if (actor.d === 'up') {
         let x = hitbox.x + 3;
@@ -32,6 +34,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         checkPoints.push({x, y});
         x = hitbox.x + hitbox.w - 4;
         checkPoints.push({x, y});
+        checkPoints.push({x: cx, y});
     }
     if (actor.d === 'down') {
         let x = hitbox.x + 3;
@@ -39,6 +42,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         checkPoints.push({x, y});
         x = hitbox.x + hitbox.w - 4;
         checkPoints.push({x, y});
+        checkPoints.push({x: cx, y});
     }
 
     // Only use check points that don't have a ledge between them and the actor.
@@ -51,12 +55,12 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         // These were tuned by hand to make sure you cannot grab across ledges.
         // I had the most problem grabbing things down and to the right.
         if (dx < 0) dx -= 4;
-        else dx++
+        else if (dx > 0) dx++
         let dy = cy - candidate.y;
         if (dy < 0) dy -= 4;
-        else dy++
-        const x = candidate.x - 3 * dx / Math.abs(dx);
-        const y = candidate.y - 3 * dy / Math.abs(dy);
+        else if (dy > 0) dy++
+        const x = candidate.x - (dx ? (3 * dx / Math.abs(dx)) : 0);
+        const y = candidate.y - (dy ? (3 * dy / Math.abs(dy)) : 0);
         const object: ObjectInstance = {
             isObject: true,
             area: actor.area,

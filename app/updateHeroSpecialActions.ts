@@ -291,7 +291,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Check if the hero is done moving through the door meaning:
         // They are no longer intersecting the door object
         // They are in an open tile.
-        const touchingTarget = hero.actionTarget && boxesIntersect(hero, hero.actionTarget.getHitbox());
+        const touchingTarget = hero.actionTarget && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getHitbox());
         if (!touchingTarget && isHeroOnOpenTile(state, hero)) {
             hero.actionTarget = null;
             hero.isUsingDoor = false;
@@ -305,7 +305,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'jumpingDown' && !editingState.isEditing) {
         // Maybe we should add a jumping down animation, but for now we play the roll
         // animation slowed down a bit.
-        hero.animationTime += 8;
+        hero.animationTime -= FRAME_LENGTH / 2;
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = 0;
@@ -323,7 +323,33 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.jumpingVy *= 0.98;
         hero.z += hero.jumpingVz;
         hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
-        if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
+        // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
+
+        // Create a hitbox representing where the heroes frame appears rather than its floor location
+        const heroHitbox = hero.getMovementHitbox();
+        const trampolineUnderShadow = hero.area.objects.find(o => o.definition?.type === 'trampoline' && boxesIntersect(heroHitbox, (o as Trampoline).getBounceHitbox()));
+        heroHitbox.y -= hero.z;
+        const trampolineUnderSprite = hero.area.objects.find(o => o.definition?.type === 'trampoline' && boxesIntersect(heroHitbox, (o as Trampoline).getBounceHitbox()));
+        if (trampolineUnderShadow || trampolineUnderSprite) {
+            // TODO: This works but messes up the camera speed, maybe we can have a shadowZ value that just moves the shadow
+            // and gives the appearance of changing z value without actually messing with the y value.
+            /*if (hero.z < 16) {
+                hero.z ++;
+                hero.y ++;
+            }*/
+            if (hero.jumpingVz <= -4 || hero.z <= groundZ) {
+                hero.animationTime = 0;
+                hero.jumpingVz = Math.max(-hero.jumpingVz, 4);
+                (trampolineUnderShadow as Trampoline).lastBounceTime = state.fieldTime;
+                if (hero.jumpingVx) {
+                    hero.jumpingVx = 2.5 * hero.jumpingVx / Math.abs(hero.jumpingVx);
+                }
+                if (hero.jumpingVy) {
+                    hero.jumpingVy = 2.5 * hero.jumpingVy / Math.abs(hero.jumpingVy);
+                }
+                return true;
+            }
+        } else if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
             let i = 0;
             while (i < 4 && isHeroOnSouthernWallTile(state, hero)) {
                 hero.y++;
@@ -347,7 +373,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.actionDy = 1;
             }
         }
-        // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
+
+
         if (hero.z <= groundZ) {
             hero.z = groundZ
             hero.isAirborn = hero.isAstralProjection;

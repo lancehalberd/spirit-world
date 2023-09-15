@@ -14,8 +14,8 @@ dialogueHash.vanaraCommander = {
                 {
                     dialogueIndex: 69,
                     dialogueType: 'hint',
-                    text: `If you use the portal behind me to return to the Material World, you will find a shortcut
-                    back to the lake, but I warn you, it isn't for the faint of heart!
+                    text: `There is a portal to the Material World here on the bridge.
+                    {|}If you use it, you can find a shortcut back to the lake, but I warn you, it isn't for the faint of heart!
                     `,
                 },
                 {

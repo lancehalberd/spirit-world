@@ -708,10 +708,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
             hero.grabObject = closestObject;
             hero.lastTouchedObject = closestObject;
-            // TODO: check if we can make the hero hug grabbed objects to always fit through tight spaces.
-            /*const [dx, dy] = directionMap[hero.d];
-            const {mx, my} = moveActor(state, hero, dx, dy, {canFall: true, canSwim: true});
-            console.log('moving towards grabbed object', {mx, my});*/
+            // Try moving 1px towards grabbed objects to prevent there being a gap between them and the object.
+            // This helps prevent cases where the hero+object can't make it through spaces that narrowly fit them together.
+            const [dx, dy] = directionMap[hero.d];
+            /*const {mx, my} = */moveActor(state, hero, dx, dy, {canFall: true, canSwim: true});
+            // console.log('moving towards grabbed object', {mx, my});
         }
     }
     if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)
