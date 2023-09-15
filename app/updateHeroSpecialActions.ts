@@ -720,6 +720,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             canSwim: true,
             direction: hero.d,
         });
+        // Returning true prevents checking for floor effects, but they should still apply while frozen.
+        checkForFloorEffects(state, hero);
         return true;
     }
     return false;

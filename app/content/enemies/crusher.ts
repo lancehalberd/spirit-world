@@ -18,6 +18,16 @@ enemyDefinitions.crusher = {
     initialAnimation: 'idle',
     initialMode: 'choose',
     lootTable: moneyLootTable,
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        // Thrown objects can hurt the hand even if it is in the air.
+        if (hit.isThrownObject) {
+            enemy.isInvulnerable = false;
+            const result =  enemy.defaultOnHit(state, hit);
+            enemy.isInvulnerable = (enemy.z > 16);
+            return result;
+        }
+        return enemy.defaultOnHit(state, hit);
+    },
     update(this: void, state: GameState, enemy: Enemy) {
         // Prevent interacting with the hand when it is too high
         enemy.isInvulnerable = (enemy.z > 16);

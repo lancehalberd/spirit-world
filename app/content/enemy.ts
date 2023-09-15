@@ -376,17 +376,16 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             playAreaSound(state, this.area, damageSound);
         }
         if (this.area !== state.areaInstance) {
-            addEffectToArea(state, state.areaInstance, new FieldAnimationEffect({
-                animation: (this.isDefeated && this.definition.type !== 'boss')
-                    ? enemyDeathAnimation
-                    : this.currentAnimation || enemyDeathAnimation,
-                x: this.x,
-                y: this.y,
-                scale: this.scale,
-                alpha: 0.3,
-                // Extend the TTL if we are showing the boss explosion animation.
-                ttl: (this.isDefeated && this.definition.type === 'boss') ? 2500 : 200,
-            }));
+            if (this.isDefeated && this.definition.type !== 'boss') {
+                addEffectToArea(state, state.areaInstance, new FieldAnimationEffect({
+                    animation: enemyDeathAnimation,
+                    x: this.x,
+                    y: this.y,
+                    scale: this.scale,
+                    alpha: 0.3,
+                    ttl: 200,
+                }));
+            }
         }
         return true;
     }
@@ -402,7 +401,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.burnDuration = burnDuration;
             this.burnDamage = burnDamage;
         }
-        // Burns unfreeze the player.
+        // Burns unfreeze the enemy.
         this.frozenDuration = 0;
     }
     showDeathAnimation(state: GameState) {
@@ -812,6 +811,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
         if (this.enemyDefinition.alternateRender) {
             this.enemyDefinition.alternateRender(context, state, this);
+        } else  if (this.enemyInvulnerableFrames > 0 || this.isDefeated) {
+            context.save();
+                context.globalAlpha *= 0.3;
+                this.render(context, state);
+            context.restore();
         }
     }
     defaultRender(context: CanvasRenderingContext2D, state?: GameState, frame = this.getFrame()) {

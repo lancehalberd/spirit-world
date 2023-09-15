@@ -35,9 +35,6 @@ Graphics:
 
 Current tasks:
     - Improvements prioritized for new helix dungeon:
-        - Allow hitting crusher enemies with thrown stones.
-        - Make sure turrets render correctly when damaged (they are missing the top for some reason).
-            - Instead of using an animation effect, just call the regular render of the enemy using 0.3 alpha in `alternateRender` if enemyInvulnerableFrames > 0.
         - Allow throwing rocks diagonally.
         - Fix jumping south to only land on the next immediate tile if southernFacingWall is < 32px
         - Fix jumping north into a southern facing wall should stop the movement and not land inside the wall.
@@ -87,6 +84,9 @@ Current tasks:
 
     - Minor issue with ledges
         - Should be able to grab ledges when below them just like you can grab solid tiles.
+
+    - Guardian boss improvement
+        - Have the boss appear staggered in the material world when hit by the balls and despawn the astral projection, similar to the rival fight.
 
     - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
 

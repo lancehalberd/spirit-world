@@ -200,11 +200,15 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
 
 function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     const hitbox = enemy.getHitbox(state);
+    const x = hitbox.x + hitbox.w / 2;
+    const y = hitbox.y + hitbox.h / 2;
+    const tx = (x / 16) | 0;
+    const ty = (y / 16) | 0;
     const pitAnimation = new FieldAnimationEffect({
         animation: enemyFallAnimation,
         drawPriority: 'background',
         drawPriorityIndex: 1,
-        x: Math.floor(hitbox.x / 16) * 16, y: Math.floor(hitbox.y / 16) * 16,
+        x: tx * 16, y: ty * 16,
     });
     addEffectToArea(state, enemy.area, pitAnimation);
     enemy.status = 'gone';
@@ -214,11 +218,13 @@ function makeEnemyFallIntoWater(state: GameState, enemy: Enemy) {
     const hitbox = enemy.getHitbox(state);
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;
+    const tx = (x / 16) | 0;
+    const ty = (y / 16) | 0;
     const animation = new FieldAnimationEffect({
         animation: splashAnimation,
         drawPriority: 'background',
         drawPriorityIndex: 1,
-        x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
+        x: tx * 16, y: ty * 16,
     });
     addEffectToArea(state, enemy.area, animation);
     enemy.status = 'gone';

@@ -1,4 +1,4 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addSparkleAnimation, burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { Blast } from 'app/content/effects/blast';
 import { Flame } from 'app/content/effects/flame';
@@ -46,6 +46,18 @@ const guardianSpiritAnimations: ActorAnimations = {
     cast: omniAnimation(guardianSpiritCastAnimation),
 };
 
+
+function addBurstEffect(this: void, state: GameState, enemy: Enemy, area: AreaInstance): void {
+    const hitbox = enemy.getHitbox();
+    const animation = new FieldAnimationEffect({
+        animation: burstAnimation,
+        drawPriority: 'background',
+        drawPriorityIndex: 1,
+        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
+        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
+    });
+    addEffectToArea(state, area, animation);
+}
 
 interface ProjectionParams {
     element: MagicElement
@@ -184,6 +196,7 @@ enemyDefinitions.guardianProjection = {
 };
 interface GuardianParams {
     lastDamaged: number
+    shouldTeleport: boolean
     usedMarkers: Set<ObjectInstance>
 }
 enemyDefinitions.guardian = {
@@ -192,9 +205,7 @@ enemyDefinitions.guardian = {
     life: 16, touchDamage: 0, update: updateGuardian,
     onHit(this: void, state: GameState, enemy: Enemy<GuardianParams>, hit: HitProperties): HitResult {
         const result = enemy.defaultOnHit(state, hit);
-        if (enemy.life > 0) {
-            teleportToNextMarker(state, enemy);
-        }
+        enemy.params.shouldTeleport = true;
         enemy.params.lastDamaged = state.fieldTime;
         return result;
     },
@@ -614,6 +625,14 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
     // Do not begin updating the guardian until the hero is in the other world.
     if (state.hero.area === enemy.area) {
         enemy.healthBarTime = 0;
+        return;
+    }
+    // Teleport away from the current location as soon as iframes run out.
+    // We don't do this immediately so the player can see the guardian for a bit after they are damaged.
+    if (enemy.params.shouldTeleport && enemy.enemyInvulnerableFrames <= 0) {
+        enemy.params.shouldTeleport = false;
+        addBurstEffect(state, enemy, state.hero.area);
+        teleportToNextMarker(state, enemy);
         return;
     }
     if (!enemy.params.lastDamaged) {

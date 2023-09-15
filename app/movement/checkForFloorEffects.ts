@@ -192,6 +192,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 // Do nothing.
             } else {
                 hero.throwHeldObject(state);
+                // Unfreeze on falling into a pit.
+                hero.frozenDuration = 0;
                 hero.heldChakram?.throw(state);
                 hero.action = 'falling';
                 //hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
