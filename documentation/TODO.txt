@@ -34,10 +34,6 @@ Graphics:
 
 
 Current tasks:
-    - Improvements prioritized for new helix dungeon:
-        - Fix jumping south to only land on the next immediate tile if southernFacingWall is < 32px
-        - Fix jumping north into a southern facing wall should stop the movement and not land inside the wall.
-
     - Fix push/pull interactions with ledges.
         - Minor issues:
             - Pot can render in front of you when standing on ledge above it.

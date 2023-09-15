@@ -75,6 +75,9 @@ export class Hero implements Actor {
     jumpingVy?: number;
     jumpingVz?: number;
     jumpingDownY?: number;
+    // This must be set when jumping to allow using trampolines.
+    // It is set to false to prevent trampolining in certain circumstances while jumping.
+    canTrampoline?: boolean;
     // If this is set; the actor is being carried by a hero/clone.
     carrier?: Hero;
     explosionTime?: number;
@@ -530,7 +533,7 @@ export class Hero implements Actor {
         ) {
             this.render(context, state);
         }
-        const isOverTrampoline = (this.action === 'jumpingDown' && this.area.objects.find(o => o.definition?.type === 'trampoline' && this.overlaps((o as Trampoline).getFrameHitbox()) ));
+        const isOverTrampoline = this.canTrampoline && (this.action === 'jumpingDown' && this.area.objects.find(o => o.definition?.type === 'trampoline' && this.overlaps((o as Trampoline).getFrameHitbox()) ));
         if (isOverTrampoline) {
             renderHeroShadow(context, state, this);
             this.render(context, state);

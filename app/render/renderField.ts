@@ -430,7 +430,7 @@ export function renderAreaObjectsBeforeHero(
         // y value is greater than it actually is. Otherwise they will be rendered behind
         // things like door frames that they should be jumping in front of.
         const heroYDepth = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
-            ? state.hero.y + 48 : state.hero.y + 16;
+            ? state.hero.y + 16 + state.hero.z : state.hero.y + 16;
         for (const object of area.objectsToRender) {
             const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
             if (drawPriority === 'background') {
@@ -493,7 +493,7 @@ export function renderAreaObjectsAfterHero(
         // y value is greater than it actually is. Otherwise they will be rendered behind
         // things like door frames that they should be jumping in front of.
         const heroYDepth = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
-            ? state.hero.y + 48 : state.hero.y + 16;
+            ? state.hero.y + 16 + state.hero.z : state.hero.y + 16;
         for (const object of area.objectsToRender) {
             const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
             if (backgroundDepth !== undefined

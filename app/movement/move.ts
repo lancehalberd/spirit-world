@@ -10,15 +10,15 @@ export function moveUp(
     movementProperties: MovementProperties,
     amount: number
 ): {mx: number, my: number} {
-    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
-    if ((hitbox.y | 0) === ((hitbox.y - amount) | 0)) {
+    if ((object.y | 0) === ((object.y - amount) | 0)) {
         object.y -= amount;
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
         return {mx: 0, my: -amount};
     }
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     const result = canMoveUp(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.y -= amount;
@@ -58,15 +58,15 @@ export function moveLeft(
     movementProperties: MovementProperties,
     amount: number
 ): {mx: number, my: number} {
-    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
-    if ((hitbox.x | 0) === ((hitbox.x - amount) | 0)) {
+    if ((object.x | 0) === ((object.x - amount) | 0)) {
         object.x -= amount;
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
         return {mx: -amount, my: 0};
     }
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     const result = canMoveLeft(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.x -= amount;
@@ -106,15 +106,15 @@ export function moveDown(
     movementProperties: MovementProperties,
     amount: number
 ): {mx: number, my: number} {
-    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
-    if ((hitbox.y | 0) === ((hitbox.y + amount) | 0)) {
+    if ((object.y | 0) === ((object.y + amount) | 0)) {
         object.y += amount;
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
         return {mx: 0, my: amount};
     }
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     const result = canMoveDown(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.y += amount;
@@ -154,15 +154,15 @@ export function moveRight(
     movementProperties: MovementProperties,
     amount: number
 ): {mx: number, my: number} {
-    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
-    if ((hitbox.x | 0) === ((hitbox.x + amount) | 0)) {
+    if ((object.x | 0) === ((object.x + amount) | 0)) {
         object.x += amount;
         if (movementProperties.actor) {
             movementProperties.actor.ignoreLedges = true;
         }
         return {mx: amount, my: 0};
     }
+    const hitbox = object.getMovementHitbox?.() || object.getHitbox();
     const result = canMoveRight(state, object.area, hitbox, movementProperties);
     if (result === true) {
         object.x += amount;

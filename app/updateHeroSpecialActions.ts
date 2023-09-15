@@ -309,6 +309,23 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = 0;
+
+        // Determine if the player is over a trampoline, which can change jumping behavior quite a bit
+        // to support the interactions with bouncing on trampolines whiles jumping.
+        // Create a hitbox representing where the heroes frame appears rather than its floor location
+        const heroHitbox = hero.getMovementHitbox();
+        const spriteHitbox = {
+            ...heroHitbox,
+            y: heroHitbox.y - hero.z,
+        }
+        const trampolineUnderSprite = hero.area.objects.find(o => o.definition?.type === 'trampoline' && boxesIntersect(spriteHitbox, (o as Trampoline).getBounceHitbox()));
+        const tallHitbox = {
+            ...heroHitbox,
+            h: 24,
+        }
+        const trampolineAhead = hero.area.objects.find(o => o.definition?.type === 'trampoline' && boxesIntersect(tallHitbox, (o as Trampoline).getBounceHitbox()));
+        const shouldBounceOnTrampoline = hero.canTrampoline && trampolineUnderSprite;
+
         // When jumping any direction but down, the jump is precomputed so we just
         // move the character along the arc until they reach the ground.
         hero.x += hero.jumpingVx;
@@ -318,6 +335,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.y += hero.jumpingVy;
         if (isHeroOnVeryTallWall(state, hero)) {
             hero.y -= hero.jumpingVy;
+        } else if (hero.jumpingVy < 0 && !shouldBounceOnTrampoline && (hero.jumpingVz <= 0 && hero.z <= groundZ + 3)) {
+            hero.canTrampoline = false;
+            hero.jumpingVy = Math.max(hero.jumpingVy, -0.0001);
+            // Move the hero off of southern facing walls when jumping north and falling into them, unless there is a trampoline to catch them,
+            for (let i = 0; i < 8 && isHeroOnSouthernWallTile(state, hero); i++) {
+                hero.y++;
+                hero.z += 0.5;
+            }
         }
         hero.jumpingVx *= 0.98;
         hero.jumpingVy *= 0.98;
@@ -325,12 +350,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
         // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
 
-        // Create a hitbox representing where the heroes frame appears rather than its floor location
-        const heroHitbox = hero.getMovementHitbox();
-        const trampolineUnderShadow = hero.area.objects.find(o => o.definition?.type === 'trampoline' && boxesIntersect(heroHitbox, (o as Trampoline).getBounceHitbox()));
-        heroHitbox.y -= hero.z;
-        const trampolineUnderSprite = hero.area.objects.find(o => o.definition?.type === 'trampoline' && boxesIntersect(heroHitbox, (o as Trampoline).getBounceHitbox()));
-        if (trampolineUnderShadow || trampolineUnderSprite) {
+        if (shouldBounceOnTrampoline) {
             // TODO: This works but messes up the camera speed, maybe we can have a shadowZ value that just moves the shadow
             // and gives the appearance of changing z value without actually messing with the y value.
             /*if (hero.z < 16) {
@@ -340,7 +360,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (hero.jumpingVz <= -4 || hero.z <= groundZ) {
                 hero.animationTime = 0;
                 hero.jumpingVz = Math.max(-hero.jumpingVz, 4);
-                (trampolineUnderShadow as Trampoline).lastBounceTime = state.fieldTime;
+                ((trampolineUnderSprite) as Trampoline).lastBounceTime = state.fieldTime;
                 if (hero.jumpingVx) {
                     hero.jumpingVx = 2.5 * hero.jumpingVx / Math.abs(hero.jumpingVx);
                 }
@@ -349,25 +369,32 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
                 return true;
             }
-        } else if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
+        } else if (hero.jumpingVy >= 0 && hero.jumpingVz < 0 && !(hero.canTrampoline && trampolineAhead)) {
             let i = 0;
+            hero.canTrampoline = false;
             while (i < 4 && isHeroOnSouthernWallTile(state, hero)) {
                 hero.y++;
                 hero.z++;
                 i++;
-                // Uncomment and possibly reduce this if hero is jumping too far south from tall cliffs.
-                //hero.jumpingVy = Math.min(hero.jumpingVy, 1);
+                // Make hero land directly in front of the cliff if this wall is tall if there is a place ahead that they cannot land on.
+                if (!isHeroOnSouthernWallTile(state, hero, 0, 16)
+                    // Check half tile as well for narrow obstacles like northern cliff ledges.
+                    && (!canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 8}) || !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 16}))
+                ) {
+                    hero.jumpingVy = 0;
+                }
                 // Without this, the hero will not be able to transition south while jumping east/west
                 // and moving down across a southern facing wall.
                 hero.actionDy = 1;
             }
+            // This will cause the hero to jump over up to 1 bad landing tile at the bottom of a cliff.
             while (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
                 hero.y++;
                 hero.z++;
                 i++;
-                // Reduce this to close to 0 so that the hero doesn't jump further south than necessary
-                // but leave it slightly positive so that screen transitions still trigger.
-                hero.jumpingVy = Math.min(hero.jumpingVy, 0.1);
+                // Make hero land directly in front of the cliff if this wall is tall.
+                // We don't do this for short jumps because it looks bad when jumping to clouds in the sky.
+                //hero.jumpingVy = Math.min(hero.jumpingVy, 0.0001);
                 // Without this, the hero will not be able to transition south while jumping east/west
                 // and moving down across an obstacle.
                 hero.actionDy = 1;
@@ -855,8 +882,8 @@ function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {
 }
 
 
-function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero): boolean {
-    const L = hero.x, R = hero.x + hero.w - 1, T = hero.y, B = hero.y + hero.h - 1;
+function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero, dx = 0, dy = 0): boolean {
+    const L = hero.x + dx, R = hero.x + hero.w - 1 + dx, T = hero.y + dy, B = hero.y + hero.h - 1 + dy;
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {

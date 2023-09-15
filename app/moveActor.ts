@@ -140,11 +140,11 @@ function moveActorInDirection(
                 actor.jumpingVz = actor.vz;
             } else {
                 let speed = 2;
-                if ((actor as Hero).equippedBoots === 'cloudBoots') {
+                /*if ((actor as Hero).equippedBoots === 'cloudBoots') {
                     speed = 2.2;
                 } else if ((actor as Hero).equippedBoots === 'ironBoots') {
                     speed = 1.5;
-                }
+                }*/
                 actor.action = 'jumpingDown';
                 actor.jumpingVx = speed * jv[0];
                 actor.jumpingVy = speed * jv[1];
@@ -154,6 +154,7 @@ function moveActorInDirection(
             // Actor shouldn't be touching the ground when they start jumping down.
             actor.z = Math.max(actor.z, 1);
             actor.isAirborn = true;
+            actor.canTrampoline = true;
             actor.grabObject = null;
         }
     }
