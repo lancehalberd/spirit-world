@@ -12,6 +12,10 @@ export function selectDialogueOption(state: GameState, dialogueKey: string, obje
         return null;
     }
     for (const dialogueOption of dialogueSet.options) {
+        // Dialogue is only available to the astral projection when this flag is explicitly set to true.
+        if (state.hero.astralProjection && !dialogueOption.allowSpirit) {
+            continue;
+        }
         if (dialogueOption.objectId && dialogueOption.objectId !== object?.definition?.id) {
             continue;
         }

@@ -401,13 +401,19 @@ const largeLogPileTiles: TileSource = {
 const railsTiles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/rails.png', {x: 0, y: 0, w: 64, h: 16}),
-    behaviors: {'all': {solid: true, defaultLayer: 'field', linkedOffset: 4}},
+    behaviors: {
+        'all': {solid: true, defaultLayer: 'field', linkedOffset: 4},
+        '1x0': {solid: true, defaultLayer: 'field2', linkedOffset: 4}
+    },
 };
 
 const spiritRailsTiles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/rails.png', {x: 0, y: 16, w: 64, h: 16}),
-    behaviors: {'all': {solid: true, defaultLayer: 'field'}},
+    behaviors: {
+        'all': {solid: true, defaultLayer: 'field'},
+        '1x0': {solid: true, defaultLayer: 'field2'},
+    },
 };
 
 const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'field', shallowWater: true };

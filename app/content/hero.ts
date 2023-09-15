@@ -20,6 +20,7 @@ import {
     renderExplosionRing, renderHeroBarrier, renderHeroShadow,
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
+import { getCloneMovementDeltas } from 'app/userInput';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea } from 'app/utils/effects';
@@ -704,13 +705,15 @@ export class Hero implements Actor {
         hero.actionFrame = 0;
         const tile = hero.pickUpTile;
         const behaviors = tile.behaviors;
+        const [dx, dy] = getCloneMovementDeltas(state, hero);
+        const direction = getDirection(dx, dy, true, hero.d);
         const thrownObject = new ThrownObject({
             frame: tile.frame,
             behaviors,
             x: hero.x,
             y: hero.y,
-            vx: directionMap[hero.d][0] * throwSpeed,
-            vy: directionMap[hero.d][1] * throwSpeed,
+            vx: directionMap[direction][0] * throwSpeed,
+            vy: directionMap[direction][1] * throwSpeed,
             vz: 2,
         });
         hero.lastTouchedObject = thrownObject;
@@ -722,8 +725,8 @@ export class Hero implements Actor {
                 behaviors,
                 x: hero.x,
                 y: hero.y,
-                vx: directionMap[hero.d][0] * throwSpeed,
-                vy: directionMap[hero.d][1] * throwSpeed,
+                vx: directionMap[direction][0] * throwSpeed,
+                vy: directionMap[direction][1] * throwSpeed,
                 vz: 2,
             });
             alternateThrownObject.linkedObject = thrownObject;

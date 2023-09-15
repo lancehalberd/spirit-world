@@ -377,9 +377,9 @@ const f0_1x1: AreaDefinition = {
                     [0,590,590,589,590,589,590,589,589,590,589,590,589,590,590,590,590,590,590,589,590,589,590,589,589,590,589,590,589,590,590,0],
                     [0,602,602,601,602,601,602,601,601,602,601,602,601,602,602,602,602,602,602,601,602,601,602,601,601,602,601,602,601,602,602,0],
                     [0,4,0,0,0,0,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,0],
-                    [0,4,0,0,0,0,4,0,0,0,0,0,0,4,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0],
-                    [0,4,4,0,0,4,4,4,4,4,4,4,0,4,0,4,0,4,4,0,4,4,0,4,4,0,4,4,4,0,4,0],
-                    [0,4,0,0,0,0,4,0,0,0,0,0,0,4,0,4,0,4,4,0,4,4,0,4,4,0,4,4,4,0,4,0],
+                    [0,4,0,0,0,0,4,4,4,4,0,0,0,4,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0],
+                    [0,4,4,0,0,4,4,0,0,0,0,0,0,4,0,4,0,4,4,0,4,4,0,4,4,0,4,4,4,0,4,0],
+                    [0,4,0,0,0,0,4,0,4,4,0,0,0,4,0,4,0,4,4,0,4,4,0,4,4,0,4,4,4,0,4,0],
                     [0,4,0,0,0,0,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,0],
                     [0,4,0,0,0,0,4,0,0,0,0,0,0,4,4,4,0,4,4,4,4,4,4,4,4,0,4,4,4,4,4,0],
                     [0,4,0,0,0,0,4,4,4,4,4,4,0,4,0,0,0,4,0,0,0,0,0,0,0,0,4,0,0,0,4,0],
@@ -516,12 +516,12 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 420, y: 420, type: "loot", lootType: "money", lootAmount: 5},
         {status: "normal", id: "", x: 35, y: 227, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 49, y: 123, type: "loot", lootType: "money", lootAmount: 10},
-        {status: "normal", id: "", x: 114, y: 115, type: "loot", lootType: "money", lootAmount: 10},
-        {status: "normal", id: "moneyMazePeachPiece", x: 111, y: 62, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 50},
+        {status: "normal", id: "", x: 114, y: 108, type: "loot", lootType: "money", lootAmount: 10},
+        {status: "normal", id: "moneyMazePeachPiece", x: 176, y: 78, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 50},
         {status: "normal", id: "", x: 452, y: 148, type: "loot", lootType: "money", lootAmount: 5},
         {status: "normal", id: "", x: 18, y: 210, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 65, y: 142, type: "loot", lootType: "money", lootAmount: 10},
-        {status: "normal", id: "", x: 114, y: 66, type: "loot", lootType: "money", lootAmount: 50, hasCustomLogic: true, customLogic: "moneyMazePeachPiece"},
+        {status: "normal", id: "", x: 179, y: 83, type: "loot", lootType: "money", lootAmount: 50, hasCustomLogic: true, customLogic: "moneyMazePeachPiece"},
         {status: "normal", id: "", x: 466, y: 66, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 194, y: 147, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 226, y: 67, type: "loot", lootType: "money", lootAmount: 10},
@@ -1020,6 +1020,7 @@ const sf0_1x1: AreaDefinition = {
 };
 zones.holyCityInterior = {
     key: 'holyCityInterior',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [

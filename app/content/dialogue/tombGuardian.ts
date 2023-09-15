@@ -44,6 +44,7 @@ dialogueHash.tombGuardian = {
                 excludedFlags: ['$teleportation'],
                 zones: ['cocoon'],
             },
+            allowSpirit: true,
             isExclusive: true,
             text: [
                 {
@@ -56,7 +57,7 @@ dialogueHash.tombGuardian = {
         {
             logicCheck: {
                 requiredFlags: ['cocoonBoss'],
-                excludedFlags: ['$teleportation', '$isSpirit'],
+                excludedFlags: ['$teleportation'],
                 zones: ['cocoon'],
             },
             isExclusive: true,

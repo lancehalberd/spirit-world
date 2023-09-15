@@ -647,6 +647,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'roll') {
+        hero.swimming = false;
+        hero.wading = false;
         // Double pressing roll performs a quick somersault.
         if (wasGameKeyPressed(state, GAME_KEY.ROLL)
             && hero.savedData.passiveTools.roll > 1
@@ -656,7 +658,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             performSomersault(state, hero);
             return true;
         }
-        // Holding roll performs a normal somersaul with preparation.
+        // Holding roll performs a normal somersault with preparation.
         if (isGameKeyDown(state, GAME_KEY.ROLL)
             && hero.savedData.passiveTools.roll > 1
             && hero.actionFrame === 11
@@ -669,9 +671,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
             hero.animationTime = 0;
-            // Don't allow rolling for two frames after completing a roll.
+            // Don't allow rolling for two Sframes after completing a roll.
             // This helps keep players from rolling over pits.
             hero.rollCooldown = 40;
+            // Immediately check for floor effects so we detect pits/water/slipping as soon as the roll is over.
+            checkForFloorEffects(state, hero);
         } else {
             const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
             const speedFactor = hero.equippedBoots === 'ironBoots' ? 0.5 : 1;

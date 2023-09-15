@@ -269,6 +269,10 @@ export class NPC implements Actor, ObjectInstance  {
         };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
+        const dialogue = this.getNextDialogue(state);
+        if (!dialogue) {
+            return;
+        }
         this.showMessage = true;
         // Face the player while talking.
         this.d = rotateDirection(hero.d, 2);
@@ -297,8 +301,12 @@ export class NPC implements Actor, ObjectInstance  {
         this.mode = mode;
         this.modeTime = 0;
     }
-    getNextDialogue(state: GameState): Dialogue|undefined {
+    getNextDialogue(state: GameState, advanceIndex = false): Dialogue|undefined {
         if (!this.definition.dialogueKey) {
+            // custom dialogue is not used on the astral projection.
+            if (state.hero.astralProjection) {
+                return;
+            }
             return {
                 text: this.definition.dialogue ?? '...',
                 dialogueIndex: this.definition.dialogueIndex ?? -1,
@@ -313,35 +321,26 @@ export class NPC implements Actor, ObjectInstance  {
             this.dialogueIndex = 0;
         }
         this.lastDialogueOption = dialogueOption;
-        return dialogueOption.text[this.dialogueIndex];
-    }
-    update(state: GameState) {
-        if (this.showMessage) {
-            this.showMessage = false;
-            if (!this.definition.dialogueKey) {
-                // This text is shown if custom dialogue is set for an NPC but not defined.
-                showMessage(state, this.definition.dialogue ?? '...');
-                setDialogueHeard(state, this.definition.dialogueIndex);
-                return;
-            }
-            const dialogueOption = selectDialogueOption(state, this.definition.dialogueKey);
-            if (!dialogueOption) {
-                // This text is shown if there was no valid dialogue option.
-                showMessage(state, '???');
-                return;
-            }
-            if (dialogueOption !== this.lastDialogueOption) {
-                this.dialogueIndex = 0;
-            }
-            this.lastDialogueOption = dialogueOption;
-            // Need to track if the dialogue option changed here so that we can reset index if it changes.
-            const dialogue = dialogueOption.text[this.dialogueIndex];
-            showMessage(state, dialogue.text);
+        const dialogue = dialogueOption.text[this.dialogueIndex];
+        // This flag should only be set when we actually show this dialogue to the player.
+        if (advanceIndex) {
             this.dialogueIndex++;
             if (this.dialogueIndex >= dialogueOption.text.length) {
                 this.dialogueIndex = dialogueOption.repeatIndex ?? this.dialogueIndex - 1;
             }
-            setDialogueHeard(state, dialogue.dialogueIndex);
+        }
+        return dialogue;
+    }
+    update(state: GameState) {
+        if (this.showMessage) {
+            this.showMessage = false;
+            const dialogue = this.getNextDialogue(state, true);
+            if (dialogue) {
+                showMessage(state, dialogue.text);
+                if (dialogue.dialogueIndex >= 0) {
+                    setDialogueHeard(state, dialogue.dialogueIndex);
+                }
+            }
             return;
         }
         npcBehaviors[this.definition.behavior]?.(state, this);

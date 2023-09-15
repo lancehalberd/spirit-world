@@ -40,6 +40,9 @@ interface DialogueOption {
     // If defined, this option will only be valid for objects with a matching object id on their object definition.
     // Only supported for saveStatues currently, but it could be easily added to NPCs as well.
     objectId?: string
+    // By default dialogue is not available when using astral projection. Set this flag to allow it for astral projection.
+    // Set this and include `requiredFlags:  '$isSpirit']` on the logic check to restrict dialogue to only the astral projection.
+    allowSpirit?: boolean
     // If this is set, this flag will be set once the player has finished this dialogue option.
     // Combining this with the same flag in `excludedFlags` will cause dialogue to occur no more than once
     // and should be used for dialogue that grants rewards to prevent giving the awards multiple times.

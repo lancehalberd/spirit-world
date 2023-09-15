@@ -35,18 +35,8 @@ Graphics:
 
 Current tasks:
     - Improvements prioritized for new helix dungeon:
-        - Allow throwing rocks diagonally.
         - Fix jumping south to only land on the next immediate tile if southernFacingWall is < 32px
         - Fix jumping north into a southern facing wall should stop the movement and not land inside the wall.
-
-    - Bug fixes
-        - Move money prize to larger platform so you don't fall in pits
-        - different sliding on ice with roll depending on where you start/land
-            -Was from stationary in War Temple with patches of ice.
-        - astral projection skip for iron skin
-            - Should make dialogue unavailable unless it has a specific astral projection flag.
-
-    - Move railing connector bits to `field2` by default.
 
     - Fix push/pull interactions with ledges.
         - Minor issues:
