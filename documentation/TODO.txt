@@ -40,8 +40,6 @@ Current tasks:
         - Chakram can collect money over some cliff ledges.
         - World Tree map is apparently broken:
             "When entering World Tree 1F, the mapping is messed up.  In whichever world we start in, when we're in the SW we see the SW quadrant map for our own world, and when we're in the other quadrants, we see the map for those 3 quadrants but in the other world."
-        - Some ladder issues in War Temple spirit world:
-            "In the War Temple, spirit world, when climbing up the ladder from B1 into the main room on 1F, we keep climbing up over the rocks on the N of the platform, and end up on the ground to the N of the platform.  Also, when going down the ladder, we just vanish as soon as we touch it, but I'm not sure if that's a general ladder issue because I can't seem to find another ladders that can be approached from the sides or front."
         - Hot room determination isn't consistent, for example:
             "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
 
