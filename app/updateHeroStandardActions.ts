@@ -477,6 +477,19 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.vx = dx / 40 + hero.vx * 0.99;
             hero.vy = dy / 40 + hero.vy * 0.99;
         }
+        // If dx/dy is set and the player is not moving backwards, make sure velocity is set high enough to trigger movement.
+        if (dx > 0 && hero.vx >= 0) {
+            hero.vx = Math.max(hero.vx, 0.2);
+        }
+        if (dx < 0 && hero.vx <= 0) {
+            hero.vx = Math.min(hero.vx, -0.2);
+        }
+        if (dy > 0 && hero.vy >= 0) {
+            hero.vy = Math.max(hero.vy, 0.2);
+        }
+        if (dy < 0 && hero.vy <= 0) {
+            hero.vy = Math.min(hero.vy, -0.2);
+        }
         const mag = Math.sqrt(hero.vx * hero.vx + hero.vy * hero.vy);
         const maxSpeed = 2.5;
         if (mag > maxSpeed) {
@@ -488,13 +501,13 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.vy = dy;
     }
     // This threshold needs to be small enough that it is reached when moving with cloud boots from a stand still.
-    if (Math.abs(hero.vx) > 0.2 || Math.abs(hero.vy) > 0.2) {
+    if (Math.abs(hero.vx) >= 0.2 || Math.abs(hero.vy) >= 0.2) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         // Only move if the hero is trying to move in the current direction or if
         // their velocity is sufficiently large enough from slipping to keep them moving.
-        const moveX = (Math.abs(hero.vx) > 0.2 || dx * hero.vx > 0) ? hero.vx : 0;
-        const moveY = (Math.abs(hero.vy) > 0.2 || dy * hero.vy > 0) ? hero.vy : 0;
+        const moveX = (Math.abs(hero.vx) >= 0.2 || dx * hero.vx > 0) ? hero.vx : 0;
+        const moveY = (Math.abs(hero.vy) >= 0.2 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
