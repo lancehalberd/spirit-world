@@ -148,7 +148,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'lightningBlessing': return `You have obtained the ${lootName}!`;
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
-        case 'goldOre': return `You found some ${lootName}`;
+        case 'goldOre': return `You found some ${lootName}!`;
     }
     return `You found the ${lootName}!`;
 }

@@ -38,7 +38,6 @@ Current tasks:
         - Vanara village music in the Fertility Temple
         - Money bug can be knocked up ledges in the crater.
         - Chakram can collect money over some cliff ledges.
-        - Should "You found some Silver Ore" have a period at the end? Just make this consistent with other item get messages.
         - Missing animation when swimming under ceilings
         - Missing animation when walking over staff underwater with iron boots.
         - World Tree map is apparently broken:
