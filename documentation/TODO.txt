@@ -18,6 +18,9 @@ Known Bugs:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
+        - Chakram / Bow can hit tiles below ledges sometimes
+            - When chakram is returning over a ledge.
+            - When chakram/bow is fired while standing over the tip of a ledge.
         - Sometimes bow/chakram get stopped when firing down cliff edges
             - This is because these tiles are not marked low.
             - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
@@ -36,7 +39,6 @@ Graphics:
 Current tasks:
     - new bugs from moonmoth:
         - Vanara village music in the Fertility Temple
-        - Chakram can collect money over some cliff ledges.
         - Hot room determination isn't consistent, for example:
             "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
 
