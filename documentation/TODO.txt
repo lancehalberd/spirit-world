@@ -58,8 +58,6 @@ Current tasks:
             When I leave the room and return, it's fine."
         - Ice snakes can fall in water due to unfreezeable water behind foreground.
 
-    - Move Nimbus Cloud to be the first passive tool listed so it is easier to access.
-
     WAI:
         - Invisibility causes conveyer belts not to effect us.
             - This is a bit unintuitive so maybe we should change it.

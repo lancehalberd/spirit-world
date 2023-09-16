@@ -47,9 +47,9 @@ function getDefaultSavedHeroData(): SavedHeroData {
             ironBoots: 0,
         },
         passiveTools: {
+            nimbusCloud: 0,
             gloves: 0,
             roll: 0,
-            nimbusCloud: 0,
             catEyes: 0,
             spiritSight: 0,
             trueSight: 0,
