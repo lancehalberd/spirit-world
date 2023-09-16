@@ -809,8 +809,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x0-crystalBat-0", x: 204, y: 132, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x0-crystalBat-1", x: 276, y: 132, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x0-crystalGuardian-0", x: 192, y: 72, type: "enemy", enemyType: "crystalGuardian", d: "down", params: {}},
-        {status: "normal", id: "", linked: true, x: 400, y: 104, style: "short", type: "sign", message: "", spirit: true},
-        {status: "normal", id: "", linked: true, x: 128, y: 104, style: "short", type: "sign", message: "", spirit: true},
+        {status: "normal", id: "", linked: true, x: 400, y: 104, style: "short", type: "sign", message: "Sometimes fighting is the only way to proceed.", spirit: true},
+        {status: "normal", id: "", linked: true, x: 128, y: 104, style: "short", type: "sign", message: "Reach the stage and speak to me if you wish to become as tough as iron.", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 358, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 1},
@@ -1093,7 +1093,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-2", x: 272, y: 144, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-3", x: 320, y: 112, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "gauntletSave", x: 48, y: 304, type: "saveStatue"},
-        {status: "normal", id: "", linked: true, x: 304, y: 296, style: "short", type: "sign", message: "", spirit: true},
+        {status: "normal", id: "", linked: true, x: 304, y: 296, style: "short", type: "sign", message: "Some objects are only visible with enhanced sight.", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 359, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 3},

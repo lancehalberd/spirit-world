@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -392,7 +391,7 @@ const f1_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "hidden", id: "bossBubblesSouth", x: 240, y: 384, type: "airBubbles"},
-        {status: "hidden", id: "bossBubblesWeset", x: 112, y: 240, type: "airBubbles"},
+        {status: "hidden", id: "bossBubblesWest", x: 112, y: 240, type: "airBubbles"},
         {status: "hidden", id: "bossBubblesEast", x: 384, y: 256, type: "airBubbles"},
         {status: "hidden", id: "bossBubblesNorth", x: 256, y: 112, type: "airBubbles"},
         {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
@@ -515,6 +514,7 @@ const sf1_0x0: AreaDefinition = null;
 const sf1_0x1: AreaDefinition = null;
 zones.riverTempleWater = {
     key: 'riverTempleWater',
+    areaSize: {w: 32, h: 32},
     surfaceKey: 'riverTemple',
     floors: [
         {

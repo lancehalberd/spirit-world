@@ -34,6 +34,38 @@ Graphics:
 
 
 Current tasks:
+    - new bugs from moonmoth:
+        - Vanara village music in the Fertility Temple
+        - Call "Fertility Temple" consistently, remove "Forest Temple" from text. Use a constant for this.
+        - Money bug can be knocked up ledges in the crater.
+        - Chakram can collect money over some cliff ledges.
+        - Should "You found some Silver Ore" have a period at the end? Just make this consistent with other item get messages.
+        - Missing animation when swimming under ceilings
+        - Missing animation when walking over staff underwater with iron boots.
+        - World Tree map is apparently broken:
+            "When entering World Tree 1F, the mapping is messed up.  In whichever world we start in, when we're in the SW we see the SW quadrant map for our own world, and when we're in the other quadrants, we see the map for those 3 quadrants but in the other world."
+        - Sliding on staff that is over ice with leather boots.
+        - Save does not include iron skin levels or boot selection.
+        - Cannot push balls while on ice (but can with cloud boots)
+        - Some ladder issues in War Temple spirit world:
+            "In the War Temple, spirit world, when climbing up the ladder from B1 into the main room on 1F, we keep climbing up over the rocks on the N of the platform, and end up on the ground to the N of the platform.  Also, when going down the ladder, we just vanish as soon as we touch it, but I'm not sure if that's a general ladder issue because I can't seem to find another ladders that can be approached from the sides or front."
+        - M opens map from menu, but Enter does not open inventory from map.
+            - Should make this consistent, but which way? I think maybe letting you switch to the inventory seems good.
+        - Hot room determination isn't consistent, for example:
+            "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
+        - Can the player freeze doors?
+            "In the Holy Sanctum, fire section, when I shoot a door leading N with an ice arrow, I can't go through it.
+            When I leave the room and return, it's fine."
+        - Ice snakes can fall in water due to unfreezeable water behind foreground.
+
+    - Move Nimbus Cloud to be the first passive tool listed so it is easier to access.
+
+    WAI:
+        - Invisibility causes conveyer belts not to effect us.
+            - This is a bit unintuitive so maybe we should change it.
+
+
+
     - Fix push/pull interactions with ledges.
         - Minor issues:
             - Pot can render in front of you when standing on ledge above it.
