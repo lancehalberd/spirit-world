@@ -510,7 +510,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         const moveY = (Math.abs(hero.vy) >= 0.2 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
-                canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
+                canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging && !isHeroFloating(state, hero) && ! isHeroSinking(state, hero)
                     // You can only push if you are moving the direction you are trying to move.
                     // Neither dimension can be negative, and one dimension must be positive.
                     && (hero.vx * dx >= 0 && hero.vy * dy >= 0) && (hero.vx * dx > 0 || hero.vy * dy > 0),

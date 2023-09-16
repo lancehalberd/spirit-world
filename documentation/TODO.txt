@@ -38,7 +38,6 @@ Current tasks:
         - Vanara village music in the Fertility Temple
         - Money bug can be knocked up ledges in the crater.
         - Chakram can collect money over some cliff ledges.
-        - Missing animation when swimming under ceilings
         - World Tree map is apparently broken:
             "When entering World Tree 1F, the mapping is messed up.  In whichever world we start in, when we're in the SW we see the SW quadrant map for our own world, and when we're in the other quadrants, we see the map for those 3 quadrants but in the other world."
         - Some ladder issues in War Temple spirit world:
@@ -48,6 +47,7 @@ Current tasks:
 
     - Prevent swimming while invisible.
 
+    - Add underwater swimming animation once Jon provides it.
 
 
     - Fix push/pull interactions with ledges.
