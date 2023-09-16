@@ -85,9 +85,15 @@ export function update() {
                     )
                 )
             ) {
-                state.paused = !state.paused;
-                state.showMap = false;
-                state.menuIndex = 0;
+                if (state.paused && state.showMap) {
+                    // If the map was showing, just switch to the menu.
+                    state.showMap = false;
+                    state.menuIndex = 0;
+                } else {
+                    state.paused = !state.paused;
+                    state.showMap = false;
+                    state.menuIndex = 0;
+                }
                 updateSoundSettings(state);
             }
         }
