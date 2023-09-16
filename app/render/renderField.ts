@@ -1,4 +1,5 @@
 import { getOrCreateAreaInstance } from 'app/content/areas';
+import { allTiles } from 'app/content/tiles';
 import { editingState } from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
@@ -612,6 +613,12 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
             let tile = layer.tiles[y][x];
             const maskTile = layer.maskTiles?.[y]?.[x];
             context.save();
+            if (tile?.behaviors?.underTile > 1 && tile?.behaviors?.showUnderTile) {
+                const underTile = allTiles[tile?.behaviors?.underTile];
+                if (underTile?.frame) {
+                    drawFrame(context, underTile.frame, {x: x * w, y: y * h, w, h});
+                }
+            }
             if (editingState.isEditing) {
                 if (tile?.behaviors?.editorTransparency) {
                     context.globalAlpha *= tile.behaviors.editorTransparency;

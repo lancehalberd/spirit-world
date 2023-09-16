@@ -52,11 +52,8 @@ Current tasks:
         - Can the player freeze doors?
             "In the Holy Sanctum, fire section, when I shoot a door leading N with an ice arrow, I can't go through it.
             When I leave the room and return, it's fine."
-        - Ice snakes can fall in water due to unfreezeable water behind foreground.
 
-    WAI:
-        - Invisibility causes conveyer belts not to effect us.
-            - This is a bit unintuitive so maybe we should change it.
+    - Prevent swimming while invisible.
 
 
 
@@ -198,12 +195,6 @@ Current tasks:
         - Use expicit floor cues if defined.
         - Only do if a Map Label is defined.
         - Show a map cue any time the floor changes when entering a new area section.
-
-    - Allow freezing tiles behind foreground walls
-        - Also allow freezing water tiles underneath masks so the ice appears under the shore line.
-        - This should be okay since the solid/solidMap is applied on top of the frozen layer
-        - Test that this doesn't break unfreezing the tile.
-        - In particular there are water tiles behind southern foreground walls that cannot be frozen which is unintuitive and annoying
 
     Charging Beetle Hybrids
         Storm - Instead of a normal charge, show a red ray warning and then do a lightning warp up to 96px that hurts everything in between.

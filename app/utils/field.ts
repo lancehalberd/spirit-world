@@ -542,11 +542,6 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
             // Cannot freeze generic ground tiles in hot areas.
             && !state.areaSection?.isHot
-            && !behavior?.solid && !behavior?.solidMap
-            // Cannot freeze ground when staff is on top of it.
-            && !behavior?.blocksStaff
-            //&& !(behavior?.covered || behavior?.blocksStaff)
-            && !behavior?.pit && !behavior?.ledges && !behavior?.diagonalLedge
             // Only attackes that hit allies freeze most ground tiles. Attacks from the player should only freeze water tiles
             // and any ground tiles that are useful to freeze.
             && (hit.hitAllies
@@ -555,12 +550,30 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             )
         ) {
             let topLayer: AreaLayer = area.layers[0];
+            let foundBlockingLayer = false;
+            // We want to allow freezing on top of ledge behaviors without losing the ledge behaviors, so we have to
+            // record any found any then include those on the frozen tile behavior.
+            let underLedges: any, underDiagonalLedge: any;
             for (const layer of area.layers) {
                 // 'foreground' layer defaults to being in the foreground regardless of drawPriority.
                 if (layer.definition.key !== 'foreground' && layer.definition.drawPriority !== 'foreground') {
                     const behaviors = layer.tiles[target.y][target.x]?.behaviors;
-                    if (!behaviors?.isOverlay) {
+                    // Blocking layers prevent freezing until another layer is found that erases the blocking behavior.
+                    if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.cloudGround || behaviors?.isGround === true)) {
+                        continue;
+                    }
+                    foundBlockingLayer = false;
+                    if (!behaviors?.isOverlay
+                        && !behaviors?.solid && !behaviors?.solidMap
+                        && !behaviors?.pit
+                    ) {
+                        underLedges = behaviors?.ledges || underLedges;
+                        underDiagonalLedge = behaviors?.diagonalLedge || underDiagonalLedge;
                         topLayer = layer;
+                    } else {
+                        foundBlockingLayer = true;
+                        underLedges = undefined;
+                        underDiagonalLedge = undefined;
                     }
                 } else {
                     break;
@@ -568,12 +581,20 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
             // Fabricate a frozen tile that has the original tile "underneath it", so it will
             // return to the original state if exposed to fire.
+            const underTile = topLayer.tiles[target.y][target.x];
             topLayer.tiles[target.y][target.x] = {
                 ...allTiles[294],
                 behaviors: {
                     ...allTiles[294].behaviors,
+                    // This is set to draw the underTile under the ice.
+                    // The element tile is actually what is used to replace the tile if
+                    // the ice is melted.
+                    underTile: underTile?.index || 0,
+                    showUnderTile: true,
+                    ledges: underLedges,
+                    diagonalLedge: underDiagonalLedge,
                     elementTiles: {
-                        fire: topLayer.tiles[target.y][target.x]?.index || 0,
+                        fire: underTile?.index || 0,
                     },
                 },
             };
