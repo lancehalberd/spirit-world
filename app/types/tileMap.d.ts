@@ -258,7 +258,10 @@ type LogicalZoneKey =
     // Beast dungeons
     | 'riverTemple' | 'crater' | 'staffTower'
     // Final dungeons
-    | 'warPalace' | 'lab' | 'tree' | 'void';
+    | 'warPalace' | 'lab' |
+    // This functions as a single dungeon, but currently it is too large to fit both on a single map.
+    'tree' | 'treeSpirit'
+    | 'void';
 
 interface FullZoneLocation extends ZoneLocation {
     logicalZoneKey: LogicalZoneKey

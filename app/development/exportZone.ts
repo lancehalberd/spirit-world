@@ -48,10 +48,11 @@ export function serializeZone(zone: Zone) {
             for (let row = 0; row < areaGrid.length; row++) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
-                    if (!area || (emptyAreas.includes(area) && !area.objects.length)) {
+                    // Section indexes + map ids for maps won't get saved if we do this, so never set entire area definitions to null.
+                    /*if (!area || (emptyAreas.includes(area) && !area.objects.length)) {
                         lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = null;`);
                         continue;
-                    }
+                    }*/
                     lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = {`);
                     if (key === 'sf') {
                         lines.push(`    isSpiritWorld: true,`);

@@ -73,7 +73,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
         objects: [],
         // Spirit world sections should match their parent definition, otherwise the
         // camera will not be aligned correctly when switching back and forth.
-        sections: parentDefinition.sections.map(section => ({...section})),
+        sections: parentDefinition.sections.map(section => ({...section, sectionIndex: undefined})),
     };
 }
 

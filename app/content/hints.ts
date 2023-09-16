@@ -600,6 +600,7 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'staffTower': return 'in the Staff Tower';
         case 'warPalace': return 'in the Palace of War';
         case 'lab': return 'in the Hidden Laboratory';
+        case 'treeSpirit': return 'in the World Tree';
         case 'tree': return 'in the World Tree';
         case 'void': return 'in the abyss of space';
         case 'gauntlet': return 'in the Gauntlet under the Grand Temple';

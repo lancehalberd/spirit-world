@@ -43,15 +43,19 @@ export function populateAllSections() {
                 const isSpiritWorld = grid === floor.spiritGrid;
                 for (let y = 0; y < grid.length; y++) {
                     for (let x = 0; x < grid[y].length; x++) {
-                        for (const section of (grid[y][x]?.sections || [])) {
-                            const location: ZoneLocation = {
-                                zoneKey,
-                                floor: floorIndex,
-                                isSpiritWorld,
-                                areaGridCoords: {x, y},
-                                x: 0, y: 0,
-                                d: 'down'
-                            }
+                        const location: ZoneLocation = {
+                            zoneKey,
+                            floor: floorIndex,
+                            isSpiritWorld,
+                            areaGridCoords: {x, y},
+                            x: 0, y: 0,
+                            d: 'down'
+                        }
+                        const area = getAreaFromLocation(location);
+                        if (!grid[y][x]) {
+                            grid[y][x] = area;
+                        }
+                        for (const section of grid[y][x].sections) {
                             if (section.index >= 0) {
                                 // If this spot was assigned, move whatever is there to a new location.
                                 if (allSections[section.index]) {
@@ -61,7 +65,7 @@ export function populateAllSections() {
                                 }
                                 allSections[section.index] = {
                                     section,
-                                    area: getAreaFromLocation(location),
+                                    area,
                                     zoneKey,
                                     floor: floorIndex,
                                     coords: [x, y],
@@ -70,7 +74,7 @@ export function populateAllSections() {
                             } else {
                                 newSections.push({
                                     section,
-                                    area: getAreaFromLocation(location),
+                                    area,
                                     zoneKey,
                                     floor: floorIndex,
                                     coords: [x, y],

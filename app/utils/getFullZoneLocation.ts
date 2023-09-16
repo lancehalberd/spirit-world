@@ -43,6 +43,8 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         || zoneKey === 'fireSanctum' || zoneKey === 'lightningSanctum' || zoneKey === 'iceSanctum'
     ) {
         logicalZoneKey = 'holySanctum';
+    } else if (zoneKey === 'tree') {
+        logicalZoneKey = isSpiritWorld ? 'treeSpirit' : 'tree';
     }
     return {
         ...location,
@@ -89,6 +91,7 @@ export function getShortZoneName(location: ZoneLocation): string {
         case 'warPalace': return 'War Palace';
         case 'lab': return 'Hidden Lab';
         case 'tree': return 'World Tree';
+        case 'treeSpirit': return 'World Tree';
         case 'void': return 'Abyss';
         case 'gauntlet': return 'Gauntlet';
         case 'holySanctum': return 'Holy Sanctum';
