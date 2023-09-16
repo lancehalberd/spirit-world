@@ -455,7 +455,7 @@ export function renderAreaObjectsBeforeHero(
         // Background objects are rendered in order of their drawPriorityIndex value.
         backgroundObjects.sort((A, B) => (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0));
         for (const objectOrEffect of backgroundObjects) {
-            if (objectOrEffect.area.definition === area.definition) {
+            if (objectOrEffect.area?.definition === area.definition) {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
@@ -463,7 +463,7 @@ export function renderAreaObjectsBeforeHero(
         }
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
-            if (objectOrEffect.area.definition === area.definition) {
+            if (objectOrEffect.area?.definition === area.definition) {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
@@ -519,7 +519,7 @@ export function renderAreaObjectsAfterHero(
         // Background objects are rendered in order of their drawPriorityIndex value.
         backgroundObjects.sort((A, B) => (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0));
         for (const objectOrEffect of backgroundObjects) {
-            if (objectOrEffect.area.definition === area.definition) {
+            if (objectOrEffect.area?.definition === area.definition) {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
@@ -528,7 +528,7 @@ export function renderAreaObjectsAfterHero(
         // Sprite objects are rendered in order of their y positions.
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
-            if (objectOrEffect.area.definition === area.definition) {
+            if (objectOrEffect.area?.definition === area.definition) {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.render?.(context, state));
             } else {
                 renderObjectWithEffects(context, state, objectOrEffect, () => objectOrEffect.alternateRender?.(context, state));
