@@ -42,7 +42,6 @@ Current tasks:
         - Missing animation when walking over staff underwater with iron boots.
         - World Tree map is apparently broken:
             "When entering World Tree 1F, the mapping is messed up.  In whichever world we start in, when we're in the SW we see the SW quadrant map for our own world, and when we're in the other quadrants, we see the map for those 3 quadrants but in the other world."
-        - Sliding on staff that is over ice with leather boots.
         - Save does not include iron skin levels or boot selection.
         - Cannot push balls while on ice (but can with cloud boots)
         - Some ladder issues in War Temple spirit world:
