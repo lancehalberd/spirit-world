@@ -4,16 +4,14 @@ import { simpleLootTable } from 'app/content/lootTables';
 import { Enemy } from 'app/content/enemy';
 
 import { omniAnimation } from 'app/content/enemyAnimations';
-import { createAnimation, frameAnimation } from 'app/utils/animations';
+import { createAnimation } from 'app/utils/animations';
 import { moveEnemyToTargetLocation, paceRandomly } from 'app/utils/enemies';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
-export const [
-    /* container */, fireFrame, iceFrame, lightningFrame
-] = createAnimation('gfx/hud/elementhud.png',
-    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 4}
-).frames;
+const elementalFlameAnimation = createAnimation('gfx/enemies/elementalFlame.png', {w: 20, h: 20, content: {x: 2, y: 4, w: 16, h: 16}}, {cols: 4, duration: 5});
+const elementalFrostAnimation = createAnimation('gfx/enemies/elementalFrost.png', {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 10, duration: 10});
+const elementalStormAnimation = createAnimation('gfx/enemies/elementalStorm.png', {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 4, duration: 5});
 
 interface ElementalProps {
     possessionTarget?: Enemy
@@ -33,7 +31,7 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
                 enemy.params.possessedTarget.defaultRender(context, state);
             context.restore();
             context.save();
-                context.globalAlpha *= (0.5 + 0.1 * Math.sin(enemy.time / 100));
+                context.globalAlpha *= (0.4 + 0.1 * Math.sin(enemy.time / 100));
                 enemy.defaultRender(context, state);
             context.restore();
         } else {
@@ -87,17 +85,17 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
 
 enemyDefinitions.elementalFlame = {
     ...baseElementalDefinition,
-    animations: {idle: omniAnimation(frameAnimation(fireFrame))}, life: 1, touchHit: {element: 'fire', damage: 1}, update: paceRandomlyAndPossess,
+    animations: {idle: omniAnimation(elementalFlameAnimation)}, life: 1, touchHit: {element: 'fire', damage: 1}, update: paceRandomlyAndPossess,
     immunities: ['fire', null],
 };
 enemyDefinitions.elementalFrost = {
     ...baseElementalDefinition,
-    animations: {idle: omniAnimation(frameAnimation(iceFrame))}, life: 1, touchHit: {element: 'ice', damage: 1}, update: paceRandomlyAndPossess,
+    animations: {idle: omniAnimation(elementalFrostAnimation)}, life: 1, touchHit: {element: 'ice', damage: 1}, update: paceRandomlyAndPossess,
     immunities: ['ice', null],
 };
 enemyDefinitions.elementalStorm = {
     ...baseElementalDefinition,
-    animations: {idle: omniAnimation(frameAnimation(lightningFrame))}, life: 1, touchHit: {element: 'lightning', damage: 1}, update: paceRandomlyAndPossess,
+    animations: {idle: omniAnimation(elementalStormAnimation)}, life: 1, touchHit: {element: 'lightning', damage: 1}, update: paceRandomlyAndPossess,
     immunities: ['lightning', null],
 };
 
@@ -121,7 +119,8 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
         enemy.flying = enemy.params.possessedTarget.flying;
         const hitbox = enemy.params.possessedTarget.getHitbox();
         enemy.x = hitbox.x + hitbox.w / 2 - 8;
-        enemy.y = hitbox.y + hitbox.h / 2 - 8;
+        enemy.y = hitbox.y + hitbox.h / 2 - 8 + enemy.params.possessedTarget.z;
+        enemy.z = enemy.params.possessedTarget.z;
         enemy.updateDrawPriority();
         return;
     } else {
@@ -132,7 +131,7 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
     // Search for an enemy in the alternate world to possess.
     // In cannon, the elementals only exist in the spirit world and possess enemies in the material world.
     for (const alternateEnemy of enemy.area.alternateArea.enemies) {
-        if (alternateEnemy.isDefeated || !alternateEnemy.isInCurrentSection(state)) {
+        if (!isTargetAvailable(state, enemy, alternateEnemy) || !alternateEnemy.isInCurrentSection(state)) {
             continue;
         }
         const hybridEnemyType = alternateEnemy.enemyDefinition?.hybrids?.[enemy.definition.enemyType];
