@@ -88,7 +88,11 @@ export const updateMusic = (state: GameState): void => {
             playTrack('mainTheme', 0, soundSettings);
         }
     }  else if (location.zoneKey === 'treeVillage') {
-        playTrack('vanaraForestTheme', 0, soundSettings);
+        if (location.isSpiritWorld) {
+            playTrack('dungeonTheme', 0, soundSettings);
+        } else {
+            playTrack('vanaraForestTheme', 0, soundSettings);
+        }
     } else if (location.zoneKey === 'sky') {
         if (location.isSpiritWorld) {
             playTrack('vanaraDreamTheme', 0, soundSettings);
