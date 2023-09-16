@@ -66,6 +66,15 @@ export function isMovementBlocked(
                     continue;
                 }
             }
+            // Climbable works similar to `isGround` but only if the movementProperties include `canClimb`.
+            if (object.getHitbox && (behaviors?.climbable && movementProperties.canClimb)) {
+                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                    walkableObject = object;
+                    blockingPitObject = null;
+                    blockingSolidObject = null;
+                    continue;
+                }
+            }
             // Would need additional checks here for objects with water/lava/brittle behaviors.
         }
     }

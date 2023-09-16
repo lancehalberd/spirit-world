@@ -71,9 +71,9 @@ interface DoorStyleFrames {
     bigKeyLocked: Frame,
 }
 interface DoorStyleDefinition {
-    w: number,
-    h: number,
-    getHitbox?: (door: Door) => Rect
+    getHitbox: (door: Door) => Rect
+    getPathHitbox: (door: Door) => Rect
+    pathBehaviors?: TileBehaviors
     isStairs?: boolean
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
@@ -82,6 +82,40 @@ interface DoorStyleDefinition {
     up?: DoorStyleFrames,
     left?: DoorStyleFrames,
 }
+
+const oldSquareBaseDoorStyle = {
+    getHitbox(door: Door) {
+        return {x: door.x, y: door.y, w: 32, h: 32};
+    },
+    getPathHitbox(door: Door) {
+        return (door.definition.d === 'up' || door.definition.d === 'down')
+            ? {x: door.x + 8, y: door.y, w: 16, h: 32}
+            // This is slightly lower than you would naively place it in order to prevent
+            // the MCs head from peaking over the top of the frame as they move left/right.
+            : {x: door.x, y: door.y + 10, w: 32, h: 16};
+    },
+};
+
+const commonBaseDoorStyle = {
+    getHitbox(door: Door) {
+        if (door.definition.d === 'up') {
+            return {x: door.x, y: door.y, w: 32, h: 32};
+        }
+        if (door.definition.d === 'down') {
+            return {x: door.x, y: door.y + 8, w: 64, h: 8};
+        }
+        return {x: door.x, y: door.y, w: 16, h: 64};
+    },
+    getPathHitbox(door: Door) {
+        if (door.definition.d === 'up') {
+            return {x: door.x + 8, y: door.y, w: 16, h: 32};
+        }
+        if (door.definition.d === 'down') {
+            return {x: door.x + 24, y: door.y + 8, w: 16, h: 8};
+        }
+        return {x: door.x, y: door.y + 32, w: 16, h: 16};
+    },
+};
 
 const woodImage = 'gfx/tiles/woodhousetilesarranged.png';
 //const woodenCrackedSouthBackground: Frame = requireFrame(woodImage, {x: 48, y: 0, w: 16, h: 16});
@@ -755,8 +789,7 @@ function renderStoneDoorForeground(context: CanvasRenderingContext2D, state: Gam
 
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavernDownstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -769,11 +802,10 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = cavernStairsDown;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     cavernUpstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -786,26 +818,15 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = cavernStairsUp;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     cavern: {
-        w: 64,
-        h: 16,
-        getHitbox(door: Door) {
-            if (door.definition.d === 'up') {
-                return {x: door.x, y: door.y, w: 32, h: 32};
-            }
-            if (door.definition.d === 'down') {
-                return {x: door.x, y: door.y + 8, w: 64, h: 8};
-            }
-            return {x: door.x, y: door.y, w: 16, h: 64};
-        },
+        ...commonBaseDoorStyle,
         render: renderCavernDoor,
-        renderForeground: renderCavernDoorForeground
+        renderForeground: renderCavernDoorForeground,
     },
     crystalDownstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -818,11 +839,10 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = crystalStairsDown;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     crystalUpstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -835,26 +855,15 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = crystalStairsUp;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     crystal: {
-        w: 64,
-        h: 16,
-        getHitbox(door: Door) {
-            if (door.definition.d === 'up') {
-                return {x: door.x, y: door.y, w: 32, h: 32};
-            }
-            if (door.definition.d === 'down') {
-                return {x: door.x, y: door.y + 8, w: 64, h: 8};
-            }
-            return {x: door.x, y: door.y, w: 16, h: 64};
-        },
+        ...commonBaseDoorStyle,
         render: renderCrystalDoor,
-        renderForeground: renderCrystalDoorForeground
+        renderForeground: renderCrystalDoorForeground,
     },
     stoneDownstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -867,11 +876,10 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = stoneStairsDown;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     stoneUpstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -884,26 +892,15 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = stoneStairsUp;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     stone: {
-        w: 64,
-        h: 16,
-        getHitbox(door: Door) {
-            if (door.definition.d === 'up') {
-                return {x: door.x, y: door.y, w: 32, h: 32};
-            }
-            if (door.definition.d === 'down') {
-                return {x: door.x, y: door.y + 8, w: 64, h: 8};
-            }
-            return {x: door.x, y: door.y, w: 16, h: 64};
-        },
+        ...commonBaseDoorStyle,
         render: renderStoneDoor,
-        renderForeground: renderStoneDoorForeground
+        renderForeground: renderStoneDoorForeground,
     },
     woodenDownstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -916,11 +913,10 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = woodenStairsDown;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     woodenUpstairs: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -933,11 +929,12 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             const frame = woodenStairsUp;
             drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        }
+        },
     },
     wooden: {
-        w: 64,
-        h: 16,
+        render: renderWoodenDoor,
+        renderForeground: renderWoodenDoorForeground,
+        // Woodon door graphics look a bit different than others for the left/right orientations.
         getHitbox(door: Door) {
             if (door.definition.d === 'up') {
                 return {x: door.x, y: door.y, w: 32, h: 32};
@@ -945,14 +942,20 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             if (door.definition.d === 'down') {
                 return {x: door.x, y: door.y + 8, w: 64, h: 8};
             }
-            return {x: door.x, y: door.y, w: 16, h: 64};
+            return {x: door.x, y: door.y, w: 16, h: 48};
         },
-        render: renderWoodenDoor,
-        renderForeground: renderWoodenDoorForeground
+        getPathHitbox(door: Door) {
+            if (door.definition.d === 'up') {
+                return {x: door.x + 8, y: door.y, w: 16, h: 32};
+            }
+            if (door.definition.d === 'down') {
+                return {x: door.x + 24, y: door.y + 8, w: 16, h: 8};
+            }
+            return {x: door.x, y: door.y + 16, w: 16, h: 32};
+        },
     },
     cave: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         down: {
             doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southTrapDoor,
             cracked: southCrackedWall,
@@ -991,8 +994,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     lightCave: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         down: {
             doorFrame: lightSouthCaveDoorFrame, doorCeiling: lightSouthCaveDoorCeiling, doorClosed: southTrapDoor,
             cracked: lightSouthCrackedWall,
@@ -1031,8 +1033,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     tree: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         up: {
             doorFrame: treeDoorOpen,
             doorClosed: treeDoorOpen,
@@ -1045,8 +1046,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     knobbyTree: {
-        w: 32,
-        h: 32,
+        ...oldSquareBaseDoorStyle,
         up: {
             doorFrame: knobbyTreeDoorOpen,
             doorClosed: knobbyTreeDoorOpen,
@@ -1059,31 +1059,25 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     ladderUp: {
-        w: 16,
-        h: 32,
-        getHitbox(door: Door) {
-            // Making this ladder narrow prevents climbing down it from the sides, but
-            // has little impact climbing up since the tiles force the hero to the
-            // center of the ladder.
-            return {x: door.x + 6, y: door.y, w: 4, h: 32};
-        },
         render(this: void, context, state, door) {
             if (door.status !== 'normal') {
                 return;
             }
             drawFrame(context, ladderMiddle, {x: door.x, y: door.y, w: 16, h: 16});
             drawFrame(context, ladderBottom, {x: door.x, y: door.y + 16, w: 16, h: 16});
-        }
-    },
-    ladderUpTall: {
-        w: 16,
-        h: 96,
+        },
         getHitbox(door: Door) {
             // Making this ladder narrow prevents climbing down it from the sides, but
             // has little impact climbing up since the tiles force the hero to the
             // center of the ladder.
-            return {x: door.x + 6, y: door.y, w: 4, h: 96};
+            return {x: door.x + 6, y: door.y + 8, w: 4, h: 24};
         },
+        getPathHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 32};
+        },
+        pathBehaviors: {climbable: true},
+    },
+    ladderUpTall: {
         render(this: void, context, state, door) {
             if (door.status !== 'normal') {
                 return;
@@ -1094,26 +1088,46 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 48, w: 16, h: 16});
             drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 64, w: 16, h: 16});
             drawFrame(context, ladderBottom, {x: door.x, y: door.y + 80, w: 16, h: 16});
-        }
+        },
+        getHitbox(door: Door) {
+            // Making this ladder narrow prevents climbing down it from the sides, but
+            // has little impact climbing up since the tiles force the hero to the
+            // center of the ladder.
+            return {x: door.x + 6, y: door.y + 8, w: 4, h: 88};
+        },
+        getPathHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 96};
+        },
+        pathBehaviors: {climbable: true},
     },
     ladderDown: {
-        w: 16,
-        h: 16,
         render(this: void, context, state, door) {
             if (door.status !== 'normal') {
                 return;
             }
             drawFrame(context, ladderTop, {x: door.x, y: door.y - 16, w: 16, h: 16});
             drawFrame(context, ladderDown, {x: door.x, y: door.y, w: 16, h: 16});
-        }
+        },
+        getHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 16};
+        },
+        getPathHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 16};
+        },
+        pathBehaviors: {climbable: true},
     },
-    square: {
-        w: 32,
-        h: 32,
-    },
+    square: oldSquareBaseDoorStyle,
     wideEntrance: {
-        w: 64,
-        h: 16,
+        getHitbox(door: Door) {
+            return (door.definition.d === 'up' || door.definition.d === 'down')
+                ? {x: door.x, y: door.y, w: 64, h: 16}
+                : {x: door.x, y: door.y, w: 16, h: 64};
+        },
+        getPathHitbox(door: Door) {
+            return (door.definition.d === 'up' || door.definition.d === 'down')
+                ? {x: door.x, y: door.y, w: 64, h: 16}
+                : {x: door.x, y: door.y, w: 16, h: 64};
+        },
     },
 };
 export type DoorStyle = keyof typeof doorStyles;

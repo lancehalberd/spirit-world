@@ -9,14 +9,20 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     }
     hero.groundHeight = 0;
     const hitbox = hero.getHitbox(state);
-    for (const entity of [...hero.area.objects, ...hero.area.effects]) {
-        if (!(entity.behaviors?.groundHeight > hero.groundHeight)) {
-            continue;
-        }
-        // The padding here needs to match any used for other interactions with this object,
-        // in particular, movingPlatform padding should match this.
-        if (boxesIntersect(entity.getHitbox(state), hitbox)) {
-            hero.groundHeight = entity.behaviors?.groundHeight;
+    for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
+        for (const entity of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+            if (!entity.getHitbox){
+                continue;
+            }
+            const behaviors = entity.getBehaviors?.(state) || entity.behaviors;
+            if (!(behaviors?.groundHeight > hero.groundHeight)) {
+                continue;
+            }
+            // The padding here needs to match any used for other interactions with this object,
+            // in particular, movingPlatform padding should match this.
+            if (boxesIntersect(entity.getHitbox(state), hitbox)) {
+                hero.groundHeight = behaviors?.groundHeight;
+            }
         }
     }
     hero.z = Math.max(hero.z, hero.groundHeight);
@@ -36,10 +42,19 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     // Apply floor effects from objects/effects.
-    for (const entity of [...hero.area.objects, ...hero.area.effects]) {
-        if (entity.getHitbox && (entity.behaviors?.groundHeight || 0) >= hero.z) {
-            if (entity.behaviors?.slippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
-                hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.equippedBoots !== 'ironBoots');
+    for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
+        for (const entity of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+            if (!entity.getHitbox){
+                continue;
+            }
+            const behaviors = entity.getBehaviors?.(state) || entity.behaviors;
+            if ((behaviors?.groundHeight || 0) >= hero.z) {
+                if (behaviors?.slippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                    hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.equippedBoots !== 'ironBoots');
+                }
+            }
+            if (behaviors?.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                startClimbing = true;
             }
         }
     }

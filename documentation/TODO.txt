@@ -49,9 +49,6 @@ Current tasks:
             - Should make this consistent, but which way? I think maybe letting you switch to the inventory seems good.
         - Hot room determination isn't consistent, for example:
             "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
-        - Can the player freeze doors?
-            "In the Holy Sanctum, fire section, when I shoot a door leading N with an ice arrow, I can't go through it.
-            When I leave the room and return, it's fine."
 
     - Prevent swimming while invisible.
 
