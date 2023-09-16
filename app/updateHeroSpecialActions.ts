@@ -70,7 +70,7 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
 }
 
 export function checkToFallUnderWater(this: void, state: GameState, vz : number): boolean {
-    if (vz > -3 || state.hero.equippedBoots === 'cloudBoots') {
+    if (vz > -3 || state.hero.savedData.equippedBoots === 'cloudBoots') {
         return false;
     }
     const hero = state.hero;
@@ -441,7 +441,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.isUncontrollable) {
             hero.explosionTime += FRAME_LENGTH;
         }
-        const isFloating = isUnderwater(state, hero) && hero.equippedBoots !== 'ironBoots';
+        const isFloating = isUnderwater(state, hero) && hero.savedData.equippedBoots !== 'ironBoots';
         if (isFloating) {
             hero.vz *= 0.9;
             hero.vx *= 0.9;
@@ -596,9 +596,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 // Staff does no damage, hero is knocked back.
                 const [dx, dy] = directionMap[staff.direction];
                 let vz = 2;
-                if (hero.equippedBoots === 'cloudBoots') {
+                if (hero.savedData.equippedBoots === 'cloudBoots') {
                     vz = 3;
-                } else if (hero.equippedBoots === 'ironBoots') {
+                } else if (hero.savedData.equippedBoots === 'ironBoots') {
                     vz = 1;
                 }
                 hero.knockBack(state, {vx: -2.5*dx, vy: -2.5*dy, vz});
@@ -653,13 +653,13 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)
-        && hero.z > minZ + 2 && (hero.equippedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
+        && hero.z > minZ + 2 && (hero.savedData.equippedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
     if (isFallingToGround) {
         hero.action = null;
         hero.z += hero.vz;
         let fallAcceleration = 1;
-        if (hero.equippedBoots === 'cloudBoots') fallAcceleration = 0.5;
-        else if (hero.equippedBoots === 'ironBoots') fallAcceleration = 2;
+        if (hero.savedData.equippedBoots === 'cloudBoots') fallAcceleration = 0.5;
+        else if (hero.savedData.equippedBoots === 'ironBoots') fallAcceleration = 2;
         hero.vz = Math.max(-8, hero.vz - fallAcceleration);
         if (hero.z <= minZ) {
             hero.z = minZ;
@@ -705,7 +705,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             checkForFloorEffects(state, hero);
         } else {
             const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            const speedFactor = hero.equippedBoots === 'ironBoots' ? 0.5 : 1;
+            const speedFactor = hero.savedData.equippedBoots === 'ironBoots' ? 0.5 : 1;
             hero.vx = directionMap[direction][0] * speedFactor * rollSpeed[hero.actionFrame];
             hero.vy = directionMap[direction][1] * speedFactor * rollSpeed[hero.actionFrame];
             hero.actionFrame++;

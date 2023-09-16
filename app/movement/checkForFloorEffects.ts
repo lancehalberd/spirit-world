@@ -38,7 +38,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // any time all four corners are over pits.
     hero.wading = hero.z <= 0;
     hero.swimming = hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
-    hero.slipping = hero.equippedBoots === 'cloudBoots';
+    hero.slipping = hero.savedData.equippedBoots === 'cloudBoots';
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     // Apply floor effects from objects/effects.
@@ -50,7 +50,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             const behaviors = entity.getBehaviors?.(state) || entity.behaviors;
             if ((behaviors?.groundHeight || 0) >= hero.z) {
                 if (behaviors?.slippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
-                    hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.equippedBoots !== 'ironBoots');
+                    hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.savedData.equippedBoots !== 'ironBoots');
                 }
             }
             if (behaviors?.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
@@ -130,11 +130,11 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.water || behaviors.solid) {
                 hero.swimming = false;
             }
-            if (behaviors.slippery && hero.equippedBoots !== 'ironBoots' && hero.z <= 0) {
+            if (behaviors.slippery && hero.savedData.equippedBoots !== 'ironBoots' && hero.z <= 0) {
                 hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible);
             }
             // Clouds boots are not slippery when walking on clouds.
-            if (behaviors.cloudGround && hero.equippedBoots === 'cloudBoots') {
+            if (behaviors.cloudGround && hero.savedData.equippedBoots === 'cloudBoots') {
                 hero.slipping = false;
             }
             if (behaviors.cloudGround) {
@@ -153,7 +153,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
             // like normal damaging ground rather than a pit. This was done because there were many instances
             // it was difficult to reset the player's position when transition screens over lava.
-            if (behaviors.pit || (behaviors.cloudGround && hero.equippedBoots !== 'cloudBoots')) {
+            if (behaviors.pit || (behaviors.cloudGround && hero.savedData.equippedBoots !== 'cloudBoots')) {
                 const tileIsUp = row < bottomRow;
                 const tileIsDown = row > topRow;
                 const tileIsLeft = column < rightColumn;
@@ -186,7 +186,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (hero.swimming && hero.equippedBoots === 'cloudBoots') {
+    if (hero.swimming && hero.savedData.equippedBoots === 'cloudBoots') {
         hero.swimming = false;
         hero.wading = true;
     }
@@ -203,8 +203,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {
             let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];
-            //if (behaviors?.cloudGround && hero.equippedBoots === 'cloudBoots') {
-            if (hero.isOverClouds && hero.equippedBoots === 'cloudBoots') {
+            //if (behaviors?.cloudGround && hero.savedData.equippedBoots === 'cloudBoots') {
+            if (hero.isOverClouds && hero.savedData.equippedBoots === 'cloudBoots') {
                 // Do nothing.
             } else {
                 hero.throwHeldObject(state);

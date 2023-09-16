@@ -20,6 +20,8 @@ function getDefaultSavedHeroData(): SavedHeroData {
         playTime: 0,
         winTime: 0,
         maxLife: 4,
+        ironSkinLife: 0,
+        equippedBoots: 'leatherBoots',
         hasRevive: false,
         money: 0,
         silverOre: 0,

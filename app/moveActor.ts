@@ -140,7 +140,7 @@ function moveActorInDirection(
                 actor.jumpingVz = actor.vz;
             } else {
                 let speed = 2;
-                /*if ((actor as Hero).equippedBoots === 'cloudBoots') {
+                /*if ((actor as Hero).savedData.equippedBoots === 'cloudBoots') {
                     speed = 2.2;
                 } else if ((actor as Hero).equippedBoots === 'ironBoots') {
                     speed = 1.5;

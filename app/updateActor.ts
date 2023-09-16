@@ -171,7 +171,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
                 hero.ironSkinCooldown = 1000;
                 // Iron skin life can be increased over the normal max using shielding units, so don't reduce
                 // iron skin life here it is over the max.
-                hero.ironSkinLife = Math.max(hero.ironSkinLife, Math.min(hero.ironSkinLife + 0.25, hero.savedData.maxLife / 4));
+                hero.savedData.ironSkinLife = Math.max(hero.savedData.ironSkinLife, Math.min(hero.savedData.ironSkinLife + 0.25, hero.savedData.maxLife / 4));
             }
         }
     }
@@ -188,9 +188,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.savedData.passiveTools.phoenixCrown > 0) {
             // If the hero has the phoenix crown, burning causes them to gain spirit instead of draining it an causing damage.
             state.hero.magic += 5 * FRAME_LENGTH / 1000;
-        } else if (hero.ironSkinLife > 0) {
+        } else if (hero.savedData.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
-            hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+            hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
             hero.ironSkinCooldown = 1000;
         } else if (hero.magic > 0) {
             // If the hero has magic, half of burning damage applies to magic and half applies to their life.
@@ -252,7 +252,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             }
         }
         if (object.definition?.type === 'shieldingUnit' && hero.overlaps(object.getHitbox())) {
-            hero.ironSkinLife = Math.min(hero.savedData.maxLife, hero.ironSkinLife + 2 * FRAME_LENGTH / 1000);
+            hero.savedData.ironSkinLife = Math.min(hero.savedData.maxLife, hero.savedData.ironSkinLife + 2 * FRAME_LENGTH / 1000);
         }
     }
     if (hero.life <= 0

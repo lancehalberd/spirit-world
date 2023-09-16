@@ -67,7 +67,6 @@ export class Hero implements Actor {
     attackBufferTime: number = 0;
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number; vy: number; frames: number};
-    equippedBoots: Equipment = 'leatherBoots';
     hasBarrier?: boolean = false;
     isInvisible?: boolean = false;
     isAirborn = false;
@@ -89,7 +88,6 @@ export class Hero implements Actor {
     lastTouchedObject?: EffectInstance | ObjectInstance;
     invulnerableFrames?: number;
     life: number;
-    ironSkinLife: number = 0;
     ironSkinCooldown: number = 500;
     wading?: boolean;
     slipping?: boolean;
@@ -163,7 +161,6 @@ export class Hero implements Actor {
 
     constructor() {
         this.clones = [];
-        this.equippedBoots = 'leatherBoots';
     }
 
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
@@ -310,7 +307,7 @@ export class Hero implements Actor {
             }
             return {};
         }
-        const preventKnockback = this.equippedBoots === 'ironBoots' || this.ironSkinLife > 0;
+        const preventKnockback = this.savedData.equippedBoots === 'ironBoots' || this.savedData.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
             let iframeMultiplier = 1;
@@ -342,7 +339,7 @@ export class Hero implements Actor {
         // Getting hit while frozen unfreezes you.
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
-        } else if (hit.element === 'ice' && !(this.ironSkinLife > 0)) {
+        } else if (hit.element === 'ice' && !(this.savedData.ironSkinLife > 0)) {
             // Getting hit by ice freezes you unless you have iron skin up.
             if (this.savedData.passiveTools.waterBlessing) {
                 this.frozenDuration = 1000;
@@ -417,10 +414,10 @@ export class Hero implements Actor {
             return;
         }
         // Iron Skin is shared across all clones, so use the values from the main hero
-        if (state.hero.ironSkinLife) {
+        if (state.hero.savedData.ironSkinLife) {
             state.hero.ironSkinCooldown = 3000;
-            if (state.hero.ironSkinLife > damage / 2) {
-                state.hero.ironSkinLife -= damage / 2;
+            if (state.hero.savedData.ironSkinLife > damage / 2) {
+                state.hero.savedData.ironSkinLife -= damage / 2;
                 // Iframes are only for the clone taking the damage.
                 this.invulnerableFrames = 50 * iframeMultiplier;
                 //if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
@@ -428,8 +425,8 @@ export class Hero implements Actor {
                 //}
                 return;
             } else {
-                damage -= 2 * state.hero.ironSkinLife;
-                state.hero.ironSkinLife = 0;
+                damage -= 2 * state.hero.savedData.ironSkinLife;
+                state.hero.savedData.ironSkinLife = 0;
             }
         }
         // If any controllable clones are in use,

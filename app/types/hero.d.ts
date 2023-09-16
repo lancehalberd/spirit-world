@@ -137,6 +137,8 @@ interface Hero extends Actor, SavedHeroData {
 
 interface SavedHeroData {
     maxLife: number
+    ironSkinLife: number
+    equippedBoots: Equipment
     // If this isn't set, the hero will start with maxLife.
     life?: number
     hasRevive: boolean

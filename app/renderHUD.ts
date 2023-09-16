@@ -51,17 +51,17 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     // Draw iron skin hearts on top of regular hearts
     x = 26;
     y = 5;
-    for (let i = 0; i < state.hero.ironSkinLife; i++) {
+    for (let i = 0; i < state.hero.savedData.ironSkinLife; i++) {
         if (i === 10) {
             y += 11;
             x = 26;
         }
         let frame: Frame = fullGreyHeart;
-        if (i >= state.hero.ironSkinLife - 0.25) {
+        if (i >= state.hero.savedData.ironSkinLife - 0.25) {
             frame = quarterGreyHeart;
-        } else if (i >= state.hero.ironSkinLife - 0.5) {
+        } else if (i >= state.hero.savedData.ironSkinLife - 0.5) {
             frame = halfGreyHeart;
-        } else if (i >= state.hero.ironSkinLife - 0.75) {
+        } else if (i >= state.hero.savedData.ironSkinLife - 0.75) {
             frame = threeGreyQuarters;
         }
         drawFrame(context, frame, {...frame, x, y});

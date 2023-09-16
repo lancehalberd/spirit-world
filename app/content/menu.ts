@@ -104,7 +104,7 @@ export function setRightTool(state: GameState, tool: ActiveTool): void {
 // Function to set the equipped boots on all copies of the hero.
 export function setEquippedBoots(state: GameState, boots: Equipment): void {
     for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.equippedBoots = boots;
+        hero.savedData.equippedBoots = boots;
     }
 }
 

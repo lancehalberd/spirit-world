@@ -187,7 +187,7 @@ function getAssistanceMenuOption(): MenuOption {
                     onSelect() {
                         const state = getState();
                         state.hero.life = 0.25;
-                        state.hero.ironSkinLife = 0;
+                        state.hero.savedData.ironSkinLife = 0;
                     }
                 },
                 {

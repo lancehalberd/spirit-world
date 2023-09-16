@@ -4,9 +4,9 @@ export function isUnderwater(state: GameState, actor: ObjectInstance): boolean {
 }
 
 export function isHeroSinking(state: GameState, hero: Hero): boolean {
-    return isUnderwater(state, hero) && !hero.isAstralProjection && hero.equippedBoots === 'ironBoots' && hero.z > 0;
+    return isUnderwater(state, hero) && !hero.isAstralProjection && hero.savedData.equippedBoots === 'ironBoots' && hero.z > 0;
 }
 
 export function isHeroFloating(state: GameState, hero: Hero): boolean {
-    return isUnderwater(state, hero) && !hero.isAstralProjection && hero.equippedBoots !== 'ironBoots';
+    return isUnderwater(state, hero) && !hero.isAstralProjection && hero.savedData.equippedBoots !== 'ironBoots';
 }

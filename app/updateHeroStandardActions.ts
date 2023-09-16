@@ -67,9 +67,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.isRunning && hero.magic > 0) {
         movementSpeed *= 1.3;
     }
-    if (hero.equippedBoots === 'ironBoots') {
+    if (hero.savedData.equippedBoots === 'ironBoots') {
         movementSpeed *= 0.6;
-    } else if (hero.equippedBoots === 'cloudBoots') {
+    } else if (hero.savedData.equippedBoots === 'cloudBoots') {
         movementSpeed *= 1.4;
     }
     if (hero.action === 'climbing') {
@@ -126,7 +126,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             testHero.z = 0;
             testHero.area = state.surfaceAreaInstance;
             // Remove equipment from test hero in case it prevents them from swimming (like cloud boots).
-            testHero.equippedBoots = 'leatherBoots';
+            testHero.savedData.equippedBoots = 'leatherBoots';
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
             if (testHero.swimming
@@ -144,12 +144,12 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 return;
             }
         }
-    } else if (hero.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
+    } else if (hero.savedData.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         let fallSpeed = 1;
-        if (hero.equippedBoots === 'cloudBoots') fallSpeed = 0.2;
-        else if (hero.equippedBoots === 'ironBoots') fallSpeed = 2;
+        if (hero.savedData.equippedBoots === 'cloudBoots') fallSpeed = 0.2;
+        else if (hero.savedData.equippedBoots === 'ironBoots') fallSpeed = 2;
         // else if (hero.action === 'roll') fallSpeed = 0.5;
         hero.z = Math.max(minZ, hero.z - fallSpeed);
         if (hero.z <= minZ) {
@@ -159,7 +159,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
 
-    if (hero.swimming && hero.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
+    if (hero.swimming && hero.savedData.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
         isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
     ) {
         /*const mx = hero.x % 16;
@@ -470,7 +470,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (hero.slipping) {
-        if (hero.equippedBoots === 'cloudBoots') {
+        if (hero.savedData.equippedBoots === 'cloudBoots') {
             hero.vx = dx / 10 + hero.vx * 0.95;
             hero.vy = dy / 10 + hero.vy * 0.95;
         } else {
@@ -767,7 +767,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         if (!hero.clones.length && (hero.swimming || isUnderwater(state, hero))) {
             // The meditate key can be used to quickly toggle iron boots in/under water.
             if (hero.savedData.equipment.ironBoots) {
-                if (hero.equippedBoots !== 'ironBoots') {
+                if (hero.savedData.equippedBoots !== 'ironBoots') {
                     setEquippedBoots(state, 'ironBoots');
                 } else {
                     setEquippedBoots(state, 'leatherBoots');
