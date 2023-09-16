@@ -36,7 +36,6 @@ Graphics:
 Current tasks:
     - new bugs from moonmoth:
         - Vanara village music in the Fertility Temple
-        - Money bug can be knocked up ledges in the crater.
         - Chakram can collect money over some cliff ledges.
         - Hot room determination isn't consistent, for example:
             "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."

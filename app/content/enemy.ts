@@ -177,13 +177,22 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         const hitbox = this.getHitbox();
         return hitbox.y + hitbox.h + this.z;
     }
+    getMovementHitbox(): Rect {
+        const frame = this.getFrame();
+        return {
+            x: this.x | 0,
+            y: this.y | 0,
+            w: ((frame.content?.w ?? frame.w) * this.scale) | 0,
+            h: ((frame.content?.h ?? frame.h) * this.scale) | 0,
+        };
+    }
     getDefaultHitbox(): Rect {
         const frame = this.getFrame();
         return {
-            x: this.x,
-            y: this.y - this.z,
-            w: (frame.content?.w ?? frame.w) * this.scale,
-            h: (frame.content?.h ?? frame.h) * this.scale,
+            x: this.x | 0,
+            y: (this.y - this.z) | 0,
+            w: ((frame.content?.w ?? frame.w) * this.scale) | 0,
+            h: ((frame.content?.h ?? frame.h) * this.scale) | 0,
         };
     }
     distanceToPoint(p: Coords): number {
