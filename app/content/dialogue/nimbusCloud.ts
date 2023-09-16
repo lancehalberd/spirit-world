@@ -102,7 +102,7 @@ dialogueHash.nimbusCloud = {
                 return `{choice:Where to?
                         |Jade Palace:nimbusCloud.jadePalace
                         |Shop:nimbusCloud.spiritShop
-                        |Forest Temple:nimbusCloud.forestTemple
+                        |Fertility Temple:nimbusCloud.forestTemple
                         |Sky:nimbusCloud.skyCity
                         |City:nimbusCloud.jadeCity
                         |Nevermind:nimbusCloud.no

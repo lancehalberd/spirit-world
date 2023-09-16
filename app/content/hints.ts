@@ -578,10 +578,9 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'ascentCave': return  'in a cave on the mountain';
         case 'ascentCaveSpirit': return  'in the spirit world in a cave on the mountain';
         case 'fertilityShrine': return 'in the shrine by the forest village';
-        case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
+        case 'fertilityShrineSpirit': return 'in the shrine by the Fertility Temple';
         case 'holyCityInterior': return 'inside the Holy City';
         case 'jadeCityInterior': return 'inside the Jade City';
-        case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
         case 'waterfallCave': return 'in the Cave Village';
         case 'treeVillage': return 'in the Vanara Village';
         case 'peachCave': return 'in the dark cave by the lake';
@@ -590,7 +589,7 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'warTemple': return 'in the Summoner Ruins';
         case 'cocoon': return 'in the Cocoon behind the Vanara Tomb';
         case 'helix': return 'in the Helix';
-        case 'forestTemple': return 'in the Forest Temple';
+        case 'forestTemple': return 'in the Fertility Temple';
         case 'waterfallTower': return 'in the Waterfall Tower';
         case 'forge': return 'in the Forge';
         case 'grandTemple': return 'in the Grand Temple';

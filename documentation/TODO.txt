@@ -36,7 +36,6 @@ Graphics:
 Current tasks:
     - new bugs from moonmoth:
         - Vanara village music in the Fertility Temple
-        - Call "Fertility Temple" consistently, remove "Forest Temple" from text. Use a constant for this.
         - Money bug can be knocked up ledges in the crater.
         - Chakram can collect money over some cliff ledges.
         - Should "You found some Silver Ore" have a period at the end? Just make this consistent with other item get messages.
