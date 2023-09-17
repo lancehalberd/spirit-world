@@ -286,6 +286,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         const speed = isUsingStairs ? 0.75 : (state.nextAreaInstance ? 0.75 : 2);
         hero.x += speed * hero.actionDx;
         hero.y += speed * hero.actionDy;
+        // Make the hero fall to the ground while using doors.
+        // This fixes the hero sliding through doors underwater without animating when
+        // they enter the doorway while sinking but with z > 0/groundHeight.
+        hero.z = Math.max(hero.groundHeight || 0, hero.z - 1);
         // This makes sure the hero displays as swimming/climbing.
         checkForFloorEffects(state, hero);
         // Check if the hero is done moving through the door meaning:

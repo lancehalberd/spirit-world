@@ -172,6 +172,8 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
     hero.actionDy = -directionMap[target.definition.d][1];
     hero.vx = 0;
     hero.vy = 0;
+    // If this isn't set to 0 the hero's sprite might peak over the top of door frames.
+    hero.z = 0;
     // This will be the opposite direction of the door they are coming out of.
     hero.d = getDirection(hero.actionDx, hero.actionDy);
 }

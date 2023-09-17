@@ -39,7 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Going through doors while sinking with iron boots is bad.
     - Staff should despawn when not equipped.
     - Investigate clone throw over ledges
     - Level 2 charge should not work with level 1 bow.

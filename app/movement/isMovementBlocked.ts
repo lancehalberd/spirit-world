@@ -49,6 +49,14 @@ export function isMovementBlocked(
                     return false;
                 }
             }*/
+
+            // Low ceiling objects block all movement if the actors z value is too high
+            // The canSwim check is a hack to keep astral projection out of low areas like door paths.
+            if (behaviors?.lowCeiling && (movementProperties.actor?.z > 3 || !movementProperties.canSwim)) {
+                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                    return {};
+                }
+            }
             if (object.getHitbox && behaviors?.pit && !movementProperties.canFall) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     blockingPitObject = object;
