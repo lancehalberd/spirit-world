@@ -142,6 +142,10 @@ export class Staff implements ObjectInstance {
                 this.remove(state);
             }
             return;
+        } else if (state.hero.savedData.leftTool !== 'staff' && state.hero.savedData.rightTool !== 'staff') {
+            // Staff automatically recalls if it is unequipped.
+            this.recall(state);
+            return;
         }
         this.animationTime += FRAME_LENGTH;
         if (this.isInvalid && this.animationTime > 100) {

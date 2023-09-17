@@ -39,7 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Staff should despawn when not equipped.
     - Investigate clone throw over ledges
     - Level 2 charge should not work with level 1 bow.
     - Staff clipping wall in Helix near the portal

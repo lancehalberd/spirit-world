@@ -148,9 +148,6 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
         hero.isInvisible = false;
     }
-    if (hero.activeStaff && hero.savedData.leftTool !== 'staff' && hero.savedData.rightTool !== 'staff') {
-        hero.activeStaff.recall(state);
-    }
     if (hero.clones?.length && hero.savedData.leftTool !== 'clone' && hero.savedData.rightTool !== 'clone') {
         removeAllClones(state);
     }
