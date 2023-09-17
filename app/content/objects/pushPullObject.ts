@@ -38,12 +38,12 @@ export class PushPullObject implements ObjectInstance {
         return { x: this.x | 0, y: this.y | 0, w: 16, h: 16 };
     }
     onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
-        console.log('pushPullObject.onHit', direction);
+        //console.log('pushPullObject.onHit', direction);
         if (this.pushAmount > 0) {
             return {blocked: true, hit: true};
         }
         if (canPush) {
-            this.pushInDirection(state, direction, null, 16);
+            this.pushInDirection(state, direction, 16);
         }
         return {hit: true};
     }
@@ -175,10 +175,10 @@ export class PushPullObject implements ObjectInstance {
             this.y = this.linkedObject.y;
             return linkedResult;
         }
-       // console.log('move succeeded');
+        //console.log('move succeeded');
         return {mx, my};
     }
-    pushInDirection(state: GameState, direction: Direction, hero: Hero = null, amount = 1): void {
+    pushInDirection(state: GameState, direction: Direction, amount = 1): void {
         //console.log('pushPullObject.pushInDirection', direction, !!hero, amount);
         if (this.pushAmount > 0) {
             return;
@@ -189,7 +189,7 @@ export class PushPullObject implements ObjectInstance {
     update(state: GameState) {
         // Move for `pushAmount` pixels after getting hit by a projectile.
         if (this.pushAmount > 0) {
-            this.pushAmount--;
+            this.pushAmount = Math.max(0, this.pushAmount - 1);
             if (!this.move(state, this.pushDirection)) {
                 this.pushAmount = 0;
             }

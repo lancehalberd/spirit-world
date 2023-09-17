@@ -86,6 +86,7 @@ export class Hero implements Actor {
     grabTile?: TileCoords;
     grabObject?: ObjectInstance;
     lastTouchedObject?: EffectInstance | ObjectInstance;
+    lastPushTime?: number
     invulnerableFrames?: number;
     life: number;
     ironSkinCooldown: number = 500;

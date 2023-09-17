@@ -211,24 +211,25 @@ function checkToPushObject(
     pushedObjects: (ObjectInstance | EffectInstance)[],
     direction: Direction,
     movementProperties: MovementProperties
-) {
+): boolean {
     if (!movementProperties.canPush) {
-        return;
+        return false;
     }
     if (!actorObject.action || actorObject.action === 'walking') {
         actorObject.action = 'pushing';
         // actorObject.animationTime = 0;
     }
     if (!pushedObjects || actorObject.action !== 'pushing') {
-        return;
+        return false;
     }
     if (pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
             actorObject.lastTouchedObject = pushedObjects[0];
+            return true;
         }
     } else if (pushedObjects.length >= 1) {
-        const actorHitbox = actorObject.getMovementHitbox?.()  || actorObject.getHitbox();
+        const actorHitbox = actorObject.getMovementHitbox?.() || actorObject.getHitbox();
         for (const object of pushedObjects) {
             const hitbox = object.getHitbox(state);
             if (Math.abs(actorHitbox.x - hitbox.x) < 8
@@ -239,8 +240,10 @@ function checkToPushObject(
                 if (object.onPush) {
                     object.onPush(state, direction);
                     actorObject.lastTouchedObject = pushedObjects[0];
+                    return true;
                 }
             }
         }
     }
+    return false;
 }

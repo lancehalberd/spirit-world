@@ -477,18 +477,22 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.vx = dx / 40 + hero.vx * 0.99;
             hero.vy = dy / 40 + hero.vy * 0.99;
         }
+        // If the player moves less than 2px a frame while pushing, the pushed object may move out of range and
+        // cause jerky movement. Since pushed objects only move 1px per frame this won't actually cause the player to move this
+        // fast, it will just make sure they keep up with the pushed object.
+        const minSpeed = hero.action === 'pushing' ? 2 : 0.2;
         // If dx/dy is set and the player is not moving backwards, make sure velocity is set high enough to trigger movement.
         if (dx > 0 && hero.vx >= 0) {
-            hero.vx = Math.max(hero.vx, 0.2);
+            hero.vx = Math.max(hero.vx, minSpeed);
         }
         if (dx < 0 && hero.vx <= 0) {
-            hero.vx = Math.min(hero.vx, -0.2);
+            hero.vx = Math.min(hero.vx, -minSpeed);
         }
         if (dy > 0 && hero.vy >= 0) {
-            hero.vy = Math.max(hero.vy, 0.2);
+            hero.vy = Math.max(hero.vy, minSpeed);
         }
         if (dy < 0 && hero.vy <= 0) {
-            hero.vy = Math.min(hero.vy, -0.2);
+            hero.vy = Math.min(hero.vy, -minSpeed);
         }
         const mag = Math.sqrt(hero.vx * hero.vx + hero.vy * hero.vy);
         const maxSpeed = 2.5;

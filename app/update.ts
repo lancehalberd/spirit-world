@@ -128,7 +128,7 @@ export function update() {
             refreshAreaLogic(state, state.alternateAreaInstance);
         }
         const hideMenu = shouldHideMenu(state);
-        if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL))) {
+        if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT))) {
             if (!hideMenu) {
                 updateMenu(state);
             }

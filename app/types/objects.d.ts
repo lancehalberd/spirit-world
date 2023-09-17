@@ -64,6 +64,11 @@ interface BaseFieldInstance {
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    // When the hero hits the effect with a weapon or tool.
+    // This is used by certain enemy attacks, but it might be better to change those to objects.
+    onHit?: (state: GameState, hit: HitProperties) => HitResult
+    // When the hero walks into an object
+    onPush?: (state: GameState, direction: Direction) => void
 }
 
 interface ObjectInstance extends BaseFieldInstance {
@@ -127,12 +132,8 @@ interface ObjectInstance extends BaseFieldInstance {
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void
-    // When the hero hits the object with a weapon or tool
-    onHit?: (state: GameState, hit: HitProperties) => HitResult
     // When the hero grabs an object and attempts to move.
     onPull?: (state: GameState, direction: Direction, hero: Hero) => void
-    // When the hero walks into an object
-    onPush?: (state: GameState, direction: Direction) => void
     pullingHeroDirection?: Direction
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
@@ -169,11 +170,6 @@ interface EffectInstance extends BaseFieldInstance {
     // The calculated yDepth for the object. This is update once per frame before rendering.
     yDepth?: number
     onEnterArea?: (state: GameState) => void
-    // When the hero hits the effect with a weapon or tool.
-    // This is used by certain enemy attacks, but it might be better to change those to objects.
-    onHit?: (state: GameState, hit: HitProperties) => HitResult
-    // When the hero walks into an object
-    onPush?: (state: GameState, direction: Direction) => void
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void

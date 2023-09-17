@@ -39,6 +39,21 @@ Graphics:
 
 
 Current tasks:
+    - Ice appearing over pits.
+    - Switches not being pressed when moving pots for cocoon entrance until I stopped using astral projection.
+    - head peeking out when leaving southern cavern doors.
+    - Bad lava tile on flame beast.
+    - Going through doors while sinking with iron boots is bad.
+    - Staff should despawn when not equipped.
+    - Investigate clone throw over ledges
+    - Level 2 charge should not work with level 1 bow.
+    - Staff clipping wall in Helix near the portal
+    - Update rolling balls to work better in a non-tile aligned world
+        - Snap to goals with ~6px wiggle
+        - When a stone hits a goal, snap the linked object to its position and set it in the goal as well
+        - Make sure all goals are linked for consistency.
+
+
     - new bugs from moonmoth:
         - Hot room determination isn't consistent, for example:
             "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."

@@ -75,6 +75,7 @@ interface Actor extends ObjectInstance {
     pickUpTile?: FullTile
     grabTile?: TileCoords
     grabObject?: ObjectInstance
+    lastPushTime?: number
     lastTouchedObject?: EffectInstance | ObjectInstance
     invulnerableFrames?: number
     life: number
