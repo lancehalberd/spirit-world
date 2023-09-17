@@ -79,7 +79,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     }
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
     // Time passes slowly for everything but the astral projection while meditating.
-    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) !== 0;
+    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) >= 20;
     area.allyTargets = [];
     if (area === state.hero.area) {
         area.allyTargets.push(state.hero);

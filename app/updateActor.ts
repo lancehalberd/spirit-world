@@ -77,7 +77,7 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     updateHero(state, state.hero);
-    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) !== 0;
+    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) >= 20;
     if (!skipFrame) {
         updatePrimaryHeroState(state, state.hero);
     }

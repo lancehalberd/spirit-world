@@ -39,7 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Switches not being pressed when moving pots for cocoon entrance until I stopped using astral projection.
     - head peeking out when leaving southern cavern doors.
     - Bad lava tile on flame beast.
     - Going through doors while sinking with iron boots is bad.
