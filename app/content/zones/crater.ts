@@ -311,7 +311,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "craterMidDoor", x: 368, y: 192, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterMidDoor", d: "up", hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 417, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 516, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -626,7 +626,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "crater:0:1x0-plantFlame-2", x: 212, y: 104, type: "enemy", enemyType: "plantFlame", d: "up", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 418, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 517, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -1200,7 +1200,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "craterLava1", x: 464, y: 64, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "never"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 419, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 518, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -1789,7 +1789,7 @@ const f0_1x1: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,898,887,887,887,887,887,887,887,887,899,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,898,887,905,891,891,891,891,891,891,891,891,904,887,899,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,890,891,887,891,891,891,891,891,891,891,891,891,891,892,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,890,891,891,891,891,891,891,891,891,891,891,891,891,892,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,898,905,891,891,891,891,891,891,891,891,891,891,891,891,904,899,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,890,891,891,891,891,891,891,891,891,891,891,891,891,891,891,892,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,890,891,891,891,891,891,891,891,891,891,891,891,891,891,891,892,0,0,0,0,0,0,0,0],
@@ -1866,7 +1866,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "craterBossPortal", x: 256, y: 272, targetZone: "crater", targetObjectId: "craterBossPortal", type: "teleporter", hasCustomLogic: true, customLogic: "flameBeast"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 421, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 520, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -2265,7 +2265,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "crater:0:2x1-ent-0", x: 164, y: 240, type: "enemy", enemyType: "plantFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava2"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 422, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 521, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -2664,7 +2664,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-snakeFlame-6", x: 220, y: 56, type: "enemy", enemyType: "plantFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 423, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 522, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const f0_1x2: AreaDefinition = {
@@ -3061,7 +3061,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-snakeFlame-7", x: 256, y: 192, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 424, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 523, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const f0_2x2: AreaDefinition = {
@@ -3595,12 +3595,39 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x2-luckyBeetle-0", x: 264, y: 304, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 425, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 524, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
-const sf0_0x0: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = null;
-const sf0_2x0: AreaDefinition = null;
+const sf0_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 417, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 0},
+    ],
+};
+const sf0_1x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 418, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 0},
+    ],
+};
+const sf0_2x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_2x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 419, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 0},
+    ],
+};
 const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_0x1,
@@ -3998,11 +4025,56 @@ const sf0_0x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32, index: 426, mapId: 'craterSpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
-const sf0_1x1: AreaDefinition = null;
-const sf0_2x1: AreaDefinition = null;
-const sf0_0x2: AreaDefinition = null;
-const sf0_1x2: AreaDefinition = null;
-const sf0_2x2: AreaDefinition = null;
+const sf0_1x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 421, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 2},
+    ],
+};
+const sf0_2x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_2x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 422, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 2},
+    ],
+};
+const sf0_0x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x2,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 423, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 4},
+    ],
+};
+const sf0_1x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x2,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 424, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 4},
+    ],
+};
+const sf0_2x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_2x2,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 425, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 4},
+    ],
+};
 const f1_0x0: AreaDefinition = {
     layers: [
         {
@@ -4312,9 +4384,9 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 96, y: 353, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, index: 427, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 1.5},
-        {x: 16, y: 0, w: 16, h: 16, index: 428, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 3, mapY: 1.5},
-        {x: 16, y: 16, w: 16, h: 16, index: 429, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 0.5},
+        {x: 0, y: 0, w: 16, h: 32, index: 533, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 1.5},
+        {x: 16, y: 0, w: 16, h: 16, index: 534, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 3, mapY: 1.5},
+        {x: 16, y: 16, w: 16, h: 16, index: 535, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 0.5},
     ],
 };
 const f1_1x0: AreaDefinition = {
@@ -4626,9 +4698,9 @@ const f1_1x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "craterKey3", x: 160, y: 448, type: "chest", lootType: "smallKey", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 430, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
-        {x: 0, y: 16, w: 16, h: 16, index: 431, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
-        {x: 16, y: 0, w: 16, h: 32, index: 432, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
+        {x: 0, y: 0, w: 16, h: 16, index: 536, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
+        {x: 0, y: 16, w: 16, h: 16, index: 537, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
+        {x: 16, y: 0, w: 16, h: 32, index: 538, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
     ],
 };
 const f1_2x0: AreaDefinition = {
@@ -4986,13 +5058,45 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 64, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background"},
     ],
     sections: [
+        {x: 0, y: 0, w: 32, h: 16, index: 539, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 540, mapId: 'crater', floorId: 'B1', mapX: 3.5, mapY: 0},
+    ],
+};
+const sf1_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_0x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 32, index: 427, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 1.5},
+        {x: 16, y: 0, w: 16, h: 16, index: 428, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 3, mapY: 1.5},
+        {x: 16, y: 16, w: 16, h: 16, index: 429, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 0.5},
+    ],
+};
+const sf1_1x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_1x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 430, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
+        {x: 0, y: 16, w: 16, h: 16, index: 431, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
+        {x: 16, y: 0, w: 16, h: 32, index: 432, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
+    ],
+};
+const sf1_2x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_2x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 433, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 3},
         {x: 0, y: 16, w: 32, h: 16, index: 434, mapId: 'crater', floorId: 'B1', mapX: 3.5, mapY: 0},
     ],
 };
-const sf1_0x0: AreaDefinition = null;
-const sf1_1x0: AreaDefinition = null;
-const sf1_2x0: AreaDefinition = null;
 zones.crater = {
     key: 'crater',
     areaSize: {w: 32, h: 32},

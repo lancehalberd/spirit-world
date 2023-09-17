@@ -39,8 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - head peeking out when leaving southern cavern doors.
-    - Bad lava tile on flame beast.
     - Going through doors while sinking with iron boots is bad.
     - Staff should despawn when not equipped.
     - Investigate clone throw over ledges
