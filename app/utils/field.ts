@@ -549,7 +549,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 || behavior?.shallowWater || behavior?.water
             )
         ) {
-            let topLayer: AreaLayer = area.layers[0];
+            let topLayer: AreaLayer;
             let foundBlockingLayer = false;
             // We want to allow freezing on top of ledge behaviors without losing the ledge behaviors, so we have to
             // record any found any then include those on the frozen tile behavior.
@@ -579,30 +579,32 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     break;
                 }
             }
-            // Fabricate a frozen tile that has the original tile "underneath it", so it will
-            // return to the original state if exposed to fire.
-            const underTile = topLayer.tiles[target.y][target.x];
-            topLayer.tiles[target.y][target.x] = {
-                ...allTiles[294],
-                behaviors: {
-                    ...allTiles[294].behaviors,
-                    // This is set to draw the underTile under the ice.
-                    // The element tile is actually what is used to replace the tile if
-                    // the ice is melted.
-                    underTile: underTile?.index || 0,
-                    showUnderTile: true,
-                    ledges: underLedges,
-                    diagonalLedge: underDiagonalLedge,
-                    elementTiles: {
-                        fire: underTile?.index || 0,
+            if (topLayer) {
+                // Fabricate a frozen tile that has the original tile "underneath it", so it will
+                // return to the original state if exposed to fire.
+                const underTile = topLayer.tiles[target.y][target.x];
+                topLayer.tiles[target.y][target.x] = {
+                    ...allTiles[294],
+                    behaviors: {
+                        ...allTiles[294].behaviors,
+                        // This is set to draw the underTile under the ice.
+                        // The element tile is actually what is used to replace the tile if
+                        // the ice is melted.
+                        underTile: underTile?.index || 0,
+                        showUnderTile: true,
+                        ledges: underLedges,
+                        diagonalLedge: underDiagonalLedge,
+                        elementTiles: {
+                            fire: underTile?.index || 0,
+                        },
                     },
-                },
-            };
-            if (area.tilesDrawn[target.y]?.[target.x]) {
-                area.tilesDrawn[target.y][target.x] = false;
+                };
+                if (area.tilesDrawn[target.y]?.[target.x]) {
+                    area.tilesDrawn[target.y][target.x] = false;
+                }
+                area.checkToRedrawTiles = true;
+                resetTileBehavior(area, target);
             }
-            area.checkToRedrawTiles = true;
-            resetTileBehavior(area, target);
             //console.log('froze tile', area.behaviorGrid?.[target.y]?.[target.x]);
         } /*else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
             for (const layer of area.layers) {
