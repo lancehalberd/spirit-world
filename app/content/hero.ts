@@ -479,7 +479,7 @@ export class Hero implements Actor {
         if (isChargingBow && state.hero.magic > 0) {
             const arrowFrame = getFrame(arrowAnimations[bowDirection], bowAnimationTime);
             drawFrameAt(context, arrowFrame, { x: this.x - 7 + arrowXOffset, y: this.y - this.z - 11 + arrowYOffset });
-            const { chargeLevel, element } = getChargeLevelAndElement(state, this);
+            const { chargeLevel, element } = getChargeLevelAndElement(state, this, this.savedData.activeTools.bow);
             const chargeAnimation = getChargedArrowAnimation(chargeLevel, element);
             if (chargeAnimation) {
                 const chargeFrame = getFrame(chargeAnimation, state.time);
@@ -630,11 +630,18 @@ export class Hero implements Actor {
         return 0;
     }
 
+    // Assuming the hero is charging a weapon or tool, returns the level of the charging tool or weapon.
+    getChargingToolLevel(this: Hero): number {
+        let tool = (this.chargingLeftTool && this.savedData.leftTool) || (this.chargingRightTool && this.savedData.rightTool);
+        // TODO: Account for gloves level if we ever support charging thrown objects.
+        return tool ? this.savedData.activeTools[tool] : this.savedData.weapon;
+    }
+
     renderChargingBehind(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
         const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
             && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
-            const { chargeLevel, element } = getChargeLevelAndElement(state, this);
+            const { chargeLevel, element } = getChargeLevelAndElement(state, this, this.getChargingToolLevel());
             if (chargeLevel) {
                 const animation = !element
                     ? chargeBackAnimation
@@ -667,7 +674,7 @@ export class Hero implements Actor {
                     ice: chargeIceFrontAnimation,
                     lightning: chargeLightningFrontAnimation
                 }[element];
-            const { chargeLevel } = getChargeLevelAndElement(state, this);
+            const { chargeLevel } = getChargeLevelAndElement(state, this, this.getChargingToolLevel());
             context.save();
                 context.globalAlpha *= 0.8;
                 const frame = getFrame(animation, this.chargeTime);

@@ -1,11 +1,12 @@
 import { isUnderwater } from 'app/utils/actor';
 
 
-export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: ActiveTool = null) {
+export function getChargeLevelAndElement(state: GameState, hero: Hero, toolChargeLevel: number) {
     if (state.hero.magic <= 0) {
         return { chargeLevel: 0, element: null };
     }
-    const maxChargeLevel = hero.getMaxChargeLevel(state);
+    // You cannot charge beyond the level of the equipment being used.
+    const maxChargeLevel = Math.min(toolChargeLevel, hero.getMaxChargeLevel(state));
     let chargeLevel = 0;
     let element: MagicElement = null;
     // The Phoenix Crown reduces charge time by 25%.

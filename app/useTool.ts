@@ -17,7 +17,7 @@ export function useTool(
     dx: number,
     dy: number,
 ): void {
-    let { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
+    let { chargeLevel, element } = getChargeLevelAndElement(state, hero, hero.savedData.activeTools[tool]);
     switch (tool) {
         case 'bow': {
             if (state.hero.magic <= 0) {

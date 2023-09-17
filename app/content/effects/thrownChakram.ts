@@ -305,7 +305,7 @@ export class HeldChakram implements EffectInstance {
         return this;
     }
     throw(state: GameState) {
-        const { chargeLevel, element } = getChargeLevelAndElement(state, this.hero);
+        const { chargeLevel, element } = getChargeLevelAndElement(state, this.hero, this.hero.savedData.weapon);
         let throwDamage = this.level;
         let throwSpeed = 1 + 2 * this.level;
         if (this.level === 1) {
@@ -456,7 +456,7 @@ export class HeldChakram implements EffectInstance {
         }
         let animationTime = 0;
         if (state.hero.getMaxChargeLevel(state) && state.hero.magic > 0) {
-            const { chargeLevel } = getChargeLevelAndElement(state, this.hero);
+            const { chargeLevel } = getChargeLevelAndElement(state, this.hero, this.hero.savedData.weapon);
             if (chargeLevel >= 1) {
                 animationTime = this.animationTime;
             } else {

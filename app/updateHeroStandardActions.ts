@@ -354,7 +354,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
         } else {
             const tool = hero.chargingLeftTool ? hero.savedData.leftTool : hero.savedData.rightTool;
-            const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
+            const { chargeLevel, element } = getChargeLevelAndElement(state, hero, hero.savedData.activeTools[tool]);
             if (chargeLevel > 0 && state.time % 100 === 0) {
                 let skipSparkle = false;
                 // These sparkles don't look good with the base bow charge animations.

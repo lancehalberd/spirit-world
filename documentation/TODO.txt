@@ -40,7 +40,6 @@ Graphics:
 
 Current tasks:
     - Investigate clone throw over ledges
-    - Level 2 charge should not work with level 1 bow.
     - Staff clipping wall in Helix near the portal
     - Update rolling balls to work better in a non-tile aligned world
         - Snap to goals with ~6px wiggle
