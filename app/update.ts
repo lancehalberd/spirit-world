@@ -362,7 +362,7 @@ function updateDefeated(state: GameState) {
         }
     }
     if (state.defeatState.time === 1000) {
-        const hitbox = state.hero.getHitbox(state);
+        const hitbox = state.hero.getHitbox();
         addDustBurst(state, state.areaInstance,
             hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, state.hero.z);
     }
@@ -382,7 +382,7 @@ function updateDefeated(state: GameState) {
         // Show a burst of particles right before the MC gets up
         // and starts regaining life.
         if (state.defeatState.time === 2400) {
-            const hitbox = state.hero.getHitbox(state);
+            const hitbox = state.hero.getHitbox();
             addReviveBurst(state, state.areaInstance,
                 hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, state.hero.z);
         }

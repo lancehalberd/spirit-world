@@ -273,7 +273,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
             // When the hero is far away, the heart will summon a series of targeted
             // lightning bolts to protect itself.
             if (enemy.params.counterAttackTimer % 1000 === 0) {
-                const hitbox = state.hero.getHitbox(state);
+                const hitbox = state.hero.getHitbox();
                 enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
                 const lightningBolt = new LightningBolt({
                     x: hitbox.x + hitbox.w / 2,
@@ -308,7 +308,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
         if (enemy.params.enrageTime % 2000 === 0) {
             enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
-            const hitbox = state.hero.getHitbox(state);
+            const hitbox = state.hero.getHitbox();
             for (let i = 0; i < 4; i++) {
                 const theta = enemy.params.theta + i * Math.PI / 2;
                 const lightningBolt = new LightningBolt({

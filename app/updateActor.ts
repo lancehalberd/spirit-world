@@ -201,7 +201,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);
         }
         if (hero.burnDuration % 40 === 0) {
-            const hitbox = hero.getHitbox(state);
+            const hitbox = hero.getHitbox();
             addSparkleAnimation(state, hero.area, pad(hitbox, -4), { element: 'fire' });
         }
     }
@@ -426,7 +426,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
     if (!hero.area) {
         debugger;
     }
-    const heroHitbox = hero.getHitbox(state);
+    const heroHitbox = hero.getHitbox();
     for (const enemy of hero.area.objects) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0
             || enemy.status === 'hidden' || enemy.status === 'gone' || enemy.status === 'off'
@@ -440,7 +440,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
         if (!touchHit) {
             continue;
         }
-        const enemyHitbox = enemy.getHitbox(state);
+        const enemyHitbox = enemy.getHitbox();
         if (boxesIntersect(heroHitbox, enemyHitbox)) {
             let dx = (heroHitbox.x + heroHitbox.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
             let dy = (heroHitbox.y + heroHitbox.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);

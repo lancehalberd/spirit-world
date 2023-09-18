@@ -17,7 +17,7 @@ export class Clone extends Hero {
         this.isClone = true;
         this.invulnerableFrames = 0;
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
 

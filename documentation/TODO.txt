@@ -39,7 +39,14 @@ Graphics:
 
 
 Current tasks:
-    - Investigate clone throw over ledges
+    - Fix clone bomb should be despawned with splash animation when thrown into water unless it is wearing clones boots.
+        - Right now it just sits on top of the water
+        - We could have it abort the clone explosion instead.
+
+    - Fix cannot walk on water while carrying tiles
+
+
+
     - Staff clipping wall in Helix near the portal
     - Update rolling balls to work better in a non-tile aligned world
         - Snap to goals with ~6px wiggle

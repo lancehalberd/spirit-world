@@ -63,7 +63,7 @@ function summonProjectiles(state: GameState, enemy: Enemy, target: EffectInstanc
             arrowTurrets[i].fireAfter((i % 4 <= 1) ? 600 : 1200);
         }
     } else {
-        const targetHitbox = target.getHitbox(state);
+        const targetHitbox = target.getHitbox();
         const x = targetHitbox.x + targetHitbox.w / 2;
         let delay = 600;
         const radius = 32 + 16 * enrageLevel
@@ -147,7 +147,7 @@ enemyDefinitions.crystalCollector = {
         } else {
             frame = getFrame(crystalBarrierVeryDamagedAnimation, enemy.params.shieldTime);
         }
-        const hitbox = enemy.getHitbox(state);
+        const hitbox = enemy.getHitbox();
         drawFrameCenteredAt(context, frame, hitbox);
         /*context.save();
             context.globalAlpha *= (0.4 + 0.4 * enemy.params.shieldLife / maxShieldLife);
@@ -241,7 +241,7 @@ function addFloorEye(state: GameState, area: AreaInstance, tx: number, ty: numbe
 function summonSpikeUnderPlayer(this: void, state: GameState, enemy: Enemy): void {
     const target = getNearbyTarget(state, enemy, 512, enemy.area.allyTargets);
     if (target) {
-        const targetHitbox = target.getHitbox(state);
+        const targetHitbox = target.getHitbox();
         const spike = new GroundSpike({
             x: targetHitbox.x + targetHitbox.w / 2,
             y: targetHitbox.y + targetHitbox.h / 2,
@@ -253,7 +253,7 @@ function summonSpikeUnderPlayer(this: void, state: GameState, enemy: Enemy): voi
 function summonSpikeAheadOfPlayer(this: void, state: GameState, enemy: Enemy): void {
     const target = getNearbyTarget(state, enemy, 512, enemy.area.allyTargets) as Hero;
     if (target) {
-        const targetHitbox = target.getHitbox(state);
+        const targetHitbox = target.getHitbox();
         const spike = new GroundSpike({
             x: targetHitbox.x + targetHitbox.w / 2,
             y: targetHitbox.y + targetHitbox.h / 2,
@@ -279,7 +279,7 @@ const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
     if (!target) {
         return;
     }
-    const targetHitbox = target.getHitbox(state);
+    const targetHitbox = target.getHitbox();
     const spikePattern = [
         [
             [0, -4], [4, 0], [0, 4], [-4, 0],
@@ -317,7 +317,7 @@ const summonLineOfSpikes = (state: GameState, enemy: Enemy) => {
         return;
     }
     const hitbox = enemy.getHitbox();
-    const targetHitbox = target.getHitbox(state);
+    const targetHitbox = target.getHitbox();
     addLineOfSpikes({
         state, area: enemy.area,
         source: [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],

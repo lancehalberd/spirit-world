@@ -123,7 +123,7 @@ export class Escalator implements ObjectInstance {
             if (hero.area !== this.area || hero.isInvisible || this.status !== 'normal') {
                 continue;
             }
-            const heroHitbox = hero.getHitbox(state);
+            const heroHitbox = hero.getHitbox();
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitboxForMovingObjects(state))
                 && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
             if (this.speed === 'slow' && touchingHero) {

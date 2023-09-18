@@ -63,6 +63,7 @@ interface Actor extends ObjectInstance {
     jumpingVx?: number
     jumpingVy?: number
     jumpingVz?: number
+    isJumpingWrecklessly?: boolean
     canTrampoline?: boolean
     // This is set when the actor jumps south and is used to determine when to
     // start checking for a landing position.

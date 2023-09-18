@@ -24,7 +24,7 @@ export class Trampoline extends PushPullObject implements ObjectInstance {
     }
     // The bouncy part of the trampoline is 16px above the base that you push around.
     getBounceHitbox(): Rect {
-        return {x: this.x, y: this.y - 16, w: 16, h: 16};
+        return {x: this.x, y: this.y - 16, w: 16, h: 12};
     }
     getFrameHitbox(): Rect {
         return {x: this.x, y: this.y - 16, w: 16, h: 32};

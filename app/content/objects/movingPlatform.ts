@@ -70,7 +70,7 @@ export class MovingPlatform implements ObjectInstance {
             if (hero.area !== this.area || hero.isInvisible || this.status !== 'normal') {
                 continue;
             }
-            const heroHitbox = hero.getHitbox(state);
+            const heroHitbox = hero.getHitbox();
             const isHeroOnPlatform = boxesIntersect(heroHitbox, this.getHitbox())
                 && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= this.behaviors.groundHeight
                 && hero.action !== 'falling' && hero.action !== 'fallen';

@@ -74,6 +74,7 @@ export class Hero implements Actor {
     jumpingVy?: number;
     jumpingVz?: number;
     jumpingDownY?: number;
+    isJumpingWrecklessly?: boolean;
     // This must be set when jumping to allow using trampolines.
     // It is set to false to prevent trampolining in certain circumstances while jumping.
     canTrampoline?: boolean;
@@ -215,14 +216,14 @@ export class Hero implements Actor {
         return copy;
     }
 
-    getHitbox(state?: GameState): Rect {
+    getHitbox(): Rect {
         if (this.hasBarrier) {
             const p = 4;
             return { x: (this.x - p) | 0, y: (this.y - p) | 0, w: this.w + 2 * p, h: this.h + 2 * p };
         }
         return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
     }
-    getMovementHitbox(this: Hero, state?: GameState): Rect {
+    getMovementHitbox(this: Hero): Rect {
         return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
     }
 
@@ -285,7 +286,7 @@ export class Hero implements Actor {
                 state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, iframeMultiplier * 10);
                 state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
             }
-            const hitbox = this.getHitbox(state);
+            const hitbox = this.getHitbox();
             if (hit.canAlwaysKnockback && hit.knockback) {
                 this.knockBack(state, hit.knockback);
             }
@@ -618,6 +619,12 @@ export class Hero implements Actor {
             context.restore();
         }
         this.renderChargingFront(context, state);
+        // Debug code for visualizing when the hero is in an invalid location underneath a ledge tile.
+        /*context.save();
+            const box = this.getMovementHitbox();
+            context.fillStyle = isUnderLedge(state, this.area, box) ? 'red' : 'blue';
+            context.fillRect(box.x, box.y, box.w, box.h);
+        context.restore();*/
     }
 
     getMaxChargeLevel(this: Hero, state: GameState): number {

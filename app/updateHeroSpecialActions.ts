@@ -336,7 +336,26 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (isHeroOnVeryTallWall(state, hero)) {
             hero.x -= hero.jumpingVx;
         }
-        hero.y += hero.jumpingVy;
+        // We check hero.jumpingVy < 1.8 because if we run this logic too early in a jump it could prevent jumping from cloud to cloud.
+        // This check could instead only start after Xms from the start of the jump if we change the initial value of jumpingVy to not
+        // always be 2 when jumping south.
+        if (!hero.isJumpingWrecklessly && hero.jumpingVy > 0 && hero.jumpingVy < 1.8) {
+            const baseY = hero.y;
+            for (let i = Math.min(1, hero.jumpingVy); i <= hero.jumpingVy; i = Math.min(i + 1, hero.jumpingVy)) {
+                hero.y = baseY + i;
+                // If the hero reaches a point they can stop at, but they cannot stop somewhere in the next 4 pixels, reduce theire y movement
+                // to 0 so they land safeley.
+                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 1})) {
+                    hero.jumpingVy = 0;
+                    break;
+                }
+                if (i >= hero.jumpingVy) {
+                    break;
+                }
+            }
+        } else {
+            hero.y += hero.jumpingVy;
+        }
         if (isHeroOnVeryTallWall(state, hero)) {
             hero.y -= hero.jumpingVy;
         } else if (hero.jumpingVy < 0 && !shouldBounceOnTrampoline && (hero.jumpingVz <= 0 && hero.z <= groundZ + 3)) {
@@ -364,6 +383,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (hero.jumpingVz <= -4 || hero.z <= groundZ) {
                 hero.animationTime = 0;
                 hero.jumpingVz = Math.max(-hero.jumpingVz, 4);
+                // Once the hero bounces off of a trampoline, they lose precise controls for landing.
+                hero.isJumpingWrecklessly = true;
                 ((trampolineUnderSprite) as Trampoline).lastBounceTime = state.fieldTime;
                 if (hero.jumpingVx) {
                     hero.jumpingVx = 2.5 * hero.jumpingVx / Math.abs(hero.jumpingVx);
@@ -380,22 +401,25 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.y++;
                 hero.z++;
                 i++;
-                // Make hero land directly in front of the cliff if this wall is tall if there is a place ahead that they cannot land on.
-                if (!isHeroOnSouthernWallTile(state, hero, 0, 16)
-                    // Check half tile as well for narrow obstacles like northern cliff ledges.
-                    && (!canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 8}) || !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 16}))
-                ) {
-                    hero.jumpingVy = 0;
-                }
                 // Without this, the hero will not be able to transition south while jumping east/west
                 // and moving down across a southern facing wall.
                 hero.actionDy = 1;
+                // If the hero reaches a point they can stop at, but they cannot stop ahead of it, reduce theire y movement
+                // to 0 so they land safeley.
+                if (!hero.isJumpingWrecklessly && canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 1})) {
+                    hero.jumpingVy = 0;
+                    break;
+                }
             }
             // This will cause the hero to jump over up to 1 bad landing tile at the bottom of a cliff.
-            while (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
+            while (!hero.isJumpingWrecklessly && i < 1 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
                 hero.y++;
                 hero.z++;
                 i++;
+                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 1})) {
+                    hero.jumpingVy = 0;
+                    break;
+                }
                 // Make hero land directly in front of the cliff if this wall is tall.
                 // We don't do this for short jumps because it looks bad when jumping to clouds in the sky.
                 //hero.jumpingVy = Math.min(hero.jumpingVy, 0.0001);
@@ -541,7 +565,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // If the hero is facing up, check if we should set up the tower instead of using it as a tool.
             if (hero.d === 'up') {
                 let towerLocation: StaffTowerLocation, onTowerMarker = false;
-                const hitbox = hero.getHitbox(state);
+                const hitbox = hero.getHitbox();
                 for (const object of hero.area.definition.objects) {
                     if (object.id === 'towerTerminal:desert') {
                         towerLocation = 'desert';
@@ -861,7 +885,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
     }
     hero.x = lastOpenPosition.x;
     hero.y = lastOpenPosition.y;
-    hitbox = hero.getHitbox(state);
+    hitbox = hero.getHitbox();
 
     // The fullroll action is 16 frames.
     hero.action = 'roll';

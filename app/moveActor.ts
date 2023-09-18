@@ -138,11 +138,13 @@ function moveActorInDirection(
                 actor.jumpingVx = actor.vx;
                 actor.jumpingVy = actor.vy;
                 actor.jumpingVz = actor.vz;
+                // The jump trajectory will not be modified to try to avoid landing on obstacles.
+                actor.isJumpingWrecklessly = true;
             } else {
                 let speed = 2;
                 /*if ((actor as Hero).savedData.equippedBoots === 'cloudBoots') {
                     speed = 2.2;
-                } else if ((actor as Hero).equippedBoots === 'ironBoots') {
+                } else if ((actor as Hero).savedData.equippedBoots === 'ironBoots') {
                     speed = 1.5;
                 }*/
                 actor.action = 'jumpingDown';
@@ -150,6 +152,7 @@ function moveActorInDirection(
                 actor.jumpingVy = speed * jv[1];
                 actor.jumpingVz = 3;
                 actor.animationTime = 0;
+                actor.isJumpingWrecklessly = false;
             }
             // Actor shouldn't be touching the ground when they start jumping down.
             actor.z = Math.max(actor.z, 1);

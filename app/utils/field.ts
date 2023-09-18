@@ -1,4 +1,5 @@
 import { allTiles } from 'app/content/tiles';
+import { isUnderLedge } from 'app/movement/isUnderLedge';
 import { destroyTile } from 'app/utils/destroyTile';
 import { directionMap, getDirection } from 'app/utils/direction';
 import { removeEffectFromArea } from 'app/utils/effects';
@@ -10,11 +11,11 @@ import { resetTileBehavior } from 'app/utils/tileBehavior';
 export { directionMap, getDirection } from 'app/utils/direction';
 
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
-    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
+    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
 }
 
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
-    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
+    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
 }
 window['canSomersaultToCoords'] = canSomersaultToCoords;
 

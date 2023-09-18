@@ -365,7 +365,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     skipSparkle = true;
                 }
                 if (!skipSparkle) {
-                    const hitbox = hero.getHitbox(state);
+                    const hitbox = hero.getHitbox();
                     addSparkleAnimation(state, hero.area, {
                         x: hitbox.x + hitbox.w / 2 + hero.actionDx * 12,
                         y: hitbox.y + hitbox.h / 2 - hero.z + hero.actionDy * 12 - 6,
@@ -681,7 +681,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = 'grabbing';
             }
             if (object.getHitbox && (behavior?.solid || object.onGrab)) {
-                const frame = object.getHitbox(state);
+                const frame = object.getHitbox();
                 // This is an unusual distance, but should do what we want still.
                 const distance = (
                     Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
