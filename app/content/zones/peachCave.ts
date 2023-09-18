@@ -400,10 +400,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCaveBoss", invertLogic: true},
         {status: "normal", id: "", x: 144, y: 432, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 24, h: 64, saveStatus: "never"},
         {status: "normal", id: "thornsInstructions", x: 208, y: 448, type: "narration", message: "I don't like the look of those thorns...\n{|}Maybe I can find another way?", w: 48, h: 48, delay: 500},
-        {status: "normal", id: "", x: 384, y: 352, type: "spawnMarker"},
-        {status: "normal", id: "", x: 336, y: 256, type: "spawnMarker"},
-        {status: "normal", id: "", x: 448, y: 368, type: "spawnMarker"},
-        {status: "normal", id: "", x: 432, y: 240, type: "spawnMarker"},
+        {status: "normal", id: "", x: 392, y: 360, type: "spawnMarker"},
+        {status: "normal", id: "", x: 336, y: 264, type: "spawnMarker"},
+        {status: "normal", id: "", x: 440, y: 360, type: "spawnMarker"},
+        {status: "normal", id: "", x: 456, y: 72, type: "spawnMarker"},
         {status: "normal", id: "peachCave-climber2", x: 464, y: 144, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {status: "normal", id: "", x: 64, y: 208, type: "narration", message: "", w: 32, h: 32, saveStatus: "never", specialBehaviorKey: "chestAndChakramInstructions"},
         {status: "normal", id: "jumpInstructions2", x: 208, y: 368, type: "narration", message: "{addCue: Walk off a ledge to jump down}", w: 48, h: 48, delay: 500, saveStatus: "never"},
@@ -411,6 +411,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 112, y: 352, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 32, h: 144, saveStatus: "never"},
         {status: "normal", id: "exploreInstructions", x: 320, y: 320, type: "narration", message: "That bug on the vine doesn't look friendly.\n{|}I won't be able to climb with it in the way.\n{addCue: Search for a way to get past the beetle.}", w: 48, h: 32, hasCustomLogic: true, customLogic: "$weapon", invertLogic: true},
         {status: "normal", id: "peachCaveSave", x: 288, y: 48, type: "narration", message: "{addCue: Face an object and press [B_PASSIVE] to interact with it.}", w: 48, h: 40, customLogic: "$weapon", saveStatus: "never"},
+        {status: "normal", id: "", x: 416, y: 160, type: "spawnMarker"},
+        {status: "normal", id: "", x: 424, y: 232, type: "spawnMarker"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 152, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 1},
@@ -3016,7 +3018,18 @@ const sf1_0x0: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16, index: 176, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 1},
     ],
 };
-const sf1_0x1: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_0x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 532, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 541, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 542, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 3, mapY: 3},
+    ],
+};
 zones.peachCave = {
     key: 'peachCave',
     areaSize: {w: 32, h: 32},
