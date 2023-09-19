@@ -69,11 +69,10 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
     }
 }
 
-export function checkToFallUnderWater(this: void, state: GameState, vz : number): boolean {
-    if (vz > -3 || state.hero.savedData.equippedBoots === 'cloudBoots') {
+export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, vz : number): boolean {
+    if (vz > -3 || state.hero.savedData.equippedBoots === 'cloudBoots' || hero !== state.hero) {
         return false;
     }
-    const hero = state.hero;
     if (hero.swimming && state.underwaterAreaInstance &&
         isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
     ) {
@@ -458,7 +457,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }
             checkForFloorEffects(state, hero);
             // This has to be done after checking floor effects to set `hero.isSwimming` correctly.
-            checkToFallUnderWater(state, hero.jumpingVz);
+            checkToFallUnderWater(state, hero, hero.jumpingVz);
         }
         // Make sure vx/vy are updated for screen transition/slipping logic on landing.
         hero.vx = hero.jumpingVx;
@@ -536,7 +535,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // starting the death sequence.
             checkForFloorEffects(state, hero);
             // Only clear the hero's vz value if they hit solid ground, leave it if they fell underwater.
-            if (!checkToFallUnderWater(state, hero.vz)) {
+            if (!checkToFallUnderWater(state, hero, hero.vz)) {
                 hero.vz = 0;
             }
         }

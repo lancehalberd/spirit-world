@@ -81,6 +81,18 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         if (hero.action !== 'walking') {
             hero.action = null;
         }
+        if (hero.grabObject) {
+            hero.grabObject = null;
+            hero.action = null;
+        }
+        if (hero.pickUpTile || hero.pickUpObject) {
+            hero.throwHeldObject(state);
+            hero.action = null;
+        }
+    }
+    if (hero.pickUpObject && hero.area !== hero.pickUpObject.area) {
+        hero.pickUpObject = null;
+        hero.action = null;
     }
     if (hero.pickUpTile || hero.pickUpObject) {
         movementSpeed *= 0.75;
@@ -188,16 +200,18 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }*/
         // Previously we only allowed transition on exact tiles, but now we are
         // experimenting with transitioning immediately.
-        enterLocation(state, {
-            ...state.location,
-            floor: zones[state.zone.underwaterKey].floors.length - 1,
-            zoneKey: state.zone.underwaterKey,
-            x: hero.x,
-            y: hero.y,
-            z: 24,
-        }, false);
-        hero.swimming = false;
-        hero.wading = false;
+        if (hero === state.hero) {
+            enterLocation(state, {
+                ...state.location,
+                floor: zones[state.zone.underwaterKey].floors.length - 1,
+                zoneKey: state.zone.underwaterKey,
+                x: hero.x,
+                y: hero.y,
+                z: 24,
+            }, false);
+            hero.swimming = false;
+            hero.wading = false;
+        }
         return;
     }
     if (hero.action === 'grabbing') {
@@ -523,7 +537,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 // This doesn't mean the player will fall, just that they can move into tiles/objects marked as pits.
                 canFall: true,
                 canJump: !hero.isAstralProjection,
-                canSwim: !encumbered,
+                canSwim: true,
                 // This prevents the movement for trying to line up with the grab object from resulting in extra movement
                 // that moves the hero way from the object and causes them to stop grabbing it.
                 // This doesn't prevent the hero from wiggling with a push pu

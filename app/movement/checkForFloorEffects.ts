@@ -186,7 +186,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (hero.swimming && hero.savedData.equippedBoots === 'cloudBoots') {
+    // Being invisible allows you to walk on water unless you are wearing iron boots.
+    if (hero.swimming && (hero.savedData.equippedBoots === 'cloudBoots' || (hero.isInvisible && hero.savedData.equippedBoots === 'leatherBoots'))) {
         hero.swimming = false;
         hero.wading = true;
     }

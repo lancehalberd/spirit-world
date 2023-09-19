@@ -159,6 +159,9 @@ function moveActorInDirection(
             actor.isAirborn = true;
             actor.canTrampoline = true;
             actor.grabObject = null;
+            if (actor.pickUpObject || actor.pickUpTile) {
+                (actor as Hero).throwHeldObject?.(state);
+            }
         }
     }
     return result;

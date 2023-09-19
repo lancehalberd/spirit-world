@@ -1,7 +1,10 @@
+import { FieldAnimationEffect, splashAnimation } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
 
 import { renderHeroShadow } from 'app/renderActor';
+import { destroyClone } from 'app/utils/destroyClone';
 import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/direction';
+import { addEffectToArea } from 'app/utils/effects';
 
 
 export class Clone extends Hero {
@@ -41,7 +44,26 @@ export class Clone extends Hero {
                 this.action = 'knocked';
                 this.animationTime = 0;
             }
+            return;
         }
+        if (this.swimming && (this.isUncontrollable || state.hero.savedData.equippedBoots === 'ironBoots')) {
+            this.drown(state);
+        }
+    }
+    drown(state: GameState) {
+        const hitbox = this.getHitbox();
+        const x = hitbox.x + hitbox.w / 2;
+        const y = hitbox.y + hitbox.h / 2;
+        const tx = (x / 16) | 0;
+        const ty = (y / 16) | 0;
+        const animation = new FieldAnimationEffect({
+            animation: splashAnimation,
+            drawPriority: 'background',
+            drawPriorityIndex: 1,
+            x: tx * 16, y: ty * 16,
+        });
+        addEffectToArea(state, this.area, animation);
+        destroyClone(state, this);
     }
     updateCoords(state: GameState) {
         const offset = carryMap[this.carrier.d][Math.min(this.carrier.pickUpFrame, carryMap[this.carrier.d].length - 1)];
