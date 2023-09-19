@@ -45,7 +45,7 @@ export class PushPullObject implements ObjectInstance {
         if (canPush) {
             this.pushInDirection(state, direction, 16);
         }
-        return {hit: true};
+        return {blocked: true, hit: true};
     }
     onPush(state: GameState, direction: Direction): void {
         //console.log('pushPullObject.onPush', direction);

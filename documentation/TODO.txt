@@ -39,29 +39,21 @@ Graphics:
 
 
 Current tasks:
+    - Staff clipping wall in Helix near the portal
+
+    - Fix cannot walk on water while carrying tiles
+
     - Fix clone bomb should be despawned with splash animation when thrown into water unless it is wearing clones boots.
         - Right now it just sits on top of the water
         - We could have it abort the clone explosion instead.
 
-    - Fix cannot walk on water while carrying tiles
 
-
-
-    - Staff clipping wall in Helix near the portal
-    - Update rolling balls to work better in a non-tile aligned world
-        - Snap to goals with ~6px wiggle
-        - When a stone hits a goal, snap the linked object to its position and set it in the goal as well
-        - Make sure all goals are linked for consistency.
-
-
-    - new bugs from moonmoth:
-        - Hot room determination isn't consistent, for example:
-            "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
+    - Hot room determination isn't consistent, for example:
+        "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
 
     - Prevent swimming while invisible.
 
     - Add underwater swimming animation once Jon provides it.
-
 
     - Fix push/pull interactions with ledges.
         - Minor issues:
@@ -80,9 +72,6 @@ Current tasks:
         - Play door open/closed sounds FX when it changes whether it is open based on the player being over it.
 
     - Fix audio restarts when going under water during the frost beast fight.
-
-    - Fix rolling balls sometimes fail to socket when they socket in the alternate world.
-        - Let's also go through and link any unlinked sockets so balls always socket together.
 
     - Improve dialogue display
         - animate lines in one at a time every ~40ms

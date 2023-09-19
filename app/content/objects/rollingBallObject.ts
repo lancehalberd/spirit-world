@@ -2,9 +2,10 @@ import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
 import { lightStoneParticles } from 'app/content/tiles/constants';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { moveObject } from 'app/movement/moveObject';
 import { playAreaSound, stopSound } from 'app/musicController';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
+import { directionMap, hitTargets } from 'app/utils/field';
 import { getObjectStatus, removeObjectFromArea, saveObjectStatus } from 'app/utils/objects';
 
 
@@ -87,9 +88,9 @@ export class RollingBallObject implements ObjectInstance {
             if (canPush) {
                 this.rollInDirection(state, direction);
             }
-            return { hit: true };
+            return { blocked: true, hit: true };
         }
-        return {};
+        return { blocked: true, hit: true };
     }
     onPush(state: GameState, direction: Direction): void {
         if (!this.rollDirection) {
@@ -101,22 +102,97 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     rollInDirection(state: GameState, direction: Direction): void {
-        if (this.stuck) {
+        if (this.stuck || this.rollDirection) {
             return;
         }
-        const x = this.x + 8 + 16 * directionMap[direction][0];
-        const y = this.y + 8 + 16 * directionMap[direction][1];
-        const movementProperties = {canFall: true, canSwim: true, needsFullTile: true};
-        if (isPointOpen(state, this.area, {x, y}, movementProperties)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProperties))
-        ) {
+        if (this.move(state, direction)) {
             this.rollDirection = direction;
             this.startRollingSound(state);
             if (this.linkedObject) {
-                this.linkedObject.rollDirection = direction;
                 this.linkedObject.startRollingSound(state);
             }
         }
+    }
+    // Returns true if the hit stops this object.
+    hitAhead(state: GameState, direction: Direction): boolean {
+        const [dx, dy] = directionMap[direction];
+        const bigHitbox = { x: this.x + dx, y: this.y + dy, w: 16, h: 16 };
+        const hitResult = hitTargets(state, this.area, {
+            canPush: true,
+            damage: 2,
+            direction,
+            hitbox: bigHitbox,
+            hitObjects: true,
+            hitEnemies: true,
+            knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+            ignoreTargets: new Set([this]),
+        });
+
+        // Create a slightly smaller hitbox then adjust it so it only covers the front half
+        // of the actual ball. This is to prevent the ball hitting things following behind it,
+        // in particular a player with the spirit barrier on will overlap the back few pixels
+        // of a ball when they push on it to make it roll.
+        const smallHitbox = {
+            x: this.x + 1,
+            y: this.y + 1,
+            w: 14,
+            h: 14,
+        };
+        if (dx < 0) {
+            smallHitbox.w = 7;
+        } else if (dx > 0) {
+            smallHitbox.x += 7;
+            smallHitbox.w = 7;
+        }
+        if (dy < 0) {
+            smallHitbox.h = 7;
+        } else if (dy > 0) {
+            smallHitbox.y += 7;
+            smallHitbox.h = 7;
+        }
+        hitTargets(state, this.area, {
+            canPush: true,
+            damage: 2,
+            direction,
+            hitbox: smallHitbox,
+            hitAllies: true,
+            knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+        });
+
+        return hitResult.blocked;
+    }
+    move(state: GameState, direction: Direction): boolean {
+        //console.log('move', direction, this.x, this.y);
+        const [dx, dy] = directionMap[direction];
+        const {mx, my} = moveObject(state, this, 2 * dx, 2 * dy, {
+            canFall: true,
+            canWiggle: true,
+            excludedObjects: new Set([this, state.hero]),
+        });
+        if (!mx && !my) {
+            //console.log('base object did not move');
+            return false;
+        }
+        if (this.linkedObject) {
+            const linkedResult = moveObject(state, this.linkedObject, mx, my, {
+                canFall: true,
+                canWiggle: false,
+                excludedObjects: new Set([this.linkedObject]),
+            });
+            this.x = this.linkedObject.x;
+            this.y = this.linkedObject.y;
+            if (!linkedResult.mx && !linkedResult.my) {
+                //console.log('linked object did not move');
+                return false;
+            }
+        }
+        this.animationTime += FRAME_LENGTH;
+        let stopped = this.hitAhead(state, direction);
+        if (this.linkedObject) {
+            stopped = this.linkedObject.hitAhead(state, direction) || stopped;
+        }
+        //console.log('was stopped by hit?', stopped);
+        return !stopped;
     }
     startRollingSound(state) {
         this.soundReference = playAreaSound(state, this.area, 'rollingBall');
@@ -131,12 +207,20 @@ export class RollingBallObject implements ObjectInstance {
         if (this.status !== 'normal') {
             return;
         }
+        if (this.rollDirection) {
+            if (!this.move(state, this.rollDirection)) {
+                this.stopRollingSound();
+                this.linkedObject?.stopRollingSound();
+                playAreaSound(state, this.area, 'rollingBallHit');
+                this.rollDirection = null;
+            }
+        }
         if (this.z <= 0) {
             for (const object of this.area.objects) {
                 if (object.definition?.type !== 'ballGoal' || object.status === 'active') {
                     continue;
                 }
-                if (Math.abs(this.x - object.x) <= 2 && Math.abs(this.y - object.y) <= 2) {
+                if (Math.abs(this.x - object.x) <= 4 && Math.abs(this.y - object.y) <= 4) {
                     this.stopRollingSound();
                     playAreaSound(state, this.area, 'rollingBallSocket');
                     (object as BallGoal).activate(state);
@@ -148,9 +232,10 @@ export class RollingBallObject implements ObjectInstance {
                         const linkedGoal = (object as BallGoal).linkedObject;
                         if (linkedGoal) {
                             linkedGoal.activate(state);
-                            removeObjectFromArea(state, this);
+                            removeObjectFromArea(state, this.linkedObject);
                         } else {
                             // If there is no alternate goal, the alternate ball is just stuck in place.
+                            // This looks bad so we should avoid it.
                             this.linkedObject.rollDirection = null;
                             this.linkedObject.stuck = true;
                         }
@@ -184,83 +269,11 @@ export class RollingBallObject implements ObjectInstance {
                 });
             }
         }
-        if (this.rollDirection) {
-            this.animationTime += FRAME_LENGTH;
-            const dx = 2 * directionMap[this.rollDirection][0];
-            const dy = 2 * directionMap[this.rollDirection][1];
-            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 1);
-            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 1);
-            // Rolling balls hurt actors and push on other objects.
-            // Use a slightly larger hitbox so we trigger hitting objects before stopping.
-            const bigHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
-            if (dx) {
-                bigHitbox.x += dx;
-            }
-            if (dy) {
-                bigHitbox.y += dy;
-            }
-            hitTargets(state, this.area, {
-                canPush: true,
-                damage: 2,
-                direction: this.rollDirection,
-                hitbox: bigHitbox,
-                hitObjects: true,
-                hitEnemies: true,
-                knockAwayFrom: {x: this.x + 8, y: this.y + 8},
-            });
-            // Create a slightly smaller hitbox then adjust it so it only covers the front half
-            // of the actual ball. This is to prevent the ball hitting things following behind it,
-            // in particular a player with the spirit barrier on will overlap the back few pixels
-            // of a ball when they push on it to make it roll.
-            const smallHitbox = {
-                x: this.x + 1,
-                y: this.y + 1,
-                w: 14,
-                h: 14,
-            };
-            if (dx < 0) {
-                smallHitbox.w = 7;
-            } else if (dx > 0) {
-                smallHitbox.x += 7;
-                smallHitbox.w = 7;
-            }
-            if (dy < 0) {
-                smallHitbox.h = 7;
-            } else if (dy > 0) {
-                smallHitbox.y += 7;
-                smallHitbox.h = 7;
-            }
-            hitTargets(state, this.area, {
-                canPush: true,
-                damage: 2,
-                direction: this.rollDirection,
-                hitbox: smallHitbox,
-                hitAllies: true,
-                knockAwayFrom: {x: this.x + 8, y: this.y + 8},
-            });
-            // MC + clones do not obstruct rolling balls.
-            const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
-            const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
-            if (!tileBehavior.solid && !tileBehavior.solidMap && !tileBehavior.outOfBounds) {
-                this.x += dx;
-                this.y += dy;
-            } else {
-                this.stopRollingSound();
-                this.linkedObject?.stopRollingSound();
-                playAreaSound(state, this.area, 'rollingBallHit');
-                this.rollDirection = null;
-            }
-        }
         // Reset the pushCounter any time this object isn't being pushed.
         if (!this.pushedThisFrame) {
             this.pushCounter = 0;
         } else {
             this.pushedThisFrame = false;
-        }
-        if (this.linkedObject && this.linkedObject.rollDirection === null) {
-            this.rollDirection = null;
-            this.x = this.linkedObject.x;
-            this.y = this.linkedObject.y;
         }
     }
     render(context, state: GameState) {

@@ -361,10 +361,10 @@ const preloadSounds = () => {
         {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, limit: 2},
         {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, limit: 2},
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
-            offset: '0:1400', loop: true, volume: 10, limit: 2
+            offset: '0:1400', loop: true, volume: 20, limit: 2
         },
-        {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 10, limit: 2},
-        {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 10, limit: 2},
+        {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, limit: 2},
+        {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, limit: 2},
         {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 10, limit: 2},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
         //     offset: '200:300', volume: 10, limit: 2},
