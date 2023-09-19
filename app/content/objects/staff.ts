@@ -63,10 +63,12 @@ export class Staff implements ObjectInstance {
         // for the graphic to match its hitbox.
         if (direction === 'left' || direction === 'right') {
             y += 5;
-            this.h = 8;
+            // This is the sized used for determining placement, the final size will be smaller.
+            this.h = 12;
         } else {
             x += 4;
-            this.w = 8;
+            // This is the sized used for determining placement, the final size will be smaller.
+            this.w = 12;
         }
         this.x = x;
         this.y = y;
@@ -114,6 +116,8 @@ export class Staff implements ObjectInstance {
         // to lay on top of tiles since the graphics are so much larger than its hitbox.
         if (direction === 'left' || direction === 'right') {
             this.h = 6;
+        } else {
+            this.w = 8;
         }
     }
     getHitbox() {

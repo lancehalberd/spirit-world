@@ -39,8 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Staff clipping wall in Helix near the portal
-
     - Fix cannot walk on water while carrying tiles
 
     - Fix clone bomb should be despawned with splash animation when thrown into water unless it is wearing clones boots.
