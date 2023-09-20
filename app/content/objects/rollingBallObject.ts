@@ -167,6 +167,7 @@ export class RollingBallObject implements ObjectInstance {
         const {mx, my} = moveObject(state, this, 2 * dx, 2 * dy, {
             canFall: true,
             canWiggle: true,
+            canSwim: true,
             excludedObjects: new Set([this, state.hero]),
         });
         if (!mx && !my) {
@@ -177,6 +178,7 @@ export class RollingBallObject implements ObjectInstance {
             const linkedResult = moveObject(state, this.linkedObject, mx, my, {
                 canFall: true,
                 canWiggle: false,
+                canSwim: true,
                 excludedObjects: new Set([this.linkedObject]),
             });
             this.x = this.linkedObject.x;

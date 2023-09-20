@@ -21,8 +21,6 @@ Known Bugs:
         - Chakram / Bow can hit tiles below ledges sometimes
             - When chakram is returning over a ledge.
                 - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
-            - When chakram/bow is fired while standing over the tip of a ledge.
-                - Maybe this is okay, it is sort of like you are firing down from the ledge by peaking over.
         - Sometimes bow/chakram get stopped when firing down cliff edges
             - This is because these tiles are not marked low.
             - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
@@ -39,6 +37,11 @@ Graphics:
 
 
 Current tasks:
+    - spirit barrier increases hitbox for climbing but shouldn't.
+
+    - When chakram/bow is fired while standing over the tip of a ledge.
+        - This is inconsistent and also makes it so your projectiles will be blocked by other ledges.
+        - Let's fix this by setting "isHigh" true initially on projectiles if an ~12x6 rectangle centered on the projectile hitbox is under a ledge.
 
     - Add underwater swimming animation once Jon provides it.
 
