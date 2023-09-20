@@ -37,8 +37,6 @@ Graphics:
 
 
 Current tasks:
-    - spirit barrier increases hitbox for climbing but shouldn't.
-
     - When chakram/bow is fired while standing over the tip of a ledge.
         - This is inconsistent and also makes it so your projectiles will be blocked by other ledges.
         - Let's fix this by setting "isHigh" true initially on projectiles if an ~12x6 rectangle centered on the projectile hitbox is under a ledge.
