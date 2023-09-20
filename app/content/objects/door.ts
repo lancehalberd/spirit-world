@@ -361,10 +361,6 @@ export class Door implements ObjectInstance {
             this.refreshIsHot(state);
         }
         let hero = state.hero;
-        // Nothing to update if the hero cannot enter the door.
-        if (!this.heroCanEnter(state)) {
-            return;
-        }
         if (this.status === 'normal' && this.isHot) {
             if (state.fieldTime % 40 === 0) {
                 let hitbox = {...this.getHitbox()};
@@ -387,6 +383,10 @@ export class Door implements ObjectInstance {
                     vy: (-1 + Math.random() / 2) * directionMap[this.definition.d][1],
                 });
             }
+        }
+        // Nothing to update if the hero cannot enter the door.
+        if (!this.heroCanEnter(state)) {
+            return;
         }
         // For some reason this can trigger when the door is closed after recent movement changes
         // so we reduce the

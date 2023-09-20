@@ -39,8 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Hot room determination isn't consistent, for example:
-        "In the Holy Sanctum, fire section, 2nd room, when I first open the door to the N, it isn't wreathed in flame.  If leave the room and return, it is.  If I leave the fire section and return, the first time I enter the 2nd room it isn't, but the second time it is."
 
     - Add underwater swimming animation once Jon provides it.
 
@@ -280,11 +278,9 @@ Current tasks:
         - crystal
         - stone
 
-    - Hot rooms should burn enemies.
-        - This is a little tricky because currently we only calculate whether the current section is hot rather than all active sections.
-        - It would be good to do this though as the status quo makes sections the hero isn't in behave inconsistently (as if they match the current section).
-        - This will gradually kill enemies that aren't immune to fire damage.
-
+    - Hot room status is incorrect in alternate world, it is always matching the current world.
+        - Fixing this will prevent ice tiles from forming incorrectly in hot rooms in the alternate world.
+        - It will also allow us to make hot rooms consistently burn enemies.
 
     - Add respawn flag to objects that causes them to respawn if destroyed.
 
