@@ -122,7 +122,7 @@ export function getContextMenu(): MenuOption[] {
             label: 'Save Location',
             onSelect() {
                 const state = getState();
-                setSpawnLocation(state, state.location);
+                setSpawnLocation(state, {...state.location, d: state.hero.d});
             }
         },
         {

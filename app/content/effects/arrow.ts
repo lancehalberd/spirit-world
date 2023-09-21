@@ -1,9 +1,10 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { getDirection, hitTargets } from 'app/utils/field';
+import { directionMap, getDirection, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
@@ -210,6 +211,7 @@ export class Arrow implements EffectInstance, Projectile {
     style: ArrowStyle = 'normal';
     isPlayerAttack = true;
     isHigh = false;
+    refreshIsHigh = true;
     constructor({
         x = 0, y = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
@@ -237,7 +239,7 @@ export class Arrow implements EffectInstance, Projectile {
         this.hybridWorlds = hybridWorlds;
     }
     getHitbox() {
-        return this;
+        return {x: this.x, y: this.y, w: this.w, h: this.h};
     }
     getYDepth() {
         if (this.isHigh) {
@@ -272,6 +274,20 @@ export class Arrow implements EffectInstance, Projectile {
         };
     }
     update(state: GameState) {
+        if (!this.area) {
+            return;
+        }
+        if (this.refreshIsHigh) {
+            this.refreshIsHigh = false;
+            const direction = getDirection(this.vx, this.vy, true);
+            const hitbox = this.getHitbox();
+            //console.log(state.hero.y, hitbox);
+            const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
+            const dx = directionMap[direction][0], dy = directionMap[direction][1];
+            const ledgeDelta = getLedgeDelta(state, this.area, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 4 * dx, y: y + 4 * dy});
+            this.isHigh = ledgeDelta < 0;
+            //console.log(ledgeDelta, this.isHigh, this.vx, this.vy, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 4 * dx, y: y + 4 * dy});
+        }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
