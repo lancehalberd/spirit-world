@@ -53,10 +53,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     const isMovementBlocked = hero.action === 'meditating' || hero.action === 'chargingCloneExplosion'
         || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
+    const isClimbing = hero.action === 'climbing';
     const isActionBlocked =
         isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject ||
         (hero.action === 'attack' && (hero.savedData.weapon < 2 || hero.actionFrame < 6)) ||
-        hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || hero.action === 'climbing';
+        hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || isClimbing;
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.savedData.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
@@ -72,8 +73,16 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     } else if (hero.savedData.equippedBoots === 'cloudBoots') {
         movementSpeed *= 1.4;
     }
-    if (hero.action === 'climbing') {
-        movementSpeed *= 0.5;
+    if (isClimbing) {
+        hero.slipping = false;
+        // Boots have less dramatic impact on movement speed when climbing.
+        if (hero.savedData.equippedBoots === 'ironBoots') {
+            movementSpeed = 0.8;
+        } else if (hero.savedData.equippedBoots === 'cloudBoots') {
+            movementSpeed = 1.2;
+        } else {
+            movementSpeed = 1;
+        }
     }
     if (hero.swimming) {
         movementSpeed *= 0.75;

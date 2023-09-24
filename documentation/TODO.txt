@@ -37,8 +37,6 @@ Graphics:
 
 
 Current tasks:
-    - Make sure climb speed isn't too fast with cloud boots (catching up with growing vines looks bad)
-
     - Add underwater swimming animation once Jon provides it.
 
     - Fix push/pull interactions with ledges.
