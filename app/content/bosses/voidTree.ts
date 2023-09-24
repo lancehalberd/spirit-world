@@ -366,16 +366,22 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.life <= 0.75 * maxLife && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
         enemy.params.enrageTime = 7000;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
         enemy.modeTime = 0;
         addLaserWarningToArea(state);
     } else if (enemy.life <= 0.5 * maxLife && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
         enemy.params.enrageTime = 12000;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
         enemy.modeTime = 0;
         addLaserWarningToArea(state);
     } else if (enemy.life <= 0.25 * maxLife && enemy.params.enrageLevel === 2) {
         enemy.params.enrageLevel = 3;
         enemy.params.enrageTime = 17000;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
         enemy.modeTime = 0;
         addLaserWarningToArea(state);
     }

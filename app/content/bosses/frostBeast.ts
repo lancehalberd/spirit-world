@@ -182,11 +182,15 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.enrageTime = 5000;
         enemy.params.shieldLife++;
         enemy.modeTime = 0;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
     } else if (enemy.life <= 4 && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
         enemy.params.enrageTime = 7000;
         enemy.params.shieldLife++;
         enemy.modeTime = 0;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
     }
     enemy.params.chargeLevel += FRAME_LENGTH;
     if (enemy.params.chargeLevel >= 4000) {

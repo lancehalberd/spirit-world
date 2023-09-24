@@ -60,9 +60,9 @@ const goldRect = subRect(innerMenuFrame, {x: 140, y: 50, w: frameSize, h: frameS
 
 const peachRect = subRect(innerMenuFrame, { x: 4, y: innerMenuFrame.h - 4 - fullPeach.h, w: fullPeach.w, h: fullPeach.h});
 
-const bigKeyRect = {...peachRect, x: peachRect.x + peachRect.w + 10, w: bigKeyFrame.w, h: bigKeyFrame.h };
-const mapRect = {...bigKeyRect, x: bigKeyRect.x + bigKeyRect.w + 2, w: scroll1.w, h: scroll1.h };
-const smallKeyRect = {...mapRect, x: mapRect.x + mapRect.w + 2, w: keyFrame.w, h: keyFrame.h };
+const mapRect = {...peachRect, x: peachRect.x + peachRect.w + 10, w: scroll1.w, h: scroll1.h };
+const bigKeyRect = {...mapRect, x: mapRect.x + mapRect.w + 2, w: bigKeyFrame.w, h: bigKeyFrame.h };
+const smallKeyRect = {...bigKeyRect, x: bigKeyRect.x + bigKeyRect.w + 2, w: keyFrame.w, h: keyFrame.h };
 
 export function renderMenuFrame(context: CanvasRenderingContext2D, state: GameState, r: Rect): void {
     drawFrame(context, menuSlices[0], {x: r.x, y: r.y, w: 8, h: 8});
@@ -154,14 +154,6 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     });
 
     const selectedItem = menuRows[state.menuRow]?.[state.menuIndex];
-    if (selectedItem) {
-        const lootName = getMenuName(state, selectedItem);
-        drawText(context, lootName, r.x + r.w - 4, r.y + r.h - 4, {
-            textBaseline: 'bottom',
-            textAlign: 'right',
-            size: 16,
-        });
-    }
 
     // Weapon isn't currently part of the selectable menu rows.
     if (state.hero.savedData.weapon >= 1 || editingState.isEditing) {
@@ -215,6 +207,23 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         drawText(context, `${dungeonInventory.smallKeys || 0}`, smallKeyRect.x + 16, smallKeyRect.y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
+            size: 16,
+        });
+    } else {
+        const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey] || {} as DungeonInventory;
+        if (dungeonInventory.map) {
+            drawFrameCenteredAt(context, scroll1, mapRect);
+        }
+    }
+
+    if (selectedItem) {
+        const lootName = getMenuName(state, selectedItem);
+        const w = lootName.length * 8 + 12, h = 18 + 8;
+        const textRect = {x: outerMenuFrame.x + outerMenuFrame.w + 8 - w, y : outerMenuFrame.y + outerMenuFrame.h + 8 - h, w, h};
+        renderMenuFrame(context, state, textRect);
+        drawText(context, lootName, textRect.x + textRect.w - 6, textRect.y + textRect.h - 4, {
+            textBaseline: 'bottom',
+            textAlign: 'right',
             size: 16,
         });
     }

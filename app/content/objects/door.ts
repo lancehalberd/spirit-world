@@ -119,6 +119,11 @@ export class Door implements ObjectInstance {
     // The door itself is always solid, but an OpenDoorPath object will be added when
     // the door is open that allows walking on the path part of the door.
     behaviors: TileBehaviors = {solid: true};
+    getBehaviors(): TileBehaviors {
+        if (this.definition.d === 'down') {
+            return {solid: true, isSouthernWall: true};
+        }
+    }
     ignorePits = true;
     isObject = <const>true;
     linkedObject: Door;

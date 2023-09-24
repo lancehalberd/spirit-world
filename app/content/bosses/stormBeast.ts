@@ -211,6 +211,11 @@ enemyDefinitions.stormHeart = {
         ) {
             return { hit: true, stopped: true };
         }
+        const shouldBeEnranged = enemy.params.enrageTime > 0 || enemy.params.enrageLevel < getStormHeartTargetEnrageLevel(enemy);
+        // Incoming damage is reduced by 80% when preparing to enter rage phase.
+        if (shouldBeEnranged && hit.damage) {
+            hit = {...hit, damage: hit.damage *= 0.2};
+        }
         if (enemy.params.cloudLife > 0) {
             enemy.params.cloudLife = Math.ceil(enemy.params.cloudLife - 1);
             if (hit.damage > 1) {
@@ -243,6 +248,16 @@ function getStormBeast(this: void, state: GameState, area: AreaInstance): Enemy 
 
 function isEnemyDefeated(enemy: Enemy): boolean {
     return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
+}
+
+function getStormHeartTargetEnrageLevel(enemy: Enemy): number {
+    if (enemy.life <= enemy.enemyDefinition.life * 1 / 3) {
+        return 2;
+    }
+    if (enemy.life <= enemy.enemyDefinition.life * 2 / 3) {
+        return 1;
+    }
+    return 0;
 }
 
 function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
@@ -320,14 +335,13 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
             }
         }
     }
-    if (enemy.life <= enemy.enemyDefinition.life * 2 / 3 && enemy.params.enrageLevel === 0) {
-        enemy.params.enrageLevel = 1;
-        enemy.params.enrageTime = 6500;
+    const targetEnrageLevel = getStormHeartTargetEnrageLevel(enemy);
+    if (enemy.params.enrageLevel < targetEnrageLevel) {
+        enemy.params.enrageLevel = targetEnrageLevel;
+        enemy.params.enrageTime = 4500 + 2000 * targetEnrageLevel;
         enemy.modeTime = 0;
-    } else if (enemy.life <= enemy.enemyDefinition.life * 1 / 3 && enemy.params.enrageLevel === 1) {
-        enemy.params.enrageLevel = 2;
-        enemy.params.enrageTime = 8500;
-        enemy.modeTime = 0;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
     }
 }
 
@@ -527,9 +541,13 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.life <= maxLife * 2 / 3 && enemy.params.enrageLevel === 0) {
             enemy.params.enrageLevel = 1;
             enemy.params.enrageTime = 6500;
+            // Burn damaged is reduced by 80% when entering rage phase.
+            enemy.burnDamage *= 0.2;
         } else if (enemy.life <= maxLife * 1 / 3 && enemy.params.enrageLevel === 1) {
             enemy.params.enrageLevel = 2;
             enemy.params.enrageTime = 8500;
+            // Burn damaged is reduced by 80% when entering rage phase.
+            enemy.burnDamage *= 0.2;
         }
     }
     const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);

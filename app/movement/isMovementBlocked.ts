@@ -20,6 +20,12 @@ export function isMovementBlocked(
         }
     }
     const actor = movementProperties.actor;
+    const canMoveUnderLowCeilings = !(movementProperties.actor?.z > 3)
+        && movementProperties.canSwim
+        // This is useful for preventing the player from getting knocked back through doorways
+        && movementProperties.actor?.action !== 'knocked'
+        // This prevents clones from being thrown into doorways
+        && movementProperties.actor?.action !== 'thrown';
 
     // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.
     let walkableObject: ObjectInstance, blockingSolidObject: ObjectInstance, blockingPitObject: ObjectInstance;
@@ -52,7 +58,7 @@ export function isMovementBlocked(
 
             // Low ceiling objects block all movement if the actors z value is too high
             // The canSwim check is a hack to keep astral projection out of low areas like door paths.
-            if (behaviors?.lowCeiling && (movementProperties.actor?.z > 3 || !movementProperties.canSwim)) {
+            if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     return {};
                 }
@@ -160,7 +166,7 @@ export function isMovementBlocked(
         return {};
     }
     // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
-    if (behaviors?.lowCeiling && (movementProperties.actor?.z > 3 || !movementProperties.canSwim)) {
+    if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
         return {};
     }
     // The second condition is a hack to prevent enemies from walking over pits.

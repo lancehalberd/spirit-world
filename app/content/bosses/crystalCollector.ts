@@ -374,11 +374,15 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         enemy.currentAnimation = enemy.animations[enemy.currentAnimationKey][enemy.d];
         enemy.params.enrageTime = 12000;
         enemy.params.enrageLevel = 2;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
     } else if (enemy.life <= 16 && enrageLevel === 0) {
         enemy.animations = crystalCollectorEnragedAnimations;
         enemy.currentAnimation = enemy.animations[enemy.currentAnimationKey][enemy.d];
         enemy.params.enrageTime = 8000;
         enemy.params.enrageLevel = 1;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
     }
 
     // Boss doesn't update for half of their iframes to make sure the damage animation isn't

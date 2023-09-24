@@ -37,15 +37,6 @@ Graphics:
 
 
 Current tasks:
-    - Throwing clone towards doorways seems to cause it to despawn
-        - Theory: clone can be thrown into doorway, but cannot land in doorway.
-            - Solution: treat lowCeiling tiles as walls for thrown/knocked actors. This might help with getting knocked out of areas as well.
-
-    - Shouldn't be able to kill beasts while hearts are alive.
-
-    - Burn is too powerful
-        - Reduce burn damage to 20% when bosses enter enrage phases.
-
     - Make sure climb speed isn't too fast with cloud boots (catching up with growing vines looks bad)
 
     - Add underwater swimming animation once Jon provides it.

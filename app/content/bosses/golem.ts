@@ -576,6 +576,8 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     }
     if (enemy.params.enrageLevel < targetEnrageLevel) {
         enemy.params.enrageLevel = targetEnrageLevel;
+        // Burn damaged is reduced by 80% when entering rage phase.
+        enemy.burnDamage *= 0.2;
         enemy.params.enragedAttacks = targetEnrageLevel;
         // Immediately stop laser attack on becoming enraged to prevent further damage.
         if (enemy.mode === 'chargeLaser'

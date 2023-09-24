@@ -141,7 +141,6 @@ export function getLedgeDelta(
                     continue;
                 }
             }
-            console.log('No delta');
         }
     }
 

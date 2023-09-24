@@ -91,7 +91,7 @@ export const climbableWall: TileBehaviors = {
     climbable: true,
     isSouthernWall: true,
     solid: true,
-    low: true,
+    //low: true,
 };
 export const spiritBushBehavior: TileBehaviors = {
     ...bushBehavior,
