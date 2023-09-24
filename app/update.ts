@@ -139,14 +139,61 @@ export function update() {
         } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {
-            updateScriptEvents(state);
-            if (state.scriptEvents.blockPlayerInput) {
-                clearKeyboardState(state);
+            let messageIsAnimating = false;
+            if (state.messagePage) {
+                const shouldSkipForward = wasConfirmKeyPressed(state) || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
+                const {lineIndex, animationTime} = state.messagePage;
+                if (lineIndex === 0) {
+                    // Currently there is no initial animation for the first page of dialogue.
+                    const initialAnimationDuration = 0;
+                    if (animationTime < initialAnimationDuration) {
+                        messageIsAnimating = true;
+                        if (shouldSkipForward) {
+                            state.messagePage.animationTime = initialAnimationDuration;
+                        }
+                    } else if (state.messagePage.frames.length <= 4) {
+                        messageIsAnimating = false;
+                        // Closing the message is handled by the containing script system.
+                    } else {
+                        messageIsAnimating = true;
+                        if (shouldSkipForward) {
+                            //console.log('Going to next page', state.messagePage.frames.length, lineIndex, ' -> ', lineIndex + 4);
+                            state.messagePage.lineIndex += 4;
+                            state.messagePage.animationTime = 0;
+                        }
+                    }
+                } else {
+                    const pageDurationTime = FRAME_LENGTH * 5 * 4;
+                    if (animationTime < pageDurationTime) {
+                        messageIsAnimating = true;
+                        if (shouldSkipForward) {
+                            //console.log('Skip paging animation', pageDurationTime);
+                            state.messagePage.animationTime = pageDurationTime;
+                        }
+                    } else if (state.messagePage.frames.length <= lineIndex + 4) {
+                        messageIsAnimating = false;
+                        // Closing the message is handled by the containing script system.
+                    } else {
+                        messageIsAnimating = true;
+                        if (shouldSkipForward) {
+                            //console.log('Going to next page', state.messagePage.frames.length, lineIndex, ' -> ', lineIndex + 4);
+                            state.messagePage.lineIndex += 4;
+                            state.messagePage.animationTime = 0;
+                        }
+                    }
+                }
+                state.messagePage.animationTime += FRAME_LENGTH;
             }
-            // Make sure we don't handle script event input twice in one frame.
-            // We could also manage this by unsetting game keys on the state.
-            if (!state.scriptEvents.blockFieldUpdates && !state.scriptEvents.handledInput) {
-                updateField(state);
+            if (!messageIsAnimating) {
+                updateScriptEvents(state);
+                if (state.scriptEvents.blockPlayerInput) {
+                    clearKeyboardState(state);
+                }
+                // Make sure we don't handle script event input twice in one frame.
+                // We could also manage this by unsetting game keys on the state.
+                if (!state.scriptEvents.blockFieldUpdates && !state.scriptEvents.handledInput) {
+                    updateField(state);
+                }
             }
         }
     } catch (e) {

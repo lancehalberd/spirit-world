@@ -23,13 +23,19 @@ interface FrameDimensions {
     // Contrast thiis with AreaObjectTarget where the `h` value is the height of the object in the game,
     // which is typically less than the height of the image (imageContentHeight = gameHeight + gameDepth / 2).
     content?: Rect
+    // Optional scale that can be set on the frame. Most contexts ignore this, but those that support it
+    // will multiple the w/h values by this number as well as the content values if present.
+    s?: number
 }
 interface FrameRectangle extends Rect {
     // When a frame does not perfectly fit the size of the content, this content rectangle can be
     // set to specify the portion of the image that is functionally part of the object in the frame.
-    // For example, a character with a long time may have the content around the character's body and
+    // For example, a character with a long tail may have the content around the character's body and
     // exclude the tail when looking at the width/height of the character.
     content?: Rect
+    // Optional scale that can be set on the frame. Most contexts ignore this, but those that support it
+    // will multiple the w/h values by this number as well as the content values if present.
+    s?: number
 }
 
 interface Frame extends FrameRectangle {
@@ -41,7 +47,7 @@ interface Frame extends FrameRectangle {
 
 interface FrameWithPattern extends Frame {
     pattern?: CanvasPattern
-};
+}
 
 interface TintedFrame extends Frame {
     color: string

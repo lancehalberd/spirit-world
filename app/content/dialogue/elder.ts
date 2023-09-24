@@ -243,7 +243,7 @@ dialogueHash.elder = {
         },
         {
             logicCheck: {
-                requiredFlags: [],
+                requiredFlags: ['$catEyes'],
                 excludedFlags: ['$bow', 'tombEntrance'],
             },
             isExclusive: true,
@@ -251,15 +251,20 @@ dialogueHash.elder = {
                 {
                     dialogueIndex: 4,
                     dialogueType: 'quest',
-                    text: `So you want to learn more about your Spirit powers?
-                    {|}Seek out the Guardian in the Vanara Tomb to the north.
-                    {|}Search my cellar for a tool you will need to enter the Tomb.
+                    text: `Greetings young one, I can sense there is something different about you today.
+                    {|}Your father didn't pay much attention to rules so I'm sure he has told you stories about my Spirit powers.
+                    {|}Stories like that are often hard to believe, but I suspect you are starting to wonder if there is any truth to them.
+                    {|}Unfortunately, it is not my place to teach you more about the Spirit World.
+                    {|}To be honest my Spirit powers are quite weak anyway, just enough to keep careful watch over this village.
+                    {|}However, there is one I know of who can teach you more if you wish.
+                    {|}To learn more about the Spirit World, seek out the Guardian in the Vanara Tomb to the north.
+                    {|}Search my cellar for a tool that will help you unlock the Tomb.
                     {flag:elderTomb}`,
                 },
                 {
                     dialogueIndex: 5,
                     dialogueType: 'reminder',
-                    text: `Search my cellar for a tool you will need to enter the Tomb.`,
+                    text: `Search my cellar for a tool that will help you unlock the Tomb.`,
                 },
             ],
             notes: `If this flag is set the elder will rescue you if you are defeated

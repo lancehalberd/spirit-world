@@ -50,7 +50,6 @@ Current tasks:
 
     - Make sure climb speed isn't too fast with cloud boots (catching up with growing vines looks bad)
 
-
     - Add underwater swimming animation once Jon provides it.
 
     - Fix push/pull interactions with ledges.
@@ -70,12 +69,6 @@ Current tasks:
         - Play door open/closed sounds FX when it changes whether it is open based on the player being over it.
 
     - Fix audio restarts when going under water during the frost beast fight.
-
-    - Improve dialogue display
-        - animate lines in one at a time every ~40ms
-            - instantly show the full page when pressing a button to advance text.
-        - animate lines moving up for each page when there is not an explicit break {|} and stop when the last line is at the bottom.
-            - instantly move the newest line to the top when pressing a button to advance the dialogue so it can be skipped through quickly.
 
     - peach cave narrative
         - Add a message to the chakram chest if you check it after opening it.

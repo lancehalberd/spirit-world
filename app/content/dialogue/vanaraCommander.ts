@@ -56,7 +56,7 @@ dialogueHash.vanaraCommander = {
                     {|}Unfortunately, it appears another Vanara is responsible for releasing them.
                     {|}We cannot hunt the beasts ourselves so we would like to send you to help.
                     {|}North of the Holy City is the Grand Temple.
-                    {|}At its heart is a portal that will take you to the Jade Palace.
+                    At its heart is a portal that will take you to the Jade Palace.
                     {|}Go there and speak with the Spirit King, I'm sure you will be expected.
                     {|}And here, take this with you before you go.
                     {flag:elementalBeastsEscaped}

@@ -150,7 +150,11 @@ export function updateScriptEvents(state: GameState): void {
             case 'showTextBox':
                 // Text cues and text box cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
-                state.messagePage = event.textPage;
+                state.messagePage = {
+                    ...event.textPage,
+                    lineIndex: 0,
+                    animationTime: 0,
+                };
                 break;
             case 'clearTextBox':
                 state.messagePage = null;

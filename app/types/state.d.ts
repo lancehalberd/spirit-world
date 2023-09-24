@@ -103,7 +103,7 @@ interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     },
-    messagePage?: TextPage
+    messagePage?: TextPageState
     randomizer?: {
         seed: number
         goal: number

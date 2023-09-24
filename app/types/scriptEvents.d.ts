@@ -34,6 +34,10 @@ interface TextPage {
     textRows: string[]
     frames: Frame[][]
 }
+interface TextPageState extends TextPage {
+    lineIndex: number
+    animationTime: number
+}
 
 interface ShowTextBoxScriptEvent {
     type: 'showTextBox'

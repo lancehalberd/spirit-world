@@ -133,7 +133,7 @@ dialogueHash.mom = {
                     dialogueIndex: 26,
                     dialogueType: 'reminder',
                     text: `You should head Southwest to the Vanara Village if you want to learn
-                    {|}more about the Vanara powers you inherited from your father.`,
+                    more about the Vanara powers you inherited from your father.`,
                 },
             ],
             repeatIndex: 0,

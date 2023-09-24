@@ -31,6 +31,8 @@ export function debugCanvas(canvas: HTMLCanvasElement | Frame, scale = CANVAS_SC
         canvas.style.position = 'absolute';
         canvas.style.top = '0';
         canvas.style.backgroundColor = 'blue';
+        canvas.style.transformOrigin = '0 0';
+        canvas.style.transform = `scale(${scale})`;
     } else {
         document.body.append(canvas.image);
         canvas.image.style.position = 'absolute';

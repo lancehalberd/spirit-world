@@ -103,17 +103,17 @@ dialogueHash.tombGuardian = {
                     dialogueIndex: 65,
                     dialogueType: 'quest',
                     text: `Well done young one, I am the Vanara Guardian.
-                    {|}I protect the resting place of the Vanara.
+                    I protect the resting place of the Vanara.
                     {|}You've come to learn more about your spirit powers?
                     {|}I knew this day would come eventually...
                     {|}I can teach you to look into the spirit realm,
-                    {|}but you won't be able to interact with it.
+                    but you won't be able to interact with it.
                     {item:spiritSight}
                     There may be a way to enhance your powers further.
                     {|}Did you know your mother is a descendant of the summoner clan?
                     {|}They weren't supposed to pass their knowledge on but it still survives in certain families.
                     {|}The summoners used special tools to enhance their powers,
-                    {|}perhaps your mother could tell you more.
+                    perhaps your mother could tell you more.
                     `,
                 },
             ],

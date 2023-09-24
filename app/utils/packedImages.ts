@@ -279,7 +279,7 @@ export function requireFrame(source: string, r?: FrameRectangle): Frame {
     // If the
     if (p) {
         return r
-            ? {image: p.image, x: r.x + p.x, y: r.y + p.y, w: r.w, h: r.h, content: r.content}
+            ? {image: p.image, x: r.x + p.x, y: r.y + p.y, w: r.w, h: r.h, content: r.content, s: r.s}
             : p;
     }
     const frame = {
@@ -292,7 +292,8 @@ export function requireFrame(source: string, r?: FrameRectangle): Frame {
         }),
         x: r?.x ?? 0, y: r?.y ?? 0,
         w: r?.w ?? 0, h: r?.h ?? 0,
-        content: r?.content
+        content: r?.content,
+        s: r?.s,
     };
     return frame;
 }
