@@ -365,6 +365,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         } else if (hit.element === 'ice' && this.definition.type !== 'boss') {
             this.frozenDuration = 1500;
             this.burnDuration = 0;
+            this.vx = this.vy = 0;
         }
         return {
             damageDealt,
@@ -613,6 +614,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         if (this.blockInvulnerableFrames > 0) {
             this.blockInvulnerableFrames--;
+        }
+        // Unfreeze defeated enemies, otherwise their death animation may be delayed
+        // until they are unfrozen.
+        if (!this.isImmortal && this.life <= 0 && this.z <= 0) {
+            this.frozenDuration = 0;
         }
         if (this.frozenDuration > 0) {
             this.frozenDuration -= FRAME_LENGTH;

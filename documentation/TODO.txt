@@ -37,8 +37,6 @@ Graphics:
 
 
 Current tasks:
-    - Enemies don't die until they unfreeze.
-
     - Throwing clone towards doorways seems to cause it to despawn
         - Theory: clone can be thrown into doorway, but cannot land in doorway.
             - Solution: treat lowCeiling tiles as walls for thrown/knocked actors. This might help with getting knocked out of areas as well.
