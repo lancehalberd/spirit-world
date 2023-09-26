@@ -310,8 +310,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "forgeLava1", x: 248, y: 64, type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 311, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 2},
-        {x: 0, y: 16, w: 32, h: 16, index: 312, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 311, mapId: 'forge', floorId: '1F', mapX: 0.5, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 312, mapId: 'forge', floorId: '1F', mapX: 0.5, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -629,8 +629,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forgeStairs1", x: 32, y: 48, type: "door", style: "cavernDownstairs", d: "up", hasCustomLogic: true, customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeStairs1", locationCue: "Forge 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 313, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava1","isInverted":true}, mapId: 'forge', floorId: '1F', mapX: 1, mapY: 2},
-        {x: 0, y: 16, w: 32, h: 16, index: 314, mapId: 'forge', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 313, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava1","isInverted":true}, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 314, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -992,9 +992,9 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "forgeMaterialStairs2", linked: true, x: 448, y: 16, type: "door", style: "cavernDownstairs", targetZone: "forge", targetObjectId: "forgeMaterialStairs2", d: "up", spirit: true, locationCue: "Forge B1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 315, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 316, hotLogic: {"hasCustomLogic":true,"customLogic":"","isInverted":false}, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 4},
-        {x: 16, y: 0, w: 16, h: 32, index: 317, mapId: 'forge', floorId: 'B1', mapX: 4, mapY: 3},
+        {x: 0, y: 0, w: 16, h: 16, index: 315, mapId: 'forge', floorId: 'B1', mapX: 0.5, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 316, hotLogic: {"hasCustomLogic":true,"customLogic":"","isInverted":false}, mapId: 'forge', floorId: 'B1', mapX: 0.5, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 317, mapId: 'forge', floorId: 'B1', mapX: 1.5, mapY: 3},
     ],
 };
 const sf1_0x0: AreaDefinition = {
@@ -1020,9 +1020,9 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "forgeBigKey", spirit: true, x: 104, y: 448, type: "chest", lootType: "bigKey", lootLevel: 2, hasCustomLogic: true, customLogic: "forgeLava3"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 318, mapId: 'forge', floorId: 'B1', mapX: 1, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 319, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 1, mapY: 4},
-        {x: 16, y: 0, w: 16, h: 32, index: 320, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 3},
+        {x: 0, y: 0, w: 16, h: 16, index: 318, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 319, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 320, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 4, mapY: 3},
     ],
 };
 const f2_0x0: AreaDefinition = {
@@ -1327,9 +1327,9 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeLava4", x: 48, y: 240, type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, index: 321, mapId: 'forge', floorId: 'B2', mapX: 3, mapY: 2},
-        {x: 16, y: 0, w: 16, h: 16, index: 322, hideMap: true, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 323, hideMap: true, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 32, index: 321, mapId: 'forge', floorId: 'B2', mapX: 2, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 322, hideMap: true, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 323, hideMap: true, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 2},
     ],
 };
 const sf2_0x0: AreaDefinition = {
@@ -1650,9 +1650,9 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeSaveStatue", linked: true, spirit: true, x: 48, y: 160, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, index: 324, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava4","isInverted":true}, mapId: 'forge', floorId: 'B2', mapX: 2, mapY: 2},
-        {x: 16, y: 0, w: 16, h: 16, index: 325, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 326, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 32, index: 324, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava4","isInverted":true}, mapId: 'forge', floorId: 'B2', mapX: 4.5, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 325, mapId: 'forge', floorId: 'B1', mapX: 4.5, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 326, mapId: 'forge', floorId: 'B1', mapX: 4.5, mapY: 2},
     ],
 };
 zones.forge = {
