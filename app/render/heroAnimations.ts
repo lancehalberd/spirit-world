@@ -151,6 +151,13 @@ const walkCarryRightAnimation: FrameAnimation = createAnimation('gfx/mc/mc4direc
 const climbGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const climbUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcclimb.png', climbGeometry, { cols: 9, duration: 6});
 
+
+const underwaterGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const underwaterDownAnimation: FrameAnimation = createAnimation('gfx/mc/swimming.png', underwaterGeometry, { x: 0, cols: 4, duration: 10});
+const underwaterRightAnimation: FrameAnimation = createAnimation('gfx/mc/swimming.png', underwaterGeometry, { x: 4, cols: 4, duration: 10});
+const underwaterUpAnimation: FrameAnimation = createAnimation('gfx/mc/swimming.png', underwaterGeometry, { x: 8, cols: 4, duration: 10});
+const underwaterLeftAnimation: FrameAnimation = createAnimation('gfx/mc/swimming.png', underwaterGeometry, { x: 12, cols: 4, duration: 10});
+
 const swimGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const floatUpAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 2, x: 0, y: 2, duration: 16});
 const floatDownAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 2, x: 0, y: 0, duration: 16});
@@ -506,6 +513,14 @@ export const heroSwimAnimations: ActorAnimations = {
     },
 };
 
+export const heroUnderwaterAnimations: ActorAnimations = {
+    idle: {
+        up: underwaterUpAnimation,
+        down: underwaterDownAnimation,
+        left: underwaterLeftAnimation,
+        right: underwaterRightAnimation,
+    },
+};
 
 export const heroSpiritAnimations: ActorAnimations = {
     grab: {

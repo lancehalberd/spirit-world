@@ -133,6 +133,9 @@ function moveActorInDirection(
     if (!actor.ignoreLedges && actor.action !== 'climbing') {
         const jv = getJumpVector(state, actor.area, actor.getHitbox());
         if (jv[0] !== 0 || jv[1] !== 0) {
+            if (actor.pickUpObject || actor.pickUpTile) {
+                (actor as Hero).throwHeldObject?.(state);
+            }
             if (actor.action === 'thrown' || actor.action === 'knocked' || actor.action === 'knockedHard') {
                 actor.action = 'jumpingDown';
                 actor.jumpingVx = actor.vx;
@@ -159,9 +162,6 @@ function moveActorInDirection(
             actor.isAirborn = true;
             actor.canTrampoline = true;
             actor.grabObject = null;
-            if (actor.pickUpObject || actor.pickUpTile) {
-                (actor as Hero).throwHeldObject?.(state);
-            }
         }
     }
     return result;

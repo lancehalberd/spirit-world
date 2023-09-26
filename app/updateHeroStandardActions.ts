@@ -130,9 +130,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.z < minZ) {
         hero.z = Math.max(hero.groundHeight, Math.min(hero.z + 1, minZ));
     }
-    if (isHeroSinking(state, hero)) {
+    const isSinking = isHeroSinking(state, hero), isFloating = !isSinking && isHeroFloating(state, hero);
+    if (isSinking) {
         hero.z = Math.max(hero.z - 1.5, minZ);
-    } else if (isHeroFloating(state, hero)) {
+    } else if (isFloating) {
         hero.vz = Math.min(1, hero.vz + 0.2);
         hero.z = Math.min(24, hero.z + hero.vz);
         if (hero.z < minZ) {
@@ -448,7 +449,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = 'walking';
                 hero.actionDx = 0;
                 hero.actionDy = 0;
-                hero.animationTime = 0;
+                // The swimming animation doesn't restart when switching between stationary and moving.
+                if (!isFloating && !isSinking) {
+                    hero.animationTime = 0;
+                }
             }
         } else {
             if ((hero.action === 'walking' || hero.action === 'pushing')
@@ -457,7 +461,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = null;
                 hero.actionDx = 0;
                 hero.actionDy = 0;
-                hero.animationTime = 0;
+                // The swimming animation doesn't restart when switching between stationary and moving.
+                if (!isFloating && !isSinking) {
+                    hero.animationTime = 0;
+                }
             }
         }
     }
@@ -537,7 +544,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         const moveY = (Math.abs(hero.vy) >= 0.2 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
-                canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging && !isHeroFloating(state, hero) && ! isHeroSinking(state, hero)
+                canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging && !isFloating && !isSinking
                     // You can only push if you are moving the direction you are trying to move.
                     // Neither dimension can be negative, and one dimension must be positive.
                     && (hero.vx * dx >= 0 && hero.vy * dy >= 0) && (hero.vx * dx > 0 || hero.vy * dy > 0),

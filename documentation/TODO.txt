@@ -37,7 +37,55 @@ Graphics:
 
 
 Current tasks:
-    - Add underwater swimming animation once Jon provides it.
+    Blocking production release:
+        - Holding passive tool button while ending dialogue triggers talking again.
+            - Probably wasButtonPressed is true because input was blocked prior to this
+        - Fix randomizer hint references to "hypeCave" and "cloneCave"
+        - Forge material/spirit maps are flipped, material world should be on the left for consistency.
+        - Carrying a stone (but not a bush) should protect you from being blown by air vents.
+
+    - Allow throwing clones diagonally.
+    - Fix pushing pots across southern wall in Gauntlet 2F
+    - Clones disappear when draining lava/etc.
+        - Grown thorns disappear when draining lava.
+    - Tower staff animation freezes when used to hit switches for draining lava.
+    - Sliding against diagonal walls is unusually slow with cloud boots.
+    - Bad looking tiles when turning off middle beads stream in waterfall tower.
+        "In the Waterfall, 1st floor, S screen, the 2 tiles to the E of the lock look bad if we use lightning arrows to turn off that entire slide, and then clear the snow, before unlocking the lock."
+    - Tree never respawns in Forest Temple
+    - Spirit Barrier appears above door frames when moving East/West through doors.
+        - This only applies with old tile sets, so probably isn't worth fixing.
+    - Change mother speech bubble in randomizer when you can finish and when you have full cleared the game?
+    - Moving platform gets stuck in a weird position sometimes in the forge.
+        - When transitioning, reset the moving platforms if they are not in the same area as the player.
+    - Shouldn't be able to use level 2 charge with level 1 weapon.
+    - Elemental immunities are confusing, they just pass through enemies.
+        - For arrows specifically, maybe they can still deal normal damage.
+    - Fire/Ice arrows bounce of void hands when they are up in the air.
+    - Should we prevent throwing rocks over ledges?
+    - Bell cave is incomplete
+        - Add bell graphics to TODO for Jon.
+
+    - Pulling animation changes when pressing a direction while the game is paused
+        - Game inputs should not be read while rendering.
+            - If this is needed, they need to be recorded elsewhere to the state to where they are not updated when paused.
+
+    Swimming bugs:
+        - Chakram/bow fire when armed and you unequip iron boots
+            - Instead let's just disarm them.
+        - Chakram returns to below you if you attack and then unequip iron boots
+            - Let's have chakram move towards the hero's z value when returning and not disappear until it is within N px vertically.
+            - Make sure chakram respects z index when rendering.
+
+    - Make sure destroying connected tiles is consistent: cutting/smashing does not effect the other world, pushing/throwing should
+
+    - Add graphical interface for choosing Nimbus Cloud location using map.
+        - How to signify cancel operation?
+
+    - Can clone throw through closed doors?
+        - Jun did this to crater secret entrance
+
+    - Ice mines are not cleaned up when defeating Guardian in Cocoon.
 
     - Fix push/pull interactions with ledges.
         - Minor issues:

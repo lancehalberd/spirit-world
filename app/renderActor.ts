@@ -11,6 +11,7 @@ import {
     heroShallowAnimations,
     heroCarryAnimations,
     heroSwimAnimations,
+    heroUnderwaterAnimations,
     Y_OFF,
 } from 'app/render/heroAnimations';
 
@@ -113,12 +114,10 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             break;
         case 'walking':
             if (isHeroFloating(state, hero)) {
-                return heroAnimations.roll[hero.d].frames[0];
-            }
-            if (isHeroSinking(state, hero)) {
-                return heroAnimations.idle[hero.d].frames[0];
-            }
-            if (hero.swimming) {
+                animations =  heroUnderwaterAnimations.idle;
+            } else  if (isHeroSinking(state, hero)) {
+                animations =  heroUnderwaterAnimations.idle;
+            } else if (hero.swimming) {
                 animations = heroSwimAnimations.move;
             } else {
                 animations = hero.wading ? heroShallowAnimations.move : heroAnimations.move;
@@ -159,12 +158,10 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             break;
         default:
             if (isHeroFloating(state, hero)) {
-                return heroAnimations.roll[hero.d].frames[0];
-            }
-            if (isHeroSinking(state, hero)) {
-                return heroAnimations.idle[hero.d].frames[0];
-            }
-            if (hero.swimming) {
+                animations =  heroUnderwaterAnimations.idle;
+            } else if (isHeroSinking(state, hero)) {
+                animations =  heroUnderwaterAnimations.idle;
+            } else if (hero.swimming) {
                 animations = heroSwimAnimations.idle;
             } else {
                 if (hero.life < 1) {

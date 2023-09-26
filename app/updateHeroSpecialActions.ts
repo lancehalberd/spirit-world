@@ -602,6 +602,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = Math.max(hero.z + hero.vz, minZ);
             if (hero.z <= minZ) {
                 hero.isAirborn = hero.isAstralProjection;
+                hero.vz = 0;
             }
             const staffLevel = state.hero.savedData.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
@@ -673,6 +674,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = Math.max(hero.z + hero.vz, minZ);
             if (hero.z <= minZ) {
                 hero.isAirborn = hero.isAstralProjection;
+                hero.vz = 0;
             }
         } else if (hero.animationTime >= jumpDuration + slamDuration) {
             hero.action = null;
