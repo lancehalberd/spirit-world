@@ -40,7 +40,6 @@ Current tasks:
     Blocking production release:
         - Holding passive tool button while ending dialogue triggers talking again.
             - Probably wasButtonPressed is true because input was blocked prior to this
-        - Fix randomizer hint references to "hypeCave" and "cloneCave"
         - Forge material/spirit maps are flipped, material world should be on the left for consistency.
         - Carrying a stone (but not a bush) should protect you from being blown by air vents.
 

@@ -575,8 +575,12 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'overworld': return 'outside';
         case 'spiritWorld': return 'out in the spirit world';
         case 'bushCave': return 'in a cave full of bushes';
+        case 'lakeTunnel': return 'in the tunnel by the lake';
         case 'ascentCave': return  'in a cave on the mountain';
         case 'ascentCaveSpirit': return  'in the spirit world in a cave on the mountain';
+        case 'cloneCave': return  'in a cave in the spirit world';
+        case 'bellCave': return  'in a cave in the spirit world';
+        case 'hypeCave': return  'in a cave in the sky of the spirit world';
         case 'fertilityShrine': return 'in the shrine by the forest village';
         case 'fertilityShrineSpirit': return 'in the shrine by the Fertility Temple';
         case 'holyCityInterior': return 'inside the Holy City';
