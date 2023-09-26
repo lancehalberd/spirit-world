@@ -109,14 +109,14 @@ function buttonIsPressed(button) {
   return button == 1.0;
 }
 
-const keysDown = {};
+const keysDown: boolean[] = [];
 let lastInput: 'keyboard' | 'gamepad' = null;
-export function isKeyboardKeyDown(keyCode: number) {
+export function isKeyboardKeyDown(keyCode: number): boolean {
     if (keysDown[keyCode]) {
         lastInput = 'keyboard';
-        return 1;
+        return true;
     }
-    return 0;
+    return false;
 }
 function isGamepadGamekeyPressed(gameKey: number) {
     // If a mapping exists for the current key code to a gamepad button,
@@ -145,9 +145,22 @@ function isGamepadGamekeyPressed(gameKey: number) {
 }
 
 export function addKeyboardListeners() {
+    // keyup events won't trigger when the document doesn't have focus, so clear all pressed
+    // keys when this happens.
+    window.addEventListener('blur', (event: FocusEvent) => {
+        for (let i = 0; i < keysDown.length; i++) {
+            keysDown[i] = false;
+        }
+    });
+    // Similar to above, the context menu prevents keyup events from registering.
+    window.addEventListener('contextmenu', (event: FocusEvent) => {
+        for (let i = 0; i < keysDown.length; i++) {
+            keysDown[i] = false;
+        }
+    });
     document.addEventListener('keyup', function(event) {
         const keyCode: number = event.which;
-        keysDown[keyCode] = null;
+        keysDown[keyCode] = false;
         unlockAudio();
     });
     document.addEventListener('keydown', function(event: KeyboardEvent) {
@@ -169,7 +182,7 @@ export function addKeyboardListeners() {
         if (keyCode === KEY.R && commandIsDown) {
             return;
         }
-        keysDown[keyCode] = 1;
+        keysDown[keyCode] = true;
     });
 }
 
@@ -187,7 +200,7 @@ export function updateKeyboardState(state: GameState) {
     for (let gameKey of Object.values(GAME_KEY)) {
         gameKeyValues[gameKey] = 0;
         for (const keyboardCode of (KEYBOARD_MAPPINGS[gameKey] || [])) {
-            gameKeyValues[gameKey] = isKeyboardKeyDown(keyboardCode);
+            gameKeyValues[gameKey] = isKeyboardKeyDown(keyboardCode) ? 1 : 0;
             if (gameKeyValues[gameKey]) {
                 break;
             }

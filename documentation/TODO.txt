@@ -38,8 +38,6 @@ Graphics:
 
 Current tasks:
     Release blockers
-        - Improve sticky keys issue, apply thrive solution if haven't yet, otherwise experiment with more improvements.
-        - Remove ctrl+k and shift+m key commands, the context menu and dom button are sufficient now.
         - Fix sign blocking rocks thrown in Vanara tomb pot room.
             - Maybe make signs low so you can throw clones over them as well.
 
