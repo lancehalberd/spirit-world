@@ -106,7 +106,8 @@ export class AirStream implements ObjectInstance {
         // TODO: Spawn wind particles orthogonally to direction from the blocked point.
         const actors = [
             ...[state.hero, ...state.hero.clones].filter(h => h.area === this.area
-                && !h.isInvisible && h.savedData.equippedBoots !== 'ironBoots' && h.action !== 'falling' && h.action !== 'fallen' && h.action !== 'grabbing'),
+                && !h.isInvisible
+                && h.savedData.equippedBoots !== 'ironBoots' && h.action !== 'falling' && h.action !== 'fallen' && h.action !== 'grabbing'),
             ...this.area.enemies,
         ];
         if (state.hero.astralProjection?.area === this.area) {
@@ -121,6 +122,10 @@ export class AirStream implements ObjectInstance {
                 let speed = 4 * windForce;
                 if (actor.isAirborn) {
                     speed *= 1.25;
+                }
+                // Objects the hero picks up reduces how much the air streams effect them.
+                if ((actor as Hero).pickUpTile?.behaviors?.pickupWeight || (actor as Hero).pickUpObject) {
+                    speed /= 2;
                 }
                 // Push the actor aloft slightly.
                 // This is intended to be small enough that players still fall with normal boots

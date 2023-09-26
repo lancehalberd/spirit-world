@@ -40,7 +40,6 @@ Current tasks:
     Blocking production release:
         - Holding passive tool button while ending dialogue triggers talking again.
             - Probably wasButtonPressed is true because input was blocked prior to this
-        - Carrying a stone (but not a bush) should protect you from being blown by air vents.
 
     - Allow throwing clones diagonally.
     - Fix pushing pots across southern wall in Gauntlet 2F
