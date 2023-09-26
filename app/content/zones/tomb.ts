@@ -526,7 +526,16 @@ const f0_1x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32, index: 190, hideMap: true, mapId: 'tomb', floorId: 'B1', mapX: 4, mapY: 3},
     ],
 };
-const sf0_0x0: AreaDefinition = null;
+const sf0_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 549, hideMap: true, mapId: 'tombSpirit', floorId: 'B1', mapX: 1, mapY: 1},
+    ],
+};
 const sf0_1x0: AreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_1x0,
@@ -546,8 +555,30 @@ const sf0_1x0: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32, index: 193, mapId: 'tombSpirit', floorId: '1F', mapX: 3, mapY: 0},
     ],
 };
-const sf0_0x1: AreaDefinition = null;
-const sf0_1x1: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 550, mapId: 'tombSpirit', floorId: 'B1', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 551, mapId: 'tombSpirit', floorId: 'B1', mapX: 1, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 552, mapId: 'tombSpirit', floorId: 'B1', mapX: 2, mapY: 3},
+    ],
+};
+const sf0_1x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 553, mapId: 'tombSpirit', floorId: 'B1', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 554, mapId: 'tombSpirit', floorId: 'B1', mapX: 3, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 555, hideMap: true, mapId: 'tombSpirit', floorId: 'B1', mapX: 4, mapY: 3},
+    ],
+};
 const f1_0x0: AreaDefinition = {
     layers: [
         {
@@ -663,7 +694,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 16, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0},
         {status: "normal", id: "", x: 176, y: 16, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0},
         {status: "normal", id: "", x: 176, y: 16, type: "turret", d: "down", fireInterval: 1000, fireOffset: 500},
-        {status: "normal", id: "", x: 384, y: 144, style: "tall", type: "sign", message: "Try hitting this pot with your Chakram.\n{|}Hold [B_WEAPON] longer to throw your Chakram harder."},
+        {status: "normal", id: "", x: 384, y: 112, style: "tall", type: "sign", message: "Try hitting this pot with your Chakram.\n{|}Hold [B_WEAPON] longer to throw your Chakram harder."},
         {status: "normal", id: "", x: 432, y: 32, style: "tall", type: "sign", message: "Face an object then press and hold [B_PASSIVE] to grab it. {|}Push and drag some objects by moving while grabbing them."},
         {status: "normal", linked: false, spirit: false, x: 448, y: 32, type: "pushPull", style: "cave", d: "down", id: "tomb:1:0x0-pushPull-2"},
     ],
@@ -1317,12 +1348,75 @@ const f1_2x1: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16, index: 208, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 4},
     ],
 };
-const sf1_0x0: AreaDefinition = null;
-const sf1_1x0: AreaDefinition = null;
-const sf1_2x0: AreaDefinition = null;
-const sf1_0x1: AreaDefinition = null;
-const sf1_1x1: AreaDefinition = null;
-const sf1_2x1: AreaDefinition = null;
+const sf1_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_0x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 556, mapId: 'tombSpirit', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 557, mapId: 'tombSpirit', floorId: '1F', mapX: 1, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 558, mapId: 'tombSpirit', floorId: '1F', mapX: 0, mapY: 2},
+    ],
+};
+const sf1_1x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_1x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 559, mapId: 'tombSpirit', floorId: '1F', mapX: 2, mapY: 1},
+    ],
+};
+const sf1_2x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_2x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 560, mapId: 'tombSpirit', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 561, mapId: 'tombSpirit', floorId: '1F', mapX: 5, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 562, mapId: 'tombSpirit', floorId: '1F', mapX: 4, mapY: 2},
+    ],
+};
+const sf1_0x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_0x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 563, mapId: 'tombSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 564, mapId: 'tombSpirit', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 565, mapId: 'tombSpirit', floorId: '1F', mapX: 0, mapY: 4},
+    ],
+};
+const sf1_1x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_1x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 16, index: 566, mapId: 'tombSpirit', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 567, mapId: 'tombSpirit', floorId: '1F', mapX: 2, mapY: 4},
+    ],
+};
+const sf1_2x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f1_2x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 32, index: 568, mapId: 'tombSpirit', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 569, mapId: 'tombSpirit', floorId: '1F', mapX: 5, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 570, mapId: 'tombSpirit', floorId: '1F', mapX: 5, mapY: 4},
+    ],
+};
 zones.tomb = {
     key: 'tomb',
     areaSize: {w: 32, h: 32},

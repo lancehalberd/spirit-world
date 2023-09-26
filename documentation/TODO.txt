@@ -37,9 +37,6 @@ Graphics:
 
 
 Current tasks:
-    Release blockers
-        - Fix sign blocking rocks thrown in Vanara tomb pot room.
-            - Maybe make signs low so you can throw clones over them as well.
 
     - Allow throwing clones diagonally.
     - Fix pushing pots across southern wall in Gauntlet 2F
