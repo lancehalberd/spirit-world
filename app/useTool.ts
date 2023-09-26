@@ -152,9 +152,9 @@ export function useTool(
                 return;
             }
             let magicCost = 5;
-            if (chargeLevel === 1) {
-                magicCost += 5;
-            }
+            //if (chargeLevel === 1) {
+            //    magicCost += 5;
+            //}
             if (state.hero.magic < magicCost) {
                 return;
             }
@@ -163,10 +163,14 @@ export function useTool(
             hero.toolOnCooldown = 'cloak';
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
             hero.toolCooldown = 400;
-            hero.barrierLevel = chargeLevel;
+            // Damage increase with cloak level.
+            hero.barrierLevel = hero.savedData.activeTools.cloak;
+            // Charing the cloak has been replaced by the barrier burst functionality.
+            /*
             if (chargeLevel === 1) {
                 hero.barrierElement = element;
             }
+            */
             hero.hasBarrier = true;
             return;
         }

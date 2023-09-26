@@ -253,13 +253,10 @@ export class Hero implements Actor {
             let spiritDamage = hit.spiritCloakDamage || Math.max(10, hit.damage * 5);
             // The cloak halves incoming damage that matches its current element.
             // Note that since the base cloak tool can no longer be charged, barrier element is never set.
-            if (hit.element && hit.element === this.barrierElement) {
-                spiritDamage /= 2;
-            }
+            //if (hit.element && hit.element === this.barrierElement) {
+            //    spiritDamage /= 2;
+            //}
             let reflectDamage = this.barrierLevel;
-            if (!this.barrierElement) {
-                reflectDamage++;
-            }
             if (hit.element === 'fire') {
                 // The barrier prevents burning damage entirely (normally a 2x multiplier)
                 // so to balance this out the barrier takes a flat 50% more damage from fire elements.
@@ -293,7 +290,7 @@ export class Hero implements Actor {
             return { hit: true, reflected: true,
                 returnHit: {
                     damage: reflectDamage,
-                    element: this.barrierElement,
+                    // element: this.barrierElement,
                     knockAwayFrom: {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,

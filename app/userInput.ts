@@ -238,6 +238,9 @@ export function clearKeyboardState(state: GameState) {
 }
 
 export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
+    if (state.scriptEvents.blockPlayerInput) {
+        return false;
+    }
     return state.keyboard.gameKeysPressed.has(keyCode);
 }
 
@@ -246,14 +249,23 @@ export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
 // the clone tool button without pressing any other buttons before releasing it. Note that it is okay if they
 // continue holding buttons that were already down when pressing the clone button.
 export function wasGameKeyPressedAndReleased(state: GameState, keyCode: number): boolean {
+    if (state.scriptEvents.blockPlayerInput) {
+        return false;
+    }
     return state.keyboard.mostRecentKeysPressed.has(keyCode) && state.keyboard.gameKeysReleased.has(keyCode);
 }
 
 export function isGameKeyDown(state: GameState, keyCode: number): boolean {
+    if (state.scriptEvents.blockPlayerInput) {
+        return false;
+    }
     return state.keyboard.gameKeysDown.has(keyCode);
 }
 
 export function getMovementDeltas(state: GameState): [number, number] {
+    if (state.scriptEvents.blockPlayerInput) {
+        return [0, 0];
+    }
     const { gameKeyValues } = state.keyboard;
     let dy = gameKeyValues[GAME_KEY.DOWN] - gameKeyValues[GAME_KEY.UP];
     if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
@@ -266,6 +278,9 @@ export function getMovementDeltas(state: GameState): [number, number] {
 }
 
 export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, number] {
+    if (state.scriptEvents.blockPlayerInput) {
+        return [0, 0];
+    }
     const [dx, dy] = getMovementDeltas(state);
     const controlledHero = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero;
     if (controlledHero.d === hero.d) {

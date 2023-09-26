@@ -26,7 +26,6 @@ import {
 } from 'app/gameConstants';
 import { initializeGame } from 'app/initialize';
 import {
-    clearKeyboardState,
     isGameKeyDown,
     updateKeyboardState,
     wasGameKeyPressed,
@@ -186,9 +185,9 @@ export function update() {
             }
             if (!messageIsAnimating) {
                 updateScriptEvents(state);
-                if (state.scriptEvents.blockPlayerInput) {
-                    clearKeyboardState(state);
-                }
+                //if (state.scriptEvents.blockPlayerInput) {
+                //    clearKeyboardState(state);
+                //}
                 // Make sure we don't handle script event input twice in one frame.
                 // We could also manage this by unsetting game keys on the state.
                 if (!state.scriptEvents.blockFieldUpdates && !state.scriptEvents.handledInput) {

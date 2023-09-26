@@ -37,9 +37,11 @@ Graphics:
 
 
 Current tasks:
-    Blocking production release:
-        - Holding passive tool button while ending dialogue triggers talking again.
-            - Probably wasButtonPressed is true because input was blocked prior to this
+    Release blockers
+        - Improve sticky keys issue, apply thrive solution if haven't yet, otherwise experiment with more improvements.
+        - Remove ctrl+k and shift+m key commands, the context menu and dom button are sufficient now.
+        - Fix sign blocking rocks thrown in Vanara tomb pot room.
+            - Maybe make signs low so you can throw clones over them as well.
 
     - Allow throwing clones diagonally.
     - Fix pushing pots across southern wall in Gauntlet 2F
@@ -62,6 +64,8 @@ Current tasks:
     - Should we prevent throwing rocks over ledges?
     - Bell cave is incomplete
         - Add bell graphics to TODO for Jon.
+    - summoner ruins ledge walls let you fire arrows up them because they aren't actually ledges
+        - Add ledges to these in addition to the solidMap that they have.
 
     - Pulling animation changes when pressing a direction while the game is paused
         - Game inputs should not be read while rendering.
