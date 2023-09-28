@@ -37,7 +37,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix pushing pots across southern wall in Gauntlet 2F
     - Clones disappear when draining lava/etc.
         - Grown thorns disappear when draining lava.
     - Tower staff animation freezes when used to hit switches for draining lava.
