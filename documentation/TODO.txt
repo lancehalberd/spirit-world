@@ -26,6 +26,8 @@ Known Bugs:
             - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
             - Marking these tiles as cliff ledges will probably allow jumping down them in some cases which will need to be fixed.
     - Shadow renders behind door tops when jumping down ledges.
+    - Spirit Barrier appears above door frames when moving East/West through doors.
+        - This only applies with old tile sets, so probably isn't worth fixing.
 
 Graphics:
     Add slam effects for the staff.
@@ -40,12 +42,9 @@ Current tasks:
     - Clones disappear when draining lava/etc.
         - Grown thorns disappear when draining lava.
     - Tower staff animation freezes when used to hit switches for draining lava.
-    - Sliding against diagonal walls is unusually slow with cloud boots.
     - Bad looking tiles when turning off middle beads stream in waterfall tower.
         "In the Waterfall, 1st floor, S screen, the 2 tiles to the E of the lock look bad if we use lightning arrows to turn off that entire slide, and then clear the snow, before unlocking the lock."
     - Tree never respawns in Forest Temple
-    - Spirit Barrier appears above door frames when moving East/West through doors.
-        - This only applies with old tile sets, so probably isn't worth fixing.
     - Change mother speech bubble in randomizer when you can finish and when you have full cleared the game?
     - Moving platform gets stuck in a weird position sometimes in the forge.
         - When transitioning, reset the moving platforms if they are not in the same area as the player.
@@ -54,8 +53,6 @@ Current tasks:
         - For arrows specifically, maybe they can still deal normal damage.
     - Fire/Ice arrows bounce of void hands when they are up in the air.
     - Should we prevent throwing rocks over ledges?
-    - Bell cave is incomplete
-        - Add bell graphics to TODO for Jon.
     - summoner ruins ledge walls let you fire arrows up them because they aren't actually ledges
         - Add ledges to these in addition to the solidMap that they have.
 
@@ -77,6 +74,8 @@ Current tasks:
 
 
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
+
+    - Add Bell graphics when provided by Jon.
 
     - Fix push/pull interactions with ledges.
         - Minor issues:

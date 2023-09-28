@@ -565,12 +565,26 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             });
             // console.log([...state.scriptEvents.activeEvents], [...state.scriptEvents.queue]);
             if (hero.action !== 'knocked' && hero.action !== 'knockedHard') {
-                if (moveX) {
-                    hero.vx = mx;
-                }
-                if (moveY) {
-                    hero.vy = my;
-                }
+                // This works okay, but sometimes causes the hero to press up against diagonal walls when not pressing diagonally.
+                /*if (hero.slipping) {
+                    if (mx || my) {
+                        const speed = Math.sqrt(hero.vx * hero.vx + hero.vy * hero.vy);
+                        const theta = Math.atan2(my, mx);
+                        hero.vx = (hero.vx + speed * Math.cos(theta)) / 2;
+                        hero.vy = (hero.vy + speed * Math.sin(theta)) / 2;
+                    }
+                } else {*/
+                    // This code seems to work okay for slipping, but does cause the player to not slide against diagonal walls
+                    // once they stop trying to move.
+                    // Do not modify velocity when slipping if it is in the direction the player is attempting to move.
+                    if (moveX && !(hero.slipping && hero.vx * dx > 0)) {
+                        hero.vx = mx;
+                    }
+                    // Do not modify velocity when slipping if it is in the direction the player is attempting to move.
+                    if (moveY && !(hero.slipping && hero.vy * dy > 0)) {
+                        hero.vy = my;
+                    }
+                //}
             }
         }
     }
