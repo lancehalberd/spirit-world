@@ -695,6 +695,8 @@ export class Hero implements Actor {
 
     throwHeldObject(this: Hero, state: GameState){
         const hero = this;
+        const [dx, dy] = getCloneMovementDeltas(state, hero);
+        const direction = getDirection(dx, dy, true, hero.d);
         if (hero.pickUpObject) {
             // This assumes only clones can be picked up and thrown. We will have to update this if
             // we add other objects to this category.
@@ -702,8 +704,8 @@ export class Hero implements Actor {
             clone.d = hero.d;
             clone.x = hero.x;
             clone.y = hero.y;
-            clone.vx = directionMap[hero.d][0] * throwSpeed;
-            clone.vy = directionMap[hero.d][1] * throwSpeed;
+            clone.vx = directionMap[direction][0] * throwSpeed;
+            clone.vy = directionMap[direction][1] * throwSpeed;
             clone.vz = 2;
             clone.action = 'thrown';
             clone.isAirborn = true;
@@ -719,8 +721,6 @@ export class Hero implements Actor {
         hero.actionFrame = 0;
         const tile = hero.pickUpTile;
         const behaviors = tile.behaviors;
-        const [dx, dy] = getCloneMovementDeltas(state, hero);
-        const direction = getDirection(dx, dy, true, hero.d);
         const thrownObject = new ThrownObject({
             frame: tile.frame,
             behaviors,
