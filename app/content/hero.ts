@@ -700,6 +700,8 @@ export class Hero implements Actor {
             // we add other objects to this category.
             const clone = hero.pickUpObject as Hero;
             clone.d = hero.d;
+            clone.x = hero.x;
+            clone.y = hero.y;
             clone.vx = directionMap[hero.d][0] * throwSpeed;
             clone.vy = directionMap[hero.d][1] * throwSpeed;
             clone.vz = 2;

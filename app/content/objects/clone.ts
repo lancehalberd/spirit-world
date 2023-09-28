@@ -26,6 +26,7 @@ export class Clone extends Hero {
 
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         this.action = 'beingCarried';
+        this.animationTime = 0;
         this.carrier = hero;
         // Track the clone rotation relative to the hero picking it up so we can rotate it correctly if the hero
         // changes directions.

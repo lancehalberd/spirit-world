@@ -37,7 +37,6 @@ Graphics:
 
 
 Current tasks:
-
     - Allow throwing clones diagonally.
     - Fix pushing pots across southern wall in Gauntlet 2F
     - Clones disappear when draining lava/etc.
@@ -78,8 +77,6 @@ Current tasks:
     - Add graphical interface for choosing Nimbus Cloud location using map.
         - How to signify cancel operation?
 
-    - Can clone throw through closed doors?
-        - Jun did this to crater secret entrance
 
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
 
