@@ -39,15 +39,22 @@ Graphics:
 
 
 Current tasks:
+    - Bad looking tiles when turning off middle beads stream in waterfall tower.
+        - The bead cover covers up the beads on the ground. In some sense it should be rendered on a particular tile layer.
+        - We can fix this by setting a layer id on the bead cover for the layer it is covering (floor2), then when it is not fully open,
+        render all background layers above that layer on top of it as part of the object. This would allow us to draw certain objects
+        "beneath" tiles in general at the expense of some extra renders.
+
+    - Moving platform gets stuck in a weird position sometimes in the forge.
+        - When transitioning, reset the moving platforms if they are not in the same area as the player.
+
+    - Staff should block ground spike attacks.
+        - Keep the ground animation, but prevent it from increasing ground height and stop the actual spike from appearing.
+
     - Clones disappear when draining lava/etc.
         - Grown thorns disappear when draining lava.
     - Tower staff animation freezes when used to hit switches for draining lava.
-    - Bad looking tiles when turning off middle beads stream in waterfall tower.
-        "In the Waterfall, 1st floor, S screen, the 2 tiles to the E of the lock look bad if we use lightning arrows to turn off that entire slide, and then clear the snow, before unlocking the lock."
-    - Tree never respawns in Forest Temple
     - Change mother speech bubble in randomizer when you can finish and when you have full cleared the game?
-    - Moving platform gets stuck in a weird position sometimes in the forge.
-        - When transitioning, reset the moving platforms if they are not in the same area as the player.
     - Shouldn't be able to use level 2 charge with level 1 weapon.
     - Elemental immunities are confusing, they just pass through enemies.
         - For arrows specifically, maybe they can still deal normal damage.

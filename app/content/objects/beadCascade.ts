@@ -220,6 +220,8 @@ export class BeadSection implements ObjectInstance {
     definition = null;
     animationTime: number;
     drawPriority: DrawPriority = 'background';
+    // This should be higher than the player fall animation+pits but lower than the staff.
+    drawPriorityIndex = 2;
     isObject = <const>true;
     h: number;
     w: number = 32;

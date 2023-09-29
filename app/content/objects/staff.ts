@@ -34,6 +34,7 @@ export class Staff implements ObjectInstance {
     definition = null;
     canPressSwitches = true;
     drawPriority: DrawPriority = 'background';
+    drawPriorityIndex = 3;
     x: number;
     y: number;
     w: number = 16;
