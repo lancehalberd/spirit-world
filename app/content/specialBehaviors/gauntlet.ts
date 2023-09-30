@@ -1,9 +1,9 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { randomizerSeed } from 'app/gameConstants';
+import { variantSeed } from 'app/gameConstants';
 import SRandom from 'app/utils/SRandom';
 
 
-const gauntletRandom = SRandom.seed(randomizerSeed).addSeed(726235);
+const gauntletRandom = SRandom.seed(variantSeed).addSeed(726235);
 
 specialBehaviorsHash.gauntletSwitch = {
     type: 'floorSwitch',

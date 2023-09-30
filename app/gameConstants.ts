@@ -60,7 +60,15 @@ export const entranceSeed = readGetParameterAsInt('entranceSeed');
 // Entrance randomizer may not be completable with randomized items, so item randomizer
 // defaults to the entrance seed if one is not set.
 export const randomizerSeed = readGetParameterAsInt('seed') || entranceSeed;
-export const isRandomizer = !!randomizerSeed;
+export const itemSeed = readGetParameterAsInt('itemSeed') || randomizerSeed;
+
+// For future use, seed that will control variations that modify the overall structure and flow of the game.
+// This could change the overworld layout, which dungeons are present, etc.
+export const worldSeed = readGetParameterAsInt('worldSeed');
+
+// This seed is used for randomizing minor variations in the game, such as the solution to some puzzles
+// and certain random elements and areas.
+export const variantSeed = readGetParameterAsInt('variantSeed') || randomizerSeed;
 // Limit randomizer total to 999 to avoid having the victory point display get too large.
 export const randomizerTotal = Math.min(readGetParameterAsInt('total') || 30, 999);
 const isBossGoal = readGetParameter('goal') === 'boss';
@@ -68,6 +76,10 @@ export const randomizerGoalType: 'victoryPoints' | 'finalBoss' = isBossGoal ? 'f
 const defaultGoalCount = (randomizerTotal * 2 / 3) | 0;
 export const randomizerGoal = Math.min(randomizerTotal, readGetParameterAsInt('goal') || defaultGoalCount);
 export const enemySeed = readGetParameterAsInt('enemySeed');
+
+// Setting any of these seeds will put the game in randomizer mode.
+// In randomizer mode, story elements are removed and HUD elements are added showing remaining checks/victory points.
+export const isRandomizer = !!entranceSeed || !!itemSeed || !!enemySeed;
 
 export const allLootTypes: LootType[] = [
     'empty',

@@ -23,12 +23,16 @@ export function addKeyboardShortcuts() {
         const isShiftDown = isKeyboardKeyDown(KEY.SHIFT);
         const keyCode: number = event.which;
 
-        if (isShiftDown && keyCode === KEY.BACK_SLASH) {
+        if (commandIsDown && keyCode === KEY.BACK_SLASH) {
             const state = getState();
             state.alwaysHideMenu = !state.alwaysHideMenu;
+            event.preventDefault();
+            return;
         }
-        if (isShiftDown && keyCode === KEY.E) {
+        if ((commandIsDown || isShiftDown) && keyCode === KEY.E) {
             toggleEditing(getState());
+            event.preventDefault();
+            return;
         }
         if (!editingState.isEditing) {
             return;
@@ -57,7 +61,7 @@ export function addKeyboardShortcuts() {
             return;
         }
         if (keyCode === KEY.R && isShiftDown) {
-            // Reset the entire zone if command is down.
+            // Reset the entire zone if shift is down.
             const state = getState();
             for (const floor of state.zone.floors) {
                 for (const grid of [floor.grid, floor.spiritGrid]) {

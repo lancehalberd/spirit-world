@@ -15,7 +15,7 @@ import {
 import { randomizeEntrances } from 'app/randomizer/entranceRandomizer';
 import SRandom from 'app/utils/SRandom';
 
-import { randomizerSeed, enemySeed, entranceSeed } from 'app/gameConstants';
+import { itemSeed, enemySeed, entranceSeed } from 'app/gameConstants';
 
 if (enemySeed) {
     const enemyRandom = SRandom.seed(enemySeed)
@@ -31,9 +31,9 @@ if (entranceSeed) {
     randomizeEntrances(SRandom.seed(entranceSeed));
 }
 
-if (randomizerSeed) {
+if (itemSeed) {
     try {
-        const assignmentsState = reverseFill(SRandom.seed(randomizerSeed), allNodes, [mainOverworldNode]);
+        const assignmentsState = reverseFill(SRandom.seed(itemSeed), allNodes, [mainOverworldNode]);
         applyLootAssignments(assignmentsState.assignments);
     } catch (e) {
         console.error('Failed to generate seed', e);
