@@ -23,7 +23,7 @@ export function moveNPCToTargetLocation(
     npc: NPC, tx: number, ty: number,
     animationStyle?: string
 ): number {
-    const hitbox = npc.getHitbox(state);
+    const hitbox = npc.getHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
         npc.d = getDirection(dx, dy);

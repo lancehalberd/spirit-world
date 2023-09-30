@@ -9,9 +9,9 @@ import { moveEnemyToTargetLocation, paceRandomly } from 'app/utils/enemies';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
-const elementalFlameAnimation = createAnimation('gfx/enemies/elementalFlame.png', {w: 20, h: 20, content: {x: 2, y: 4, w: 16, h: 16}}, {cols: 4, duration: 5});
-const elementalFrostAnimation = createAnimation('gfx/enemies/elementalFrost.png', {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 10, duration: 10});
-const elementalStormAnimation = createAnimation('gfx/enemies/elementalStorm.png', {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 4, duration: 5});
+export const elementalFlameAnimation = createAnimation('gfx/enemies/elementalFlame.png', {w: 20, h: 20, content: {x: 2, y: 4, w: 16, h: 16}}, {cols: 4, duration: 5});
+export const elementalFrostAnimation = createAnimation('gfx/enemies/elementalFrost.png', {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 10, duration: 10});
+export const elementalStormAnimation = createAnimation('gfx/enemies/elementalStorm.png', {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 4, duration: 5});
 
 interface ElementalProps {
     possessionTarget?: Enemy

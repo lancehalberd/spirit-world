@@ -57,6 +57,7 @@ interface BaseFieldInstance {
     // Objects with lower `drawPriorityIndex` are drawn before others. Default value is 0.
     // Can be set to -1 to draw behind objects with the default value.
     drawPriorityIndex?: number
+    doesNotFall?: boolean
     getDrawPriority?: (state: GameState) => DrawPriority
     render: (context: CanvasRenderingContext2D, state: GameState) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void

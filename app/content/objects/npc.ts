@@ -1,5 +1,10 @@
 import { objectHash } from 'app/content/objects/objectHash';
-import { rivalAnimations, snakeAnimations } from 'app/content/enemyAnimations';
+import {
+    dronDirectionalAnimations, sentryBotAnimations,
+    rivalAnimations, snakeAnimations,
+    omniAnimation,
+} from 'app/content/enemyAnimations';
+import { elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation } from 'app/content/enemies/elemental';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
@@ -36,6 +41,7 @@ interface NPCStyleDefinition {
     scale?: number
     shadowOffset?: number
     flipRight?: boolean
+    z?: number
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState, npc: NPC) => void
 }
 
@@ -59,11 +65,35 @@ export const npcStyles = {
     giantSnake: {
         animations: snakeAnimations,
         scale: 3,
-        shadowOffset: -3,
+        shadowOffset: 2,
         flipRight: true,
+    } as NPCStyleDefinition,
+    bigSpirit: {
+        animations: sentryBotAnimations,
+        shadowOffset: 2,
+    } as NPCStyleDefinition,
+    smallSpirit: {
+        animations: dronDirectionalAnimations,
+        z: 6,
+    } as NPCStyleDefinition,
+    flameSpirit: {
+        animations: {idle: omniAnimation(elementalFlameAnimation)},
+        z: 6,
+        scale: 2,
+    } as NPCStyleDefinition,
+    frostSpirit: {
+        animations: {idle: omniAnimation(elementalFrostAnimation)},
+        z: 6,
+        scale: 2,
+    } as NPCStyleDefinition,
+    stormSpirit: {
+        animations: {idle: omniAnimation(elementalStormAnimation)},
+        z: 6,
+        scale: 2,
     } as NPCStyleDefinition,
     sleepingLightningBeast: {
         animations: lightningBeastAnimations,
+        shadowOffset: -20,
     } as NPCStyleDefinition,
     gal: {
         animations: galAnimations,
@@ -225,6 +255,7 @@ export class NPC implements Actor, ObjectInstance  {
     };
     x: number;
     y: number;
+    doesNotFall = true;
     flying = false;
     life = 1;
     vx = 0;
@@ -252,12 +283,13 @@ export class NPC implements Actor, ObjectInstance  {
         this.y = definition.y;
         const animationStyle = npcStyles[this.definition.style];
         this.currentAnimation = animationStyle.animations.idle[this.d];
+        this.z = animationStyle.z || 0;
         this.params = {};
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         const frame = this.getFrame();
         const animationStyle = npcStyles[this.definition.style];
         const scale = animationStyle.scale || 1;
@@ -400,15 +432,28 @@ export class NPC implements Actor, ObjectInstance  {
         }
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
-        const animationStyle = npcStyles[this.definition.style];
+        /*const animationStyle = npcStyles[this.definition.style];
         const scale = animationStyle.scale || 1;
         const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
         drawFrame(context, frame, { ...frame,
             x: this.x + (this.w - shadowFrame.w) * scale / 2,
-            y: this.y + animationStyle.shadowOffset * scale,
+            y: this.y + (animationStyle.shadowOffset || 0) * scale,
             w: frame.w * scale,
             h: frame.h * scale,
-        });
+        });*/
+
+        const animationStyle = npcStyles[this.definition.style];
+        const npcScale = animationStyle.scale || 1;
+        const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
+        const hitbox = this.getHitbox();
+        const shadowScale = Math.round(hitbox.w / shadowFrame.w);
+        const target = {
+            x: hitbox.x + (hitbox.w - frame.w * shadowScale) / 2,
+            y: hitbox.y + hitbox.h - frame.h * shadowScale + (animationStyle.shadowOffset || 0) * npcScale, // - 3 * enemy.scale,
+            w: frame.w * shadowScale,
+            h: frame.h * shadowScale,
+        };
+        drawFrame(context, frame, target);
     }
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];

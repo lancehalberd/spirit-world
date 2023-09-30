@@ -215,14 +215,21 @@ export const entAnimations: ActorAnimations = {
 };
 
 const droneGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
-const droneAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4});
+const droneDownAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 0});
+const droneRightAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 1});
+const droneUpAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 2});
+const droneLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 3});
 export const droneAnimations: ActorAnimations = {
+    idle: omniAnimation(droneDownAnimation),
+};
+
+export const dronDirectionalAnimations: ActorAnimations = {
     idle: {
-        up: droneAnimation,
-        down: droneAnimation,
-        left: droneAnimation,
-        right: droneAnimation,
-    },
+        up: droneUpAnimation,
+        down: droneDownAnimation,
+        left: droneLeftAnimation,
+        right: droneRightAnimation,
+    }
 };
 
 const sentryBotGeometry: FrameDimensions = { w: 40, h: 39, content: { x: 4, y: 8, w: 32, h: 32} };

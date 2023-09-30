@@ -135,7 +135,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
                 }
             }
             // Objects that can fall in pits are assumed to fall to the ground when not supported.
-            if (object.z > object.groundHeight) {
+            if (object.z > object.groundHeight && !object.doesNotFall) {
                 object.z = Math.max(object.groundHeight, object.z - 1);
             } else {
                 object.z = Math.max(object.z, object.groundHeight);
