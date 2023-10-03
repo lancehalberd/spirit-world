@@ -812,7 +812,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         ((!isCloneToolDown && hero === state.hero) || (isCloneToolDown && hero !== state.hero))
         && wasGameKeyPressed(state, GAME_KEY.MEDITATE)
     ) {
-        if (!hero.clones.length && (hero.swimming || isUnderwater(state, hero))) {
+        if (hero.swimming || (!hero.clones.length && isUnderwater(state, hero))) {
             // The meditate key can be used to quickly toggle iron boots in/under water.
             if (hero.savedData.equipment.ironBoots) {
                 if (hero.savedData.equippedBoots !== 'ironBoots') {

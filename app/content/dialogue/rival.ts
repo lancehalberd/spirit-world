@@ -41,26 +41,54 @@ dialogueHash.rival = {
         startSecondFight: (state: GameState) => {
             const rival = getRivalBoss(state);
             // Make the character walk north to get the rival on the screen.
-            state.scriptEvents.activeEvents.push({
-                type: 'update',
-                update(state: GameState): boolean {
-                    const hero = state.hero;
-                    hero.d = 'up';
-                    hero.action = 'walking';
-                    hero.animationTime += FRAME_LENGTH;
-                    const {mx, my} = moveActor(state, hero, 0, -1, {
-                        canSwim: true,
-                        canJump: true,
-                        direction: 'up',
-                    });
-                    if ((!mx && !my) || hero.y <= 96) {
-                        hero.action = null;
-                        return false;
-                    }
-                    updateCamera(state);
-                    return true;
-                },
-            });
+            if (state.hero.y > 96) {
+                // Entering from the south, the hero walks north until the Rival is in frame.
+                state.scriptEvents.activeEvents.push({
+                    type: 'update',
+                    update(state: GameState): boolean {
+                        const hero = state.hero;
+                        hero.d = 'up';
+                        hero.action = 'walking';
+                        hero.animationTime += FRAME_LENGTH;
+                        const {mx, my} = moveActor(state, hero, 0, -1, {
+                            canSwim: true,
+                            canJump: true,
+                            direction: 'up',
+                        });
+                        if ((!mx && !my) || hero.y <= 96) {
+                            hero.action = null;
+                            return false;
+                        }
+                        updateCamera(state);
+                        return true;
+                    },
+                });
+            } else {
+                // Entering from the north, the hero just walks south through the Rival.
+                // This is not ideal, but we will probably remove the rival fight when you
+                // enter the Helix from the top so it isn't worth worrying about.
+                state.scriptEvents.activeEvents.push({
+                    type: 'update',
+                    update(state: GameState): boolean {
+                        const hero = state.hero;
+                        hero.d = 'down';
+                        hero.action = 'walking';
+                        hero.animationTime += FRAME_LENGTH;
+                        const {mx, my} = moveActor(state, hero, 0, 1, {
+                            canSwim: true,
+                            canJump: true,
+                            direction: 'down',
+                        });
+                        if ((!mx && !my) || hero.y >= 96) {
+                            hero.action = null;
+                            hero.d = 'up';
+                            return false;
+                        }
+                        updateCamera(state);
+                        return true;
+                    },
+                });
+            }
             state.scriptEvents.activeEvents.push({
                 type: 'wait',
                 time: 0,
