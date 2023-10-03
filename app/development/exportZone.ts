@@ -108,6 +108,13 @@ export function serializeZone(zone: Zone) {
                         lines.push(`        {${Object.keys(object).filter(k => object[k] !== undefined && object[k] !== null).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
                     }
                     lines.push('    ],');
+                    if (area.variants?.length) {
+                        lines.push('    variants: [');
+                        for (const variant of area.variants) {
+                            lines.push(`        {${Object.keys(variant).filter(k => variant[k] !== undefined && variant[k] !== null).map(k => `${k}: ${JSON.stringify(variant[k])}` ).join(', ')}},`);
+                        }
+                        lines.push('    ],');
+                    }
                     lines.push('    sections: [');
                     for (const section of area.sections) {
                         let extraFields = '';

@@ -142,14 +142,7 @@ function getBossPalette() {
 }
 
 export function getObjectTypeProperties(): PanelRows {
-    const state = getState();
     const object: ObjectDefinition = editingState.selectedObject;
-    if (editingState.tool === 'select') {
-        const selectedObject = state.areaInstance.definition.objects.includes(editingState.selectedObject)
-        if (!selectedObject) {
-            return ['Click an object to select it.'];
-        }
-    }
     if (object.type === 'enemy') {
         const palette = getEnemyPalette();
         palette.selectedKey = object.enemyType as EnemyType;
@@ -602,13 +595,16 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
 
 }
 
+export function isObjectSelected(state: GameState, editingState: EditingState): boolean {
+    return !!state.areaInstance.definition.objects.includes(editingState.selectedObject);
+}
+
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
     let rows: PanelRows = [];
 
     const object: ObjectDefinition = editingState.selectedObject;
 
-    const selectedObject = state.areaInstance.definition.objects.includes(editingState.selectedObject)
-        ? editingState.selectedObject : null;
+    const selectedObject = isObjectSelected(state, editingState) ? editingState.selectedObject : null;
     if (selectedObject) {
         rows.push({
             name: 'id',
@@ -1372,17 +1368,23 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
     return rows;
 }
 
-export function unselectObject(editingState: EditingState, refresh: boolean = true) {
+export function unselectObject(editingState: EditingState) {
     editingState.selectedObject = {...editingState.selectedObject};
     delete editingState.selectedObject.id;
     editingState.needsRefresh = true;
 }
 
-export function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
+export function onMouseDownSelectObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
     let changedSelection = false;
     if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
         if (!isPointInObject(x, y, editingState.selectedObject)) {
-            unselectObject(editingState, false);
+            unselectObject(editingState);
+            changedSelection = true;
+        }
+    }
+    if (state.areaInstance.definition.variants?.includes(editingState.selectedVariantData)) {
+        if (!isPointInShortRect(x + state.camera.x, y + state.camera.y, editingState.selectedVariantData)) {
+            unselectObject(editingState);
             changedSelection = true;
         }
     }
@@ -1399,12 +1401,14 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
         editingState.needsRefresh = true;
     }
     // If selectedObject is still set, then we are dragging it, so indicate the drag offset.
-    if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
+    const objectIsSelected = !!state.areaInstance.definition.objects.includes(editingState.selectedObject);
+    if (objectIsSelected) {
         editingState.dragOffset = {
             x: editingState.selectedObject.x - x,
             y: editingState.selectedObject.y - y,
         };
     }
+    return objectIsSelected;
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
@@ -1434,9 +1438,9 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
 
 }
 
-export function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
+export function onMouseDragObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
     if (!state.areaInstance.definition.objects.includes(editingState.selectedObject) || !editingState.dragOffset) {
-        return;
+        return false;
     }
     const linkedDefinition = editingState.selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
     const oldX = editingState.selectedObject.x, oldY = editingState.selectedObject.y;
@@ -1453,6 +1457,7 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
         }
         updateObjectInstance(state, editingState.selectedObject);
     }
+    return true;
 }
 
 function getLinkedDefinition(alternateArea: AreaDefinition, object: ObjectDefinition): ObjectDefinition {

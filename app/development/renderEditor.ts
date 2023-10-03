@@ -6,6 +6,7 @@ import {
     renderObjectPreview,
     unselectObject,
 } from 'app/development/objectEditor';
+import { fixVariantPosition, unselectVariant } from 'app/development/variantEditor';
 import { getSelectionBounds } from 'app/development/brushSelection';
 import { renderZoneEditor } from 'app/development/zoneEditor';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
@@ -24,6 +25,9 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     // Unselect objects that are no longer in the current area.
     if (editingState.selectedObject?.id && !state.areaInstance.definition.objects.find(o => o === editingState.selectedObject)) {
         unselectObject(editingState);
+    }
+    if (editingState.selectedVariantData?.id && !state.areaInstance.definition.variants?.find(o => o === editingState.selectedVariantData)) {
+        unselectVariant(editingState);
     }
     renderEditorArea(context, state, state.areaInstance);
     if (state.nextAreaInstance) {
@@ -65,6 +69,13 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
         }
+        for (const variantData of (area.definition.variants || [])) {
+            context.save();
+                context.globalAlpha *= 0.3;
+                context.fillStyle = 'pink';
+                context.fillRect(variantData.x, variantData.y, variantData.w, variantData.h);
+            context.restore();
+        }
         // Tool previews are only drawn for the current area.
         if (area === state.areaInstance) {
             if (editingState.tool === 'tileChunk') {
@@ -78,6 +89,20 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
+            }
+            if (editingState.tool === 'variant') {
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                const variantData = editingState.selectedVariantData;
+                variantData.x = x + state.camera.x;
+                variantData.y = y + state.camera.y;
+                fixVariantPosition(variantData);
+                context.strokeRect(
+                    variantData.x,
+                    variantData.y,
+                    variantData.w || 48,
+                    variantData.h || 48
+                );
             }
             if (editingState.tool === 'brush') {
                 const w = 16, h = 16;
@@ -183,6 +208,12 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 }
                 context.fillStyle = 'white';
                 context.fillRect(target.x, target.y, target.w, target.h);
+            }
+            const variantData = editingState.selectedVariantData;
+            if (editingState.selectedVariantData && state.areaInstance.definition.variants?.includes(variantData)) {
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                context.strokeRect(variantData.x, variantData.y, variantData.w, variantData.h);
             }
             if (['object', 'enemy', 'boss'].includes(editingState.tool)) {
                 renderObjectPreview(context, state, editingState, x, y);

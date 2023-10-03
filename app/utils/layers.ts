@@ -1,3 +1,4 @@
+import { allTiles } from 'app/content/tiles';
 import { layersInOrder } from 'app/gameConstants';
 
 export function addNewLayer(
@@ -7,7 +8,6 @@ export function addNewLayer(
     alternateDefinition?: AreaDefinition,
 ): AreaLayerDefinition {
     const topLayerDefinition = definition.layers[definition.layers.length - 1];
-    const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
     const layerDefinition: AreaLayerDefinition = {
         ...topLayerDefinition,
         drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
@@ -20,6 +20,7 @@ export function addNewLayer(
     initializeAreaLayerTiles(layerDefinition);
     definition.layers.splice(layerIndex, 0, layerDefinition);
     if (alternateDefinition?.layers) {
+        const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
         const alternateLayerDefinition: AreaLayerDefinition = {
             ...alternateTopLayerDefinition,
             drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
@@ -84,4 +85,77 @@ export function getDrawPriority(layer: AreaLayerDefinition): DrawPriority {
         return layer.drawPriority;
     }
     return layer.key.startsWith('foreground') ? 'foreground' : 'background';
+}
+
+
+// Functions for manipulating instance layers are intended for variation changes
+// that are applied as the area is created by Variant objects.
+// These changes are not saved permanently and should not be made to the area definitions.
+export function getOrAddInstanceLayer(
+    layerKey: string,
+    area: AreaInstance,
+    alternateArea?: AreaInstance,
+) {
+    for (const layer of area.layers) {
+        if (layer.key === layerKey) {
+            return layer;
+        }
+    }
+    return addMissingInstanceLayer(layerKey, area, alternateArea);
+}
+export function addMissingInstanceLayer(
+    layerKey: string,
+    area: AreaInstance,
+    alternateArea?: AreaInstance,
+): AreaLayer {
+    const layerIndex = layersInOrder.indexOf(layerKey);
+    for (let i = 0; i < area.layers.length; i++) {
+        if (layersInOrder.indexOf(area.layers[i].key) > layerIndex) {
+            return addNewInstanceLayer(layerKey, i, area, alternateArea);
+        }
+    }
+    return addNewInstanceLayer(layerKey, area.layers.length, area, alternateArea);
+}
+export function addNewInstanceLayer(
+    layerKey: string,
+    layerIndex: number,
+    area: AreaInstance,
+    alternateArea?: AreaInstance,
+): AreaLayer {
+    const topLayer = area.layers[area.layers.length - 1];
+    const layer: AreaLayer = {
+        ...topLayer,
+        definition: {
+            key: layerKey,
+            drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
+        },
+        key: layerKey,
+        tiles: [],
+    };
+    initializeAreaInstanceLayerTiles(layer);
+    area.layers.splice(layerIndex, 0, layer);
+    if (alternateArea?.layers) {
+        const alternateTopLayer = alternateArea.layers[alternateArea.layers.length - 1];
+        const alternateLayer: AreaLayer = {
+            ...alternateTopLayer,
+            definition: {
+                key: layerKey,
+                drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
+            },
+            key: layerKey,
+            tiles: [],
+        };
+        initializeAreaInstanceLayerTiles(alternateLayer);
+        alternateArea.layers.splice(layerIndex, 0, alternateLayer);
+    }
+    return layer;
+}
+export function initializeAreaInstanceLayerTiles(layer: AreaLayer): void {
+    const tiles = layer.tiles;
+    for (let y = 0; y < layer.h; y++) {
+        tiles[y] = tiles[y] || [];
+        for (let x = 0; x < layer.w; x++) {
+            tiles[y][x] = tiles[y][x] || allTiles[0];
+        }
+    }
 }

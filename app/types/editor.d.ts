@@ -60,7 +60,7 @@ type PropertyRow = (EditorProperty<any> | HTMLElement | string)[];
 
 type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];
 
-type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select' | 'tileChunk';
+type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select' | 'tileChunk' | 'variant';
 interface EditingState {
     tool: EditorToolType
     previousTool: EditorToolType
@@ -76,6 +76,7 @@ interface EditingState {
     refreshMinimap?: boolean
     replacePercentage: number
     selectedObject?: ObjectDefinition
+    selectedVariantData?: VariantData
     spirit: boolean
     dragOffset?: {x: number, y: number}
     selectedSections: number[]

@@ -10,13 +10,19 @@ import {
     deleteObject,
     fixObjectPosition,
     getObjectFrame,
-    onMouseDownSelect,
-    onMouseMoveSelect,
+    onMouseDownSelectObject,
+    onMouseDragObject,
     unselectObject,
     updateObjectInstance,
 } from 'app/development/objectEditor';
 import { updateBrushCanvas } from 'app/development/propertyPanel';
 import { setEditingTool } from 'app/development/toolTab';
+import {
+    createVariantData,
+    onMouseDownSelectVariant,
+    onMouseDragVariant,
+    unselectVariant,
+} from 'app/development/variantEditor';
 import { getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords } from 'app/render/renderMap';
 import { getState } from 'app/state';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
@@ -47,7 +53,7 @@ mainCanvas.addEventListener('wheel', (event: WheelEvent) => {
     } else if (event.deltaY > 0) {
         editingState.areaScale = 0.5;
     }
-});
+}, {passive: true});
 
 let wasSelectingTiles = false;
 mainCanvas.addEventListener('mousemove', function () {
@@ -91,6 +97,23 @@ mainCanvas.addEventListener('mousemove', function () {
             break;
     }
 });
+function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number) {
+    if (onMouseDownSelectObject(state, editingState, x, y)) {
+        unselectVariant(editingState);
+        return;
+    }
+    if (onMouseDownSelectVariant(state, editingState, x, y)) {
+        return;
+    }
+}
+function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number) {
+    if (onMouseDragObject(state, editingState, x, y)) {
+        return;
+    }
+    if (onMouseDragVariant(state, editingState, x, y)) {
+        return;
+    }
+}
 mainCanvas.addEventListener('mousedown', function (event) {
     if (event.which !== 1 || contextMenuState.contextMenu) {
         return;
@@ -131,6 +154,8 @@ mainCanvas.addEventListener('mousedown', function (event) {
         case 'object':
             onMouseDownObject(state, editingState, x, y);
             break;
+        case 'variant':
+            onMouseDownVariant(state, editingState, x, y);
         case 'tileChunk':
             editingState.dragOffset = {x, y};
             break;
@@ -213,6 +238,18 @@ function onMouseDownObject(state: GameState, editingState: EditingState, x: numb
     if (!isKeyboardKeyDown(KEY.SHIFT)) {
         setEditingTool('select');
         editingState.selectedObject = newObject;
+        editingState.needsRefresh = true;
+    }
+}
+
+function onMouseDownVariant(state: GameState, editingState: EditingState, x: number, y: number): void {
+    const variant: VariantData = createVariantData(state, editingState, x, y);
+    state.areaInstance.definition.variants = state.areaInstance.definition.variants || [];
+    state.areaInstance.definition.variants.push(variant);
+    refreshArea(state);
+    if (!isKeyboardKeyDown(KEY.SHIFT)) {
+        setEditingTool('select');
+        editingState.selectedVariantData = variant;
         editingState.needsRefresh = true;
     }
 }

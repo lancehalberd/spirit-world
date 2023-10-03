@@ -432,16 +432,6 @@ export class NPC implements Actor, ObjectInstance  {
         }
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
-        /*const animationStyle = npcStyles[this.definition.style];
-        const scale = animationStyle.scale || 1;
-        const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
-        drawFrame(context, frame, { ...frame,
-            x: this.x + (this.w - shadowFrame.w) * scale / 2,
-            y: this.y + (animationStyle.shadowOffset || 0) * scale,
-            w: frame.w * scale,
-            h: frame.h * scale,
-        });*/
-
         const animationStyle = npcStyles[this.definition.style];
         const npcScale = animationStyle.scale || 1;
         const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;

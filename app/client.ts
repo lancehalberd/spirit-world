@@ -11,6 +11,7 @@ import { updateMusic } from 'app/musicController';
 
 export * from 'app/content/objects';
 export * from 'app/content/dialogue';
+export * from 'app/content/variants';
 export * from 'app/content/specialBehaviors';
 export * from 'app/development/tests';
 export * from 'app/development/tileEditor';

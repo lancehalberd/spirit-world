@@ -123,3 +123,8 @@ class SRandom {
 const instance = new SRandom(0.5);
 window['SRandom'] = instance;
 export default instance;
+
+class _SRandom extends SRandom {}
+declare global {
+    export interface SRandom extends _SRandom {}
+}

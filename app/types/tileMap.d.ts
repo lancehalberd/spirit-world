@@ -322,6 +322,7 @@ interface AreaDefinition {
     default?: boolean
     layers: AreaLayerDefinition[]
     objects: ObjectDefinition[]
+    variants?: VariantData[]
     // Used to divide a larger super tile into smaller screens.
     sections: AreaSection[]
     // 0/undefined = fully lit, 100 = pitch black.

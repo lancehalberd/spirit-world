@@ -1,6 +1,7 @@
 import { palettes, sourcePalettes } from 'app/content/palettes';
 import { editingState } from 'app/development/editingState';
-import { getObjectTypeProperties } from 'app/development/objectEditor';
+import { getObjectTypeProperties, isObjectSelected } from 'app/development/objectEditor';
+import { getVariantTypeSelector, isVariantSelected, unselectVariant } from 'app/development/variantEditor';
 import {
     renderPropertyRows, updateBrushCanvas,
 } from 'app/development/propertyPanel';
@@ -16,7 +17,14 @@ const toolTabContainer = new TabContainer<EditorToolType>('brush', [
         key: 'select',
         label: '↖',
         render(container: HTMLElement) {
-            renderPropertyRows(container, getObjectPaletteProperties());
+            const state = getState();
+            if (isVariantSelected(state, editingState)) {
+                renderPropertyRows(container, getVariantTypeSelector());
+            } else if (isObjectSelected(state, editingState)) {
+                renderPropertyRows(container, getObjectPaletteProperties());
+            } else {
+                renderPropertyRows(container, ['Click an object to select it.']);
+            }
         },
         refresh(container: HTMLElement) {
             this.render(container);
@@ -53,6 +61,19 @@ const toolTabContainer = new TabContainer<EditorToolType>('brush', [
         },
     },
     {
+        key: 'variant',
+        label: 'V',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getVariantTypeSelector());
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+        onSelect() {
+            unselectVariant(editingState);
+        }
+    },
+    {
         key: 'object',
         label: 'object',
         render(container: HTMLElement) {
@@ -81,7 +102,7 @@ const toolTabContainer = new TabContainer<EditorToolType>('brush', [
         refresh(container: HTMLElement) {
             this.render(container);
         },
-    }
+    },
 ], (selectedKey) => {
     editingState.previousTool = editingState.tool;
     editingState.tool = selectedKey;

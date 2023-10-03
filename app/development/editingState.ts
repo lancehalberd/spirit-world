@@ -20,6 +20,16 @@ export const editingState: EditingState = {
     areaScale: 1,
     selectedSections: [],
     recentAreas: [],
+    selectedVariantData: {
+        id: '',
+        seed: 0,
+        x: 0, y: 0,
+        type: 'blockedPath',
+        w: 48,
+        h: 48,
+        d: 'up',
+        styleWeights: {},
+    },
 };
 window['editingState'] = editingState;
 window.onbeforeunload = () => {

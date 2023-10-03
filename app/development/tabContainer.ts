@@ -5,6 +5,7 @@ interface SingleTab<T extends string> {
     label?: string
     render(container: HTMLElement): void
     refresh(container: HTMLElement): void
+    onSelect?: () => void
 }
 export class TabContainer<T extends string> {
     element: HTMLElement;
@@ -14,6 +15,11 @@ export class TabContainer<T extends string> {
     showTab(tabKey: T) {
         this.selectedTabKey = tabKey;
         this.onSelect?.(tabKey);
+        for (const tab of this.tabs) {
+            if (tab.key === this.selectedTabKey) {
+                tab.onSelect?.();
+            }
+        }
         this.render();
     }
     render(): void {

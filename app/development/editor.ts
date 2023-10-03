@@ -9,6 +9,7 @@ import { renderToolTabContainer } from 'app/development/toolTab';
 import { checkToRefreshMinimap, renderZoneTabContainer } from 'app/development/zoneEditor';
 import { displayPropertyPanel, hideAllPropertyPanels } from 'app/development/propertyPanel';
 import { createObjectDefinition, combinedObjectTypes } from 'app/development/objectEditor';
+import { getVariantProperties, isVariantSelected } from 'app/development/variantEditor';
 import { enterLocation } from 'app/utils/enterLocation';
 
 
@@ -173,6 +174,8 @@ function displayContextPanel(state: GameState): void {
 function getContextProperties(state: GameState): PanelRows {
     if (editingState.tool === 'brush' || editingState.tool === 'replace') {
         return getBrushContextProperties(state);
+    } else if (editingState.tool === 'variant' || (editingState.tool === 'select' && isVariantSelected(state, editingState))) {
+        return getVariantProperties(state);
     } else {
         return getObjectProperties(state, editingState);
     }

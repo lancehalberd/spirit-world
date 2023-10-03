@@ -13,7 +13,7 @@ import { getDrawPriority, initializeAreaLayerTiles, initializeAreaTiles } from '
 import { mapTile } from 'app/utils/mapTile';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
-
+import { applyVariantsToArea } from 'app/utils/variants';
 
 export function getDefaultArea(w = 32, h = 32): AreaDefinition {
     return {
@@ -252,8 +252,8 @@ export function switchToNextAreaSection(state: GameState): void {
     checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
 }
 
-export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition, parentLayer: AreaLayerDefinition): void {
-    const tiles = layer.grid.tiles;
+export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayer): void {
+    const tiles = layer.tiles;
     const isForeground = getDrawPriority(layer) === 'foreground';
     for (let y = 0; y < tiles.length; y++) {
         if (!behaviorGrid[y]) {
@@ -261,19 +261,16 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
         }
         for (let x = 0; x < tiles.length; x++) {
             let tile = tiles[y][x];
-            if (!tile && parentLayer) {
-                tile = parentLayer.grid.tiles[y]?.[x];
-            }
             if (!tile) {
                 continue;
             }
-            const behaviors = allTiles[tile]?.behaviors;
+            const behaviors = tile?.behaviors;
             // The behavior grid combines behaviors of all layers, with higher layers
             // overriding the behavior of lower layers.
             // Masked tiles are assumed to set no behaviors as they mostly just show the tiles
             // underneath them.
-            if (behaviors && !layer.mask?.tiles?.[y]?.[x]) {
-                applyTileToBehaviorGrid(behaviorGrid, {x, y}, allTiles[tile], isForeground);
+            if (behaviors && !layer.maskTiles?.[y]?.[x]) {
+                applyTileToBehaviorGrid(behaviorGrid, {x, y}, tile, isForeground);
             }
         }
     }
@@ -422,12 +419,9 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             }
         }
     }
+    applyVariantsToArea(instance);
     for (const layer of instance.layers) {
-        const definitionIndex = definition.layers.indexOf(layer.definition);
-        applyLayerToBehaviorGrid(behaviorGrid,
-            instance.definition.layers[definitionIndex],
-            definition.parentDefinition?.layers?.[definitionIndex]
-        );
+        applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
     definition.objects.filter(
         object => isObjectLogicValid(state, object)
@@ -510,13 +504,6 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             nextAreaInstance.checkToRedrawTiles = true;
             nextAreaInstance.behaviorGrid = [];
             nextAreaInstance.layers = [...instance.layers];
-            /*for (const layer of nextAreaInstance.layers || []) {
-                const definitionIndex = nextAreaInstance.definition.layers.indexOf(layer.definition);
-                applyLayerToBehaviorGrid(nextAreaInstance.behaviorGrid,
-                    nextAreaInstance.definition.layers[definitionIndex],
-                    nextAreaInstance.definition.parentDefinition?.layers?.[definitionIndex]
-                );
-            }*/
             // Update any tile behaviors that may have changed as layers were added/removed.
             for (let y = 0; y < nextAreaInstance.h; y++) {
                 for (let x = 0; x < nextAreaInstance.w; x++) {
@@ -573,6 +560,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             nextAreaInstance.enemies = [...instance.enemies];
             instance.priorityObjects = []
             instance = nextAreaInstance;
+
+            // TODO: test how variants look when using slow transition logic refreshes like draining lava.
+            applyVariantsToArea(instance);
         }
         // Call refresh logic on any objects currently in the area in case their state depends on the current logic.
         // For example, the door and signs in the Staff Tower Elevator update their state as you interact with the elevator
