@@ -11,6 +11,6 @@ Zelda-like adventure game
 1. In the command line:
     > `npm install`
 1. In the command line:
-    > `npm run server`
-1. This must be run in a different terminal concurrently with the server. In the command line:
     > `npm start`
+1. The server should start immediately but you'll have to wait a moment for the newest client code to compile.
+1. Visit localhost:3000 to view the game.
