@@ -195,7 +195,10 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic -= drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000;
             // This will result in a 1 second cooldown by default for a 2 second burn.
             state.hero.increaseMagicRegenCooldown(10);
-            hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+            // Having the barrier up will completely negate the burn damage applying to the hero's life.
+            if (!hero.hasBarrier) {
+                hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+            }
         } else {
             // 100% of burn damage goes to life without iron skin or magic.
             hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);

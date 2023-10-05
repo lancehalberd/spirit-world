@@ -39,9 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Spirit Barrier doesn't stop hot room burning damage.
-    - Door doesn't glow after beeting flying beetle in peach cave.
-
     - Add blocked path object
         -> Set originalTiles when applying variants so they still apply when resetting areas on scrolling to them.
             -> Possibly need to re-apply variants on resetting areas to preserve objects when scrolling.
@@ -72,6 +69,19 @@ Current tasks:
 
     - Add a procedural cave to the material overworld with 1-3 checks
         - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
+
+    - Add new visualization for spirit energy cooldown
+        - Track recently lost/expended spirit energy
+        - Draw recently lost/expended spirit energy on top of spirit energy in an orange color
+        - Each frame reduce recently lost/expended spirit energy by 20ms / cooldown ms so it always hits 0 when cooldown expires.
+        - The effect would be that you see your expended spirit energy get consumed gradually and regen does not start until the animation completes.
+        - One oddity is that when your spirit energy becomes negative, the orange bar might suddenly become taller than previously.
+            - Should make sure to limit the orange bar so that it cannot visually go over the top of the bar.
+
+    - Add consumable items
+        - Peach Potion - Restores 5 hearts
+        - Spirit Tonic - Restores all Spirit Energy (and resets cooldown)
+        - Spirit Elixer - Restores all Spirit Energy and grants unlimited Spirit Energy for 5s
 
     - Allow copying and pasting variants
     - Allow resizing variants by clicking and dragging near the edges.

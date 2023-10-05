@@ -118,11 +118,19 @@ export class OpenDoorPath implements ObjectInstance {
 export class Door implements ObjectInstance {
     // The door itself is always solid, but an OpenDoorPath object will be added when
     // the door is open that allows walking on the path part of the door.
-    behaviors: TileBehaviors = {solid: true};
     getBehaviors(): TileBehaviors {
+        let behaviors: TileBehaviors = {solid: true};
         if (this.definition.d === 'down') {
-            return {solid: true, isSouthernWall: true};
+            behaviors.isSouthernWall = true;
         }
+        const wasClosed = this.definition.status === 'closed'
+            || this.definition.status === 'closedSwitch'
+            || this.definition.status === 'closedEnemy';
+        if (wasClosed && this.isOpen()) {
+            behaviors.brightness = 0.5;
+            behaviors.lightRadius = 36;
+        }
+        return behaviors;
     }
     ignorePits = true;
     isObject = <const>true;
