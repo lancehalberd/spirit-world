@@ -48,8 +48,14 @@ function getVariantById(variantId: string) {
 
 export function variantLogic(variantId: string): LogicCheck {
     const variantData = getVariantById(variantId);
+    if (!variantData) {
+        debugger;
+    }
     let variantRandom = baseVarientRandom.addSeed(variantData.seed);
     const definition = variantHash[variantData.type];
+    if (!definition) {
+        throw new Error(variantData.type + " variant type not found");
+    }
     const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
     return definition.getLogic(style, variantRandom, variantData);
 }

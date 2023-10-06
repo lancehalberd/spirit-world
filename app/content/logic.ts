@@ -211,6 +211,7 @@ export const canUseTeleporters = orLogic(hasSpiritSight, hasTrueSight);
 export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);
 
 export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEscaped']};
+export const beastsDefeated: LogicCheck = {requiredFlags: ['flameBeast', 'frostBeast', 'stormBeast']};
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,
@@ -268,9 +269,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
     towerStaff: {
         requiredFlags: ['$staff:2'],
     },
-    beastsDefeated: {
-        requiredFlags: ['flameBeast', 'frostBeast', 'stormBeast'],
-    },
+    beastsDefeated,
 };
 
 

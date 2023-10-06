@@ -5,6 +5,8 @@ import {
     orLogic,
 } from 'app/content/logic';
 
+import { variantLogic } from 'app/utils/variants';
+
 
 export const treeVillageNodes: LogicNode[] = [
     {
@@ -353,6 +355,47 @@ export const holyCityNodes: LogicNode[] = [
     },
 
     // Jade city
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCityNorthwestHouse',
+        entranceIds: ['jadeCityNorthwestDoor'],
+        exits: [{ objectId: 'jadeCityNorthwestDoor'}],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCityMaze',
+        paths: [{nodeId: 'jadeCityMazeSmallMoney', logic: variantLogic('jadeCityMazeBlock1')}],
+        entranceIds: ['jadeCityWestDoor'],
+        exits: [{ objectId: 'jadeCityWestDoor'}],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCityMazeSmallMoney',
+        checks: [{objectId: 'jadeCityMazeSmallMoney'}],
+        paths: [{nodeId: 'jadeCityMazeBack', logic: variantLogic('jadeCityMazeBlock2')}]
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCityMazeBack',
+        checks: [{objectId: 'jadeCityMazeBigMoney', logic: variantLogic('jadeCityMazeBlock3')}],
+        entranceIds: ['jadeCityMazeExit'],
+        exits: [{ objectId: 'jadeCityMazeExit'}],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCitySouthwestHouse',
+        npcs: [
+            {loot: {type: 'dialogueLoot', id: 'helpfulSpirit', lootType: 'money', lootAmount: 50}},
+        ],
+        entranceIds: ['jadeCitySouthwestDoor'],
+        exits: [{ objectId: 'jadeCitySouthwestDoor'}],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCityNortheastHouse',
+        entranceIds: ['jadeCityNortheastDoor'],
+        exits: [{ objectId: 'jadeCityNortheastDoor'}],
+    },
     {
         zoneId: 'holyCityInterior',
         nodeId: 'jadeCitySoutheastHouse',

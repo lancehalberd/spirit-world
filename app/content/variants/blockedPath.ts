@@ -1,6 +1,10 @@
 import { allTiles } from 'app/content/tiles';
 import { variantHash } from 'app/content/variants/variantHash';
-import { canCross2Gaps, canCross6Gaps, orLogic, hasIce, hasInvisibility, hasGloves, hasCloudBoots } from 'app/content/logic';
+import {
+    canCross2Gaps, canCross6Gaps, orLogic,
+    hasIce, hasInvisibility, hasGloves, hasMitts, hasCloudBoots,
+    hasTowerStaff,
+} from 'app/content/logic';
 import { getOrAddInstanceLayer } from 'app/utils/layers';
 
 function toTileRect(r: Rect): Rect {
@@ -16,17 +20,17 @@ function fillLayerRect(random: SRandom, area: AreaInstance, layerKey: string, r:
     const layer = getOrAddInstanceLayer(layerKey, area);
     for (let y = r.y; y < r.y + r.h; y++) {
         for (let x = r.x; x < r.x + r.w; x++) {
-            if (!layer.tiles[y]) {
+            if (!layer.tiles[y] || !layer.originalTiles[y]) {
                 debugger;
             }
-            layer.tiles[y][x] = random.element(tiles);
+            layer.originalTiles[y][x] = layer.tiles[y][x] = random.element(tiles);
             random = random.nextSeed();
         }
     }
 }
 
 variantHash.blockedPath = {
-    styles: ['smallGap', 'bigGap', 'rocks', 'crackedGround'],
+    styles: ['smallGap', 'bigGap', 'rocks', 'heavyRocks', 'crackedGround'],
     gridSize: 16,
     applyToArea(style: string, random: SRandom, area: AreaInstance, data: VariantData): boolean {
         const r = toTileRect(data);
@@ -49,6 +53,14 @@ variantHash.blockedPath = {
             }
             case 'bigGap': {
                 fillLayerRect(random, area, 'floor2', r, [allTiles[4]]);
+                return true;
+            }
+            case 'heavyRocks': {
+                if (area.definition.isSpiritWorld) {
+                    fillLayerRect(random, area, 'field', r, [allTiles[187], allTiles[188]]);
+                } else {
+                    fillLayerRect(random, area, 'field', r, [allTiles[8], allTiles[9]]);
+                }
                 return true;
             }
             case 'rocks': {
@@ -75,7 +87,8 @@ variantHash.blockedPath = {
             case 'smallGap': return canCross2Gaps;
             case 'bigGap': return canCross6Gaps;
             case 'rocks': return hasGloves;
-            case 'crackedGround': return orLogic(hasIce, hasInvisibility, hasCloudBoots);
+            case 'heavyRocks': return hasMitts;
+            case 'crackedGround': return orLogic(hasIce, hasInvisibility, hasCloudBoots, hasTowerStaff);
         }
     },
 };

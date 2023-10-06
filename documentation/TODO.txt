@@ -39,25 +39,18 @@ Graphics:
 
 
 Current tasks:
-    - Add blocked path object
-        -> Set originalTiles when applying variants so they still apply when resetting areas on scrolling to them.
-            -> Possibly need to re-apply variants on resetting areas to preserve objects when scrolling.
-        -> Allow referencing variants by id in logic anywhere with a logic requirement.
-
     - Add variable switch object
         - Set map of type -> weight
             - types: burstSwitch, flameSwitch/frostSwitch/stormSwitch, heldSwitch(good for doors only),
+        -> Possibly need to re-apply variants on resetting areas to preserve objects when scrolling.
 
     - Add variable checks to procedurally generated areas
         - Adding variable checks to varition objects is a little tricky because the randomizer has to both be able to read + write the checks
         but there won't be an object definitions to write the checks to, so it would have to be added as an override to the variationData.
         - This is also tricky for procedurally generated, but it is a hard requirement for them so it isn't extra work.
 
-    - Populate Spirit City
-        - Add placeholder NPCs and dialogue
-            - Use lightning drone + robot sprites as placeholders
-        - Add an NPC with a check to the SW house
-        - Add procedural checks + obstacles to the spirit money making game area
+    - Add additional blockedPath styles.
+        - Maybe cracked pots requiring clone tool
 
     - Populate Spirit Ruins
         - Link entrances to the spirit world

@@ -131,6 +131,7 @@ export function addNewInstanceLayer(
         },
         key: layerKey,
         tiles: [],
+        originalTiles: [],
     };
     initializeAreaInstanceLayerTiles(layer);
     area.layers.splice(layerIndex, 0, layer);
@@ -144,6 +145,7 @@ export function addNewInstanceLayer(
             },
             key: layerKey,
             tiles: [],
+            originalTiles: [],
         };
         initializeAreaInstanceLayerTiles(alternateLayer);
         alternateArea.layers.splice(layerIndex, 0, alternateLayer);
@@ -151,11 +153,12 @@ export function addNewInstanceLayer(
     return layer;
 }
 export function initializeAreaInstanceLayerTiles(layer: AreaLayer): void {
-    const tiles = layer.tiles;
+    const tiles = layer.tiles, originalTiles = layer.originalTiles;
     for (let y = 0; y < layer.h; y++) {
         tiles[y] = tiles[y] || [];
+        originalTiles[y] = originalTiles[y] || [];
         for (let x = 0; x < layer.w; x++) {
-            tiles[y][x] = tiles[y][x] || allTiles[0];
+            originalTiles[y][x] = tiles[y][x] = tiles[y][x] || allTiles[0];
         }
     }
 }

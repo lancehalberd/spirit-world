@@ -352,6 +352,10 @@ function drawBrush(targetX: number, targetY: number): void {
     }
     for (const layer of area.layers) {
         const layerDefinition = layer.definition;
+        if (!layer.definition?.grid) {
+            // This can happen when a variant adds a layer to an area that is otherwise not defined.
+            continue;
+        }
         const parentLayer = area.definition.parentDefinition?.layers?.find(parentLayer => parentLayer.key === layer.key);
         // When a layer is selected, only draw to it.
         if (editingState.selectedLayerKey && layer.key !== editingState.selectedLayerKey) {

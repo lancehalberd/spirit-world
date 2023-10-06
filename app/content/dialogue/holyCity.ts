@@ -112,10 +112,27 @@ dialogueHash.streetVendor = {
         purchase1: `You won't regret this. {item:peachOfImmortalityPiece} {flag:vendor1}`,
         attempt2: `{buy:150:streetVendor.purchase2:streetVendor.fail`,
         purchase2: `You're getting a great deal. {item:silverOre} {flag:vendor2}`,
+        attempt3: `{buy:300:streetVendor.purchase3:streetVendor.fail`,
+        purchase3: `Make sure to treasure it. {item:goldOre} {flag:vendor3}`,
         fail: 'Come back with more Jade.',
         no: 'Your loss friend.',
     },
     options: [
+        {
+            logicCheck: {
+                requiredFlags: ['vendor2', 'beastsDefeated'],
+                excludedFlags: ['vendor3'],
+            },
+            text: [
+                {
+                    dialogueIndex: -1,
+                    dialogueType: 'subquest',
+                    text: `I found something of great value while exploring, only 300 Jade...
+                    {choice:Buy for 300 Jade?|Yes:streetVendor.attempt3|No:streetVendor.no}`,
+                },
+            ],
+
+        },
         {
             logicCheck: {
                 requiredFlags: ['vendor1', 'elementalBeastsEscaped'],
@@ -157,6 +174,87 @@ dialogueHash.streetVendor = {
                     text: `That's all I have for now friend.`,
                 },
             ],
+        },
+    ],
+};
+
+dialogueHash.helpfulSpirit = {
+    key: 'helpfulSpirit',
+    options: [
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: ['helpfulSpiritGift'],
+            },
+            text: [
+                {
+                    dialogueIndex: 134,
+                    dialogueType: 'subquest',
+                    text: `
+                    Even some beings in the Spirit World use Jade currency.
+                    {|}I have no use for this but maybe it will be helpful on your quest?
+                    {flag:helpfulSpiritGift} {item:money=50}`,
+                },
+            ],
+
+        },
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: [],
+            },
+            text: [
+                {
+                    dialogueIndex: 135,
+                    text: `I am told they are building a city for Spirits on the firmament.`,
+                },
+                {
+                    dialogueIndex: 139,
+                    text: `Even when the Sky City is finished, we will still need Spirits to monitor the Humans.`,
+                },
+            ],
+        },
+    ],
+};
+
+dialogueHash.curiousSpirit = {
+    key: 'curiousSpirit',
+    options: [
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: [],
+            },
+            text: [
+                {
+                    dialogueIndex: 140,
+                    text: `It is interesting observing a material being in the Spirit World.`,
+                },
+                {
+                    dialogueIndex: 141,
+                    text: `
+                    Did you know Humans cannot survive in the Spirit World?
+                    {|}Their lungs are not compatible with the atmosphere here.
+                    `,
+                },
+                {
+                    dialogueIndex: 142,
+                    text: `
+                    Humans require a special gas called oxygen to produce energy, but it does not naturally occur in the air here.
+                    {|}Even though energy is abundant in the Spirit World their bodies are unable to process it.
+                    {|}There is even oxygen in water but human lungs cannot process liquids.
+                    `,
+                },
+                {
+                    dialogueIndex: 143,
+                    text: `
+                    The Human Champion is an interesting exception.
+                    She straddles both worlds, dipping in and out of them as she pleases.
+                    {|}I hear you can do something similar when you peek into the other world.
+                    `,
+                },
+            ],
+            repeatIndex: 0,
         },
     ],
 };

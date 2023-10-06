@@ -1,5 +1,6 @@
 import {
     andLogic,
+    beastsDefeated,
     canCross2Gaps, hasGloves,
     canCross4Gaps, canUseTeleporters, hasReleasedBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasFire, canRemoveHeavyStones, canRemoveLightStones,
@@ -16,6 +17,7 @@ export const mainOverworldNode: LogicNode = {
     complexNpcs: [
         {dialogueKey: 'streetVendor', optionKey: 'purchase1'},
         {dialogueKey: 'streetVendor', optionKey: 'purchase2', logic: hasReleasedBeasts},
+        {dialogueKey: 'streetVendor', optionKey: 'purchase3', logic: beastsDefeated},
     ],
     paths: [
         { nodeId: 'overworldMountain', logic: canRemoveLightStones },
@@ -195,16 +197,31 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'warTempleSpiritArea', logic: canRemoveHeavyStones },
         ],
         entranceIds: [
-            'fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance', 'jadeCitySoutheastDoor',
+            'fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance',
+            'jadePalaceEntrance',
+            'jadeCityNorthwestDoor', 'jadeCityWestDoor', 'jadeCitySouthwestDoor',
+            'jadeCityNortheastDoor', 'jadeCitySoutheastDoor',
             'cloneCaveEntrance', 'cloneCaveExit',
-            ],
+        ],
         exits: [
             { objectId: 'jadePalaceEntrance' },
+            { objectId: 'jadeCityNorthwestDoor' },
+            { objectId: 'jadeCityWestDoor' },
+            { objectId: 'jadeCitySouthwestDoor' },
+            { objectId: 'jadeCityNortheastDoor' },
             { objectId: 'jadeCitySoutheastDoor' },
             { objectId: 'fertilityTempleSpiritEntrance' },
             { objectId: 'staffTowerSpiritEntrance', logic: {requiredFlags: ['staffTowerSpiritEntrance']} },
             { objectId: 'cloneCaveExit' },
         ],
+    },
+    {
+        zoneId,
+        nodeId: 'jadeCityMazeExit',
+        checks: [{objectId: 'jadeCityMazePeachPiece'}],
+        paths: [{ nodeId: 'mainSpiritWorld' }],
+        entranceIds: ['jadeCityMazeExit'],
+        exits: [{ objectId: 'jadeCityMazeExit' }],
     },
     {
         zoneId,
@@ -445,7 +462,7 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'westSpiritWorldMountain' },
             { nodeId: 'waterfallTowerSky'},
         ],
-        entranceIds: ['caves-ascentExitSpirit', 'forgeEntrance'],
+        entranceIds: ['forgeEntrance'],
         exits: [
             { objectId: 'forgeEntrance' },
         ],

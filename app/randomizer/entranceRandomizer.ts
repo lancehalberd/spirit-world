@@ -34,6 +34,7 @@ interface DoorLocation {
 // one needs to be connected to a reachable entrance using a connected exit group.
 const unreachableSpiritEntranceGroups = [
     ['caves:caves-ascentExitSpirit'],
+    ['holyCityInterior:jadeCityMazeExit'],
     ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
 ];
 
@@ -90,6 +91,13 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     {
         spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
     },
+    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
+    have support for a one way tunnel, so this cannot currently function as a connected exit group.
+    {
+        spiritEntranceTargets: ['overworld:jadeCityMazeExit'],
+        // It is not possible to reach the entrance door when entering from the exit door.
+        immutableEntranceTargets: ['overworld:jadeCityWestDoor'],
+    },*/
     /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
     have support for a one way tunnel, so this cannot currently function as a connected exit group.
     {
@@ -214,13 +222,13 @@ export function randomizeEntrances(random: typeof SRandom) {
         }
     });
     if (normalEntrances.size !== normalExits.size) {
-        console.error(`normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
+        console.error(`initial normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
         console.error([...normalEntrances]);
         console.error([...normalExits]);
         return;
     }
     if (spiritEntrances.size !== spiritExits.size) {
-        console.error(`spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
+        console.error(`initial spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
         console.error([...spiritEntrances]);
         console.error([...spiritExits]);
         return;
@@ -335,26 +343,30 @@ export function randomizeEntrances(random: typeof SRandom) {
             set.delete(targetIdOfExit);
             set.delete(targetIdOfEntrance);
         }
+
+        if (normalEntrances.size !== normalExits.size) {
+            console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
+            console.error(`normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
+            console.error([...normalEntrances]);
+            console.error([...normalExits]);
+            return;
+        }
+        if (spiritEntrances.size !== spiritExits.size) {
+            console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
+            console.error(`spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
+            console.error([...spiritEntrances]);
+            console.error([...spiritExits]);
+            return;
+        }
+        if (waterEntrances.size !== waterExits.size) {
+            console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
+            console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
+            console.error([...waterEntrances]);
+            console.error([...waterExits]);
+            return;
+        }
     }
 
-    if (normalEntrances.size !== normalExits.size) {
-        console.error(`normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
-        console.error([...normalEntrances]);
-        console.error([...normalExits]);
-        return;
-    }
-    if (spiritEntrances.size !== spiritExits.size) {
-        console.error(`spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
-        console.error([...spiritEntrances]);
-        console.error([...spiritExits]);
-        return;
-    }
-    if (waterEntrances.size !== waterExits.size) {
-        console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
-        console.error([...waterEntrances]);
-        console.error([...waterExits]);
-        return;
-    }
 
     //console.log('GENERAL ASSIGNMENTS:');
     for (const entrancePairing of [
