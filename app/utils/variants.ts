@@ -24,12 +24,12 @@ function chooseStyleVariant(styles: string[], random: SRandom, data: VariantData
     return styles[0];
 }
 
-export function applyVariantsToArea(area: AreaInstance): void {
+export function applyVariantsToArea(state: GameState, area: AreaInstance): void {
     for (const variantData of (area.definition.variants || [])) {
         let variantRandom = baseVarientRandom.addSeed(variantData.seed);
         const definition = variantHash[variantData.type];
         const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
-        definition.applyToArea(style, variantRandom, area, variantData);
+        definition.applyToArea(style, variantRandom, state, area, variantData);
     }
 }
 

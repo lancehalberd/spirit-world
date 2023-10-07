@@ -372,12 +372,12 @@ export const holyCityNodes: LogicNode[] = [
         zoneId: 'holyCityInterior',
         nodeId: 'jadeCityMazeSmallMoney',
         checks: [{objectId: 'jadeCityMazeSmallMoney'}],
-        paths: [{nodeId: 'jadeCityMazeBack', logic: variantLogic('jadeCityMazeBlock2')}]
+        paths: [{nodeId: 'jadeCityMazeBack', logic: variantLogic('jadeCityMazeSwitch')}]
     },
     {
         zoneId: 'holyCityInterior',
         nodeId: 'jadeCityMazeBack',
-        checks: [{objectId: 'jadeCityMazeBigMoney', logic: variantLogic('jadeCityMazeBlock3')}],
+        checks: [{objectId: 'jadeCityMazeBigMoney', logic: variantLogic('jadeCityMazeBlock2')}],
         entranceIds: ['jadeCityMazeExit'],
         exits: [{ objectId: 'jadeCityMazeExit'}],
     },

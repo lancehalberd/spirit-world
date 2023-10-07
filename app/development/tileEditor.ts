@@ -557,11 +557,15 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     if (event.which === KEY.BACK_SPACE) {
         if (editingState.tool === 'brush') {
-    const [x, y] = getAreaMousePosition();
+            const [x, y] = getAreaMousePosition();
             deleteTile(x, y);
         } else if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
             deleteObject(state, editingState.selectedObject);
             unselectObject(editingState);
+        }  else if (state.areaInstance.definition.variants?.includes(editingState.selectedVariantData)) {
+            const index = state.areaInstance.definition.variants.indexOf(editingState.selectedVariantData);
+            state.areaInstance.definition.variants.splice(index, 1);
+            refreshArea(state);
         }
     }
     if (event.which === KEY.ESCAPE) {

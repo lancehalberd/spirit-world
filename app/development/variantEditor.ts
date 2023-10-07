@@ -1,9 +1,14 @@
 import { variantHash } from 'app/content/variants/variantHash';
 import { editingState } from 'app/development/editingState';
+import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 import { enterLocation } from 'app/utils/enterLocation';
 
-const variantTypes: VariantType[] = ['blockedPath'];
+const variantTypes = Object.keys(variantHash) as VariantType[];
+
+function refreshArea(state: GameState, doNotRefreshEditor = false) {
+    enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
+}
 
 export function getVariantTypeSelector(): PanelRows {
     const variantData = editingState.selectedVariantData;
@@ -13,12 +18,9 @@ export function getVariantTypeSelector(): PanelRows {
         values: variantTypes,
         onChange(type: VariantType) {
             variantData.type = type;
+            refreshArea(getState());
         },
     }];
-}
-
-function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
 }
 
 export function getVariantProperties(state: GameState): PanelRows {
@@ -102,6 +104,18 @@ export function getVariantProperties(state: GameState): PanelRows {
     }
     if (row.length) {
         rows.push(row);
+    }
+    for (const field of (definition.fields || [])) {
+        rows.push({
+            name: field.key,
+            value: variantData.fields?.[field.key] || field.defaultValue,
+            values: field.getValues?.(state),
+            onChange(value: any) {
+                variantData.fields = variantData.fields || {};
+                variantData.fields[field.key] = value;
+                refreshArea(state);
+            },
+        });
     }
 
     return rows;

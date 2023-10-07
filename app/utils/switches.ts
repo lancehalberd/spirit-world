@@ -9,17 +9,37 @@ export function areAllSwitchesActivated(state: GameState, area: AreaInstance, sw
     );
 }
 
-export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): void {
+export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): boolean {
     if (!switchInstance.definition.targetObjectId) {
-        return;
+        return false;
     }
     if (!areAllSwitchesActivated(state, area, switchInstance)) {
-        return;
+        return false;
     }
     for (const object of [...area.objects, ...(area.alternateArea?.objects || [])]) {
         if (object.definition?.id === switchInstance.definition.targetObjectId) {
             activateTarget(state, object, true);
         }
     }
+    return true;
 }
 
+function getTargetObjectIdsByTypesAndArea(area: AreaInstance, types: ObjectType[]): string[] {
+    if (!area) {
+        return [];
+    }
+    return area.objects.filter(object => types.includes(object.definition?.type)).map(object => object.definition?.id).filter(id => id);
+}
+
+export function getSwitchTargetIds(area: AreaInstance): string[] {
+    return [
+        'none',
+        ...getTargetObjectIdsByTypesAndArea(area,
+            [
+                'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
+                'narration', 'pitEntrance', 'shieldingUnit',
+                'teleporter', 'torch', 'escalator', 'airStream', 'anode',
+            ]
+        )
+    ];
+}

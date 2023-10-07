@@ -20,6 +20,7 @@ export class CrystalSwitch implements ObjectInstance {
         brightness: 0.5,
         lightRadius: 16,
     };
+    alwaysReset = false;
     isNeutralTarget = true;
     drawPriority: DrawPriority = 'sprites';
     definition: CrystalSwitchDefinition = null;
@@ -30,6 +31,8 @@ export class CrystalSwitch implements ObjectInstance {
     status: ObjectStatus = 'normal';
     timeLeft: number = 0;
     animationTime: number = 0;
+    // This will be set to keep a switch on even if it has a timer.
+    stayOn: boolean = false;
     constructor(state: GameState, definition: CrystalSwitchDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -54,7 +57,11 @@ export class CrystalSwitch implements ObjectInstance {
         this.timeLeft = this.definition.timer || 0;
         this.behaviors.brightness = 1;
         this.behaviors.lightRadius = 32;
-        checkIfAllSwitchesAreActivated(state, this.area, this);
+        if (checkIfAllSwitchesAreActivated(state, this.area, this)) {
+            if (this.definition.stayOnAfterActivation) {
+                this.stayOn = true;
+            }
+        }
         if (this.definition.specialBehaviorKey) {
             const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSwitchBehavior;
             specialBehavior?.onActivate(state, this);
@@ -63,12 +70,16 @@ export class CrystalSwitch implements ObjectInstance {
             this.linkedObject.status = 'active';
             this.linkedObject.animationTime = 0;
             this.linkedObject.timeLeft = this.definition.timer || 0;
-            checkIfAllSwitchesAreActivated(state, this.linkedObject.area, this.linkedObject);
+            if (checkIfAllSwitchesAreActivated(state, this.linkedObject.area, this.linkedObject)) {
+                if (this.linkedObject.definition.stayOnAfterActivation) {
+                    this.linkedObject.stayOn = true;
+                }
+            }
         }
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.status === 'active' && this.timeLeft > 0) {
+        if (this.status === 'active' && (this.timeLeft > 0 && !this.stayOn)) {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';

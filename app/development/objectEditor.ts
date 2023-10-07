@@ -26,6 +26,7 @@ import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import { getSwitchTargetIds } from 'app/utils/switches';
 
 
 type PartialObjectDefinitionWithType = Partial<ObjectDefinition> & {type: ObjectType};
@@ -516,16 +517,7 @@ export function getSwitchTargetProperties(
     object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | KeyBlockDefinition
 ): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = [
-        'none',
-        ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
-            [
-                'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
-                'narration', 'pitEntrance', 'shieldingUnit',
-                'teleporter', 'torch', 'escalator', 'airStream', 'anode',
-            ]
-        )
-    ];
+    const objectIds = getSwitchTargetIds(state.areaInstance);
 
     if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
         delete object.targetObjectId;

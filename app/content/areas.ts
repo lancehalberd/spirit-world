@@ -419,7 +419,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             }
         }
     }
-    applyVariantsToArea(instance);
+    applyVariantsToArea(state, instance);
     for (const layer of instance.layers) {
         applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
@@ -561,8 +561,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             instance.priorityObjects = []
             instance = nextAreaInstance;
 
-            // TODO: test how variants look when using slow transition logic refreshes like draining lava.
-            applyVariantsToArea(instance);
+            applyVariantsToArea(state, instance);
         }
         // Call refresh logic on any objects currently in the area in case their state depends on the current logic.
         // For example, the door and signs in the Staff Tower Elevator update their state as you interact with the elevator
@@ -666,5 +665,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
             }
         }
     }
+
+    applyVariantsToArea(state, area);
 }
 

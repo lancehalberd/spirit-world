@@ -39,11 +39,6 @@ Graphics:
 
 
 Current tasks:
-    - Add variable switch object
-        - Set map of type -> weight
-            - types: burstSwitch, flameSwitch/frostSwitch/stormSwitch, heldSwitch(good for doors only),
-        -> Possibly need to re-apply variants on resetting areas to preserve objects when scrolling.
-
     - Add variable checks to procedurally generated areas
         - Adding variable checks to varition objects is a little tricky because the randomizer has to both be able to read + write the checks
         but there won't be an object definitions to write the checks to, so it would have to be added as an override to the variationData.

@@ -32,7 +32,7 @@ function fillLayerRect(random: SRandom, area: AreaInstance, layerKey: string, r:
 variantHash.blockedPath = {
     styles: ['smallGap', 'bigGap', 'rocks', 'heavyRocks', 'crackedGround'],
     gridSize: 16,
-    applyToArea(style: string, random: SRandom, area: AreaInstance, data: VariantData): boolean {
+    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData): boolean {
         const r = toTileRect(data);
         switch (style){
             case 'smallGap': {

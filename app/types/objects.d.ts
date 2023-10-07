@@ -436,19 +436,19 @@ interface AirStreamDefinition extends BaseObjectDefinition {
 }
 
 interface FloorSwitchDefinition extends BaseObjectDefinition {
-    type: 'floorSwitch',
-    toggleOnRelease?: boolean,
-    targetObjectId?: string,
+    type: 'floorSwitch'
+    toggleOnRelease?: boolean
+    targetObjectId?: string
 }
 
 interface KeyBlockDefinition extends BaseObjectDefinition {
-    type: 'keyBlock',
-    targetObjectId?: string,
+    type: 'keyBlock'
+    targetObjectId?: string
 }
 
 interface IndicatorDefinition extends BaseObjectDefinition {
-    type: 'indicator',
-    targetObjectId?: string,
+    type: 'indicator'
+    targetObjectId?: string
 }
 
 type LootObjectDefinition = BaseObjectDefinition & LootData & {
@@ -457,11 +457,12 @@ type LootObjectDefinition = BaseObjectDefinition & LootData & {
 }
 
 interface CrystalSwitchDefinition extends BaseObjectDefinition {
-    type: 'crystalSwitch',
+    type: 'crystalSwitch'
     element?: MagicElement,
     // If this is set, this crystal will de-activate after this many milliseconds.
-    timer?: number,
-    targetObjectId?: string,
+    timer?: number
+    targetObjectId?: string
+    stayOnAfterActivation?: boolean
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
