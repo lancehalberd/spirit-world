@@ -39,10 +39,14 @@ Graphics:
 
 
 Current tasks:
-    - Add variable checks to procedurally generated areas
-        - Adding variable checks to varition objects is a little tricky because the randomizer has to both be able to read + write the checks
-        but there won't be an object definitions to write the checks to, so it would have to be added as an override to the variationData.
-        - This is also tricky for procedurally generated, but it is a hard requirement for them so it isn't extra work.
+    - Fix getting stuck between barriers in front of sky palace
+    - Fix getting knocked into the sky when sommersaulting on to lightning barriers
+    - If a closed door is linked to an open door and the area is refreshed (say from opening a chest), the closed door will open.
+    - Fix storm beast cloud does not knock you away.
+    - Fix erros when using invisibility cloak on top of the heart.
+
+    - Add a procedural cave to the material overworld with 1-3 checks
+        - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
 
     - Add additional blockedPath styles.
         - Maybe cracked pots requiring clone tool
@@ -53,10 +57,6 @@ Current tasks:
             - Use 2x scale elements for NPCs
         - Add NPC with a check to the East building
         - Add a visible check somewhere outside that can be peaked early with spirit sight
-        - Add a procedural area to the West building (the building with no entrance in the material world) with 1-2 checks
-
-    - Add a procedural cave to the material overworld with 1-3 checks
-        - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
 
     - Add new visualization for spirit energy cooldown
         - Track recently lost/expended spirit energy
@@ -646,6 +646,12 @@ Current tasks:
         - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
 
     Storm Beast
+        - Storm Beast Heart should summon lightning summoning minions each time you remove 10% of its health.
+        - Storm Beast Heart should take 80% reduced damage after losing 25% health until the cloud reforms.
+        - Storm Beast Heart should have no enraged behavior or invulnerability for the cloud.
+        - There should be a mechanic for ending Storm Beast's enrage phase early.
+            - For example, it summons 2 + N lightning turrets and the enrage phase ends when they are defeated.
+            - It would be cool if using cloud boots to walk on the clouds around the tower was beneficial for this or some other mechanic.
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
 

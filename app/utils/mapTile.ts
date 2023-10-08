@@ -33,6 +33,16 @@ explicitIndexMapping[spiritCrystalGroundSquare] = spiritCrystalGroundSquare;
 
 //const logged: boolean[] = [];
 
+export function mapTileIndex(tileIndex: number): number {
+    if (tileIndex < 2) {
+        return tileIndex;
+    }
+    if (typeof explicitIndexMapping[tileIndex] === 'number') {
+        return explicitIndexMapping[tileIndex];
+    }
+    return mapTile(allTiles[tileIndex])?.index || 0;
+}
+
 // Maps a tile set in the parent area to the default tile that should be used in the child area.
 // For example, a liftable rock in the normal world is mapped to a liftable crystal in the spirit world.
 export function mapTile(baseTile?: FullTile): FullTile|null {
@@ -48,6 +58,7 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
     // Tiles with linked offsets map to different tiles than the parent definition.
     const linkedOffset = baseTile?.behaviors?.linkedOffset || 0;
     if (linkedOffset) {
+        explicitIndexMapping[baseTile.index] = baseTile.index + linkedOffset;
         // uncomment this if you ever want a list of all linkedOffsets being used.
         /*if (!logged[baseTile.index]) {
             console.log(`explicitIndexMapping[${baseTile.index}] = ${baseTile.index + linkedOffset};`);
@@ -57,13 +68,15 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
     }
 
     if (baseTile.behaviors?.shallowWater || baseTile.behaviors?.water) {
+        explicitIndexMapping[baseTile.index] = spiritCrystalGround;
         return allTiles[spiritCrystalGround];
     }
 
     if (baseTile.behaviors?.defaultLayer === 'floor') {
+        explicitIndexMapping[baseTile.index] = spiritGround;
         return allTiles[spiritGround];
     }
-
+    explicitIndexMapping[baseTile.index] = baseTile.index;
     return baseTile;
 }
 

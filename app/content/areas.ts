@@ -9,6 +9,7 @@ import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
+import { getAreaDimensions } from 'app/utils/getAreaSize';
 import { getDrawPriority, initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
@@ -318,16 +319,17 @@ export function addRecentArea(areaInstance: AreaInstance): void {
 
 export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
+    const areaSize = getAreaDimensions(definition);
     const [canvas, context] = createCanvasAndContext(
-        definition.layers[0].grid.w * 16,
-        definition.layers[0].grid.h * 16,
+        areaSize.w * 16,
+        areaSize.h * 16,
     );
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
         dark: definition.dark,
-        w: definition.layers[0].grid.w,
-        h: definition.layers[0].grid.h,
+        w: areaSize.w,
+        h: areaSize.h,
         behaviorGrid,
         tilesDrawn: [],
         checkToRedrawTiles: true,

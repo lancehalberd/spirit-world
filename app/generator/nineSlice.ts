@@ -3,7 +3,7 @@ import { getOrAddLayer } from 'app/utils/layers';
 
 // const floor2Tiles = [793, 796, 797, 799, 800];
 
-export function applyNineSlice(area: AreaDefinition, r: Rect, slice: NineSlice, alternateArea?: AreaDefinition): void {
+export function applyNineSlice(random: SRandom, area: AreaDefinition, r: Rect, slice: NineSlice, alternateArea?: AreaDefinition): void {
     // Height of bottom slice
     const B = slice.h - (slice.r.y + slice.r.h);
     // Width of right slice
@@ -107,8 +107,55 @@ export const caveRoom: NineSlice = {
             ]
         }
     ]
-}
+};
+
+export const stoneWalls: NineSlice = {
+    w: 6, h: 8,
+    r: {x: 2, y: 4, w : 2, h : 2},
+    layers: [
+        {
+            key: 'field',
+            grid: [
+                [0,  0,  0,  0,  0,0],
+                [0,1203,1204,1203,1204,0],
+                [0,1204,1203,1204,1203,0],
+                [0,  0,  0,  0,  0,0],
+                [0,  0,  0,  0,  0,0],
+                [0,  0,  0,  0,  0,0],
+                [0,  0,  0,  0,  0,0],
+                [0,  0,  0,  0,  0,0],
+            ]
+        },
+        {
+            key: 'field2',
+            grid: [
+                [0,0,0,0,0,0],
+                [0,695, 0, 0, 692,0],
+                [0,703, 0, 0, 700,0],
+                [0,703, 0, 0, 700,0],
+                [0,703, 0, 0, 700,0],
+                [0,703, 0, 0, 700,0],
+                [0,703, 0, 0, 700,0],
+                [0,0,0,0,0,0],
+            ]
+        },
+        {
+            key: 'foreground2',
+            grid: [
+                [1172,1163,1163,1163,1163,1171],
+                [1162,   0,   0,   0,   0,1162],
+                [1162,   0,   0,   0,   0,1162],
+                [1162,   0,   0,   0,   0,1162],
+                [1162,   0,   0,   0,   0,1162],
+                [1162,   0,   0,   0,   0,1162],
+                [1162,   0,   0,   0,   0,1162],
+                [1168,1163,1163,1163,1163,1167],
+            ]
+        }
+    ]
+};
 
 export const slices = {
     caveRoom,
+    stoneWalls,
 };

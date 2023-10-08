@@ -1,5 +1,7 @@
 import { allTiles } from 'app/content/tiles';
 import { layersInOrder } from 'app/gameConstants';
+import { getAreaDimensions } from 'app/utils/getAreaSize';
+import { mapTileIndex } from 'app/utils/mapTile';
 
 export function addNewLayer(
     layerKey: string,
@@ -7,26 +9,25 @@ export function addNewLayer(
     definition: AreaDefinition,
     alternateDefinition?: AreaDefinition,
 ): AreaLayerDefinition {
-    const topLayerDefinition = definition.layers[definition.layers.length - 1];
+    const areaSize = getAreaDimensions(definition);
     const layerDefinition: AreaLayerDefinition = {
-        ...topLayerDefinition,
         drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
         key: layerKey,
         grid: {
-            ...topLayerDefinition.grid,
+            w: areaSize.w,
+            h: areaSize.h,
             tiles: [],
         },
     };
     initializeAreaLayerTiles(layerDefinition);
     definition.layers.splice(layerIndex, 0, layerDefinition);
     if (alternateDefinition?.layers) {
-        const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
         const alternateLayerDefinition: AreaLayerDefinition = {
-            ...alternateTopLayerDefinition,
             drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
             key: layerKey,
             grid: {
-                ...alternateTopLayerDefinition.grid,
+                w: areaSize.w,
+                h: areaSize.h,
                 tiles: [],
             },
         };
@@ -60,6 +61,30 @@ export function getOrAddLayer(
         }
     }
     return addMissingLayer(layerKey, definition, alternateDefinition);
+}
+
+export function inheritAllLayerTilesFromParent(area: AreaDefinition) {
+    const parentLayers = area.parentDefinition?.layers;
+    for (const layer of (parentLayers || [])) {
+        inheritLayerTilesFromParent(layer.key, area);
+    }
+}
+
+export function inheritLayerTilesFromParent(layerKey: string, area: AreaDefinition) {
+    const parentLayer = area.parentDefinition?.layers?.find(l => l.key === layerKey);
+    if (!parentLayer) {
+        return;
+    }
+    const childLayer = getOrAddLayer(layerKey, area);
+    const childTiles = childLayer.grid.tiles;
+    for (let y = 0; y < childLayer.grid.h; y++) {
+        childTiles[y] = childTiles[y] || [];
+        // We need to do this so that each row has the correct number of elements, as in some places
+        // we use row.length for iterating through tiles or checking the bounds of the grid.
+        for (let x = 0; x < childLayer.grid.w; x++) {
+            childTiles[y][x] = mapTileIndex(parentLayer.grid.tiles[y]?.[x]) || 0;
+        }
+    }
 }
 
 export function initializeAreaLayerTiles(layer: AreaLayerDefinition): AreaLayerDefinition {
@@ -122,9 +147,9 @@ export function addNewInstanceLayer(
     area: AreaInstance,
     alternateArea?: AreaInstance,
 ): AreaLayer {
-    const topLayer = area.layers[area.layers.length - 1];
     const layer: AreaLayer = {
-        ...topLayer,
+        w: area.w,
+        h: area.h,
         definition: {
             key: layerKey,
             drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
@@ -136,9 +161,9 @@ export function addNewInstanceLayer(
     initializeAreaInstanceLayerTiles(layer);
     area.layers.splice(layerIndex, 0, layer);
     if (alternateArea?.layers) {
-        const alternateTopLayer = alternateArea.layers[alternateArea.layers.length - 1];
         const alternateLayer: AreaLayer = {
-            ...alternateTopLayer,
+            w: alternateArea.w,
+            h: alternateArea.h,
             definition: {
                 key: layerKey,
                 drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',

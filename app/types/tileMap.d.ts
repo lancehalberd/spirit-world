@@ -320,6 +320,8 @@ interface AreaSectionInstance extends AreaSection {
 
 interface AreaDefinition {
     default?: boolean
+    w?: number
+    h?: number
     layers: AreaLayerDefinition[]
     objects: ObjectDefinition[]
     variants?: VariantData[]

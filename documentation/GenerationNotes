@@ -48,7 +48,15 @@ Specific Dungeon Constraints:
             - For example [[Cat Eyes, Bow,], [Cat Eyes, Gloves]] for Tomb
               or [[roll, lightningBlessing], [roll, Mitts], [roll, lightningMagic], [roll, invisibility]] for Sky Palace
         Interior Required Item Sets - Array of item sets that the dungeon will require in order to access the rest of the dungeon from this entrance.
-            The cross product of exterior X interior items sets for a door form the set of required external item sets for completing the dungeon.
+        The cross product of exterior X interior items sets for a door form the set of required external item sets for completing the dungeon.
+            That is, if a door requires item sets A or B to enter, and has interior item requirements C or D
+            Then the dungeon must be completeable with any of these item sets: AC, AD, BC, or BD. The idea is that if the player has an item set that
+            let's them make meaningful progress in the dungeon, they should be able to complete the dungeon with this item set. If the player is not
+            able to complete a dungeon, they should discover this very early in exploring the dungeon (due to entrance exterior/interior requirements),
+            rather than very late in the dungeon. When the player can access a lot of the dungeon, it is unintuitive and perhaps difficult to determine
+            that they do not meet the requirements for completing the dungeon which would reasonably undermine their confidence in the design of the game.
+            Note that additional items can be required to complete the dungeon so long as they are obtainable with items required to successfully enter.
+            This is a very common pattern in designed dungeons where the big chest contains a progress item that is required to complete the dungeon.
         Geographical information:
             style: ladder up/down, stairs up/down, N/E/S/W door or path
             floor

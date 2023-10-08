@@ -338,7 +338,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
     const targetEnrageLevel = getStormHeartTargetEnrageLevel(enemy);
     if (enemy.params.enrageLevel < targetEnrageLevel) {
         enemy.params.enrageLevel = targetEnrageLevel;
-        enemy.params.enrageTime = 4500 + 2000 * targetEnrageLevel;
+        enemy.params.enrageTime = 4500;
         enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
@@ -540,12 +540,12 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
     if (isEnemyDefeated(stormHeart)) {
         if (enemy.life <= maxLife * 2 / 3 && enemy.params.enrageLevel === 0) {
             enemy.params.enrageLevel = 1;
-            enemy.params.enrageTime = 6500;
+            enemy.params.enrageTime = 4500;
             // Burn damaged is reduced by 80% when entering rage phase.
             enemy.burnDamage *= 0.2;
         } else if (enemy.life <= maxLife * 1 / 3 && enemy.params.enrageLevel === 1) {
             enemy.params.enrageLevel = 2;
-            enemy.params.enrageTime = 8500;
+            enemy.params.enrageTime = 4500;
             // Burn damaged is reduced by 80% when entering rage phase.
             enemy.burnDamage *= 0.2;
         }

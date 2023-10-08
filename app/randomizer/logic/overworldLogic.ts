@@ -267,9 +267,11 @@ export const overworldNodes: LogicNode[] = [
         ],
         entranceIds: [
             'warTempleEntranceSpirit',
+            'warPalaceWestDoor'
         ],
         exits: [
             { objectId: 'warTempleEntranceSpirit' },
+            { objectId: 'warPalaceWestDoor' },
         ],
     },
     {

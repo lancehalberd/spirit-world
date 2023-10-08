@@ -32,6 +32,7 @@ import { initializeAreaLayerTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
 import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
+import SRandom from 'app/utils/SRandom';
 import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 export * from 'app/development/packSprites';
 
@@ -188,7 +189,7 @@ document.addEventListener('mouseup', (event) => {
         const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
         editingState.dragOffset = null;
         const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};
-        chunkGenerators[editingState.tileChunkKey](state.areaInstance.definition, r, state.alternateAreaInstance.definition);
+        chunkGenerators[editingState.tileChunkKey](SRandom.seed(Math.random()), state.areaInstance.definition, r, state.alternateAreaInstance.definition);
         refreshArea(state);
         editingState.hasChanges = true;
         return;
@@ -528,7 +529,7 @@ export function selectAll() {
         return;
     }
     if (editingState.tool === 'tileChunk') {
-        chunkGenerators[editingState.tileChunkKey](state.areaInstance.definition, state.areaSection, state.alternateAreaInstance.definition);
+        chunkGenerators[editingState.tileChunkKey](SRandom.seed(Math.random()), state.areaInstance.definition, state.areaSection, state.alternateAreaInstance.definition);
         refreshArea(state);
         editingState.hasChanges = true;
     }
