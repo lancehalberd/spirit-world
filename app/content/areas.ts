@@ -394,17 +394,17 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     if (definition.parentDefinition?.layers) {
         for (const layer of instance.layers) {
             const definitionIndex = definition.layers.indexOf(layer.definition);
-            const parentLayerDefinition = definition.parentDefinition.layers[definitionIndex];
+            const parentLayerDefinition = definition.parentDefinition.layers.find(l => l.key === layer.key);
             if (!parentLayerDefinition) {
                 console.warn('Missing parent layer definition for layer', layer);
                 console.warn('Copying child layer to parent');
-                definition.parentDefinition.layers[definitionIndex] = initializeAreaLayerTiles({
+                definition.parentDefinition.layers.splice(definitionIndex, 0, initializeAreaLayerTiles({
                     ...layer.definition,
                     grid: {
                         ...layer.definition.grid,
                         tiles: [],
                     },
-                });
+                }));
                 //debugger;
                 continue;
             }

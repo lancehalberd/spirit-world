@@ -39,14 +39,14 @@ Graphics:
 
 
 Current tasks:
-    - Fix getting stuck between barriers in front of sky palace
-    - Fix getting knocked into the sky when sommersaulting on to lightning barriers
-    - If a closed door is linked to an open door and the area is refreshed (say from opening a chest), the closed door will open.
     - Fix storm beast cloud does not knock you away.
     - Fix erros when using invisibility cloak on top of the heart.
 
     - Add a procedural cave to the material overworld with 1-3 checks
         - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
+
+    - Music stopping and door open sound playing a lot during balloon megapede boss
+        - Make sure there aren't gaps where no enemies are present for music/enemiesDefeated logic
 
     - Add additional blockedPath styles.
         - Maybe cracked pots requiring clone tool
@@ -96,7 +96,7 @@ Current tasks:
     - Elemental immunities are confusing, they just pass through enemies.
         - For arrows specifically, maybe they can still deal normal damage.
     - Fire/Ice arrows bounce of void hands when they are up in the air.
-    - Should we prevent throwing rocks over ledges?
+    - Should we prevent throwing rocks up ledges?
     - summoner ruins ledge walls let you fire arrows up them because they aren't actually ledges
         - Add ledges to these in addition to the solidMap that they have.
 

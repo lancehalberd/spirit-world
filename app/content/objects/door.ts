@@ -176,16 +176,18 @@ export class Door implements ObjectInstance {
             if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
                 this.changeStatus(state, 'blownOpen');
             } else {
+                if (this.definition.status === 'closedSwitch') {
+                    debugger;
+                }
                 this.changeStatus(state, 'normal');
             }
+        } else if (this.definition.status === 'closedEnemy') {
+            // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
+            // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
+            // door where the enemies are already defeated (or there are not yet enemies).
+            this.changeStatus(state, 'normal');
         } else {
             this.changeStatus(state, this.definition.status);
-        }
-        // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
-        // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
-        // door where the enemies are already defeated (or there are not yet enemies).
-        if (this.definition.status === 'closedEnemy') {
-            this.changeStatus(state, 'normal');
         }
         this.refreshHotStatus = true;
     }
@@ -269,6 +271,10 @@ export class Door implements ObjectInstance {
         if (forceOpen) {
             status = (status === 'cracked') ? 'blownOpen' : 'normal';
             isOpen = true;
+        }
+        // Do nothing if the status is already set this way.
+        if (this.status === status) {
+            return;
         }
         this.status = status;
         if (this.linkedObject && this.linkedObject.status !== status) {

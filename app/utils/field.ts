@@ -440,7 +440,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     } else {
                         const dx = hit.hitRay.x2 - hit.hitRay.x1, dy = hit.hitRay.y2 - hit.hitRay.y1;
                         const distance = Math.sqrt(dx * dx + dy * dy);
-                        knockback = {vx: 4 * dx / distance, vy: 4 * dy / distance, vz: 2};
+                        knockback = {vx: 4 * dy / distance, vy: -4 * dx / distance, vz: 2};
                     }
                 }
                 applyHitToObject(state, object, {...hit, direction: getDirection(dx, dy), knockback}, combinedResult);

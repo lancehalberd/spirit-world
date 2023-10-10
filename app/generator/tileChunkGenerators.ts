@@ -183,6 +183,10 @@ interface RoomGenerationRules {
 // This means that if area is the base world, then the override clear tile will be applied to the alternate area.
 // If area is the child world, then the default tiles will be explicitly added to the child world and then replace with empty tiles in the base world.
 export function clearTileInOneWorld(area: AreaDefinition, alternateArea: AreaDefinition, layerKey: string, tx: number, ty: number) {
+    // Do nothing if this layer does not exist in either area.
+    if (!area.layers.find(l => l.key === layerKey) && !alternateArea.layers.find(l => l.key === layerKey)) {
+        return;
+    }
     const baseArea = area.parentDefinition || area;
     if (area === baseArea) {
         // To clear tiles from the baseArea but keep them in the child area, they must be explicitly set in the child area first and then cleared
