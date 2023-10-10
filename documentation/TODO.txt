@@ -40,13 +40,10 @@ Graphics:
 
 Current tasks:
     - Fix storm beast cloud does not knock you away.
-    - Fix erros when using invisibility cloak on top of the heart.
+    - Fix errors when using invisibility cloak on top of the heart.
 
     - Add a procedural cave to the material overworld with 1-3 checks
         - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
-
-    - Music stopping and door open sound playing a lot during balloon megapede boss
-        - Make sure there aren't gaps where no enemies are present for music/enemiesDefeated logic
 
     - Add additional blockedPath styles.
         - Maybe cracked pots requiring clone tool
@@ -74,7 +71,6 @@ Current tasks:
     - Allow copying and pasting variants
     - Allow resizing variants by clicking and dragging near the edges.
         - Should probably change the arrow cursor for this.
-
 
     - Bad looking tiles when turning off middle beads stream in waterfall tower.
         - The bead cover covers up the beads on the ground. In some sense it should be rendered on a particular tile layer.
@@ -118,6 +114,7 @@ Current tasks:
 
 
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
+        - Same for long lasting lightning attacks
 
     - Add Bell graphics when provided by Jon.
 
@@ -158,7 +155,6 @@ Current tasks:
         - jade city
         - spirit forest
         - gauntlet
-
         - war palace
         - lab
         - spirit sky
@@ -181,8 +177,6 @@ Current tasks:
         - Replace door with open arch guarded by a warrior monk
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
         - Make sure rolling doesn't let you pass
-
-    - Bug: Back of hype cave is in logic when you don't have enough magic to reach it.
 
     - Add a task for a generic enemy transformation animation I can use for upgrading enemies to elemental versions.
         - Having them instantly change looks buggy in some cases, and for the flies it is hard to tell when it even happened.

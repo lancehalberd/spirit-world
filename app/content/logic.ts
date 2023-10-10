@@ -158,6 +158,11 @@ export const hasCharge: OrLogicCheck = orLogic(hasFire, hasIce, hasLightning);
 
 export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
 export const hasSomersault: LogicCheck = {requiredFlags: ['$roll:2']};
+export const hasLongSomersault: LogicCheck = andLogic(
+    hasSomersault,
+    // All of these increase mana enough to teleport a third time, but cat eyes does not.
+    orLogic(hasSpiritBarrier, hasPhoenixCrown, {requiredFlags: ['$fire']}, {requiredFlags: ['$ice']}, {requiredFlags: ['$lightning']},)
+);
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
 export const hasTowerStaff: LogicCheck = {requiredFlags: ['$staff:2']};
 export const canHasTowerStaff: LogicCheck = {requiredFlags: ['stormBeast']};

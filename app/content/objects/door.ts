@@ -276,6 +276,10 @@ export class Door implements ObjectInstance {
         if (this.status === status) {
             return;
         }
+        // If a "closedEnemy" door has been saved as open, it shouldn't enter the "closedEnemy" status again.
+        if (status === 'closedEnemy' && getObjectStatus(state, this.definition)) {
+            return;
+        }
         this.status = status;
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);

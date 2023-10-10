@@ -2,12 +2,12 @@ import {
     andLogic,
     hasBossWeapon,
     hasBow,
-    hasCloudBoots, hasIce, hasSomersault,
+    hasCloudBoots, hasIce, hasLongSomersault,
     canAvoidBossAttacks,
     orLogic,
 } from 'app/content/logic';
 
-const canPassLongCrumbleFloors = orLogic(hasCloudBoots, hasIce, hasSomersault);
+const canPassLongCrumbleFloors = orLogic(hasCloudBoots, hasIce, hasLongSomersault);
 
 // This logic does not appropriately support traversing the tower in reverse.
 const zoneId = 'forestTemple';
