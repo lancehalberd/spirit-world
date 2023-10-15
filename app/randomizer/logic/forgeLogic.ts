@@ -92,9 +92,9 @@ export const forgeNodes: LogicNode[] = [
         nodeId: 'forgeBoss',
         checks: [{objectId: 'forgeBoss', logic: canDefeatBalloonMegapede}],
         paths: [{nodeId: 'forgeForge', logic: canDefeatBalloonMegapede}],
-        entranceIds: ['forgeStairs3'],
+        entranceIds: ['forgeBossEntrance'],
         exits: [
-            {objectId: 'forgeStairs3'}
+            {objectId: 'forgeBossEntrance'}
         ],
     },
     {
