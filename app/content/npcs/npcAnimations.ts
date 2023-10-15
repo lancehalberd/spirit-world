@@ -9,3 +9,9 @@ export const lightningBeastAnimations: ActorAnimations = {
     idle: omniAnimation(lightningBeastSleepingAnimation),
 };
 
+
+const crystalDragonGeometry: FrameDimensions = { w: 80, h: 80, content: { x: 12, y: 50, w: 57, h: 28} };
+const crystalDragonIdleAnimation: FrameAnimation = createAnimation('gfx/npcs/crystalDragonFinal.png', crystalDragonGeometry, { cols: 2, duration: 33});
+export const crystalDragonAnimations: ActorAnimations = {
+    idle: omniAnimation(crystalDragonIdleAnimation),
+};

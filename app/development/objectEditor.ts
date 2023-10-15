@@ -1416,16 +1416,10 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
         object.y = Math.round(object.y / 16) * 16;
         return
     }
-    // Default behavior is to snap to half grid.
-    if (object.type === 'enemy' || object.type === 'boss') {
+    // Default behavior is to snap to quarter grid.
+    if (object.type !== 'loot') {
         object.x = Math.round(object.x / 4) * 4;
         object.y = Math.round(object.y / 4) * 4;
-        return;
-    }
-    // Default behavior is to snap to half grid.
-    if (object.type !== 'loot') {
-        object.x = Math.round(object.x / 8) * 8;
-        object.y = Math.round(object.y / 8) * 8;
     }
 
 }

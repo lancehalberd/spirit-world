@@ -18,7 +18,7 @@ import {
     vanaraGrayAnimations, vanaraPurpleAnimations,
     vanaraRedAnimations, zoroAnimations,
 } from 'app/render/npcAnimations';
-import { lightningBeastAnimations } from 'app/content/npcs/npcAnimations'
+import { crystalDragonAnimations, lightningBeastAnimations } from 'app/content/npcs/npcAnimations'
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
@@ -40,6 +40,7 @@ interface NPCStyleDefinition {
     animations: ActorAnimations
     scale?: number
     shadowOffset?: number
+    noShadow?: true
     flipRight?: boolean
     z?: number
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState, npc: NPC) => void
@@ -67,6 +68,10 @@ export const npcStyles = {
         scale: 3,
         shadowOffset: 2,
         flipRight: true,
+    } as NPCStyleDefinition,
+    crystalDragon: {
+        animations: crystalDragonAnimations,
+        noShadow: true,
     } as NPCStyleDefinition,
     bigSpirit: {
         animations: sentryBotAnimations,
@@ -406,6 +411,11 @@ export class NPC implements Actor, ObjectInstance  {
             });
         }
         //drawFrameAt(context, frame, this);
+    }
+    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        const animationStyle = npcStyles[this.definition.style];
+        const frame = this.getFrame();
+        const scale = animationStyle.scale || 1;
         // Dialogue indicators should not be drawn while script events are running since they are
         // distracting during cut scenes, and you cannot usually interract with NPCs while events are running.
         if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length) {
@@ -433,6 +443,9 @@ export class NPC implements Actor, ObjectInstance  {
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
+        if (animationStyle.noShadow) {
+            return;
+        }
         const npcScale = animationStyle.scale || 1;
         const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
         const hitbox = this.getHitbox();

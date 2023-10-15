@@ -372,7 +372,8 @@ interface HitResult {
 }
 
 interface BaseObjectDefinition {
-    id: string
+    // Defaults to ''
+    id?: string
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean
     // If true, use the inverse of the given logic check.
@@ -393,7 +394,8 @@ interface BaseObjectDefinition {
     spirit?: boolean
     // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
     style?: string
-    status: ObjectStatus
+    // Defaults to 'normal'
+    status?: ObjectStatus
     isFrozen?: boolean
     // Invisible objects are only rendered if the hero has true sight.
     isInvisible?: boolean
