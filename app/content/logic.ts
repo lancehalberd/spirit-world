@@ -139,8 +139,6 @@ export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak'] };
 export const hasInvisibility: LogicCheck = { requiredFlags: ['$cloak:2'] };
 export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
 export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
-export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
-export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing']};
@@ -217,6 +215,11 @@ export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrie
 
 export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEscaped']};
 export const beastsDefeated: LogicCheck = {requiredFlags: ['flameBeast', 'frostBeast', 'stormBeast']};
+
+// These logic checks should only be used during generation and are not supported during game play.
+// object+chest ids that require keys/big keys automatically apply key logic already.
+export const hasSmallKey: LogicCheck = {requiredFlags: ['$smallKey']};
+export const hasBigKey: LogicCheck = {requiredFlags: ['$bigKey']};
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

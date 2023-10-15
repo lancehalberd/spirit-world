@@ -69,7 +69,8 @@ class SRandom {
         }
         if (collection.constructor == Array) {
             const array = collection as Array<any>;
-            return array[Math.floor(this.random() * array.length)];
+            const roll = this.random();
+            return array[Math.floor(roll * array.length)];
         }
         console.log("Warning @ Random.element: "+ collection + " is neither Array or Object");
         return null;

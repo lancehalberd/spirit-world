@@ -11,6 +11,9 @@ export * from 'app/randomizer/main';
 import { addContextMenuListeners } from 'app/development/contextMenu';
 import { editingState } from 'app/development/editingState';
 import { refreshEditor } from 'app/development/editor';
+
+export * from 'app/generator/treeGraphs';
+
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { update } from 'app/update';
 import { render } from 'app/render';

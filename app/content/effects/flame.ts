@@ -46,7 +46,9 @@ interface Props {
 }
 
 export class Flame implements EffectInstance, Props {
-    drawPriority: DrawPriority = 'sprites';
+    getDrawPriority(state: GameState) {
+        return this.z < 24 ? 'sprites' : 'foreground';
+    }
     behaviors: TileBehaviors = {
         brightness: 0.5,
         lightRadius: 24,
@@ -138,7 +140,7 @@ export class Flame implements EffectInstance, Props {
 
         // Experimental code to make falling flames "fall down" southern cliffs they pass over.
         // Falls a max of 80px a frame.
-        if (this.z >= 4) {
+        if (this.z >= 4 && this.vy > 0) {
             const hitbox = this.getHitbox();
             const x = hitbox.x + hitbox.w / 2;
             let y = hitbox.y + hitbox.h / 2;

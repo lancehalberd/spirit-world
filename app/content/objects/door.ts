@@ -177,7 +177,7 @@ export class Door implements ObjectInstance {
                 this.changeStatus(state, 'blownOpen');
             } else {
                 if (this.definition.status === 'closedSwitch') {
-                    debugger;
+                    // debugger;
                 }
                 this.changeStatus(state, 'normal');
             }

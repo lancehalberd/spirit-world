@@ -63,25 +63,26 @@ export function getOrAddLayer(
     return addMissingLayer(layerKey, definition, alternateDefinition);
 }
 
-export function inheritAllLayerTilesFromParent(area: AreaDefinition) {
+export function inheritAllLayerTilesFromParent(area: AreaDefinition, r?: Rect) {
     const parentLayers = area.parentDefinition?.layers;
     for (const layer of (parentLayers || [])) {
-        inheritLayerTilesFromParent(layer.key, area);
+        inheritLayerTilesFromParent(layer.key, area, r);
     }
 }
 
-export function inheritLayerTilesFromParent(layerKey: string, area: AreaDefinition) {
+export function inheritLayerTilesFromParent(layerKey: string, area: AreaDefinition, r?: Rect) {
     const parentLayer = area.parentDefinition?.layers?.find(l => l.key === layerKey);
     if (!parentLayer) {
         return;
     }
     const childLayer = getOrAddLayer(layerKey, area);
     const childTiles = childLayer.grid.tiles;
-    for (let y = 0; y < childLayer.grid.h; y++) {
+    r = r || {x: 0, y: 0, w: childLayer.grid.w, h: childLayer.grid.h};
+    for (let y = r.y; y < r.y + r.h; y++) {
         childTiles[y] = childTiles[y] || [];
         // We need to do this so that each row has the correct number of elements, as in some places
         // we use row.length for iterating through tiles or checking the bounds of the grid.
-        for (let x = 0; x < childLayer.grid.w; x++) {
+        for (let x = r.x; x < r.x + r.w; x++) {
             childTiles[y][x] = mapTileIndex(parentLayer.grid.tiles[y]?.[x]) || 0;
         }
     }
