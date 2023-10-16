@@ -24,10 +24,6 @@ export class Narration implements ObjectInstance {
         this.trigger = definition.trigger || 'touch';
         this.x = definition.x;
         this.y = definition.y;
-        if (isRandomizer || getObjectStatus(state, this.definition)) {
-            this.status = 'gone';
-            saveObjectStatus(state, this.definition);
-        }
         this.time = 0;
     }
     isActive(state: GameState) {
@@ -47,6 +43,9 @@ export class Narration implements ObjectInstance {
         return { x: this.x, y: this.y, w: this.definition.w, h: this.definition.h };
     }
     runScript(state: GameState): void {
+        if (isRandomizer) {
+            return;
+        }
         setScript(state, this.definition.message);
         saveObjectStatus(state, this.definition);
         this.status = 'gone';
@@ -62,6 +61,12 @@ export class Narration implements ObjectInstance {
         // If the flag gets set for some reason, set this object to gone so it won't trigger.
         if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
+            return;
+        }
+        if (isRandomizer) {
+            this.status = 'gone';
+            saveObjectStatus(state, this.definition);
+            return;
         }
         // Narration competes with other scripts, so don't run it until other scripts are completed.
         // Revive this code if it seems necessary

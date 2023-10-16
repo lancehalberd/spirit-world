@@ -697,7 +697,7 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
         }
         // TODO: Optionally add a barrier here based on the requirements and include its logic on this path connection.
         node.paths.push({
-            nodeId: `${zoneId}-${path.targetId}`,
+            nodeId: `${zoneId}-${roomId}-${path.targetId}`,
         });
     }
 
