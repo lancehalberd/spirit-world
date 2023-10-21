@@ -206,21 +206,6 @@ export function clearTileInOneWorld(area: AreaDefinition, alternateArea: AreaDef
     }
 }
 
-interface RoomSlot extends Rect {
-    d: Direction
-    id: string
-}
-interface RoomPath extends Rect {
-    d: Direction
-    sourceId: string
-    targetId: string
-}
-
-interface RoomSkeleton {
-    slots: RoomSlot[]
-    paths: RoomPath[]
-}
-
 export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, alternateArea: AreaDefinition, section: Rect, rules: RoomGenerationRules): RoomSkeleton {
     const slots: RoomSlot[] = [];
     const paths: RoomPath[] = [];
@@ -274,7 +259,7 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
             paths.push({
                 targetId,
                 sourceId,
-                x: innerRect.x + innerRect.w - 3,
+                x: innerRect.x + innerRect.w - 2,
                 y,
                 w: 2,
                 h,

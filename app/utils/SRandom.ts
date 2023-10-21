@@ -49,6 +49,11 @@ class SRandom {
         return this._seed;
     }
 
+    mutate(): SRandom {
+        this._seed = nextSeed(this._seed);
+        return this;
+    }
+
     /**
      * @param {number} min  The smallest returned value
      * @param {number} max  The largest returned value

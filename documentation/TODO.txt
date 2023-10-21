@@ -41,9 +41,12 @@ Graphics:
 Current tasks:
     - Fix storm beast cloud does not knock you away.
     - Fix errors when using invisibility cloak on top of the heart.
+    - Can knock pots backwards by hitting them with pots overhead while facing down.
 
     - Add a procedural cave to the material overworld with 1-3 checks
         - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
+
+    - Add Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
 
     - Add additional blockedPath styles.
         - Maybe cracked pots requiring clone tool

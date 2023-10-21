@@ -1,3 +1,4 @@
+import { zones } from 'app/content/zones/zoneHash';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -383,6 +384,7 @@ export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation):
 }
 
 export function fixSpawnLocationOnLoad(state: GameState): void {
+    const { zoneKey, floor} = state.hero.savedData.spawnLocation
     // Rather than fix individual spawn locations like this, we should force the loaded spawn location to
     // be in an enumeration of defined spawn locations, and just have logic to choose the best one.
     if (state.hero.savedData.spawnLocation.zoneKey === 'newPeachCave') {
@@ -400,6 +402,15 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
     if (state.hero.savedData.spawnLocation.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff >= 2) {
         // Do not spawn inside the tower if the tower is not currently placed anywhere.
         state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
+    }
+    const zone = zones[zoneKey];
+    if (!zone) {
+        // Just spawn at the exit to the peach cave if the zone doesn't exist.
+        state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
+    }
+    if (!zone.floors[floor]) {
+        state.hero.savedData.spawnLocation.floor = 0;
+        state.hero.savedData.spawnLocation.areaGridCoords = {x: 0, y: 0};
     }
 }
 
