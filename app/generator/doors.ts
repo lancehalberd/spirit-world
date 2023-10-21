@@ -1,10 +1,155 @@
+import { clearTileInOneWorld } from 'app/generator/tiles';
 
 
+type DoorType = 'door'|'upstairs'|'downstairs'|'ladder';
+
+interface DoorContext extends SlotContext {
+    doorType: DoorType
+}
 
 export type DoorData = {
     definition: EntranceDefinition
     w: number
     h: number
+}
+
+
+// TODO: support placing linked doors simultaneously.
+
+// This returns w/h for the entrance so we don't have to recompute it from the resulting definition.
+export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: Direction, style: GenerationStyle, type: DoorType} ): {definition: EntranceDefinition, w: number, h: number} {
+    let w = 32, h = 32;
+    let computedStyle: string = 'stone';
+    switch(style) {
+        case 'stone':
+            computedStyle = 'stone';
+            break;
+        case 'cave':
+            computedStyle = 'cavern';
+            break;
+        case 'tree':
+        case 'wooden':
+            computedStyle = 'wooden';
+            break;
+        case 'crystalCave':
+        case 'crystalPalace':
+            computedStyle = 'crystal';
+            break;
+    }
+    if (type === 'upstairs') {
+        d = 'up';
+        computedStyle = `${computedStyle}Upstairs`;
+    } else if (type === 'downstairs') {
+        d = 'up';
+        computedStyle = `${computedStyle}Downstairs`;
+    }
+    if (type === 'ladder') {
+        if (d === 'up') {
+            computedStyle ='ladderUp';
+            w = 16;
+            h = 32;
+        } else {
+            d = 'down';
+            computedStyle = 'ladderdown';
+            w = 16;
+            h = 16;
+        }
+    } else if (d === 'left' || d === 'right') {
+        w = 16;
+        h = 64;
+    } else if (d === 'down') {
+        w = 64;
+        h = 16;
+    }
+    const definition: EntranceDefinition = {
+        type: 'door',
+        id,
+        d,
+        status: 'normal',
+        style: computedStyle,
+        x: 0,
+        y: 0,
+    };
+    return {definition, w, h};
+}
+
+
+export function addDoor(context: DoorContext): EntranceDefinition {
+    const {random, zoneId, roomId, slot, area, alternateArea, doorType} = context;
+    // TODO: support other styles
+    let d = slot.d, style = 'stone';
+    if (doorType === 'upstairs') {
+        d = 'up';
+        // TODO: support other styles
+        style = 'stoneUpstairs';
+    }
+    if (doorType === 'downstairs') {
+        d = 'up';
+        // TODO: support other styles
+        style = 'stoneDownstairs';
+    }
+    if (doorType === 'ladder') {
+        if (d === 'up') {
+            style ='ladderUp';
+        } else {
+            d = 'down';
+            style = 'ladderdown';
+        }
+    }
+    const definition: EntranceDefinition = {
+        type: 'door',
+        id: `${zoneId}-${roomId}-${slot.id}`,
+        d,
+        status: 'normal',
+        style,
+        x: 0,
+        y: 0,
+    }
+    random.generateAndMutate();
+    if (doorType === 'door' && d === 'down') {
+        const tx = random.range(slot.x, slot.x + slot.w - 4);
+        const ty = slot.y + slot.h - 1;
+        definition.x = tx * 16;
+        definition.y = ty * 16;
+        // Clear the foreground tiles from around the door.
+        for (let y = 0; y < 2; y++) {
+            for (let x = 0; x < 4; x++) {
+                clearTileInOneWorld(area, alternateArea, 'foreground', tx + x, ty - 1 + y);
+                clearTileInOneWorld(area, alternateArea, 'foreground2', tx + x, ty - 1 + y);
+            }
+        }
+    } else if (d === 'up') {
+        const tx = random.range(slot.x, slot.x + slot.w - 2);
+        const ty = slot.y;
+        definition.x = tx * 16;
+        definition.y = ty * 16;
+    } else if (d === 'left') {
+        const tx = slot.x;
+        const ty = random.range(slot.y, slot.y + slot.h - 4);
+        definition.x = tx * 16;
+        definition.y = ty * 16;
+        // Clear the foreground tiles from around the door.
+        for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 2; x++) {
+                clearTileInOneWorld(area, alternateArea, 'foreground', tx + x, ty + y);
+                clearTileInOneWorld(area, alternateArea, 'foreground2', tx + x, ty + y);
+            }
+        }
+    } else if (d === 'right') {
+        const tx = slot.x + slot.w - 1;
+        const ty = random.range(slot.y, slot.y + slot.h - 4);
+        definition.x = tx * 16;
+        definition.y = ty * 16;
+        // Clear the foreground tiles from around the door.
+        for (let y = 0; y < 4; y++) {
+            for (let x = 0; x < 2; x++) {
+                clearTileInOneWorld(area, alternateArea, 'foreground', tx - 1 + x, ty + y);
+                clearTileInOneWorld(area, alternateArea, 'foreground2', tx - 1 + x, ty + y);
+            }
+        }
+    }
+    area.objects.push(definition);
+    return definition;
 }
 
 function chooseStairDoorSlot(random: SRandom, parent: TreeNode, child: TreeNode): number {
@@ -101,6 +246,42 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
         baseDoorData.definition.x = (baseAreaSection.x + baseAreaSection.w - 1) * 16;
         if (childDoorData) {
             childDoorData.definition.x = childAreaSection.x * 16 + 16;
+        }
+    }
+}
+
+export function addDoorAndClearForegroundTiles(definition: EntranceDefinition, area: AreaDefinition, alternateArea: AreaDefinition) {
+    area.objects.push(definition);
+
+    if (definition.style !== 'ladderDown' && definition.d === 'down') {
+        const left = Math.ceil(definition.x / 16), right = Math.floor((definition.x + 64) / 16);
+        const top = ((definition.y / 16) | 0) - 1, bottom = top + 2;
+        // Clear the foreground tiles from around the door.
+        for (let y = top; y < bottom; y++) {
+            for (let x = left; x < right; x++) {
+                clearTileInOneWorld(area, alternateArea, 'foreground', x, y);
+                clearTileInOneWorld(area, alternateArea, 'foreground2', x, y);
+            }
+        }
+    } else if (definition.d === 'left') {
+        const left = ((definition.x / 16) | 0), right = left + 2;
+        const top = Math.ceil(definition.y / 16), bottom = Math.floor((definition.y + 64) / 16);
+        // Clear the foreground tiles from around the door.
+        for (let y = top; y < bottom; y++) {
+            for (let x = left; x < right; x++) {
+                clearTileInOneWorld(area, alternateArea, 'foreground', x, y);
+                clearTileInOneWorld(area, alternateArea, 'foreground2', x, y);
+            }
+        }
+    } else if (definition.d === 'right') {
+        const left = ((definition.x / 16) | 0) - 1, right = left + 2;
+        const top = Math.ceil(definition.y / 16), bottom = Math.floor((definition.y + 64) / 16);
+        // Clear the foreground tiles from around the door.
+        for (let y = top; y < bottom; y++) {
+            for (let x = left; x < right; x++) {
+                clearTileInOneWorld(area, alternateArea, 'foreground', x, y);
+                clearTileInOneWorld(area, alternateArea, 'foreground2', x, y);
+            }
         }
     }
 }

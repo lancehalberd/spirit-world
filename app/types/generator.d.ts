@@ -2,6 +2,68 @@
 type GenerationStyle = 'cave'|'tree'|'stone'|'wooden'|'crystalCave'|'crystalPalace';
 
 
+type RequiredItemSet = (PassiveTool | ActiveTool)[];
+
+interface EntranceGenerationRules {
+    id: string
+    targetZone: string
+    targetObjectId: string
+    direction: Direction
+    style?: GenerationStyle
+    type: 'door'|'upstairs'|'downstairs'|'ladder'
+}
+interface LootGenerationRules {
+    id: string
+    lootType: LootType
+    lootAmount?: number
+    lootLevel?: number
+    requiredItemSets: RequiredItemSet[]
+}
+
+interface RoomGenerationRules {
+    entrances: EntranceGenerationRules[]
+    checks?: LootGenerationRules[]
+    enemyTypes?: EnemyType[]
+    bossTypes?: BossType[]
+    style: GenerationStyle
+}
+
+interface GlobalGeneratorContext {
+    random: SRandom
+    slotGenerators?: SlotGenerator[]
+}
+
+interface ZoneGeneratorContext extends GlobalGeneratorContext {
+    zoneId: string
+}
+
+interface RoomGeneratorContext extends ZoneGeneratorContext {
+    roomId: string
+    // The primary area content is being generated for.
+    area: AreaDefinition
+    // The alternate area for the area content is being generated for.
+    alternateArea: AreaDefinition
+    // The material world area.
+    baseArea: AreaDefinition
+    section: AreaSection
+    // The spirit world area.
+    childArea: AreaDefinition
+    rules: RoomGenerationRules
+}
+
+interface SlotContext extends RoomGeneratorContext {
+    slot: RoomSlot
+}
+
+interface SlotGenerator {
+    isValid?: (context: SlotContext) => boolean
+    apply?: (context: SlotContext) => void
+}
+
+
+
+
+
 interface RoomSlot extends Rect {
     d: Direction
     id: string
@@ -19,6 +81,7 @@ interface RoomSkeleton {
 
 interface TreeNode {
     type?: 'boss'|'bigChest'|'goal'|'trap'|'treasure'
+    style?: GenerationStyle
     lootType?: LootType
     lootLevel?: number
     lootAmount?: number

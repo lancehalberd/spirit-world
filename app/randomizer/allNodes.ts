@@ -17,7 +17,7 @@ import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
 import { labNodes } from 'app/randomizer/logic/labLogic';
 import { treeNodes, voidNodes } from 'app/randomizer/logic/treeLogic';
-import { warPalaceWestRoomNodes } from 'app/generator/tileChunkGenerators';
+import { warPalaceWestRoomNodes } from 'app/generator/content/warPalaceWestRoom';
 
 export const allNodes = [
     ...overworldNodes,

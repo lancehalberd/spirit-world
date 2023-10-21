@@ -3,13 +3,9 @@ import { zones } from 'app/content/zones/zoneHash';
 import { variantSeed } from 'app/gameConstants';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 import srandom from 'app/utils/SRandom';
-import {
-    addDoorAndClearForegroundTiles,
-    chunkGenerators,
-    getEntranceDefintion,
-    generateTallRoomSkeleton,
-} from 'app/generator/tileChunkGenerators';
-import { positionDoors } from 'app/generator/doors';
+import { chunkGenerators } from 'app/generator/tileChunkGenerators';
+import { generateTallRoomSkeleton } from 'app/generator/skeletons/basic';
+import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
 import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
 import { pad } from 'app/utils/index';
 
@@ -528,6 +524,7 @@ function createZoneFromTree(props: {
         console.error('Infinte loop in createZoneFromTree');
         debugger;
     }
+    propogateStyle(tree);
     const floorCount = 1 + zMax - zMin;
     for (let floor = 0; floor < floorCount; floor++) {
         const grid: AreaDefinition[][] = [], spiritGrid: AreaDefinition[][] = [];
@@ -628,12 +625,11 @@ function createZoneFromTree(props: {
             }
             node.skeleton = generateTallRoomSkeleton(random, node.baseArea, node.childArea, adjustedSection, {
                 entrances: [],
-                style: 'stone',
+                style: node.style,
             });
         }
     }
 
-    const style = 'stone';
     // Populate contents of nodes, including door connections.
     for (const node of placedNodes) {
         /*
@@ -644,7 +640,7 @@ function createZoneFromTree(props: {
             const entranceDoorData = getEntranceDefintion({
                 id: node.entrance.id,
                 d: node.entrance.d,
-                style,
+                style: node.style,
                 type: node.entrance.type,
             });
             positionDoors(random, entranceDoorData, node);
@@ -668,13 +664,13 @@ function createZoneFromTree(props: {
                 baseDoorData = getEntranceDefintion({
                     id: parentId,
                     d: 'up',
-                    style,
+                    style: node.style,
                     type: node.coords.z < child.coords.z ? 'upstairs' : 'downstairs',
                 });
                 childDoorData = getEntranceDefintion({
                     id: childId,
                     d: 'up',
-                    style,
+                    style: node.style,
                     type: node.coords.z < child.coords.z ? 'downstairs' : 'upstairs',
                 });
                 baseDoorData.definition.targetZone = zoneId;
@@ -685,26 +681,26 @@ function createZoneFromTree(props: {
                 baseDoorData = getEntranceDefintion({
                     id: parentId,
                     d: node.coords.y < child.coords.y ? 'down' : 'up',
-                    style,
+                    style: node.style,
                     type: 'door',
                 });
                 childDoorData = getEntranceDefintion({
                     id: childId,
                     d: node.coords.y < child.coords.y ? 'up' : 'down',
-                    style,
+                    style: node.style,
                     type: 'door',
                 });
             } else {
                 baseDoorData = getEntranceDefintion({
                     id: parentId,
                     d: node.coords.x < child.coords.x ? 'right' : 'left',
-                    style,
+                    style: node.style,
                     type: 'door',
                 });
                 childDoorData = getEntranceDefintion({
                     id: childId,
                     d: node.coords.x < child.coords.x ? 'left' : 'right',
-                    style,
+                    style: node.style,
                     type: 'door',
                 });
             }
@@ -987,6 +983,13 @@ function normalizeTree(random: SRandom, tree: TreeNode) {
     }
 }
 
+function propogateStyle(tree: TreeNode) {
+    for (const child of (tree.nodes || [])) {
+        child.style = child.style || tree.style;
+        propogateStyle(child);
+    }
+}
+
 function mutateTree(random: SRandom, tree: TreeNode) {
     random.generateAndMutate();
     const childCount = (tree.nodes?.length || 0);
@@ -1100,7 +1103,7 @@ const tombTreeNoLocks: TreeNode = {
         targetObjectId: 'tombEntrance',
     },
     nodes: [
-        { lootType: 'map' },
+        { lootType: 'map', style: 'stone' },
         {
             requirements: [[hasWeapon]],
             nodes: [
