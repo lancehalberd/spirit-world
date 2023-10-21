@@ -122,6 +122,7 @@ interface TreeNode {
     childAreaSection?: AreaSection
     // The entrance definition for this node from its parent.
     entranceDefinition?: EntranceDefinition
+    allEntranceDefinitions?: EntranceDefinition[]
     // Unique node id
     id?: string
     skeleton?: RoomSkeleton

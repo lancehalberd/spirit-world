@@ -119,12 +119,3 @@ chunkGenerators.specialStoneFloor = createSpecialStoneFloor;
     bossTypes?: BossType[]
 
 }*/
-
-
-
-
-
-// TODO: support placing linked doors simultaneously.
-
-
-

@@ -4,7 +4,7 @@ import { variantSeed } from 'app/gameConstants';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 import srandom from 'app/utils/SRandom';
 import { chunkGenerators } from 'app/generator/tileChunkGenerators';
-import { generateTallRoomSkeleton } from 'app/generator/skeletons/basic';
+import { generatePitMaze, generateTallRoomSkeleton } from 'app/generator/skeletons/basic';
 import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
 import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
 import { pad } from 'app/utils/index';
@@ -611,6 +611,7 @@ function createZoneFromTree(props: {
         };
         chunkGenerators.stoneRoom(random, node.baseArea, section);
         inheritAllLayerTilesFromParent(node.childArea, node.childAreaSection);
+        node.allEntranceDefinitions = [];
     }
 
     for (const node of placedNodes) {
@@ -647,6 +648,7 @@ function createZoneFromTree(props: {
             addDoorAndClearForegroundTiles(entranceDoorData.definition, node.baseArea, node.childArea);
             entranceDoorData.definition.targetZone = node.entrance.targetZone;
             entranceDoorData.definition.targetObjectId = node.entrance.targetObjectId;
+            node.allEntranceDefinitions.push(entranceDoorData.definition);
         }
 
         const enemyDoors: string[] = [];
@@ -779,6 +781,9 @@ function createZoneFromTree(props: {
             }
             addDoorAndClearForegroundTiles(baseDoorData.definition, node.baseArea, node.childArea);
             addDoorAndClearForegroundTiles(childDoorData.definition, child.baseArea, child.childArea);
+            node.allEntranceDefinitions.push(baseDoorData.definition);
+            child.allEntranceDefinitions.push(childDoorData.definition);
+
             child.entranceDefinition = childDoorData.definition;
         }
         if (enemyDoors.length || node.type === 'trap') {
@@ -809,6 +814,12 @@ function createZoneFromTree(props: {
                 node.lootAmount = 50;
             } else {
                 node.lootAmount = 20;
+            }
+        }
+        if (!node.populateRoom && !node.skeleton) {
+            if (random.mutate().random() < 0.5) {
+                // TODO: populate allEntrances on node as they are added.
+                node.skeleton = generatePitMaze(random, node);
             }
         }
         if (node.populateRoom) {
