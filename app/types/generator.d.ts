@@ -65,7 +65,7 @@ interface SlotGenerator {
 
 
 interface RoomSlot extends Rect {
-    d: Direction
+    d?: Direction
     id: string
 }
 interface RoomPath extends Rect {

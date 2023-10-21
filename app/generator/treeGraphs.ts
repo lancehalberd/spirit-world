@@ -17,6 +17,19 @@ TODO:
 2. Add shortcut cycles from leaf nodes after spatial assignment.
     A. Starting with the deepest leaf, do a BFS of the grid up to depth 3 and stop on encountering a populated node.
     B. For each populated node, record the node, path and the difference in node depth
+
+TODO: Improve performance by creating zones on demand. (This might be more work than it is worth)
+    Make generation within each zone independent of other zones.
+    Only generate data needed for randomization initially
+        Randomizer logic with full definitions needed for randomization
+            lootObject: {id, type, amount, level} instead of just objectId on checks
+            doorObject: {...} instead of objectId for entrances/locked doors
+        Update randomizer to modify these values during entrance/item randomization when they are found
+    Make generation read definitions from generated logic when generated the final zone so that randomizer changes are applied.
+
+    * If this is too much work, an alternative would be to use in demand generation for procedural only so that mode is fast, and
+    then for randomizer just generate everything initially as part of randomization since randomization takes a while anyway.
+
 */
 
 interface ZoneConstraints {
@@ -55,8 +68,6 @@ function valueMatchesConstraints(newMin: number, newMax: number, currentMin: num
     }
     return true;
 }
-
-
 
 function areCoordsOpen(nodeMap, x: number, y: number, z: number, w: number, h: number) {
     for (let dy = 0; dy < h; dy++) {
@@ -817,7 +828,7 @@ function createZoneFromTree(props: {
             }
         }
         if (!node.populateRoom && !node.skeleton) {
-            if (random.mutate().random() < 0.5) {
+            if (random.mutate().random() < 0.8) {
                 // TODO: populate allEntrances on node as they are added.
                 node.skeleton = generatePitMaze(random, node);
             }
@@ -851,13 +862,14 @@ function createZoneFromTree(props: {
                     delete node.lootType;
                     continue;
                 }
-                const outerTile = random.mutate().element([0, 0, 2,2,5]);
+                const outerTile = random.mutate().element([0, 0, 2,2, 4, 5]);
                 const innerTile = random.mutate().element([0, 2,4,5]);
                 const r = random.mutate().range(1, 2);
                 const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                for (let y = slot.y; y < slot.y + slot.h; y++) {
-                    for (let x = slot.x; x < slot.x + slot.w; x++) {
-                        if (y < slot.y + r || y >= slot.y + slot.h - r || x < slot.x + r || x >= slot.x + slot.w - r) {
+                const rect = pad(slot, -1);
+                for (let y = rect.y; y < rect.y + rect.h; y++) {
+                    for (let x = rect.x; x < rect.x + rect.w; x++) {
+                        if (y < rect.y + r || y >= rect.y + rect.h - r || x < rect.x + r || x >= rect.x + rect.w - r) {
                             fieldLayer.grid.tiles[y][x] = outerTile;
                         } else {
                             fieldLayer.grid.tiles[y][x] = innerTile;

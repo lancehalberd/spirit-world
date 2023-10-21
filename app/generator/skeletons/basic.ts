@@ -111,6 +111,14 @@ interface PitMazeNode {
     distance: number
     x: number
     y: number
+    i: number
+}
+interface PitMazeConnection {
+    x: number
+    y: number
+    dx: number
+    dy: number
+    sum?: number
 }
 
 export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
@@ -153,7 +161,7 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
     }
     const livePaths: PitMazeNode[] = [];
     let emptyTiles = w * h;
-
+    const allNodes: PitMazeNode[] = [];
 
     const entrances = node.allEntranceDefinitions.filter(o => o.type === 'door') as EntranceDefinition[];
     for (const entrance of entrances) {
@@ -189,14 +197,18 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
             const node: PitMazeNode = {
                 distance: 0,
                 x, y,
+                i: livePaths.length,
                 directions: ['up', 'down', 'left', 'right'],
             };
+            node.root = node;
             livePaths.push(node);
+            allNodes.push(node);
             emptyTiles--;
-            grid[y][x] = node
-            //console.log(x, y, entrance);
+            grid[y][x] = node;
         }
     }
+
+    const allConnections: PitMazeConnection[] = [];
 
     let changed = false;
     do {
@@ -204,35 +216,111 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
         for (let i = 0; i < livePaths.length; i++) {
             let head = livePaths[i];
             if (head.directions.length) {
+                changed = true;
                 const [dx, dy] = directionMap[random.mutate().removeElement(head.directions)];
                 const x = head.x + dx, y = head.y + dy;
                 if (x >= 0 && x < w && y >= 0 && y < h && !grid[y][x]) {
                     const node: PitMazeNode = {
                         distance: head.distance + 1,
+                        parent: head,
+                        root: head.root,
                         x, y,
+                        i: head.i,
                         directions: ['up', 'down', 'left', 'right'],
                     };
                     emptyTiles--;
                     grid[y][x] = node;
                     livePaths[i] = node;
-                    changed = true;
-                    if (dx) {
-                        const tx = columnXValues[Math.max(head.x, head.x + dx)];
-                        const ty = random.mutate().range(rowYValues[head.y] + 1, rowYValues[head.y + 1] - 1);
-                        floor2Tiles[ty][tx] = 0;
-                    } else {
-                        const tx = random.mutate().range(columnXValues[head.x] + 1, columnXValues[head.x + 1] - 1);
-                        const ty = rowYValues[Math.max(head.y, head.y + dy)];
-                        floor2Tiles[ty][tx] = 0;
-                    }
+                    allNodes.push(node);
+                    allConnections.push({x: head.x, y: head.y, dx, dy});
+
                 }
             } else if (head.parent) {
-                livePaths[i] = head.parent;
                 changed = true;
+                livePaths[i] = head.parent;
             }
         }
     } while (emptyTiles && changed);
-    //console.log({ emptyTiles});
+
+    // If there is more than one path, we need to join them altogether.
+    if (livePaths.length > 1) {
+        const bestConnections: PitMazeConnection[][] = [];
+        for (let i = 0; i < livePaths.length; i++) {
+            bestConnections[i] = [];
+        }
+        for (let y = 0; y < h - 1; y++) {
+            for (let x = 0; x < w - 1; x++) {
+                const node = grid[y][x ];
+                if (!node) {
+                    continue;
+                }
+                for (const [dx, dy] of [[1, 0], [0, 1]]) {
+                    const nextNode = grid[y + dy][x + dx];
+                    if (!nextNode || nextNode.i === node.i) {
+                        continue;
+                    }
+                    const sum = node.distance + nextNode.distance;
+                    if (!bestConnections[node.i][nextNode.i] || bestConnections[node.i][nextNode.i].sum < sum) {
+                        bestConnections[node.i][nextNode.i] = {x, y, dx, dy, sum};
+                        bestConnections[nextNode.i][node.i] = {x, y, dx, dy, sum};
+                    }
+                }
+            }
+        }
+        const groups: Set<number>[] = [];
+        for (let i = 0; i < livePaths.length; i++) {
+            groups[i] = new Set([i]);
+        }
+        const sortedConnections: PitMazeConnection[] = [];
+        for (let i = 1; i < livePaths.length; i++) {
+            for (let j = 0; j < i; j++) {
+                if (bestConnections[i][j]) {
+                    sortedConnections.push(bestConnections[i][j]);
+                }
+            }
+        }
+        sortedConnections.sort((a, b) => b.sum - a.sum);
+        for (const connection of sortedConnections) {
+            const nodeA = grid[connection.y][connection.x];
+            const nodeB = grid[connection.y + connection.dy][connection.x + connection.dx];
+            if (!groups[nodeA.i].has(nodeB.i)) {
+                allConnections.push(connection);
+                const combinedGroup = new Set([...groups[nodeA.i], ...groups[nodeB.i]]);
+                groups[nodeA.i] = combinedGroup;
+                groups[nodeB.i] = combinedGroup;
+            }
+        }
+    }
+
+    for (const connection of allConnections) {
+        const {x, y, dx, dy} = connection;
+        if (dx) {
+            const tx = columnXValues[Math.max(x, x + dx)];
+            const ty = random.mutate().range(rowYValues[y] + 1, rowYValues[y + 1] - 1);
+            floor2Tiles[ty][tx] = 0;
+        } else {
+            const tx = random.mutate().range(columnXValues[x] + 1, columnXValues[x + 1] - 1);
+            const ty = rowYValues[Math.max(y, y + dy)];
+            floor2Tiles[ty][tx] = 0;
+        }
+    }
+
+    allNodes.sort((a, b) => b.distance - a.distance);
+
+    for (let i = 0; i < 4 && i < allNodes.length; i++) {
+        const node = allNodes[i];
+        const left = columnXValues[node.x] + 1;
+        const right = columnXValues[node.x + 1];
+        const top = rowYValues[node.y] + 1;
+        const bottom = rowYValues[node.y + 1];
+        slots.push({
+            id: 's-' + slots.length,
+            x: left,
+            y: top,
+            w: right - left,
+            h: bottom - top,
+        });
+    }
 
     return {slots, paths};
 }

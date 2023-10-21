@@ -186,8 +186,8 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
     if (childNode && childNode.coords.z !== baseNode.coords.z) {
         // Stair cases use specific slots so they won't collide with normal north doors.
         const tx = chooseStairDoorSlot(random, baseNode, childNode);
-        baseDoorData.definition.x = tx * 16 - baseDoorData.w / 2;
-        childDoorData.definition.x = tx * 16 - childDoorData.w / 2;
+        baseDoorData.definition.x = tx * 16 + 8 - baseDoorData.w / 2;
+        childDoorData.definition.x = tx * 16 + 8 - childDoorData.w / 2;
     } else if (baseDoorData.definition.d === 'up' || baseDoorData.definition.d === 'down') {
         // TODO: Handle ladders here
         let left = (baseAreaSection.x + 1) * 16;
@@ -214,10 +214,7 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
             bottom = Math.min(bottom, (childAreaSection.y + childAreaSection.h) * 16);
         }
         random.generateAndMutate();
-        // Keep left/right doors towards the center so that obstacles around doors do not
-        // collide with eachother.
-        const p = childNode?.doorP || random.element([0.5, 0.4, 0.6]);
-        const cy = top + p * (bottom - top);
+        const cy = top + (bottom - top) / 2 - 8;
         baseDoorData.definition.y = cy - baseDoorData.h / 2;
         if (childDoorData) {
             childDoorData.definition.y = cy - childDoorData.h / 2;
