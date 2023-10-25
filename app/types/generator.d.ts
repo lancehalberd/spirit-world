@@ -60,10 +60,6 @@ interface SlotGenerator {
     apply?: (context: SlotContext) => void
 }
 
-
-
-
-
 interface RoomSlot extends Rect {
     d?: Direction
     id: string
@@ -87,6 +83,8 @@ interface TreeNode {
     lootAmount?: number
     nodes?: TreeNode[]
     requirements?: LogicCheck[][]
+    // Distance from the root to this node.
+    depth?: number
     // If set, the room will generate with entrances in this direction.
     // For example if this is ['down'], then the entrance must be on the south side of the room.
     entranceDirections?: Direction[]
@@ -103,6 +101,7 @@ interface TreeNode {
     wide?: boolean
     // Similar to wide, inidicates this room is a full super tile in height.
     tall?: boolean
+    minimumSlotCount?: number
     populateRoom?: (context: {zoneId: string, random: SRandom}, node: TreeNode) => void
     // If this is set, the door leading to this room will be centered p% of the way across the available space.
     doorP?: number

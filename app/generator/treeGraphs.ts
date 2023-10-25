@@ -4,7 +4,7 @@ import { variantSeed } from 'app/gameConstants';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 import srandom from 'app/utils/SRandom';
 import { chunkGenerators } from 'app/generator/tileChunkGenerators';
-import { generatePitMaze, generateTallRoomSkeleton } from 'app/generator/skeletons/basic';
+import { generateEmptyRoom, generatePitMaze, generateVerticalPath } from 'app/generator/skeletons/basic';
 import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
 import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
 import { pad } from 'app/utils/index';
@@ -30,6 +30,10 @@ TODO: Improve performance by creating zones on demand. (This might be more work 
     * If this is too much work, an alternative would be to use in demand generation for procedural only so that mode is fast, and
     then for randomizer just generate everything initially as part of randomization since randomization takes a while anyway.
 
+TODO: Add tags that can be set on nodes/slots/paths that can be used for additional context for example:
+    'high'/'low' to indicate relative z value
+    'far' to indicate a slot is out of the way and may be a good place to place a check or switch
+    'turret' might indicate a good spot to place a ranged stationary enemy.
 */
 
 interface ZoneConstraints {
@@ -339,7 +343,8 @@ function attemptToPlaceChild(
 }
 
 
-const expandRoomChance = 0.3;
+// 32% change to expand in one direction => ~10% chance to expand in both.
+const expandRoomChance = 0.32;
 
 function checkToExpandPlacedNode(
     random: SRandom,
@@ -353,7 +358,6 @@ function checkToExpandPlacedNode(
         if (node.wide !== undefined) {
             return;
         }
-        // 40% chance to try making a room wider
         if (random.generateAndMutate() > expandRoomChance) {
             return;
         }
@@ -376,7 +380,6 @@ function checkToExpandPlacedNode(
         if (node.tall !== undefined) {
             return;
         }
-        // 40% chance to try making a room taller.
         if (random.generateAndMutate() > expandRoomChance) {
             return;
         }
@@ -625,23 +628,6 @@ function createZoneFromTree(props: {
         node.allEntranceDefinitions = [];
     }
 
-    for (const node of placedNodes) {
-        if (node.populateRoom) {
-            continue;
-        }
-        if (node.tall) {
-            const adjustedSection = {
-                ...node.baseAreaSection,
-                x: node.baseAreaSection.x + 1,
-                w: node.baseAreaSection.w - 1,
-            }
-            node.skeleton = generateTallRoomSkeleton(random, node.baseArea, node.childArea, adjustedSection, {
-                entrances: [],
-                style: node.style,
-            });
-        }
-    }
-
     // Populate contents of nodes, including door connections.
     for (const node of placedNodes) {
         /*
@@ -797,25 +783,6 @@ function createZoneFromTree(props: {
 
             child.entranceDefinition = childDoorData.definition;
         }
-        if (enemyDoors.length || node.type === 'trap') {
-            const left = (node.baseAreaSection.x + 1) * 16;
-            const right = (node.baseAreaSection.x + node.baseAreaSection.w) * 16;
-            const top = (node.baseAreaSection.y + 2) * 16;
-            const bottom = (node.baseAreaSection.y + node.baseAreaSection.h) * 16;
-            random.generateAndMutate();
-            const [px, py] = random.element([[0.25, 0.25], [0.25, 0.75], [0.75, 0.25], [0.75, 0.75]]);
-            node.baseArea.objects.push({
-                type: 'enemy',
-                enemyType: node.baseArea.isSpiritWorld
-                    ? random.element(['plantFlame','plantFrost','plantStorm'])
-                    : random.element(['beetleHorned', 'snake', 'plant', 'beetleWinged']) ,
-                id: `${node.id}-enemy`,
-                d: 'down',
-                status: 'normal',
-                x: left + px * (right - left) - 16,
-                y: top + py * (bottom - top) - 8,
-            });
-        }
         if (node.type === 'treasure') {
             node.lootType = 'money'
             const roll = random.generateAndMutate();
@@ -827,23 +794,44 @@ function createZoneFromTree(props: {
                 node.lootAmount = 20;
             }
         }
-        if (!node.populateRoom && !node.skeleton) {
-            if (random.mutate().random() < 0.8) {
-                // TODO: populate allEntrances on node as they are added.
-                node.skeleton = generatePitMaze(random, node);
-            }
-        }
         if (node.populateRoom) {
             node.populateRoom({zoneId, random}, node);
-        } else if (node.skeleton) {
+            continue;
+        }
+        // Determine the minimum number of slots required before generating the room skeleton.
+        node.minimumSlotCount = node.minimumSlotCount || 0;
+        // Must have a slot for the loot check.
+        if (node.lootType) {
+            node.minimumSlotCount++;
+        }
+        const enemyRequired = (enemyDoors.length || node.type === 'trap')
+            // 50% chance a chest will require defeating enemies to spawn it.
+            || (node.lootType && random.mutate().random() < 0.5);
+        // Must have a slot for at least one enemy.
+        if (enemyRequired) {
+            node.minimumSlotCount++;
+        }
+
+        if (!node.skeleton && random.mutate().random() < 1) {
+            node.skeleton = generateVerticalPath(random, node);
+        }
+        if (!node.skeleton && random.mutate().random() < 0.2) {
+            node.skeleton = generatePitMaze(random, node);
+        }
+        if (!node.skeleton) {
+            node.skeleton = generateEmptyRoom(random, node);
+        }
+        const roomDifficulty = node.depth || random.mutate().range(3, 5);
+        let enemyDifficulty = 0;
+        if (node.skeleton) {
             const {slots, paths} = node.skeleton;
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
-                if (i === slots.length - 1 && node.lootType) {
+                if (node.lootType) {
                     const definition: LootObjectDefinition = {
                         type: 'chest',
                         id: `${node.id}-smallKey`,
-                        status: 'normal',
+                        status: (node.type !== 'bigChest' && enemyRequired) ? 'hiddenEnemy' : 'normal',
                         x: (slot.x + slot.w / 2) * 16,
                         y: (slot.y + slot.h / 2) * 16,
                         lootType: node.lootType,
@@ -860,6 +848,24 @@ function createZoneFromTree(props: {
                     }
                     node.baseArea.objects.push(definition);
                     delete node.lootType;
+                    continue;
+                }
+                const mustAddEnemy = enemyRequired && !enemyDifficulty;
+                if (mustAddEnemy || (enemyDifficulty < roomDifficulty && random.mutate().random() < 0.8)) {
+                    // TODO: Use enemies code to add an enemy that matches contextual requirements and difficulty.
+                    random.generateAndMutate();
+                    node.baseArea.objects.push({
+                        type: 'enemy',
+                        enemyType: node.baseArea.isSpiritWorld
+                            ? random.element(['plantFlame','plantFrost','plantStorm'])
+                            : random.element(['beetleHorned', 'snake', 'plant', 'beetleWinged']) ,
+                        id: `${node.id}-enemy`,
+                        d: 'down',
+                        status: 'normal',
+                        x: (slot.x + slot.w / 2) * 16,
+                        y: (slot.y + slot.h / 2) * 16,
+                    });
+                    enemyDifficulty++;
                     continue;
                 }
                 const outerTile = random.mutate().element([0, 0, 2,2, 4, 5]);
@@ -889,7 +895,7 @@ function createZoneFromTree(props: {
                     }
                 }
             }
-        } else {
+        } /*else {
             // This is the standard interior rect for rooms.
             let slot = {
                 x: node.baseAreaSection.x + 2,
@@ -941,14 +947,8 @@ function createZoneFromTree(props: {
                     fieldLayer.grid.tiles[slot.y + 2][x] = fieldLayer.grid.tiles[slot.y + 2][x] || 2;
                     fieldLayer.grid.tiles[slot.y + slot.h - 2 - 1][x] = fieldLayer.grid.tiles[slot.y + slot.h - 2 - 1][x] || 2;
                 }
-            } else if (random.mutate().random() < 0.2) {
-                /*const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                for (let x = slot.x; x < slot.x + slot.w; x++) {
-                    fieldLayer.grid.tiles[slot.y + 2][x] = fieldLayer.grid.tiles[slot.y + 2][x] || 2;
-                    fieldLayer.grid.tiles[slot.y + slot.h - 2 - 1][x] = fieldLayer.grid.tiles[slot.y + slot.h - 2 - 1][x] || 2;
-                }*/
             }
-        }
+        }*/
     }
 
 
