@@ -214,7 +214,7 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
             bottom = Math.min(bottom, (childAreaSection.y + childAreaSection.h) * 16);
         }
         random.generateAndMutate();
-        const cy = top + (bottom - top) / 2 - 8;
+        const cy = top + (bottom - top) / 2;
         baseDoorData.definition.y = cy - baseDoorData.h / 2;
         if (childDoorData) {
             childDoorData.definition.y = cy - childDoorData.h / 2;

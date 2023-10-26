@@ -8,8 +8,8 @@ export function generateEmptyRoom(random: SRandom, node: TreeNode): RoomSkeleton
     const paths: RoomPath[] = [];
     const w = node.wide ? 6 : 4;
     const h = node.tall ? 6 : 4;
-    const xs = node.wide ? [8, 16, 24] : [node.baseAreaSection.x + 5, node.baseAreaSection.x + 11];
-    const ys = node.tall ? [8, 16, 24] : [node.baseAreaSection.y + 5, node.baseAreaSection.y + 11];
+    const xs = node.wide ? [8, 16, 24] : [node.baseAreaSection.x + 6, node.baseAreaSection.x + 11];
+    const ys = node.tall ? [8, 16, 24] : [node.baseAreaSection.y + 7, node.baseAreaSection.y + 11];
     for (const y of ys) {
         for (const x of xs) {
             slots.push({

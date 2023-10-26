@@ -3,7 +3,7 @@ import { zones } from 'app/content/zones/zoneHash';
 import { variantSeed } from 'app/gameConstants';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 import srandom from 'app/utils/SRandom';
-import { chunkGenerators } from 'app/generator/tileChunkGenerators';
+import { chunkGenerators, createSpecialStoneFloor } from 'app/generator/tileChunkGenerators';
 import { generateEmptyRoom, generatePitMaze, generateVerticalPath } from 'app/generator/skeletons/basic';
 import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
 import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
@@ -538,7 +538,7 @@ function createZoneFromTree(props: {
         console.error('Infinte loop in createZoneFromTree');
         debugger;
     }
-    propogateStyle(tree);
+    finalizeTree(tree);
     const floorCount = 1 + zMax - zMin;
     for (let floor = 0; floor < floorCount; floor++) {
         const grid: AreaDefinition[][] = [], spiritGrid: AreaDefinition[][] = [];
@@ -750,7 +750,7 @@ function createZoneFromTree(props: {
                 const yR = isVertical ? 3 : 2;
                 const xR = isVertical ? 2 : 3;
                 const cx = definition.x + baseDoorData.w / 2;
-                const cy = definition.y + baseDoorData.h / 2;
+                let cy = definition.y + baseDoorData.h / 2;
                 const left = Math.floor(cx / 16 - xR), right = Math.floor(cx / 16 + xR);
                 const top = Math.floor(cy / 16 - yR), bottom = Math.floor(cy / 16 + yR);
                 for (let y = top; y <= bottom; y++) {
@@ -812,7 +812,7 @@ function createZoneFromTree(props: {
             node.minimumSlotCount++;
         }
 
-        if (!node.skeleton && random.mutate().random() < 1) {
+        if (!node.skeleton && random.mutate().random() < 0.3) {
             node.skeleton = generateVerticalPath(random, node);
         }
         if (!node.skeleton && random.mutate().random() < 0.2) {
@@ -828,12 +828,20 @@ function createZoneFromTree(props: {
             for (let i = 0; i < slots.length; i++) {
                 const slot = slots[i];
                 if (node.lootType) {
+                    const w = Math.min(slot.w, 4);
+                    const h = Math.min(slot.h, 4);
+                    const x = Math.floor(slot.x + slot.w / 2 - w / 2);
+                    const y = Math.floor(slot.y + slot.h / 2 - h / 2);
+                    // TODO: if this gets complex, moves this to its own function for populating checks in slots.
+                    //   Call this function first with all slots in case it wants to add puzzle elements for the check.
+                    //   Indicate the number of free slots that can be used for the check, or just pass in a subset that is this long.
+                    createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
                     const definition: LootObjectDefinition = {
                         type: 'chest',
                         id: `${node.id}-smallKey`,
                         status: (node.type !== 'bigChest' && enemyRequired) ? 'hiddenEnemy' : 'normal',
-                        x: (slot.x + slot.w / 2) * 16,
-                        y: (slot.y + slot.h / 2) * 16,
+                        x: (x + w / 2) * 16,
+                        y: (y + h / 2) * 16,
                         lootType: node.lootType,
                         lootLevel: node.lootLevel,
                         lootAmount: node.lootAmount,
@@ -862,8 +870,8 @@ function createZoneFromTree(props: {
                         id: `${node.id}-enemy`,
                         d: 'down',
                         status: 'normal',
-                        x: (slot.x + slot.w / 2) * 16,
-                        y: (slot.y + slot.h / 2) * 16,
+                        x: (slot.x + slot.w / 2) * 16 - 16,
+                        y: (slot.y + slot.h / 2) * 16 - 8,
                     });
                     enemyDifficulty++;
                     continue;
@@ -875,6 +883,9 @@ function createZoneFromTree(props: {
                 const rect = pad(slot, -1);
                 for (let y = rect.y; y < rect.y + rect.h; y++) {
                     for (let x = rect.x; x < rect.x + rect.w; x++) {
+                        if (fieldLayer.grid.tiles[y][x]) {
+                            continue;
+                        }
                         if (y < rect.y + r || y >= rect.y + rect.h - r || x < rect.x + r || x >= rect.x + rect.w - r) {
                             fieldLayer.grid.tiles[y][x] = outerTile;
                         } else {
@@ -1006,12 +1017,6 @@ function normalizeTree(random: SRandom, tree: TreeNode) {
     }
 }
 
-function propogateStyle(tree: TreeNode) {
-    for (const child of (tree.nodes || [])) {
-        child.style = child.style || tree.style;
-        propogateStyle(child);
-    }
-}
 
 function mutateTree(random: SRandom, tree: TreeNode) {
     random.generateAndMutate();
@@ -1064,6 +1069,14 @@ function mutateTree(random: SRandom, tree: TreeNode) {
     }
 }
 
+function finalizeTree(tree: TreeNode) {
+    tree.depth = tree.depth || 0;
+    for (const child of (tree.nodes || [])) {
+        child.style = child.style || tree.style;
+        child.depth = tree.depth + 1;
+        finalizeTree(child);
+    }
+}
 
 /*
 const tombTree: TreeNode = {
