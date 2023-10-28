@@ -28,6 +28,14 @@ interface RoomGenerationRules {
     style: GenerationStyle
 }
 
+/*interface DungeonGenerationRules {
+    entranceIds: string[]
+    world: 'spirit'|'material'|'hybrid'
+    size?: number
+    enemyTypes?: EnemyType[]
+    bossTypes?: BossType[]
+}*/
+
 interface GlobalGeneratorContext {
     random: SRandom
     slotGenerators?: SlotGenerator[]

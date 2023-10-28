@@ -1,5 +1,5 @@
 import { applyNineSlice, slices } from 'app/generator/nineSlice';
-import { applyCaveWalls } from 'app/generator/tileChunkGenerators';
+import { applyCaveWalls } from 'app/generator/styles/cave';
 import { directionMap } from 'app/utils/direction';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 
