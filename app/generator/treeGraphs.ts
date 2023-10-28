@@ -4,7 +4,7 @@ import { variantSeed } from 'app/gameConstants';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 import srandom from 'app/utils/SRandom';
 import { chunkGenerators, createSpecialStoneFloor } from 'app/generator/tileChunkGenerators';
-import { generateEmptyRoom, generatePitMaze, generateVerticalPath } from 'app/generator/skeletons/basic';
+import { generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath } from 'app/generator/skeletons/basic';
 import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
 import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
 import { pad } from 'app/utils/index';
@@ -776,8 +776,8 @@ function createZoneFromTree(props: {
                     }
                 }
             }
-            addDoorAndClearForegroundTiles(baseDoorData.definition, node.baseArea, node.childArea);
-            addDoorAndClearForegroundTiles(childDoorData.definition, child.baseArea, child.childArea);
+            //addDoorAndClearForegroundTiles(baseDoorData.definition, node.baseArea, node.childArea);
+            //addDoorAndClearForegroundTiles(childDoorData.definition, child.baseArea, child.childArea);
             node.allEntranceDefinitions.push(baseDoorData.definition);
             child.allEntranceDefinitions.push(childDoorData.definition);
 
@@ -812,6 +812,9 @@ function createZoneFromTree(props: {
             node.minimumSlotCount++;
         }
 
+        if (!node.skeleton && random.mutate().random() < 1) {
+            node.skeleton = generateShortTunnel(random, node);
+        }
         if (!node.skeleton && random.mutate().random() < 0.3) {
             node.skeleton = generateVerticalPath(random, node);
         }
@@ -821,6 +824,13 @@ function createZoneFromTree(props: {
         if (!node.skeleton) {
             node.skeleton = generateEmptyRoom(random, node);
         }
+
+        // Add doors to the area after the skeletons are generated so that the foreground tiles
+        // are correctly cleaned up around the door.
+        for (const definition of node.allEntranceDefinitions) {
+            addDoorAndClearForegroundTiles(definition, node.baseArea, node.childArea);
+        }
+
         const roomDifficulty = node.depth || random.mutate().range(3, 5);
         let enemyDifficulty = 0;
         if (node.skeleton) {

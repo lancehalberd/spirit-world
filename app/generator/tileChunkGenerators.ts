@@ -126,7 +126,13 @@ export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, a
         w: Math.min(r.w, fieldLayer.grid.w - x),
         h: Math.min(r.h, fieldLayer.grid.h - y),
     };
-    const solidChunks: {v: {top: number, bottom: number}, h: {left: number, right: number}}[][] = [];
+    const solidChunks: {
+        v: {top: number, bottom: number}
+        h: {left: number, right: number}
+        isLeft?: boolean
+        isRight?: boolean
+        isConcave?: boolean
+    }[][] = [];
     for (let y = r.y; y < r.y + r.h; y++) {
         solidChunks[y] = [];
         if (!fieldTiles[y]) {
@@ -200,7 +206,8 @@ export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, a
             break;
         }
     }
-    for (let y = r.y; y < r.y + r.h; y++) {
+    // Calculate from bottom up so we can determine concavity of southern walls from the bottom tile up.
+    for (let y = r.y + r.h - 1; y >= r.y; y--) {
         for (let x = r.x; x < r.x + r.w; x++) {
             if (!solidChunks[y][x]) {
                 continue;
@@ -211,43 +218,83 @@ export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, a
             if (y === v.top) {
                 // Northern facing wall
                 if (x === h.left) {
-                    foreground2Tiles[y][x] = [748, 749][parity];
+                    if ((y + 1 >= r.y + r.h || solidChunks[y + 1][x - 1]) && (x + 1 >= r.x + r.w || solidChunks[y - 1][x + 1])) {
+                        // Make the tile concave if this is an inside corner.
+                        foreground2Tiles[y][x] = 749;
+                    } else {
+                        foreground2Tiles[y][x] = 748;
+                    }
                 } else if (x === h.right - 1) {
-                    foreground2Tiles[y][x] = [746, 747][parity];
+                    if ((y + 1 >= r.y + r.h || solidChunks[y + 1][x + 1]) && (x - 1 < r.x || solidChunks[y - 1][x - 1])) {
+                        // Make the tile concave if this is an inside corner.
+                        foreground2Tiles[y][x] = 746;
+                    } else {
+                        foreground2Tiles[y][x] = 747;
+                    }
                 } else {
-                    foregroundTiles[y][x] = 57;
+                    foregroundTiles[y][x] = 28;
                     // This row should always be defined since rows beyond the range would be assumed solid (and this is the top of the chunk).
                     foreground2Tiles[y - 1][x] = [744, 745][(parity + 1) % 2];
                 }
             } else if (y === v.bottom - 1) {
                 // Bottom part of south wall
                 if (x === h.left) {
-                    fieldTiles[y][x] = [771, 772][parity];
+                    solidChunks[y][x].isLeft = true;
+                    solidChunks[y][x].isConcave = (y - 1 < r.y || !!solidChunks[y - 1][x - 1]) && (x + 1 >= r.x + r.w || !!solidChunks[y + 1][x + 1]);
+                    console.log(solidChunks[y][x].isConcave);
+                    if (solidChunks[y][x].isConcave) {
+                        fieldTiles[y][x] = 772;
+                    } else {
+                        fieldTiles[y][x] = 771;
+                    }
                 } else if (x === h.right - 1) {
-                    fieldTiles[y][x] = [773, 774][parity];
+                    solidChunks[y][x].isRight = true;
+                    solidChunks[y][x].isConcave = (y - 1 < r.y || !!solidChunks[y - 1][x + 1]) && (x - 1 < r.x || !!solidChunks[y + 1][x - 1]);
+                    if (solidChunks[y][x].isConcave) {
+                        fieldTiles[y][x] = 773;
+                    } else {
+                        fieldTiles[y][x] = 774;
+                    }
                 } else {
                     fieldTiles[y][x] = [762, 763][parity];
                 }
             } else if (y === v.bottom - 2) {
                 // Upper part of south wall
+                solidChunks[y][x].isLeft = solidChunks[y + 1][x].isLeft;
+                solidChunks[y][x].isRight = solidChunks[y + 1][x].isRight;
+                solidChunks[y][x].isConcave = solidChunks[y + 1][x].isConcave;
                 if (x === h.left) {
                     fieldTiles[y][x] = [765, 768][parity];
                 } else if (x === h.right - 1) {
                     fieldTiles[y][x] = [766, 769][parity];
                 } else {
-                    // TODO: detect left/right edges 1 tile below this tile and use interior diagonals instead here.
-                    fieldTiles[y][x] = [753, 754][parity];
+                    if (solidChunks[y][x].isLeft) {
+                        fieldTiles[y][x] = 764;
+                    } else if (solidChunks[y][x].isRight) {
+                        fieldTiles[y][x] = 770;
+                    } else {
+                        fieldTiles[y][x] = [753, 754][parity];
+                    }
                 }
             } else if (y === v.bottom - 3) {
                 // Ceiling above south wall
                 foregroundTiles[y][x] = 57;
+                const {isLeft, isRight, isConcave} = solidChunks[y + 1][x];
                 if (x === h.left) {
-                    foreground2Tiles[y][x] = [882, 883][parity];
+                    foreground2Tiles[y][x] = isConcave ? 883 : 882;
                 } else if (x === h.right - 1) {
-                    foreground2Tiles[y][x] = [884, 885][parity];
+                    foreground2Tiles[y][x] = isConcave ? 884 : 885;
                 } else {
-                    // TODO: detect left/right edges 2 tiles below this tile and use interior diagonals instead here.
-                    foreground2Tiles[y][x] = [732, 733][parity];
+                    if (isLeft) {
+                        foreground2Tiles[y][x] = isConcave ? 883 : 882;
+                    } else if (isRight) {
+                        foreground2Tiles[y][x] = isConcave ? 884 : 885;
+                    } else {
+                        // These tiles don't look very good.
+                        //foreground2Tiles[y][x] = [732, 733][parity];
+                        // So just reuse the tiles from the north walls.
+                        foreground2Tiles[y][x] = [744, 745][parity];
+                    }
                 }
             } else {
                 // Vertical interior.
@@ -257,7 +304,12 @@ export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, a
                 } else if (x === h.right - 1) {
                     foreground2Tiles[y][x] = [737, 741][parity];
                 } else {
-                    // detect left/right edges 1 or 2 tiles below and add edges here.
+                    const h1 = solidChunks[y + 1]?.[x]?.h, h2 = solidChunks[y + 2]?.[x]?.h
+                    if (x === h1?.right - 1 || x === h2?.right - 1) {
+                        foreground2Tiles[y][x] = [737, 741][parity];
+                    } else if (x === h1?.left || x === h2?.left) {
+                        foreground2Tiles[y][x] = [736, 740][parity];
+                    }
                 }
             }
         }

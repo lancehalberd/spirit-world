@@ -3,6 +3,7 @@ import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import { ThrownObject } from 'app/content/effects/thrownObject';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
@@ -523,6 +524,7 @@ export class Hero implements Actor {
         // This prevents them from rendering under foreground ceiling tiles at the top of ladders.
         const isClimbingLadder = (this.actionTarget?.style === 'ladderUp' || this.actionTarget?.style === 'ladderUpTall');
         if (
+            editingState.isEditing ||
             (isClimbingLadder && this.y < this.actionTarget.y + 24)
             // Render hero in the foreground when they are high enough (occurs when falling into an area).
             || this.z > 24

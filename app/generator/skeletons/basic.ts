@@ -1,4 +1,5 @@
 import { applyNineSlice, slices } from 'app/generator/nineSlice';
+import { applyCaveWalls } from 'app/generator/tileChunkGenerators';
 import { directionMap } from 'app/utils/direction';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 
@@ -382,6 +383,72 @@ export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkele
     }
 
     inheritAllLayerTilesFromParent(childArea);
+
+    return {slots, paths};
+}
+
+
+
+export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkeleton|undefined {
+    if (node.tall || node.allEntranceDefinitions.length < 2 || node.minimumSlotCount > 0) {
+        return;
+    }
+    const slots: RoomSlot[] = [];
+    const paths: RoomPath[] = [];
+    let left = 1000, right = 0;
+    const section = node.baseAreaSection;
+    const fieldTiles = getOrAddLayer('field', node.baseArea).grid.tiles;
+    // Fill the entire section with walls that we will later clear out.
+    for (let y = section.y; y < section.y + section.h; y++) {
+        for (let x = section.x; x < section.x + section.w; x++) {
+            // TODO: change/randomize this solid tile to match the style of this node.
+            fieldTiles[y][x] = 10;
+        }
+    }
+    for (const entrance of node.allEntranceDefinitions) {
+        if (entrance.d === 'down') {
+            const center = Math.ceil(entrance.x / 16) + 1;
+            left = Math.min(left, center);
+            right = Math.max(right, center + 1);
+            for (let y = section.y + 9; y < section.y + section.h - 1; y++) {
+                fieldTiles[y][center] = 0;
+               // if (y >= section.y + section.h - 3) {
+                    fieldTiles[y][center - 1] = 0;
+                    fieldTiles[y][center + 1] = 0;
+                //}
+            }
+        }
+        if (entrance.d === 'up') {
+            const center = Math.floor(entrance.x / 16) + 1;
+            left = Math.min(left, center);
+            right = Math.max(right, center + 1);
+            for (let y = section.y + 3; y <= section.y + 9; y++) {
+                fieldTiles[y][center] = 0;
+                //if (y <= section.y + 4) {
+                    fieldTiles[y][center - 1] = 0;
+                    fieldTiles[y][center + 1] = 0;
+                //}
+            }
+        }
+        if (entrance.d === 'left') {
+            left = section.x + 2;
+        }
+        if (entrance.d === 'right') {
+            right = section.x + section.w - 1;
+        }
+    }
+
+    for (let x = left; x < right; x++) {
+        fieldTiles[section.y + 8][x] = 0;
+        fieldTiles[section.y + 9][x] = 0
+        fieldTiles[section.y + 10][x] = 0;
+        if (x <= section.x + 3 || x >= section.x + section.w - 3) {
+            fieldTiles[section.y + 7][x] = 0;
+            fieldTiles[section.y + 11][x] = 0;
+        }
+    }
+
+    applyCaveWalls(random, node.baseArea, node.baseAreaSection, node.childArea);
 
     return {slots, paths};
 }
