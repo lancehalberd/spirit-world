@@ -190,7 +190,7 @@ export function canMoveDown(
             if (atx === tx + 1) {
                 const leftOfAnchorBehaviors = area?.behaviorGrid[aty]?.[atx - 1];
                 if (leftOfAnchorBehaviors?.ledges?.right === false || anchorTileBehaviors?.ledges?.left === true) {
-                    if (pixelTileBehaviors.diagonalLedge) {
+                    if (pixelTileBehaviors?.diagonalLedge) {
                         isAbove = true;
                     }
                     break DETERMINE_FLAGS;
@@ -200,7 +200,7 @@ export function canMoveDown(
             if (atx === tx - 1) {
                 const rightOfAnchorBehaviors = area?.behaviorGrid[atx + 1]?.[atx];
                 if (rightOfAnchorBehaviors?.ledges?.left === false || anchorTileBehaviors?.ledges?.right === true) {
-                    if (pixelTileBehaviors.diagonalLedge) {
+                    if (pixelTileBehaviors?.diagonalLedge) {
                         isAbove = true;
                     }
                     break DETERMINE_FLAGS;

@@ -1,6 +1,9 @@
 import { getOrAddLayer } from 'app/utils/layers';
+import { addRoomFrame } from 'app/generator/skeletons/basic';
+
 
 export function populateTombBoss({zoneId, random}, node: TreeNode) {
+    addRoomFrame(random, node);
     const cx = (node.baseAreaSection.x + node.baseAreaSection.w / 2) * 16 + 8;
     node.baseArea.objects.push({
         type: 'boss',
@@ -15,6 +18,7 @@ export function populateTombBoss({zoneId, random}, node: TreeNode) {
 }
 
 export function populateTombGuardianRoom({zoneId, random}, node: TreeNode) {
+    addRoomFrame(random, node);
     // TODO: Add eye decorations in front of exit door
     // TODO: Add decorations around portal
     // TODO: Add decorations around pots+portal switch

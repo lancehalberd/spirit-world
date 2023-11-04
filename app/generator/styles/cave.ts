@@ -2,6 +2,81 @@ import { getOrAddLayer } from 'app/utils/layers';
 import { allTiles } from 'app/content/tiles';
 
 
+
+const caveFloorTile = 36;
+const caveFloorRandomDecorations = [49, 50, 54, 55, 56];
+const closedEye = 51;
+const openEye = 52;
+const rectangle = 53;
+
+
+export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+    const floorLayer = getOrAddLayer('floor', area, alternateArea);
+    const floor2Tiles = getOrAddLayer('floor2', area, alternateArea).grid.tiles;
+    const floorTiles = floorLayer.grid.tiles;
+    // Limit the rectangle to the bounds of the area.
+    const x =  Math.max(0, r.x), y = Math.max(0, r.y);
+    r = {
+        x, y,
+        w: Math.min(r.w, floorLayer.grid.w - x),
+        h: Math.min(r.h, floorLayer.grid.h - y),
+    };
+    for (let y = r.y; y < r.y + r.h; y++) {
+        for (let x = r.x; x < r.x + r.w; x++) {
+            floorTiles[y][x] = caveFloorTile
+            if (random.mutate().random() < 0.85) {
+                floor2Tiles[y][x] = 0;
+                continue;
+            }
+            floor2Tiles[y][x] = random.mutate().element(caveFloorRandomDecorations);
+        }
+    }
+}
+
+export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+    const floorLayer = getOrAddLayer('floor', area, alternateArea);
+    const floor2Tiles = getOrAddLayer('floor2', area, alternateArea).grid.tiles;
+    const floorTiles = floorLayer.grid.tiles;
+    // Limit the rectangle to the bounds of the area.
+    const x =  Math.max(0, r.x), y = Math.max(0, r.y);
+    r = {
+        x, y,
+        w: Math.min(r.w, floorLayer.grid.w - x),
+        h: Math.min(r.h, floorLayer.grid.h - y),
+    };
+    for (let y = r.y; y < r.y + r.h; y++) {
+        for (let x = r.x; x < r.x + r.w; x++) {
+            floorTiles[y][x] = caveFloorTile
+            const isOutsideRow = y === 0 || y === r.h - 1;
+            const isOutsideColumn = x === 0 || x === r.w - 1;
+            if (isOutsideRow && isOutsideColumn) {
+                floor2Tiles[y][x] = rectangle;
+            } else if (isOutsideRow || isOutsideColumn) {
+                floor2Tiles[y][x] = openEye;
+            } else {
+                floor2Tiles[y][x] = closedEye;
+            }
+        }
+    }
+}
+
+export function addCaveRoomFrame(random: SRandom, node: TreeNode) {
+    const fieldTiles = getOrAddLayer('field', node.baseArea, node.childArea).grid.tiles;
+    const section = node.baseAreaSection;
+    createCaveFloor(random, node.baseArea, section, node.childArea);
+    for (const x of [section.x, section.x + 1, section.x + section.w - 1]) {
+        for (let y = section.y; y < section.y + section.h; y++) {
+            fieldTiles[y][x] = 57;
+        }
+    }
+    for (const y of [section.y, section.y + 1, section.y + 2, section.y + section.h - 1]) {
+        for (let x = section.x; x < section.x + section.w; x++) {
+            fieldTiles[y][x] = 57;
+        }
+    }
+    applyCaveWalls(random, node.baseArea, section, node.childArea);
+}
+
 // Adds cave walls everywhere that is currently solid in the field layer.
 // This assumes cave wall height is 2, but this could be generalized to support taller cave walls.
 export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {

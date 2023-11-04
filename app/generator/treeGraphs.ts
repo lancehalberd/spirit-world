@@ -1,9 +1,9 @@
 import { canCross2Gaps, canRemoveLightStones, hasBigKey, hasSmallKey, hasWeapon } from 'app/content/logic';
 import { zones } from 'app/content/zones/zoneHash';
 import { variantSeed } from 'app/gameConstants';
-import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
+import { getOrAddLayer } from 'app/utils/layers';
 import srandom from 'app/utils/SRandom';
-import { chunkGenerators } from 'app/generator/tileChunkGenerators';
+import { createSpecialCaveFloor } from 'app/generator/styles/cave';
 import { createSpecialStoneFloor } from 'app/generator/styles/stone';
 import { generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath } from 'app/generator/skeletons/basic';
 import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
@@ -536,7 +536,7 @@ function createZoneFromTree(props: {
         }
     }
     if (safety >= 1000) {
-        console.error('Infinte loop in createZoneFromTree');
+        console.error('Infinite loop in createZoneFromTree');
         debugger;
     }
     finalizeTree(tree);
@@ -608,24 +608,11 @@ function createZoneFromTree(props: {
     }
     // Add floor/walls to all placed rooms
     for (const node of placedNodes) {
-        let section = node.baseAreaSection;
         if (!node.baseArea || !node.childArea) {
             console.error('Placed node missing area', node);
             debugger;
             continue;
         }
-        const foregroundLayer = getOrAddLayer('foreground', node.baseArea, node.childArea);
-        for (let y = section.y; y < section.y + section.h; y++) {
-            foregroundLayer.grid.tiles[y][section.x] = 57;
-        }
-        // Reduce the room size by one to account for the removed column above.
-        section = {
-            ...section,
-            x: section.x + 1,
-            w: section.w - 1,
-        };
-        chunkGenerators.stoneRoom(random, node.baseArea, section);
-        inheritAllLayerTilesFromParent(node.childArea, node.childAreaSection);
         node.allEntranceDefinitions = [];
     }
 
@@ -797,6 +784,9 @@ function createZoneFromTree(props: {
         }
         if (node.populateRoom) {
             node.populateRoom({zoneId, random}, node);
+            for (const definition of node.allEntranceDefinitions) {
+                addDoorAndClearForegroundTiles(definition, node.baseArea, node.childArea);
+            }
             continue;
         }
         // Determine the minimum number of slots required before generating the room skeleton.
@@ -846,7 +836,12 @@ function createZoneFromTree(props: {
                     // TODO: if this gets complex, moves this to its own function for populating checks in slots.
                     //   Call this function first with all slots in case it wants to add puzzle elements for the check.
                     //   Indicate the number of free slots that can be used for the check, or just pass in a subset that is this long.
-                    createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                    if (node.style === 'stone') {
+                        createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                    } else {
+                        // Cave style is the default.
+                        createSpecialCaveFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                    }
                     const definition: LootObjectDefinition = {
                         type: 'chest',
                         id: `${node.id}-smallKey`,
@@ -1149,8 +1144,9 @@ const tombTreeNoLocks: TreeNode = {
         targetZone: 'overworld',
         targetObjectId: 'tombEntrance',
     },
+    style: 'cave',
     nodes: [
-        { lootType: 'map', style: 'stone' },
+        { lootType: 'map' },
         {
             requirements: [[hasWeapon]],
             nodes: [
@@ -1170,6 +1166,7 @@ const tombTreeNoLocks: TreeNode = {
                             nodes: [
                                 {
                                     type: 'boss',
+                                    style: 'stone',
                                     wide: false,
                                     tall: false,
                                     requirements: [[hasBigKey]],

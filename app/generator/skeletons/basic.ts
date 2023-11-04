@@ -1,10 +1,40 @@
 import { applyNineSlice, slices } from 'app/generator/nineSlice';
-import { applyCaveWalls } from 'app/generator/styles/cave';
+import { addCaveRoomFrame, applyCaveWalls, createCaveFloor } from 'app/generator/styles/cave';
+import { applyStoneWalls, createStoneFloor } from 'app/generator/styles/stone';
+
+import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 import { directionMap } from 'app/utils/direction';
 import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
 
 
+// Extract this to generator/styles/stone and refactor chunkGenerators to remove cyclical dependency.
+function addStoneRoomFrame(random: SRandom, node: TreeNode) {
+        let section = node.baseAreaSection;
+    const foregroundLayer = getOrAddLayer('foreground', node.baseArea, node.childArea);
+    for (let y = section.y; y < section.y + section.h; y++) {
+        foregroundLayer.grid.tiles[y][section.x] = 57;
+    }
+    // Reduce the room size by one to account for the removed column above.
+    section = {
+        ...section,
+        x: section.x + 1,
+        w: section.w - 1,
+    };
+    chunkGenerators.stoneRoom(random, node.baseArea, section);
+    inheritAllLayerTilesFromParent(node.childArea, node.childAreaSection);
+}
+
+export function addRoomFrame(random: SRandom, node: TreeNode) {
+    if (node.style === 'stone') {
+        addStoneRoomFrame(random, node);
+    } else {
+        addCaveRoomFrame(random, node);
+    }
+}
+
+
 export function generateEmptyRoom(random: SRandom, node: TreeNode): RoomSkeleton {
+    addRoomFrame(random, node);
     const slots: RoomSlot[] = [];
     const paths: RoomPath[] = [];
     const w = node.wide ? 6 : 4;
@@ -45,6 +75,7 @@ interface PitMazeConnection {
 }
 
 export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
+    addRoomFrame(random, node);
     const slots: RoomSlot[] = [];
     const paths: RoomPath[] = [];
     const baseArea = node.baseArea;
@@ -249,6 +280,7 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
 
 
 export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkeleton|undefined {
+    addRoomFrame(random, node);
     const slots: RoomSlot[] = [];
     const paths: RoomPath[] = [];
     const baseArea = node.baseArea;
@@ -387,8 +419,6 @@ export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkele
     return {slots, paths};
 }
 
-
-
 export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkeleton|undefined {
     if (node.tall || node.allEntranceDefinitions.length < 2 || node.minimumSlotCount > 0) {
         return;
@@ -402,6 +432,7 @@ export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkelet
     for (let y = section.y; y < section.y + section.h; y++) {
         for (let x = section.x; x < section.x + section.w; x++) {
             // TODO: change/randomize this solid tile to match the style of this node.
+            // For example, use crystals in the spirit world.
             fieldTiles[y][x] = 10;
         }
     }
@@ -416,6 +447,7 @@ export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkelet
                     fieldTiles[y][center - 1] = 0;
                     fieldTiles[y][center + 1] = 0;
                 //}
+
             }
         }
         if (entrance.d === 'up') {
@@ -448,7 +480,13 @@ export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkelet
         }
     }
 
-    applyCaveWalls(random, node.baseArea, node.baseAreaSection, node.childArea);
+    if (node.style === 'stone') {
+        createStoneFloor(random, node.baseArea, section, node.childArea);
+        applyStoneWalls(random, node.baseArea, section, node.childArea);
+    } else {
+        createCaveFloor(random, node.baseArea, section, node.childArea);
+        applyCaveWalls(random, node.baseArea, section, node.childArea);
+    }
 
     return {slots, paths};
 }

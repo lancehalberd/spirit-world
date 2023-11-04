@@ -186,7 +186,7 @@ export function canMoveLeft(
             if (aty === ty + 1) {
                 const upOfAnchorBehaviors = area?.behaviorGrid[aty - 1]?.[atx];
                 if (upOfAnchorBehaviors?.ledges?.down === false || anchorTileBehaviors?.ledges?.up === true) {
-                    if (pixelTileBehaviors.diagonalLedge) {
+                    if (pixelTileBehaviors?.diagonalLedge) {
                         isAbove = true;
                     }
                     break DETERMINE_FLAGS;
@@ -196,7 +196,7 @@ export function canMoveLeft(
             if (aty === ty - 1) {
                 const downOfAnchorBehaviors = area?.behaviorGrid[aty + 1]?.[atx];
                 if (downOfAnchorBehaviors?.ledges?.up === false || anchorTileBehaviors?.ledges?.down === true) {
-                    if (pixelTileBehaviors.diagonalLedge) {
+                    if (pixelTileBehaviors?.diagonalLedge) {
                         isAbove = true;
                     }
                     break DETERMINE_FLAGS;
