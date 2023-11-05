@@ -46,6 +46,8 @@ Current tasks:
     - Jumping north towards the edge of the screen causes you to respawn at a safe location
         - Tiles off the edge of the screen should count as safe landing spots for landing or they should block you while jumping.
     - Fix balls can enter doorways (+potential softlock in gauntlet ball puzzle)
+    - Fix returning to last save in staff tower with tower staff in inventory causes problems.
+        - This option should be disabled in this case.
 
 
 
