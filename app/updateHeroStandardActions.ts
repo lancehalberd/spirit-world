@@ -627,9 +627,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (canAttack
         && (wasGameKeyPressed(state, GAME_KEY.WEAPON) || (hero.attackBufferTime > state.fieldTime - 200))
     ) {
-        // TODO: check the player has a specific chakram available to use here.
-        const usedChakrams = hero.thrownChakrams.length + (hero.heldChakram ? 1 : 0);
-        if (state.hero.savedData.weapon - usedChakrams > 0) {
+        // Find the highest level Chakram that is not currently in use for the next attack.
+        const availableLevel = [2, 1].find(level =>
+            // Hero must own this level of Chakram.
+            (hero.savedData.weapon & (1 << (level - 1)))
+            // This level must not be in use by a held or thrown chakram.
+            && hero.heldChakram?.level !== level
+            && !hero.thrownChakrams.find(c => c.level === level)
+        );
+        if (availableLevel > 0) {
             hero.action = 'charging';
             hero.chargeTime = 0;
             hero.animationTime = 0;
@@ -641,7 +647,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 vx: directionMap[direction][0],
                 vy: directionMap[direction][1],
                 source: hero,
-                level: Math.min(state.hero.savedData.weapon, hero.thrownChakrams[0]?.level === 2 ? 1 : 2),
+                level: Math.min(state.hero.savedData.weapon, availableLevel),
             });
             addEffectToArea(state, hero.area, hero.heldChakram);
             return;
