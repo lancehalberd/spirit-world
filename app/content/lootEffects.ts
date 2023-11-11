@@ -2,22 +2,24 @@ import { setLeftTool, setRightTool } from 'app/content/menu';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 
+const MAX_LEVEL = 2;
 
 type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
 
 function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
-    // Negative number indicates losing loot, and currently is just for setting down the Tower Staff.
-    if (loot.lootLevel < 0) {
-        return Math.max(0, currentLevel + loot.lootLevel);
-    }
-    // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
-    // if the player already possesses a better version.
+    // Non-progressive upgrades specify the exact level of the item.
     if (loot.lootLevel) {
         //console.log(loot.lootType, 'max', currentLevel, loot.lootLevel);
-        return Math.max(currentLevel, loot.lootLevel);
+        return currentLevel | (1 << (loot.lootLevel - 1));
     }
     //console.log(loot.lootType, 'increment', currentLevel);
-    return currentLevel + 1;
+    for (let i = 0; i < MAX_LEVEL; i++) {
+        const bit = 1 << i;
+        if (!(currentLevel & bit)) {
+            return currentLevel | bit;
+        }
+    }
+    return currentLevel;
 }
 
 function getDungeonInventory(state: GameState): DungeonInventory {

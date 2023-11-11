@@ -399,7 +399,7 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
     if (state.savedState.objectFlags.elevatorDropped && !state.savedState.objectFlags.elevatorFixed) {
         state.hero.savedData.spawnLocation = SPAWN_STAFF_ELEVATOR;
     }
-    if (state.hero.savedData.spawnLocation.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff >= 2) {
+    if (state.hero.savedData.spawnLocation.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff & 2) {
         // Do not spawn inside the tower if the tower is not currently placed anywhere.
         state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
     }

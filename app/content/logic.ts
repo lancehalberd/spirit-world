@@ -266,13 +266,13 @@ export const logicHash: {[key: string]: LogicCheck} = {
         excludedFlags: ['stormBeast'],
     },
     desertTower: (state: GameState) => {
-        return state.hero.savedData.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'desert';
+        return !(state.hero.savedData.activeTools.staff & 2) && state.savedState.staffTowerLocation === 'desert';
     },
     forestTower: (state: GameState) => {
-        return state.hero.savedData.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'forest';
+        return !(state.hero.savedData.activeTools.staff & 2) && state.savedState.staffTowerLocation === 'forest';
     },
     mountainTower: (state: GameState) => {
-        return state.hero.savedData.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'mountain';
+        return !(state.hero.savedData.activeTools.staff & 2) && state.savedState.staffTowerLocation === 'mountain';
     },
     towerStaff: {
         requiredFlags: ['$staff:2'],

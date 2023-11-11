@@ -368,7 +368,7 @@ export class Hero implements Actor {
         this.hasBarrier = false;
         this.activeBarrierBurst = new BarrierBurstEffect({
             element: getElement(state, this),
-            level: this.savedData.activeTools.cloak,
+            level: (this.savedData.activeTools.cloak & 2) ? 2: 1,
             source: this,
         });
         addEffectToArea(state, this.area, this.activeBarrierBurst);
@@ -472,7 +472,7 @@ export class Hero implements Actor {
         } else if (directionMap[bowDirection][1] > 0) {
             arrowYOffset += directionMap[bowDirection][0] === 0 ? 8 : 4;
         }
-        const animations = this.savedData.activeTools.bow >= 2 ? goldBowAnimations : bowAnimations;
+        const animations = (this.savedData.activeTools.bow & 2) ? goldBowAnimations : bowAnimations;
         const frame = getFrame(animations[bowDirection], bowAnimationTime);
         drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
         if (isChargingBow && state.hero.magic > 0) {
@@ -640,7 +640,10 @@ export class Hero implements Actor {
     getChargingToolLevel(this: Hero): number {
         let tool = (this.chargingLeftTool && this.savedData.leftTool) || (this.chargingRightTool && this.savedData.rightTool);
         // TODO: Account for gloves level if we ever support charging thrown objects.
-        return tool ? this.savedData.activeTools[tool] : this.savedData.weapon;
+        if (tool) {
+            return (this.savedData.activeTools[tool] & 2) ? 2 : 1;
+        }
+        return this.heldChakram?.level || ((this.savedData.weapon & 2) ? 2 : 1);
     }
 
     renderChargingBehind(this: Hero, context: CanvasRenderingContext2D, state: GameState) {

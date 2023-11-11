@@ -54,10 +54,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isClimbing = hero.action === 'climbing';
+    const canThrowSecondChakram = hero.savedData.weapon === 3 && hero.actionFrame > 6;
     const isActionBlocked =
-        isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject ||
-        (hero.action === 'attack' && (hero.savedData.weapon < 2 || hero.actionFrame < 6)) ||
-        hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || isClimbing;
+        isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject
+        || (hero.action === 'attack' && !canThrowSecondChakram)
+        || hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || isClimbing;
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.savedData.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
@@ -626,6 +627,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (canAttack
         && (wasGameKeyPressed(state, GAME_KEY.WEAPON) || (hero.attackBufferTime > state.fieldTime - 200))
     ) {
+        // TODO: check the player has a specific chakram available to use here.
         const usedChakrams = hero.thrownChakrams.length + (hero.heldChakram ? 1 : 0);
         if (state.hero.savedData.weapon - usedChakrams > 0) {
             hero.action = 'charging';

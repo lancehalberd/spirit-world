@@ -593,7 +593,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
                 if (towerLocation && onTowerMarker) {
                     state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
-                    state.hero.savedData.activeTools.staff = 1;
+                    state.hero.savedData.activeTools.staff &= ~2;
                     refreshAreaLogic(state, hero.area);
                     saveGame(state);
                     return;
@@ -604,7 +604,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.isAirborn = hero.isAstralProjection;
                 hero.vz = 0;
             }
-            const staffLevel = state.hero.savedData.activeTools.staff;
+            const staffLevel = (state.hero.savedData.activeTools.staff & 2) ? 2 : 1;
             const maxLength = staffLevel > 1 ? 64 : 4;
             const crushingPower = staffLevel > 1 ? 2 : 1;
             const staff = new Staff(state, {

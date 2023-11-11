@@ -156,14 +156,14 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     const selectedItem = menuRows[state.menuRow]?.[state.menuIndex];
 
     // Weapon isn't currently part of the selectable menu rows.
-    if (state.hero.savedData.weapon >= 1 || editingState.isEditing) {
+    if ((state.hero.savedData.weapon & 1) || editingState.isEditing) {
         const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
-        renderFaded(context, !state.hero.savedData.weapon,
+        renderFaded(context, !(state.hero.savedData.weapon & 1),
             () => drawFrameCenteredAt(context, frame, weapon1Rect));
     }
-    if (state.hero.savedData.weapon >= 2 || editingState.isEditing) {
+    if ((state.hero.savedData.weapon & 2) || editingState.isEditing) {
         const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.savedData.weapon });
-        renderFaded(context, !(state.hero.savedData.weapon >= 2),
+        renderFaded(context, !(state.hero.savedData.weapon & 2),
             () => drawFrameCenteredAt(context, frame, weapon2Rect));
     }
     if (state.hero.savedData.silverOre || editingState.isEditing) {
@@ -249,7 +249,7 @@ mainCanvas.addEventListener('click', function (event) {
     let {x, y} = innerMenuFrame;
 
     if (isPointInShortRect(mouseX, mouseY, weapon1Rect) || isPointInShortRect(mouseX, mouseY, weapon2Rect)) {
-        state.hero.savedData.weapon = ((state.hero.savedData.weapon || 0) + 1) % 3;
+        state.hero.savedData.weapon = ((state.hero.savedData.weapon || 0) + 1) % 4;
         return;
     }
     if (isPointInShortRect(mouseX, mouseY, peachRect)) {
@@ -294,7 +294,7 @@ mainCanvas.addEventListener('click', function (event) {
                 } else if (menuItem === 'return') {
                     // No handling
                 } else if (menuItem === 'bow' || menuItem === 'cloak' || menuItem === 'staff' || menuItem === 'clone') {
-                    state.hero.savedData.activeTools[menuItem] = ((state.hero.savedData.activeTools[menuItem] || 0) + 1) % 3;
+                    state.hero.savedData.activeTools[menuItem] = ((state.hero.savedData.activeTools[menuItem] || 0) + 1) % 4;
                 } else if (menuItem === 'leatherBoots' || menuItem === 'ironBoots' || menuItem === 'cloudBoots') {
                     state.hero.savedData.equipment[menuItem] = ((state.hero.savedData.equipment[menuItem] || 0) + 1) % 2;
                 } else if (menuItem === 'neutral') {
@@ -304,7 +304,7 @@ mainCanvas.addEventListener('click', function (event) {
                 } else {
                     if (menuItem === 'gloves' || menuItem === 'roll') {
                         // These passive tools have 2 levels.
-                        state.hero.savedData.passiveTools[menuItem] = ((state.hero.savedData.passiveTools[menuItem] || 0) + 1) % 3;
+                        state.hero.savedData.passiveTools[menuItem] = ((state.hero.savedData.passiveTools[menuItem] || 0) + 1) % 4;
                     } else {
                         state.hero.savedData.passiveTools[menuItem] = ((state.hero.savedData.passiveTools[menuItem] || 0) + 1) % 2;
                     }

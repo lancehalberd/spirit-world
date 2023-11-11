@@ -6,6 +6,9 @@ dialogueHash.citySmith = {
     key: 'citySmith',
     mappedOptions: {
         upgrade: (state: GameState) => {
+            if (!(state.hero.savedData.weapon & 1)) {
+                return `I don't possess the tools to work on such a fine weapon.`;
+            }
             if (state.hero.savedData.weaponUpgrades.normalRange) {
                 return `{@citySmith.damage}`;
             }

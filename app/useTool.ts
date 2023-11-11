@@ -23,7 +23,7 @@ export function useTool(
             if (state.hero.magic <= 0) {
                 return;
             }
-            const isUpgradedBow = state.hero.savedData.activeTools.bow >= 2;
+            const isUpgradedBow = state.hero.savedData.activeTools.bow & 2;
             let speed = isUpgradedBow ? 6 : 4;
             let damage = isUpgradedBow ? 4 : 2;
             damage *= (2 ** chargeLevel);
@@ -164,7 +164,7 @@ export function useTool(
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
             hero.toolCooldown = 400;
             // Damage increase with cloak level.
-            hero.barrierLevel = hero.savedData.activeTools.cloak;
+            hero.barrierLevel = (hero.savedData.activeTools.cloak & 2) ? 2 : 1;
             // Charing the cloak has been replaced by the barrier burst functionality.
             /*
             if (chargeLevel === 1) {
@@ -178,8 +178,9 @@ export function useTool(
             if (state.hero.magic <= 0 || state.hero.life <= 1) {
                 return;
             }
+            const maxClones = (state.hero.savedData.activeTools.clone & 2) ? 2 : 1;
             if (isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)
-                && state.hero.clones.length < state.hero.savedData.activeTools.clone
+                && state.hero.clones.length < maxClones
             ) {
                 state.hero.magic -= 10;
                 state.hero.increaseMagicRegenCooldown(1000 * 10 / 10);
@@ -206,7 +207,7 @@ export function useTool(
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
-                for (let i = 0; i < state.hero.savedData.activeTools.clone && i < state.hero.life - 1; i++) {
+                for (let i = 0; i < maxClones && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
                     state.hero.clones.push(clone);
                     addObjectToArea(state, state.areaInstance, clone);

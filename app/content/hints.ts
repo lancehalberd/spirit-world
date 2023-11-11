@@ -348,7 +348,7 @@ const missions: Mission[] = [
                 && !!state.hero.savedData.passiveTools.trueSight;
         },
         isResolved(state: GameState) {
-            return state.hero.savedData.activeTools.cloak >= 2;
+            return !!(state.hero.savedData.activeTools.cloak & 2);
         },
     },
     {
@@ -399,7 +399,7 @@ const missions: Mission[] = [
                 );
         },
         isResolved(state: GameState) {
-            return state.hero.savedData.activeTools.bow >= 2;
+            return !!(state.hero.savedData.activeTools.bow & 2);
         },
     },
     {
