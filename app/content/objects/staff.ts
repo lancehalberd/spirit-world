@@ -116,9 +116,9 @@ export class Staff implements ObjectInstance {
         // it isn't intuitive otherwise. We don't do this earlier because otherwise the staff can appear
         // to lay on top of tiles since the graphics are so much larger than its hitbox.
         if (direction === 'left' || direction === 'right') {
-            this.h = 6;
+            this.h = 12;
         } else {
-            this.w = 8;
+            //this.w = 8;
         }
     }
     getHitbox() {
@@ -175,9 +175,9 @@ export class Staff implements ObjectInstance {
         //context.fillRect(attackHitbox.x, attackHitbox.y, attackHitbox.w, attackHitbox.h);
         let x = this.x | 0, y = this.y | 0;
         if (this.direction === 'left' || this.direction === 'right') {
-            x -= 3;
+            //x -= 3;
             let frame = getFrame(leftAnimation, this.animationTime);
-            y -= 5;
+            y -= 3;
             drawFrame(context, frame, {...frame, x: x - 2, y});
             const w = this.w - 16;
             if (w > 0) {
@@ -186,11 +186,11 @@ export class Staff implements ObjectInstance {
                 drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: x + 10, y, w});
             }
             frame = getFrame(rightAnimation, this.animationTime);
-            drawFrame(context, frame, {...frame, x: x + this.w - 12, y});
+            drawFrame(context, frame, {...frame, x: x + this.w - 18, y});
         } else {
             y -= 4;
             let frame = getFrame(topAnimation, this.animationTime);
-            x -= 6;
+            x -= 4;
             drawFrame(context, frame, {...frame, x, y: y});
             const h = this.h - 25;
             if (h > 0) {
@@ -201,7 +201,10 @@ export class Staff implements ObjectInstance {
             frame = getFrame(bottomAnimation, this.animationTime);
             drawFrame(context, frame, {...frame, x, y: y + this.h - 11});
         }
-        //context.fillStyle = 'blue';
-        //context.fillRect(this.x, this.y, this.w, this.h);
+        /*context.save();
+            context.globalAlpha *= 0.6;
+            context.fillStyle = 'blue';
+            context.fillRect(this.x, this.y, this.w, this.h);
+        context.restore();*/
     }
 }

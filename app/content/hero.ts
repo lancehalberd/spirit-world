@@ -227,6 +227,12 @@ export class Hero implements Actor {
     getMovementHitbox(this: Hero): Rect {
         return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
     }
+    // This is used when checking what part of the floor the hero is touching for things like standing on platforms
+    // or damaging floor. The hero's normal movement hitbox is much taller than the hero appears so using this
+    // shorter hitbox makes floor effects feel more intuitive.
+    getFloorHitbox(this: Hero): Rect {
+        return { x: (this.x | 0) + 2, y: (this.y | 0) + 8, w: this.w - 4, h: this.h - 8 };
+    }
 
     overlaps(this: Hero, target: Rect | {getHitbox: () => Rect}) {
         if ((target as any).getHitbox) {
@@ -520,6 +526,13 @@ export class Hero implements Actor {
     }
 
     renderForeground(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        // Debug floor hitbox.
+        /*context.save();
+            context.globalAlpha *= 0.6;
+            context.fillStyle = 'orange';
+            const floorHitbox = this.getFloorHitbox();
+            context.fillRect(floorHitbox.x, floorHitbox.y, floorHitbox.w, floorHitbox.h);
+        context.restore();*/
         // Start drawing the hero in the foreground when they are most of the way up a ladder.
         // This prevents them from rendering under foreground ceiling tiles at the top of ladders.
         const isClimbingLadder = (this.actionTarget?.style === 'ladderUp' || this.actionTarget?.style === 'ladderUpTall');

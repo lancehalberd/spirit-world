@@ -365,9 +365,12 @@ export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitPro
 }
 
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
+    const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
+    if (!area) {
+        return combinedResult;
+    }
     // explicitly default element to null if it is not set.
     hit = {...hit, element: hit.element ?? null}
-    const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
     let targets: (EffectInstance | ObjectInstance)[] = [];
     if (hit.hitEnemies) {
         targets = [...targets, ...area.enemyTargets];

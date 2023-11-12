@@ -46,8 +46,8 @@ Current tasks:
     - Jumping north towards the edge of the screen causes you to respawn at a safe location
         - Tiles off the edge of the screen should count as safe landing spots for landing or they should block you while jumping.
     - Fix balls can enter doorways (+potential softlock in gauntlet ball puzzle)
-    - Staff doesn't depress floor switches to the north that it appears to be on top of.
-        - Can we extend the hitbox north for switches without messing up how it looks to stand on it when walking north?
+    - Robot stopped moving in ST basement. Maybe ice damage against shield is broken?
+        - Unable to reproduce.
 
 
     - Add a procedural cave to the material overworld with 1-3 checks

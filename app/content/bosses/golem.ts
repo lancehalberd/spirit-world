@@ -441,12 +441,14 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     const cx = hitbox.x + hitbox.w / 2;//, cy = hitbox.y + hitbox.h / 2;
     if (shouldMoveToPlayer) {
         const target = getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);
-        const targetHitbox = target.getHitbox(state);
-        // Track the player's x position when possible.
-        if (targetHitbox.x + targetHitbox.w / 2 < cx - 4) {
-            moveEnemy(state, enemy, -enemy.speed, 0, {canFall: true});
-        } else if (targetHitbox.x + targetHitbox.w / 2 > cx + 4) {
-            moveEnemy(state, enemy, enemy.speed, 0, {canFall: true});
+        if (target) {
+            const targetHitbox = target.getHitbox(state);
+            // Track the player's x position when possible.
+            if (targetHitbox.x + targetHitbox.w / 2 < cx - 4) {
+                moveEnemy(state, enemy, -enemy.speed, 0, {canFall: true});
+            } else if (targetHitbox.x + targetHitbox.w / 2 > cx + 4) {
+                moveEnemy(state, enemy, enemy.speed, 0, {canFall: true});
+            }
         }
     }
     if (enemy.mode === 'warmup') {

@@ -118,6 +118,7 @@ interface ObjectInstance extends BaseFieldInstance {
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state?: GameState) => Readonly<Rect>
+    getFloorHitbox?: () => Readonly<Rect>
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
     // This can be set to override the default yDepth calculation for an object.

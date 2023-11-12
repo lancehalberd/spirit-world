@@ -32,15 +32,16 @@ export class FloorSwitch implements ObjectInstance {
     }
     isDepressed(state: GameState): boolean {
         const hitbox = this.getHitbox();
-        if (state.hero.z <= 0 && state.hero.area === this.area && state.hero.overlaps(hitbox)) {
+        if (state.hero.z <= 0 && state.hero.area === this.area && rectanglesOverlap(state.hero.getFloorHitbox(), hitbox)) {
             return true;
         }
         for (const object of this.area.objects) {
             // Only solid objects with hitboxes can press switches.
-            if (object === this || !object.getHitbox || !(object.behaviors?.solid || object.canPressSwitches)) {
+            if (object === this || !(object.getFloorHitbox || object.getHitbox) || !(object.behaviors?.solid || object.canPressSwitches)) {
                 continue;
             }
-            if (!(object.z > 0) && rectanglesOverlap(object.getHitbox(state), hitbox)) {
+            const objectHitbox = object.getFloorHitbox?.() || object.getHitbox();
+            if (!(object.z > 0) && rectanglesOverlap(objectHitbox, hitbox)) {
                 return true;
             }
         }

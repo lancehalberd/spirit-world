@@ -8,7 +8,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         return;
     }
     hero.groundHeight = 0;
-    const hitbox = hero.getMovementHitbox();
+    const hitbox = hero.getFloorHitbox();
     for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
         for (const entity of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
             if (!entity.getHitbox){
