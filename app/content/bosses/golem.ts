@@ -170,7 +170,7 @@ export const golemHandHurtAnimations: ActorAnimations = {
 };
 
 enemyDefinitions.golem = {
-    animations: golemHeadAnimations, life: 12, touchHit: { damage: 1 },
+    animations: golemHeadAnimations, life: 12, touchHit: { damage: 1, canAlwaysKnockback: true },
     acceleration: 0.3, speed: 3,
     hasShadow: false,
     update: updateGolem,

@@ -449,7 +449,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 applyHitToObject(state, object, {...hit, direction: getDirection(dx, dy), knockback}, combinedResult);
             }
         } else if (hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox)) {
-            const direction = getDirection(
+            const direction = hit.direction || getDirection(
                 hitbox.x - hit.hitbox.x + 8 * (hit.vx || 0),
                 hitbox.y - hit.hitbox.y + 8 * (hit.vy || 0)
             );

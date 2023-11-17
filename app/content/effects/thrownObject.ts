@@ -1,6 +1,7 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { playAreaSound } from 'app/musicController';
 import { drawFrame } from 'app/utils/animations';
+import { getDirection } from 'app/utils/direction';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
@@ -44,24 +45,30 @@ export class ThrownObject implements EffectInstance {
         this.behaviors = behaviors ?? {};
         this.damage = this.behaviors.throwDamage ?? damage;
     }
-    getHitbox(state: GameState) {
+    getHitbox() {
         // Technically it is unrealistic to use the z-component in the hitbox, but practically
         // it seems to work a bit better to include it.
-        return { ...this.frame, x: this.x, y: this.y - this.z };
+        return { ...this.frame, x: this.x | 0, y: (this.y | 0) - (this.z | 0) };
     }
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
         this.z += this.vz;
         this.vz -= 0.5;
+        // To prevent hitting tiles north of you when throwing south,
+        // do not hit targets for the first few frames when throwing south.
+        if (this.vy > 0 && this.vz > 0) {
+            return;
+        }
         const hitResult = hitTargets(state, this.area, {
             canPush: true,
             damage: this.damage,
             isThrownObject: true,
-            hitbox: this.getHitbox(state),
+            hitbox: this.getHitbox(),
             knockback: { vx: this.vx, vy: this.vy, vz: 0},
             vx: this.vx,
             vy: this.vy,
+            direction: getDirection(this.vx, this.vy),
             hitEnemies: true,
             hitObjects: true,
         });
@@ -85,5 +92,8 @@ export class ThrownObject implements EffectInstance {
     }
     render(context, state: GameState) {
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y - this.z });
+        /*const hitbox = this.getHitbox();
+        context.fillStyle = 'red';
+        context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
     }
 }

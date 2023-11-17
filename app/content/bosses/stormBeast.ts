@@ -152,22 +152,34 @@ const drawCloudFormation = (context: CanvasRenderingContext2D, state: GameState,
     }
 }
 
+interface CloudParams {
+    enrageLevel: number
+    enrageTime: number
+    counterAttackTimer: number
+    cloudLife: number
+    cloudRegenerateTimer: number
+    cloudIsReforming: boolean
+    counterAttackMode: 'bolts' | 'discharge'
+}
 
-enemyDefinitions.stormHeart = {
+const stormHeart: EnemyDefinition<CloudParams> = {
     // The storm heart is smaller than other hearts, but takes up a lot of space with its cloud barrier.
-    animations: stormHeartAnimations, life: 60, scale: 2, touchHit: { damage: 0 },
+    animations: stormHeartAnimations, life: 60, scale: 2, touchHit: { damage: 0, canAlwaysKnockback: true },
     hasShadow: false,
     update: updateStormHeart,
     params: {
         enrageLevel: 0,
+        enrageTime: 0,
         counterAttackTimer: 0,
         cloudLife: 7,
         cloudRegenerateTimer: 0,
+        cloudIsReforming: false,
+        counterAttackMode: 'bolts',
     },
     immunities: ['lightning'],
     elementalMultipliers: {'ice': 1.5, 'fire': 1.5},
     initialMode: 'hidden',
-    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<CloudParams>): void {
         let frameIndex = Math.floor(7 - enemy.params.cloudLife);
         frameIndex = Math.min(7, Math.max(0, frameIndex));
         drawCloudFormation(context, state, enemy, frameIndex);
@@ -187,10 +199,10 @@ enemyDefinitions.stormHeart = {
             context.fillRect(innerHitbox.x, innerHitbox.y, innerHitbox.w, innerHitbox.h);
         context.restore();*/
     },
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy<CloudParams>, target: Rect): void {
         enemy.defaultRenderPreview(context, target, {x: 0, y: 0, w: 32, h: 32});
     },
-    getHitbox(enemy: Enemy): Rect {
+    getHitbox(enemy: Enemy<CloudParams>): Rect {
         return {
             x: enemy.x - 24,
             y: enemy.y - 48,
@@ -198,7 +210,7 @@ enemyDefinitions.stormHeart = {
             h: 48 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
         };
     },
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+    onHit(state: GameState, enemy: Enemy<CloudParams>, hit: HitProperties): HitResult {
         const innerHitbox = {
             x: enemy.x,
             y: enemy.y,
@@ -229,16 +241,17 @@ enemyDefinitions.stormHeart = {
         }
         if (!(enemy.params.counterAttackTimer > 0)) {
             const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
-            const { mag } = getVectorToTarget(state, enemy, target);
+            const mag = target ? getVectorToTarget(state, enemy, target)?.mag : 0;
             enemy.params.counterAttackMode = (mag >= 128) ? 'bolts' : 'discharge';
             enemy.params.counterAttackTimer = 3200;
         }
         return enemy.defaultOnHit(state, hit);
     }
 };
+enemyDefinitions.stormHeart = stormHeart;
 
-function getStormHeart(this: void, state: GameState, area: AreaInstance): Enemy {
-    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'stormHeart') as Enemy;
+function getStormHeart(this: void, state: GameState, area: AreaInstance): Enemy<CloudParams> {
+    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'stormHeart') as Enemy<CloudParams>;
 }
 
 /*
@@ -288,14 +301,20 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
             // When the hero is far away, the heart will summon a series of targeted
             // lightning bolts to protect itself.
             if (enemy.params.counterAttackTimer % 1000 === 0) {
-                const hitbox = state.hero.getHitbox();
-                enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
-                const lightningBolt = new LightningBolt({
-                    x: hitbox.x + hitbox.w / 2,
-                    y: hitbox.y + hitbox.h / 2,
-                    shockWaveTheta: enemy.params.theta,
-                });
-                addEffectToArea(state, enemy.area, lightningBolt);
+                const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
+                if (target) {
+                    const hitbox = target.getHitbox();
+                    enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
+                    const lightningBolt = new LightningBolt({
+                        x: hitbox.x + hitbox.w / 2,
+                        y: hitbox.y + hitbox.h / 2,
+                        shockWaveTheta: enemy.params.theta,
+                    });
+                    addEffectToArea(state, enemy.area, lightningBolt);
+                } else {
+                    // Abort counterattack if we can no longer find a target.
+                    enemy.params.counterAttackTimer = 0;
+                }
             }
         }
         if (enemy.params.counterAttackTimer <= 0) {
