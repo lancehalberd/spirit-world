@@ -304,7 +304,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             // except the current if the clone tool is being pressed.
             if (!isCloneToolDown || hero !== state.hero) {
                 hero.explosionTime += FRAME_LENGTH;
-                if (hero.explosionTime >= EXPLOSION_TIME) {
+                if (hero.area && hero.explosionTime >= EXPLOSION_TIME) {
                     hero.action = null;
                     hero.explosionTime = 0;
                     playAreaSound(state, hero.area, 'cloneExplosion');

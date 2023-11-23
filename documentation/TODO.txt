@@ -48,7 +48,7 @@ Current tasks:
     - Jumping north towards the edge of the screen causes you to respawn at a safe location
         - Tiles off the edge of the screen should count as safe landing spots for landing or they should block you while jumping.
     - Fix balls can enter doorways (+potential softlock in gauntlet ball puzzle)
-
+    - Clone carried/thrown from shallow water shows shallow water animation.
 
     - Add a procedural cave to the material overworld with 1-3 checks
         - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation
