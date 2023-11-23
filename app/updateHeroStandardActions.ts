@@ -563,6 +563,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 boundingBox: (hero.isAstralProjection || hero.bounce) ? getSectionBoundingBox(state, hero) : undefined,
                 actor: hero,
                 dx: moveX, dy: moveY,
+                canMoveIntoEntranceTiles: hero === state.hero && hero.action !== 'knocked' && hero?.action !== 'thrown',
             });
             // console.log([...state.scriptEvents.activeEvents], [...state.scriptEvents.queue]);
             if (hero.action !== 'knocked' && hero.action !== 'knockedHard') {

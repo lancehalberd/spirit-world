@@ -78,6 +78,8 @@ interface TileBehaviors {
     midHeight?: boolean
     // Low ceiling is solid if the hero has z > 4, also enemies can't move through it by default.
     lowCeiling?: boolean
+    // Entrance tiles are open tiles in doorways that the hero can move onto, but other objects treat as solid.
+    isEntrance?: boolean
     // Tile to replace this with if it is exposed to an element (fire melts/burns things, ice freezes things, etc)
     elementTiles?: {[key in MagicElement]?: number}
     // Specifies tile replacements when exposed to an element based on an offset rather than absolute tile index.

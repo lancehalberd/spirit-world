@@ -98,7 +98,7 @@ export class OpenDoorPath implements ObjectInstance {
     constructor(public door: Door) { }
     getBehaviors(state: GameState) {
         const style = doorStyles[this.door.style] || doorStyles.cavern;
-        return style.pathBehaviors || {isGround: true, lowCeiling: true};
+        return style.pathBehaviors || {isGround: true, lowCeiling: true, isEntrance: true};
     }
     getHitbox(): Rect {
         const style = doorStyles[this.door.style] || doorStyles.cavern;

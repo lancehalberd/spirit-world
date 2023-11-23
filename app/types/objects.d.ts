@@ -240,6 +240,9 @@ interface MovementProperties {
     // 0 - bushes, 1 - light stones, 2 - heavy stones.
     // This was added to support the staff destroying bushes/small rocks, but might be used for enemies as well.
     crushingPower?: number
+    // Used to prevent most things from moving into doorways, and to prevent the hero from
+    // being knocked into doorways.
+    canMoveIntoEntranceTiles?: boolean
 }
 
 interface Projectile {
