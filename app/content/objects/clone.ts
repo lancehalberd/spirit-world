@@ -31,6 +31,7 @@ export class Clone extends Hero {
         // Track the clone rotation relative to the hero picking it up so we can rotate it correctly if the hero
         // changes directions.
         this.carryRotationOffset = directionToLeftRotationsFromRight[this.d] - directionToLeftRotationsFromRight[hero.d];
+        this.wading = false;
         hero.pickUpObject = this;
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
