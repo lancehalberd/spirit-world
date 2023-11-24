@@ -192,9 +192,8 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         } else if (hero.magic > 0) {
             // If the hero has magic, half of burning damage applies to magic and half applies to their life.
             const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
-            state.hero.magic -= drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000;
             // This will result in a 1 second cooldown by default for a 2 second burn.
-            state.hero.increaseMagicRegenCooldown(10);
+            state.hero.spendMagic(drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000, 10);
             // Having the barrier up will completely negate the burn damage applying to the hero's life.
             if (!hero.hasBarrier) {
                 hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
@@ -339,6 +338,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
         || (!state.hero.savedData.passiveTools.phoenixCrown && state.hero.burnDuration > 0);
     if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
+        state.hero.recentMagicSpent = state.hero.recentMagicSpent * (state.hero.magicRegenCooldown - FRAME_LENGTH) / state.hero.magicRegenCooldown;
         state.hero.magicRegenCooldown -= FRAME_LENGTH;
     }
     if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
@@ -352,8 +352,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
         // Slowly expend spirit energy while running.
-        state.hero.magic -= drainCoefficient * 5 * FRAME_LENGTH / 1000;
-        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 5);
+        state.hero.spendMagic(drainCoefficient * 5 * FRAME_LENGTH / 1000, drainCoefficient * FRAME_LENGTH / 5);
     } else if (state.hero.actualMagicRegen < 0) {
         // Magic is being drained for some reason
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
@@ -363,8 +362,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
     }
-    // Clones drain 2 magic per second.
-    state.hero.magic -= 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000;
+    // Clones drain 2 magic per second but do not effect cooldown time.
+    state.hero.spendMagic(2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
     // Meditation grants 3 additional spirit energy per second.
     if (hero.action === 'meditating' && state.hero.magicRegenCooldown <= 0) {
         state.hero.magic += 3 * FRAME_LENGTH / 1000;
@@ -377,11 +376,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
-                state.hero.magic -= drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient;
+                state.hero.spendMagic(drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient);
                 targetLightRadius = 320 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.savedData.passiveTools.catEyes > 0) {
-                state.hero.magic -= drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient;
+                state.hero.spendMagic(drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient);
                 targetLightRadius = 80 * coefficient;
                 minLightRadius += 10 * coefficient;
             }

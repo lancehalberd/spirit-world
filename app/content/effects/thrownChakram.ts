@@ -326,10 +326,11 @@ export class HeldChakram implements EffectInstance {
         if (chargeLevel >= 1) {
             throwSpeed = 12;
             throwDamage += 2;
-            state.hero.magic -= 10;
+            let magicCost = 10;
             if (state.hero.savedData.element) {
-                state.hero.magic -= 10;
+                magicCost += 10;
             }
+            state.hero.spendMagic(magicCost);
         } else if (state.hero.getMaxChargeLevel(state) >= 1) {
             // Chakram reaches max speed twice as fast once you have the charge tool.
             if (this.animationTime >= 300) {

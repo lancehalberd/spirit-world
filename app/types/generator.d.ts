@@ -103,6 +103,7 @@ interface TreeNode {
         targetZone: string
         targetObjectId: string
     }
+    difficultyModifier?: number
     // Indicates this room is a full super tile in width.
     // Can be set as a requirement when creating the tree or randomly added during generation.
     // Set to false to prevent the room from being randomly assigned a wide layout.

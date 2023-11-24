@@ -99,7 +99,9 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
     if (state.hero.magic >= 1) {
         drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCapHeight + barHeight - spiritBottom.h + 1});
     }
-    const fillHeight = Math.floor(state.hero.magic);
+    //const fillHeight = Math.floor(state.hero.magic);
+    const magicSpent = Math.ceil(state.hero.recentMagicSpent);
+    const fillHeight = Math.floor(Math.min(state.hero.maxMagic, state.hero.magic + magicSpent));
     if (fillHeight > 0) {
         drawFrame(context, spiritFill, {...spiritFill, x, y: y + topCapHeight + barHeight - fillHeight, h: fillHeight});
         // Draw the top of the spirit bar at 100%, otherwise draw the indicator line at the top of the fill.
@@ -108,6 +110,14 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         } else if (fillHeight > 1) {
             drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCapHeight + barHeight - fillHeight});
         }
+    }
+    const spentHeight = Math.floor(Math.min(fillHeight, magicSpent));
+    if (spentHeight > 0) {
+        context.save();
+            context.globalAlpha *= 0.6;
+            context.fillStyle = 'red';
+            context.fillRect(x + 6, y + topCapHeight + barHeight - fillHeight, 4, spentHeight);
+        context.restore();
     }
     if (state.renderMagicCooldown) {
         const cooldownHeight = Math.floor(state.hero.magicRegenCooldown / 100);

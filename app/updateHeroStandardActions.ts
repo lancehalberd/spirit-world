@@ -357,11 +357,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         if (isToolButtonPressed(state, 'cloak') && hero.hasBarrier) {
             if (hero.chargeTime >= 400) {
                 hero.burstBarrier(state);
-                state.hero.magic -= 10;
+                let magicCost = 10;
                 if (state.hero.savedData.element) {
-                    state.hero.magic -= 10;
+                    magicCost += 10;
                 }
-                state.hero.increaseMagicRegenCooldown(500);
+                state.hero.spendMagic(magicCost);
                 if (hero.savedData.activeTools.cloak >= 2) {
                     hero.isInvisible = true;
                 }
@@ -613,8 +613,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (state.hero.savedData.passiveTools.teleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
-                state.hero.magic -= 10;
-                state.hero.increaseMagicRegenCooldown(500);
+                state.hero.spendMagic(10);
                 state.hero.x = hero.x;
                 state.hero.y = hero.y;
                 // match the projection to the hero eyes.
@@ -799,8 +798,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             delete hero.heldChakram;
         }
         hero.chargingLeftTool = hero.chargingRightTool = false;
-        state.hero.magic -= 5;
-        state.hero.increaseMagicRegenCooldown(200);
+        state.hero.spendMagic(5);
         hero.action = 'roll';
         hero.isAirborn = true;
         hero.actionFrame = 0;

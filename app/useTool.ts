@@ -49,8 +49,7 @@ export function useTool(
             if (element === 'lightning') {
                 speed += 2;
             }
-            state.hero.magic -= magicCost;
-            state.hero.increaseMagicRegenCooldown(1000 * magicCost / 10);
+            state.hero.spendMagic(magicCost);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'bow';
             let direction = hero.d;
@@ -158,8 +157,7 @@ export function useTool(
             if (state.hero.magic < magicCost) {
                 return;
             }
-            state.hero.magic -= magicCost;
-            state.hero.increaseMagicRegenCooldown(1000 * magicCost / 10);
+            state.hero.spendMagic(magicCost);
             hero.toolOnCooldown = 'cloak';
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
             hero.toolCooldown = 400;
@@ -182,8 +180,7 @@ export function useTool(
             if (isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)
                 && state.hero.clones.length < maxClones
             ) {
-                state.hero.magic -= 10;
-                state.hero.increaseMagicRegenCooldown(1000 * 10 / 10);
+                state.hero.spendMagic(10);
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
@@ -202,8 +199,7 @@ export function useTool(
             }
             // The normal clone tool functionality only works when no clones currently exist.
             if (!state.hero.clones.length) {
-                state.hero.magic -= 10;
-                state.hero.increaseMagicRegenCooldown(1000 * 10 / 10);
+                state.hero.spendMagic(10);
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
@@ -226,8 +222,7 @@ export function useTool(
             if (hero.activeStaff?.area || state.hero.magic <= 0) {
                 return;
             }
-            state.hero.magic -= 10;
-            state.hero.increaseMagicRegenCooldown(1000 * 10 / 50);
+            state.hero.spendMagic(10);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'staff';
             hero.canceledStaffPlacement = false;

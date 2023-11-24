@@ -94,7 +94,7 @@ export class AstralProjection extends Hero {
         }
         if (hit.damage) {
             // Astral projection damage is applied to the magic meter at 5x effectiveness.
-            state.hero.magic -= Math.max(10, hit.damage * 5);
+            state.hero.spendMagic(Math.max(10, hit.damage * 5));
             // Astral projection has fewer invulnerability frames since it can't be killed
             // and magic regenerates automatically.
             this.invulnerableFrames = 20;

@@ -121,6 +121,9 @@ export class Hero implements Actor {
     magicRegenCooldown: number = 0;
     // This is the maximum value magic regen cooldown can reach. It is reduced by certain items.
     magicRegenCooldownLimit: number = 4000;
+    // How much magic the hero has spent recently. This is drawn as a red bar on top of remaining magic
+    // and is used to visualize both how much magic the hero spent and how long until magic regen starts again.
+    recentMagicSpent: number = 0;
     lightRadius: number = 20;
     rollCooldown: number = 0;
     toolCooldown: number = 0;
@@ -286,9 +289,9 @@ export class Hero implements Actor {
                 reflectDamage++;
             }
             if (hit.damage && state.hero.invulnerableFrames <= 0) {
-                state.hero.magic -= spiritDamage;
+                state.hero.spendMagic(spiritDamage);
                 state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, iframeMultiplier * 10);
-                state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
+                // state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
             }
             const hitbox = this.getHitbox();
             if (hit.canAlwaysKnockback && hit.knockback) {
@@ -768,6 +771,18 @@ export class Hero implements Actor {
         hero.pickUpTile = null;
     }
 
+    // This should only be called on `state.hero`.
+    spendMagic(amount: number, cooldownAmount?: number) {
+        this.magic -= amount;
+        this.recentMagicSpent += amount;
+        if (cooldownAmount > 0) {
+            this.increaseMagicRegenCooldown(cooldownAmount);
+        } else if (cooldownAmount !== 0) {
+            this.increaseMagicRegenCooldown(100 * amount);
+        }
+    }
+
+    // This should only be called on `state.hero`.
     increaseMagicRegenCooldown(amount: number): void {
         this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
     }
