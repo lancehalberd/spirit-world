@@ -706,13 +706,19 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         let closestLiftableTileCoords: TileCoords = null,
             closestObject: ObjectInstance = null,
             closestDistance = 100;
+        let glovesLevel = 0;
+        if (state.hero.savedData.passiveTools.gloves & 2) {
+            glovesLevel = 2;
+        } else if (state.hero.savedData.passiveTools.gloves & 1) {
+            glovesLevel = 1;
+        }
         for (const target of tiles) {
             const behavior = hero.area.behaviorGrid?.[target.y]?.[target.x];
             if (behavior?.solid) {
                 hero.action = 'grabbing';
                 hero.grabTile = target;
             }
-            if (hero.savedData.passiveTools.gloves >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
+            if (glovesLevel >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
                 // This is an unusual distance, but should do what we want still.
                 const distance = (
                     Math.abs(target.x * 16 - hero.x) +
@@ -751,7 +757,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             for (const layer of hero.area.layers) {
                 const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                 const behavior = tile?.behaviors;
-                if (behavior?.pickupWeight <= state.hero.savedData.passiveTools.gloves) {
+                if (behavior?.pickupWeight <= glovesLevel) {
                     hero.pickUpTile = tile;
                     playAreaSound(state, hero.area, 'pickUpObject');
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);

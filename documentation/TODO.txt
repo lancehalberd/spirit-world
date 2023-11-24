@@ -46,10 +46,7 @@ Cannot reproduce:
         - Possibly fixed by other changes.
 
 Current tasks:
-    - Fix can pick up solid rocks...
-
-    - Lower priority:
-        - Fix Golem hands are not blocking charged chakram attacks.
+    - Fix Golem hands are not blocking charged chakram attacks.
 
     - Add a variant cave with new paths to the mountains + spirit world.
         - 3 possible entrances determined by variant seed:
