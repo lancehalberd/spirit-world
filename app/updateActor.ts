@@ -334,12 +334,14 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
     }
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
-    const preventRegeneration = state.hero.actualMagicRegen < 0
+    const preventCooldownRegeneration = isInvisible
         || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
         || (!state.hero.savedData.passiveTools.phoenixCrown && state.hero.burnDuration > 0);
-    if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
+    if (state.hero.magicRegenCooldown > 0 && !preventCooldownRegeneration) {
         state.hero.recentMagicSpent = state.hero.recentMagicSpent * (state.hero.magicRegenCooldown - FRAME_LENGTH) / state.hero.magicRegenCooldown;
         state.hero.magicRegenCooldown -= FRAME_LENGTH;
+    } else if (!preventCooldownRegeneration) {
+        state.hero.recentMagicSpent = 0;
     }
     if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
         // Double regeneration rate while idle.
@@ -362,8 +364,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
     }
-    // Clones drain 2 magic per second but do not effect cooldown time.
-    state.hero.spendMagic(2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
+    if (state.hero.clones.length) {
+        // Clones drain 2 magic per second but do not effect cooldown time.
+        state.hero.spendMagic(2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
+    }
     // Meditation grants 3 additional spirit energy per second.
     if (hero.action === 'meditating' && state.hero.magicRegenCooldown <= 0) {
         state.hero.magic += 3 * FRAME_LENGTH / 1000;
@@ -376,11 +380,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
-                state.hero.spendMagic(drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient);
+                state.hero.spendMagic(drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient, 0);
                 targetLightRadius = 320 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.savedData.passiveTools.catEyes > 0) {
-                state.hero.spendMagic(drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient);
+                state.hero.spendMagic(drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient, 0);
                 targetLightRadius = 80 * coefficient;
                 minLightRadius += 10 * coefficient;
             }

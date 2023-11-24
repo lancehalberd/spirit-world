@@ -46,9 +46,10 @@ Cannot reproduce:
         - Possibly fixed by other changes.
 
 Current tasks:
-    - Fix clones continue to drain spirit energy when switching to a new area instance.
-        - Despawn clones that aren't in the hero's current area.
-    - For some reason picking up/throwing a clone seems to reset spirit energy cooldown.
+    - Fix can pick up solid rocks...
+
+    - Lower priority:
+        - Fix Golem hands are not blocking charged chakram attacks.
 
     - Add a variant cave with new paths to the mountains + spirit world.
         - 3 possible entrances determined by variant seed:

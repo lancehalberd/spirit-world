@@ -100,23 +100,29 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCapHeight + barHeight - spiritBottom.h + 1});
     }
     //const fillHeight = Math.floor(state.hero.magic);
-    const magicSpent = Math.ceil(state.hero.recentMagicSpent);
-    const fillHeight = Math.floor(Math.min(state.hero.maxMagic, state.hero.magic + magicSpent));
+    const fillHeight = Math.min(state.hero.maxMagic, Math.round(state.hero.magic + state.hero.recentMagicSpent));
+    const magicSpent = fillHeight - Math.floor(Math.min(state.hero.maxMagic, state.hero.magic));
+    const spentHeight = Math.min(fillHeight, magicSpent);
     if (fillHeight > 0) {
         drawFrame(context, spiritFill, {...spiritFill, x, y: y + topCapHeight + barHeight - fillHeight, h: fillHeight});
         // Draw the top of the spirit bar at 100%, otherwise draw the indicator line at the top of the fill.
-        if (fillHeight >= state.hero.maxMagic) {
+        if (fillHeight >= state.hero.maxMagic && magicSpent === 0) {
             drawFrame(context, spiritTop, {...spiritTop, x, y: y + topCapHeight - 1});
         } else if (fillHeight > 1) {
             drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCapHeight + barHeight - fillHeight});
+            if (spentHeight > 0 && fillHeight - spentHeight > 0) {
+                drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCapHeight + barHeight - fillHeight + spentHeight});
+            }
         }
     }
-    const spentHeight = Math.floor(Math.min(fillHeight, magicSpent));
     if (spentHeight > 0) {
         context.save();
             context.globalAlpha *= 0.6;
-            context.fillStyle = 'red';
+            context.fillStyle = 'black';
             context.fillRect(x + 6, y + topCapHeight + barHeight - fillHeight, 4, spentHeight);
+            if (fillHeight >= state.hero.maxMagic) {
+                context.fillRect(x + 7, y + topCapHeight + barHeight - fillHeight - 1, 2, 1);
+            }
         context.restore();
     }
     if (state.renderMagicCooldown) {

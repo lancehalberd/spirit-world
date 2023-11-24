@@ -773,9 +773,15 @@ export class Hero implements Actor {
 
     // This should only be called on `state.hero`.
     spendMagic(amount: number, cooldownAmount?: number) {
+        //console.log('spendMagic', amount, cooldownAmount);
         this.magic -= amount;
         this.recentMagicSpent += amount;
-        if (cooldownAmount > 0) {
+        if (this.magic < 0) {
+            // This prevents the recentMagicSpent portion from jumping when your magic becomes negative.
+            this.recentMagicSpent += this.magic - 1;
+            this.magic = -1;
+            this.magicRegenCooldown = this.magicRegenCooldownLimit;
+        } else if (cooldownAmount > 0) {
             this.increaseMagicRegenCooldown(cooldownAmount);
         } else if (cooldownAmount !== 0) {
             this.increaseMagicRegenCooldown(100 * amount);
@@ -784,6 +790,7 @@ export class Hero implements Actor {
 
     // This should only be called on `state.hero`.
     increaseMagicRegenCooldown(amount: number): void {
+        //console.log('increaseMagicRegenCooldown', amount);
         this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
     }
 }
