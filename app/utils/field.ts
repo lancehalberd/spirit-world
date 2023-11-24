@@ -20,6 +20,12 @@ export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Poin
 window['canSomersaultToCoords'] = canSomersaultToCoords;
 
 export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Point, movementProperties: MovementProperties): boolean {
+    x = x | 0;
+    y = y | 0;
+    /*console.log(x, y, isPointOpen(state, area, {x: x, y: y}, movementProperties));
+    console.log(x + 15, y, isPointOpen(state, area, {x: x + 15, y: y}, movementProperties));
+    console.log(x, y + 15, isPointOpen(state, area, {x: x, y: y + 15}, movementProperties));
+    console.log(x + 15, y + 15, isPointOpen(state, area, {x: x + 15, y: y + 15}, movementProperties));*/
    /* return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
         isPointOpen(state, area, {x: x + 13, y: y + 2}, movementProperties) &&
         isPointOpen(state, area, {x: x + 2, y: y + 13}, movementProperties) &&

@@ -45,8 +45,9 @@ Cannot reproduce:
 
 Current tasks:
     - If controlled clones despawns during quick clone toss, sometimes you'll take control of the original clone in an invalid position, such as inside a solid object or cliff face.
-    - Jumping north towards the edge of the screen causes you to respawn at a safe location
-        - Tiles off the edge of the screen should count as safe landing spots for landing or they should block you while jumping.
+
+    - Add a short grace period where whirlpools cannot grab you when surfacing in an area.
+        - Not sure if we have an existing timer for determining this, but we could add the time the hero entered the area if necessary.
 
     - Add a procedural cave to the material overworld with 1-3 checks
         - checks blocked by any early game items: bow/roll/gloves/astral projection/cloak/teleportation

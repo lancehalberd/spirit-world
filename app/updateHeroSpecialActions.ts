@@ -430,6 +430,24 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
 
 
         if (hero.z <= groundZ) {
+            // This is supposed to protect against landing slightly outside of the area causing the player to take damage
+            // as if they landed somewhere invalid but it seems like it might not be needed with fixes to isPointOpen.
+            /*if (!state.nextAreaInstance) {
+                const movementHitbox = hero.getMovementHitbox();
+                // Snap player to the current area if they are not currently transitioning. Otherwise they will
+                // land outside of the area which is invalid for landing causing them to take damage and
+                // respawn at their last safe location.
+                if (movementHitbox.x < 0) {
+                    hero.x -= movementHitbox.x;
+                } else if (movementHitbox.x + movementHitbox.w > 16 * state.areaInstance.w ) {
+                    hero.x -= ((movementHitbox.x + movementHitbox.w) - 16 * state.areaInstance.w);
+                }
+                if (movementHitbox.y < 0) {
+                    hero.y -= movementHitbox.y
+                } else if (movementHitbox.y + movementHitbox.h > 16 * state.areaInstance.h ) {
+                    hero.y -= ((movementHitbox.y + movementHitbox.h) - 16 * state.areaInstance.h);
+                }
+            }*/
             hero.z = groundZ
             hero.isAirborn = hero.isAstralProjection;
             hero.action = null;
