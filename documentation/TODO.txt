@@ -46,8 +46,6 @@ Cannot reproduce:
         - Possibly fixed by other changes.
 
 Current tasks:
-    - Fix Golem hands are not blocking charged chakram attacks.
-
     - Add a variant cave with new paths to the mountains + spirit world.
         - 3 possible entrances determined by variant seed:
             - Overworld near Mountain Tower
