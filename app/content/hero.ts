@@ -773,14 +773,16 @@ export class Hero implements Actor {
 
     // This should only be called on `state.hero`.
     spendMagic(amount: number, cooldownAmount?: number) {
-        //console.log('spendMagic', amount, cooldownAmount);
+        // console.log('spendMagic', amount, cooldownAmount);
         this.magic -= amount;
         this.recentMagicSpent += amount;
         if (this.magic < 0) {
             // This prevents the recentMagicSpent portion from jumping when your magic becomes negative.
-            this.recentMagicSpent += this.magic - 1;
-            this.magic = -1;
-            this.magicRegenCooldown = this.magicRegenCooldownLimit;
+            this.recentMagicSpent += this.magic - 0.001;
+            this.magic = -0.001;
+            if (amount >= 10) {
+                this.magicRegenCooldown = this.magicRegenCooldownLimit;
+            }
         } else if (cooldownAmount > 0) {
             this.increaseMagicRegenCooldown(cooldownAmount);
         } else if (cooldownAmount !== 0) {
