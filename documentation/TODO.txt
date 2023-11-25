@@ -61,10 +61,6 @@ Current tasks:
         - Exit blocked by Cloud Boots/Ice(U-turn cracked ground) or Astral Projection (pot switches in both worlds)
             - Exits to ledge above entrance to cave ascent, which will now have a Silver Ore on it.
 
-    - Add a short grace period where whirlpools cannot grab you when surfacing in an area.
-        - Not sure if we have an existing timer for determining this, but we could add the time the hero entered the area if necessary.
-
-
     - Add Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
         - Have to find schematics + 1 silver ore and can craft at regular smith after fully upgrading chakram.
         - Similar upgrades from spirit smith for iron boots+cloud boots after fully upgrading gold chakram.

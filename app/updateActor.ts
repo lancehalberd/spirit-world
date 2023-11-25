@@ -151,6 +151,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.clones?.length && hero.savedData.leftTool !== 'clone' && hero.savedData.rightTool !== 'clone') {
         removeAllClones(state);
     }
+    hero.areaTime += FRAME_LENGTH;
     if (hero.frozenDuration > 0) {
         hero.frozenDuration -= FRAME_LENGTH;
     } else {

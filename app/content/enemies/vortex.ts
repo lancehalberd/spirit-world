@@ -54,6 +54,9 @@ enemyDefinitions.vortex = {
             if (!(hero instanceof Hero)) {
                 return;
             }
+            if (hero.areaTime < 500) {
+                return;
+            }
             // Vortexes on the surface only suck heroes towards them that are swimming.
             if (!vortexIsUnderwater && !(hero.swimming || hero.wading)) {
                 continue

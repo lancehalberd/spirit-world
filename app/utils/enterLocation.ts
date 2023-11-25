@@ -118,6 +118,7 @@ export function enterLocation(
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
     linkObjects(state);
     state.hero.area = state.areaInstance;
+    state.hero.areaTime = 0;
     state.hero.x = location.x;
     state.hero.y = location.y;
     if (location.z >= 0) {
