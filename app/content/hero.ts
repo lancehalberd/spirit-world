@@ -64,6 +64,8 @@ export class Hero implements Actor {
     actionDy?: number;
     actionFrame?: number = 0;
     actionTarget?: any;
+    // How long the hero has been in the current area.
+    areaTime: number = 0;
     animationTime: number = 0;
     attackBufferTime: number = 0;
     // like being knocked but doesn't stop MC charge or other actions.

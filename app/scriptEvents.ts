@@ -247,6 +247,18 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             });
             continue
         }
+        if (actionToken.startsWith('timeout:')) {
+            const valueToken = actionToken.substring('timeout:'.length);
+            let duration = parseInt(valueToken, 10);
+            if (isNaN(duration)) {
+                duration = 1000;
+            }
+            events.push({
+                type: 'wait',
+                duration,
+            });
+            continue
+        }
         console.error('Unhandled action token', actionToken);
     }
     events.push({ type: 'clearTextBox' });

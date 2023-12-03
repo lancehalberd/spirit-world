@@ -1,7 +1,7 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
-    - Enemies can get trapped inside the Staff Tower graphics if they are in the are it occupies when it is created.
+    - Enemies can get trapped inside the Staff Tower graphics if they are in the area it occupies when it is created.
         - Should probably kill enemies in this area when setting up the tower.
 
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
@@ -39,13 +39,19 @@ Graphics:
 
 Cannot reproduce:
     - Robot stopped moving in ST basement. Maybe ice damage against shield is broken?
-        - Unable to reproduce.
     - There was a bug where almost killing Storm Heart with burning damage would leave it invulnerable, but I haven't been able to reproduce.
         - If this happens again, investigate the state of the Storm Heart to get a better understanding of what triggers this, for example is it related to enrage or enemy iframes?
     - If controlled clones despawns during quick clone toss, sometimes you'll take control of the original clone in an invalid position, such as inside a solid object or cliff face.
         - Possibly fixed by other changes.
 
 Current tasks:
+
+    - Fix level 1 staff shows as level 2 staff when obtained after level 2 staff in randomizer.
+
+    - Come up with a method for generating enemy patterns in generated areas.
+        - Want to be able to have a consitent theme for an area
+            - So of multiple possible enemy combinations, one is chosen for a zone and then each section chooses enemies from this combination.
+
     - Add a variant cave with new paths to the mountains + spirit world.
         - 3 possible entrances determined by variant seed:
             - Overworld near Mountain Tower
@@ -61,9 +67,16 @@ Current tasks:
         - Exit blocked by Cloud Boots/Ice(U-turn cracked ground) or Astral Projection (pot switches in both worlds)
             - Exits to ledge above entrance to cave ascent, which will now have a Silver Ore on it.
 
-    - Add Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
-        - Have to find schematics + 1 silver ore and can craft at regular smith after fully upgrading chakram.
-        - Similar upgrades from spirit smith for iron boots+cloud boots after fully upgrading gold chakram.
+    - Add boot upgrades:
+        - Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
+            - Have to find schematics + 2 silver ore + 100 Jade and can craft at regular smith after fully upgrading chakram.
+            - Schematics are in an ice cave in the material world
+        - Flying Boots that replace cloud boots. Flying boots can move over pits.
+            - Schematics are given by the regular smith after fully upgrading the chakram.
+            - Bring schematics, 1 gold ore and cloud boots to spirit Smith to upgrade to flying boots after fully upgrading gold chakram.
+        - Forge Boots that replace iron boots. Forge boots have no movement penalty and can walk on lava without taking damage.
+            - Schematics are given by the spirit smith after fully upgrading the gold chakram.
+            - Bring schematics, 1 gold ore and iron boots to spirit Smith to upgrade to forge boots after fully upgrade gold chakram.
 
     - Add additional blockedPath styles.
         - Maybe cracked pots requiring clone tool
@@ -313,7 +326,6 @@ Current tasks:
 
     - Require traversing War Palace from top to bottom in the Spirit World, starting from the Sky
 
-
     - generate bow chest switch puzzle
         - switches are E/W/N/S from a single point in the area at least 4 tiles out from the point.
         - increase difficulty with
@@ -336,7 +348,6 @@ Current tasks:
     - generate bow door switch puzzle
         - increase difficulty with
             - 1 - 4 switches on 4/3/2/1s timers
-
 
     - Chest styles
         - Trash (Jade)
@@ -396,9 +407,6 @@ Current tasks:
 
     - Heavy 2x2 blocks that can only be pushed if the player has mitts
         - Make this a variation of push/pull object that is 32x32
-
-    - Try using fade transition for material -> spirit world
-        - If this isn't better, try using a circle wipe transition with a gradient instead.
 
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
@@ -754,9 +762,6 @@ High level list of things left to do:
 Generic boss improvements
     - Add vulnerable phases for bosses where they take ~5x damage, increase boss health by ~2x
 
-Lava improvements:
-    - Eventually we might want to make this temporary.
-
 Misc improvements
     - allow facing diagonals while not moving?
 
@@ -837,7 +842,7 @@ Golem Boss Improvements:
 
 Dungeon 2 Improvements:
     - Add more uses of spirit sight:
-        - See actual elemental beasts in the front room where the statues are located.
+        - pot puzzle to open a door, 4 pots, 3 are linked and blocked, 1 can be moved to the switch
 
 Dungeon 3 Improvements:
     - Add new enemies.
@@ -854,6 +859,12 @@ River Temple Improvements:
 Staff Tower Improvements
     - Add a prompt after defeating the boss to indicate that the elevator is working again
         - Might be tricky to word in a way that makes sense. "The lights got brighter, maybe some of the machines work now."
+    - Fix enemies can attack you while you are paused waiting for the elevator.
+        - Make the screen shake a little while the elevator is coming instead of freezing the player
+            - This is a little tricky because we have to handle the possibility of the player leaving before the script completes.
+            - We could add some sort of `onCancel` or `finally` behavior for scripts that run to make sure they are left in a good state if they don't complete. Maybe scripts aren't canceled on leaving in which case this may not be an issue.
+            - This needs to handle ignoring the player interacting with the sign again if they have already called the elevator.
+        - Add a screen outside the elevator for summoning it.
     - Add content to 4F Material world, probably some sort of gauntlet that is easier when the boss is defeated.
         - Should have a short cut so it can by bypassed after completing once.
     - Conveyer belts/escalators.
@@ -880,6 +891,8 @@ Crater Improvements
             - Or fight it in the spirit world if you are there
     - Add heat sink enemies
         - Like ghosts in material world
+        - Move to the hottest tile/object they can find:
+            - lava (4x radius) > fire (2x radius) > player (radius) > freezeable tile (radius)
         - Become solid+vulnerable when they try to pump heat from the material world
         - Can turn lava tiles solid briefly, or solid tiles to ice
         - Will try to chase and freeze the player if they get near

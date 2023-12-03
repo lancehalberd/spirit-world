@@ -137,7 +137,7 @@ specialBehaviorsHash.elevatorDoor = {
                         ? `The door won't open.`
                         : `
                         {playSound:switch}
-                        {wait:1500}
+                        {wait:500}
                         {playSound:switch}
                         {flag:elevatorFloor=${doorFloor}}`
                     );

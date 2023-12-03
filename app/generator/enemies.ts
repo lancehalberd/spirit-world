@@ -16,15 +16,15 @@ interface EnemyGroup {
 
 }
 
+/*
+EnemyPool:
+    2 of [Snake 1, Beetle 1, FlyingBeetle 2, TinyBeetle 0]
+    2 of [ChargingBeetle 3, golemHand 3, ArrowTurret 3]
+    1 of [miniGolem 5]
+ */
 
-export function addEnemyFromGroupToSlot(slot: RoomSlot, groups: EnemyGroup[], maxDifficulty?: number) {
-
-    const cx = (slot.x + slot.w / 2) * 16;
-    const cy = (slot.y + slot.h / 2) * 16;
-}
-
-export function addEnemyFromGroupToSlot(slot: RoomSlot, groups: EnemyGroup[], maxDifficulty?: number) {
-
+// Adds the enemy group to a slot
+export function addEnemyGroupToSlot(slot: RoomSlot, groups: EnemyGroup, maxDifficulty?: number) {
     const cx = (slot.x + slot.w / 2) * 16;
     const cy = (slot.y + slot.h / 2) * 16;
 }
