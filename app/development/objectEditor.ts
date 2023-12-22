@@ -1301,6 +1301,7 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         }
     }
     rows.push({
+        id: 'objectStyle',
         name: 'style',
         value: object.style || Object.keys(styles)[0],
         values: Object.keys(styles),

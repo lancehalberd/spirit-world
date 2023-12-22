@@ -8,6 +8,7 @@ export * from 'app/content/zones/underwater';
 export * from 'app/content/zones/caves';
 export * from 'app/content/zones/hypeCave';
 export * from 'app/content/zones/bellCave';
+export * from 'app/content/zones/treeCave';
 export * from 'app/content/zones/holyCityInterior';
 export * from 'app/content/zones/grandTemple';
 export * from 'app/content/zones/waterfallCave';

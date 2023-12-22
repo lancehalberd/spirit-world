@@ -131,6 +131,7 @@ function getObjectPaletteProperties(): PanelRows {
 function getTileChunkProperties(): PanelRows {
     let rows: PanelRows = [];
     rows.push({
+        id: 'tileChunkStyle',
         name: 'style',
         value: editingState.tileChunkKey,
         values: Object.keys(chunkGenerators),
