@@ -707,10 +707,13 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             closestObject: ObjectInstance = null,
             closestDistance = 100;
         let glovesLevel = 0;
-        if (state.hero.savedData.passiveTools.gloves & 2) {
-            glovesLevel = 2;
-        } else if (state.hero.savedData.passiveTools.gloves & 1) {
-            glovesLevel = 1;
+        // Gloves do not apply to the astral projection.
+        if (!hero.isAstralProjection) {
+            if (state.hero.savedData.passiveTools.gloves & 2) {
+                glovesLevel = 2;
+            } else if (state.hero.savedData.passiveTools.gloves & 1) {
+                glovesLevel = 1;
+            }
         }
         for (const target of tiles) {
             const behavior = hero.area.behaviorGrid?.[target.y]?.[target.x];
@@ -762,7 +765,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     playAreaSound(state, hero.area, 'pickUpObject');
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                     if (behavior.linkableTiles) {
-                        const alternateLayer = state.alternateAreaInstance.layers.find(l => l.key === layer.key);
+                        const alternateLayer = hero.area.alternateArea.layers.find(l => l.key === layer.key);
                         if(alternateLayer) {
                             const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                             if (linkedTile && behavior.linkableTiles.includes(linkedTile.index)) {

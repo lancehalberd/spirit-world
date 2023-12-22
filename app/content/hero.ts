@@ -768,7 +768,7 @@ export class Hero implements Actor {
             });
             alternateThrownObject.linkedObject = thrownObject;
             thrownObject.linkedObject = alternateThrownObject;
-            addEffectToArea(state, state.alternateAreaInstance, alternateThrownObject);
+            addEffectToArea(state, hero.area.alternateArea, alternateThrownObject);
         }
         hero.pickUpTile = null;
     }

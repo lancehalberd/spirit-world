@@ -462,6 +462,18 @@ const lootFrames = {
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
 } as const;
 
+function determineLevel(lootLevel: number, currentValue: number): number {
+    if (lootLevel) {
+        return lootLevel;
+    }
+    for (let i = 0; i < 2; i++) {
+        if ((currentValue & (1 << i)) === 0) {
+            return i + 1;
+        }
+    }
+    return 1;
+}
+
 const [
     lightHalf, darkHalf, wholeCoin
 ] = createAnimation('gfx/hud/money.png', largeMoneyGeometry, {x: 7, cols: 3}).frames;
@@ -484,43 +496,50 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         return wholeCoin;
     }
     if (lootType === 'weapon') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.weapon)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.weapon);
+        if (lootLevel === 1){
             return silverChakram;
         }
         return goldChakram;
     }
     if (lootType === 'bow') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.bow)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.bow);
+        if (lootLevel === 1) {
             return bow;
         }
         return goldBow;
     }
     if (lootType === 'cloak') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.cloak)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.cloak);
+        if (lootLevel === 1) {
             return lootFrames.spiritCloak;
         }
         return lootFrames.invisibilityCloak;
     }
     if (lootType === 'staff') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.staff)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.staff);
+        if (lootLevel === 1) {
             return lootFrames.staff;
         }
         return lootFrames.towerStaff;
     }
     if (lootType === 'clone') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.activeTools.clone)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.clone);
+        if (lootLevel === 1) {
             return lootFrames.clone;
         }
         return lootFrames.clone2;
     }
     if (lootType === 'roll') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.passiveTools.roll)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.passiveTools.roll);
+        if (lootLevel === 1) {
             return lootFrames.roll;
         }
         return lootFrames.somersault;
     }
     if (lootType === 'gloves') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.savedData.passiveTools.gloves)){
+        lootLevel = determineLevel(lootLevel, state.hero.savedData.passiveTools.gloves);
+        if (lootLevel === 1) {
             return lootFrames.gloves;
         }
         return lootFrames.bracelet;
