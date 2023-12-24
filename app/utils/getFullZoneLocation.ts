@@ -59,6 +59,7 @@ export function getShortZoneName(location: ZoneLocation): string {
         case 'ascentCaveSpirit': return 'Spirit Cave';
         case 'ascentCave': return 'Cave';
         case 'bushCave': return 'Cave';
+        case 'treeCave': return 'Cave';
         case 'fertilityShrineSpirit': return 'SpiritShrine';
         case 'fertilityShrine': return 'Shrine';
         case 'jadePalace': return 'Jade Palace';

@@ -179,8 +179,8 @@ const f0_0x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "treeCaveMoney", linked: true, x: 120, y: 128, type: "chest", lootType: "money", lootAmount: 50},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 830, mapId: 'treeCave', floorId: '1F', mapX: 0, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 831, mapId: 'treeCave', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 0, y: 0, w: 16, h: 16, index: 830, mapId: 'overworld', entranceId: 'treeCaveEntrance', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 831, mapId: 'overworld', entranceId: 'treeCaveEntrance', mapX: 0, mapY: 1},
         {x: 16, y: 0, w: 16, h: 32, index: 832, mapId: 'treeCave', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
@@ -366,8 +366,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "treeCaveSpiritEntrance", x: 120, y: 432, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "treeCaveSpiritEntrance", d: "up", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 833, mapId: 'treeCaveSpirit', floorId: '1F', mapX: 0, mapY: 0}, 
-        {x: 0, y: 16, w: 16, h: 16, index: 834, mapId: 'treeCaveSpirit', floorId: '1F', mapX: 0, mapY: 1}, 
+        {x: 0, y: 0, w: 16, h: 16, index: 833, mapId: 'overworld', entranceId: 'treeCaveSpiritEntrance', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 834, mapId: 'overworld', entranceId: 'treeCaveSpiritEntrance', mapX: 0, mapY: 1},
         {x: 16, y: 0, w: 16, h: 32, index: 835, mapId: 'treeCaveSpirit', floorId: '1F', mapX: 1, mapY: 0}, 
     ],
 };
