@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps, canHasTowerStaff, hasSpiritBarrier, hasClone,
-    hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility,
+    hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasStaff,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -269,6 +269,31 @@ export const cavesNodes: LogicNode[] = [
         exits: [
             { objectId: 'helixEntrance' },
         ],
+    },
+
+    // Tree Cave
+    {
+        zoneId: 'treeCave',
+        nodeId: 'treeCaveFront',
+        entranceIds: ['treeCaveEntrance'],
+        exits: [
+            { objectId: 'treeCaveEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeCave',
+        nodeId: 'treeCaveFrontSpirit',
+        entranceIds: ['treeCaveSpiritEntrance'],
+        exits: [
+            { objectId: 'treeCaveSpiritEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeCave',
+        nodeId: 'treeCaveBack',
+        checks: [{objectId: 'treeCaveMoney', logic: hasStaff}],
+        paths: [{ nodeId: 'treeCaveFront'}],
+        entranceIds: ['treeCaveMarker'],
     },
 
     // Clone Cave

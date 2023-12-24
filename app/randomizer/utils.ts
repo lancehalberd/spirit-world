@@ -15,7 +15,7 @@ import {
     findReachableChecks,
     findReachableNodes,
 } from 'app/randomizer/find';
-import { missingExitNodeSet, missingNodeSet, warnOnce } from 'app/randomizer/warnOnce';
+import { missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce } from 'app/randomizer/warnOnce';
 
 import { cloneDeep } from 'app/utils/index';
 import { applySavedState, getDefaultState } from 'app/state';
@@ -874,6 +874,12 @@ export function verifyNodeConnections() {
         for (const exit of (currentNode.exits || [])) {
             const { object } = findDoorById(zone, exit.objectId);
             const exitObject = object as EntranceDefinition;
+            if (!exitObject) {
+                warnOnce(missingObjectSet,
+                    zone.key + '::' + exit.objectId,
+                    'Exit not found: ');
+                continue;
+            }
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
             const nextNode = allNodes.find(node =>
                 (node !== currentNode || exitObject.targetObjectId !== exit.objectId)

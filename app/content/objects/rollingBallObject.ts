@@ -206,6 +206,10 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        // Unlink this ball if the linked ball is destroyed.
+        if (this.linkedObject && !this.linkedObject.area) {
+            delete this.linkedObject;
+        }
         if (this.status !== 'normal') {
             return;
         }

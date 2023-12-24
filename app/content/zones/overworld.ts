@@ -2951,8 +2951,8 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:2x1-luckyBeetle-0", x: 304, y: 392, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-plant-0", linked: false, x: 292, y: 224, type: "enemy", enemyType: "plant", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-plant-1", linked: false, x: 372, y: 64, type: "enemy", enemyType: "plant", d: "down", params: {}},
-        {status: "normal", id: "", x: 352, y: 352, type: "door", style: "tree", d: "up", linked: true},
-        {status: "normal", id: "", x: 368, y: 320, style: "singleTile", type: "pitEntrance"},
+        {status: "normal", id: "treeCaveEntrance", x: 352, y: 352, type: "door", style: "tree", d: "up", linked: true, targetZone: "treeCave", targetObjectId: "treeCaveEntrance"},
+        {status: "normal", id: "treeCavePit", x: 368, y: 320, style: "singleTile", type: "pitEntrance", targetZone: "treeCave", targetObjectId: "treeCaveMarker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 26, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 2},
@@ -6856,7 +6856,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-elementalStorm-1", logicKey: "towerStorm", x: 96, y: 356, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-elementalStorm-2", logicKey: "towerStorm", x: 148, y: 428, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-elementalStorm-4", logicKey: "towerStorm", x: 380, y: 412, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},
-        {status: "normal", id: "", x: 352, y: 352, type: "door", style: "knobbyTree", d: "up", linked: true, spirit: true},
+        {status: "normal", id: "treeCaveSpiritEntrance", x: 352, y: 352, type: "door", style: "knobbyTree", d: "up", linked: true, spirit: true, targetZone: "treeCave", targetObjectId: "treeCaveSpiritEntrance"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 42, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 2},
