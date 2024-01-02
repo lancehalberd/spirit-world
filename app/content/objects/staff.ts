@@ -71,6 +71,17 @@ export class Staff implements ObjectInstance {
             // This is the sized used for determining placement, the final size will be smaller.
             this.w = 12;
         }
+        // Since the player's feet appear low in their tile, plant the staff several pixels further south when placing it in
+        // the up direction so there is not a large gap between the staff hitbox and the players feet.
+        // Otherwise if the player stands on the southern edge of a pit and places the staff, they may create a gap that is big
+        // enough for them to fall into when trying to walk onto the staff.
+        if (this.direction === 'up') {
+            y += 8;
+        } else if (this.direction === 'left') {
+            x += 2;
+        } else if (this.direction === 'right') {
+            x -= 2;
+        }
         this.x = x;
         this.y = y;
         this.element = element;

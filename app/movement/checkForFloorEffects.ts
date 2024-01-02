@@ -28,10 +28,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     hero.z = Math.max(hero.z, hero.groundHeight);
     const tileSize = 16;
 
-    let leftColumn = Math.floor((hero.x + 4) / tileSize);
-    let rightColumn = Math.floor((hero.x + hero.w - 5) / tileSize);
-    let topRow = Math.floor((hero.y + 4) / tileSize);
-    let bottomRow = Math.floor((hero.y + hero.h - 5) / tileSize);
+    let leftColumn = Math.floor(hero.x / tileSize);
+    let rightColumn = Math.floor((hero.x + hero.w) / tileSize);
+    let topRow = Math.floor(hero.y / tileSize);
+    let bottomRow = Math.floor((hero.y + hero.h) / tileSize);
 
     const behaviorGrid = hero.area.behaviorGrid;
     // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall

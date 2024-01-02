@@ -59,6 +59,10 @@ Cannot reproduce:
         - Possibly fixed by other changes.
 
 Current tasks:
+    - Fix "function addEffectToArea(state, area, effect) {"
+        null area in area.effects.push
+    - Fix can hit rolling balls while they are falling.
+
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
             - So of multiple possible enemy combinations, one is chosen for a zone and then each section chooses enemies from this combination.
