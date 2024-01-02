@@ -1,5 +1,9 @@
 
 export function addEffectToArea(state: GameState, area: AreaInstance, effect: EffectInstance): void {
+    if (!area) {
+        console.trace("Missing area instance in addEffectToArea")
+        return;
+    }
     if (effect.area && effect.area !== area) {
         removeEffectFromArea(state, effect);
     }

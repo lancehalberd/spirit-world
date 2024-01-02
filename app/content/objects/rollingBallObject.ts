@@ -75,6 +75,9 @@ export class RollingBallObject implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, {canPush, direction, isBonk, isStaff}: HitProperties): HitResult {
+        if (this.z > this.groundHeight) {
+            return {};
+        }
         // If the staff is allowed to hit rolling balls, it should shatter them instead of appear to
         // go through them.
         // Another option would be for it to bounce the staff back instead.
@@ -93,6 +96,9 @@ export class RollingBallObject implements ObjectInstance {
         return { blocked: true, hit: true };
     }
     onPush(state: GameState, direction: Direction): void {
+        if (this.z > this.groundHeight) {
+            return;
+        }
         if (!this.rollDirection) {
             this.pushCounter++;
             this.pushedThisFrame = true;
