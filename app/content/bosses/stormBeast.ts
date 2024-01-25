@@ -615,10 +615,10 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         }
         const heartBox = stormHeart.getHitbox();
         if (moveEnemyToTargetLocation(state, enemy, heartBox.x + heartBox.w / 2, heartBox.y + heartBox.h / 2) < 10) {
-            if (enemy.modeTime % 1000 === 0) {
-                enemy.life += 0.5;
+            if (enemy.modeTime % 100 === 0) {
+                enemy.life += 0.1;
                 // Drains a little life from the heart to regenerate.
-                stormHeart.life -= 0.1;
+                // stormHeart.life -= 0.1;
             }
         }
         if (enemy.life >= maxLife) {

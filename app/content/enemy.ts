@@ -727,6 +727,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.status = 'gone';
             }
             return;
+        } else {
+            this.checkIfDefeated(state);
         }
         const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
         if (this.action === 'knocked') {
