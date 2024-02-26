@@ -46,11 +46,13 @@ const sectionLayouts = {
 const tileScale = 2;
 const pixelScale = tileScale / 16;
 
-const [mapCanvas, mapContext] = createCanvasAndContext(128, 128);
+const defaultSize = 128;
+
+const [mapCanvas, mapContext] = createCanvasAndContext(defaultSize, defaultSize);
 mapCanvas.style.position = 'absolute'
 mapCanvas.style.top = '0px';
 mapCanvas.style.left = '0px';
-const [mapOverlayCanvas, mapOverlayContext] = createCanvasAndContext(128, 128);
+const [mapOverlayCanvas, mapOverlayContext] = createCanvasAndContext(defaultSize, defaultSize);
 mapOverlayCanvas.style.position = 'absolute'
 mapOverlayCanvas.style.top = '0px';
 mapOverlayCanvas.style.left = '0px';
@@ -107,6 +109,9 @@ function jumpToMinimapLocation() {
 }
 
 const minimapContainer = tagElement('div');
+// Initialize the minimap container to the correct size, otherwise it will be 0x0 and other elements will render behind the minimap.
+minimapContainer.style.width = `${defaultSize}px`;
+minimapContainer.style.height = `${defaultSize}px`;
 minimapContainer.style.position = 'relative';
 minimapContainer.append(mapCanvas);
 minimapContainer.append(mapOverlayCanvas);
