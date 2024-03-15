@@ -67,21 +67,6 @@ export class DoorTop implements ObjectInstance {
                 drawFrame(context, frame, { ...frame, x: this.door.x, y: this.door.y });
             }
         }
-        if (this.door.status === 'frozen') {
-            context.save();
-                context.globalAlpha = 0.5;
-                context.fillStyle = 'white';
-                if (definition.d === 'up') {
-                    context.fillRect(this.door.x, this.door.y, 32, 12);
-                } else if (definition.d === 'down') {
-                    context.fillRect(this.door.x, this.door.y + 20, 32, 12);
-                } else if (definition.d === 'left') {
-                    context.fillRect(this.door.x, this.door.y, 12, 32);
-                } else if (definition.d === 'right') {
-                    context.fillRect(this.door.x + 20, this.door.y, 12, 32);
-                }
-            context.restore();
-        }
     }
 }
 
@@ -150,6 +135,7 @@ export class Door implements ObjectInstance {
     // This gets set to true if this instance has been opened and is used to prevent the door
     // from closing automatically when logic is refreshed.
     wasOpened: boolean = false;
+    isFrozen: boolean = false;
     isHot = false;
     refreshHotStatus = true;
     isLadder = false;
@@ -188,6 +174,11 @@ export class Door implements ObjectInstance {
             this.changeStatus(state, 'normal');
         } else {
             this.changeStatus(state, this.definition.status);
+        }
+        if (this.definition.frozenLogic) {
+            const frozenByDefault = evaluateLogicDefinition(state, this.definition.frozenLogic, false);
+            // Doors are only frozen if they are frozen by default and not yet melted.
+            this.isFrozen = frozenByDefault && !getObjectStatus(state, this.definition, 'melted');
         }
         this.refreshHotStatus = true;
     }
@@ -251,7 +242,7 @@ export class Door implements ObjectInstance {
         return parts;
     }
     isOpen(): boolean {
-        return this.status === 'normal' || this.status === 'blownOpen';
+        return !this.isFrozen && (this.status === 'normal' || this.status === 'blownOpen');
     }
     // Hero cannot enter doors while they are jumping down/falling in front of a door.
     heroCanEnter(state: GameState): boolean {
@@ -259,12 +250,11 @@ export class Door implements ObjectInstance {
     }
     renderOpen(state: GameState): boolean {
         const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getHitbox()) && this.heroCanEnter(state);
-        return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
+        return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
         let isOpen = status === 'normal' || status === 'blownOpen';
-        const wasFrozen = this.status === 'frozen';
         const wasOpen = this.status === 'normal' || this.status === 'blownOpen';
         this.wasOpened = isOpen;
 
@@ -302,7 +292,7 @@ export class Door implements ObjectInstance {
         if (!this.area) {
             return;
         }
-        if (!wasOpen && isOpen && !wasFrozen) {
+        if (!wasOpen && isOpen) {
             playAreaSound(state, this.area, 'doorOpen');
         } else if (wasOpen && !isOpen && !this.renderOpen(state)) {
             playAreaSound(state, this.area, 'doorClose');
@@ -360,9 +350,11 @@ export class Door implements ObjectInstance {
         }
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (this.status === 'frozen') {
+        if (this.isFrozen) {
             if (hit.element === 'fire') {
-                this.changeStatus(state, 'normal');
+                this.isFrozen = false;
+                saveObjectStatus(state, this.definition, true, 'melted');
+                playAreaSound(state, this.area, 'doorOpen');
                 return { hit: true };
             }
             return { hit: true, blocked: true };
@@ -379,6 +371,10 @@ export class Door implements ObjectInstance {
             } else {
                 this.changeStatus(state, 'normal');
             }
+        }
+        // Automatically unfreeze if this flag gets set.
+        if (this.isFrozen && getObjectStatus(state, this.definition, 'melted')) {
+            this.isFrozen = false;
         }
         if (this.area && this.refreshHotStatus) {
             this.refreshIsHot(state);
@@ -514,14 +510,6 @@ export class Door implements ObjectInstance {
                     frame = doorStyle[this.definition.d].doorFrame;
                 }
                 drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
-            }
-            if (this.status === 'frozen') {
-                context.save();
-                    context.globalAlpha = 0.5;
-                    context.fillStyle = 'white';
-                    context.fillRect(this.x, this.y, 32, 32);
-                context.restore();
-                return;
             }
             if (this.renderOpen(state)) {
                 return;

@@ -252,6 +252,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 type: definition.type,
                 style: definition.style || 'cave', //Object.keys(doorStyles)[0],
+                frozenLogic: definition.frozenLogic,
                 openLogic: definition.openLogic,
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
@@ -567,7 +568,6 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'stairs':
             return ['normal', 'closed', 'closedEnemy', 'closedSwitch',
                 'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
-                'frozen',
             ];
         case 'chest':
             return ['normal', 'hiddenEnemy', 'hiddenSwitch'];
@@ -857,11 +857,18 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows = [
                 ...rows,
+                ...getLogicProperties(state, 'Is Frozen?', object.frozenLogic, updatedLogic => {
+                    object.frozenLogic = updatedLogic;
+                    updateObjectInstance(state, object);
+                }),
+            ];
+            rows = [
+                ...rows,
                 ...getLogicProperties(state, 'Force Open?', object.openLogic, updatedLogic => {
                     object.openLogic = updatedLogic;
                     updateObjectInstance(state, object);
                     editingState.needsRefresh = true;
-                })
+                }),
             ];
             // This intentionally continue on to the marker properties.
         case 'pitEntrance':

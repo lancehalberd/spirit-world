@@ -477,6 +477,8 @@ interface EntranceDefinition extends BaseObjectDefinition {
     targetObjectId?: string
     // This can be set to force a door to be open if the logic is true.
     openLogic?: LogicDefinition
+    // If this logic is present and true, the door is frozen until the unfrozen flag is set.
+    frozenLogic?: LogicDefinition
     // This is the number of keys that the player must have access to use this door in
     // the randomizer logic. This value is calculated by the randomizer logic if it is not
     // manually set.

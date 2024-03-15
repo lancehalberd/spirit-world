@@ -72,7 +72,7 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     }
 }
 
-export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean | number = true): void {
+export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean | number = true, suffix = ''): void {
     let treatment = definition.saveStatus;
     // Make sure treatment is forever for locked doors. Might as well do the same for frozen/cracked doors.
     if (definition.type === 'door' && (
@@ -100,6 +100,7 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             treatment = 'forever';
         }
     }
+    const fullKey = definition.id + '-' + suffix;
     if (treatment === 'forever' || treatment === 'zone') {
         const hash = treatment === 'forever'
             ? state.savedState.objectFlags
@@ -108,17 +109,17 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             console.error('Missing object id', definition);
             return;
         }
-        if (flag !== false && hash[definition.id] !== flag) {
-            hash[definition.id] = flag;
+        if (flag !== false && hash[fullKey] !== flag) {
+            hash[fullKey] = flag;
             saveGame(state);
-        } else if (flag === false && hash[definition.id]) {
-            delete hash[definition.id];
+        } else if (flag === false && hash[fullKey]) {
+            delete hash[fullKey];
             saveGame(state);
         }
     }
 }
 
-export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition): boolean | number | string {
+export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition, suffix = ''): boolean | number | string {
     // Lucky beetles have special logic to prevent farming the same few over and over again.
     if (definition.type === 'enemy' && definition.enemyType === 'luckyBeetle') {
         // Lucky Beetle must have an id in order to appear.
@@ -130,11 +131,12 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     if (!definition.id) {
         return false;
     }
-    if (state.savedState.zoneFlags[definition.id] !== undefined) {
-        return state.savedState.zoneFlags[definition.id];
+    const fullKey = definition.id + '-' + suffix;
+    if (state.savedState.zoneFlags[fullKey] !== undefined) {
+        return state.savedState.zoneFlags[fullKey];
     }
-    if (state.savedState.objectFlags[definition.id] !== undefined) {
-        return state.savedState.objectFlags[definition.id];
+    if (state.savedState.objectFlags[fullKey] !== undefined) {
+        return state.savedState.objectFlags[fullKey];
     }
     return false;
 }

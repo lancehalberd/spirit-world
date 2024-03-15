@@ -1,5 +1,11 @@
+import {
+    iceFrontAnimation,
+    iceLeftAnimation,
+    iceRightAnimation,
+    iceTopAnimation,
+} from 'app/content/animations/iceOverlay';
 import type { Door } from 'app/content/objects/door';
-import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
 import { requireFrame } from 'app/utils/packedImages';
 
@@ -166,20 +172,13 @@ function renderWoodenDoor(this: void, context: CanvasRenderingContext2D, state: 
             overFrame = bigLockedDoorCover;
         } else if (door.status === 'cracked') {
             frame = woodenNorthCrack;
-        } else if (door.definition.status !== 'frozen') {
+        } else {
             // This covers closed, closedEnemy + closedSwitch
             overFrame = blockedDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         if (overFrame) {
             drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
-        }
-        if (door.status === 'frozen') {
-            context.save();
-                context.globalAlpha = 0.5;
-                context.fillStyle = 'white';
-                context.fillRect(door.x, door.y, 32, 32);
-            context.restore();
         }
     } else if (door.definition.d === 'left') {
         if (door.status === 'cracked') {
@@ -207,8 +206,10 @@ function renderWoodenDoor(this: void, context: CanvasRenderingContext2D, state: 
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
     }
     // There is no background frame for southern doors.
+    checkToRenderFrozenDoor(context, state, door);
 }
 function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    checkToRenderFrozenDoorForeground(context, state, door);
     /*if (door.definition.d === 'down') {
         let frame = woodenSouthDoorEmpty;
         if (door.isOpen()) {
@@ -248,6 +249,9 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
             drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         }
     } else if (door.definition.d === 'up') {
+        if (door.isFrozen) {
+            return;
+        }
         let frame = woodenNorthDoorway;
         if (door.definition.status === 'cracked'
             || door.definition.status === 'blownOpen'
@@ -346,20 +350,13 @@ function renderCavernDoor(this: void, context: CanvasRenderingContext2D, state: 
             overFrame = bigLockedDoorCover;
         } else if (door.status === 'cracked') {
             frame = cavernNorthCrack;
-        } else if (door.definition.status !== 'frozen') {
+        } else {
             // This covers closed, closedEnemy + closedSwitch
             overFrame = blockedDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         if (overFrame) {
             drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
-        }
-        if (door.status === 'frozen') {
-            context.save();
-                context.globalAlpha = 0.5;
-                context.fillStyle = 'white';
-                context.fillRect(door.x, door.y, 32, 32);
-            context.restore();
         }
     } else if (door.definition.d === 'left') {
         if (door.status === 'cracked') {
@@ -387,9 +384,11 @@ function renderCavernDoor(this: void, context: CanvasRenderingContext2D, state: 
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
     }
     // There is no background frame for southern doors.
+    checkToRenderFrozenDoor(context, state, door);
 }
 
 function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    checkToRenderFrozenDoorForeground(context, state, door);
     if (door.definition.d === 'down') {
         let frame = cavernSouthDoorEmpty;
         // This frame is used if the doorway can have a door in it (closed or locked).
@@ -411,10 +410,12 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
             drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         }
     } else if (door.definition.d === 'up') {
+        if (door.isFrozen) {
+            return;
+        }
         let frame = cavernNorthDoorway;
         if (door.definition.status === 'cracked'
             || door.definition.status === 'blownOpen'
-            || door.definition.status === 'frozen'
         ) {
             frame = door.renderOpen(state) ? cavernNorthBlownup : null;
         }
@@ -494,6 +495,34 @@ const [
 
 debugCanvas;//(blockedDoorCover);
 
+function checkToRenderFrozenDoor(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (!door.isFrozen) {
+        return;
+    }
+    if (door.definition.d === 'up') {
+        const frame = getFrame(iceFrontAnimation, state.fieldTime);
+        drawFrame(context, frame, {x: door.x - 2, y: door.y + 4, w: frame.w, h: frame.h});
+    }
+    if (door.definition.d === 'left') {
+        const frame = getFrame(iceRightAnimation, state.fieldTime);
+        drawFrame(context, frame, {x: door.x + 6, y: door.y + 20, w: frame.w, h: frame.h});
+    }
+    if (door.definition.d === 'right') {
+        const frame = getFrame(iceLeftAnimation, state.fieldTime);
+        drawFrame(context, frame, {x: door.x - 6, y: door.y + 20, w: frame.w, h: frame.h});
+    }
+}
+
+function checkToRenderFrozenDoorForeground(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (!door.isFrozen) {
+        return;
+    }
+    if (door.definition.d === 'down') {
+        const frame = getFrame(iceTopAnimation, state.fieldTime);
+        drawFrame(context, frame, {x: door.x + 16, y: door.y - 12, w: frame.w, h: frame.h});
+    }
+}
+
 function renderCrystalDoor(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'up') {
         let frame = crystalNorthDoorway, overFrame: Frame = null;
@@ -509,20 +538,13 @@ function renderCrystalDoor(this: void, context: CanvasRenderingContext2D, state:
             overFrame = bigLockedCrystalDoorCover;
         } else if (door.status === 'cracked') {
             frame = crystalNorthCrack;
-        } else if (door.definition.status !== 'frozen') {
+        } else {
             // This covers closed, closedEnemy + closedSwitch
             overFrame = blockedCrystalDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         if (overFrame) {
             drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
-        }
-        if (door.status === 'frozen') {
-            context.save();
-                context.globalAlpha = 0.5;
-                context.fillStyle = 'white';
-                context.fillRect(door.x, door.y, 32, 32);
-            context.restore();
         }
     } else if (door.definition.d === 'left') {
         if (door.status === 'cracked') {
@@ -550,9 +572,11 @@ function renderCrystalDoor(this: void, context: CanvasRenderingContext2D, state:
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
     }
     // There is no background frame for southern doors.
+    checkToRenderFrozenDoor(context, state, door);
 }
 
 function renderCrystalDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    checkToRenderFrozenDoorForeground(context, state, door);
     if (door.definition.d === 'down') {
         let frame = crystalSouthDoorEmpty;
         // This frame is used if the doorway can have a door in it (closed or locked).
@@ -574,10 +598,12 @@ function renderCrystalDoorForeground(context: CanvasRenderingContext2D, state: G
             drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         }
     } else if (door.definition.d === 'up') {
+        if (door.isFrozen) {
+            return;
+        }
         let frame = crystalNorthDoorway;
         if (door.definition.status === 'cracked'
             || door.definition.status === 'blownOpen'
-            || door.definition.status === 'frozen'
         ) {
             frame = door.renderOpen(state) ? crystalNorthBlownup : null;
         }
@@ -672,20 +698,13 @@ function renderStoneDoor(this: void, context: CanvasRenderingContext2D, state: G
             overFrame = bigLockedStoneDoorCover;
         } else if (door.status === 'cracked') {
             frame = stoneNorthCrack;
-        } else if (door.definition.status !== 'frozen') {
+        } else {
             // This covers closed, closedEnemy + closedSwitch
             overFrame = blockedStoneDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         if (overFrame) {
             drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
-        }
-        if (door.status === 'frozen') {
-            context.save();
-                context.globalAlpha = 0.5;
-                context.fillStyle = 'white';
-                context.fillRect(door.x, door.y, 32, 32);
-            context.restore();
         }
     } else if (door.definition.d === 'left') {
         if (door.status === 'cracked') {
@@ -713,9 +732,11 @@ function renderStoneDoor(this: void, context: CanvasRenderingContext2D, state: G
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
     }
     // There is no background frame for southern doors.
+    checkToRenderFrozenDoor(context, state, door);
 }
 
 function renderStoneDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    checkToRenderFrozenDoorForeground(context, state, door);
     if (door.definition.d === 'down') {
         let frame = stoneSouthDoorEmpty;
         // This frame is used if the doorway can have a door in it (closed or locked).
@@ -737,10 +758,12 @@ function renderStoneDoorForeground(context: CanvasRenderingContext2D, state: Gam
             drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         }
     } else if (door.definition.d === 'up') {
+        if (door.isFrozen) {
+            return;
+        }
         let frame = stoneNorthDoorway;
         if (door.definition.status === 'cracked'
             || door.definition.status === 'blownOpen'
-            || door.definition.status === 'frozen'
         ) {
             frame = door.renderOpen(state) ? stoneNorthBlownup : null;
         }
@@ -787,173 +810,79 @@ function renderStoneDoorForeground(context: CanvasRenderingContext2D, state: Gam
     }
 }
 
+function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame): DoorStyleDefinition {
+    return {
+        ...oldSquareBaseDoorStyle,
+        isStairs: true,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                baseStyle.render(context, state, door);
+                return;
+            }
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+            checkToRenderFrozenDoor(context, state, door);
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.isFrozen) {
+                return;
+            }
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        },
+    };
+}
+
+const cavernDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: renderCavernDoor,
+    renderForeground: renderCavernDoorForeground,
+};
+const crystalDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: renderCrystalDoor,
+    renderForeground: renderCrystalDoorForeground,
+};
+const stoneDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: renderStoneDoor,
+    renderForeground: renderStoneDoorForeground,
+};
+const woodenDoorStyle: DoorStyleDefinition = {
+    render: renderWoodenDoor,
+    renderForeground: renderWoodenDoorForeground,
+    // Woodon door graphics look a bit different than others for the left/right orientations.
+    getHitbox(door: Door) {
+        if (door.definition.d === 'up') {
+            return {x: door.x, y: door.y, w: 32, h: 32};
+        }
+        if (door.definition.d === 'down') {
+            return {x: door.x, y: door.y + 8, w: 64, h: 8};
+        }
+        return {x: door.x, y: door.y, w: 16, h: 48};
+    },
+    getPathHitbox(door: Door) {
+        if (door.definition.d === 'up') {
+            return {x: door.x + 8, y: door.y, w: 16, h: 32};
+        }
+        if (door.definition.d === 'down') {
+            return {x: door.x + 24, y: door.y + 8, w: 16, h: 8};
+        }
+        return {x: door.x, y: door.y + 16, w: 16, h: 32};
+    },
+};
+
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
-    cavernDownstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.cavern.render(context, state, door);
-                return;
-            }
-            const frame = cavernStairsDown;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = cavernStairsDown;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    cavernUpstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.cavern.render(context, state, door);
-                return;
-            }
-            const frame = cavernStairsUp;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = cavernStairsUp;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    cavern: {
-        ...commonBaseDoorStyle,
-        render: renderCavernDoor,
-        renderForeground: renderCavernDoorForeground,
-    },
-    crystalDownstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.crystal.render(context, state, door);
-                return;
-            }
-            const frame = crystalStairsDown;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = crystalStairsDown;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    crystalUpstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.crystal.render(context, state, door);
-                return;
-            }
-            const frame = crystalStairsUp;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = crystalStairsUp;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    crystal: {
-        ...commonBaseDoorStyle,
-        render: renderCrystalDoor,
-        renderForeground: renderCrystalDoorForeground,
-    },
-    stoneDownstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.stone.render(context, state, door);
-                return;
-            }
-            const frame = stoneStairsDown;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = stoneStairsDown;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    stoneUpstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.stone.render(context, state, door);
-                return;
-            }
-            const frame = stoneStairsUp;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = stoneStairsUp;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    stone: {
-        ...commonBaseDoorStyle,
-        render: renderStoneDoor,
-        renderForeground: renderStoneDoorForeground,
-    },
-    woodenDownstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.wooden.render(context, state, door);
-                return;
-            }
-            const frame = woodenStairsDown;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = woodenStairsDown;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    woodenUpstairs: {
-        ...oldSquareBaseDoorStyle,
-        isStairs: true,
-        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
-                doorStyles.wooden.render(context, state, door);
-                return;
-            }
-            const frame = woodenStairsUp;
-            drawFrameAt(context, frame, {x: door.x, y: door.y});
-        },
-        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            const frame = woodenStairsUp;
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
-        },
-    },
-    wooden: {
-        render: renderWoodenDoor,
-        renderForeground: renderWoodenDoorForeground,
-        // Woodon door graphics look a bit different than others for the left/right orientations.
-        getHitbox(door: Door) {
-            if (door.definition.d === 'up') {
-                return {x: door.x, y: door.y, w: 32, h: 32};
-            }
-            if (door.definition.d === 'down') {
-                return {x: door.x, y: door.y + 8, w: 64, h: 8};
-            }
-            return {x: door.x, y: door.y, w: 16, h: 48};
-        },
-        getPathHitbox(door: Door) {
-            if (door.definition.d === 'up') {
-                return {x: door.x + 8, y: door.y, w: 16, h: 32};
-            }
-            if (door.definition.d === 'down') {
-                return {x: door.x + 24, y: door.y + 8, w: 16, h: 8};
-            }
-            return {x: door.x, y: door.y + 16, w: 16, h: 32};
-        },
-    },
+    cavern: cavernDoorStyle,
+    cavernDownstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsDown),
+    cavernUpstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsUp),
+    crystal: crystalDoorStyle,
+    crystalDownstairs: stairsDoorStyle(crystalDoorStyle, crystalStairsDown),
+    crystalUpstairs: stairsDoorStyle(crystalDoorStyle, crystalStairsUp),
+    stone: stoneDoorStyle,
+    stoneDownstairs: stairsDoorStyle(stoneDoorStyle, stoneStairsDown),
+    stoneUpstairs: stairsDoorStyle(stoneDoorStyle, stoneStairsUp),
+    wooden: woodenDoorStyle,
+    woodenDownstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsDown),
+    woodenUpstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsUp),
     cave: {
         ...oldSquareBaseDoorStyle,
         down: {
