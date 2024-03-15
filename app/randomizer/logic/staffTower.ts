@@ -22,6 +22,10 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF1Downstairs',
+        checks: [
+            {objectId: 'staffTowerEntranceMoneyA'},
+            {objectId: 'staffTowerEntranceMoneyB'},
+        ],
         paths: [
             {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasIce, hasCloudBoots, hasClone, hasSomersault)}
         ],
