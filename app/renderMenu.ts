@@ -23,7 +23,7 @@ const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h:
 const cursor = createAnimation('gfx/hud/cursortemp.png', {w: frameSize, h: frameSize}).frames[0];
 
 const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 2, cols: 2}
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {x: 2, cols: 2}
 ).frames;
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
@@ -296,7 +296,7 @@ mainCanvas.addEventListener('click', function (event) {
                 } else if (menuItem === 'bow' || menuItem === 'cloak' || menuItem === 'staff' || menuItem === 'clone') {
                     state.hero.savedData.activeTools[menuItem] = ((state.hero.savedData.activeTools[menuItem] || 0) + 1) % 4;
                 } else if (menuItem === 'leatherBoots' || menuItem === 'ironBoots' || menuItem === 'cloudBoots') {
-                    state.hero.savedData.equipment[menuItem] = ((state.hero.savedData.equipment[menuItem] || 0) + 1) % 2;
+                    state.hero.savedData.equipment[menuItem] = ((state.hero.savedData.equipment[menuItem] || 0) + 1) % 3;
                 } else if (menuItem === 'neutral') {
                     // No handling
                 } else if (menuItem === 'fire' || menuItem === 'ice' || menuItem === 'lightning') {

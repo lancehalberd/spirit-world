@@ -76,7 +76,7 @@ function updateSpiritBarFrame(state: GameState): void {
 export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameState): void {
     context.fillStyle = 'black';
     updateSpiritBarFrame(state);
-    const x = 5, y = 5;
+    const x = 3, y = 3;
     drawFrame(context, spiritFrame, {...spiritFrame, x: x - 8, y});
     // Draw the glow effect on top of the top cap if appropriate.
     const reviveAnimationTime = state.fieldTime - state.reviveTime;

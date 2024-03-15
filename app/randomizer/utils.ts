@@ -203,6 +203,7 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
     const bigKeys: LootWithLocation[] = [];
     const smallKeys: LootWithLocation[] = [];
     const maps: LootWithLocation[] = [];
+    const ore: LootWithLocation[] = [];
     const progressLoot: LootWithLocation[] = [];
     const peachLoot: LootWithLocation[] = [];
     const trashLoot: LootWithLocation[] = [];
@@ -214,9 +215,11 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
             case 'peach':
             case 'empty':
             case 'victoryPoint':
+                trashLoot.push(lootWithLocation);
+                break;
             case 'silverOre':
             case 'goldOre':
-                trashLoot.push(lootWithLocation);
+                ore.push(lootWithLocation);
                 break;
             case 'bigKey':
                 bigKeys.push(lootWithLocation);
@@ -236,7 +239,7 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
         }
     }
 
-    return { bigKeys, smallKeys, maps, progressLoot, peachLoot, trashLoot };
+    return { bigKeys, smallKeys, maps, ore, progressLoot, peachLoot, trashLoot };
 }
 
 // Make a deep copy of the state.
@@ -321,6 +324,8 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     let victoryPointsHidden = 0, replaceGoodChecks = false;
     const shuffledLoot = random.shuffle(allLootObjects);
     while (randomizerGoalType === 'victoryPoints' && victoryPointsHidden < randomizerTotal) {
+        let remainingSilverNeeded = 12; // 5 for chakram, 5 for gold chakram, 2 for spike boots.
+        let remainingGoldOreNeeded = 4; // 2 for gold chakram, 1 for forge boots, 1 for flying boots.
         let remainingPeachPiecesNeeded = 12;
         for (const lootWithLocation of shuffledLoot) {
             switch (lootWithLocation.lootObject.lootType) {
@@ -328,13 +333,30 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
                     lootWithLocation.lootObject.lootAmount++;
                     victoryPointsHidden++;
                     break;
+                case 'empty':
+                case 'money':
                 case 'silverOre':
+                    if (!replaceGoodChecks) {
+                        break;
+                    }
+                    if (remainingSilverNeeded > 0) {
+                        remainingSilverNeeded--;
+                    } else {
+                        lootWithLocation.lootObject.lootType = 'victoryPoint';
+                        lootWithLocation.lootObject.lootAmount = 1;
+                        victoryPointsHidden++;
+                    }
                 case 'goldOre':
                     if (!replaceGoodChecks) {
                         break;
                     }
-                case 'empty':
-                case 'money':
+                    if (remainingGoldOreNeeded > 0) {
+                        remainingGoldOreNeeded--;
+                    } else {
+                        lootWithLocation.lootObject.lootType = 'victoryPoint';
+                        lootWithLocation.lootObject.lootAmount = 1;
+                        victoryPointsHidden++;
+                    }
                 case 'peach':
                     lootWithLocation.lootObject.lootType = 'victoryPoint';
                     lootWithLocation.lootObject.lootAmount = 1;
@@ -408,7 +430,8 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     let placeFullPeachFirst = initialReachableChecks.length < 13;
 
 
-    let { bigKeys, smallKeys, maps, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
+    let { bigKeys, smallKeys, maps, ore, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
+    ore = random.shuffle(ore);
     progressLoot = random.shuffle(progressLoot);
     random.generateAndMutate();
     peachLoot = random.shuffle(peachLoot);
@@ -431,7 +454,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
         console.log('Placing', fullPeach, 'at', location)
         assignItemToLocation(assignmentsState, fullPeach, location);
     }
-    let remainingLoot = [...bigKeys, ...smallKeys, ...progressLoot, ...peachLoot];
+    let remainingLoot = [...bigKeys, ...smallKeys, ...ore, ...progressLoot, ...peachLoot];
     for (let itemSet of [bigKeys, smallKeys, maps, progressLoot, peachLoot]) {
         while (itemSet.length) {
             const itemToPlace = random.removeElement(itemSet);

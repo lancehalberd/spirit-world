@@ -17,7 +17,7 @@ const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
 
 const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 2, cols: 2}
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {x: 2, cols: 2}
 ).frames;
 
 const frameSize = 24;

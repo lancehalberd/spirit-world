@@ -60,6 +60,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     }
     hero.canFloat = true;
     hero.isOverClouds = false;
+    hero.slipping = !hero.isAstralProjection && !hero.isInvisible && hero.savedData.equippedBoots !== 'ironBoots';
+    if (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots > 1) {
+        hero.slipping = false;
+    }
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
@@ -130,8 +134,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.water || behaviors.solid) {
                 hero.swimming = false;
             }
-            if (behaviors.slippery && hero.savedData.equippedBoots !== 'ironBoots' && hero.z <= 0) {
-                hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible);
+            if (!behaviors.slippery && !behaviors.pit  && !behaviors.water  && !behaviors.shallowWater && !behaviors.solid) {
+                hero.slipping = false;
             }
             // Clouds boots are not slippery when walking on clouds.
             if (behaviors.cloudGround && hero.savedData.equippedBoots === 'cloudBoots') {

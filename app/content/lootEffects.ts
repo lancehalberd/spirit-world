@@ -62,7 +62,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         ].includes(loot.lootType)) {
             state.hero.savedData.elements[loot.lootType] = applyUpgrade(state.hero.savedData.elements[loot.lootType], loot);
         }  else if ([
-            'cloudBoots', 'ironBoots'
+            'leatherBoots', 'cloudBoots', 'ironBoots'
         ].includes(loot.lootType)) {
             state.hero.savedData.equipment[loot.lootType] = applyUpgrade(state.hero.savedData.equipment[loot.lootType], loot);
         } else if (loot.lootType === 'money') {

@@ -78,7 +78,6 @@ const imagePacks: PackedImageData[] = [
         {x:352,y:752,w:260,h:22,originalSource:'gfx/effects/enemyfall2.png'},
         {x:912,y:96,w:16,h:4,originalSource:'gfx/tiles/spiritparticlesregeneration.png'},
         {x:0,y:1648,w:752,h:16,originalSource:'gfx/hud/whiteFont8x16.png'},
-        {x:0,y:1664,w:774,h:18,originalSource:'gfx/hud/icons.png'},
         {x:624,y:752,w:120,h:20,originalSource:'gfx/hud/elementhud.png'},
         {x:992,y:128,w:18,h:18,originalSource:'gfx/hud/cloak1.png'},
         {x:992,y:160,w:18,h:18,originalSource:'gfx/hud/cloak2.png'},

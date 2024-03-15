@@ -94,9 +94,21 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'catEyes': return 'Cat Eyes';
         case 'nimbusCloud': return 'Nimbus Cloud';
         case 'trueSight': return 'True Sight';
-        case 'leatherBoots': return 'Leather Boots';
-        case 'ironBoots': return 'Iron Boots';
-        case 'cloudBoots': return 'Cloud Boots';
+        case 'leatherBoots':
+            if (lootLevel === 1) {
+                return 'Spike Boots';
+            }
+            return 'Leather Boots';
+        case 'ironBoots':
+            if (lootLevel === 1) {
+                return 'Iron Boots';
+            }
+            return 'Forge Boots';
+        case 'cloudBoots':
+            if (lootLevel === 1) {
+                return 'Cloud Boots';
+            }
+            return 'Flying Boots';
         case 'fireBlessing': return 'Fire Blessing';
         case 'waterBlessing': return 'Water Blessing';
         case 'lightningBlessing': return 'Ancient Badge';
@@ -109,8 +121,14 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
 export function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
     const lootName = getLootName(state, lootType, lootLevel);
     switch (lootType) {
+        case 'leatherBoots':
         case 'cloudBoots':
-        case 'ironBoots': return `You found the ${lootName}!` + equipBootsMessage;
+        case 'ironBoots':
+            if (lootLevel > 1) {
+                const oldLootName = getLootName(state, lootType, 1);
+                return `Your ${oldLootName} have been upgraded into ${lootName}!`;
+            }
+            return `You found the ${lootName}!` + equipBootsMessage;
         case 'bigKey': return 'You found a special key!';
         case 'smallKey': return 'You found a small key!';
         case 'map': return 'You found a map!';
@@ -155,12 +173,23 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
 
 export function getLootHelpMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
     switch (lootType) {
+        case 'leatherBoots':
+            if (lootLevel === 1) {
+                return 'These are just regular boots. You can wear them when you don\'t want to wear other boots.';
+            }
+            return 'Spike Boots let you walk on ice without slipping and even make you a bit faster!';
         case 'cloudBoots':
-            return 'Use the Cloud Boots to glide over dangerous ground and even walk in the clouds!'
-                + '{|}Cloud Boots allow you to move faster but with less control.';
+            if (lootLevel === 1) {
+                return 'Use the Cloud Boots to glide over dangerous ground and even walk in the clouds!'
+                    + '{|}Cloud Boots allow you to move faster but with less control.';
+            }
+            return 'You can even walk over pits with Flying Boots as long as you keep moving!';
         case 'ironBoots':
-            return 'Use the Iron Boots to explore under water but watch your breath!'
-                + '{|}Iron boots slow you down but keep you from slipping and being knocked back.';
+            if (lootLevel === 1) {
+                return 'Use the Iron Boots to explore under water but watch your breath!'
+                    + '{|}Iron boots slow you down but keep you from slipping and being knocked back.';
+            }
+            return 'Forge Boots are lighter and can withstand walking through lava!'
         case 'weapon':
             if (state.hero.savedData.weapon === 1) {
                 return `Press [B_WEAPON] to throw the Chakram.
@@ -381,14 +410,16 @@ export const [
     treeStaff, towerStaff,
     /* recycle */, /* book */, scroll1, /* scroll2 */, scroll3,
     nimbusCloud, trueSight,
-    goldOre, silverOre,
+    /*goldOre*/, /*silverOre*/,
     goldMedal, silverMedal, bronzeMedal,
     waterBlessing, fireBlessing, lightningBlessing,
     goldBow,
     silverChakram, goldChakram,
     goldMail, ironSkin,
+    goldOre, silverOre,
+    spikeBoots, forgeBoots, flyingBoots,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 43}
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 48}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -480,6 +511,24 @@ const [
 export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}:
     {lootType: LootType, lootLevel?: number, lootAmount?: number}
 ): Frame {
+    if (lootType === 'leatherBoots') {
+        if (lootLevel > 1) {
+            return spikeBoots;
+        }
+        return normalBoots;
+    }
+    if (lootType === 'ironBoots') {
+        if (lootLevel > 1) {
+            return forgeBoots;
+        }
+        return ironBoots;
+    }
+    if (lootType === 'cloudBoots') {
+        if (lootLevel > 1) {
+            return flyingBoots;
+        }
+        return cloudBoots;
+    }
     if (lootType === 'money') {
         if (!lootAmount || lootAmount === 1) {
             return lightOrb;
