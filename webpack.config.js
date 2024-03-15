@@ -10,6 +10,7 @@ module.exports = {
         test: /\.(ts|js)$/,
         use: 'ts-loader',
         exclude: /node_modules/,
+        include: /app/,
       },
     ],
   },

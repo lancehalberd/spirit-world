@@ -9,5 +9,6 @@
     "outDir": "./tsc/",
     // "strictNullChecks": true,
     "target": "ES2019"
-  }
+  },
+  "include": ["app/**/*"],
 }
