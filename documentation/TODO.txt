@@ -72,7 +72,6 @@ Graphics Work:
 
 Current tasks:
     - Add Bell graphics
-    - Add Mother+Father NPCs
     - Add Obsidian Tileset
         - Apply to spirit world tile mappings for building/cliff exteriors
         - Touch up spirit world to fix anything that looks bad.

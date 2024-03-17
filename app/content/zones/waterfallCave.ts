@@ -260,7 +260,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCaveBackLeft", x: 48, y: 240, type: "door", style: "cavern", d: "down", targetZone: "waterfallCave", targetObjectId: "waterfallCaveBackLeft"},
         {status: "normal", id: "waterfallCaveBackRight", x: 400, y: 240, type: "door", style: "cavern", d: "down", targetZone: "waterfallCave", targetObjectId: "waterfallCaveBackRight"},
         {status: "normal", id: "waterfallCave:0:0x0-npc-2", x: 320, y: 64, d: "down", behavior: "none", style: "vanaraGold", type: "npc", dialogue: "I'm trying to sleep!", dialogueIndex: 117},
-        {status: "normal", id: "waterfallCave:0:0x0-npc-3", x: 304, y: 192, d: "right", behavior: "random", style: "vanaraBlack", type: "npc", dialogue: "Welcome home, son. Sit down and relax!", dialogueIndex: 118},
+        {status: "normal", id: "waterfallCave:0:0x0-npc-3", x: 304, y: 112, d: "right", behavior: "idle", style: "father", type: "npc", dialogue: "Welcome home, son. Sit down and relax!", dialogueIndex: 118},
         {status: "normal", id: "waterfallCave:0:0x0-npc-5", x: 368, y: 176, d: "left", behavior: "none", style: "vanaraGold", type: "npc", dialogue: "I'm knitting a scarf for my human friend. Necks with no hair get cold so easily!", dialogueIndex: 119},
         {status: "normal", id: "waterfallCaveRightMain", x: 336, y: 496, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveRightMain", d: "down"},
         {status: "normal", id: "waterfallCave:0:0x0-npc-4", x: 48, y: 48, d: "right", behavior: "idle", style: "guy", type: "npc", dialogue: "I love my cozy home.", dialogueIndex: 120},
@@ -278,7 +278,14 @@ const f0_0x0: AreaDefinition = {
     ],
     dark: 50,
 };
-const f0_1x0: AreaDefinition = null;
+const f0_1x0: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 525, mapId: 'waterfallCave', floorId: '1F', mapX: 2, mapY: 0},
+    ],
+};
 const f0_0x1: AreaDefinition = {
     layers: [
         {
@@ -938,12 +945,52 @@ const f0_1x1: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16, index: 127, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 3},
     ],
 };
-const sf0_0x0: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = null;
-const sf0_1x1: AreaDefinition = null;
+const sf0_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16, index: 526, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 527, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 528, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 1},
+    ],
+};
+const sf0_1x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 529, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 0},
+    ],
+};
+const sf0_0x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32, index: 530, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 2},
+    ],
+};
+const sf0_1x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 16, index: 531, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 543, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 3},
+    ],
+};
 zones.waterfallCave = {
     key: 'waterfallCave',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [

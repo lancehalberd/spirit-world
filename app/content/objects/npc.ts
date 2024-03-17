@@ -5,20 +5,25 @@ import {
     omniAnimation,
 } from 'app/content/enemyAnimations';
 import { elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation } from 'app/content/enemies/elemental';
+import {
+    crystalDragonAnimations,
+    fatherAnimations,
+    lightningBeastAnimations,
+    momAnimations,
+} from 'app/content/npcs/npcAnimations'
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
     guyAnimations, guy2Animations,
-    momAnimations, paleMonkAnimations,
+    paleMonkAnimations,
     midMonkAnimations, darkMonkAnimations,
     vanaraBlackAnimations, vanaraBlueAnimations,
     vanaraBrownAnimations, vanaraGoldAnimations,
     vanaraGrayAnimations, vanaraPurpleAnimations,
     vanaraRedAnimations, zoroAnimations,
 } from 'app/render/npcAnimations';
-import { crystalDragonAnimations, lightningBeastAnimations } from 'app/content/npcs/npcAnimations'
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
@@ -114,6 +119,10 @@ export const npcStyles = {
     } as NPCStyleDefinition,
     guy2: {
         animations: guy2Animations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    father: {
+        animations: fatherAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     mom: {

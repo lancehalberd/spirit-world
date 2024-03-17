@@ -15,3 +15,24 @@ const crystalDragonIdleAnimation: FrameAnimation = createAnimation('gfx/npcs/cry
 export const crystalDragonAnimations: ActorAnimations = {
     idle: omniAnimation(crystalDragonIdleAnimation),
 };
+
+
+const momImage: string = 'gfx/npcs/mother.png';
+const momGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
+const momDownAnimation: FrameAnimation = createAnimation(momImage, momGeometry);
+const momIdleDownAnimation: FrameAnimation = createAnimation(momImage, momGeometry, { cols: 2, duration: 4});
+
+export const momAnimations: ActorAnimations = {
+    still: omniAnimation(momDownAnimation),
+    idle: omniAnimation(momIdleDownAnimation),
+};
+
+const fatherImage: string = 'gfx/npcs/father.png';
+const fatherGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
+const fatherDownAnimation: FrameAnimation = createAnimation(fatherImage, fatherGeometry);
+const fatherIdleDownAnimation: FrameAnimation = createAnimation(fatherImage, fatherGeometry, { cols: 2, duration: 4});
+
+export const fatherAnimations: ActorAnimations = {
+    still: omniAnimation(fatherDownAnimation),
+    idle: omniAnimation(fatherIdleDownAnimation),
+};
