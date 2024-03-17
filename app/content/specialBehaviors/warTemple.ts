@@ -1,5 +1,6 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { variantSeed } from 'app/gameConstants';
+import { removeObjectFromArea } from 'app/utils/objects';
 import SRandom from 'app/utils/SRandom';
 
 
@@ -27,6 +28,17 @@ specialBehaviorsHash.warTempleEntrancePot = {
             const [x, y] = warTempleRandom.addSeed(4).element(offsets);
             object.x = object.definition.x - x;
             object.y = object.definition.y + y;
+        }
+    }
+};
+
+specialBehaviorsHash.warTempleSpiritPot = {
+    type: 'pushPull',
+    apply(state: GameState, object: ObjectInstance) {
+        const index = warTempleRandom.addSeed(5).range(0, 3);
+        if (object.definition.id === 'warTemplePot' + index) {
+            console.log("removing " + object.definition.id);
+            removeObjectFromArea(state, object);
         }
     }
 };

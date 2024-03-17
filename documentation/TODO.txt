@@ -841,10 +841,6 @@ Golem Boss Improvements:
         - Could have the boss slam against the walls when strafing side to side or raise entire body and slam ground to drop stones.
         - Could also drop additional permanent barries that reduce the safe zones on the sides.
 
-Dungeon 2 Improvements:
-    - Add more uses of spirit sight:
-        - pot puzzle to open a door, 4 pots, 3 are linked and blocked, 1 can be moved to the switch
-
 Dungeon 3 Improvements:
     - Add new enemies.
     - Animate the ents when they attack.
@@ -854,7 +850,6 @@ River Temple Improvements:
     - Some crab enemies with ice shells that require fire element to defeat
     - Allow swimming over low walls, use ice spikes to block paths if necessary.
     - Maybe torches should stay lit during the boss fight once turned on.
-    - Add special behavior for frozen doors instead of having two door objects.
 
 
 Staff Tower Improvements
