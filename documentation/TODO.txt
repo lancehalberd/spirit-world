@@ -71,6 +71,13 @@ Graphics Work:
 
 
 Current tasks:
+    - Add Bell graphics
+    - Add Mother+Father NPCs
+    - Add Obsidian Tileset
+        - Apply to spirit world tile mappings for building/cliff exteriors
+        - Touch up spirit world to fix anything that looks bad.
+
+
     - Add boot upgrades:
         - Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
             - Have to find schematics + 2 silver ore + 100 Jade and can craft at regular smith after fully upgrading chakram.
@@ -84,7 +91,6 @@ Current tasks:
 
     - Add boot schematic checks to the randomizer.
 
-    - Pot falls through southern bit of staff
     - hitting cracked pots diagonally
 
     - Cloak element is lost when changing areas but you stay invisible. This should be consistent.
@@ -178,7 +184,6 @@ Current tasks:
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
         - Same for long lasting lightning attacks
 
-    - Add Bell graphics when provided by Jon.
 
     - Fix push/pull interactions with ledges.
         - Minor issues:

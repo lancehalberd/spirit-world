@@ -28,10 +28,20 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     hero.z = Math.max(hero.z, hero.groundHeight);
     const tileSize = 16;
 
-    let leftColumn = Math.floor(hero.x / tileSize);
-    let rightColumn = Math.floor((hero.x + hero.w) / tileSize);
-    let topRow = Math.floor(hero.y / tileSize);
-    let bottomRow = Math.floor((hero.y + hero.h) / tileSize);
+    // This was using the exact four corners of the player earlier, but this made it easy for the player to walk
+    /*const leftColumn = Math.floor(hero.x / tileSize);
+    const rightColumn = Math.floor((hero.x + hero.w - 1) / tileSize);
+    const topRow = Math.floor(hero.y / tileSize);
+    const bottomRow = Math.floor((hero.y + hero.h - 1) / tileSize);*/
+    /*const leftColumn = Math.floor((hero.x + 2) / tileSize);
+    const rightColumn = Math.floor((hero.x + hero.w - 3) / tileSize);
+    const topRow = Math.floor((hero.y + 2) / tileSize);
+    const bottomRow = Math.floor((hero.y + hero.h - 3) / tileSize);*/
+    const leftColumn = Math.floor(hitbox.x / tileSize);
+    const rightColumn = Math.floor((hitbox.x + hitbox.w - 1) / tileSize);
+    const topRow = Math.floor(hitbox.y / tileSize);
+    const bottomRow = Math.floor((hitbox.y + hitbox.h - 1) / tileSize);
+
 
     const behaviorGrid = hero.area.behaviorGrid;
     // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall
@@ -98,22 +108,13 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 }
             }
             if (behaviors.climbable) {
-                // Originall this code just sart `startClimbing = true` with no checks, but there is an ugly edge case where you
+                // Originally this code just sart `startClimbing = true` with no checks, but there is an ugly edge case where you
                 // could start climbing down while off of the tile enough that you wouldn't wiggle to line up with the ladder.
                 // This change will cause you to just jump down the ledge rather than start climbing if your alignment with the
-                // climbable tile is too far to fix by wiggling.
-                const tileIsDown = row > topRow;
-                if (tileIsDown) {
-                    const tileIsLeft = column < rightColumn;
-                    const tileIsRight = column > leftColumn;
-                    // Don't start climbing when the climbable tile is too far to the bottom left or right corner of the character.
-                    if ((tileIsLeft && hero.x % 16 < 8)
-                        || (tileIsRight && hero.x % 16 > 8)
-                        || (!tileIsLeft && !tileIsRight)
-                    ) {
-                        startClimbing = true;
-                    }
-                } else {
+                // climbable tile is too far to fix by wiggling
+
+                // Don't start climbing when the climbable tile is too far to the left or right of the character.
+                if (column * 16 - hero.x <= 8 && hero.x - column * 16 <= 8) {
                     startClimbing = true;
                 }
             }

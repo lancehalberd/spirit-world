@@ -122,8 +122,6 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         if (object.area && !object.ignorePits && object.getHitbox) {
             object.groundHeight = 0;
             const hitbox = object.getHitbox();
-            const x = hitbox.x + hitbox.w / 2;
-            const y = hitbox.y + hitbox.h / 2;
             for (const otherObject of area.objects) {
                 if (otherObject === object) {
                     continue;
@@ -140,22 +138,48 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             } else {
                 object.z = Math.max(object.z, object.groundHeight);
             }
-            const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
-            if (tileBehavior?.pit  && !(object.z > 0)) {
-                const animation = new FieldAnimationEffect({
-                    animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
-                    drawPriority: 'background',
-                    drawPriorityIndex: 1,
-                    x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
-                });
-                addEffectToArea(state, object.area, animation);
-                removeObjectFromArea(state, object);
-            } else if (tileBehavior?.water  && !(object.z > 0)) {
+            if (object.z > 0) {
+                continue;
+            }
+            let isOnGround = false, waterTileCoords: number[], pitTileCoords: number[];
+            const points = [
+                [hitbox.x + 4, hitbox.y + 4],
+                [hitbox.x + hitbox.w - 5, hitbox.y + 4],
+                [hitbox.x + 4, hitbox.y + hitbox.h - 5],
+                [hitbox.x + hitbox.w - 5, hitbox.y + hitbox.h - 5],
+            ];
+            for (const [x, y] of points) {
+                const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
+                if (tileBehavior?.pit  && !(object.z > 0)) {
+                    pitTileCoords = [((x / 16) | 0), ((y / 16) | 0)];
+                } else if (tileBehavior?.water  && !(object.z > 0)) {
+                    waterTileCoords = [((x / 16) | 0), ((y / 16) | 0)];
+                } else {
+                    isOnGround = true;
+                }
+            }
+            // Object is supported by ground, it should sink or fall.
+            if (isOnGround) {
+                continue;
+            }
+            // Object will fall in water over pits.
+            if (waterTileCoords) {
                 const animation = new FieldAnimationEffect({
                     animation: splashAnimation,
                     drawPriority: 'background',
                     drawPriorityIndex: 1,
-                    x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
+                    x: waterTileCoords[0] * 16, y: waterTileCoords[1] * 16,
+                });
+                addEffectToArea(state, object.area, animation);
+                removeObjectFromArea(state, object);
+            }
+            // Object falls into a pit.
+            if (pitTileCoords) {
+                const animation = new FieldAnimationEffect({
+                    animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
+                    drawPriority: 'background',
+                    drawPriorityIndex: 1,
+                    x: pitTileCoords[0] * 16, y: pitTileCoords[1] * 16,
                 });
                 addEffectToArea(state, object.area, animation);
                 removeObjectFromArea(state, object);
