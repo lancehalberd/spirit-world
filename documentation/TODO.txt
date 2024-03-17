@@ -42,7 +42,53 @@ Cannot reproduce:
     - If controlled clones despawns during quick clone toss, sometimes you'll take control of the original clone in an invalid position, such as inside a solid object or cliff face.
         - Possibly fixed by other changes.
 
+Graphics Work:
+    Create icons for new items:
+        Magic Beans
+        Consumables
+            Peach Potion
+            Spirit Tonic
+            Spirit Elixer
+
+        Human Champion items:
+            Elemental/Magic boots (apply equipped element to the ground while walking)
+            Flippers (allow diving and staying submerged by holding the passive tool button) (can be used as long as iron boots are not equipped)
+
+    Large objects/structures
+        Staff tower exterior (ground and sky)
+        World tree exterior B2, B1, ground and sky, possibly vertical exterior
+        Elemental statues
+
+    Boss graphics:
+        Summoner Statues for War Temple Boss
+            The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
+
+    Open ended tasks
+        New tile sets
+            Vanara Ship(Cocoon, Helix + World Tree Variants) Material+Spirit
+            Research Lab(Fertility Temple + Underground Lab)
+            Staff Tower/Precursor Ruins
+
+
 Current tasks:
+    - Add boot upgrades:
+        - Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
+            - Have to find schematics + 2 silver ore + 100 Jade and can craft at regular smith after fully upgrading chakram.
+            - Schematics are in an ice cave in the material world
+        - Flying Boots that replace cloud boots. Flying boots can move over pits.
+            - Schematics are given by the regular smith after fully upgrading the chakram.
+            - Bring schematics, 1 gold ore and cloud boots to spirit Smith to upgrade to flying boots after fully upgrading gold chakram.
+        - Forge Boots that replace iron boots. Forge boots have no movement penalty and can walk on lava without taking damage.
+            - Schematics are given by the spirit smith after fully upgrading the gold chakram.
+            - Bring schematics, 1 gold ore and iron boots to spirit Smith to upgrade to forge boots after fully upgrade gold chakram.
+
+    - Add boot schematic checks to the randomizer.
+
+    - Pot falls through southern bit of staff
+    - hitting cracked pots diagonally
+
+    - Cloak element is lost when changing areas but you stay invisible. This should be consistent.
+    - "Looks like BK Mode to Me" message with full item set and no progress in forge yet.
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
             - So of multiple possible enemy combinations, one is chosen for a zone and then each section chooses enemies from this combination.
@@ -62,16 +108,6 @@ Current tasks:
         - Exit blocked by Cloud Boots/Ice(U-turn cracked ground) or Astral Projection (pot switches in both worlds)
             - Exits to ledge above entrance to cave ascent, which will now have a Silver Ore on it.
 
-    - Add boot upgrades:
-        - Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
-            - Have to find schematics + 2 silver ore + 100 Jade and can craft at regular smith after fully upgrading chakram.
-            - Schematics are in an ice cave in the material world
-        - Flying Boots that replace cloud boots. Flying boots can move over pits.
-            - Schematics are given by the regular smith after fully upgrading the chakram.
-            - Bring schematics, 1 gold ore and cloud boots to spirit Smith to upgrade to flying boots after fully upgrading gold chakram.
-        - Forge Boots that replace iron boots. Forge boots have no movement penalty and can walk on lava without taking damage.
-            - Schematics are given by the spirit smith after fully upgrading the gold chakram.
-            - Bring schematics, 1 gold ore and iron boots to spirit Smith to upgrade to forge boots after fully upgrade gold chakram.
 
     - Improvement, carried object should drop when astral projection despawns holding something.
         - Right now it just disappears with the astral projection.
