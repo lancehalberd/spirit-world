@@ -1,9 +1,11 @@
 import { objectHash } from 'app/content/objects/objectHash';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
-import { createAnimation, drawFrameAt } from 'app/utils/animations';
+import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 
 
-const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
+const bellAnimation: FrameAnimation = createAnimation('gfx/objects/bell.png', {w: 16, h: 32}, {cols: 8, y: 0});
+const bellFrame: Frame = bellAnimation.frames[0];
 
 export const bellStyles = {
     bellA4: {
@@ -31,7 +33,7 @@ export class Bell implements ObjectInstance {
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
     animation: FrameAnimation = null;
-    animationTime = 0;
+    animationTime = bellAnimation.duration * 2;
     constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -44,15 +46,20 @@ export class Bell implements ObjectInstance {
         if (hit.isBonk) {
             const style = bellStyles[this.definition.style] || bellStyles.bellA4;
             style.playSound(state, this);
+            this.animationTime = 0;
         }
         return {
             stopped: true,
         };
     }
     update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
     }
     render(context, state: GameState) {
-        let frame: Frame = potFrame;
+        let frame: Frame = bellFrame;
+        if (this.animationTime < bellAnimation.duration * 2) {
+            frame = getFrame(bellAnimation, this.animationTime);
+        }
         if (!frame) {
             debugger;
         }

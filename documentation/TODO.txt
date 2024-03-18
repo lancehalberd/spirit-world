@@ -43,6 +43,12 @@ Cannot reproduce:
         - Possibly fixed by other changes.
 
 Graphics Work:
+    High Priority Graphics:
+        Torch/Fire Pit + Camp Fire
+        Ent Enemy
+            Growing Thorns attack
+            Shooting Thorns attack
+
     Create icons for new items:
         Magic Beans
         Consumables
