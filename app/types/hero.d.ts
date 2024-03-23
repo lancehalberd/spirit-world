@@ -151,6 +151,7 @@ interface SavedHeroData {
     spiritTokens: number
     victoryPoints: number
     activeTools: {[key in ActiveTool]: number}
+    blueprints: {[key in Blueprints]: number}
     equipment: {[key in Equipment]: number}
     passiveTools: {[key in PassiveTool]: number}
     elements: {[key in MagicElement]: number}

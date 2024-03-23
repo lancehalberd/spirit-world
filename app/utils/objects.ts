@@ -79,7 +79,8 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
         definition.status === 'locked'
         || definition.status === 'bigKeyLocked'
         || definition.status === 'cracked'
-        || definition.status === 'frozen'
+        // Used for frozen doors.
+        || suffix === 'melted'
     )) {
         treatment = 'forever';
         if (!definition.id) {

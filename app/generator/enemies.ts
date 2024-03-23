@@ -25,6 +25,6 @@ EnemyPool:
 
 // Adds the enemy group to a slot
 export function addEnemyGroupToSlot(slot: RoomSlot, groups: EnemyGroup, maxDifficulty?: number) {
-    const cx = (slot.x + slot.w / 2) * 16;
-    const cy = (slot.y + slot.h / 2) * 16;
+    //const cx = (slot.x + slot.w / 2) * 16;
+    //const cy = (slot.y + slot.h / 2) * 16;
 }

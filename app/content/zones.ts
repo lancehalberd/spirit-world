@@ -6,6 +6,7 @@ export * from 'app/content/zones/sky';
 export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/underwater';
 export * from 'app/content/zones/caves';
+export * from 'app/content/zones/frozenCave';
 export * from 'app/content/zones/hypeCave';
 export * from 'app/content/zones/bellCave';
 export * from 'app/content/zones/treeCave';

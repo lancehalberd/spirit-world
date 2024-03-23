@@ -105,8 +105,10 @@ export const allLootTypes: LootType[] = [
     'astralProjection', 'teleportation',
     'ironSkin', 'goldMail', 'phoenixCrown',
     'waterBlessing', 'fireBlessing', 'lightningBlessing',
-    'ironBoots', 'cloudBoots',
-    'fire', 'ice', 'lightning'
+    'leatherBoots', 'ironBoots', 'cloudBoots',
+    'fire', 'ice', 'lightning',
+    // Blueprints
+    'spikeBoots', 'flyingBoots', 'forgeBoots',
 ];
 
 export const layersInOrder = ['floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2'];

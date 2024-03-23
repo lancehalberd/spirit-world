@@ -35,7 +35,10 @@ function getChargeMessage(state: GameState) {
 
 export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
     if (!lootLevel) {
-        lootLevel = state.hero.savedData.activeTools[lootType] || state.hero.savedData.passiveTools[lootType] || 1;
+        lootLevel = state.hero.savedData.activeTools[lootType]
+            || state.hero.savedData.passiveTools[lootType]
+            || state.hero.savedData.equipment[lootType]
+            || 1;
     }
     switch (lootType) {
         case 'bow':
@@ -96,9 +99,9 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'trueSight': return 'True Sight';
         case 'leatherBoots':
             if (lootLevel === 1) {
-                return 'Spike Boots';
+                return 'Leather Boots';
             }
-            return 'Leather Boots';
+            return 'Spike Boots';
         case 'ironBoots':
             if (lootLevel === 1) {
                 return 'Iron Boots';
@@ -109,6 +112,12 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
                 return 'Cloud Boots';
             }
             return 'Flying Boots';
+        case 'spikeBoots':
+            return 'Spiked Boots Schematics';
+        case 'flyingBoots':
+            return 'Flying Boots Schematics';
+        case 'forgeBoots':
+            return 'Forge Boots Schematics';
         case 'fireBlessing': return 'Fire Blessing';
         case 'waterBlessing': return 'Water Blessing';
         case 'lightningBlessing': return 'Ancient Badge';
@@ -168,7 +177,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
     }
-    return `You found the ${lootName}!`;
+    return `You obtained the ${lootName}!`;
 }
 
 export function getLootHelpMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
@@ -300,6 +309,12 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Select the Nimbus Cloud and press [B_WEAPON] to use it.'
                 + '{|}Use the Nimbus Cloud inside to return to the entrance.'
                 + '{|}Use the Nimbus Cloud outside to instantly travel the world.';
+        case 'spikeBoots':
+            return 'Bring these schematics to a certain armor smith to upgrade your Leather Boots';
+        case 'flyingBoots':
+            return 'Bring these schematics to a certain armor smith to upgrade your Cloud Boots';
+        case 'forgeBoots':
+            return 'Bring these schematics to a certain armor smith to upgrade your Iron Boots';
         case 'silverOre':
             return 'Maybe someone in the city can use this to make something.';
         case 'goldOre':
@@ -381,7 +396,6 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
         return showMessage(state, getMessage);
     }
 }
-
 
 function createLootFrame(color: string, letter: string): Frame {
     const size = 16;
@@ -486,6 +500,10 @@ const lootFrames = {
     leatherBoots: normalBoots,
     ironBoots: ironBoots,
     cloudBoots: cloudBoots,
+    // Blueprints:
+    spikeBoots: scroll1,
+    flyingBoots: scroll1,
+    forgeBoots: scroll1,
     fireBlessing,
     waterBlessing,
     lightningBlessing,

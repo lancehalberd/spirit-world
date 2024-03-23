@@ -69,17 +69,25 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.isRunning && hero.magic > 0) {
         movementSpeed *= 1.3;
     }
-    if (hero.savedData.equippedBoots === 'ironBoots') {
+    if (hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots < 2) {
+        // Note that there is no movement speed penalty for level 2 iron boots.
         movementSpeed *= 0.6;
     } else if (hero.savedData.equippedBoots === 'cloudBoots') {
         movementSpeed *= 1.4;
+    } else if (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots >= 2) {
+        // Spike boots give the hero a small movement speed boost in addition to preventing slipping.
+        // They would be almost strictly worse than the Forge Boots without this.
+        movementSpeed *= 1.1;
     }
     if (isClimbing) {
         hero.slipping = false;
         // Boots have less dramatic impact on movement speed when climbing.
-        if (hero.savedData.equippedBoots === 'ironBoots') {
+        if (hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots < 2) {
             movementSpeed = 0.8;
-        } else if (hero.savedData.equippedBoots === 'cloudBoots') {
+        } else if (hero.savedData.equippedBoots === 'cloudBoots'
+            // Spike boots get the same climbing speed bonus as cloud boots.
+            || (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots >= 2)
+        ) {
             movementSpeed = 1.2;
         } else {
             movementSpeed = 1;

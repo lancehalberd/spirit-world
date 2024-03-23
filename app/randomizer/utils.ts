@@ -204,7 +204,10 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
     const smallKeys: LootWithLocation[] = [];
     const maps: LootWithLocation[] = [];
     const ore: LootWithLocation[] = [];
-    const progressLoot: LootWithLocation[] = [];
+    const maxPriority: LootWithLocation[] = [];
+    const highPriority: LootWithLocation[] = [];
+    const mediumPriority: LootWithLocation[] = [];
+    const lowPriority: LootWithLocation[] = [];
     const peachLoot: LootWithLocation[] = [];
     const trashLoot: LootWithLocation[] = [];
     for (const lootWithLocation of lootObjects) {
@@ -234,12 +237,40 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
             case 'peachOfImmortalityPiece':
                 peachLoot.push(lootWithLocation);
                 break;
+            case 'nimbusCloud':
+                maxPriority.push(lootWithLocation);
+                break;
+            // High priority checks are progress items that give a lot of checks when found in
+            // Sphere 0. Placing these early will make generation failure less likely by
+            // placing fewer lower progress items that could fill Sphere 0.
+            // For example, the various elemental blessings do not add extra checks from Sphere 0,
+            // so if too many items like these are placed early in Sphere 0 (along with Ores),
+            // then it can be the case that there is no room left in Sphere 0 to place a progress
+            // item required to reach more checks.
+            case 'bow':
+            case 'gloves':
+            case 'ironBoots':
+            case 'staff':
+            case 'spiritSight':
+            case 'astralProjection':
+            case 'teleportation':
+                highPriority.push(lootWithLocation);
+                break;
+            // Low priority checks are important items that give access to no or very few checks.
+            case 'goldMail':
+            case 'ironSkin':
+                lowPriority.push(lootWithLocation);
+                break;
             default:
-                progressLoot.push(lootWithLocation);
+                mediumPriority.push(lootWithLocation);
         }
     }
 
-    return { bigKeys, smallKeys, maps, ore, progressLoot, peachLoot, trashLoot };
+    return {
+        bigKeys, smallKeys, maps,
+        progressLoot: [ore, maxPriority, highPriority, mediumPriority, lowPriority],
+        peachLoot, trashLoot
+    };
 }
 
 // Make a deep copy of the state.
@@ -327,6 +358,8 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
         let remainingSilverNeeded = 12; // 5 for chakram, 5 for gold chakram, 2 for spike boots.
         let remainingGoldOreNeeded = 4; // 2 for gold chakram, 1 for forge boots, 1 for flying boots.
         let remainingPeachPiecesNeeded = 12;
+        // This is required for the hack to add a full peach to sphere 0 below.
+        let needsFullPeachPiece = true;
         for (const lootWithLocation of shuffledLoot) {
             switch (lootWithLocation.lootObject.lootType) {
                 case 'victoryPoint':
@@ -366,8 +399,9 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
                     if (!replaceGoodChecks) {
                         break;
                     }
-                    if (remainingPeachPiecesNeeded > 0) {
+                    if (remainingPeachPiecesNeeded > 0 || needsFullPeachPiece) {
                         remainingPeachPiecesNeeded -= 4;
+                        needsFullPeachPiece = false;
                     } else {
                         lootWithLocation.lootObject.lootType = 'victoryPoint';
                         lootWithLocation.lootObject.lootAmount = 1;
@@ -430,10 +464,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     let placeFullPeachFirst = initialReachableChecks.length < 13;
 
 
-    let { bigKeys, smallKeys, maps, ore, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
-    ore = random.shuffle(ore);
-    progressLoot = random.shuffle(progressLoot);
-    random.generateAndMutate();
+    let { bigKeys, smallKeys, maps, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
     peachLoot = random.shuffle(peachLoot);
     random.generateAndMutate();
     trashLoot = random.shuffle(trashLoot);
@@ -454,8 +485,16 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
         console.log('Placing', fullPeach, 'at', location)
         assignItemToLocation(assignmentsState, fullPeach, location);
     }
-    let remainingLoot = [...bigKeys, ...smallKeys, ...ore, ...progressLoot, ...peachLoot];
-    for (let itemSet of [bigKeys, smallKeys, maps, progressLoot, peachLoot]) {
+    const allItemSets: LootWithLocation[][] = [bigKeys, smallKeys, maps, ...progressLoot, peachLoot];
+    const remainingLoot: LootWithLocation[] = [];
+    for (let i = 0; i < allItemSets.length; i++) {
+        allItemSets[i] = random.shuffle(allItemSets[i]);
+        random.generateAndMutate();
+        for (const item of allItemSets[i]) {
+            remainingLoot.push(item);
+        }
+    }
+    for (let itemSet of allItemSets) {
         while (itemSet.length) {
             const itemToPlace = random.removeElement(itemSet);
             random.generateAndMutate();

@@ -41,6 +41,7 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     }
     return state.hero.savedData.activeTools[itemFlag] >= level || state.hero.savedData.passiveTools[itemFlag] >= level
         || state.hero.savedData.elements[itemFlag] >= level || state.hero.savedData.equipment[itemFlag] >= level
+        || state.hero.savedData.blueprints[itemFlag]
         || state.hero.savedData.weaponUpgrades[itemFlag];
 }
 

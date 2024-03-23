@@ -48,7 +48,16 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // any time all four corners are over pits.
     hero.wading = hero.z <= 0;
     hero.swimming = hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
-    hero.slipping = hero.savedData.equippedBoots === 'cloudBoots';
+    const bootsAreSlippery = hero.savedData.equippedBoots === 'cloudBoots';
+    // Here is assumed to be slipping until we determine a reason that they are not.
+    hero.slipping = true;
+    if (hero.isAstralProjection
+        || (hero.isInvisible && hero.savedData.equippedBoots !== 'cloudBoots')
+        || hero.savedData.equippedBoots === 'ironBoots'
+        || (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots > 1)
+    ) {
+        hero.slipping = false;
+    }
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     // Apply floor effects from objects/effects.
@@ -58,22 +67,21 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 continue;
             }
             const behaviors = entity.getBehaviors?.(state) || entity.behaviors;
-            if ((behaviors?.groundHeight || 0) >= hero.z) {
-                if (behaviors?.slippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
-                    hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.savedData.equippedBoots !== 'ironBoots');
+            if (!behaviors) {
+                continue;
+            }
+            if ((behaviors.groundHeight || 0) >= hero.z) {
+                if (!behaviors.slippery && !bootsAreSlippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                    hero.slipping = false;
                 }
             }
-            if (behaviors?.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
+            if (behaviors.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
                 startClimbing = true;
             }
         }
     }
     hero.canFloat = true;
     hero.isOverClouds = false;
-    hero.slipping = !hero.isAstralProjection && !hero.isInvisible && hero.savedData.equippedBoots !== 'ironBoots';
-    if (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots > 1) {
-        hero.slipping = false;
-    }
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
@@ -135,7 +143,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.water || behaviors.solid) {
                 hero.swimming = false;
             }
-            if (!behaviors.slippery && !behaviors.pit  && !behaviors.water  && !behaviors.shallowWater && !behaviors.solid) {
+            // Don't slip if on any non-slippery ground unless wearing cloud boots.
+            if (!bootsAreSlippery && !behaviors.slippery
+                && !behaviors.pit  && !behaviors.water  && !behaviors.shallowWater && !behaviors.solid
+            ) {
                 hero.slipping = false;
             }
             // Clouds boots are not slippery when walking on clouds.
@@ -153,7 +164,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.canFloat = false;
             }
             if (behaviors.isLava && hero.z <= 0) {
-                hero.onHit(state, { damage: 4, element: 'fire' });
+                const lavaProof = hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots >= 2;
+                if (!lavaProof) {
+                    hero.onHit(state, { damage: 4, element: 'fire' });
+                }
             }
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
             // like normal damaging ground rather than a pit. This was done because there were many instances
@@ -204,7 +218,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     hero.isTouchingPit = fallingTopLeft || fallingTopRight || fallingBottomLeft || fallingBottomRight;
     hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
     if (hero.isOverPit) {
-        hero.canFloat = false;
+        const canFly = hero.savedData.equippedBoots === 'cloudBoots' && hero.savedData.equipment.cloudBoots >= 2;
+        if (!canFly) {
+            hero.canFloat = false;
+        }
     }
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {

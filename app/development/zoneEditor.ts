@@ -762,6 +762,7 @@ export function getLogicProperties(
     if (currentValue !== 'none' && currentValue !== 'true') {
         rows.push({
             name: 'Invert',
+            id: `${label} Invert Logic`,
             value: !!logic?.isInverted,
             onChange(isInverted: boolean) {
                 const updatedLogic = {...(logic || {})};

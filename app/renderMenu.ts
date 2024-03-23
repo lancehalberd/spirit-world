@@ -101,10 +101,26 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     function renderBoots(equipment: Equipment): void {
         const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.savedData.equipment[equipment] || 1 });
         const target = {w: frameSize, h: frameSize, x, y};
+
         if (state.hero.savedData.equippedBoots === equipment) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
         }
+
+        const scrollTarget = {...target, x: target.x + 6, y: target.y - 4};
+        const hideSpikeBootsRecipe = !state.hero.savedData.blueprints.spikeBoots || state.hero.savedData.equipment.leatherBoots > 1;
+        if (equipment === 'leatherBoots' && (!hideSpikeBootsRecipe || editingState.isEditing)) {
+            renderFaded(context, hideSpikeBootsRecipe, () => drawFrameCenteredAt(context, scroll1, scrollTarget));
+        }
+        const hideFlyingBootsRecipe = !state.hero.savedData.blueprints.flyingBoots || state.hero.savedData.equipment.cloudBoots > 1;
+        if (equipment === 'cloudBoots' && (!hideFlyingBootsRecipe || editingState.isEditing)) {
+            renderFaded(context, hideFlyingBootsRecipe, () => drawFrameCenteredAt(context, scroll1, scrollTarget));
+        }
+        const hideForgeBootsRecipe = !state.hero.savedData.blueprints.forgeBoots || state.hero.savedData.equipment.ironBoots > 1;
+        if (equipment === 'ironBoots' && (!hideForgeBootsRecipe || editingState.isEditing)) {
+            renderFaded(context, hideForgeBootsRecipe, () => drawFrameCenteredAt(context, scroll1, scrollTarget));
+        }
+
         renderFaded(context, !state.hero.savedData.equipment[equipment], () => drawFrameCenteredAt(context, frame, target));
     }
     function renderElement(element: MagicElement): void {
@@ -295,8 +311,38 @@ mainCanvas.addEventListener('click', function (event) {
                     // No handling
                 } else if (menuItem === 'bow' || menuItem === 'cloak' || menuItem === 'staff' || menuItem === 'clone') {
                     state.hero.savedData.activeTools[menuItem] = ((state.hero.savedData.activeTools[menuItem] || 0) + 1) % 4;
-                } else if (menuItem === 'leatherBoots' || menuItem === 'ironBoots' || menuItem === 'cloudBoots') {
-                    state.hero.savedData.equipment[menuItem] = ((state.hero.savedData.equipment[menuItem] || 0) + 1) % 3;
+                } else if (menuItem === 'leatherBoots') {
+                    if (state.hero.savedData.equipment.leatherBoots === 2) {
+                        state.hero.savedData.equipment.leatherBoots = 1;
+                        state.hero.savedData.blueprints.spikeBoots = 0;
+                    } else if (state.hero.savedData.blueprints.spikeBoots) {
+                        state.hero.savedData.equipment.leatherBoots = 2;
+                    } else {
+                        state.hero.savedData.blueprints.spikeBoots = 1;
+                    }
+                } else if (menuItem === 'cloudBoots') {
+                    if (state.hero.savedData.equipment.cloudBoots === 2) {
+                        state.hero.savedData.equipment.cloudBoots = 0;
+                        state.hero.savedData.blueprints.flyingBoots = 0;
+                    } else if (state.hero.savedData.blueprints.flyingBoots) {
+                        state.hero.savedData.equipment.cloudBoots = 2;
+                    } else if (state.hero.savedData.equipment.cloudBoots) {
+                        state.hero.savedData.blueprints.flyingBoots = 1;
+                    } else {
+                        state.hero.savedData.equipment.cloudBoots = 1;
+                    }
+                } else if (menuItem === 'ironBoots') {
+                    if (state.hero.savedData.equipment.ironBoots === 2) {
+                        state.hero.savedData.equipment.ironBoots = 0;
+                        state.hero.savedData.blueprints.forgeBoots = 0;
+                    } else if (state.hero.savedData.blueprints.forgeBoots) {
+                        state.hero.savedData.equipment.ironBoots = 2;
+                    } else if (state.hero.savedData.equipment.ironBoots) {
+                        state.hero.savedData.blueprints.forgeBoots = 1;
+                    } else {
+                        state.hero.savedData.equipment.ironBoots = 1;
+                    }
+
                 } else if (menuItem === 'neutral') {
                     // No handling
                 } else if (menuItem === 'fire' || menuItem === 'ice' || menuItem === 'lightning') {

@@ -77,22 +77,9 @@ Graphics Work:
 
 
 Current tasks:
-    - Add Bell graphics
     - Add Obsidian Tileset
         - Apply to spirit world tile mappings for building/cliff exteriors
         - Touch up spirit world to fix anything that looks bad.
-
-
-    - Add boot upgrades:
-        - Spike Boots that replace leather boots. Spike boots never slip and have 10% increased movement speed.
-            - Have to find schematics + 2 silver ore + 100 Jade and can craft at regular smith after fully upgrading chakram.
-            - Schematics are in an ice cave in the material world
-        - Flying Boots that replace cloud boots. Flying boots can move over pits.
-            - Schematics are given by the regular smith after fully upgrading the chakram.
-            - Bring schematics, 1 gold ore and cloud boots to spirit Smith to upgrade to flying boots after fully upgrading gold chakram.
-        - Forge Boots that replace iron boots. Forge boots have no movement penalty and can walk on lava without taking damage.
-            - Schematics are given by the spirit smith after fully upgrading the gold chakram.
-            - Bring schematics, 1 gold ore and iron boots to spirit Smith to upgrade to forge boots after fully upgrade gold chakram.
 
     - Add boot schematic checks to the randomizer.
 

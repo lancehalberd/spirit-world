@@ -532,8 +532,11 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 320, y: 48, type: "spawnMarker", linked: true},
         {status: "normal", id: "overworld:0:0x0-plant-1", x: 352, y: 56, type: "enemy", enemyType: "plant", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-squirrel-0", x: 180, y: 388, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
-        {status: "normal", id: "overworld:0:0x0-squirrel-1", x: 288, y: 388, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-squirrel-1", x: 288, y: 352, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-plant-0", x: 156, y: 40, type: "enemy", enemyType: "plant", d: "down", params: {}},
+        {status: "active", id: "", x: 204, y: 392, type: "torch"},
+        {status: "normal", id: "", x: 304, y: 392, type: "torch"},
+        {status: "normal", id: "frozenCaveEntrance", x: 296, y: 288, type: "door", style: "cavernUpstairs", frozenLogic: {"logicKey":"hasReleasedBeasts","isInverted":true}, d: "up", targetZone: "frozenCave", targetObjectId: "frozenCaveEntrance"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 18, mapId: 'overworld', floorId: '1F', mapX: 0, mapY: 0},

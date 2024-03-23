@@ -618,7 +618,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "forgeEntrance", x: 224, y: 496, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "forgeEntrance", d: "down", locationCue: "Forge 1F"},
         {status: "normal", id: "forgeSmallMoney", x: 456, y: 88, type: "chest", lootType: "money", lootLevel: 1, hasCustomLogic: true, customLogic: "forgeLava1", lootAmount: 50},
-        {status: "normal", id: "forgeWorker", x: 80, y: 400, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "Be careful, lava has flooded the forge!\n{|}You can coat yourself with spirit dust for temporary protection.", dialogueIndex: 96},
+        {status: "normal", id: "forgeWorker", x: 60, y: 380, d: "down", behavior: "idle", style: "flameSpirit", type: "npc", dialogue: "Be careful, lava has flooded the forge!\n{|}You can coat yourself with spirit dust for temporary protection.", dialogueIndex: 96},
         {status: "normal", id: "", linked: true, x: 64, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 416, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 464, y: 320, type: "teleporter", spirit: true},
@@ -1645,9 +1645,10 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeBoss", x: 344, y: 428, type: "boss", enemyType: "balloonMegapede", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "up", params: {"length":7}},
         {status: "normal", id: "", x: 288, y: 240, type: "door", style: "cavern", d: "down"},
         {status: "normal", id: "forgeArmor", x: 416, y: 64, type: "chest", lootType: "goldMail", lootAmount: 50, lootLevel: 1},
-        {status: "normal", id: "forgeSmith", x: 368, y: 64, d: "down", behavior: "face", style: "zoro", type: "npc", dialogueKey: "forgeSmith"},
+        {status: "normal", id: "forgeArmorSmith", x: 448, y: 56, d: "down", behavior: "face", style: "flameSpirit", type: "npc", dialogueKey: "forgeArmorSmith"},
         {status: "normal", id: "", spirit: true, x: 176, y: 160, type: "shieldingUnit"},
         {status: "normal", id: "forgeSaveStatue", linked: true, spirit: true, x: 48, y: 160, type: "saveStatue"},
+        {status: "normal", id: "forgeSmith", x: 368, y: 56, d: "down", behavior: "face", style: "flameSpirit", type: "npc", dialogueKey: "forgeSmith"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 324, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava4","isInverted":true}, mapId: 'forge', floorId: 'B2', mapX: 4.5, mapY: 2},

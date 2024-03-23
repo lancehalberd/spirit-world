@@ -13,6 +13,7 @@ type Collectible = 'peachOfImmortality'
     | 'silverOre'
     | 'goldOre'
     | 'victoryPoint';
+type Blueprints = 'spikeBoots' | 'flyingBoots' | 'forgeBoots';
 type CommonLoot = 'money' | 'peach';
 type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
@@ -24,11 +25,13 @@ type LootType = 'empty' | 'weapon'
     | ActiveTool | Equipment | PassiveTool
     // Neutral element is used to unequip elements in the menu
     | 'neutral' | MagicElement
+    | Blueprints
     | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 type MenuOptionType = LootType | 'help' | 'return';
 
 type WeaponUpgrades = 'normalDamage' | 'normalRange' | 'spiritDamage' | 'spiritRange';
+
 
 interface LootTable {
     totalWeight: number

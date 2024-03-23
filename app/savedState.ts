@@ -37,6 +37,11 @@ function getDefaultSavedHeroData(): SavedHeroData {
             clone: 0,
             cloak: 0,
         },
+        blueprints: {
+            spikeBoots: 0,
+            flyingBoots: 0,
+            forgeBoots: 0,
+        },
         element: null,
         elements: {
             fire: 0,
