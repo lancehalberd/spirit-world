@@ -101,7 +101,7 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             treatment = 'forever';
         }
     }
-    const fullKey = definition.id + '-' + suffix;
+    const fullKey =  definition.id + (suffix ? '-' + suffix : '');
     if (treatment === 'forever' || treatment === 'zone') {
         const hash = treatment === 'forever'
             ? state.savedState.objectFlags
@@ -132,7 +132,7 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     if (!definition.id) {
         return false;
     }
-    const fullKey = definition.id + '-' + suffix;
+    const fullKey = definition.id + (suffix ? '-' + suffix : '');
     if (state.savedState.zoneFlags[fullKey] !== undefined) {
         return state.savedState.zoneFlags[fullKey];
     }

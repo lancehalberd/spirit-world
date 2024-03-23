@@ -100,6 +100,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
             // Default behavior is open solid ground.
             if (!behaviors) {
+                if (!bootsAreSlippery) {
+                    hero.slipping = false;
+                }
                 hero.swimming = false;
                 hero.wading = false;
                 continue;
@@ -264,6 +267,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.animationTime = 0;
             }
         }
+    }
+    // Cannot be slipping while swimming/wading/climbing.
+    if (hero.swimming || (hero.wading && !bootsAreSlippery) || hero.action === 'climbing') {
+        hero.slipping = false;
     }
     // This code used to make players slip into pits they were standing near, but it has some
     // technical issues with slipping through ledges, and it is kind of annoying anyway, so it
