@@ -30,6 +30,8 @@ interface DungeonInventory {
     bigKey: boolean
     map: boolean
     smallKeys: number
+    // Total number of small keys ever collected for this dungeon.
+    totalSmallKeys: number
 }
 
 type Scene = 'title'

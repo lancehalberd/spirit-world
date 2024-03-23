@@ -284,7 +284,7 @@ mainCanvas.addEventListener('click', function (event) {
         return;
     }
     state.savedState.dungeonInventories[state.location.logicalZoneKey]
-        = state.savedState.dungeonInventories[state.location.logicalZoneKey] || {bigKey: false, map: false, smallKeys: 0};
+        = state.savedState.dungeonInventories[state.location.logicalZoneKey] || {bigKey: false, map: false, smallKeys: 0, totalSmallKeys: 0};
     const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
     if (isPointInShortRect(mouseX, mouseY, bigKeyRect)) {
         dungeonInventory.bigKey = !dungeonInventory.bigKey;

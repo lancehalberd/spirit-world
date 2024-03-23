@@ -147,6 +147,9 @@ interface SavedHeroData {
     money: number
     silverOre: number
     goldOre: number
+    // Total silver/gold ore ever found, used for randomizer logic.
+    totalSilverOre: number
+    totalGoldOre: number
     peachQuarters: number
     spiritTokens: number
     victoryPoints: number

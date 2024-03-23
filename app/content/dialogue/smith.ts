@@ -1,6 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { isLogicValid, orLogic } from 'app/content/logic';
-import { CHAKRAM_2_NAME } from 'app/gameConstants';
+import { CHAKRAM_2_NAME, isRandomizer } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
 
 const canUpgradeLeatherBoots: LogicCheck = {
@@ -186,7 +186,15 @@ dialogueHash.citySmith = {
             return `Excellent! Your Chakram is more powerful than ever!`;
         },
         fail: 'This work doesn\'t come cheap, you need to bring more Jade.',
-        no: 'Another time then.'
+        no: 'Another time then.',
+        citySmithReward: isRandomizer ? `{item:flyingBoots} {flag:citySmithReward}` : `
+            Wait!{-}
+            Let me take a look at those boots...
+            {|}I once had a dream I made a pair of boots that could walk on the very air itself.
+            {|}I don't possess the skill to make them, but take these blueprints with you.
+            {|}If there really is a Spirit Forge, maybe they can make my dream a reality!
+            {item:flyingBoots} {flag:citySmithReward}
+        `,
     },
     options: [
         // The smith will give you blueprints for the flying boots once you obtain all normal upgrades
@@ -194,20 +202,13 @@ dialogueHash.citySmith = {
         {
             logicCheck: {
                 requiredFlags: ['$normalDamage', '$normalRange', '$cloudBoots'],
-                excludedFlags: ['$flyingBoots']
+                excludedFlags: ['citySmithReward']
             },
             text: [
                 {
                     dialogueIndex: -1,
                     dialogueType: 'subquest',
-                    text: `
-                        Wait!{-}
-                        Let me take a look at those boots...
-                        {|}I once had a dream I made a pair of boots that could walk on the very air itself.
-                        {|}I don't possess the skill to make them, but take these blueprints with you.
-                        {|}If there really is a Spirit Forge, maybe they can make my dream a reality!
-                        {item:flyingBoots}
-                    `,
+                    text: `{@citySmith.citySmithReward}`,
                 },
             ],
         },
@@ -285,7 +286,7 @@ dialogueHash.citySmith = {
         },
         {
             logicCheck: {
-                requiredFlags: ['$weapon'],
+                requiredFlags: ['$weapon:1'],
             },
             text: [
                 {
@@ -467,7 +468,11 @@ dialogueHash.forgeSmith = {
             return `Excellent! Your Chakram is more powerful than ever!`;
         },
         fail: 'You still need Jade even in the Spirit World.',
-        no: 'Another time then.'
+        no: 'Another time then.',
+        forgeSmithReward: isRandomizer ? `{item:forgeBoots} {flag:forgeSmithReward}` : `
+            With the right materials my friend could turn those Iron Boots into a pair of our famous Forge Boots.
+            {item:forgeBoots} {flag:forgeSmithReward}
+        `,
     },
     options: [
         // The forge smith will give you blueprints for the forge boots once you obtain all spirit upgrades
@@ -475,27 +480,13 @@ dialogueHash.forgeSmith = {
         {
             logicCheck: {
                 requiredFlags: ['$spiritDamage', '$spiritRange', '$ironBoots'],
-                excludedFlags: ['$forgeBoots']
+                excludedFlags: ['forgeSmithReward']
             },
             text: [
                 {
                     dialogueIndex: -1,
                     dialogueType: 'subquest',
-                    text: `
-                        With the right materials my friend could turn those Iron Boots into a pair of our famous Forge Boots.
-                        {item:forgeBoots}
-                    `,
-                },
-            ],
-        },
-        // The forge smith will offer to upgrade boots once the Chakram is fully upgraded and you bring him the recipes.
-        {
-            logicCheck: orLogic(canUpgradeCloudBoots, canUpgradeIronBoots),
-            text: [
-                {
-                    dialogueIndex: -1,
-                    dialogueType: 'subquest',
-                    text: `{@forgeSmith.upgradeBoots}`,
+                    text: `{@forgeSmith.forgeSmithReward}`,
                 },
             ],
         },

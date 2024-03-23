@@ -228,7 +228,7 @@ function canOpenDoor(location: FullZoneLocation, state: GameState, door: Entranc
     // Only pass through
     if (door.status === 'locked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
-        return dungeonInventory?.smallKeys >= door.requiredKeysForLogic;
+        return dungeonInventory?.totalSmallKeys >= door.requiredKeysForLogic;
     }
     if (door.status === 'bigKeyLocked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];

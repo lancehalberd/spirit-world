@@ -537,6 +537,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
 function debugState(state: GameState) {
     console.log(state.hero.savedData.activeTools);
     console.log(state.hero.savedData.passiveTools);
+    console.log({totalSilverOre: state.hero.savedData.totalSilverOre, totalGoldOre: state.hero.savedData.totalGoldOre });
     console.log(Object.keys(state.savedState.objectFlags));
 }
 
@@ -795,6 +796,10 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 addCheck(flag, 'overworld');
             } else if (dialogueKey === 'storageVanara') {
                 addCheck(flag, 'treeVillage');
+            } else if (dialogueKey === 'citySmith') {
+                addCheck(flag, 'holyCityInterior');
+            } else if (dialogueKey === 'forgeSmith') {
+                addCheck(flag, 'forge');
             } else {
                 console.error('Unhandled dialogue key', dialogueKey);
             }

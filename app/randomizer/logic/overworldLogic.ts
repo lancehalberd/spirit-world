@@ -43,6 +43,7 @@ export const mainOverworldNode: LogicNode = {
         'overworld:holyCityFoodHouse', 'overworld:holyCityBridgeHouse',
         'overworld:holyCityGardenHouse', 'overworld:holyCityClothesHouse',
         'fertilityTempleEntrance',
+        'frozenCaveEntrance',
     ],
     exits: [
         {objectId: 'sideArea:noToolEntrance'},
@@ -61,6 +62,12 @@ export const mainOverworldNode: LogicNode = {
         {objectId: 'fertilityTempleEntrance'},
         {objectId: 'treeCaveEntrance'},
         {objectId: 'treeCavePit'},
+        {
+            objectId: 'frozenCaveEntrance',
+            // This door is frozen until the beasts are released.
+            // You can use fire magic to melt it, or medium range to use a nearby camp fire to melt it.
+            logic: orLogic(hasReleasedBeasts, hasFire, hasMediumRange)
+        },
     ],
 };
 export const overworldNodes: LogicNode[] = [

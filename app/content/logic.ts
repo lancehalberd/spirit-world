@@ -28,10 +28,16 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         return isRandomizer;
     }
     if (itemFlag === 'weapon') {
-        return state.hero.savedData.weapon >= level;
+        return (state.hero.savedData.weapon & level) > 0;
     }
     if (itemFlag === 'maxLife') {
         return state.hero.savedData.maxLife >= level;
+    }
+    if (itemFlag === 'totalSilverOre') {
+        return state.hero.savedData.totalSilverOre >= level;
+    }
+    if (itemFlag === 'totalGoldOre') {
+        return state.hero.savedData.totalGoldOre >= level;
     }
     if (itemFlag === 'silverOre') {
         return state.hero.savedData.silverOre >= level;
@@ -143,7 +149,7 @@ export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing']};
-export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
+export const hasChakram: LogicCheck = {requiredFlags: ['$weapon:3']};
 export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 export const hasPhoenixCrown: LogicCheck = {requiredFlags: ['$phoenixCrown']};
 
@@ -189,6 +195,10 @@ export const canDefeatBalloonMegapede = andLogic(hasBossWeapon, canAvoidBossAtta
 
 export const canRemoveLightStones = orLogic(hasGloves, hasStaff);
 export const canRemoveHeavyStones = orLogic(hasMitts, canHasTowerStaff);
+
+export const canHasSpikeBoots = {requiredFlags: ['canReachCitySmith', '$spikeBoots', '$totalSilverOre:12']};
+export const canHasFlyingBoots = {requiredFlags: ['canReachForgeSmith', '$cloudBoots', '$flyingBoots', '$totalGoldOre:4']};
+export const canHasForgeBoots = {requiredFlags: ['canReachForgeSmith', '$ironBoots', '$forgeBoots', '$totalGoldOre:4']};
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot

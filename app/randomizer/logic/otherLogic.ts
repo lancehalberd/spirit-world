@@ -1,5 +1,5 @@
 import {
-    andLogic, canCross2Gaps, canHasTowerStaff, hasSpiritBarrier, hasClone,
+    andLogic, canCross2Gaps, canHasSpikeBoots, canHasFlyingBoots, hasIronBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
     hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasStaff,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
@@ -291,9 +291,31 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'treeCave',
         nodeId: 'treeCaveBack',
-        checks: [{objectId: 'treeCaveMoney', logic: hasStaff}],
+        checks: [{objectId: 'treeCaveSilver', logic: hasStaff}],
         paths: [{ nodeId: 'treeCaveFront'}],
         entranceIds: ['treeCaveMarker'],
+    },
+
+    // Frozen Cave
+    {
+        zoneId: 'frozenCave',
+        nodeId: 'frozenCaveFront',
+        paths: [{ nodeId: 'frozenCaveBack', logic:
+            orLogic(
+                andLogic(orLogic(canHasSpikeBoots, hasIronBoots), canCross2Gaps),
+                canHasFlyingBoots,
+                hasSomersault
+            )}],
+        checks: [{objectId: 'frozenCaveSpikeBoots'}],
+        entranceIds: ['frozenCaveEntrance'],
+        exits: [
+            { objectId: 'frozenCaveEntrance' },
+        ],
+    },
+    {
+        zoneId: 'frozenCave',
+        nodeId: 'frozenCaveBack',
+        checks: [{objectId: 'frozenCaveGold'}, {objectId: 'frozenCaveMoney'}],
     },
 
     // Clone Cave
@@ -369,6 +391,16 @@ export const holyCityNodes: LogicNode[] = [
     {
         zoneId: 'holyCityInterior',
         nodeId: 'gardenHouse',
+        complexNpcs: [
+            {
+                dialogueKey: 'citySmith',
+                optionKey: 'citySmithReward',
+                // Must fully upgrade the normal chakram and have cloud boots to obtain this reward.
+                // Upgrading costs 5 silver, but you could spend an additional 7 upgrading the magic chakram and spike boots.
+                logic: { requiredFlags: ['$weapon:1', '$cloudBoots', '$totalSilverOre:12']},
+            },
+        ],
+        flags: [{flag: 'canReachCitySmith'}],
         entranceIds: ['gardenHouse'],
         exits: [{ objectId: 'gardenHouse'}],
     },

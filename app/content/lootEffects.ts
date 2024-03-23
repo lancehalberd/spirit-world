@@ -27,6 +27,7 @@ function getDungeonInventory(state: GameState): DungeonInventory {
         bigKey: false,
         map: false,
         smallKeys: 0,
+        totalSmallKeys: 0,
     };
 }
 function updateDungeonInventory(state: GameState, inventory: DungeonInventory, save: boolean = true): void {
@@ -73,8 +74,10 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
             state.hero.savedData.money += (loot.lootAmount || 1);
         } else if (loot.lootType === 'silverOre') {
             state.hero.savedData.silverOre++;
+            state.hero.savedData.totalSilverOre++;
         } else if (loot.lootType === 'goldOre') {
             state.hero.savedData.goldOre++;
+            state.hero.savedData.totalGoldOre++;
         } else if (loot.lootType === 'victoryPoint') {
             state.hero.savedData.victoryPoints += (loot.lootAmount || 1);
         }  else {
@@ -97,6 +100,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
     smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);
         inventory.smallKeys++;
+        inventory.totalSmallKeys++;
         updateDungeonInventory(state, inventory, false);
     },
     peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {

@@ -176,7 +176,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 176, type: "rollingBall", linked: true},
         {status: "normal", id: "treeCaveMarker", linked: true, x: 120, y: 192, type: "marker"},
         {status: "normal", id: "", linked: true, x: 96, y: 240, type: "door", style: "cavern", d: "down"},
-        {status: "hiddenSwitch", id: "treeCaveMoney", linked: true, x: 120, y: 128, type: "chest", lootType: "money", lootAmount: 50},
+        {status: "hiddenSwitch", id: "treeCaveSilver", linked: true, x: 120, y: 128, type: "chest", lootType: "silverOre", lootAmount: 50},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 830, mapId: 'overworld', entranceId: 'treeCaveEntrance', mapX: 0, mapY: 0},

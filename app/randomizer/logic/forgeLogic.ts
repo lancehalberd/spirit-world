@@ -101,6 +101,17 @@ export const forgeNodes: LogicNode[] = [
         zoneId,
         nodeId: 'forgeForge',
         checks: [{objectId: 'forgeArmor'}],
+        complexNpcs: [
+            {
+                dialogueKey: 'forgeSmith',
+                optionKey: 'forgeSmithReward',
+                // Must fully upgrade the magic chakram and have iron boots to obtain this reward.
+                // Upgrading costs 5 silver and 2 gold, but you could spend an additional 7 upgrading the normal chakram and leather boots.
+                // As well as another 2 gold upgrading cloud boots and iron boots.
+                logic: { requiredFlags: ['$weapon:2', '$ironBoots', '$totalSilverOre:12', '$totalGoldOre:4']},
+            },
+        ],
+        flags: [{flag: 'canReachForgeSmith'}],
         paths: [{nodeId: 'forgeBoss'}],
         entranceIds: ['forgeShortcut'],
         exits: [

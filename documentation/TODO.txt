@@ -81,7 +81,9 @@ Current tasks:
         - Apply to spirit world tile mappings for building/cliff exteriors
         - Touch up spirit world to fix anything that looks bad.
 
-    - Add boot schematic checks to the randomizer.
+    - Fix bug: possible to defeat frost beast without getting reward somehow
+        - Jun did this by firing fire arrows from the bottom of the screen.
+            - The door opened but he didn't get the reward, and the boss respawned on returning.
 
     - hitting cracked pots diagonally
 
