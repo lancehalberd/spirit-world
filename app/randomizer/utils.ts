@@ -368,6 +368,10 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
                     break;
                 case 'empty':
                 case 'money':
+                    lootWithLocation.lootObject.lootType = 'victoryPoint';
+                    lootWithLocation.lootObject.lootAmount = 1;
+                    victoryPointsHidden++;
+                    break;
                 case 'silverOre':
                     if (!replaceGoodChecks) {
                         break;
@@ -375,10 +379,12 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
                     if (remainingSilverNeeded > 0) {
                         remainingSilverNeeded--;
                     } else {
+                        console.log(lootWithLocation.lootObject.lootType, 'replacing with VP');
                         lootWithLocation.lootObject.lootType = 'victoryPoint';
                         lootWithLocation.lootObject.lootAmount = 1;
                         victoryPointsHidden++;
                     }
+                    break;
                 case 'goldOre':
                     if (!replaceGoodChecks) {
                         break;
@@ -386,10 +392,12 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
                     if (remainingGoldOreNeeded > 0) {
                         remainingGoldOreNeeded--;
                     } else {
+                        console.log(lootWithLocation.lootObject.lootType, 'replacing with VP');
                         lootWithLocation.lootObject.lootType = 'victoryPoint';
                         lootWithLocation.lootObject.lootAmount = 1;
                         victoryPointsHidden++;
                     }
+                    break;
                 case 'peach':
                     lootWithLocation.lootObject.lootType = 'victoryPoint';
                     lootWithLocation.lootObject.lootAmount = 1;
