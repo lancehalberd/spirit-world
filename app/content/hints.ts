@@ -575,6 +575,7 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'overworld': return 'outside';
         case 'spiritWorld': return 'out in the spirit world';
         case 'bushCave': return 'in a cave full of bushes';
+        case 'frozenCave': return  'in a frozen cave';
         case 'lakeTunnel': return 'in the tunnel by the lake';
         case 'ascentCave': return  'in a cave on the mountain';
         case 'ascentCaveSpirit': return  'in the spirit world in a cave on the mountain';
