@@ -1,9 +1,19 @@
+export const BITMAP_TOP_LEFT_6: Uint16Array = new Uint16Array([
+    0xFC00, 0xF800, 0xF000, 0xE000, 0xC000, 0x8000, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+]);
 export const BITMAP_TOP_LEFT_8: Uint16Array = new Uint16Array([
     0xFF00, 0xFE00, 0xFC00, 0xF800, 0xF000, 0xE000, 0xC000, 0x8000,
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
-]);export const BITMAP_TOP_LEFT_8_STRIP: Uint16Array = new Uint16Array([
+]);
+export const BITMAP_TOP_LEFT_8_STRIP: Uint16Array = new Uint16Array([
     0x00FF, 0x01FE, 0x03FC, 0x07F8, 0x0FF0, 0x1FE0, 0x3FC0, 0x7F80,
     0xFF00, 0xFE00, 0xFC00, 0xF800, 0xF000, 0xE000, 0xC000, 0x8000,
+]);
+
+export const BITMAP_TOP_RIGHT_6: Uint16Array = new Uint16Array([
+    0x003F, 0x001F, 0x000F, 0x0007, 0x0003, 0x0001, 0x0000, 0x0000,
+    0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 ]);
 export const BITMAP_TOP_RIGHT_8: Uint16Array = new Uint16Array([
     0x00FF, 0x007F, 0x003F, 0x001F, 0x000F, 0x0007, 0x0003, 0x0001,
@@ -23,10 +33,22 @@ export const BITMAP_TOP_RIGHT: Uint16Array = new Uint16Array([
 ]);
 export const BITMAP_BOTTOM_LEFT: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT].reverse());
 export const BITMAP_BOTTOM_RIGHT: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT].reverse());
+export const BITMAP_BOTTOM_LEFT_6: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_6].reverse());
 export const BITMAP_BOTTOM_LEFT_8: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_8].reverse());
+export const BITMAP_BOTTOM_RIGHT_6: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_6].reverse());
 export const BITMAP_BOTTOM_RIGHT_8: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_8].reverse());
 export const BITMAP_BOTTOM_LEFT_8_STRIP: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_8_STRIP].reverse());
 export const BITMAP_BOTTOM_RIGHT_8_STRIP: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_8_STRIP].reverse());
+
+export const BITMAP_DIAGONAL_TOP_LEFT_LEDGE: Uint16Array = new Uint16Array([
+    0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F, 0x007F,
+    0x00FF, 0x01FE, 0x03FC, 0x07F8, 0x0FF0, 0x1FE0, 0x3FC0, 0x7F80,
+]);
+
+export const BITMAP_DIAGONAL_TOP_RIGHT_LEDGE: Uint16Array = new Uint16Array([
+    0x0000, 0x8000, 0xC000, 0xE000, 0xF000, 0xF800, 0xFC00, 0xFE00,
+    0xFF00, 0x7F80, 0x3FC0, 0x1FE0, 0x0FF0, 0x07F8, 0x03FC, 0x01FE,
+]);
 
 export const BITMAP_TOP: Uint16Array = new Uint16Array([
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,

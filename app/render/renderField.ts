@@ -376,6 +376,31 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
             }
         context.restore();
         context.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+
+
+        // Uncomment this to draw red over solid pixels from solidMap behaviors.
+        /*context.save();
+            context.fillStyle = 'red';
+            context.globalAlpha *= 0.6;
+            translateContextForAreaAndCamera(context, state, area);
+            for (let y = 0; y < area.h; y++) {
+                if (!area.tilesDrawn[y]) {
+                    area.tilesDrawn[y] = [];
+                }
+                for (let x = 0; x < area.w; x++) {
+                    const behaviors = area.behaviorGrid[y][x];
+                    if (behaviors?.solidMap) {
+                        for (let sy = 0; sy < 16; sy++) {
+                            for (let sx = 0; sx < 16; sx++) {
+                                if (behaviors.solidMap[sy] >> (15 - sx) & 1) {
+                                    context.fillRect(16 * x + sx, 16 * y +sy, 1, 1 );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        context.restore();*/
     }
 }
 

@@ -36,10 +36,12 @@ interface NineSlice {
     }[]
 }
 
+type DefaultLayer = 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2';
+
 interface TileBehaviors {
     // 0-1
     brightness?: number
-    defaultLayer?: 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2'
+    defaultLayer?: DefaultLayer
     // In pixels
     lightRadius?: number
     // Flag set to indicate tile is invalid for landing on when jumping down a cliff.

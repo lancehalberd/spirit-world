@@ -31,6 +31,7 @@ import {
 import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
+import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
 import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
@@ -1152,6 +1153,7 @@ addTiles([
     ...allStoneCeilingTileSources,
     ...allDesertTileSources,
     ...allFancyStoneCeilingTileSources,
+    ...allObsidianTileSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
