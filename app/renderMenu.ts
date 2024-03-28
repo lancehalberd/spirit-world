@@ -1,5 +1,5 @@
 import { getMenuName, getMenuRows } from 'app/content/menu';
-import { getLootFrame, neutralElement, scroll1 } from 'app/content/loot';
+import { getLootFrame, lootFrames, neutralElement } from 'app/content/loot';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE } from 'app/gameConstants';
 import { mainCanvas } from 'app/utils/canvas';
 import { characterMap } from 'app/utils/simpleWhiteFont';
@@ -60,7 +60,8 @@ const goldRect = subRect(innerMenuFrame, {x: 140, y: 50, w: frameSize, h: frameS
 
 const peachRect = subRect(innerMenuFrame, { x: 4, y: innerMenuFrame.h - 4 - fullPeach.h, w: fullPeach.w, h: fullPeach.h});
 
-const mapRect = {...peachRect, x: peachRect.x + peachRect.w + 10, w: scroll1.w, h: scroll1.h };
+const mapFrame = lootFrames.map;
+const mapRect = {...peachRect, x: peachRect.x + peachRect.w + 10, w: mapFrame.w, h: mapFrame.h };
 const bigKeyRect = {...mapRect, x: mapRect.x + mapRect.w + 2, w: bigKeyFrame.w, h: bigKeyFrame.h };
 const smallKeyRect = {...bigKeyRect, x: bigKeyRect.x + bigKeyRect.w + 2, w: keyFrame.w, h: keyFrame.h };
 
@@ -107,18 +108,18 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
             fillRect(context, pad(target, -2), 'black');
         }
 
-        const scrollTarget = {...target, x: target.x + 6, y: target.y - 4};
+        const scrollTarget = {...target, x: target.x + 4, y: target.y - 2};
         const hideSpikeBootsRecipe = !state.hero.savedData.blueprints.spikeBoots || state.hero.savedData.equipment.leatherBoots > 1;
         if (equipment === 'leatherBoots' && (!hideSpikeBootsRecipe || editingState.isEditing)) {
-            renderFaded(context, hideSpikeBootsRecipe, () => drawFrameCenteredAt(context, scroll1, scrollTarget));
+            renderFaded(context, hideSpikeBootsRecipe, () => drawFrameCenteredAt(context, lootFrames.spikeBoots, scrollTarget));
         }
         const hideFlyingBootsRecipe = !state.hero.savedData.blueprints.flyingBoots || state.hero.savedData.equipment.cloudBoots > 1;
         if (equipment === 'cloudBoots' && (!hideFlyingBootsRecipe || editingState.isEditing)) {
-            renderFaded(context, hideFlyingBootsRecipe, () => drawFrameCenteredAt(context, scroll1, scrollTarget));
+            renderFaded(context, hideFlyingBootsRecipe, () => drawFrameCenteredAt(context, lootFrames.flyingBoots, scrollTarget));
         }
         const hideForgeBootsRecipe = !state.hero.savedData.blueprints.forgeBoots || state.hero.savedData.equipment.ironBoots > 1;
         if (equipment === 'ironBoots' && (!hideForgeBootsRecipe || editingState.isEditing)) {
-            renderFaded(context, hideForgeBootsRecipe, () => drawFrameCenteredAt(context, scroll1, scrollTarget));
+            renderFaded(context, hideForgeBootsRecipe, () => drawFrameCenteredAt(context, lootFrames.forgeBoots, scrollTarget));
         }
 
         renderFaded(context, !state.hero.savedData.equipment[equipment], () => drawFrameCenteredAt(context, frame, target));
@@ -218,7 +219,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (editingState.isEditing) {
         const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey] || {} as DungeonInventory;
         renderFaded(context, !dungeonInventory.bigKey, () => drawFrameCenteredAt(context, bigKeyFrame, bigKeyRect));
-        renderFaded(context, !dungeonInventory.map, () => drawFrameCenteredAt(context, scroll1, mapRect));
+        renderFaded(context, !dungeonInventory.map, () => drawFrameCenteredAt(context, mapFrame, mapRect));
         renderFaded(context, !dungeonInventory.smallKeys, () => drawFrameCenteredAt(context, keyFrame, smallKeyRect));
         drawText(context, `${dungeonInventory.smallKeys || 0}`, smallKeyRect.x + 16, smallKeyRect.y + frameSize / 2, {
             textBaseline: 'middle',
@@ -228,7 +229,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     } else {
         const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey] || {} as DungeonInventory;
         if (dungeonInventory.map) {
-            drawFrameCenteredAt(context, scroll1, mapRect);
+            drawFrameCenteredAt(context, mapFrame, mapRect);
         }
     }
 

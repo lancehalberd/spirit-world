@@ -422,7 +422,7 @@ export const [
     circlet, phoenixCrown,
     teleportFrame, /* teleportFrame2 */,
     treeStaff, towerStaff,
-    /* recycle */, /* book */, scroll1, /* scroll2 */, scroll3,
+    /* recycle */, /* book */, /*scroll1*/, /* scroll2 */, scroll3,
     nimbusCloud, trueSight,
     /*goldOre*/, /*silverOre*/,
     goldMedal, silverMedal, bronzeMedal,
@@ -461,7 +461,12 @@ const [
     /* smallWhole*/,
 ] = createAnimation('gfx/hud/money.png', smallMoneyGeometry, {cols: 7}).frames;
 
-const lootFrames = {
+const scrollGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
+const [map] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 1, cols: 1}).frames;
+const [greyUpgrade, redUpgrade, blueUpgrade, /* goldUpgrade */ ] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 3, cols: 4}).frames;
+
+
+export const lootFrames = {
     smallKey: keyOutlineFrame,
     silverOre,
     goldOre,
@@ -474,7 +479,7 @@ const lootFrames = {
     goldMail,
     ironSkin,
     bigKey: bigKeyOutlineFrame,
-    map: scroll1,
+    map,
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,
@@ -501,15 +506,16 @@ const lootFrames = {
     ironBoots: ironBoots,
     cloudBoots: cloudBoots,
     // Blueprints:
-    spikeBoots: scroll1,
-    flyingBoots: scroll1,
-    forgeBoots: scroll1,
+    spikeBoots: greyUpgrade,
+    flyingBoots: blueUpgrade,
+    forgeBoots: redUpgrade,
     fireBlessing,
     waterBlessing,
     lightningBlessing,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
 } as const;
+
 
 function determineLevel(lootLevel: number, currentValue: number): number {
     if (lootLevel) {
