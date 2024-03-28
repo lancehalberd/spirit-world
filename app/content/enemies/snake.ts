@@ -2,13 +2,14 @@ import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { shootFrostInCone } from 'app/content/bosses/frostBeast';
 import { Flame } from 'app/content/effects/flame';
 import { simpleLootTable } from 'app/content/lootTables';
-
 import { snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations } from 'app/content/enemyAnimations';
+import { renderLightningCircle, renderLightningRay } from 'app/render/renderLightning'
 import { directionMap, directionToRadiansMap } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { paceRandomly } from 'app/utils/enemies';
-import { hitTargets } from 'app/utils/field';
+import { canMoveEnemy, moveEnemy, paceRandomly } from 'app/utils/enemies';
+import { hitTargets } from 'app/utils/field';;
 import { getLineOfSightTargetAndDirection } from 'app/utils/target';
+import Random from 'app/utils/Random';
 
 
 const fireBallAbility: EnemyAbility<boolean> = {
@@ -166,13 +167,29 @@ const maxImageCount = 13;
 enemyDefinitions.snakeStorm = {
     ...baseSnakeDefinition,
     abilities: [],
-    animations: snakeStormAnimations, speed: 3,
+    animations: snakeStormAnimations, speed: 10,
     // baseMovementProperties: {canSwim: true},
     touchHit: {damage: 1, element: 'lightning'},
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
     update(state: GameState, enemy: Enemy) {
-        paceRandomly(state, enemy, 0);
+        if (enemy.mode === 'choose' && enemy.modeTime === 400) {
+            const choices: Direction[] = ['up', 'down', 'left', 'right'];
+            while (choices.length) {
+                const d = Random.removeElement(choices);
+                if (canMoveEnemy(state, enemy, enemy.speed * directionMap[d][0], enemy.speed * directionMap[d][1], {})) {
+                    enemy.d = d;
+                    enemy.setMode('walk')
+                    break;
+                }
+            }
+        }
+        if (enemy.modeTime >= 400) {
+            enemy.changeToAnimation('move');
+            if (Math.random() < (enemy.modeTime - 600) / 2000 || !moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1], {})) {
+                enemy.setMode('choose');
+            }
+        }
         enemy.params.afterFrames = enemy.params.afterFrames ?? [];
         //if (enemy.time % 60 === 0) {
             const afterFrames = enemy.params.afterFrames;
@@ -192,6 +209,24 @@ enemyDefinitions.snakeStorm = {
                 context.globalAlpha *= 0.6 * (1 - (i + 1) / (maxImageCount + 2));
                 afterFrames[i].defaultRender(context, state);
             context.restore();
+        }
+
+        const hitbox1 = enemy.getHitbox();
+        let renderedRay = false;
+        if (afterFrames.length >= 10) {
+            const hitbox2 = afterFrames[afterFrames.length - 1].getHitbox();
+            const dx = hitbox1.x - hitbox2.x, dy = hitbox1.y - hitbox2.y;
+            if (dx*dx + dy * dy > 50) {
+                renderLightningRay(context, {
+                    x1: hitbox1.x + hitbox1.w / 2, y1: hitbox1.y + hitbox1.h / 2,
+                    x2: hitbox2.x + hitbox2.w / 2, y2: hitbox2.y + hitbox2.h / 2,
+                    r: 8,
+                }, 2);
+                renderedRay = true;
+            }
+        }
+        if (!renderedRay) {
+            renderLightningCircle(context, {x: hitbox1.x + hitbox1.w / 2, y: hitbox1.y + hitbox1.h / 2, r: 12}, 2)
         }
     }
 };
