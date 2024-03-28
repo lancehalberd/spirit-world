@@ -269,7 +269,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCave:0:0x0-npc-8", x: 432, y: 432, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "I have to check all of the food for freshness. Maybe I'll have a little snack while I work...", dialogueIndex: 123},
         {status: "normal", id: "waterfallCave:0:0x0-npc-10", x: 240, y: 384, d: "right", behavior: "idle", style: "vanaraGold", type: "npc", dialogue: "Chopping wood sure calms me down.", dialogueIndex: 124},
         {status: "normal", id: "waterfallCaveLeftMain", x: 128, y: 496, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveLeftMain", d: "down"},
-        {status: "normal", id: "", x: 80, y: 432, type: "pushPull"},
+        {status: "active", id: "", x: 72, y: 432, style: "firePit", type: "torch"},
+        {status: "normal", id: "", x: 72, y: 424, type: "pushPull"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 122, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 0},
