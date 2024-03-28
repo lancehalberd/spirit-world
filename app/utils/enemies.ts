@@ -247,6 +247,13 @@ export function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number
     return mx !== 0 || my !== 0;
 }
 
+export function canMoveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
+    const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);
+    enemy.x -= mx;
+    enemy.y -= my;
+    return mx !== 0 || my !== 0;
+}
+
 // Returns true only if the enemy moves the full amount.
 export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
     const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);

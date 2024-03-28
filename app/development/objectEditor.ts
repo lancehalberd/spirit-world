@@ -10,6 +10,7 @@ import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { doorStyles } from 'app/content/objects/doorStyles';
+import { torchStyles } from 'app/content/objects/torch';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
@@ -415,13 +416,19 @@ export function createObjectDefinition(
         case 'saveStatue':
         case 'shieldingUnit':
         case 'tippable':
-        case 'torch':
         case 'trampoline':
         case 'vineSprout':
         case 'waterPot':
             return {
                 ...commonProps,
                 saveStatus: definition.saveStatus,
+                type: definition.type,
+            };
+        case 'torch':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                style: definition.style || Object.keys(torchStyles)[0],
                 type: definition.type,
             };
         case 'pushStairs':
@@ -1294,6 +1301,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = pitStyles;
     } else if (object.type === 'bell') {
         styles = bellStyles;
+    } else if (object.type === 'torch') {
+        styles = torchStyles;
     }
     if (!styles) {
         return [];

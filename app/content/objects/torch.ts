@@ -1,13 +1,64 @@
 //import { resetTileBehavior } from 'app/content/areas';
 //import { allTiles } from 'app/content/tiles';
-import { flameAnimation } from 'app/content/effects/flame';
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
-import { drawFrameAt, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 
+const baseGeometry = {w: 16, h: 32, content: {x: 0, w: 16, y: 16, h : 16}};
+const pitFireGeometry = {w: 16, h: 32, content: {x: 0, w: 16, y: 17, h : 16}};
+
+const campFireAnimation = createAnimation('gfx/objects/torch.png', baseGeometry, {x: 1, y: 0, cols: 4});
+const pitFireAnimation = createAnimation('gfx/objects/torch.png', pitFireGeometry, {x: 1, y: 0, cols: 4});
+const torchFireAnimation = createAnimation('gfx/objects/torch.png', baseGeometry, {x: 1, y: 3, cols: 4});
+
+export const torchStyles = {
+    // Default style.
+    torch: {
+        baseAnimation: createAnimation('gfx/objects/torch.png', baseGeometry, {x: 0, y: 4, cols: 1}),
+        flameAnimation: torchFireAnimation,
+    },
+    logs: {
+        baseAnimation: createAnimation('gfx/objects/torch.png', baseGeometry, {x: 0, y: 1, cols: 1}),
+        flameAnimation: campFireAnimation
+    },
+    firePit: {
+        baseAnimation: createAnimation('gfx/objects/torch.png', baseGeometry, {x: 0, y: 2, cols: 1}),
+        flameAnimation: pitFireAnimation,
+    },
+    bowl: {
+        baseAnimation: createAnimation('gfx/objects/torch.png', baseGeometry, {x: 0, y: 6, cols: 1}),
+        flameAnimation: torchFireAnimation,
+    },
+};
+
+
+export class TorchFlame implements ObjectInstance {
+    get area(): AreaInstance {
+        return this.torch.area;
+    }
+    drawPriority: 'sprites' = 'sprites';
+    status: ObjectStatus;
+    x = this.torch.x;
+    y = this.torch.y;
+    ignorePits = true;
+    isObject = <const>true;
+    constructor(public torch: Torch) {}
+    getYDepth(): number {
+       return this.y + 8;
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const style = torchStyles[this.torch.definition.style] || torchStyles.torch;
+        drawFrameAt(context, getFrame(style.flameAnimation, this.torch.animationTime), {
+            x: this.x,
+            y: this.y,
+            w: 16,
+            h: 16,
+        });
+    }
+}
 
 export class Torch implements ObjectInstance {
     area: AreaInstance;
@@ -15,21 +66,17 @@ export class Torch implements ObjectInstance {
         solid: true,
         low: true,
     };
-    drawPriority: 'sprites' = 'sprites';
-    definition: SimpleObjectDefinition = null;
+    drawPriority: 'background' = 'background';
     isObject = <const>true;
     isNeutralTarget = true;
-    x: number;
-    y: number;
-    status: ObjectStatus = 'normal';
+    x = this.definition.x;
+    y = this.definition.y;
+    status: ObjectStatus = this.definition.status;
     animationTime = 0;
     appliedFireToTiles = false;
-    constructor(state: GameState, definition: SimpleObjectDefinition) {
-        this.definition = definition;
+    flame = new TorchFlame(this);
+    constructor(state: GameState, public definition: SimpleObjectDefinition) {
         this.behaviors = {...this.behaviors};
-        this.x = definition.x;
-        this.y = definition.y;
-        this.status = this.definition.status;
         if (getObjectStatus(state, this.definition)) {
             this.status = 'active';
         }
@@ -40,6 +87,15 @@ export class Torch implements ObjectInstance {
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
+    getParts(state: GameState) {
+        if (this.status === 'active') {
+            return [this.flame];
+        }
+        return [];
+    }
+    /*getYDepth(): number {
+       return this.y + 8;
+    }*/
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (this.status === 'active' && hit.element === 'ice') {
             this.status = 'normal';
@@ -65,28 +121,6 @@ export class Torch implements ObjectInstance {
             },
             hitTiles: true,
         });
-        /*const tx = (this.x / 16) | 0, ty = (this.y / 16) | 0;
-        for(let dy = -2; dy <= 2; dy++) {
-            for(let dx = -2; dx <= 2; dx++) {
-                if (dx * dx + dy * dy >= 8) continue;
-                let changed = false;
-                for (const layer of this.area.layers) {
-                    const tile = layer.tiles?.[ty+dy]?.[tx + dx];
-                    const fireTile = tile?.behaviors?.elementTiles?.fire;
-                    if (typeof fireTile !== 'undefined') {
-                        layer.tiles[ty + dy][tx + dx] = layer.originalTiles[ty + dy][tx + dx] = allTiles[fireTile];
-                        changed = true;
-                    }
-                }
-                if (changed) {
-                    this.area.checkToRedrawTiles = true;
-                    if (this.area.tilesDrawn?.[ty + dy]?.[tx + dx]) {
-                        this.area.tilesDrawn[ty + dy][tx + dx] = false;
-                    }
-                    resetTileBehavior(this.area, {x: tx + dx, y: ty + dy});
-                }
-            }
-        }*/
         this.appliedFireToTiles = true;
     }
     update(state: GameState) {
@@ -96,25 +130,20 @@ export class Torch implements ObjectInstance {
         }
         this.animationTime += FRAME_LENGTH;
     }
+    renderFloor() {
+
+    }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && this.status !== 'active') {
             return;
         }
-        context.beginPath();
-        context.rect(this.x, this.y, 16, 16);
-        context.fillStyle = 'black';
-        context.strokeStyle = '#888';
-        context.fill();
-        context.stroke();
-        if (this.status === 'active') {
-            const frame = getFrame(flameAnimation, this.animationTime);
-            drawFrameAt(context, frame, {
-                x: this.x,
-                y: this.y - 4,
-                w: frame.content.w,
-                h: frame.content.h,
-            });
-        }
+        const style = torchStyles[this.definition.style] || torchStyles.torch;
+        drawFrameAt(context, getFrame(style.baseAnimation, this.animationTime), {
+            x: this.x,
+            y: this.y,
+            w: 16,
+            h: 16,
+        });
     }
 }
 objectHash.torch = Torch;
