@@ -81,7 +81,6 @@ Current tasks:
         - Apply to spirit world tile mappings for building/cliff exteriors
         - Touch up spirit world to fix anything that looks bad.
 
-    - Add true sight indicator when removing the pot in the war temple 2F puzzle.
     - Fix transitioning north when being pushed south by bead flows.
 
     - Fix bug: possible to defeat frost beast without getting reward somehow

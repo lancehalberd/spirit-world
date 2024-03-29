@@ -1,6 +1,8 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { variantSeed } from 'app/gameConstants';
 import { removeObjectFromArea } from 'app/utils/objects';
+import { Indicator } from 'app/content/objects/indicator';
+import { addObjectToArea } from 'app/utils/objects';
 import SRandom from 'app/utils/SRandom';
 
 
@@ -37,8 +39,16 @@ specialBehaviorsHash.warTempleSpiritPot = {
     apply(state: GameState, object: ObjectInstance) {
         const index = warTempleRandom.addSeed(5).range(0, 3);
         if (object.definition.id === 'warTemplePot' + index) {
-            console.log("removing " + object.definition.id);
             removeObjectFromArea(state, object);
+        } else {
+            const indicator = new Indicator(state, {
+                type: 'indicator', id: 'potIndicator', status: 'normal',
+                targetObjectId: object.definition.id,  x: object.x, y: object.y
+            });
+            // The alternate area isn't defined in time to add it here, so this will cause the
+            // indicator to swap worlds when possible.
+            indicator.swapWorlds = true;
+            addObjectToArea(state, object.area, indicator);
         }
     }
 };

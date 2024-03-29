@@ -1,7 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
-
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 export class Indicator implements ObjectInstance {
     area: AreaInstance;
@@ -15,6 +15,8 @@ export class Indicator implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     target?: ObjectInstance;
+    // Set this to swap the indicator to the other world when possible.
+    swapWorlds?: boolean = false;
     constructor(state: GameState, definition: IndicatorDefinition) {
         this.definition = definition;
         this.x = this.definition.x;
@@ -26,6 +28,11 @@ export class Indicator implements ObjectInstance {
     update(state: GameState) {
         if (!this.area || this.status !== 'normal') {
             return;
+        }
+        if (this.area.alternateArea && this.swapWorlds) {
+            const alternateArea = this.area.alternateArea;
+            removeObjectFromArea(state, this);
+            addObjectToArea(state, alternateArea, this);
         }
         if (this.target) {
             // If the target is removed, delete the target and try finding a matching target next frame.

@@ -432,7 +432,7 @@ export class NPC implements Actor, ObjectInstance  {
             if (dialogue) {
                 context.save();
                     if (dialogue.dialogueType === 'reminder' || isDialogueHeard(state, dialogue.dialogueIndex)) {
-                        context.globalAlpha *= 0.5;
+                        context.globalAlpha *= 0.4;
                     }
                     const w = (frame.content?.w ?? frame.w) * scale;
                     const x = this.x + w / 2, y = this.y - (frame?.content?.y || 0) * scale - this.z - 12;

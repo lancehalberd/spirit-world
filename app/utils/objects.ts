@@ -26,7 +26,7 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         try {
             specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
         } catch (error) {
-            console.error(object.definition.specialBehaviorKey);
+            console.error(object.definition.specialBehaviorKey, error);
         }
     }
 
