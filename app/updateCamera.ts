@@ -3,7 +3,7 @@ import {
     setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
 import { editingState } from 'app/development/editingState';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { setAreaSection } from 'app/utils/area';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -72,6 +72,12 @@ export function updateCamera(state: GameState, speed?: number): void {
             state.hero.safeY = state.hero.y;
             state.areaInstance.cameraOffset = {x: 0, y: 0};
             state.nextAreaInstance = null;
+            state.scriptEvents.activeEvents.push({
+                type: 'wait',
+                blockPlayerInput: true,
+                duration: 2 * FRAME_LENGTH,
+                time: state.time,
+            });
 
             state.alternateAreaInstance = getAreaInstanceFromLocation(
                 state,
