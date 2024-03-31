@@ -4,22 +4,22 @@ import { CHAKRAM_2_NAME, isRandomizer } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
 
 const canUpgradeLeatherBoots: LogicCheck = {
-    // You must fully upgrade the Chakram, have the recipe
-    requiredFlags: ['$normalDamage', '$normalRange', '$spikeBoots'],
+    // You just need the recipe.
+    requiredFlags: ['$spikeBoots'],
     // The option is removed once you have obtained the flying boots.
     excludedFlags: ['$leatherBoots:2']
 };
 
 const canUpgradeCloudBoots: LogicCheck = {
-    // You must fully upgrade the Chakram, have the recipe and the cloud boots.
-    requiredFlags: ['$spiritDamage', '$spiritRange', '$flyingBoots', '$cloudBoots:1'],
+    // You must have the recipe and the cloud boots.
+    requiredFlags: ['$flyingBoots', '$cloudBoots:1'],
     // The option is removed once you have obtained the flying boots.
     excludedFlags: ['$cloudBoots:2']
 };
 
 const canUpgradeIronBoots: LogicCheck = {
-    // You must fully upgrade the Chakram, have the recipe and the iron boots.
-    requiredFlags: ['$spiritDamage', '$spiritRange', '$forgeBoots', '$ironBoots:1'],
+    // You must have the recipe and the iron boots.
+    requiredFlags: ['$forgeBoots', '$ironBoots:1'],
     // The option is removed once you have obtained the flying boots.
     excludedFlags: ['$ironBoots:2']
 };
