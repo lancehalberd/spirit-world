@@ -94,6 +94,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (hero.swimming) {
+        hero.slipping = false;
         movementSpeed *= 0.75;
         // Abort any unsupported actions while swimming.
         if (hero.action !== 'walking') {
@@ -141,8 +142,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
     const isSinking = isHeroSinking(state, hero), isFloating = !isSinking && isHeroFloating(state, hero);
     if (isSinking) {
+        hero.slipping = false;
         hero.z = Math.max(hero.z - 1.5, minZ);
     } else if (isFloating) {
+        hero.slipping = false;
         hero.vz = Math.min(1, hero.vz + 0.2);
         hero.z = Math.min(24, hero.z + hero.vz);
         if (hero.z < minZ) {
@@ -508,10 +511,20 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             dy = hero.bounce.vy;
         }
     }
-    if (hero.slipping) {
-        if (hero.savedData.equippedBoots === 'cloudBoots') {
-            hero.vx = dx / 10 + hero.vx * 0.95;
-            hero.vy = dy / 10 + hero.vy * 0.95;
+    if (hero.slipping || isFloating) {
+        let maxSpeed = 2.5;
+        if (isFloating) {
+            hero.vx = dx / 20 + hero.vx * 0.96;
+            hero.vy = dy / 20 + hero.vy * 0.96;
+        } else if (hero.savedData.equippedBoots === 'cloudBoots') {
+            if (hero.savedData.equipment.cloudBoots >= 2) {
+                hero.vx = dx / 5 + hero.vx * 0.95;
+                hero.vy = dy / 5 + hero.vy * 0.95;
+            } else {
+                hero.vx = dx / 10 + hero.vx * 0.95;
+                hero.vy = dy / 10 + hero.vy * 0.95;
+            }
+            maxSpeed = 3;
         } else {
             hero.vx = dx / 40 + hero.vx * 0.99;
             hero.vy = dy / 40 + hero.vy * 0.99;
@@ -534,7 +547,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.vy = Math.min(hero.vy, -minSpeed);
         }
         const mag = Math.sqrt(hero.vx * hero.vx + hero.vy * hero.vy);
-        const maxSpeed = 2.5;
+        // TODO: Consider fixing this so that this doesn't reduce how fast the player can move in the direction they are
+        // currently moving. For example, right now if the player is being pushed down by an air stream, this code reduces
+        // how fast they can move left or right, even though this should not depend on them being blown down.
         if (mag > maxSpeed) {
             hero.vx *= maxSpeed / mag;
             hero.vy *= maxSpeed / mag;
