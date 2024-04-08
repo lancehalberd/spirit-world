@@ -79,8 +79,6 @@ Graphics Work:
 
 
 Current tasks:
-    - Fix: Make forge shortcut lead to the front room instead of the back for easier access.
-
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
     - hitting cracked pots diagonal

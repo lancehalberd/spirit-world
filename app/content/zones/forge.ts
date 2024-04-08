@@ -622,7 +622,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 64, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 416, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 464, y: 320, type: "teleporter", spirit: true},
-        {status: "closed", id: "forgeShortcut", x: 240, y: 16, type: "door", style: "cavernDownstairs", d: "up", customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeShortcut", locationCue: "Forge 1F", openLogic: {"hasCustomLogic":true,"customLogic":"forgeBoss","isInverted":false}},
+        {status: "closed", id: "forgeShortcut", x: 240, y: 304, type: "door", style: "cavernDownstairs", d: "up", customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeShortcut", locationCue: "Forge 1F", openLogic: {"hasCustomLogic":true,"customLogic":"forgeBoss","isInverted":false}},
         {status: "normal", id: "", x: 400, y: 240, type: "door", style: "cavern", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", x: 48, y: 240, type: "door", style: "cavern", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", x: 112, y: 304, type: "shieldingUnit"},
