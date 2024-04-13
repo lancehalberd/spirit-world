@@ -511,9 +511,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             dy = hero.bounce.vy;
         }
     }
-    if (hero.slipping || isFloating) {
+    if (hero.slipping || hero.swimming || isFloating) {
         let maxSpeed = 2.5;
-        if (isFloating) {
+        if (isFloating || hero.swimming) {
             hero.vx = dx / 20 + hero.vx * 0.96;
             hero.vy = dy / 20 + hero.vy * 0.96;
         } else if (hero.savedData.equippedBoots === 'cloudBoots') {

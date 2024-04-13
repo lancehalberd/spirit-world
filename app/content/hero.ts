@@ -1,3 +1,6 @@
+import {
+    iceFrontAnimation,
+} from 'app/content/animations/iceOverlay';
 import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { Staff } from 'app/content/objects/staff';
@@ -5,6 +8,7 @@ import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import { ThrownObject } from 'app/content/effects/thrownObject';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
+
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
@@ -606,7 +610,7 @@ export class Hero implements Actor {
         if (hero.action === 'usingStaff' && hero.d === 'up') {
             this.renderStaff(context, state, hero.d);
         }
-        const frame = this.renderHeroFrame(context, state);
+        this.renderHeroFrame(context, state);
         if (this.toolOnCooldown === 'cloak') {
             this.renderCloak(context, state);
         }
@@ -623,16 +627,11 @@ export class Hero implements Actor {
             renderHeroBarrier(context, state, hero);
         }
         if (hero.frozenDuration > 0) {
+            const frame = getFrame(iceFrontAnimation, hero.frozenDuration);
             context.save();
-                context.fillStyle = 'white';
                 const p = Math.round(Math.min(3, hero.frozenDuration / 200));
                 context.globalAlpha *= (0.3 + 0.15 * p);
-                context.fillRect(
-                    Math.round(hero.x - frame.content.x - p),
-                    Math.round(hero.y - hero.z - frame.content.y - p),
-                    Math.round(frame.w + 2 * p),
-                    Math.round(frame.h + 2 * p)
-                );
+                drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
             context.restore();
         }
         this.renderChargingFront(context, state);

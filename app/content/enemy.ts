@@ -1,3 +1,6 @@
+import {
+    iceFrontAnimation,
+} from 'app/content/animations/iceOverlay';
 import { addSparkleAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { addTextCue } from 'app/content/effects/textCue';
@@ -810,18 +813,21 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.enemyDefinition.renderOver(context, state, this);
         }
         if (this.frozenDuration > 0) {
+            const frame = getFrame(iceFrontAnimation, this.frozenDuration);
             context.save();
-                context.fillStyle = 'white';
-                const p = Math.round(Math.min(3, this.frozenDuration / 200));
+                const p = Math.ceil(Math.min(3, this.frozenDuration / 200));
                 context.globalAlpha *= (0.3 + 0.15 * p);
-                // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
                 const hitbox = this.getHitbox(state);
-                context.fillRect(
-                    Math.round(hitbox.x - p),
-                    Math.round(hitbox.y - p),
-                    Math.round(hitbox.w + 2 * p),
-                    Math.round(hitbox.h + 2 * p)
-                );
+                const targetWidth = 2 * p + hitbox.w;
+                const targetHeight = 2 * p + hitbox.h;
+                const scale = Math.round(Math.max(1, targetWidth / 24, targetHeight / 24) * 2) / 2;
+                // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+                drawFrame(context, frame, {
+                    x: hitbox.x - (frame.w * scale - hitbox.w) / 2,
+                    y: hitbox.y + hitbox.h - frame.h * scale + 6 * scale,
+                    w: frame.w * scale,
+                    h: frame.h * scale,
+                });
             context.restore();
         }
     }
