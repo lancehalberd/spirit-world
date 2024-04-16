@@ -1,13 +1,13 @@
 import { editingState } from 'app/development/editingState';
 import { renderEditor } from 'app/development/renderEditor';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
+import { renderDefeatedMenu } from 'app/scenes/defeated/renderDefeated';
 import { renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera } from 'app/render/renderField';
 import { renderHUD } from 'app/renderHUD';
-import { renderMenu } from 'app/renderMenu';
+import { renderInventory } from 'app/scenes/inventory/renderInventory';
 import { renderMap } from 'app/render/renderMap';
 import { renderMessage } from 'app/render/renderMessage';
-import { renderTitle } from 'app/renderTitle';
+import { renderTitle } from 'app/scenes/title/renderTitle';
 import { getState, shouldHideMenu } from 'app/state';
 import { mainContext } from 'app/utils/canvas';
 
@@ -42,7 +42,7 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
             if (state.showMap) {
                 renderMap(context, state);
             } else {
-                renderMenu(context, state);
+                renderInventory(context, state);
             }
         }
         return;
@@ -103,7 +103,7 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         if (state.showMap) {
             renderMap(context, state);
         } else {
-            renderMenu(context, state);
+            renderInventory(context, state);
         }
     }
 }

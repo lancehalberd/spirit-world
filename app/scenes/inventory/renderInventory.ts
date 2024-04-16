@@ -79,7 +79,7 @@ export function renderMenuFrame(context: CanvasRenderingContext2D, state: GameSt
     drawFrame(context, menuSlices[8], {x: r.x + r.w - 8, y: r.y + r.h - 8, w: 8, h: 8});
 }
 
-export function renderMenu(context: CanvasRenderingContext2D, state: GameState): void {
+export function renderInventory(context: CanvasRenderingContext2D, state: GameState): void {
     renderMenuFrame(context, state, outerMenuFrame);
 
     //fillRect(context, r, 'white');

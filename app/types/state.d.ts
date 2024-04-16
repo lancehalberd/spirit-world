@@ -34,7 +34,7 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type Scene = 'title'
+type Scene = 'prologue' | 'title'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options';
 

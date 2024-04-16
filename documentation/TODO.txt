@@ -81,6 +81,15 @@ Graphics Work:
 Current tasks:
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
+    - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
+        - Allow the player to move under solid objects this way
+        - If they remove iron boots under a solid object, they should stay submerged until they aren't on a solid tile.
+        - Could add a special tile for underwater passage that let's them go under any tiles in this fashion provided they are submerged.
+        - Player shouldn't take damage while submerged.
+        - Non-deep water/water passage tiles are treated as solid for the player while submerged.
+        - Player should lose spirit underwater just as when otherwise submerged
+
+
     - hitting cracked pots diagonal
     - Cloak element is lost when changing areas but you stay invisible. This should be consistent.
     - "Looks like BK Mode to Me" message with full item set and no progress in forge yet.
