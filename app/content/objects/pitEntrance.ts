@@ -10,14 +10,26 @@ import { getObjectStatus } from 'app/utils/objects';
 
 
 const pitFrame = createAnimation('gfx/tiles/pit.png', {w: 16, h: 16}).frames[0];
+const futuristicPitFrame = createAnimation('gfx/tiles/futuristic.png', {w: 32, h: 32}, {left: 592, top: 16}).frames[0];
 
-export const pitStyles: {[key: string]: {getHitbox: (pit: PitEntrance) => Rect}} = {
+interface PitStyle {
+    frame: Frame
+    getHitbox: (pit: PitEntrance) => Rect
+    getPitbox?: (pit: PitEntrance) => Rect
+}
+
+export const pitStyles: {[key: string]: PitStyle} = {
     default: {
+        frame: futuristicPitFrame,
         getHitbox(pit: PitEntrance): Rect {
             return {x: pit.x, y: pit.y, w: 32, h: 32};
+        },
+        getPitbox(pit: PitEntrance): Rect {
+            return {x: pit.x, y: pit.y + 10, w: 32, h: 22};
         }
     },
     singleTile: {
+        frame: pitFrame,
         getHitbox(pit: PitEntrance): Rect {
             return {x: pit.x, y: pit.y, w: 16, h: 16};
         }
@@ -71,8 +83,9 @@ export class PitEntrance implements ObjectInstance {
             }
         }
         const hero = state.hero;
+        const hitbox = this.getHitbox();
         if (this.area === hero.area && hero.z <= 0 && hero.action !== 'roll' && hero.action !== 'preparingSomersault'
-            && isObjectInsideTarget(hero.getMovementHitbox(), pad(this.getHitbox(), 2))
+            && isObjectInsideTarget(hero.getMovementHitbox(), pad(hitbox, 4))
         ) {
             if (hero.action === 'fallen') {
                 enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, onEnterZoneFromPit);
@@ -82,16 +95,34 @@ export class PitEntrance implements ObjectInstance {
                 hero.action = 'falling';
                 hero.animationTime = 0;
             }
+            const pitStyle = pitStyles[this.style] || pitStyles.default;
+            const pitbox = pitStyle.getPitbox?.(this) || hitbox;
+            const heroBox = hero.getMovementHitbox();
+            if (pitbox && !isObjectInsideTarget(heroBox, pitbox)) {
+                if (heroBox.x < pitbox.x && heroBox.x + heroBox.w <= pitbox.x + pitbox.w - 1) {
+                    hero.x++;
+                }
+                if (heroBox.x + heroBox.w > pitbox.x + pitbox.w && heroBox.x >= pitbox.x + 1) {
+                    hero.x--;
+                }
+                if (heroBox.y < pitbox.y && heroBox.y + heroBox.h <= pitbox.y + pitbox.h - 1) {
+                    hero.y++;
+                }
+                if (heroBox.y + heroBox.h > pitbox.y + pitbox.h && heroBox.y >= pitbox.y + 1) {
+                    hero.y--;
+                }
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        const pitStyle = pitStyles[this.style] || pitStyles.default;
         if (this.status !== 'normal' || this.isUnderObject(state)) {
             if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);
             }
             return;
         }
-        drawFrame(context, pitFrame, this.getHitbox());
+        drawFrame(context, pitStyle.frame, this.getHitbox());
     }
 }
 objectHash.pitEntrance = PitEntrance;

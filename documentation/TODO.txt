@@ -79,6 +79,27 @@ Graphics Work:
 
 
 Current tasks:
+    - Add prologue sequence with placeholder graphics from Hillary.
+
+    - Add futuristic graphics
+        - New tiles
+            - New pit tile behaviors, mix between pits+southern walls.
+        - New doors
+            - Probably need to give feedback on the southern doors, not sure if they work as is.
+        - New ladders
+        - New anode/cathode styles
+            - lightning should track the animation of the orbs
+        - New conveyer belt styles
+        - New escalator styles
+            - Include the railings in the object so it doesn't need to be tile aligned and we don't need railing tiles?
+                - Might require a new object, but still could be worth it.
+        - New terminal styles (replace existing terminals)
+    - Add elevator
+        - Ring hitbox for blocking all movement.
+        - Animated terminal in the front
+        - Elevator platform with terminal on it can animate up/down with the player on it
+        - Need a mask for hiding the platform/terminal/player when coming out of the floor.
+
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
     - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
@@ -89,6 +110,8 @@ Current tasks:
         - Non-deep water/water passage tiles are treated as solid for the player while submerged.
         - Player should lose spirit underwater just as when otherwise submerged
 
+    - Ease player to target position when falling into tile pits, so it is less jarring.
+        - This was recently added for falling into pit entrance objects.
 
     - hitting cracked pots diagonal
     - Cloak element is lost when changing areas but you stay invisible. This should be consistent.
