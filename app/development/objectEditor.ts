@@ -165,7 +165,7 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
+    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall',
     'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
@@ -326,6 +326,13 @@ export function createObjectDefinition(
                 d: definition.d || 'down',
                 saveStatus: definition.saveStatus,
                 params,
+            };
+        }
+        case 'elevator': {
+            return {
+                ...commonProps,
+                type: definition.type,
+                floor: definition.floor || 0,
             };
         }
         case 'escalator': {
@@ -772,6 +779,16 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 value: object.h,
                 onChange(h: number) {
                     object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'elevator':
+            rows.push({
+                name: 'floor',
+                value: object.floor || 0,
+                onChange(floor: number) {
+                    object.floor = floor;
                     updateObjectInstance(state, object);
                 },
             });

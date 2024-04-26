@@ -1,4 +1,4 @@
-import {
+/*import {
     BITMAP_BOTTOM_6,
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
     BITMAP_LEFT_6,
@@ -9,7 +9,7 @@ import {
     BITMAP_BOTTOM_LEFT_8_STRIP, BITMAP_BOTTOM_RIGHT_8_STRIP,
     BITMAP_DIAGONAL_TOP_LEFT_LEDGE, BITMAP_DIAGONAL_TOP_RIGHT_LEDGE,
     orBitMasks,
-} from 'app/content/bitMasks';
+} from 'app/content/bitMasks';*/
 import { 
     southernWallBehavior,
     topRightWall,
@@ -26,6 +26,7 @@ const squareFloor: TileSource = {
         'all': { defaultLayer: 'floor2' },
         '1x1': { defaultLayer: 'floor' },
     },
+    paletteTargets: [{key: 'future', x: 0, y : 0}],
 };
 
 const convexCorners: TileSource = {
@@ -39,6 +40,7 @@ const convexCorners: TileSource = {
         [ 0, 0], [ 2, 0],
         [ 0, 2], [ 2, 2],
     ],
+    paletteTargets: [{key: 'future', x: 3, y : 0}],
 };
 
 const concaveCorners: TileSource = {
@@ -52,16 +54,95 @@ const concaveCorners: TileSource = {
         [ 0, 0], [ 2, 0],
         [ 0, 2], [ 2, 2],
     ],
+    paletteTargets: [{key: 'future', x: 6, y : 0}],
 };
 
-const obsidianAngledWalls: TileSource = {
+const pitWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 64, y: 144, w: 64, h: 48}),
+    source: requireFrame(futuristicImage, {x: 640, y: 16, w: 48, h: 32}),
+    behaviors: {
+        'all': { defaultLayer: 'floor', pit: true, pitWall: true },
+    },
+    paletteTargets: [{key: 'future', x: 9, y : 0}],
+};
+const pit: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 640, y: 48, w: 48, h: 32}),
+    behaviors: {
+        'all': { defaultLayer: 'floor', pit: true },
+    },
+    paletteTargets: [{key: 'future', x: 9, y : 2}],
+};
+
+
+const ceilingEdges: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 0, y: 128, w: 80, h: 80}),
+    behaviors: {
+        'all': { defaultLayer: 'foreground2' },
+    },
+    tileCoordinates: [
+                 [1, 0], [2, 0], [3, 0],
+        [ 0, 1], [1, 1],         [3, 1],[4, 1],
+        [ 0, 2],                        [4, 2],
+        [ 0, 3], [1, 3],         [3, 3],[4, 3],
+                 [1, 4], [2, 4], [3, 4],
+    ],
+    paletteTargets: [{key: 'future', x: 0, y : 3}],
+};
+const ceilingCorners: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 160, y: 128, w: 32, h: 64}),
+    behaviors: {
+        'all': { defaultLayer: 'foreground2' },
+    },
+    paletteTargets: [{key: 'future', x: 5, y : 3}],
+};
+
+const angledWalls: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 80, y: 224, w: 96, h: 96}),
     behaviors: {
         'all': southernWallBehavior,
-        '0x2': topRightWall, '1x2': topLeftWall, '2x2': topRightWall, '3x2': topLeftWall,
+        '0x5': topLeftWall,
+        '1x4': topLeftWall,
+        '2x3': topLeftWall,
+
+        '3x3': topRightWall,
+        '4x4': topRightWall,
+        '5x5': topRightWall,
     },
+    tileCoordinates: [
+                 [0, 1], [2, 0], [3, 0], [4, 0],
+                 [1, 1], [2, 1], [3, 1], [4, 1],
+        [ 0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2],
+        [ 0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3],
+        [ 0, 4], [1, 4],                 [4, 4], [5, 4],
+        [ 0, 5],                                 [5, 5],
+    ],
+    paletteTargets: [{key: 'future', x: 0, y : 8}],
 };
+
+const wallTiles: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 16, y: 208, w: 48, h: 48}),
+    behaviors: {
+        'all': southernWallBehavior,
+    },
+    paletteTargets: [{key: 'future', x: 6, y : 8}],
+};
+
+const wallStrip: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 16, y: 272, w: 16, h: 48}),
+    behaviors: {
+        'all': southernWallBehavior,
+    },
+    paletteTargets: [{key: 'future', x: 9, y : 8}],
+};
+
+/*
+
 
 const obsidianStairs: TileSource = {
     w: 16, h: 16,
@@ -146,14 +227,18 @@ const obsidianFloor: TileSource = {
         [0, 1],[1, 1],[2, 1],
         [0, 2],[1, 2],[2, 2], [4, 2], [5, 2],
     ],
-};
+};*/
 
 
-export const allObsidianTileSources: TileSource[] = [
+export const allFuturisticTileSources: TileSource[] = [
     squareFloor,
-    obsidianAngledWalls,
-    obsidianFloor,
-    obsidianLedges,
-    obsidianLedgeBits,
-    obsidianStairs,
+    convexCorners,
+    concaveCorners,
+    pitWalls,
+    pit,
+    ceilingEdges,
+    ceilingCorners,
+    angledWalls,
+    wallTiles,
+    wallStrip,
 ];

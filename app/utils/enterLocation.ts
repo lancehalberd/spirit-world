@@ -157,4 +157,5 @@ export function enterLocation(
     if (editingState.isEditing && !doNotRefreshEditor) {
         editingState.needsRefresh = true;
     }
+    callback?.();
 }

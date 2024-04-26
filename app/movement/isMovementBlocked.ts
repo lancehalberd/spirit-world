@@ -33,7 +33,7 @@ export function isMovementBlocked(
             if (movementProperties.excludedObjects?.has(object)) {
                 continue;
             }
-            const behaviors = getObjectBehaviors(state, object);
+            const behaviors = getObjectBehaviors(state, object, x, y);
             if (!movementProperties.canPassWalls && object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     blockingSolidObject = object;

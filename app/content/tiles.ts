@@ -28,9 +28,11 @@ import {
     topRightWall,
     unliftableStoneBehavior,
 } from 'app/content/tiles/constants';
+import { paletteHash } from 'app/content/tiles/paletteHash';
 import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
+import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
@@ -81,17 +83,30 @@ function addSingleTileFromTileSource(tileSource: TileSource, x: number, y: numbe
 function addTiles(palettes: TileSource[]) {
     const w = 16, h = 16;
     for (const palette of palettes) {
+
         // Use specified array of coordinates if found.
         if (palette.tileCoordinates) {
             for (const coordinates of palette.tileCoordinates) {
                 const [x, y] = coordinates;
                 addSingleTileFromTileSource(palette, x, y);
+                for (const target of (palette.paletteTargets || [])) {
+                    paletteHash[target.key] = (paletteHash[target.key] || [[]]);
+                    const ty = target.y + y, tx = target.x + x;
+                    paletteHash[target.key][ty] = paletteHash[target.key][ty] || [];
+                    paletteHash[target.key][ty][tx] = index - 1;
+                }
             }
         } else {
             // Otherwise loop over all coordinates.
             for (let py = 0; py < palette.source.h / h; py ++) {
                 for (let px = 0; px < palette.source.w / w; px ++) {
                     addSingleTileFromTileSource(palette, px, py);
+                    for (const target of (palette.paletteTargets || [])) {
+                        paletteHash[target.key] = (paletteHash[target.key] || [[]]);
+                        const ty = target.y + py, tx = target.x + px;
+                        paletteHash[target.key][ty] = paletteHash[target.key][ty] || [];
+                        paletteHash[target.key][ty][tx] = index - 1;
+                    }
                 }
             }
         }
@@ -1154,6 +1169,7 @@ addTiles([
     ...allDesertTileSources,
     ...allFancyStoneCeilingTileSources,
     ...allObsidianTileSources,
+    ...allFuturisticTileSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

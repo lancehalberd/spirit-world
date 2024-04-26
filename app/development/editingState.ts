@@ -1,4 +1,4 @@
-import { palettes } from 'app/content/palettes';
+import { paletteHash } from 'app/content/tiles/paletteHash';
 import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 
 
@@ -11,7 +11,7 @@ export const editingState: EditingState = {
     previousTool: 'select',
     hasChanges: false,
     isEditing: false,
-    paletteKey: Object.keys(palettes)[0],
+    paletteKey: Object.keys(paletteHash)[0],
     tileChunkKey: Object.keys(chunkGenerators)[0],
     // Default editing the field, not the floor.
     refreshMinimap: true,

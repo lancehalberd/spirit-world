@@ -170,6 +170,7 @@ export class Hero implements Actor {
     canceledStaffPlacement?: boolean;
 
     savedData: SavedHeroData;
+    renderParent?: BaseFieldInstance;
 
     constructor() {
         this.clones = [];

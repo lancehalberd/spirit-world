@@ -94,7 +94,7 @@ export function isPointOpen(
         if (movementProperties.excludedObjects?.has(object)) {
             continue;
         }
-        const behaviors = getObjectBehaviors(state, object);
+        const behaviors = getObjectBehaviors(state, object, x, y);
         if (object.getHitbox && behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return false;

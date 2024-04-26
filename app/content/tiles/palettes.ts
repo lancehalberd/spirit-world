@@ -1,8 +1,9 @@
 import { allTiles } from 'app/content/tiles';
+import { paletteHash } from 'app/content/tiles/paletteHash';
 
 
 export const sourcePalettes: {[key: string]: SourcePalette} = {};
-const everything: TilePalette = [[]];
+paletteHash.everything = [[]];
 let x = 0, y = 0;
 for (let i = 0; i < allTiles.length; i++) {
     const image = allTiles[i]?.frame?.image;
@@ -15,10 +16,10 @@ for (let i = 0; i < allTiles.length; i++) {
         };
         sourcePalettes[key].tiles.push(i);
     }
-    if (!everything[y]) {
-        everything[y] = [];
+    if (!paletteHash.everything[y]) {
+        paletteHash.everything[y] = [];
     }
-    everything[y][x++] = i;
+    paletteHash.everything[y][x++] = i;
     if (x >= 16) {
         y++;
         x = 0;
@@ -37,7 +38,7 @@ for (let i = 0; i < allTiles.length; i++) {
     [36,49,50,51,52,53,54,55,56,1,6,7,8,9,10,0,],
     [2,3,4,5,26,27,28,29,111,106,107,1,1,1,1,1],
 ];*/
-const cave: TilePalette = [
+paletteHash.cave = [
     [750, 751, 752, 753, 754, 755, 756, 757, 758, 807, 808, 809, 806, 815, 816, 805],
     [759, 760, 761, 762, 763, 764, 765, 766, 767, 810, 0, 811, 817, 818, 819, 820],
     [793, 794, 795, 796, 797, 764, 768, 769, 770, 812, 813, 814, 821, 822, 823, 824],
@@ -52,7 +53,7 @@ const cave: TilePalette = [
     [776, 786, 785, 788, 787, 775, 778, 777, 780, 779, 879, 880, 881, , , 57],
 ];
 
-const overworld: TilePalette = [
+paletteHash.overworld = [
     [38,45,45,45,45,45,45,37,38,45,45,45,45,45,45,37],
     [46,219,220,211,212,221,222,47,46,227,228,203,204,229,230,47],
     [46,235,236,213,214,237,238,47,46,243,244,205,206,245,246,47],
@@ -66,14 +67,14 @@ const overworld: TilePalette = [
     [49,50,51,52,53,54,55,56,1,1,1,33,34,35,0,0],
 ];
 
-const clouds: TilePalette= [
+paletteHash.clouds = [
     [394, 395, 396, 406, 407, 0, 153, 154, 1],
     [398, 399, 400, 410, 411, 155, 156, 157, 158],
     [402, 403, 404, 408, 409, 159, 160, 161, 162],
     [397, 401, 405, 412, 413, 0, 163, 164, 1],
 ];
 
-const water: TilePalette = [
+paletteHash.water = [
     [422, 423, 424, 429, 453, 454, 455, 425, 123, 124, 125, 132],
     [426, 427, 428, 456, 457, 458, 459, 460, 126, 127, 128, 132],
     [430, 431, 432, 0, 461, 462, 463, 0, 129, 130, 131, 1],
@@ -85,7 +86,7 @@ const water: TilePalette = [
     [0, 451, 452, 0, 0, 482, 483, 0, 0, 151, 152, 1],
 ];
 
-const trees: TilePalette = [
+paletteHash.trees = [
     [505, 506, 507, 508, 0, 517, 518, 519, 520, 1, 0, 517, 518, 519, 520, 1],
     [509, 510, 511, 512, 521, 522, 523, 524, 525, 526, 521, 522, 523, 524, 525, 526],
     [513, 514, 515, 516, 527, 528, 529, 530, 531, 532, 527, 528, 529, 530, 531, 532],
@@ -98,7 +99,7 @@ const trees: TilePalette = [
     [0, 0, 539, 540, 0, 0, 539, 540, 0, 0, 0, 539, 540, 0, 0, 0],
 ];
 
-const wooden: TilePalette = [
+paletteHash.wooden = [
     [622, 623, 624, 625, 626, 627, 618, 619, 620, 621, 668, 669, 670, 57],
     [622, 623, 624, 625, 626, 627, 618, 619, 620, 621, 671, 672, 673, ],
     [571, 563, 570, 569, 1, 585, 586, 0, 636, 635, 674, 675, 676, ],
@@ -116,7 +117,7 @@ const wooden: TilePalette = [
     [617, 615, , , , , 614, , , , , , , ],
 ];
 
-const crystalCave: TilePalette = [
+paletteHash.crystalCave = [
     [979, 980, 981, 982, 983, 984, 985, 986, 987, 1029, 1030, 1031, 1028, 1037, 1038, 1027],
     [988, 989, 990, 991, 992, 993, 994, 995, 996, 1032, 0, 1033, 1039, 1040, 1041, 1042],
     [1004, 1005, 1006, 1008, 1023, 996, 997, 998, 999, 1034, 1035, 1036, 1043, 1044, 1045, 1046],
@@ -131,7 +132,7 @@ const crystalCave: TilePalette = [
     [1007, 1011, 1010, 1013, 1012, , , , , , 1101, 1102, 1103, , , 1009],
 ];
 
-const stoneExterior: TilePalette = [
+paletteHash.stoneExterior = [
     [1327, 1328, 1329, 1330, 1364, 1365, 1366, 1367, 1368, 1351, 1352, 1353],
     [1336, 1343, 1326, 1336, 1369, 0, 0, 0, 1370, 1356, 1357, 1358],
     [1334, 1346, 1337, 1334, 1371, 0, 0, 0, 1372, 1348, 1349, 1350],
@@ -144,7 +145,7 @@ const stoneExterior: TilePalette = [
     [1217, 1218, 1216, 1215, 1214, 1388, 1401, 1402, 1445, 1407, 0, 0],
 ];
 
-const shadows: TilePalette = [
+paletteHash.shadows = [
     [688, 689, 690, 691, 1, 684, 685, 686, 1],
     [704, 0, 0, 707, 692, 0, 0, 0, 695],
     [710, 0, 0, 713, 700, 0, 0, 0, 703],
@@ -154,7 +155,7 @@ const shadows: TilePalette = [
     [683, 687, 688, 691, 705, 706, 721, 722, ],
     [714, 718, 719, 724, , , , , ],
 ];
-const lava: TilePalette = [
+paletteHash.lava = [
     [886, 887, 888, 898, 899, 0, 898, 899, 1],
     [890, 891, 892, 902, 903, 898, 905, 904, 899],
     [894, 895, 896, 900, 901, 902, 901, 900, 903],
@@ -168,18 +169,5 @@ const lava: TilePalette = [
 /**
 console.log(editingState.brush.none.tiles.map(t => "\t[" + t.join(", ") + "],").join("\n"));
  */
-export const palettes = {
-    overworld,
-    stoneExterior,
-    cave,
-    lava,
-    water,
-    crystalCave,
-    clouds,
-    trees,
-    wooden,
-    shadows,
-    everything,
-};
 
-window['palettes'] = palettes;
+

@@ -688,6 +688,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSpiritEntrance", type: "floorSwitch"},
         {status: "normal", id: "", x: 336, y: 80, style: "displayScreen", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "closedSwitch", id: "staffTowerSpiritBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, spirit: true, saveStatus: "forever", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}, locationCue: "Tower 1F"},
+        {status: "normal", id: "", x: 312, y: 336, type: "elevator", floor: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 445, mapId: 'staffTower', floorId: '1F', mapX: 3, mapY: 2},
@@ -913,6 +914,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "closed", id: "elevatorDoor0", x: 240, y: 416, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor", d: "up", specialBehaviorKey: "elevatorDoor", locationCue: "Tower B1"},
         {status: "normal", id: "elevatorFixed", x: 256, y: 144, type: "boss", enemyType: "superSquirrel", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritBasementLadder", x: 224, y: 16, type: "door", style: "ladderUp", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "up", customLogic: "elevatorDropped", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}, locationCue: "Tower B1"},
+        {status: "normal", id: "", x: 392, y: 248, type: "elevator", floor: 0},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 446, mapId: 'staffTower', floorId: 'B1', mapX: 3, mapY: 2},
@@ -1617,6 +1619,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "staffTower3F4F", x: 288, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTower3F4F", d: "up", locationCue: "Tower 3F"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 336, y: 80, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "staffTowerBigMoney2", x: 208, y: 448, type: "chest", lootType: "money", lootAmount: 100},
+        {status: "normal", id: "", x: 296, y: 68, type: "elevator", floor: 3},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 449, mapId: 'staffTower', floorId: '3F', mapX: 3, mapY: 2},
@@ -1846,6 +1849,7 @@ const sf1_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower:s1:0x1-squirrelStorm-0", x: 352, y: 208, type: "enemy", enemyType: "squirrelStorm", d: "down", params: {}},
         {status: "normal", id: "staffTower:s1:0x1-squirrelStorm-1", x: 144, y: 208, type: "enemy", enemyType: "squirrelStorm", d: "down", params: {}},
         {status: "normal", id: "staffTower:s1:0x1-lightningDrone-0", x: 272, y: 464, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
+        {status: "normal", id: "", x: 392, y: 248, type: "elevator", floor: 2},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 450, mapId: 'staffTower', floorId: '2F', mapX: 3, mapY: 2},
@@ -2543,6 +2547,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 216, y: 464, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 280, y: 464, type: "spawnMarker"},
         {status: "normal", id: "staffTowerSave", x: 240, y: 272, type: "saveStatue"},
+        {status: "normal", id: "", x: 128, y: 52, type: "elevator", floor: 5},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 453, mapId: 'staffTower', floorId: '5F', mapX: 3, mapY: 2},
@@ -2770,6 +2775,7 @@ const sf2_0x1: AreaDefinition = {
         {status: "normal", id: "staffTowerSpiritSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSpiritSkyEntrance", d: "down", locationCue: "Tower 4F", saveStatus: "forever"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 336, y: 80, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "staffTower:s2:0x1-sentryBot-0", x: 240, y: 208, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
+        {status: "normal", id: "", x: 324, y: 284, type: "elevator", floor: 4},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 454, mapId: 'staffTower', floorId: '4F', mapX: 3, mapY: 2},

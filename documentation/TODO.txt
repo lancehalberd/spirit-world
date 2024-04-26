@@ -78,12 +78,28 @@ Graphics Work:
             Staff Tower/Precursor Ruins
 
 
+Error when leaving the game in another tab for a while, when changing areas from staff tower basement to first floor.
+This would have swapped music from the boss to dungeon music since the miniboss was alive in the basement.
+Maybe a bunch of calls to switch between the A/B tracks were queued up while running in a background tab.
+RangeError: Maximum call stack size exceeded
+    at Howl._getSoundIds (howler.js:2116:27)
+    at Howl.volume (howler.js:1224:24)
+    at Object.action (howler.js:1244:27)
+    at Howl._loadQueue (howler.js:1939:16)
+    at Howl._loadQueue (howler.js:1934:16)
+    at Howl._emit (howler.js:1914:12)
+    at Howl.mute (howler.js:1198:16)
+    at Object.action (howler.js:1161:18)
+    at Howl._loadQueue (howler.js:1939:16)
+    at Howl._loadQueue (howler.js:1934:16)
+
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Add futuristic graphics
         - New tiles
             - New pit tile behaviors, mix between pits+southern walls.
+                - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.
         - New doors
             - Probably need to give feedback on the southern doors, not sure if they work as is.
         - New ladders
@@ -95,10 +111,11 @@ Current tasks:
                 - Might require a new object, but still could be worth it.
         - New terminal styles (replace existing terminals)
     - Add elevator
-        - Ring hitbox for blocking all movement.
-        - Animated terminal in the front
-        - Elevator platform with terminal on it can animate up/down with the player on it
-        - Need a mask for hiding the platform/terminal/player when coming out of the floor.
+        - Update to new tile sheet
+            - Fix ring wall to match new graphics.
+                - Remember the hitbox of the elevator has to contain the hitbox for the entire ring.
+        - Add broken functionality
+            - call terminal is not animated
 
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
@@ -119,6 +136,10 @@ Current tasks:
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
             - So of multiple possible enemy combinations, one is chosen for a zone and then each section chooses enemies from this combination.
+
+    - pushable cathode/anode we can use for puzzles where you have to divert electricity to remove a barrier or activate a lightning switch.
+        - Need to make sure the lightning barrier can hit objects like switches for this to work.
+        - Could have an anode object that sends lightning at all nearby cathodes briefly when hit by lightning.
 
     - Add a variant cave with new paths to the mountains + spirit world.
         - 3 possible entrances determined by variant seed:

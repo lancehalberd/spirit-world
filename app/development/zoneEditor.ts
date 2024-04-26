@@ -419,6 +419,7 @@ export function getZoneProperties(): PanelRows {
     const floor = state.location.floor;
     rows.push([{
         name: 'zone',
+        id: 'choose-zone',
         value: state.location.zoneKey,
         values: Object.keys(zones),
         onChange(zoneKey: string) {
@@ -453,6 +454,7 @@ export function getZoneProperties(): PanelRows {
     },
     {
         name: 'floor',
+        id: 'zone-floor',
         value: '' + (floor + 1),
         values: ([...new Array(state.zone.floors.length)].map((v, i) => '' + (i + 1))),
         onChange(floorString: string) {
@@ -559,6 +561,7 @@ export function getZoneProperties(): PanelRows {
     }]);
     rows.push({
         name: 'Spirit World',
+        id: 'toggle-zone-world',
         value: !!state.location.isSpiritWorld,
         onChange(isSpiritWorld: boolean) {
             if (state.location.isSpiritWorld != isSpiritWorld) {
@@ -633,6 +636,7 @@ export function getZoneProperties(): PanelRows {
     }]);
     rows.push({
         name: 'sections',
+        id: 'select-area-layout',
         value: 'Change Layout',
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: string) {
@@ -676,6 +680,7 @@ export function getZoneProperties(): PanelRows {
     });
     rows.push({
         name: 'Refresh Area',
+        id: 'refresh-area',
         onClick() {
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;

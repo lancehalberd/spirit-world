@@ -142,8 +142,8 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     return false;
 }
 
-export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance) {
-    return object.behaviors || object.getBehaviors?.(state);
+export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance, x?: number, y?: number) {
+    return object.behaviors || object.getBehaviors?.(state, x, y);
 }
 
 export function deactivateTargets(state: GameState, area: AreaInstance, targetObjectId: string = null): void {

@@ -1,4 +1,4 @@
-import { palettes } from 'app/content/palettes';
+import { paletteHash } from 'app/content/tiles/paletteHash';
 import { addNewTile, allTiles, generateTileHash, generateTileHashMap } from 'app/content/tiles';
 import { tagElement } from 'app/dom';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
@@ -364,8 +364,8 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                 // Add the new tile to the "everything" palette.
                 let py = (tile.index / 16) | 0;
                 let px = tile.index % 16;
-                palettes.everything[py] = palettes.everything[py] || [];
-                palettes.everything[py][px] = tile.index;
+                paletteHash.everything[py] = paletteHash.everything[py] || [];
+                paletteHash.everything[py][px] = tile.index;
                 refreshPaletteCanvas();
             }
             property.sourcePalette[gy][gx] = tile?.index || 0;

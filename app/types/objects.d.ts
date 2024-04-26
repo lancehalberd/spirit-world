@@ -51,7 +51,7 @@ interface AssignmentState {
 interface BaseFieldInstance {
     area?: AreaInstance
     behaviors?: TileBehaviors
-    getBehaviors?: (state: GameState) => TileBehaviors
+    getBehaviors?: (state: GameState, x?: number, y?: number) => TileBehaviors
     drawPriority?: DrawPriority
     // Only supported when drawPriority === 'background' currently.
     // Objects with lower `drawPriorityIndex` are drawn before others. Default value is 0.
@@ -63,6 +63,7 @@ interface BaseFieldInstance {
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderForeground2?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
@@ -70,6 +71,8 @@ interface BaseFieldInstance {
     onHit?: (state: GameState, hit: HitProperties) => HitResult
     // When the hero walks into an object
     onPush?: (state: GameState, direction: Direction) => void
+    // If set this object will not be rendered by the area and is expected to be rendered by the parent object.
+    renderParent?: BaseFieldInstance
 }
 
 interface ObjectInstance extends BaseFieldInstance {
@@ -547,11 +550,9 @@ interface NarrationDefinition extends BaseObjectDefinition {
     h: number
 }
 
-interface EscalatorDefinition extends BaseObjectDefinition {
-    type: 'escalator'
-    speed: 'slow' | 'fast'
-    w: number
-    h: number
+interface ElevatorDefinition extends BaseObjectDefinition {
+    type: 'elevator'
+    floor: number
 }
 
 interface SimpleMovementDefinition {
@@ -607,6 +608,7 @@ type ObjectDefinition = SimpleObjectDefinition
     | BossObjectDefinition
     | CrystalSwitchDefinition
     | DecorationDefinition
+    | ElevatorDefinition
     | EntranceDefinition
     | EnemyObjectDefinition
     | EscalatorDefinition

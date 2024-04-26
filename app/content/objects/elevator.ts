@@ -1,0 +1,563 @@
+import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { isObjectLogicValid } from 'app/content/logic';
+import { TextCue } from 'app/content/effects/textCue';
+import { objectHash } from 'app/content/objects/objectHash';
+import { zones } from 'app/content/zones';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { renderHeroShadow } from 'app/renderActor';
+import { appendScript } from 'app/scriptEvents';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { setAreaSection } from 'app/utils/area';
+import { createCanvasAndContext, drawCanvas, debugCanvas } from 'app/utils/canvas';
+import { addEffectToArea } from 'app/utils/effects';
+import { enterLocation } from 'app/utils/enterLocation';
+import { fixCamera } from 'app/utils/fixCamera';
+import { isPixelInShortRect } from 'app/utils/index';
+
+const [floorSlot, floorPitMask, floorPit, /*floorPit2*/, platformInFloor, ring, platform ] = createAnimation('gfx/tiles/futuristic.png', {w: 112, h: 104}, {left: 0, top: 508, cols: 7}).frames;
+
+const callTerminalHideAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32}, {left: 0, top: 784, cols: 16, duration: 4}, {loop: false});
+
+const controlTerminalAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32}, {left: 0, top: 752, cols: 1, duration: 4});
+
+const innerRadius = 42, outerRadius = 52;
+const maskFrame = floorPitMask;
+debugCanvas;//(platformInFloor, 1);
+// This canvas is used to compose all the elements together that will be masked (the playform with the terminal+player on it).
+const [maskedCanvas, maskedContext] = createCanvasAndContext(maskFrame.w, maskFrame.h);
+const [maskCanvas, maskContext] = createCanvasAndContext(maskFrame.w, maskFrame.h);
+/**
+ * Render bottom ring as background, and low enough so that it doesn't look weird.
+ * Render top rings in the foreground, high enough that it doesn't look weird.
+ * Render platform+occupants in foreground between back and front rings and masked behind the floor mask.
+ *   Maybe introduce the concept of a 'renderParent' to objects which is responsible for rendering them.
+ *   If it is set, an object won't be rendered by the field, but by the renderParent's render logic.
+ *   Them the player will set the elevator as the render parent when they are standing on the platform.
+ */
+export class Elevator implements ObjectInstance {
+    area: AreaInstance;
+    animationTime: number = 0;
+    getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors {
+        const hitbox = this.getHitbox();
+        if (!isPixelInShortRect(x, y, hitbox)) {
+            return {};
+        }
+        const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
+        const r2 = dx*dx + dy*dy;
+        // The ring around the elevator is solid
+        if (r2 > innerRadius * innerRadius && r2 < outerRadius * outerRadius) {
+            const theta = Math.atan2(dy, dx);
+            if (theta < Math.PI / 3 || theta > 2 * Math.PI / 3) {
+                return {solid: true};
+            }
+        }
+        return {};
+    }
+    offsetX: number = 0;
+    offsetY: number = 0;
+    definition: ElevatorDefinition;
+    drawPriority: DrawPriority = 'background';
+    isObject = <const>true;
+    isNeutralTarget = true;
+    x: number;
+    y: number;
+    status: ObjectStatus = 'normal';
+    elevatorY = 0;
+    floorDelta = 0;
+    callTerminal: ElevatorCallTerminal;
+    controlTerminal: ElevatorControlTerminal;
+    targetDelta = 0;
+    // rings: ElevatorRing[];
+    constructor(state: GameState, definition: ElevatorDefinition) {
+        this.definition = definition;
+        this.status = definition.status;
+        this.x = this.definition.x;
+        this.y = this.definition.y;
+        const elevatorFloor = getElevatorFloor(state);
+        if (elevatorFloor > this.definition.floor) {
+            this.floorDelta = 1;
+        } else if (elevatorFloor < this.definition.floor) {
+            this.floorDelta = -1;
+        } else {
+            this.floorDelta = 0;
+        }
+        console.log('new Elevator', this.definition.floor, '?', elevatorFloor, '=', this.floorDelta);
+        this.callTerminal = new ElevatorCallTerminal(this);
+        this.controlTerminal = new ElevatorControlTerminal(this);
+        /*this.rings = [
+            new ElevatorRing(this, 48, 0),
+            new ElevatorRing(this, 96, Math.PI / 2),
+            new ElevatorRing(this, 144, Math.PI),
+        ];*/
+    }
+    getParts() {
+        const parts: ObjectInstance[] = [this.callTerminal];
+        if (this.floorDelta === 0) {
+            parts.push(this.controlTerminal);
+        }
+        return parts;
+    }
+    getHitbox() {
+        return {x: this.x, y: this.y, w: floorSlot.w, h: floorSlot.h};
+    }
+    // Run the sequence to move the elevator to a target floor while the hero rides it.
+    travelToFloor(state: GameState, floor: number) {
+        state.hero.renderParent = this;
+        state.hero.action = null;
+        state.hero.isControlledByObject = true;
+        this.targetDelta = floor - this.definition.floor;
+                    /*
+                    {playSound:switch}
+                    {flag:elevatorClosed}
+                    {wait:200}
+                    {startScreenShake:1:0:elevator}
+                    {wait:1500}
+                    {stopScreenShake:elevator}
+                    {wait:200}
+                    {playSound:switch}
+                    {clearFlag:elevatorClosed}
+                    {flag:elevatorFloor=${i}}*/
+    }
+    callToCurrentFloor(state: GameState) {
+        if (this.floorDelta > 0) {
+            this.elevatorY = 160;
+        } else {
+            this.elevatorY = -128;
+        }
+        console.log('callToCurrentFloor', this.elevatorY, this.definition.floor);
+        this.floorDelta = 0;
+        state.savedState.objectFlags.elevatorFloor = this.definition.floor;
+        this.callTerminal.update(state);
+        this.controlTerminal.update(state);
+        if (state.hero.renderParent === this) {
+            state.hero.z = this.elevatorY;
+        }
+    }
+    update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
+        if (this.targetDelta > 0) {
+            this.elevatorY += 2;
+            if (this.elevatorY >= 160) {
+                enterZoneByElevator(
+                    state,
+                    state.location.zoneKey,
+                    this.definition.floor + this.targetDelta,
+                    false,
+                );
+            }
+        } else if (this.targetDelta < 0) {
+            this.elevatorY -= 2;
+            if (this.elevatorY <= -128) {
+                enterZoneByElevator(
+                    state,
+                    state.location.zoneKey,
+                    this.definition.floor + this.targetDelta,
+                    false,
+                );
+            }
+        } else if (this.elevatorY < 0) {
+            this.elevatorY += 2;
+        } else if (this.elevatorY > 0) {
+            this.elevatorY -= 2;
+        }
+        this.callTerminal.update(state);
+        this.controlTerminal.update(state);
+        if (state.hero.renderParent === this) {
+            if (this.elevatorY === 0) {
+                delete state.hero.renderParent;
+            } else {
+                state.hero.z = this.elevatorY;
+                // For now we don't allow the player to move while the elevator is moving.
+                state.hero.isControlledByObject = true;
+            }
+        }
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        /*const {x,y,w,h} = this.getHitbox();
+        context.fillStyle = 'red';
+        context.fillRect(x,y ,w ,h);*/
+        if (this.definition.floor === 0) {
+            drawFrame(context, floorSlot, {...floorSlot, x: this.x, y: this.y});
+        } else {
+            drawFrame(context, floorPit, {...floorPit, x: this.x, y: this.y});
+        }
+        drawFrame(context, ring, {...ring, x: this.x, y: this.y});
+        if (this.floorDelta === 0) {
+            if (this.elevatorY === 0) {
+                drawFrame(context, platformInFloor, {...platformInFloor, x: this.x, y: this.y});
+                this.controlTerminal.render(context, state);
+            } else if (this.elevatorY < 0) {
+                maskedContext.clearRect(0, 0, maskFrame.w, maskFrame.h);
+                drawFrame(maskedContext, platform, {...platform, x: 0, y: -this.elevatorY});
+                maskedContext.save();
+                    maskedContext.translate(-this.x, -this.y);
+                    this.controlTerminal.render(maskedContext, state);
+                    if (state.hero.renderParent === this) {
+                        // Need to force the shadow to move up/down with the elavator
+                        maskedContext.translate(0, -this.elevatorY);
+                            renderHeroShadow(maskedContext, state, state.hero)
+                        maskedContext.translate(0, this.elevatorY);
+                        state.hero.render(maskedContext, state);
+                    }
+                maskedContext.restore();
+                maskContext.clearRect(0, 0, maskFrame.w, maskFrame.h);
+                maskContext.globalCompositeOperation = 'source-over';
+                drawFrame(maskContext, maskFrame, {...maskFrame, x: 0, y: 0});
+                maskContext.globalCompositeOperation = 'source-in';
+                drawCanvas(maskContext, maskedCanvas, {...maskFrame, x: 0, y: 0}, {...maskFrame, x: 0, y: 0});
+                // Draw the masked content first, then the mask frame on top.
+                //window['debugCanvas'](maskCanvas);
+                drawCanvas(context, maskCanvas, {...maskFrame, x: 0, y: 0}, {...platform, x: this.x, y: this.y});
+                //context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
+            } else if (this.elevatorY <= 24) {
+                drawFrame(context, platform, {...platform, x: this.x, y: this.y - this.elevatorY});
+                this.controlTerminal.render(context, state);
+                if (state.hero.renderParent === this) {
+                    // Need to force the shadow to move up/down with the elavator
+                    context.save();
+                        context.translate(0, -this.elevatorY);
+                        renderHeroShadow(context, state, state.hero)
+                    context.restore();
+                    state.hero.render(context, state);
+                }
+            }
+        }
+        // const terminalFrame = terminalAnimation.frames[0];
+        // drawFrame(context, terminalFrame, {...terminalFrame, x: this.x + 32, y: this.y + 80});
+        /*context.strokeStyle = 'blue';
+        context.beginPath();
+        context.arc(x + w / 2, y + h / 2, innerRadius, 0, Math.PI * 2);
+        context.stroke();
+        context.beginPath();
+        context.arc(x + w / 2, y + h / 2, outerRadius, 0, Math.PI * 2);
+        context.stroke();*/
+    }
+    renderForeground2(context: CanvasRenderingContext2D, state: GameState) {
+        const ringYs = [
+            64 + 5 * Math.sin(this.animationTime / 400),
+            112 + 5 * Math.sin(Math.PI / 2 + this.animationTime / 400),
+            160 + 5 * Math.sin(Math.PI + this.animationTime / 400),
+        ]
+        const halfRing = ring.h / 2;
+        for (const y of ringYs) {
+            drawFrame(context, {...ring, h: halfRing}, {...floorPit, x: this.x, y: this.y - y, h: halfRing});
+        }
+        if (this.floorDelta === 0) {
+            if (this.elevatorY > 24) {
+                drawFrame(context, platform, {...floorPit, x: this.x, y: this.y - this.elevatorY});
+                this.controlTerminal.render(context, state);
+                if (state.hero.renderParent === this) {
+                    // Need to force the shadow to move up/down with the elavator
+                    context.save();
+                        context.translate(0, -this.elevatorY);
+                        renderHeroShadow(context, state, state.hero)
+                    context.restore();
+                    state.hero.render(context, state);
+                }
+            }
+        }
+        for (const y of ringYs) {
+            drawFrame(context, {...ring, y: ring.y + halfRing, h: halfRing}, {...floorPit, x: this.x, y: this.y - y + halfRing, h: halfRing});
+        }
+    }
+}
+objectHash.elevator = Elevator;
+
+function getElevatorFloor(state: GameState): number {
+    return state.savedState.objectFlags.elevatorFloor as number ?? 2;
+    const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
+    const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
+    const startingFloor = elevatorDropped ? 0 : 2;
+    // Elevator is broken down at level 2 by default. 0 = basement, 1 = first floor, etc.
+     return elevatorFixed
+            ? state.savedState.objectFlags.elevatorFloor as number ?? startingFloor
+            : startingFloor;
+}
+
+
+
+class ElevatorControlTerminal implements ObjectInstance {
+    get area() {
+       return this.elevator.area;
+    }
+    behaviors: TileBehaviors = { solid: true };
+    drawPriority: DrawPriority = 'sprites';
+    offsetX: number = 0;
+    offsetY: number = 0;
+    definition: ElevatorDefinition;
+    isObject = <const>true;
+    isNeutralTarget = true;
+    pattern: CanvasPattern;
+    status: ObjectStatus = 'normal';
+    elevatorY = 0;
+    x = this.elevator.x + 32;
+    y = this.elevator.y;
+    z = 0;
+    animationTime = 0;
+    renderParent = this.elevator;
+    constructor(public elevator: Elevator) {
+    }
+    update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
+        this.z = this.elevator.elevatorY;
+    }
+    getHitbox() {
+        return {
+            x: this.x + 6, y: this.y + 14, h: 10, w: 36
+        };
+    }
+    onGrab(state: GameState) {
+        // Doesn't work while the elevator isn't docked.
+        if (this.elevator.elevatorY !== 0) {
+            return;
+        }
+        // TODO: Make this dynamic based on elevator objects in the zone and the name of the floor for their section.
+        appendScript(state, '{choice:SELECT FLOOR|B1:elevator.f0|1F:elevator.f1|2F:elevator.f2|3F:elevator.f3|4F:elevator.f4|5F:elevator.f5}');
+        // Set the results of choosing a floor based on the current floor the elevator is on:
+        for (let i = 0; i < 6; i++) {
+            dialogueHash.elevator.mappedOptions[`f${i}`] = (i === this.elevator.definition.floor)
+                // Just play a confirm sound and do nothing if it is on this floor.
+                ? `{playSound:switch}`
+                // Do the move elevator sequence.
+                : (state: GameState) => {
+                    this.elevator.travelToFloor(state, i);
+                    return '';
+                };
+        }
+        state.hero.action = null;
+        // TODO: Handle case where the elevator is off.
+        // TODO: Handle case where elevator is stuck on an upper floor
+        // TODO: Handle case where elevator is stuck on the ground floor
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const frame = getFrame(controlTerminalAnimation, this.animationTime);
+        // debugCanvas(frame, 1);
+        drawFrame(context, frame, {...frame, x: this.x, y: this.y - this.z});
+    }
+}
+
+class ElevatorCallTerminal implements ObjectInstance {
+    get area() {
+       return this.elevator.area;
+    }
+    offsetX: number = 0;
+    offsetY: number = 0;
+    definition: ElevatorDefinition;
+    isObject = <const>true;
+    isNeutralTarget = true;
+    pattern: CanvasPattern;
+    status: ObjectStatus = 'normal';
+    elevatorY = 0;
+    x = this.elevator.x + 32;
+    y = this.elevator.y + 81;
+    animationTime = (this.elevator.floorDelta === 0) ? callTerminalHideAnimation.duration : 0;
+    constructor(public elevator: Elevator) {
+    }
+    update(state: GameState) {
+        // If the hide terminal animation is not complete, start running it once the elevator is close to being docked.
+        if (this.animationTime <= callTerminalHideAnimation.duration && this.elevator.floorDelta === 0 && Math.abs(this.elevator.elevatorY) < 36) {
+            this.animationTime += FRAME_LENGTH;
+        }
+    }
+    getHitbox() {
+        return {
+            x: this.x + 6, y: this.y + 14, h: 10, w: 36
+        };
+    }
+    getDrawPriority() {
+        return this.animationTime > callTerminalHideAnimation.frameDuration * FRAME_LENGTH * 7 ? 'background' : 'sprites';
+    }
+    getBehaviors() {
+        return this.animationTime > callTerminalHideAnimation.frameDuration * FRAME_LENGTH * 7
+            ? null
+            : { solid: true };
+    }
+    onGrab(state: GameState) {
+        // There is nothing to grab when the terminal is flush with the floor.
+        if (this.animationTime > callTerminalHideAnimation.frameDuration * FRAME_LENGTH * 7) {
+            state.hero.action = null;
+            return;
+        }
+        // No special behavior if the terminal is not fully up or the platform is already on this floor.
+        if (this.animationTime !== 0 || this.elevator.floorDelta === 0) {
+            return;
+        }
+        // Summon the platform to the current floor.
+        state.hero.action = null;
+        this.elevator.callToCurrentFloor(state);
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const frame = getFrame(callTerminalHideAnimation, this.animationTime);
+        // debugCanvas(frame, 1);
+        drawFrame(context, frame, {...frame, x: this.x, y: this.y});
+    }
+}
+
+/*
+class ElevatorRing implements ObjectInstance {
+    area: AreaInstance;
+    behaviors: TileBehaviors;
+    offsetX: number = 0;
+    offsetY: number = 0;
+    definition: ElevatorDefinition;
+    drawPriority: DrawPriority = 'foreground';
+    isObject = <const>true;
+    isNeutralTarget = true;
+    pattern: CanvasPattern;
+    status: ObjectStatus = 'normal';
+    elevatorY = 0;
+    x = this.elevator.x;
+    y = this.elevator.y;
+    z = this.zOffset;
+    back = new ElevatorRingBack(this);
+    constructor(public elevator: Elevator, public zOffset: number, public timeOffset: number) {
+    }
+    update() {
+        this.z = this.zOffset + Math.sin(this.timeOffset + this.elevator.animationTime / 400);
+    }
+    getParts() {
+        return []
+    }
+    render() {
+
+    }
+}
+
+class ElevatorRingBack implements ObjectInstance {
+    area: AreaInstance;
+    behaviors: TileBehaviors;
+    offsetX: number = 0;
+    offsetY: number = 0;
+    definition: ElevatorDefinition;
+    drawPriority: DrawPriority = 'foreground';
+    isObject = <const>true;
+    isNeutralTarget = true;
+    pattern: CanvasPattern;
+    status: ObjectStatus = 'normal';
+    elevatorY = 0;
+    x = 0;
+    y = 0;
+    z =
+    constructor(public ring: ElevatorRing) {
+    }
+    update() {
+        this.y =
+    }
+
+    getYDepth() {
+        return
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrame(context, floorPit, {...floorPit, x: this.x, y: this.y});
+        if (this.elevatorY === 0) {
+            drawFrame(context, platformInFloor, {...floorPit, x: this.x, y: this.y});
+        }
+    }
+}*/
+
+
+
+export function enterZoneByElevator(
+    state: GameState,
+    zoneKey: string,
+    targetFloor: number,
+    instant: boolean = true,
+    callback: (state: GameState) => void = null
+): boolean {
+    const zone = zones[zoneKey];
+    if (!zone) {
+        console.error(`Missing zone: ${zoneKey}`);
+        return false;
+    }
+    const objectLocation = findElevatorLocation(state, zoneKey, targetFloor, state.areaInstance.definition.isSpiritWorld, true);
+    if (!objectLocation) {
+        return false;
+    }
+    console.log('enterZoneByElevator', targetFloor, objectLocation);
+    enterLocation(state, objectLocation, instant, () => {
+        const elevator = findElevatorForFloor(state.areaInstance, targetFloor);
+        const hitbox = elevator.getHitbox();
+        state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+        state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 16;
+        state.hero.d = 'up';
+        state.hero.renderParent = elevator;
+        state.hero.isControlledByObject = true;
+        elevator.callToCurrentFloor(state);
+        setAreaSection(state, true);
+        fixCamera(state);
+        // TODO: Make this generic so the elevator can be used in other areas, particularly generated areas.
+        const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];
+        const textCue = new TextCue(state, { text: 'Tower ' + floorName });
+        addEffectToArea(state, state.areaInstance, textCue);
+
+        callback?.(state);
+    });
+    return true;
+}
+
+export function findElevatorLocation(
+    state: GameState,
+    zoneKey: string,
+    targetFloor: number,
+    checkSpiritWorldFirst = false,
+    showErrorIfMissing = false
+): ZoneLocation & {object: ObjectDefinition} | false {
+    const zone = zones[zoneKey];
+    if (!zone) {
+        debugger;
+        console.error('Missing zone', zoneKey);
+        return false;
+    }
+    for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
+        for (let floor = 0; floor < zone.floors.length; floor++) {
+            // Search the corresponding spirit/material world before checking in the alternate world.
+            const areaGrids = checkSpiritWorldFirst
+                ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
+                : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
+            const areaGrid = areaGrids[worldIndex];
+            const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
+            for (let y = 0; y < areaGrid.length; y++) {
+                for (let x = 0; x < areaGrid[y].length; x++) {
+                    for (const object of (areaGrid[y][x]?.objects || [])) {
+                        if (object.type === 'elevator' && object.floor === targetFloor) {
+                            if (!isObjectLogicValid(state, object)) {
+                                continue;
+                            }
+                            return {
+                                zoneKey,
+                                floor,
+                                areaGridCoords: {x, y},
+                                x: object.x,
+                                y: object.y,
+                                d: state.hero.d,
+                                isSpiritWorld: inSpiritWorld,
+                                object,
+                            };
+                        }
+                    }
+                }
+            }
+        }
+    }
+    if (showErrorIfMissing) {
+        console.error('Could not find elevator for floor ', targetFloor, 'in', zoneKey);
+    }
+    return false;
+}
+
+function findElevatorForFloor(areaInstance: AreaInstance, targetFloor: number): Elevator {
+    for (const object of areaInstance.objects) {
+        if (!object.definition) {
+            continue;
+        }
+        if (object.definition.type === 'elevator' && object.definition.floor === targetFloor) {
+            return object as Elevator;
+        }
+    }
+    console.error('Missing elevator for floor', targetFloor);
+}
+
+class _Elevator extends Elevator {}
+declare global {
+    export interface Elevator extends _Elevator {}
+}

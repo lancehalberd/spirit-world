@@ -4,19 +4,12 @@ import { moveActor } from 'app/moveActor';
 import { drawFrameAt } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
-import { allImagesLoaded } from 'app/utils/images';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
-import { requireFrame } from 'app/utils/packedImages';
+import { createAnimation } from 'app/utils/animations';
 
-// Middle wooden stair tile for escalator.
-const woodenStairs: Frame = requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 224, y: 32, w: 16, h: 16});
-const verticalBelt: Frame = requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 208, y: 96, w: 16, h: 16});
-const [horizontalBeltCanvas, horizontalBeltContext] = createCanvasAndContext(16, 16);
-const [verticalBeltCanvas, verticalBeltContext] = createCanvasAndContext(16, 16);
-const [escalatorCanvas, escalatorContext] = createCanvasAndContext(16, 16);
-const horizontalBelt: Frame = {image: horizontalBeltCanvas, x: 0, y: 0, w: 16, h: 16};
-// Scale up all the images so that they look good moving quickly.
-const createHorizontalBelt = async () => {
+
+// Example of how to asyncronously create a canvas from a loaded image.
+/*const createHorizontalBelt = async () => {
     await allImagesLoaded();
     horizontalBeltContext.save();
         horizontalBeltContext.translate(8, 8);
@@ -35,21 +28,24 @@ const createHorizontalBelt = async () => {
     woodenStairs.y = 0;
     woodenStairs.image = escalatorCanvas;
 }
-createHorizontalBelt();
+createHorizontalBelt();*/
 debugCanvas;//(beltCanvas);
+// 48, 336, down left up right
+
+const [beltDown, beltLeft, beltUp, beltRight] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 48, top: 336, rows: 4}).frames;
+
+const [escalatorFrame] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 424, rows: 4}).frames;
 
 export const escalatorStyles: {[key: string]: {[key in Direction]?: FrameWithPattern}} = {
     escalator: {
-        up: woodenStairs,
-        down: woodenStairs,
-        left: woodenStairs,
-        right: woodenStairs,
+        up: escalatorFrame,
+        down: escalatorFrame,
     },
     belt: {
-        up: verticalBelt,
-        down: verticalBelt,
-        left: horizontalBelt,
-        right: horizontalBelt,
+        up: beltUp,
+        down: beltDown,
+        left: beltLeft,
+        right: beltRight,
     },
 };
 

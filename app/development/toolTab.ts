@@ -1,4 +1,5 @@
-import { palettes, sourcePalettes } from 'app/content/palettes';
+import { sourcePalettes } from 'app/content/tiles/palettes';
+import { paletteHash } from 'app/content/tiles/paletteHash';
 import { editingState } from 'app/development/editingState';
 import { getObjectTypeProperties, isObjectSelected } from 'app/development/objectEditor';
 import { getVariantTypeSelector, isVariantSelected, unselectVariant } from 'app/development/variantEditor';
@@ -163,7 +164,7 @@ function getBrushPaletteProperties(): PanelRows {
     rows.push([{
         name: 'palette',
         value: editingState.paletteKey,
-        values: [...Object.keys(palettes), ...Object.keys(sourcePalettes)],
+        values: [...Object.keys(paletteHash), ...Object.keys(sourcePalettes)],
         onChange(key: string) {
             editingState.paletteKey = key;
             state.areaInstance.tilesDrawn = [];
@@ -188,11 +189,11 @@ function getBrushPaletteProperties(): PanelRows {
             editingState.needsRefresh = true;
         },
     }]);
-    if (palettes[editingState.paletteKey]) {
+    if (paletteHash[editingState.paletteKey]) {
         rows.push({
             name: 'brush',
             value: editingState.brush,
-            palette: palettes[editingState.paletteKey],
+            palette: paletteHash[editingState.paletteKey],
             onChange(tiles: TileGridDefinition) {
                 editingState.brush = {'none': tiles};
                 updateBrushCanvas(editingState.brush);
