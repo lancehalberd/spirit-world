@@ -111,9 +111,6 @@ Current tasks:
                 - Might require a new object, but still could be worth it.
         - New terminal styles (replace existing terminals)
     - Add elevator
-        - Update to new tile sheet
-            - Fix ring wall to match new graphics.
-                - Remember the hitbox of the elevator has to contain the hitbox for the entire ring.
         - Add broken functionality
             - call terminal is not animated
 

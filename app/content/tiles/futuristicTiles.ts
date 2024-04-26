@@ -19,17 +19,18 @@ import { requireFrame } from 'app/utils/packedImages';
 
 const futuristicImage = 'gfx/tiles/futuristic.png';
 
-const squareFloor: TileSource = {
+let y = 0;
+const lightSquareFloor: TileSource = {
     w: 16, h: 16,
     source: requireFrame(futuristicImage, {x: 16, y: 16, w: 48, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '1x1': { defaultLayer: 'floor' },
     },
-    paletteTargets: [{key: 'future', x: 0, y : 0}],
+    paletteTargets: [{key: 'future', x: 0, y}],
 };
 
-const convexCorners: TileSource = {
+const lightConvexCorners: TileSource = {
     w: 16, h: 16,
     source: requireFrame(futuristicImage, {x: 144, y: 16, w: 48, h: 48}),
     behaviors: {
@@ -40,10 +41,10 @@ const convexCorners: TileSource = {
         [ 0, 0], [ 2, 0],
         [ 0, 2], [ 2, 2],
     ],
-    paletteTargets: [{key: 'future', x: 3, y : 0}],
+    paletteTargets: [{key: 'future', x: 3, y}],
 };
 
-const concaveCorners: TileSource = {
+const lightConcaveCorners: TileSource = {
     w: 16, h: 16,
     source: requireFrame(futuristicImage, {x: 224, y: 32, w: 48, h: 48}),
     behaviors: {
@@ -54,30 +55,69 @@ const concaveCorners: TileSource = {
         [ 0, 0], [ 2, 0],
         [ 0, 2], [ 2, 2],
     ],
-    paletteTargets: [{key: 'future', x: 6, y : 0}],
+    paletteTargets: [{key: 'future', x: 6, y}],
 };
 
 const pitWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 640, y: 16, w: 48, h: 32}),
+    source: requireFrame(futuristicImage, {x: 624, y: 16, w: 48, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'floor', pit: true, pitWall: true },
     },
-    paletteTargets: [{key: 'future', x: 9, y : 0}],
+    paletteTargets: [{key: 'future', x: 9, y}],
 };
 const pit: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 640, y: 48, w: 48, h: 32}),
+    source: requireFrame(futuristicImage, {x: 624, y: 32, w: 48, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor', pit: true },
     },
-    paletteTargets: [{key: 'future', x: 9, y : 2}],
+    paletteTargets: [{key: 'future', x: 9, y: y + 1}],
+};
+y += 3;
+
+const darkSquareFloor: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 16, y: 112, w: 48, h: 48}),
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+        '1x1': { defaultLayer: 'floor' },
+    },
+    paletteTargets: [{key: 'future', x: 0, y}],
 };
 
+const darkConvexCorners: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 144, y: 112, w: 48, h: 48}),
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        // Thin ledges you can jump off of
+        [ 0, 0], [ 2, 0],
+        [ 0, 2], [ 2, 2],
+    ],
+    paletteTargets: [{key: 'future', x: 3, y}],
+};
+
+const darkConcaveCorners: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 224, y: 128, w: 48, h: 48}),
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        // Thin ledges you can jump off of
+        [ 0, 0], [ 2, 0],
+        [ 0, 2], [ 2, 2],
+    ],
+    paletteTargets: [{key: 'future', x: 6, y}],
+};
+y += 3;
 
 const ceilingEdges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 0, y: 128, w: 80, h: 80}),
+    source: requireFrame(futuristicImage, {x: 0, y: 208, w: 80, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
     },
@@ -88,20 +128,21 @@ const ceilingEdges: TileSource = {
         [ 0, 3], [1, 3],         [3, 3],[4, 3],
                  [1, 4], [2, 4], [3, 4],
     ],
-    paletteTargets: [{key: 'future', x: 0, y : 3}],
+    paletteTargets: [{key: 'future', x: 0, y}],
 };
 const ceilingCorners: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 160, y: 128, w: 32, h: 64}),
+    source: requireFrame(futuristicImage, {x: 160, y: 288, w: 32, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
     },
-    paletteTargets: [{key: 'future', x: 5, y : 3}],
+    paletteTargets: [{key: 'future', x: 5, y}],
 };
+y += 5;
 
 const angledWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 80, y: 224, w: 96, h: 96}),
+    source: requireFrame(futuristicImage, {x: 16, y: 448, w: 96, h: 96}),
     behaviors: {
         'all': southernWallBehavior,
         '0x5': topLeftWall,
@@ -120,25 +161,25 @@ const angledWalls: TileSource = {
         [ 0, 4], [1, 4],                 [4, 4], [5, 4],
         [ 0, 5],                                 [5, 5],
     ],
-    paletteTargets: [{key: 'future', x: 0, y : 8}],
+    paletteTargets: [{key: 'future', x: 0, y}],
 };
 
 const wallTiles: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 16, y: 208, w: 48, h: 48}),
+    source: requireFrame(futuristicImage, {x: 48, y: 384, w: 48, h: 48}),
     behaviors: {
         'all': southernWallBehavior,
     },
-    paletteTargets: [{key: 'future', x: 6, y : 8}],
+    paletteTargets: [{key: 'future', x: 6, y}],
 };
 
 const wallStrip: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(futuristicImage, {x: 16, y: 272, w: 16, h: 48}),
+    source: requireFrame(futuristicImage, {x: 16, y: 384, w: 16, h: 48}),
     behaviors: {
         'all': southernWallBehavior,
     },
-    paletteTargets: [{key: 'future', x: 9, y : 8}],
+    paletteTargets: [{key: 'future', x: 9, y}],
 };
 
 /*
@@ -231,9 +272,12 @@ const obsidianFloor: TileSource = {
 
 
 export const allFuturisticTileSources: TileSource[] = [
-    squareFloor,
-    convexCorners,
-    concaveCorners,
+    lightSquareFloor,
+    lightConvexCorners,
+    lightConcaveCorners,
+    darkSquareFloor,
+    darkConvexCorners,
+    darkConcaveCorners,
     pitWalls,
     pit,
     ceilingEdges,

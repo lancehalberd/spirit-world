@@ -14,13 +14,15 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { fixCamera } from 'app/utils/fixCamera';
 import { isPixelInShortRect } from 'app/utils/index';
 
-const [floorSlot, floorPitMask, floorPit, /*floorPit2*/, platformInFloor, ring, platform ] = createAnimation('gfx/tiles/futuristic.png', {w: 112, h: 104}, {left: 0, top: 508, cols: 7}).frames;
+const [floorSlot, floorPitMask, floorPit, /*floorPit2*/, platformInFloor, ring, platform ] = createAnimation('gfx/tiles/futuristic.png',
+    {w: 112, h: 110}, {left: 0, top: 728, cols: 7}
+).frames;
 
-const callTerminalHideAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32}, {left: 0, top: 784, cols: 16, duration: 4}, {loop: false});
+const callTerminalHideAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32}, {left: 0, top: 1214, cols: 18, duration: 4}, {loop: false});
 
-const controlTerminalAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32}, {left: 0, top: 752, cols: 1, duration: 4});
+const controlTerminalAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32}, {left: 0, top: 1024, cols: 2, duration: 24});
 
-const innerRadius = 42, outerRadius = 52;
+const innerRadius = 46, outerRadius = 54;
 const maskFrame = floorPitMask;
 debugCanvas;//(platformInFloor, 1);
 // This canvas is used to compose all the elements together that will be masked (the playform with the terminal+player on it).
@@ -233,6 +235,10 @@ export class Elevator implements ObjectInstance {
         context.stroke();*/
     }
     renderForeground2(context: CanvasRenderingContext2D, state: GameState) {
+        // This layer isn't used on the top floor of the elevator.
+        if (this.definition.floor >= 5) {
+            return;
+        }
         const ringYs = [
             64 + 5 * Math.sin(this.animationTime / 400),
             112 + 5 * Math.sin(Math.PI / 2 + this.animationTime / 400),
@@ -291,7 +297,7 @@ class ElevatorControlTerminal implements ObjectInstance {
     status: ObjectStatus = 'normal';
     elevatorY = 0;
     x = this.elevator.x + 32;
-    y = this.elevator.y;
+    y = this.elevator.y + 4;
     z = 0;
     animationTime = 0;
     renderParent = this.elevator;
@@ -303,7 +309,7 @@ class ElevatorControlTerminal implements ObjectInstance {
     }
     getHitbox() {
         return {
-            x: this.x + 6, y: this.y + 14, h: 10, w: 36
+            x: this.x + 6, y: this.y + 16, h: 8, w: 36
         };
     }
     onGrab(state: GameState) {
@@ -349,7 +355,7 @@ class ElevatorCallTerminal implements ObjectInstance {
     status: ObjectStatus = 'normal';
     elevatorY = 0;
     x = this.elevator.x + 32;
-    y = this.elevator.y + 81;
+    y = this.elevator.y + 85;
     animationTime = (this.elevator.floorDelta === 0) ? callTerminalHideAnimation.duration : 0;
     constructor(public elevator: Elevator) {
     }
@@ -361,7 +367,7 @@ class ElevatorCallTerminal implements ObjectInstance {
     }
     getHitbox() {
         return {
-            x: this.x + 6, y: this.y + 14, h: 10, w: 36
+            x: this.x + 6, y: this.y + 16, h: 8, w: 36
         };
     }
     getDrawPriority() {
