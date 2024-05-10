@@ -9,8 +9,9 @@ import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { getObjectStatus } from 'app/utils/objects';
 
 
-const pitFrame = createAnimation('gfx/tiles/pit.png', {w: 16, h: 16}).frames[0];
-const futuristicPitFrame = createAnimation('gfx/tiles/futuristic.png', {w: 32, h: 32}, {left: 592, top: 16}).frames[0];
+const pitFrame = createAnimation('gfx/objects/cave-pits.png', {w: 16, h: 16}, {left: 0, top: 16}).frames[0];
+const futuristicPitFrame = createAnimation('gfx/tiles/futuristic.png', {w: 32, h: 32}, {left: 576, top: 16}).frames[0];
+const naturalPitFrame = createAnimation('gfx/objects/cave-pits.png', {w: 32, h: 32}, {left: 32, top: 0}).frames[0];
 
 interface PitStyle {
     frame: Frame
@@ -20,6 +21,15 @@ interface PitStyle {
 
 export const pitStyles: {[key: string]: PitStyle} = {
     default: {
+        frame: naturalPitFrame,
+        getHitbox(pit: PitEntrance): Rect {
+            return {x: pit.x, y: pit.y, w: 32, h: 32};
+        },
+        getPitbox(pit: PitEntrance): Rect {
+            return {x: pit.x, y: pit.y + 10, w: 32, h: 22};
+        }
+    },
+    futuristic: {
         frame: futuristicPitFrame,
         getHitbox(pit: PitEntrance): Rect {
             return {x: pit.x, y: pit.y, w: 32, h: 32};

@@ -21,6 +21,7 @@ debugCanvas;//(blockedDoorCover);
 interface V1DoorFrames {
     crackedBackground: Frame
     northDoorway: Frame
+    northClosed?: Frame
     northBlownup: Frame
     northCrack: Frame
     westDoorEmpty: Frame
@@ -58,7 +59,7 @@ function renderV1DoorBackground(this: void, context: CanvasRenderingContext2D, s
             frame = v1DoorFrames.northCrack;
         } else {
             // This covers closed, closedEnemy + closedSwitch
-            overFrame = blockedDoorCover;
+            overFrame = v1DoorFrames?.northClosed || blockedDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         if (overFrame) {
@@ -113,7 +114,12 @@ function renderV1DoorForeground(context: CanvasRenderingContext2D, state: GameSt
             drawFrame(context, v1DoorFrames.southCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
             drawFrame(context, v1DoorFrames.southCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
         } else {
-            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+            if (frame.h > 16) {
+                // This handles the case for the future doors.
+                drawFrame(context, frame, {...frame, x: door.x, y: door.y + 16 - frame.h});
+            } else {
+                drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+            }
         }
     } else if (door.definition.d === 'up') {
         if (door.isFrozen) {
@@ -603,11 +609,11 @@ const crystalDoorStyle: DoorStyleDefinition = {
 
 // STONE DOOR STYLE
 const stoneImage = 'gfx/tiles/stonetileset.png';
-const stoneCrackedBackground: Frame = requireFrame(stoneImage, {x: 0, y: 240, w: 16, h: 16});
-const stoneEastCrackedWall: Frame = requireFrame(stoneImage, {x: 304, y: 64, w: 16, h: 16});
-const stoneWestCrackedWall: Frame = requireFrame(stoneImage, {x: 320, y: 64, w: 16, h: 16});
+const stoneCrackedBackground = requireFrame(stoneImage, {x: 0, y: 240, w: 16, h: 16});
+const stoneEastCrackedWall = requireFrame(stoneImage, {x: 304, y: 64, w: 16, h: 16});
+const stoneWestCrackedWall = requireFrame(stoneImage, {x: 320, y: 64, w: 16, h: 16});
 //const stoneNorthCrackedWall: Frame = requireFrame(stoneImage, {x: 304, y: 80, w: 16, h: 16});
-const stoneSouthCrackedWall: Frame = requireFrame(stoneImage, {x: 320, y: 80, w: 16, h: 16});
+const stoneSouthCrackedWall = requireFrame(stoneImage, {x: 320, y: 80, w: 16, h: 16});
 const [
     stoneSouthDoorClosed, stoneSouthDoorOpen, stoneSouthDoorEmpty
 ] = createAnimation(stoneImage, {w: 64, h: 16},
@@ -616,7 +622,7 @@ const [
     stoneWestDoorClosed, stoneEastDoorClosed, stoneWestDoorOpen, stoneEastDoorOpen,
     /* */, /* */, stoneWestDoorEmpty, stoneEastDoorEmpty,
 ] = createAnimation(stoneImage, {w: 16, h: 64},
-    {left: 432, y: 0, cols: 4, rows: 2}).frames;
+    {left: 432, top: 0, cols: 4, rows: 2}).frames;
 const [
     stoneWestDoorOpenForeground, stoneEastDoorOpenForeground,
     stoneWestDoorEmptyForeground, stoneEastDoorEmptyForeground,
@@ -626,7 +632,7 @@ const [
     stoneStairsUp, stoneStairsDown, stoneNorthDoorway, stoneNorthBlownup,
     /*stoneStairs*/, stoneNorthCrack,
 ] = createAnimation(stoneImage, {w: 32, h: 32},
-    {left: 304, y: 0, cols: 4, rows: 2}).frames;
+    {left: 304, top: 0, cols: 4, rows: 2}).frames;
 const stoneDoorFrames: V1DoorFrames = {
     crackedBackground: stoneCrackedBackground,
     northDoorway: stoneNorthDoorway,
@@ -661,7 +667,7 @@ const obsidianImage = 'gfx/tiles/obsidianCliffs.png';
 const [
     obsidianStairsUp, obsidianStairsDown, obsidianNorthDoorway
 ] = createAnimation(obsidianImage, {w: 32, h: 32},
-    {left: 112, y: 0, cols: 3, rows: 1}).frames;
+    {left: 112, top: 0, cols: 3, rows: 1}).frames;
 
 const obsidianDoorFrames: V1DoorFrames = {
     crackedBackground: cavernCrackedBackground,
@@ -689,6 +695,54 @@ const obsidianDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, obsidianDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, obsidianDoorFrames),
+};
+
+// FUTURE DOOR STYLE
+const futureImage = 'gfx/tiles/futuristic.png';
+// Missing most of the frames for the obsidian doors, but we can still mostly draw southern facing obsidian doors.
+const futureDoorClosed = requireFrame(futureImage, {x: 0, y: 1264, w: 32, h: 32});
+const futureDoorOpen = requireFrame(futureImage, {x: 48, y: 1264, w: 32, h: 32});
+const futureStairsUp = requireFrame(futureImage, {x: 0, y: 1312, w: 32, h: 32});
+const futureStairsDown = requireFrame(futureImage, {x: 48, y: 1312, w: 32, h: 32});
+
+const futureSouthClosed = requireFrame(futureImage, {x: 80, y: 1264, w: 64, h: 32});
+const futureSouthOpen = requireFrame(futureImage, {x: 128, y: 1264, w: 64, h: 32});
+
+// TODO: support east/west future door graphics. The closed frame is render on top of the door frame, and both are
+// entirely in the foreground.
+//const futureEastDoor = requireFrame(futureImage, {x: 125, y: 1312, w: 16, h: 64});
+//const futureEastClosed = requireFrame(futureImage, {x: 109, y: 1312, w: 16, h: 64});
+
+//const futureWestDoor = requireFrame(futureImage, {x: 147, y: 1312, w: 16, h: 64});
+//const futureWestClosed = requireFrame(futureImage, {x: 163, y: 1312, w: 16, h: 64});
+
+const futureDoorFrames: V1DoorFrames = {
+    crackedBackground: cavernCrackedBackground,
+    northDoorway: futureDoorOpen,
+    northClosed: futureDoorClosed,
+    northBlownup: cavernNorthBlownup,
+    northCrack: cavernNorthCrack,
+    westDoorEmpty: cavernWestDoorEmpty,
+    westDoorEmptyForeground: cavernWestDoorEmptyForeground,
+    westDoorOpen: cavernWestDoorOpen,
+    westDoorOpenForeground: cavernWestDoorOpenForeground,
+    westDoorClosed: cavernWestDoorClosed,
+    westCrackedWall: cavernWestCrackedWall,
+    eastDoorEmpty: cavernEastDoorEmpty,
+    eastDoorEmptyForeground: cavernEastDoorEmptyForeground,
+    eastDoorOpen: cavernEastDoorOpen,
+    eastDoorOpenForeground: cavernEastDoorOpenForeground,
+    eastDoorClosed: cavernEastDoorClosed,
+    eastCrackedWall: cavernEastCrackedWall,
+    southDoorEmpty: futureSouthOpen,
+    southDoorOpen: futureSouthOpen,
+    southDoorClosed: futureSouthClosed,
+    southCrackedWall: cavernSouthCrackedWall,
+};
+const futureDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, futureDoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, futureDoorFrames),
 };
 
 function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame): DoorStyleDefinition {
@@ -752,6 +806,9 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     wooden: woodenDoorStyle,
     woodenDownstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsDown),
     woodenUpstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsUp),
+    future: futureDoorStyle,
+    futureDownstairs: stairsDoorStyle(futureDoorStyle, futureStairsDown),
+    futureUpstairs: stairsDoorStyle(futureDoorStyle, futureStairsUp),
     cave: {
         ...oldSquareBaseDoorStyle,
         down: {

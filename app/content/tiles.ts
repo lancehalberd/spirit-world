@@ -16,6 +16,7 @@ import {
     heavyStoneBehavior,
     lightStoneBehavior,
     pitBehavior,
+    singleTileSource,
     southernWallBehavior,
     spiritPlantBehavior,
     spiritBushBehavior,
@@ -233,14 +234,6 @@ async function logUniqueTiles(newTiles: Frame): Promise<void> {
         result += '\n';
     }
     console.log(result);
-}
-
-function singleTileSource(source: string, behaviors: TileBehaviors = null, x = 0, y = 0, w = 16, h = 16): TileSource {
-    return {
-        w, h,
-        source: requireFrame(source, {x, y, w, h}),
-        behaviors: behaviors ? {'0x0': behaviors} : {},
-    };
 }
 
 function stampTileSource(frame: Frame, tileCoordinates: number[][], behaviors: {[key: string]: TileBehaviors} = {}): TileSource {
@@ -1044,7 +1037,7 @@ addTiles([
             hitEnemies: true,
         },
     }),
-    singleTileSource('gfx/tiles/pit.png', pitBehavior),
+    singleTileSource('gfx/objects/cave-pits.png', pitBehavior, 0, 16),
     singleTileSource('gfx/tiles/thorns.png', thornBehavior),
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior),
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior, 16),

@@ -91,4 +91,5 @@ interface EditingState {
         dragged: boolean
         movedCount: number
     }
+    showWalls?: boolean
 }

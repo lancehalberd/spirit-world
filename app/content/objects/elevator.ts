@@ -83,7 +83,7 @@ export class Elevator implements ObjectInstance {
         } else {
             this.floorDelta = 0;
         }
-        console.log('new Elevator', this.definition.floor, '?', elevatorFloor, '=', this.floorDelta);
+        //console.log('new Elevator', this.definition.floor, '?', elevatorFloor, '=', this.floorDelta);
         this.callTerminal = new ElevatorCallTerminal(this);
         this.controlTerminal = new ElevatorControlTerminal(this);
         /*this.rings = [
@@ -126,7 +126,7 @@ export class Elevator implements ObjectInstance {
         } else {
             this.elevatorY = -128;
         }
-        console.log('callToCurrentFloor', this.elevatorY, this.definition.floor);
+        //console.log('callToCurrentFloor', this.elevatorY, this.definition.floor);
         this.floorDelta = 0;
         state.savedState.objectFlags.elevatorFloor = this.definition.floor;
         this.callTerminal.update(state);
@@ -479,7 +479,7 @@ export function enterZoneByElevator(
     if (!objectLocation) {
         return false;
     }
-    console.log('enterZoneByElevator', targetFloor, objectLocation);
+    //console.log('enterZoneByElevator', targetFloor, objectLocation);
     enterLocation(state, objectLocation, instant, () => {
         const elevator = findElevatorForFloor(state.areaInstance, targetFloor);
         const hitbox = elevator.getHitbox();

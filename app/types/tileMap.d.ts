@@ -13,21 +13,23 @@ interface PackingImageData extends PackedImageData {
     context: CanvasRenderingContext2D
 }
 
+interface PaletteTarget {
+    key: string
+    x: number
+    y: number
+}
+
 interface TileSource {
     // The size of the tiles
-    w: number,
-    h: number,
+    w: number
+    h: number
     // The source frame of the tiles.
-    source: Frame,
+    source: Frame
     behaviors?: {
-        [key: string]: TileBehaviors,
-    },
-    tileCoordinates?: number[][],
-    paletteTargets?: {
-        key: string
-        x: number
-        y: number
-    }[]
+        [key: string]: TileBehaviors
+    }
+    tileCoordinates?: number[][]
+    paletteTargets?: PaletteTarget[]
 }
 
 interface NineSlice {

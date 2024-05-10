@@ -6,6 +6,10 @@ export const BITMAP_TOP_LEFT_8: Uint16Array = new Uint16Array([
     0xFF00, 0xFE00, 0xFC00, 0xF800, 0xF000, 0xE000, 0xC000, 0x8000,
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 ]);
+export const BITMAP_TOP_LEFT_24: Uint16Array = new Uint16Array([
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+    0xFFFF, 0xFFFE, 0xFFFC, 0xFFF8, 0xFFF0, 0xFFE0, 0xFFC0, 0xFF80,
+]);
 export const BITMAP_TOP_LEFT_8_STRIP: Uint16Array = new Uint16Array([
     0x00FF, 0x01FE, 0x03FC, 0x07F8, 0x0FF0, 0x1FE0, 0x3FC0, 0x7F80,
     0xFF00, 0xFE00, 0xFC00, 0xF800, 0xF000, 0xE000, 0xC000, 0x8000,
@@ -18,6 +22,10 @@ export const BITMAP_TOP_RIGHT_6: Uint16Array = new Uint16Array([
 export const BITMAP_TOP_RIGHT_8: Uint16Array = new Uint16Array([
     0x00FF, 0x007F, 0x003F, 0x001F, 0x000F, 0x0007, 0x0003, 0x0001,
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
+]);
+export const BITMAP_TOP_RIGHT_24: Uint16Array = new Uint16Array([
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+    0xFFFF, 0x7FFF, 0x3FFF, 0x1FFF, 0x0FFF, 0x07FF, 0x03FF, 0x01FF,
 ]);
 export const BITMAP_TOP_RIGHT_8_STRIP: Uint16Array = new Uint16Array([
     0xFF00, 0x7F80, 0x3FC0, 0x1FE0, 0x0FF0, 0x07F8, 0x03FC, 0x01FE,
@@ -35,8 +43,10 @@ export const BITMAP_BOTTOM_LEFT: Uint16Array = new Uint16Array([...BITMAP_TOP_LE
 export const BITMAP_BOTTOM_RIGHT: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT].reverse());
 export const BITMAP_BOTTOM_LEFT_6: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_6].reverse());
 export const BITMAP_BOTTOM_LEFT_8: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_8].reverse());
+export const BITMAP_BOTTOM_LEFT_24: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_24].reverse());
 export const BITMAP_BOTTOM_RIGHT_6: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_6].reverse());
 export const BITMAP_BOTTOM_RIGHT_8: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_8].reverse());
+export const BITMAP_BOTTOM_RIGHT_24: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_24].reverse());
 export const BITMAP_BOTTOM_LEFT_8_STRIP: Uint16Array = new Uint16Array([...BITMAP_TOP_LEFT_8_STRIP].reverse());
 export const BITMAP_BOTTOM_RIGHT_8_STRIP: Uint16Array = new Uint16Array([...BITMAP_TOP_RIGHT_8_STRIP].reverse());
 

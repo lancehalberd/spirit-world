@@ -97,12 +97,6 @@ Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Add futuristic graphics
-        - New tiles
-            - New pit tile behaviors, mix between pits+southern walls.
-                - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.
-        - New doors
-            - Probably need to give feedback on the southern doors, not sure if they work as is.
-        - New ladders
         - New anode/cathode styles
             - lightning should track the animation of the orbs
         - New conveyer belt styles
@@ -110,9 +104,19 @@ Current tasks:
             - Include the railings in the object so it doesn't need to be tile aligned and we don't need railing tiles?
                 - Might require a new object, but still could be worth it.
         - New terminal styles (replace existing terminals)
-    - Add elevator
-        - Add broken functionality
-            - call terminal is not animated
+            - Include new standalone terminal object with sprite layering and solid hitbox, the same as the elevator control terminal.
+        - New tiles
+            - New pit tile behaviors, mix between pits+southern walls.
+                - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.
+            - Add pitMap behavior for angled pit tiles
+    - Add elevator behaviors
+        - off, terminals are not animated/functional
+        - stuck at floor (upper vs bottom floor)
+            - fall sequence
+    - Lower priority futuristic graphics
+        - New ladders
+        - east/west doors
+
 
     - Add Obsidian Tileset manually to buildings in the spirit world.
 

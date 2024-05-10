@@ -7,12 +7,12 @@ import {
 import { 
     bottomCeilingBehavior,
     bottomLeftCeiling,
+    bottomLeftShallowCeiling,
     bottomRightCeiling,
+    bottomRightShallowCeiling,
     ceilingBehavior,
     southernWallBehavior,
-    topRightCeiling,
     topRightWall,
-    topLeftCeiling,
     topLeftWall,
 } from 'app/content/tiles/constants';
 import { requireFrame } from 'app/utils/packedImages';
@@ -26,8 +26,8 @@ const stoneCeiling: TileSource = {
         '1x1': bottomCeilingBehavior,
         '2x2': bottomCeilingBehavior, '3x2': bottomCeilingBehavior, '4x2': bottomCeilingBehavior,
         '0x3': bottomCeilingBehavior, '1x3': bottomCeilingBehavior, '3x3': bottomCeilingBehavior,
-        '0x4': topLeftCeiling, '4x4': topLeftCeiling, '1x7': topLeftCeiling,
-        '1x4': topRightCeiling, '5x4': topRightCeiling, '0x7': topRightCeiling,
+        '0x4': bottomRightShallowCeiling, '4x4': bottomRightShallowCeiling, '1x7': bottomRightShallowCeiling,
+        '1x4': bottomLeftShallowCeiling, '5x4': bottomLeftShallowCeiling, '0x7': bottomLeftShallowCeiling,
         '5x3': bottomLeftCeiling, '0x5': bottomLeftCeiling, '1x6': bottomLeftCeiling,
         '4x3': bottomRightCeiling, '1x5': bottomRightCeiling, '0x6': bottomRightCeiling,
         '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,

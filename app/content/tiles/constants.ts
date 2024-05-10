@@ -1,15 +1,30 @@
 import {
     BITMAP_BOTTOM,
-    BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
+    BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_LEFT_24, BITMAP_BOTTOM_RIGHT_8, BITMAP_BOTTOM_RIGHT_24,
     BITMAP_TOP_LEFT_8_STRIP, BITMAP_TOP_RIGHT_8_STRIP,
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
     BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
 } from 'app/content/bitMasks';
 import { createAnimation } from 'app/utils/animations';
+import { requireFrame } from 'app/utils/packedImages';
 
 import { rareLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 
 
+export function singleTileSource(
+    source: string,
+    behaviors: TileBehaviors = null,
+    x = 0, y = 0,
+    paletteTargets: PaletteTarget[] = []
+): TileSource {
+    const w = 16, h = 16;
+    return {
+        w, h,
+        source: requireFrame(source, {x, y, w, h}),
+        behaviors: behaviors ? {'0x0': behaviors} : {},
+        paletteTargets,
+    };
+}
 
 export const bushParticles: Frame[] = createAnimation('gfx/tiles/bush.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 export const lightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
@@ -139,10 +154,12 @@ export const baseCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2',
 
 export const ceilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solid: true};
 export const bottomCeilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM};
+export const bottomLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
+export const bottomLeftShallowCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_24};
+export const bottomRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
+export const bottomRightShallowCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_24};
 export const topLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP};
 export const topRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
-export const bottomLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
-export const bottomRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
 
 export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false};
 export const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false};

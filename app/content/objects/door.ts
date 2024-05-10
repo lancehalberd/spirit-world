@@ -50,6 +50,32 @@ export class DoorTop implements ObjectInstance {
         return this.y + 64;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        // Only the north door uses sprite sorting, all other directions are just rendered in the foreground.
+        if (this.door.definition.d !== 'up') {
+            return;
+        }
+        const definition = this.door.definition;
+        const doorStyle = doorStyles[this.door.style];
+        if (doorStyle.renderForeground) {
+            doorStyle.renderForeground(context, state, this.door);
+            return;
+        }
+        if (doorStyle[definition.d] && this.door.status !== 'cracked') {
+            let frame: Frame;
+            if (this.door.status === 'blownOpen') {
+                frame = doorStyle[definition.d].caveCeiling;
+            } else {
+                frame = doorStyle[definition.d].doorCeiling;
+            }
+            if (frame) {
+                drawFrame(context, frame, { ...frame, x: this.door.x, y: this.door.y });
+            }
+        }
+    }
+    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.door.definition.d === 'up') {
+            return;
+        }
         const definition = this.door.definition;
         const doorStyle = doorStyles[this.door.style];
         if (doorStyle.renderForeground) {
