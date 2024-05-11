@@ -97,12 +97,8 @@ Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Add futuristic graphics
-        - New anode/cathode styles
-            - lightning should track the animation of the orbs
-        - New conveyer belt styles
-        - New escalator styles
-            - Include the railings in the object so it doesn't need to be tile aligned and we don't need railing tiles?
-                - Might require a new object, but still could be worth it.
+        - New stairs object
+            - Like the escalator style with rails except no moving floor.
         - New terminal styles (replace existing terminals)
             - Include new standalone terminal object with sprite layering and solid hitbox, the same as the elevator control terminal.
         - New tiles

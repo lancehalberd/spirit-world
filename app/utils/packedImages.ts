@@ -48,7 +48,6 @@ const imagePacks: PackedImageData[] = [
         {x:0,y:1216,w:256,h:256,originalSource:'gfx/temporary_tiles/temp_woodAndFood.png'},
         {x:880,y:16,w:16,h:16,originalSource:'gfx/tiles/iceTile.png'},
         {x:880,y:112,w:96,h:32,originalSource:'gfx/temporary_tiles/temp_laundry32.png'},
-        {x:880,y:32,w:64,h:32,originalSource:'gfx/tiles/rails.png'},
         {x:256,y:288,w:128,h:80,originalSource:'gfx/tiles/deeptoshallowwater.png'},
         {x:352,y:640,w:128,h:80,originalSource:'gfx/tiles/shallowtodeepwater1.png'},
         {x:480,y:640,w:128,h:80,originalSource:'gfx/tiles/watershore.png'},

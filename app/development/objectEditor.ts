@@ -16,6 +16,7 @@ import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/loot';
+import { lightningBarrierStyles } from 'app/content/objects/lightningBarrier';
 import { pitStyles } from 'app/content/objects/pitEntrance';
 import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
@@ -220,8 +221,15 @@ export function createObjectDefinition(
                 ...commonProps,
                 saveStatus: definition.saveStatus,
                 type: definition.type,
+                style: definition.style || Object.keys(lightningBarrierStyles)[0],
                 offInterval: definition.offInterval,
                 onInterval: definition.onInterval,
+            };
+        case 'cathode':
+            return {
+                ...commonProps,
+                type: definition.type,
+                style: definition.style || Object.keys(lightningBarrierStyles)[0],
             };
         case 'ballGoal':
             return {
@@ -1320,6 +1328,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = bellStyles;
     } else if (object.type === 'torch') {
         styles = torchStyles;
+    } else if (object.type === 'cathode' || object.type === 'anode') {
+        styles = lightningBarrierStyles;
     }
     if (!styles) {
         return [];

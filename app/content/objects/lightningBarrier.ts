@@ -1,10 +1,51 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderLightningRay } from 'app/render/renderLightning'
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
+
+function renderTransmitter(this: void, context: CanvasRenderingContext2D, state: GameState, object: Anode | Cathode) {
+    context.fillStyle = 'silver';
+    context.beginPath();
+    context.moveTo(object.x + 4, object.y + 12);
+    context.lineTo(object.x + 8, object.y);
+    context.lineTo(object.x + 12, object.y + 12);
+    context.fill();
+    context.beginPath();
+    context.arc(object.x + 8, object.y, 4, 0, 2 * Math.PI);
+    context.fill();
+}
+
+// This is just [lowFrame, middleFrame, highFrame].
+const orbAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 22}, {left: 16, top: 977, cols: 3});
+
+function renderOrb(this: void, context: CanvasRenderingContext2D, state: GameState, object: Anode | Cathode) {
+    const z = getOrbHeight(object);
+    const frame = orbAnimation.frames[z - 9] || orbAnimation.frames[1];
+    drawFrame(context, frame, {...frame, y: object.y + 12 - frame.h, x: object.x})
+}
+
+function getOrbHeight(object: Anode | Cathode) {
+    return 10 + Math.round(Math.cos(object.time / 400));
+}
+
+interface LightningBarrierStyle {
+    render: (context: CanvasRenderingContext2D, state: GameState, object: Anode | Cathode) => void
+    getBeamHeight: (object: Anode | Cathode) => number
+}
+export const lightningBarrierStyles: {[key: string]: LightningBarrierStyle} = {
+    coil: {
+        render: renderTransmitter,
+        getBeamHeight: () => 8,
+    },
+    orb: {
+        render: renderOrb,
+        getBeamHeight: getOrbHeight,
+    },
+}
 
 export class Anode implements ObjectInstance {
     area: AreaInstance;
@@ -26,6 +67,7 @@ export class Anode implements ObjectInstance {
     // external event updates its status.
     isOn = true;
     animationTime = 0;
+    time = FRAME_LENGTH * ((Math.random() * 10) | 0);
     cathodes: Cathode[] = [];
     cathodeIndex: number = 0;
     constructor(state: GameState, definition: AnodeDefinition) {
@@ -86,6 +128,7 @@ export class Anode implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {
+        this.time += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         if (!this.isRunning(state)) {
             if (this.definition.offInterval && this.animationTime >= this.definition.offInterval) {
@@ -125,15 +168,19 @@ export class Anode implements ObjectInstance {
         if (this.status !== 'normal' && this.status !== 'off' ) {
             return;
         }
-        renderTransmitter(context, state, this);
+        const style = lightningBarrierStyles[this.definition.style] || lightningBarrierStyles.coil;
+        style.render(context, state, this);
         if (!this.isRunning(state)) {
             return;
         }
         const cathode = this.cathodes?.[this.cathodeIndex % this.cathodes?.length];
         if (cathode) {
+            const z = style.getBeamHeight(this);
+            const cathodeStyle = lightningBarrierStyles[cathode.definition.style] || lightningBarrierStyles.coil;
+            const cathodeZ = cathodeStyle.getBeamHeight(this);
             renderLightningRay(context, {
-                x1: this.x + 8, y1: this.y,
-                x2: cathode.x + 8, y2: cathode.y,
+                x1: this.x + 8, y1: this.y + 8 - z,
+                x2: cathode.x + 8, y2: cathode.y + 8 - cathodeZ,
                 r: 4,
             });
         }
@@ -146,18 +193,6 @@ export class Anode implements ObjectInstance {
             context.stroke();
         }*/
     }
-}
-
-function renderTransmitter(this: void, context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance) {
-    context.fillStyle = 'silver';
-    context.beginPath();
-    context.moveTo(object.x + 4, object.y + 12);
-    context.lineTo(object.x + 8, object.y);
-    context.lineTo(object.x + 12, object.y + 12);
-    context.fill();
-    context.beginPath();
-    context.arc(object.x + 8, object.y, 4, 0, 2 * Math.PI);
-    context.fill();
 }
 
 export class Cathode implements ObjectInstance {
@@ -174,20 +209,26 @@ export class Cathode implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    time = FRAME_LENGTH * ((Math.random() * 10) | 0);
     constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.status = this.definition.status || 'normal';
         this.x = definition.x;
         this.y = definition.y;
+        this.time = 0;
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
+    }
+    update() {
+        this.time += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal') {
             return;
         }
-        renderTransmitter(context, state, this);
+        const style = lightningBarrierStyles[this.definition.style] || lightningBarrierStyles.coil;
+        style.render(context, state, this);
     }
 }
 objectHash.anode = Anode;

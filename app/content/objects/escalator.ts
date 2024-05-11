@@ -1,11 +1,13 @@
 import { objectHash } from 'app/content/objects/objectHash';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
-import { drawFrameAt } from 'app/utils/animations';
+import { drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { createAnimation } from 'app/utils/animations';
+import { requireFrame } from 'app/utils/packedImages';
 
 
 // Example of how to asyncronously create a canvas from a loaded image.
@@ -32,27 +34,59 @@ createHorizontalBelt();*/
 debugCanvas;//(beltCanvas);
 // 48, 336, down left up right
 
-const [beltDown, beltLeft, beltUp, beltRight] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 48, top: 336, rows: 4}).frames;
+const [beltDown, beltLeft, beltUp, beltRight] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 48, top: 560, rows: 4}).frames;
 
-const [escalatorFrame] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 424, rows: 4}).frames;
+const [escalatorFrame] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 656, rows: 4}).frames;
+// 203,646 26x75 9px bottom, 4px top, 5px wide
+const leftRailTop: Frame = requireFrame('gfx/tiles/futuristic.png', {x: 203, y: 642, w: 5, h: 4});
+const leftRailMiddle: Frame = requireFrame('gfx/tiles/futuristic.png', {x: 203, y: 650, w: 5, h: 10});
+const leftRailBottom: Frame = requireFrame('gfx/tiles/futuristic.png', {x: 203, y: 708, w: 5, h: 9});
+const rightRailTop: Frame = requireFrame('gfx/tiles/futuristic.png', {x: 224, y: 642, w: 5, h: 4});
+const rightRailMiddle: Frame = requireFrame('gfx/tiles/futuristic.png', {x: 224, y: 650, w: 5, h: 10});
+const rightRailBottom: Frame = requireFrame('gfx/tiles/futuristic.png', {x: 224, y: 708, w: 5, h: 9});
 
-export const escalatorStyles: {[key: string]: {[key in Direction]?: FrameWithPattern}} = {
+
+interface RailingFrames {
+    top: Frame
+    middle: Frame
+    bottom: Frame
+}
+interface EscalatorStyle {
+    belts: {[key in Direction]?: FrameWithPattern}
+    // These are not used for the conveyer belt styles.
+    // They are also only supported for the up/down directions.
+    leftRailing?: RailingFrames
+    rightRailing?: RailingFrames
+}
+
+export const escalatorStyles: {[key: string]: EscalatorStyle} = {
     escalator: {
-        up: escalatorFrame,
-        down: escalatorFrame,
+        belts: {
+            up: escalatorFrame,
+            down: escalatorFrame,
+        },
+        leftRailing: {top: leftRailTop, middle: leftRailMiddle, bottom: leftRailBottom},
+        rightRailing: {top: rightRailTop, middle: rightRailMiddle, bottom: rightRailBottom},
     },
     belt: {
-        up: beltUp,
-        down: beltDown,
-        left: beltLeft,
-        right: beltRight,
+        belts: {
+            up: beltUp,
+            down: beltDown,
+            left: beltLeft,
+            right: beltRight,
+        }
     },
 };
 
 export class Escalator implements ObjectInstance {
     area: AreaInstance;
     animationTime: number = 0;
-    behaviors: TileBehaviors;
+    behaviors: TileBehaviors = {
+        isGround: true,
+        // Currently isGround does not block falling in pits by itself, we must also set
+        // groundHeight > 0 to prevent falling into pits behind the stairs.
+        groundHeight: 1,
+    };
     offsetX: number = 0;
     offsetY: number = 0;
     definition: EscalatorDefinition;
@@ -65,12 +99,29 @@ export class Escalator implements ObjectInstance {
     // 'normal' is running 'off' is stopped.
     speed: EscalatorDefinition['speed']
     status: ObjectStatus = 'normal';
+    leftRailing?: EscalatorRailing
+    rightRailing?: EscalatorRailing
     constructor(state: GameState, definition: EscalatorDefinition) {
         this.definition = definition;
         this.status = definition.status;
         this.x = this.definition.x;
         this.y = this.definition.y;
         this.speed = this.definition.speed;
+        const style = escalatorStyles[this.definition.style] || escalatorStyles.belt;
+        if (style.leftRailing && style.rightRailing) {
+            this.leftRailing = new EscalatorRailing(this, 'left');
+            this.rightRailing = new EscalatorRailing(this, 'right');
+        }
+    }
+    getParts() {
+        const parts: ObjectInstance[] = [];
+        if (this.leftRailing) {
+            parts.push(this.leftRailing);
+        }
+        if (this.rightRailing) {
+            parts.push(this.rightRailing);
+        }
+        return parts;
     }
     onActivate(state: GameState) {
         this.status = 'normal';
@@ -81,12 +132,10 @@ export class Escalator implements ObjectInstance {
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (this.status === 'frozen' && hit.element === 'fire') {
             this.status = 'normal';
-            delete this.behaviors;
+            this.behaviors.slippery = false;
         } else if (hit.element === 'ice') {
             this.status = 'frozen';
-            this.behaviors = {
-                slippery: true
-            };
+            this.behaviors.slippery = true;
         }
         return {};
     }
@@ -121,7 +170,7 @@ export class Escalator implements ObjectInstance {
             }
             const heroHitbox = hero.getHitbox();
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitboxForMovingObjects(state))
-                && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
+                && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= this.behaviors.groundHeight;
             if (this.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {
                     canFall: true,
@@ -161,8 +210,8 @@ export class Escalator implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const style = escalatorStyles[this.definition.style as keyof typeof escalatorStyles] || escalatorStyles.belt;
-        const frame = style[this.definition.d];
+        const style = escalatorStyles[this.definition.style] || escalatorStyles.belt;
+        const frame = style.belts[this.definition.d];
         if (!frame) {
             debugger;
         }
@@ -185,6 +234,59 @@ export class Escalator implements ObjectInstance {
         }
     }
 }
+// The railings are separated so that they can be solid and render with 'sprites' priority.
+class EscalatorRailing implements ObjectInstance {
+    behaviors: TileBehaviors = {
+        solid: true,
+        midHeight: true,
+    };
+    drawPriority: DrawPriority = 'background';
+    status: ObjectStatus;
+    x: number;
+    y: number;
+    isObject = <const>true;
+    pullingHeroDirection: Direction;
+    frames: RailingFrames;
+    constructor(public escalator: Escalator, public side: 'left' | 'right') {
+        const style = escalatorStyles[this.escalator.definition.style] || escalatorStyles.belt;
+        this.frames = this.side === 'left' ? style.leftRailing : style.rightRailing;
+    }
+    getHitbox(): Rect {
+        const w = this.frames.top.w;
+        const overhang = 8;
+        if (this.side === 'left') {
+            return { x: this.escalator.x - w, y: this.escalator.y - overhang, w, h: this.escalator.definition.h + 2 * overhang };
+        }
+        return { x: this.escalator.x + this.escalator.definition.w, y: this.escalator.y - overhang, w, h: this.escalator.definition.h + 2 * overhang };
+    }
+    get area(): AreaInstance {
+        return this.escalator.area;
+    }
+    render(context, state: GameState) {
+        const hitbox = this.getHitbox();
+        const shadowH = 2;
+        let x = hitbox.x;
+        drawFrame(context, this.frames.top,
+            { ...this.frames.top, x, y: hitbox.y}
+        );
+        const h = hitbox.h + shadowH - this.frames.top.h - this.frames.bottom.h;
+        if (h > 0) {
+            drawFrame(context, this.frames.middle, { ...this.frames.middle, x, y: hitbox.y + this.frames.top.h, h});
+        }
+        drawFrame(context, this.frames.bottom,
+            { ...this.frames.bottom, x, y: hitbox.y + hitbox.h - this.frames.bottom.h + shadowH}
+        );
+        if (editingState.showWalls) {
+            context.save();
+                context.globalAlpha *= 0.5;
+                const r = this.getHitbox();
+                context.fillStyle = 'red';
+                context.fillRect(r.x, r.y, r.w, r.h);
+            context.restore();
+        }
+    }
+}
+
 objectHash.escalator = Escalator;
 
 class _Escalator extends Escalator {}
