@@ -21,6 +21,7 @@ export const bossTypes = <const>[
     'guardian',
     'crystalCollector',
     'balloonMegapede',
+    'mediumOrbBoss', 'largeOrbBoss',
     'superSquirrel',
     'frostHeart', 'frostBeast',
     'flameHeart', 'flameBeast',

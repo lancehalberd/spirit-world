@@ -338,7 +338,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
 
 const mapObjectTypes: ObjectType[] = [
-    'waterfall', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest'
+    'waterfall', 'decoration', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest'
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {

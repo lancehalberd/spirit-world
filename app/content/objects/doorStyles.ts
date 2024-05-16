@@ -94,7 +94,7 @@ function renderV1DoorBackground(this: void, context: CanvasRenderingContext2D, s
     checkToRenderFrozenDoor(context, state, door);
 }
 
-function renderV1DoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames) {
+function renderV1DoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames, h = 12) {
     checkToRenderFrozenDoorForeground(context, state, door);
     if (door.definition.d === 'down') {
         let frame = v1DoorFrames.southDoorEmpty;
@@ -131,9 +131,10 @@ function renderV1DoorForeground(context: CanvasRenderingContext2D, state: GameSt
         ) {
             frame = door.renderOpen(state) ? v1DoorFrames.northBlownup : null;
         }
-        // Only draw the top 12 pixels of southern facing doors over the player.
+        // Only draw the top N pixels of southern facing doors over the player so they appear to go behind
+        // the top of the doorway.
         if (frame) {
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+            drawFrame(context, {...frame, h}, {...frame, x: door.x, y: door.y, h});
         }
     } else if (door.definition.d === 'left') {
         let frame = v1DoorFrames.westDoorEmptyForeground;
@@ -742,10 +743,10 @@ const futureDoorFrames: V1DoorFrames = {
 const futureDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, futureDoorFrames),
-    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, futureDoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, futureDoorFrames, 6),
 };
 
-function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame): DoorStyleDefinition {
+function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, h = 12): DoorStyleDefinition {
     return {
         ...oldSquareBaseDoorStyle,
         isStairs: true,
@@ -761,7 +762,7 @@ function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame): DoorStyl
             if (door.isFrozen) {
                 return;
             }
-            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+            drawFrame(context, {...frame, h}, {...frame, x: door.x, y: door.y, h});
         },
     };
 }
@@ -807,8 +808,8 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     woodenDownstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsDown),
     woodenUpstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsUp),
     future: futureDoorStyle,
-    futureDownstairs: stairsDoorStyle(futureDoorStyle, futureStairsDown),
-    futureUpstairs: stairsDoorStyle(futureDoorStyle, futureStairsUp),
+    futureDownstairs: stairsDoorStyle(futureDoorStyle, futureStairsDown, 6),
+    futureUpstairs: stairsDoorStyle(futureDoorStyle, futureStairsUp, 6),
     cave: {
         ...oldSquareBaseDoorStyle,
         down: {

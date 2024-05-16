@@ -2,6 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
+import { isPixelInShortRect } from 'app/utils/index';
 
 
 export class Decoration implements ObjectInstance {
@@ -26,11 +27,11 @@ export class Decoration implements ObjectInstance {
         this.w = definition.w;
         this.h = definition.h;
     }
-    getBehaviors(): TileBehaviors|undefined {
+    getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
         const decorationType = decorationTypes[this.definition.decorationType];
-        return decorationType.behaviors;
+        return decorationType.getBehaviors?.(state, this, x, y) || decorationType.behaviors;
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getHitbox?.(this) || this;
     }
@@ -82,6 +83,7 @@ interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     getHitbox?: (decoration: Decoration) => Rect
     behaviors?: TileBehaviors
+    getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
 }
 export const decorationTypes: {[key: string]: DecorationType} = {
     lightningBeastStatue: {
@@ -136,6 +138,33 @@ export const decorationTypes: {[key: string]: DecorationType} = {
         },
     }
 }
+
+const staffTowerFrame = requireFrame('gfx/staging/Tower.png', {x: 14, y: 17, w: 164, h: 209, content: {x: 0, y: 81, w: 164, h: 128}});
+decorationTypes.staffTower = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, staffTowerFrame, decoration);
+    },
+    getBehaviors(state: GameState, decoration: Decoration, x?: number, y?: number): TileBehaviors {
+        const hitbox = decoration.getHitbox();
+        if (!isPixelInShortRect(x, y, hitbox)) {
+            return {};
+        }
+        const radius = 82;
+        // TODO: make this an ellipse instead of a circle.
+        const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
+        const r2 = dx*dx + dy*dy;
+        // The ring around the elevator is solid
+        if (r2 < radius * radius) {
+            return {solid: true};
+        }
+        return {};
+    },
+    getHitbox(decoration: Decoration): Rect {;
+        return getFrameHitbox(decoration, staffTowerFrame);
+    },
+};
+
+
 objectHash.decoration = Decoration;
 
 declare global {

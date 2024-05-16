@@ -2956,6 +2956,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:2x1-plant-1", linked: false, x: 372, y: 64, type: "enemy", enemyType: "plant", d: "down", params: {}},
         {status: "normal", id: "treeCaveEntrance", x: 352, y: 352, type: "door", style: "tree", d: "up", linked: true, targetZone: "treeCave", targetObjectId: "treeCaveEntrance"},
         {status: "normal", id: "treeCavePit", x: 368, y: 320, style: "singleTile", type: "pitEntrance", targetZone: "treeCave", targetObjectId: "treeCaveMarker"},
+        {status: "normal", id: "", x: 86, y: 298, type: "decoration", w: 16, h: 16, decorationType: "staffTower"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 26, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 2},

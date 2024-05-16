@@ -1,4 +1,5 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 
@@ -6,12 +7,30 @@ import { getTileBehaviors, hitTargets } from 'app/utils/field';
 function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {
     const dx = ray.x2 - ray.x1, dy = ray.y2 - ray.y1;
     const mag = Math.sqrt(dx * dx + dy * dy);
-    for (let i = 20; i < mag; i += 4) {
-        const x = ray.x1 + i * dx / mag, y = ray.y1 + i * dy / mag;
-        const { tileBehavior } = getTileBehaviors(state, area, {x, y});
+    let ledgeDeltaSum = 0, lastPoint: Point;
+    for (let i = 0; i < mag; i += 4) {
+        const point = {
+            x: ray.x1 + i * dx / mag,
+            y: ray.y1 + i * dy / mag,
+        };
+        const { tileBehavior } = getTileBehaviors(state, area, point);
         if (!tileBehavior?.low && tileBehavior?.solid && !(tileBehavior?.isSouthernWall && dy > 0)) {
-            return {...ray, x2: x, y2: y};
+            return {...ray, x2: point.x, y2: point.y};
         }
+        if (lastPoint) {
+            const ledgeDelta = getLedgeDelta(state, area, lastPoint, point);
+            if (ledgeDelta < 0) {
+                ledgeDeltaSum--;
+            }
+            if (ledgeDelta > 0) {
+                ledgeDeltaSum++;
+            }
+            // Line of site is blocked when
+            if (ledgeDeltaSum > 0) {
+                return {...ray, x2: point.x, y2: point.y};
+            }
+        }
+        lastPoint = point;
     }
     return ray;
 }
@@ -54,6 +73,7 @@ export class LaserBeam implements EffectInstance, Props {
     shockWaveTheta: number;
     animationTime = 0;
     done = false;
+    memoizedHitRay: Ray;
     constructor({sx, sy, tx, ty, damage = 2, delay = 0, duration = 200, ignoreWalls = false, tellDuration = 0, radius = 6}: Props) {
         this.sx = sx | 0;
         this.sy = sy | 0;
@@ -67,6 +87,9 @@ export class LaserBeam implements EffectInstance, Props {
         this.damage = damage;
     }
     getHitRay(state: GameState): Ray {
+        if (this.memoizedHitRay) {
+            return this.memoizedHitRay;
+        }
         const baseRay = {
             x1: this.sx, y1: this.sy,
             x2: this.tx, y2: this.ty,
@@ -75,9 +98,12 @@ export class LaserBeam implements EffectInstance, Props {
         if (this.ignoreWalls) {
             return baseRay
         }
-        return truncateRay(state, this.area, baseRay);
+        this.memoizedHitRay = truncateRay(state, this.area, baseRay);
+        return this.memoizedHitRay;
     }
     update(state: GameState) {
+        // We only memoize the hit ray for a single frame before recalculating it.
+        delete this.memoizedHitRay;
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
@@ -88,6 +114,7 @@ export class LaserBeam implements EffectInstance, Props {
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime <= this.duration) {
+            // TODO: prevent hitting targets that are below a ledge from the source of the beam unless ignoring walls.
             hitTargets(state, this.area, {
                 damage: this.damage,
                 hitRay: this.getHitRay(state),

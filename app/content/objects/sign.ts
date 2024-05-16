@@ -1,6 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { requireFrame } from 'app/utils/packedImages';
 
 
 const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
@@ -11,6 +12,11 @@ const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeo
 const plaqueGeometry = {w: 16, h: 16, content: {x: 0, y: -2, w: 16, h: 16}};
 const [nicePlaque] = createAnimation('gfx/objects/plaque.png', plaqueGeometry).frames;
 const [brokenPlaque] = createAnimation('gfx/objects/plaque_broken.png', plaqueGeometry).frames;
+
+const tabletOn1 = requireFrame('gfx/tiles/futuristic.png', {x: 6, y: 1155, w: 37, h: 26});
+const tabletOn2 = requireFrame('gfx/tiles/futuristic.png', {x: 54, y: 1155, w: 37, h: 26});
+const tabletOff = requireFrame('gfx/tiles/futuristic.png', {x: 102, y: 1187, w: 37, h: 26});
+
 
 export const signStyles = {
     displayScreen: {
@@ -40,6 +46,18 @@ export const signStyles = {
                 context.fillStyle = '#FFF';
                 context.fillRect(sign.x + 3, sign.y + 3, 1, 3);
             }
+        },
+        isSpiritReadable: false,
+    },
+    stoneTerminal: {
+        w: 33,
+        h: 14,
+        render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
+            let frame = tabletOff;
+            if (sign.status === 'normal') {
+                frame = (state.time % 1000 < 500) ? tabletOn1 : tabletOn2;
+            }
+            drawFrame(context, frame, {...frame, x: sign.x - 2, y: sign.y - 10});
         },
         isSpiritReadable: false,
     },

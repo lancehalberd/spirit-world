@@ -5,6 +5,7 @@ import {
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { addEffectToArea } from 'app/utils/effects';
 import {
     paceAndCharge,
@@ -21,8 +22,8 @@ const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = fal
     const {x, y, mag} = vector;
     const hitbox = enemy.getHitbox(state);
     const tx = hitbox.x + hitbox.w / 2 + x * 1000, ty = hitbox.y + hitbox.h / 2 + y * 1000;
-    const { mag: sightDistance } = getEndOfLineOfSight(state, enemy, tx, ty);
-    if (!ignoreWalls && sightDistance < mag) {
+    const { mag: sightDistance, targetIsBelow } = getEndOfLineOfSight(state, enemy, tx, ty);
+    if (!ignoreWalls && (targetIsBelow || sightDistance < mag)) {
         return false;
     }
     // The idea here is to target as far as possible beyond the target.
@@ -32,9 +33,10 @@ const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = fal
 };
 
 function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: number): {
-    x: number,
-    y: number,
+    x: number
+    y: number
     mag: number
+    targetIsBelow?: boolean;
     blocked?: boolean
 } {
     const hitbox = enemy.getHitbox(state);
@@ -42,14 +44,32 @@ function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: num
     const cy = hitbox.y + hitbox.h / 2;
     const dx = tx - cx, dy = ty - cy;
     const mag = Math.sqrt(dx * dx + dy * dy);
-    for (let i = 20; i < mag; i += 4) {
-        const x = cx + i * dx / mag, y = cy + i * dy / mag;
-        const { tileBehavior } = getTileBehaviors(state, enemy.area, {x, y});
+    let ledgeDeltaSum = 0, lastPoint: Point;
+    for (let i = 0; i < mag; i += 4) {
+        const point = {
+            x: cx + i * dx / mag,
+            y: cy + i * dy / mag,
+        };
+        const { tileBehavior } = getTileBehaviors(state, enemy.area, point);
         if (!tileBehavior?.low && tileBehavior?.solid) {
-            return {x, y, mag: i, blocked: true};
+            return {x: point.x, y: point.y, mag: i, blocked: true};
         }
+        if (lastPoint) {
+            const ledgeDelta = getLedgeDelta(state, enemy.area, lastPoint, point);
+            if (ledgeDelta < 0) {
+                ledgeDeltaSum--;
+            }
+            if (ledgeDelta > 0) {
+                ledgeDeltaSum++;
+            }
+            // Line of site is blocked when
+            if (ledgeDeltaSum > 0) {
+                return {x: point.x, y: point.y, mag: i, blocked: true};
+            }
+        }
+        lastPoint = point;
     }
-    return {x: tx, y: ty, mag};
+    return {x: tx, y: ty, mag, targetIsBelow: ledgeDeltaSum < 0};
 }
 
 const chargeTime = 400;

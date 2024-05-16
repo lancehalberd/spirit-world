@@ -1,5 +1,6 @@
 import { LightningAnimationEffect } from 'app/content/effects/lightningAnimationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
@@ -21,15 +22,14 @@ export class LightningDischarge implements EffectInstance {
     x: number;
     y: number;
     damage: number;
-    radius: number;
+    r: number;
     source: Enemy;
     tellDuration: number;
     constructor({x = 0, y = 0, damage = 2, radius = 48, source, tellDuration = 1000}: Props) {
-        this.animationTime = 0;
         this.x = x;
         this.y = y;
         this.damage = damage;
-        this.radius = radius;
+        this.r = radius;
         this.source = source;
         this.tellDuration = tellDuration;
     }
@@ -51,11 +51,7 @@ export class LightningDischarge implements EffectInstance {
             hitTargets(state, this.area, {
                 damage: 4,
                 element: 'lightning',
-                hitCircle: {
-                    x: this.x,
-                    y: this.y,
-                    r: this.radius,
-                },
+                hitCircle: this,
                 hitAllies: true,
                 hitObjects: true,
                 hitTiles: true,
@@ -63,7 +59,7 @@ export class LightningDischarge implements EffectInstance {
                 knockAwayFrom: {x: this.x, y: this.y},
             });
             addEffectToArea(state, this.area, new LightningAnimationEffect({
-                circle: {x: this.x, y: this.y, r: this.radius},
+                circle: this,
                 duration: 200,
             }));
             removeEffectFromArea(state, this);
@@ -71,23 +67,11 @@ export class LightningDischarge implements EffectInstance {
     }
     render(context, state: GameState) {
         if (this.animationTime < this.tellDuration) {
-            const p = Math.max(0, Math.min(1, this.animationTime / this.tellDuration));
-            context.save();
-                // Darker yellow outline shows the full radius of the attack.
-                context.globalAlpha *= 0.3;
-                context.beginPath();
-                context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-                context.strokeStyle = 'red';
-                context.stroke();
-                // Lighter fill grows to indicate when the attack will hit.
-                context.globalAlpha *= 0.3;
-                context.beginPath();
-                context.arc(this.x, this.y, p * this.radius, 0, 2 * Math.PI);
-                context.fillStyle = 'red';
-                context.fill();
-                //context.globalAlpha *= 0.66;
-                //renderLightningCircle(context, {x: this.x, y: this.y, r: p * this.radius}, 5);
-            context.restore();
+            renderDamageWarning(context, {
+                circle: this,
+                duration: this.tellDuration,
+                time: this.animationTime,
+            });
         }
     }
 }

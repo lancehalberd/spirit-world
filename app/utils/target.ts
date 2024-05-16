@@ -1,3 +1,4 @@
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 
 export function isTargetVisible(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance): boolean {
     return !!target && !!target.getHitbox && !target.isInvisible;
@@ -86,6 +87,9 @@ export function getLineOfSightTargetAndDirection(
     // By default enemies will not aggro you from much further than half a screen.
     distance = 128
 ): {d: Direction, hero: Hero} {
+    if (!source.area) {
+        return {d: null, hero: null};
+    }
     const hitbox = source.getHitbox(state);
     for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
         if (!isTargetVisible(state, source, hero)) {
@@ -97,21 +101,35 @@ export function getLineOfSightTargetAndDirection(
         // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile
         // off (like 0.5px in line of sight), otherwise the hero can't hide from line of sight on another tile if
         // they aren't perfectly lined up with the tile.
-        if (hitbox.x + 1 < hero.x + hero.w && hitbox.x + hitbox.w - 1 > hero.x && (direction !== 'left' && direction !== 'right')) {
-            if ((hero.y < hitbox.y && direction === 'down') || (hero.y > hitbox.y && direction === 'up')) {
+        const heroHitbox = hero.getHitbox();
+        if (hitbox.x + 1 < heroHitbox.x + heroHitbox.w && hitbox.x + hitbox.w - 1 > hero.x && (direction !== 'left' && direction !== 'right')) {
+            if ((heroHitbox.y < hitbox.y && direction === 'down') || (heroHitbox.y > hitbox.y && direction === 'up')) {
                 continue
             }
-            const x = Math.floor(hitbox.x / 16);
-            const y1 = Math.floor(hero.y / 16), y2 = Math.floor(hitbox.y / 16);
+
+            const x = hitbox.x + hitbox.w / 2;
+            const tx = Math.floor(x / 16);
+            const y1 = heroHitbox.y + heroHitbox.h / 2, y2 = hitbox.y + hitbox.h / 2;
             const minY = Math.min(y1, y2);
             const maxY = Math.max(y1, y2);
             let blocked = false;
-            for (let y = minY; y <= maxY; y++) {
-                const tileBehavior = {...(source.area?.behaviorGrid[y]?.[x] || {})};
+            let lastPoint: Point;
+            for (let y = minY; y <= maxY; y += 4) {
+                const ty = Math.floor(y / 16);
+                const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
                 if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
                     blocked = true;
                     break;
                 }
+                const point = {x, y};
+                if (lastPoint) {
+                    const ledgeDelta = getLedgeDelta(state, source.area, lastPoint, point);
+                    if (ledgeDelta != 0) {
+                        blocked = true;
+                        break;
+                    }
+                }
+                lastPoint = point;
             }
             if (!blocked) {
                 return {
@@ -124,17 +142,29 @@ export function getLineOfSightTargetAndDirection(
             if ((hero.x < hitbox.x && direction === 'right') || (hero.x > hitbox.x && direction === 'left')) {
                 continue
             }
-            const y = Math.floor(hitbox.y / 16);
-            const x1 = Math.floor(hero.x / 16), x2 = Math.floor(hitbox.x / 16);
+            const y = hitbox.y + hitbox.h / 2;
+            const ty = Math.floor(y / 16);
+            const x1 = heroHitbox.x + heroHitbox.w / 2, x2 = hitbox.x + hitbox.w / 2;
             const minX = Math.min(x1, x2);
             const maxX = Math.max(x1, x2);
             let blocked = false;
-            for (let x = minX; x <= maxX; x++) {
-                const tileBehavior = {...(source.area?.behaviorGrid[y]?.[x] || {})};
+            let lastPoint: Point;
+            for (let x = minX; x <= maxX; x += 4) {
+                const tx = Math.floor(x / 16);
+                const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
                 if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
                     blocked = true;
                     break;
                 }
+                const point = {x, y};
+                if (lastPoint) {
+                    const ledgeDelta = getLedgeDelta(state, source.area, lastPoint, point);
+                    if (ledgeDelta != 0) {
+                        blocked = true;
+                        break;
+                    }
+                }
+                lastPoint = point;
             }
             if (!blocked) {
                 return {

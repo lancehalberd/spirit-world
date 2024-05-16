@@ -195,6 +195,19 @@ const angledWalls: TileSource = {
     paletteTargets: [{key: 'future', x: 0, y}],
 };
 
+const angledWallInteriors: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(futuristicImage, {x: 352, y: 400, w: 96, h: 48}),
+    behaviors: {
+        'all': southernWallBehavior,
+    },
+    tileCoordinates: [
+                         [2, 0], [3, 0],
+                 [1, 1],                 [4, 1],
+        [ 0, 2],         [2, 2], [3, 2],         [5, 2],
+    ],
+};
+
 const ceilingEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame(futuristicImage, {x: 0, y: 208, w: 80, h: 80}),
@@ -498,4 +511,5 @@ export const allFuturisticTileSources: TileSource[] = [
     bottomRightCurvedCeiling,
     rightTopCurvedCeiling,
     rightBottomCurvedCeiling,
+    angledWallInteriors,
 ];

@@ -96,11 +96,14 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Implement new Staff Tower design
+        - New floating electric orb enemy
+            - Creates lightning bolt + radial shockwave attack in alternate world during blast.
+        - New splitting electric orb mid boss
+
     - Add futuristic graphics
         - New stairs object
             - Like the escalator style with rails except no moving floor.
-        - New terminal styles (replace existing terminals)
-            - Include new standalone terminal object with sprite layering and solid hitbox, the same as the elevator control terminal.
         - New tiles
             - New pit tile behaviors, mix between pits+southern walls.
                 - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.

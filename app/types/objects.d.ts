@@ -376,6 +376,8 @@ interface HitResult {
     setElement?: MagicElement
     // Returns the set of targets hit.
     hitTargets?: Set<EffectInstance | ObjectInstance>
+    // Additional data can be returned with a HitResult that might be helpful when debugging.
+    debug?: any
 }
 
 interface BaseObjectDefinition {

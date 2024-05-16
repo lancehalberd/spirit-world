@@ -323,16 +323,17 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 return {
                     hit: true,
                     blocked: true,
+                    debug: 'lightning hit an "off" enemy'
                 };
             }
-            return {};
+            return {debug: 'enemy is "off"'};
         }
         if (this.life <= 0 || this.status === 'gone' || this.enemyInvulnerableFrames || this.isInvulnerable) {
             return {};
         }
         // Ignore attacks that this enemy is immune to.
         if (this.enemyDefinition.immunities?.includes(hit.element)) {
-            return {};
+            return {debug: 'enemy is immune to ' + hit.element};
         }
         if (this.shielded && !(hit.isThrownObject && hit.damage > 1)) {
             // Thrown objects with more than 1 damage still do half damage through shields.
