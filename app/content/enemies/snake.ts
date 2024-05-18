@@ -17,7 +17,7 @@ const fireBallAbility: EnemyAbility<boolean> = {
         if (Math.random() < 0.01) {
             return true;
         }
-        return !!getLineOfSightTargetAndDirection(state, enemy, enemy.d).hero;
+        return !!getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, enemy.d).target;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
         const hitbox = enemy.getHitbox(state);
@@ -83,8 +83,8 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
 type LineOfSightTargetType = ReturnType<typeof getLineOfSightTargetAndDirection>;
 const frostConeAbility: EnemyAbility<LineOfSightTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): LineOfSightTargetType {
-        const target = getLineOfSightTargetAndDirection(state, enemy);
-        return target.hero ? target : undefined;
+        const target = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets);
+        return target.target ? target : undefined;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: LineOfSightTargetType) {
         enemy.d = target.d;

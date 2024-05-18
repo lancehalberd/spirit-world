@@ -55,6 +55,7 @@ export class Anode implements ObjectInstance {
         brightness: 0.5,
         lightRadius: 16,
     };
+    ignorePits = true;
     drawPriority: 'sprites' = 'sprites';
     definition: AnodeDefinition = null;
     isObject = <const>true;
@@ -204,6 +205,7 @@ export class Cathode implements ObjectInstance {
         brightness: 0.5,
         lightRadius: 16,
     };
+    ignorePits = true;
     drawPriority: 'sprites' = 'sprites';
     definition: SimpleObjectDefinition = null;
     isObject = <const>true;

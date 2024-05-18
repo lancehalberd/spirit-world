@@ -231,8 +231,8 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
         return;
     }
     if (enemy.mode === 'shoot') {
-        const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
-        if (!hero && enemy.modeTime > 900) {
+        const {target} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
+        if (!target && enemy.modeTime > 900) {
             enemy.setMode('wait');
         } else if (enemy.modeTime % 300 === FRAME_LENGTH) {
             shoot();
@@ -242,8 +242,8 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
             enemy.setMode('shoot');
         }
     } else {
-        const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
-        if (hero) {
+        const {target} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
+        if (target) {
             enemy.setMode('charge');
         }
     }

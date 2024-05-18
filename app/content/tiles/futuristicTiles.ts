@@ -288,7 +288,7 @@ const leftCurvedWalls: TileSource = {
         'all': southernWallBehavior,
         '0x0': ceilingBehavior,
         '0x3': topLeftWall,
-        '0x4': { defaultLayer: 'field'},
+        '0x4': { defaultLayer: 'field', isGround: false, isOverlay: true},
     },
     paletteTargets: [{key: 'future', x: 1, y: y + 2}],
 };
@@ -311,7 +311,7 @@ const topLeftCurvedWallTiles: TileSource = {
     behaviors: {
         'all': southernWallBehavior,
         '0x0': ceilingBehavior,
-        '0x4': { defaultLayer: 'field'},
+        '0x4':{ defaultLayer: 'field', isGround: false, isOverlay: true},
     },
     paletteTargets: [{key: 'future', x: 3, y}],
 };
@@ -321,7 +321,7 @@ const topRightCurvedWallTiles: TileSource = {
     behaviors: {
         'all': southernWallBehavior,
         '0x0': ceilingBehavior,
-        '0x4': { defaultLayer: 'field'},
+        '0x4': { defaultLayer: 'field', isGround: false, isOverlay: true},
     },
     paletteTargets: [{key: 'future', x: 4, y}],
 };

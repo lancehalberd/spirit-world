@@ -220,6 +220,12 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     }
     hero.isTouchingPit = fallingTopLeft || fallingTopRight || fallingBottomLeft || fallingBottomRight;
     hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
+    // This version prevents the player from sinking when any pixel is over somethign with groundHeight > 0.
+    // This is intended to prevent falling into pits on objects that have the "isGround" behavior.
+    // This is bad for two reason: this should work without having to set groundHeight > 0.
+    // It also means the player won't fall as quickly when floating with cloud boots and moving off of ground objects,
+    // Allowing them to cross 48px gaps instead of just 32px gaps.
+    // hero.isOverPit = hero.groundHeight <= 0 && fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
     if (hero.isOverPit) {
         const canFly = hero.savedData.equippedBoots === 'cloudBoots' && hero.savedData.equipment.cloudBoots >= 2;
         if (!canFly) {

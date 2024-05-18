@@ -114,14 +114,17 @@ export const spiritBushBehavior: TileBehaviors = {
     particles: spiritBushParticles,
     breakSound: 'bushShatter',
     linkableTiles: [2],
+    linkedOffset: 0,
 };
 export const spiritLightStoneBehavior: TileBehaviors = {
     ...lightStoneBehavior, particles: spiritLightStoneParticles,
     linkableTiles: [6, 7],
+    linkedOffset: 0,
 };
 export const spiritHeavyStoneBehavior: TileBehaviors = {
     ...heavyStoneBehavior, particles: spiritHeavyStoneParticles,
     linkableTiles: [8, 9],
+    linkedOffset: 0,
 };
 export const spiritUnliftableStoneBehavior: TileBehaviors = {
     ...lowWallBehavior,

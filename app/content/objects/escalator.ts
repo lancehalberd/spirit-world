@@ -93,6 +93,7 @@ export class Escalator implements ObjectInstance {
     drawPriority: DrawPriority = 'background';
     isObject = <const>true;
     isNeutralTarget = true;
+    ignorePits = true;
     x: number;
     y: number;
     pattern: CanvasPattern;

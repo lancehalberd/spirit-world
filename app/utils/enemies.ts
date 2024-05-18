@@ -104,8 +104,8 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.setAnimation('idle', enemy.d);
         }
     } else if (enemy.mode !== 'charge') {
-        const {d, hero} = getLineOfSightTargetAndDirection(state, enemy, undefined, false, enemy.aggroRadius);
-        if (hero) {
+        const {d, target} = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, undefined, false, enemy.aggroRadius);
+        if (target) {
             enemy.d = d;
             enemy.setMode('charge');
             enemy.canBeKnockedBack = false;

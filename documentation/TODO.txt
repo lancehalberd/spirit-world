@@ -98,11 +98,11 @@ Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Implement new Staff Tower design
-        - Third floor
-        - Basement
-        - Fifth floor
+        - Add elevator behaviors
+            - off, terminals are not animated/functional
+            - stuck at floor (upper vs bottom floor)
+                - fall sequence
         - Roof
-        - Add locks + keys to 1-2F and 3-4F
         - New floating electric orb enemy
             - Creates lightning bolt + radial shockwave attack in alternate world during blast.
         - New splitting stationary electric orb mid boss
@@ -121,19 +121,13 @@ Current tasks:
                 - At 2/3 and 1/3 life the heart enrages activating 1 then 2 orbs in the spirit world.
                     - The player must teleport to the spirit world to clear the cloud.
                     - The beast can attack the player with lightning bolts while they are in the spirit world, if it is not regenerating.
+        - New pit tile behaviors, mix between pits+southern walls.
+            - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.
 
-    - Add futuristic graphics
+    - Lower priority futuristic graphics
+        - Reuse future ceiling edges for ledge tiles on the floor2 layer.
         - New stairs object
             - Like the escalator style with rails except no moving floor.
-        - New tiles
-            - New pit tile behaviors, mix between pits+southern walls.
-                - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.
-            - Add pitMap behavior for angled pit tiles
-    - Add elevator behaviors
-        - off, terminals are not animated/functional
-        - stuck at floor (upper vs bottom floor)
-            - fall sequence
-    - Lower priority futuristic graphics
         - New ladders
         - east/west doors
 
@@ -142,7 +136,13 @@ Current tasks:
         - When using Test State, switch to the "test" save slot.
         - Add a context option to switch save slots between test, 1, 2, 3
 
+    - Render ladders+stairs as up/down arrows in dungeon maps.
+        - Add a property to doors for overriding the default map style.
+
     - Add Obsidian Tileset manually to buildings in the spirit world.
+
+    - Add pitMap behavior for angled pit tiles
+        - This is low priority as long as I only use these flush with angled walls.
 
     - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
         - Allow the player to move under solid objects this way

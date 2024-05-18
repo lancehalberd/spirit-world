@@ -52,7 +52,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     const isThrowingCloak = hero.toolOnCooldown === 'cloak';
     const isMovementBlocked = hero.action === 'meditating' || hero.action === 'chargingCloneExplosion'
         || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
-    const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
+    // We use groundHeight of 1 to prevent falling into pits currently. But this allows the player to float longer
+    // over pits than we intend, so we don't increase the float height until the ground height is at least 2.
+    const maxCloudBootsZ = Math.max(0, hero.groundHeight - 1) + MAX_FLOAT_HEIGHT;
     const isClimbing = hero.action === 'climbing';
     const canThrowSecondChakram = hero.savedData.weapon === 3 && hero.actionFrame > 6;
     const isActionBlocked =
@@ -179,10 +181,12 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
     } else if (hero.savedData.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
-        hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
+        // The intention is the the player can walk over patterns of 2 solid floor and 2 gaps indefinitely, so they have to
+        // gain height fast enough on the solid floor to achieve thiese. 1 solid floor should not be enough though.
+        hero.z = Math.min(hero.z + 0.15, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         let fallSpeed = 1;
-        if (hero.savedData.equippedBoots === 'cloudBoots') fallSpeed = 0.2;
+        if (hero.savedData.equippedBoots === 'cloudBoots') fallSpeed = 0.3;
         else if (hero.savedData.equippedBoots === 'ironBoots') fallSpeed = 2;
         // else if (hero.action === 'roll') fallSpeed = 0.5;
         hero.z = Math.max(minZ, hero.z - fallSpeed);
