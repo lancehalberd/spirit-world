@@ -167,7 +167,7 @@ enemyDefinitions.largeOrbBoss = {
 function updateOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
     const hitbox = enemy.getHitbox(state);
     if (enemy.modeTime % 100 === 0) {
-        addSparkleAnimation(state, state.areaInstance, {...hitbox, x: 0, y: 0}, { element: 'lightning', target: enemy });
+        addSparkleAnimation(state, enemy.area, {...hitbox, x: 0, y: 0}, { element: 'lightning', target: enemy });
     }
     const isInverted = enemy.params.invertedDuration > 0;
     if (isInverted) {

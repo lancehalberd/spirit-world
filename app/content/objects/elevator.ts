@@ -309,7 +309,7 @@ class ElevatorControlTerminal implements ObjectInstance {
     }
     getHitbox() {
         return {
-            x: this.x + 6, y: this.y + 16, h: 8, w: 36
+            x: this.x + 8, y: this.y + 16, h: 8, w: 32
         };
     }
     onGrab(state: GameState) {
@@ -367,7 +367,7 @@ class ElevatorCallTerminal implements ObjectInstance {
     }
     getHitbox() {
         return {
-            x: this.x + 6, y: this.y + 16, h: 8, w: 36
+            x: this.x + 8, y: this.y + 16, h: 8, w: 32
         };
     }
     getDrawPriority() {

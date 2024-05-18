@@ -310,6 +310,8 @@ interface HitProperties {
     destroysObjects?: boolean
     // If this is true, the hit will knock targets away from the hit itself based on the geometry.
     knockAwayFromHit?: boolean
+    // How strong the knockback is, default is 1, not supported for all knockback types yet.
+    knockbackForce?: number
     knockback?: {vx: number, vy: number, vz: number}
     // If this is set, knockback will be added as a vector from this point towards the hit target.
     knockAwayFrom?: {x: number, y: number}
@@ -521,7 +523,7 @@ interface NPCDefinition extends BaseObjectDefinition {
 type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret'
     | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
-    | 'tippable' | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';
+    | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';
 
 interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType
@@ -588,6 +590,11 @@ interface PushStairsDefinition extends BaseObjectDefinition {
     offset: number
 }
 
+interface TippableObjectDefinition extends BaseObjectDefinition {
+    type: 'tippable'
+    shattered?: boolean
+}
+
 interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -625,6 +632,7 @@ type ObjectDefinition = SimpleObjectDefinition
     | PushStairsDefinition
     | SignDefinition
     | SpikeBallDefinition
+    | TippableObjectDefinition
     | TurretDefinition
     | WaterfallDefinition
     ;

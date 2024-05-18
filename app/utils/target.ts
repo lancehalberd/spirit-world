@@ -49,9 +49,7 @@ export function getVectorToNearbyTarget(state: GameState,
         }
         const targetHitbox = target.getHitbox(state);
         const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-        // Experiment aiming for the center of the bottom of the hitbox, the point on the ground
-        // the actor is on top of, rather than the center of their hitbox.
-        const dy = (targetHitbox.y + targetHitbox.h) - (hitbox.y + hitbox.h);
+        const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             if (mag) {
@@ -98,11 +96,11 @@ export function getLineOfSightTargetAndDirection(
         if (getVectorToTarget(state, source, hero).mag > distance) {
             continue;
         }
-        // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile
-        // off (like 0.5px in line of sight), otherwise the hero can't hide from line of sight on another tile if
-        // they aren't perfectly lined up with the tile.
         const heroHitbox = hero.getHitbox();
-        if (hitbox.x + 1 < heroHitbox.x + heroHitbox.w && hitbox.x + hitbox.w - 1 > hero.x && (direction !== 'left' && direction !== 'right')) {
+        if (hitbox.x <= heroHitbox.x + heroHitbox.w / 2
+            && hitbox.x + hitbox.w >= hero.x + heroHitbox.w / 2
+            && (direction !== 'left' && direction !== 'right')
+        ) {
             if ((heroHitbox.y < hitbox.y && direction === 'down') || (heroHitbox.y > hitbox.y && direction === 'up')) {
                 continue
             }
@@ -114,7 +112,7 @@ export function getLineOfSightTargetAndDirection(
             const maxY = Math.max(y1, y2);
             let blocked = false;
             let lastPoint: Point;
-            for (let y = minY; y <= maxY; y += 4) {
+            for (let y = minY; true; y += 4) {
                 const ty = Math.floor(y / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
                 if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
@@ -130,6 +128,9 @@ export function getLineOfSightTargetAndDirection(
                     }
                 }
                 lastPoint = point;
+                if (y >= maxY) {
+                    break;
+                }
             }
             if (!blocked) {
                 return {
@@ -138,7 +139,10 @@ export function getLineOfSightTargetAndDirection(
                 };
             }
         }
-        if (hitbox.y + 1 < hero.y + hero.h && hitbox.y + hitbox.h - 1 > hero.y && (direction !== 'up' && direction !== 'down')) {
+        if (hitbox.y <= heroHitbox.y + heroHitbox.h / 2
+            && hitbox.y + hitbox.h >= hero.y + heroHitbox.h / 2
+            && (direction !== 'up' && direction !== 'down')
+        ) {
             if ((hero.x < hitbox.x && direction === 'right') || (hero.x > hitbox.x && direction === 'left')) {
                 continue
             }
@@ -149,7 +153,7 @@ export function getLineOfSightTargetAndDirection(
             const maxX = Math.max(x1, x2);
             let blocked = false;
             let lastPoint: Point;
-            for (let x = minX; x <= maxX; x += 4) {
+            for (let x = minX; true; x += 4) {
                 const tx = Math.floor(x / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
                 if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
@@ -165,6 +169,9 @@ export function getLineOfSightTargetAndDirection(
                     }
                 }
                 lastPoint = point;
+                if (x >= maxX) {
+                    break;
+                }
             }
             if (!blocked) {
                 return {

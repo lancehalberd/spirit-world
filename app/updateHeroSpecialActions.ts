@@ -8,7 +8,7 @@ import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameC
 import { editingState } from 'app/development/editingState';
 import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/userInput';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { getSectionBoundingBox, moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import { playAreaSound } from 'app/musicController';
 import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';

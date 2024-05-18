@@ -136,10 +136,14 @@ export function isMovementBlocked(
             }
             return {};
         }
-    } else if (actor) {
+    }
+    // This was used to make actors not jump off of ledges when ground objects were over the ledge, but it
+    // caused them to ignore ledges if they were touching ground objects at all, including ground objects
+    // underneath ledges they were walking over.
+    /*else if (actor) {
         // This should happen even if the actor is running into a solid object/pit that they cannot pass.
         actor.ignoreLedges = true;
-    }
+    }*/
     if (blockingPitObject) {
         return {};
     }

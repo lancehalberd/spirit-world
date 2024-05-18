@@ -444,12 +444,13 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 2} : null;
                 }
                 if (!knockback && hit.knockAwayFromHit) {
+                    const f = hit.knockbackForce || 1
                     if (distance) {
-                        knockback = {vx: -4 * dx / distance, vy: -4 * dy / distance, vz: 2};
+                        knockback = {vx: -4 * f * dx / distance, vy: -4 * f * dy / distance, vz: 2 * f};
                     } else {
                         const dx = hit.hitRay.x2 - hit.hitRay.x1, dy = hit.hitRay.y2 - hit.hitRay.y1;
                         const distance = Math.sqrt(dx * dx + dy * dy);
-                        knockback = {vx: 4 * dy / distance, vy: -4 * dx / distance, vz: 2};
+                        knockback = {vx: 4 * f * dy / distance, vy: -4 * f * dx / distance, vz: 2 * f};
                     }
                 }
                 applyHitToObject(state, object, {...hit, direction: getDirection(dx, dy), knockback}, combinedResult);

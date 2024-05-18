@@ -13,9 +13,9 @@ const plaqueGeometry = {w: 16, h: 16, content: {x: 0, y: -2, w: 16, h: 16}};
 const [nicePlaque] = createAnimation('gfx/objects/plaque.png', plaqueGeometry).frames;
 const [brokenPlaque] = createAnimation('gfx/objects/plaque_broken.png', plaqueGeometry).frames;
 
-const tabletOn1 = requireFrame('gfx/tiles/futuristic.png', {x: 6, y: 1155, w: 37, h: 26});
-const tabletOn2 = requireFrame('gfx/tiles/futuristic.png', {x: 54, y: 1155, w: 37, h: 26});
-const tabletOff = requireFrame('gfx/tiles/futuristic.png', {x: 102, y: 1187, w: 37, h: 26});
+const tabletOn1 = requireFrame('gfx/tiles/futuristic.png', {x: 6, y: 1155, w: 36, h: 26});
+const tabletOn2 = requireFrame('gfx/tiles/futuristic.png', {x: 54, y: 1155, w: 36, h: 26});
+const tabletOff = requireFrame('gfx/tiles/futuristic.png', {x: 102, y: 1187, w: 36, h: 26});
 
 
 export const signStyles = {
@@ -50,7 +50,7 @@ export const signStyles = {
         isSpiritReadable: false,
     },
     stoneTerminal: {
-        w: 33,
+        w: 32,
         h: 14,
         render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
             let frame = tabletOff;

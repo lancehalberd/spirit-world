@@ -2,7 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/direction';
 import { getBoundingRect } from 'app/utils/index';
-import { getSectionBoundingBox } from 'app/moveActor';
+import { getSectionBoundingBox } from 'app/movement/moveActor';
 import { moveObject } from 'app/movement/moveObject';
 
 

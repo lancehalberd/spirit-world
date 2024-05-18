@@ -1,3 +1,5 @@
+import { isObjectInsideTarget } from 'app/utils/index';
+import { getObjectBehaviors } from 'app/utils/objects';
 
 const anchors = [
     {dx: 0, dy: 0, vx: -1, vy: -1},
@@ -21,6 +23,21 @@ export function getJumpVector(
     // coordinates of the top left anchor point
     const ax = L + ((hitbox.w / 2) | 0) - 1;
     const ay = T + ((hitbox.h / 2) | 0) - 1;
+
+    // Don't look for a jump vector when all 4 anchor points are on top of the same object with the isGround behavior.
+    for (const baseObject of area.objects) {
+        for (const object of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+            if (!object.getHitbox || object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                continue;
+            }
+            const behaviors = getObjectBehaviors(state, object);
+            if (object.getHitbox && behaviors?.isGround) {
+                if (isObjectInsideTarget({x: ax, y: ay, w: 2, h: 2}, object.getHitbox())) {
+                     return sum;
+                }
+            }
+        }
+    }
 
     for (const anchor of anchors) {
         const x = ax + anchor.dx, y = ay + anchor.dy;

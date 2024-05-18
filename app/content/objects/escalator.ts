@@ -1,7 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
+import { moveActor } from 'app/movement/moveActor';
 import { drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
@@ -84,7 +84,7 @@ export class Escalator implements ObjectInstance {
     behaviors: TileBehaviors = {
         isGround: true,
         // Currently isGround does not block falling in pits by itself, we must also set
-        // groundHeight > 0 to prevent falling into pits behind the stairs.
+        // groundHeight > 0 to prevent falling into pits under the conveyer belt.
         groundHeight: 1,
     };
     offsetX: number = 0;
@@ -144,12 +144,13 @@ export class Escalator implements ObjectInstance {
     }
     getHitboxForMovingObjects(state: GameState) {
         const hitbox = pad(this.definition, 8);
+        const padding = 4;//6;
         if (this.definition.d === 'down' || this.definition.d === 'up') {
-            hitbox.y -= 6;
-            hitbox.h += 12;
+            hitbox.y -= padding;
+            hitbox.h += 2 * padding;
         } else {
-            hitbox.x -= 6;
-            hitbox.w += 12;
+            hitbox.x -= padding;
+            hitbox.w += 2 * padding;
         }
         return hitbox;
     }
@@ -170,7 +171,7 @@ export class Escalator implements ObjectInstance {
             }
             const heroHitbox = hero.getHitbox();
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitboxForMovingObjects(state))
-                && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= this.behaviors.groundHeight;
+                && hero.action !== 'roll' && hero.action !== 'jumpingDown' && hero.action !== 'preparingSomersault' && hero.z <= this.behaviors.groundHeight;
             if (this.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {
                     canFall: true,

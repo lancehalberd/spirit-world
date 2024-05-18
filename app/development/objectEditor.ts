@@ -430,7 +430,6 @@ export function createObjectDefinition(
         case 'rollingBall':
         case 'saveStatue':
         case 'shieldingUnit':
-        case 'tippable':
         case 'trampoline':
         case 'vineSprout':
         case 'waterPot':
@@ -439,6 +438,14 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 type: definition.type,
             };
+        case 'tippable':
+            return {
+                ...commonProps,
+                shattered: definition.shattered,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+            };
+
         case 'torch':
             return {
                 ...commonProps,
@@ -787,6 +794,16 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 value: object.h,
                 onChange(h: number) {
                     object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'tippable':
+            rows.push({
+                name: 'shattered',
+                value: object.shattered || false,
+                onChange(shattered: boolean) {
+                    object.shattered = shattered;
                     updateObjectInstance(state, object);
                 },
             });

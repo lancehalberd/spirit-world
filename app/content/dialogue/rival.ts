@@ -1,7 +1,7 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { appendCallback, appendScript, wait } from 'app/scriptEvents';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
+import { moveActor } from 'app/movement/moveActor';
 import { saveGame } from 'app/utils/saveGame';
 import { updateCamera } from 'app/updateCamera';
 

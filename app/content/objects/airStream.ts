@@ -1,7 +1,7 @@
 import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
+import { moveActor } from 'app/movement/moveActor';
 import { createAnimation, drawFrame, frameAnimation } from 'app/utils/animations';
 import { directionMap } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';

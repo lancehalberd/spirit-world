@@ -4,7 +4,7 @@ import { omniAnimation } from 'app/content/enemyAnimations';
 import { Hero } from 'app/content/hero';
 import { zones } from 'app/content/zones/zoneHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/moveActor';
+import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/movement/moveActor';
 import { isUnderwater } from 'app/utils/actor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';

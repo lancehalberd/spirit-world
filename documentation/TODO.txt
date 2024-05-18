@@ -93,13 +93,34 @@ RangeError: Maximum call stack size exceeded
     at Howl._loadQueue (howler.js:1939:16)
     at Howl._loadQueue (howler.js:1934:16)
 
+
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Implement new Staff Tower design
+        - Third floor
+        - Basement
+        - Fifth floor
+        - Roof
+        - Add locks + keys to 1-2F and 3-4F
         - New floating electric orb enemy
             - Creates lightning bolt + radial shockwave attack in alternate world during blast.
-        - New splitting electric orb mid boss
+        - New splitting stationary electric orb mid boss
+            - 3 orbs are absorbing power in the basement.
+            - Same orbs that appear during the boss fight.
+            - Split into 4 orbs when defeated.
+        - Update boss
+            - Add giant orbs to spirit world during boss fight that generate storm clouds and prevent damaging the cloud around the heart.
+                - Player must use stone terminal to teleport to the spirit world to destroy the orbs then return.
+                - When the heart enrages, it summons new orbs in the material world to protect it and the beast guards the terminal
+                  when it is not regenerating.
+                - These orbs split into 4 small orbs when defeated which the player can choose to destroy or not.
+                - Player originally enters from the spirit world and passes by three inactive orbs.
+                - Player teleports to the material world and the boss is inert until the player reveals the heart.
+                - The beast appears once the player exposes the heart the first time.
+                - At 2/3 and 1/3 life the heart enrages activating 1 then 2 orbs in the spirit world.
+                    - The player must teleport to the spirit world to clear the cloud.
+                    - The beast can attack the player with lightning bolts while they are in the spirit world, if it is not regenerating.
 
     - Add futuristic graphics
         - New stairs object
@@ -116,6 +137,10 @@ Current tasks:
         - New ladders
         - east/west doors
 
+    - Improve Test State
+        - Add a "test" save slot.
+        - When using Test State, switch to the "test" save slot.
+        - Add a context option to switch save slots between test, 1, 2, 3
 
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
@@ -156,6 +181,10 @@ Current tasks:
         - Exit blocked by Cloud Boots/Ice(U-turn cracked ground) or Astral Projection (pot switches in both worlds)
             - Exits to ledge above entrance to cave ascent, which will now have a Silver Ore on it.
 
+
+    - Remove Howler.js and use WebAudioContext directly.
+        This article on sound implementation in Cross Code might be useful:
+            https://www.radicalfishgames.com/?p=973
 
     - Improvement, carried object should drop when astral projection despawns holding something.
         - Right now it just disappears with the astral projection.

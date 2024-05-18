@@ -4,7 +4,7 @@ import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/ut
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { sample } from 'app/utils/index';
 import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
-import { getSectionBoundingBox, moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 
 
 

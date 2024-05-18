@@ -161,6 +161,7 @@ export class Anode implements ObjectInstance {
                 },
                 hitAllies: true,
                 knockAwayFromHit: true,
+                knockbackForce: 0.5,
             });
         }
     }

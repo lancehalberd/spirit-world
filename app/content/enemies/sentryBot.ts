@@ -52,7 +52,7 @@ function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: num
         };
         const { tileBehavior } = getTileBehaviors(state, enemy.area, point);
         if (!tileBehavior?.low && tileBehavior?.solid) {
-            return {x: point.x, y: point.y, mag: i, blocked: true};
+            return {x: point.x, y: point.y, mag: i - 4, blocked: true};
         }
         if (lastPoint) {
             const ledgeDelta = getLedgeDelta(state, enemy.area, lastPoint, point);
@@ -64,7 +64,7 @@ function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: num
             }
             // Line of site is blocked when
             if (ledgeDeltaSum > 0) {
-                return {x: point.x, y: point.y, mag: i, blocked: true};
+                return {x: point.x, y: point.y, mag: i - 4, blocked: true};
             }
         }
         lastPoint = point;

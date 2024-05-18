@@ -1,4 +1,4 @@
-import { getSectionBoundingBox, moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import { getDirection } from 'app/utils/direction';
 
 

@@ -1,6 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
+import { moveActor } from 'app/movement/moveActor';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';

@@ -28,9 +28,8 @@ export class TippableObject implements ObjectInstance {
     isNeutralTarget = true;
     isObject = <const>true;
     drawPriority: DrawPriority = 'sprites';
-    definition = null;
-    x: number;
-    y: number;
+    x: number = this.definition.x;
+    y: number = this.definition.y;
     z: number = 0;
     fallFrame = 0;
     fallingInPlace: boolean = false;
@@ -41,13 +40,9 @@ export class TippableObject implements ObjectInstance {
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
-    animationTime = 0;
-    shattered = false;
-    constructor(state: GameState, definition: SimpleObjectDefinition) {
-        this.definition = definition;
-        this.x = definition.x;
-        this.y = definition.y;
-    }
+    shattered = this.definition.shattered || false;
+    animationTime = this.shattered ? fallingAnimation.duration : 0;
+    constructor(state: GameState, public definition: TippableObjectDefinition) {}
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
@@ -69,7 +64,7 @@ export class TippableObject implements ObjectInstance {
     }
     freezePot(state: GameState, link = true): FrozenPotObject {
         // Pot can only be frozen before it is tipped over.
-        if (this.fallingInPlace || this.fallDirection || this.shattered) {
+        if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return;
         }
         const frozenPot = new FrozenPotObject(
@@ -92,9 +87,12 @@ export class TippableObject implements ObjectInstance {
         return frozenPot
     }
     onPull(state: GameState, direction: Direction): void {
-        if (!this.fallDirection && !this.fallingInPlace && this.grabDirection === direction) {
+        if (this.shattered || this.fallDirection || this.fallingInPlace) {
+            return;
+        }
+        if (this.grabDirection === direction) {
             this.fallInDirection(state, direction);
-        } else if (!this.fallDirection && !this.fallingInPlace) {
+        } else {
             this.fallingInPlace = true;
             this.animationTime = -80;
             if (this.linkedObject) {
@@ -104,16 +102,17 @@ export class TippableObject implements ObjectInstance {
         }
     }
     onPush(state: GameState, direction: Direction): void {
-        if (!this.fallDirection && !this.fallingInPlace) {
-            this.pushCounter++;
-            this.pushedLastFrame = true;
-            if (this.pushCounter >= 20) {
-                this.fallInDirection(state, direction);
-            }
+        if (this.shattered || this.fallDirection || this.fallingInPlace) {
+            return;
+        }
+        this.pushCounter++;
+        this.pushedLastFrame = true;
+        if (this.pushCounter >= 20) {
+            this.fallInDirection(state, direction);
         }
     }
     fallInDirection(state: GameState, direction: Direction): void {
-        if (this.fallDirection || this.fallingInPlace) {
+        if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return;
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
@@ -145,12 +144,16 @@ export class TippableObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        if (this.shattered) {
+            return;
+        }
         if (this.fallingInPlace) {
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime === 200) {
                 this.releaseBrokenPot(state);
             }
-        } if (this.fallDirection) {
+        }
+        if (this.fallDirection) {
             this.animationTime += FRAME_LENGTH;
             if (this.fallFrame < 16) {
                 this.fallFrame++;
@@ -158,7 +161,7 @@ export class TippableObject implements ObjectInstance {
                 this.y += directionMap[this.fallDirection][1];
             }
         }
-        if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
+        if (this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
             this.shattered = true;
             this.pullingHeroDirection = null;
             this.releaseBrokenPot(state);

@@ -8,7 +8,7 @@ import { EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KE
 import { getActorTargets } from 'app/getActorTargets';
 import { playAreaSound } from 'app/musicController';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { getSectionBoundingBox, moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import {
     getCloneMovementDeltas,
     isGameKeyDown,

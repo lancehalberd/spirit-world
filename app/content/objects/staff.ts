@@ -1,5 +1,5 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getSectionBoundingBox } from 'app/moveActor';
+import { getSectionBoundingBox } from 'app/movement/moveActor';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
