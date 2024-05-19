@@ -98,10 +98,9 @@ Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Implement new Staff Tower design
+        - Add spawn markers near pits.
         - Add elevator behaviors
             - off, terminals are not animated/functional
-            - stuck at floor (upper vs bottom floor)
-                - fall sequence
         - Roof
         - New floating electric orb enemy
             - Creates lightning bolt + radial shockwave attack in alternate world during blast.

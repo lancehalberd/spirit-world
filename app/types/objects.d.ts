@@ -660,6 +660,10 @@ interface SpecialSignBehavior extends BaseSpecialBehavior<Sign> {
     type: 'sign'
 }
 
+interface SpecialElevatorBehavior extends BaseSpecialBehavior<Elevator> {
+    type: 'elevator'
+}
+
 interface SpecialSwitchBehavior extends BaseSpecialBehavior<Sign> {
     // This could be extended for floor switches and other switches.
     type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal'
@@ -685,6 +689,7 @@ interface SpecialAreaBehavior extends BaseSpecialBehavior<AreaInstance> {
 
 type SpecialBehavior
     = SpecialDoorBehavior
+    | SpecialElevatorBehavior
     | SpecialNarrationBehavior
     | SpecialPushPullBehavior
     | SpecialSwitchBehavior

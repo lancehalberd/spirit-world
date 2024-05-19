@@ -5,7 +5,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { zones } from 'app/content/zones';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderHeroShadow } from 'app/renderActor';
-import { appendScript } from 'app/scriptEvents';
+import { appendCallback, appendScript } from 'app/scriptEvents';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { setAreaSection } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas, debugCanvas } from 'app/utils/canvas';
@@ -64,6 +64,7 @@ export class Elevator implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    specialStatus?: 'stuck' | 'off' | 'crashed' | 'falling';
     elevatorY = 0;
     floorDelta = 0;
     callTerminal: ElevatorCallTerminal;
@@ -120,6 +121,56 @@ export class Elevator implements ObjectInstance {
                     {clearFlag:elevatorClosed}
                     {flag:elevatorFloor=${i}}*/
     }
+    fallToBasement(state: GameState) {
+        console.log('Fall to basement');
+        appendScript(state, '{playSound:switch}{wait:500}');
+        // Hack: Force leather boots on to prevent the player from sliding.
+        const boots = state.hero.savedData.equippedBoots;
+        state.hero.savedData.equippedBoots = 'leatherBoots';
+        appendCallback(state, (state: GameState) => {
+            this.elevatorY = -4;
+            state.screenShakes.push({
+                dx: 0, dy: 1, startTime: state.fieldTime, endTime: state.fieldTime + 500
+            });
+            state.hero.action = 'knocked';
+            state.hero.vy = 0.5;
+            state.hero.vx = 0;
+            state.hero.vz = 3;
+            return '';
+        });
+        appendScript(state, '{wait:1000}');
+        appendCallback(state, (state: GameState) => {
+            this.elevatorY -= 12;
+            state.screenShakes.push({
+                dx: 0, dy: 1, startTime: state.fieldTime, endTime: state.fieldTime + 500
+            });
+            state.hero.action = 'knocked';
+            state.hero.vy = 0.5;
+            state.hero.vx = 0;
+            state.hero.vz = 4;
+            return '';
+        });
+        appendScript(state, '{wait:1500}');
+        appendCallback(state, (state: GameState) => {
+            console.log('fall!');
+            this.specialStatus = 'falling';
+            state.screenShakes.push({
+                dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 500
+            });
+            state.hero.action = 'knocked';
+            state.hero.vy = 0;
+            state.hero.vx = 0;
+            state.hero.vz = 4;
+            return '';
+        });
+        appendScript(state, '{wait:300}');
+        appendCallback(state, (state: GameState) => {
+            state.hero.savedData.equippedBoots = boots;
+            state.hero.action = 'falling';
+            state.hero.animationTime = 0;
+            return '';
+        });
+    }
     callToCurrentFloor(state: GameState) {
         if (this.floorDelta > 0) {
             this.elevatorY = 160;
@@ -137,42 +188,73 @@ export class Elevator implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.targetDelta > 0) {
-            this.elevatorY += 2;
-            if (this.elevatorY >= 160) {
+        if (this.specialStatus === 'falling') {
+            this.elevatorY -= 8;
+            if (state.hero.action === 'falling' && state.hero.animationTime < 400) {
+                state.hero.y++;
+            }
+            if (this.elevatorY <= -128 && state.hero.action === 'fallen') {
                 enterZoneByElevator(
                     state,
                     state.location.zoneKey,
-                    this.definition.floor + this.targetDelta,
+                    0,
                     false,
                 );
             }
-        } else if (this.targetDelta < 0) {
-            this.elevatorY -= 2;
-            if (this.elevatorY <= -128) {
-                enterZoneByElevator(
-                    state,
-                    state.location.zoneKey,
-                    this.definition.floor + this.targetDelta,
-                    false,
-                );
+        }
+        if (this.specialStatus === 'crashed') {
+            // TODO: I would like to show the platform crashing first before the
+            // player crashes.
+            // Currently the scene is too dark to show this because the light
+            // centers on the player and starts with radius 0.
+            //if (this.elevatorY > 0) {
+            //    this.elevatorY = Math.max(0, this.elevatorY - 2);
+            //}
+            if (state.hero.renderParent === this) {
+                if (this.elevatorY === 0) {
+                    delete state.hero.renderParent;
+                }
             }
-        } else if (this.elevatorY < 0) {
-            this.elevatorY += 2;
-        } else if (this.elevatorY > 0) {
-            this.elevatorY -= 2;
+        }
+        // Normal behavior does not apply when a special status is applied.
+        if (!this.specialStatus) {
+            if (this.targetDelta > 0) {
+                this.elevatorY += 2;
+                if (this.elevatorY >= 160) {
+                    enterZoneByElevator(
+                        state,
+                        state.location.zoneKey,
+                        this.definition.floor + this.targetDelta,
+                        false,
+                    );
+                }
+            } else if (this.targetDelta < 0) {
+                this.elevatorY -= 2;
+                if (this.elevatorY <= -128) {
+                    enterZoneByElevator(
+                        state,
+                        state.location.zoneKey,
+                        this.definition.floor + this.targetDelta,
+                        false,
+                    );
+                }
+            } else if (this.elevatorY < 0) {
+                this.elevatorY += 2;
+            } else if (this.elevatorY > 0) {
+                this.elevatorY -= 2;
+            }
+            if (state.hero.renderParent === this) {
+                if (this.elevatorY === 0) {
+                    delete state.hero.renderParent;
+                } else {
+                    state.hero.z = this.elevatorY;
+                    // For now we don't allow the player to move while the elevator is moving.
+                    state.hero.isControlledByObject = true;
+                }
+            }
         }
         this.callTerminal.update(state);
         this.controlTerminal.update(state);
-        if (state.hero.renderParent === this) {
-            if (this.elevatorY === 0) {
-                delete state.hero.renderParent;
-            } else {
-                state.hero.z = this.elevatorY;
-                // For now we don't allow the player to move while the elevator is moving.
-                state.hero.isControlledByObject = true;
-            }
-        }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         /*const {x,y,w,h} = this.getHitbox();
@@ -270,10 +352,8 @@ export class Elevator implements ObjectInstance {
 objectHash.elevator = Elevator;
 
 function getElevatorFloor(state: GameState): number {
-    return state.savedState.objectFlags.elevatorFloor as number ?? 2;
     const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
-    const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
-    const startingFloor = elevatorDropped ? 0 : 2;
+    const startingFloor = 2;
     // Elevator is broken down at level 2 by default. 0 = basement, 1 = first floor, etc.
      return elevatorFixed
             ? state.savedState.objectFlags.elevatorFloor as number ?? startingFloor
@@ -305,6 +385,9 @@ class ElevatorControlTerminal implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        if (this.elevator.specialStatus) {
+            this.animationTime = 0;
+        }
         this.z = this.elevator.elevatorY;
     }
     getHitbox() {
@@ -317,6 +400,36 @@ class ElevatorControlTerminal implements ObjectInstance {
         if (this.elevator.elevatorY !== 0) {
             return;
         }
+
+        if (this.elevator.specialStatus === 'stuck') {
+            state.hero.action = null;
+            // Set this callback here to give it easy access to the elevator instance.
+            dialogueHash.elevator.mappedOptions.releaseBreak = (state: GameState) => {
+                this.elevator.fallToBasement(state);
+                return '';
+            }
+            appendScript(state, `
+                !WARNING![-]POWER FAILURE DETECTED
+                {|}EMERGENCY BREAK ACTIVATED
+                {choice:RELEASE BREAK?|Yes:elevator.releaseBreak|No}
+            `);
+            return;
+        }
+        if (this.elevator.specialStatus === 'crashed') {
+            state.hero.action = null;
+            appendScript(state, `
+                !WARNING![-]POWER FAILURE DETECTED
+                {|}POSSIBLE SHORT DETECTED IN BASEMENT.
+            `);
+            // This doesn't open until the mid boss is defeated now.
+            //    EMERGENCY ESCAPE HATCH OPENED IN BASEMENT.
+            return;
+        }
+        // Normal behavior is prevented by any special status.
+        if (this.elevator.specialStatus) {
+            return;
+        }
+
         // TODO: Make this dynamic based on elevator objects in the zone and the name of the floor for their section.
         appendScript(state, '{choice:SELECT FLOOR|B1:elevator.f0|1F:elevator.f1|2F:elevator.f2|3F:elevator.f3|4F:elevator.f4|5F:elevator.f5}');
         // Set the results of choosing a floor based on the current floor the elevator is on:
@@ -386,6 +499,17 @@ class ElevatorCallTerminal implements ObjectInstance {
         }
         // No special behavior if the terminal is not fully up or the platform is already on this floor.
         if (this.animationTime !== 0 || this.elevator.floorDelta === 0) {
+            return;
+        }
+        if (this.elevator.specialStatus === 'stuck') {
+            appendScript(state, `
+                !WARNING![-]POWER FAILURE DETECTED
+                {|}SAFETY BREAK ACTIVATED, THE PLATFORM CANNOT BE CALLED.
+            `);
+            state.hero.action = null;
+        }
+        // Normal behavior is prevented by any special status.
+        if (this.elevator.specialStatus) {
             return;
         }
         // Summon the platform to the current floor.
@@ -464,6 +588,7 @@ class ElevatorRingBack implements ObjectInstance {
 
 
 export function enterZoneByElevator(
+    this: void,
     state: GameState,
     zoneKey: string,
     targetFloor: number,
@@ -495,6 +620,13 @@ export function enterZoneByElevator(
         const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];
         const textCue = new TextCue(state, { text: 'Tower ' + floorName });
         addEffectToArea(state, state.areaInstance, textCue);
+        // This means the player just dropped the elevator to the basement.
+        if (elevator.specialStatus === 'stuck') {
+            elevator.specialStatus = 'crashed';
+            elevator.floorDelta = 0;
+            elevator.elevatorY = 0;
+            state.hero.action = 'knocked';
+        }
 
         callback?.(state);
     });
