@@ -98,7 +98,8 @@ Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Implement new Staff Tower design
-        - Add spawn markers near pits.
+        - Change status of elevator when the mid boss is defeated.
+        - Don't reveal basement ladder until midboss is defeated.
         - Add elevator behaviors
             - off, terminals are not animated/functional
         - Roof

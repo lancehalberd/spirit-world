@@ -7,6 +7,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (!hero.area) {
         return;
     }
+    // Track whether the tallest object the player is standing on is slippery.
     hero.groundHeight = 0;
     const hitbox = hero.getFloorHitbox();
     for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
@@ -60,6 +61,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     }
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
+    let isOnSlipperyObject = false;
     // Apply floor effects from objects/effects.
     for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
         for (const entity of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
@@ -73,6 +75,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if ((behaviors.groundHeight || 0) >= hero.z) {
                 if (!behaviors.slippery && !bootsAreSlippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
                     hero.slipping = false;
+                } else if (behaviors.slippery  && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                    // This will prevent background tile behavior from preventing the player from slipping.
+                    isOnSlipperyObject = true;
                 }
             }
             if (behaviors.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
@@ -100,7 +105,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
             // Default behavior is open solid ground.
             if (!behaviors) {
-                if (!bootsAreSlippery) {
+                // Check the hero is touching the ground, otherwise this will cause them
+                if (hero.groundHeight === 0 && !isOnSlipperyObject && !bootsAreSlippery) {
                     hero.slipping = false;
                 }
                 hero.swimming = false;
@@ -147,7 +153,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.swimming = false;
             }
             // Don't slip if on any non-slippery ground unless wearing cloud boots.
-            if (!bootsAreSlippery && !behaviors.slippery
+            if (!bootsAreSlippery && !behaviors.slippery && !isOnSlipperyObject
                 && !behaviors.pit  && !behaviors.water  && !behaviors.shallowWater && !behaviors.solid
             ) {
                 hero.slipping = false;
