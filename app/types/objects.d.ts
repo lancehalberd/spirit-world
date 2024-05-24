@@ -73,6 +73,8 @@ interface BaseFieldInstance {
     onPush?: (state: GameState, direction: Direction) => void
     // If set this object will not be rendered by the area and is expected to be rendered by the parent object.
     renderParent?: BaseFieldInstance
+    getParts?: (state: GameState) => BaseFieldInstance[]
+    getHitbox?: (state?: GameState) => Readonly<Rect>
 }
 
 interface ObjectInstance extends BaseFieldInstance {
@@ -119,8 +121,6 @@ interface ObjectInstance extends BaseFieldInstance {
     showTrueSightIndicator?: boolean
     changeStatus?: (state: GameState, status: ObjectStatus) => void
     cleanup?: (state: GameState) => void,
-    // This is called when a user grabs a solid tile
-    getHitbox?: (state?: GameState) => Readonly<Rect>
     getFloorHitbox?: () => Readonly<Rect>
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
@@ -166,8 +166,6 @@ interface EffectInstance extends BaseFieldInstance {
     z?: number
     height?: number
     cleanup?: (state: GameState) => void
-    // This is called when a user grabs a solid tile
-    getHitbox?: (state?: GameState) => Readonly<Rect>
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
     // This can be set to override the default yDepth calculation for an object.
@@ -479,7 +477,7 @@ interface CrystalSwitchDefinition extends BaseObjectDefinition {
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs'
+    type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs' | 'staffTower'
     targetZone?: string
     targetObjectId?: string
     // This can be set to force a door to be open if the logic is true.

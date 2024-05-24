@@ -13,9 +13,10 @@ import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { isPointInShortRect, boxesIntersect, pad } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
+import { getObjectAndParts} from 'app/utils/objects';
+import { requireFrame } from 'app/utils/packedImages';
 import { isSectionExplored } from 'app/utils/sections';
 import { drawText } from 'app/utils/simpleWhiteFont';
-import { requireFrame } from 'app/utils/packedImages';
 
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
@@ -338,7 +339,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
 
 const mapObjectTypes: ObjectType[] = [
-    'waterfall', 'decoration', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest'
+    'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest'
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
@@ -386,8 +387,21 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                 context.save();
                     context.scale(4 / area.w, 4 / area.h);
                     context.translate(-source.x, -source.y);
-                    for(const part of [object, ...(object.getParts?.(state) || [])]) {
-                        part.render(context, state);
+                    const objectAndParts = getObjectAndParts(state, object)
+                    for(const part of objectAndParts) {
+                        if (part.drawPriority === 'background') {
+                            part.render(context, state);
+                        }
+                    }
+                    for(const part of objectAndParts) {
+                        if (part.drawPriority === 'sprites') {
+                            part.render(context, state);
+                        }
+                    }
+                    for(const part of objectAndParts) {
+                        if (part.drawPriority === 'foreground') {
+                            part.render(context, state);
+                        }
                         part.renderForeground?.(context, state);
                     }
                 context.restore();

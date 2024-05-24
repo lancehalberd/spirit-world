@@ -1,28 +1,196 @@
 import { destroyTile } from 'app/utils/destroyTile';
 import { directionMap } from 'app/utils/direction';
+import { getCompositeBehaviors } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
+import { getFieldInstanceAndParts } from 'app/utils/objects';
 
-
+// TODO: break ground under player if z <= 0 and they aren't rolling.
 export function checkForFloorEffects(state: GameState, hero: Hero) {
+    if (!hero.area) {
+        return;
+    }
+    const hitbox = hero.getFloorHitbox();
+    const checkPoints = [
+        {x: hitbox.x, y: hitbox.y},
+        {x: hitbox.x + hitbox.w - 1, y: hitbox.y},
+        {x: hitbox.x, y: hitbox.y + hitbox.h - 1},
+        {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1},
+    ];
+    const pointBehaviors = checkPoints.map(point => getCompositeBehaviors(state, hero.area, point, state.nextAreaInstance));
+    let topBehaviors = [];
+    hero.groundHeight = 0;
+    for (const behaviors of pointBehaviors) {
+        const groundHeight = behaviors.groundHeight || 0;
+        if (groundHeight > hero.groundHeight) {
+            hero.groundHeight = groundHeight;
+            topBehaviors = [behaviors];
+        } else if (groundHeight === hero.groundHeight) {
+            topBehaviors.push(behaviors);
+        }
+    }
+    hero.z = Math.max(hero.z, hero.groundHeight);
+    hero.wading = hero.z <= 0;
+    hero.swimming = hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
+    const bootsAreSlippery = hero.savedData.equippedBoots === 'cloudBoots';
+    // Here is assumed to be slipping until we determine a reason that they are not.
+    hero.slipping = true;
+    hero.canFloat = false;
+    hero.isOverClouds = false;
+    hero.isTouchingPit = false;
+    hero.isOverPit = true;
+    if (hero.isAstralProjection
+        || (hero.isInvisible && hero.savedData.equippedBoots !== 'cloudBoots')
+        || hero.savedData.equippedBoots === 'ironBoots'
+        || (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots > 1)
+    ) {
+        hero.slipping = false;
+    }
+    let startClimbing = false
+    for (const behaviors of topBehaviors) {
+        if (!bootsAreSlippery && !behaviors.slippery
+            && !behaviors.pit  && !behaviors.water  && !behaviors.shallowWater
+        ) {
+            hero.slipping = false;
+        }
+        if (behaviors.climbable) {
+            startClimbing = true;
+        }
+        if (behaviors.touchHit && hero.onHit) {
+            if (!behaviors.touchHit.isGroundHit || hero.z <= 0) {
+                hero.onHit(state, behaviors.touchHit);
+                /*const { returnHit } = hero.onHit(state, behaviors.touchHit);
+
+                if (behaviors.cuttable && behaviors.cuttable <= returnHit?.damage) {
+                    for (const layer of hero.area.layers) {
+                        const tile = layer.tiles[actualRow]?.[actualColumn];
+                        if (tile?.behaviors?.cuttable <= returnHit.damage) {
+                            destroyTile(state, hero.area, { x: actualColumn, y: actualRow, layerKey: layer.key });
+                        }
+                    }
+                }*/
+            }
+        }
+        if (!behaviors.water && !behaviors.outOfBounds) {
+            hero.swimming = false;
+        }
+        if (!behaviors.shallowWater && !behaviors.water && !behaviors.outOfBounds) {
+            hero.wading = false;
+        }
+        // Don't slip if on any non-slippery ground unless wearing cloud boots.
+        // Clouds boots are not slippery when walking on clouds.
+        if (behaviors.cloudGround && hero.savedData.equippedBoots === 'cloudBoots') {
+            hero.slipping = false;
+        }
+        if (behaviors.cloudGround) {
+            hero.isOverClouds = true;
+        }
+        // Cloud boots allow you to stand on, but not float over liquids.
+        if (!behaviors.isLava && !behaviors.cloudGround && !behaviors.water && !behaviors.shallowWater) {
+            hero.canFloat = true;
+        }
+        // Note that standing on N/E/W ledges will raise the z value to 1 to prevent touching lava while standing over a ledge.
+        if (behaviors.isLava && hero.z <= 0) {
+            const lavaProof = hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots >= 2;
+            if (!lavaProof) {
+                hero.onHit(state, { damage: 4, element: 'fire' });
+            }
+        }
+        if (behaviors.pit || behaviors.cloudGround) {
+            hero.isTouchingPit = true;
+        }
+        if (!behaviors.pit && !(behaviors.cloudGround && hero.savedData.equippedBoots !== 'cloudBoots') && !behaviors.outOfBounds) {
+            hero.isOverPit = false;
+        }
+    }
+    // Being invisible allows you to walk on water unless you are wearing iron boots.
+    if (hero.swimming && (hero.savedData.equippedBoots === 'cloudBoots' || (hero.isInvisible && hero.savedData.equippedBoots === 'leatherBoots'))) {
+        hero.swimming = false;
+        hero.wading = true;
+    }
+    if (startClimbing) {
+        hero.action = 'climbing';
+    } else if (!startClimbing && hero.action === 'climbing') {
+        hero.action = null;
+    }
+    if (hero.isOverPit) {
+        const canFly = hero.savedData.equippedBoots === 'cloudBoots' && hero.savedData.equipment.cloudBoots >= 2;
+        if (!canFly) {
+            hero.canFloat = false;
+        }
+    }
+    if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
+        if (hero.z <= 0 && hero.action !== 'roll') {
+            const behaviorGrid = hero.area.behaviorGrid;
+            const tileSize = 16;
+            let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];
+            //if (behaviors?.cloudGround && hero.savedData.equippedBoots === 'cloudBoots') {
+            if (hero.isOverClouds && hero.savedData.equippedBoots === 'cloudBoots') {
+                // Do nothing.
+            } else {
+                hero.throwHeldObject(state);
+                // Unfreeze on falling into a pit.
+                hero.frozenDuration = 0;
+                hero.heldChakram?.throw(state);
+                hero.action = 'falling';
+                //hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
+                hero.x = Math.round(hero.x / tileSize) * tileSize;
+                hero.y = Math.round(hero.y / tileSize) * tileSize;
+                if (behaviors?.cloudGround) {
+                    hero.y -= 4;
+                    // This will play the cloud poof animation over the hero as they fall.
+                    hero.isOverClouds = true;
+                    if (behaviors?.diagonalLedge) {
+                        hero.x -= directionMap[behaviors?.diagonalLedge][0] * 12;
+                        hero.y -= directionMap[behaviors?.diagonalLedge][1] * 12;
+                    }
+                    if (behaviors?.ledges?.up) {
+                        hero.y += 8;
+                    }
+                    if (behaviors?.ledges?.down) {
+                        hero.y -= 8;
+                    }
+                    if (behaviors?.ledges?.left) {
+                        hero.x += 8;
+                    }
+                    if (behaviors?.ledges?.right) {
+                        hero.x -= 8;
+                    }
+                } else {
+                    hero.isOverClouds = false;
+                }
+                hero.animationTime = 0;
+            }
+        }
+    }
+    // Cannot be slipping while swimming/wading/climbing.
+    if (hero.swimming || (hero.wading && !bootsAreSlippery) || hero.action === 'climbing') {
+        hero.slipping = false;
+    }
+}
+
+export function checkForFloorEffectsOld(state: GameState, hero: Hero) {
     if (!hero.area) {
         return;
     }
     // Track whether the tallest object the player is standing on is slippery.
     hero.groundHeight = 0;
     const hitbox = hero.getFloorHitbox();
+    const checkPoints = [
+        {x: hitbox.x, y: hitbox.y},
+        {x: hitbox.x + hitbox.w - 1, y: hitbox.y},
+        {x: hitbox.x, y: hitbox.y + hitbox.h - 1},
+        {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1},
+    ];
     for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
-        for (const entity of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+        for (const entity of getFieldInstanceAndParts(state, baseObject)) {
             if (!entity.getHitbox){
                 continue;
             }
-            const behaviors = entity.getBehaviors?.(state) || entity.behaviors;
-            if (!(behaviors?.groundHeight > hero.groundHeight)) {
-                continue;
-            }
-            // The padding here needs to match any used for other interactions with this object,
-            // in particular, movingPlatform padding should match this.
-            if (boxesIntersect(entity.getHitbox(state), hitbox)) {
-                hero.groundHeight = behaviors?.groundHeight;
+            for (const p of checkPoints) {
+                const behaviors = entity.getBehaviors?.(state, p.x, p.y) || entity.behaviors;
+                if (behaviors?.groundHeight > hero.groundHeight) {
+                    hero.groundHeight = behaviors.groundHeight;
+                }
             }
         }
     }
@@ -64,24 +232,26 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     let isOnSlipperyObject = false;
     // Apply floor effects from objects/effects.
     for (const baseObject of [...hero.area.objects, ...hero.area.effects]) {
-        for (const entity of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+        for (const entity of getFieldInstanceAndParts(state, baseObject)) {
             if (!entity.getHitbox){
                 continue;
             }
-            const behaviors = entity.getBehaviors?.(state) || entity.behaviors;
-            if (!behaviors) {
-                continue;
-            }
-            if ((behaviors.groundHeight || 0) >= hero.z) {
-                if (!behaviors.slippery && !bootsAreSlippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
-                    hero.slipping = false;
-                } else if (behaviors.slippery  && boxesIntersect(entity.getHitbox(state), hitbox)) {
-                    // This will prevent background tile behavior from preventing the player from slipping.
-                    isOnSlipperyObject = true;
+            for (const p of checkPoints) {
+                const behaviors = entity.getBehaviors?.(state, p.x, p.y) || entity.behaviors;
+                if (!behaviors) {
+                    continue;
                 }
-            }
-            if (behaviors.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
-                startClimbing = true;
+                if ((behaviors.groundHeight || 0) >= hero.z) {
+                    if (!behaviors.slippery && !bootsAreSlippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                        hero.slipping = false;
+                    } else if (behaviors.slippery  && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                        // This will prevent background tile behavior from preventing the player from slipping.
+                        isOnSlipperyObject = true;
+                    }
+                }
+                if (behaviors.climbable && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                    startClimbing = true;
+                }
             }
         }
     }

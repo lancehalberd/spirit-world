@@ -19,6 +19,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 import {
     canSomersaultToCoords,
     directionMap,
+    getCompositeBehaviors,
     getDirection,
     getTileBehaviorsAndObstacles,
     hitTargets,
@@ -166,6 +167,30 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
         hero.vx = 0;
         hero.vy = 0;
+        const hitbox = hero.getMovementHitbox();
+        const checkPoints = [
+            {x: hitbox.x, y: hitbox.y, dx: 1, dy: 1},
+            {x: hitbox.x + hitbox.w - 1, y: hitbox.y, dx: -1, dy: 1},
+            {x: hitbox.x, y: hitbox.y + hitbox.h - 1, dx: 1, dy: -1},
+            {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1, dx: -1, dy: -1},
+        ];
+        // While the hero is falling, push them around until all their check points are over actual pit tiles.
+        let onPitWall = false;
+        for (const p of checkPoints) {
+            const behaviors = getCompositeBehaviors(state, hero.area, p, state.nextAreaInstance);
+            if (behaviors.pitWall) {
+                onPitWall = true;
+            }
+            if (!(behaviors.pit || behaviors.cloudGround || behaviors.pitWall)) {
+                hero.x += p.dx;
+                hero.y += p.dy;
+            }
+        }
+        // Pit wall tiles always push the hero south to match the perspective.
+        if (onPitWall) {
+            hero.y++;
+        }
+
         if (hero.isOverClouds && hero.animationTime >= cloudPoofAnimation.duration) {
             hero.action = 'fallen';
             hero.actionFrame = 0;

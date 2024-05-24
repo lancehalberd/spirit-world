@@ -26,6 +26,7 @@ export * from 'app/content/objects/saveStatue';
 export * from 'app/content/objects/shieldingUnit';
 export * from 'app/content/objects/sign';
 export * from 'app/content/objects/spikeBall';
+export * from 'app/content/objects/staffTower';
 export * from 'app/content/objects/teleporter';
 export * from 'app/content/objects/tippableObject';
 export * from 'app/content/objects/torch';

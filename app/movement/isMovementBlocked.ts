@@ -1,7 +1,7 @@
 import { destroyTile } from 'app/utils/destroyTile';
 import { tileHitAppliesToTarget } from 'app/utils/field';
 import { isPixelInShortRect } from 'app/utils/index';
-import { getObjectBehaviors } from 'app/utils/objects';
+import { getObjectAndParts, getObjectBehaviors } from 'app/utils/objects';
 
 
 export function isMovementBlocked(
@@ -26,7 +26,7 @@ export function isMovementBlocked(
     // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.
     let walkableObject: ObjectInstance, blockingSolidObject: ObjectInstance, blockingPitObject: ObjectInstance;
     for (const baseObject of area.objects) {
-        for (const object of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+        for (const object of getObjectAndParts(state, baseObject)) {
             if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
@@ -72,7 +72,7 @@ export function isMovementBlocked(
             }
             // Objects defined with `isGround` can cover pits/solid tiles to allow
             // the player to walk over them, such as a stair case or ladder.
-            if (object.getHitbox && behaviors?.isGround) {
+            if (object.getHitbox && (behaviors?.isGround || behaviors?.isNotSolid)) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     walkableObject = object;
                     blockingPitObject = null;

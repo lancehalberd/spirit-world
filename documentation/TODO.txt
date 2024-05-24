@@ -97,6 +97,7 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+
     - Implement new Staff Tower design
         - Change status of elevator when the mid boss is defeated.
         - Don't reveal basement ladder until midboss is defeated.
@@ -123,6 +124,10 @@ Current tasks:
                     - The beast can attack the player with lightning bolts while they are in the spirit world, if it is not regenerating.
         - New pit tile behaviors, mix between pits+southern walls.
             - Behave like pit normally, but when the player is falling, causes the player to ease down and possibly delay the animation.
+        - Improve elevator fall sequence:
+            - Make elevator platfrom glow so we can see it fall in the basement ahead of the player.
+            - Start it off screen
+            - Delay the fall of the player until the platform crashes.
 
     - Lower priority futuristic graphics
         - Reuse future ceiling edges for ledge tiles on the floor2 layer.
@@ -216,6 +221,13 @@ Current tasks:
         - We can fix this by setting a layer id on the bead cover for the layer it is covering (floor2), then when it is not fully open,
         render all background layers above that layer on top of it as part of the object. This would allow us to draw certain objects
         "beneath" tiles in general at the expense of some extra renders.
+
+
+    - Add new draw priority to an object
+        - Unclear if this will be useful for anything yet.
+        - overTileLayer/underTileLayer(+layerKey): Draws the object to the background or foreground canvas immediately before or after
+          the layer specified by layerKey.
+          - Since these layers are not updated, the object will only be redrawn when the associated canvas is redrawn.
 
     - Moving platform gets stuck in a weird position sometimes in the forge.
         - When transitioning, reset the moving platforms if they are not in the same area as the player.

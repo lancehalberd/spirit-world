@@ -974,6 +974,9 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     },
     square: oldSquareBaseDoorStyle,
     wideEntrance: {
+        // We use isNotSolid here since we see the ground type for this entrance.
+        // for example the player should swim through water or wade through shallow water behind this entrance.
+        pathBehaviors: {isNotSolid: true, lowCeiling: true, isEntrance: true},
         getHitbox(door: Door) {
             return (door.definition.d === 'up' || door.definition.d === 'down')
                 ? {x: door.x, y: door.y, w: 64, h: 16}

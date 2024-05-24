@@ -1,5 +1,6 @@
 import { Hero } from 'app/content/hero';
 import { isPixelInShortRect } from 'app/utils/index';
+import { getObjectAndParts } from 'app/utils/objects';
 import { moveObject } from 'app/movement/moveObject';
 
 
@@ -83,7 +84,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
     }
 
     for (const baseObject of actor.area.objects) {
-        for (const object of [baseObject, ...(baseObject.getParts?.(state) || [])].filter(o => o.getHitbox)) {
+        for (const object of getObjectAndParts(state, baseObject).filter(o => o.getHitbox)) {
             if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }

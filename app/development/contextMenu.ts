@@ -8,8 +8,9 @@ import { CANVAS_SCALE, overworldKeys } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
-import { mainCanvas } from 'app/utils/canvas';
 import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
+import { mainCanvas } from 'app/utils/canvas';
+import { getCompositeBehaviors } from 'app/utils/field';
 import { getElementRectangle, isPointInShortRect } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { saveSettings } from 'app/utils/saveSettings';
@@ -140,6 +141,18 @@ export function getContextMenu(): MenuOption[] {
                 const sx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
                 const sy = Math.floor((state.camera.y + lastContextClick[1]) / 16);
                 console.log(state.areaInstance.behaviorGrid?.[sy]?.[sx]);
+            }
+        });
+        options.push({
+            label: 'Log Pixel Behavior',
+            onSelect() {
+                const state = getState();
+                const point = {
+                    x: state.camera.x + lastContextClick[0],
+                    y: state.camera.y + lastContextClick[1],
+                };
+                console.log(point);
+                console.log(getCompositeBehaviors(state, state.areaInstance, point, state.nextAreaInstance));
             }
         });
         options.push({

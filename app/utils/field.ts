@@ -4,7 +4,7 @@ import { destroyTile } from 'app/utils/destroyTile';
 import { directionMap, getDirection } from 'app/utils/direction';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
-import { getObjectBehaviors, removeObjectFromArea } from 'app/utils/objects';
+import { getFieldInstanceAndParts, getObjectBehaviors, removeObjectFromArea } from 'app/utils/objects';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 
@@ -94,22 +94,12 @@ export function isPointOpen(
         if (movementProperties.excludedObjects?.has(object)) {
             continue;
         }
+        // Object behaviors do not support solidMap, they can just return different values
+        // for specific x/y coordinates if necessary.
         const behaviors = getObjectBehaviors(state, object, x, y);
         if (object.getHitbox && behaviors?.solid) {
-            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
-                return false;
-            }
-        } /*else if (object.getHitbox && behaviors?.solidMap) {
-            // Currently we don't support solidMap on objects. They can just apply this
-            // to the tile map if necessary, otherwise, maybe we should add something like
-            // getPixelBehavior(x: number, y: number): TileBehaviors to objects.
-            const hitbox = object.getHitbox(state);
-            let sx = (x - hitbox.x) | 0;
-            let sy = (y - hitbox.y) | 0;
-            if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
-                return false;
-            }
-        }*/
+            return false;
+        }
     }
     // Not sure why we have a special check for the hero here.
     /*if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
@@ -120,10 +110,71 @@ export function isPointOpen(
     return true;
 }
 
+export function getCompositeBehaviors(
+    state: GameState,
+    area: AreaInstance,
+    {x, y}: Point,
+    nextArea: AreaInstance = null,
+): TileBehaviors {
+    let tileBehavior: TileBehaviors = {}
+    const allObjects = [
+        ...area.objects,
+        ...area.effects,
+        ...(nextArea?.objects || []),
+        ...(nextArea?.effects || []),
+    ]
+    tileBehavior.groundHeight = 0;
+    let lastSolidBehavior: TileBehaviors;
+    for (const baseObject of allObjects) {
+        for (const entity of getFieldInstanceAndParts(state, baseObject)) {
+            const behaviors = getObjectBehaviors(state, entity, x, y);
+            if (!behaviors) {
+                continue;
+            }
+            // Currently we evaluate behaviors in the default object order, but we should instead
+            // evaluate them in the order they are drawn so the objects that appear on top visually
+            // override the objects underneath.
+            const groundHeight = behaviors.groundHeight || 0;
+            // For non-solid objects, only the behaviors with the highest ground matter.
+            if (groundHeight > tileBehavior.groundHeight) {
+                tileBehavior = behaviors;
+            } else if (groundHeight >= tileBehavior.groundHeight) {
+                // TODO: Rather than combine these, we should probably only apply the behavior
+                // from the object that is drawn on top (which the player would see at this pixel).
+                tileBehavior = {
+                    ...tileBehavior,
+                    ...behaviors
+                };
+                if (behaviors.isGround || behaviors.isNotSolid) {
+                    tileBehavior.solid = false;
+                    // isGround overrides any previous solid behavior.
+                    lastSolidBehavior = null;
+                }
+            }
+            if (behaviors.solid) {
+                lastSolidBehavior = behaviors;
+            }
+        }
+    }
+    if (lastSolidBehavior) {
+        return lastSolidBehavior;
+    }
+
+    // Ignore tile behaviors behind objects that are marked as isGround or have positive groundHeight.
+    if (tileBehavior.groundHeight > 0 || tileBehavior.isGround) {
+        return tileBehavior;
+    }
+    delete tileBehavior.groundHeight;
+    return {
+        ...getTileBehaviors(state, area, {x, y}, nextArea).tileBehavior,
+        ...tileBehavior,
+    };
+}
+
 export function getTileBehaviors(
     state: GameState,
     area: AreaInstance,
-    {x, y}: Tile,
+    {x, y}: Point,
     nextArea: AreaInstance = null,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number} {
     let tx = Math.floor(x / 16);

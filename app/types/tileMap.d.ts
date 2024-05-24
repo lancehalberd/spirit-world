@@ -115,6 +115,8 @@ interface TileBehaviors {
     // If this is set to false, then a tile shouldn't override pit/lava behavior underneath it.
     // If this is set to true on an object then it should override ground behavior underneath it.
     isGround?: boolean
+    // If this is set on an object, it will override solid behavior behind it, but not ground behavior.
+    isNotSolid?: boolean
     // If this is true, this tile is an overlay on top of the ground and should have cover effects applied
     // to the layer beneath it instead of on top of it.
     // For example, shadows are typically on `field2` which is in the background, but freezing tiles shuold

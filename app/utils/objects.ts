@@ -1,5 +1,6 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { playSound } from 'app/musicController';
+import { isPixelInShortRect } from 'app/utils/index';
 import { applyBehaviorToTile } from 'app/utils/tileBehavior';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -143,7 +144,14 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
 }
 
 export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance, x?: number, y?: number) {
-    return object.behaviors || object.getBehaviors?.(state, x, y);
+    if (!object.getHitbox) {
+        return undefined;
+    }
+    // If the point is passed in, only return behaviors if the point is in the hitbox.
+    if (typeof x !== 'undefined' && !isPixelInShortRect(x, y, object.getHitbox(state))) {
+        return undefined;
+    }
+    return object.getBehaviors?.(state, x, y) || object.behaviors;
 }
 
 export function deactivateTargets(state: GameState, area: AreaInstance, targetObjectId: string = null): void {
@@ -187,4 +195,23 @@ export function deactivateTarget(state: GameState, target: ObjectInstance): void
     if (target.definition?.status === 'closedSwitch' && !target.definition.saveStatus) {
         changeObjectStatus(state, target, 'closedSwitch');
     }
+}
+
+export function getObjectAndParts(state: GameState, object: ObjectInstance): ObjectInstance[] {
+    const objectAndParts = [object];
+    const parts = (object.getParts?.(state) || []);
+    for (const part of parts) {
+        objectAndParts.push(...getObjectAndParts(state, part));
+    }
+    return objectAndParts;
+}
+
+
+export function getFieldInstanceAndParts(state: GameState, object: ObjectInstance|EffectInstance): (ObjectInstance|EffectInstance)[] {
+    const objectAndParts = [object];
+    const parts = (object.getParts?.(state) || []);
+    for (const part of parts) {
+        objectAndParts.push(...getFieldInstanceAndParts(state, part));
+    }
+    return objectAndParts;
 }

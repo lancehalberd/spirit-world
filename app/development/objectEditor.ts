@@ -167,7 +167,7 @@ export function getObjectTypeProperties(): PanelRows {
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall',
+    'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
@@ -256,6 +256,7 @@ export function createObjectDefinition(
                 targetObjectId: definition.targetObjectId,
             };
         case 'door':
+        case 'staffTower':
         case 'stairs':
             return {
                 ...commonProps,
@@ -608,6 +609,8 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
             return ['normal', 'off', 'frozen'];
         case 'airStream':
         case 'shieldingUnit':
+        case 'staffTower':
+            return ['normal', 'closed'];
         case 'turret':
             return ['normal', 'off'];
         default:
@@ -921,6 +924,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             ];
             // This intentionally continue on to the marker properties.
         case 'pitEntrance':
+        case 'staffTower':
         case 'teleporter':
             const zoneKeys = Object.keys(zones);
             const zoneKey = object.targetZone || 'none';
@@ -940,9 +944,13 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             const zone = zones[zoneKey];
             // Pit entrances target markers, but other entrances target the same kind of entrnace,
-            // for example stairs => stairs, doors => doors.
-            const targetType: ObjectType =
-                object.type === 'pitEntrance' ? 'marker' : object.type;
+            // for example teleporter => teleporter, doors => doors.
+            let targetType: ObjectType = object.type;
+            if (object.type === 'pitEntrance') {
+                targetType = 'marker';
+            } else if (object.type === 'staffTower') {
+                targetType = 'door';
+            }
             const objectIds = zone ? getTargetObjectIdsByTypes(zone, [targetType]) : [];
             if (objectIds.length) {
                 if (objectIds.indexOf(object.targetObjectId) < 0) {
@@ -1347,6 +1355,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = torchStyles;
     } else if (object.type === 'cathode' || object.type === 'anode') {
         styles = lightningBarrierStyles;
+    } else if (object.type === 'staffTower') {
+        styles = {'ground': 0, 'sky': 1};
     }
     if (!styles) {
         return [];

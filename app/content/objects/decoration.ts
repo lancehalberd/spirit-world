@@ -1,8 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrameContentAt, getFrame, getFrameHitbox } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
-import { isPixelInShortRect } from 'app/utils/index';
 
 
 export class Decoration implements ObjectInstance {
@@ -30,6 +29,14 @@ export class Decoration implements ObjectInstance {
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getBehaviors?.(state, this, x, y) || decorationType.behaviors;
+    }
+    getYDepth(): number {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        if (decorationType.getYDepth) {
+            return decorationType.getYDepth(this)
+        }
+        const hitbox = this.getHitbox();
+        return hitbox.y + hitbox.h;
     }
     getHitbox(): Rect {
         const decorationType = decorationTypes[this.definition.decorationType];
@@ -63,27 +70,12 @@ const glowingPedestalAnimation = createAnimation('gfx/decorations/largeStatuePed
 
 const lightningBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
-function getFrameHitbox(object: ObjectInstance, frame: FrameRectangle): Rect {
-    return {
-        x: object.x,
-        y: object.y,
-        w: (frame.content?.w || frame.w),
-        h: (frame.content?.h || frame.h),
-    };
-}
-function drawFrameContentAt(context: CanvasRenderingContext2D, frame: Frame, {x, y, z}: {x: number, y: number, z?: number}): void {
-    drawFrame(context, frame, {
-        ...frame,
-        x: x - (frame.content?.x || 0),
-        y: y - (frame.content?.y || 0) - (z || 0),
-    });
-}
-
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     getHitbox?: (decoration: Decoration) => Rect
     behaviors?: TileBehaviors
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
+    getYDepth?: (decoration: Decoration) => number
 }
 export const decorationTypes: {[key: string]: DecorationType} = {
     lightningBeastStatue: {
@@ -95,22 +87,22 @@ export const decorationTypes: {[key: string]: DecorationType} = {
             solid: true,
         },
         getHitbox(decoration: Decoration): Rect {
-            return getFrameHitbox(decoration, lightningBeastStatueFrame);
+            return getFrameHitbox(lightningBeastStatueFrame, decoration);
         },
     },
     fireBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrame(context, fireBeastStatueImage, {...fireBeastStatueImage, x: decoration.x, y: decoration.y});
+            drawFrameContentAt(context, fireBeastStatueImage, {...fireBeastStatueImage, x: decoration.x, y: decoration.y});
         }
     },
     iceBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrame(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
+            drawFrameContentAt(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
         }
     },
     entranceLight: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
+            drawFrameContentAt(context, entranceLightFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
         },
     },
     pedestal: {
@@ -121,7 +113,7 @@ export const decorationTypes: {[key: string]: DecorationType} = {
             solid: true,
         },
         getHitbox(decoration: Decoration): Rect {
-            return getFrameHitbox(decoration, pedestalFrame);
+            return getFrameHitbox(pedestalFrame, decoration);
         },
     },
     pedestalGlowing: {
@@ -134,36 +126,10 @@ export const decorationTypes: {[key: string]: DecorationType} = {
         },
         getHitbox(decoration: Decoration): Rect {
             const frame = getFrame(glowingPedestalAnimation, decoration.animationTime);
-            return getFrameHitbox(decoration, frame);
+            return getFrameHitbox(frame, decoration);
         },
     }
 }
-
-const staffTowerFrame = requireFrame('gfx/staging/Tower.png', {x: 14, y: 17, w: 164, h: 209, content: {x: 0, y: 81, w: 164, h: 128}});
-decorationTypes.staffTower = {
-    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, staffTowerFrame, decoration);
-    },
-    getBehaviors(state: GameState, decoration: Decoration, x?: number, y?: number): TileBehaviors {
-        const hitbox = decoration.getHitbox();
-        if (!isPixelInShortRect(x, y, hitbox)) {
-            return {};
-        }
-        const radius = 82;
-        // TODO: make this an ellipse instead of a circle.
-        const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
-        const r2 = dx*dx + dy*dy;
-        // The ring around the elevator is solid
-        if (r2 < radius * radius) {
-            return {solid: true};
-        }
-        return {};
-    },
-    getHitbox(decoration: Decoration): Rect {;
-        return getFrameHitbox(decoration, staffTowerFrame);
-    },
-};
-
 
 objectHash.decoration = Decoration;
 

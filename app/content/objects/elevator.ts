@@ -152,7 +152,6 @@ export class Elevator implements ObjectInstance {
         });
         appendScript(state, '{wait:1500}');
         appendCallback(state, (state: GameState) => {
-            console.log('fall!');
             this.specialStatus = 'falling';
             state.screenShakes.push({
                 dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 500

@@ -145,8 +145,6 @@ export function enterLocation(
     state.hotLevel = state.areaSection.isHot ? 1 : 0;
     fixCamera(state);
     checkToUpdateSpawnLocation(state);
-    // Make sure the actor is shown as swimming/wading during the transition frames.
-    checkForFloorEffects(state, state.hero);
     setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);
     for (const object of [...state.areaInstance.objects, ...state.areaInstance.effects]) {
@@ -158,4 +156,6 @@ export function enterLocation(
         editingState.needsRefresh = true;
     }
     callback?.();
+    // Make sure the actor is shown as swimming/wading during the transition frames.
+    checkForFloorEffects(state, state.hero);
 }

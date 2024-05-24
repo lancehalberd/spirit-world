@@ -11,6 +11,7 @@ import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, update
 import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
+import { getFieldInstanceAndParts } from 'app/utils/objects';
 
 // This is the max size of the spirit sight circle.
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
@@ -135,7 +136,7 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
     }
     area.objectsToRender = [];
     for (const object of [...area?.objects || [], ...area?.effects || []]) {
-        for (const part of [object, ...(object.getParts?.(state) || [])]) {
+        for (const part of getFieldInstanceAndParts(state, object)) {
             // Invisible objects are not rendered unless the hero has true sight.
             if (!editingState.isEditing && !state.hero.savedData.passiveTools.trueSight && object.definition?.isInvisible) {
                 continue;
@@ -158,7 +159,7 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
     // Also include anything from the alternate area that has an `alternateRender*` method defined.
     // For example, Vanara NPCs render faint spirits in the alternate world.
     for (const object of [...area?.alternateArea?.objects || [], ...area?.alternateArea?.effects || []]) {
-        for (const part of [object, ...(object.getParts?.(state) || [])]) {
+        for (const part of getFieldInstanceAndParts(state, object)) {
             // Invisible objects are not rendered unless the hero has true sight.
             if (!editingState.isEditing && !state.hero.savedData.passiveTools.trueSight && object.definition?.isInvisible) {
                 continue;

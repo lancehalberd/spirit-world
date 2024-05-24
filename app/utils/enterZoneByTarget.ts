@@ -32,7 +32,7 @@ export function enterZoneByTarget(
         return false;
     }
     enterLocation(state, objectLocation, instant, () => {
-        const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]);
+        const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]);
         if (target?.getHitbox) {
             const hitbox = target.getHitbox(state);
             state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
@@ -140,7 +140,7 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
     const hero = state.hero;
     hero.isUsingDoor = true;
     hero.isExitingDoor = true;
-    const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]) as Door;
+    const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]) as Door;
     if (!target){
         console.error(state.areaInstance.objects);
         console.error(targetObjectId);
@@ -193,12 +193,19 @@ function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjec
     hero.y--;
 }
 
-function findEntranceById(areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {
+function findEntranceById(state: GameState, areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {
     for (const object of areaInstance.objects) {
         if (!object.definition || skippedDefinitions?.includes(object.definition)) {
             continue;
         }
-        if (object.definition.type !== 'enemy' && object.definition.type !== 'boss' && object.definition.id === id) {
+        if (object.definition.type !== 'enemy'
+            && object.definition.type !== 'boss'
+            && object.definition.id === id
+        ) {
+            // The "staffTower" has a door subcomponent that should be targeted rather than the tower itself.
+            if (object.definition.type === 'staffTower') {
+                return object.getParts(state).find(object => object.definition?.id === id);
+            }
             return object;
         }
     }

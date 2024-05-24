@@ -6,7 +6,7 @@ import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { playSound } from 'app/musicController';
 import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrameHitbox } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { pad, boxesIntersect } from 'app/utils/index';
 import { setObjectFlag } from 'app/utils/objectFlags';
@@ -142,7 +142,7 @@ export class LootObject implements ObjectInstance {
         this.behaviors = { brightness: 0, lightRadius: 0 };
     }
     getHitbox(state?: GameState) {
-        return getFrameHitBox(this.frame, this);
+        return getFrameHitbox(this.frame, this);
     }
     update(state: GameState) {
         if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {

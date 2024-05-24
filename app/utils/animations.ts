@@ -149,7 +149,19 @@ export function drawFrameCenteredAt(
         tx | 0, ty | 0, w | 0, h | 0);
 }
 
-export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: number}): Rect {
+export function drawFrameContentAt(
+    context: CanvasRenderingContext2D,
+    frame: Frame,
+    {x, y, z}: {x: number, y: number, z?: number}
+): void {
+    drawFrame(context, frame, {
+        ...frame,
+        x: x - (frame.content?.x || 0),
+        y: y - (frame.content?.y || 0) - (z || 0),
+    });
+}
+
+export function getFrameHitbox({content, w, h}: Frame, {x, y}: {x: number, y: number}): Rect {
     return {
         x, y,
         w: content?.w ?? w,
