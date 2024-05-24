@@ -4,7 +4,6 @@ import { getCompositeBehaviors } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 import { getFieldInstanceAndParts } from 'app/utils/objects';
 
-// TODO: break ground under player if z <= 0 and they aren't rolling.
 export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (!hero.area) {
         return;

@@ -759,6 +759,24 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     return combinedResult;
 }
 
+export function breakBrittleTiles(state: GameState, area: AreaInstance, hitbox: Rect) {
+    const tiles = getTilesInRectangle(area, hitbox);
+    const behaviorGrid = area.behaviorGrid;
+    for (const {x, y} of tiles) {
+        let behaviors = behaviorGrid[y]?.[x];
+        if (!behaviors?.isBrittleGround) {
+            continue;
+        }
+        for (const layer of area.layers) {
+            const tile = layer.tiles[y]?.[x];
+            if (tile?.behaviors?.isBrittleGround) {
+                destroyTile(state, area, {x, y, layerKey: layer.key});
+                break;
+            }
+        }
+    }
+}
+
 export function isTargetHit(hitbox: Rect, hit: HitProperties): boolean {
     if (hit.hitCircle) {
         const r = hit.hitCircle.r;

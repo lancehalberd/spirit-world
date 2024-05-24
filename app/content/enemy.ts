@@ -9,14 +9,14 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
+import { renderEnemyShadow } from 'app/renderActor';
 import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
-import { getDirection } from 'app/utils/field';
-import { pad } from 'app/utils/index';
-import { renderEnemyShadow } from 'app/renderActor';
 import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
+import { breakBrittleTiles, getDirection } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import { isTargetVisible } from 'app/utils/target';
@@ -788,6 +788,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         // Checks if the enemy fell into a pit, for example
         checkForFloorEffects(state, this);
+        // Break brittle tiles under the enemy.
+        if (this.z <= 0) {
+            breakBrittleTiles(state, this.area, pad(this.getMovementHitbox(), -4));
+        }
     }
     getHealthPercent(state): number {
         if (this.enemyDefinition.getHealthPercent) {

@@ -15,6 +15,7 @@ import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndRelea
 import { removeAllClones, setNextAreaSection } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
 import {
+    breakBrittleTiles,
     directionMap,
 } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -126,6 +127,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // Mostly don't check for pits/damage when the player cannot control themselves
         if (!hero.isAstralProjection) {
             checkForFloorEffects(state, hero);
+            if (hero.z <= 0 && hero.action !== 'roll') {
+                // Pad the floor hitbox to prevent breaking floor tiles at the very edge
+                // of the hitbox.
+                breakBrittleTiles(state, hero.area, pad(hero.getFloorHitbox(), -4));
+            }
         }
     }
     updateGenericHeroState(state, hero);
