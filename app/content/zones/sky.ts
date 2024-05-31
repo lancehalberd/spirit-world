@@ -1608,7 +1608,7 @@ const f0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closed", id: "staffTowerSkyEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
+        {status: "closed", id: "staffTowerSkyEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up", linked: true},
         {status: "normal", id: "hypeCaveEntrance", x: 448, y: 64, type: "door", style: "cavern", targetZone: "hypeCave", targetObjectId: "hypeCaveEntrance", d: "up"},
     ],
     sections: [
@@ -3562,9 +3562,9 @@ const sf0_2x1: AreaDefinition = {
                     [561,565,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,189],
                     [590,607,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,189],
                     [596,612,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,189],
-                    [602,617,1008,1008,1008,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1008,189],
-                    [0,1008,1008,1008,1008,1008,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1008,189],
-                    [0,1,1008,1008,1008,1008,1008,1008,1008,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189],
+                    [602,617,1008,1008,1008,1008,1008,1,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1008,189],
+                    [0,1008,1008,1008,1008,1008,1008,1,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1008,189],
+                    [0,1,1008,1008,1008,1008,1008,1008,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189],
                     [0,0,0,0,0,0,0,1008,1008,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189],
                     [0,0,0,0,0,0,0,0,1008,1008,1008,1008,1008,1008,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189],
@@ -3659,8 +3659,8 @@ const sf0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "stone", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up"},
         {status: "normal", id: "hypeCaveEntranceSpirit", x: 448, y: 64, type: "door", style: "cavern", targetZone: "hypeCave", targetObjectId: "hypeCaveEntranceSpirit", d: "up"},
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 14, mapId: 'skySpirit', floorId: '1F', mapX: 4, mapY: 2},

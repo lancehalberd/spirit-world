@@ -161,7 +161,8 @@ export class Spark implements EffectInstance, Props {
 
 export function addRadialSparks(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Coords, count: number, thetaOffset = 0, speed = 4, damage = 1
+    [x, y]: Coords, count: number, thetaOffset = 0, speed = 4,
+    extraProps?: Partial<Props>
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
@@ -172,8 +173,8 @@ export function addRadialSparks(this: void,
             y,
             vx: speed * dx,
             vy: speed * dy,
-            damage,
             ttl: 1000,
+            ...extraProps,
         });
         addEffectToArea(state, area, spark);
     }
@@ -181,7 +182,8 @@ export function addRadialSparks(this: void,
 
 export function addArcOfSparks(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
+    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4,
+    extraProps?: Partial<Props>
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = count === 1
@@ -195,6 +197,7 @@ export function addArcOfSparks(this: void,
             vx: 4 * dx,
             vy: 4 * dy,
             ttl: 1000,
+            ...extraProps,
         });
         addEffectToArea(state, area, spark);
     }

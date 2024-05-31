@@ -72,6 +72,15 @@ const angledPit: TileSource = {
     source: requireFrame(futuristicImage, {x: 688, y: 16, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor', pit: true },
+        '0x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '1x0': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '2x0': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '3x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+
+        '0x2': { defaultLayer: 'floor', pit: true, pitWall: true },
+        '1x1': { defaultLayer: 'floor', pit: true, pitWall: true },
+        '2x1': { defaultLayer: 'floor', pit: true, pitWall: true },
+        '3x2': { defaultLayer: 'floor', pit: true, pitWall: true },
     },
     tileCoordinates: [
                 [1, 0], [2, 0],

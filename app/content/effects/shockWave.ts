@@ -9,15 +9,16 @@ const geometry = {w: 8, h: 16};
 const shockWaveAnimation = createAnimation('gfx/effects/shockwave.png', geometry, {cols: 4, duration: 2});
 
 interface Props {
-    x: number,
-    y: number,
-    z?: number,
-    damage?: number,
-    vx?: number,
-    vy?: number,
-    vz?: number,
-    az?: number,
-    ttl?: number,
+    x: number
+    y: number
+    z?: number
+    damage?: number
+    vx?: number
+    vy?: number
+    vz?: number
+    az?: number
+    ttl?: number
+    delay?: number
 }
 
 export class ShockWave implements EffectInstance, Props {
@@ -38,7 +39,8 @@ export class ShockWave implements EffectInstance, Props {
     animationTime = 0;
     speed = 0;
     ttl: number;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, ttl = 2000}: Props) {
+    delay: number;
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, ttl = 2000, delay = 0}: Props) {
         this.damage = damage;
         this.x = x;
         this.y = y;
@@ -48,8 +50,13 @@ export class ShockWave implements EffectInstance, Props {
         this.vz = vz;
         this.az = az;
         this.ttl = ttl;
+        this.delay = delay;
     }
     update(state: GameState) {
+        if (this.delay > 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
         this.x += this.vx;
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
@@ -82,7 +89,8 @@ export class ShockWave implements EffectInstance, Props {
 
 export function addRadialShockWaves(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Coords, count: number, thetaOffset = 0
+    [x, y]: Coords, count: number, thetaOffset = 0,
+    extraProps?: Partial<Props>
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
@@ -94,6 +102,7 @@ export function addRadialShockWaves(this: void,
             vx: 4 * dx,
             vy: 4 * dy,
             ttl: 1000,
+            ...extraProps,
         });
         addEffectToArea(state, area, shockWave);
     }
@@ -101,7 +110,8 @@ export function addRadialShockWaves(this: void,
 
 export function addArcOfShockWaves(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
+    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4,
+    extraProps?: Partial<Props>
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = count === 1
@@ -115,6 +125,7 @@ export function addArcOfShockWaves(this: void,
             vx: 4 * dx,
             vy: 4 * dy,
             ttl: 1000,
+            ...extraProps,
         });
         addEffectToArea(state, area, shockWave);
     }

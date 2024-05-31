@@ -1,29 +1,39 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
+import { drawFrame, drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { allImagesLoaded } from 'app/utils/images';
 import { isPixelInShortRect } from 'app/utils/index';
 import { requireFrame } from 'app/utils/packedImages';
 
-//const staffTowerFrame = requireFrame('gfx/objects/staffTower.png', {x: 26, y: 17, w: 172, h: 239, content: {x: 0, y: 72, w: 172, h: 167}});
-const staffTowerFrame = requireFrame('gfx/objects/staffTower.png', {x: 234, y: 17, w: 172, h: 241, content: {x: 0, y: 72, w: 172, h: 167}});
-const staffTowerMaskFrame = requireFrame('gfx/objects/staffTower.png', {x: 442, y: 17, w: 172, h: 241, content: {x: 0, y: 72, w: 172, h: 167}});
-
+const staffTowerFrame = requireFrame('gfx/objects/staffTower.png', {x: 234, y: 17, w: 172, h: 240, content: {x: 0, y: 72, w: 172, h: 167}});
+const staffTowerMaskFrame = requireFrame('gfx/objects/staffTower.png', {x: 442, y: 17, w: 172, h: 240, content: {x: 0, y: 72, w: 172, h: 167}});
 const staffTowerCloudFrame = requireFrame('gfx/objects/staffTower.png', {x: 851, y: 266, w: 186, h: 141});
-
-//const staffTowerSkyFrame = requireFrame('gfx/objects/staffTower.png', {x: 26, y: 273, w: 172, h: 239, content: {x: 0, y: 72, w: 172, h: 167}});
-const staffTowerSkyFrame = requireFrame('gfx/objects/staffTower.png', {x: 234, y: 273, w: 172, h: 241, content: {x: 0, y: 72, w: 172, h: 167}});
+const staffTowerSkyFrame = requireFrame('gfx/objects/staffTower.png', {x: 234, y: 273, w: 172, h: 272, content: {x: 0, y: 72, w: 172, h: 167}});
 const staffTowerSkyMaskFrame = requireFrame('gfx/objects/staffTower.png', {x: 442, y: 273, w: 172, h: 272, content: {x: 0, y: 72, w: 172, h: 167}});
-
 const staffTowerSkyBalconyFrame = requireFrame('gfx/objects/staffTower.png', {x: 672, y: 493, w: 128, h: 82});
-const staffTowerSkyBottomFrame = requireFrame('gfx/objects/staffTower.png', {x: 234, y: 612, w: 172, h: 93});
+
+const staffTowerSpiritFrame = requireFrame('gfx/objects/staffTower.png', {x: 26, y: 17, w: 172, h: 240, content: {x: 0, y: 72, w: 172, h: 167}});
+const staffTowerSpiritMaskFrame = staffTowerMaskFrame;
+const staffTowerSpiritSkyFrame = requireFrame('gfx/objects/staffTower.png', {x: 26, y: 273, w: 172, h: 240, content: {x: 0, y: 72, w: 172, h: 167}});
+const staffTowerSpiritSkyMaskFrame = staffTowerMaskFrame;
+const staffTowerSpiritSkyBalconyFrame = requireFrame('gfx/objects/staffTower.png', {x: 880, y: 493, w: 128, h: 75});
+
+const [maskCanvas, maskContext] = createCanvasAndContext(staffTowerSkyMaskFrame.w, staffTowerSkyMaskFrame.h);
+const [glowCanvas, glowContext] = createCanvasAndContext(staffTowerSkyMaskFrame.w, staffTowerSkyMaskFrame.h);
+
 // TODO: Update entrance randomizer to treat 'staffTower' objects like doors.
 // TODO: Fix MC renders over the door frame when exiting the tower.
 //       Remove the "doorTop" as a separate component.
 //       If the hero is using the door, set the door as the renderParent, and then render the door top after them.
 // TOOO: Add terminal as tower part on the ground level and use it to tear down+setup tower.
+// TODO: Tower should block projectiles. (add x/y coords to projectile behaviors checks)
+// TODO: Shadow is hidden under balcony because it is drawn in sprite frame to be in front of the tower.
+//       Possible fix: make hero a renderChild of the balcony when the hero is standing on it.
+// TODO: Try rendering the top of the tower at ground level using a transparent filter near the top:
+//        -> Do not render the top ~40 pixels of the tower at all.
+//        -> Render the cloud using a solid -> transparent gradient over the top 40 pixels so the cloud fades out
 export class StaffTower implements ObjectInstance {
     area: AreaInstance;
     definition: EntranceDefinition;
@@ -90,7 +100,7 @@ export class StaffTower implements ObjectInstance {
         this.door.update(state);
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
-        if (this.definition.style === 'sky') {
+        if (this.definition.style === 'sky' || this.definition.spirit) {
             return;
         }
         drawFrameContentAt(context, staffTowerCloudFrame, {x: this.x - 8, y: this.y - 80});
@@ -99,18 +109,67 @@ export class StaffTower implements ObjectInstance {
         // TODO: Use this mask to draw composite effets for the tower lights.
         // Matt grey or black when the tower is off.
         // shifting patterns of white and blue when it is on.
+        let maskFrame = staffTowerMaskFrame;
         if (this.definition.style === 'sky') {
-            // drawFrameContentAt(context, staffTowerSkyMaskFrame, this);
-            drawFrameContentAt(context, staffTowerSkyFrame, this);
+            maskFrame = this.definition.spirit ? staffTowerSpiritSkyMaskFrame : staffTowerSkyMaskFrame;
         } else {
-            drawFrameContentAt(context, staffTowerMaskFrame, this);
-            drawFrameContentAt(context, staffTowerFrame, this);
+            maskFrame = this.definition.spirit ? staffTowerSpiritMaskFrame : staffTowerMaskFrame;
+        }
+        maskContext.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+        maskContext.globalCompositeOperation = 'source-over';
+        drawFrame(maskContext, maskFrame, {...maskFrame, x: 0, y: 0});
+        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+        //const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
+        if (towerIsOn) {
+            maskContext.globalCompositeOperation = 'source-in';
+
+            // Just fade between white/black
+            //let n = ((this.animationTime / 100) % 30) | 0;
+            //if (n >= 15) n = 30 - n;
+            //const c = '0123456789ABCDEF'[Math.floor(n)];
+            //glowContext.fillStyle = `#${c}${c}${c}`;
+            const h = 111;
+
+            for (let y = 90, i = 0; y < maskFrame.h; y += h, i++) {
+                const backgroundColor = this.definition.spirit ? '#80F': 'black';
+
+                const r = this.definition.spirit ? 40 : 40;
+                let p = ((this.animationTime + 1000 * i) % 2000) / 2000;
+                p = (1 - Math.cos(p * Math.PI)) / 2;
+                const center = (maskFrame.w + r) * p;
+                const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
+                gradient.addColorStop(0, backgroundColor);
+                // purple: '#A0F'
+                gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
+                gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
+                gradient.addColorStop(0.54, backgroundColor);
+                glowContext.fillStyle = gradient;
+                glowContext.beginPath();
+                glowContext.fillRect(0, y, maskFrame.w, h);
+            }
+            drawFrame(maskContext, {...maskFrame, image: glowCanvas, x: 0, y: 0}, {...maskFrame, x: 0, y: 0});
+        }
+        drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);
+        //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
+        if (this.definition.style === 'sky') {
+            if (this.definition.spirit) {
+                drawFrameContentAt(context, staffTowerSpiritSkyFrame, this);
+            } else {
+                drawFrameContentAt(context, staffTowerSkyFrame, this);
+            }
+            this.balcony.render(context, state);
+        } else {
+            if (this.definition.spirit) {
+                drawFrameContentAt(context, staffTowerSpiritFrame, this);
+            } else {
+                drawFrameContentAt(context, staffTowerFrame, this);
+            }
         }
         this.door.render(context, state);
     }
 }
 
-const [/*balconyCanvas*/, balconyContext] = createCanvasAndContext(staffTowerSkyBalconyFrame.w, staffTowerSkyBalconyFrame.h)
+const [/*balconyCanvas*/, balconyContext] = createCanvasAndContext(staffTowerSkyBalconyFrame.w, staffTowerSkyBalconyFrame.h);
 const createHorizontalBelt = async () => {
     await allImagesLoaded();
     drawFrameContentAt(balconyContext, staffTowerSkyBalconyFrame, {x: 0, y: 0});
@@ -126,21 +185,33 @@ export class Balcony implements ObjectInstance {
     drawPriority: 'background' = 'background';
     status: ObjectStatus;
     x: number = this.staffTower.x + 22;
+    // Because the 'isGround' behavior ignores solid walls, this position has to be exact
+    // to prevent the hero from being able to enter the door when it is closed.
     y: number = this.staffTower.y + 149;
     ignorePits = true;
     isObject = <const>true;
+    renderParent = this.staffTower;
     constructor(public staffTower: StaffTower) {}
     getHitbox(): Rect {
         return getFrameHitbox(staffTowerSkyBalconyFrame, this);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameContentAt(context, staffTowerSkyMaskFrame, this.staffTower);
-        drawFrameContentAt(context, staffTowerSkyBottomFrame, {x: this.staffTower.x, y: this.staffTower.y + 106});
-        drawFrameContentAt(context, staffTowerSkyBalconyFrame, this);
+        if (this.staffTower.definition.spirit) {
+            drawFrameContentAt(context, staffTowerSpiritSkyBalconyFrame, this);
+        } else {
+            drawFrameContentAt(context, staffTowerSkyBalconyFrame, this);
+        }
     }
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors {
         if (typeof x === 'undefined') {
             return {isGround: true, groundHeight: 1};
+        }
+        // If we have to adjust the graphics, we might use the below code to prevent moving through the tower
+        // the exact number might need to be adjusted depending on the relative position of the balcony.
+        // This prevents overriding the behavior of the tower+door, otherwise this would let you walk
+        // through the tower+solid parts of the door.
+        if (y < this.y + 22) {
+            return {};
         }
         //console.log(x, y);
         //console.log(x - this.x, y -this.y, balconyContext.getImageData(x - this.x, y -this.y, 1, 1).data);
@@ -151,22 +222,12 @@ export class Balcony implements ObjectInstance {
             return {isGround: true, groundHeight: 1};
         }
         if (alpha) {
+            if (this.staffTower.definition.spirit) {
+                return {};
+            }
             return {pit: true, pitWall: true};
         }
         return {};
-        //debugger;
-        // TODO: if x+y are defined, base this all on pixel value of the balcony graphic
-        // for the spirit world, which just contains the floor graphics (and not the soutern lip/edge of the balcony).
-        const hitbox = this.getHitbox();
-        // This prevents overriding the behavior of the tower+door, otherwise this would let you walk
-        // through the tower+solid parts of the door.
-        if (y < this.y + 22) {
-            return {};
-        }
-        if (!isPixelInShortRect(x, y, hitbox)) {
-            return {};
-        }
-        return {isGround: true, groundHeight: 1};
     }
 }
 

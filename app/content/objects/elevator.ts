@@ -8,6 +8,7 @@ import { renderHeroShadow } from 'app/renderActor';
 import { appendCallback, appendScript } from 'app/scriptEvents';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { setAreaSection } from 'app/utils/area';
+import { playAreaSound } from 'app/musicController';
 import { createCanvasAndContext, drawCanvas, debugCanvas } from 'app/utils/canvas';
 import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
@@ -129,6 +130,7 @@ export class Elevator implements ObjectInstance {
         state.hero.savedData.equippedBoots = 'leatherBoots';
         appendCallback(state, (state: GameState) => {
             this.elevatorY = -4;
+            playAreaSound(state, this.area, 'bossDeath');
             state.screenShakes.push({
                 dx: 0, dy: 1, startTime: state.fieldTime, endTime: state.fieldTime + 500
             });
@@ -141,6 +143,7 @@ export class Elevator implements ObjectInstance {
         appendScript(state, '{wait:1000}');
         appendCallback(state, (state: GameState) => {
             this.elevatorY -= 12;
+            playAreaSound(state, this.area, 'bossDeath');
             state.screenShakes.push({
                 dx: 0, dy: 1, startTime: state.fieldTime, endTime: state.fieldTime + 500
             });
@@ -153,6 +156,7 @@ export class Elevator implements ObjectInstance {
         appendScript(state, '{wait:1500}');
         appendCallback(state, (state: GameState) => {
             this.specialStatus = 'falling';
+            playAreaSound(state, this.area, 'bossDeath');
             state.screenShakes.push({
                 dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 500
             });

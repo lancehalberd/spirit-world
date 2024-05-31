@@ -15,7 +15,7 @@ export function moveEnemyToTargetLocation(
     movementProperties?: MovementProperties
 ): number {
     movementProperties = movementProperties ?? {};
-    const hitbox = enemy.getHitbox(state);
+    const hitbox = enemy.getMovementHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
         enemy.d = getDirection(dx, dy);
@@ -159,7 +159,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
     //const behaviorGrid = enemy.area.behaviorGrid;
     //const tileSize = 16;
 
-    const hitbox = enemy.getHitbox(state);
+    const hitbox = enemy.getMovementHitbox();
     /*let leftColumn = Math.floor((hitbox.x + 6) / tileSize);
     let rightColumn = Math.floor((hitbox.x + hitbox.w - 7) / tileSize);
     let topRow = Math.floor((hitbox.y + 6) / tileSize);
@@ -199,7 +199,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
 }
 
 function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
-    const hitbox = enemy.getHitbox(state);
+    const hitbox = enemy.getMovementHitbox();
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;
     const tx = (x / 16) | 0;
@@ -215,7 +215,7 @@ function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
 }
 
 function makeEnemyFallIntoWater(state: GameState, enemy: Enemy) {
-    const hitbox = enemy.getHitbox(state);
+    const hitbox = enemy.getMovementHitbox();
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;
     const tx = (x / 16) | 0;
@@ -232,7 +232,7 @@ function makeEnemyFallIntoWater(state: GameState, enemy: Enemy) {
 
 export function hasEnemyLeftSection(state: GameState, enemy: Enemy, padding = 32): boolean {
     const { section } = getAreaSize(state);
-    const hitbox = enemy.getHitbox(state);
+    const hitbox = enemy.getMovementHitbox();
     return (enemy.vx < 0 && hitbox.x + hitbox.w < section.x - padding)
         || (enemy.vx > 0 && hitbox.x > section.x + section.w + padding)
         || (enemy.vy < 0 && hitbox.y + hitbox.h < section.y - padding)
@@ -291,4 +291,12 @@ function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number,
         return {mx: dx, my: dy};
     }
     return moveActor(state, enemy, dx, dy, movementProperties);
+}
+
+export function isEnemyDefeated(enemy: Enemy): boolean {
+    return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
+}
+
+export function isEnemyMissing(area: AreaInstance, enemy: Enemy): boolean {
+    return enemy?.area !== area || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }

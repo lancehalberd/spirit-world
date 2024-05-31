@@ -238,7 +238,7 @@ function useSpinningSparkAttack(state: GameState, enemy: Enemy): void {
     if (enemy.modeTime % 400 === 0) {
         enemy.params.sparkTheta = (enemy.params.sparkTheta || 0) + Math.PI / 24;
         const hitbox = enemy.getHitbox();
-        addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, 4);
+        addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, {damage: 4});
     }
 }
 

@@ -16,6 +16,7 @@ import {
 } from 'app/render/heroAnimations';
 
 const shallowGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+export const largeShadowFrame: Frame = createAnimation('gfx/largeShadow.png', { w: 32, h: 16 }).frames[0];
 export const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 export const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeometry, {cols: 3, duration: 10});
@@ -303,9 +304,32 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
 }
 
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    const frame = enemy.z >= 4 ? smallShadowFrame : shadowFrame;
     const hitbox = enemy.getHitbox(state);
-    const shadowScale = Math.round(hitbox.w / shadowFrame.w);
+    if (enemy.w > 0) {
+        context.save();
+            context.globalAlpha *= 0.6;
+            context.fillStyle = 'black';
+            const cx = hitbox.x + hitbox.w / 2;
+            const cy = hitbox.y + (enemy.z | 0) + hitbox.h - hitbox.w / 4;
+            context.translate(cx, cy);
+            context.scale(1, 0.5);
+            const scale = Math.max(0.6, 0.97 ** (enemy.z * 16 / hitbox.w));
+            context.globalAlpha *= scale;
+            context.scale(0.95 * scale, 0.95 * scale);
+            context.beginPath();
+            context.arc(0, 0, hitbox.w / 2, 0, Math.PI * 2);
+            context.fill();
+        context.restore();
+        return;
+    }
+
+    let frame = shadowFrame;
+    if (hitbox.w >= 32) {
+        frame = largeShadowFrame;
+    } else if (hitbox.w < 24 && enemy.z >= 4) {
+        frame = smallShadowFrame;
+    }
+    const shadowScale = Math.max(1, Math.floor(hitbox.w / frame.w));
     const target = {
         x: hitbox.x + (hitbox.w - frame.w * shadowScale) / 2,
         y: hitbox.y + hitbox.h - frame.h * shadowScale + enemy.z, // - 3 * enemy.scale,

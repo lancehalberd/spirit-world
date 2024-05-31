@@ -313,7 +313,7 @@ dialogueHash.forgeArmorSmith = {
     key: 'forgeArmorSmith',
     mappedOptions: {
         upgrade: (state: GameState) => {
-            const textParts = ['I can upgrade your equipment for 100 Jade and some Gold Ore.', '{choice:Upgrade Equipment?'];
+            const textParts = ['I can upgrade your equipment for 200 Jade and some Gold Ore.', '{choice:Upgrade Equipment?'];
             if (isLogicValid(state, canUpgradeCloudBoots)) {
                 textParts.push('|Cloud Boots:forgeArmorSmith.chooseCloudBoots');
             }

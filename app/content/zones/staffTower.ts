@@ -986,10 +986,11 @@ const sf0_0x1: AreaDefinition = {
     parentDefinition: f0_0x1,
     layers: null,
     objects: [
-        {status: "normal", id: "elevatorFixed", x: 304, y: 204, type: "boss", enemyType: "superSquirrel", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "elevatorFixed", x: 296, y: 208, type: "boss", enemyType: "largeOrb", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritBasementLadder", x: 192, y: 112, type: "door", style: "ladderUpTall", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "up", customLogic: "elevatorDropped", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}, locationCue: "Tower B1"},
         {status: "normal", id: "", x: 264, y: 324, type: "elevator", floor: 0, specialBehaviorKey: "staffTowerElevator"},
         {status: "normal", id: "", x: 312, y: 464, type: "door", style: "ladderUp", d: "down", linked: true, spirit: true},
+        {status: "normal", id: "elevatorFixed", x: 152, y: 376, type: "boss", enemyType: "largeOrb", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 446, mapId: 'staffTower', floorId: 'B1', mapX: 3, mapY: 2},

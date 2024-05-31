@@ -48,7 +48,7 @@ export const enemyTypes = <const>[
     'lightningDrone',
     'luckyBeetle',
     'plant', 'plantFlame', 'plantFrost', 'plantStorm',
-    'smallOrb', 'mediumOrb',
+    'smallOrb', 'largeOrb',
     'sentryBot',
     'snake', 'snakeFlame', 'snakeFrost', 'snakeStorm',
     'squirrel', 'squirrelFlame', 'squirrelFrost', 'squirrelStorm',
