@@ -71,7 +71,6 @@ export class Elevator implements ObjectInstance {
     callTerminal: ElevatorCallTerminal;
     controlTerminal: ElevatorControlTerminal;
     targetDelta = 0;
-    // rings: ElevatorRing[];
     constructor(state: GameState, definition: ElevatorDefinition) {
         this.definition = definition;
         this.status = definition.status;
@@ -88,11 +87,6 @@ export class Elevator implements ObjectInstance {
         //console.log('new Elevator', this.definition.floor, '?', elevatorFloor, '=', this.floorDelta);
         this.callTerminal = new ElevatorCallTerminal(this);
         this.controlTerminal = new ElevatorControlTerminal(this);
-        /*this.rings = [
-            new ElevatorRing(this, 48, 0),
-            new ElevatorRing(this, 96, Math.PI / 2),
-            new ElevatorRing(this, 144, Math.PI),
-        ];*/
     }
     getParts() {
         const parts: ObjectInstance[] = [this.callTerminal];
@@ -110,20 +104,8 @@ export class Elevator implements ObjectInstance {
         state.hero.action = null;
         state.hero.isControlledByObject = true;
         this.targetDelta = floor - this.definition.floor;
-                    /*
-                    {playSound:switch}
-                    {flag:elevatorClosed}
-                    {wait:200}
-                    {startScreenShake:1:0:elevator}
-                    {wait:1500}
-                    {stopScreenShake:elevator}
-                    {wait:200}
-                    {playSound:switch}
-                    {clearFlag:elevatorClosed}
-                    {flag:elevatorFloor=${i}}*/
     }
     fallToBasement(state: GameState) {
-        console.log('Fall to basement');
         appendScript(state, '{playSound:switch}{wait:500}');
         // Hack: Force leather boots on to prevent the player from sliding.
         const boots = state.hero.savedData.equippedBoots;
@@ -259,6 +241,16 @@ export class Elevator implements ObjectInstance {
         this.callTerminal.update(state);
         this.controlTerminal.update(state);
     }
+    renderHero(context: CanvasRenderingContext2D, state: GameState) {
+        if (state.hero.renderParent === this) {
+            // Need to force the shadow to move up/down with the elavator
+            context.save();
+                context.translate(0, -this.elevatorY);
+                renderHeroShadow(context, state, state.hero);
+            context.restore();
+            state.hero.render(context, state);
+        }
+    }
     render(context: CanvasRenderingContext2D, state: GameState) {
         /*const {x,y,w,h} = this.getHitbox();
         context.fillStyle = 'red';
@@ -279,13 +271,7 @@ export class Elevator implements ObjectInstance {
                 maskedContext.save();
                     maskedContext.translate(-this.x, -this.y);
                     this.controlTerminal.render(maskedContext, state);
-                    if (state.hero.renderParent === this) {
-                        // Need to force the shadow to move up/down with the elavator
-                        maskedContext.translate(0, -this.elevatorY);
-                            renderHeroShadow(maskedContext, state, state.hero)
-                        maskedContext.translate(0, this.elevatorY);
-                        state.hero.render(maskedContext, state);
-                    }
+                    this.renderHero(maskedContext, state);
                 maskedContext.restore();
                 maskContext.clearRect(0, 0, maskFrame.w, maskFrame.h);
                 maskContext.globalCompositeOperation = 'source-over';
@@ -337,14 +323,7 @@ export class Elevator implements ObjectInstance {
             if (this.elevatorY > 24) {
                 drawFrame(context, platform, {...floorPit, x: this.x, y: this.y - this.elevatorY});
                 this.controlTerminal.render(context, state);
-                if (state.hero.renderParent === this) {
-                    // Need to force the shadow to move up/down with the elavator
-                    context.save();
-                        context.translate(0, -this.elevatorY);
-                        renderHeroShadow(context, state, state.hero)
-                    context.restore();
-                    state.hero.render(context, state);
-                }
+                this.renderHero(context, state);
             }
         }
         for (const y of ringYs) {
@@ -525,70 +504,6 @@ class ElevatorCallTerminal implements ObjectInstance {
         drawFrame(context, frame, {...frame, x: this.x, y: this.y});
     }
 }
-
-/*
-class ElevatorRing implements ObjectInstance {
-    area: AreaInstance;
-    behaviors: TileBehaviors;
-    offsetX: number = 0;
-    offsetY: number = 0;
-    definition: ElevatorDefinition;
-    drawPriority: DrawPriority = 'foreground';
-    isObject = <const>true;
-    isNeutralTarget = true;
-    pattern: CanvasPattern;
-    status: ObjectStatus = 'normal';
-    elevatorY = 0;
-    x = this.elevator.x;
-    y = this.elevator.y;
-    z = this.zOffset;
-    back = new ElevatorRingBack(this);
-    constructor(public elevator: Elevator, public zOffset: number, public timeOffset: number) {
-    }
-    update() {
-        this.z = this.zOffset + Math.sin(this.timeOffset + this.elevator.animationTime / 400);
-    }
-    getParts() {
-        return []
-    }
-    render() {
-
-    }
-}
-
-class ElevatorRingBack implements ObjectInstance {
-    area: AreaInstance;
-    behaviors: TileBehaviors;
-    offsetX: number = 0;
-    offsetY: number = 0;
-    definition: ElevatorDefinition;
-    drawPriority: DrawPriority = 'foreground';
-    isObject = <const>true;
-    isNeutralTarget = true;
-    pattern: CanvasPattern;
-    status: ObjectStatus = 'normal';
-    elevatorY = 0;
-    x = 0;
-    y = 0;
-    z =
-    constructor(public ring: ElevatorRing) {
-    }
-    update() {
-        this.y =
-    }
-
-    getYDepth() {
-        return
-    }
-    render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrame(context, floorPit, {...floorPit, x: this.x, y: this.y});
-        if (this.elevatorY === 0) {
-            drawFrame(context, platformInFloor, {...floorPit, x: this.x, y: this.y});
-        }
-    }
-}*/
-
-
 
 export function enterZoneByElevator(
     this: void,

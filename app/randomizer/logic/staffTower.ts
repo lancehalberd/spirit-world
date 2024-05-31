@@ -1,21 +1,29 @@
 import {
     andLogic,
+    canCross2Gaps,
+    canCrossDynamic2Gaps,
     canCrossDynamic4Gaps,
+    canCrossLightningBarriers,
+    canHasTowerStaff,
+    canMoveHeavyStairs,
+    canRemoveLightStones,
     hasReleasedBeasts,
     hasBossWeapon,
     hasCloudBoots,
     hasClone,
     hasIce,
     hasLightning,
-    hasRoll,
+    hasInvisibility,
     hasSomersault,
-    hasStaff,
     hasTeleportation,
+    hasWeapon,
     orLogic,
 } from 'app/content/logic';
 
 
-const hasDroppedElevator = {requiredFlags: ['elevatorDropped']};
+const hasFixedElevator = {requiredFlags: ['elevatorFixed']};
+// There are many ways to get over the fast escalators.
+const canCrossEscalators = orLogic(canHasTowerStaff, hasIce, hasCloudBoots, hasSomersault, hasInvisibility);
 
 const zoneId = 'staffTower';
 export const staffTowerNodes: LogicNode[] = [
@@ -27,7 +35,7 @@ export const staffTowerNodes: LogicNode[] = [
             {objectId: 'staffTowerEntranceMoney'},
         ],
         paths: [
-            {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasIce, hasCloudBoots, hasClone, hasSomersault)}
+            {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasClone, canCrossEscalators)}
         ],
         entranceIds: ['staffTowerEntrance'],
         exits: [{objectId: 'staffTowerEntrance'}],
@@ -38,86 +46,148 @@ export const staffTowerNodes: LogicNode[] = [
         paths: [
             {nodeId: 'staffTowerF1Downstairs'},
             // Power is only on after the storm beast is released.
-            {nodeId: 'staffTowerF1Spirit', logic: hasReleasedBeasts},
+            {nodeId: 'staffTowerF1SpiritUpstairs', logic: hasReleasedBeasts},
         ],
         entranceIds: ['staffTowerBasementLadder'],
-        exits: [{objectId: 'staffTowerBasementLadder', logic: orLogic(hasLightning, hasDroppedElevator)}],
+        exits: [{objectId: 'staffTowerBasementLadder', logic: orLogic(hasLightning, hasFixedElevator)}],
     },
     {
         zoneId,
         nodeId: 'staffTowerB1',
         checks: [
+            // Lightning is required as the enemies are off+invulnerable after the boss is defeated.
+            // They must be hit with lightning to be turned on and defeated.
             { objectId: 'staffTowerGold', logic: andLogic(hasLightning, hasBossWeapon) },
         ],
         entranceIds: ['staffTowerBasementLadder'],
-        exits: [{objectId: 'staffTowerBasementLadder', logic: hasDroppedElevator}],
+        exits: [{objectId: 'staffTowerBasementLadder', logic: hasFixedElevator}],
     },
     {
         zoneId,
-        nodeId: 'staffTowerF1Spirit',
-        flags: [{flag: 'staffTowerSpiritEntrance'}],
+        nodeId: 'staffTowerF1SpiritUpstairs',
         paths: [
             // Power is only on after the storm beast is released.
             {nodeId: 'staffTowerF1Upstairs', logic: hasReleasedBeasts},
-            // Always in logic since this is the default tower location
-            {nodeId: 'mainSpiritWorld'},
-            // Other exits don't need logic since they have to already be in logic to move the tower to them.
+            {nodeId: 'staffTowerF1SpiritDownstairs'},
         ],
         entranceIds: ['staffTower1F2F', 'staffTowerSpiritEntrance'],
         exits: [{objectId: 'staffTower1F2F'}, {objectId: 'staffTowerSpiritEntrance'}],
     },
     {
         zoneId,
-        nodeId: 'staffTowerF2SpiritMain',
+        nodeId: 'staffTowerF1SpiritDownstairs',
+        flags: [{flag: 'staffTowerSpiritEntrance'}],
         paths: [
-            {nodeId: 'staffTowerF2'},
+            {nodeId: 'staffTowerF1SpiritUpstairs', logic: orLogic(hasClone, canCrossEscalators)},
+            // Always in logic since this is the default tower location
+            {nodeId: 'mainSpiritWorld'},
+            // Other exits don't need logic since they have to already be in logic to move the tower to them.
         ],
-        // This is one way entrance because of the cliff after the door.
+        entranceIds: ['staffTower1F2F', 'staffTowerSpiritEntrance', 'staffTowerLowerDoor'],
+        exits: [{objectId: 'staffTower1F2F'}, {objectId: 'staffTowerSpiritEntrance'}, {objectId: 'staffTowerLowerDoor'}],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF1SpiritKeyRoom',
+        checks: [{ objectId: 'staffTowerLowerKey', logic: hasWeapon }],
+        entranceIds: ['staffTowerLowerDoor'],
+        exits: [{objectId: 'staffTowerLowerDoor'}],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF2SpiritNorth',
+        paths: [
+            {nodeId: 'staffTowerF2SpiritSouth', logic: canRemoveLightStones},
+        ],
         entranceIds: ['staffTower1F2F'],
+        exits: [{objectId: 'staffTower1F2F'}],
     },
     {
         zoneId,
-        nodeId: 'staffTowerF2',
-        checks: [
-            { objectId: 'staffTowerMap', logic: orLogic(hasIce, hasStaff, hasCloudBoots, hasSomersault) },
-        ],
-        // This is blocked as an entrance because of the lightning barrier.
-        // Can eventually remove this and split the upper area and allow invisibility to move past the barrier.
-        exits: [{objectId: 'staffTower2F3F'}],
-    },
-    {
-        zoneId,
-        nodeId: 'staffTowerF3West',
-        checks: [
-            // You have to cross a 4 gap from a conveyer belt to reach this chest.
-            { objectId: 'staffTowerBigMoney1', logic: canCrossDynamic4Gaps },
-        ],
+        // Technically this is East+West+South, but the requirements all need gloves.
+        nodeId: 'staffTowerF2SpiritSouth',
         paths: [
-            {nodeId: 'staffTowerF3SpiritWest', logic: hasReleasedBeasts},
+            {nodeId: 'staffTowerF2SpiritNorth', logic: canRemoveLightStones},
+            {nodeId: 'staffTowerF2SpiritElevator', logic: canMoveHeavyStairs},
+            // Terminal is only on once the beasts are released
+            // The roll/escalator logic actually applies to leaving the area right after you use the terminal.
+            {nodeId: 'staffTowerF2', logic: andLogic(hasReleasedBeasts, orLogic(canCrossDynamic2Gaps, canCrossEscalators))},
         ],
-        entranceIds: ['staffTower2F3F'],
-    },
-    {
-        zoneId,
-        nodeId: 'staffTowerF3SpiritWest',
-        exits: [{objectId: 'tower3FPit'}],
     },
     {
         zoneId,
         nodeId: 'staffTowerF2SpiritElevator',
         paths: [
+            {nodeId: 'staffTowerF2SpiritSouth'},
             {nodeId: 'staffTowerB1Spirit', logic: hasReleasedBeasts},
         ],
         entranceIds: ['tower2FMarker'],
     },
     {
         zoneId,
-        nodeId: 'staffTowerB1Spirit',
+        nodeId: 'staffTowerF2SpiritMap',
+        checks: [{ objectId: 'staffTowerMap'}],
+        paths: [
+            {nodeId: 'staffTowerF2SpiritSouth', logic: canRemoveLightStones},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF2',
+        paths: [
+            // Terminal is only on once the beasts are released
+            {nodeId: 'staffTowerF2SpiritMap', logic: hasReleasedBeasts},
+            {nodeId: 'staffTowerF2Elevator', logic: canMoveHeavyStairs},
+        ],
+        entranceIds: ['staffTower2F3F'],
+        exits: [{objectId: 'staffTower2F3F'}],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF2Elevator',
+        checks: [{ objectId: 'staffTowerPeachPiece' }],
+        paths: [{nodeId: 'staffTowerF2'}],
+        entranceIds: ['tower2FMarker'],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF3',
         checks: [
-            { objectId: 'elevatorFixed', logic: andLogic(hasBossWeapon, hasRoll) },
+            // You have to cross a 4 gap from a conveyer belt to reach this chest.
+            { objectId: 'staffTowerBigMoney1', logic: canCrossDynamic4Gaps },
         ],
         paths: [
-            {nodeId: 'staffTowerF1Spirit', logic: hasBossWeapon},
+            // Terminal is off until the beasts are released.
+            // The weapon is required for defeating enemies after using the terminal
+            {nodeId: 'staffTowerF3Spirit', logic: andLogic(hasReleasedBeasts, canCrossDynamic2Gaps, hasWeapon)},
+        ],
+        entranceIds: ['staffTower2F3F'],
+        exits: [
+            {objectId: 'staffTower2F3F'},
+            {objectId: 'tower3FPit', logic: orLogic(hasIce, hasCloudBoots, hasSomersault, canHasTowerStaff)},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF3Spirit',
+        paths: [
+            // Terminal is off until the beasts are released, need to roll and defeat plants to reach terminal from door.
+            {nodeId: 'staffTowerF3', logic: andLogic(hasReleasedBeasts, canCross2Gaps, hasWeapon)},
+        ],
+        exits: [{objectId: 'staffTower3F4F'}, {objectId: 'tower3FPit', logic: hasWeapon}],
+        entranceIds: [
+            'staffTower3F4F',
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerB1Spirit',
+        checks: [
+            { objectId: 'elevatorFixed', logic: hasBossWeapon },
+        ],
+        paths: [
+            {nodeId: 'staffTowerF1SpiritDownstairs', logic: hasBossWeapon},
+            {nodeId: 'staffTowerF2SpiritElevator', logic: hasBossWeapon},
             {nodeId: 'staffTowerF3SpiritElevator', logic: hasBossWeapon},
             {nodeId: 'staffTowerF4Spirit', logic: hasBossWeapon},
             {nodeId: 'staffTowerF5SpiritElevator', logic: hasBossWeapon},
@@ -126,14 +196,24 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF3SpiritElevator',
-        checks: [
-            { objectId: 'staffTowerBigMoney2' },
+        checks: [ { objectId: 'staffTowerBigMoney2' }],
+        paths: [{nodeId: 'staffTowerF3Spirit'} ],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF4',
+        flags: [{flag: 'staffTowerSkyEntrance'}],
+        entranceIds: ['staffTowerSkyEntrance', 'staffTower4F5F'],
+        exits: [
+            {objectId: 'staffTowerSkyEntrance'},
+            {objectId: 'staffTower4F5F'},
         ],
     },
     {
         zoneId,
         nodeId: 'staffTowerF4Spirit',
         paths: [
+            // Terminal is off until the beasts are released.
             {nodeId: 'staffTowerF4', logic: hasReleasedBeasts},
         ],
         entranceIds: [
@@ -147,29 +227,37 @@ export const staffTowerNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'staffTowerF3SpiritEast',
-        paths: [
-            {nodeId: 'staffTowerF3East', logic: hasReleasedBeasts},
-        ],
-        entranceIds: ['staffTower3F4F'],
-        exits: [{objectId: 'staffTower3F4F'}],
-    },
-    {
-        zoneId,
-        nodeId: 'staffTowerF3East',
-        checks: [
-            // This doesn't require cloud boots after defeating the `stormBeast`, but that isn't capture here yet.
-            { objectId: 'staffTowerPeachPiece', logic: hasCloudBoots },
-        ],
-        paths: [
-            {nodeId: 'staffTowerF3West'},
-        ],
-    },
-    {
-        zoneId,
         nodeId: 'staffTowerF5SpiritElevator',
+        paths: [
+            // Terminal is off until the beasts are released.
+            {nodeId: 'staffTowerF5South', logic: hasReleasedBeasts},
+        ],
         exits: [
-            {objectId: 'staffTowerRoof', logic: andLogic(hasBossWeapon, hasStaff, orLogic(hasSomersault, hasTeleportation))},
+            // To reach the roof the player must use a terminal to travel to the material world and remove some stones.
+            // Then they must return to the spirit world and use teleportation to reach the ladder.
+            {objectId: 'staffTowerRoof', logic: andLogic(hasReleasedBeasts, hasTeleportation, canRemoveLightStones)},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF5North',
+        checks: [ { objectId: 'staffTowerUpperKey' }],
+        paths: [
+            // Terminal is off until the beasts are released.
+            {nodeId: 'staffTowerF5South', logic: canCrossLightningBarriers},
+        ],
+        entranceIds: ['staffTower4F5F'],
+        exits: [
+            {objectId: 'staffTower4F5F'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerF5South',
+        paths: [
+            {nodeId: 'staffTowerF5North', logic: canRemoveLightStones},
+            // Terminal is off until the beasts are released.
+            {nodeId: 'staffTowerF5SpiritElevator', logic: hasReleasedBeasts},
         ],
     },
     {
@@ -181,16 +269,5 @@ export const staffTowerNodes: LogicNode[] = [
             { objectId: 'stormBeast', logic: hasBossWeapon },
         ],
         entranceIds: ['staffTowerRoof'],
-    },
-    {
-        zoneId,
-        nodeId: 'staffTowerF4',
-        flags: [{flag: 'staffTowerSkyEntrance'}],
-        entranceIds: ['staffTowerSkyEntrance'],
-        exits: [
-            {objectId: 'staffTowerSkyEntrance'},
-        ],
-        // This leads to the terminal to acquire the staff, but there are no actual checks here, so I'm not filling this in for now.
-        // This also has the
     },
 ];

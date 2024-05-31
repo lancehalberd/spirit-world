@@ -23,17 +23,6 @@ const staffTowerSpiritSkyBalconyFrame = requireFrame('gfx/objects/staffTower.png
 const [maskCanvas, maskContext] = createCanvasAndContext(staffTowerSkyMaskFrame.w, staffTowerSkyMaskFrame.h);
 const [glowCanvas, glowContext] = createCanvasAndContext(staffTowerSkyMaskFrame.w, staffTowerSkyMaskFrame.h);
 
-// TODO: Update entrance randomizer to treat 'staffTower' objects like doors.
-// TODO: Fix MC renders over the door frame when exiting the tower.
-//       Remove the "doorTop" as a separate component.
-//       If the hero is using the door, set the door as the renderParent, and then render the door top after them.
-// TOOO: Add terminal as tower part on the ground level and use it to tear down+setup tower.
-// TODO: Tower should block projectiles. (add x/y coords to projectile behaviors checks)
-// TODO: Shadow is hidden under balcony because it is drawn in sprite frame to be in front of the tower.
-//       Possible fix: make hero a renderChild of the balcony when the hero is standing on it.
-// TODO: Try rendering the top of the tower at ground level using a transparent filter near the top:
-//        -> Do not render the top ~40 pixels of the tower at all.
-//        -> Render the cloud using a solid -> transparent gradient over the top 40 pixels so the cloud fades out
 export class StaffTower implements ObjectInstance {
     area: AreaInstance;
     definition: EntranceDefinition;

@@ -27,7 +27,11 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             topBehaviors.push(behaviors);
         }
     }
-    hero.z = Math.max(hero.z, hero.groundHeight);
+    // Some objects like the elevator set the hero's z value, so when the hero is controlled by an object
+    // they are responsible for enforcing this constraint if they want it.
+    if (!hero.isControlledByObject) {
+        hero.z = Math.max(hero.z, hero.groundHeight);
+    }
     hero.wading = hero.z <= 0;
     hero.swimming = hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
     const bootsAreSlippery = hero.savedData.equippedBoots === 'cloudBoots';

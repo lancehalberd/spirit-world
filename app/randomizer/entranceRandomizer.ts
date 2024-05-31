@@ -163,7 +163,7 @@ export function randomizeEntrances(random: typeof SRandom) {
             }
             return;
         }
-        if (object.type !== 'door') {
+        if (object.type !== 'door' && object.type !== 'staffTower') {
             return;
         }
         if (!object.targetZone || object.targetZone === zone.key) {

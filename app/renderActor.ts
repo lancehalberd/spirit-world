@@ -16,7 +16,6 @@ import {
 } from 'app/render/heroAnimations';
 
 const shallowGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
-export const largeShadowFrame: Frame = createAnimation('gfx/largeShadow.png', { w: 32, h: 16 }).frames[0];
 export const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 export const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeometry, {cols: 3, duration: 10});
@@ -325,7 +324,7 @@ export function renderEnemyShadow(context: CanvasRenderingContext2D, state: Game
 
     let frame = shadowFrame;
     if (hitbox.w >= 32) {
-        frame = largeShadowFrame;
+        frame = shadowFrame;
     } else if (hitbox.w < 24 && enemy.z >= 4) {
         frame = smallShadowFrame;
     }

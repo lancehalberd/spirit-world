@@ -15,7 +15,13 @@ specialBehaviorsHash.staffTowerElevator = {
         this.onRefreshLogic(state, elevator);
     },
     onRefreshLogic(state: GameState, elevator: Elevator) {
-        // Do not override the special status of the elevator once it is set.
+        const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
+        // Clear the crashed status once the elevator is fixed.
+        if (elevator.specialStatus === 'crashed' && elevatorFixed) {
+            delete elevator.specialStatus;
+            return;
+        }
+        // Do not override other special statuses of the elevator once it is set.
         if (elevator.specialStatus) {
             return;
         }
@@ -24,7 +30,7 @@ specialBehaviorsHash.staffTowerElevator = {
             elevator.specialStatus = 'off';
             return;
         }
-        const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
+
         if (!elevatorFixed) {
             elevator.specialStatus = 'stuck';
             return;

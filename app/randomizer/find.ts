@@ -77,7 +77,7 @@ export function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicN
 }
 
 export function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
-    return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'teleporter']);
+    return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'staffTower', 'teleporter']);
 }
 export function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
     return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss']);

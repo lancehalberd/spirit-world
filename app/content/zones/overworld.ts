@@ -6600,7 +6600,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-elementalStorm-2", logicKey: "towerStorm", x: 148, y: 428, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-elementalStorm-4", logicKey: "towerStorm", x: 380, y: 412, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},
         {status: "normal", id: "treeCaveSpiritEntrance", x: 352, y: 352, type: "door", style: "knobbyTree", d: "up", linked: true, spirit: true, targetZone: "treeCave", targetObjectId: "treeCaveSpiritEntrance"},
-        {status: "closed", id: "staffTowerEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "ground", targetZone: "staffTower", d: "up", targetObjectId: "staffTowerSpiritEntrance", linked: true, spirit: true},
+        {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "ground", targetZone: "staffTower", d: "up", targetObjectId: "staffTowerSpiritEntrance", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 846, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 2},
