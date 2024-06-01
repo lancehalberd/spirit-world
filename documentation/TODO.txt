@@ -97,10 +97,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Release blockers:
-        - Staff tower should block projectiles
-            - add x/y coords to projectile behaviors checks
-
     - Higher priority stretch goals
         - Update boss
             - New roof design

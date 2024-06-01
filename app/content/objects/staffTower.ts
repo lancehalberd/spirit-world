@@ -27,6 +27,7 @@ export class StaffTower implements ObjectInstance {
     area: AreaInstance;
     definition: EntranceDefinition;
     drawPriority: DrawPriority = 'sprites';
+    isNeutralTarget = true;
     isObject = <const>true;
     ignorePits = true;
     x: number;
@@ -69,7 +70,7 @@ export class StaffTower implements ObjectInstance {
         const radius = 82;
         // TODO: make this an ellipse instead of a circle.
         const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
-        const r2 = dx*dx + dy*dy;
+        const r2 = dx * dx + dy * dy;
         // The ring around the elevator is solid
         if (r2 < radius * radius) {
             return {solid: true};
@@ -117,10 +118,11 @@ export class StaffTower implements ObjectInstance {
             //if (n >= 15) n = 30 - n;
             //const c = '0123456789ABCDEF'[Math.floor(n)];
             //glowContext.fillStyle = `#${c}${c}${c}`;
-            const h = 111;
+            // Theses values are chosen so that the split is between distinct veins on the tower.
+            const h = this.definition.style === 'sky' ? 111 : 117;
 
             for (let y = 90, i = 0; y < maskFrame.h; y += h, i++) {
-                const backgroundColor = this.definition.spirit ? '#80F': 'black';
+                const backgroundColor = this.definition.spirit ? '#40A': 'black';
 
                 const r = this.definition.spirit ? 40 : 40;
                 let p = ((this.animationTime + 1000 * i) % 2000) / 2000;

@@ -201,6 +201,7 @@ export class Arrow implements EffectInstance, Projectile {
     direction: Direction;
     blocked = false;
     reflected: boolean = false;
+    // For rival attacks that can hit the MC in this world and the Rival in the alternate world.
     hybridWorlds: boolean;
     stuckFrames: number = 0;
     stuckTo: {

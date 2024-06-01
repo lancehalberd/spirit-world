@@ -803,8 +803,45 @@ function isObject(object: ObjectInstance | EffectInstance): object is ObjectInst
     return !!(object as ObjectInstance).isObject;
 }
 
+function getHitTestPoints(hit: HitProperties): Point[] {
+    const points: Point[] = [];
+    if (hit.hitCircle) {
+        const c = hit.hitCircle;
+        points.push({x: c.x, y: c.y - c.r});
+        points.push({x: c.x - c.r, y: c.y});
+        points.push({x: c.x + c.r, y: c.y});
+        points.push({x: c.x, y: c.y + c.r});
+    } else if (hit.hitRay) {
+        // This isn't great.
+        const r = hit.hitRay;
+        points.push({x: r.x1, y: r.y1});
+        points.push({x: r.x2, y: r.y2});
+    } else {
+        const box = hit.hitbox;
+        points.push({x: box.x, y: box.y});
+        points.push({x: box.x + box.w - 1, y: box.y});
+        points.push({x: box.x, y: box.y + box.h - 1});
+        points.push({x: box.x + box.w - 1, y: box.y + box.h - 1});
+    }
+    return points;
+}
+
 function applyHitToObject(state: GameState, object: ObjectInstance | EffectInstance, hit: HitProperties, combinedResult: HitResult) {
-    const behaviors = getObjectBehaviors(state, object);
+    let behaviors: TileBehaviors = {solid: false, destructible: false, low: false};
+    if (object.getBehaviors) {
+        for (const p of getHitTestPoints(hit)) {
+            const pointBehaviors = object.getBehaviors(state, p.x, p.y);
+            behaviors.solid = behaviors.solid || pointBehaviors.solid;
+            behaviors.destructible = behaviors.destructible || pointBehaviors.destructible;
+            behaviors.low = behaviors.low || pointBehaviors.low;
+            // We can stop after finding a single solid point.
+            if (behaviors.solid) {
+                break;
+            }
+        }
+    } else {
+        behaviors = object.behaviors;
+    }
     if (object.onHit) {
         const result = object.onHit(state, hit);
         if (combinedResult.destroyed && result.hit && !result.destroyed && !result.pierced) {
