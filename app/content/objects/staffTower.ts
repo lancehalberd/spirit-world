@@ -201,7 +201,7 @@ export class Balcony implements ObjectInstance {
         // the exact number might need to be adjusted depending on the relative position of the balcony.
         // This prevents overriding the behavior of the tower+door, otherwise this would let you walk
         // through the tower+solid parts of the door.
-        if (y < this.y + 22) {
+        if (y < this.y + 22 && x > this.x + 40 && x < this.x + 93) {
             return {};
         }
         //console.log(x, y);
