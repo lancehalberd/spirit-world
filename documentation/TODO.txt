@@ -99,6 +99,12 @@ Current tasks:
 
     - Fix default screen size
 
+    - Fix water is too fast from ground: set vx/vy to 0 on start swimming?
+    - Cannot reach water check in peach cave.
+    - Fell into hidden pit in waterfall tower when hit by an enemy onto it.
+    - Moving floors/platforms shuoldn't interact with the player when they are falling in pits.
+    - Staff tower boss is reachable without fixing the elevator.
+
     - Update all tower exteriors. Replace screen terminal with stone tablet terminal.
         - Add tower setup behavior to the stone tablet instead of using the staff.
         - Make sure tower setup behavior is correct

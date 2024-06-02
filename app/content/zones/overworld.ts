@@ -2827,6 +2827,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "treeCaveEntrance", x: 352, y: 352, type: "door", style: "tree", d: "up", linked: true, targetZone: "treeCave", targetObjectId: "treeCaveEntrance"},
         {status: "normal", id: "treeCavePit", x: 368, y: 320, style: "singleTile", type: "pitEntrance", targetZone: "treeCave", targetObjectId: "treeCaveMarker"},
         {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "ground", targetZone: "staffTower", d: "up", targetObjectId: "staffTowerEntrance", linked: true},
+        {status: "normal", id: "towerMarker", x: 168, y: 384, type: "marker", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 836, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 2},
@@ -6601,6 +6602,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-elementalStorm-4", logicKey: "towerStorm", x: 380, y: 412, type: "enemy", enemyType: "elementalStorm", d: "down", params: {}},
         {status: "normal", id: "treeCaveSpiritEntrance", x: 352, y: 352, type: "door", style: "knobbyTree", d: "up", linked: true, spirit: true, targetZone: "treeCave", targetObjectId: "treeCaveSpiritEntrance"},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 92, y: 224, type: "staffTower", style: "ground", targetZone: "staffTower", d: "up", targetObjectId: "staffTowerSpiritEntrance", linked: true, spirit: true},
+        {status: "normal", id: "towerMarker", x: 168, y: 384, type: "marker", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 846, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 2},
