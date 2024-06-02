@@ -109,7 +109,8 @@ export class StaffTower implements ObjectInstance {
         maskContext.globalCompositeOperation = 'source-over';
         drawFrame(maskContext, maskFrame, {...maskFrame, x: 0, y: 0});
         const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
-        //const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
+        const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
+        //const towerIsHaywire = false;
         if (towerIsOn) {
             maskContext.globalCompositeOperation = 'source-in';
 
@@ -119,25 +120,65 @@ export class StaffTower implements ObjectInstance {
             //const c = '0123456789ABCDEF'[Math.floor(n)];
             //glowContext.fillStyle = `#${c}${c}${c}`;
             // Theses values are chosen so that the split is between distinct veins on the tower.
-            const h = this.definition.style === 'sky' ? 111 : 117;
+            const backgroundColor = this.definition.spirit ? '#40A': 'black';
 
-            for (let y = 90, i = 0; y < maskFrame.h; y += h, i++) {
-                const backgroundColor = this.definition.spirit ? '#40A': 'black';
-
-                const r = this.definition.spirit ? 40 : 40;
-                let p = ((this.animationTime + 1000 * i) % 2000) / 2000;
-                p = (1 - Math.cos(p * Math.PI)) / 2;
-                const center = (maskFrame.w + r) * p;
-                const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
-                gradient.addColorStop(0, backgroundColor);
-                // purple: '#A0F'
-                gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
-                gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
-                gradient.addColorStop(0.54, backgroundColor);
-                glowContext.fillStyle = gradient;
-                glowContext.beginPath();
-                glowContext.fillRect(0, y, maskFrame.w, h);
+            const r = towerIsHaywire ? 30 : 50;
+            if (this.definition.style !== 'sky') {
+                const rects = [
+                    {x: 0, y: 115, w: 41, h: 53},// 41x53 234, 132
+                    {x: 25, y: 85, w: 25, h: 46}, //49x46, 234,102
+                    {x: 0, y: 154, w: 16, h: 38},// 16x38, 234, 171
+                    {x: 21, y: 169, w: 59, h: 37},// 59x37, 255, 186
+                    {x: 62, y: 127, w: 63, h: 33},// 63x33, 296, 144
+                    {x: 92, y: 164, w: 44, h: 72},// 44x72, 326,181
+                    {x: 137, y: 164, w: 34, h: 43},// 34x43, 371,181
+                    {x: 151, y: 97, w: 20, h: 58},// 20x58, 385,114
+                    {x: 18, y: 205, w: 21, h: 24},// 24, 252,222
+                ];
+                // Set this
+                const duration = towerIsHaywire ? 1000 : 6000;
+                for (let i = 0; i < rects.length; i++) {
+                    const rect = rects[i];
+                    let p = ((this.animationTime + (duration * 0.45) * i) % duration) / duration;
+                    p = (1 - Math.cos(p * Math.PI)) / 2;
+                    //console.log(p);
+                    let center = (maskFrame.w + 2 * r) * p - r;
+                    // Hack to double the frequency of waves.
+                    if (center > rect.x + rect.w + r || center < rect.x - r) {
+                        p = ((this.animationTime + (duration * 0.45) * i + duration / 2) % duration) / duration;
+                        p = (1 - Math.cos(p * Math.PI)) / 2;
+                        //console.log(p);
+                        center = (maskFrame.w + 2 * r) * p - r;
+                    }
+                    const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
+                    gradient.addColorStop(0, backgroundColor);
+                    // purple: '#A0F'
+                    gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
+                    gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
+                    gradient.addColorStop(0.54, backgroundColor);
+                    glowContext.fillStyle = gradient;
+                    glowContext.beginPath();
+                    glowContext.fillRect(rect.x, rect.y, rect.w, rect.h);
+                }
+            } else {
+                const h = this.definition.style === 'sky' ? 111 : 117;
+                for (let y = 90, i = 0; y < maskFrame.h; y += h, i++) {
+                    let p = ((this.animationTime + 1000 * i) % 2000) / 2000;
+                    p = (1 - Math.cos(p * Math.PI)) / 2;
+                    const center = (maskFrame.w + r) * p;
+                    const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
+                    gradient.addColorStop(0, backgroundColor);
+                    // purple: '#A0F'
+                    gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
+                    gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
+                    gradient.addColorStop(0.54, backgroundColor);
+                    glowContext.fillStyle = gradient;
+                    glowContext.beginPath();
+                    glowContext.fillRect(0, y, maskFrame.w, h);
+                }
             }
+
+
             drawFrame(maskContext, {...maskFrame, image: glowCanvas, x: 0, y: 0}, {...maskFrame, x: 0, y: 0});
         }
         drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);

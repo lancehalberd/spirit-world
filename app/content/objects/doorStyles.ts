@@ -954,7 +954,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         getPathHitbox(door: Door) {
             return {x: door.x, y: door.y, w: 16, h: 96};
         },
-        pathBehaviors: {climbable: true},
+        pathBehaviors: {climbable: true, solid: true},
     },
     ladderDown: {
         render(this: void, context, state, door) {
@@ -970,7 +970,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         getPathHitbox(door: Door) {
             return {x: door.x, y: door.y, w: 16, h: 16};
         },
-        pathBehaviors: {climbable: true},
+        pathBehaviors: {climbable: true, solid: true},
     },
     square: oldSquareBaseDoorStyle,
     wideEntrance: {

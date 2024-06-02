@@ -34,7 +34,8 @@ export function isMovementBlocked(
                 continue;
             }
             const behaviors = getObjectBehaviors(state, object, x, y);
-            if (!movementProperties.canPassWalls && object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
+            const canClimbObject = behaviors?.climbable && movementProperties.canClimb;
+            if (!movementProperties.canPassWalls && !canClimbObject && object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     blockingSolidObject = object;
                     blockingPitObject = null;
@@ -81,7 +82,7 @@ export function isMovementBlocked(
                 }
             }
             // Climbable works similar to `isGround` but only if the movementProperties include `canClimb`.
-            if (object.getHitbox && (behaviors?.climbable && movementProperties.canClimb)) {
+            if (object.getHitbox && canClimbObject) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                     walkableObject = object;
                     blockingPitObject = null;

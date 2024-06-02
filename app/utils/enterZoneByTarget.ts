@@ -162,8 +162,10 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
         if (hitbox.w === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
             hero.y += 8;
         }
+        hero.renderParent = target;
     }
     hero.actionTarget = target;
+
     if (target.style === 'ladderUp' || target.style === 'ladderDown') {
         hero.action = 'climbing';
     }

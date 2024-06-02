@@ -178,7 +178,7 @@ const stormHeart: EnemyDefinition<CloudParams> = {
     },
     immunities: ['lightning'],
     elementalMultipliers: {'ice': 1.5, 'fire': 1.5},
-    initialMode: 'hidden',
+    initialMode: 'waiting',
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<CloudParams>): void {
         let frameIndex = Math.floor(7 - enemy.params.cloudLife);
         frameIndex = Math.min(7, Math.max(0, frameIndex));
@@ -274,7 +274,7 @@ function getStormHeartTargetEnrageLevel(enemy: Enemy): number {
 }
 
 function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
-    if (enemy.mode === 'hidden') {
+    if (enemy.mode === 'waiting') {
         if (enemy.area === state.areaInstance) {
             enemy.setMode('choose');
         }

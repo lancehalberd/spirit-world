@@ -323,6 +323,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (!touchingTarget && isHeroOnOpenTile(state, hero)) {
             hero.actionTarget = null;
             hero.isUsingDoor = false;
+            delete hero.renderParent;
             hero.isExitingDoor = false;
             hero.safeD = hero.d;
             hero.safeX = hero.x;
