@@ -99,6 +99,11 @@ Current tasks:
 
     - Fix default screen size
 
+    - Update all tower exteriors. Replace screen terminal with stone tablet terminal.
+        - Add tower setup behavior to the stone tablet instead of using the staff.
+        - Make sure tower setup behavior is correct
+        - Stone terminal should be hidden when the tower is off.
+
     - Higher priority stretch goals
         - Update boss
             - New roof design
@@ -127,8 +132,6 @@ Current tasks:
     - Low priority Staff Tower Exterior
         - Cosmetic: shadow is hidden by tower balcony
             - Possible fix: make hero a renderChild of the balcony when the hero is standing on it.
-        - Update all tower exteriors. Replace screen terminal with stone tablet terminal.
-        - Add tower setup behavior to the stone tablet instead of using the staff.
         - Improve tower visuals
             - Try rendering the top of the tower at ground level using a transparent filter near the top:
             - Do not render the top ~40 pixels of the tower at all.

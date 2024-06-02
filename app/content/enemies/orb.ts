@@ -46,8 +46,6 @@ const warningDistance = 144;
 const beamDistance = 80;
 const blastDistance = 24;
 
-const maxOrbSpeed = 3;
-
 const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
     flying: true,
     lootTable: lifeLootTable,
@@ -203,12 +201,34 @@ enemyDefinitions.largeOrb = {
         brightness: 0.6,
         lightRadius: 40,
     },
-    params: {inertia: 4, orbCount: 2},
+    params: {
+        // The lower this is the faster the orb will accelerate towards the player.
+        inertia: 1.5,
+        orbCount: 2,
+    },
+    speed: 0.8,
     animations: {idle: omniAnimation(largeOrbAnimation)}, life: 48, touchHit: {element: 'lightning', damage: 2}, update: updateLargeOrb,
     immunities: ['lightning'],
     onHit(this: void, state: GameState, enemy: Enemy<OrbProps>, hit: HitProperties): HitResult {
         const life = enemy.life;
         const result = enemy.defaultOnHit(state, hit);
+        // The orb can be knocked back a little once it is in its pinch mode.
+        if (result.hit && enemy.params.invertedDuration) {
+            let knockback = hit.knockback;
+            if (hit.knockAwayFrom) {
+                const hitbox = enemy.getHitbox();
+                const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+                const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                const mag = Math.sqrt(dx * dx + dy * dy);
+                if (mag) {
+                    knockback = {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0};
+                }
+            }
+            if (knockback) {
+                enemy.vx += knockback.vx;
+                enemy.vy += knockback.vy;
+            }
+        }
         const damage = life - enemy.life;
         if (damage > 0) {
             // The orb bob's faster after taking damage.
@@ -246,16 +266,17 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
         }
     }
 
-
     if (!enemy.params.invertedDuration) {
         if (enemy.life <= enemy.enemyDefinition.life / 3) {
+            enemy.vx = enemy.vy = 0;
             // The large orb will explode after this duration.
             enemy.params.invertedDuration = 8000;
             for (const smallOrb of enemy.params.smallOrbs) {
                 delete smallOrb.params.largeOrb;
                 const v = getVectorToTarget(state, enemy, smallOrb);
-                smallOrb.vx = maxOrbSpeed * v.x;
-                smallOrb.vy = maxOrbSpeed * v.y;
+                const maxSpeed = 2.5 * smallOrb.enemyDefinition.speed;
+                smallOrb.vx = maxSpeed * v.x;
+                smallOrb.vy = maxSpeed * v.y;
             }
             enemy.params.smallOrbs = [];
             return;
@@ -401,12 +422,13 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                 });
             }
             if (inversion > 0 && v.mag < blastDistance) {
-                enemy.vx = -maxOrbSpeed * v.x;
-                enemy.vy = -maxOrbSpeed * v.y;
+                const maxSpeed = 2.5 * enemy.enemyDefinition.speed;
+                enemy.vx = -maxSpeed * v.x;
+                enemy.vy = -maxSpeed * v.y;
                 enemy.params.bobThetaV = fastBobThetaV;
                 enemy.params.invertedDuration = 1000;
-                otherEnemy.vx = maxOrbSpeed * v.x;
-                otherEnemy.vy = maxOrbSpeed * v.y;
+                otherEnemy.vx = maxSpeed * v.x;
+                otherEnemy.vy = maxSpeed * v.y;
                 otherEnemy.params.bobThetaV = fastBobThetaV;
                 otherEnemy.params.invertedDuration = 1000;
                 const blastCircle = getBlastCircle(enemy, otherEnemy);
@@ -439,10 +461,11 @@ function moveOrbTowardsClosestTarget(state: GameState, enemy: Enemy<OrbProps>) {
     enemy.vx *= 0.99;
     enemy.vy *= 0.99;
     const minSpeed = enemy.enemyDefinition.speed;
+    const maxSpeed = 2.5 * minSpeed;
     const speed = Math.sqrt(enemy.vx * enemy.vx + enemy.vy * enemy.vy);
-    if (speed > maxOrbSpeed) {
-        enemy.vx = maxOrbSpeed * enemy.vx / speed;
-        enemy.vy = maxOrbSpeed * enemy.vy / speed;
+    if (speed > maxSpeed) {
+        enemy.vx = maxSpeed * enemy.vx / speed;
+        enemy.vy = maxSpeed * enemy.vy / speed;
     } else if (speed > 0 && speed < minSpeed) {
         enemy.vx = minSpeed * enemy.vx / speed;
         enemy.vy = minSpeed * enemy.vy / speed;
