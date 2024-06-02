@@ -99,7 +99,6 @@ Current tasks:
 
     - Fix default screen size
 
-    - Moving floors/platforms shuoldn't interact with the player when they are falling in pits.
     - Staff tower boss is reachable without fixing the elevator.
     - TL cave walls in foreground2 render in front of player when swimming (in city water for example)
         - This should just be on a background layer, perhaps field 2.

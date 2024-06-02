@@ -176,19 +176,27 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         ];
         // While the hero is falling, push them around until all their check points are over actual pit tiles.
         let onPitWall = false;
+        let dx = 0, dy = 0;
         for (const p of checkPoints) {
             const behaviors = getCompositeBehaviors(state, hero.area, p, state.nextAreaInstance);
             if (behaviors.pitWall) {
                 onPitWall = true;
             }
-            if (!(behaviors.pit || behaviors.cloudGround || behaviors.pitWall)) {
-                hero.x += p.dx;
-                hero.y += p.dy;
+            if (!(behaviors.pit || behaviors.cloudGround || behaviors.pitWall || behaviors.canFallUnder)) {
+                dx += p.dx;
+                dy += p.dy;
             }
         }
         // Pit wall tiles always push the hero south to match the perspective.
-        if (onPitWall) {
+        if (onPitWall || dy > 0) {
             hero.y++;
+        } else if (dy < 0) {
+            hero.y--;
+        }
+        if (onPitWall || dx > 0) {
+            hero.x++;
+        } else if (dx < 0) {
+            hero.x--;
         }
 
         if (hero.isOverClouds && hero.animationTime >= cloudPoofAnimation.duration) {

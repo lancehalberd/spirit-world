@@ -14,6 +14,7 @@ export class MovingPlatform implements ObjectInstance {
     area: AreaInstance;
     behaviors: TileBehaviors = {
         groundHeight: 1,
+        canFallUnder: true,
     };
     definition: MovingPlatformDefinition;
     drawPriority: DrawPriority = 'background';

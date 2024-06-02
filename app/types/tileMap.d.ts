@@ -125,6 +125,11 @@ interface TileBehaviors {
     isOverlay?: boolean
     // number of pixels to raise the player when on this tile. Created for the staff ground.
     groundHeight?: number
+    // Indicates that this tile shouldn't push the player towards pits when the player is in the falling animation.
+    // Player eases away from non-pit tiles to pit tiles when falling so they will appear to fall into the abyss
+    // and not through non pit tiles. However, some objects like moving platforms allow the player to fall under them
+    // and don't require pushing the player towards pit tiles.
+    canFallUnder?: boolean
     // Assign this to skip tiles in source images.
     skipped?: boolean
     // Blocks movement
