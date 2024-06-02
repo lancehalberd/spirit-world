@@ -99,11 +99,11 @@ Current tasks:
 
     - Fix default screen size
 
-    - Fix water is too fast from ground: set vx/vy to 0 on start swimming?
-    - Cannot reach water check in peach cave.
     - Fell into hidden pit in waterfall tower when hit by an enemy onto it.
     - Moving floors/platforms shuoldn't interact with the player when they are falling in pits.
     - Staff tower boss is reachable without fixing the elevator.
+    - TL cave walls in foreground2 render in front of player when swimming (in city water for example)
+        - This should just be on a background layer, perhaps field 2.
 
     - Update all tower exteriors. Replace screen terminal with stone tablet terminal.
         - Add tower setup behavior to the stone tablet instead of using the staff.

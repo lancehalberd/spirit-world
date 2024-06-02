@@ -97,7 +97,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
     if (hero.swimming) {
         hero.slipping = false;
-        movementSpeed *= 0.75;
+        movementSpeed *= 0.8;
         // Abort any unsupported actions while swimming.
         if (hero.action !== 'walking') {
             hero.action = null;
@@ -518,8 +518,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.slipping || hero.swimming || isFloating) {
         let maxSpeed = 2.5;
         if (isFloating || hero.swimming) {
-            hero.vx = dx / 20 + hero.vx * 0.96;
-            hero.vy = dy / 20 + hero.vy * 0.96;
+            hero.vx = dx / 8 + hero.vx * 0.85;
+            hero.vy = dy / 8 + hero.vy * 0.85;
         } else if (hero.savedData.equippedBoots === 'cloudBoots') {
             if (hero.savedData.equipment.cloudBoots >= 2) {
                 hero.vx = dx / 5 + hero.vx * 0.95;
