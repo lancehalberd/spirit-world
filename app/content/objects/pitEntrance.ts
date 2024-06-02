@@ -50,7 +50,6 @@ export class PitEntrance implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: EntranceDefinition = null;
-    behaviors: TileBehaviors = {pit: true};
     isObject = <const>true;
     x: number;
     ignorePits = true;
@@ -70,6 +69,12 @@ export class PitEntrance implements ObjectInstance {
     }
     getHitbox(): Rect {
         return (pitStyles[this.style] || pitStyles.default).getHitbox(this);
+    }
+    getBehaviors(state: GameState) {
+        if (this.status !== 'normal' || this.isUnderObject(state)) {
+            return {};
+        }
+        return {pit: true};
     }
     isUnderObject(state: GameState): boolean {
         if (!this.area || this.style !== 'singleTile') {
