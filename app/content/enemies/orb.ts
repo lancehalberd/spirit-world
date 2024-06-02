@@ -199,6 +199,10 @@ enemyDefinitions.smallOrb = {
 
 enemyDefinitions.largeOrb = {
     ...baseOrbDefinition,
+    tileBehaviors: {
+        brightness: 0.6,
+        lightRadius: 40,
+    },
     params: {inertia: 4, orbCount: 2},
     animations: {idle: omniAnimation(largeOrbAnimation)}, life: 48, touchHit: {element: 'lightning', damage: 2}, update: updateLargeOrb,
     immunities: ['lightning'],
@@ -256,6 +260,9 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
             enemy.params.smallOrbs = [];
             return;
         }
+    }
+    if (enemy.modeTime % 100 === 0) {
+        addSparkleAnimation(state, enemy.area, {...hitbox, x: 0, y: 0}, { element: 'lightning', target: enemy });
     }
     if (enemy.params.invertedDuration) {
         enemy.params.invertedDuration -= FRAME_LENGTH;

@@ -31,6 +31,11 @@ interface Props {
 export class Spark implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
+    // This may need to depend on the shape of the spark.
+    behaviors = {
+        brightness: 0.6,
+        lightRadius: 16,
+    };
     isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
