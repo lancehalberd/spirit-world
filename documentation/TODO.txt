@@ -96,9 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - TL cave walls in foreground2 render in front of player when swimming (in city water for example)
-        - This should just be on a background layer, perhaps field 2.
-
     - Update all tower exteriors. Replace screen terminal with stone tablet terminal.
         - Add tower setup behavior to the stone tablet instead of using the staff.
         - Make sure tower setup behavior is correct

@@ -22,6 +22,10 @@ export function isMovementBlocked(
     const actor = movementProperties.actor;
     const canMoveUnderLowCeilings = !(movementProperties.actor?.z > 3);
     const canMoveIntoEntranceTiles = movementProperties.canMoveIntoEntranceTiles;
+    // If we wanted to enforce movementProperties.maxHeight with a reasonable default relative to current ground height:
+    // movementProperties.maxHeight = movementProperties.maxHeight ?? 6;
+    // const currentHeight = actor?.groundHeight || 0;
+    // (behaviors?.groundHeight - currentHeight) > movementProperties.maxHeight
 
     // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.
     let walkableObject: ObjectInstance, blockingSolidObject: ObjectInstance, blockingPitObject: ObjectInstance;
