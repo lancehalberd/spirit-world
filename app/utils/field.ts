@@ -188,7 +188,8 @@ export function getTileBehaviors(
     const tileBehavior = {...(definedBehavior || {})};
     if (!state.areaSection || tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
-        tileBehavior.outOfBounds = true;
+        // Tiles are not considered out of bounds during screen transitions.
+        tileBehavior.outOfBounds = !nextArea && !state.nextAreaSection;
     }
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
     if (!tileBehavior.solid && tileBehavior.solidMap) {
