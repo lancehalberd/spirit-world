@@ -15,8 +15,16 @@ const blockAnimationProperties = {
 };
 // The key block sticks up until it reaches frame 9.
 const blockedDuration = blockAnimationProperties.frameMap.indexOf(9) * blockAnimationProperties.duration * FRAME_LENGTH;
-const smallKeyBlockAnimation = createAnimation('gfx/tiles/locked_tile_small.png', blockGeometry, blockAnimationProperties, {loop: false});
-const bigKeyBlockAnimation = createAnimation('gfx/tiles/locked_tile.png', blockGeometry, blockAnimationProperties, {loop: false});
+const smallKeyBlockAnimation = createAnimation('gfx/objects/locked_tile_small.png', blockGeometry, blockAnimationProperties, {loop: false});
+const bigKeyBlockAnimation = createAnimation('gfx/objects/locked_tile.png', blockGeometry, blockAnimationProperties, {loop: false});
+
+const switchBlockAnimationProperties = {
+    cols: 8,
+    duration: 5,
+    frameMap: [0, 1, 2, 3, 4, 5, 6, 7],
+};
+const switchBlockAnimation = createAnimation('gfx/objects/locked_tile_switch.png', blockGeometry, switchBlockAnimationProperties, {loop: false});
+const switchBlockedDuration = switchBlockAnimationProperties.frameMap.indexOf(4) * switchBlockAnimationProperties.duration * FRAME_LENGTH;
 
 export class KeyBlock implements ObjectInstance {
     area: AreaInstance;
@@ -34,7 +42,12 @@ export class KeyBlock implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = this.definition.status;
-        this.animation = this.status === 'bigKeyLocked' ? bigKeyBlockAnimation : smallKeyBlockAnimation;
+        this.animation = switchBlockAnimation;
+        if (this.status === 'locked') {
+            this.animation = smallKeyBlockAnimation;
+        } else if (this.status === 'bigKeyLocked') {
+            this.animation = bigKeyBlockAnimation;
+        }
         if (getObjectStatus(state, definition)) {
             // Remove opened keyblocks so they can be used as doors.
             this.isOpen = true;
@@ -42,6 +55,9 @@ export class KeyBlock implements ObjectInstance {
         }
     }
     isCompletelyOpen() {
+        if (this.definition.status === 'closed') {
+            return this.isOpen && this.animationTime >= switchBlockedDuration;
+        }
         return this.isOpen && this.animationTime >= blockedDuration;
     }
     getDrawPriority(state: GameState) {
@@ -53,19 +69,11 @@ export class KeyBlock implements ObjectInstance {
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
-    tryToUnlock(state: GameState): boolean {
+    onActivate(state: GameState): boolean {
         if (this.isOpen) {
             return false;
         }
-        const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
-        if (this.status === 'locked' && dungeonInventory?.smallKeys) {
-            dungeonInventory.smallKeys--;
-            this.isOpen = true;
-        } else if (this.status === 'bigKeyLocked' && dungeonInventory?.bigKey) {
-            this.isOpen = true;
-        } else {
-            return false;
-        }
+        this.isOpen = true;
         if (this.definition.id) {
             state.savedState.objectFlags[this.definition.id] = true;
             // Immediately save that the target object has been activated,
@@ -74,13 +82,13 @@ export class KeyBlock implements ObjectInstance {
             // mid animation.
             if (this.definition.targetObjectId) {
                 state.savedState.objectFlags[this.definition.targetObjectId] = true;
+                state.scriptEvents.activeEvents.push({
+                    type: 'wait',
+                    time: state.time,
+                    duration: blockedDuration,
+                    blockPlayerInput: true,
+                });
             }
-            state.scriptEvents.activeEvents.push({
-                type: 'wait',
-                time: state.time,
-                duration: blockedDuration,
-                blockPlayerInput: true,
-            });
         } else {
             console.error('Keyblock was missing an id', this);
             debugger;
@@ -88,9 +96,26 @@ export class KeyBlock implements ObjectInstance {
         saveGame(state);
         return true;
     }
+    tryToUnlock(state: GameState): boolean {
+        if (this.isOpen) {
+            return false;
+        }
+        const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
+        if (this.status === 'locked' && dungeonInventory?.smallKeys) {
+            dungeonInventory.smallKeys--;
+            return this.onActivate(state);
+        } else if (this.status === 'bigKeyLocked' && dungeonInventory?.bigKey) {
+            return this.onActivate(state);
+        } else {
+            return false;
+        }
+    }
     onGrab(state: GameState) {
         if (this.isOpen) {
             state.hero.action = null;
+            return;
+        }
+        if (this.status === 'closed') {
             return;
         }
         if (!this.tryToUnlock(state)) {

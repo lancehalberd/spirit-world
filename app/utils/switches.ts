@@ -10,15 +10,19 @@ export function areAllSwitchesActivated(state: GameState, area: AreaInstance, sw
 }
 
 export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): boolean {
-    if (!switchInstance.definition.targetObjectId) {
+    if (!switchInstance.definition.targetObjectId || switchInstance.status !== 'active') {
         return false;
     }
-    if (!areAllSwitchesActivated(state, area, switchInstance)) {
+    const requireAll = switchInstance.definition.requireAll ?? true;
+    if (requireAll && !areAllSwitchesActivated(state, area, switchInstance)) {
         return false;
     }
+    let playChime = true;
     for (const object of [...area.objects, ...(area.alternateArea?.objects || [])]) {
         if (object.definition?.id === switchInstance.definition.targetObjectId) {
-            activateTarget(state, object, true);
+            activateTarget(state, object, playChime);
+            // Only play chimes once per switch activation.
+            playChime = false;
         }
     }
     return true;
@@ -36,7 +40,7 @@ export function getSwitchTargetIds(area: AreaInstance): string[] {
         'none',
         ...getTargetObjectIdsByTypesAndArea(area,
             [
-                'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
+                'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'keyBlock',
                 'narration', 'pitEntrance', 'shieldingUnit',
                 'teleporter', 'torch', 'escalator', 'airStream', 'anode',
             ]

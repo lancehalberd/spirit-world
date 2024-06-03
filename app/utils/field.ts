@@ -832,6 +832,9 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
     if (object.getBehaviors) {
         for (const p of getHitTestPoints(hit)) {
             const pointBehaviors = object.getBehaviors(state, p.x, p.y);
+            if (!pointBehaviors) {
+                continue;
+            }
             behaviors.solid = behaviors.solid || pointBehaviors.solid;
             behaviors.destructible = behaviors.destructible || pointBehaviors.destructible;
             behaviors.low = behaviors.low || pointBehaviors.low;

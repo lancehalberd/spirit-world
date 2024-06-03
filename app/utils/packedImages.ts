@@ -245,8 +245,8 @@ const imagePacks: PackedImageData[] = [
         {x:896,y:816,w:128,h:32,originalSource:'gfx/effects/beadcascadeunder.png'},
         {x:896,y:848,w:128,h:32,originalSource:'gfx/effects/beadcascadeover.png'},
         {x:816,y:1088,w:192,h:20,originalSource:'gfx/objects/activatablecrystal.png'},
-        {x:0,y:1152,w:416,h:36,originalSource:'gfx/tiles/locked_tile_small.png'},
-        {x:416,y:1152,w:416,h:36,originalSource:'gfx/tiles/locked_tile.png'},
+        {x:0,y:1152,w:416,h:36,originalSource:'gfx/objects/locked_tile_small.png'},
+        {x:416,y:1152,w:416,h:36,originalSource:'gfx/objects/locked_tile.png'},
         {x:816,y:1120,w:176,h:18,originalSource:'gfx/tiles/tippablepot.png'}
     ],
 },

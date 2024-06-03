@@ -235,6 +235,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
             };
         case 'beadCascade':
@@ -253,6 +254,7 @@ export function createObjectDefinition(
                 element: definition.element,
                 saveStatus: definition.saveStatus,
                 timer: definition.timer || 0,
+                requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
             };
         case 'door':
@@ -358,6 +360,7 @@ export function createObjectDefinition(
         case 'floorSwitch':
             return {
                 ...commonProps,
+                requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
                 toggleOnRelease: definition.toggleOnRelease,
                 type: definition.type,
@@ -372,6 +375,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
             };
         case 'pitEntrance':
@@ -554,6 +558,14 @@ export function getSwitchTargetProperties(
         delete object.targetObjectId;
     }
     rows.push({
+        name: 'require all',
+        value: object.requireAll ?? true,
+        onChange(requireAll: boolean) {
+            object.requireAll = requireAll;
+            updateObjectInstance(state, object);
+        },
+    });
+    rows.push({
         name: 'target object',
         value: object.targetObjectId ?? 'none',
         values: objectIds,
@@ -593,7 +605,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'teleporter':
             return ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
         case 'keyBlock':
-            return ['locked', 'bigKeyLocked'];
+            return ['closed', 'locked', 'bigKeyLocked'];
         case 'door':
         case 'stairs':
             return ['normal', 'closed', 'closedEnemy', 'closedSwitch',

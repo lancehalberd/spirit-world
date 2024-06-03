@@ -63,7 +63,6 @@ Graphics Work:
             Flippers (allow diving and staying submerged by holding the passive tool button) (can be used as long as iron boots are not equipped)
 
     Large objects/structures
-        Staff tower exterior (ground and sky)
         World tree exterior B2, B1, ground and sky, possibly vertical exterior
         Elemental statues
 
@@ -97,9 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Fix default screen size
-
-    - Staff tower boss is reachable without fixing the elevator.
     - TL cave walls in foreground2 render in front of player when swimming (in city water for example)
         - This should just be on a background layer, perhaps field 2.
 
@@ -107,6 +103,10 @@ Current tasks:
         - Add tower setup behavior to the stone tablet instead of using the staff.
         - Make sure tower setup behavior is correct
         - Stone terminal should be hidden when the tower is off.
+    - Teleportation to reach the final boss requires too much precision, the walls should be thinner
+        - The north wall should only be half solid, we can fix this by adding a new tile instead of using composite tiles.
+
+    - Fix default screen size
 
     - Higher priority stretch goals
         - Update boss

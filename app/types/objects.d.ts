@@ -413,9 +413,8 @@ interface BaseObjectDefinition {
     d?: Direction
 }
 
-interface BallGoalDefinition extends BaseObjectDefinition {
+interface BallGoalDefinition extends BaseSwitchDefinition {
     type: 'ballGoal',
-    targetObjectId?: string,
 }
 
 interface BeadCascadeDefinition extends BaseObjectDefinition {
@@ -446,15 +445,19 @@ interface AirStreamDefinition extends BaseObjectDefinition {
     offInterval?: number
 }
 
-interface FloorSwitchDefinition extends BaseObjectDefinition {
-    type: 'floorSwitch'
-    toggleOnRelease?: boolean
+interface BaseSwitchDefinition extends BaseObjectDefinition {
     targetObjectId?: string
+    // This will deafult to true.
+    requireAll?: boolean
 }
 
-interface KeyBlockDefinition extends BaseObjectDefinition {
+interface FloorSwitchDefinition extends BaseSwitchDefinition {
+    type: 'floorSwitch'
+    toggleOnRelease?: boolean
+}
+
+interface KeyBlockDefinition extends BaseSwitchDefinition {
     type: 'keyBlock'
-    targetObjectId?: string
 }
 
 interface IndicatorDefinition extends BaseObjectDefinition {
@@ -467,12 +470,11 @@ type LootObjectDefinition = BaseObjectDefinition & LootData & {
     price?: number
 }
 
-interface CrystalSwitchDefinition extends BaseObjectDefinition {
+interface CrystalSwitchDefinition extends BaseSwitchDefinition {
     type: 'crystalSwitch'
     element?: MagicElement,
     // If this is set, this crystal will de-activate after this many milliseconds.
     timer?: number
-    targetObjectId?: string
     stayOnAfterActivation?: boolean
 }
 

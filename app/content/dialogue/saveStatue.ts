@@ -193,9 +193,7 @@ dialogueHash.saveStatue = {
             ],
         },
         {
-            logicCheck: {
-                zones: ['staffTowerMiddleSave'],
-            },
+            objectId: 'staffTowerMiddleSave',
             text: [
                 {
                     dialogueIndex: 159,
@@ -208,16 +206,13 @@ dialogueHash.saveStatue = {
             ],
         },
         {
-            logicCheck: {
-                zones: ['staffTowerBossSave'],
-            },
+            objectId: 'staffTowerBossSave',
             text: [
                 {
                     dialogueIndex: 160,
                     dialogueType: 'hint',
                     text: `
-                        If you stop the disturbance on the roof of this tower
-                        you will be able to use a terminal on this floor to take control of the tower itself.
+                        Use your Spirit Abilities to reach the ladder.
                         {item:secondChance}
                     `,
                 },
