@@ -1,5 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { appendScript } from 'app/scriptEvents';
 import { drawFrame, drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
@@ -23,6 +24,10 @@ const staffTowerSpiritSkyBalconyFrame = requireFrame('gfx/objects/staffTower.png
 const [maskCanvas, maskContext] = createCanvasAndContext(staffTowerSkyMaskFrame.w, staffTowerSkyMaskFrame.h);
 const [glowCanvas, glowContext] = createCanvasAndContext(staffTowerSkyMaskFrame.w, staffTowerSkyMaskFrame.h);
 
+const shakeTime = 1600;
+const shrinkTime = 1000;
+const gatherTime = 400;
+
 export class StaffTower implements ObjectInstance {
     area: AreaInstance;
     definition: EntranceDefinition;
@@ -33,6 +38,7 @@ export class StaffTower implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    specialStatus?: 'collapsing'|'deploying';
     animationTime = 0;
     door: ObjectInstance;
     balcony: Balcony;
@@ -54,6 +60,19 @@ export class StaffTower implements ObjectInstance {
         // Door's normally render on the background layer, but this door must render on top of the tower, which is in the sprite layer.
         this.door.renderParent = this;
         this.balcony = new Balcony(this);
+    }
+    collapse(state: GameState) {
+        this.specialStatus = 'collapsing';
+        this.animationTime = 0;
+        // Prevent the hero from moving while the tower collapses.
+        state.hero.isControlledByObject = true;
+        state.screenShakes = [{dx: 1, dy: 0, startTime: state.fieldTime}];
+    }
+    deploy(state: GameState) {
+        this.specialStatus = 'deploying';
+        this.animationTime = 0;
+        // Prevent the hero from moving while the tower is deployed.
+        state.hero.isControlledByObject = true;
     }
     getParts() {
         const parts = [this.door];
@@ -100,6 +119,30 @@ export class StaffTower implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        if (this.specialStatus === 'collapsing') {
+            state.hero.isControlledByObject = true;
+            if (this.animationTime === 400) {
+                state.screenShakes = [{dx: 1, dy: 1, startTime: state.fieldTime}];
+            } else if (this.animationTime === 800) {
+                state.screenShakes = [{dx: 2, dy: 2, startTime: state.fieldTime}];
+            } else if (this.animationTime === shakeTime) {
+                state.screenShakes = [{dx: 1, dy: 1, startTime: state.fieldTime}];
+            } else if (this.animationTime >= shakeTime + 200) {
+                state.screenShakes = [];
+            }
+            if (this.animationTime >= shakeTime + shrinkTime + gatherTime) {
+                // Pick up the staff at the end of the collapsing sequence.
+                appendScript(state, '{item:staff=2}');
+            } else if (this.animationTime >= shakeTime + shrinkTime) {
+                const hitbox = this.getHitbox();
+                const heroBox = state.hero.getHitbox();
+                const dx = (heroBox.x + heroBox.w / 2) - (hitbox.x + hitbox.w / 2);
+                const dy = (heroBox.y + heroBox.h / 2) - (hitbox.y + hitbox.h / 2);
+                const timeLeft = gatherTime - (this.animationTime - shakeTime - shrinkTime);
+                this.x += dx * FRAME_LENGTH / timeLeft;
+                this.y += dy * FRAME_LENGTH / timeLeft;
+            }
+        }
         this.door.area = this.area;
         this.door.update(state);
     }
@@ -110,108 +153,144 @@ export class StaffTower implements ObjectInstance {
         drawFrameContentAt(context, staffTowerCloudFrame, {x: this.x - 8, y: this.y - 80});
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        // TODO: Use this mask to draw composite effets for the tower lights.
-        // Matt grey or black when the tower is off.
-        // shifting patterns of white and blue when it is on.
-        let maskFrame = staffTowerMaskFrame;
-        if (this.definition.style === 'sky') {
-            maskFrame = this.definition.spirit ? staffTowerSpiritSkyMaskFrame : staffTowerSkyMaskFrame;
-        } else {
-            maskFrame = this.definition.spirit ? staffTowerSpiritMaskFrame : staffTowerMaskFrame;
+        let scale = 1;
+        if (this.specialStatus === 'collapsing') {
+            if (this.animationTime >= shakeTime) {
+                scale = Math.max(0.03, 1 - (this.animationTime - shakeTime) / shrinkTime);
+            }
         }
-        maskContext.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
-        maskContext.globalCompositeOperation = 'source-over';
-        drawFrame(maskContext, maskFrame, {...maskFrame, x: 0, y: 0});
-        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
-        const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
-        //const towerIsHaywire = false;
-        if (towerIsOn) {
-            maskContext.globalCompositeOperation = 'source-in';
+        context.save();
+            if (scale !== 1) {
+                const hitbox = this.getHitbox();
+                context.translate(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2);
+                context.scale(scale, scale);
+                //context.scale(scale, 1 - (1 - scale) * 0.8);
+                context.translate(-(hitbox.x + hitbox.w / 2), -(hitbox.y + hitbox.h / 2));
+            }
+            // TODO: Use this mask to draw composite effets for the tower lights.
+            // Matt grey or black when the tower is off.
+            // shifting patterns of white and blue when it is on.
+            let maskFrame = staffTowerMaskFrame;
+            if (this.definition.style === 'sky') {
+                maskFrame = this.definition.spirit ? staffTowerSpiritSkyMaskFrame : staffTowerSkyMaskFrame;
+            } else {
+                maskFrame = this.definition.spirit ? staffTowerSpiritMaskFrame : staffTowerMaskFrame;
+            }
+            maskContext.clearRect(0, 0, glowCanvas.width, glowCanvas.height);
+            maskContext.globalCompositeOperation = 'source-over';
+            drawFrame(maskContext, maskFrame, {...maskFrame, x: 0, y: 0});
+            const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+            const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
+            //const towerIsHaywire = false;
+            if (towerIsOn) {
+                maskContext.globalCompositeOperation = 'source-in';
 
-            // Just fade between white/black
-            //let n = ((this.animationTime / 100) % 30) | 0;
-            //if (n >= 15) n = 30 - n;
-            //const c = '0123456789ABCDEF'[Math.floor(n)];
-            //glowContext.fillStyle = `#${c}${c}${c}`;
-            // Theses values are chosen so that the split is between distinct veins on the tower.
-            const backgroundColor = this.definition.spirit ? '#40A': 'black';
+                // Just fade between white/black
+                //let n = ((this.animationTime / 100) % 30) | 0;
+                //if (n >= 15) n = 30 - n;
+                //const c = '0123456789ABCDEF'[Math.floor(n)];
+                //glowContext.fillStyle = `#${c}${c}${c}`;
+                // Theses values are chosen so that the split is between distinct veins on the tower.
+                const backgroundColor = this.definition.spirit ? '#40A': 'black';
 
-            const r = towerIsHaywire ? 30 : 50;
-            if (this.definition.style !== 'sky') {
-                const rects = [
-                    {x: 0, y: 115, w: 41, h: 53},// 41x53 234, 132
-                    {x: 25, y: 85, w: 25, h: 46}, //49x46, 234,102
-                    {x: 0, y: 154, w: 16, h: 38},// 16x38, 234, 171
-                    {x: 21, y: 169, w: 59, h: 37},// 59x37, 255, 186
-                    {x: 62, y: 127, w: 63, h: 33},// 63x33, 296, 144
-                    {x: 92, y: 164, w: 44, h: 72},// 44x72, 326,181
-                    {x: 137, y: 164, w: 34, h: 43},// 34x43, 371,181
-                    {x: 151, y: 97, w: 20, h: 58},// 20x58, 385,114
-                    {x: 18, y: 205, w: 21, h: 24},// 24, 252,222
-                ];
-                // Set this
-                const duration = towerIsHaywire ? 1000 : 6000;
-                for (let i = 0; i < rects.length; i++) {
-                    const rect = rects[i];
-                    let p = ((this.animationTime + (duration * 0.45) * i) % duration) / duration;
-                    p = (1 - Math.cos(p * Math.PI)) / 2;
-                    //console.log(p);
-                    let center = (maskFrame.w + 2 * r) * p - r;
-                    // Hack to double the frequency of waves.
-                    if (center > rect.x + rect.w + r || center < rect.x - r) {
-                        p = ((this.animationTime + (duration * 0.45) * i + duration / 2) % duration) / duration;
+                const r = towerIsHaywire ? 30 : 50;
+                if (this.definition.style !== 'sky') {
+                    const rects = [
+                        {x: 0, y: 115, w: 41, h: 53},// 41x53 234, 132
+                        {x: 25, y: 85, w: 25, h: 46}, //49x46, 234,102
+                        {x: 0, y: 154, w: 16, h: 38},// 16x38, 234, 171
+                        {x: 21, y: 169, w: 59, h: 37},// 59x37, 255, 186
+                        {x: 62, y: 127, w: 63, h: 33},// 63x33, 296, 144
+                        {x: 92, y: 164, w: 44, h: 72},// 44x72, 326,181
+                        {x: 137, y: 164, w: 34, h: 43},// 34x43, 371,181
+                        {x: 151, y: 97, w: 20, h: 58},// 20x58, 385,114
+                        {x: 18, y: 205, w: 21, h: 24},// 24, 252,222
+                    ];
+                    // Set this
+                    const duration = towerIsHaywire ? 1000 : 6000;
+                    for (let i = 0; i < rects.length; i++) {
+                        const rect = rects[i];
+                        let p = ((this.animationTime + (duration * 0.45) * i) % duration) / duration;
                         p = (1 - Math.cos(p * Math.PI)) / 2;
                         //console.log(p);
-                        center = (maskFrame.w + 2 * r) * p - r;
+                        let center = (maskFrame.w + 2 * r) * p - r;
+                        // Hack to double the frequency of waves.
+                        if (center > rect.x + rect.w + r || center < rect.x - r) {
+                            p = ((this.animationTime + (duration * 0.45) * i + duration / 2) % duration) / duration;
+                            p = (1 - Math.cos(p * Math.PI)) / 2;
+                            //console.log(p);
+                            center = (maskFrame.w + 2 * r) * p - r;
+                        }
+                        const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
+                        gradient.addColorStop(0, backgroundColor);
+                        // purple: '#A0F'
+                        gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
+                        gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
+                        gradient.addColorStop(0.54, backgroundColor);
+                        glowContext.fillStyle = gradient;
+                        glowContext.beginPath();
+                        glowContext.fillRect(rect.x, rect.y, rect.w, rect.h);
                     }
-                    const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
-                    gradient.addColorStop(0, backgroundColor);
-                    // purple: '#A0F'
-                    gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
-                    gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
-                    gradient.addColorStop(0.54, backgroundColor);
-                    glowContext.fillStyle = gradient;
-                    glowContext.beginPath();
-                    glowContext.fillRect(rect.x, rect.y, rect.w, rect.h);
+                } else {
+                    const h = this.definition.style === 'sky' ? 111 : 117;
+                    for (let y = 90, i = 0; y < maskFrame.h; y += h, i++) {
+                        let p = ((this.animationTime + 1000 * i) % 2000) / 2000;
+                        p = (1 - Math.cos(p * Math.PI)) / 2;
+                        const center = (maskFrame.w + r) * p;
+                        const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
+                        gradient.addColorStop(0, backgroundColor);
+                        // purple: '#A0F'
+                        gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
+                        gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
+                        gradient.addColorStop(0.54, backgroundColor);
+                        glowContext.fillStyle = gradient;
+                        glowContext.beginPath();
+                        glowContext.fillRect(0, y, maskFrame.w, h);
+                    }
                 }
-            } else {
-                const h = this.definition.style === 'sky' ? 111 : 117;
-                for (let y = 90, i = 0; y < maskFrame.h; y += h, i++) {
-                    let p = ((this.animationTime + 1000 * i) % 2000) / 2000;
-                    p = (1 - Math.cos(p * Math.PI)) / 2;
-                    const center = (maskFrame.w + r) * p;
-                    const gradient = glowContext.createLinearGradient(center - r, 0, center + r, 0);
-                    gradient.addColorStop(0, backgroundColor);
-                    // purple: '#A0F'
-                    gradient.addColorStop(0.5, this.definition.spirit ? '#FF4' : '#8FF');
-                    gradient.addColorStop(0.52, this.definition.spirit ? 'white': 'white');
-                    gradient.addColorStop(0.54, backgroundColor);
-                    glowContext.fillStyle = gradient;
-                    glowContext.beginPath();
-                    glowContext.fillRect(0, y, maskFrame.w, h);
-                }
-            }
 
 
-            drawFrame(maskContext, {...maskFrame, image: glowCanvas, x: 0, y: 0}, {...maskFrame, x: 0, y: 0});
-        }
-        drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);
-        //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
-        if (this.definition.style === 'sky') {
-            if (this.definition.spirit) {
-                drawFrameContentAt(context, staffTowerSpiritSkyFrame, this);
-            } else {
-                drawFrameContentAt(context, staffTowerSkyFrame, this);
+                drawFrame(maskContext, {...maskFrame, image: glowCanvas, x: 0, y: 0}, {...maskFrame, x: 0, y: 0});
             }
-            this.balcony.render(context, state);
-        } else {
-            if (this.definition.spirit) {
-                drawFrameContentAt(context, staffTowerSpiritFrame, this);
+            drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);
+            //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
+            if (this.definition.style === 'sky') {
+                if (this.definition.spirit) {
+                    drawFrameContentAt(context, staffTowerSpiritSkyFrame, this);
+                } else {
+                    drawFrameContentAt(context, staffTowerSkyFrame, this);
+                }
+                this.balcony.render(context, state);
             } else {
-                drawFrameContentAt(context, staffTowerFrame, this);
+                if (this.definition.spirit) {
+                    drawFrameContentAt(context, staffTowerSpiritFrame, this);
+                } else {
+                    drawFrameContentAt(context, staffTowerFrame, this);
+                }
             }
-        }
-        this.door.render(context, state);
+            if (scale < 1) {
+                context.save();
+                context.translate(0, -100 * (1 - scale));
+                drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);
+                //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
+                if (this.definition.style === 'sky') {
+                    if (this.definition.spirit) {
+                        drawFrameContentAt(context, staffTowerSpiritSkyFrame, this);
+                    } else {
+                        drawFrameContentAt(context, staffTowerSkyFrame, this);
+                    }
+                    this.balcony.render(context, state);
+                } else {
+                    if (this.definition.spirit) {
+                        drawFrameContentAt(context, staffTowerSpiritFrame, this);
+                    } else {
+                        drawFrameContentAt(context, staffTowerFrame, this);
+                    }
+                }
+                context.restore();
+            }
+            this.door.render(context, state);
+        context.restore();
     }
 }
 

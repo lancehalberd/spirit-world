@@ -2,6 +2,7 @@ import { refreshAreaLogic } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { Sign } from 'app/content/objects/sign';
+import { StaffTower } from 'app/content/objects/staffTower';
 import { showMessage } from 'app/scriptEvents';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -211,8 +212,15 @@ specialBehaviorsHash.towerExteriorTerminal = {
 dialogueHash.towerExteriorTerminal = {
     key: 'towerTeleporter',
     mappedOptions: {
-        collapse: `{item:staff=2}`,
-
+        collapse(state: GameState) {
+            for (const object of state.areaInstance.objects) {
+                if (object.definition.type === 'staffTower') {
+                    (object as StaffTower).collapse(state);
+                    return '';
+                }
+            }
+            return '';
+        }
     },
     options: [],
 };
