@@ -1,6 +1,9 @@
+import { refreshAreaLogic } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { Sign } from 'app/content/objects/sign';
+import { showMessage } from 'app/scriptEvents';
+import { saveGame } from 'app/utils/saveGame';
 
 
 specialBehaviorsHash.staffTower = {
@@ -143,39 +146,73 @@ dialogueHash.towerLargeTerminal = {
 specialBehaviorsHash.towerExteriorTerminal = {
     type: 'sign',
     apply(state: GameState, object: Sign) {
-        this.onRefreshLogic(state, object);
+        this.onRefreshLogic(state, object, true);
     },
-    onRefreshLogic(state: GameState, object: Sign) {
+    onRefreshLogic(state: GameState, object: Sign, fresh = false) {
+        const terminalLocation = object.definition.id.split(':')[1] as StaffTowerLocation;
+        const staffIsInInventory = state.hero.savedData.activeTools.staff >= 2;
+        const towerIsHere = !staffIsInInventory && terminalLocation === state.savedState.staffTowerLocation;
         const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
-        if (!towerIsOn) {
+        //console.log(state.savedState.staffTowerLocation, object.definition.id, {staffIsInInventory, towerIsHere, towerIsOn})
+        if (!towerIsOn && towerIsHere) {
             object.status = 'off';
             return;
         }
+        if (!towerIsHere && !staffIsInInventory) {
+            object.status = 'hidden';
+            return;
+        }
+        object.status = 'normal';
+    },
+    onRead(state: GameState, object: Sign) {
+        const terminalLocation = object.definition.id.split(':')[1] as StaffTowerLocation;
+        const staffIsInInventory = state.hero.savedData.activeTools.staff >= 2;
+        const towerIsHere = !staffIsInInventory && terminalLocation === state.savedState.staffTowerLocation;
+        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+        //console.log(state.savedState.staffTowerLocation, object.definition.id, {staffIsInInventory, towerIsHere, towerIsOn})
+        if (!towerIsOn && towerIsHere) {
+            return;
+        }
+        if (!towerIsHere && !staffIsInInventory) {
+            return;
+        }
+        if (staffIsInInventory) {
+            dialogueHash.towerExteriorTerminal.mappedOptions.deploy = (state: GameState) => {
+                state.savedState.staffTowerLocation = terminalLocation;
+                state.hero.savedData.activeTools.staff &= ~2;
+                refreshAreaLogic(state, state.hero.area);
+                saveGame(state);
+                return '';
+            };
+            return showMessage(state, `
+                DEPLOY THE TOWER TO THIS LOCATION?
+                {choice:DEPLOY?|Yes:towerExteriorTerminal.deploy|No}
+            `);
+        }
         if (!state.savedState.objectFlags.stormBeast) {
-            object.message = `
+            return showMessage(state, `
                 !WARNING![-]
                 ENERGY SURGES HAVE COMPROMISED PRIMARY FUNCTIONS.
-            `;
-            return;
+            `);
         }
         if (!state.savedState.objectFlags.staffTowerActivated) {
-            object.message = `
+            return showMessage(state, `
                 THIS TERMINAL CONTROLS TOWER DEPLOYMENT.{|}
                 UNAUTHORIZED OPERATION IS PROHIBITED.
-            `;
-            return;
+            `);
         }
-        object.message = `
+        return showMessage(state, `
             THIS TERMINAL CONTROLS TOWER DEPLOYMENT.{|}
             COLLAPSE TOWER FOR RELOCATION?
             {choice:COLLAPSE?|Yes:towerExteriorTerminal.collapse|No}
-        `;
+        `);
     }
 };
 dialogueHash.towerExteriorTerminal = {
     key: 'towerTeleporter',
     mappedOptions: {
         collapse: `{item:staff=2}`,
+
     },
     options: [],
 };

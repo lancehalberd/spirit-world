@@ -658,13 +658,14 @@ interface SpecialEnemyBehavior extends BaseSpecialBehavior<Enemy> {
 
 interface SpecialSignBehavior extends BaseSpecialBehavior<Sign> {
     type: 'sign'
+    onRead?: (state: GameState, object: Sign) => void
 }
 
 interface SpecialElevatorBehavior extends BaseSpecialBehavior<Elevator> {
     type: 'elevator'
 }
 
-interface SpecialSwitchBehavior extends BaseSpecialBehavior<Sign> {
+interface SpecialSwitchBehavior extends BaseSpecialBehavior<ObjectInstance> {
     // This could be extended for floor switches and other switches.
     type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal'
     onActivate?: (state: GameState, object: ObjectInstance) => void

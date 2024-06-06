@@ -128,9 +128,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (!hero.isAstralProjection) {
             checkForFloorEffects(state, hero);
             if (hero.z <= 0 && hero.action !== 'roll') {
-                // Pad the floor hitbox to prevent breaking floor tiles at the very edge
-                // of the hitbox.
-                breakBrittleTiles(state, hero.area, pad(hero.getFloorHitbox(), -4));
+                // It would be nice not to break everything under the hitbox here, for example,
+                // by using a smaller hitbox. Unfortunately that would allow the player to walk
+                // over cracked tiles by walking in between them.
+                breakBrittleTiles(state, hero.area, hero.getFloorHitbox());
             }
         }
     }

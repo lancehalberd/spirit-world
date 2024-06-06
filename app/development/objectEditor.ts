@@ -623,6 +623,8 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'shieldingUnit':
         case 'staffTower':
             return ['normal', 'closed'];
+        case 'sign':
+            return ['normal', 'hidden'];
         case 'turret':
             return ['normal', 'off'];
         default:
@@ -1490,6 +1492,11 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
     if (object.type === 'escalator' || object.type === 'decoration' || object.type === 'waterfall') {
         //object.x = Math.round(object.x / 8) * 8;
         //object.y = Math.round(object.y / 8) * 8;
+        return;
+    }
+    if (object.type === 'staffTower') {
+        object.x = Math.round(object.x / 2) * 2;
+        object.y = Math.round(object.y / 2) * 2;
         return;
     }
     const instance = createObjectInstance(state, object);

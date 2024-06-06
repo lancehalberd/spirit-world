@@ -96,6 +96,9 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     } else if (!grid[y][x].layers) {
         const areaDefinition = grid[y][x];
         const alternateAreaDefinition = alternateGrid[y][x];
+        if (!alternateAreaDefinition) {
+            debugger;
+        }
         if (alternateAreaDefinition.layers) {
             grid[y][x] = initializeAreaTiles({
                 ...areaDefinition,

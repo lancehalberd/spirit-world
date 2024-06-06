@@ -1,6 +1,8 @@
 import { objectHash } from 'app/content/objects/objectHash';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
 
 
@@ -17,6 +19,7 @@ const tabletOn1 = requireFrame('gfx/tiles/futuristic.png', {x: 6, y: 1155, w: 36
 const tabletOn2 = requireFrame('gfx/tiles/futuristic.png', {x: 54, y: 1155, w: 36, h: 26});
 const tabletOff = requireFrame('gfx/tiles/futuristic.png', {x: 102, y: 1187, w: 36, h: 26});
 
+const tabletHideAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32, content: {x: 6, w: 36, y: 5, h: 26}}, {left: 0, top: 1214, cols: 18, duration: 4}, {loop: false});
 
 export const signStyles = {
     displayScreen: {
@@ -52,12 +55,26 @@ export const signStyles = {
     stoneTerminal: {
         w: 32,
         h: 14,
-        render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
-            let frame = tabletOff;
-            if (sign.status === 'normal') {
-                frame = (state.time % 1000 < 500) ? tabletOn1 : tabletOn2;
+        getFrame(state: GameState, sign: Sign): Frame {
+            if (sign.status === 'hidden') {
+                return getFrame(tabletHideAnimation, sign.animationTime);
+            } else if (sign.status === 'normal') {
+                if (sign.animationTime < tabletHideAnimation.duration) {
+                    return getFrame(tabletHideAnimation, tabletHideAnimation.duration - sign.animationTime);
+                } else {
+                    return (state.time % 1000 < 500) ? tabletOn1 : tabletOn2;
+                }
             }
-            drawFrame(context, frame, {...frame, x: sign.x - 2, y: sign.y - 10});
+            return tabletOff;
+        },
+        render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
+            const frame = signStyles.stoneTerminal.getFrame(state, sign);
+            drawFrameAt(context, {...frame, h: 13}, {x: sign.x - 2, y: sign.y - 10});
+        },
+        // Hack to render the outline around the terminal under the player.
+        renderShadow(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
+            const frame = signStyles.stoneTerminal.getFrame(state, sign);
+            drawFrameAt(context, {...frame, h: frame.h - 13, y: frame.y + 13}, {x: sign.x - 2, y: sign.y - 10 + 13});
         },
         isSpiritReadable: false,
     },
@@ -93,7 +110,6 @@ export const signStyles = {
 
 export class Sign implements ObjectInstance {
     area: AreaInstance;
-    definition: SignDefinition;
     drawPriority: 'sprites' = 'sprites';
     behaviors = {
         solid: true,
@@ -101,20 +117,31 @@ export class Sign implements ObjectInstance {
     };
     isObject = <const>true;
     linkedObject: Sign;
-    x: number;
-    y: number;
-    status: ObjectStatus = 'normal';
+    x = this.definition.x;
+    y = this.definition.y;
+    status: ObjectStatus = this.definition.status ?? 'normal';
     isNeutralTarget = true;
-    message: string;
-    constructor(state: GameState, definition: SignDefinition) {
-        this.definition = definition;
-        this.x = definition.x;
-        this.y = definition.y;
-        this.message = this.definition.message;
+    message = this.definition.message;
+    // If we support more animations later, we will need to make this variable based on the sign style.
+    // Right now we only use this for hiding/showing the tablets that sink into the ground.
+    animationTime = tabletHideAnimation.duration;
+    constructor(state: GameState, public definition: SignDefinition) {
     }
     getHitbox(state: GameState): Rect {
         const style = signStyles[this.definition.style] || signStyles.short;
         return { x: this.x, y: this.y, w: style.w, h: style.h };
+    }
+    onActivate(state: GameState) {
+        if (this.status === 'hidden') {
+            this.status = 'normal';
+            this.animationTime = 0;
+        }
+    }
+    onDeactivate(state: GameState) {
+        if (this.status === 'normal') {
+            this.status = 'hidden';
+            this.animationTime = 0;
+        }
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         // Don't take actions that would start new scripts while running scripts.
@@ -128,9 +155,20 @@ export class Sign implements ObjectInstance {
         if (hero.isAstralProjection && !style.isSpiritReadable) {
             return;
         }
+        if (this.definition.specialBehaviorKey) {
+            const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSignBehavior;
+            if (specialBehavior.onRead) {
+                specialBehavior?.onRead?.(state, this);
+                hero.action = null;
+                return;
+            }
+        }
         showMessage(state, this.message);
         // Remove the grab action since the hero is reading the sign, not grabbing it.
         hero.action = null;
+    }
+    update() {
+        this.animationTime += FRAME_LENGTH;
     }
     render(context, state: GameState) {
         const style = signStyles[this.definition.style] || signStyles.short;
@@ -140,6 +178,13 @@ export class Sign implements ObjectInstance {
         }
         const frame = this.definition.spirit ? style.spirit : style.normal;
         drawFrame(context, frame, { ...frame, x: this.x - (frame.content?.x ?? 0), y: this.y - (frame.content?.y ?? 0) });
+    }
+    renderShadow(context, state: GameState) {
+        const style = signStyles[this.definition.style] || signStyles.short;
+        if (style.renderShadow) {
+            style.renderShadow(context, state, this);
+            return;
+        }
     }
 }
 objectHash.sign = Sign;

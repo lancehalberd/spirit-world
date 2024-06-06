@@ -888,110 +888,18 @@ const f0_2x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32, index: 497, mapId: 'underwater', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
-const f0_0x2: AreaDefinition = {
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 28, mapId: 'underwater', floorId: '1F', mapX: 0, mapY: 4},
-    ],
-};
-const f0_1x2: AreaDefinition = {
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 42, mapId: 'underwater', floorId: '1F', mapX: 2, mapY: 4},
-    ],
-};
-const f0_2x2: AreaDefinition = {
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 43, mapId: 'underwater', floorId: '1F', mapX: 4, mapY: 4},
-    ],
-};
-const sf0_0x0: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_0x0,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 44, mapId: 'underwaterSpirit', floorId: '1F', mapX: 0, mapY: 0},
-    ],
-};
-const sf0_1x0: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_1x0,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 456, mapId: 'underwaterSpirit', floorId: '1F', mapX: 2, mapY: 0},
-    ],
-};
-const sf0_2x0: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_2x0,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 458, mapId: 'underwaterSpirit', floorId: '1F', mapX: 4, mapY: 0},
-    ],
-};
-const sf0_0x1: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_0x1,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 465, mapId: 'underwaterSpirit', floorId: '1F', mapX: 0, mapY: 2},
-    ],
-};
-const sf0_1x1: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_1x1,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 466, mapId: 'underwaterSpirit', floorId: '1F', mapX: 2, mapY: 2},
-    ],
-};
-const sf0_2x1: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_2x1,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 468, mapId: 'underwaterSpirit', floorId: '1F', mapX: 4, mapY: 2},
-    ],
-};
-const sf0_0x2: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_0x2,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 498, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 4},
-    ],
-};
-const sf0_1x2: AreaDefinition = {
-    isSpiritWorld: true,
-    parentDefinition: f0_1x2,
-    layers: null,
-    objects: [
-    ],
-    sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 499, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 4},
-    ],
-};
+const f0_0x2: AreaDefinition = null;
+const f0_1x2: AreaDefinition = null;
+const f0_2x2: AreaDefinition = null;
+const sf0_0x0: AreaDefinition = null;
+const sf0_1x0: AreaDefinition = null;
+const sf0_2x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = null;
+const sf0_1x1: AreaDefinition = null;
+const sf0_2x1: AreaDefinition = null;
+const sf0_0x2: AreaDefinition = null;
+const sf0_1x2: AreaDefinition = null;
+const sf0_2x2: AreaDefinition = null;
 zones.underwater = {
     key: 'underwater',
     areaSize: {w: 32, h: 32},
@@ -1006,7 +914,7 @@ zones.underwater = {
             spiritGrid: [
                 [sf0_0x0,sf0_1x0,sf0_2x0,],
                 [sf0_0x1,sf0_1x1,sf0_2x1,],
-                [sf0_0x2,sf0_1x2,],
+                [sf0_0x2,sf0_1x2,sf0_2x2,],
             ],
         },
     ],

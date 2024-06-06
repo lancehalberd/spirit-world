@@ -67,13 +67,23 @@ export class StaffTower implements ObjectInstance {
         if (!isPixelInShortRect(x, y, hitbox)) {
             return {};
         }
-        const radius = 82;
-        // TODO: make this an ellipse instead of a circle.
-        const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
-        const r2 = dx * dx + dy * dy;
-        // The ring around the elevator is solid
+        // All of the top except for 1 tile is a solid rectangle.
+        if (y < this.y + 112 && y > this.y + 16) {
+            return {solid: true};
+        }
+        // The bottom is a solid half circle.
+        const radius = 86;
+        let dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
+        let r2 = dx * dx + dy * dy;
         if (r2 < radius * radius) {
             return {solid: true};
+        }
+        if (this.definition.style === 'sky') {
+            dy = y - (hitbox.y + (hitbox.h + 36) / 2);
+            r2 = dx * dx + dy * dy;
+            if (r2 < radius * radius) {
+                return {pit: true, pitWall: true};
+            }
         }
         return {};
     }
@@ -82,7 +92,11 @@ export class StaffTower implements ObjectInstance {
         return hitbox.y + hitbox.h - 57;
     }
     getHitbox(): Rect {;
-        return getFrameHitbox(staffTowerFrame, this);
+        const hitbox = getFrameHitbox(staffTowerFrame, this);
+        if (this.definition.style === 'sky') {
+            hitbox.h += 16;
+        }
+        return hitbox;
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;

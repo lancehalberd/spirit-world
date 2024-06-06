@@ -193,7 +193,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         } else if (dy < 0) {
             hero.y--;
         }
-        if (onPitWall || dx > 0) {
+        if (dx > 0) {
             hero.x++;
         } else if (dx < 0) {
             hero.x--;
