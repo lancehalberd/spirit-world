@@ -4,6 +4,7 @@ import { appendScript } from 'app/scriptEvents';
 import { drawFrame, drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
+import { hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { isPixelInShortRect } from 'app/utils/index';
 import { requireFrame } from 'app/utils/packedImages';
@@ -27,6 +28,7 @@ const [glowCanvas, glowContext] = createCanvasAndContext(staffTowerSkyMaskFrame.
 const shakeTime = 1600;
 const shrinkTime = 1000;
 const gatherTime = 400;
+const throwTime = 800;
 
 export class StaffTower implements ObjectInstance {
     area: AreaInstance;
@@ -73,6 +75,12 @@ export class StaffTower implements ObjectInstance {
         this.animationTime = 0;
         // Prevent the hero from moving while the tower is deployed.
         state.hero.isControlledByObject = true;
+        const hitbox = this.getHitbox();
+        const heroBox = state.hero.getHitbox();
+        const dx = (heroBox.x + heroBox.w / 2) - (hitbox.x + hitbox.w / 2);
+        const dy = (heroBox.y + heroBox.h / 2) - (hitbox.y + hitbox.h / 2);
+        this.x += dx;
+        this.y += dy - 2;
     }
     getParts() {
         const parts = [this.door];
@@ -119,7 +127,26 @@ export class StaffTower implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.specialStatus === 'collapsing') {
+        if (this.specialStatus === 'deploying') {
+            state.hero.isControlledByObject = true;
+            if (this.animationTime < throwTime) {
+                this.y -= 5;
+            } else if (this.animationTime === throwTime) {
+                this.y = -200;
+                this.x = this.definition.x;
+            } else if (this.y < this.definition.y) {
+                this.y = Math.min(this.y + 6, this.definition.y);
+            } else {
+                state.screenShakes = [{dx: 5, dy: 5, startTime: state.fieldTime, endTime: state.fieldTime + 1000}];
+                delete this.specialStatus;
+                // Should destroy anything the tower lands on that isn't immune to physical damage.
+                hitTargets(state, this.area, {
+                    damage: 100,
+                    hitbox: this.getHitbox(),
+                    hitEnemies: true,
+                });
+            }
+        } else if (this.specialStatus === 'collapsing') {
             state.hero.isControlledByObject = true;
             if (this.animationTime === 400) {
                 state.screenShakes = [{dx: 1, dy: 1, startTime: state.fieldTime}];
@@ -142,9 +169,16 @@ export class StaffTower implements ObjectInstance {
                 this.x += dx * FRAME_LENGTH / timeLeft;
                 this.y += dy * FRAME_LENGTH / timeLeft;
             }
+        } else {
+            // Do not update the door during the animations, it might overlap the character
+            // and trigger entering the door.
+            this.door.update(state);
         }
         this.door.area = this.area;
-        this.door.update(state);
+        // Need to udpate the door during animations that move the tower.
+        this.door.x = this.x + 70;
+        this.door.y = this.y + 138;
+
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         if (this.definition.style === 'sky' || this.definition.spirit) {
@@ -158,6 +192,9 @@ export class StaffTower implements ObjectInstance {
             if (this.animationTime >= shakeTime) {
                 scale = Math.max(0.03, 1 - (this.animationTime - shakeTime) / shrinkTime);
             }
+        }
+        if (this.specialStatus === 'deploying' && this.animationTime < throwTime) {
+            scale = 0.03;
         }
         context.save();
             if (scale !== 1) {
@@ -271,6 +308,27 @@ export class StaffTower implements ObjectInstance {
             if (scale < 1) {
                 context.save();
                 context.translate(0, -100 * (1 - scale));
+                drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);
+                //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
+                if (this.definition.style === 'sky') {
+                    if (this.definition.spirit) {
+                        drawFrameContentAt(context, staffTowerSpiritSkyFrame, this);
+                    } else {
+                        drawFrameContentAt(context, staffTowerSkyFrame, this);
+                    }
+                    this.balcony.render(context, state);
+                } else {
+                    if (this.definition.spirit) {
+                        drawFrameContentAt(context, staffTowerSpiritFrame, this);
+                    } else {
+                        drawFrameContentAt(context, staffTowerFrame, this);
+                    }
+                }
+                context.restore();
+            }
+            if (scale < 1) {
+                context.save();
+                context.translate(0, -200 * (1 - scale));
                 drawFrameContentAt(context, {...maskFrame, image: maskCanvas, x: 0, y: 0}, this);
                 //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
                 if (this.definition.style === 'sky') {

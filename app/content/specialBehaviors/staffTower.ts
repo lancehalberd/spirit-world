@@ -181,8 +181,14 @@ specialBehaviorsHash.towerExteriorTerminal = {
             dialogueHash.towerExteriorTerminal.mappedOptions.deploy = (state: GameState) => {
                 state.savedState.staffTowerLocation = terminalLocation;
                 state.hero.savedData.activeTools.staff &= ~2;
-                refreshAreaLogic(state, state.hero.area);
+                refreshAreaLogic(state, state.hero.area, true);
                 saveGame(state);
+                for (const object of state.areaInstance.objects) {
+                    if (object.definition.type === 'staffTower') {
+                        (object as StaffTower).deploy(state);
+                        return '';
+                    }
+                }
                 return '';
             };
             return showMessage(state, `

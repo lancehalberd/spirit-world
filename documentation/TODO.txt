@@ -96,10 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Animate tower deployment:
-        - Miniature tower flies up from the player off screen.
-        - Full sized tower falls from off screen and lands with a large sound effect and screen shake.
-
     - Teleportation to reach the final boss requires too much precision, the walls should be thinner
         - The north wall should only be half solid, we can fix this by adding a new tile instead of using composite tiles.
 
