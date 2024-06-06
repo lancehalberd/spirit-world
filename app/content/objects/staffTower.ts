@@ -1,5 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import { appendScript } from 'app/scriptEvents';
 import { drawFrame, drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -61,6 +62,7 @@ export class StaffTower implements ObjectInstance {
         });
         // Door's normally render on the background layer, but this door must render on top of the tower, which is in the sprite layer.
         this.door.renderParent = this;
+        this.door.area = this.area;
         this.balcony = new Balcony(this);
     }
     collapse(state: GameState) {
@@ -137,7 +139,9 @@ export class StaffTower implements ObjectInstance {
             } else if (this.y < this.definition.y) {
                 this.y = Math.min(this.y + 6, this.definition.y);
             } else {
-                state.screenShakes = [{dx: 5, dy: 5, startTime: state.fieldTime, endTime: state.fieldTime + 1000}];
+                state.screenShakes = [{dx: 0, dy: 5, startTime: state.fieldTime, endTime: state.fieldTime + 1000}];
+                playAreaSound(state, state.areaInstance, 'bossDeath');
+                playAreaSound(state, state.areaInstance, 'cloneExplosion');
                 delete this.specialStatus;
                 // Should destroy anything the tower lands on that isn't immune to physical damage.
                 hitTargets(state, this.area, {
@@ -172,19 +176,32 @@ export class StaffTower implements ObjectInstance {
         } else {
             // Do not update the door during the animations, it might overlap the character
             // and trigger entering the door.
+            this.door.area = this.area;
             this.door.update(state);
         }
-        this.door.area = this.area;
         // Need to udpate the door during animations that move the tower.
         this.door.x = this.x + 70;
         this.door.y = this.y + 138;
-
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         if (this.definition.style === 'sky' || this.definition.spirit) {
             return;
         }
-        drawFrameContentAt(context, staffTowerCloudFrame, {x: this.x - 8, y: this.y - 80});
+        let scale = 1;
+        if (this.specialStatus === 'collapsing') {
+            if (this.animationTime >= shakeTime) {
+                scale = Math.max(0.03, 1 - (this.animationTime - shakeTime) / shrinkTime);
+            }
+        }
+        if (this.specialStatus === 'deploying' && this.animationTime < throwTime) {
+            scale = 0.03;
+        }
+        context.save();
+            if (scale !== 1) {
+                context.globalAlpha *= Math.max(0, scale - 0.3);
+            }
+            drawFrameContentAt(context, staffTowerCloudFrame, {x: this.x - 8, y: this.y - 80});
+        context.restore();
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         let scale = 1;
