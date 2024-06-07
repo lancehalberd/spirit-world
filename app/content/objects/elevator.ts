@@ -412,7 +412,10 @@ class ElevatorControlTerminal implements ObjectInstance {
         }
 
         // TODO: Make this dynamic based on elevator objects in the zone and the name of the floor for their section.
-        appendScript(state, '{choice:SELECT FLOOR|B1:elevator.f0|1F:elevator.f1|2F:elevator.f2|3F:elevator.f3|4F:elevator.f4|5F:elevator.f5}');
+        let options = ['B1', '1F', '2F', '3F', '4F', '5F'];
+        options[this.elevator.definition.floor] = options[this.elevator.definition.floor] +' (Stay)';
+        options = options.map((v, i) => `${v}:elevator.f${i}`);
+        appendScript(state, `{choice:SELECT FLOOR|${options.join('|')}}`);
         // Set the results of choosing a floor based on the current floor the elevator is on:
         for (let i = 0; i < 6; i++) {
             dialogueHash.elevator.mappedOptions[`f${i}`] = (i === this.elevator.definition.floor)

@@ -221,7 +221,7 @@ const ceilingEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame(futuristicImage, {x: 0, y: 208, w: 80, h: 80}),
     behaviors: {
-        'all': ceilingBehavior,
+        'all': {defaultLayer: 'foreground2', isVeryTall: true, isGround: false},
         '0x3': bottomLeftShallowCeiling,
         '1x4': bottomLeftShallowCeiling,
         '2x4': bottomCeilingBehavior,

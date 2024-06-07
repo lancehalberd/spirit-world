@@ -370,9 +370,9 @@ interface Path {
 }
 
 const stormBeastPaths = [
-    { start: [256, -64], end: [128, 256]},
-    { start: [-64, 256], end: [256, 384]},
-    { start: [256, 576], end: [384, 256]},
+    { start: [320, -80], end: [192, 320]},
+    { start: [-80, 320], end: [320, 448]},
+    { start: [320, 720], end: [448, 320]},
 ];
 
 
