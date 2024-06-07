@@ -1194,7 +1194,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-ent-0", x: 384, y: 80, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "crater:0:2x0-snakeFlame-2", x: 212, y: 228, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1Objects"},
         {status: "normal", id: "crater:0:2x0-ent-1", x: 132, y: 340, type: "enemy", enemyType: "plantFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1Objects"},
-        {status: "locked", id: "craterLava2", x: 248, y: 240, type: "keyBlock", hasCustomLogic: true, customLogic: "craterLava1Objects"},
+        {status: "locked", id: "craterLava2", x: 248, y: 240, type: "keyBlock", hasCustomLogic: true, customLogic: "craterLava1Objects", freezePlayer: true},
         {status: "normal", id: "craterStairs", x: 144, y: 160, type: "door", style: "cavernDownstairs", targetZone: "crater", targetObjectId: "craterStairs", d: "up", hasCustomLogic: true, customLogic: "craterLava1Objects"},
         {status: "normal", id: "craterLavaSwitch1", x: 416, y: 80, type: "floorSwitch", specialBehaviorKey: "craterLavaSwitch", saveStatus: "forever"},
         {status: "normal", id: "craterLava1", x: 464, y: 64, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "never"},
@@ -5046,7 +5046,7 @@ const f1_2x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "craterEastDoor", x: 64, y: 80, type: "door", style: "cavern", d: "down", targetZone: "crater", targetObjectId: "craterEastDoor"},
         {status: "normal", id: "craterLavaDoor", x: 32, y: 176, type: "door", style: "cavern", d: "left", hasCustomLogic: true, customLogic: "craterLava3", targetZone: "crater", targetObjectId: "craterLavaDoor"},
-        {status: "locked", id: "craterLava3", x: 400, y: 56, type: "keyBlock"},
+        {status: "locked", id: "craterLava3", x: 400, y: 56, type: "keyBlock", freezePlayer: true},
         {status: "normal", id: "craterInnerRightDoor", x: 16, y: 496, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterInnerRightDoor", d: "down"},
         {status: "normal", id: "craterRightDoor", x: 320, y: 496, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterRightDoor", d: "down"},
         {status: "normal", id: "", x: 16, y: 480, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background"},

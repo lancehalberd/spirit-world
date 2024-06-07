@@ -165,7 +165,7 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
 
 export function activateTarget(state: GameState, target: ObjectInstance, playChime = false): void {
     if (target.onActivate) {
-        if (target.onActivate(state)) {
+        if (target.onActivate(state) && playChime) {
             playSound(state, 'secretChime');
         }
         return;

@@ -982,7 +982,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 464, y: 464, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "forgeLava2", linked: false, spirit: false, x: 200, y: 312, type: "floorSwitch", saveStatus: "forever"},
         {status: "normal", id: "forge:1:0x0-ent-1", x: 376, y: 92, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "forgeLava2"},
-        {status: "locked", id: "forgeLava3", x: 376, y: 64, type: "keyBlock", hasCustomLogic: true, customLogic: "forgeLava2"},
+        {status: "locked", id: "forgeLava3", x: 376, y: 64, type: "keyBlock", hasCustomLogic: true, customLogic: "forgeLava2", freezePlayer: true},
         {status: "normal", id: "forge:1:0x0-ent-2", x: 376, y: 120, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "forgeLava2"},
         {status: "normal", id: "forge:1:0x0-balloonCentipede-0", linked: true, x: 40, y: 64, type: "enemy", enemyType: "balloonCentipede", d: "right", params: {}},
         {status: "normal", id: "forge:1:0x0-balloonCentipede-1", linked: true, x: 44, y: 200, type: "enemy", enemyType: "balloonCentipede", d: "right", params: {}},

@@ -96,8 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Can move when unlocking keyblocks that change layers.
-        - Maybe make the freezing behavior just a flag on the keyblock.
     - Update Storm beast locations to be centered around the new platform.
     - Fix floor select in elevator should indicate the current floor.
 

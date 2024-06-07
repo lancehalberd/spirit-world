@@ -458,6 +458,7 @@ interface FloorSwitchDefinition extends BaseSwitchDefinition {
 
 interface KeyBlockDefinition extends BaseSwitchDefinition {
     type: 'keyBlock'
+    freezePlayer?: boolean
 }
 
 interface IndicatorDefinition extends BaseObjectDefinition {

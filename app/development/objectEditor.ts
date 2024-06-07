@@ -375,6 +375,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                freezePlayer: definition.freezePlayer ?? false,
                 requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
             };
@@ -1144,6 +1145,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             break;
         case 'keyBlock':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
+            rows.push({
+                name: 'freeze player',
+                value: object.freezePlayer ?? false,
+                onChange(freezePlayer: boolean) {
+                    object.freezePlayer = freezePlayer;
+                    updateObjectInstance(state, object);
+                },
+            });
             break;
         case 'enemy':
             rows = [...rows, ...getEnemyFields(state, editingState, object)];

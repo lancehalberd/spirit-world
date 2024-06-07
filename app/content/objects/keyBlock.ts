@@ -80,7 +80,7 @@ export class KeyBlock implements ObjectInstance {
             // but wait for the animation to finish before activating the target.
             // Saving the flag immediately is important in case the player leaves the screen
             // mid animation.
-            if (this.definition.targetObjectId) {
+            if (this.definition.targetObjectId || this.definition.freezePlayer) {
                 state.savedState.objectFlags[this.definition.targetObjectId] = true;
                 state.scriptEvents.activeEvents.push({
                     type: 'wait',
