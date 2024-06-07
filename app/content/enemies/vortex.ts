@@ -89,7 +89,7 @@ enemyDefinitions.vortex = {
                         hero.wading = false;
                         hero.vz = -3;
                     } else {
-                        hero.action = 'falling';
+                        hero.fallIntoPit(state);
                         hero.animationTime = 400;
                         hero.x = enemy.x + 4;
                         hero.y = enemy.y + 4;

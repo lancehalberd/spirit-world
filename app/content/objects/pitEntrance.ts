@@ -105,10 +105,7 @@ export class PitEntrance implements ObjectInstance {
             if (hero.action === 'fallen') {
                 enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, onEnterZoneFromPit);
             } else if (hero.action !== 'falling') {
-                hero.throwHeldObject(state);
-                hero.heldChakram?.throw(state);
-                hero.action = 'falling';
-                hero.animationTime = 0;
+                hero.fallIntoPit(state);
             }
             const pitStyle = pitStyles[this.style] || pitStyles.default;
             const pitbox = pitStyle.getPitbox?.(this) || hitbox;

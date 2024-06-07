@@ -384,11 +384,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = null;
                 hero.chargingLeftTool = hero.chargingRightTool = false;
             }
-        } else if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
+        } else if (hero.chargingLeftTool && ((!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) && !state.scriptEvents.blockPlayerInput) || !canCharge)) {
             useTool(state, hero, hero.savedData.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
             hero.action = null;
-        } else if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
+        } else if (hero.chargingRightTool && ((!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) && !state.scriptEvents.blockPlayerInput) || !canCharge)) {
             useTool(state, hero, hero.savedData.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
             hero.action = null;
@@ -422,7 +422,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
-        } else if (hero.heldChakram && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
+        } else if (hero.heldChakram && !state.scriptEvents.blockPlayerInput && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
             hero.action = 'attack';
             hero.animationTime = 0;
             hero.actionFrame = 0;

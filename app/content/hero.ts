@@ -28,7 +28,7 @@ import {
 import { getCloneMovementDeltas } from 'app/userInput';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { destroyClone } from 'app/utils/destroyClone';
-import { addEffectToArea } from 'app/utils/effects';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
 import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';
@@ -388,6 +388,22 @@ export class Hero implements Actor {
             source: this,
         });
         addEffectToArea(state, this.area, this.activeBarrierBurst);
+    }
+    fallIntoPit(state: GameState) {
+        this.throwHeldObject(state);
+        this.heldChakram?.throw(state);
+        this.endInvisibility(state);
+        // Unfreeze on falling into a pit.
+        this.frozenDuration = 0;
+        this.action = 'falling';
+        this.animationTime = 0;
+    }
+    endInvisibility(state: GameState) {
+        this.isInvisible = false;
+        if (this.activeBarrierBurst) {
+            removeEffectFromArea(state, this.activeBarrierBurst);
+            delete this.activeBarrierBurst;
+        }
     }
 
     shatterBarrier(state: GameState) {

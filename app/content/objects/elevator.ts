@@ -151,8 +151,7 @@ export class Elevator implements ObjectInstance {
         appendScript(state, '{wait:300}');
         appendCallback(state, (state: GameState) => {
             state.hero.savedData.equippedBoots = boots;
-            state.hero.action = 'falling';
-            state.hero.animationTime = 0;
+            state.hero.fallIntoPit(state);
             return '';
         });
     }

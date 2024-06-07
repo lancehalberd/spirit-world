@@ -130,11 +130,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (hero.isOverClouds && hero.savedData.equippedBoots === 'cloudBoots') {
                 // Do nothing.
             } else {
-                hero.throwHeldObject(state);
-                // Unfreeze on falling into a pit.
-                hero.frozenDuration = 0;
-                hero.heldChakram?.throw(state);
-                hero.action = 'falling';
+                hero.fallIntoPit(state);
                 //hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
                 hero.x = Math.round(hero.x / tileSize) * tileSize;
                 hero.y = Math.round(hero.y / tileSize) * tileSize;
@@ -418,11 +414,7 @@ export function checkForFloorEffectsOld(state: GameState, hero: Hero) {
             if (hero.isOverClouds && hero.savedData.equippedBoots === 'cloudBoots') {
                 // Do nothing.
             } else {
-                hero.throwHeldObject(state);
-                // Unfreeze on falling into a pit.
-                hero.frozenDuration = 0;
-                hero.heldChakram?.throw(state);
-                hero.action = 'falling';
+                hero.fallIntoPit(state);
                 //hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
                 hero.x = Math.round(hero.x / tileSize) * tileSize;
                 hero.y = Math.round(hero.y / tileSize) * tileSize;

@@ -82,6 +82,7 @@ export function enterLocation(
     state.zone = zones[location.zoneKey];
     state.hero.x = location.x;
     state.hero.y = location.y;
+    state.hero.endInvisibility(state);
     // If the player somehow enters the staff tower while the tower staff is equipped (such as returning to last save)
     // Remove the tower staff from their inventory.
     if (state.location.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff & 2) {

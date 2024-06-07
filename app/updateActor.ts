@@ -152,7 +152,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         hero.isInvisible = false;
     }
     // End invisibility once the player lets go of the cloak tool.
-    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
+    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak') && !state.scriptEvents.blockPlayerInput) {
         hero.isInvisible = false;
     }
     if (hero.clones?.length && hero.savedData.leftTool !== 'clone' && hero.savedData.rightTool !== 'clone') {
@@ -285,10 +285,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
                 removeEffectFromArea(state, hero.heldChakram);
                 delete hero.heldChakram;
             }
-            if (hero.activeBarrierBurst) {
-                removeEffectFromArea(state, hero.activeBarrierBurst);
-                delete hero.activeBarrierBurst;
-            }
+            hero.endInvisibility(state);
             if (state.hero.savedData.hasRevive) {
                 state.reviveTime = state.fieldTime;
             }
