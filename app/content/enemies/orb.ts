@@ -174,8 +174,28 @@ function getBlastCircle(enemy: Enemy, otherEnemy: Enemy, p = 1): Circle {
     };
 }
 
+
+// Orb's can be knocked around but aren't actually knocked down.
+function applyHitKnockbackToOrb(hit: HitProperties, enemy: Enemy<OrbProps>): void {
+    let knockback = hit.knockback;
+    if (hit.knockAwayFrom) {
+        const hitbox = enemy.getHitbox();
+        const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+        const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+        const mag = Math.sqrt(dx * dx + dy * dy);
+        if (mag) {
+            knockback = {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0};
+        }
+    }
+    if (knockback) {
+        enemy.vx += knockback.vx;
+        enemy.vy += knockback.vy;
+    }
+}
+
 enemyDefinitions.smallOrb = {
     ...baseOrbDefinition,
+    canBeKnockedBack: false,
     animations: {idle: omniAnimation(orbAnimation)}, life: 8, touchHit: {element: 'lightning', damage: 2}, update: updateSmallOrb,
     immunities: ['lightning'],
     onHit(this: void, state: GameState, enemy: Enemy<OrbProps>, hit: HitProperties): HitResult {
@@ -186,10 +206,7 @@ enemyDefinitions.smallOrb = {
         if (result.hit) {
             // The orb bob's faster after taking damage.
             enemy.params.bobThetaV = fastBobThetaV;
-        }
-        // TODO: Find a better way to prevent the orb from falling to the ground when knocked.
-        if (enemy.action === 'knocked') {
-            delete enemy.action;
+            applyHitKnockbackToOrb(hit, enemy);
         }
         return result;
     },
@@ -215,20 +232,7 @@ enemyDefinitions.largeOrb = {
         const result = enemy.defaultOnHit(state, hit);
         // The orb can be knocked back a little once it is in its pinch mode.
         if (result.hit && enemy.params.invertedDuration) {
-            let knockback = hit.knockback;
-            if (hit.knockAwayFrom) {
-                const hitbox = enemy.getHitbox();
-                const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
-                const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
-                const mag = Math.sqrt(dx * dx + dy * dy);
-                if (mag) {
-                    knockback = {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0};
-                }
-            }
-            if (knockback) {
-                enemy.vx += knockback.vx;
-                enemy.vy += knockback.vy;
-            }
+            applyHitKnockbackToOrb(hit, enemy);
         }
         const damage = life - enemy.life;
         if (damage > 0) {

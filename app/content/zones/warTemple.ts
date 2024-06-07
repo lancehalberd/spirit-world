@@ -527,11 +527,11 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closed", id: "warTemple:0:1x0-smallKey-0", x: 496, y: 352, type: "door", style: "stone", d: "right", linked: true},
-        {status: "closed", id: "warTemple:0:1x0-smallKey-0", x: 0, y: 352, type: "door", style: "stone", d: "left", linked: true},
-        {status: "hiddenSwitch", id: "warTemple:0:1x0-smallKey-0", x: 240, y: 368, type: "chest", lootType: "smallKey", lootLevel: 1},
-        {status: "normal", id: "", x: 160, y: 368, targetObjectId: "warTemple:0:1x0-smallKey-0", toggleOnRelease: true, type: "floorSwitch"},
-        {status: "normal", id: "", x: 320, y: 368, targetObjectId: "warTemple:0:1x0-smallKey-0", toggleOnRelease: true, type: "floorSwitch"},
+        {status: "closed", id: "0", x: 496, y: 352, type: "door", style: "stone", d: "right", linked: true, openLogic: {"hasCustomLogic":true,"customLogic":"warTempleSmallKey1","isInverted":false}},
+        {status: "closed", id: "", x: 0, y: 352, type: "door", style: "stone", d: "left", linked: true, openLogic: {"hasCustomLogic":true,"customLogic":"warTempleSmallKey1","isInverted":false}},
+        {status: "hiddenSwitch", id: "warTempleSmallKey1", x: 240, y: 368, type: "chest", lootType: "smallKey", lootLevel: 1},
+        {status: "normal", id: "", x: 160, y: 368, targetObjectId: "warTempleSmallKey1", toggleOnRelease: true, type: "floorSwitch"},
+        {status: "normal", id: "", x: 320, y: 368, targetObjectId: "warTempleSmallKey1", toggleOnRelease: true, type: "floorSwitch"},
         {status: "normal", id: "", linked: true, x: 192, y: 368, type: "pushPull"},
         {status: "normal", id: "", linked: true, x: 288, y: 368, type: "pushPull"},
     ],
@@ -2958,8 +2958,8 @@ const sf0_1x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "", linked: true, x: 192, y: 368, type: "pushPull", spirit: true},
         {status: "normal", id: "", linked: true, x: 288, y: 368, type: "pushPull", spirit: true},
-        {status: "normal", id: "warTemple:0:1x0-smallKey-0", x: 496, y: 352, type: "door", style: "stone", d: "right", linked: true, spirit: true},
-        {status: "normal", id: "warTemple:0:1x0-smallKey-0", x: 0, y: 352, type: "door", style: "stone", d: "left", linked: true, spirit: true},
+        {status: "normal", id: "", x: 496, y: 352, type: "door", style: "stone", d: "right", linked: true, spirit: true},
+        {status: "normal", id: "", x: 0, y: 352, type: "door", style: "stone", d: "left", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 227, hideMap: true, mapId: 'warTempleSpirit', floorId: '1F', mapX: 2, mapY: 0},

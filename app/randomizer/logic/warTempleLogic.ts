@@ -81,7 +81,7 @@ export const warTempleNodes: LogicNode[] = [
         nodeId: 'warTempleMainEntrance',
         paths: [
             {nodeId: 'warTempleKeyDoor'},
-            {nodeId: 'warTemple:0:1x0-smallKey-0', logic: canRemoveLightStones},
+            {nodeId: 'warTempleBackRoom', logic: canRemoveLightStones},
         ],
         entranceIds: ['warTempleMainEntrance', 'warTempleLock1'],
         exits: [
@@ -91,9 +91,9 @@ export const warTempleNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'warTemple:0:1x0-smallKey-0',
+        nodeId: 'warTempleBackRoom',
         checks: [
-            {objectId: 'warTemple:0:1x0-smallKey-0'},
+            {objectId: 'warTempleSmallKey1'},
             // The player can defeat all these enemies using stones now that enemies stay
             // defeated when leaving and returning to rooms.
             {objectId: 'warTemple:0:0x0-money-0', logic: orLogic(hasWeapon, canRemoveLightStones)},

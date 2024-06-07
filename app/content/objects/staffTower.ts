@@ -62,7 +62,6 @@ export class StaffTower implements ObjectInstance {
         });
         // Door's normally render on the background layer, but this door must render on top of the tower, which is in the sprite layer.
         this.door.renderParent = this;
-        this.door.area = this.area;
         this.balcony = new Balcony(this);
     }
     collapse(state: GameState) {

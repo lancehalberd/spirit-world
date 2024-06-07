@@ -96,11 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Cleanup flower beneath terminal in forest tower location.
-    - Secret sound does not play when revealing chest in the back of war temple.
-    - Add short cuts to river temple with level 2 gloves. In particular allow getting the chest there with gloves instead of staff.
-    - Fix stairs under escalator in gauntlet.
-    - Sound like burning orbs play death SFX twice, let's make sure it only triggers once per enemy.
     - Fix floor select in elevator should indicate the current floor.
     - Update Storm beast locations to be centered around the new platform.
     - Charging chakram while crossing screens causes you to automatically release it and be knocked back through the screen transition.
