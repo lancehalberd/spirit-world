@@ -93,6 +93,10 @@ type DialogueKey = 'streetVendor' | 'storageVanara' | 'forgeSmith' | 'citySmith'
 interface LogicNode {
     // The id of the zone this node is in
     zoneId: string
+    // This can be set to disambiguate entrances with the same id in different worlds.
+    // When this is set entrance connections will only match nodes that share the same value
+    // unless they are teleporters.
+    isSpiritWorld?: boolean
     // The id for this node, used for targeting it from other nodes.
     nodeId: string
     // The ids of any loot checks in this node.

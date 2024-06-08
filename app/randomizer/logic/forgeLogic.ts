@@ -81,9 +81,8 @@ export const forgeNodes: LogicNode[] = [
         nodeId: 'forgeStairPuzzle',
         checks: [{objectId: 'forgeSmallKey'}],
         paths: [{nodeId: 'forgeB2', logic: orLogic(drainedLava4, canCross4Gaps, hasIce, hasInvisibility)}],
-        entranceIds: ['forgeStairs2', 'forgeStairs3'],
+        entranceIds: ['forgeStairs3'],
         exits: [
-            {objectId: 'forgeStairs2'},
             {objectId: 'forgeStairs3', logic: hasMitts}
         ],
     },

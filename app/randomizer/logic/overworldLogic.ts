@@ -35,7 +35,7 @@ export const mainOverworldNode: LogicNode = {
     ],
     entranceIds: [
         'sideArea:noToolEntrance', 'tombTeleporter',
-        'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance',
+        'peachCaveTopEntrance', 'peachCaveWaterEntrance',
         'staffTowerEntrance',
         'treeCaveEntrance',
         'tombEntrance', 'waterfallCaveEntrance', 'grandTempleEntrance',

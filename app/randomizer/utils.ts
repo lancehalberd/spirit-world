@@ -104,7 +104,7 @@ function exportLootData() {
 window['exportLootData'] = exportLootData;
 
 
-function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
+export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
     const handledIds = new Set<string>();
     for (const node of allNodes) {
         const zone = getZone(node.zoneId);
@@ -274,7 +274,7 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
 }
 
 // Make a deep copy of the state.
-function copyState(state: GameState): GameState {
+export function copyState(state: GameState): GameState {
     return {
         ...state,
         hero: state.hero.getCopy(),
@@ -286,7 +286,7 @@ function copyState(state: GameState): GameState {
     };
 }
 
-function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLocation): GameState {
+export function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLocation): GameState {
     if (lootWithLocation.lootObject.lootType === 'empty') {
         return state;
     }
@@ -309,7 +309,7 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     return stateCopy;
 }
 
-function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], startingNodes: LogicNode[]): GameState {
+export function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], startingNodes: LogicNode[]): GameState {
     let changed, updatedState = state;
     do {
         changed = false;

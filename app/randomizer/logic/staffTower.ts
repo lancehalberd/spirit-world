@@ -70,8 +70,8 @@ export const staffTowerNodes: LogicNode[] = [
             {nodeId: 'staffTowerF1Upstairs', logic: hasReleasedBeasts},
             {nodeId: 'staffTowerF1SpiritDownstairs'},
         ],
-        entranceIds: ['staffTower1F2F', 'staffTowerSpiritEntrance'],
-        exits: [{objectId: 'staffTower1F2F'}, {objectId: 'staffTowerSpiritEntrance'}],
+        entranceIds: ['staffTower1F2F'],
+        exits: [{objectId: 'staffTower1F2F'}],
     },
     {
         zoneId,
@@ -83,8 +83,8 @@ export const staffTowerNodes: LogicNode[] = [
             {nodeId: 'mainSpiritWorld'},
             // Other exits don't need logic since they have to already be in logic to move the tower to them.
         ],
-        entranceIds: ['staffTower1F2F', 'staffTowerSpiritEntrance', 'staffTowerLowerDoor'],
-        exits: [{objectId: 'staffTower1F2F'}, {objectId: 'staffTowerSpiritEntrance'}, {objectId: 'staffTowerLowerDoor'}],
+        entranceIds: ['staffTowerSpiritEntrance', 'staffTowerLowerDoor'],
+        exits: [{objectId: 'staffTowerSpiritEntrance'}, {objectId: 'staffTowerLowerDoor'}],
     },
     {
         zoneId,
@@ -117,6 +117,7 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF2SpiritElevator',
+        isSpiritWorld: true,
         paths: [
             {nodeId: 'staffTowerF2SpiritSouth'},
             {nodeId: 'staffTowerB1Spirit', logic: hasReleasedBeasts},
@@ -145,6 +146,7 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF2Elevator',
+        isSpiritWorld: false,
         checks: [{ objectId: 'staffTowerPeachPiece' }],
         paths: [{nodeId: 'staffTowerF2'}],
         entranceIds: ['tower2FMarker'],
@@ -152,6 +154,7 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF3',
+        isSpiritWorld: false,
         checks: [
             // You have to cross a 4 gap from a conveyer belt to reach this chest.
             { objectId: 'staffTowerBigMoney1', logic: canCrossDynamic4Gaps },
@@ -170,6 +173,7 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF3Spirit',
+        isSpiritWorld: true,
         paths: [
             // Terminal is off until the beasts are released, need to roll and defeat plants to reach terminal from door.
             {nodeId: 'staffTowerF3', logic: andLogic(hasReleasedBeasts, canCross2Gaps, hasWeapon)},
@@ -202,6 +206,10 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF4',
+        paths: [
+            // Terminal is off until the beasts are released.
+            {nodeId: 'staffTowerF4Spirit', logic: hasReleasedBeasts},
+        ],
         flags: [{flag: 'staffTowerSkyEntrance'}],
         entranceIds: ['staffTowerSkyEntrance', 'staffTower4F5F'],
         exits: [

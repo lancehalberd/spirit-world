@@ -2673,7 +2673,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 304, y: 416, type: "crystalSwitch", element: "lightning", timer: 0, targetObjectId: "skyPalaceEntranceBarrier"},
         {status: "normal", id: "", x: 248, y: 264, type: "teleporter", linked: true},
         {status: "normal", id: "skyPalaceSave", x: 168, y: 32, type: "saveStatue"},
-        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "forestTower", x: 66, y: 486, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up", linked: true, spirit: true},
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "forestTower", x: 66, y: 486, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 13, mapId: 'skySpirit', floorId: '1F', mapX: 2, mapY: 2},

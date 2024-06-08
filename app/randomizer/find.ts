@@ -49,6 +49,14 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
             const nextNode = allNodes.find(node =>
                 (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
+                // If isSpiritWorld is defined for both nodes, they must match.
+                && (
+                    node.isSpiritWorld === undefined ||
+                    currentNode.isSpiritWorld === undefined ||
+                    node.isSpiritWorld === currentNode.isSpiritWorld ||
+                    // Teleporters can link material/spirit world together.
+                    exitObject.type === 'teleporter'
+                )
                 && node.zoneId === exitObject.targetZone
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
