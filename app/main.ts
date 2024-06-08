@@ -1,4 +1,4 @@
-import { CANVAS_SCALE } from 'app/gameConstants';
+import { getCanvasScale } from 'app/development/getCanvasScale';
 import { getContextMenu, hideContextMenu, showContextMenu } from 'app/development/contextMenu';
 import { mainCanvas } from 'app/utils/canvas';
 import { getMousePosition, } from 'app/utils/mouse';
@@ -11,7 +11,7 @@ export function getCanvasCoords() {
 // let dragStartCoords = null;
 mainCanvas.addEventListener('mousemove', function () {
     // const [lastX, lastY] = canvasCoords || [-1, -1];
-    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getMousePosition(mainCanvas, getCanvasScale());
     canvasCoords = [x, y];
 });
 
@@ -19,7 +19,7 @@ mainCanvas.addEventListener('mousedown', function (event) {
     if (event.which !== 1) {
         return;
     }
-    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getMousePosition(mainCanvas, getCanvasScale());
     canvasCoords = [x, y];
 });
 

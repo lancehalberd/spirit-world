@@ -4,7 +4,8 @@ import { getTestStateContextMenuOption } from 'app/development/contextMenu/setSt
 import { contextMenuState, editingState } from 'app/development/editingState';
 import { toggleEditing } from 'app/development/editor';
 import { tagElement } from 'app/dom';
-import { CANVAS_SCALE, overworldKeys } from 'app/gameConstants';
+import { getCanvasScale } from 'app/development/getCanvasScale';
+import { overworldKeys } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
@@ -337,7 +338,7 @@ export function addContextMenuListeners(): void {
         }
         event.preventDefault();
         const [x, y] = getMousePosition();
-        lastContextClick = getMousePosition(mainCanvas, CANVAS_SCALE);
+        lastContextClick = getMousePosition(mainCanvas, getCanvasScale());
         const menu = getContextMenu();
         showContextMenu(menu, x, y);
     });

@@ -1,12 +1,3 @@
-.gameContent {
-    position: relative;
-    overflow-x: hidden;
-    overflow-y: hidden;
-    white-space: nowrap;
-    width: 1280px;
-    height: 1120px;
-}
-
 /* Context Menu */
 .contextMenu {
     position: absolute;

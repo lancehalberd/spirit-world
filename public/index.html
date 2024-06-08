@@ -16,17 +16,18 @@
         margin-left: auto;
         margin-right: auto;
         padding-top: 0;
-        width: 1280px;
-        min-height: 1120px;
+        width: 256px;
+        height: 224px;
         background-color: black;
         background-repeat: repeat;
-        border: 5px solid gold;
+        border: 1px solid gold;
         top: 0px;
         -moz-user-select: none;
         -khtml-user-select: none;
         -webkit-user-select: none;
         -o-user-user-select: none;
         cursor: default;
+        transform-origin: top center;
     }
     .loading {
         font-size: 50px;
@@ -51,9 +52,15 @@
     <meta property='og:type' content='website'/>
 </head>
 <body>
-<div class="js-mainGame  mainGame">
+<div class="js-mainGame mainGame" style="transform: scale(4);">
     <script>
-        window.version = '0.4.26';
+        window.version = '0.4.27';
+        function resizeGame() {
+            // This includes 1px padding for the border.
+            const scale = Math.max(1, Math.floor(Math.min(window.innerWidth / 257, window.innerHeight / 225)));
+            document.getElementsByClassName('mainGame')[0].style.transform = `scale(${scale}`;
+        }
+        window.onresize = resizeGame;
         // Only show the loading text if it takes more than .2 seconds to load
         setTimeout(function () {
             if (document.querySelector('.js-gameContent').style.display === 'none') {
@@ -69,7 +76,7 @@
         mainStyles.href = `styles.css?v=${version}`;
         document.head.append(mainStyles);
     </script>
-    <div class="js-loading loading" style="display: none; padding: 20px; font-family: sans-serif;">
+    <div class="js-loading loading" style="display: none; padding: 4px; font-size: 16px; font-family: sans-serif;">
         Loading...
     </div>
     <div class="js-gameContent gameContent" style="display: none">
@@ -77,7 +84,7 @@
             <canvas
                 class="js-mainCanvas mainCanvas"
                 width="256" height="224"
-                style="background-color: blue; transform-origin: 0 0; transform: scale(5);"
+                style="background-color: blue;"
             ></canvas>
         </div>
     </div>

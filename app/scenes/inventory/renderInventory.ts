@@ -1,6 +1,7 @@
 import { getMenuName, getMenuRows } from 'app/content/menu';
 import { getLootFrame, lootFrames, neutralElement } from 'app/content/loot';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE } from 'app/gameConstants';
+import { getCanvasScale } from 'app/development/getCanvasScale';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { mainCanvas } from 'app/utils/canvas';
 import { characterMap } from 'app/utils/simpleWhiteFont';
 import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';
@@ -262,7 +263,7 @@ mainCanvas.addEventListener('click', function (event) {
         return;
     }
     const rowHeight = 25, rowWidth = 26;
-    const [mouseX, mouseY] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [mouseX, mouseY] = getMousePosition(mainCanvas, getCanvasScale());
     let {x, y} = innerMenuFrame;
 
     if (isPointInShortRect(mouseX, mouseY, weapon1Rect) || isPointInShortRect(mouseX, mouseY, weapon2Rect)) {

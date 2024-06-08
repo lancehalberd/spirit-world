@@ -3,8 +3,9 @@ import { convertLocationToMapCoordinates, getMapTarget } from 'app/content/hints
 import { allSections, dungeonMaps } from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
 import { editingState } from 'app/development/editingState';
+import { getCanvasScale } from 'app/development/getCanvasScale';
 import { initializeSection } from 'app/development/sections';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE, overworldKeys } from 'app/gameConstants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, overworldKeys } from 'app/gameConstants';
 import { heroIcon } from 'app/render/heroAnimations';
 import { checkToRedrawTiles } from 'app/render/renderField';
 import { createAnimation, drawFrame } from 'app/utils/animations';
@@ -446,7 +447,7 @@ export function getSectionUnderMouse(state: GameState): AreaSection | undefined 
     if (!sections) {
         return;
     }
-    let [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    let [x, y] = getMousePosition(mainCanvas, getCanvasScale());
     x -= innerDungeonMapRectangle.x;
     y -= innerDungeonMapRectangle.y;
     for (const sectionIndex of [...sections].reverse()) {

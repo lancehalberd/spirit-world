@@ -1,11 +1,12 @@
 import { editingState } from 'app/development/editingState';
-import { CANVAS_HEIGHT, CANVAS_SCALE, CANVAS_WIDTH } from 'app/gameConstants';
+import { getCanvasScale } from 'app/development/getCanvasScale';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { mainCanvas } from 'app/utils/canvas';
 import { getMousePosition } from 'app/utils/mouse';
 
 export function getAreaMousePosition(): Coords {
     // This gets the x/y coords in pixels from the top left corner of the screen.
-    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    const [x, y] = getMousePosition(mainCanvas, getCanvasScale());
     // When editing, these translations are applied before rendering to scale the screen from the center:
     // context.translate(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
     // context.scale(editingState.areaScale, editingState.areaScale);

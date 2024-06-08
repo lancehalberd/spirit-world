@@ -96,8 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Fix default screen size
-
     - Higher priority stretch goals
         - Update boss
             - New roof design
