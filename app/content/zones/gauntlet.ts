@@ -259,7 +259,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "gauntletBigKey", x: 408, y: 448, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "normal", id: "gauntletRightStairs", x: 416, y: 16, type: "door", style: "woodenUpstairs", d: "up", targetZone: "gauntlet", targetObjectId: "gauntletRightStairs", locationCue: "Gauntlet 1F"},
         {status: "normal", id: "", x: 80, y: 144, type: "tippable"},
-        {status: "normal", id: "", x: 423, y: 72, speed: "fast", d: "down", w: 18, h: 56, style: "escalator", type: "escalator"},
+        {status: "normal", id: "", x: 423, y: 70, speed: "fast", d: "down", w: 18, h: 56, style: "escalator", type: "escalator"},
         {status: "normal", id: "", x: 64, y: 144, type: "tippable"},
         {status: "normal", id: "", x: 48, y: 128, type: "pushPull"},
         {status: "normal", id: "", x: 96, y: 128, type: "pushPull"},

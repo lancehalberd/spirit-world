@@ -386,7 +386,7 @@ export class Balcony implements ObjectInstance {
     x: number = this.staffTower.x + 22;
     // Because the 'isGround' behavior ignores solid walls, this position has to be exact
     // to prevent the hero from being able to enter the door when it is closed.
-    y: number = this.staffTower.y + 149;
+    y: number = this.staffTower.y + 148;
     ignorePits = true;
     isObject = <const>true;
     renderParent = this.staffTower;

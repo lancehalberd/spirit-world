@@ -258,7 +258,7 @@ class EscalatorRailing implements ObjectInstance {
     }
     getHitbox(): Rect {
         const w = this.frames.top.w;
-        const overhang = 8;
+        const overhang = 6;
         if (this.side === 'left') {
             return { x: this.escalator.x - w, y: this.escalator.y - overhang, w, h: this.escalator.definition.h + 2 * overhang };
         }
