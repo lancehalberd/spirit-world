@@ -96,11 +96,6 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Improve Test State
-        - Add a "test" save slot.
-        - When using Test State, switch to the "test" save slot.
-        - Add a context option to switch save slots between test, 1, 2, 3
-
     - Higher priority stretch goals
         - Update boss
             - New roof design

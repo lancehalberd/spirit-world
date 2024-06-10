@@ -1,5 +1,8 @@
 
 export function saveGame(state: GameState): void {
+    if (state.savedGameIndex < 0) {
+        return;
+    }
     state.savedState.savedHeroData = state.hero.exportSavedHeroData();
     // There is a bug where selecting the delete option in randomizer triggers the `saveGame`
     // function and saves a new file to the delete index which keeps creating more save files.
@@ -19,4 +22,9 @@ export function saveGamesToLocalStorage(state: GameState): void {
         console.error(e);
         debugger;
     }
+}
+
+export function setSaveSlot(state: GameState, index: number): void {
+    state.savedGameIndex = index;
+    saveGame(state);
 }

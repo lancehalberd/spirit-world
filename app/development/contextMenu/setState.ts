@@ -9,8 +9,9 @@ import {
     minimizerSpawnLocations,
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 import { cloneDeep } from 'app/utils/index';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import { setSaveSlot } from 'app/utils/saveGame';
 
 
 function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedState = false) {
@@ -19,6 +20,8 @@ function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedS
             label: `${name}`,
             onSelect() {
                 const state = getState();
+                // Switch to the test save slot to avoid overriding player data.
+                setSaveSlot(state, -1);
                 if (useSavedState) {
                     applySavedState(state, cloneDeep(spawnLocations[name].savedState));
                 }

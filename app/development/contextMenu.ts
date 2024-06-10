@@ -14,6 +14,7 @@ import { mainCanvas } from 'app/utils/canvas';
 import { getCompositeBehaviors } from 'app/utils/field';
 import { getElementRectangle, isPointInShortRect } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
+import { setSaveSlot } from 'app/utils/saveGame';
 import { saveSettings } from 'app/utils/saveSettings';
 import { toggleAllSounds, updateSoundSettings } from 'app/utils/soundSettings';
 
@@ -120,13 +121,7 @@ export function getContextMenu(): MenuOption[] {
         getAssistanceMenuOption(),
         getSettingsMenuOption(),
         getTestStateContextMenuOption(),
-        {
-            label: 'Save Location',
-            onSelect() {
-                const state = getState();
-                setSpawnLocation(state, {...state.location, d: state.hero.d});
-            }
-        },
+        ...getSaveOptions(state),
         {
             label: editingState.isEditing ? 'Stop Map Editor' : 'Start Map Editor',
             onSelect() {
@@ -171,6 +166,39 @@ export function getContextMenu(): MenuOption[] {
         });
     }
 
+    return options;
+}
+
+
+function getSaveOptions(state: GameState): MenuOption[] {
+    const options:MenuOption[] = [
+        {
+            label: 'Save To...',
+            getChildren() {
+                return [0, 1, 2].map(index => {
+                    return {
+                        // Indicate what the current save slot is.
+                        label: `Slot ${index + 1}` + (index === state.savedGameIndex ? ' (Current)' : ''),
+                        onSelect() {
+                            setSaveSlot(getState(), index);
+                        }
+                    }
+                });
+            }
+
+
+        },
+    ];
+    // This option is only valid when using an actual save slot, otherwise it will be ignored.
+    if (state.savedGameIndex >= 0) {
+        options.push({
+            label: 'Save Location',
+            onSelect() {
+                const state = getState();
+                setSpawnLocation(state, {...state.location, d: state.hero.d});
+            }
+        });
+    }
     return options;
 }
 
