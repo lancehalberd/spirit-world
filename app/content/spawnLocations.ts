@@ -174,6 +174,28 @@ export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+export const SPAWN_HELIX_MATERIAL_EXIT: ZoneLocation = {
+    zoneKey: 'helix',
+    floor: 3,
+    x: 310,
+    y: 530,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
+
+export const SPAWN_HELIX_SPIRIT_EXIT: ZoneLocation = {
+    zoneKey: 'helix',
+    floor: 3,
+    x: 310,
+    y: 530,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: true,
+};
+
 export const SPAWN_GRAND_TEMPLE_ENTRANCE: ZoneLocation = {
     zoneKey: 'grandTemple',
     floor: 0,
@@ -417,6 +439,8 @@ const prioritizedSpawnLocations = [
     SPAWN_WAR_TEMPLE_ENTRANCE,
     SPAWN_COCOON_ENTRANCE,
     SPAWN_HELIX_ENTRANCE,
+    SPAWN_HELIX_MATERIAL_EXIT,
+    SPAWN_HELIX_SPIRIT_EXIT,
     SPAWN_GAUNTLET_ENTRANCE,
     SPAWN_FOREST_ENTRANCE,
     SPAWN_WATERFALL_ENTRANCE,

@@ -609,6 +609,7 @@ function moveRivalToArea(state: GameState, area: AreaInstance, rival: Enemy): vo
 function updateRival2(this: void, state: GameState, enemy: Enemy): void {
     // The hero can get stuck in the doorway if we initiate the cutscene before they finish exiting the door.
     if (state.hero.isUsingDoor) {
+        enemy.healthBarTime = 0;
         return;
     }
     if (enemy.area !== state.hero.area) {
@@ -629,6 +630,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
         return;
     }
     if (!enemy.params.introduced) {
+        enemy.healthBarTime = 0;
         enemy.params.introduced = true;
         appendScript(state, '{@rival.startSecondFight}');
     }

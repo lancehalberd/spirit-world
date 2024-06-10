@@ -668,15 +668,15 @@ function moveHandToPosition(this: void, state: GameState, enemy: Enemy, otherHan
         // An isolated hand will center itself over the golem's weak spot
         const x = golemHitbox.x + golemHitbox.w / 2;
         const y = golemHitbox.y + golemHitbox.h + hitbox.h / 2;
-        moveEnemyToTargetLocation(state, enemy, x + xOffset, y - enemy.z, undefined, {canFall: true});
+        moveEnemyToTargetLocation(state, enemy, x + xOffset, y, undefined, {canFall: true});
     } else if (enemy.params.side === 'left') {
         const x = golemHitbox.x + golemHitbox.w / 2 - hitbox.w / 2 + 3;
         const y = golemHitbox.y + golemHitbox.h + hitbox.h / 2;
-        moveEnemyToTargetLocation(state, enemy, x + xOffset, y - enemy.z, undefined, {canFall: true});
+        moveEnemyToTargetLocation(state, enemy, x + xOffset, y, undefined, {canFall: true});
     } else if (enemy.params.side === 'right') {
         const x = golemHitbox.x + golemHitbox.w / 2 + hitbox.w / 2 - 3;
         const y = golemHitbox.y + golemHitbox.h + hitbox.h / 2;
-        moveEnemyToTargetLocation(state, enemy, x + xOffset, y - enemy.z, undefined, {canFall: true});
+        moveEnemyToTargetLocation(state, enemy, x + xOffset, y, undefined, {canFall: true});
     }
 }
 
@@ -740,11 +740,11 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             if (enemy.params.side === 'left') {
                 const x = golemHitbox.x + golemHitbox.w / 2 - hitbox.w;
                 const y = golemHitbox.y + golemHitbox.h + hitbox.h / 2;
-                moveEnemyToTargetLocation(state, enemy, x, y - enemy.z, undefined, {canFall: true});
+                moveEnemyToTargetLocation(state, enemy, x, y, undefined, {canFall: true});
             } else if (enemy.params.side === 'right') {
                 const x = golemHitbox.x + golemHitbox.w / 2 + hitbox.w;
                 const y = golemHitbox.y + golemHitbox.h + hitbox.h / 2;
-                moveEnemyToTargetLocation(state, enemy, x, y - enemy.z, undefined, {canFall: true});
+                moveEnemyToTargetLocation(state, enemy, x, y, undefined, {canFall: true});
             }
             return;
         }
@@ -787,7 +787,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             const targetHitbox = target.getHitbox(state);
             const x = targetHitbox.x + targetHitbox.w / 2;
             const y = golemHitbox.y + golemHitbox.h + hitbox.h / 2 + 8;
-            moveEnemyToTargetLocation(state, enemy, x, y - enemy.z, undefined, {canFall: true});
+            moveEnemyToTargetLocation(state, enemy, x, y, undefined, {canFall: true});
         }
         if (enemy.modeTime >= 1300) {
             enemy.setMode('punch');
@@ -802,7 +802,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             const targetHitbox = target.getHitbox(state);
             const x = targetHitbox.x + targetHitbox.w / 2;
             const y = targetHitbox.y + targetHitbox.h / 2;
-            moveEnemyToTargetLocation(state, enemy, x, y - enemy.z, undefined, {canFall: true});
+            moveEnemyToTargetLocation(state, enemy, x, y, undefined, {canFall: true});
         }
         if (enemy.modeTime >= 1300) {
             enemy.setMode('targetedSlam');

@@ -179,6 +179,7 @@ enemyDefinitions.snakeStorm = {
                 const d = Random.removeElement(choices);
                 if (canMoveEnemy(state, enemy, enemy.speed * directionMap[d][0], enemy.speed * directionMap[d][1], {})) {
                     enemy.d = d;
+                    enemy.changeToAnimation('move');
                     enemy.setMode('walk')
                     break;
                 }

@@ -98,7 +98,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'retreat') {
-        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y - 24 + hitbox.h / 2) === 0) {
+        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y - 16 + hitbox.h / 2) === 0) {
             enemy.setMode('summon');
         }
     } else if (enemy.mode === 'summon') {
@@ -141,7 +141,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
         if (enemy.modeTime >= 1500) {
             // If the player has less than 2 health always return immediately.
             const returnChance = 0.4 + Math.max(0, 0.6 * (4 - state.hero.life) / 2);
-            if (enemy.life > 8 || Math.random() > returnChance) {
+            if (enemy.life > 8 || Math.random() < returnChance) {
                 enemy.setMode('return');
             } else {
                 const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);

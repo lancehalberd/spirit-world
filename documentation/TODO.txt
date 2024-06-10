@@ -96,6 +96,11 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Improve Test State
+        - Add a "test" save slot.
+        - When using Test State, switch to the "test" save slot.
+        - Add a context option to switch save slots between test, 1, 2, 3
+
     - Higher priority stretch goals
         - Update boss
             - New roof design
@@ -120,6 +125,22 @@ Current tasks:
             - Middle platform should block ground sparks
             - Make spinning orbs vulnerable to ice.
 
+    - New enemy: lava monster with shell (TBD by artist)
+        - possible designs:
+            - Boulder with an enterior like a clam/urchin
+            - Mollusk
+        - When spawned in lava moves around as bubbles, can be trapped by freezing lava over it.
+            - Will eventually use an AoE fire attack to unfreeze the lava when trapped.
+            - On cool down, jumps out of the water with splash effect and shoots (tracking?) fireball(s) at the player
+            - Freezing it when jumping has the same effect as freezing it while on land.
+            - Attacks will melt frozen lava
+        - When spawned on land it paces slowly and approaches player within a fairly large radius.
+        - When close enough it uses firebreath attack with slow turn speed and long cooldown.
+        - Only vulnerable to staff+cold damage when the shell is up.
+        - Shell takes 2 hits to destroy, either from staff or being frozen and then hit with a physical attack.
+            - Freezing and hitting with staff will instantly defeat the enemy.
+        - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
+        - Can move into lava. Returning to lava will regenerate the shell if missing.
 
     - Low priority Staff Tower Exterior
         - Cosmetic: shadow is hidden by tower balcony
@@ -142,10 +163,6 @@ Current tasks:
         - Add elevator behaviors
             - off, terminals are not animated/functional
 
-    - Improve Test State
-        - Add a "test" save slot.
-        - When using Test State, switch to the "test" save slot.
-        - Add a context option to switch save slots between test, 1, 2, 3
 
     - Render ladders+stairs as up/down arrows in dungeon maps.
         - Add a property to doors for overriding the default map style.

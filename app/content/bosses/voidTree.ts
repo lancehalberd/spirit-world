@@ -592,7 +592,7 @@ function moveHandNorthOfTarget(this: void, state: GameState, enemy: Enemy) {
         const targetHitbox = target.getHitbox(state);
         const x = targetHitbox.x + targetHitbox.w / 2;
         const y = Math.max(32, targetHitbox.y - 96);
-        moveEnemyToTargetLocation(state, enemy, x, y - enemy.z);
+        moveEnemyToTargetLocation(state, enemy, x, y);
     }
 }
 
@@ -657,7 +657,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
             const targetHitbox = target.getHitbox(state);
             const x = targetHitbox.x + targetHitbox.w / 2;
             const y = targetHitbox.y + targetHitbox.h / 2;
-            moveEnemyToTargetLocation(state, enemy, x, y - enemy.z);
+            moveEnemyToTargetLocation(state, enemy, x, y);
         }
         if (enemy.modeTime >= 1300) {
             enemy.setMode('targetedSlam');

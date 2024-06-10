@@ -268,6 +268,7 @@ type LogicalZoneKey =
     // Spirit world sub areas
     | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
     | 'peachCaveSpirit' | 'hypeCave' | 'bellCave' | 'cloneCave'
+    | 'warPalaceWestRoom'
     // Early dungeons
     | 'tomb' | 'warTemple' | 'cocoon' | 'helix'
     // Mid dungeons
