@@ -175,12 +175,15 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1, dx: -1, dy: -1},
         ];
         // While the hero is falling, push them around until all their check points are over actual pit tiles.
-        let onPitWall = false;
+        let onPitWall = false, isOnSingleTilePit = false;
         let dx = 0, dy = 0;
         for (const p of checkPoints) {
             const behaviors = getCompositeBehaviors(state, hero.area, p, state.nextAreaInstance);
             if (behaviors.pitWall) {
                 onPitWall = true;
+            }
+            if (behaviors.isSingleTilePit) {
+                isOnSingleTilePit = true;
             }
             if (!(behaviors.pit || behaviors.cloudGround || behaviors.pitWall || behaviors.canFallUnder)) {
                 dx += p.dx;
@@ -192,11 +195,29 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.y++;
         } else if (dy < 0) {
             hero.y--;
+        } else if (isOnSingleTilePit) {
+            hero.y = hero.y | 0;
+            if (hero.y % 16 == 0) {
+                // do nothing.
+            } else if (hero.y % 16 < 8) {
+                hero.y--;
+            } else {
+                hero.y++;
+            }
         }
         if (dx > 0) {
             hero.x++;
         } else if (dx < 0) {
             hero.x--;
+        } else if (isOnSingleTilePit) {
+            hero.x = hero.x | 0;
+            if (hero.x % 16 == 0) {
+                // do nothing.
+            } else if (hero.x % 16 < 8) {
+                hero.x--;
+            } else {
+                hero.x++;
+            }
         }
 
         if (hero.isOverClouds && hero.animationTime >= cloudPoofAnimation.duration) {

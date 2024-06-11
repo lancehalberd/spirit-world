@@ -88,7 +88,7 @@ export const southernWallBehavior: TileBehaviors = {
     defaultLayer: 'field',
     isSouthernWall: true,
 }
-export const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true };
+export const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true, isSingleTilePit: true };
 export const thornBehavior: TileBehaviors = {
     defaultLayer: 'field',
     lootTable: rareLifeLootTable,

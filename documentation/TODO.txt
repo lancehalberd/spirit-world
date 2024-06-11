@@ -164,7 +164,7 @@ Current tasks:
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
     - Add pitMap behavior for angled pit tiles
-        - This is low priority as long as I only use these flush with angled walls.
+        - This will improve the edges of the storm beast arena.
 
     - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
         - Allow the player to move under solid objects this way
@@ -173,9 +173,6 @@ Current tasks:
         - Player shouldn't take damage while submerged.
         - Non-deep water/water passage tiles are treated as solid for the player while submerged.
         - Player should lose spirit underwater just as when otherwise submerged
-
-    - Ease player to target position when falling into tile pits, so it is less jarring.
-        - This was recently added for falling into pit entrance objects.
 
     - hitting cracked pots diagonal
     - "Looks like BK Mode to Me" message with full item set and no progress in forge yet.
