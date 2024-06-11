@@ -504,17 +504,14 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     shouldRespawn(state: GameState) {
         return this.alwaysReset;
     }
+    // Randomize abilities and use the first one that is valid.
+    // Does not cancel active abilities.
     useRandomAbility(state: GameState) {
         if (this.activeAbility) {
             return;
         }
-        // Randomize the list of abilities with charges and then use the first one that
-        // can find a valid target.
-        const chargedAbilities = Random.shuffle(this.abilities.filter(ability => ability.charges > 0));
-        for (const ability of chargedAbilities) {
-            const target = ability.definition.getTarget(state, this);
-            if (target) {
-                this.useAbility(state, ability, target);
+        for (const ability of Random.shuffle(this.abilities)) {
+            if (this.tryUsingAbility(state, ability.definition)) {
                 return;
             }
         }
@@ -530,6 +527,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         const ability = this.abilities.find(a => a.definition === definition);
         if (!ability || !(ability.charges > 0)) {
+            return false;
+        }
+        if (ability.definition.isEnabled?.(state, this) === false) {
             return false;
         }
         const target = ability.definition.getTarget(state, this);

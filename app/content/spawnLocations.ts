@@ -381,8 +381,8 @@ export const SPAWN_STAFF_ELEVATOR: ZoneLocation = {
 export const SPAWN_STAFF_BOSS: ZoneLocation = {
     zoneKey: 'staffTower',
     floor: 3,
-    x: 248,
-    y: 248,
+    x: 312,
+    y: 312,
     z: 0,
     d: 'up',
     areaGridCoords: {y: 0, x: 0},

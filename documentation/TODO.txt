@@ -98,7 +98,6 @@ Current tasks:
 
     - Higher priority stretch goals
         - Update boss
-            - New roof design
             - Add giant orbs to spirit world during boss fight that generate storm clouds and prevent damaging the cloud around the heart.
                 - Player must use stone terminal to teleport to the spirit world to destroy the orbs then return.
                 - When the heart enrages, it summons new orbs in the material world to protect it and the beast guards the terminal
@@ -497,8 +496,7 @@ Current tasks:
         - Collectible (Silver/Gold Ore/Peach/Peach Piece)
         - Prize (Chakram/Tool/Victory Point)
 
-
-    - Allow lookind underwater with R2 when you do not have iron boots.
+    - Allow looking underwater with R2 when you do not have iron boots.
         - Use same effect as spirit sight
 
     - Forest temple boss should provide a golden peach in addition to the clone tool.
@@ -516,18 +514,12 @@ Current tasks:
 
     - Add respawn flag to objects that causes them to respawn if destroyed.
 
-
-    - Use grey cloud tiles for lightning bolt cloud animation
-        - Possibly also for the cloud tiles during the storm beast fight
-            - At least the clouds around the storm heart
-        - Would be good to change to normal clouds after the fight.
+    - Use grey cloud tiles for clouds covering storm heart.
 
     - Make it easier to find the gloves
         - Add a quest state that highlights the entrance with the gloves.
         - Move the map to the main chamber as a new check with a simple puzzle to obtain it
             - Include the big chest room on the map, draw chests and big chests to the map
-
-    - Block exit door in pit room in War Temple 3F
 
     - Aimed Projectiles for Cocoon boss an other
         - EnemyProjectile wrapper for CrystalSpike/Flame/Frost/Spark that takes an element to determine which projectile to use

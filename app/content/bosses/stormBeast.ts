@@ -3,7 +3,7 @@ import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
-import { lightningBoltAbility } from 'app/content/enemyAbilities/lightningBolt'
+import { chargedLightningBoltAbility, lightningBoltAbility } from 'app/content/enemyAbilities/lightningBolt'
 import { allTiles } from 'app/content/tiles';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -439,10 +439,34 @@ const stormBeastLightningAbility = {
     recoverTime: 400,
 }
 
+const stormBeastChargedLightningAbility = {
+    ...chargedLightningBoltAbility,
+    // This powerful ability only activates once the heart is at half health or below.
+    isEnabled(state: GameState, enemy: Enemy): boolean {
+        const stormHeart = getStormHeart(state, enemy.area);
+        if (isEnemyDefeated(stormHeart)) {
+            return true;
+        }
+        return stormHeart.life <= stormHeart.enemyDefinition.life / 2;
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        enemy.changeToAnimation('prepareCast');
+        const {x, y} = getVectorToTarget(state, enemy, target.target);
+        const theta = Math.atan2(y, x);
+        enemy.rotation = theta - Math.PI / 2;
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        chargedLightningBoltAbility.useAbility(state, enemy, target);
+        enemy.changeToAnimation('cast');
+    },
+    prepTime: 600,
+    recoverTime: 400,
+}
+
 enemyDefinitions.stormBeast = {
     animations: stormBeastAnimations, life: 90, scale: 1, update: updateStormBeast, flying: true,
     aggroRadius: 2000,
-    abilities: [sparkAbility, stormBeastLightningAbility],
+    abilities: [sparkAbility, stormBeastLightningAbility, stormBeastChargedLightningAbility],
     acceleration: 0.3, speed: 4,
     touchHit: { damage: 4, element: 'lightning'},
     immunities: ['lightning'],

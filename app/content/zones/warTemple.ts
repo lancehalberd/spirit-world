@@ -6257,7 +6257,7 @@ const f2_0x0: AreaDefinition = {
         {status: "bigKeyLocked", id: "warTempleBossDoor", x: 112, y: 272, type: "door", style: "stone", d: "up"},
         {status: "normal", id: "", x: 240, y: 352, type: "door", style: "stone", d: "right"},
         {status: "normal", id: "", x: 256, y: 352, type: "door", style: "stone", d: "left"},
-        {status: "normal", id: "warTemple:2:0x0-door-4", x: 368, y: 272, type: "door", style: "stone", d: "up"},
+        {status: "closed", id: "warTemple:2:0x0-door-4", x: 368, y: 272, type: "door", style: "stone", d: "up"},
         {status: "normal", id: "warTemple:2:0x0-door-5", x: 352, y: 240, type: "door", style: "stone", d: "down"},
         {status: "normal", id: "warTempleStairs2", x: 368, y: 16, type: "door", style: "stoneDownstairs", targetZone: "warTemple", targetObjectId: "warTempleStairs2", d: "up", locationCue: "War Temple 3F"},
         {status: "normal", id: "warTemple:2:0x0-pitEntrance-0", x: 304, y: 320, targetZone: "warTemple", targetObjectId: "warTempleKeyMarker", type: "pitEntrance", style: "futuristic"},
