@@ -1,4 +1,5 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { addRadialSparks } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -14,7 +15,7 @@ import { addEffectToArea } from 'app/utils/effects';
 import { isEnemyMissing, moveEnemyFull, moveEnemyToTargetLocation } from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
+import { getVectorToNearbyTarget, getVectorToHitbox, getVectorToTarget } from 'app/utils/target';
 
 const orbAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 12, h: 12}, {left: 18, top: 979});
 const largeOrbAnimation = createAnimation('gfx/enemies/largeOrb.png', {w: 48, h: 48}, {left: 0, top: 0});
@@ -85,6 +86,9 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
         }
     },
     renderOver(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<OrbProps>) {
+        if (enemy.status === 'off') {
+            return;
+        }
         const hitbox = enemy.getHitbox();
         const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
         if (enemy.params.smallOrbs) {
@@ -156,6 +160,9 @@ function renderHalfBeam(context: CanvasRenderingContext2D, orbA: Enemy, orbB: En
 }
 
 function getAttraction(enemy: Enemy): number {
+    if (enemy.status === 'off') {
+        return 0;
+    }
     if (enemy.definition.enemyType === 'smallOrb') {
         return 1;
     } else if (enemy.definition.enemyType === 'largeOrb') {
@@ -321,19 +328,21 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
     }
     enemy.params.shockwaveTimer -= FRAME_LENGTH * enemy.params.smallOrbs.length;
     if (enemy.params.shockwaveTimer <= 0) {
-        const target = getVectorToNearbyTarget(state, enemy, 296, enemy.area.allyTargets)?.target;
+        const largeOrbVector = getVectorToNearbyTarget(state, enemy, 296, enemy.area.allyTargets);
+        const target = largeOrbVector?.target;
         if (target) {
             // When a target is nearby, place an attack from an orb that will hit the target if they stand still.
             for (const smallOrb of enemy.params.smallOrbs) {
-                const v = getVectorToTarget(state, smallOrb, target);
+                const smallOrbHitbox = smallOrb.getMovementHitbox();
+                const v = getVectorToHitbox(state, smallOrbHitbox, target.getHitbox());
                 let theta = -1;
                 if (Math.abs(v.x) < 0.05 || Math.abs(v.y) <= 0.05) {
                     theta = 0;
                 } else if (Math.abs(1 - Math.abs(v.x / v.y)) <= 0.05) {
                     theta = Math.PI / 4;
                 }
-                if (theta >= 0) {
-                    const smallOrbHitbox = smallOrb.getMovementHitbox();
+                // Orbs should only target the player when they aren't on the opposite side of the orb from them.
+                if (theta >= 0 && v.mag <= Math.max(48, largeOrbVector.mag + 16)) {
                     addRadialSparks(
                         state, enemy.area, [smallOrbHitbox.x + smallOrbHitbox.w / 2, smallOrbHitbox.y + smallOrbHitbox.h / 2],
                         4, theta, 3,
@@ -436,14 +445,29 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                 otherEnemy.vy = maxSpeed * v.y;
                 otherEnemy.params.bobThetaV = fastBobThetaV;
                 otherEnemy.params.invertedDuration = 1000;
+
+                // Create an electric discharge in the spirit world.
                 const blastCircle = getBlastCircle(enemy, otherEnemy);
                 const discharge = new LightningDischarge({
                     x: blastCircle.x,
                     y: blastCircle.y,
                     tellDuration: 400,
                     radius: blastCircle.r,
+                    hitEnemies: false,
                 });
                 addEffectToArea(state, enemy.area, discharge);
+
+                // And a lightning bolt in the material world.
+                const props = {
+                    damage: 2,
+                    x: blastCircle.x,
+                    y: blastCircle.y,
+                    delay: 800,
+                    shockWaves: 6,
+                    shockWaveTheta: Math.floor(2 * Math.random()) * Math.PI / 6,
+                }
+                const lightningBolt = new LightningBolt(props);
+                addEffectToArea(state, enemy.area.alternateArea, lightningBolt);
             } else if (v.mag > 1){
                 enemy.vx += inversion * v.x / v.mag * attraction / (enemy.params.inertia || 10);
                 enemy.vy += inversion * v.y / v.mag * attraction / (enemy.params.inertia || 10);
@@ -478,10 +502,10 @@ function moveOrbTowardsClosestTarget(state: GameState, enemy: Enemy<OrbProps>) {
 
     // TODO: Implement this so that this enemy ignores pits+low walls but not other walls/ledges.
     enemy.flying = false;
-    if (!moveEnemyFull(state, enemy, enemy.vx, 0, {canWiggle: false})) {
+    if (!moveEnemyFull(state, enemy, enemy.vx, 0, {canWiggle: false, canFall: true})) {
         enemy.vx = -enemy.vx;
     }
-    if (!moveEnemyFull(state, enemy, 0, enemy.vy, {canWiggle: false})) {
+    if (!moveEnemyFull(state, enemy, 0, enemy.vy, {canWiggle: false, canFall: true})) {
         enemy.vy = -enemy.vy;
     }
     enemy.flying = true;

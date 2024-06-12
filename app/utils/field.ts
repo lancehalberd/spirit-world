@@ -362,7 +362,7 @@ export function getTilesInRectangle(area: AreaInstance, rect: Rect): TileCoords[
     return tiles;
 }
 
-export function getTilesInCircle(area: AreaInstance, {x, y, r}: {x: number, y: number, r: number}): TileCoords[] {
+export function getTilesInCircle(area: AreaInstance, {x, y, r}: Circle): TileCoords[] {
     const tileSize = 16;
     const tiles: TileCoords[] = []
     const T = Math.round((y - r) / tileSize);
@@ -386,7 +386,35 @@ export function getTilesInCircle(area: AreaInstance, {x, y, r}: {x: number, y: n
     return tiles;
 }
 
-function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
+export function getTilesInRay(area: AreaInstance, {x1, y1, x2, y2, r}: Ray): TileCoords[] {
+    const tileSize = 16;
+    const tiles: TileCoords[] = []
+    const T = Math.floor((Math.min(y1, y2) - r) / tileSize);
+    const B = Math.ceil((Math.max(y1, y2) + r) / tileSize) - 1;
+    //console.log({x1, y1, x2, y2, r});
+    //console.log({T, B});
+    for (let ty = T; ty <= B; ty++) {
+        if (ty < 0 || ty >= area.h) continue;
+        const L = Math.floor((Math.min(x1, x2) - r) / tileSize);
+        const R = Math.ceil((Math.max(x1, x2) + r) / tileSize) - 1;
+        //console.log({L, R});
+        for (let tx = L; tx <= R; tx++) {
+            if (tx < 0 || tx >= area.w) continue;
+
+            const { distance } = distanceToSegment(
+                { x: tx * 16 + 8, y: ty * 16 + 8},
+                {x1, y1, x2, y2}
+            );
+            //console.log({tx, ty, distance});
+            if (distance < 10) {
+                tiles.push({x: tx, y: ty});
+            }
+        }
+    }
+    return tiles;
+}
+
+function distanceToSegment({x, y}: Point, {x1, y1, x2, y2}: {x1: number, y1: number, x2: number, y2: number}) {
     const lengthSquared = (x2 - x1) ** 2 + (y2 - y1) ** 2;
     if (lengthSquared == 0) {
         const dx = x2 - x, dy = y2 - y;
@@ -406,7 +434,7 @@ function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
         distance: Math.sqrt(dx * dx + dy * dy),
         // Return the vector pointing from the point to the closest point on the line.
         dx, dy,
-    }
+    };
 }
 
 export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitProperties, target: ObjectInstance | EffectInstance) {
@@ -534,6 +562,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     }
     if (hit.hitTiles && hit.hitCircle) {
         hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
+    }
+    if (hit.hitTiles && hit.hitRay) {
+        hitTiles = [...hitTiles, ...getTilesInRay(area, hit.hitRay)];
     }
     let setProjectileHigh = false, setProjectileLow = false;
     if (hit.projectile?.isHigh) {

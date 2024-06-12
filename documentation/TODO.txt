@@ -96,28 +96,13 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Higher priority stretch goals
-        - Update boss
-            - Add giant orbs to spirit world during boss fight that generate storm clouds and prevent damaging the cloud around the heart.
-                - Player must use stone terminal to teleport to the spirit world to destroy the orbs then return.
-                - When the heart enrages, it summons new orbs in the material world to protect it and the beast guards the terminal
-                  when it is not regenerating.
-                - These orbs split into 4 small orbs when defeated which the player can choose to destroy or not.
-                - Player originally enters from the spirit world and passes by three inactive orbs.
-                - Player teleports to the material world and the boss is inert until the player reveals the heart.
-                - The beast appears once the player exposes the heart the first time.
-                - At 2/3 and 1/3 life the heart enrages activating 1 then 2 orbs in the spirit world.
-                    - The player must teleport to the spirit world to clear the cloud.
-                    - The beast can attack the player with lightning bolts while they are in the spirit world, if it is not regenerating.
-        - Orb enemies create lightning bolt + radial shockwave attack in alternate world during blast.
-        - Improve midboss:
-            - Do something more aggressive during pinch phase
-                - Growing AoE lightning ring
-                - Shock arcs centered on player every 1s
-                - Make sure player can knock the orb away with attacks
-                    - Accelerate towards the player faster requiring knockback or fast speed to escape
-            - Middle platform should block ground sparks
-            - Make spinning orbs vulnerable to ice.
+    - Improve midboss:
+        - Do something more aggressive during pinch phase
+            - Growing AoE lightning ring
+            - Shock arcs centered on player every 1s
+            - Make sure player can knock the orb away with attacks
+                - Accelerate towards the player faster requiring knockback or fast speed to escape
+        - Make spinning orbs vulnerable to ice.
 
     - New enemy: lava monster with shell (TBD by artist)
         - possible designs:

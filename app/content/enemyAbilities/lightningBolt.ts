@@ -20,7 +20,7 @@ export const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
             y: hitbox.y + hitbox.h / 2,
             shockWaveTheta: enemy.params.theta,
         });
-        addEffectToArea(state, enemy.area, lightningBolt);
+        addEffectToArea(state, target.target.area, lightningBolt);
     },
     cooldown: 4000,
     initialCharges: 0,
@@ -54,7 +54,7 @@ export const chargedLightningBoltAbility: EnemyAbility<NearbyTargetType> = {
             strikes: 4,
         }
         const lightningBolt = new LightningBolt(props);
-        addEffectToArea(state, enemy.area, lightningBolt);
+        addEffectToArea(state, target.target.area, lightningBolt);
     },
     cooldown: 4000,
     initialCharges: 0,

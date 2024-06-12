@@ -76,7 +76,11 @@ export class Spark implements EffectInstance, Props {
             damage: this.damage,
             element: 'lightning',
             hitAllies: true,
+            // This is needed to prevent the spark from traveling across ledges.
+            hitTiles: true,
             knockAwayFrom: {x: this.x, y: this.y},
+            vx: this.vx,
+            vy: this.vy,
             ...this.props.extraHitProps,
         }
         if (this.hitRay) {
@@ -126,17 +130,42 @@ export class Spark implements EffectInstance, Props {
         if (this.animationTime >= this.ttl) {
             removeEffectFromArea(state, this);
         } else {
-            let hit = hitTargets(state, this.area, this.getHitProperties()).hit;
+            let hitResult = hitTargets(state, this.area, this.getHitProperties());
+            let hit = hitResult.hit, stopped = hitResult.blocked || hitResult.stopped;
             if (this.props.hybridWorlds) {
-                hit = hit || hitTargets(state, this.area.alternateArea, this.getHitProperties()).hit;
+                hitResult = hitTargets(state, this.area.alternateArea, this.getHitProperties());
+                hit = hit || hitResult.hit;
+                stopped = stopped || hitResult.blocked || hitResult.stopped;
             }
             if (hit) {
                 this.props.onHit?.(state, this);
+            }
+            if (stopped) {
+                removeEffectFromArea(state, this);
             }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.hitRay) {
+            /*context.save();
+                context.fillStyle = 'red';
+                context.globalAlpha *= 0.5;
+                const tiles = getTilesInRay(this.area, {
+                    ...this.hitRay,
+                    x1: this.x + this.hitRay.x1,
+                    y1: this.y + this.hitRay.y1,
+                    x2: this.x + this.hitRay.x2,
+                    y2: this.y + this.hitRay.y2,
+                });
+                for (const tile of tiles) {
+                    context.fillRect(tile.x * 16, tile.y * 16, 16, 16);
+                }
+                context.strokeStyle = 'blue';
+                context.beginPath();
+                context.moveTo(this.x + this.hitRay.x1, this.y + this.hitRay.y1);
+                context.lineTo(this.x + this.hitRay.x2, this.y + this.hitRay.y2);
+                context.stroke();
+            context.restore();*/
             const theta = Math.atan2(this.hitRay.y2 - this.hitRay.y1, this.hitRay.x2 - this.hitRay.x1);
             const px = 2 * Math.cos(theta);
             const py = 2 * Math.sin(theta);

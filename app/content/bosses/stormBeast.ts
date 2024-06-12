@@ -1,3 +1,4 @@
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { Spark } from 'app/content/effects/spark';
@@ -21,6 +22,7 @@ import {
 import { hitTargets, isTargetHit } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { allImagesLoaded } from 'app/utils/images';
+import { pad } from 'app/utils/index';
 import Random from 'app/utils/Random';
 import {
     getNearbyTarget,
@@ -162,6 +164,16 @@ interface CloudParams {
     counterAttackMode: 'bolts' | 'discharge'
 }
 
+
+function getHeartHitbox(enemy: Enemy<CloudParams>): Rect {
+    return {
+        x: enemy.x + 8,
+        y: enemy.y,
+        w: 32,
+        h: 16 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
+    };
+};
+
 const stormHeart: EnemyDefinition<CloudParams> = {
     // The storm heart is smaller than other hearts, but takes up a lot of space with its cloud barrier.
     animations: stormHeartAnimations, life: 60, scale: 2, touchHit: { damage: 0, canAlwaysKnockback: true },
@@ -183,18 +195,13 @@ const stormHeart: EnemyDefinition<CloudParams> = {
         let frameIndex = Math.floor(7 - enemy.params.cloudLife);
         frameIndex = Math.min(7, Math.max(0, frameIndex));
         drawCloudFormation(context, state, enemy, frameIndex);
-        /*
-        context.save();
+
+        /*context.save();
             context.globalAlpha *= 0.5;
             const hitbox = enemy.getHitbox(state);
             context.fillStyle = 'white';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-            const innerHitbox = {
-                x: enemy.x,
-                y: enemy.y,
-                w: 32,
-                h: 16 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
-            };
+            const innerHitbox = getHeartHitbox(enemy);
             context.fillStyle = 'red';
             context.fillRect(innerHitbox.x, innerHitbox.y, innerHitbox.w, innerHitbox.h);
         context.restore();*/
@@ -204,22 +211,23 @@ const stormHeart: EnemyDefinition<CloudParams> = {
     },
     getHitbox(enemy: Enemy<CloudParams>): Rect {
         return {
+            x: enemy.x - 16,
+            y: enemy.y - 40,
+            w: 80,
+            h: 32 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
+        };
+        /*return {
             x: enemy.x - 24,
             y: enemy.y - 48,
             w: 96,
             h: 48 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
-        };
+        };*/
     },
     onHit(state: GameState, enemy: Enemy<CloudParams>, hit: HitProperties): HitResult {
-        const innerHitbox = {
-            x: enemy.x,
-            y: enemy.y,
-            w: 32,
-            h: 16 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
-        };
+        const innerHitbox = getHeartHitbox(enemy);
         // Cloud cannot be damaged while it is reforming after a counter attack or while enraged
         if (enemy.params.cloudIsReforming || enemy.params.enrageTime > 0
-            || !isTargetHit(innerHitbox, hit)
+            || !isTargetHit(innerHitbox, hit) || isOrbProtectingHeart(state, enemy.area)
         ) {
             return { hit: true, stopped: true };
         }
@@ -251,7 +259,11 @@ const stormHeart: EnemyDefinition<CloudParams> = {
 enemyDefinitions.stormHeart = stormHeart;
 
 function getStormHeart(this: void, state: GameState, area: AreaInstance): Enemy<CloudParams> {
-    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'stormHeart') as Enemy<CloudParams>;
+    return area.enemies.find(target => target.definition.enemyType === 'stormHeart') as Enemy<CloudParams>;
+}
+
+function getOrbs(this: void, state: GameState, area: AreaInstance, status: ObjectStatus): Enemy[] {
+    return area.enemies.filter(target => target.definition.enemyType === 'largeOrb' && target.status === status);
 }
 
 /*
@@ -273,9 +285,13 @@ function getStormHeartTargetEnrageLevel(enemy: Enemy): number {
     return 0;
 }
 
+function isOrbProtectingHeart(this: void, state: GameState, area: AreaInstance): boolean {
+    return getOrbs(state, area.alternateArea, 'normal').length > 0;
+}
+
 function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.mode === 'waiting') {
-        if (enemy.area === state.areaInstance) {
+        if (enemy.area === state.areaInstance && enemy.life < enemy.enemyDefinition.life) {
             enemy.setMode('choose');
         }
         enemy.healthBarTime = 0;
@@ -339,7 +355,6 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
     // const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 144 : 500, enemy.area.allyTargets);
     if (isEnraged) {
         enemy.params.enrageTime -= FRAME_LENGTH;
-        enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
         if (enemy.params.enrageTime % 2000 === 0) {
             enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
             const hitbox = state.hero.getHitbox();
@@ -361,6 +376,19 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
+        const orbs = getOrbs(state, enemy.area.alternateArea, 'off');
+        if (orbs[0]) {
+            orbs[0].status = 'normal';
+        }
+        if (orbs[1] && targetEnrageLevel >= 2) {
+            orbs[1].status = 'normal';
+        }
+    }
+    if (isOrbProtectingHeart(state, enemy.area)) {
+        // This has the unintended side effect of making the heart visible from the spirit world,
+        // but maybe this is an okay effect, let's see.
+        enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
+        addSparkleAnimation(state, enemy.area, pad(enemy.getHitbox(), -8), { element: 'lightning' });
     }
 }
 
@@ -422,6 +450,10 @@ const sparkAbility: EnemyAbility<NearbyTargetType> = {
 
 const stormBeastLightningAbility = {
     ...lightningBoltAbility,
+    // Allow targeting between worlds.
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, state.hero.area.allyTargets);
+    },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('prepareCast');
         const {x, y} = getVectorToTarget(state, enemy, target.target);
@@ -441,6 +473,10 @@ const stormBeastLightningAbility = {
 
 const stormBeastChargedLightningAbility = {
     ...chargedLightningBoltAbility,
+    // Allow targeting between worlds.
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, state.hero.area.allyTargets);
+    },
     // This powerful ability only activates once the heart is at half health or below.
     isEnabled(state: GameState, enemy: Enemy): boolean {
         const stormHeart = getStormHeart(state, enemy.area);
@@ -482,6 +518,9 @@ enemyDefinitions.stormBeast = {
         return enemy.defaultOnHit(state, hit);
     },
     renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (enemy.mode === 'hidden') {
+            return;
+        }
         const animation = stormBeastGlowAnimations[enemy.currentAnimationKey]?.down;
         if (animation) {
             const frame = getFrame(animation, enemy.animationTime);
@@ -554,8 +593,10 @@ function leaveScreen(enemy: Enemy): void {
 }
 
 function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
+    const stormHeart = getStormHeart(state, enemy.area);
     if (enemy.mode === 'hidden') {
-        if (enemy.area === state.areaInstance) {
+        // Stay hidden until the player enters the same area and damages the storm heart(or no heart is present).
+        if (enemy.area === state.areaInstance && (!stormHeart || stormHeart?.life < stormHeart?.enemyDefinition.life)) {
             const { section } = getAreaSize(state);
             enemy.status = 'normal';
             enemy.setMode('enter');
@@ -564,6 +605,24 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.y = section.y - 48;
         }
         enemy.healthBarTime = 0;
+        return;
+    }
+    // If the hero
+    if (enemy.mode !== 'regenerate' && enemy.mode !== 'transform' && enemy.area !== state.areaInstance) {
+        enemy.setMode('attackOtherWorld');
+        const t = {x: 320, y: 320};
+        if (moveEnemyToTargetLocation(state, enemy, t.x, t.y) < 10) {
+            faceCenter(state, enemy);
+            enemy.useRandomAbility(state);
+        } else {
+            const hitbox = enemy.getHitbox();
+            enemy.rotation = Math.atan2(t.y - (hitbox.y + hitbox.h / 2), t.x - (hitbox.x + hitbox.w / 2)) - Math.PI / 2;
+        }
+        return;
+    }
+    // Leave the screen when the hero returns.
+    if (enemy.mode === 'attackOtherWorld' && enemy.area === state.areaInstance) {
+        leaveScreen(enemy);
         return;
     }
     // While the beast is a ball of lightning, it moves super fast and does AoE lightning damage around it.
@@ -578,7 +637,6 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
     } else {
         enemy.speed = 4;
     }
-    const stormHeart = getStormHeart(state, enemy.area);
     const maxLife = enemy.enemyDefinition.life;
     if (isEnemyDefeated(stormHeart)) {
         if (enemy.life <= maxLife * 2 / 3 && enemy.params.enrageLevel === 0) {
@@ -592,6 +650,20 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
             // Burn damaged is reduced by 80% when entering rage phase.
             enemy.burnDamage *= 0.2;
         }
+    } else if (enemy.mode !== 'regenerate' && enemy.mode !== 'transform' && isOrbProtectingHeart(state, enemy.area)) {
+        enemy.setMode('protect');
+        const t = {x: 400, y: 320};
+        if (moveEnemyToTargetLocation(state, enemy, t.x, t.y) < 10) {
+            faceCenter(state, enemy);
+            enemy.useRandomAbility(state);
+        } else {
+            const hitbox = enemy.getHitbox();
+            enemy.rotation = Math.atan2(t.y - (hitbox.y + hitbox.h / 2), t.x - (hitbox.x + hitbox.w / 2)) - Math.PI / 2;
+        }
+    }
+    if (enemy.mode === 'protect' && ! isOrbProtectingHeart(state, enemy.area)) {
+        leaveScreen(enemy);
+        return;
     }
     const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
     // The storm beast teleports to the center of the screen as a ball of lightning.

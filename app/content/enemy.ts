@@ -323,10 +323,15 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 return {
                     hit: true,
                     blocked: true,
+                    stopped: true,
                     debug: 'lightning hit an "off" enemy'
                 };
             }
-            return {debug: 'enemy is "off"'};
+            return {
+                debug: 'enemy is "off"',
+                blocked: true,
+                stopped: true,
+            };
         }
         if (this.life <= 0 || this.status === 'gone' || this.enemyInvulnerableFrames || this.isInvulnerable) {
             return {};

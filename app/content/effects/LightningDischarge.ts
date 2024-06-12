@@ -12,6 +12,7 @@ interface Props {
     radius?: number
     source?: Enemy
     tellDuration?: number
+    hitEnemies?: boolean
 }
 
 export class LightningDischarge implements EffectInstance {
@@ -19,20 +20,14 @@ export class LightningDischarge implements EffectInstance {
     animationTime: number = 0;
     isEffect = <const>true;
     isEnemyAttack = true;
-    x: number;
-    y: number;
-    damage: number;
-    r: number;
-    source: Enemy;
-    tellDuration: number;
-    constructor({x = 0, y = 0, damage = 2, radius = 48, source, tellDuration = 1000}: Props) {
-        this.x = x;
-        this.y = y;
-        this.damage = damage;
-        this.r = radius;
-        this.source = source;
-        this.tellDuration = tellDuration;
-    }
+    x = this.props.x || 0;
+    y = this.props.y || 0;
+    damage = this.props.damage ?? 2;
+    r = this.props.radius || 48;
+    source = this.props.source;
+    tellDuration = this.props.tellDuration ?? 1000;
+    // {x = 0, y = 0, damage = 2, radius = 48, source, tellDuration = 1000}
+    constructor(public props: Props) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         // If this effect has an enemy as a source, remove it if the source disappears during the tell duration.
@@ -55,7 +50,7 @@ export class LightningDischarge implements EffectInstance {
                 hitAllies: true,
                 hitObjects: true,
                 hitTiles: true,
-                hitEnemies: true,
+                hitEnemies: this.props.hitEnemies ?? true,
                 knockAwayFrom: {x: this.x, y: this.y},
             });
             addEffectToArea(state, this.area, new LightningAnimationEffect({

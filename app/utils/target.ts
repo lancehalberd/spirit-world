@@ -41,6 +41,16 @@ export function getVectorToTarget(state: GameState, source: EffectInstance | Obj
     return {mag, x: 0, y: 1};
 }
 
+export function getVectorToHitbox(state: GameState, source: Rect, target: Rect):{x: number, y: number, mag: number} {
+    const dx = (target.x + target.w / 2) - (source.x + source.w / 2);
+    const dy = (target.y + target.h / 2) - (source.y + source.h / 2);
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    if (mag) {
+        return {mag, x: dx / mag, y: dy / mag};
+    }
+    return {mag, x: 0, y: 1};
+}
+
 export function getVectorToNearbyTarget(state: GameState,
     source: EffectInstance | ObjectInstance, radius: number,
     targets: (EffectInstance | ObjectInstance)[]
