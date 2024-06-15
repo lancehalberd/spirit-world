@@ -1,13 +1,15 @@
 import {
     iceFrontAnimation,
 } from 'app/content/animations/iceOverlay';
-import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addParticleAnimations, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
+import { lightStoneParticles, heavyStoneParticles } from 'app/content/tiles/constants';
 import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import { ThrownObject } from 'app/content/effects/thrownObject';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
@@ -105,6 +107,7 @@ export class Hero implements Actor {
     sinking?: boolean;
     inAirBubbles?: boolean;
     frozenDuration?: number;
+    frozenHeartDuration?: number;
     burnDamage?: number = 0;
     burnDuration?: number = 0;
     isRunning?: boolean;
@@ -323,6 +326,7 @@ export class Hero implements Actor {
             }
             return {};
         }
+        const hadIronSkin = this.savedData.ironSkinLife > 0;
         const preventKnockback = this.savedData.equippedBoots === 'ironBoots' || this.savedData.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
@@ -349,19 +353,24 @@ export class Hero implements Actor {
             }
             this.takeDamage(state, damage, iframeMultiplier);
         }
-        if (hit.knockback && (hit.canAlwaysKnockback || !preventKnockback)) {
+        if (hit.knockback && hit.element !== 'ice' && (hit.canAlwaysKnockback || !preventKnockback)) {
             this.knockBack(state, hit.knockback);
         }
         // Getting hit while frozen unfreezes you.
-        if (this.frozenDuration > 0) {
+        if (this.frozenHeartDuration > 0) {
+            this.frozenHeartDuration = 0;
+        } else if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
-        } else if (hit.element === 'ice' && !(this.savedData.ironSkinLife > 0)) {
-            // Getting hit by ice freezes you unless you have iron skin up.
-            if (this.savedData.passiveTools.waterBlessing) {
-                this.frozenDuration = 1000;
+        } else if (hit.element === 'ice') {
+            const duration = this.savedData.passiveTools.waterBlessing ? 1000 : 1500;
+            if (hadIronSkin) {
+                this.frozenHeartDuration = 2 * duration;
             } else {
-                this.frozenDuration = 1500;
+                // Getting hit by ice freezes you unless you have iron skin up.
+                this.frozenDuration = duration;
+                this.vx = this.vy = 0;
             }
+                playAreaSound(state, state.areaInstance, 'freeze');
             // ice hits remove burns.
             this.burnDuration = 0;
         }
@@ -375,6 +384,7 @@ export class Hero implements Actor {
         }
         // Burns unfreeze the player.
         this.frozenDuration = 0;
+        this.frozenHeartDuration = 0;
     }
 
     burstBarrier(state: GameState) {
@@ -445,19 +455,45 @@ export class Hero implements Actor {
         if (state.scriptEvents.blockPlayerInput) {
             return;
         }
+        if (this.frozenHeartDuration > 0) {
+            // When the player has frozen hearts, all damage just destroys those hearts.
+            const targetValue = Math.max(0, Math.ceil(this.savedData.ironSkinLife) - 2);
+            damage = 2 * (this.savedData.ironSkinLife - targetValue);
+            //playAreaSound(state, state.areaInstance, 'rockShatter');
+            //playAreaSound(state, state.areaInstance, 'freeze');
+            //playAreaSound(state, state.areaInstance, 'pickUpObject');
+            //addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 8,
+            //    [...lightStoneParticles, ...heavyStoneParticles],
+            //    {numberParticles}, 4
+            //);
+        }
         // Iron Skin is shared across all clones, so use the values from the main hero
         if (state.hero.savedData.ironSkinLife) {
             state.hero.ironSkinCooldown = 3000;
-            if (state.hero.savedData.ironSkinLife > damage / 2) {
+            const numberParticles = Math.ceil(damage * 2);
+            addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 8,
+                [...lightStoneParticles, ...heavyStoneParticles],
+                {numberParticles}, 4
+            );
+            if (state.hero.savedData.ironSkinLife >= damage / 2) {
                 state.hero.savedData.ironSkinLife -= damage / 2;
+                if (damage >= 1) {
+                    playAreaSound(state, state.areaInstance, 'rockShatter');
+                } else {
+                    // Play a different sound for small amounts of damage.
+                    playAreaSound(state, state.areaInstance, 'pickUpObject');
+                }
+
                 // Iframes are only for the clone taking the damage.
-                this.invulnerableFrames = 50 * iframeMultiplier;
+                this.invulnerableFrames = 30 * iframeMultiplier;
                 //if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
                 //    destroyClone(state, this);
                 //}
                 return;
             } else {
                 damage -= 2 * state.hero.savedData.ironSkinLife;
+                // Always play the full sound when the last of the iron skin barrier is destroyed.
+                playAreaSound(state, state.areaInstance, 'rockShatter');
                 state.hero.savedData.ironSkinLife = 0;
             }
         }
@@ -465,6 +501,7 @@ export class Hero implements Actor {
         // any damage the hero or any clone take destroys it.
         // If there are no controllable clones, damage will only kill the
         // uncontrollably ones, never the primary clone the player is controlling.
+        playAreaSound(state, state.areaInstance, 'ouch');
         if (state.hero.clones.filter(clone => !clone.isUncontrollable).length
             || this !== state.hero
         ) {
@@ -648,7 +685,7 @@ export class Hero implements Actor {
             context.save();
                 const p = Math.round(Math.min(3, hero.frozenDuration / 200));
                 context.globalAlpha *= (0.3 + 0.15 * p);
-                drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
+                drawFrameAt(context, frame, { x: this.x - 10, y: this.y - this.z - 13 });
             context.restore();
         }
         this.renderChargingFront(context, state);

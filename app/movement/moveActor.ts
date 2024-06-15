@@ -1,5 +1,6 @@
 import { getJumpVector } from 'app/movement/getJumpVector';
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
+import { playAreaSound } from 'app/musicController';
 import { directionMap, getDirection } from 'app/utils/direction';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
@@ -136,6 +137,7 @@ function moveActorInDirection(
             if (actor.pickUpObject || actor.pickUpTile) {
                 (actor as Hero).throwHeldObject?.(state);
             }
+            playAreaSound(state, state.areaInstance, 'fall');
             if (actor.action === 'thrown' || actor.action === 'knocked' || actor.action === 'knockedHard') {
                 actor.action = 'jumpingDown';
                 actor.jumpingVx = actor.vx;

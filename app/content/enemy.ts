@@ -298,7 +298,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.blockInvulnerableFrames) {
             return;
         }
-        playAreaSound(state, this.area, 'blockAttack');
+        this.makeSound(state,'blockAttack');
         this.blockInvulnerableFrames = 30;
     }
     defaultBlockHit(state: GameState, hit: HitProperties, stopped = false): HitResult {
@@ -372,6 +372,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && this.definition.type !== 'boss') {
+            this.makeSound(state, 'freeze');
             this.frozenDuration = 1500;
             this.burnDuration = 0;
             this.vx = this.vy = 0;
@@ -392,7 +393,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
         this.enemyInvulnerableFrames = (iframeMultiplier * 20) | 0;
         if (!this.checkIfDefeated(state)) {
-            playAreaSound(state, this.area, damageSound);
+            this.makeSound(state, damageSound);
         }
         if (this.area !== state.areaInstance) {
             if (this.isDefeated && this.definition.type !== 'boss') {
@@ -487,7 +488,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             deathAnimation.vy = this.vy;
             deathAnimation.friction = 0.1;
         }
-        playAreaSound(state, this.area, 'enemyDeath');
+        this.makeSound(state, 'enemyDeath');
         if (this.enemyDefinition.lootTable) {
             dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
                 hitbox.x + hitbox.w / 2,
@@ -641,7 +642,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 if (this.z <= 0) {
                     this.isAirborn = false;
                 }
-                if (this.z === 0 && this.vz <= -4) {
+                if (this.z === 0 && this.vz <= -5) {
                     this.applyDamage(state, (this.vz / -4) | 0);
                     this.frozenDuration = 0;
                 }

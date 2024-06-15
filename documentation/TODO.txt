@@ -96,13 +96,15 @@ RangeError: Maximum call stack size exceeded
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Improve midboss:
-        - Do something more aggressive during pinch phase
-            - Growing AoE lightning ring
-            - Shock arcs centered on player every 1s
-            - Make sure player can knock the orb away with attacks
-                - Accelerate towards the player faster requiring knockback or fast speed to escape
-        - Make spinning orbs vulnerable to ice.
+    - Arrows(and other projectiles) should be stopped by southern facing walls
+    - Sparks shouldn't go through low solid tiles.
+
+    - Render a bubble around player that breaks lightning barriers when they are protected by the Ancient Badge.
+
+
+    - Fix shockwave graphics have artifacts around them when rotated.
+        - In general we probably need to add an extra 1px padding around any images in packed sprites if they are rendered rotated or scaled
+        - Applies to storm beast as well.
 
     - New enemy: lava monster with shell (TBD by artist)
         - possible designs:
@@ -134,17 +136,12 @@ Current tasks:
             - Make elevator platfrom glow so we can see it fall in the basement ahead of the player.
             - Start it off screen
             - Delay the fall of the player until the platform crashes.
-        - Reuse future ceiling edges for ledge tiles on the floor2 layer.
         - New stairs object
             - Like the escalator style with rails except no moving floor.
         - New ladders
         - east/west doors
         - Add elevator behaviors
             - off, terminals are not animated/functional
-
-
-    - Render ladders+stairs as up/down arrows in dungeon maps.
-        - Add a property to doors for overriding the default map style.
 
     - Add Obsidian Tileset manually to buildings in the spirit world.
 

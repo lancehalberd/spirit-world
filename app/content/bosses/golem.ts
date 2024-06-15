@@ -856,7 +856,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 // We could increase the spark count for a more difficult version of the boss.
                 2, // + (golem?.params.enrageLevel || 0),
-                Math.PI / 2, Math.PI / 6
+                Math.PI / 2, Math.PI / 6, 20, {maxSpeed: 5, delay: 200}
             );
             if (isSlammingHands) {
                 // Continue slamming until the last N seconds of the slam attack.
@@ -881,8 +881,8 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             addSlamEffect(state, enemy);
             addRadialShockWaves(
                 state, enemy.area,
-                [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
-                4, Math.PI / 4
+                [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 + 4],
+                4, Math.PI / 4, 20, {maxSpeed: 5, delay: 200}
             );
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');

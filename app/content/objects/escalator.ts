@@ -2,6 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/movement/moveActor';
+import { playAreaSound } from 'app/musicController';
 import { drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
@@ -137,6 +138,7 @@ export class Escalator implements ObjectInstance {
         } else if (hit.element === 'ice') {
             this.status = 'frozen';
             this.behaviors.slippery = true;
+            playAreaSound(state, this.area, 'freeze');
         }
         return {};
     }

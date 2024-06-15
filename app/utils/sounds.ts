@@ -377,9 +377,9 @@ const preloadSounds = () => {
             offset: '0:250', volume: 10, limit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
             offset: '0:100', volume: 20, limit: 3},
-        {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 50, limit: 1},
-        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 15, limit: 3},
-        {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 15, limit: 2},
+        {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 100, limit: 1},
+        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 50, limit: 3},
+        {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 50, limit: 2},
         {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', offset: '300:200', volume: 100, limit: 1},
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 100, limit: 1},
         {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
@@ -419,25 +419,15 @@ window['requireSound'] = requireSound;
 // Safari uses webkitAudioContext instead of AudioContext.
 const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
 
-function makeDistortionCurve(amount) {
-  var k = typeof amount === 'number' ? amount : 50,
-    n_samples = 44100,
-    curve = new Float32Array(n_samples),
-    deg = Math.PI / 180,
-    i = 0,
-    x;
-  for ( ; i < n_samples; ++i ) {
-    x = i * 2 / n_samples - 1;
-    curve[i] = ( 3 + k ) * x * 20 * deg / ( Math.PI + k * Math.abs(x) );
-  }
-  return curve;
-};
-var distortionCurve = makeDistortionCurve(100);
-
-function playBeeps(frequencies, volume, duration, {smooth=false, swell=false, taper=false, distortion=false}) {
+function playBeeps(frequencies, volume, duration, {
+    smooth=false,
+    swell = 0,
+    taper = 0,
+    type = 'square' as OscillatorType
+}) {
     frequencies = Float32Array.from(frequencies);
     const oscillator = audioContext.createOscillator();
-    oscillator.type = 'square';
+    oscillator.type = type;
     if (smooth) oscillator.frequency.setValueCurveAtTime(frequencies, audioContext.currentTime, duration);
     else {
         for (var i = 0; i < frequencies.length; i++) {
@@ -445,25 +435,20 @@ function playBeeps(frequencies, volume, duration, {smooth=false, swell=false, ta
         }
     }
     let lastNode:AudioNode = oscillator;
-    if (distortion) {
-        const distortionNode = audioContext.createWaveShaper();
-        distortionNode.curve = distortionCurve;
-        distortionNode.oversample = '4x';
-        lastNode.connect(distortionNode);
-        lastNode = distortionNode;
-    }
 
     const gainNode = audioContext.createGain();
     if (swell) {
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + duration * .1);
+        gainNode.gain.setValueAtTime(volume / 100, audioContext.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + duration * swell);
+        //gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + duration * swell);
     } else {
         gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
     }
     if (taper) {
-        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + duration * .9);
+        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + duration * (1 - taper));
         // gainNode.gain.setTargetAtTime(0, audioContext.currentTime, duration / 10);
-        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+        //gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+        gainNode.gain.exponentialRampToValueAtTime(volume / 100, audioContext.currentTime + duration);
     }
     lastNode.connect(gainNode);
     lastNode = gainNode;
@@ -473,6 +458,8 @@ function playBeeps(frequencies, volume, duration, {smooth=false, swell=false, ta
     oscillator.start();
     oscillator.stop(audioContext.currentTime + duration);
 }
+window['playBeeps'] = playBeeps;
+
 
 function playBellSound(frequencies, volume, duration) {
     const combinedGainedNode = audioContext.createGain();
@@ -507,11 +494,27 @@ sounds.set('reflect', {
         playBeeps([2000, 8000, 4000], .01, .1, {});
     }
 });
-sounds.set('wand', {
+sounds.set('fall', {
     play() {
-        playBeeps([1200, 400], 0.01, .1, {smooth: true, taper: true, swell: true, distortion: true});
+        //playBeeps([1350, 900, 600, 400], 0.05, .15, {smooth: true, taper: 0.6, swell: 0.4});
+        playBeeps([1350, 900, 600, 400], 0.1, .2, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'});
     }
 });
+sounds.set('freeze', {
+    play() {
+        const x = 1200;
+        playBeeps(
+            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08, .2,
+            {taper: 0.1, swell: 0.1, type: 'triangle'}
+        );
+    }
+});
+sounds.set('ouch', {
+    play() {
+        playBeeps([200, 400, 100, 200], 0.05, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'});
+    }
+});
+
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
 const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];

@@ -695,7 +695,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 // We could increase the spark count for a more difficult version of the boss.
                 3, // + (golem?.params.enrageLevel || 0),
-                Math.PI / 2, Math.PI / 3
+                Math.PI / 2, Math.PI / 3, 20, {maxSpeed: 5, delay: 200}
             );
             enemy.params.stunTime = 500;
             enemy.setMode('slammed');
@@ -713,7 +713,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
             addRadialShockWaves(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
-                6, Math.PI / 6
+                6, Math.PI / 6, 20, {maxSpeed: 5, delay: 200}
             );
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');

@@ -13,6 +13,9 @@ const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
 const [, fullGreyHeart, threeGreyQuarters, halfGreyHeart, quarterGreyHeart] =
     createAnimation('gfx/hud/greyhearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
+const [, fullFrozenHeart, threeFrozenQuarters, halfFrozenHeart, quarterFrozenHeart] =
+    createAnimation('gfx/hud/frozenhearts.png', {w: 10, h: 10}, {cols: 5}).frames;
+
 const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
 
@@ -51,18 +54,32 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     // Draw iron skin hearts on top of regular hearts
     x = 26;
     y = 5;
+    const effectiveIronSkin = state.hero.frozenHeartDuration > 0
+        ? Math.max(0, Math.ceil(state.hero.savedData.ironSkinLife) - 2)
+        : state.hero.savedData.ironSkinLife;
     for (let i = 0; i < state.hero.savedData.ironSkinLife; i++) {
         if (i === 10) {
             y += 11;
             x = 26;
         }
         let frame: Frame = fullGreyHeart;
-        if (i >= state.hero.savedData.ironSkinLife - 0.25) {
-            frame = quarterGreyHeart;
-        } else if (i >= state.hero.savedData.ironSkinLife - 0.5) {
-            frame = halfGreyHeart;
-        } else if (i >= state.hero.savedData.ironSkinLife - 0.75) {
-            frame = threeGreyQuarters;
+        if (i >= effectiveIronSkin) {
+            frame = fullFrozenHeart;
+            if (i >= state.hero.savedData.ironSkinLife - 0.25) {
+                frame = quarterFrozenHeart;
+            } else if (i >= state.hero.savedData.ironSkinLife - 0.5) {
+                frame = halfFrozenHeart;
+            } else if (i >= state.hero.savedData.ironSkinLife - 0.75) {
+                frame = threeFrozenQuarters;
+            }
+        } else {
+            if (i >= state.hero.savedData.ironSkinLife - 0.25) {
+                frame = quarterGreyHeart;
+            } else if (i >= state.hero.savedData.ironSkinLife - 0.5) {
+                frame = halfGreyHeart;
+            } else if (i >= state.hero.savedData.ironSkinLife - 0.75) {
+                frame = threeGreyQuarters;
+            }
         }
         drawFrame(context, frame, {...frame, x, y});
         x += 11;

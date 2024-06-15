@@ -303,21 +303,41 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
 }
 
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    const hitbox = enemy.getHitbox(state);
+    const hitbox = enemy.getMovementHitbox();
     if (enemy.w > 0) {
         context.save();
-            context.globalAlpha *= 0.6;
             context.fillStyle = 'black';
             const cx = hitbox.x + hitbox.w / 2;
-            const cy = hitbox.y + (enemy.z | 0) + hitbox.h - hitbox.w / 4;
-            context.translate(cx, cy);
-            context.scale(1, 0.5);
-            const scale = Math.max(0.6, 0.97 ** (enemy.z * 16 / hitbox.w));
-            context.globalAlpha *= scale;
-            context.scale(0.95 * scale, 0.95 * scale);
-            context.beginPath();
-            context.arc(0, 0, hitbox.w / 2, 0, Math.PI * 2);
-            context.fill();
+            const cy = hitbox.y + hitbox.h - hitbox.w / 4;
+            const fullScale = 0.95;
+            if (enemy.z === 0) {
+                context.globalAlpha *= 0.6;
+                context.translate(cx, cy);
+                context.scale(1, 0.5);
+                context.scale(fullScale, fullScale);
+                context.beginPath();
+                context.arc(0, 0, hitbox.w / 2, 0, Math.PI * 2);
+                context.fill();
+            } else {
+                context.globalAlpha *= 0.35;
+                context.translate(cx, cy);
+                context.scale(1, 0.5);
+                const dw = Math.min(hitbox.w / 2, enemy.z / 6);
+                if (hitbox.w / 2 - dw > 0) {
+                    context.save();
+                        const zAlpha = 0.96 ** (enemy.z / 2);
+                        context.globalAlpha *= zAlpha;
+                        context.beginPath();
+                        context.arc(0, 0, hitbox.w / 2 - dw, 0, Math.PI * 2);
+                        context.fill();
+                    context.restore();
+                }
+                const zAlpha = 0.9 ** (enemy.z / 2);
+                context.globalAlpha *= zAlpha;
+                context.beginPath();
+                context.arc(0, 0, hitbox.w / 2 + dw, 0, Math.PI * 2);
+                context.fill();
+            }
         context.restore();
         return;
     }

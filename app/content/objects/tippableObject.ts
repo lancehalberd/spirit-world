@@ -2,6 +2,7 @@ import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
 import { PushPullObject } from 'app/content/objects/pushPullObject'
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
@@ -67,6 +68,7 @@ export class TippableObject implements ObjectInstance {
         if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return;
         }
+        playAreaSound(state, this.area, 'freeze');
         const frozenPot = new FrozenPotObject(
             state,
             {

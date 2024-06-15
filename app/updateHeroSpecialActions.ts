@@ -845,7 +845,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.frozenDuration > 0) {
-        hero.frozenDuration -= FRAME_LENGTH;
         hero.vx *= 0.99;
         hero.vy *= 0.99;
         moveActor(state, hero, hero.vx, hero.vy, {

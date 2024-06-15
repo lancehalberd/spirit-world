@@ -3,7 +3,7 @@ import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { addRadialSparks } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { lifeLootTable } from 'app/content/lootTables';
+import { certainLifeLootTable } from 'app/content/lootTables';
 import { Enemy } from 'app/content/enemy';
 
 import { omniAnimation } from 'app/content/enemyAnimations';
@@ -30,7 +30,10 @@ interface OrbProps {
     orbCount?: number
     smallOrbs?: Enemy<OrbProps>[]
     largeOrb?: Enemy<OrbProps>
-    spinTheta?: number
+    // Angle of this orb relative to the orb it is circling.
+    // This is used when calculating how to evenly distribute
+    // the orbs around the large orb.
+    largeOrbTheta?: number
     spinThetaV?: number
     shockwaveIndex?: number
     shockwaveTimer?: number
@@ -49,7 +52,9 @@ const blastDistance = 24;
 
 const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
     flying: true,
-    lootTable: lifeLootTable,
+    // In particular this gives the player a reliable way to recover some life when fighting
+    // the bosses in the Staff Tower.
+    lootTable: certainLifeLootTable,
     params: {inertia: 2},
     speed: 1.2,
     updateFlyingZ(this: void, state: GameState, enemy: Enemy<OrbProps>) {
@@ -85,12 +90,14 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
             addObjectToArea(state, enemy.area.alternateArea, baseEnemy);
         }
     },
-    renderOver(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<OrbProps>) {
-        if (enemy.status === 'off') {
+    render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<OrbProps>) {
+        if (enemy.status === 'off' || enemy.frozenDuration > 0) {
+            enemy.defaultRender(context, state);
             return;
         }
-        const hitbox = enemy.getHitbox();
-        const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
+        enemy.defaultRender(context, state);
+        //const hitbox = enemy.getHitbox();
+        //const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
         if (enemy.params.smallOrbs) {
             // Large orbs render beams to all captured small orbs.
             for (const smallOrb of enemy.params.smallOrbs) {
@@ -112,19 +119,20 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
             const inversion = (enemy.params.invertedDuration > 0 || otherEnemy.params.invertedDuration > 0) ? -1 : 1;
             if (inversion > 0 && getAttraction(otherEnemy) > 0) {
                 const v = getVectorToTarget(state, enemy, otherEnemy);
-                const otherHitbox = otherEnemy.getHitbox();
-                const ocx = otherHitbox.x + otherHitbox.w / 2, ocy = otherHitbox.y + otherHitbox.h / 2;
+                //const otherHitbox = otherEnemy.getHitbox();
+                //const ocx = otherHitbox.x + otherHitbox.w / 2, ocy = otherHitbox.y + otherHitbox.h / 2;
                 if (v.mag < beamDistance) {
                     /*renderDamageWarning(context, {
                         circle: getBlastCircle(enemy, otherEnemy),
                         duration: 1000,
                         time: 0,
                     });*/
-                    renderLightningRay(context, {
+                    renderHalfBeam(context, enemy, otherEnemy)
+                    /*renderLightningRay(context, {
                         x1: cx, y1: cy,
                         x2: (cx + ocx) / 2, y2: (cy + ocy) / 2,
                         r: 4,
-                    }, 2, 20);
+                    }, 2, 20);*/
                 } else if (v.mag < warningDistance) {
 
                     const p = 1 - (v.mag - beamDistance) / (warningDistance - beamDistance);
@@ -149,18 +157,20 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
 };
 function renderHalfBeam(context: CanvasRenderingContext2D, orbA: Enemy, orbB: Enemy) {
     const hitbox = orbA.getHitbox();
-        const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
+    const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
     const otherHitbox = orbB.getHitbox();
-    const ocx = otherHitbox.x + otherHitbox.w / 2, ocy = otherHitbox.y + otherHitbox.h / 2;
+    const dx = otherHitbox.x + otherHitbox.w / 2 - x, dy = otherHitbox.y + otherHitbox.h / 2 - y;
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    const r = hitbox.w / 2;
     renderLightningRay(context, {
-        x1: cx, y1: cy,
-        x2: (cx + ocx) / 2, y2: (cy + ocy) / 2,
+        x1: x + r * dx / mag, y1: y + r * dy / mag,
+        x2: x + dx / 2, y2: y + dy / 2,
         r: 4,
     }, 2, 20);
 }
 
 function getAttraction(enemy: Enemy): number {
-    if (enemy.status === 'off') {
+    if (enemy.status === 'off' || enemy.frozenDuration > 0) {
         return 0;
     }
     if (enemy.definition.enemyType === 'smallOrb') {
@@ -206,7 +216,18 @@ enemyDefinitions.smallOrb = {
     animations: {idle: omniAnimation(orbAnimation)}, life: 8, touchHit: {element: 'lightning', damage: 2}, update: updateSmallOrb,
     immunities: ['lightning'],
     onHit(this: void, state: GameState, enemy: Enemy<OrbProps>, hit: HitProperties): HitResult {
-        if (enemy.params.largeOrb) {
+        const largeOrb = enemy.params.largeOrb;
+        if (largeOrb) {
+            // The small orb can be frozen to disconnect it from the large orb.
+            if (hit.element === 'ice') {
+                const result = enemy.defaultOnHit(state, hit);
+                if (result.hit) {
+                    const index = largeOrb.params.smallOrbs.indexOf(enemy);
+                    if (index >= 0) {
+                        largeOrb.params.smallOrbs.splice(index, 1);
+                    }
+                }
+            }
             return enemy.defaultBlockHit(state, hit, true);
         }
         const result = enemy.defaultOnHit(state, hit);
@@ -217,10 +238,34 @@ enemyDefinitions.smallOrb = {
         }
         return result;
     },
+    onDeath(this: void, state: GameState, enemy: Enemy<OrbProps>) {
+        const largeOrb = enemy.params.largeOrb;
+        if (largeOrb) {
+            largeOrb.applyDamage(state, largeOrb.enemyDefinition.life / 3)
+        }
+    }
+};
+
+const sparkAbility: EnemyAbility<true> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): true {
+        return true
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: true): void {
+        const hitbox = enemy.getMovementHitbox();
+        const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
+        addRadialSparks(state, enemy.area, [cx, cy], 6, 2 * Math.PI * Math.random(), 4, {
+            damage: 2,
+            ttl: 4000,
+            delay: 800,
+        });
+    },
+    cooldown: 2000,
+    prepTime: 1000,
 };
 
 enemyDefinitions.largeOrb = {
     ...baseOrbDefinition,
+    abilities: [sparkAbility],
     tileBehaviors: {
         brightness: 0.6,
         lightRadius: 40,
@@ -278,6 +323,11 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
         }
     }
 
+    // The large orb will only attack when there are no circling orbs.
+    if (!enemy.params.smallOrbs.length) {
+        enemy.useRandomAbility(state);
+    }
+
     if (!enemy.params.invertedDuration) {
         if (enemy.life <= enemy.enemyDefinition.life / 3) {
             enemy.vx = enemy.vy = 0;
@@ -309,12 +359,41 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
     if (enemy.params.spinThetaV > baseSpinThetaV) {
         enemy.params.spinThetaV -= 0.0001;
     }
-    enemy.params.spinTheta = (enemy.params.spinTheta || 0) + enemy.params.spinThetaV;
     enemy.params.smallOrbs = enemy.params.smallOrbs.filter(orb => !isEnemyMissing(enemy.area, orb));
-    for (let i = 0; i < enemy.params.smallOrbs.length; i++) {
-        const smallOrb = enemy.params.smallOrbs[i];
+    const smallOrbs = enemy.params.smallOrbs;
+    for (let i = 0; i < smallOrbs.length; i++) {
+        const smallOrb = smallOrbs[i];
+        const v = getVectorToHitbox(enemy.getMovementHitbox(), smallOrb.getMovementHitbox());
+        smallOrb.params.largeOrbTheta = Math.atan2(v.y, v.x) + 2 * Math.PI;
+    }
+    smallOrbs.sort((a, b) => b.params.largeOrbTheta - a.params.largeOrbTheta);
+    //console.log(orbThetas);
+    let targetOrbThetas = [smallOrbs[0]?.params.largeOrbTheta];
+    for (let i = 0; smallOrbs.length > 1 && i < smallOrbs.length; i++) {
+        const theta = smallOrbs[i].params.largeOrbTheta;
+        const previousOrb = smallOrbs[(i + smallOrbs.length - 1) % smallOrbs.length];
+        const nextOrb = smallOrbs[(i + 1) % smallOrbs.length];
+        // Measure angle between this orb and the previous orb vs this orb and the next orb.
+        let leftTheta = theta - previousOrb.params.largeOrbTheta;
+        leftTheta = (leftTheta + 2 * Math.PI) % (2 * Math.PI);
+        let rightTheta = nextOrb.params.largeOrbTheta - theta;
+        rightTheta = (rightTheta + 2 * Math.PI) % (2 * Math.PI);
+        if (leftTheta > rightTheta) {
+            // If this orb is further from the previous orb, make its target theta lower.
+            targetOrbThetas[i] = theta - Math.min(Math.PI / 48, (leftTheta - rightTheta) / 4);
+        } else if (rightTheta > leftTheta) {
+            // If this orb is further from the next orb, make its target theta higher.
+            targetOrbThetas[i] = theta + Math.min(Math.PI / 96, (rightTheta - leftTheta) / 4);
+        } else {
+            targetOrbThetas[i] = theta;
+        }
+        //console.log({leftTheta, rightTheta, theta: orbThetas[i], targetTheta: targetOrbThetas[i]});
+    }
+    //console.log(targetOrbThetas);
+    for (let i = 0; i < smallOrbs.length; i++) {
+        const smallOrb = smallOrbs[i];
         const smallOrbHitbox = smallOrb.getMovementHitbox();
-        const theta = enemy.params.spinTheta + i * 2 * Math.PI / enemy.params.smallOrbs.length;
+        const theta = targetOrbThetas[i] + enemy.params.spinThetaV;
         const tx = hitbox.x + hitbox.w / 2 + orbitRadius * Math.cos(theta);
         const ty = hitbox.y + hitbox.h / 2 + orbitRadius * Math.sin(theta);
         //smallOrb.x = tx - smallOrbHitbox.w / 2;
@@ -326,15 +405,15 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
         smallOrb.vx = speed * dx / mag;
         smallOrb.vy = speed * dy / mag;
     }
-    enemy.params.shockwaveTimer -= FRAME_LENGTH * enemy.params.smallOrbs.length;
+    enemy.params.shockwaveTimer -= FRAME_LENGTH * smallOrbs.length;
     if (enemy.params.shockwaveTimer <= 0) {
         const largeOrbVector = getVectorToNearbyTarget(state, enemy, 296, enemy.area.allyTargets);
         const target = largeOrbVector?.target;
         if (target) {
             // When a target is nearby, place an attack from an orb that will hit the target if they stand still.
-            for (const smallOrb of enemy.params.smallOrbs) {
+            for (const smallOrb of smallOrbs) {
                 const smallOrbHitbox = smallOrb.getMovementHitbox();
-                const v = getVectorToHitbox(state, smallOrbHitbox, target.getHitbox());
+                const v = getVectorToHitbox(smallOrbHitbox, target.getHitbox());
                 let theta = -1;
                 if (Math.abs(v.x) < 0.05 || Math.abs(v.y) <= 0.05) {
                     theta = 0;
@@ -352,12 +431,13 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                     break;
                 }
             }
-        } else {
-            // Randomly attack from the small orbs when no target is nearby.
+        } else if (state.areaInstance === enemy.area) {
+            // Randomly attack from the small orbs when no target is nearby,
+            // as long as the hero is in this world.
             enemy.params.shockwaveTimer = 2000;
             enemy.params.shockwaveIndex = (enemy.params.shockwaveIndex || 0) + 1;
             enemy.params.shockwaveTheta = (enemy.params.shockwaveTheta || 0) + Math.PI / 4;
-            const smallOrb = enemy.params.smallOrbs[enemy.params.shockwaveIndex % enemy.params.smallOrbs.length];
+            const smallOrb = smallOrbs[enemy.params.shockwaveIndex % smallOrbs.length];
             const smallOrbHitbox = smallOrb.getMovementHitbox();
             addRadialSparks(
                 state, enemy.area, [smallOrbHitbox.x + smallOrbHitbox.w / 2, smallOrbHitbox.y + smallOrbHitbox.h / 2],
@@ -381,6 +461,9 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
         }
     }
     if (enemy.params.largeOrb) {
+        if (enemy.params.largeOrb.params.smallOrbs.indexOf(enemy) < 0) {
+            enemy.params.largeOrb.params.smallOrbs.push(enemy);
+        }
 
         if (enemy.modeTime % 60 === 0) {
             addSparkleAnimation(state, enemy.area, {...hitbox, x: 0, y: 0}, { element: 'lightning', target: enemy });

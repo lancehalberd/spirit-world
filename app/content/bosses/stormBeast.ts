@@ -1,6 +1,7 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
+import { addArcOfShockWaves } from 'app/content/effects/shockWave';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
@@ -376,7 +377,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
-        const orbs = getOrbs(state, enemy.area.alternateArea, 'off');
+        const orbs = getOrbs(state, enemy.area.alternateArea, 'off').reverse();
         if (orbs[0]) {
             orbs[0].status = 'normal';
         }
@@ -398,9 +399,9 @@ interface Path {
 }
 
 const stormBeastPaths = [
-    { start: [320, -80], end: [192, 320]},
-    { start: [-80, 320], end: [320, 448]},
-    { start: [320, 720], end: [448, 320]},
+    { start: [320, -80], end: [216, 320]},
+    { start: [-80, 320], end: [320, 424]},
+    { start: [320, 720], end: [424, 320]},
 ];
 
 
@@ -427,7 +428,13 @@ const sparkAbility: EnemyAbility<NearbyTargetType> = {
         const sparkCount = Math.min(7, Math.max(4, 2 + enemy.modeTime / 1000));
         const baseTheta = Math.atan2(section.y + section.h / 2 - cy, section.x + section.w / 2 - cx);
         enemy.rotation = baseTheta - Math.PI / 2;
-        for (let i = 0; i < sparkCount; i++) {
+        addArcOfShockWaves(state, enemy.area, [cx, cy], sparkCount, baseTheta, Math.PI / 2 / (sparkCount - 2), 44, {
+            damage: 2,
+            maxSpeed: 5,
+            ttl: 4000,
+            //delay: 400,
+        });
+        /*for (let i = 0; i < sparkCount; i++) {
             const theta = baseTheta - Math.PI / 4 + Math.PI / 2 * i / (sparkCount - 1);
             const dx = Math.cos(theta), dy = Math.sin(theta);
             const spark = new Spark({
@@ -439,7 +446,7 @@ const sparkAbility: EnemyAbility<NearbyTargetType> = {
                 ttl: 2000,
             });
             addEffectToArea(state, enemy.area, spark);
-        }
+        }*/
     },
     cooldown: 2000,
     initialCharges: 3,
@@ -655,7 +662,10 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         const t = {x: 400, y: 320};
         if (moveEnemyToTargetLocation(state, enemy, t.x, t.y) < 10) {
             faceCenter(state, enemy);
-            enemy.useRandomAbility(state);
+            // Attack on cooldown once the heart stops raging.
+            if (stormHeart.params.enrageTime <= 0) {
+                enemy.useRandomAbility(state);
+            }
         } else {
             const hitbox = enemy.getHitbox();
             enemy.rotation = Math.atan2(t.y - (hitbox.y + hitbox.h / 2), t.x - (hitbox.x + hitbox.w / 2)) - Math.PI / 2;

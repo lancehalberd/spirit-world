@@ -76,7 +76,7 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
         } else if (this.lastBolt && strikeTime === LIGHTNING_ANIMATION_DURATION && this.shockWaves) {
             // The lightning bolt releases sparks when they hit.
             addRadialSparks(
-                state, this.area, [this.lastBolt.x, this.lastBolt.y], this.shockWaves, this.shockWaveTheta, 4, {delay: 200}
+                state, this.area, [this.lastBolt.x, this.lastBolt.y], this.shockWaves, this.shockWaveTheta, 4, {delay: 800}
             );
             this.shockWaveTheta += this.shockWaveDelta;
         }

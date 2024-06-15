@@ -260,15 +260,15 @@ const [
 ] = createAnimation('gfx/tiles/ladder.png', {w: 16, h: 16}, {rows: 5}).frames;
 
 interface DoorStyleFrames {
-    doorFrame: Frame,
-    doorCeiling?: Frame,
-    doorClosed: Frame,
-    cracked: Frame,
-    caveFrame: Frame,
-    caveCeiling?: Frame,
-    cave: Frame,
-    locked: Frame,
-    bigKeyLocked: Frame,
+    doorFrame: Frame
+    doorCeiling?: Frame
+    doorClosed: Frame
+    cracked: Frame
+    caveFrame: Frame
+    caveCeiling?: Frame
+    cave: Frame
+    locked: Frame
+    bigKeyLocked: Frame
 }
 interface DoorStyleDefinition {
     getHitbox: (door: Door) => Rect
@@ -277,10 +277,14 @@ interface DoorStyleDefinition {
     isStairs?: boolean
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
-    down?: DoorStyleFrames,
-    right?: DoorStyleFrames,
-    up?: DoorStyleFrames,
-    left?: DoorStyleFrames,
+    down?: DoorStyleFrames
+    right?: DoorStyleFrames
+    up?: DoorStyleFrames
+    left?: DoorStyleFrames
+    mapIcon?: MapIcon
+    // Possible options for dynamic map icons:
+    // getMapIcon?: (state: GameState, door: Door) => void
+    // renderMapIcon?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
 }
 
 const oldSquareBaseDoorStyle = {
@@ -746,7 +750,7 @@ const futureDoorStyle: DoorStyleDefinition = {
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, futureDoorFrames, 6),
 };
 
-function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, h = 12): DoorStyleDefinition {
+function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, mapIcon: MapIcon, h = 12): DoorStyleDefinition {
     return {
         ...oldSquareBaseDoorStyle,
         isStairs: true,
@@ -764,6 +768,7 @@ function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, h = 12): 
             }
             drawFrame(context, {...frame, h}, {...frame, x: door.x, y: door.y, h});
         },
+        mapIcon,
     };
 }
 
@@ -793,23 +798,23 @@ const woodenDoorStyle: DoorStyleDefinition = {
 
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavern: cavernDoorStyle,
-    cavernDownstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsDown),
-    cavernUpstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsUp),
+    cavernDownstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsDown, 'down'),
+    cavernUpstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsUp, 'up'),
     crystal: crystalDoorStyle,
-    crystalDownstairs: stairsDoorStyle(crystalDoorStyle, crystalStairsDown),
-    crystalUpstairs: stairsDoorStyle(crystalDoorStyle, crystalStairsUp),
+    crystalDownstairs: stairsDoorStyle(crystalDoorStyle, crystalStairsDown, 'down'),
+    crystalUpstairs: stairsDoorStyle(crystalDoorStyle, crystalStairsUp, 'up'),
     stone: stoneDoorStyle,
-    stoneDownstairs: stairsDoorStyle(stoneDoorStyle, stoneStairsDown),
-    stoneUpstairs: stairsDoorStyle(stoneDoorStyle, stoneStairsUp),
+    stoneDownstairs: stairsDoorStyle(stoneDoorStyle, stoneStairsDown, 'down'),
+    stoneUpstairs: stairsDoorStyle(stoneDoorStyle, stoneStairsUp, 'up'),
     obsidian: obsidianDoorStyle,
-    obsidianDownstairs: stairsDoorStyle(obsidianDoorStyle, obsidianStairsDown),
-    obsidianUpstairs: stairsDoorStyle(obsidianDoorStyle, obsidianStairsUp),
+    obsidianDownstairs: stairsDoorStyle(obsidianDoorStyle, obsidianStairsDown, 'down'),
+    obsidianUpstairs: stairsDoorStyle(obsidianDoorStyle, obsidianStairsUp, 'up'),
     wooden: woodenDoorStyle,
-    woodenDownstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsDown),
-    woodenUpstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsUp),
+    woodenDownstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsDown, 'down'),
+    woodenUpstairs: stairsDoorStyle(woodenDoorStyle, woodenStairsUp, 'up'),
     future: futureDoorStyle,
-    futureDownstairs: stairsDoorStyle(futureDoorStyle, futureStairsDown, 6),
-    futureUpstairs: stairsDoorStyle(futureDoorStyle, futureStairsUp, 6),
+    futureDownstairs: stairsDoorStyle(futureDoorStyle, futureStairsDown, 'down', 6),
+    futureUpstairs: stairsDoorStyle(futureDoorStyle, futureStairsUp, 'up', 6),
     cave: {
         ...oldSquareBaseDoorStyle,
         down: {
@@ -932,6 +937,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             return {x: door.x, y: door.y, w: 16, h: 32};
         },
         pathBehaviors: {climbable: true},
+        mapIcon: 'up',
     },
     ladderUpTall: {
         render(this: void, context, state, door) {
@@ -955,6 +961,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             return {x: door.x, y: door.y, w: 16, h: 96};
         },
         pathBehaviors: {climbable: true, solid: true},
+        mapIcon: 'up',
     },
     ladderDown: {
         render(this: void, context, state, door) {
@@ -971,6 +978,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             return {x: door.x, y: door.y, w: 16, h: 16};
         },
         pathBehaviors: {climbable: true, solid: true},
+        mapIcon: 'down',
     },
     square: oldSquareBaseDoorStyle,
     wideEntrance: {

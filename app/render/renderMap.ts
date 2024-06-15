@@ -1,5 +1,6 @@
 import { createAreaInstance } from 'app/content/areas';
 import { convertLocationToMapCoordinates, getMapTarget } from 'app/content/hints';
+import { doorStyles } from 'app/content/objects/doorStyles';
 import { allSections, dungeonMaps } from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
 import { editingState } from 'app/development/editingState';
@@ -412,6 +413,7 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                 && object.definition.targetZone && object.definition.targetObjectId
                 && object.status !== 'cracked'
             ) {
+                const doorStyle = doorStyles[object.definition.style] || doorStyles.cavern;
                 if (object.definition.style === 'wideEntrance' && object.definition.d === 'up') {
                     drawFrame(context, upFrame, {...upFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - upFrame.w / 2,
@@ -421,6 +423,19 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                     drawFrame(context, downFrame, {...downFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - downFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h) * yScale) - downFrame.h,
+                    });
+                } else if (doorStyle.mapIcon) {
+                    let frame = doorFrame;
+                    if (doorStyle.mapIcon === 'up') {
+                        frame = upFrame;
+                    } else if (doorStyle.mapIcon === 'down') {
+                        frame = downFrame;
+                    }
+                    drawFrame(context, frame, {...frame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
+                            // Render southern doors further up.
+                            + (object.definition.d === 'down' ? -2 : 0),
                     });
                 } else {
                     drawFrame(context, doorFrame, {...doorFrame,

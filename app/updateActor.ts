@@ -159,6 +159,10 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         removeAllClones(state);
     }
     hero.areaTime += FRAME_LENGTH;
+    if (hero.frozenHeartDuration > 0) {
+        hero.frozenHeartDuration -= FRAME_LENGTH;
+        hero.ironSkinCooldown = 1000;
+    }
     if (hero.frozenDuration > 0) {
         hero.frozenDuration -= FRAME_LENGTH;
     } else {

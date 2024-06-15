@@ -184,18 +184,16 @@ paletteHash.future = [
     [null, null, 1665, 1675, 1680, 1685, null, null, null, null, 1735, 1736],
     [null, 1639, 1666, 1676, 1681, 1686, 1642, null, null, 1737, null, null, 1738],
     [1721, 1670, 1667, 1677, 1682, 1687, 1690, 1731, 1739, null, 1740, 1741, null, 1742],
-    [1722, 1671, 1668, 1678, 1683, 1688, 1691, 1732],
-    [1702, 1672, 1669, 1679, 1684, 1689, 1692, 1703],
-    [1702, 1673, null, null, null, null, 1693, 1703],
-    [1702, 1674, null, null, null, null, 1694, 1703],
-    [1723, 1724, null, null, null, null, 1733, 1734],
-    [null, 1719, null, null, null, null, 1720],
-    [null, 1704, 1717, 1725, 1728, 1718, 1706],
-    [null, null, 1726, 1727, 1729, 1730]
+    [1722, 1671, 1668, 1678, 1683, 1688, 1691, 1732, 1757, 1755, 1758,1762, 1761],
+    [1702, 1672, 1669, 1679, 1684, 1689, 1692, 1703, 1751, null, 1750,1760, 1759],
+    [1702, 1673, null, null, null, null, 1693, 1703, 1763, 1744, 1764],
+    [1702, 1674, null, null, null, null, 1694, 1703, null, 1743, 1744, 1745, null],
+    [1723, 1724, null, null, null, null, 1733, 1734, 1746, 1747, null, 1748, 1749],
+    [null, 1719, null, null, null, null, 1720, null, 1750, null, null, null, 1751],
+    [null, 1704, 1717, 1725, 1728, 1718, 1706, null, 1754, 1752, null, 1753, 1756],
+    [null, null, 1726, 1727, 1729, 1730, null, null, null, 1754, 1755, 1756, null]
 ];
 // Use this to export the current brush as a palette grid.
 /**
 console.log(editingState.brush.none.tiles.map(t => "\t[" + t.join(", ") + "],").join("\n"));
  */
-
-

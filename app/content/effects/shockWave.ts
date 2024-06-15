@@ -13,9 +13,12 @@ interface Props {
     y: number
     z?: number
     damage?: number
+    maxSpeed?: number
     vx?: number
     vy?: number
     vz?: number
+    ax?: number
+    ay?: number
     az?: number
     ttl?: number
     delay?: number
@@ -34,20 +37,25 @@ export class ShockWave implements EffectInstance, Props {
     vz: number = 0;
     vx: number;
     vy: number;
+    ax: number;
+    ay: number;
     az: number;
     radius: number = 3;
     animationTime = 0;
-    speed = 0;
+    maxSpeed = 0;
     ttl: number;
     delay: number;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, ttl = 2000, delay = 0}: Props) {
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, damage = 1, maxSpeed = 0, ttl = 2000, delay = 0}: Props) {
         this.damage = damage;
+        this.maxSpeed = maxSpeed;
         this.x = x;
         this.y = y;
         this.z = z;
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
+        this.ax = ax;
+        this.ay = ay;
         this.az = az;
         this.ttl = ttl;
         this.delay = delay;
@@ -60,6 +68,13 @@ export class ShockWave implements EffectInstance, Props {
         this.x += this.vx;
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
+        this.vx = this.vx + this.ax;
+        this.vy = this.vy + this.ay;
+        const mag = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        if (this.maxSpeed && mag > this.maxSpeed) {
+            this.vx = this.maxSpeed * this.vx / mag;
+            this.vy = this.maxSpeed * this.vy / mag;
+        }
         this.vz = Math.max(-8, this.vz + this.az);
         this.animationTime += FRAME_LENGTH;
 
@@ -89,7 +104,7 @@ export class ShockWave implements EffectInstance, Props {
 
 export function addRadialShockWaves(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Coords, count: number, thetaOffset = 0,
+    [x, y]: Coords, count: number, thetaOffset = 0, offset = 0,
     extraProps?: Partial<Props>
 ): void {
     for (let i = 0; i < count; i++) {
@@ -97,8 +112,8 @@ export function addRadialShockWaves(this: void,
         const dx = Math.cos(theta);
         const dy = Math.sin(theta);
         const shockWave = new ShockWave({
-            x,
-            y,
+            x: x + offset * dx,
+            y: y + offset * dy,
             vx: 4 * dx,
             vy: 4 * dy,
             ttl: 1000,
@@ -110,7 +125,7 @@ export function addRadialShockWaves(this: void,
 
 export function addArcOfShockWaves(this: void,
     state: GameState, area: AreaInstance,
-    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4,
+    [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4, offset: number,
     extraProps?: Partial<Props>
 ): void {
     for (let i = 0; i < count; i++) {
@@ -119,11 +134,16 @@ export function addArcOfShockWaves(this: void,
             : centerTheta - thetaRadius + i * 2 * thetaRadius / (count - 1);
         const dx = Math.cos(theta);
         const dy = Math.sin(theta);
+        const maxSpeed = extraProps.maxSpeed || 0;
+        // Start slow and accelerate to maxSpeed if it is defined.
+        const speed = maxSpeed ? 0.1 : 4;
         const shockWave = new ShockWave({
-            x,
-            y,
-            vx: 4 * dx,
-            vy: 4 * dy,
+            x: x + offset * dx,
+            y: y + offset * dy,
+            vx: speed * dx,
+            vy: speed * dy,
+            ax: maxSpeed / 50 * dx,
+            ay: maxSpeed / 50 * dy,
             ttl: 1000,
             ...extraProps,
         });
