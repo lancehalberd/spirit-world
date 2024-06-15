@@ -101,7 +101,6 @@ Current tasks:
 
     - Render a bubble around player that breaks lightning barriers when they are protected by the Ancient Badge.
 
-
     - Fix shockwave graphics have artifacts around them when rotated.
         - In general we probably need to add an extra 1px padding around any images in packed sprites if they are rendered rotated or scaled
         - Applies to storm beast as well.

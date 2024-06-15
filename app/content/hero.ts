@@ -370,7 +370,7 @@ export class Hero implements Actor {
                 this.frozenDuration = duration;
                 this.vx = this.vy = 0;
             }
-                playAreaSound(state, state.areaInstance, 'freeze');
+            playAreaSound(state, state.areaInstance, 'freeze');
             // ice hits remove burns.
             this.burnDuration = 0;
         }

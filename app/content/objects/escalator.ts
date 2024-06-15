@@ -135,7 +135,7 @@ export class Escalator implements ObjectInstance {
         if (this.status === 'frozen' && hit.element === 'fire') {
             this.status = 'normal';
             this.behaviors.slippery = false;
-        } else if (hit.element === 'ice') {
+        } else if (hit.element === 'ice' && this.status !== 'frozen') {
             this.status = 'frozen';
             this.behaviors.slippery = true;
             playAreaSound(state, this.area, 'freeze');
