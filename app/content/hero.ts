@@ -361,7 +361,7 @@ export class Hero implements Actor {
             this.frozenHeartDuration = 0;
         } else if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
-        } else if (hit.element === 'ice') {
+        } else if (hit.element === 'ice' && this.frozenDuration <= -500) {
             const duration = this.savedData.passiveTools.waterBlessing ? 1000 : 1500;
             if (hadIronSkin) {
                 this.frozenHeartDuration = 2 * duration;

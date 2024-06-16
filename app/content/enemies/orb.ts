@@ -277,6 +277,7 @@ enemyDefinitions.largeOrb = {
     },
     speed: 0.8,
     canBeKnockedBack: false,
+    canBeFrozen: false,
     animations: {idle: omniAnimation(largeOrbAnimation)}, life: 48, touchHit: {element: 'lightning', damage: 2}, update: updateLargeOrb,
     immunities: ['lightning'],
     onHit(this: void, state: GameState, enemy: Enemy<OrbProps>, hit: HitProperties): HitResult {

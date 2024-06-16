@@ -29,6 +29,7 @@ export function isMovementBlocked(
 
     // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.
     let walkableObject: ObjectInstance, blockingSolidObject: ObjectInstance, blockingPitObject: ObjectInstance;
+    let blockingHit: HitProperties;
     for (const baseObject of area.objects) {
         for (const object of getObjectAndParts(state, baseObject)) {
             if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
@@ -41,6 +42,11 @@ export function isMovementBlocked(
             const canClimbObject = behaviors?.climbable && movementProperties.canClimb;
             if (!movementProperties.canPassWalls && !canClimbObject && object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                    // A player can be hit only when running into a solid object only if that object damages and it
+                    // is the only solid object they are running into.
+                    if (!blockingSolidObject && behaviors?.touchHit) {
+                        blockingHit = behaviors?.touchHit;
+                    }
                     blockingSolidObject = object;
                     blockingPitObject = null;
                     continue;
@@ -60,6 +66,7 @@ export function isMovementBlocked(
             // Low ceiling objects block all movement if the actors z value is too high
             if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
                 if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                    blockingHit = null;
                     return {};
                 }
             }
@@ -82,6 +89,7 @@ export function isMovementBlocked(
                     walkableObject = object;
                     blockingPitObject = null;
                     blockingSolidObject = null;
+                    blockingHit = null;
                     continue;
                 }
             }
@@ -91,6 +99,7 @@ export function isMovementBlocked(
                     walkableObject = object;
                     blockingPitObject = null;
                     blockingSolidObject = null;
+                    blockingHit = null;
                     continue;
                 }
             }
@@ -149,6 +158,21 @@ export function isMovementBlocked(
         // This should happen even if the actor is running into a solid object/pit that they cannot pass.
         actor.ignoreLedges = true;
     }*/
+    if (blockingHit) {
+        if (actor && tileHitAppliesToTarget(state, blockingHit, movementProperties.actor)) {
+            const mag = Math.sqrt(movementProperties.dx * movementProperties.dx + movementProperties.dy * movementProperties.dy)
+            const { returnHit } = actor.onHit?.(state, { ...blockingHit, knockback: {
+                vx: - 4 * movementProperties.dx / mag,
+                vy: - 4 * movementProperties.dy / mag,
+                vz: 2,
+            }});
+            // Apply reflected damage to enemies if they were the source of the `touchHit`.
+            if (returnHit && blockingHit.source?.onHit) {
+                blockingHit.source.onHit(state, returnHit);
+            }
+            return {};
+        }
+    }
     if (blockingPitObject) {
         return {};
     }

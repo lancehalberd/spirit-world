@@ -177,7 +177,8 @@ function getHeartHitbox(enemy: Enemy<CloudParams>): Rect {
 
 const stormHeart: EnemyDefinition<CloudParams> = {
     // The storm heart is smaller than other hearts, but takes up a lot of space with its cloud barrier.
-    animations: stormHeartAnimations, life: 60, scale: 2, touchHit: { damage: 0, canAlwaysKnockback: true },
+    animations: stormHeartAnimations, life: 60, scale: 2,
+    tileBehaviors: { solid: true, touchHit: {damage: 0, canAlwaysKnockback: true  }},
     hasShadow: false,
     update: updateStormHeart,
     params: {

@@ -371,7 +371,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // Hitting frozen enemies unfreezes them.
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
-        } else if (hit.element === 'ice' && this.definition.type !== 'boss') {
+        } else if (hit.element === 'ice' && this.definition.type !== 'boss' && this.enemyDefinition.canBeFrozen !== false) {
             this.makeSound(state, 'freeze');
             this.frozenDuration = 1500;
             this.burnDuration = 0;

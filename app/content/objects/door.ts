@@ -384,6 +384,12 @@ export class Door implements ObjectInstance {
             }
         }
         if (hero.actionTarget === this) {
+            // Some logic like code to prevent bouncing between screens resets these to 0, so make sure to
+            // fix them if this ever happens.
+            if (hero.actionDx === 0 && hero.actionDy === 0) {
+                hero.actionDx = directionMap[this.definition.d][0];
+                hero.actionDy = directionMap[this.definition.d][1];
+            }
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
             const hitbox = this.getHitbox();

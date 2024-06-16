@@ -163,7 +163,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         hero.frozenHeartDuration -= FRAME_LENGTH;
         hero.ironSkinCooldown = 1000;
     }
-    if (hero.frozenDuration > 0) {
+    if (hero.frozenDuration > -500) {
         hero.frozenDuration -= FRAME_LENGTH;
     } else {
         hero.animationTime += FRAME_LENGTH;
