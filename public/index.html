@@ -61,6 +61,7 @@
             document.getElementsByClassName('mainGame')[0].style.transform = `scale(${scale}`;
         }
         window.onresize = resizeGame;
+        resizeGame();
         // Only show the loading text if it takes more than .2 seconds to load
         setTimeout(function () {
             if (document.querySelector('.js-gameContent').style.display === 'none') {
