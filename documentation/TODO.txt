@@ -1,9 +1,6 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
-    - Enemies can get trapped inside the Staff Tower graphics if they are in the area it occupies when it is created.
-        - Should probably kill enemies in this area when setting up the tower.
-
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
         - Probably stop grabbing with projection when teleporting.
     - Enemies hit in the spirit world make noise when taking damage
@@ -14,28 +11,12 @@ Known Bugs:
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
-    - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
-        -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
-    - Cliff Edge issues:
-        - Would be nice if staff could go across edges.
-        - Chakram / Bow can hit tiles below ledges sometimes
-            - When chakram is returning over a ledge.
-                - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
-        - Sometimes bow/chakram get stopped when firing down cliff edges
-            - This is because these tiles are not marked low.
-            - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
-            - Marking these tiles as cliff ledges will probably allow jumping down them in some cases which will need to be fixed.
-    - Shadow renders behind door tops when jumping down ledges.
+
+Won't Fix:
+    - Chakram can hit tiles below ledges sometimes when returning.
+        - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
     - Spirit Barrier appears above door frames when moving East/West through doors.
         - This only applies with old tile sets, so probably isn't worth fixing.
-
-Graphics:
-    Add slam effects for the staff.
-    Sweat animation when pulling on something you cannot move.
-    Add Item Get Frame gfx/wukongimportantitem.png 20x28
-    Add sparkles to peach loot + hud.
-    Add damage effects for hitting enemies?
-    Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Cannot reproduce:
     - Fix bug: possible to defeat frost beast without getting reward somehow
@@ -92,18 +73,19 @@ RangeError: Maximum call stack size exceeded
     at Howl._loadQueue (howler.js:1939:16)
     at Howl._loadQueue (howler.js:1934:16)
 
+Graphics to Implement:
+    Add slam effects for the staff.
+    Sweat animation when pulling on something you cannot move.
+    Add Item Get Frame gfx/wukongimportantitem.png 20x28
+    Add sparkles to peach loot + hud.
+    Add damage effects for hitting enemies?
+    Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Arrows(and other projectiles) should be stopped by southern facing walls
-    - Sparks shouldn't go through low solid tiles.
-
-    - Render a bubble around player that breaks lightning barriers when they are protected by the Ancient Badge.
-
-    - Fix shockwave graphics have artifacts around them when rotated.
-        - In general we probably need to add an extra 1px padding around any images in packed sprites if they are rendered rotated or scaled
-        - Applies to storm beast as well.
+    - Add 1px padding around packed images that are rotated.
+        - Just do this to all effects and pack them together.
 
     - New enemy: lava monster with shell (TBD by artist)
         - possible designs:
@@ -144,6 +126,8 @@ Current tasks:
 
     - Add Obsidian Tileset manually to buildings in the spirit world.
 
+    - Would be nice if staff could go across edges.
+
     - Add pitMap behavior for angled pit tiles
         - This will improve the edges of the storm beast arena.
 
@@ -155,8 +139,6 @@ Current tasks:
         - Non-deep water/water passage tiles are treated as solid for the player while submerged.
         - Player should lose spirit underwater just as when otherwise submerged
 
-    - hitting cracked pots diagonal
-    - "Looks like BK Mode to Me" message with full item set and no progress in forge yet.
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
             - So of multiple possible enemy combinations, one is chosen for a zone and then each section chooses enemies from this combination.
@@ -188,9 +170,6 @@ Current tasks:
     - Improvement, carried object should drop when astral projection despawns holding something.
         - Right now it just disappears with the astral projection.
 
-    - Puzzle idea: break a ball with the staff so that you can roll a ball that it is linked to in the other world.
-        - Instead of this being required, this could be used to make a puzzle much less time consuming.
-
     - Add additional blockedPath styles.
         - Maybe cracked pots requiring clone tool
 
@@ -215,7 +194,6 @@ Current tasks:
         - We can fix this by setting a layer id on the bead cover for the layer it is covering (floor2), then when it is not fully open,
         render all background layers above that layer on top of it as part of the object. This would allow us to draw certain objects
         "beneath" tiles in general at the expense of some extra renders.
-
 
     - Add new draw priority to an object
         - Unclear if this will be useful for anything yet.
@@ -341,10 +319,11 @@ Current tasks:
                     - The lake drains to the east towards the holy city on what was previously a fairly small water shed, but is now much larger due to diverting water from the west water shed.
             - Add cliffs around parts of the lake.
                 - Maybe we can reduce the exits out of the lake to make pathing more interesting and to help push the player towards the waterfall initially.
-            - Add cliffs underwater in the lake that bottom out at the location of the helix
+            - I would like to add cliffs underwater, but we can't used this with the swimming mechanic because they don't have a real z component.
 
     - Extract air stream effect so it can be used as an enemy ability
         - Add a warmup time that can be used as a tell (ramps up from 0-100% effect over N ms).
+        - Give the Storm Beast an attack where they try to blow you off the platform.
 
     - Add chunk objects to editor
         - Choose w/h, style, then any additional properties from the style parameters.
@@ -770,16 +749,6 @@ Current tasks:
 
     - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
         - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
-
-    Storm Beast
-        - Storm Beast Heart should summon lightning summoning minions each time you remove 10% of its health.
-        - Storm Beast Heart should take 80% reduced damage after losing 25% health until the cloud reforms.
-        - Storm Beast Heart should have no enraged behavior or invulnerability for the cloud.
-        - There should be a mechanic for ending Storm Beast's enrage phase early.
-            - For example, it summons 2 + N lightning turrets and the enrage phase ends when they are defeated.
-            - It would be cool if using cloud boots to walk on the clouds around the tower was beneficial for this or some other mechanic.
-        - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
-        - Storm Beast can charge south to exit the battle field
 
     - Game occasionally plays small bits of music while muted.
 

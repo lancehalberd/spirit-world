@@ -1,7 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
+import { /*getTilesInCircle,*/ hitTargets } from 'app/utils/field';
 
 
 
@@ -81,16 +81,35 @@ export class ShockWave implements EffectInstance, Props {
         if (this.animationTime >= this.ttl) {
             removeEffectFromArea(state, this);
         } else {
-            hitTargets(state, this.area, {
+            const hitResult = hitTargets(state, this.area, {
+                cutsGround: true,
                 damage: this.damage,
+                hitTiles: true,
                 hitCircle: {x: this.x, y: this.y, r: this.radius},
                 element: 'lightning',
                 hitAllies: true,
+                vx: this.vx,
+                vy: this.vy,
                 knockAwayFrom: {x: this.x, y: this.y},
             });
+            if (hitResult.blocked || hitResult.stopped) {
+                removeEffectFromArea(state, this);
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        /*context.save();
+            context.fillStyle = 'red';
+            context.globalAlpha *= 0.5;
+            const tiles = getTilesInCircle(this.area, {x: this.x, y: this.y, r: this.radius});
+            for (const tile of tiles) {
+                context.fillRect(tile.x * 16, tile.y * 16, 16, 16);
+            }
+            context.strokeStyle = 'blue';
+            context.beginPath();
+            context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+            context.stroke();
+        context.restore();*/
         const frame = getFrame(shockWaveAnimation, this.animationTime);
         const theta = Math.atan2(this.vy, this.vx);
         context.fillStyle = 'yellow';

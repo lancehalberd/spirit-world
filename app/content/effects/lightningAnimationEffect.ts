@@ -35,7 +35,7 @@ export class LightningAnimationEffect implements EffectInstance, Props {
         if (this.circle) {
             renderLightningCircle(context, this.circle, 4, Math.min(100, Math.max(40, this.circle.r | 0)));
         } else if (this.ray) {
-            renderLightningRay(context, this.ray, 4);
+            renderLightningRay(context, this.ray, {strength: 4});
         }
     }
 }

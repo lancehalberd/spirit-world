@@ -53,15 +53,12 @@ export class TippableObject implements ObjectInstance {
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.element === 'ice') {
             this.freezePot(state);
-            return {hit: true};
-        }
-        if (!this.fallDirection) {
-            if (hit.canPush) {
-                this.fallInDirection(state, hit.direction);
+        } else if (!this.fallDirection && hit.canPush ) {
+            if (!this.fallInDirection(state, hit.direction)) {
+                this.fallInPlace(state);
             }
-            return { hit: true };
         }
-        return { hit: true, blocked: true };
+        return { hit: true, stopped: true };
     }
     freezePot(state: GameState, link = true): FrozenPotObject {
         // Pot can only be frozen before it is tipped over.
@@ -95,12 +92,7 @@ export class TippableObject implements ObjectInstance {
         if (this.grabDirection === direction) {
             this.fallInDirection(state, direction);
         } else {
-            this.fallingInPlace = true;
-            this.animationTime = -80;
-            if (this.linkedObject) {
-                this.linkedObject.fallingInPlace = true;
-                this.linkedObject.animationTime = -80;
-            }
+            this.fallInPlace(state);
         }
     }
     onPush(state: GameState, direction: Direction): void {
@@ -113,9 +105,32 @@ export class TippableObject implements ObjectInstance {
             this.fallInDirection(state, direction);
         }
     }
-    fallInDirection(state: GameState, direction: Direction): void {
+    fallInPlace(state: GameState): void {
         if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return;
+        }
+        this.fallingInPlace = true;
+        this.animationTime = -80;
+        if (this.linkedObject) {
+            this.linkedObject.fallingInPlace = true;
+            this.linkedObject.animationTime = -80;
+        }
+    }
+    fallInDirection(state: GameState, direction: Direction): boolean {
+        if (direction === "downleft") {
+            return this.fallInDirection(state, 'down') || this.fallInDirection(state, 'left');
+        }
+        if (direction === "downright") {
+            return this.fallInDirection(state, 'down') || this.fallInDirection(state, 'right');
+        }
+        if (direction === "upleft") {
+            return this.fallInDirection(state, 'up') || this.fallInDirection(state, 'left');
+        }
+        if (direction === "upright") {
+            return this.fallInDirection(state, 'up') || this.fallInDirection(state, 'right');
+        }
+        if (this.shattered || this.fallDirection || this.fallingInPlace) {
+            return false;
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
@@ -131,7 +146,9 @@ export class TippableObject implements ObjectInstance {
                 this.linkedObject.animationTime = -80;
                 this.linkedObject.pullingHeroDirection = direction;
             }
+            return true;
         }
+        return false;
     }
     onDestroy(state: GameState, dx: number, dy: number) {
         addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 2, particleFrames);

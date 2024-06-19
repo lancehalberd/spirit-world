@@ -10,6 +10,10 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
+        if (!currentNode) {
+            console.error('Found undefined node');
+            return [];
+        }
         // console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);
         if (!zone) {

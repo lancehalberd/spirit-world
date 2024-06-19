@@ -14,7 +14,7 @@ function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {
             y: ray.y1 + i * dy / mag,
         };
         const { tileBehavior } = getTileBehaviors(state, area, point);
-        if (!tileBehavior?.low && tileBehavior?.solid && !(tileBehavior?.isSouthernWall && dy > 0)) {
+        if (!tileBehavior?.low && tileBehavior?.solid) {
             return {...ray, x2: point.x, y2: point.y};
         }
         if (lastPoint) {

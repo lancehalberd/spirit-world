@@ -153,7 +153,8 @@ const imagePacks: PackedImageData[] = [
         {x:992,y:224,w:24,h:8,originalSource:'gfx/effects/crystalwallparticles.png'},
         {x:752,y:1552,w:64,h:28,originalSource:'gfx/effects/crystalwallparticles2.png'},
         {x:400,y:2192,w:216,h:23,originalSource:'gfx/enemies/turret.png'},
-        {x:992,y:240,w:32,h:16,originalSource:'gfx/effects/shockwave.png'},
+        //This version is packed too tightly and causes artifacts when rendering at certain angles.
+        //{x:992,y:240,w:32,h:16,originalSource:'gfx/effects/shockwave.png'},
         {x:672,y:2416,w:84,h:128,originalSource:'gfx/npcs/21x32-zoro.png'},
         {x:160,y:1616,w:72,h:26,originalSource:'gfx/npcs/vanara-black-facing.png'},
         {x:704,y:1936,w:72,h:26,originalSource:'gfx/npcs/vanara-blue-facing.png'},

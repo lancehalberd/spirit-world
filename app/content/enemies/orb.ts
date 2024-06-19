@@ -147,7 +147,7 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
                             x1: enemy.x + 6, y1: enemy.y + 6 - enemy.z,
                             x2: enemy.x + 6 + p * v.x * beamDistance / 2, y2:enemy.y + 6 - enemy.z + p * v.y * beamDistance / 2,
                             r: 2,
-                        }, 1, 15);
+                        }, {strength: 1, treeSize: 15});
                     context.restore();
 
                 }
@@ -166,7 +166,7 @@ function renderHalfBeam(context: CanvasRenderingContext2D, orbA: Enemy, orbB: En
         x1: x + r * dx / mag, y1: y + r * dy / mag,
         x2: x + dx / 2, y2: y + dy / 2,
         r: 4,
-    }, 2, 20);
+    }, {strength: 2, treeSize: 20});
 }
 
 function getAttraction(enemy: Enemy): number {
@@ -406,7 +406,7 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
         smallOrb.vx = speed * dx / mag;
         smallOrb.vy = speed * dy / mag;
     }
-    enemy.params.shockwaveTimer -= FRAME_LENGTH * smallOrbs.length;
+    enemy.params.shockwaveTimer -= FRAME_LENGTH * Math.min(2, smallOrbs.length);
     if (enemy.params.shockwaveTimer <= 0) {
         const largeOrbVector = getVectorToNearbyTarget(state, enemy, 296, enemy.area.allyTargets);
         const target = largeOrbVector?.target;

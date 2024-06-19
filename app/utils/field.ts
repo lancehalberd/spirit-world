@@ -365,19 +365,19 @@ export function getTilesInRectangle(area: AreaInstance, rect: Rect): TileCoords[
 export function getTilesInCircle(area: AreaInstance, {x, y, r}: Circle): TileCoords[] {
     const tileSize = 16;
     const tiles: TileCoords[] = []
-    const T = Math.round((y - r) / tileSize);
-    const B = Math.round((y + r) / tileSize) - 1;
+    const T = Math.floor((y - r) / tileSize);
+    const B = Math.ceil((y + r) / tileSize) - 1;
     const r2 = r * r;
-    // console.log({x, y, r});
-    // console.log({T, B});
+    //console.log({x, y, r});
+    //console.log({T, B});
     for (let ty = T; ty <= B; ty++) {
         if (ty < 0 || ty >= area.h) continue;
         const my = ty * tileSize + tileSize / 2;
         const dy = my - y;
-        const dx = Math.sqrt(r2 - dy * dy);
-        const L = Math.round((x - dx) / tileSize);
-        const R = Math.round((x + dx) / tileSize) - 1;
-        // console.log({my, dy, dx, L, R});
+        const dx = Math.sqrt(Math.max(0, r2 - dy * dy));
+        const L = Math.floor((x - dx) / tileSize);
+        const R = Math.ceil((x + dx) / tileSize) - 1;
+        //console.log({my, dy, dx, L, R});
         for (let tx = L; tx <= R; tx++) {
             if (tx < 0 || tx >= area.w) continue;
             tiles.push({x: tx, y: ty});
@@ -414,14 +414,15 @@ export function getTilesInRay(area: AreaInstance, {x1, y1, x2, y2, r}: Ray): Til
     return tiles;
 }
 
-function distanceToSegment({x, y}: Point, {x1, y1, x2, y2}: {x1: number, y1: number, x2: number, y2: number}) {
+export function distanceToSegment({x, y}: Point, {x1, y1, x2, y2}: {x1: number, y1: number, x2: number, y2: number}) {
     const lengthSquared = (x2 - x1) ** 2 + (y2 - y1) ** 2;
     if (lengthSquared == 0) {
         const dx = x2 - x, dy = y2 - y;
         return {
             distance: Math.sqrt(dx * dx + dy * dy),
-            // Return the vector pointing from the point to the closest point on the line.
+            // Return the vector pointing towards the end of the segment.
             dx, dy,
+            cx: x, cy: y,
         };
     }
     // The dot product of A * B over the length gives the full length of the projection of
@@ -434,6 +435,8 @@ function distanceToSegment({x, y}: Point, {x1, y1, x2, y2}: {x1: number, y1: num
         distance: Math.sqrt(dx * dx + dy * dy),
         // Return the vector pointing from the point to the closest point on the line.
         dx, dy,
+        // Return the closest point on the segment.
+        cx: closestX, cy: closestY
     };
 }
 
@@ -744,7 +747,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             (
                 (behavior?.cuttable > hit.damage || behavior?.solid)
                 && (!behavior?.low || hit.cutsGround)
-                && (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
+                //&& (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
             )
             || (!hit.projectile?.passedLedgeTiles?.find(t => t.x === target.x && t.y === target.y) && (
                 (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))

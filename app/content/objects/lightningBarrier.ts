@@ -2,7 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderLightningRay } from 'app/render/renderLightning'
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { hitTargets } from 'app/utils/field';
+import { distanceToSegment, hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
@@ -180,11 +180,36 @@ export class Anode implements ObjectInstance {
             const z = style.getBeamHeight(this);
             const cathodeStyle = lightningBarrierStyles[cathode.definition.style] || lightningBarrierStyles.coil;
             const cathodeZ = cathodeStyle.getBeamHeight(this);
-            renderLightningRay(context, {
+            const ray = {
                 x1: this.x + 8, y1: this.y + 8 - z,
                 x2: cathode.x + 8, y2: cathode.y + 8 - cathodeZ,
                 r: 4,
-            });
+            }
+            // The lightning blessing breaks the beam to make it obvious that the hero can pass through safely.
+            if (state.hero.savedData.passiveTools.lightningBlessing > 0) {
+                let dx = ray.x2 - ray.x1, dy = ray.y2 - ray.y1;
+                let mag = Math.sqrt(dx * dx + dy * dy);
+                let blocked = false;
+                dx /= mag, dy /= mag;
+                for (const hero of [state.hero, ...state.hero.clones]) {
+                    const hitbox = hero.getMovementHitbox();
+                    const result = distanceToSegment({x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2}, ray);
+                    if (result.distance < 14) {
+                        mag = Math.max(0, Math.min(mag, Math.sqrt((result.cx - ray.x1) ** 2 + (result.cy - ray.y1) ** 2) - 8));
+                        blocked = true;
+                    }
+                }
+                if (mag > 4) {
+                    ray.x2 = ray.x1 + mag * dx;
+                    ray.y2 = ray.y1 + mag * dy;
+                    if (blocked) {
+                        ray.r += 4;
+                    }
+                    renderLightningRay(context, ray, {fray: blocked});
+                }
+            } else {
+                renderLightningRay(context, ray);
+            }
         }
         /*if (this.status === 'normal' && this.cathodes.length) {
             const cathode = this.cathodes[this.cathodeIndex];

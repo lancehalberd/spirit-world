@@ -56,7 +56,14 @@ export function renderLightningCircle(context: CanvasRenderingContext2D, {x, y, 
 }
 
 
-export function renderLightningRay(context: CanvasRenderingContext2D, {x1, y1, x2, y2, r}: Ray, strength = 2, treeSize = 40): void {
+export function renderLightningRay(context: CanvasRenderingContext2D, {x1, y1, x2, y2, r}: Ray, {
+    // Effects how large individual branches are
+    strength = 2,
+    // Effects the number of branches
+    treeSize = 40,
+    // If true the ray will be frayed towards x2,y2 instead of coming to a point
+    fray = false,
+} = {}): void {
     const rdx = x2 - x1, rdy = y2 - y1;
     // This angle is orthogonal to the ray.
     const theta = Math.atan2(rdy, rdx) + Math.PI / 2;
@@ -67,10 +74,13 @@ export function renderLightningRay(context: CanvasRenderingContext2D, {x1, y1, x
         // Sample random point from the far side of the ray
         const p1 = (i + 1) / treeSize;// Math.min((i + 5) / treeSize, Math.max(i / treeSize, 1 - Math.random()));
         const p1s = i / treeSize;
-        const p2Max = (p1s + 0.1) * (1.1 - p1s) / 0.6 / 0.4;
-        const p2Min = (p1s + 0.1) * (p1s - 1.1) / 0.6 / 0.4;
+        const p2Max = fray ? p1  : (p1s + 0.1) * (1.1 - p1s) / 0.6 / 0.4;
+        const p2Min = fray ? -p1 : (p1s + 0.1) * (p1s - 1.1) / 0.6 / 0.4;
         const p2 = p2Min + Math.random() * (p2Max - p2Min);
-        const target = {x: x1 + p1 * rdx + r * p2 * Math.cos(theta), y: y1 + p1 * rdy + r * p2 * Math.sin(theta)};
+        const target = {
+            x: x1 + p1 * rdx + r * p2 * Math.cos(theta),
+            y: y1 + p1 * rdy + r * p2 * Math.sin(theta),
+        };
 
         // Find the node on the tree closest to the sampled target point.
         let closestNode: RRTNode, closestDistanceSquared: number;

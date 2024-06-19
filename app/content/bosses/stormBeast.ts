@@ -80,10 +80,13 @@ Transformed - 12-13 loop. Runs at 2 FPS.
 
 // The hitbox won't rotate with the frame so we use a fairly small square hitbox that will be approximately correct regardless of rotation.
 const stormBeastGeometry = {w: 156, h: 121, content: {x: 53, y: 39, w: 50, h: 50}};
+// Frame at index 5 uses the full frame width which causes artifacts on nearby frames if they render the full width when rotated
+// Instead of adding padding to all frames, we just use this smaller geometry for animations that use frame index 4 and 6.
+const stormBeastSmallGeometry = {w: 154, h: 121, content: {x: 52, y: 39, w: 50, h: 50}};
 const stormBeastFlyingAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {cols: 4, duration: 10});
-const stormBeastPrepareCastAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 4, cols: 1, duration: 10});
+const stormBeastPrepareCastAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastSmallGeometry, {xSpace: 2, x: 4, cols: 1, duration: 10});
 const stormBeastCastAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 5, cols: 1, duration: 10});
-const stormBeastChargingAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 6, cols: 2, duration: 10});
+const stormBeastChargingAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastSmallGeometry, {xSpace: 2, x: 6, cols: 2, duration: 10});
 const stormBeastPrepareAttackAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 7, cols: 1, duration: 10});
 const stormBeastAttackAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 8, cols: 1, duration: 10});
 const stormBeastAttackRecoverAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 9, cols: 2, duration: 10});
@@ -663,8 +666,8 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         const t = {x: 400, y: 320};
         if (moveEnemyToTargetLocation(state, enemy, t.x, t.y) < 10) {
             faceCenter(state, enemy);
-            // Attack on cooldown once the heart stops raging.
-            if (stormHeart.params.enrageTime <= 0) {
+            // Attack on cooldown once the heart stops raging unless the beast needs to regenerate.
+            if (stormHeart.params.enrageTime <= 0 && enemy.life >= enemy.enemyDefinition.life * 2 / 3) {
                 enemy.useRandomAbility(state);
             }
         } else {
@@ -672,7 +675,7 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.rotation = Math.atan2(t.y - (hitbox.y + hitbox.h / 2), t.x - (hitbox.x + hitbox.w / 2)) - Math.PI / 2;
         }
     }
-    if (enemy.mode === 'protect' && ! isOrbProtectingHeart(state, enemy.area)) {
+    if (enemy.mode === 'protect' && !isOrbProtectingHeart(state, enemy.area)) {
         leaveScreen(enemy);
         return;
     }

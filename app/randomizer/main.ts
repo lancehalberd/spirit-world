@@ -7,7 +7,7 @@ import {
 } from 'app/content/spawnLocations';
 
 import { mainOverworldNode } from 'app/randomizer/logic/overworldLogic';
-import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
+import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
 import { findLootObjects, findReachableNodes } from 'app/randomizer/find';
 import { applySavedState, getDefaultState } from 'app/state';
 import { allNodes } from 'app/randomizer/allNodes';
@@ -34,16 +34,16 @@ function testConnectivity() {
         }
     }
     finalState = setAllFlagsInLogic(finalState, allNodes,  [mainOverworldNode]);
-    const reachableNodes = findReachableNodes(staffTowerNodes, [staffTowerNodes.find(node => node.nodeId === 'staffTowerF1Downstairs')], finalState);
+    const reachableNodes = findReachableNodes(forgeNodes, [forgeNodes.find(node => node.nodeId === 'forgeEntrance')], finalState);
     console.log(reachableNodes);
     console.log(finalState.savedState.dungeonInventories.staffTower);
-    for (const node of staffTowerNodes) {
+    for (const node of forgeNodes) {
         if (!reachableNodes.includes(node)) {
             console.log('Could not reach node', node);
         }
     }
 }
-testConnectivity//();
+testConnectivity;//();
 function checkForEntranceIdConflicts() {
     const idToNode: {[key in string]: LogicNode[]} = {};
     for (const node of allNodes) {

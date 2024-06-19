@@ -81,6 +81,7 @@ export class Spark implements EffectInstance, Props {
             knockAwayFrom: {x: this.x, y: this.y},
             vx: this.vx,
             vy: this.vy,
+            cutsGround: true,
             ...this.props.extraHitProps,
         }
         if (this.hitRay) {
@@ -175,7 +176,7 @@ export class Spark implements EffectInstance, Props {
                 x2: this.x + this.hitRay.x2 + px,
                 y2: this.y + this.hitRay.y2 + py,
                 r: this.hitRay.r + 2
-            }, 1, 20);
+            },  {strength: 1, treeSize: 20});
         } else {
             //const strength = this.hitCircle.r < 8 ? 1 : 2;
             //const count = this.hitCircle.r < 8 ? 20 : 30;

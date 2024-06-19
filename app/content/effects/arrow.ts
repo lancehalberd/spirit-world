@@ -285,9 +285,11 @@ export class Arrow implements EffectInstance, Projectile {
             //console.log(state.hero.y, hitbox);
             const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
             const dx = directionMap[direction][0], dy = directionMap[direction][1];
-            const ledgeDelta = getLedgeDelta(state, this.area, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 4 * dx, y: y + 4 * dy});
+            // This range is set pretty precisely for the MC to be able to shoot off the top of ledges over walls but
+            // not be able to shoot past ledges up walls.
+            const ledgeDelta = getLedgeDelta(state, this.area, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
             this.isHigh = ledgeDelta < 0;
-            //console.log(ledgeDelta, this.isHigh, this.vx, this.vy, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 4 * dx, y: y + 4 * dy});
+            //console.log(ledgeDelta, this.isHigh, this.vx, this.vy, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
         }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;

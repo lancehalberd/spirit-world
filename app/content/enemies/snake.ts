@@ -222,7 +222,7 @@ enemyDefinitions.snakeStorm = {
                     x1: hitbox1.x + hitbox1.w / 2, y1: hitbox1.y + hitbox1.h / 2,
                     x2: hitbox2.x + hitbox2.w / 2, y2: hitbox2.y + hitbox2.h / 2,
                     r: 8,
-                }, 2);
+                }, {strength: 2});
                 renderedRay = true;
             }
         }
