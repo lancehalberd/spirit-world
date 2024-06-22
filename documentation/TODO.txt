@@ -112,10 +112,6 @@ Current tasks:
         - Add elevator behaviors
             - off, terminals are not animated/functional
 
-    - Add Obsidian Tileset manually to buildings in the spirit world.
-
-    - Would be nice if staff could go across edges.
-
     - Add pitMap behavior for angled pit tiles
         - This will improve the edges of the storm beast arena.
 
@@ -753,6 +749,7 @@ Current tasks:
     - Work on new waterfall graphics
         - Email Jon about waterfall graphic updates.
 
+    - Would be nice if staff could go across edges.
 
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
