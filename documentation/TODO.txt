@@ -104,19 +104,7 @@ Current tasks:
         - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
         - Can move into lava. Returning to lava will regenerate the shell if missing.
 
-    - Low priority Staff Tower Exterior
-        - Cosmetic: shadow is hidden by tower balcony
-            - Possible fix: make hero a renderChild of the balcony when the hero is standing on it.
-        - Improve tower visuals
-            - Try rendering the top of the tower at ground level using a transparent filter near the top:
-            - Do not render the top ~40 pixels of the tower at all.
-            - Render the cloud using a solid -> transparent gradient over the top 40 pixels so the cloud fades out
-
     - Low priority Staff Tower changes
-        - Improve elevator fall sequence:
-            - Make elevator platfrom glow so we can see it fall in the basement ahead of the player.
-            - Start it off screen
-            - Delay the fall of the player until the platform crashes.
         - New stairs object
             - Like the escalator style with rails except no moving floor.
         - New ladders
@@ -142,6 +130,8 @@ Current tasks:
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
             - So of multiple possible enemy combinations, one is chosen for a zone and then each section chooses enemies from this combination.
+    - Add additional blockedPath styles.
+        - Maybe cracked pots requiring clone tool
 
     - pushable cathode/anode we can use for puzzles where you have to divert electricity to remove a barrier or activate a lightning switch.
         - Need to make sure the lightning barrier can hit objects like switches for this to work.
@@ -169,9 +159,6 @@ Current tasks:
 
     - Improvement, carried object should drop when astral projection despawns holding something.
         - Right now it just disappears with the astral projection.
-
-    - Add additional blockedPath styles.
-        - Maybe cracked pots requiring clone tool
 
     - Populate Spirit Ruins
         - Link entrances to the spirit world
@@ -239,6 +226,12 @@ Current tasks:
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
         - Same for long lasting lightning attacks
 
+    - Low priority Staff Tower Exterior
+        - Cosmetic: shadow is hidden by tower balcony
+            - Possible fix: make hero a renderChild of the balcony when the hero is standing on it.
+                - This would require defining when the hero is standing on it and then applying the same behavior
+                  to any other objects that can be on the balcony and then sorting them internally.
+                - Seems too complicated maybe we should find a different solution.
 
     - Fix push/pull interactions with ledges.
         - Minor issues:

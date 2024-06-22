@@ -217,6 +217,8 @@ export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoo
 export const canCross6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
 export const canCross8Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
+export const canCrossPrecise2Gaps: OrLogicCheck = orLogic(hasRoll, hasStaff, hasTeleportation);
+
 export const canCrossDynamic2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasClone);
 export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasSomersault, hasClone);
 export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));

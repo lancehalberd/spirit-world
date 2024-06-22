@@ -1,5 +1,5 @@
 import {
-    andLogic, canCross2Gaps, canHasSpikeBoots, canHasFlyingBoots, hasIronBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
+    andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, hasIronBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
     hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasStaff,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
@@ -302,7 +302,7 @@ export const cavesNodes: LogicNode[] = [
         nodeId: 'frozenCaveFront',
         paths: [{ nodeId: 'frozenCaveBack', logic:
             orLogic(
-                andLogic(orLogic(canHasSpikeBoots, hasIronBoots), canCross2Gaps),
+                andLogic(orLogic(canHasSpikeBoots, hasIronBoots), canCrossPrecise2Gaps),
                 canHasFlyingBoots,
                 hasSomersault
             )}],

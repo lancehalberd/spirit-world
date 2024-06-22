@@ -5764,7 +5764,7 @@ const sf0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:s0:2x1-ent-0", x: 396, y: 208, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:2x1-ent-0", x: 380, y: 208, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 168, y: 420, style: "stoneTerminal", type: "sign", message: "", linked: true},
         {status: "normal", id: "", x: 176, y: 64, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 168, y: 160, type: "spawnMarker", linked: true, spirit: true},

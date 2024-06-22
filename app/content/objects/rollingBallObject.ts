@@ -165,7 +165,7 @@ export class RollingBallObject implements ObjectInstance {
             knockAwayFrom: {x: this.x + 8, y: this.y + 8},
         });
 
-        return hitResult.blocked;
+        return hitResult.blocked || hitResult.stopped;
     }
     move(state: GameState, direction: Direction): boolean {
         //console.log('move', direction, this.x, this.y);

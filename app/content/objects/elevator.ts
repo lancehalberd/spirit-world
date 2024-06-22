@@ -29,21 +29,18 @@ debugCanvas;//(platformInFloor, 1);
 // This canvas is used to compose all the elements together that will be masked (the playform with the terminal+player on it).
 const [maskedCanvas, maskedContext] = createCanvasAndContext(maskFrame.w, maskFrame.h);
 const [maskCanvas, maskContext] = createCanvasAndContext(maskFrame.w, maskFrame.h);
-/**
- * Render bottom ring as background, and low enough so that it doesn't look weird.
- * Render top rings in the foreground, high enough that it doesn't look weird.
- * Render platform+occupants in foreground between back and front rings and masked behind the floor mask.
- *   Maybe introduce the concept of a 'renderParent' to objects which is responsible for rendering them.
- *   If it is set, an object won't be rendered by the field, but by the renderParent's render logic.
- *   Them the player will set the elevator as the render parent when they are standing on the platform.
- */
+
+const lightBehaviors: TileBehaviors = {
+    brightness: 0.5,
+    lightRadius: 48,
+}
 export class Elevator implements ObjectInstance {
     area: AreaInstance;
     animationTime: number = 0;
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors {
-        const hitbox = this.getHitbox();
+        const hitbox = this.getLandingHitbox();
         if (!isPixelInShortRect(x, y, hitbox)) {
-            return {};
+            return lightBehaviors;
         }
         const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
         const r2 = dx*dx + dy*dy;
@@ -51,10 +48,10 @@ export class Elevator implements ObjectInstance {
         if (r2 > innerRadius * innerRadius && r2 < outerRadius * outerRadius) {
             const theta = Math.atan2(dy, dx);
             if (theta < Math.PI / 3 || theta > 2 * Math.PI / 3) {
-                return {solid: true};
+                return {solid: true, ...lightBehaviors};
             }
         }
-        return {};
+        return lightBehaviors;
     }
     offsetX: number = 0;
     offsetY: number = 0;
@@ -95,8 +92,11 @@ export class Elevator implements ObjectInstance {
         }
         return parts;
     }
-    getHitbox() {
+    getLandingHitbox() {
         return {x: this.x, y: this.y, w: floorSlot.w, h: floorSlot.h};
+    }
+    getHitbox() {
+        return {x: this.x, y: this.y - this.elevatorY, w: floorSlot.w, h: floorSlot.h};
     }
     // Run the sequence to move the elevator to a target floor while the hero rides it.
     travelToFloor(state: GameState, floor: number) {
@@ -187,17 +187,18 @@ export class Elevator implements ObjectInstance {
             }
         }
         if (this.specialStatus === 'crashed') {
-            // TODO: I would like to show the platform crashing first before the
-            // player crashes.
-            // Currently the scene is too dark to show this because the light
-            // centers on the player and starts with radius 0.
-            //if (this.elevatorY > 0) {
-            //    this.elevatorY = Math.max(0, this.elevatorY - 2);
-            //}
-            if (state.hero.renderParent === this) {
+            if (this.elevatorY > 0) {
+                this.elevatorY = Math.max(0, this.elevatorY - 8);
                 if (this.elevatorY === 0) {
-                    delete state.hero.renderParent;
+                    playAreaSound(state, this.area, 'bossDeath');
+                    state.screenShakes.push({
+                        dx: 2, dy: 4, startTime: state.fieldTime, endTime: state.fieldTime + 500
+                    });
                 }
+                state.hero.z = 320;
+            }
+            if (state.hero.renderParent && state.hero.z < 300) {
+                delete state.hero.renderParent;
             }
         }
         // Normal behavior does not apply when a special status is applied.
@@ -241,6 +242,10 @@ export class Elevator implements ObjectInstance {
         this.controlTerminal.update(state);
     }
     renderHero(context: CanvasRenderingContext2D, state: GameState) {
+        // Don't draw the hero's shadow while the elevator is falling during the crash sequence.
+        if (state.hero.z > 300) {
+            return;
+        }
         if (state.hero.renderParent === this) {
             // Need to force the shadow to move up/down with the elavator
             context.save();
@@ -265,6 +270,8 @@ export class Elevator implements ObjectInstance {
                 drawFrame(context, platformInFloor, {...platformInFloor, x: this.x, y: this.y});
                 this.controlTerminal.render(context, state);
             } else if (this.elevatorY < 0) {
+                // We use a mask to draw the platform/player/terminal behind the background
+                // as the platform moves below the floor to a lower level.
                 maskedContext.clearRect(0, 0, maskFrame.w, maskFrame.h);
                 drawFrame(maskedContext, platform, {...platform, x: 0, y: -this.elevatorY});
                 maskedContext.save();
@@ -284,14 +291,7 @@ export class Elevator implements ObjectInstance {
             } else if (this.elevatorY <= 24) {
                 drawFrame(context, platform, {...platform, x: this.x, y: this.y - this.elevatorY});
                 this.controlTerminal.render(context, state);
-                if (state.hero.renderParent === this) {
-                    // Need to force the shadow to move up/down with the elavator
-                    context.save();
-                        context.translate(0, -this.elevatorY);
-                        renderHeroShadow(context, state, state.hero)
-                    context.restore();
-                    state.hero.render(context, state);
-                }
+                this.renderHero(maskedContext, state);
             }
         }
         // const terminalFrame = terminalAnimation.frames[0];
@@ -527,7 +527,7 @@ export function enterZoneByElevator(
     //console.log('enterZoneByElevator', targetFloor, objectLocation);
     enterLocation(state, objectLocation, instant, () => {
         const elevator = findElevatorForFloor(state.areaInstance, targetFloor);
-        const hitbox = elevator.getHitbox();
+        const hitbox = elevator.getLandingHitbox();
         state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
         state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 16;
         state.hero.d = 'up';
@@ -544,7 +544,7 @@ export function enterZoneByElevator(
         if (elevator.specialStatus === 'stuck') {
             elevator.specialStatus = 'crashed';
             elevator.floorDelta = 0;
-            elevator.elevatorY = 0;
+            elevator.elevatorY = 300;
             state.hero.action = 'knocked';
         }
 

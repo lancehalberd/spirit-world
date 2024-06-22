@@ -412,9 +412,19 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
     if (state.hero.savedData.spawnLocation.zoneKey === 'newPeachCave') {
         state.hero.savedData.spawnLocation.zoneKey = 'peachCave';
     }
-    // The player restarts at the defeated boss if they haven't made it to the overworld yet.
-    if (state.hero.savedData.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags.peachCaveBoss) {
-        state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
+
+    // We don't want the player to respawn inside of the peach cave if they finish the peach cave and then quit
+    // before hitting another save point. To that end if their save slot is in the peach cave, we will spawn them
+    // outside of it unless they have already talked to their mom or obtained the bow.
+    const respectPeachCaveSave = state.hero.savedData.activeTools.bow > 0 || state.savedState.objectFlags.momElder;
+    if (state.hero.savedData.spawnLocation.zoneKey === 'peachCave' && !respectPeachCaveSave) {
+        if (state.savedState.objectFlags.homeInstructions) {
+            // Once the player has stepped into the world map, start them outside the cave if they didn't save elsewhere.
+            state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
+        } else if (state.savedState.objectFlags.peachCaveBoss) {
+            // The player restarts at the defeated boss if they haven't made it to the overworld yet.
+            state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
+        }
     }
     if (state.hero.savedData.spawnLocation.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff & 2) {
         // Do not spawn inside the tower if the tower is not currently placed anywhere.
@@ -432,8 +442,6 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
 }
 
 const prioritizedSpawnLocations = [
-    SPAWN_LOCATION_WATERFALL_VILLAGE,
-    SPAWN_LOCATION_PEACH_CAVE_EXIT,
     // Spirit world
     SPAWN_LOCATION_TOMB_ENTRANCE,
     SPAWN_WAR_TEMPLE_ENTRANCE,
