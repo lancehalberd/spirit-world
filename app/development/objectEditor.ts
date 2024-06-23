@@ -10,6 +10,7 @@ import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { doorStyles } from 'app/content/objects/doorStyles';
+import { stairsStyles } from 'app/content/objects/stairs';
 import { torchStyles } from 'app/content/objects/torch';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
@@ -168,7 +169,7 @@ export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
-    'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
+    'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
 
@@ -259,7 +260,6 @@ export function createObjectDefinition(
             };
         case 'door':
         case 'staffTower':
-        case 'stairs':
             return {
                 ...commonProps,
                 type: definition.type,
@@ -353,6 +353,15 @@ export function createObjectDefinition(
                 d: definition.d || 'down',
                 w: definition.w || 16,
                 h: definition.h || 16,
+                style: definition.style || Object.keys(escalatorStyles)[0],
+                type: definition.type,
+            };
+        }
+        case 'stairs': {
+            return {
+                ...commonProps,
+                w: definition.w || 32,
+                h: definition.h || 64,
                 style: definition.style || Object.keys(escalatorStyles)[0],
                 type: definition.type,
             };
@@ -608,7 +617,6 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'keyBlock':
             return ['closed', 'locked', 'bigKeyLocked'];
         case 'door':
-        case 'stairs':
             return ['normal', 'closed', 'closedEnemy', 'closedSwitch',
                 'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
             ];
@@ -1231,7 +1239,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows.push({
                 name: 'w',
-                value: object.w || 16,
+                value: object.w || 32,
                 onChange(w: number) {
                     object.w = w;
                     updateObjectInstance(state, object);
@@ -1239,7 +1247,25 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows.push({
                 name: 'h',
-                value: object.h || 16,
+                value: object.h || 32,
+                onChange(h: number) {
+                    object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'stairs':
+            rows.push({
+                name: 'w',
+                value: object.w || 32,
+                onChange(w: number) {
+                    object.w = w;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'h',
+                value: object.h || 64,
                 onChange(h: number) {
                     object.h = h;
                     updateObjectInstance(state, object);
@@ -1380,6 +1406,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = lightningBarrierStyles;
     } else if (object.type === 'staffTower') {
         styles = {'ground': 0, 'sky': 1};
+    } else if (object.type === 'stairs') {
+        styles = stairsStyles
     }
     if (!styles) {
         return [];
@@ -1498,7 +1526,7 @@ export function onMouseDownSelectObject(state: GameState, editingState: EditingS
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    if (object.type === 'escalator' || object.type === 'decoration' || object.type === 'waterfall') {
+    if (object.type === 'escalator' || object.type === 'stairs' || object.type === 'decoration' || object.type === 'waterfall') {
         //object.x = Math.round(object.x / 8) * 8;
         //object.y = Math.round(object.y / 8) * 8;
         return;

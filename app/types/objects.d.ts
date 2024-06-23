@@ -480,7 +480,7 @@ interface CrystalSwitchDefinition extends BaseSwitchDefinition {
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs' | 'staffTower'
+    type: 'teleporter' | 'pitEntrance' | 'door' | 'staffTower'
     targetZone?: string
     targetObjectId?: string
     // This can be set to force a door to be open if the logic is true.
@@ -585,6 +585,12 @@ interface EscalatorDefinition extends BaseObjectDefinition {
     h: number
 }
 
+interface StairsDefinition extends BaseObjectDefinition {
+    type: 'stairs'
+    w: number
+    h: number
+}
+
 interface PushStairsDefinition extends BaseObjectDefinition {
     type: 'pushStairs'
     w: number
@@ -633,6 +639,7 @@ type ObjectDefinition = SimpleObjectDefinition
     | PushStairsDefinition
     | SignDefinition
     | SpikeBallDefinition
+    | StairsDefinition
     | TippableObjectDefinition
     | TurretDefinition
     | WaterfallDefinition

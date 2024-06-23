@@ -105,8 +105,6 @@ Current tasks:
         - Can move into lava. Returning to lava will regenerate the shell if missing.
 
     - Low priority Staff Tower changes
-        - New stairs object
-            - Like the escalator style with rails except no moving floor.
         - New ladders
         - east/west doors
         - Add elevator behaviors

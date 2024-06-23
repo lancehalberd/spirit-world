@@ -643,7 +643,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "staffTowerBasementBot2", x: 452, y: 252, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
         {status: "normal", id: "staffTowerBasementBot3", x: 164, y: 492, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
         {status: "normal", id: "staffTowerBasementBot4", x: 452, y: 492, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
-        {status: "normal", id: "", x: 312, y: 464, type: "door", style: "ladderUp", d: "down", linked: true},
+        {status: "normal", id: "", x: 304, y: 453, w: 32, h: 48, style: "futuristic", type: "stairs", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 444, mapId: 'staffTower', floorId: 'B1', mapX: 1, mapY: 2},
@@ -987,9 +987,9 @@ const sf0_0x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "elevatorFixed", x: 296, y: 208, type: "boss", enemyType: "largeOrb", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "", x: 264, y: 324, type: "elevator", floor: 0, specialBehaviorKey: "staffTowerElevator"},
-        {status: "normal", id: "", x: 312, y: 464, type: "door", style: "ladderUp", d: "down", linked: true, spirit: true},
         {status: "normal", id: "elevatorFixed", x: 440, y: 376, type: "boss", enemyType: "largeOrb", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "elevatorFixed", x: 152, y: 376, type: "boss", enemyType: "largeOrb", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "", x: 304, y: 453, w: 32, h: 48, style: "futuristic", type: "stairs", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 446, mapId: 'staffTower', floorId: 'B1', mapX: 3, mapY: 2},
@@ -2952,7 +2952,6 @@ const f2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTower4F5F", x: 304, y: 112, type: "door", style: "futureDownstairs", targetZone: "staffTower", targetObjectId: "staffTower4F5F", d: "up", locationCue: "Tower 5F"},
         {status: "normal", id: "", x: 304, y: 360, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerLargeTerminal"},
-        {status: "normal", id: "", x: 312, y: 464, type: "door", style: "ladderUp", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", x: 200, y: 216, targetObjectId: "staffTower5FBarrier", type: "floorSwitch", toggleOnRelease: false, requireAll: false},
         {status: "normal", id: "", x: 240, y: 500, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "closed", id: "staffTower5FBarrier", x: 384, y: 212, type: "keyBlock"},
@@ -2960,6 +2959,7 @@ const f2_0x0: AreaDefinition = {
         {status: "closed", id: "staffTower5FBarrier", x: 224, y: 212, type: "keyBlock"},
         {status: "normal", id: "", x: 424, y: 216, targetObjectId: "staffTower5FBarrier", type: "floorSwitch", requireAll: false},
         {status: "normal", id: "", x: 424, y: 216, targetObjectId: "staffTower5FBarrier", type: "floorSwitch"},
+        {status: "normal", id: "", x: 304, y: 453, w: 32, h: 48, style: "futuristic", type: "stairs", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 451, mapId: 'staffTower', floorId: '5F', mapX: 1, mapY: 2},
@@ -3273,7 +3273,6 @@ const f2_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 576, targetObjectId: "staffTowerSkyEntrance", type: "floorSwitch"},
         {status: "normal", id: "staffTower:2:0x1-luckyBeetle-0", x: 312, y: 352, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "", x: 144, y: 180, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
-        {status: "normal", id: "", x: 152, y: 240, type: "door", style: "ladderUp", d: "up"},
         {status: "normal", id: "", x: 352, y: 464, type: "door", style: "ladderUp", d: "up", linked: true, spirit: true},
         {status: "normal", id: "", x: 72, y: 335, speed: "fast", d: "up", w: 48, h: 144, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 256, y: 280, speed: "fast", d: "left", w: 128, h: 32, style: "belt", type: "escalator"},
@@ -3282,6 +3281,7 @@ const f2_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 216, y: 335, speed: "fast", d: "down", w: 32, h: 144, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 392, y: 335, speed: "fast", d: "up", w: 32, h: 144, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 520, y: 335, speed: "fast", d: "down", w: 48, h: 144, style: "belt", type: "escalator"},
+        {status: "normal", id: "", x: 150, y: 229, w: 20, h: 48, style: "futuristic", type: "stairs", linked: false, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 452, mapId: 'staffTower', floorId: '4F', mapX: 1, mapY: 2},
@@ -3699,9 +3699,9 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerBossSave", x: 304, y: 572, type: "saveStatue"},
         {status: "normal", id: "", x: 264, y: 324, type: "elevator", floor: 5, specialBehaviorKey: "staffTowerElevator"},
         {status: "normal", id: "staffTower:s2:0x0-sentryBot-0", x: 448, y: 352, type: "enemy", enemyType: "largeOrb", d: "down", saveStatus: "forever", params: {}},
-        {status: "normal", id: "", x: 312, y: 464, type: "door", style: "ladderUp", d: "down", linked: true},
         {status: "normal", id: "", x: 304, y: 180, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "normal", id: "", x: 368, y: 500, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
+        {status: "normal", id: "", x: 304, y: 453, w: 32, h: 48, style: "futuristic", type: "stairs", linked: true, spirit: false},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 453, mapId: 'staffTower', floorId: '5F', mapX: 3, mapY: 2},
@@ -4020,8 +4020,8 @@ const sf2_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower4Bot2", x: 392, y: 276, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
         {status: "normal", id: "", x: 264, y: 324, type: "elevator", floor: 4, specialBehaviorKey: "staffTowerElevator"},
         {status: "normal", id: "staffTower4Bot1", x: 216, y: 504, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
-        {status: "normal", id: "", x: 472, y: 240, type: "door", style: "ladderUp", d: "up"},
         {status: "normal", id: "", x: 272, y: 464, type: "door", style: "ladderUp", d: "up"},
+        {status: "normal", id: "", x: 470, y: 229, w: 20, h: 48, style: "futuristic", type: "stairs", linked: false, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 454, mapId: 'staffTower', floorId: '4F', mapX: 3, mapY: 2},
