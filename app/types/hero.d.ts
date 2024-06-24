@@ -141,6 +141,7 @@ interface SavedHeroData {
     maxLife: number
     ironSkinLife: number
     equippedBoots: Equipment
+    previousBoots?: Equipment
     // If this isn't set, the hero will start with maxLife.
     life?: number
     hasRevive: boolean

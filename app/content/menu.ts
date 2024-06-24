@@ -103,6 +103,12 @@ export function setRightTool(state: GameState, tool: ActiveTool): void {
 
 // Function to set the equipped boots on all copies of the hero.
 export function setEquippedBoots(state: GameState, boots: Equipment): void {
+    // If this is actually changing boots, asign the current boots to the
+    // previously equipped boots slot. This is used for swapping back to cloud boots
+    // while underwater.
+    if (state.hero.savedData.equippedBoots !== boots) {
+        state.hero.savedData.previousBoots = state.hero.savedData.equippedBoots;
+    }
     for (const hero of [state.hero, ...state.hero.clones]) {
         hero.savedData.equippedBoots = boots;
     }

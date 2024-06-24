@@ -22,6 +22,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
         maxLife: 4,
         ironSkinLife: 0,
         equippedBoots: 'leatherBoots',
+        previousBoots: 'leatherBoots',
         hasRevive: false,
         money: 0,
         silverOre: 0,

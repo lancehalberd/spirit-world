@@ -729,6 +729,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 knockAwayFromHit: true,
                 isStaff: true,
                 isBonk: staff.staffBonked,
+                canDamageCrystalShields: staff.staffBonked,
             });
             hitTargets(state, state.areaInstance, {
                 hitbox: baseTarget,

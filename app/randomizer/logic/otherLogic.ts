@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, hasIronBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
-    hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasStaff,
+    hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasLongSomersault, hasStaff,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -304,7 +304,7 @@ export const cavesNodes: LogicNode[] = [
             orLogic(
                 andLogic(orLogic(canHasSpikeBoots, hasIronBoots), canCrossPrecise2Gaps),
                 canHasFlyingBoots,
-                hasSomersault
+                hasLongSomersault,
             )}],
         checks: [{objectId: 'frozenCaveSpikeBoots'}],
         entranceIds: ['frozenCaveEntrance'],

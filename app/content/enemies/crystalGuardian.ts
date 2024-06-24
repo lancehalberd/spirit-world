@@ -102,8 +102,13 @@ enemyDefinitions.crystalGuardian = {
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         if (enemy.params.shieldLife > 0) {
             if (hit.canDamageCrystalShields && enemy.params.shieldInvulnerableTime <= 0) {
-                // Right now shield takes a flat 2 damage no matter the source.
-                enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - 2);
+                if (hit.isBonk && state.hero.savedData.activeTools.staff & 2) {
+                    // The Tower Staff destroys the shield in a single hit.
+                    enemy.params.shieldLife = 0;
+                } else {
+                    // Right now shield takes a flat 2 damage no matter the source.
+                    enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - 2);
+                }
                 enemy.params.shieldInvulnerableTime = 100;
                 enemy.makeSound(state, 'enemyHit');
                 const hitbox = enemy.getHitbox();

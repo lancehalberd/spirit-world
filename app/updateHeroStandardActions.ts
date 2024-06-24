@@ -861,7 +861,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (hero.savedData.equippedBoots !== 'ironBoots') {
                     setEquippedBoots(state, 'ironBoots');
                 } else {
-                    setEquippedBoots(state, 'leatherBoots');
+                    setEquippedBoots(state, state.hero.savedData.previousBoots || 'leatherBoots');
                 }
             }
         } else if (!hero.isAstralProjection
