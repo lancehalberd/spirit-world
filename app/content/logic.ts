@@ -192,6 +192,9 @@ export const canAvoidBossAttacks: OrLogicCheck = orLogic(hasRoll, hasSpiritBarri
 export const canBeatGolem = andLogic(hasBossWeapon, canAvoidBossAttacks);
 export const canBeatIdols = andLogic(hasBossWeapon, canAvoidBossAttacks);
 export const canDefeatBalloonMegapede = andLogic(hasBossWeapon, canAvoidBossAttacks);
+export const canDefeatFlameElemental = orLogic(hasIce, hasLightning);
+export const canDefeatFrostElemental = orLogic(hasFire, hasLightning);
+export const canDefeatStormElemental = orLogic(hasIce, hasFire);
 
 export const canRemoveLightStones = orLogic(hasGloves, hasStaff);
 export const canRemoveHeavyStones = orLogic(hasMitts, canHasTowerStaff);

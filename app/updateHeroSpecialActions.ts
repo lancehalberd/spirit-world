@@ -709,6 +709,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     startTime: state.fieldTime,
                     endTime: state.fieldTime + 350,
                 });
+                // The staff only hits 24px in front of the hero when it bonks.
+                if (staff.direction === 'up') {
+                    baseTarget = {x: hero.x, y: hero.y - 24, w: 16, h: 24};
+                } else if (staff.direction === 'down') {
+                    baseTarget = {x: hero.x, y: hero.y + 16, w: 16, h: 24};
+                } else if (staff.direction === 'left') {
+                    baseTarget = {x: hero.x - 24, y: hero.y, w: 24, h: 16};
+                } else if (staff.direction === 'right') {
+                    baseTarget = {x: hero.x + 16, y: hero.y, w: 24, h: 16};
+                }
             } else if (staff.isInvalid) {
                 // Staff hits at least a 3 tile area even if it doesn't get placed.
                 if (staff.direction === 'up') {
@@ -738,6 +748,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitObjects: true,
                 isStaff: true,
                 isBonk: staff.staffBonked,
+                direction: staff.direction,
             });
             if (!staff.staffBonked) {
                 state.screenShakes.push({

@@ -84,12 +84,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Push Stairs
-        - Chakram should not go through railings
-        - Hero shouldn't grab walls through the floor
-            - This applies to stairs/escalators as well.
-        - Bonking with Level 2 staff should move stairs
-
     - Add 1px padding around packed images that are rotated.
         - Just do this to all effects and pack them together.
 

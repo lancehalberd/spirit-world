@@ -71,6 +71,9 @@ export class PushStairs implements ObjectInstance {
             showMessage(state, 'It feels like you could move this if you were a little stronger.');
             return;
         }
+        this.moveInDirection(state, direction);
+    }
+    moveInDirection(state: GameState, direction: 'left' | 'right'): void {
         if (this.pushDirection) {
             return;
         }
@@ -143,6 +146,7 @@ class PushStairsRailing implements ObjectInstance {
     x: number;
     y: number;
     isObject = <const>true;
+    isNeutralTarget = true;
     xOffset = (this.side === 'left') ? 3 : 26;
     pullingHeroDirection: Direction;
     constructor(public pushStairs: PushStairs, public side: 'left' | 'right') {}
@@ -159,6 +163,14 @@ class PushStairsRailing implements ObjectInstance {
         //const r = this.getHitbox();
         //context.fillStyle = 'red';
         //context.fillRect(r.x, r.y, r.w, r.h);
+    }
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (hit.isBonk && hit.crushingPower >= 2) {
+            if (hit.direction === (this.side === 'left' ? 'right' : 'left')) {
+                this.pushStairs.moveInDirection(state, hit.direction);
+            }
+        }
+        return {stopped: true};
     }
     onPush(state: GameState, direction: Direction): void {
         // The left side can only be pushed right and vice-versa.

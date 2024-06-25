@@ -10,7 +10,7 @@ import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefe
 import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
-import { removeObjectFromArea } from 'app/utils/objects';
+import { getFieldInstanceAndParts, removeObjectFromArea } from 'app/utils/objects';
 
 export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
@@ -89,18 +89,20 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     // This is the array of literal Enemy instances.
     area.enemies = [];
     area.neutralTargets = [];
-    for (const object of [...area?.objects || [], ...area?.effects || []]) {
-        if (object.isAllyTarget) {
-            area.allyTargets.push(object);
-        }
-        if (object.isEnemyTarget) {
-            area.enemyTargets.push(object);
-        }
-        if (object.isNeutralTarget) {
-            area.neutralTargets.push(object);
-        }
-        if (object instanceof Enemy) {
-            area.enemies.push(object);
+    for (const baseObject of [...area?.objects || [], ...area?.effects || []]) {
+        for (const object of getFieldInstanceAndParts(state, baseObject)) {
+            if (object.isAllyTarget) {
+                area.allyTargets.push(object);
+            }
+            if (object.isEnemyTarget) {
+                area.enemyTargets.push(object);
+            }
+            if (object.isNeutralTarget) {
+                area.neutralTargets.push(object);
+            }
+            if (object instanceof Enemy) {
+                area.enemies.push(object);
+            }
         }
     }
     // area.objects array may be mutated during updates, so make a copy of it before iterating over it.

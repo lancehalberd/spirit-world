@@ -143,7 +143,7 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     return false;
 }
 
-export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance, x?: number, y?: number) {
+export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance, x?: number, y?: number): TileBehaviors | undefined {
     if (!object.getHitbox) {
         return undefined;
     }

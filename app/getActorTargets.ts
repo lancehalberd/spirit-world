@@ -1,6 +1,6 @@
 import { Hero } from 'app/content/hero';
 import { isPixelInShortRect } from 'app/utils/index';
-import { getObjectAndParts } from 'app/utils/objects';
+import { getObjectBehaviors, getObjectAndParts } from 'app/utils/objects';
 import { moveObject } from 'app/movement/moveObject';
 
 
@@ -10,8 +10,9 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
     const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
     const checkPoints: Point[] = [];
     const usedCheckPoints: Point[] = [];
-    const objects: ObjectInstance[] = []
-    const tiles: TileCoords[] = []
+    const tilePoints: Point[] = [];
+    const objects: ObjectInstance[] = [];
+    const tiles: TileCoords[] = [];
 
     if (actor.d === 'left') {
         let x = hitbox.x - 2;
@@ -79,7 +80,8 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
         if (mx === dx && my === dy) {
             // console.log(candidate.x, candidate.y, {x, y}, mx, my);
             usedCheckPoints.push(candidate);
-            tiles.push({x: (candidate.x / tileSize) | 0, y: (candidate.y / tileSize) | 0})
+            tilePoints.push(candidate);
+
         }
     }
 
@@ -93,13 +95,25 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
                 continue;
             }
             const hitbox = object.getHitbox();
+            let added = false;
             for (const point of usedCheckPoints) {
                 if (isPixelInShortRect(point.x, point.y, hitbox)) {
-                    objects.push(object);
-                    break;
+                    // Only add the object to the objects array once.
+                    if (!added) {
+                        objects.push(object);
+                        added = true;
+                    }
+                    // Ignore any tiles underneath an object marked with isGround
+                    let tileIndex = tilePoints.indexOf(point);
+                    if (tileIndex >= 0 && getObjectBehaviors(state, object, point.x, point.y)?.isGround) {
+                        tilePoints.splice(tileIndex, 1);
+                    }
                 }
             }
         }
+    }
+    for (const point of tilePoints) {
+        tiles.push({x: (point.x / tileSize) | 0, y: (point.y / tileSize) | 0})
     }
 
     return { objects, tiles };
