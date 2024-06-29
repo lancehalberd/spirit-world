@@ -256,8 +256,11 @@ const [ treeDoorOpen ] = createAnimation('gfx/tiles/treesheet.png', {w: 32, h: 3
 const [ knobbyTreeDoorOpen ] = createAnimation('gfx/tiles/knobbytrees.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
 
 const [
-    ladderTop, ladderMiddle, /*ladderMiddle*/, ladderBottom, ladderDown
+    ladderTop, ladderMiddle, /*ladderMiddle*/, ladderBottom, ladderDownFrame
 ] = createAnimation('gfx/tiles/ladder.png', {w: 16, h: 16}, {rows: 5}).frames;
+const [
+    futureLadderTop, futureLadderMiddle, futureLadderBottom, /*futureLadderTop*/, futureLadderDownFrame
+] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 832, rows: 5}).frames;
 
 interface DoorStyleFrames {
     doorFrame: Frame
@@ -796,6 +799,74 @@ const woodenDoorStyle: DoorStyleDefinition = {
     },
 };
 
+function ladderUp(middleFrame: Frame, bottomFrame: Frame): DoorStyleDefinition {
+    return {
+        render(this: void, context, state, door) {
+            if (door.status !== 'normal') {
+                return;
+            }
+            drawFrame(context, middleFrame, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, bottomFrame, {x: door.x, y: door.y + 16, w: 16, h: 16});
+        },
+        getHitbox(door: Door) {
+            // Making this ladder narrow prevents climbing down it from the sides, but
+            // has little impact climbing up since the tiles force the hero to the
+            // center of the ladder.
+            return {x: door.x + 6, y: door.y + 8, w: 4, h: 24};
+        },
+        getPathHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 32};
+        },
+        pathBehaviors: {climbable: true},
+        mapIcon: 'up',
+    };
+}
+function tallLadderUp(middleFrame: Frame, bottomFrame: Frame): DoorStyleDefinition {
+    return {
+        render(this: void, context, state, door) {
+            if (door.status !== 'normal') {
+                return;
+            }
+            drawFrame(context, middleFrame, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, middleFrame, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, middleFrame, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, middleFrame, {x: door.x, y: door.y + 48, w: 16, h: 16});
+            drawFrame(context, middleFrame, {x: door.x, y: door.y + 64, w: 16, h: 16});
+            drawFrame(context, bottomFrame, {x: door.x, y: door.y + 80, w: 16, h: 16});
+        },
+        getHitbox(door: Door) {
+            // Making this ladder narrow prevents climbing down it from the sides, but
+            // has little impact climbing up since the tiles force the hero to the
+            // center of the ladder.
+            return {x: door.x + 6, y: door.y + 8, w: 4, h: 88};
+        },
+        getPathHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 96};
+        },
+        pathBehaviors: {climbable: true, solid: true},
+        mapIcon: 'up',
+    };
+}
+function ladderDown(topFrame: Frame, downFrame: Frame): DoorStyleDefinition {
+    return {
+        render(this: void, context, state, door) {
+            if (door.status !== 'normal') {
+                return;
+            }
+            drawFrame(context, topFrame, {x: door.x, y: door.y - 16, w: 16, h: 16});
+            drawFrame(context, downFrame, {x: door.x, y: door.y, w: 16, h: 16});
+        },
+        getHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 16};
+        },
+        getPathHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 16, h: 16};
+        },
+        pathBehaviors: {climbable: true, solid: true},
+        mapIcon: 'down',
+    };
+}
+
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavern: cavernDoorStyle,
     cavernDownstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsDown, 'down'),
@@ -919,67 +990,12 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: knobbyTreeDoorOpen,
         },
     },
-    ladderUp: {
-        render(this: void, context, state, door) {
-            if (door.status !== 'normal') {
-                return;
-            }
-            drawFrame(context, ladderMiddle, {x: door.x, y: door.y, w: 16, h: 16});
-            drawFrame(context, ladderBottom, {x: door.x, y: door.y + 16, w: 16, h: 16});
-        },
-        getHitbox(door: Door) {
-            // Making this ladder narrow prevents climbing down it from the sides, but
-            // has little impact climbing up since the tiles force the hero to the
-            // center of the ladder.
-            return {x: door.x + 6, y: door.y + 8, w: 4, h: 24};
-        },
-        getPathHitbox(door: Door) {
-            return {x: door.x, y: door.y, w: 16, h: 32};
-        },
-        pathBehaviors: {climbable: true},
-        mapIcon: 'up',
-    },
-    ladderUpTall: {
-        render(this: void, context, state, door) {
-            if (door.status !== 'normal') {
-                return;
-            }
-            drawFrame(context, ladderMiddle, {x: door.x, y: door.y, w: 16, h: 16});
-            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 16, w: 16, h: 16});
-            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 32, w: 16, h: 16});
-            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 48, w: 16, h: 16});
-            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 64, w: 16, h: 16});
-            drawFrame(context, ladderBottom, {x: door.x, y: door.y + 80, w: 16, h: 16});
-        },
-        getHitbox(door: Door) {
-            // Making this ladder narrow prevents climbing down it from the sides, but
-            // has little impact climbing up since the tiles force the hero to the
-            // center of the ladder.
-            return {x: door.x + 6, y: door.y + 8, w: 4, h: 88};
-        },
-        getPathHitbox(door: Door) {
-            return {x: door.x, y: door.y, w: 16, h: 96};
-        },
-        pathBehaviors: {climbable: true, solid: true},
-        mapIcon: 'up',
-    },
-    ladderDown: {
-        render(this: void, context, state, door) {
-            if (door.status !== 'normal') {
-                return;
-            }
-            drawFrame(context, ladderTop, {x: door.x, y: door.y - 16, w: 16, h: 16});
-            drawFrame(context, ladderDown, {x: door.x, y: door.y, w: 16, h: 16});
-        },
-        getHitbox(door: Door) {
-            return {x: door.x, y: door.y, w: 16, h: 16};
-        },
-        getPathHitbox(door: Door) {
-            return {x: door.x, y: door.y, w: 16, h: 16};
-        },
-        pathBehaviors: {climbable: true, solid: true},
-        mapIcon: 'down',
-    },
+    ladderUp: ladderUp(ladderMiddle, ladderBottom),
+    ladderUpTall: tallLadderUp(ladderMiddle, ladderBottom),
+    ladderDown: ladderDown(ladderTop, ladderDownFrame),
+    futureLadderUp: ladderUp(futureLadderMiddle, futureLadderBottom),
+    futureLadderUpTall: tallLadderUp(futureLadderMiddle, futureLadderBottom),
+    futureLadderDown: ladderDown(futureLadderTop, futureLadderDownFrame),
     square: oldSquareBaseDoorStyle,
     wideEntrance: {
         // We use isNotSolid here since we see the ground type for this entrance.

@@ -1,4 +1,5 @@
 import { removeObjectFromArea } from 'app/utils/objects';
+import { swapHeroStates } from 'app/utils/swapHeroStates';
 
 
 export function destroyClone(state: GameState, clone: Hero): void {
@@ -17,10 +18,7 @@ export function destroyClone(state: GameState, clone: Hero): void {
     if (clone === state.hero) {
         // If the "clone" destroyed was the hero, then pop the last clone and move the hero to it.
         const lastClone = state.hero.clones.pop();
-        state.hero.activeStaff = lastClone.activeStaff;
-        state.hero.activeBarrierBurst = lastClone.activeBarrierBurst;
-        state.hero.x = lastClone.x;
-        state.hero.y = lastClone.y;
+        swapHeroStates(state.hero, lastClone);
         removeObjectFromArea(state, lastClone);
     } else {
         // If a non-hero clone is destroyed we just remove it from the array of clones.

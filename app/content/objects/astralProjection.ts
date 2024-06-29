@@ -51,11 +51,11 @@ export function getSpiritFrame(state: GameState, hero: Hero): Frame {
 }
 
 export class AstralProjection extends Hero {
-    constructor(hero: Hero) {
+    constructor(state: GameState, hero: Hero) {
         super();
         this.isAstralProjection = true;
         this.isAirborn = true;
-        this.life = hero.magic;
+        this.life = state.hero.magic;
         this.x = hero.x;
         this.y = hero.y;
         this.w = hero.w;

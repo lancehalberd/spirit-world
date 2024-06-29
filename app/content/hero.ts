@@ -651,6 +651,9 @@ export class Hero implements Actor {
         this.renderChargingBehind(context, state);
         if (this.isInvisible) {
             this.renderChargingFront(context, state);
+             if (hero.pickUpTile) {
+                renderCarriedTile(context, state, hero);
+            }
             return;
         }
         const isChargingBow = (hero.chargingRightTool && hero.savedData.rightTool === 'bow')

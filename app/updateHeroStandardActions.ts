@@ -68,7 +68,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
 
     let dx = 0, dy = 0;
     let movementSpeed = 2;
-    if (hero.isRunning && hero.magic > 0) {
+    if (hero.isRunning && state.hero.magic > 0) {
         movementSpeed *= 1.3;
     }
     if (hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots < 2) {
@@ -350,7 +350,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, MAX_SPIRIT_RADIUS);
                 if (hero.savedData.passiveTools.astralProjection && hero.area.alternateArea) {
                     if (!hero.astralProjection) {
-                        hero.astralProjection = new AstralProjection(hero);
+                        hero.astralProjection = new AstralProjection(state, hero);
                         addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
                     }
                 }
@@ -637,7 +637,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
         if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-            if (state.hero.savedData.passiveTools.teleportation && state.hero.magic > 0
+            const preventTeleportation = hero.grabObject || hero.grabTile;
+            if (!preventTeleportation && state.hero.savedData.passiveTools.teleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.spendMagic(10);

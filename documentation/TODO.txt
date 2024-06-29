@@ -1,30 +1,25 @@
 Test at http://localhost:81/alttp/public/
 
-Known Bugs:
-    - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
-        - Probably stop grabbing with projection when teleporting.
-    - Enemies hit in the spirit world make noise when taking damage
-        - this might be nice to keep for the cocoon boss
-        - when players can actively hit enemies in the spirit world we should play a sound. For example, hitting an enemy with a linked bush shouldn't be silent.
-    - Clone tool bugs
-        - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
-    - Held rocks/bushes are invisible while using cloak
-    - Piercing projectiles that can push things should be stopped by the first object they push
-        or not be able to push additional objects, for example, the charged chakram.
+Bugs:
 
-Won't Fix:
-    - Chakram can hit tiles below ledges sometimes when returning.
-        - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
-    - Spirit Barrier appears above door frames when moving East/West through doors.
-        - This only applies with old tile sets, so probably isn't worth fixing.
+    Won't Fix:
+        - Chakram can hit tiles below ledges sometimes when returning.
+            - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
+        - Spirit Barrier appears above door frames when moving East/West through doors.
+            - This only applies with old tile sets, so probably isn't worth fixing.
+        - Enemies hit in the spirit world make noise when taking damage
+            - This isn't a bug, this provides useful feedback when the player hits enemies in the spirit world, such as with bushes
+              or rolling stones.
+            - This feels strange when an enemy is hit offscreen passively, like a squirrel running into thorn bushes.
+                - Probably enemies shouldn't run into thorn bushes anyway.
 
-Cannot reproduce:
-    - Fix bug: possible to defeat frost beast without getting reward somehow
-        - Jun did this by firing fire arrows from the bottom of the screen.
-            - The door opened but he didn't get the reward, and the boss respawned on returning.
-    - Robot stopped moving in ST basement. Maybe ice damage against shield is broken?
-    - If controlled clones despawns during quick clone toss, sometimes you'll take control of the original clone in an invalid position, such as inside a solid object or cliff face.
-        - Possibly fixed by other changes.
+    Cannot reproduce:
+        - Fix bug: possible to defeat frost beast without getting reward somehow
+            - Jun did this by firing fire arrows from the bottom of the screen.
+                - The door opened but he didn't get the reward, and the boss respawned on returning.
+        - Robot stopped moving in ST basement. Maybe ice damage against shield is broken?
+        - If controlled clones despawns during quick clone toss, sometimes you'll take control of the original clone in an invalid position, such as inside a solid object or cliff face.
+            - Possibly fixed by other changes.
 
 Graphics Work:
     High Priority Graphics:
@@ -55,7 +50,6 @@ Graphics Work:
         New tile sets
             Vanara Ship(Cocoon, Helix + World Tree Variants) Material+Spirit
             Research Lab(Fertility Temple + Underground Lab)
-            Staff Tower/Precursor Ruins
 
 
 Error when leaving the game in another tab for a while, when changing areas from staff tower basement to first floor.
@@ -84,6 +78,12 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Add ladder versions with top of ladder frames for use in areas.
+    - Future ladder graphics shadow should be 1px below the hitbox. Maybe add shadowHeight param.
+
+    - Add pitMap behavior for angled pit tiles
+        - This will improve the edges of the storm beast arena.
+
     - Add 1px padding around packed images that are rotated.
         - Just do this to all effects and pack them together.
 
@@ -103,15 +103,6 @@ Current tasks:
             - Freezing and hitting with staff will instantly defeat the enemy.
         - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
         - Can move into lava. Returning to lava will regenerate the shell if missing.
-
-    - Low priority Staff Tower changes
-        - New ladders
-        - east/west doors
-        - Add elevator behaviors
-            - off, terminals are not animated/functional
-
-    - Add pitMap behavior for angled pit tiles
-        - This will improve the edges of the storm beast arena.
 
     - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
         - Allow the player to move under solid objects this way
@@ -216,6 +207,10 @@ Current tasks:
     - Add graphical interface for choosing Nimbus Cloud location using map.
         - How to signify cancel operation?
 
+    - Low priority Staff Tower changes
+        - east/west doors
+        - Add elevator behaviors
+            - off, terminals are not animated/functional
 
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
         - Same for long lasting lightning attacks

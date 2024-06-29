@@ -22,6 +22,7 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { boxesIntersect, pad } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
+import { swapHeroStates } from 'app/utils/swapHeroStates';
 
 export function updateAllHeroes(this: void, state: GameState) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
@@ -85,32 +86,6 @@ export function updateAllHeroes(this: void, state: GameState) {
     checkToStartScreenTransition(state, state.hero);
 }
 
-function swapHeroStates(heroA: Hero, heroB: Hero) {
-    const allKeys = [...new Set([...Object.keys(heroA), ...Object.keys(heroB)])];
-    for (const key of allKeys) {
-        if (key === 'behaviors' || key === 'magic'
-            || key === 'isUncontrollable' || key === 'explosionTime'
-        ) {
-            continue;
-        }
-        const temp = heroA[key];
-        heroA[key] = heroB[key];
-        heroB[key] = temp;
-    }
-    // Update chakrams to match their correct owner.
-    for (const hero of [heroA, heroB]) {
-        if (hero.heldChakram) {
-            hero.heldChakram.hero = hero;
-        }
-        if (hero.activeBarrierBurst) {
-            hero.activeBarrierBurst.source = hero;
-        }
-        for (const chakram of hero.thrownChakrams) {
-            chakram.source = hero;
-        }
-    }
-}
-
 export function updateHero(this: void, state: GameState, hero: Hero) {
     hero.justRespawned = false;
     // If the hero is performing some special action with logic that overrides default actions,
@@ -140,6 +115,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 
 
 export function updateGenericHeroState(this: void, state: GameState, hero: Hero) {
+    // Hero takes one damage every half second while in a hot room without the fire blessing.
+    if (!editingState.isEditing && state.areaSection?.isHot && !state.hero.savedData.passiveTools.fireBlessing) {
+        hero.applyBurn(1, 500);
+    }
     if (hero.rollCooldown > 0) {
         hero.rollCooldown -= FRAME_LENGTH;
     }
@@ -161,7 +140,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     hero.areaTime += FRAME_LENGTH;
     if (hero.frozenHeartDuration > 0) {
         hero.frozenHeartDuration -= FRAME_LENGTH;
-        hero.ironSkinCooldown = 1000;
+        state.hero.ironSkinCooldown = Math.max(state.hero.ironSkinCooldown, 1000);
     }
     if (hero.frozenDuration > -500) {
         hero.frozenDuration -= FRAME_LENGTH;
@@ -171,19 +150,6 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
-        if (hero.savedData.passiveTools.ironSkin && hero.magic >= hero.maxMagic) {
-            hero.ironSkinCooldown -= FRAME_LENGTH;
-            // Iron skin restored twice as quickly when still.
-            if (!hero.action || hero.action === 'meditating') {
-                hero.ironSkinCooldown -= FRAME_LENGTH;
-            }
-            if (hero.ironSkinCooldown <= 0) {
-                hero.ironSkinCooldown = 1000;
-                // Iron skin life can be increased over the normal max using shielding units, so don't reduce
-                // iron skin life here it is over the max.
-                hero.savedData.ironSkinLife = Math.max(hero.savedData.ironSkinLife, Math.min(hero.savedData.ironSkinLife + 0.25, hero.savedData.maxLife / 4));
-            }
-        }
     }
     // Burns end immediately dealing no damage to swimming targets.
     if (hero.swimming) {
@@ -191,6 +157,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     }
     if (hero.burnDuration > 0) {
         hero.burnDuration -= FRAME_LENGTH;
+        state.hero.ironSkinCooldown = Math.max(state.hero.ironSkinCooldown, 3000);
         // Burns expire twice as fast when standing on water.
         if (hero.wading) {
             hero.burnDuration -= FRAME_LENGTH;
@@ -200,20 +167,19 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic += 5 * FRAME_LENGTH / 1000;
         } else if (hero.savedData.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
-            hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
-            hero.ironSkinCooldown = 1000;
-        } else if (hero.magic > 0) {
+            hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - state.hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+        } else if (state.hero.magic > 0) {
             // If the hero has magic, half of burning damage applies to magic and half applies to their life.
             const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
             // This will result in a 1 second cooldown by default for a 2 second burn.
-            state.hero.spendMagic(drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000, 10);
+            state.hero.spendMagic(drainCoefficient * 10 * state.hero.burnDamage / 2 * FRAME_LENGTH / 1000, 10);
             // Having the barrier up will completely negate the burn damage applying to the hero's life.
             if (!hero.hasBarrier) {
-                hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+                state.hero.life = Math.max(0, state.hero.life - state.hero.burnDamage / 2 * FRAME_LENGTH / 1000);
             }
         } else {
             // 100% of burn damage goes to life without iron skin or magic.
-            hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);
+            state.hero.life = Math.max(0, state.hero.life - state.hero.burnDamage * FRAME_LENGTH / 1000);
         }
         if (hero.burnDuration % 40 === 0) {
             const hitbox = hero.getHitbox();
@@ -251,10 +217,6 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
 }
 
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
-    // Hero takes one damage every half second while in a hot room without the fire blessing.
-    if (!editingState.isEditing && state.areaSection?.isHot && !hero.savedData.passiveTools.fireBlessing) {
-        hero.applyBurn(1, 500);
-    }
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
         if (object instanceof AirBubbles && object.status === 'normal') {
@@ -267,18 +229,18 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             hero.savedData.ironSkinLife = Math.min(hero.savedData.maxLife, hero.savedData.ironSkinLife + 2 * FRAME_LENGTH / 1000);
         }
     }
-    if (hero.life <= 0
+    if (state.hero.life <= 0
         && hero.action !== 'thrown' && hero.action !== 'knocked' && hero.action !== 'knockedHard'
         && hero.action !== 'jumpingDown' && hero.action !== 'falling' && hero.action !== 'fallen'
     ) {
         if (hero.area.enemies.find(enemy => enemy.definition.id === 'tombRivalBoss')
             && state.savedState.objectFlags.elderTomb
         ) {
-            hero.life = 0.01;
+            state.hero.life = 0.01;
             // The elder rescues you from defeat by the rival if certain conditions are met.
             prependScript(state, '{@elder.tombRescue}');
         } else {
-            hero.life = 0;
+            state.hero.life = 0;
             hero.action = null;
             hero.chargeTime = 0;
             hero.frozenDuration = 0;
@@ -301,6 +263,21 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
     const isInvisible = !![state.hero, ...state.hero.clones].find(hero => hero.isInvisible);
     const hasBarrier = !![state.hero, ...state.hero.clones].find(hero => hero.hasBarrier);
+
+    if (hero.savedData.passiveTools.ironSkin && state.hero.magic >= state.hero.maxMagic) {
+        state.hero.ironSkinCooldown -= FRAME_LENGTH;
+        // Iron skin restored twice as quickly when still.
+        if (!hero.action || hero.action === 'meditating') {
+            state.hero.ironSkinCooldown -= FRAME_LENGTH;
+        }
+        if (state.hero.ironSkinCooldown <= 0) {
+            state.hero.ironSkinCooldown = 1000;
+            // Iron skin life can be increased over the normal max using shielding units, so don't reduce
+            // iron skin life here it is over the max.
+
+            hero.savedData.ironSkinLife = Math.max(hero.savedData.ironSkinLife, Math.min(hero.savedData.ironSkinLife + 0.25, hero.savedData.maxLife / 4));
+        }
+    }
 
     if (isInvisible) {
         let drainAmount = drainCoefficient * 4 * FRAME_LENGTH / 1000;
@@ -346,7 +323,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
     const preventCooldownRegeneration = isInvisible
         || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
-        || (!state.hero.savedData.passiveTools.phoenixCrown && state.hero.burnDuration > 0);
+        || (!state.hero.savedData.passiveTools.phoenixCrown && hero.burnDuration > 0);
     if (state.hero.magicRegenCooldown > 0 && !preventCooldownRegeneration) {
         state.hero.recentMagicSpent = state.hero.recentMagicSpent * (state.hero.magicRegenCooldown - FRAME_LENGTH) / state.hero.magicRegenCooldown;
         state.hero.magicRegenCooldown -= FRAME_LENGTH;

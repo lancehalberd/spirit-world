@@ -46,7 +46,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     ) {
         hero.slipping = false;
     }
-    let startClimbing = false
+    let startClimbing = false, touchHit: HitProperties = undefined;
     for (const behaviors of topBehaviors) {
         if (!bootsAreSlippery && !behaviors.slippery
             && !behaviors.pit  && !behaviors.water  && !behaviors.shallowWater
@@ -56,9 +56,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         if (behaviors.climbable) {
             startClimbing = true;
         }
-        if (behaviors.touchHit && hero.onHit) {
+        if (!touchHit && behaviors.touchHit && hero.onHit) {
             if (!behaviors.touchHit.isGroundHit || hero.z <= 0) {
-                hero.onHit(state, behaviors.touchHit);
+                touchHit = behaviors.touchHit;
+
                 /*const { returnHit } = hero.onHit(state, behaviors.touchHit);
 
                 if (behaviors.cuttable && behaviors.cuttable <= returnHit?.damage) {
@@ -93,7 +94,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         if (behaviors.isLava && hero.z <= 0) {
             const lavaProof = hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots >= 2;
             if (!lavaProof) {
-                hero.onHit(state, { damage: 4, element: 'fire' });
+                // Lava overrides other damaging ground.
+                touchHit = { damage: 4, element: 'fire' };
             }
         }
         if (behaviors.pit || behaviors.cloudGround) {
@@ -103,6 +105,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             hero.isOverPit = false;
         }
     }
+    if (touchHit) {
+        hero.onHit(state, touchHit);
+    }
+
     // Being invisible allows you to walk on water unless you are wearing iron boots.
     if (hero.swimming && (hero.savedData.equippedBoots === 'cloudBoots' || (hero.isInvisible && hero.savedData.equippedBoots === 'leatherBoots'))) {
         hero.swimming = false;

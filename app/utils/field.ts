@@ -795,6 +795,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
 }
 
 export function breakBrittleTiles(state: GameState, area: AreaInstance, hitbox: Rect) {
+    if (!area) {
+        return;
+    }
     const tiles = getTilesInRectangle(area, hitbox);
     const behaviorGrid = area.behaviorGrid;
     for (const {x, y} of tiles) {

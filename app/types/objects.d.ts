@@ -70,7 +70,7 @@ interface BaseFieldInstance {
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
     // When the hero walks into an object
-    onPush?: (state: GameState, direction: Direction) => void
+    onPush?: (state: GameState, direction: Direction, actor: Actor) => void
     // If set this object will not be rendered by the area and is expected to be rendered by the parent object.
     renderParent?: BaseFieldInstance
     getParts?: (state: GameState) => BaseFieldInstance[]

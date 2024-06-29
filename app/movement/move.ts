@@ -224,7 +224,7 @@ function checkToPushObject(
     }
     if (pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
-            pushedObjects[0].onPush(state, direction);
+            pushedObjects[0].onPush(state, direction, actorObject);
             actorObject.lastTouchedObject = pushedObjects[0];
             return true;
         }
@@ -238,7 +238,7 @@ function checkToPushObject(
                 || Math.abs(actorHitbox.y + actorHitbox.h - hitbox.y - hitbox.h) < 8
             ) {
                 if (object.onPush) {
-                    object.onPush(state, direction);
+                    object.onPush(state, direction, actorObject);
                     actorObject.lastTouchedObject = pushedObjects[0];
                     return true;
                 }

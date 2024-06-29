@@ -1,7 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { directionMap, isTileOpen } from 'app/utils/field';
+import { directionMap } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 
@@ -26,6 +26,7 @@ export class PushStairs implements ObjectInstance {
     linkedObject: PushStairs;
     pushFrame = 0;
     pushDirection: Direction;
+    pushFast: boolean;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
@@ -73,7 +74,7 @@ export class PushStairs implements ObjectInstance {
         }
         this.moveInDirection(state, direction);
     }
-    moveInDirection(state: GameState, direction: 'left' | 'right'): void {
+    moveInDirection(state: GameState, direction: 'left' | 'right', fast = false): void {
         if (this.pushDirection) {
             return;
         }
@@ -83,23 +84,52 @@ export class PushStairs implements ObjectInstance {
         if (direction === 'right' && this.x > this.definition.x + this.definition.w - 48) {
             return;
         }
-        const x = this.x + 16 * directionMap[direction][0];
-        const y = this.y + 16 * directionMap[direction][1];
-        const excludedObjects = new Set([this, this.linkedObject]);
-        const movementProperties = {canFall: true, canSwim: true, canCrossLedges: true, excludedObjects};
         // For now just always allow moving push stairs and rely on putting them in places where this doesn't cause problems.
-        if (true || isTileOpen(state, this.area, {x, y}, movementProperties)
-            && (!this.linkedObject || isTileOpen(state, this.linkedObject.area, {x, y}, movementProperties))
-        ) {
+        //const x = this.x + 16 * directionMap[direction][0];
+        //const y = this.y + 16 * directionMap[direction][1];
+        //const excludedObjects = new Set([this, this.linkedObject]);
+        //const movementProperties = {canFall: true, canSwim: true, canCrossLedges: true, excludedObjects};
+        //if (true || isTileOpen(state, this.area, {x, y}, movementProperties)
+        //    && (!this.linkedObject || isTileOpen(state, this.linkedObject.area, {x, y}, movementProperties))
+        //) {
             this.pushDirection = direction;
+            this.pushFast = fast;
             this.leftRailing.pullingHeroDirection = direction;
             this.rightRailing.pullingHeroDirection = direction;
             this.pushFrame = 0;
-        }
+        //}
+    }
+    stopMoving() {
+        this.leftRailing.pullingHeroDirection = null;
+        this.rightRailing.pullingHeroDirection = null;
+        this.pushDirection = null;
+        this.pushFrame = 0;
     }
     update(state: GameState) {
         if (this.pushDirection) {
-            if (this.pushFrame < 16) {
+            if (this.pushFast) {
+                this.x += 4 * directionMap[this.pushDirection][0];
+                this.y += 4 * directionMap[this.pushDirection][1];
+                if (this.pushDirection === 'left' && this.x <= this.definition.x) {
+                    this.x = this.definition.x;
+                    state.screenShakes.push({
+                        dx: 2, dy: 0, startTime: state.fieldTime, endTime: state.fieldTime + 400
+                    });
+                    this.stopMoving();
+                }
+                if (this.pushDirection === 'right' && this.x >= this.definition.x + this.definition.w - 32) {
+                    this.x = this.definition.x + this.definition.w - 32;
+                    state.screenShakes.push({
+                        dx: 2, dy: 0, startTime: state.fieldTime, endTime: state.fieldTime + 400
+                    });
+                    this.stopMoving();
+                }
+                if (this.linkedObject) {
+                    this.linkedObject.x = this.x;
+                    this.linkedObject.y = this.y;
+                }
+                saveObjectStatus(state, this.definition, this.x);
+            } else if (this.pushFrame < 16) {
                 this.pushFrame++;
                 this.x += directionMap[this.pushDirection][0];
                 this.y += directionMap[this.pushDirection][1];
@@ -109,10 +139,7 @@ export class PushStairs implements ObjectInstance {
                 }
                 saveObjectStatus(state, this.definition, this.x);
             } else {
-            this.leftRailing.pullingHeroDirection = null;
-            this.rightRailing.pullingHeroDirection = null;
-                this.pushDirection = null;
-                this.pushFrame = 0;
+                this.stopMoving();
             }
         } else if (!this.pushedLastFrame) {
             this.pushCounter = 0;
@@ -167,19 +194,31 @@ class PushStairsRailing implements ObjectInstance {
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.isBonk && hit.crushingPower >= 2) {
             if (hit.direction === (this.side === 'left' ? 'right' : 'left')) {
-                this.pushStairs.moveInDirection(state, hit.direction);
+                this.pushStairs.moveInDirection(state, hit.direction, true);
             }
         }
         return {stopped: true};
     }
-    onPush(state: GameState, direction: Direction): void {
+    onPush(state: GameState, direction: Direction, actor: Actor): void {
         // The left side can only be pushed right and vice-versa.
         if (direction !== (this.side === 'left' ? 'right' : 'left')) {
+            return;
+        }
+        const hitbox = actor.getHitbox();
+        // Only allow pushing using the bar at the bottom of the stairs.
+        // Pushing too high can let the player get stuck in walls.
+        if (hitbox.y < this.pushStairs.y) {
             return;
         }
         this.pushStairs.onPush(state, direction);
     }
     onPull(state: GameState, direction: Direction, hero: Hero): void {
+        const hitbox = hero.getHitbox();
+        // Only allow pushing using the bar at the bottom of the stairs.
+        // Pushing too high can let the player get stuck in walls.
+        if (hitbox.y < this.pushStairs.y) {
+            return;
+        }
         const oppositeDirection = (this.side === 'left' ? 'right' : 'left');
         // Can only pull from the outside (when not standing on the stairs).
         if (hero.d === oppositeDirection) {
