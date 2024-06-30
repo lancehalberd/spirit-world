@@ -22,6 +22,7 @@ export function isMovementBlocked(
     const actor = movementProperties.actor;
     const canMoveUnderLowCeilings = !(movementProperties.actor?.z > 3);
     const canMoveIntoEntranceTiles = movementProperties.canMoveIntoEntranceTiles;
+    const canClimb = movementProperties.mustClimb || movementProperties.canClimb;
     // If we wanted to enforce movementProperties.maxHeight with a reasonable default relative to current ground height:
     // movementProperties.maxHeight = movementProperties.maxHeight ?? 6;
     // const currentHeight = actor?.groundHeight || 0;
@@ -39,9 +40,9 @@ export function isMovementBlocked(
                 continue;
             }
             const behaviors = getObjectBehaviors(state, object, x, y);
-            const canClimbObject = behaviors?.climbable && movementProperties.canClimb;
+            const canClimbObject = behaviors?.climbable && canClimb;
             if (!movementProperties.canPassWalls && !canClimbObject && object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
-                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                if (isPixelInShortRect(x, y, object.getHitbox())) {
                     // A player can be hit only when running into a solid object only if that object damages and it
                     // is the only solid object they are running into.
                     if (!blockingSolidObject && behaviors?.touchHit) {
@@ -65,18 +66,18 @@ export function isMovementBlocked(
 
             // Low ceiling objects block all movement if the actors z value is too high
             if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
-                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                if (isPixelInShortRect(x, y, object.getHitbox())) {
                     blockingHit = null;
                     return {};
                 }
             }
             if (behaviors?.isEntrance && !canMoveIntoEntranceTiles) {
-                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                if (isPixelInShortRect(x, y, object.getHitbox())) {
                     return {};
                 }
             }
             if (object.getHitbox && behaviors?.pit && !movementProperties.canFall) {
-                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                if (isPixelInShortRect(x, y, object.getHitbox())) {
                     blockingPitObject = object;
                     blockingSolidObject = null;
                     continue;
@@ -84,8 +85,12 @@ export function isMovementBlocked(
             }
             // Objects defined with `isGround` can cover pits/solid tiles to allow
             // the player to walk over them, such as a stair case or ladder.
-            if (object.getHitbox && (behaviors?.isGround || behaviors?.isNotSolid)) {
-                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+            if (object.getHitbox && (behaviors?.isGround || behaviors?.isNotSolid)
+                // When movement requires climbing, objects aren't considered walkable unless they are climbable,
+                // which is handled below.
+                && !movementProperties.mustClimb
+            ) {
+                if (isPixelInShortRect(x, y, object.getHitbox())) {
                     walkableObject = object;
                     blockingPitObject = null;
                     blockingSolidObject = null;
@@ -94,8 +99,11 @@ export function isMovementBlocked(
                 }
             }
             // Climbable works similar to `isGround` but only if the movementProperties include `canClimb`.
-            if (object.getHitbox && canClimbObject) {
-                if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+            if (object.getHitbox && behaviors?.climbable) {
+                if (isPixelInShortRect(x, y, object.getHitbox())) {
+                    if (!canClimb) {
+                        return {};
+                    }
                     walkableObject = object;
                     blockingPitObject = null;
                     blockingSolidObject = null;
@@ -107,7 +115,15 @@ export function isMovementBlocked(
         }
     }
     if (!walkableObject) {
-        // Actors that cannot jump are not allowed to walk over the tips of ledges.
+        // Being above tiles doesn't ignore restrictions based on climbing.
+        // This is because we expect climbing tiles to cross into ledge tiles frequently.
+        if (!behaviors?.climbable && movementProperties.mustClimb) {
+            return {};
+        }
+        if (behaviors?.climbable && !canClimb) {
+            return {};
+        }
+        // Actors that cannot jump are not allowed to walk over the tips of ledges, except to climb down them if they can climb.
         if (isAbove && !movementProperties.canJump) {
             return {};
         }
@@ -212,8 +228,13 @@ export function isMovementBlocked(
         return {};
     }
 
+    // Movement is blocked on non-climbable pixels for objects that must climb.
+    if (!behaviors?.climbable && movementProperties.mustClimb) {
+        return {};
+    }
     // Climbing a tile allows you to ignore solid pixels on the tile.
-    const canClimbTile = behaviors?.climbable && movementProperties.canClimb;
+    const canClimbTile = behaviors?.climbable && canClimb;
+
     // Moving over a tile when thrown allows you to ignore solid pixels on low to mid height tiles.
     const moveOverTile = movementProperties.canPassMediumWalls && (behaviors?.low || behaviors?.midHeight);
     const ignoreSolidPixels = movementProperties.canPassWalls || moveOverTile || canClimbTile;

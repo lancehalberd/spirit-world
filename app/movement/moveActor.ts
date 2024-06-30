@@ -100,6 +100,18 @@ function moveActorInDirection(
         canWiggle,
         excludedObjects,
     };
+    // Movement left or right either does not allow you to change your climbing status.
+    // So if you are already climbing, you must move to climbable tiles, and if you are not
+    // climbing, you cannot move to climbable tiles.
+    if (actor.action === 'climbing') {
+        if (direction === 'left' || direction === 'right') {
+            movementProperties.mustClimb = true;
+        }
+    } else {
+        if (direction === 'left' || direction === 'right') {
+            movementProperties.canClimb = false;
+        }
+    }
 
     // If this movement would move outside of the bounding rectangle, do not allow
     // it if it moves them further outside the rectangle, but do allow it otherwise.
@@ -120,13 +132,31 @@ function moveActorInDirection(
     actor.ignoreLedges = false;
     let result = {mx: 0, my: 0};
     if (direction === 'up') {
+        // Movement up/down requires being fully aligned with climbable or non climbable tiles,
+        // so when climbing is allowed we first try moving without climbing, and if that fails,
+        // we then try moving with required climbing.
+        let canClimb = movementProperties.canClimb;
+        movementProperties.canClimb = false;
         result = moveUp(state, actor, movementProperties, -amount);
+        if (canClimb && !result.mx && !result.my) {
+            movementProperties.mustClimb = true;
+            result = moveUp(state, actor, movementProperties, -amount);
+        }
     }
     if (direction === 'left') {
         result = moveLeft(state, actor, movementProperties, -amount);
     }
     if (direction === 'down' ) {
+        // Movement up/down requires being fully aligned with climbable or non climbable tiles,
+        // so when climbing is allowed we first try moving without climbing, and if that fails,
+        // we then try moving with required climbing.
+        let canClimb = movementProperties.canClimb;
+        movementProperties.canClimb = false;
         result = moveDown(state, actor, movementProperties, amount);
+        if (canClimb && !result.mx && !result.my) {
+            movementProperties.mustClimb = true;
+            result = moveDown(state, actor, movementProperties, amount);
+        }
     }
     if (direction === 'right') {
         result = moveRight(state, actor, movementProperties, amount);

@@ -3273,7 +3273,7 @@ const f2_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 576, targetObjectId: "staffTowerSkyEntrance", type: "floorSwitch"},
         {status: "normal", id: "staffTower:2:0x1-luckyBeetle-0", x: 312, y: 352, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "", x: 144, y: 180, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
-        {status: "normal", id: "", x: 352, y: 464, type: "door", style: "futureLadderUp", d: "up", linked: true, spirit: true},
+        {status: "normal", id: "", x: 352, y: 464, type: "door", style: "futureLadderUp", d: "up", linked: false, spirit: true},
         {status: "normal", id: "", x: 72, y: 335, speed: "fast", d: "up", w: 48, h: 144, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 256, y: 280, speed: "fast", d: "left", w: 128, h: 32, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 216, y: 176, speed: "fast", d: "up", w: 32, h: 96, style: "belt", type: "escalator"},
@@ -4022,7 +4022,6 @@ const sf2_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower4Bot1", x: 216, y: 504, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
         {status: "normal", id: "", x: 272, y: 464, type: "door", style: "futureLadderUp", d: "up"},
         {status: "normal", id: "", x: 470, y: 229, w: 20, h: 48, style: "futuristic", type: "stairs", linked: false, spirit: true},
-        {status: "normal", id: "", x: 352, y: 464, type: "door", style: "futureLadderUp", d: "up", linked: true, spirit: false},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 454, mapId: 'staffTower', floorId: '4F', mapX: 3, mapY: 2},

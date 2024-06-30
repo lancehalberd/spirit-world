@@ -192,6 +192,10 @@ export class Door implements ObjectInstance {
     }
     // Hero cannot enter doors while they are jumping down/falling in front of a door.
     heroCanEnter(state: GameState): boolean {
+        // Ladders that don't connect zone cannot be entered, they just apply the climbable behavior behind them.
+        if (this.isLadderUp() && !this.definition.targetZone) {
+            return false;
+        }
         return state.hero.area === this.area && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     renderOpen(state: GameState): boolean {
@@ -246,7 +250,7 @@ export class Door implements ObjectInstance {
     }
     getEditorHitbox(): Rect {
         const hitbox = this.getHitbox();
-        return {x: this.x, y: this.y, w: Math.max(16, hitbox.w), h: Math.max(16, hitbox.h)};
+        return {x: this.x, y: this.y, w: Math.max(16, hitbox.x + hitbox.w - this.x), h: Math.max(16, hitbox.y + hitbox.h - this.y)};
     }
     getHitbox(): Rect {
         const doorStyle = doorStyles[this.style];
@@ -310,6 +314,9 @@ export class Door implements ObjectInstance {
     isStairs(state: GameState): boolean {
         return !!doorStyles[this.style].isStairs;
     }
+    isLadderUp(): boolean {
+        return !!doorStyles[this.style].isLadderUp;
+    }
     update(state: GameState) {
         if (this.status !== 'normal' && this.status !== 'blownOpen' && getObjectStatus(state, this.definition)) {
             if (this.definition.status === 'cracked') {
@@ -326,35 +333,46 @@ export class Door implements ObjectInstance {
             this.refreshIsHot(state);
         }
         let hero = state.hero;
-        if (this.status === 'normal' && this.isHot) {
+        if (this.status === 'normal' && this.isHot && !this.isFrozen) {
             if (state.fieldTime % 40 === 0) {
                 let hitbox = {...this.getHitbox()};
-                if (this.definition.d === 'up') {
-                    hitbox.x += 5;
-                    hitbox.w -= 10;
-                    hitbox.z = 0;
-                    hitbox.zd = hitbox.h - 8;
-                    hitbox.y += hitbox.h - 2;
-                    hitbox.h = 0;
+                if (this.isLadderUp()) {
+                    hitbox.h = 4;
+                    hitbox.z = 8;
+                    addSparkleAnimation(state, this.area, hitbox, {
+                        element: 'fire',
+                    }, {
+                        drawPriority: 'sprites',
+                        vx: (Math.random() - 1 / 2),
+                        vy: (Math.random() - 1 / 2),
+                        vz: -1,
+                    });
                 } else {
-                    hitbox.y += 6;
-                    hitbox = pad(hitbox, -4);
+                    if (this.definition.d === 'up') {
+                        hitbox.x += 5;
+                        hitbox.w -= 10;
+                        hitbox.z = 0;
+                        hitbox.zd = hitbox.h - 8;
+                        hitbox.y += hitbox.h - 2;
+                        hitbox.h = 0;
+                    } else {
+                        hitbox.y += 6;
+                        hitbox = pad(hitbox, -4);
+                    }
+                    addSparkleAnimation(state, this.area, hitbox, {
+                        element: 'fire',
+                    }, {
+                        drawPriority: 'sprites',
+                        vx: (-1 + Math.random() / 2) * directionMap[this.definition.d][0],
+                        vy: (-1 + Math.random() / 2) * directionMap[this.definition.d][1],
+                    });
                 }
-                addSparkleAnimation(state, this.area, hitbox, {
-                    element: 'fire',
-                }, {
-                    drawPriority: 'sprites',
-                    vx: (-1 + Math.random() / 2) * directionMap[this.definition.d][0],
-                    vy: (-1 + Math.random() / 2) * directionMap[this.definition.d][1],
-                });
             }
         }
         // Nothing to update if the hero cannot enter the door.
         if (!this.heroCanEnter(state)) {
             return;
         }
-        // For some reason this can trigger when the door is closed after recent movement changes
-        // so we reduce the
         const heroIsTouchingDoor = boxesIntersect(hero.getMovementHitbox(), this.getHitbox());
         if (heroIsTouchingDoor &&
             // If the hero has no action target, have the door control them as soon as they touch it

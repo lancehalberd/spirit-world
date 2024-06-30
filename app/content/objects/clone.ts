@@ -11,6 +11,7 @@ export class Clone extends Hero {
     canPressSwitches = true;
     carryRotationOffset: number;
     ignorePits = true;
+    cannotSwapTo = false;
     uncontrollable = false;
     constructor(hero: Hero) {
         super();

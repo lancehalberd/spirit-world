@@ -1,7 +1,6 @@
 import { directionMap } from 'app/utils/direction';
 import { getCompositeBehaviors } from 'app/utils/field';
 
-
 export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (!hero.area) {
         return;

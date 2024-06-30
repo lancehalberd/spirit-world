@@ -617,11 +617,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
     }
-    // Return the climbing animation to a neutral state any time the character isn't moving vertically.
-    // If we allow moving laterally while climbing this would need to be updated, but the animation
-    // would probably also need to be adjusted.
-    if (!dy && hero.action === 'climbing') {
-        hero.animationTime = 4 * 6 * FRAME_LENGTH;
+    // Return the climbing animation to a neutral state any time the character isn't moving or trying to move vertically.
+    if (!hero.vy && !hero.vx && !dy && hero.action === 'climbing') {
+        hero.animationTime = 3 * 6 * FRAME_LENGTH;
     }
     if (hero.isAstralProjection) {
         const dx = hero.x - state.hero.x, dy = hero.y - state.hero.y;

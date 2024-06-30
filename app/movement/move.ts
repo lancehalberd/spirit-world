@@ -33,6 +33,8 @@ export function moveUp(
         const wiggleResult = moveRight(state, object, {
             ...movementProperties,
             canWiggle: false,
+            canClimb: false,
+            mustClimb: false,
         }, amount);
         if (wiggleResult.my || wiggleResult.mx) {
             return wiggleResult;
@@ -43,6 +45,8 @@ export function moveUp(
         const wiggleResult = moveLeft(state, object, {
             ...movementProperties,
             canWiggle: false,
+            canClimb: false,
+            mustClimb: false,
         }, amount);
         if (wiggleResult.my || wiggleResult.mx) {
             return wiggleResult;
@@ -129,6 +133,8 @@ export function moveDown(
         const wiggleResult = moveRight(state, object, {
             ...movementProperties,
             canWiggle: false,
+            canClimb: false,
+            mustClimb: false,
         }, amount);
         if (wiggleResult.my || wiggleResult.mx) {
             return wiggleResult;
@@ -139,6 +145,8 @@ export function moveDown(
         const wiggleResult = moveLeft(state, object, {
             ...movementProperties,
             canWiggle: false,
+            canClimb: false,
+            mustClimb: false,
         }, amount);
         if (wiggleResult.my || wiggleResult.mx) {
             return wiggleResult;

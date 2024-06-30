@@ -213,6 +213,8 @@ interface MovementProperties {
     mustSwim?: boolean
     // Can go on tiles marked as climbable
     canClimb?: boolean
+    // Enemies with this prop can only move on climbable pixels.
+    mustClimb?: boolean
     // Can go up ledges True when climbing.
     canCrossLedges?: boolean
     // Can go down ledges
@@ -480,7 +482,7 @@ interface CrystalSwitchDefinition extends BaseSwitchDefinition {
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'teleporter' | 'pitEntrance' | 'door' | 'staffTower'
+    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter'
     targetZone?: string
     targetObjectId?: string
     // This can be set to force a door to be open if the logic is true.

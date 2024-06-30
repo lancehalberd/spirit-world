@@ -124,7 +124,7 @@ export function getCompositeBehaviors(
         ...(nextArea?.effects || []),
     ]
     tileBehavior.groundHeight = 0;
-    let lastSolidBehavior: TileBehaviors;
+    let lastSolidBehavior: TileBehaviors, lastClimbableBehavior: TileBehaviors;
     for (const baseObject of allObjects) {
         for (const entity of getFieldInstanceAndParts(state, baseObject)) {
             const behaviors = getObjectBehaviors(state, entity, x, y);
@@ -151,10 +151,16 @@ export function getCompositeBehaviors(
                     lastSolidBehavior = null;
                 }
             }
+            if (behaviors.climbable) {
+                lastClimbableBehavior = behaviors;
+            }
             if (behaviors.solid) {
                 lastSolidBehavior = behaviors;
             }
         }
+    }
+    if (lastClimbableBehavior) {
+        return lastClimbableBehavior;
     }
     if (lastSolidBehavior) {
         return lastSolidBehavior;

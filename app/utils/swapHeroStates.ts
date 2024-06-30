@@ -6,7 +6,8 @@ export function swapHeroStates(heroA: Hero, heroB: Hero) {
     for (const key of allKeys) {
         if (key === 'behaviors' || key === 'magic' || key === 'maxMagic'
             || key === 'life' || key === 'ironSkinCooldown'
-            || key === 'isUncontrollable' || key === 'explosionTime'
+            // These are properties only meant to be set on the clone.
+            || key === 'cannotSwapTo' || key === 'isUncontrollable' || key === 'explosionTime'
         ) {
             continue;
         }

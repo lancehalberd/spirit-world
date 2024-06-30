@@ -78,8 +78,12 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add ladder versions with top of ladder frames for use in areas.
-    - Future ladder graphics shadow should be 1px below the hitbox. Maybe add shadowHeight param.
+    - Hidden ladders down should not apply solid behavior.
+
+    - Standing off the lip of a right ledge and facing left and firing a bow blocks the arrow as if it hit the ledge.
+        - Similar for other directions.
+        - For the hero, ledge delta calculations for firing arrows should be based on the anchor points of the hero
+            - This should make their behavior consistent with the jumping down behavior.
 
     - Add pitMap behavior for angled pit tiles
         - This will improve the edges of the storm beast arena.
