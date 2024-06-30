@@ -78,11 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Standing off the lip of a right ledge and facing left and firing a bow blocks the arrow as if it hit the ledge.
-        - Similar for other directions.
-        - For the hero, ledge delta calculations for firing arrows should be based on the anchor points of the hero
-            - This should make their behavior consistent with the jumping down behavior.
-
     - Add pitMap behavior for angled pit tiles
         - This will improve the edges of the storm beast arena.
 
@@ -204,10 +199,13 @@ Current tasks:
             - Let's have chakram move towards the hero's z value when returning and not disappear until it is within N px vertically.
             - Make sure chakram respects z index when rendering.
 
-    - Make sure destroying connected tiles is consistent: cutting/smashing does not effect the other world, pushing/throwing should
-
     - Add graphical interface for choosing Nimbus Cloud location using map.
         - How to signify cancel operation?
+
+    - Make sure destroying connected tiles is consistent: cutting/smashing does not effect the other world, pushing/throwing should
+
+    - Remove logic for projectiles hitting ledges from field::hitTargets and remove projectiles hitting ledges using
+      either movement logic or ledgeDelta logic.
 
     - Low priority Staff Tower changes
         - east/west doors

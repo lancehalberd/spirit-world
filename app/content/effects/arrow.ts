@@ -4,7 +4,7 @@ import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import { directionMap, getDirection, getTilesInRectangle, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
@@ -213,6 +213,7 @@ export class Arrow implements EffectInstance, Projectile {
     isPlayerAttack = true;
     isHigh = false;
     refreshIsHigh = true;
+    passedLedgeTiles: TileCoords[] = [];
     constructor({
         x = 0, y = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
@@ -223,7 +224,7 @@ export class Arrow implements EffectInstance, Projectile {
         this.vx = vx;
         this.vy = vy;
         this.ax = ax;
-        this.ay = ay
+        this.ay = ay;
         this.direction = getDirection(this.vx, this.vy, true);
         this.damage = damage;
         this.spiritCloakDamage = spiritCloakDamage;
@@ -290,6 +291,10 @@ export class Arrow implements EffectInstance, Projectile {
             const ledgeDelta = getLedgeDelta(state, this.area, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
             this.isHigh = ledgeDelta < 0;
             //console.log(ledgeDelta, this.isHigh, this.vx, this.vy, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
+            // Indicate that the arrow has already passed over the tile that it was shot from.
+            // This prevents the arrow from stopped by a ledge boundary that the source is standing on top of.
+            const tileHitbox = {x: this.x - 12 * dx, y: this.y - 12 * dy, w: this.w, h: this.h};
+            this.passedLedgeTiles.push(...getTilesInRectangle(this.area, tileHitbox));
         }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
@@ -433,15 +438,25 @@ export class Arrow implements EffectInstance, Projectile {
         if (!this.blocked && !this.stuckFrames && this.element === 'lightning') {
             const x = this.x + this.w / 2, y = this.y + this.h / 2;
             const r = this.chargeLevel > 1 ? 24 : 16;
-            /*context.beginPath();
-            context.arc(x, y, r, 0, 2 * Math.PI);
-            context.save();
-                context.globalAlpha *= 0.1;
-                context.fillStyle = 'yellow'
-                context.fill();
-            context.restore();*/
             renderLightningCircle(context, {x, y, r});
         }
+
+        // This renders the tile hitbox along with any tiles in range for debugging purposes.
+        /*context.save();
+            context.fillStyle = 'red';
+            context.globalAlpha *= 0.5;
+            const direction = getDirection(this.vx, this.vy, true);
+            const dx = directionMap[direction][0], dy = directionMap[direction][1];
+            const tileHitbox = {x: this.x - 12 * dx, y: this.y - 12 * dy, w: this.w, h: this.h};
+            const tiles = getTilesInRectangle(this.area, tileHitbox);
+            for (const tile of tiles) {
+                context.fillRect(tile.x * 16, tile.y * 16, 16, 16);
+            }
+            context.strokeStyle = 'blue';
+            context.beginPath();
+            context.rect(tileHitbox.x, tileHitbox.y, tileHitbox.w, tileHitbox.h);
+            context.stroke();
+        context.restore();*/
     }
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
         if (this.hybridWorlds) {
