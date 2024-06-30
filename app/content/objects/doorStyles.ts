@@ -10,6 +10,37 @@ import { debugCanvas } from 'app/utils/canvas';
 import { requireFrame } from 'app/utils/packedImages';
 
 
+interface DoorStyleFrames {
+    doorFrame: Frame
+    doorCeiling?: Frame
+    doorClosed: Frame
+    cracked: Frame
+    caveFrame: Frame
+    caveCeiling?: Frame
+    cave: Frame
+    locked: Frame
+    bigKeyLocked: Frame
+}
+export interface DoorStyleDefinition {
+    getHitbox: (door: Door) => Rect
+    getPathHitbox: (door: Door) => Rect
+    pathBehaviors?: TileBehaviors
+    isStairs?: boolean
+    isLadderUp?: boolean
+    isLadderDown?: boolean
+    render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
+    down?: DoorStyleFrames
+    right?: DoorStyleFrames
+    up?: DoorStyleFrames
+    left?: DoorStyleFrames
+    mapIcon?: MapIcon
+    // Possible options for dynamic map icons:
+    // getMapIcon?: (state: GameState, door: Door) => void
+    // renderMapIcon?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
+}
+
+
 // These are used across many styles of door.
 const [
     blockedDoorCover, lockedDoorCover, bigLockedDoorCover,
@@ -262,34 +293,6 @@ const [
     futureLadderTop, futureLadderMiddle, futureLadderBottom, /*futureLadderTop*/, futureLadderDownFrame
 ] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 832, rows: 5}).frames;
 
-interface DoorStyleFrames {
-    doorFrame: Frame
-    doorCeiling?: Frame
-    doorClosed: Frame
-    cracked: Frame
-    caveFrame: Frame
-    caveCeiling?: Frame
-    cave: Frame
-    locked: Frame
-    bigKeyLocked: Frame
-}
-interface DoorStyleDefinition {
-    getHitbox: (door: Door) => Rect
-    getPathHitbox: (door: Door) => Rect
-    pathBehaviors?: TileBehaviors
-    isStairs?: boolean
-    isLadderUp?: boolean
-    render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
-    renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
-    down?: DoorStyleFrames
-    right?: DoorStyleFrames
-    up?: DoorStyleFrames
-    left?: DoorStyleFrames
-    mapIcon?: MapIcon
-    // Possible options for dynamic map icons:
-    // getMapIcon?: (state: GameState, door: Door) => void
-    // renderMapIcon?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
-}
 
 const oldSquareBaseDoorStyle = {
     getHitbox(door: Door) {
@@ -872,6 +875,7 @@ function ladderDown(topFrame: Frame, downFrame: Frame): DoorStyleDefinition {
         },
         pathBehaviors: {climbable: true, solid: true},
         mapIcon: 'down',
+        isLadderDown: true,
     };
 }
 

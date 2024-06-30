@@ -1,7 +1,6 @@
 import { TextCue } from 'app/content/effects/textCue';
 import { evaluateLogicDefinition, isObjectLogicValid } from 'app/content/logic';
 import { Door } from 'app/content/objects/door';
-import { doorStyles } from 'app/content/objects/doorStyles';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { zones } from 'app/content/zones';
@@ -148,8 +147,7 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
     }
     // When passing horizontally through narrow doors, we need to start 3px lower than usual.
     if (target.definition.type === 'door') {
-        const style = doorStyles[target.style];
-        const hitbox = style.getHitbox(target);
+        const hitbox = target.style.getHitbox(target);
         // When exiting new style doors, the MCs head appears above the frame, so start them lower.
         if (hitbox.w === 64 && target.definition.d === 'up') {
             hero.y += 6;
@@ -166,7 +164,7 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
     }
     hero.actionTarget = target;
 
-    if (target.style === 'ladderUp' || target.style === 'ladderDown') {
+    if (target.style.isLadderUp || target.style.isLadderDown) {
         hero.action = 'climbing';
     }
     // Make sure the hero is coming *out* of the target door.

@@ -1,6 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { evaluateLogicDefinition } from 'app/content/logic';
-import { doorStyles, DoorStyle } from 'app/content/objects/doorStyles';
+import { DoorStyleDefinition, doorStyles } from 'app/content/objects/doorStyles';
 import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { playAreaSound } from 'app/musicController';
@@ -29,12 +29,10 @@ export class OpenDoorPath implements ObjectInstance {
     isObject = <const>true;
     constructor(public door: Door) { }
     getBehaviors(state: GameState) {
-        const style = doorStyles[this.door.style] || doorStyles.cavern;
-        return style.pathBehaviors || {isGround: true, lowCeiling: true, isEntrance: true};
+        return this.door.style.pathBehaviors || {isGround: true, lowCeiling: true, isEntrance: true};
     }
     getHitbox(): Rect {
-        const style = doorStyles[this.door.style] || doorStyles.cavern;
-        return style.getPathHitbox(this.door);
+        return this.door.style.getPathHitbox(this.door);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (editingState.showWalls) {
@@ -52,6 +50,12 @@ export class Door implements ObjectInstance {
     // The door itself is always solid, but an OpenDoorPath object will be added when
     // the door is open that allows walking on the path part of the door.
     getBehaviors(): TileBehaviors {
+        const isOpen = this.isOpen();
+        // Closed ladders down are just empty floor tiles, so they shouldn't have solid behavior
+        // like most closed doors.
+        if (this.style.isLadderDown && !isOpen) {
+            return {};
+        }
         let behaviors: TileBehaviors = {solid: true};
         if (this.definition.d === 'down') {
             behaviors.isSouthernWall = true;
@@ -59,7 +63,7 @@ export class Door implements ObjectInstance {
         const wasClosed = this.definition.status === 'closed'
             || this.definition.status === 'closedSwitch'
             || this.definition.status === 'closedEnemy';
-        if (wasClosed && this.isOpen()) {
+        if (wasClosed && isOpen) {
             behaviors.brightness = 0.5;
             behaviors.lightRadius = 36;
         }
@@ -72,13 +76,12 @@ export class Door implements ObjectInstance {
     updateDuringTransition = true;
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
-    definition: EntranceDefinition = null;
     isNeutralTarget = true;
-    x: number;
-    y: number;
+    x = this.definition.x;
+    y = this.definition.y;
     status: ObjectStatus = 'normal';
-    style: DoorStyle = 'cave';
-    doorPath: OpenDoorPath;
+    style: DoorStyleDefinition = doorStyles[this.definition.style] || doorStyles.cave;
+    doorPath = new OpenDoorPath(this);
     // This gets set to true if this instance has been opened and is used to prevent the door
     // from closing automatically when logic is refreshed.
     wasOpened: boolean = false;
@@ -86,21 +89,12 @@ export class Door implements ObjectInstance {
     isHot = false;
     refreshHotStatus = true;
     isLadder = false;
-    constructor(state: GameState, definition: EntranceDefinition) {
-        this.definition = definition;
-        this.x = definition.x;
-        this.y = definition.y;
+    constructor(state: GameState, public definition: EntranceDefinition) {
         if (this.definition.d === 'up' && this.definition.price) {
             this.definition.status = 'closed';
         }
         this.status = definition.status || 'normal';
         this.refreshLogic(state);
-        this.style = definition.style as DoorStyle;
-        if (!doorStyles[this.style]) {
-            this.style = 'cave';
-        }
-        this.doorPath = new OpenDoorPath(this);
-
     }
     refreshLogic(state: GameState) {
         // If the player already opened this door, set it to the appropriate open status.
@@ -193,7 +187,12 @@ export class Door implements ObjectInstance {
     // Hero cannot enter doors while they are jumping down/falling in front of a door.
     heroCanEnter(state: GameState): boolean {
         // Ladders that don't connect zone cannot be entered, they just apply the climbable behavior behind them.
-        if (this.isLadderUp() && !this.definition.targetZone) {
+        if (this.style.isLadderUp && !this.definition.targetZone) {
+            return false;
+        }
+        // The hero can walk over closed ladders down as they are plain ground tiles, so this should return false
+        // to preven the hero from activating them while closed.
+        if (this.style.isLadderDown && !this.isOpen()) {
             return false;
         }
         return state.hero.area === this.area && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
@@ -253,8 +252,7 @@ export class Door implements ObjectInstance {
         return {x: this.x, y: this.y, w: Math.max(16, hitbox.x + hitbox.w - this.x), h: Math.max(16, hitbox.y + hitbox.h - this.y)};
     }
     getHitbox(): Rect {
-        const doorStyle = doorStyles[this.style];
-        return doorStyle.getHitbox(this);
+        return this.style.getHitbox(this);
     }
     onPush(state: GameState, direction: Direction): void {
         if (direction === this.definition.d) {
@@ -312,10 +310,7 @@ export class Door implements ObjectInstance {
         return {};
     }
     isStairs(state: GameState): boolean {
-        return !!doorStyles[this.style].isStairs;
-    }
-    isLadderUp(): boolean {
-        return !!doorStyles[this.style].isLadderUp;
+        return !!this.style.isStairs;
     }
     update(state: GameState) {
         if (this.status !== 'normal' && this.status !== 'blownOpen' && getObjectStatus(state, this.definition)) {
@@ -336,7 +331,7 @@ export class Door implements ObjectInstance {
         if (this.status === 'normal' && this.isHot && !this.isFrozen) {
             if (state.fieldTime % 40 === 0) {
                 let hitbox = {...this.getHitbox()};
-                if (this.isLadderUp()) {
+                if (this.style.isLadderUp) {
                     hitbox.h = 4;
                     hitbox.z = 8;
                     addSparkleAnimation(state, this.area, hitbox, {
@@ -411,7 +406,7 @@ export class Door implements ObjectInstance {
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
             const hitbox = this.getHitbox();
-            if (this.style === 'ladderUp' || this.style === 'ladderUpTall') {
+            if (this.style.isLadderUp) {
                 const reachedTop = hero.y <= this.y;
                 if (reachedTop) {
                     // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.
@@ -425,7 +420,7 @@ export class Door implements ObjectInstance {
                         }
                     }
                 }
-            } else if (this.style === 'ladderDown') {
+            } else if (this.style.isLadderDown) {
                 const reachedBottom = hero.y >= this.y;
                 if (reachedBottom) {
                     // 'ladderDown' is only for changing zones so make the hero climb back up if changing zones fails.
@@ -454,7 +449,6 @@ export class Door implements ObjectInstance {
         return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const doorStyle = doorStyles[this.style];
         if (this.definition.d === 'up' && this.status === 'closed' && this.definition.price) {
             const hitbox = this.getHitbox();
             drawText(context, `${this.definition.price}`,
@@ -464,8 +458,8 @@ export class Door implements ObjectInstance {
                 size: 16,
             });
         }
-        if (doorStyle.render) {
-            doorStyle.render(context, state, this);
+        if (this.style.render) {
+            this.style.render(context, state, this);
             if (this.definition.d === 'down'
                 && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'sky')
                 && this.isOpen()
@@ -474,32 +468,32 @@ export class Door implements ObjectInstance {
                 // but I would like to understand at some point.
                 drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: this.x, y: this.y - 16});
             }
-        } else if (doorStyle[this.definition.d]) {
+        } else if (this.style[this.definition.d]) {
             let frame: Frame;
             if (this.status !== 'cracked') {
                 if (this.status === 'blownOpen') {
-                    frame = doorStyle[this.definition.d].cave;
+                    frame = this.style[this.definition.d].cave;
                 } else {
-                    frame = doorStyle[this.definition.d].doorFrame;
+                    frame = this.style[this.definition.d].doorFrame;
                 }
                 drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
             }
             if (!this.renderOpen(state)) {
                 switch (this.status) {
                     case 'cracked':
-                        frame = doorStyle[this.definition.d].cracked;
+                        frame = this.style[this.definition.d].cracked;
                         break;
                     case 'blownOpen':
-                        frame = doorStyle[this.definition.d].cave;
+                        frame = this.style[this.definition.d].cave;
                         break;
                     case 'locked':
-                        frame = doorStyle[this.definition.d].locked;
+                        frame = this.style[this.definition.d].locked;
                         break;
                     case 'bigKeyLocked':
-                        frame = doorStyle[this.definition.d].bigKeyLocked;
+                        frame = this.style[this.definition.d].bigKeyLocked;
                         break;
                     default:
-                        frame = doorStyle[this.definition.d].doorClosed;
+                        frame = this.style[this.definition.d].doorClosed;
                         break;
                 }
                 drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
@@ -510,14 +504,14 @@ export class Door implements ObjectInstance {
             state.hero.render(context, state);
             // Draw the top of the door over the hero when they are walking through it.
             if (this.definition.d === 'up') {
-                if (doorStyle.renderForeground) {
-                    doorStyle.renderForeground(context, state, this);
-                } else if (doorStyle[this.definition.d] && this.status !== 'cracked') {
+                if (this.style.renderForeground) {
+                    this.style.renderForeground(context, state, this);
+                } else if (this.style[this.definition.d] && this.status !== 'cracked') {
                     let frame: Frame;
                     if (this.status === 'blownOpen') {
-                        frame = doorStyle[this.definition.d].caveCeiling;
+                        frame = this.style[this.definition.d].caveCeiling;
                     } else {
-                        frame = doorStyle[this.definition.d].doorCeiling;
+                        frame = this.style[this.definition.d].doorCeiling;
                     }
                     if (frame) {
                         drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
@@ -530,18 +524,17 @@ export class Door implements ObjectInstance {
         if (this.definition.d === 'up') {
             return;
         }
-        const definition = this.definition;
-        const doorStyle = doorStyles[this.style];
-        if (doorStyle.renderForeground) {
-            doorStyle.renderForeground(context, state, this);
+        if (this.style.renderForeground) {
+            this.style.renderForeground(context, state, this);
             return;
         }
-        if (doorStyle[definition.d] && this.status !== 'cracked') {
+        const directionFrames = this.style[this.definition.d];
+        if (directionFrames && this.status !== 'cracked') {
             let frame: Frame;
             if (this.status === 'blownOpen') {
-                frame = doorStyle[definition.d].caveCeiling;
+                frame = directionFrames.caveCeiling;
             } else {
-                frame = doorStyle[definition.d].doorCeiling;
+                frame = directionFrames.doorCeiling;
             }
             if (frame) {
                 drawFrame(context, frame, { ...frame, x: this.x, y: this.y });

@@ -78,8 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Hidden ladders down should not apply solid behavior.
-
     - Standing off the lip of a right ledge and facing left and firing a bow blocks the arrow as if it hit the ledge.
         - Similar for other directions.
         - For the hero, ledge delta calculations for firing arrows should be based on the anchor points of the hero
