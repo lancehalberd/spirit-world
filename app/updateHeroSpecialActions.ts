@@ -576,19 +576,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         });
         // The astral projection stays 4px off the ground.
         if (!isFloating && hero.z <= minZ) {
-            if (hero.vz <= -8 || hero.action === 'thrown') {
+            const hardLanding = hero.vz <= -8;
+            if (hardLanding || hero.action === 'thrown') {
                 const landingHit: HitProperties = {
                     damage: 1,
                     hitbox: pad(hero.getHitbox(), 4),
                     hitTiles: true,
                 };
                 hitTargets(state, hero.area, landingHit);
-                const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y: hero.y }, excludedObjects, state.nextAreaInstance);
-                if (hero.vz <= -8 && !tileBehavior?.water && !tileBehavior?.pit) {
-                    state.screenShakes.push({
-                        dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
-                    });
-                }
             }
             // If a thrown hero lands in a wall, destroy it.
             // If this is the last hero, they will just go back to
@@ -607,6 +602,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // so we immediately apply floor effects so that they will apply pits before
             // starting the death sequence.
             checkForFloorEffects(state, hero);
+            // Shake the screen if the hero has a hard landing on a solid surface.
+            if (hardLanding && !hero.swimming && hero.action !== 'falling') {
+                state.screenShakes.push({
+                    dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
+                });
+            }
             // Only clear the hero's vz value if they hit solid ground, leave it if they fell underwater.
             if (!checkToFallUnderWater(state, hero, hero.vz)) {
                 hero.vz = 0;

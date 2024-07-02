@@ -214,6 +214,16 @@ export function isMovementBlocked(
     if (behaviors?.pit && !movementProperties.canFall) {
         return {};
     }
+    if (behaviors?.pitMap && !movementProperties.canFall) {
+        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+        if (movementProperties.needsFullTile) {
+            return {};
+        }
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        if (behaviors.pitMap[y % 16] >> (15 - (x % 16)) & 1) {
+            return {};
+        }
+    }
     if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
         return {};
     }
@@ -226,6 +236,16 @@ export function isMovementBlocked(
     }
     if (behaviors?.isLava && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
         return {};
+    }
+    if (behaviors?.pitMap && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
+        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+        if (movementProperties.needsFullTile) {
+            return {};
+        }
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        if (behaviors.isLavaMap[y % 16] >> (15 - (x % 16)) & 1) {
+            return {};
+        }
     }
 
     // Movement is blocked on non-climbable pixels for objects that must climb.

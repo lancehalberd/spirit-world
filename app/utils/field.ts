@@ -115,6 +115,7 @@ export function getCompositeBehaviors(
     area: AreaInstance,
     {x, y}: Point,
     nextArea: AreaInstance = null,
+    ingoreObject: ObjectInstance | EffectInstance = null
 ): TileBehaviors {
     let tileBehavior: TileBehaviors = {}
     const allObjects = [
@@ -127,6 +128,9 @@ export function getCompositeBehaviors(
     let lastSolidBehavior: TileBehaviors, lastClimbableBehavior: TileBehaviors;
     for (const baseObject of allObjects) {
         for (const entity of getFieldInstanceAndParts(state, baseObject)) {
+            if (entity === ingoreObject) {
+                continue;
+            }
             const behaviors = getObjectBehaviors(state, entity, x, y);
             if (!behaviors) {
                 continue;
@@ -203,6 +207,18 @@ export function getTileBehaviors(
         const sx = (x | 0) % 16;
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
+    }
+    if (!tileBehavior.isLava && tileBehavior.isLavaMap) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        // console.log(tileBehavior.isLavaMap, y, x, sy, sx, tileBehavior.isLavaMap[sy] >> (15 - sx));
+        tileBehavior.isLava = !!(tileBehavior.isLavaMap[sy] >> (15 - sx) & 1);
+    }
+    if (!tileBehavior.pit && tileBehavior.pitMap) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        // console.log(tileBehavior.pitMap, y, x, sy, sx, tileBehavior.pitMap[sy] >> (15 - sx));
+        tileBehavior.pit = !!(tileBehavior.pitMap[sy] >> (15 - sx) & 1);
     }
     return { tileBehavior, tx, ty };
 }
@@ -662,13 +678,13 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 if (layer.definition.key !== 'foreground' && layer.definition.drawPriority !== 'foreground') {
                     const behaviors = layer.tiles[target.y][target.x]?.behaviors;
                     // Blocking layers prevent freezing until another layer is found that erases the blocking behavior.
-                    if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.cloudGround || behaviors?.isGround === true)) {
+                    if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.isLavaMap || behaviors?.cloudGround || behaviors?.isGround === true)) {
                         continue;
                     }
                     foundBlockingLayer = false;
                     if (!behaviors?.isOverlay
                         && !behaviors?.solid && !behaviors?.solidMap
-                        && !behaviors?.pit
+                        && !behaviors?.pit && !behaviors?.pitMap
                     ) {
                         underLedges = behaviors?.ledges || underLedges;
                         underDiagonalLedge = behaviors?.diagonalLedge || underDiagonalLedge;
@@ -934,7 +950,7 @@ export function coverTile(
 ): boolean {
     const behavior = area.behaviorGrid?.[ty]?.[tx];
     // For now solid tiles and pits cannot be covered
-    if (behavior?.solid || behavior?.pit || behavior?.covered
+    if (behavior?.solid || behavior?.pit || behavior?.pitMap || behavior?.covered
         || behavior?.blocksStaff || behavior?.solidMap
         || behavior?.diagonalLedge
     ) {

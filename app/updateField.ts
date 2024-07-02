@@ -8,7 +8,7 @@ import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea } from 'app/utils/effects';
-import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { getCompositeBehaviors } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { getFieldInstanceAndParts, removeObjectFromArea } from 'app/utils/objects';
 
@@ -151,10 +151,10 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
                 [hitbox.x + hitbox.w - 5, hitbox.y + hitbox.h - 5],
             ];
             for (const [x, y] of points) {
-                const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
-                if (tileBehavior?.pit  && !(object.z > 0)) {
+                const behaviors = getCompositeBehaviors(state, object.area, {x, y}, null, object);
+                if (behaviors?.pit  && !(object.z > 0)) {
                     pitTileCoords = [((x / 16) | 0), ((y / 16) | 0)];
-                } else if (tileBehavior?.water  && !(object.z > 0)) {
+                } else if (behaviors?.water  && !(object.z > 0)) {
                     waterTileCoords = [((x / 16) | 0), ((y / 16) | 0)];
                 } else {
                     isOnGround = true;

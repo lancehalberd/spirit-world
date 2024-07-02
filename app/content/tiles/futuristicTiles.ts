@@ -1,15 +1,7 @@
-/*import {
-    BITMAP_BOTTOM_6,
+import {
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
-    BITMAP_LEFT_6,
-    BITMAP_RIGHT_6,
-    BITMAP_TOP_6,
-    BITMAP_TOP_LEFT_8, BITMAP_TOP_RIGHT_8,
-    BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
-    BITMAP_BOTTOM_LEFT_8_STRIP, BITMAP_BOTTOM_RIGHT_8_STRIP,
-    BITMAP_DIAGONAL_TOP_LEFT_LEDGE, BITMAP_DIAGONAL_TOP_RIGHT_LEDGE,
-    orBitMasks,
-} from 'app/content/bitMasks';*/
+    BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
+} from 'app/content/bitMasks';
 import { 
     bottomCeilingBehavior,
     bottomLeftCeiling,
@@ -72,15 +64,20 @@ const angledPit: TileSource = {
     source: requireFrame(futuristicImage, {x: 688, y: 16, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor', pit: true },
-        '0x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
-        '1x0': { defaultLayer: 'floor2', pit: true, pitWall: true },
-        '2x0': { defaultLayer: 'floor2', pit: true, pitWall: true },
-        '3x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '0x1': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_RIGHT, pitWall: true },
+        '1x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_RIGHT, pitWall: true },
+        '2x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_LEFT, pitWall: true },
+        '3x1': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_LEFT, pitWall: true },
 
         '0x2': { defaultLayer: 'floor', pit: true, pitWall: true },
         '1x1': { defaultLayer: 'floor', pit: true, pitWall: true },
         '2x1': { defaultLayer: 'floor', pit: true, pitWall: true },
         '3x2': { defaultLayer: 'floor', pit: true, pitWall: true },
+
+        '0x3': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_RIGHT },
+        '1x4': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_RIGHT },
+        '2x4': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_LEFT },
+        '3x3': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_LEFT },
     },
     tileCoordinates: [
                 [1, 0], [2, 0],

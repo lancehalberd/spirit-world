@@ -129,7 +129,7 @@ export function getLineOfSightTargetAndDirection(
             for (let y = minY; true; y += 4) {
                 const ty = Math.floor(y / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
-                if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
+                if (tileBehavior.solid || tileBehavior.solidMap || (!projectile && (tileBehavior.pit || tileBehavior.pitMap || tileBehavior.water))) {
                     blocked = true;
                     break;
                 }
@@ -170,7 +170,7 @@ export function getLineOfSightTargetAndDirection(
             for (let x = minX; true; x += 4) {
                 const tx = Math.floor(x / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
-                if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
+                if (tileBehavior.solid || tileBehavior.solidMap || (!projectile && (tileBehavior.pit || tileBehavior.pitMap || tileBehavior.water))) {
                     blocked = true;
                     break;
                 }

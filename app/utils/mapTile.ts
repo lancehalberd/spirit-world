@@ -72,7 +72,7 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
         return allTiles[spiritCrystalGround];
     }
 
-    if (baseTile.behaviors?.defaultLayer === 'floor' && !baseTile.behaviors?.pit) {
+    if (baseTile.behaviors?.defaultLayer === 'floor' && !baseTile.behaviors?.pit && !baseTile.behaviors?.pitMap) {
         explicitIndexMapping[baseTile.index] = spiritGround;
         return allTiles[spiritGround];
     }

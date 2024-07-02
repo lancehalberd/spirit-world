@@ -108,6 +108,7 @@ interface TileBehaviors {
     isBrittleGround?: boolean
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean
+    pitMap?: Uint16Array
     // If a player falls over a single tile pit they will be eased towards being tile aligned.
     isSingleTilePit?: boolean
     // This can be set to true for pit tiles to indicate that they are the wall background for a pit
@@ -148,6 +149,8 @@ interface TileBehaviors {
     showUnderTile?: boolean
     shallowWater?: boolean
     slippery?: boolean
+    // To be used if we add pixel granularity to ice floors for ice attacks.
+    slipperyMap?: Uint16Array
     water?: boolean
     // How much damage this tile does if thrown.
     throwDamage?: number

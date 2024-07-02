@@ -78,9 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add pitMap behavior for angled pit tiles
-        - This will improve the edges of the storm beast arena.
-
     - Add 1px padding around packed images that are rotated.
         - Just do this to all effects and pack them together.
 

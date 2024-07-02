@@ -1,6 +1,6 @@
 import { FieldAnimationEffect, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
 import { addEffectToArea } from 'app/utils/effects';
-import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { directionMap, getDirection, getCompositeBehaviors } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { sample } from 'app/utils/index';
 import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
@@ -189,10 +189,10 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
     if (checkForPits) {
         const x = hitbox.x + hitbox.w / 2;
         const y = hitbox.y + hitbox.h / 2;
-        const { tileBehavior } = getTileBehaviorsAndObstacles(state, enemy.area, {x, y});
-        if (tileBehavior?.pit) {
+        const behaviors = getCompositeBehaviors(state, enemy.area, {x, y}, null, enemy);
+        if (behaviors.pit) {
             makeEnemyFallIntoPit(state, enemy);
-        } else if (tileBehavior?.water && !enemy.canSwim) {
+        } else if (behaviors.water && !enemy.canSwim) {
             makeEnemyFallIntoWater(state, enemy);
         }
     }

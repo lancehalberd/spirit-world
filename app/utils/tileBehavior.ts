@@ -116,12 +116,27 @@ export function applyTileToBehaviorGrid(
     }
     const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
     const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
+    // Merge matching bitmasks together.
     const baseSolidMap = behaviorGrid[y][x]?.solidMap;
+    const baseLavaMap = behaviorGrid[y][x]?.solidMap;
+    const basePitMap = behaviorGrid[y][x]?.pitMap;
     behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
     if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
         behaviorGrid[y][x].solidMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
         for (let row = 0; row < 16; row++) {
             behaviorGrid[y][x].solidMap[row] = baseSolidMap[row] | behaviors.solidMap[row];
+        }
+    }
+    if (!behaviorGrid[y]?.[x]?.isLava && baseLavaMap && behaviors.isLavaMap) {
+        behaviorGrid[y][x].isLavaMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+        for (let row = 0; row < 16; row++) {
+            behaviorGrid[y][x].isLavaMap[row] = baseLavaMap[row] | behaviors.isLavaMap[row];
+        }
+    }
+    if (!behaviorGrid[y]?.[x]?.pit && basePitMap && behaviors.pitMap) {
+        behaviorGrid[y][x].pitMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+        for (let row = 0; row < 16; row++) {
+            behaviorGrid[y][x].pitMap[row] = basePitMap[row] | behaviors.pitMap[row];
         }
     }
     // It is convenient for the projectile hit detection system to assume that ledges are always defined as going down

@@ -297,7 +297,7 @@ const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
             const x = targetHitbox.x + targetHitbox.w / 2 + coords[0] * 16;
             const y = targetHitbox.y + targetHitbox.h / 2 + coords[1] * 16;
             const { tileBehavior } = getTileBehaviors(state, enemy.area, {x, y});
-            if (tileBehavior?.solid || tileBehavior?.pit) {
+            if (tileBehavior?.solid || tileBehavior?.pit || tileBehavior?.pitMap) {
                 continue;
             }
             const spike = new GroundSpike({

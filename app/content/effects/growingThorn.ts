@@ -45,7 +45,7 @@ export class GrowingThorn implements EffectInstance, Props {
             if (coverTile(state, this.area, tx, ty, thornsTilesIndex)) {
             /*const behavior = this.area.behaviorGrid?.[ty]?.[tx];
             // Don't grow thorns over pits/walls
-            if (!behavior?.solid && !behavior?.pit) {
+            if (!behavior?.solid && !behavior?.pit && !behavior?.pitMap) {
                 let topLayer: AreaLayer = this.area.layers[0];
                 for (const layer of this.area.layers) {
                     if (layer.definition.drawPriority !== 'foreground') {

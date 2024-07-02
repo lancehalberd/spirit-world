@@ -34,6 +34,7 @@ import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
+import { lava, lavaStone } from 'app/content/tiles/lava';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
@@ -972,34 +973,6 @@ const crystalBeadFloor: TileSource = {
     ]
 };
 
-/*
-const [lavaCanvas, lavaContext] = createCanvasAndContext(64, 80);
-const createLavaTiles = async () => {
-    await allImagesLoaded();
-    drawTintedImage(lavaContext,
-        requireFrame('gfx/tiles/cloud.png', {x: 0, y: 0, w: 64, h: 80, color: '#F00', amount: 0.6},
-        {x: 0, y: 0, w: lavaCanvas.width, h: lavaCanvas.height }
-    );
-}
-createLavaTiles();*/
-//debugCanvas(lavaCanvas);
-// First tile is 886
-const lava: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/lava.png', {x: 0, y: 0, w: 64, h: 80}),
-    behaviors: {
-        'all': { defaultLayer: 'floor2', isLava: true, editorTransparency: 0.3, elementOffsets: {ice: 256} },
-    },
-};
-// First tile is 1142
-const lavaStone: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/lavaStone.png', {x: 0, y: 0, w: 64, h: 80}),
-    behaviors: {
-        'all': { defaultLayer: 'floor2', isGround: true, elementOffsets: {fire: -256} },
-    },
-};
-
 const spiritFloor: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/spiritfloor.png', {x: 0, y: 0, w: 80, h: 64}),
@@ -1020,9 +993,6 @@ const spiritFloorEdges: TileSource = {
 };
 
 const solidPitSource: TileSource = solidColorTile('#111111', {pit: true});
-
-
-
 
 addTiles([
     // This is the empty tile.
