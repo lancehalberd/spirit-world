@@ -358,6 +358,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         } else {
             hero.spiritRadius = Math.max(hero.spiritRadius - 8, 0);
             if (hero.astralProjection) {
+                hero.astralProjection.dropHeldObject(state);
                 hero.astralProjection.d = hero.d;
             }
             if (hero.spiritRadius === 0) {

@@ -772,6 +772,59 @@ export class Hero implements Actor {
         }
     }
 
+    dropHeldObject(this: Hero, state: GameState){
+        const hero = this;
+        if (hero.pickUpObject) {
+            // This assumes only clones can be picked up and dropped.
+            // Since only astral projection drops items, and the projection
+            // cannot pick up a clone, this branch is not currently expected to run.
+            const clone = hero.pickUpObject as Hero;
+            clone.x = hero.x;
+            clone.y = hero.y;
+            clone.vx = 0
+            clone.vy = 0;
+            clone.vz = 0;
+            clone.action = 'thrown';
+            clone.isAirborn = true;
+            clone.animationTime = 0;
+            clone.carrier = null;
+            hero.pickUpObject = null;
+            return;
+        }
+        if (!hero.pickUpTile) {
+            return;
+        }
+        const tile = hero.pickUpTile;
+        const behaviors = tile.behaviors;
+        const thrownObject = new ThrownObject({
+            frame: tile.frame,
+            behaviors,
+            x: hero.x,
+            y: hero.y,
+            vx: 0,
+            vy: 0,
+            vz: 0,
+        });
+        hero.lastTouchedObject = thrownObject;
+        addEffectToArea(state, hero.area, thrownObject);
+        if (tile.linkedTile) {
+            const behaviors = tile.linkedTile.behaviors;
+            const alternateThrownObject = new ThrownObject({
+                frame: tile.linkedTile.frame,
+                behaviors,
+                x: hero.x,
+                y: hero.y,
+                vx: 0,
+                vy: 0,
+                vz: 0,
+            });
+            alternateThrownObject.linkedObject = thrownObject;
+            thrownObject.linkedObject = alternateThrownObject;
+            addEffectToArea(state, hero.area.alternateArea, alternateThrownObject);
+        }
+        hero.pickUpTile = null;
+    }
+
     throwHeldObject(this: Hero, state: GameState){
         const hero = this;
         const [dx, dy] = getCloneMovementDeltas(state, hero);

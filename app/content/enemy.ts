@@ -14,7 +14,7 @@ import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
-import { breakBrittleTiles, getDirection } from 'app/utils/field';
+import { breakBrittleTilesInRect, getDirection } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
@@ -796,7 +796,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         checkForFloorEffects(state, this);
         // Break brittle tiles under the enemy.
         if (this.z <= 0) {
-            breakBrittleTiles(state, this.area, pad(this.getMovementHitbox(), -4));
+            breakBrittleTilesInRect(state, this.area, pad(this.getMovementHitbox(), -4));
         }
     }
     getHealthPercent(state): number {

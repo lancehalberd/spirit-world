@@ -78,8 +78,22 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add 1px padding around packed images that are rotated.
-        - Just do this to all effects and pack them together.
+    - Possible work items:
+        - Add placeholder for prologue
+        - Add cutscene with tree dialogue to Peach Cave
+            - Would like Vanara Tree graphics for this at some point + web covering.
+            - Brainstorm what the Helix+World Tree look like
+            - Maybe a bean stalk wrapped around a central pillar
+            - Maybe a 4 dimensional helix projected into 3 dimensions?
+            - For the material world, there could be a large ring of disturbed water in the lake where the invisible tree is.
+                - The top of the helix should be an ivory platform just above a cloud that fully obscures it from below.
+                - "Want to know something mysterious? There is a cloud above the center of the lake that never moves!"
+        - Add final dungeon
+            - Would prefer to have Vanara Ship tiles
+        - Add sky city
+            - Would prefer to have smooth crystal exterior tiles
+        - Work on larger world map
+            - Would like to brainstorm more ideas of what to include.
 
     - New enemy: lava monster with shell (TBD by artist)
         - possible designs:
@@ -135,9 +149,6 @@ Current tasks:
     - Remove Howler.js and use WebAudioContext directly.
         This article on sound implementation in Cross Code might be useful:
             https://www.radicalfishgames.com/?p=973
-
-    - Improvement, carried object should drop when astral projection despawns holding something.
-        - Right now it just disappears with the astral projection.
 
     - Populate Spirit Ruins
         - Link entrances to the spirit world

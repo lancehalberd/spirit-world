@@ -15,7 +15,7 @@ import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndRelea
 import { removeAllClones, setNextAreaSection } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
 import {
-    breakBrittleTiles,
+    breakBrittleTilesInRect,
     directionMap,
 } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -106,7 +106,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 // It would be nice not to break everything under the hitbox here, for example,
                 // by using a smaller hitbox. Unfortunately that would allow the player to walk
                 // over cracked tiles by walking in between them.
-                breakBrittleTiles(state, hero.area, hero.getFloorHitbox());
+                breakBrittleTilesInRect(state, hero.area, hero.getFloorHitbox());
             }
         }
     }

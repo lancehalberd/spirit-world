@@ -367,6 +367,20 @@ export function getTileBehaviorsAndObstacles(
     return { tileBehavior, tx, ty, objects };
 }
 
+function getHitTiles(area: AreaInstance, hit: HitProperties): TileCoords[] {
+    let hitTiles = [];
+    if (hit.tileHitbox || hit.hitbox) {
+        hitTiles = getTilesInRectangle(area, hit.tileHitbox || hit.hitbox);
+    }
+    if (hit.hitCircle) {
+        hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
+    }
+    if (hit.hitRay) {
+        hitTiles = [...hitTiles, ...getTilesInRay(area, hit.hitRay)];
+    }
+    return hitTiles;
+}
+
 export function getTilesInRectangle(area: AreaInstance, rect: Rect): TileCoords[] {
     const tileSize = 16;
     const tiles: TileCoords[] = []
@@ -581,19 +595,14 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             applyHitToObject(state, object, {...hit, direction, knockback}, combinedResult);
         }
     }
-    let hitTiles = [];
-    if (hit.hitTiles && (hit.tileHitbox || hit.hitbox)) {
-        hitTiles = getTilesInRectangle(area, hit.tileHitbox || hit.hitbox);
-    }
-    if (hit.hitTiles && hit.hitCircle) {
-        hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
-    }
-    if (hit.hitTiles && hit.hitRay) {
-        hitTiles = [...hitTiles, ...getTilesInRay(area, hit.hitRay)];
-    }
+    const hitTiles = hit.hitTiles ? getHitTiles(area, hit) : [];
     let setProjectileHigh = false, setProjectileLow = false;
     if (hit.projectile?.isHigh) {
         hit.projectile.passedLedgeTiles = [];
+    }
+    if (hit.breaksGround) {
+        // Don't calculate hit tiles again if we already know them.
+        breakBrittleTiles(state, area, hitTiles.length ? hitTiles : getHitTiles(area, hit));
     }
     // TODO: Get tiles hit by ray
     for (const target of hitTiles) {
@@ -816,11 +825,17 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     return combinedResult;
 }
 
-export function breakBrittleTiles(state: GameState, area: AreaInstance, hitbox: Rect) {
+export function breakBrittleTilesInRect(state: GameState, area: AreaInstance, hitbox: Rect) {
     if (!area) {
         return;
     }
-    const tiles = getTilesInRectangle(area, hitbox);
+    breakBrittleTiles(state, area, getTilesInRectangle(area, hitbox));
+}
+
+export function breakBrittleTiles(state: GameState, area: AreaInstance, tiles: TileCoords[]) {
+    if (!area) {
+        return;
+    }
     const behaviorGrid = area.behaviorGrid;
     for (const {x, y} of tiles) {
         let behaviors = behaviorGrid[y]?.[x];

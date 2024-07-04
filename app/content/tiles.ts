@@ -7,6 +7,7 @@ import {
     BITMAP_RIGHT_2, BITMAP_TOP_2,
 } from 'app/content/bitMasks';
 import {
+    emptyTile,
     bottomLeftCeiling,
     bottomRightCeiling,
     bushBehavior,
@@ -995,8 +996,7 @@ const spiritFloorEdges: TileSource = {
 const solidPitSource: TileSource = solidColorTile('#111111', {pit: true});
 
 addTiles([
-    // This is the empty tile.
-    singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
+    emptyTile,
     singleTileSource('gfx/tiles/bush.png', bushBehavior, 0),
     singleTileSource('gfx/tiles/cactussheet.png', {
         ...bushBehavior,

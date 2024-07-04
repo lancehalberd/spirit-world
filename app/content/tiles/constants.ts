@@ -5,6 +5,7 @@ import {
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
     BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
 } from 'app/content/bitMasks';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { createAnimation } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
 
@@ -168,3 +169,11 @@ export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BIT
 export const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false};
 export const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, isSouthernWall: true, isGround: false};
 export const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, isSouthernWall: true, isGround: false};
+
+const [emptyCanvas] = createCanvasAndContext(16, 16);
+export const emptyTile: TileSource = {
+    w: 16, h: 16,
+    source: {image: emptyCanvas, x: 0, y: 0, w: 16, h: 16},
+    behaviors: {'0x0': {defaultLayer: 'field'}},
+    paletteTargets: [],
+};

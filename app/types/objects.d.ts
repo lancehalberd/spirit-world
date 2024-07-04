@@ -304,6 +304,8 @@ interface HitProperties {
     canPush?: boolean
     // Whether this can cut ground tiles like thorns.
     cutsGround?: boolean
+    // Whether this attack will break brittle ground tiles.
+    breaksGround?: boolean
     // Describes the heavyness of liftable tiles that this hit can destroy.
     crushingPower?: number
     // Whether this can destroy destructible objects like pots and cracked doorways.

@@ -71,6 +71,8 @@ export class ThrownObject implements EffectInstance {
             direction: getDirection(this.vx, this.vy),
             hitEnemies: true,
             hitObjects: true,
+            // Break the ground the object lands on in the last frame.
+            breaksGround: (this.z <= 0),
         });
         if (hitResult.hit || hitResult.blocked || this.z <= 0) {
             this.breakOnImpact(state);

@@ -12,14 +12,14 @@ function booleanGrid(columns: number, rows: number): boolean[][] {
     return grid;
 }
 
-export function packSprites(prefix: string, gridSize: number, columns: number, rows: number): PackedImageData[] {
+export function packSprites(prefixes: string[], gridSize: number = 16, columns: number = 64, rows: number = 160, padding: number = 0): PackedImageData[] {
     const packedImages: PackingImageData[] = [];
     for (const key of Object.keys(images)) {
         // Ignore already packed images.
         if (key.startsWith('gfx/packed_images')) {
             continue;
         }
-        if (!key.startsWith(prefix)) {
+        if (!prefixes.some(prefix => key.startsWith(prefix))) {
             continue;
         }
         const {width, height} = images[key];
@@ -33,20 +33,22 @@ export function packSprites(prefix: string, gridSize: number, columns: number, r
         }
         let packed = false;
         for (const packedImage of packedImages) {
-            if (packSprite(key, images[key], packedImage, gridSize)) {
+            if (packSprite(key, images[key], packedImage, gridSize, padding)) {
                 packed = true;
                 break;
             }
         }
         if (!packed) {
-            const [canvas, context] = createCanvasAndContext(gridSize * columns, gridSize * rows);
+            const width = gridSize * columns + padding * (columns - 1);
+            const height = gridSize * rows + padding * (rows - 1);
+            const [canvas, context] = createCanvasAndContext(width, height);
             const newPackedImage: PackingImageData = {
                 packedImages: [],
                 grid: booleanGrid(columns, rows),
                 image: canvas,
                 context,
             };
-            packSprite(key, images[key], newPackedImage, gridSize);
+            packSprite(key, images[key], newPackedImage, gridSize, padding);
             packedImages.push(newPackedImage);
         }
         // Loop through existing packedImages and try to place this image in free cells.
@@ -70,9 +72,9 @@ export function serializePackedImage(packedImage: PackingImageData): string {
 }
 window['serializePackedImage'] = serializePackedImage;
 
-export function packSprite(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number): boolean {
-    const cellHeight = Math.ceil(image.height / gridSize);
-    const cellWidth = Math.ceil(image.width / gridSize);
+function packSprite(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, padding: number): boolean {
+    const cellHeight = Math.ceil((image.height + padding) / (gridSize + padding));
+    const cellWidth = Math.ceil((image.width + padding) / (gridSize + padding));
     const { grid } = packedImage;
     for (let y = 0; y <= grid.length - cellHeight; y++) {
         for (let x = 0; x <= grid[y].length - cellWidth; x++) {
@@ -80,7 +82,7 @@ export function packSprite(key: string, image: HTMLImageElement, packedImage: Pa
                 // This spot is taken.
                 continue;
             }
-            if (addSpriteToLocation(key, image, packedImage, gridSize, [x, y])) {
+            if (addSpriteToLocation(key, image, packedImage, gridSize, [x, y], padding)) {
                 return true;
             }
         }
@@ -88,29 +90,36 @@ export function packSprite(key: string, image: HTMLImageElement, packedImage: Pa
     return false;
 }
 
-export function addSpriteToLocation(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, [x, y]: Coords): boolean {
-    const cellHeight = Math.ceil(image.height / gridSize);
-    const cellWidth = Math.ceil(image.width / gridSize);
+function addSpriteToLocation(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, [gx, gy]: Coords, padding: number): boolean {
+    const cellHeight = Math.ceil((image.height + padding) / (gridSize + padding));
+    const cellWidth = Math.ceil((image.width + padding) / (gridSize + padding));
     const { grid } = packedImage;
     // Check if all cells the image requires are unused.
-    for (let sy = y; sy < y + cellHeight; sy++) {
-        for (let sx = x; sx < x + cellWidth; sx++) {
+    for (let sy = gy; sy < gy + cellHeight; sy++) {
+        for (let sx = gx; sx < gx + cellWidth; sx++) {
             if (grid[sy][sx]) {
                 return false;
             }
         }
     }
+    const px = gx * (gridSize + padding);
+    const py = gy * (gridSize + padding);
     packedImage.packedImages.push({
-        x: x * gridSize,
-        y: y * gridSize,
+        x: px,
+        y: py,
         w: image.width,
         h: image.height,
         originalSource: key,
     });
-    packedImage.context.drawImage(image, x * gridSize, y * gridSize);
+    // Uncomment this to see which parts of the grid the packaged images are taking up.
+    /*packedImage.context.beginPath();
+    packedImage.context.fillStyle = 'green'
+    packedImage.context.rect(px, py, cellWidth * gridSize + padding * (cellWidth - 1), cellHeight * gridSize + padding * (cellHeight - 1))
+    packedImage.context.fill();*/
+    packedImage.context.drawImage(image, px, py);
     // If they are all unused, add the image and mark the cells as used.
-    for (let sy = y; sy < y + cellHeight; sy++) {
-        for (let sx = x; sx < x + cellWidth; sx++) {
+    for (let sy = gy; sy < gy + cellHeight; sy++) {
+        for (let sx = gx; sx < gx + cellWidth; sx++) {
             grid[sy][sx] = true;
         }
     }
