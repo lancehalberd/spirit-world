@@ -9,10 +9,27 @@ export function wait(state: GameState, duration: number) {
     });
 }
 
-export function appendCallback(state: GameState, callback: (state: GameState) => void) {
+export function appendCallback(state: GameState, callback: (state: GameState) => void|boolean) {
     state.scriptEvents.queue.push({
         type: 'callback',
         callback,
+    });
+}
+
+export function runBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
+    appendCallback(state, (state) => {
+        state.scriptEvents.activeEvents.push({
+            type: 'update',
+            update: updateCallback,
+        });
+        state.scriptEvents.activeEvents.push({
+            type: 'wait',
+            time: 0,
+            waitingOnActiveEvents: true,
+            blockFieldUpdates: true,
+        });
+        // Make sure no other scripts are processed until this finishes.
+        return true;
     });
 }
 
@@ -195,6 +212,20 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             events.push({
                 type: 'playSound',
                 sound,
+            });
+            continue;
+        }
+        if (actionToken.startsWith('playTrack:')) {
+            const track = actionToken.substring('playTrack:'.length) as TrackKey;
+            events.push({
+                type: 'playTrack',
+                track: track,
+            });
+            continue;
+        }
+        if (actionToken.startsWith('stopTrack')) {
+            events.push({
+                type: 'stopTrack',
             });
             continue;
         }

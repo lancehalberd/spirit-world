@@ -74,7 +74,7 @@ const missions: Mission[] = [
             if (state.location.zoneKey !== 'peachCave') {
                 return `I wonder if that glowing peach is still in that cave?
                     {|}The entrance was just east of the waterfall and north of the lake.`;
-            } else if (!state.savedState.objectFlags.peachCaveBoss) {
+            } else if (!state.savedState.objectFlags.peachCaveTree) {
                 return 'With this Chakram I should be able to climb out of this cave.';
             } else {
                 return 'I left that glowing peach somewhere in this cave.';

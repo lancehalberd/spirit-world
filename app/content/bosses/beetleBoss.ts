@@ -98,7 +98,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'retreat') {
-        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y - 16 + hitbox.h / 2) === 0) {
+        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y + hitbox.h / 2) === 0) {
             enemy.setMode('summon');
         }
     } else if (enemy.mode === 'summon') {

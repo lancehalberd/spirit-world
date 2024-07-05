@@ -91,7 +91,7 @@ interface SetFlagScriptEvent {
 }
 interface CallbackScriptEvent {
     type: 'callback'
-    callback: (state: GameState) => void
+    callback: (state: GameState) => void|boolean
 }
 interface ClearFlagScriptEvent {
     type: 'clearFlag'
@@ -108,6 +108,13 @@ interface GainLootScriptEvent {
 interface PlaySoundScriptEvent {
     type: 'playSound'
     sound: string
+}
+interface PlayTrackScriptEvent {
+    type: 'playTrack'
+    track: TrackKey
+}
+interface StopTrackScriptEvent {
+    type: 'stopTrack'
 }
 interface RunDialogueScriptScriptEvent {
     type: 'runDialogueScript'
@@ -172,6 +179,7 @@ type ScriptEvent
     | EnterLocationScriptEvent
     | GainLootScriptEvent
     | PlaySoundScriptEvent
+    | PlayTrackScriptEvent
     | RefreshAreaLogicScriptEvent
     | RemoveTextCueScriptEvent
     | RestScriptEvent
@@ -182,6 +190,7 @@ type ScriptEvent
     | ShowTextBoxScriptEvent
     | StartScreenShakeScriptEvent
     | StopScreenShakeScriptEvent
+    | StopTrackScriptEvent
     | WaitScriptEvent
     ;
 

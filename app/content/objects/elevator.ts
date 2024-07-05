@@ -120,7 +120,6 @@ export class Elevator implements ObjectInstance {
             state.hero.vy = 0.5;
             state.hero.vx = 0;
             state.hero.vz = 3;
-            return '';
         });
         appendScript(state, '{wait:1000}');
         appendCallback(state, (state: GameState) => {
@@ -133,7 +132,6 @@ export class Elevator implements ObjectInstance {
             state.hero.vy = 0.5;
             state.hero.vx = 0;
             state.hero.vz = 4;
-            return '';
         });
         appendScript(state, '{wait:1500}');
         appendCallback(state, (state: GameState) => {
@@ -146,13 +144,11 @@ export class Elevator implements ObjectInstance {
             state.hero.vy = 0;
             state.hero.vx = 0;
             state.hero.vz = 4;
-            return '';
         });
         appendScript(state, '{wait:300}');
         appendCallback(state, (state: GameState) => {
             state.hero.savedData.equippedBoots = boots;
             state.hero.fallIntoPit(state);
-            return '';
         });
     }
     callToCurrentFloor(state: GameState) {

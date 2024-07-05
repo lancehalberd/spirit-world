@@ -26,12 +26,13 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vy = 0;
     state.hero.vz = 0;
     state.hero.d = state.hero.savedData.spawnLocation.d;
+    // Clear any script events that may have lingered from a previous state.
+    // Do this before entering the new location, which may trigger new events.
+    state.scriptEvents.queue = [];
+    state.scriptEvents.activeEvents = [];
     enterLocation(state, state.hero.savedData.spawnLocation, true, null, true);
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
 
-    // Clear any script events that may have lingered from a previous state.
-    state.scriptEvents.queue = [];
-    state.scriptEvents.activeEvents = [];
 
     // Don't display hints in randomizer mode.
     if (isRandomizer) {

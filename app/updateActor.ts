@@ -211,9 +211,6 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             hero.toolOnCooldown = null;
         }
     }
-    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
-
-    }
 }
 
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {

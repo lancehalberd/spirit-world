@@ -70,8 +70,11 @@ const defaultSavedState = getDefaultSavedState();
 const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50, secondChance: 1},
     ['peachCaveWeapon', 'peachCaveSprout1', 'peachCaveSprout2']
 );
-const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},
-    ['peachCaveBoss', 'peachCave:fullPeach', 'homeInstructions']
+const peachBossDefeatedState = applyItems(peachBossState, {},
+    ['peachCaveBoss']
+);
+const peachCaveExitState = applyItems(peachBossDefeatedState, {maxLife: 1, catEyes: 1},
+    ['peachCaveTree', 'peachCave:fullPeach', 'homeInstructions']
 );
 const tombRivalStateStory = applyItems(peachCaveExitState, {bow: 1},
     ['momElder', 'treeVillageBow', 'closedBowDoor', 'elderTomb']
@@ -232,6 +235,10 @@ export const easyBossSpawnLocations: SpawnLocationOptions = {
 };
 
 export const storySpawnLocations: SpawnLocationOptions = {
+    'Peach Cave Tree': {
+        location: spawnLocations.SPAWN_LOCATION_PEACH_CAVE_BOSS,
+        savedState: peachBossDefeatedState,
+    },
     'Tomb Rival Fight': {
         location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
         savedState: tombRivalStateStory,

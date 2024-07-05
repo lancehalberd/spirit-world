@@ -1,6 +1,5 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
-import { getAreaSize } from 'app/utils/getAreaSize';
 import { fillRect, pad } from 'app/utils/index';
 import { simpleWhiteFont, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 
@@ -87,8 +86,8 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
     let rowFrames: Frame[] = [];
     let rowWidth = 0;
     let rowNeedsSpace = false;
-    const nextRow = () => {
-        if (rowText.length) {
+    const nextRow = (force = false) => {
+        if (rowText.length || force) {
             currentPage.textRows.push(rowText);
             currentPage.frames.push(rowFrames);
             // Pages can now be any number of lines long as we scroll through them.
@@ -109,8 +108,8 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
     for (const spacedChunk of spacedChunks) {
         // This will split the spaced chunk into a sequence of elements like:
         // ['string', 'escapedToken', 'string', ...].
-        // For example: ['Press', '[B_WEAPON', 'to']
-        const stringAndIconTokens = spacedChunk.split(/[\[\]]+/);
+        // For example: ['Press', 'B_WEAPON', 'to']
+        const stringAndIconTokens = spacedChunk.split(/[\[\]]/);
         while (stringAndIconTokens.length) {
             const stringToken = stringAndIconTokens.shift();
             if (stringToken) {
@@ -135,8 +134,16 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
             }
             const iconToken = stringAndIconTokens.shift();
             if (iconToken) {
+                // Force adding a line break.
                 if (iconToken === '-') {
-                    nextRow();
+                    nextRow(true);
+                    continue;
+                }
+                // Force adding a space to the current line.
+                if (iconToken === '_') {
+                    rowFrames.push(null);
+                    rowText += ' ';
+                    rowWidth += characterWidth;
                     continue;
                 }
                 const tokenFrames = getEscapedFrames(state, iconToken);
@@ -204,8 +211,8 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         w,
         h,
     };
-    const {section} = getAreaSize(state);
-    if (state.hero.y - section.y >= 128) {
+    //const {section} = getAreaSize(state);
+    if (state.hero.y - state.camera.y >= 128) {
         r.y = 32;
     }
     if (state.messagePage) {

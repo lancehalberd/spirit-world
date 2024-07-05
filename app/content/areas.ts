@@ -527,7 +527,11 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 } else {
                     state.transitionState = {
                         callback: () => null,
-                        nextLocation: state.location,
+                        nextLocation: {
+                            ...state.location,
+                            x: state.hero.x,
+                            y: state.hero.y,
+                        },
                         time: 0,
                         type: 'mutating',
                         nextAreaInstance,

@@ -46,7 +46,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -215,7 +215,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -384,7 +384,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCave:0:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 336, y: 96, type: "waterPot", hasCustomLogic: true, customLogic: "peachCaveBoss", invertLogic: true},
+        {id: "peachCave:0:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 336, y: 96, type: "waterPot", hasCustomLogic: true, customLogic: "peachCaveTree", invertLogic: true},
         {id: "peachCave:0:0x0-door-0", linked: false, spirit: false, status: "normal", x: 64, y: 272, type: "door", d: "up", style: "cavern"},
         {id: "peachCaveWeapon", linked: false, spirit: false, status: "normal", x: 176, y: 80, type: "chest", lootType: "weapon", lootLevel: 0},
         {id: "peachCave:stairsUp", linked: false, spirit: false, status: "closed", x: 272, y: 32, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsDown", d: "left", style: "cavern", openLogic: {"logicKey":"isRandomizer","isInverted":false}},
@@ -397,7 +397,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "peachCave-climber1", x: 336, y: 304, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {status: "normal", id: "peachCave-climber3", x: 304, y: 192, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {id: "", linked: false, spirit: false, status: "closedEnemy", x: 48, y: 240, type: "door", d: "down", style: "cavern"},
-        {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCaveBoss", invertLogic: true},
+        {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCaveTree", invertLogic: true},
         {status: "normal", id: "", x: 144, y: 432, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 24, h: 64, saveStatus: "never"},
         {status: "normal", id: "thornsInstructions", x: 208, y: 448, type: "narration", message: "I don't like the look of those thorns...\n{|}Maybe I can find another way?", w: 48, h: 48, delay: 500},
         {status: "normal", id: "", x: 392, y: 360, type: "spawnMarker"},
@@ -627,7 +627,7 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -754,7 +754,7 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -993,7 +993,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1162,7 +1162,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1508,7 +1508,7 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1635,7 +1635,7 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1944,7 +1944,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2030,7 +2030,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2241,7 +2241,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'foregroundTree',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2294,8 +2294,8 @@ const f1_0x0: AreaDefinition = {
         {id: "peachCave:1:0x0-beetleWinged-2", linked: false, spirit: false, status: "normal", x: 352, y: 320, type: "enemy", enemyType: "beetleWinged"},
         {id: "peachCave:1:0x0-beetleWinged-3", linked: false, spirit: false, status: "normal", x: 400, y: 400, type: "enemy", enemyType: "beetleWinged"},
         {id: "peachCaveBoss", linked: false, spirit: false, status: "normal", x: 108, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "empty"},
-        {status: "normal", id: "peachCaveSprout2", x: 48, y: 336, type: "vineSprout", customLogic: "peachCaveBoss", invertLogic: true},
-        {status: "normal", id: "peachCave:fullPeach", x: 119, y: 93, type: "loot", lootType: "peachOfImmortality", lootLevel: 1, hasCustomLogic: true, customLogic: "peachCaveBoss"},
+        {status: "normal", id: "peachCaveSprout2", x: 48, y: 336, type: "vineSprout", customLogic: "peachCaveTree", invertLogic: true},
+        {status: "normal", id: "peachCave:fullPeach", x: 119, y: 93, type: "loot", lootType: "peachOfImmortality", lootLevel: 1, hasCustomLogic: true, customLogic: "peachCaveTree"},
         {status: "normal", id: "peachCave:1:0x0-luckyBeetle-0", x: 384, y: 144, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
@@ -2670,7 +2670,7 @@ const sf1_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2756,7 +2756,7 @@ const sf1_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2967,7 +2967,7 @@ const sf1_0x0: AreaDefinition = {
         {
             key: 'foregroundTree',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCaveBoss',
+            hasCustomLogic: true, customLogic: 'peachCaveTree',
             invertLogic: true,
             grid: {
                 w: 32,

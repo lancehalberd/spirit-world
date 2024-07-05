@@ -89,7 +89,9 @@ export function updateScriptEvents(state: GameState): void {
         //console.log('Running event', event.type, event);
         switch (event.type) {
             case 'callback':
-                event.callback(state);
+                if (event.callback(state)) {
+                    state.scriptEvents.blockEventQueue = true;
+                }
                 break;
             case 'wait':
                 state.scriptEvents.activeEvents.push({
@@ -177,6 +179,13 @@ export function updateScriptEvents(state: GameState): void {
                 break;
             case 'playSound':
                 playSound(state, event.sound);
+                break;
+            case 'playTrack':
+                state.scriptEvents.overrideMusic = event.track;
+                break;
+            // This doesn't stop the BGM, it reverts back to the default BGM.
+            case 'stopTrack':
+                delete state.scriptEvents.overrideMusic;
                 break;
             case 'runDialogueScript':
                 const dialogueSet = dialogueHash[event.npcKey];

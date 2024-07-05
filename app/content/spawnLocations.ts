@@ -39,7 +39,7 @@ export const SPAWN_LOCATION_PEACH_CAVE_BOSS: ZoneLocation = {
     zoneKey: 'peachCave',
     floor: 1,
     x: 120,
-    y: 132,
+    y: 160,
     z: 0,
     d: 'up',
     areaGridCoords: {x: 0, y: 0},
@@ -421,7 +421,7 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
         if (state.savedState.objectFlags.homeInstructions) {
             // Once the player has stepped into the world map, start them outside the cave if they didn't save elsewhere.
             state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
-        } else if (state.savedState.objectFlags.peachCaveBoss) {
+        } else if (state.savedState.objectFlags.peachCaveTree) {
             // The player restarts at the defeated boss if they haven't made it to the overworld yet.
             state.hero.savedData.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
         }

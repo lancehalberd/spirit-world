@@ -75,6 +75,10 @@ export function addKeyboardShortcuts() {
                     }
                 }
             }
+            // Ad Hoc overrides for keys set by script objects.
+            if (state.location.zoneKey === 'peachCave') {
+                delete state.savedState.objectFlags.peachCaveTree;
+            }
             state.savedState.luckyBeetles = [];
             delete state.savedState.dungeonInventories[state.location.logicalZoneKey];
             state.location.x = state.hero.x;
