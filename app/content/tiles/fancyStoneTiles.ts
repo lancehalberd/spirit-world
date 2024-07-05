@@ -1,5 +1,6 @@
 import {
-    southernWallBehavior
+    deletedTiles,
+    southernWallBehavior,
 } from 'app/content/tiles/constants';
 import { requireFrame } from 'app/utils/packedImages';
 
@@ -22,9 +23,8 @@ const concaveFancyStoneCeilingTiles: TileSource = {
 
 const fancyStoneCeilingAlternateTiles: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/ceilingtilesfancystone.png', {x: 16, y: 48, w: 16, h: 32}),
+    source: requireFrame('gfx/tiles/ceilingtilesfancystone.png', {x: 32, y: 48, w: 16, h: 16}),
     behaviors: {
-        '0x0': {defaultLayer: 'floor'},
         '0x1': {defaultLayer: 'floor2', underTile: 4, isBrittleGround: true},
     },
 };
@@ -60,6 +60,7 @@ const fancyStonePillar: TileSource = {
 export const allFancyStoneCeilingTileSources: TileSource[] = [
     convexFancyStoneCeilingTiles,
     concaveFancyStoneCeilingTiles,
+    deletedTiles(1),
     fancyStoneCeilingAlternateTiles,
     fancyStoneWall,
     fancyStonePillar,

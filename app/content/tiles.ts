@@ -7,7 +7,11 @@ import {
     BITMAP_RIGHT_2, BITMAP_TOP_2,
 } from 'app/content/bitMasks';
 import {
+    canvasPalette,
+    deletedTileSource,
+    deletedTiles,
     emptyTile,
+    solidColorTile,
     bottomLeftCeiling,
     bottomRightCeiling,
     bushBehavior,
@@ -51,16 +55,6 @@ import { requireFrame } from 'app/utils/packedImages';
 export const allTiles: FullTile[] = [null];
 window['allTiles'] = allTiles;
 
-
-const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
-function deletedTiles(n: number): TileSource {
-    return {
-        ...deletedTileSource,
-        tileCoordinates: [...new Array(n)].map(() => [0, 0]),
-    };
-}
-// Add this to ignore if deletedTiles isn't called
-deletedTiles;
 
 let index = 1;
 function addSingleTileFromTileSource(tileSource: TileSource, x: number, y: number) {
@@ -246,24 +240,7 @@ function stampTileSource(frame: Frame, tileCoordinates: number[][], behaviors: {
         behaviors,
     };
 }
-function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TileSource {
-    const [canvas, context] = createCanvasAndContext(16, 16);
-    draw(context);
-    /*canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    document.body.append(canvas);*/
-    return {
-        w: 16, h: 16,
-        source: {image: canvas, x: 0, y: 0, w: 16, h: 16},
-        behaviors: behaviors ? {'0x0': behaviors} : {},
-    };
-}
-function solidColorTile(color: string, behaviors: TileBehaviors = null): TileSource {
-    return canvasPalette(context => {
-        context.fillStyle = color;
-        context.fillRect(0, 0, 16, 16);
-    }, behaviors);
-}
+
 export function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBehaviors = null): TileSource {
     return canvasPalette(context => {
         const gradient = context.createLinearGradient(x0, y0, x1, y1);
@@ -1090,7 +1067,7 @@ addTiles([
     shallowToDeepAngles,
     deepToShallow,
     deepToShallowAngles,
-    deletedTileSource,
+    deletedTiles(1),
     caveFloorSpiritPalette,
     treeStump,
     treeLeavesTop,

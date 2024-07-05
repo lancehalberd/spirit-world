@@ -3,6 +3,7 @@ import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/sho
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
+import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import {
     accelerateInDirection,
@@ -190,13 +191,13 @@ enemyDefinitions.golem = {
     },
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'chargeLaser') {
+            const [x, y] = getMouthLaserCoords(state, enemy);
             context.save();
                 const p = enemy.modeTime / LASER_CHARGE_TIME;
                 context.globalAlpha *= 0.3 + 0.7 * p;
-                const r = 1 + 16 * (1 - p);
+                const r = 1 + 20 * (1 - p);
                 context.fillStyle = 'rgba(207,35,64,1)';
                 context.beginPath();
-                const [x, y] = getMouthLaserCoords(state, enemy);
                 context.arc(x, y, r, 0, 2 * Math.PI);
                 context.fill();
             context.restore();
@@ -214,6 +215,29 @@ enemyDefinitions.golem = {
                 context.fill();
             context.restore();
 
+        }
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (enemy.mode === 'chargeLaser') {
+            const [x, y] = getMouthLaserCoords(state, enemy);
+            renderDamageWarning(context, {
+                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
+                duration: LASER_CHARGE_TIME,
+                time: enemy.modeTime,
+            });
+        } else if (enemy.mode === 'chargeStrafeLaser') {
+            let [x, y] = getLeftEyeLaserCoords(state, enemy);
+            renderDamageWarning(context, {
+                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
+                duration: FAST_LASER_CHARGE_TIME,
+                time: enemy.modeTime,
+            });
+            [x, y] = getRightEyeLaserCoords(state, enemy);
+            renderDamageWarning(context, {
+                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
+                duration: FAST_LASER_CHARGE_TIME,
+                time: enemy.modeTime,
+            });
         }
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {

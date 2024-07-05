@@ -122,7 +122,7 @@ export class KeyBlock implements ObjectInstance {
             if (this.status === 'bigKeyLocked') {
                 showMessage(state, 'This device requires a special key.');
             } else if (this.status === 'locked') {
-                showMessage(state, 'This device requires a key.');
+                showMessage(state, 'This device requires a small key.');
             }
             state.hero.action = null;
         }

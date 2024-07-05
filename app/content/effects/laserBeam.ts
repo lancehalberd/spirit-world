@@ -1,5 +1,6 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getLedgeDelta } from 'app/movement/getLedgeDelta';
+import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 
@@ -68,6 +69,7 @@ export class LaserBeam implements EffectInstance, Props {
     delay: number;
     duration: number;
     ignoreWalls: boolean;
+    totalTellDuration: number;
     tellDuration: number;
     shockWaves: number;
     shockWaveTheta: number;
@@ -82,6 +84,7 @@ export class LaserBeam implements EffectInstance, Props {
         this.delay = delay;
         this.radius = radius;
         this.duration = duration;
+        this.totalTellDuration = tellDuration;
         this.tellDuration = tellDuration;
         this.ignoreWalls = ignoreWalls;
         this.damage = damage;
@@ -144,7 +147,14 @@ export class LaserBeam implements EffectInstance, Props {
            return;
        }
        if (this.tellDuration > 0) {
-            const ray = this.getHitRay(state);
+           const ray = this.getHitRay(state);
+           renderDamageWarning(context, {
+                ray,
+                duration: this.totalTellDuration,
+                time: this.totalTellDuration - this.tellDuration,
+            });
+
+           /* const ray = this.getHitRay(state);
             context.save();
                 context.translate(ray.x1, ray.y1);
                 const dx = ray.x2 - ray.x1;
@@ -162,7 +172,7 @@ export class LaserBeam implements EffectInstance, Props {
                 }
             context.restore();
             //drawLaser(context, this.getHitRay(state), 0.1);
-            return;
+            return;*/
        }
     }
 }

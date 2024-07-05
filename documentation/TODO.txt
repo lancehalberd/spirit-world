@@ -78,9 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add NPC dialog
-        "Want to know something mysterious? There is a cloud above the center of the lake that never moves!"
-
     - Possible work items:
         - Add placeholder for prologue
         - Add final dungeon
@@ -89,6 +86,16 @@ Current tasks:
             - Would prefer to have smooth crystal exterior tiles
         - Work on larger world map
             - Would like to brainstorm more ideas of what to include.
+
+    - Fix Void Tree fight
+        - Layers disappear (possibly when fighting flame heart while frost heart is active)
+        - Let's force fast transitions when the hearts die.
+        - Don't allow freezing the hearts.
+
+    - Add sound for picking up small peach
+    - Add sound effect using pink noise when near a waterfall.
+        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
+    - Play vanara dream music when talking to the Guardian in the Tomb.
 
     - New enemy: lava monster with shell (TBD by artist)
         - possible designs:

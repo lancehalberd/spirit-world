@@ -75,7 +75,19 @@ export class Door implements ObjectInstance {
     alwaysReset = true;
     updateDuringTransition = true;
     area: AreaInstance;
-    drawPriority: DrawPriority = 'background';
+    //drawPriority: DrawPriority = 'background';
+    getDrawPriority(state: GameState): DrawPriority {
+        // Upgrade the draw priority to 'sprites' when the hero is rendered by the door.
+        // Otherwise the hero might be drawn behind objects on the ground, like the key block
+        // in the Tomb that is right next to a door.
+        if (state.hero.renderParent == this) {
+            return 'sprites';
+        }
+        // Normally we want to draw doors in the background so that they always render behind the player
+        // and their shadow. This simplifies rendering the player in front of doors that they jump down
+        // in front of.
+        return 'background';
+    }
     isNeutralTarget = true;
     x = this.definition.x;
     y = this.definition.y;
