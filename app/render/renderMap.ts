@@ -1,5 +1,5 @@
 import { createAreaInstance } from 'app/content/areas';
-import { convertLocationToMapCoordinates, getMapTarget } from 'app/content/hints';
+import { convertLocationToMapCoordinates, getMapTargets } from 'app/content/hints';
 import { doorStyles } from 'app/content/objects/doorStyles';
 import { allSections, dungeonMaps } from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
@@ -96,14 +96,16 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     }
 
     if (state.time % 1000 <= 600) {
-        const location = getMapTarget(state);
-        if (location && location.zoneKey === zone && location.isSpiritWorld === state.location.isSpiritWorld) {
-            const mapCoordinates = convertLocationToMapCoordinates(location);
-            drawFrame(context, questMarker, {
-                ...questMarker,
-                x: r.x + mapCoordinates.x - 4,
-                y: r.y + mapCoordinates.y - 15,
-            });
+        const locations = getMapTargets(state);
+        for (const location of locations) {
+            if (location && location.zoneKey === zone && location.isSpiritWorld === state.location.isSpiritWorld) {
+                const mapCoordinates = convertLocationToMapCoordinates(location);
+                drawFrame(context, questMarker, {
+                    ...questMarker,
+                    x: r.x + mapCoordinates.x - 4,
+                    y: r.y + mapCoordinates.y - 15,
+                });
+            }
         }
     }
 }

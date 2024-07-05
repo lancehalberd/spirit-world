@@ -267,7 +267,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCave:0:0x0-npc-6", x: 144, y: 48, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "Zzzz.", dialogueIndex: 121},
         {status: "normal", id: "waterfallCave:0:0x0-npc-7", x: 208, y: 160, d: "left", behavior: "idle", style: "vanaraGold", type: "npc", dialogue: "I can't decide what to wear today...", dialogueIndex: 122},
         {status: "normal", id: "waterfallCave:0:0x0-npc-8", x: 432, y: 432, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "I have to check all of the food for freshness. Maybe I'll have a little snack while I work...", dialogueIndex: 123},
-        {status: "normal", id: "waterfallCave:0:0x0-npc-10", x: 240, y: 384, d: "right", behavior: "idle", style: "vanaraGold", type: "npc", dialogue: "Chopping wood sure calms me down.", dialogueIndex: 124},
+        {status: "normal", id: "waterfallCave:0:0x0-npc-10", x: 240, y: 384, d: "right", behavior: "idle", style: "vanaraGold", type: "npc", dialogue: "Chopping wood sure calms me down.", dialogueIndex: 162},
         {status: "normal", id: "waterfallCaveLeftMain", x: 128, y: 496, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveLeftMain", d: "down"},
         {status: "active", id: "", x: 72, y: 432, style: "firePit", type: "torch"},
         {status: "normal", id: "", x: 72, y: 424, type: "pushPull"},
@@ -940,6 +940,8 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "waterfallCaveEmptyChest", x: 336, y: 288, type: "chest", lootType: "empty", lootLevel: 1},
         {status: "normal", id: "", x: 160, y: 96, type: "pushPull"},
         {status: "normal", id: "", x: 176, y: 96, type: "pushPull"},
+        {status: "normal", id: "waterfallCaveMysteryNpc", x: 312, y: 132, d: "right", behavior: "random", style: "vanaraBrown", type: "npc", dialogue: "\"Want to know something mysterious?{|} There is a cloud above the center of the lake that never moves!\"", dialogueIndex: 161},
+        {status: "normal", id: "waterfallCaveEmptyRoomNpc", x: 112, y: 388, d: "right", behavior: "random", style: "vanaraGold", type: "npc", dialogue: "We recently finished digging this new room but we still need to furnish it.", dialogueIndex: 124},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 126, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},

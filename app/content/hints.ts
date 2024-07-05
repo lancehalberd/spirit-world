@@ -5,9 +5,10 @@ import { setScript } from 'app/scriptEvents';
 import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import Random from 'app/utils/Random';
 
+type ObjectZoneLocation = ZoneLocation & { object?: ObjectDefinition };
 
 interface Mission {
-    getMarkerLocation?: (state :GameState) => ZoneLocation & { object?: ObjectDefinition } | false
+    getMarkerLocation?: (state :GameState) => ObjectZoneLocation | false
     markerFrame?: Frame
     getScript: (state: GameState) => string
     isAvailable: (state: GameState) => boolean
@@ -29,6 +30,7 @@ function findSpiritSkyObject(state: GameState, objectId: string) {
 
 const getPeachCaveLocation = (state: GameState) => findMaterialWorldObject(state, 'peachCaveTopEntrance');
 const getWaterfallVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallCaveEntrance');
+const getVanaraVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'vanaraVillager');
 const getVanaraElderLocation = (state: GameState) => findMaterialWorldObject(state, 'elderEntrance');
 
 const getTombLocation = (state: GameState) => findMaterialWorldObject(state, 'tombEntrance');
@@ -103,8 +105,9 @@ const missions: Mission[] = [
         getMarkerLocation: getWaterfallVillageLocation,
         getScript(state: GameState) {
             if (state.location.zoneKey !== 'waterfallCave') {
-                return `I've been out for a long time, I should head home to the cave behind the waterfall.
+                return `I've been out for a long time, maybe I should head home to the cave behind the waterfall.
                     {|}The waterfall is just north of the lake.
+                    {|}On the other hand, maybe I should go to the forest to warn the Vanara about what that mysterious tree told me?
                     {addCue: Press [B_MAP] to view the map}`;
             } else {
                 return `I should tell my mom about what happened in the cave.
@@ -123,9 +126,25 @@ const missions: Mission[] = [
         },
     },
     {
+        getMarkerLocation: getVanaraVillageLocation,
+        getScript(state: GameState) {
+            return `I should ask around the Forest Village about that tree.`;
+        },
+        isAvailable(state: GameState) {
+            return !!state.savedState.objectFlags.homeInstructions || state.location.zoneKey !== 'peachCave';
+        },
+        isResolved(state: GameState) {
+            // This is normally resolved by talking to your mom, but it is also considered resolved
+            // if you talk to the Vanara Elder or Vanara Guardian first.
+            return !!state.savedState.objectFlags.momElder
+                || !!state.savedState.objectFlags.elderTomb
+                || state.hero.savedData.passiveTools.spiritSight > 0;
+        },
+    },
+    {
         getMarkerLocation: getVanaraElderLocation,
         getScript(state: GameState) {
-            return `I should talk to the Vanara Elder about my strange powers.
+            return `I should talk to the Vanara Elder about that tree and my strange powers.
                 {|}He lives in the woods to the southwest with the other Vanara.
                 {addCue: Press [B_MAP] to view the map}`
         },
@@ -529,19 +548,20 @@ export function showHint(state: GameState): void {
     }
 }
 
-export function getMapTarget(state: GameState): ZoneLocation & { object?: ObjectDefinition } | false {
+export function getMapTargets(state: GameState): ObjectZoneLocation[] {
     if (isRandomizer) {
-        return null;
+        return [];
     }
+    const locations: ObjectZoneLocation[] = [];
     for (const mission of missions) {
         if (mission.isAvailable(state) && !mission.isResolved(state)) {
             const location = mission.getMarkerLocation(state);
             if (location) {
-                return location;
+                locations.push(location);
             }
         }
     }
-    return null;
+    return locations;
 }
 
 export function convertLocationToMapCoordinates(location: ZoneLocation & {object?: ObjectDefinition}): {x: number, y: number} {

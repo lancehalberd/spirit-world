@@ -78,10 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Update dialogue + goals after leaving peach save
-        - Dialogue should reflect option to go home or go to Vanara village
-        - Goal should show a general marker on the Vanara village before talking to mother/getting the bow.
-
     - Add NPC dialog
         "Want to know something mysterious? There is a cloud above the center of the lake that never moves!"
 
