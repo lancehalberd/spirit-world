@@ -150,7 +150,7 @@ dialogueHash.mom = {
                     text: `Welcome home son!
                     {|}You were gone so long I was worried you got into trouble again!
                     {|}...
-                    {|}You ate a strange fruit in a cave and now you can see in the dark?
+                    {|}You ate a strange fruit in a cave and now you can see in the dark? The Spirit Tree?
                     {|}Your father said that the Vanara Elder had some kind of magic power but he
                     said it was dangerous and they had to keep it secret.
                     {|}If you have the same kind of power you should talk to the Elder just in case.

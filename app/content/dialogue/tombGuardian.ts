@@ -75,7 +75,7 @@ dialogueHash.tombGuardian = {
         {
             logicCheck: {
                 requiredFlags: ['$spiritSight', '$astralProjection'],
-                excludedFlags: [],
+                excludedFlags: ['tombExit'],
             },
             isExclusive: true,
             text: [
@@ -104,8 +104,10 @@ dialogueHash.tombGuardian = {
                     dialogueType: 'quest',
                     text: `Well done young one, I am the Vanara Guardian.
                     I protect the resting place of the Vanara.
-                    {|}You've come to learn more about your spirit powers?
-                    {|}I knew this day would come eventually...
+                    {|}You were given a warning for the Spirit Tree?
+                    {|}The Spirit Tree watches over all Vanara, even the little rebels in your village.
+                    {|}Relax and know that your warning has reached her already, but if you wish to see
+                    her yourself you will have to awaken your spirit powers.
                     {|}I can teach you to look into the spirit realm,
                     but you won't be able to interact with it.
                     {item:spiritSight}
@@ -138,7 +140,7 @@ dialogueHash.tombGuardian = {
         {
             logicCheck: {
                 requiredFlags: ['tombTeleporter'],
-                excludedFlags: [],
+                excludedFlags: ['$astralProjection'],
             },
             isExclusive: true,
             text: [
@@ -157,6 +159,24 @@ dialogueHash.tombGuardian = {
                     {|}Use the teleporter to return here once you can touch the Spirit World.`,
                 },
             ],
+        },
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueIndex: 163,
+                    text: `We guardians help the Spirit Tree watch over this world.`,
+                },
+                {
+                    dialogueIndex: 164,
+                    text: `It is not our place to interfere even when we wish we could.`,
+                },
+            ],
+            repeatIndex: 0,
         },
     ],
 };

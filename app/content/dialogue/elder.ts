@@ -252,7 +252,9 @@ dialogueHash.elder = {
                     dialogueIndex: 4,
                     dialogueType: 'quest',
                     text: `Greetings young one, I can sense there is something different about you today.
-                    {|}Your father didn't pay much attention to rules so I'm sure he has told you stories about my spirit powers.
+                    {|}A warning about the Spirit Tree?
+                    {|}No no, I believe you, this is too strange even for one of your tales.
+                    {|}*sigh* Your father didn't pay much attention to rules so I'm sure he has told you stories about my spirit powers.
                     {|}Stories like that are often hard to believe, but I suspect you are starting to wonder if there is any truth to them.
                     {|}Unfortunately, it is not my place to teach you more about the Spirit World.
                     {|}To be honest my spirit powers are quite weak anyway, just enough to keep careful watch over this village.
