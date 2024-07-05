@@ -78,13 +78,24 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Add cutscene after the Peach Cave boss.
+        - [Thank you for saving me.]
+          {|}"Woah, is this a magic tree?"
+          {|}[I'm sorry, but I don't have much time, those creatures were draining my energy.]
+          {|}[Please take this and warn the Vanara, the Spirit Tree may be in danger.]
+          {|}"Wait, who are you? How'd-"
+          {|}[]
+
     - Possible work items:
         - Add placeholder for prologue
         - Add cutscene with tree dialogue to Peach Cave
             - Would like Vanara Tree graphics for this at some point + web covering.
             - Brainstorm what the Helix+World Tree look like
-            - Maybe a bean stalk wrapped around a central pillar
-            - Maybe a 4 dimensional helix projected into 3 dimensions?
+                - Looks like white coral that grows in spiraling tubes that occassionally branch out from the main stalk.
+                - Smaller quick growing mushrooms+tendrils grow out of the coral in various places.
+                - The coral can grow to shape and forms rooms and corridors as desired.
+                - The main trunk is often constructed into a gauntlet of trials to test Vanara who want to crew ships to other planets.
+                - The tree can pull out of the material world to hide itself, similar to Vanara invisibility.
             - For the material world, there could be a large ring of disturbed water in the lake where the invisible tree is.
                 - The top of the helix should be an ivory platform just above a cloud that fully obscures it from below.
                 - "Want to know something mysterious? There is a cloud above the center of the lake that never moves!"
