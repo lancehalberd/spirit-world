@@ -190,7 +190,10 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldLakePiece',
-        paths: [{nodeId: 'overworldMain'}],
+        paths: [
+            {nodeId: 'overworldMain'},
+            {nodeId: 'mainSpiritWorld', logic: andLogic(canUseTeleporters, canRemoveLightStones)},
+        ],
         checks: [
             { objectId: 'overworldLakePiece' },
         ],
@@ -202,7 +205,7 @@ export const overworldNodes: LogicNode[] = [
         paths: [
             { nodeId: 'spiritWorldMountain', logic: canRemoveLightStones },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
-            { nodeId: 'overworldLakePiece', logic: canUseTeleporters },
+            { nodeId: 'overworldLakePiece', logic: andLogic(canUseTeleporters, canRemoveLightStones) },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: canRemoveHeavyStones },
         ],
@@ -424,6 +427,8 @@ export const skyNodes: LogicNode[] = [
         nodeId: 'outsideHelix',
         paths: [
             { nodeId: 'mainCloudPath', logic: hasCloudBoots },
+            // Walk straight north on the right side to fall onto the small plateau next to the lake.
+            { nodeId: 'overworldLakePiece'},
         ],
         entranceIds: ['helixSkyEntrance'],
         exits: [
