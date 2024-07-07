@@ -36,3 +36,13 @@ export const fatherAnimations: ActorAnimations = {
     still: omniAnimation(fatherDownAnimation),
     idle: omniAnimation(fatherIdleDownAnimation),
 };
+
+//const testGeometry: FrameDimensions = {w: 14, h: 26};
+//const testDownAnimation: FrameAnimation = createAnimation('gfx/staging/human.png', testGeometry, {left: 252});
+//window['debugCanvas'](testDownAnimation.frames[0], 2);
+
+/*export const testAnimations: ActorAnimations = {
+    still: omniAnimation(testDownAnimation),
+    idle: omniAnimation(testDownAnimation),
+};
+*/

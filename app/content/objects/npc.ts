@@ -10,6 +10,7 @@ import {
     fatherAnimations,
     lightningBeastAnimations,
     momAnimations,
+    //testAnimations,
 } from 'app/content/npcs/npcAnimations'
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
@@ -68,6 +69,10 @@ function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state
 }
 
 export const npcStyles = {
+    /*test: {
+        animations: testAnimations,
+        shadowOffset: 2,
+    } as NPCStyleDefinition,*/
     giantSnake: {
         animations: snakeAnimations,
         scale: 3,
