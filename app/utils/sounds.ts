@@ -514,7 +514,16 @@ sounds.set('ouch', {
         playBeeps([200, 400, 100, 200], 0.05, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'});
     }
 });
-
+sounds.set('drink', {
+    play() {
+        playBeeps([200, 100, 400, 800, 600, 2400], 0.03, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'});
+    }
+});
+sounds.set('heart', {
+    play() {
+        playBeeps([800, 1400, 2800, 2100], 0.05, .2, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'});
+    }
+});
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
 const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];

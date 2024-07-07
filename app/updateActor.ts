@@ -8,6 +8,7 @@ import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
+import { playAreaSound } from 'app/musicController';
 import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
@@ -115,6 +116,20 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 
 
 export function updateGenericHeroState(this: void, state: GameState, hero: Hero) {
+    if (hero.displayLife === undefined) {
+        hero.displayLife = hero.life;
+    }
+    if (hero.displayLife > hero.life && hero.invulnerableFrames <= 0) {
+        //hero.displayLife = Math.max(hero.life, hero.displayLife - 0.1);
+        hero.displayLife = hero.life;
+    } else if (hero.displayLife < hero.life) {
+        const oldModValue = hero.displayLife % 1;
+        hero.displayLife = Math.min(hero.life, hero.displayLife + 0.1);
+        if (hero.displayLife % 1 < oldModValue) {
+            //console.log(hero.displayLife);
+            playAreaSound(state, state.areaInstance, 'heart');
+        }
+    }
     // Hero takes one damage every half second while in a hot room without the fire blessing.
     if (!editingState.isEditing && state.areaSection?.isHot && !state.hero.savedData.passiveTools.fireBlessing) {
         hero.applyBurn(1, 500);

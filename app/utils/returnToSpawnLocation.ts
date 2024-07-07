@@ -5,6 +5,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 
 export function returnToSpawnLocation(state: GameState) {
     state.hero.life = state.hero.savedData.maxLife;
+    state.hero.displayLife = state.hero.life;
     // Only fill the magic bar if the hero has some magic regen.
     if (state.hero.magicRegen) {
         state.hero.magic = state.hero.maxMagic;

@@ -102,7 +102,9 @@ dialogueHash.tombGuardian = {
                 {
                     dialogueIndex: 65,
                     dialogueType: 'quest',
-                    text: `Well done young one, I am the Vanara Guardian.
+                    text: `
+                    {playTrack:vanaraDreamTheme}
+                    Well done young one, I am the Vanara Guardian.
                     I protect the resting place of the Vanara.
                     {|}You were given a warning for the Spirit Tree?
                     {|}The Spirit Tree watches over all Vanara, even the little rebels in your village.
@@ -116,6 +118,7 @@ dialogueHash.tombGuardian = {
                     {|}They weren't supposed to pass their knowledge on but it still survives in certain families.
                     {|}The summoners used special tools to enhance their powers,
                     perhaps your mother could tell you more.
+                    {stopTrack}
                     `,
                 },
             ],

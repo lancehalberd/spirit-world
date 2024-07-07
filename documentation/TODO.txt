@@ -78,6 +78,13 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Prevent weapon knockback from triggering area transition.
+        - Update movement behavior to treat door entrances+exterior edges of the screen as walls when knocked back.
+        - If nothing else, at least move stationary plant enemies far enough from transition edges to not trigger this by the forest.
+
+    - Add sound effect using pink noise when near a waterfall.
+        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
+
     - Possible work items:
         - Add placeholder for prologue
         - Add final dungeon
@@ -86,16 +93,6 @@ Current tasks:
             - Would prefer to have smooth crystal exterior tiles
         - Work on larger world map
             - Would like to brainstorm more ideas of what to include.
-
-    - Fix Void Tree fight
-        - Layers disappear (possibly when fighting flame heart while frost heart is active)
-        - Let's force fast transitions when the hearts die.
-        - Don't allow freezing the hearts.
-
-    - Add sound for picking up small peach
-    - Add sound effect using pink noise when near a waterfall.
-        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
-    - Play vanara dream music when talking to the Guardian in the Tomb.
 
     - New enemy: lava monster with shell (TBD by artist)
         - possible designs:
@@ -113,6 +110,12 @@ Current tasks:
             - Freezing and hitting with staff will instantly defeat the enemy.
         - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
         - Can move into lava. Returning to lava will regenerate the shell if missing.
+
+    - Add crushed status effect
+        - Applied from certain attacks like golem hand slams, guardians running over the hero, etc.
+        - Render the hero laying down for Nms.
+        - Button press shakes the player sprite and reduces duration by 200ms once every 200ms.
+        - Gold armor should reduce or prevent the effect of crushed.
 
     - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
         - Allow the player to move under solid objects this way
@@ -884,7 +887,7 @@ Charge Chakram Attack:
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
-    - All bombable + locked doors have ids, all objects with saveStatus set have ids.
+    - All bombable + locked doors have ids, all objects with saveStatues set have ids.
     - All objectFlags correspond to some object or dialogue key or loot type
     - All escaped dialogue corresponds to a special frame or loot type.
 

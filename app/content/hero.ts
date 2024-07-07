@@ -99,6 +99,10 @@ export class Hero implements Actor {
     lastPushTime?: number
     invulnerableFrames?: number;
     life: number;
+    // The amount of life to actually display in the HUD.
+    // This value may change over many frames to catch up with
+    // the actual life value which changes in larger chunks.
+    displayLife?: number;
     ironSkinCooldown: number = 500;
     wading?: boolean;
     slipping?: boolean;
@@ -268,6 +272,25 @@ export class Hero implements Actor {
         if (this.action === 'roll' && !hit.canDamageRollingHero) {
             return {};
         }
+        const hitbox = this.getHitbox();
+        // Generically knock the hero back if knockAwayFromHit is set but no actual knockbac vector is set.
+        if (hit.knockAwayFromHit && !hit.knockback) {
+            let dx = -directionMap[this.d][0], dy = -directionMap[this.d][1];
+            if (hit.hitbox) {
+                dx = (hitbox.x + hitbox.w / 2) - (hit.hitbox.x + hit.hitbox.w / 2);
+                dy = (hitbox.y + hitbox.h / 2) - (hit.hitbox.y + hit.hitbox.h / 2);
+            } else if (hit.hitCircle) {
+                dx = (hitbox.x + hitbox.w / 2) - hit.hitCircle.x;
+                dy = (hitbox.y + hitbox.h / 2) - hit.hitCircle.y;
+            } else if (hit.hitRay) {
+                // TODO.
+            }
+            hit.knockback = {
+                vx: 4 * dx,
+                vy: 4 * dy,
+                vz: 2,
+            };
+        }
         if (this.hasBarrier) {
             let iframeMultiplier = 1;
             let spiritDamage = hit.spiritCloakDamage || Math.max(10, hit.damage * 5);
@@ -303,7 +326,6 @@ export class Hero implements Actor {
                 state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, iframeMultiplier * 10);
                 // state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
             }
-            const hitbox = this.getHitbox();
             if (hit.canAlwaysKnockback && hit.knockback) {
                 this.knockBack(state, hit.knockback);
             }
@@ -455,6 +477,9 @@ export class Hero implements Actor {
         if (state.scriptEvents.blockPlayerInput) {
             return;
         }
+        // Immediately change display life to the current life so that it is obvious how much
+        // damage the most recent hid did.
+        this.displayLife = this.life;
         if (this.frozenHeartDuration > 0) {
             // When the player has frozen hearts, all damage just destroys those hearts.
             const targetValue = Math.max(0, Math.ceil(this.savedData.ironSkinLife) - 2);

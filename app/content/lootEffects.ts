@@ -1,4 +1,5 @@
 import { setLeftTool, setRightTool } from 'app/content/menu';
+import { playAreaSound } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -105,6 +106,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
     },
     peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         state.hero.life = Math.min(state.hero.life + 1, state.hero.savedData.maxLife);
+        playAreaSound(state, state.areaInstance, 'drink');
     },
     peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         state.hero.savedData.maxLife++;

@@ -5,6 +5,7 @@ import {
 import {
     FRAME_LENGTH, GAME_KEY,
 } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import {
     isGameKeyDown,
     wasGameKeyPressed,
@@ -64,6 +65,8 @@ export function updateDefeated(state: GameState) {
                 state.defeatState.defeated = false;
                 saveGame(state);
             }
+            state.hero.displayLife = state.hero.life;
+            playAreaSound(state, state.areaInstance, 'heart');
         }
         return;
     }

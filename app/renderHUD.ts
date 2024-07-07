@@ -32,23 +32,45 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     // Draw heart backs, and fillings
     let x = 26;
     let y = 5;
+    const normalHeartLife = Math.min(state.hero.life, state.hero.displayLife);
     for (let i = 0; i < state.hero.savedData.maxLife; i++) {
         if (i === 10) {
             y += 11;
             x = 26;
         }
         drawFrame(context, emptyHeart, {...emptyHeart, x, y});
+        // Recently lost hearts render semi transparent for a bit.
+        if (state.hero.displayLife > state.hero.life) {
+            context.save();
+                context.globalAlpha *= 0.4 * state.hero.invulnerableFrames / 30;
+                let frame = fullHeart;
+                if (i >= state.hero.displayLife ) {
+                    frame = null;
+                } else if (i >= state.hero.displayLife  - 0.25) {
+                    frame = quarterHeart;
+                } else if (i >= state.hero.displayLife  - 0.5) {
+                    frame = halfHeart;
+                } else if (i >= state.hero.displayLife  - 0.75) {
+                    frame = threeQuarters;
+                }
+                if (frame) {
+                    drawFrame(context, frame, {...frame, x, y});
+                }
+            context.restore();
+        }
         let frame = fullHeart;
-        if (i >= state.hero.life) {
-            frame = emptyHeart;
-        } else if (i >= state.hero.life - 0.25) {
+        if (i >= normalHeartLife) {
+            frame = null;
+        } else if (i >= normalHeartLife - 0.25) {
             frame = quarterHeart;
-        } else if (i >= state.hero.life - 0.5) {
+        } else if (i >= normalHeartLife - 0.5) {
             frame = halfHeart;
-        } else if (i >= state.hero.life - 0.75) {
+        } else if (i >= normalHeartLife - 0.75) {
             frame = threeQuarters;
         }
-        drawFrame(context, frame, {...frame, x, y});
+        if (frame) {
+            drawFrame(context, frame, {...frame, x, y});
+        }
         x += 11;
     }
     // Draw iron skin hearts on top of regular hearts

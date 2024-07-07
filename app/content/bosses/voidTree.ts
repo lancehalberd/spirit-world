@@ -256,7 +256,7 @@ function useSpinningFrostAttack(state: GameState, enemy: Enemy): void {
 enemyDefinitions.voidStone = {
     animations: stoneHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
-    canBeKnockedBack: false,
+    canBeKnockedBack: false, canBeFrozen: false,
     aggroRadius: 144,
     immunities: [null],
     abilities: [giantLaserAbility, summonVoidHandAbility],
@@ -265,7 +265,7 @@ enemyDefinitions.voidStone = {
 enemyDefinitions.voidFlame = {
     animations: flameHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
-    canBeKnockedBack: false,
+    canBeKnockedBack: false, canBeFrozen: false,
     aggroRadius: 144,
     abilities: [flameWallAbility],
     immunities: ['fire'],
@@ -275,7 +275,7 @@ enemyDefinitions.voidFlame = {
 enemyDefinitions.voidFrost = {
     animations: frostHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
-    canBeKnockedBack: false,
+    canBeKnockedBack: false, canBeFrozen: false,
     aggroRadius: 144,
     abilities: [voidTreeIceGrenadeAbility],
     immunities: ['ice'],
@@ -285,7 +285,7 @@ enemyDefinitions.voidFrost = {
 enemyDefinitions.voidStorm = {
     animations: stormHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
-    canBeKnockedBack: false,
+    canBeKnockedBack: false, canBeFrozen: false,
     aggroRadius: 144,
     abilities: [lightningBoltAbility],
     immunities: ['lightning'],

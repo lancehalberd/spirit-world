@@ -1,7 +1,8 @@
 import { logicHash } from 'app/content/logic';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH, RIVAL_NAME } from 'app/gameConstants';
-import { appendCallback, appendScript, wait } from 'app/scriptEvents';
+import { appendCallback, appendScript, runBlockingCallback, wait } from 'app/scriptEvents';
+import { updateGenericHeroState } from 'app/updateActor';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { saveGame } from 'app/utils/saveGame';
 import { moveEnemyToTargetLocation } from 'app/utils/enemies';
@@ -137,16 +138,16 @@ dialogueHash.elder = {
                         elder.changeToAnimation('idle');
                     }
                 });
-                for (let i = 0; i < 3; i++) {
-                    wait(state, 500);
-                    state.scriptEvents.queue.push({
-                        type: 'callback',
-                        callback(state: GameState) {
-                            state.hero.life++;
-                            state.scriptEvents.blockFieldUpdates = true;
-                        }
-                    });
-                }
+                appendScript(state, `Here, drink this.`);
+                wait(state, 1000);
+                appendCallback(state, () => {
+                    state.hero.life = state.hero.savedData.maxLife;
+                });
+                runBlockingCallback(state, () => {
+                    updateGenericHeroState(state, state.hero);
+                    return state.hero.displayLife < state.hero.life
+                });
+
                 wait(state, 500);
                 state.scriptEvents.queue.push({
                     type: 'callback',

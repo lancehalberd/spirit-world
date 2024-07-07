@@ -406,6 +406,9 @@ enemyDefinitions.rival2 = {
                 } else {
                     enemy.useTauntFromList(state, ['normalDamage', 'normalDamage2']);
                 }
+                // This will potentially allow the rival to dodge a second attack after he is hit once while staggered.
+                // Sometimes this can be triggered when multiple ice shards hit him, which is not ideal.
+                // Consider not applying this when hit by his own projectiles.
                 enemy.setMode('hurt');
             } else {
                 if (hit.element === 'ice') {

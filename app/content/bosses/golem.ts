@@ -726,6 +726,17 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.params.side = 'right';
         }
     }
+    // Disable touch hit during slam attacks, otherwise the touch damage will prevent the actual attack damage.
+    if (enemy.mode !== 'targetedSlam' && enemy.mode !== 'slamHand' && enemy.z <= 10) {
+        enemy.behaviors = {
+            touchHit: {
+                damage: 1,
+                knockAwayFromHit: true,
+            },
+        };
+    } else {
+        delete enemy.behaviors;
+    }
     // The thumb is on the left and should face towards the middle so the hand on
     // the left side of the face (in global coordinates) needs to be reflected, which means
     // we need it to face 'right' because the 'right' frame is reflected by the engine.
@@ -872,6 +883,12 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.z -= 2;
         if (enemy.z <= 0) {
             enemy.z = 0;
+            hitTargets(state, enemy.area, {
+                hitbox: enemy.getHitbox(),
+                damage: 2,
+                knockAwayFromHit: true,
+                hitAllies: true,
+            });
             enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 2);
             addSlamEffect(state, enemy);
@@ -900,6 +917,12 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.z -= 3;
         if (enemy.z <= 0) {
             enemy.z = 0;
+            hitTargets(state, enemy.area, {
+                hitbox: enemy.getHitbox(),
+                damage: 2,
+                knockAwayFromHit: true,
+                hitAllies: true,
+            });
             enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 3);
             addSlamEffect(state, enemy);

@@ -143,6 +143,7 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
 
 interface SectionRenderData {
     alpha: number
+    isExplored: boolean
     source: Rect
     target: Rect
     area: AreaInstance
@@ -173,7 +174,8 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
         }
         //mapContext.fillStyle = 'blue';
         const isHidden = sectionData.section.hideMap;
-        const isExplored = hasMap || isSectionExplored(state, sectionData.section.index);
+        const isActuallyExplored = isSectionExplored(state, sectionData.section.index);
+        const isExplored = hasMap || isActuallyExplored;
         if (!editingState.isEditing && (!isExplored || isHidden)) {
             //mapContext.fillStyle = 'red';
             continue;
@@ -181,6 +183,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
         const {area, section} = sectionData;
         sectionRenderData.push({
             alpha: isHidden ? 0.2 : (!isExplored ? 0.6 : 1),
+            isExplored: isActuallyExplored,
             source: {
                 x: section.x * 16,
                 y: section.y * 16,
@@ -214,6 +217,14 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             renderMapObjects(mapContext, state, data.area,
                 data.target,  data.source, hasMap);
         mapContext.restore();
+        if (!data.isExplored && !editingState.isEditing) {
+            mapContext.save();
+                mapContext.globalAlpha *= 0.7;
+                mapContext.fillStyle = 'black';
+                mapContext.fillRect(data.target.x, data.target.y, data.target.w, data.target.h);
+            mapContext.restore();
+        }
+
     }
 }
 
