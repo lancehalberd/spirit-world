@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, hasIronBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
-    hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasLongSomersault, hasStaff,
+    hasRangedPush, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasLongSomersault, hasStaff,
     hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -291,7 +291,8 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'treeCave',
         nodeId: 'treeCaveBack',
-        checks: [{objectId: 'treeCaveSilver', logic: hasStaff}],
+        // It is a bit tricky, but you can use clone explosion to push the rolling ball in this room.
+        checks: [{objectId: 'treeCaveSilver', logic: andLogic(hasStaff, orLogic(hasRangedPush, hasClone))}],
         paths: [{ nodeId: 'treeCaveFront'}],
         entranceIds: ['treeCaveMarker'],
     },
