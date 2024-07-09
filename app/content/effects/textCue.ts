@@ -28,9 +28,11 @@ export class TextCue implements EffectInstance {
     priority: number = this.props.priority ?? 0;
     duration: number = this.props.duration ?? 3000;
     textFrames: Frame[][];
+    isUsingKeyboard: boolean = false;
     constructor(state, readonly props: TextCueProps) {
         // TextCue only supports a single page of messages.
         this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
+        this.isUsingKeyboard = state.isUsingKeyboard;
     }
     fadeOut() {
         if (this.duration === 0) {
@@ -41,6 +43,11 @@ export class TextCue implements EffectInstance {
     }
     update(state: GameState) {
         this.time += FRAME_LENGTH;
+        // Update which keys are displayed if the player changes their input source while a message is already displayed.
+        if (this.isUsingKeyboard !== state.isUsingKeyboard) {
+            this.isUsingKeyboard = state.isUsingKeyboard;
+            this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
+        }
         if (this.duration && this.time >= this.duration) {
             this.done = true;
             removeEffectFromArea(state, this);
