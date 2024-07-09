@@ -381,14 +381,14 @@ class ElevatorControlTerminal implements ObjectInstance {
         if (this.elevator.specialStatus === 'stuck') {
             state.hero.action = null;
             // Set this callback here to give it easy access to the elevator instance.
-            dialogueHash.elevator.mappedOptions.releaseBreak = (state: GameState) => {
+            dialogueHash.elevator.mappedOptions.releaseBrake = (state: GameState) => {
                 this.elevator.fallToBasement(state);
                 return '';
             }
             appendScript(state, `
                 !WARNING![-]POWER FAILURE DETECTED
-                {|}EMERGENCY BREAK ACTIVATED
-                {choice:RELEASE BREAK?|Yes:elevator.releaseBreak|No}
+                {|}EMERGENCY BRAKE ACTIVATED
+                {choice:RELEASE BRAKE?|Yes:elevator.releaseBrake|No}
             `);
             return;
         }
@@ -484,7 +484,7 @@ class ElevatorCallTerminal implements ObjectInstance {
         if (this.elevator.specialStatus === 'stuck') {
             appendScript(state, `
                 !WARNING![-]POWER FAILURE DETECTED
-                {|}SAFETY BREAK ACTIVATED, THE PLATFORM CANNOT BE CALLED.
+                {|}SAFETY BRAKE ACTIVATED, THE PLATFORM CANNOT BE CALLED.
             `);
             state.hero.action = null;
         }
