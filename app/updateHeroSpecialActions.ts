@@ -305,10 +305,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.takeDamage(state, damage);
             destroyClone(state, hero);
             hero.action = null;
-            // stop updating this hero if it was a clone that got destroyed by taking damage.
-            if (!hero.area) {
-                return;
-            }
+            return true;
         }
         return true;
     }
@@ -526,7 +523,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.takeDamage(state, 1);
                 destroyClone(state, hero);
                 hero.action = null;
-                return;
+                return true;
             }
             checkForFloorEffects(state, hero);
             // This has to be done after checking floor effects to set `hero.isSwimming` correctly.
@@ -551,7 +548,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 if (hero.action === 'thrown') {
                     if (!canSomersaultToCoords(state, hero, hero)) {
                         destroyClone(state, hero);
-                        return;
+                        return true;
                     }
                 }
                 hero.action = null;
@@ -592,7 +589,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (hero.action === 'thrown') {
                 if (!canSomersaultToCoords(state, hero, hero)) {
                     destroyClone(state, hero);
-                    return;
+                    return true;
                 }
             }
             hero.z = minZ;
