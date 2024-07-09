@@ -77,6 +77,61 @@ export function getMenuName(state: GameState, type: MenuOptionType): string {
     return getLootName(state, type);
 }
 
+export function getMenuTip(state: GameState, type: MenuOptionType): {buttons: string, action: string} | null {
+    if (type === 'help') {
+        return {
+            buttons: '[B_WEAPON]',
+            action: 'Show',
+        };
+    }
+    if (type === 'return' || type === 'nimbusCloud') {
+        return {
+            buttons: '[B_WEAPON]',
+            action: 'Use',
+        };
+    }
+    if (type === 'bow' || type === 'staff' || type === 'cloak' || type === 'clone') {
+        return {
+            buttons: '[B_LEFT_TOOL]/[B_RIGHT_TOOL]',
+            action: 'Equip',
+        };
+    }
+    if (type === 'fire' || type === 'ice' || type === 'lightning') {
+        if (state.hero.savedData.element === type) {
+            return {
+                buttons: '[B_WEAPON]',
+                action: 'Unequip',
+            };
+        }
+        return {
+            buttons: '[B_WEAPON]',
+            action: 'Unequip',
+        };
+    }
+    if (type === 'neutral') {
+        if (state.hero.savedData.element === null) {
+            return null
+        }
+        return {
+            buttons: '[B_WEAPON]',
+            action: 'Equip',
+        };
+    }
+    if (type === 'leatherBoots' || type === 'ironBoots' || type === 'cloudBoots') {
+        if (state.hero.savedData.equippedBoots === type) {
+            return null
+        }
+        return {
+            buttons: '[B_WEAPON]',
+            action: 'Equip',
+        };
+    }
+    return {
+        buttons: '[B_WEAPON]',
+        action: 'Help',
+    };
+}
+
 export function getMenuHelpMessage(state: GameState, type: MenuOptionType): string {
     if (type === 'help') {
         return 'Hint';

@@ -58,7 +58,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             return 'Tower Staff';
         case 'clone':
             if (lootLevel === 1) {
-                return 'Clone';
+                return 'Shadow Clone';
             }
             return 'Double Clone';
         case 'roll':

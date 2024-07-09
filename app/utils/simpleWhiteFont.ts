@@ -50,14 +50,42 @@ const [
     keyboard_m,
 ] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 51}).frames;
 
-const smallKeys = [
-    xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
+const narrowFrames = [
+    xbox_y, xbox_b, xbox_a, xbox_x, xbox_start, xbox_select,
+    xbox_r2, xbox_l2,
     ps_x, ps_circle, ps_square, ps_triangle, ps_start,
-    keyboard_c, keyboard_v, keyboard_z, keyboard_x,
+];
+for (const narrowFrame of narrowFrames) {
+    narrowFrame.x += 5;
+    narrowFrame.w -= 9;
+}
+const mediumFrames = [
+    xbox_r1, xbox_l1, xbox_dpad, xbox_leftStick
+];
+for (const narrowFrame of mediumFrames) {
+    narrowFrame.x += 3;
+    narrowFrame.w -= 6;
+}
+const xboxButtons = [
+    xbox_y, xbox_b, xbox_a, xbox_x,
 ]
-for (const smallKey of smallKeys) {
-    smallKey.x += 5;
-    smallKey.w -= 9;
+for (const xboxButton of xboxButtons) {
+    xboxButton.content = {...xboxButton.content, y: 2};
+}
+const singleKeys = [
+    keyboard_c, keyboard_v, keyboard_z, keyboard_x,
+    keyboard_h,
+    keyboard_j,
+    keyboard_k,
+    keyboard_y,
+    keyboard_u,
+    keyboard_i,
+    keyboard_o,
+    keyboard_m,
+]
+for (const singleKey of singleKeys) {
+    singleKey.x += 3;
+    singleKey.w -= 6;
 }
 
 export const xboxMap = {

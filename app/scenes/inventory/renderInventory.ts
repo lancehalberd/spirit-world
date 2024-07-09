@@ -1,4 +1,4 @@
-import { getMenuName, getMenuRows } from 'app/content/menu';
+import { getMenuName, getMenuRows, getMenuTip } from 'app/content/menu';
 import { getLootFrame, lootFrames, neutralElement } from 'app/content/loot';
 import { getCanvasScale } from 'app/development/getCanvasScale';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
@@ -10,6 +10,7 @@ import { getMousePosition } from 'app/utils/mouse';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { contextMenuState, editingState } from 'app/development/editingState';
 import { getState, shouldHideMenu } from 'app/state';
+import { parseMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 
 const MARGIN = 20;
@@ -236,14 +237,52 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
 
     if (selectedItem) {
         const lootName = getMenuName(state, selectedItem);
-        const w = lootName.length * 8 + 12, h = 18 + 8;
-        const textRect = {x: outerMenuFrame.x + outerMenuFrame.w + 8 - w, y : outerMenuFrame.y + outerMenuFrame.h + 8 - h, w, h};
-        renderMenuFrame(context, state, textRect);
-        drawText(context, lootName, textRect.x + textRect.w - 6, textRect.y + textRect.h - 4, {
+        const nameBoxWidth = lootName.length * 8 + 12, h = 18 + 8;
+        const nameBoxRect = {
+            x: outerMenuFrame.x + outerMenuFrame.w + 8 - nameBoxWidth,
+            y: outerMenuFrame.y + outerMenuFrame.h + 8 - h - 20,
+            w: nameBoxWidth, h};
+        renderMenuFrame(context, state, nameBoxRect);
+        drawText(context, lootName, nameBoxRect.x + nameBoxRect.w - 6, nameBoxRect.y + nameBoxRect.h - 4, {
             textBaseline: 'bottom',
             textAlign: 'right',
             size: 16,
         });
+        const menuTip = getMenuTip(state, selectedItem);
+        if (menuTip) {
+            const textFrames = parseMessage(state, menuTip.buttons)[0].frames[0].filter(v => v);
+            let buttonW = 0;
+            for (const frame of textFrames) {
+                buttonW += frame ? frame.w : 8;
+            }
+            const padding = 2;
+
+            const w = buttonW + padding + menuTip.action.length * 8 + 12, h = 18 + 8;
+            const textRect = {
+                x: nameBoxRect.x + nameBoxRect.w - w,//nameBoxRect.x + nameBoxRect.w / 2 - w / 2,//outerMenuFrame.x + outerMenuFrame.w + 12 - w,
+                y: outerMenuFrame.y + outerMenuFrame.h + 10 - h,
+                w, h
+            };
+            renderMenuFrame(context, state, textRect);
+            const characterWidth = 8;
+            let x = textRect.x + 4;
+            for (const frame of textFrames) {
+                if (!frame) {
+                    x += characterWidth;
+                    continue;
+                }
+                drawFrame(context, frame, {
+                    x: x - (frame.content?.x || 0),
+                    y: textRect.y + 6 - (frame.content?.y || 0), w: frame.w, h: frame.h
+                });
+                x += frame.w;
+            }
+            drawText(context, menuTip.action, textRect.x + 4 + buttonW + padding, textRect.y + textRect.h - 4, {
+                textBaseline: 'bottom',
+                textAlign: 'left',
+                size: 16,
+            });
+        }
     }
 }
 
