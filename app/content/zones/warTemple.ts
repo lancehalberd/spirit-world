@@ -1119,7 +1119,6 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x1-door-1", x: 368, y: 16, type: "door", style: "stone", d: "up", linked: true},
         {status: "normal", id: "warTemple:0:0x1-snakeFlame-0", x: 304, y: 160, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "warTemple:0:0x1-snakeFlame-1", x: 304, y: 80, type: "enemy", enemyType: "snake", d: "down", params: {}},
-        {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "future", d: "up", linked: true, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 215, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 2},
@@ -3537,7 +3536,7 @@ const sf0_0x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "warTempleLadder", x: 368, y: 352, type: "door", style: "ladderUp", d: "up", targetZone: "warTemple", targetObjectId: "warTempleLadder", locationCue: "War Temple B1"},
-        {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "future", d: "up", linked: true, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1"},
+        {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "future", d: "up", linked: false, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1"},
         {status: "normal", id: "warTemple:0:0x1-door-1", x: 368, y: 16, type: "door", style: "stone", d: "up", linked: true, spirit: true},
         {status: "normal", id: "warTemple:0:0x1-door-0", x: 496, y: 96, type: "door", style: "stone", d: "right", linked: true, spirit: true},
         {status: "normal", id: "warTemple:s0:0x1-elementalFrost-0", x: 364, y: 200, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},
