@@ -12,6 +12,7 @@ import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
 } from 'app/userInput';
+import { updateControls } from 'app/scenes/controls/updateControls';
 import { updateDefeated } from 'app/scenes/defeated/updateDefeated';
 import { updateInventory } from 'app/scenes/inventory/updateInventory';
 import { updateTitle } from 'app/scenes/title/updateTitle';
@@ -41,6 +42,11 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
+        // This has higher priority than anything and basically freezes the game to show the controls.
+        if (state.showControls) {
+            updateControls(state);
+            return;
+        }
         if (state.scene === 'prologue') {
 
         }

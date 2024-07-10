@@ -87,6 +87,7 @@ interface GameState {
     mutationDuration?: number
     paused: boolean
     showMap: boolean
+    showControls: boolean
     menuIndex: number
     menuRow: number
     // This is mostly used for debugging animations.

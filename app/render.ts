@@ -1,6 +1,7 @@
 import { editingState } from 'app/development/editingState';
 import { renderEditor } from 'app/development/renderEditor';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
+import { renderControls } from 'app/scenes/controls/renderControls';
 import { renderDefeatedMenu } from 'app/scenes/defeated/renderDefeated';
 import { renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera } from 'app/render/renderField';
 import { renderHUD } from 'app/renderHUD';
@@ -35,6 +36,10 @@ export function render() {
 }
 
 export function renderInternal(context: CanvasRenderingContext2D, state: GameState) {
+    if (state.showControls) {
+        renderControls(context, state);
+        return;
+    }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
         renderTransition(context, state);
         renderHUD(context, state);

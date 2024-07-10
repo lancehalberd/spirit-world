@@ -2,6 +2,7 @@ import { editingState } from 'app/development/editingState';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/editor';
 import { updateObjectInstance } from 'app/development/objectEditor';
+import { toggleShowControls } from 'app/scenes/controls/updateControls';
 import { getState } from 'app/state';
 import { isKeyboardKeyDown, KEY } from 'app/userInput'
 import { enterLocation } from 'app/utils/enterLocation';
@@ -32,6 +33,10 @@ export function addKeyboardShortcuts() {
         if ((commandIsDown || isShiftDown) && keyCode === KEY.E) {
             toggleEditing(getState());
             event.preventDefault();
+            return;
+        }
+        if (keyCode === KEY.ESCAPE) {
+            toggleShowControls(getState());
             return;
         }
         if (!editingState.isEditing) {
