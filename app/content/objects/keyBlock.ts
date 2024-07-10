@@ -127,6 +127,15 @@ export class KeyBlock implements ObjectInstance {
             state.hero.action = null;
         }
     }
+    onPush(state: GameState) {
+        if (this.isOpen) {
+            return;
+        }
+        if (this.status === 'closed') {
+            return;
+        }
+        this.tryToUnlock(state);
+    }
     update(state: GameState) {
         if (this.isOpen && this.animationTime < this.animation.duration) {
             this.animationTime += FRAME_LENGTH;
