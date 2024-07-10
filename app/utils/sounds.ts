@@ -55,12 +55,12 @@ export function requireSound(key, callback = null): GameSound {
                 if (newSound.soundSettings.muteTracks) {
                     newSound.howl.mute(true);
                 } else if (newSound.shouldFadeIn) {
-                    //console.log('newSound.howl.fade', newSound.props.volume * newSound.soundSettings.globalVolume);
+                    //console.log('newSound.howl.fade', newSound.props.volume * newSound.soundSettings.musicVolume);
                     newSound.howl.mute(false);
-                    newSound.howl.fade(0, newSound.props.volume * newSound.soundSettings.globalVolume, 1000);
+                    newSound.howl.fade(0, newSound.props.volume * newSound.soundSettings.musicVolume, 1000);
                 } else {
                     newSound.howl.mute(false);
-                    newSound.howl.volume(newSound.props.volume * newSound.soundSettings.globalVolume);
+                    newSound.howl.volume(newSound.props.volume * newSound.soundSettings.musicVolume);
                 }
             },
             onplayerror(error) {
@@ -185,13 +185,14 @@ export function playSound(key, soundSettings: SoundSettings) {
     try {
         if (sound.howl) {
             sound.howl.mute(muted);
+            sound.howl.volume(sound.props.volume * soundSettings.soundVolume);
             if (sound.spriteName) {
                 sound.howl.play(sound.spriteName);
             } else {
                 sound.howl.play();
             }
         } else if (sound.play && !muted) {
-            sound.play();
+            sound.play(soundSettings);
         }
     } catch(e) {
         console.log(e);
@@ -303,7 +304,7 @@ export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSe
         sound.shouldFadeIn = true;
     } else {
         //console.log('hard start', volume);
-        sound.howl.volume(sound.props.volume * soundSettings.globalVolume);
+        sound.howl.volume(sound.props.volume * soundSettings.musicVolume);
         sound.shouldFadeIn = false;
     }
     sound.howl.mute(soundSettings.muteTracks);
@@ -490,38 +491,38 @@ function playBellSound(frequencies, volume, duration) {
 }
 
 sounds.set('reflect', {
-    play() {
-        playBeeps([2000, 8000, 4000], .01, .1, {});
+    play(soundSettings: SoundSettings) {
+        playBeeps([2000, 8000, 4000], .01 * soundSettings.soundVolume, .1, {});
     }
 });
 sounds.set('fall', {
-    play() {
+    play(soundSettings: SoundSettings) {
         //playBeeps([1350, 900, 600, 400], 0.05, .15, {smooth: true, taper: 0.6, swell: 0.4});
-        playBeeps([1350, 900, 600, 400], 0.1, .2, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'});
+        playBeeps([1350, 900, 600, 400], 0.1 * soundSettings.soundVolume, .2, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'});
     }
 });
 sounds.set('freeze', {
-    play() {
+    play(soundSettings: SoundSettings) {
         const x = 1200;
         playBeeps(
-            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08, .2,
+            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08 * soundSettings.soundVolume, .2,
             {taper: 0.1, swell: 0.1, type: 'triangle'}
         );
     }
 });
 sounds.set('ouch', {
-    play() {
-        playBeeps([200, 400, 100, 200], 0.05, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'});
+    play(soundSettings: SoundSettings) {
+        playBeeps([200, 400, 100, 200], 0.05 * soundSettings.soundVolume, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'});
     }
 });
 sounds.set('drink', {
-    play() {
-        playBeeps([200, 100, 400, 800, 600, 2400], 0.03, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'});
+    play(soundSettings: SoundSettings) {
+        playBeeps([200, 100, 400, 800, 600, 2400], 0.03 * soundSettings.soundVolume, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'});
     }
 });
 sounds.set('heart', {
-    play() {
-        playBeeps([800, 1400, 2800, 2100], 0.05, .2, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'});
+    play(soundSettings: SoundSettings) {
+        playBeeps([800, 1400, 2800, 2100], 0.05 * soundSettings.soundVolume, .2, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'});
     }
 });
 
@@ -536,8 +537,8 @@ const notes = Object.keys(noteFrequencies);
 
 notes.forEach((noteName) => {
     sounds.set(`bell${noteName}`, {
-        play() {
-            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, 2);
+        play(soundSettings: SoundSettings) {
+            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2 * soundSettings.soundVolume, 2);
         }
     });
 });

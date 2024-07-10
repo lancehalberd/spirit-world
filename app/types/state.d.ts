@@ -24,6 +24,9 @@ interface Settings {
     muteMusic?: boolean
     // Mute sound effects
     muteSounds?: boolean
+    globalVolume?: number
+    musicVolume?: number
+    soundVolume?: number
 }
 
 interface DungeonInventory {

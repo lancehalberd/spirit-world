@@ -1,7 +1,6 @@
 interface SoundSettings {
     muteTracks?: boolean
     muteSounds?: boolean
-    globalVolume?: number
     musicVolume?: number
     soundVolume?: number
 }
@@ -28,7 +27,7 @@ interface GameSound {
     instanceLimit?: number
     spriteName?: 'sprite'
     // This is just used by custom audio context sounds
-    play?: () => void
+    play?: (soundSettings: SoundSettings) => void
     // BGM Only
     shouldPlay?: boolean
     shouldFadeIn?: boolean
