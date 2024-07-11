@@ -184,34 +184,39 @@ export class Staff implements ObjectInstance {
         //context.fillStyle = 'red';
         //const attackHitbox = this.getAttackHitbox();
         //context.fillRect(attackHitbox.x, attackHitbox.y, attackHitbox.w, attackHitbox.h);
-        let x = this.x | 0, y = this.y | 0;
-        if (this.direction === 'left' || this.direction === 'right') {
-            //x -= 3;
-            let frame = getFrame(leftAnimation, this.animationTime);
-            y -= 3;
-            drawFrame(context, frame, {...frame, x: x - 2, y});
-            const w = this.w - 16;
-            if (w > 0) {
-                frame = getFrame(horizontalAnimation, this.animationTime);
-                // This frame is 16px center in 20px space, but we need the exact rectangle to stretch it correctly.
-                drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: x + 10, y, w});
+        context.save();
+            if (state.hero.activeStaff !== this) {
+                context.globalAlpha *= 0.6;
             }
-            frame = getFrame(rightAnimation, this.animationTime);
-            drawFrame(context, frame, {...frame, x: x + this.w - 18, y});
-        } else {
-            y -= 4;
-            let frame = getFrame(topAnimation, this.animationTime);
-            x -= 4;
-            drawFrame(context, frame, {...frame, x, y: y});
-            const h = this.h - 25;
-            if (h > 0) {
-                frame = getFrame(verticalAnimation, this.animationTime);
-                // This frame is 16px offset by 1px in 17px space, but we need the exact rectangle to stretch it correctly.
-                drawFrame(context, {...frame, y: frame.y + 1, h: 16}, {...frame, x, y: y + 16, h});
+            let x = this.x | 0, y = this.y | 0;
+            if (this.direction === 'left' || this.direction === 'right') {
+                //x -= 3;
+                let frame = getFrame(leftAnimation, this.animationTime);
+                y -= 3;
+                drawFrame(context, frame, {...frame, x: x - 2, y});
+                const w = this.w - 32;
+                if (w > 0) {
+                    frame = getFrame(horizontalAnimation, this.animationTime);
+                    // This frame is 16px center in 20px space, but we need the exact rectangle to stretch it correctly.
+                    drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: x + 16, y, w});
+                }
+                frame = getFrame(rightAnimation, this.animationTime);
+                drawFrame(context, frame, {...frame, x: x + this.w - 18, y});
+            } else {
+                y -= 4;
+                let frame = getFrame(topAnimation, this.animationTime);
+                x -= 4;
+                drawFrame(context, frame, {...frame, x, y: y});
+                const h = this.h - 27;
+                if (h > 0) {
+                    frame = getFrame(verticalAnimation, this.animationTime);
+                    // This frame is 16px offset by 1px in 17px space, but we need the exact rectangle to stretch it correctly.
+                    drawFrame(context, {...frame, y: frame.y + 1, h: 16}, {...frame, x, y: y + 17, h});
+                }
+                frame = getFrame(bottomAnimation, this.animationTime);
+                drawFrame(context, frame, {...frame, x, y: y + this.h - 11});
             }
-            frame = getFrame(bottomAnimation, this.animationTime);
-            drawFrame(context, frame, {...frame, x, y: y + this.h - 11});
-        }
+        context.restore();
         /*context.save();
             context.globalAlpha *= 0.6;
             context.fillStyle = 'blue';

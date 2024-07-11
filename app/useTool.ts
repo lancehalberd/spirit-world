@@ -7,6 +7,7 @@ import { directionMap, getDirection, rotateDirection } from 'app/utils/direction
 import { addEffectToArea } from 'app/utils/effects';
 import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea } from 'app/utils/objects';
+import { swapHeroStates } from 'app/utils/swapHeroStates';
 
 
 
@@ -207,6 +208,8 @@ export function useTool(
                     const clone = new Clone(state.hero);
                     state.hero.clones.push(clone);
                     addObjectToArea(state, state.areaInstance, clone);
+                    // Switch to the new clone immediately
+                    swapHeroStates(state.hero, clone);
                 }
             }
             return;

@@ -20,6 +20,7 @@ export class Clone extends Hero {
         }
         this.isClone = true;
         this.invulnerableFrames = 0;
+        delete this.activeStaff;
     }
     getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
