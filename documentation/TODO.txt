@@ -78,9 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Fix audio slider deprecation warning
-        - add style="writing-mode: vertical-lr; direction: rtl"
-
     - Rolling ball hitbox is either too large or gets out of line sometimes.
         - In cocoon basement, when it is in a corner you should be able to walk around it but cannot.
 

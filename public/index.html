@@ -45,10 +45,11 @@
     input[type=range][orient=vertical] {
         writing-mode: vertical-lr;
         direction: rtl;
-        appearance: slider-vertical;
         width: 16px;
         vertical-align: bottom;
     }
+    /* This causes warnings in Chrome, but might be necessary in other browsers. */
+    /* appearance: slider-vertical; */
     </style>
     <title>Adventure Game</title>
     <meta property='og:title' content='Spirit Quest'/>
