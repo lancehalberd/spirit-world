@@ -92,8 +92,6 @@ interface GameState {
     menuRow: number
     // This is mostly used for debugging animations.
     alwaysHideMenu?: boolean
-    // Mostly used for debugging spirit energy balance.
-    renderMagicCooldown?: boolean
     defeatState: {
         defeated: boolean
         reviving?: boolean

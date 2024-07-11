@@ -7,7 +7,6 @@ import { tagElement } from 'app/dom';
 import { getCanvasScale } from 'app/development/getCanvasScale';
 import { overworldKeys } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
-import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
 import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
 import { mainCanvas } from 'app/utils/canvas';
@@ -294,29 +293,6 @@ function getSettingsMenuOption(): MenuOption {
                         saveSettings(state);
                     }
                 },
-                {
-                    label: 'Show Controls',
-                    onSelect() {
-                        showMessage(state, `
-                            [B_DPAD] Movement
-                            [-] [B_PASSIVE] Interact
-                            [-] [B_WEAPON] Weapon
-                            [-] [B_TOOL] Tools
-                            [-] [B_ROLL] Roll
-                            [-] [B_MEDITATE] Meditate
-                            [-] [B_MENU] Menu
-                            [-] [B_MAP] Map
-                            [-] [B_PREVIOUS_ELEMENT] Prev Element
-                            [-] [B_NEXT_ELEMENT] Next Element
-                        `);
-                    }
-                },
-                {
-                    label: state.renderMagicCooldown ? 'Hide Cooldown Bar' : 'Show Cooldown Bar',
-                    onSelect() {
-                        state.renderMagicCooldown = !state.renderMagicCooldown;
-                    }
-                }
             ];
         }
     }
