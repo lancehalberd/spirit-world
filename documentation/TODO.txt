@@ -78,8 +78,6 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add overlay text after leaving the lake indicating that you can run, display it until the player runs once while the message is displayed.
-
     - Update tileset for the Tomb once I have the new pit graphics.
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
 

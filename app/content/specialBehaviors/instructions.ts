@@ -1,6 +1,23 @@
 import { addTextCue, findTextCue } from 'app/content/effects/textCue';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 
+specialBehaviorsHash.runInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+
+        if (state.hero.magicRegen && !state.savedState.objectFlags.runInstructions) {
+            helpText = `Hold [B_PASSIVE] to run.[-]Running uses Spirit Energy.`;
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    },
+};
+
 specialBehaviorsHash.barrierBurstInstructions = {
     type: 'narration',
     update(state: GameState, object: ObjectInstance) {
