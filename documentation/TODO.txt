@@ -78,6 +78,18 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Fix audio slider deprecation warning
+        - add style="writing-mode: vertical-lr; direction: rtl"
+
+    - Rolling ball hitbox is either too large or gets out of line sometimes.
+        - In cocoon basement, when it is in a corner you should be able to walk around it but cannot.
+
+    - Spawn point in 4F staff tower is wrong and spawns you partially in a wall.
+
+    - Fix "secret" sound can play on the title screen.
+        - Should make sure no SFX can play on the titlescreen by always using `playAreaSound` and adding logic
+        so that it cannot play if the scene is not the field.
+
     - Update tileset for the Tomb once I have the new pit graphics.
         - Add new pit graphics.
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.

@@ -287,7 +287,7 @@ export class Elevator implements ObjectInstance {
             } else if (this.elevatorY <= 24) {
                 drawFrame(context, platform, {...platform, x: this.x, y: this.y - this.elevatorY});
                 this.controlTerminal.render(context, state);
-                this.renderHero(maskedContext, state);
+                this.renderHero(context, state);
             }
         }
         // const terminalFrame = terminalAnimation.frames[0];
