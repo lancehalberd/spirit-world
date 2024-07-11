@@ -3,6 +3,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { getDirection } from 'app/utils/direction';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -159,6 +160,7 @@ export class ThrownChakram implements EffectInstance {
             }
         }
 
+        const direction = getDirection(this.vx, this.vy, true);
         let hit: HitProperties;
         // The lightning element adds a large hit ring around the chakram that cannot
         // push targets or knock them back and also won't stop the projectile.
@@ -167,6 +169,7 @@ export class ThrownChakram implements EffectInstance {
             hit = {
                 damage: this.damage,
                 element: this.element,
+                direction,
                 vx: this.vx,
                 vy: this.vy,
                 hitCircle: { r, x: this.x + this.w / 2, y: this.y + this.h / 2},
@@ -187,6 +190,7 @@ export class ThrownChakram implements EffectInstance {
             damage: this.damage,
             element: this.element,
             cutsGround: true,
+            direction,
             vx: this.vx,
             vy: this.vy,
             hitbox: this,
@@ -227,6 +231,7 @@ export class ThrownChakram implements EffectInstance {
         // A small hitbox check for hitting tiles that stops on any impact, this allows the chakram to go partially
         // into solid tiles and hit things at the base of walls.
         hit = {
+            direction,
             vx: this.vx,
             vy: this.vy,
             hitbox: pad(this, -4),

@@ -108,7 +108,9 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     rollInDirection(state: GameState, direction: Direction): void {
-        if (this.stuck || this.rollDirection) {
+        if (this.stuck || this.rollDirection
+            || this.linkedObject?.stuck || this.linkedObject?.rollDirection
+        ) {
             return;
         }
         if (this.move(state, direction)) {
@@ -222,9 +224,15 @@ export class RollingBallObject implements ObjectInstance {
         if (this.rollDirection) {
             if (!this.move(state, this.rollDirection)) {
                 this.stopRollingSound();
-                this.linkedObject?.stopRollingSound();
-                playAreaSound(state, this.area, 'rollingBallHit');
                 this.rollDirection = null;
+                this.x = this.x | 0;
+                this.y = this.y | 0;
+                if (this.linkedObject) {
+                    this.linkedObject.x = this.x;
+                    this.linkedObject.y = this.y;
+                    this.linkedObject.stopRollingSound();
+                }
+                playAreaSound(state, this.area, 'rollingBallHit');
             }
         }
         if (this.z <= 0) {
@@ -250,6 +258,9 @@ export class RollingBallObject implements ObjectInstance {
                             // This looks bad so we should avoid it.
                             this.linkedObject.rollDirection = null;
                             this.linkedObject.stuck = true;
+                            // Lock it the position of the socket in this case.
+                            this.linkedObject.x = object.x;
+                            this.linkedObject.y = object.y;
                         }
                     }
                     return;
