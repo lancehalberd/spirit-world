@@ -79,7 +79,19 @@ Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
     - Update tileset for the Tomb once I have the new pit graphics.
+        - Add new pit graphics.
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
+
+    - Add new crystal pit graphics
+        - Add small crystal pit tile, use in secret entrance to sky palace.
+        - Make crystal cracked ground become crystal pits.
+
+    - Remove old graphics
+        - Replace remaining old cave graphics.
+        - Replace old cave tiles with deleted tiles.
+        - Remove all references to the cave tiles, but keep the image itself.
+        - Replace remaining cave doors and remove graphics + door style.
+            - Set cavern as default door style.
 
     - Review human graphics from vexed
         - Create a customNpc object that let's you mix and match characteristics:
@@ -91,7 +103,10 @@ Current tasks:
     - Improve Coccoon boss
         - "Your weapons cannot reach me in the spirit world"
         - Double the bosses life and make the rolling balls stagger him into the material world like Rival 2.
+        - Staggering causes the Astral Projection to lose all of its life and cannot regenerate.
         - Teleports away once the player deals 2+ damage or after 3 seconds (they can deal 1 damage then a large hit for max damage).
+
+    - objects thrown into pits should use the pit animation instead of breaking.
 
     - Running into solid invisible chests feels bad.
         - At least move them out of the way.
@@ -313,11 +328,6 @@ Current tasks:
     - Minor issue with ledges
         - Should be able to grab ledges when below them just like you can grab solid tiles.
 
-    - Guardian boss improvement
-        - Have the boss appear staggered in the material world when hit by the balls and despawn the astral projection, similar to the rival fight.
-
-    - Add ladder to exterior of staff tower that becomes visible once the elevator is repaired.
-
     - Save statues missing dialog:
         - jade city
         - spirit forest
@@ -337,7 +347,6 @@ Current tasks:
                 - If the player positions themselves correctly they can knock the rival back into the ice spike and stagger/freeze the rival.
                 - Either way the ice spike disappears after the fire ball attack to prevent accumulation.
 
-
     - Get drain graphics for forge?
 
     - Allow sneaking into grand temple with invisibility
@@ -349,10 +358,6 @@ Current tasks:
         - Having them instantly change looks buggy in some cases, and for the flies it is hard to tell when it even happened.
 
     - Fade out any text cues during screen transitions. Right now it just abruptly disappears.
-
-
-    - Leon respawned at a door and kept going up/down the entrance stairs to the lightning sanctum.
-        - I could not reproduce however and couldn't see anything suspicious in the code.
 
     - Overworld project
         - Add lake
@@ -467,8 +472,6 @@ Current tasks:
             - Activatable bridges (cloud sommersault would allow full traversal of sky, which is probably fine)
             - Could make it so that entering sky palace requires gaining access to multiple sky areas first
 
-    - Require traversing War Palace from top to bottom in the Spirit World, starting from the Sky
-
     - generate bow chest switch puzzle
         - switches are E/W/N/S from a single point in the area at least 4 tiles out from the point.
         - increase difficulty with
@@ -503,13 +506,6 @@ Current tasks:
 
     - Forest temple boss should provide a golden peach in addition to the clone tool.
 
-    - Investigate updating various tile sets to new version:
-        - identify changed tiles and plan how to fix issues caused by the update:
-            - possibly switch the order of tiles to prevent any changes
-            - identify and update maps where tiles change
-        - crystal
-        - stone
-
     - Hot room status is incorrect in alternate world, it is always matching the current world.
         - Fixing this will prevent ice tiles from forming incorrectly in hot rooms in the alternate world.
         - It will also allow us to make hot rooms consistently burn enemies.
@@ -521,7 +517,6 @@ Current tasks:
     - Make it easier to find the gloves
         - Add a quest state that highlights the entrance with the gloves.
         - Move the map to the main chamber as a new check with a simple puzzle to obtain it
-            - Include the big chest room on the map, draw chests and big chests to the map
 
     - Aimed Projectiles for Cocoon boss an other
         - EnemyProjectile wrapper for CrystalSpike/Flame/Frost/Spark that takes an element to determine which projectile to use
@@ -531,7 +526,6 @@ Current tasks:
             - Projectile vx/vy update to point at target as long as it is visible
             - Possibly can set an additional delay where vx/vy stop targeting before projectiles launch
         - Cocoon boss summons a ring of aimed projectiles around them with 400ms increasing delay on each one
-
 
     - Brainstorm how the beasts get released
         - Maybe destroying the idols causes them to wake up and flee the War Temple
@@ -614,7 +608,7 @@ Current tasks:
 
     - Restrict laser barrage to if voidStone is active. Change it to be single bursts of 4 that can occur multiple times per phase. Slightly increase delay.
 
-    - Add void pit tiles and use them in the void area, add solid cliff edges to prevent jumping into the void.
+    - Add void pit tiles and use them in the void area, add ledges to prevent walking over the void.
         - This will allow the astral projection to move freely over the void.
 
     - Holy Sanctum Improvements
@@ -627,7 +621,7 @@ Current tasks:
                 ? Should this same sequence play out with any item in randomizer, or should the Phoenix crown always initiate the fight in randomizer
                     - Perhaps spawning the Phoenix briefly transports the player to a pocket spirit dimension where the fight happens.
                     - For now, let's just have this apply to whichever item is placed in the Phoenix Crown chest in the Holy Sanctum.
-                    - The item will still appear to be the phoenix crown on opening the chest, butt then the Phoenix will just drop whatever it was assigned.
+                    - The item will still appear to be the phoenix crown on opening the chest, but then the Phoenix will just drop whatever it was assigned.
         - Add sanctum tower with bow in big chest
             - Include hybrid material/spirt world puzzles
 
@@ -647,8 +641,6 @@ Current tasks:
 
     - Add some additional requirement for completing crater to put the boss out of logic with few items.
         - Switches that can only be hit with staff or clone throw + iron boots
-
-    - test staff interactions with ledges.
 
     - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
 
@@ -816,15 +808,12 @@ Minigame Ideas:
         - Boss practice
     - Could add something like an AR arcade to spirit city
 
-
 Staff Improvements:
     - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer
         - This should start at 4x1, 5x1 then 6x2->10x2, 11x3->15x3, 16x4->20x4
         - Preview will only show the max size that will fit in the current space
         - Ideally you could move around while charging and the preview will update appropriately
         - Would be nice to have this preview behavior when holding down the staff button for staff 1.
-
-Throwing an object into a pit should use the pit animation rather than breaking.
 
 Respawn improvements:
     Only adjust respawn when in the same screen area as the spawn point.
@@ -843,19 +832,10 @@ Tutorial Improvements:
 Add more screen shakes:
     - Lava draining transition
     - Probably for some impactful boss attacks.
-    - Maybe when falling from a large height.
     - Scene where elemental beasts escape and attack the holy city
         - Maybe could be periodic large shake+explosion as if there is a large explosion nearby
         - Could have different combination of effects to signify attacks from each type of elemental beast
         - Could make sure these effects are also used when actually fighting the beasts for consistency
-
-Improve Staff Tower Setup:
-    - Maybe should create a staff tower object and use this instead of the current layer solution
-    - Then we can detect if you are facing the object and not standing inside it to deploy the tower.
-    - Would force the tower to look consistent and make it easy to update when we have better graphics
-    - Can also detect zone overworld vs sky to create the upper+lower parts correctly.
-    - Can render consistent ground graphics for when the tower is not present.
-    - Animation should be throwing staff into the sky as it grows with its shadow, then falls to the ground when the shadow is as large as the foundation.
 
 High level list of things left to do:
     Areas missing significant content:
@@ -866,9 +846,6 @@ High level list of things left to do:
         Phoenix boss in Holy Sanctum
         Eight Trigram Furnace at the end of the Gauntlet
         Crater midboss
-        Helix Boss
-            - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
-            - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
         - Vanara dreamland boss simulator with difficulty modifiers
         Hero helping during first elemental beast fight
@@ -967,7 +944,7 @@ Golem Boss Improvements:
         - Could have the boss slam against the walls when strafing side to side or raise entire body and slam ground to drop stones.
         - Could also drop additional permanent barries that reduce the safe zones on the sides.
 
-Dungeon 3 Improvements:
+Coccoon Improvements:
     - Add new enemies.
     - Animate the ents when they attack.
 
@@ -977,18 +954,7 @@ River Temple Improvements:
     - Allow swimming over low walls, use ice spikes to block paths if necessary.
     - Maybe torches should stay lit during the boss fight once turned on.
 
-
 Staff Tower Improvements
-    - Add a prompt after defeating the boss to indicate that the elevator is working again
-        - Might be tricky to word in a way that makes sense. "The lights got brighter, maybe some of the machines work now."
-    - Fix enemies can attack you while you are paused waiting for the elevator.
-        - Make the screen shake a little while the elevator is coming instead of freezing the player
-            - This is a little tricky because we have to handle the possibility of the player leaving before the script completes.
-            - We could add some sort of `onCancel` or `finally` behavior for scripts that run to make sure they are left in a good state if they don't complete. Maybe scripts aren't canceled on leaving in which case this may not be an issue.
-            - This needs to handle ignoring the player interacting with the sign again if they have already called the elevator.
-        - Add a screen outside the elevator for summoning it.
-    - Add content to 4F Material world, probably some sort of gauntlet that is easier when the boss is defeated.
-        - Should have a short cut so it can by bypassed after completing once.
     - Conveyer belts/escalators.
         - Conveyer belts should also effect movable object/enemies on the ground touching them.
         - Lightning magic will turn a conveyer belt on if it is off.
@@ -1054,22 +1020,13 @@ Add ability to charge carried objects
     Should add selected element to thrown object
     Apply element changes to tiles while you hold them (bush might burn up into ash in your hands with fire element, or turn to ice)
 
-
 Improve Tool Selection:
-    - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
-    - Display a letter attached to the selection based on the button/keyboard key.
+    - Display a letter attached to the selection + HUD based on the button/keyboard key.
 
 Additional Staff Behavior:
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
-    Top N pixels of character should be drawn on foreground as well so that it appears in front of staff when facing north.
-        - Probably should disable staff when character is standing on any tiles marked with low ceiling just in case.
-
-Animate hearts refilling
 
 Add spirit element that replaces the default 'none' element when the upgrade is found. In vanilla this would require getting all other elements first.
 
-Idea:
-    Objects you can bounce off of when jumping
-        - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 

@@ -984,7 +984,7 @@ addTiles([
             hitEnemies: true,
         },
     }),
-    singleTileSource('gfx/objects/cave-pits.png', pitBehavior, 0, 16),
+    singleTileSource('gfx/tiles/cavePits.png', pitBehavior, 16, 48),
     singleTileSource('gfx/tiles/thorns.png', thornBehavior),
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior),
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior, 16),

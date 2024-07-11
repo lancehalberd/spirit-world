@@ -6,6 +6,7 @@ const spiritGround = 1114;
 const spiritDustGround = 190;
 const spiritCrystalGroundSquare = 1005;
 const spiritCrystalGround = 1007;
+const spiritCrystalSmoothGround = 1009;
 
 // Maps specific parent tile indexes to  child tile indexes.
 const explicitIndexMapping: number[] = [];
@@ -23,12 +24,15 @@ for (let i = 1420; i <= 1432; i++) {
     explicitIndexMapping[i] = 0
 }
 
+
+
 // Sky
 explicitIndexMapping[262] = spiritCrystalGround;
 // This is used a lot in the holy sanctum currently.
 explicitIndexMapping[spiritCrystalGround] = spiritCrystalGround;
 // This is used a lot in the sky palace currently.
 explicitIndexMapping[spiritCrystalGroundSquare] = spiritCrystalGroundSquare;
+explicitIndexMapping[spiritCrystalSmoothGround] = spiritCrystalSmoothGround;
 
 
 //const logged: boolean[] = [];
