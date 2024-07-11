@@ -78,6 +78,44 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
+    - Add overlay text after leaving the lake indicating that you can run, display it until the player runs once while the message is displayed.
+
+    - Update tileset for the Tomb once I have the new pit graphics.
+        - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
+
+    - Review human graphics from vexed
+        - Create a customNpc object that let's you mix and match characteristics:
+            - Male/Female
+            - Child/Adult
+            - hair -> eyes -> mouth
+            - body -> legs -> feet
+
+    - Improve Coccoon boss
+        - "Your weapons cannot reach me in the spirit world"
+        - Double the bosses life and make the rolling balls stagger him into the material world like Rival 2.
+        - Teleports away once the player deals 2+ damage or after 3 seconds (they can deal 1 damage then a large hit for max damage).
+
+    - Running into solid invisible chests feels bad.
+        - At least move them out of the way.
+        - Maybe they shouldn't have collision unless you can see them?
+
+    - Replace low stones underwater with walls or taller obstacles.
+
+    - Add tutorial sections for clone
+        - Swapping between clones
+        - Clone Explosion
+        - Controller multiple clones
+        - Clone throw
+
+    - Add some sort of effect when Cloud Sommersault is held so the game doesn't just look frozen.
+
+    - Add a better indication for which clone(s)+staff(s) are controlled.
+
+    - Improve magma graphics
+        - Get animated frames if possible.
+
+    - Add coil graphics for lightning barriers. 3x styles.
+
     - Prevent weapon knockback from triggering area transition.
         - Update movement behavior to treat door entrances+exterior edges of the screen as walls when knocked back.
         - If nothing else, at least move stationary plant enemies far enough from transition edges to not trigger this by the forest.
@@ -110,6 +148,20 @@ Current tasks:
             - Freezing and hitting with staff will instantly defeat the enemy.
         - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
         - Can move into lava. Returning to lava will regenerate the shell if missing.
+
+    - Add additional pit corner tiles to from future tile set and use them in Staff Tower to clean up corners.
+
+
+    - Mechanic for breaking crystal barriers open is unintuitive.
+    - Allow equipping a third tool instead of the Chakram?
+        - This would require HUD updates to indicate all three tools.
+        - Alternatively, we could have different base weapons that you could switch between.
+    - Add 4th spirit upgrade that let's you swap between worlds while meditating.
+
+    - Brainstorm more clone tool puzzles.
+        - Maybe in the back of Forest Temple scientists give you the clone tool and then agree to answer questions if you complete "tests" for them.
+
+    - Brainstorm more invisibility puzzles.
 
     - Add crushed status effect
         - Applied from certain attacks like golem hand slams, guardians running over the hero, etc.
