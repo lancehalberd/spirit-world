@@ -404,17 +404,17 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                     context.translate(-source.x, -source.y);
                     const objectAndParts = getObjectAndParts(state, object)
                     for(const part of objectAndParts) {
-                        if (part.drawPriority === 'background') {
+                        if ((part.getDrawPriority?.(state) || part.drawPriority) === 'background') {
                             part.render(context, state);
                         }
                     }
                     for(const part of objectAndParts) {
-                        if (part.drawPriority === 'sprites') {
+                        if ((part.getDrawPriority?.(state) || part.drawPriority) === 'sprites') {
                             part.render(context, state);
                         }
                     }
                     for(const part of objectAndParts) {
-                        if (part.drawPriority === 'foreground') {
+                        if ((part.getDrawPriority?.(state) || part.drawPriority) === 'foreground') {
                             part.render(context, state);
                         }
                         part.renderForeground?.(context, state);
