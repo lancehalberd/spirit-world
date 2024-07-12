@@ -26,7 +26,7 @@ const cavePitEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame(cavePitsImage, {x: 112, y: 64, w: 80, h: 48}),
     behaviors: {
-        'all': { defaultLayer: 'floor2' },
+        'all': { defaultLayer: 'floor2', isGround: false },
     },
     paletteTargets: [{key: 'pits', x, y}],
     tileCoordinates: [

@@ -25,7 +25,7 @@ const SLAM_HANDS_DURATION = 4000;
 const SLAM_HANDS_PAUSE_DURATION = 3000;
 
 
-const golemHeadGeometry: FrameDimensions = { w: 64, h: 64 };
+const golemHeadGeometry: FrameDimensions = { w: 64, h: 64, content: {x: 4, y: 16, w: 56, h: 48} };
 const golemHeadAsleepAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry);
 const golemHeadWarmupAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 0, cols: 5}, {loop: false});
 const golemHeadIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 1 });

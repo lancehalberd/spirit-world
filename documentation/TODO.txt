@@ -81,6 +81,9 @@ Current tasks:
     - Update tileset for the Tomb once I have the new pit graphics.
         - Add new pit graphics.
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
+        - Fix angled southern ceiling walls have awkard bumps.
+
+    - Closed doors do not render open during super tile transition
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.

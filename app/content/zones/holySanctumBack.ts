@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -449,8 +448,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", spirit: true, x: 120, y: 336, type: "crystalSwitch", timer: 200, targetObjectId: "holySanctumBackSwitchDoor"},
         {status: "normal", id: "", spirit: true, x: 208, y: 304, type: "crystalSwitch", timer: 200, targetObjectId: "holySanctumBackSwitchDoor"},
         {status: "normal", id: "holySanctumGolem", spirit: true, x: 96, y: 48, type: "boss", enemyType: "golem", lootType: "money", lootAmount: 100, lootLevel: 1, d: "up", params: {}},
-        {status: "normal", id: "holySanctumGolem", spirit: true, x: 96, y: 112, type: "enemy", enemyType: "golemHand", d: "right", saveStatus: "never", params: {}},
-        {status: "normal", id: "holySanctumGolem", spirit: true, x: 128, y: 112, type: "enemy", enemyType: "golemHand", d: "up", saveStatus: "never", params: {}},
+        {status: "normal", id: "holySanctumGolem", spirit: true, x: 96, y: 96, type: "enemy", enemyType: "golemHand", d: "right", saveStatus: "never", params: {}},
+        {status: "normal", id: "holySanctumGolem", spirit: true, x: 128, y: 96, type: "enemy", enemyType: "golemHand", d: "up", saveStatus: "never", params: {}},
         {status: "normal", id: "holySanctumIdols", spirit: true, x: 372, y: 72, type: "boss", enemyType: "stormIdol", lootType: "money", lootAmount: 100, lootLevel: 1, d: "up", params: {}},
         {status: "normal", id: "holySanctumIdols", spirit: true, x: 308, y: 152, type: "boss", enemyType: "flameIdol", lootType: "money", lootAmount: 100, lootLevel: 1, d: "up", params: {}},
         {status: "normal", id: "holySanctumIdols", spirit: true, x: 432, y: 152, type: "boss", enemyType: "frostIdol", lootType: "money", lootAmount: 100, lootLevel: 1, d: "up", params: {}},
@@ -464,6 +463,7 @@ const sf0_0x0: AreaDefinition = {
 };
 zones.holySanctumBack = {
     key: 'holySanctumBack',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [
