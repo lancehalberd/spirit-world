@@ -1,4 +1,4 @@
-import { playSound } from 'app/musicController';
+import { playAreaSound } from 'app/musicController';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { changeObjectStatus } from 'app/utils/objects';
 
@@ -38,6 +38,8 @@ export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstanc
         }
     }
     if (playChime) {
-        playSound(state, 'secretChime');
+        // The player should always hear this, but we still need to use `playAreaSound`
+        // to prevent this from playing from the preview during save selection.
+        playAreaSound(state, state.areaInstance, 'secretChime');
     }
 }

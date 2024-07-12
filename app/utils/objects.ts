@@ -1,5 +1,5 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { playSound } from 'app/musicController';
+import { playAreaSound } from 'app/musicController';
 import { isPixelInShortRect } from 'app/utils/index';
 import { applyBehaviorToTile } from 'app/utils/tileBehavior';
 import { saveGame } from 'app/utils/saveGame';
@@ -166,7 +166,7 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
 export function activateTarget(state: GameState, target: ObjectInstance, playChime = false): void {
     if (target.onActivate) {
         if (target.onActivate(state) && playChime) {
-            playSound(state, 'secretChime');
+            playAreaSound(state, state.areaInstance, 'secretChime');
         }
         return;
     }
@@ -174,13 +174,13 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
         changeObjectStatus(state, target, 'normal');
         saveObjectStatus(state, target.definition, true);
         if (playChime) {
-            playSound(state, 'secretChime');
+            playAreaSound(state, state.areaInstance, 'secretChime');
         }
     } else if (target.status === 'closedSwitch') {
         changeObjectStatus(state, target, 'normal');
         saveObjectStatus(state, target.definition, true);
         if (playChime) {
-            playSound(state, 'secretChime');
+            playAreaSound(state, state.areaInstance, 'secretChime');
         }
     }
 }
@@ -188,7 +188,7 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
 export function deactivateTarget(state: GameState, target: ObjectInstance): void {
     if (target.onDeactivate) {
         if (target.onDeactivate(state)) {
-            playSound(state, 'secretChime');
+            playAreaSound(state, state.areaInstance, 'secretChime');
         }
         return;
     }

@@ -78,16 +78,9 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Fix "secret" sound can play on the title screen.
-        - Should make sure no SFX can play on the titlescreen by always using `playAreaSound` and adding logic
-        so that it cannot play if the scene is not the field.
-
     - Update tileset for the Tomb once I have the new pit graphics.
         - Add new pit graphics.
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
-
-    - Art request: Pots+broken pots should be taller to make them more obvious that you cannot throw/shoot over them.
-        - Request a pot version that requires upgraded gloves/staff to move.
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
