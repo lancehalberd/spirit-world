@@ -35,6 +35,8 @@ import {
     unliftableStoneBehavior,
 } from 'app/content/tiles/constants';
 import { paletteHash } from 'app/content/tiles/paletteHash';
+import { allCavePitTileSources } from 'app/content/tiles/cavePits';
+import { allCrystalCavePitTileSources } from 'app/content/tiles/crystalCavePits';
 import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
@@ -1059,7 +1061,9 @@ addTiles([
     foodBoxTiles,
     logAndFoodBagTiles,
     largeLogPileTiles,
-    deletedTiles(58),
+    ...allCavePitTileSources,
+    ...allCrystalCavePitTileSources,
+    deletedTiles(26),
     clouds,
     railsTiles,
     spiritRailsTiles,

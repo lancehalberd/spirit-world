@@ -193,6 +193,17 @@ paletteHash.future = [
     [null, 1704, 1717, 1725, 1728, 1718, 1706, null, 1754, 1752, null, 1753, 1756],
     [null, null, 1726, 1727, 1729, 1730, null, null, null, 1754, 1755, 1756, null]
 ];
+
+// Delete this fine tuned palette to see the generated pits palette.
+paletteHash.pits = [
+    [336,337,338,1   ,352,353,354],
+    [339,340,341,null,355,356,357],
+    [342,343,344,null,358,359,360],
+    [345,346,347,null,361,362,363],
+    [348,775,349,null,364,1007,365],
+    [350,337,351,1   ,366,353,367]
+];
+
 // Use this to export the current brush as a palette grid.
 /**
 console.log(editingState.brush.none.tiles.map(t => "\t[" + t.join(", ") + "],").join("\n"));
