@@ -83,8 +83,6 @@ Current tasks:
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
         - Fix angled southern ceiling walls have awkard bumps.
 
-    - Closed doors do not render open during super tile transition
-
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
         - Make crystal cracked ground become crystal pits.
@@ -312,12 +310,6 @@ Current tasks:
                 - This is pretty uncommon but can still happen even with code to move the player towards objects on grab.
                 - The issue is that if the player's subpixel doesn't match the pot, when the pot can no longer move forward, the player is stuck at
                   the subpixel distance. The attempt to wiggle, but the pot has no wiggle room(it is flush with the wall), so the player's movement is aborted.
-
-    - Fix doors closed as you walk into them.
-        - Good example is walking into the key room NW from the big chest in tomb.
-        - I think we update doors once on creating the area, let's go ahead and detect if the hero is walking into a door then
-            - render the door open if the hero + 16 *dx/dy intersected the door object.
-        - Play door open/closed sounds FX when it changes whether it is open based on the player being over it.
 
     - Fix audio restarts when going under water during the frost beast fight.
 

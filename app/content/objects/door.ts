@@ -207,10 +207,16 @@ export class Door implements ObjectInstance {
         if (this.style.isLadderDown && !this.isOpen()) {
             return false;
         }
-        return state.hero.area === this.area && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
+        return (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     renderOpen(state: GameState): boolean {
-        const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getHitbox()) && this.heroCanEnter(state);
+        const hitbox = {...this.getHitbox()};
+        // Adjust this by the area hitbox if this is in the next area, otherwise hit detection with the hero will be incorrect.
+        if (this.area === state.nextAreaInstance) {
+            hitbox.x += this.area.cameraOffset.x;
+            hitbox.y += this.area.cameraOffset.y;
+        }
+        const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), 0), hitbox) && this.heroCanEnter(state);
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
