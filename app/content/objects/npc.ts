@@ -10,6 +10,10 @@ import {
     fatherAnimations,
     lightningBeastAnimations,
     momAnimations,
+    manAnimations,
+    boyAnimations,
+    womanAnimations,
+    girlAnimations,
     //testAnimations,
 } from 'app/content/npcs/npcAnimations'
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -23,7 +27,8 @@ import {
     vanaraBlackAnimations, vanaraBlueAnimations,
     vanaraBrownAnimations, vanaraGoldAnimations,
     vanaraGrayAnimations, vanaraPurpleAnimations,
-    vanaraRedAnimations, zoroAnimations,
+    vanaraRedAnimations,
+    zoroAnimations,
 } from 'app/render/npcAnimations';
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
@@ -48,7 +53,10 @@ interface NPCStyleDefinition {
     shadowOffset?: number
     noShadow?: true
     flipRight?: boolean
+    flipLeft?: boolean
     z?: number
+    // Defaults to the frame height.
+    height?: number
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState, npc: NPC) => void
 }
 
@@ -73,6 +81,30 @@ export const npcStyles = {
         animations: testAnimations,
         shadowOffset: 2,
     } as NPCStyleDefinition,*/
+    man: {
+        animations: manAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 25,
+    } as NPCStyleDefinition,
+    boy: {
+        animations: boyAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 21,
+    } as NPCStyleDefinition,
+    woman: {
+        animations: womanAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 25,
+    } as NPCStyleDefinition,
+    girl: {
+        animations: girlAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 21,
+    } as NPCStyleDefinition,
     giantSnake: {
         animations: snakeAnimations,
         scale: 3,
@@ -402,13 +434,13 @@ export class NPC implements Actor, ObjectInstance  {
         const animationStyle = npcStyles[this.definition.style];
         const frame = this.getFrame();
         const scale = animationStyle.scale || 1;
-        if (this.d === 'right' && animationStyle.flipRight) {
-            // Flip the frame when facing right. We may need an additional flag for this behavior
-            // if we don't do it for all enemies on the right frames.
+        if ((this.d === 'right' && animationStyle.flipRight) || (this.d === 'left' && animationStyle.flipLeft)) {
+            // Some sprites only have a left or a right frame that we flip to produce the other frame.
             const w = (frame.content?.w ?? frame.w) * scale;
             context.save();
-                context.translate((this.x | 0) + (frame?.content?.x || 0) * scale + w / 2, 0);
+                context.translate((this.x | 0) + w / 2, 0);
                 context.scale(-1, 1);
+                context.fillStyle = 'red';
                 drawFrame(context, frame, { ...frame,
                     x: - w / 2 - (frame?.content?.x || 0) * scale,
                     y: this.y - (frame?.content?.y || 0) * scale - this.z,
@@ -424,7 +456,6 @@ export class NPC implements Actor, ObjectInstance  {
                 h: frame.h * scale,
             });
         }
-        //drawFrameAt(context, frame, this);
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
@@ -440,7 +471,11 @@ export class NPC implements Actor, ObjectInstance  {
                         context.globalAlpha *= 0.4;
                     }
                     const w = (frame.content?.w ?? frame.w) * scale;
-                    const x = this.x + w / 2, y = this.y - (frame?.content?.y || 0) * scale - this.z - 12;
+                    const x = this.x + w / 2;
+                    let y = this.y - (frame?.content?.y || 0) * scale - this.z - 12;
+                    if (animationStyle.height) {
+                        y = this.y + (frame?.content?.h || 0) * scale - this.z - animationStyle.height - 12;
+                    }
                     drawFrame(context, speechBubble, {...speechBubble, x, y });
                     if (dialogue.dialogueType === 'quest') {
                         drawFrame(context, yellowQuest, {...yellowQuest, x, y });

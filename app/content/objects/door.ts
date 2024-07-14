@@ -212,7 +212,7 @@ export class Door implements ObjectInstance {
     renderOpen(state: GameState): boolean {
         const hitbox = {...this.getHitbox()};
         // Adjust this by the area hitbox if this is in the next area, otherwise hit detection with the hero will be incorrect.
-        if (this.area === state.nextAreaInstance) {
+        if (this.area && this.area === state.nextAreaInstance) {
             hitbox.x += this.area.cameraOffset.x;
             hitbox.y += this.area.cameraOffset.y;
         }

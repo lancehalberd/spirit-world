@@ -1,5 +1,54 @@
+import { createHumanNpcActorAnimations } from 'app/development/npcBuilder';
 import { createAnimation, omniAnimation } from 'app/utils/animations';
 
+
+export const manAnimations: ActorAnimations = createHumanNpcActorAnimations({
+    skin: 2,
+    hairColor: 1,
+    hairStyle: 0,
+    eyeColor: 2,
+    lipColor: 2,
+    shirt: 0,
+    pants: 0,
+    shoes: 0,
+});
+
+export const boyAnimations: ActorAnimations = createHumanNpcActorAnimations({
+    isChild: true,
+    skin: 3,
+    hairColor: 0,
+    hairStyle: 1,
+    eyeColor: 3,
+    lipColor: 3,
+    shirt: 1,
+    pants: 1,
+    shoes: -1,
+});
+
+export const womanAnimations: ActorAnimations = createHumanNpcActorAnimations({
+    isWoman: true,
+    skin: 0,
+    hairColor: 3,
+    hairStyle: 0,
+    eyeColor: 0,
+    lipColor: 0,
+    shirt: 1,
+    pants: 0,
+    shoes: 1,
+});
+
+export const girlAnimations: ActorAnimations = createHumanNpcActorAnimations({
+    isWoman: true,
+    isChild: true,
+    skin: 1,
+    hairColor: 2,
+    hairStyle: 1,
+    eyeColor: 1,
+    lipColor: 1,
+    shirt: 1,
+    pants: -1,
+    shoes: -1,
+});
 
 
 // This box is taller than it needs as a hack to make it easy to interact with when it is on the pedestal.

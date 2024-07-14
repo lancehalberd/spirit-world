@@ -83,6 +83,8 @@ Current tasks:
         - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
         - Fix angled southern ceiling walls have awkard bumps.
 
+    - Replace Frozen Heart ice barrier graphics.
+
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
         - Make crystal cracked ground become crystal pits.
