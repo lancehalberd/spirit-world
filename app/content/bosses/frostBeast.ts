@@ -34,10 +34,10 @@ const createFrostAnimation = async () => {
             w: iceElement.w * 2, h: iceElement.h * 2
         });
     frostHeartContext.restore();
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 0, y: 2});
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: iceElement.w, y: 0});
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 2 * iceElement.w, y: 0});
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 3 * iceElement.w, y: 2});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 0, y: iceElement.h - 2});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: iceElement.w, y: iceElement.h});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 2 * iceElement.w, y: iceElement.h});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 3 * iceElement.w, y: iceElement.h - 2});
 }
 createFrostAnimation();
 const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
@@ -212,12 +212,7 @@ function renderIceShield(context: CanvasRenderingContext2D, state: GameState, en
     if (enemy.area?.underwater || enemy.params.shieldLife <= 0) {
         return;
     }
-    const hitbox = enemy.getHitbox(state);
-    context.save();
-        context.globalAlpha *= (0.5 + 0.5 * enemy.params.shieldLife / 8);
-        context.fillStyle = 'white';
-        context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-    context.restore();
+    enemy.renderFrozenEffect(context, enemy.params.shieldLife / 8);
 }
 
 
