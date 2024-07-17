@@ -4,6 +4,7 @@ import { DoorStyleDefinition, doorStyles } from 'app/content/objects/doorStyles'
 import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { playAreaSound } from 'app/musicController';
+import { renderHeroShadow } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { enterZoneByTarget, findObjectLocation, isLocationHot } from 'app/utils/enterZoneByTarget';
@@ -203,21 +204,17 @@ export class Door implements ObjectInstance {
             return false;
         }
         // The hero can walk over closed ladders down as they are plain ground tiles, so this should return false
-        // to preven the hero from activating them while closed.
+        // to prevent the hero from activating them while closed.
         if (this.style.isLadderDown && !this.isOpen()) {
             return false;
         }
         return (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
+    isHeroTriggeringDoor(state: GameState) {
+        return boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getOffsetHitbox()) && this.heroCanEnter(state);
+    }
     renderOpen(state: GameState): boolean {
-        const hitbox = {...this.getHitbox()};
-        // Adjust this by the area hitbox if this is in the next area, otherwise hit detection with the hero will be incorrect.
-        if (this.area && this.area === state.nextAreaInstance) {
-            hitbox.x += this.area.cameraOffset.x;
-            hitbox.y += this.area.cameraOffset.y;
-        }
-        const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), 0), hitbox) && this.heroCanEnter(state);
-        return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;
+        return this.isHeroTriggeringDoor(state) || this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
@@ -271,6 +268,13 @@ export class Door implements ObjectInstance {
     }
     getHitbox(): Rect {
         return this.style.getHitbox(this);
+    }
+    // This returns this hitbox offset by the area's cameraOffset.
+    getOffsetHitbox(): Rect {
+        const hitbox = this.style.getHitbox(this);
+        hitbox.x += this.area?.cameraOffset?.x ?? 0;
+        hitbox.y += this.area?.cameraOffset?.y ?? 0;
+        return hitbox;
     }
     onPush(state: GameState, direction: Direction): void {
         if (direction === this.definition.d) {
@@ -386,7 +390,8 @@ export class Door implements ObjectInstance {
         if (!this.heroCanEnter(state)) {
             return;
         }
-        const heroIsTouchingDoor = boxesIntersect(hero.getMovementHitbox(), this.getHitbox());
+        const heroIsTouchingDoor = this.isHeroTriggeringDoor(state);
+        //const heroIsTouchingDoor = boxesIntersect(hero.getMovementHitbox(), this.getOffsetHitbox());
         if (heroIsTouchingDoor &&
             // If the hero has no action target, have the door control them as soon as they touch it
             (!hero.actionTarget || (hero.actionTarget !== this && !hero.isExitingDoor))
@@ -518,8 +523,19 @@ export class Door implements ObjectInstance {
             }
         }
         if (state.hero.renderParent == this) {
-            //renderHeroShadow(context, state, state.hero);
-            state.hero.render(context, state);
+
+            if (this.area === state.nextAreaInstance) {
+                // The hero's coordinates are always relative to `this.area`, so we need to
+                // adjust by the door's camera offset if it is part of the next area during a transition.
+                context.save();
+                    context.translate(-this.area.cameraOffset.x, -this.area.cameraOffset.y);
+                    renderHeroShadow(context, state, state.hero);
+                    state.hero.render(context, state);
+                context.restore();
+            } else {
+                renderHeroShadow(context, state, state.hero);
+                state.hero.render(context, state);
+            }
             // Draw the top of the door over the hero when they are walking through it.
             if (this.definition.d === 'up') {
                 if (this.style.renderForeground) {

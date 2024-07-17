@@ -96,6 +96,12 @@ export function updateCamera(state: GameState, speed?: number): void {
             }
             checkIfAllEnemiesAreDefeated(state, state.areaInstance);
             checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
+
+            // Make sure to remove renderParent from the hero for any objects that are
+            // no longer being rendered.
+            if (state.hero.renderParent && state.hero.renderParent.area !== state.hero.area) {
+                delete state.hero.renderParent;
+            }
         }
         return;
     }

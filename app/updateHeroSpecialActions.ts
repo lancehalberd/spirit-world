@@ -327,7 +327,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.isUsingDoor) {
-        const isUsingStairs = (hero.actionTarget as Door)?.isStairs?.(state);
+        const door: Door|undefined = hero.actionTarget as Door;
+        const isUsingStairs = door?.isStairs?.(state);
         hero.action = 'walking';
         hero.animationTime += FRAME_LENGTH;
         // Automatically move the hero forward in the direction set by the door, ignoring obstacles.
@@ -345,8 +346,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Check if the hero is done moving through the door meaning:
         // They are no longer intersecting the door object
         // They are in an open tile.
-        const touchingTarget = hero.actionTarget && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getHitbox());
-        if (!touchingTarget && isHeroOnOpenTile(state, hero)) {
+        //const touchingTarget = hero.actionTarget
+        //    && (hero.actionTarget.area === state.areaInstance || hero.actionTarget.area === state.nextAreaInstance)
+        //    && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getOffsetHitbox());
+        if (!door?.isHeroTriggeringDoor?.(state) && isHeroOnOpenTile(state, hero)) {
             hero.actionTarget = null;
             hero.isUsingDoor = false;
             delete hero.renderParent;

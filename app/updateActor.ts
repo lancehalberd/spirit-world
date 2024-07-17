@@ -202,7 +202,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         }
     }
     // Remove action targets from old areas.
-    if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
+    if (hero.actionTarget && hero.actionTarget.area !== hero.area && hero.actionTarget.area !== state.nextAreaInstance) {
         hero.actionTarget = null;
     }
     if (hero.grabObject && hero.action !== 'grabbing') {
