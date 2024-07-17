@@ -78,10 +78,15 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Update tileset for the Tomb once I have the new pit graphics.
-        - Add new pit graphics.
-        - Use futuristic tileset for the exterior of the Cocoon for now for better foreshadowing.
-        - Fix angled southern ceiling walls have awkard bumps.
+    - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
+
+    - Render blue overall over underwater sections of map.
+
+    - Add SFX for opening key blocks. Click followed by a sliding stone noise.
+
+    - Render map fog after all sections+objects are rendered so that objects are never drawn on top of the fog.
+
+    - Fix angled southern ceiling walls have awkard bumps in cavern graphics.
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.

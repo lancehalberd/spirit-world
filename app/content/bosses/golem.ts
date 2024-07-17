@@ -192,6 +192,27 @@ enemyDefinitions.golem = {
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'chargeLaser') {
             const [x, y] = getMouthLaserCoords(state, enemy);
+            renderDamageWarning(context, {
+                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
+                duration: LASER_CHARGE_TIME,
+                time: enemy.modeTime,
+            });
+        } else if (enemy.mode === 'chargeStrafeLaser') {
+            let [x, y] = getLeftEyeLaserCoords(state, enemy);
+            renderDamageWarning(context, {
+                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
+                duration: FAST_LASER_CHARGE_TIME,
+                time: enemy.modeTime,
+            });
+            [x, y] = getRightEyeLaserCoords(state, enemy);
+            renderDamageWarning(context, {
+                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
+                duration: FAST_LASER_CHARGE_TIME,
+                time: enemy.modeTime,
+            });
+        }
+        if (enemy.mode === 'chargeLaser') {
+            const [x, y] = getMouthLaserCoords(state, enemy);
             context.save();
                 const p = enemy.modeTime / LASER_CHARGE_TIME;
                 context.globalAlpha *= 0.3 + 0.7 * p;
@@ -218,27 +239,6 @@ enemyDefinitions.golem = {
         }
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        if (enemy.mode === 'chargeLaser') {
-            const [x, y] = getMouthLaserCoords(state, enemy);
-            renderDamageWarning(context, {
-                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
-                duration: LASER_CHARGE_TIME,
-                time: enemy.modeTime,
-            });
-        } else if (enemy.mode === 'chargeStrafeLaser') {
-            let [x, y] = getLeftEyeLaserCoords(state, enemy);
-            renderDamageWarning(context, {
-                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
-                duration: FAST_LASER_CHARGE_TIME,
-                time: enemy.modeTime,
-            });
-            [x, y] = getRightEyeLaserCoords(state, enemy);
-            renderDamageWarning(context, {
-                ray: { x1: x, y1: y, x2: x, y2: y + 512, r: 6},
-                duration: FAST_LASER_CHARGE_TIME,
-                time: enemy.modeTime,
-            });
-        }
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // Thrown objects can hurt the golem as if it as an ordinary enemy.
@@ -422,11 +422,11 @@ function getMouthLaserCoords(state: GameState, enemy: Enemy): number[] {
 }
 function getLeftEyeLaserCoords(state: GameState, enemy: Enemy): number[] {
     const hitbox = enemy.getHitbox(state);
-    return [hitbox.x + hitbox.w / 2 - 14, hitbox.y + 38];
+    return [hitbox.x + hitbox.w / 2 - 14, hitbox.y + 22];
 }
 function getRightEyeLaserCoords(state: GameState, enemy: Enemy): number[] {
     const hitbox = enemy.getHitbox(state);
-    return [hitbox.x + hitbox.w / 2 + 14, hitbox.y + 38];
+    return [hitbox.x + hitbox.w / 2 + 14, hitbox.y + 22];
 }
 
 function fireLaser(this: void, state: GameState, enemy: Enemy, duration: number, radius: number, coords: number[]): LaserBeam {
