@@ -78,33 +78,12 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
-
-    - Render blue overall over underwater sections of map.
-
-    - Add SFX for opening key blocks. Click followed by a sliding stone noise.
-
-    - Render map fog after all sections+objects are rendered so that objects are never drawn on top of the fog.
-
-    - Fix angled southern ceiling walls have awkard bumps in cavern graphics.
+    Blocking Next Release:
+        - Render map fog after all sections+objects are rendered so that objects are never drawn on top of the fog.
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
         - Make crystal cracked ground become crystal pits.
-
-    - Remove old graphics
-        - Replace remaining old cave graphics.
-        - Replace old cave tiles with deleted tiles.
-        - Remove all references to the cave tiles, but keep the image itself.
-        - Replace remaining cave doors and remove graphics + door style.
-            - Set cavern as default door style.
-
-    - Review human graphics from vexed
-        - Create a customNpc object that let's you mix and match characteristics:
-            - Male/Female
-            - Child/Adult
-            - hair -> eyes -> mouth
-            - body -> legs -> feet
 
     - Improve Coccoon boss
         - "Your weapons cannot reach me in the spirit world"
@@ -114,9 +93,28 @@ Current tasks:
 
     - objects thrown into pits should use the pit animation instead of breaking.
 
+    - Add SFX for opening key blocks. Click followed by a sliding stone noise.
+
+    - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
+
+    - Render blue overall over underwater sections of map.
+
+    - Fix angled southern ceiling walls have awkard bumps in cavern graphics.
+
     - Running into solid invisible chests feels bad.
         - At least move them out of the way.
         - Maybe they shouldn't have collision unless you can see them?
+
+    - Remove old graphics
+        - Replace remaining old cave graphics.
+            - Underwater - Use cave tileset.
+            - Cocoon (Use futuristic+obsidian tiles for now?)
+            - River Temple Boss+Underwater - use stone tileset
+        - Replace old cave tiles with deleted tiles.
+        - Remove all references to the cave tiles, but keep the image itself.
+        - Replace remaining cave doors and remove graphics + door style.
+            - Set cavern as default door style.
+
 
     - Replace low stones underwater with walls or taller obstacles.
 
