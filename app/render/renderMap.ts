@@ -26,7 +26,14 @@ const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols
 const borderSize = 4;
 const worldSize = 192;
 const questMarker = requireFrame('gfx/hud/questMarker.png', {x: 0, y: 0, w: 9, h: 18});
-const [doorFrame, chestFrame, downFrame, upFrame] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 4}).frames;
+const [
+    doorFrame, chestFrame,
+    downFrame, upFrame,
+    smallLockFrame, bigLockFrame,
+    verticalFrame, horizontalFrame,
+    blockedFrame,
+] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 9}).frames;
+// window['debugCanvas'](smallLockFrame, 5);
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (overworldKeys.includes(state.location.zoneKey)) {
@@ -354,7 +361,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
 
 const mapObjectTypes: ObjectType[] = [
-    'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest'
+    'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
@@ -390,7 +397,26 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
             /*if (object.definition.id === 'warTempleNorthEntrance') {
                 debugger;
             }*/
-            if (object.definition?.type === 'chest' || object.definition?.type === 'bigChest') {
+            if (object.definition?.type === 'keyBlock') {
+                if (!state.savedState.objectFlags[object.definition.id]) {
+                    if (object.definition?.status === 'bigKeyLocked') {
+                        drawFrame(context, bigLockFrame, {...bigLockFrame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
+                        });
+                    } else if (object.definition?.status === 'locked') {
+                        drawFrame(context, smallLockFrame, {...smallLockFrame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
+                        });
+                    } else {
+                        drawFrame(context, blockedFrame, {...blockedFrame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - blockedFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - blockedFrame.h / 2,
+                        });
+                    }
+                }
+            } else if (object.definition?.type === 'chest' || object.definition?.type === 'bigChest') {
                 // Only render graphics for chests if drawChests is true.
                 if (drawChests && !state.savedState.objectFlags[object.definition.id] && object.definition.lootType !== 'empty') {
                     drawFrame(context, chestFrame, {...chestFrame,
@@ -422,40 +448,77 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                 context.restore();
             }
 
-            if (object.definition?.type === 'door'
-                && object.definition.targetZone && object.definition.targetObjectId
-                && object.status !== 'cracked'
-            ) {
+            if (object.definition?.type === 'door') {
+                // Do not render cracked doors unless they have already been opened.
+                const isOpened = state.savedState.objectFlags[object.definition.id];
+                if (object.definition.status === 'cracked' && !isOpened) {
+                    continue;
+                }
+                const wasClosed = object.definition.status === 'closed'
+                    || object.definition.status === 'closedSwitch'
+                    || object.definition.status === 'closedEnemy';
                 const doorStyle = doorStyles[object.definition.style] || doorStyles.cavern;
-                if (object.definition.style === 'wideEntrance' && object.definition.d === 'up') {
-                    drawFrame(context, upFrame, {...upFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - upFrame.w / 2,
-                        y: Math.round((hitbox.y) * yScale),
-                    });
-                } else if (object.definition.style === 'wideEntrance' && object.definition.d === 'down') {
-                    drawFrame(context, downFrame, {...downFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - downFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h) * yScale) - downFrame.h,
-                    });
-                } else if (doorStyle.mapIcon) {
-                    let frame = doorFrame;
-                    if (doorStyle.mapIcon === 'up') {
-                        frame = upFrame;
-                    } else if (doorStyle.mapIcon === 'down') {
-                        frame = downFrame;
+                if (wasClosed && !isOpened) {
+                    // Ladders are hidden when closed, so do not draw them to the map.
+                    if (doorStyle.isLadderUp || doorStyle.isLadderDown) {
+                        continue;
                     }
-                    drawFrame(context, frame, {...frame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
-                            // Render southern doors further up.
-                            + (object.definition.d === 'down' ? -2 : 0),
+                    drawFrame(context, blockedFrame, {...blockedFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - blockedFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - blockedFrame.h / 2,
+                    });
+                } else if (object.definition.status === 'locked' && !isOpened) {
+
+                    drawFrame(context, smallLockFrame, {...smallLockFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
+                    });
+                } else if (object.definition.status === 'bigKeyLocked' && !isOpened) {
+                    drawFrame(context, bigLockFrame, {...bigLockFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
+                    });
+                } else if (object.definition.targetZone && object.definition.targetObjectId) {
+                    if (object.definition.style === 'wideEntrance' && object.definition.d === 'up') {
+                        drawFrame(context, upFrame, {...upFrame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - upFrame.w / 2,
+                            y: Math.round((hitbox.y) * yScale),
+                        });
+                    } else if (object.definition.style === 'wideEntrance' && object.definition.d === 'down') {
+                        drawFrame(context, downFrame, {...downFrame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - downFrame.w / 2,
+                            y: Math.round((hitbox.y + hitbox.h) * yScale) - downFrame.h,
+                        });
+                    } else if (doorStyle.mapIcon) {
+                        let frame = doorFrame;
+                        if (doorStyle.mapIcon === 'up') {
+                            frame = upFrame;
+                        } else if (doorStyle.mapIcon === 'down') {
+                            frame = downFrame;
+                        }
+                        drawFrame(context, frame, {...frame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
+                            y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
+                                // Render southern doors further up.
+                                + (object.definition.d === 'down' ? -2 : 0),
+                        });
+                    } else {
+                        drawFrame(context, doorFrame, {...doorFrame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - doorFrame.w / 2,
+                            y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - doorFrame.h / 2
+                                // Render southern doors further up.
+                                + (object.definition.d === 'down' ? -2 : 0),
+                        });
+                    }
+                } else if (object.definition?.d === 'up' || object.definition?.d === 'down') {
+                    drawFrame(context, verticalFrame, {...verticalFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - verticalFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - verticalFrame.h / 2,
                     });
                 } else {
-                    drawFrame(context, doorFrame, {...doorFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - doorFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - doorFrame.h / 2
-                            // Render southern doors further up.
-                            + (object.definition.d === 'down' ? -2 : 0),
+                    drawFrame(context, horizontalFrame, {...horizontalFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - horizontalFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - horizontalFrame.h / 2,
                     });
                 }
             }

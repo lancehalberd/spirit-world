@@ -276,7 +276,6 @@ const imagePacks: PackedImageData[] = [
         {x:160,y:1744,w:816,h:48,originalSource:'gfx/effects/crystalpod.png'},
         {x:752,y:624,w:24,h:24,originalSource:'gfx/hud/menu9slice.png'},
         {x:768,y:560,w:9,h:18,originalSource:'gfx/hud/questMarker.png'},
-        {x:576,y:576,w:24,h:6,originalSource:'gfx/hud/mapIcons.png'},
         {x:608,y:688,w:24,h:24,originalSource:'gfx/hud/cursortemp.png'},
         {x:624,y:1152,w:160,h:16,originalSource:'gfx/chakram1.png'},
         {x:0,y:1760,w:160,h:16,originalSource:'gfx/chakram2.png'},
