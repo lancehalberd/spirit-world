@@ -95,3 +95,86 @@ export const fatherAnimations: ActorAnimations = {
     idle: omniAnimation(testDownAnimation),
 };
 */
+
+
+
+/*
+Temporary NPC graphics for Jade Champion
+
+Authors: Benjamin K. Smith (BenCreating), bluecarrot16, TheraHedwig, Evert, MuffinElZangano, Durrani, Pierre Vigier (pvigier), ElizaWy, Matthew Krohn (makrohn), Johannes Sjölund (wulax), Stephen Challener (Redshrike), Thane Brimhall (pennomi), JaidynReiman, Yamilian, Nila122, Michael Whitlock (bigbeargames)
+
+- body/bodies/female/amber.png: by Benjamin K. Smith (BenCreating), bluecarrot16, TheraHedwig, Evert, MuffinElZangano, Durrani, Pierre Vigier (pvigier), ElizaWy, Matthew Krohn (makrohn), Johannes Sjölund (wulax), Stephen Challener (Redshrike). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. see details at https://opengameart.org/content/lpc-character-bases
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - https://opengameart.org/content/lpc-ladies
+    - https://opengameart.org/content/lpc-7-womens-shirts
+    - https://opengameart.org/content/lpc-jump-expanded
+
+- head/heads/human/female/amber.png: by bluecarrot16, Benjamin K. Smith (BenCreating), Stephen Challener (Redshrike). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. original head by Redshrike; tweaks by BenCreating; modular version by bluecarrot16
+    - https://opengameart.org/content/
+    - https://opengameart.org/content/lpc-character-bases
+
+- head/nose/straight/adult/amber.png: by Thane Brimhall (pennomi), Matthew Krohn (makrohn). License(s): GPL 3.0, CC-BY-SA 3.0.
+    - https://opengameart.org/content/lpc-base-character-expressions
+
+- eyes/human/adult/green.png: by JaidynReiman, Matthew Krohn (makrohn), Stephen Challener (Redshrike). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. original by Redshrike, mapped to all frames by Matthew Krohn & JaidynReiman
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+
+- eyes/eyebrows/thin/adult/dark_brown.png: by ElizaWy. License(s): OGA-BY 3.0.
+    - https://github.com/ElizaWy/LPC/tree/main/Characters/Hair
+
+- hair/braid2/female/dark_brown.png: by Yamilian, bluecarrot16. License(s): CC-BY-SA 3.0, GPL 3.0.
+    - https://opengameart.org/content/lpc-heroine
+    - https://opengameart.org/content/lpc-hair
+
+- facial/earrings/simple/left/adult/green.png: by bluecarrot16. License(s): CC-BY-SA 3.0.
+    - https://opengameart.org/content/lpc-pirates
+
+- facial/earrings/simple/right/adult/green.png: by bluecarrot16. License(s): CC-BY-SA 3.0.
+    - https://opengameart.org/content/lpc-pirates
+
+- shoulders/legion/female/gold.png: by Nila122. License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 2.0, GPL 3.0.
+    - https://opengameart.org/content/lpc-roman-armor
+
+- arms/armour/plate/female/gold.png: by Michael Whitlock (bigbeargames), Matthew Krohn (makrohn), Johannes Sjölund (wulax). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0.
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - https://opengameart.org/content/lpc-combat-armor-for-women
+    - http://opengameart.org/content/lpc-clothing-updates
+
+- arms/bracers/female/gold.png: by Matthew Krohn (makrohn), Johannes Sjölund (wulax). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0.
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+
+- gloves/female/green.png: by Michael Whitlock (bigbeargames), Matthew Krohn (makrohn), Johannes Sjölund (wulax), bluecarrot16. License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0.
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - http://opengameart.org/content/lpc-clothing-updates
+
+- torso/clothes/longsleeve/longsleeve/female/green.png: by bluecarrot16, ElizaWy, Stephen Challener (Redshrike). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. original by ElizaWy, edited to v3 bases by bluecarrot16
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+    - https://opengameart.org/content/lpc-7-womens-shirts
+    - http://opengameart.org/content/lpc-clothing-updates
+
+- torso/armour/plate/female/gold.png: by bluecarrot16, Michael Whitlock (bigbeargames), Matthew Krohn (makrohn), Johannes Sjölund (wulax). License(s): CC-BY-SA 3.0, GPL 3.0.
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - https://opengameart.org/content/lpc-combat-armor-for-women
+    - http://opengameart.org/content/lpc-clothing-updates
+
+- feet/boots_fold/universal/female/copper.png: by JaidynReiman. License(s): OGA-BY 3.0+, CC-BY 3.0+, GPL 3.0.
+    - https://opengameart.org/content/lpc-relm-outfit-pieces-2-kimonos-2-sleeves-2-boots-tabi-socks
+*/
+// Frames are Up/Left/Down/Right [0-3]Castx7, [4-7]Thrustx8 [8-11]Walkx9, [12-15]Slashx6, [16-19]Shootx13 [20]Deathx6
+const jadeChampionImage: string = 'gfx/npcs/jadeChampion.png';
+const jadeChampionGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const jadeChampionAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11}),
+    },
+    move: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 9}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9, cols: 9}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10, cols: 9}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11, cols: 9}),
+    },
+};

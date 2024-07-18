@@ -512,7 +512,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 d: definition.d || 'down',
                 behavior: definition.behavior || Object.keys(npcBehaviors)[0] as NPCBehavior,
-                style: definition.style || Object.keys(npcStyles)[0] as NPCStyle,
+                style: definition.style || Object.keys(npcStyles)[0],
                 type: definition.type,
                 dialogueKey: definition.dialogueKey,
                 dialogue: definition.dialogue,

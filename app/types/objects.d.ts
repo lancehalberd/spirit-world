@@ -515,7 +515,6 @@ interface SignDefinition extends BaseObjectDefinition {
 interface NPCDefinition extends BaseObjectDefinition {
     type: 'npc'
     behavior: NPCBehavior
-    style: NPCStyle
     dialogueKey?: string
     dialogue?: string
     dialogueType?: DialogueType

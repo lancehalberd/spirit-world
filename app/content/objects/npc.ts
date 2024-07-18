@@ -14,6 +14,7 @@ import {
     boyAnimations,
     womanAnimations,
     girlAnimations,
+    jadeChampionAnimations,
     //testAnimations,
 } from 'app/content/npcs/npcAnimations'
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -76,157 +77,162 @@ function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state
     context.restore();
 }
 
-export const npcStyles = {
+export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     /*test: {
         animations: testAnimations,
         shadowOffset: 2,
-    } as NPCStyleDefinition,*/
+    },*/
+    jadeChampion: {
+        animations: jadeChampionAnimations,
+        shadowOffset: 2,
+        height: 26,
+    },
     man: {
         animations: manAnimations,
         shadowOffset: 2,
         flipLeft: true,
         height: 25,
-    } as NPCStyleDefinition,
+    },
     boy: {
         animations: boyAnimations,
         shadowOffset: 2,
         flipLeft: true,
         height: 21,
-    } as NPCStyleDefinition,
+    },
     woman: {
         animations: womanAnimations,
         shadowOffset: 2,
         flipLeft: true,
         height: 25,
-    } as NPCStyleDefinition,
+    },
     girl: {
         animations: girlAnimations,
         shadowOffset: 2,
         flipLeft: true,
         height: 21,
-    } as NPCStyleDefinition,
+    },
     giantSnake: {
         animations: snakeAnimations,
         scale: 3,
         shadowOffset: 2,
         flipRight: true,
-    } as NPCStyleDefinition,
+    },
     crystalDragon: {
         animations: crystalDragonAnimations,
         noShadow: true,
-    } as NPCStyleDefinition,
+    },
     bigSpirit: {
         animations: sentryBotAnimations,
         shadowOffset: 2,
-    } as NPCStyleDefinition,
+    },
     smallSpirit: {
         animations: dronDirectionalAnimations,
         z: 6,
-    } as NPCStyleDefinition,
+    },
     flameSpirit: {
         animations: {idle: omniAnimation(elementalFlameAnimation)},
         z: 6,
         scale: 2,
-    } as NPCStyleDefinition,
+    },
     frostSpirit: {
         animations: {idle: omniAnimation(elementalFrostAnimation)},
         z: 6,
         scale: 2,
-    } as NPCStyleDefinition,
+    },
     stormSpirit: {
         animations: {idle: omniAnimation(elementalStormAnimation)},
         z: 6,
         scale: 2,
-    } as NPCStyleDefinition,
+    },
     sleepingLightningBeast: {
         animations: lightningBeastAnimations,
         shadowOffset: -20,
-    } as NPCStyleDefinition,
+    },
     gal: {
         animations: galAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     gal2: {
         animations: gal2Animations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     guy: {
         animations: guyAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     guy2: {
         animations: guy2Animations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     father: {
         animations: fatherAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     mom: {
         animations: momAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     rival: {
         animations: rivalAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     paleMonk: {
         animations: paleMonkAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     midMonk: {
         animations: midMonkAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     darkMonk: {
         animations: darkMonkAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
     vanara: {
         animations: heroAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraBlack: {
         animations: vanaraBlackAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraBlue: {
         animations: vanaraBlueAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraBrown: {
         animations: vanaraBrownAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraGold: {
         animations: vanaraGoldAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraGray: {
         animations: vanaraGrayAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraPurple: {
         animations: vanaraPurpleAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     vanaraRed: {
         animations: vanaraRedAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
-    } as NPCStyleDefinition,
+    },
     zoro: {
         animations: zoroAnimations,
         shadowOffset: 1,
-    } as NPCStyleDefinition,
+    },
 };
 
 export const npcBehaviors = {
@@ -516,7 +522,6 @@ objectHash.npc = NPC;
 
 class _NPC extends NPC {}
 declare global {
-    export type NPCStyle = keyof typeof npcStyles;
     export type NPCBehavior = keyof typeof npcBehaviors;
     export interface NPC extends _NPC {}
 }
