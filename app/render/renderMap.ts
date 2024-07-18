@@ -215,6 +215,16 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 data.target,  data.source);
         mapContext.restore();
     }
+    // Add shading over unexplored areas.
+    for (const data of sectionRenderData) {
+        if (!data.isExplored && !editingState.isEditing) {
+            mapContext.save();
+                mapContext.globalAlpha *= 0.7;
+                mapContext.fillStyle = 'black';
+                mapContext.fillRect(data.target.x, data.target.y, data.target.w, data.target.h);
+            mapContext.restore();
+        }
+    }
     // Then draw objects on top:
     // (possible drawback is objects being drawn on top of foreground tiles, but so far this isn't a problem.)
     // (technically we should draw: background tiles, background objects, foreground tiles, foreground objects, then map icons)
@@ -224,14 +234,6 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             renderMapObjects(mapContext, state, data.area,
                 data.target,  data.source, hasMap);
         mapContext.restore();
-        if (!data.isExplored && !editingState.isEditing) {
-            mapContext.save();
-                mapContext.globalAlpha *= 0.7;
-                mapContext.fillStyle = 'black';
-                mapContext.fillRect(data.target.x, data.target.y, data.target.w, data.target.h);
-            mapContext.restore();
-        }
-
     }
 }
 
