@@ -48,17 +48,12 @@ export function serializeZone(zone: Zone) {
             for (let row = 0; row < areaGrid.length; row++) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
-                    // Section indexes + map ids for maps won't get saved if we do this, so never set entire area definitions to null.
-                    /*if (!area || (emptyAreas.includes(area) && !area.objects.length)) {
-                        lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = null;`);
-                        continue;
-                    }*/
                     lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = {`);
                     if (key === 'sf') {
                         lines.push(`    isSpiritWorld: true,`);
                         lines.push(`    parentDefinition: f${floorIndex}_${column}x${row},`);
                     }
-                    if (!area.layers || emptyAreas.includes(area)) {
+                    if (!area?.layers || emptyAreas.includes(area)) {
                         // Setting the layers to null will initialize this to the
                         // default layers which inherits from parent area.
                         lines.push('    layers: null,');
@@ -104,11 +99,11 @@ export function serializeZone(zone: Zone) {
                         lines.push('    ],');
                     }
                     lines.push('    objects: [');
-                    for (const object of area.objects) {
+                    for (const object of (area?.objects || [])) {
                         lines.push(`        {${Object.keys(object).filter(k => object[k] !== undefined && object[k] !== null).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
                     }
                     lines.push('    ],');
-                    if (area.variants?.length) {
+                    if (area?.variants?.length) {
                         lines.push('    variants: [');
                         for (const variant of area.variants) {
                             lines.push(`        {${Object.keys(variant).filter(k => variant[k] !== undefined && variant[k] !== null).map(k => `${k}: ${JSON.stringify(variant[k])}` ).join(', ')}},`);
@@ -116,7 +111,7 @@ export function serializeZone(zone: Zone) {
                         lines.push('    ],');
                     }
                     lines.push('    sections: [');
-                    for (const section of area.sections) {
+                    for (const section of (area?.sections || [])) {
                         let extraFields = '';
                         if (section.index >= 0) {
                             extraFields += `, index: ${section.index}`;
@@ -146,13 +141,13 @@ export function serializeZone(zone: Zone) {
 
                     }
                     lines.push('    ],');
-                    if (area.dark) {
+                    if (area?.dark) {
                         lines.push(`    dark: ${area.dark},`);
                     }
-                    if (area.corrosiveLogic) {
+                    if (area?.corrosiveLogic) {
                         lines.push(`    corrosiveLogic: ${JSON.stringify(area.corrosiveLogic)},`);
                     }
-                    if (area.specialBehaviorKey) {
+                    if (area?.specialBehaviorKey) {
                         lines.push(`    specialBehaviorKey: '${area.specialBehaviorKey}',`);
                     }
                     lines.push('};');
