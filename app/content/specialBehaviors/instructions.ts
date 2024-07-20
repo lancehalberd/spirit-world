@@ -5,8 +5,9 @@ specialBehaviorsHash.runInstructions = {
     type: 'narration',
     update(state: GameState, object: ObjectInstance) {
         let helpText = '';
+        const id = object.definition.id;
 
-        if (state.hero.magicRegen && !state.savedState.objectFlags.runInstructions) {
+        if (state.hero.magicRegen && !state.savedState.objectFlags[id]) {
             helpText = `Hold [B_PASSIVE] to run.[-]Running uses Spirit Energy.`;
         }
         const textCue = findTextCue(state);

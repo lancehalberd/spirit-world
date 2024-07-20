@@ -2852,6 +2852,8 @@ const f1_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 384, y: 28, type: "turret", d: "down", fireInterval: 1500, fireOffset: 0, style: "arrow"},
         {status: "normal", id: "", x: 112, y: 28, type: "turret", d: "down", fireInterval: 1200, fireOffset: 200, style: "arrow"},
         {status: "normal", id: "tombEntered", x: 240, y: 448, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "forever"},
+        {status: "normal", id: "tombRunInstructions", x: 328, y: 184, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "forever"},
+        {status: "normal", id: "tombRunInstructions", specialBehaviorKey: "runInstructions", x: 452, y: 112, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 204, mapId: 'tomb', floorId: '1F', mapX: 2, mapY: 3},

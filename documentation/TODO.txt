@@ -78,9 +78,11 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add new crystal pit graphics
-        - Add small crystal pit tile, use in secret entrance to sky palace.
-        - Make crystal cracked ground become crystal pits.
+    - Add SFX for opening key blocks. Click followed by a sliding stone noise.
+
+    - Render blue overall over underwater sections of map.
+
+    - objects thrown into pits should use the pit animation instead of breaking.
 
     - Improve Coccoon boss
         - "Your weapons cannot reach me in the spirit world"
@@ -88,13 +90,13 @@ Current tasks:
         - Staggering causes the Astral Projection to lose all of its life and cannot regenerate.
         - Teleports away once the player deals 2+ damage or after 3 seconds (they can deal 1 damage then a large hit for max damage).
 
-    - objects thrown into pits should use the pit animation instead of breaking.
+    - Add new crystal pit graphics
+        - Add small crystal pit tile, use in secret entrance to sky palace.
+        - Make crystal cracked ground become crystal pits.
 
-    - Add SFX for opening key blocks. Click followed by a sliding stone noise.
+    - Replace low stones underwater with walls or taller obstacles.
 
     - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
-
-    - Render blue overall over underwater sections of map.
 
     - Fix angled southern ceiling walls have awkard bumps in cavern graphics.
 
@@ -111,9 +113,6 @@ Current tasks:
         - Remove all references to the cave tiles, but keep the image itself.
         - Replace remaining cave doors and remove graphics + door style.
             - Set cavern as default door style.
-
-
-    - Replace low stones underwater with walls or taller obstacles.
 
     - Add tutorial sections for clone
         - Swapping between clones
