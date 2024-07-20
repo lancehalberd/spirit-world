@@ -50,6 +50,7 @@ interface GameState {
     hero: Hero
     camera: { x: number, y: number }
     fieldTime: number
+    prologueTime: number
     time: number
     // This marks when the last HUD revive animation started.
     reviveTime: number

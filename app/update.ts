@@ -15,6 +15,7 @@ import {
 import { updateControls } from 'app/scenes/controls/updateControls';
 import { updateDefeated } from 'app/scenes/defeated/updateDefeated';
 import { updateInventory } from 'app/scenes/inventory/updateInventory';
+import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
 import { updateTitle } from 'app/scenes/title/updateTitle';
 import {
     canPauseGame,
@@ -48,7 +49,8 @@ export function update() {
             return;
         }
         if (state.scene === 'prologue') {
-
+            updatePrologue(state);
+            return;
         }
         if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'

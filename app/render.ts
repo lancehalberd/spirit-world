@@ -6,6 +6,7 @@ import { renderDefeatedMenu } from 'app/scenes/defeated/renderDefeated';
 import { renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera } from 'app/render/renderField';
 import { renderHUD } from 'app/renderHUD';
 import { renderInventory } from 'app/scenes/inventory/renderInventory';
+import { renderPrologue } from 'app/scenes/prologue/renderPrologue';
 import { renderMap } from 'app/render/renderMap';
 import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/scenes/title/renderTitle';
@@ -38,6 +39,10 @@ export function render() {
 export function renderInternal(context: CanvasRenderingContext2D, state: GameState) {
     if (state.showControls) {
         renderControls(context, state);
+        return;
+    }
+    if (state.scene === 'prologue') {
+        renderPrologue(context, state);
         return;
     }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {

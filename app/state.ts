@@ -105,6 +105,7 @@ export function getDefaultState(): GameState {
         // This is set when the player gains or uses a revive
         // and reviveAnimationTime = fieldTime - reviveTime
         reviveTime: 0,
+        prologueTime: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
         location: getFullZoneLocation(SPAWN_LOCATION_FULL),
@@ -120,7 +121,7 @@ export function getDefaultState(): GameState {
             defeated: false,
             time: 0,
         },
-        scene: 'title',
+        scene: 'prologue',
         keyboard: {
             gameKeyValues: [],
             gameKeysDown: new Set(),
@@ -161,7 +162,7 @@ export function initializeState() {
     state = getDefaultState();
     loadSavedData();
     setSaveFileToState(0);
-    state.scene = 'title';
+    state.scene = 'prologue';
 }
 
 export function getState(): GameState {

@@ -15,6 +15,10 @@ export const updateMusic = (state: GameState): void => {
         return;
     }
     const soundSettings = getSoundSettings(state);
+    if (state.scene === 'prologue') {
+        playTrack('dungeonTheme', 0, soundSettings);
+        return;
+    }
     if (state.scene !== 'game') {
         playTrack('mainTheme', 0, soundSettings);
         return;
