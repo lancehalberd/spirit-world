@@ -78,7 +78,8 @@ Graphics to Implement:
 Current tasks:
     - Add prologue sequence with placeholder graphics from Hillary.
 
-    - Add SFX for opening key blocks. Click followed by a sliding stone noise.
+    - Continuous sounds should be paused while the game is stopped.
+    - Sound controls should apply immediately to continuous sound effects like rolling balls/key block.
 
     - Render blue overall over underwater sections of map.
 
@@ -89,6 +90,8 @@ Current tasks:
         - Double the bosses life and make the rolling balls stagger him into the material world like Rival 2.
         - Staggering causes the Astral Projection to lose all of its life and cannot regenerate.
         - Teleports away once the player deals 2+ damage or after 3 seconds (they can deal 1 damage then a large hit for max damage).
+
+    - Let charging beetles charge through and destroy bushes.
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
@@ -162,7 +165,7 @@ Current tasks:
         - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
         - Can move into lava. Returning to lava will regenerate the shell if missing.
 
-    - Add additional pit corner tiles to from future tile set and use them in Staff Tower to clean up corners.
+    - Add additional pit corner tiles to the future tile set and use them in Staff Tower to clean up corners.
 
 
     - Mechanic for breaking crystal barriers open is unintuitive.
@@ -181,6 +184,7 @@ Current tasks:
         - Render the hero laying down for Nms.
         - Button press shakes the player sprite and reduces duration by 200ms once every 200ms.
         - Gold armor should reduce or prevent the effect of crushed.
+        - Iron skin prevents the effect but at the cost of losing all stacks of iron skin.
 
     - Render player mostly submerged in deepwater with iron boots on (draw the top 4px of the sprite over the shallow water animation)
         - Allow the player to move under solid objects this way

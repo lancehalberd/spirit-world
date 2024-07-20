@@ -359,8 +359,12 @@ export function isTrackPlaying(trackKey: TrackKey): boolean {
 const preloadSounds = () => {
     [
         {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, offset: '0:200', limit: 2},
+        {key: 'unlock', source: 'sfx/Cube click_odrive.wav', volume: 50, limit: 2},
         {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, limit: 2},
         {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, limit: 2},
+        {key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
+            offset: '0:700', volume: 60, limit: 2
+        },
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
             offset: '0:1400', loop: true, volume: 20, limit: 2
         },
