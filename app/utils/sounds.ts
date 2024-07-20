@@ -245,7 +245,8 @@ const musicTracks = {
     towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 10 },
     skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 10 },
     // Used for the lake temple
-    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
+    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/ocean.mp3', volume: 8 },
+    skyPalaceTheme: {key: 'skyPalaceTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
     village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
     // Used for summoner ruins.
