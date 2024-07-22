@@ -22,6 +22,8 @@ import { populateAllDialogue} from 'app/content/dialogue/dialogueList';
 import { getState } from 'app/state';
 import { updateMusic } from 'app/musicController';
 
+export * from 'app/development/packFont';
+
 setInterval(update, FRAME_LENGTH);
 
 populateAllSections();
