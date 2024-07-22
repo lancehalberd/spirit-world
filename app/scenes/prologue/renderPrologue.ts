@@ -1,9 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { fillRect } from 'app/utils/index';
-import { drawText } from 'app/utils/simpleWhiteFont';
 import { requireFrame } from 'app/utils/packedImages';
-
 
 const scrollAnimation = createAnimation('gfx/prologue/scrollAnimation.png', {w: 256, h: 30},
     {rows: 3, duration: 3}, {loop: true}
@@ -13,7 +11,8 @@ const lowerScroll = requireFrame('gfx/prologue/lowerScroll.png', {x: 0, y: 0, w:
 
 
 // scroll rolls up from the bottom of the screen revealing the image underneath it and going off the top of the screen.
-const unrollDuration = 2000;
+const initialPause = 1000;
+const unrollDuration = 1000;
 const pauseDuration = 6000;
 const panStartY = 1280 - 224, panEndY = 64;
 const panFramesPerPixel = 3;
@@ -23,19 +22,18 @@ const panFramesPerPixel = 3;
 export function renderPrologue(context: CanvasRenderingContext2D, state: GameState): void {
     let r = {x: 0, y: 0, w: CANVAS_WIDTH, h: CANVAS_HEIGHT};
     fillRect(context, r, 'black');
-    const unrollTime = state.prologueTime;
-    const unrollP = state.prologueTime / unrollDuration;
-    const unrollY = 224 - Math.floor(254 * unrollP);
-    const pauseTime = state.prologueTime - unrollDuration;
+    const unrollTime = Math.max(0, state.prologueTime - initialPause);
+    const unrollP = unrollTime / unrollDuration;
+    const unrollY = 87 - Math.floor(144 * unrollP);
+    const pauseTime = unrollTime - unrollDuration;
     const panTime = pauseTime - pauseDuration;
 
+    // Initially we only render the portion of the scroll that is below the unrolling scroll animation.
+    const scrollH = Math.floor(224 * unrollP) + 70;
+    const scrollY = unrollY + 15;
     // Render the main scroll on the bottom
-    if (unrollTime < unrollDuration) {
-        // Initially we only render the portion of the scroll that is below the unrolling scroll animation.
-        const scrollY = unrollY + 15;
-        if (scrollY < 224) {
-            drawFrameAt(context, {...scrollFrame, y: panStartY + scrollY, h: 224 - scrollY}, {x: 0, y: scrollY});
-        }
+    if (scrollH + scrollY < scrollFrame.h - panStartY) {
+        drawFrameAt(context, {...scrollFrame, y: scrollFrame.h - scrollH, h: scrollH}, {x: 0, y: scrollY});
     } else {
         let panY = panStartY;
         if (panTime > 0) {
@@ -54,27 +52,27 @@ export function renderPrologue(context: CanvasRenderingContext2D, state: GameSta
     } else if (unrollTime >= unrollDuration) {
         drawFrameAt(context, lowerScroll, {x: 0, y: 0});
     }
-    const textTime = state.prologueTime - unrollDuration - 500;
-    let startTime = 0, duration = 4500, pause = 500, sectionPause = 500, lineHeight = 18;
+    const textTime = unrollTime - unrollDuration - 500;
+    let startTime = 0, duration = 4500, longDuration = 7000, pause = 500, sectionPause = 500, lineHeight = 20;
     renderFadeInText(context, 'Long ago,', textTime, startTime, duration);
     renderFadeInText(context, 'Humans and Vanara', textTime, startTime, duration, lineHeight);
     startTime += duration + pause;
-    renderFadeInText(context, 'Lived in harmony with', textTime, startTime, duration);
-    renderFadeInText(context, 'the Spirit World.', textTime, startTime, duration, lineHeight);
+    renderFadeInText(context, 'Lived in harmony with the Spirits.', textTime, startTime, duration, 10);
+    //renderFadeInText(context, 'the Spirit World.', textTime, startTime, duration, lineHeight);
     startTime += duration + sectionPause;
 
     renderFadeInText(context, 'But one day,', textTime, startTime, duration);
     renderFadeInText(context, 'a foolish and greedy Vanara', textTime, startTime, duration, lineHeight);
     startTime += duration + pause;
-    renderFadeInText(context, 'stole the power', textTime, startTime, duration);
-    renderFadeInText(context, 'of the Spirit World', textTime, startTime, duration, lineHeight);
-    startTime += duration + pause;
-    renderFadeInText(context, 'and tried to enslave', textTime, startTime, duration);
-    renderFadeInText(context, 'the world.', textTime, startTime, duration, lineHeight);
-    startTime += duration + sectionPause;
+    renderFadeInText(context, 'stole the power of the Spirits', textTime, startTime, longDuration);
+    renderFadeInText(context, 'and tried to enslave the world.', textTime, startTime, longDuration, lineHeight);
+    startTime += longDuration + sectionPause;
+    //renderFadeInText(context, 'and tried to enslave', textTime, startTime, duration);
+    //renderFadeInText(context, 'the world.', textTime, startTime, duration, lineHeight);
+    //startTime += duration + sectionPause;
 
-    renderFadeInText(context, 'Just when it seemed', textTime, startTime, duration);
-    renderFadeInText(context, 'that all hope was lost', textTime, startTime, duration, lineHeight);
+    renderFadeInText(context, 'But just when it seemed', textTime, startTime, duration);
+    renderFadeInText(context, 'that all hope was lost,', textTime, startTime, duration, lineHeight);
     startTime += duration + pause;
     renderFadeInText(context, 'The Spirit Gods sent', textTime, startTime, duration);
     renderFadeInText(context, 'a brave Champion', textTime, startTime, duration, lineHeight);
@@ -94,18 +92,19 @@ export function renderPrologue(context: CanvasRenderingContext2D, state: GameSta
     startTime += duration + sectionPause;
 
     renderFadeInText(context, 'For who knows what', textTime, startTime, duration);
-    renderFadeInText(context, 'disasters might come', textTime, startTime, duration, lineHeight);
+    renderFadeInText(context, 'disasters might come,', textTime, startTime, duration, lineHeight);
     startTime += duration + pause;
-    renderFadeInText(context, 'if ever there was ', textTime, startTime, duration);
+    renderFadeInText(context, 'if ever there was', textTime, startTime, duration);
     renderFadeInText(context, 'another foolish enough', textTime, startTime, duration, lineHeight);
     startTime += duration + pause;
+    // Extra long duration here to keep this text on screen as it fades to black.
     renderFadeInText(context, 'to unlock the powers', textTime, startTime, 10 * duration);
-    renderFadeInText(context, 'of the Spirit World?', textTime, startTime, 10 * duration, lineHeight);
+    renderFadeInText(context, 'of the Spirit World...', textTime, startTime, 10 * duration, lineHeight);
     startTime += duration + sectionPause;
 
     if (unrollTime < unrollDuration) {
         // The unrolling scroll animation is drawn on top of the scroll as it reveals it.
-        const frame = getFrame(scrollAnimation, state.prologueTime);
+        const frame = getFrame(scrollAnimation, unrollTime);
         drawFrameAt(context, frame, {x: 0, y: unrollY});
     }
 
@@ -137,6 +136,10 @@ function renderFadeInText(
     const alpha = Math.min(Math.min(1, Math.max(0, fadeInTime / fadeInDuration)), Math.max(0, 1 - fadeOutTime / fadeOutDuration));
     context.save();
         context.globalAlpha *= alpha;
-        drawText(context, text, 128, 184 + yOffset, {textAlign: 'center', maxWidth: 240, textBaseline: 'top'});
+        context.font = '15px PixelScript';
+        context.textAlign = 'center';
+        context.textBaseline = 'top';
+        context.fillText(text, 128, 187 + yOffset);
+        //drawText(context, text, 128, 186 + yOffset, {textAlign: 'center', maxWidth: 240, textBaseline: 'top'});
     context.restore();
 }
