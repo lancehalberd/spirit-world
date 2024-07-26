@@ -1,4 +1,4 @@
-import { FieldAnimationEffect, objectFallAnimation, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
+import { addObjectFallAnimation, addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { setEquippedElement } from 'app/content/menu';
 import { editingState } from 'app/development/editingState';
@@ -7,7 +7,6 @@ import { wasGameKeyPressed } from 'app/userInput';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
-import { addEffectToArea } from 'app/utils/effects';
 import { getCompositeBehaviors } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { getFieldInstanceAndParts, removeObjectFromArea } from 'app/utils/objects';
@@ -166,24 +165,23 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             }
             // Object will fall in water over pits.
             if (waterTileCoords) {
-                const animation = new FieldAnimationEffect({
-                    animation: splashAnimation,
-                    drawPriority: 'background',
-                    drawPriorityIndex: 1,
-                    x: waterTileCoords[0] * 16, y: waterTileCoords[1] * 16,
+                addSplashAnimation(state, object.area, {
+                    x: waterTileCoords[0] * 16 + 8,
+                    y: waterTileCoords[1] * 16 + 8,
                 });
-                addEffectToArea(state, object.area, animation);
                 removeObjectFromArea(state, object);
             }
             // Object falls into a pit.
             if (pitTileCoords) {
-                const animation = new FieldAnimationEffect({
-                    animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
-                    drawPriority: 'background',
-                    drawPriorityIndex: 1,
-                    x: pitTileCoords[0] * 16, y: pitTileCoords[1] * 16,
-                });
-                addEffectToArea(state, object.area, animation);
+                const point = {
+                    x: pitTileCoords[0] * 16 + 8,
+                    y: pitTileCoords[1] * 16 + 8,
+                }
+                if (object.definition?.type === 'enemy') {
+                    addEnemyFallAnimation(state, object.area, point);
+                } else {
+                    addObjectFallAnimation(state, object.area, point);
+                }
                 removeObjectFromArea(state, object);
             }
         }

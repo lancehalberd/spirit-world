@@ -1,9 +1,9 @@
-import { addParticleAnimations } from 'app/content/effects/animationEffect';
+import { addParticleAnimations, addObjectFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
 import { playAreaSound } from 'app/musicController';
 import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/direction';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
+import { getCompositeBehaviors, hitTargets } from 'app/utils/field';;
 
 
 
@@ -60,11 +60,12 @@ export class ThrownObject implements EffectInstance {
         if (this.vy > 0 && this.vz > 0) {
             return;
         }
+        const hitbox = this.getHitbox();
         const hitResult = hitTargets(state, this.area, {
             canPush: true,
             damage: this.damage,
             isThrownObject: true,
-            hitbox: this.getHitbox(),
+            hitbox,
             knockback: { vx: this.vx, vy: this.vy, vz: 0},
             vx: this.vx,
             vy: this.vy,
@@ -74,8 +75,29 @@ export class ThrownObject implements EffectInstance {
             // Break the ground the object lands on in the last frame.
             breaksGround: (this.z <= 0),
         });
-        if (hitResult.hit || hitResult.blocked || this.z <= 0) {
+        if (hitResult.hit || hitResult.blocked) {
             this.breakOnImpact(state);
+        } else if (this.z <= 0) {
+            const x = hitbox.x + hitbox.w / 2;
+            const y = hitbox.y + hitbox.h / 2;
+            const behaviors = getCompositeBehaviors(state, this.area, {x, y}, null, this);
+            const tx = (x / 16) | 0;
+            const ty = (y / 16) | 0;
+            if (behaviors.pit) {
+                addObjectFallAnimation(state, this.area, {
+                    x: tx * 16 + 8,
+                    y: ty * 16 + 8,
+                });
+                removeEffectFromArea(state, this);
+            } else if (behaviors.water) {
+                addSplashAnimation(state, this.area, {
+                    x: tx * 16 + 8,
+                    y: ty * 16 + 8,
+                });
+                removeEffectFromArea(state, this);
+            } else {
+                this.breakOnImpact(state);
+            }
         }
     }
     breakOnImpact(state) {
@@ -86,7 +108,7 @@ export class ThrownObject implements EffectInstance {
                 this.x + this.frame.w / 2, 
                 this.y + this.frame.h / 2,
                 this.z, this.behaviors.particles, this.behaviors);
-            if (this.linkedObject && !this.linkedObject.broken) {
+            if (this.linkedObject && this.linkedObject.area && !this.linkedObject.broken) {
                 this.linkedObject.breakOnImpact(state);
             }
             removeEffectFromArea(state, this);

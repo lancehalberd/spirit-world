@@ -61,9 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-
-    - objects thrown into pits should use the pit animation instead of breaking.
-
     - Improve Coccoon boss
         - "Your weapons cannot reach me in the spirit world"
         - Double the bosses life and make the rolling balls stagger him into the material world like Rival 2.

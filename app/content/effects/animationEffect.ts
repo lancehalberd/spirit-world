@@ -416,6 +416,27 @@ export function addBurstParticle(
     }
 }
 
+export function addFieldAnimation(state: GameState, area: AreaInstance, animation: FrameAnimation, {x, y}: Point): FieldAnimationEffect {
+    const animationEffect = new FieldAnimationEffect({
+        animation,
+        drawPriority: 'background',
+        drawPriorityIndex: 1,
+        x, y,
+    });
+    addEffectToArea(state, area, animationEffect);
+    return animationEffect;
+}
+
+export function addSplashAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
+    return addFieldAnimation(state, area, splashAnimation, {x: x - 8, y: y - 8});
+}
+export function addObjectFallAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
+    return addFieldAnimation(state, area, objectFallAnimation, {x: x - 8, y: y - 8});
+}
+export function addEnemyFallAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
+    return addFieldAnimation(state, area, enemyFallAnimation, {x: x - 8, y: y - 8});
+}
+
 class _FieldAnimationEffect extends FieldAnimationEffect {}
 declare global {
     export interface FieldAnimationEffect extends _FieldAnimationEffect {}
