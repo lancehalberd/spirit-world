@@ -115,7 +115,8 @@ const missions: Mission[] = [
             }
         },
         isAvailable(state: GameState) {
-            return !!state.savedState.objectFlags.homeInstructions || state.location.zoneKey !== 'peachCave';
+            return state.hero.savedData.passiveTools.catEyes > 0
+                &&(!!state.savedState.objectFlags.homeInstructions || state.location.zoneKey !== 'peachCave');
         },
         isResolved(state: GameState) {
             // This is normally resolved by talking to your mom, but it is also considered resolved
@@ -131,7 +132,8 @@ const missions: Mission[] = [
             return `I should ask around the Forest Village about that tree.`;
         },
         isAvailable(state: GameState) {
-            return !!state.savedState.objectFlags.homeInstructions || state.location.zoneKey !== 'peachCave';
+            return state.hero.savedData.passiveTools.catEyes > 0
+                && (!!state.savedState.objectFlags.homeInstructions || state.location.zoneKey !== 'peachCave');
         },
         isResolved(state: GameState) {
             // This is normally resolved by talking to your mom, but it is also considered resolved

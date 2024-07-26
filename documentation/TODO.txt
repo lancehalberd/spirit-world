@@ -61,11 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - All audio should pause when the game stops updating.
-        - When in a background tab.
-        - When showing the game controls.
-
-    - Render blue overall over underwater sections of map.
 
     - objects thrown into pits should use the pit animation instead of breaking.
 
@@ -299,6 +294,10 @@ Current tasks:
                   the subpixel distance. The attempt to wiggle, but the pot has no wiggle room(it is flush with the wall), so the player's movement is aborted.
 
     - Fix audio restarts when going under water during the frost beast fight.
+
+    - All audio should pause when the game stops updating.
+        - When in a background tab.
+        - When showing the game controls.
 
     - peach cave narrative
         - Add a message to the chakram chest if you check it after opening it.

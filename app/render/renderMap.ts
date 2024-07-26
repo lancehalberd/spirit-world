@@ -151,6 +151,7 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
 interface SectionRenderData {
     alpha: number
     isExplored: boolean
+    isUnderwater: boolean
     source: Rect
     target: Rect
     area: AreaInstance
@@ -188,9 +189,11 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             continue;
         }
         const {area, section} = sectionData;
+        const zone = zones[sectionData.zoneKey];
         sectionRenderData.push({
             alpha: isHidden ? 0.2 : (!isExplored ? 0.6 : 1),
             isExplored: isActuallyExplored,
+            isUnderwater: !sectionData.isSpiritWorld && !!zone.surfaceKey,
             source: {
                 x: section.x * 16,
                 y: section.y * 16,
@@ -215,8 +218,16 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 data.target,  data.source);
         mapContext.restore();
     }
-    // Add shading over unexplored areas.
     for (const data of sectionRenderData) {
+        // Draw blue overlay to indicate underwater areas.
+        if (data.isUnderwater) {
+            mapContext.save();
+                mapContext.globalAlpha *= 0.5;
+                mapContext.fillStyle = '#00F';
+                mapContext.fillRect(data.target.x, data.target.y, data.target.w, data.target.h);
+            mapContext.restore();
+        }
+        // Add black overlay to indicate unexplored areas.
         if (!data.isExplored && !editingState.isEditing) {
             mapContext.save();
                 mapContext.globalAlpha *= 0.7;
@@ -227,7 +238,8 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
     }
     // Then draw objects on top:
     // (possible drawback is objects being drawn on top of foreground tiles, but so far this isn't a problem.)
-    // (technically we should draw: background tiles, background objects, foreground tiles, foreground objects, then map icons)
+    // Better draw order:
+    // background tiles, background objects, foreground tiles, foreground objects, overlays, map icons.
     for (const data of sectionRenderData) {
         mapContext.save();
             mapContext.globalAlpha *= data.alpha;
