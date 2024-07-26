@@ -36,6 +36,7 @@ export function update() {
         if (areAllImagesLoaded())  {
             initializeGame();
             isGameInitialized = true;
+            updateSoundSettings(getState());
         }
         return;
     }

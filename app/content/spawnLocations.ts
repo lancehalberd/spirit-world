@@ -309,7 +309,7 @@ export const RIVER_TEMPLE_UPPER_ENTRANCE: ZoneLocation = {
     zoneKey: 'riverTemple',
     floor: 1,
     x: 375,
-    y: 300,
+    y: 312,
     z: 0,
     d: 'down',
     areaGridCoords: {x: 0, y: 0},

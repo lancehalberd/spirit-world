@@ -1,23 +1,25 @@
-import {Howl} from 'howler';
 import { noteFrequencies } from './noteFrequencies';
-
-class _Howl extends Howl {}
-
 
 const sounds = new Map<string, GameSound>();
 window['sounds'] = sounds;
-let audioUnlocked = false;
+
+// This was being used to unlock audio on player interaction, but maybe this isn't necessary any more?
+// We should test this on other browsers.
+//let audioUnlocked = true;
 export function unlockAudio() {
-    audioUnlocked = true;
+    //audioUnlocked = true;
 }
 
-export function requireSound(key, callback = null): GameSound {
+export function requireSound(key): GameSound {
+    // Note that since sounds are cached by key, if the same key is used with different options,
+    // it will be returned with the options first used for that key.
     let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
         [source, offset, volume] = key.split('+');
         key = source;
     } else {
         offset = key.offset;
+        duration = key.duration;
         volume = key.volume;
         limit = key.limit;
         loop = key.loop;
@@ -27,202 +29,237 @@ export function requireSound(key, callback = null): GameSound {
         type = key.type || type;
         key = key.key || source;
     }
-    if (sounds.has(key)) return sounds.get(key);
-    if (offset) [offset, duration] = String(offset).split(':').map(Number);
-    if (type === 'bgm') {
-        const howlerProperties: HowlerProperties = {
-            src: [`${source}`],
-            html5: true,
-            loop: false,
-            volume: volume / 50,
-            // Stop the track when it finishes fading out.
-            onfade() {
-                //console.log('finished fade', newSound.props.src, newSound.shouldPlay, newSound.howl.volume());
-                // console.log(id, 'fadein', currentTrackSource, key, this.volume());
-                // Documentation says this only runs when fade completes,
-                // but it seems to run at the start and end of fades.
-                if (!newSound.shouldPlay) {
-                    //console.log('Stopping from onFade ', newSound.props.src);
-                    newSound.howl.stop();
-                    // this.volume(volume / 50);
-                    removeFadingTrack(newSound);
-                } else if (newSound.howl.volume() === 0) {
-                    removeFadingTrack(newSound);
-                }
-            },
-            onplay() {
-                //console.log('onplay', newSound.props.src, newSound.shouldFadeIn);
-                if (newSound.soundSettings.muteTracks) {
-                    newSound.howl.mute(true);
-                } else if (newSound.shouldFadeIn) {
-                    //console.log('newSound.howl.fade', newSound.props.volume * newSound.soundSettings.musicVolume);
-                    newSound.howl.mute(false);
-                    newSound.howl.fade(0, newSound.props.volume * newSound.soundSettings.musicVolume, 1000);
-                } else {
-                    newSound.howl.mute(false);
-                    newSound.howl.volume(newSound.props.volume * newSound.soundSettings.musicVolume);
-                }
-            },
-            onplayerror(error) {
-                //console.log('onplayerror', newSound.props.src, error);
-            },
-            onload() {
-                if (callback) {
-                    callback(newSound);
-                }
-            },
-            onend() {
-                //console.log('onend repeatFrom', repeatFrom, newSound.props.src, key);
-                newSound.shouldFadeIn = false;
-                // Make sure we don't loop if this track is no longer playing. This condition may be
-                // reached when the track loops while it is fading out so that the howl is still playing
-                // but the track has already been removed from the array of playingTracks and shouldPlay
-                // is already set to false.
-                if (newSound.shouldPlay) {
-                    newSound.howl.seek((repeatFrom || 0) / 1000);
-                    newSound.howl.play();
-                }
-            }
-        };
-        // A track can specify another track source to automatically transition to without crossfade.
-        if (nextTrack) {
-            howlerProperties.onend = function() {
-                //console.log('onend nextTrack', repeatFrom, newSound.props.src, key);
-                newSound.howl.stop();
-                playingTracks = [];
-                window['playingTracks'] = playingTracks;
-                playTrack(nextTrack, 0, newSound.soundSettings, false, false);
-            };
-            // Make sure the next track is preloaded.
-            if (!musicTracks[nextTrack]) {
-                requireSound(musicTracks[nextTrack]);
-            }
-        }
-        const newSound: GameSound = {
-            howl: new Howl(howlerProperties),
-            props: howlerProperties,
-            nextTrack,
-        };
-        sounds.set(key, newSound);
-        return newSound;
-    } else {
-        const howlerProperties: HowlerProperties = {
-            src: [`${source}`],
-            loop: loop || false,
-            volume: (volume || 1) / 50,
-            onplay: function () {
-                if (newSound.activeInstances === 0) {
-                    playingSounds.add(newSound);
-                }
-                newSound.activeInstances++;
-                audioUnlocked = true;
-                //console.log('playing sound', newSound.activeInstances);
-            },
-            onstop: function () {
-                newSound.activeInstances--;
-                //console.log('stopped sound', newSound.activeInstances);
-                if (newSound.activeInstances === 0) {
-                    playingSounds.delete(newSound);
-                }
-            },
-            onend: function () {
-                newSound.activeInstances--;
-                //console.log('finished sound', newSound.activeInstances);
-                if (newSound.activeInstances === 0) {
-                    playingSounds.delete(newSound);
-                }
-            },
-            onload: function () {
-                if (callback) {
-                    callback(newSound);
-                }
-            },
-        };
-        if (offset || duration) {
-            if (!duration) {
-                console.log('missing duration for sound sprite.', key, offset, duration);
-                debugger;
-            }
-            howlerProperties.sprite = {
-                sprite: [offset, duration],
-            };
-        }
-        const newSound: GameSound = {
-            howl: new Howl(howlerProperties),
-            activeInstances: 0,
-            instanceLimit: limit || 5,
-            props: howlerProperties,
-            nextTrack,
-        }
-        if (howlerProperties.sprite) {
-            newSound.spriteName = 'sprite';
-        }
-        sounds.set(key, newSound);
-        return newSound;
+    if (sounds.has(key)) {
+        return sounds.get(key);
     }
+
+    const newSound: GameSound = {
+        key,
+        volume: volume / 50,
+        offset,
+        repeatFrom,
+        duration,
+        instances: [],
+    };
+    if (type === 'bgm') {
+        newSound.nextTrack = nextTrack;
+        newSound.loop = !nextTrack;
+    } else {
+        newSound.loop = loop || false;
+        newSound.instanceLimit = limit || 5;
+    }
+    fetch(source)
+        .then(res => res.arrayBuffer())
+        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+        .then(audioBuffer => newSound.audioBuffer = audioBuffer);
+    sounds.set(key, newSound);
+    return newSound;
 }
 
-const playingSounds = new Set<GameSound>();
-export function playSound(key, soundSettings: SoundSettings) {
-    const sound = requireSound(key);
+// This is used for any sounds loaded into audio buffers.
+function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: number): AudioInstance|false {
+    const instance: AudioInstance = {
+        sound,
+        sourceNode: audioContext.createBufferSource(),
+        gainNode: audioContext.createGain(),
+        startTime,
+    };
+    instance.sourceNode.connect(instance.gainNode);
+    instance.sourceNode.buffer = sound.audioBuffer;
+    // Merged
+    const offset = sound.offset || 0;
+    const repeatFrom = sound.repeatFrom || offset;
+    // This is the time in the audio buffer where the sound is scheduled to end or repeat.
+    const bufferEndTime = sound.duration ? (offset + sound.duration) : sound.audioBuffer.duration;
+    const firstDuration = bufferEndTime - offset;
+    const otherDurations =  bufferEndTime - repeatFrom;
+    // The time that playbook should start from in the audio buffer. This will be updated based
+    // on the seek time, offset, and looping behavior of the sound.
+    if (sound.loop) {
+        instance.sourceNode.loop = true;
+        if (sound.duration) {
+            instance.sourceNode.loopEnd = bufferEndTime;
+        }
+        if (repeatFrom) {
+            instance.sourceNode.loopStart = repeatFrom;
+        }
+        // We probably wouldn't need all this custom logic if stopped supporting an initial offset
+        // time. Probably the buffer source already takes into account looping + loopStart if you
+        // start at a time value larger than the initial duration.
+        let bufferStartTime = seekTime;
+        if (bufferStartTime >= firstDuration) {
+            bufferStartTime -= firstDuration;
+            bufferStartTime = repeatFrom + bufferStartTime % otherDurations;
+        } else {
+            bufferStartTime = offset + bufferStartTime;
+        }
+        instance.sourceNode.start(startTime, bufferStartTime);
+    } else {
+        const bufferStartTime = offset + seekTime;
+        const duration = bufferEndTime - bufferStartTime;
+        // If this sound does not loop, do not play anything if
+        // the seek time is larger than the duration of the sound.
+        if (duration <= 0) {
+            return false;
+        }
+        instance.endTime = startTime + duration;
+        instance.sourceNode.start(startTime, bufferStartTime);
+        instance.sourceNode.stop(instance.endTime)
+    }
 
-    if (sound.activeInstances >= sound.instanceLimit) {
+    sound.instances.push(instance);
+    return instance;
+}
+
+export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime): AudioInstance | undefined {
+    const sound = requireSound(key);
+    const currentTime = audioContext.currentTime;
+    // Synth sounds don't support instances yet.
+    // Clean up references to any instances that should have completed.
+    sound.instances = sound.instances.filter(instance => instance.endTime && instance.endTime >= currentTime);
+    // Ignore this sound if we have already scheduled the maximum number of simultaneous effects.
+    if (sound.instances.length >= sound.instanceLimit) {
         return;
     }
-    const muted = soundSettings.muteSounds;
-    const now = Date.now();
-    const customDelay = sound.customDelay || 40;
-    if (sound.canPlayAfter && sound.canPlayAfter > now) {
-        // Don't play the sound if more than the instance limit are queued into
-        // the future.
-        const delay = sound.canPlayAfter - now;
-        if (delay <= sound.instanceLimit * customDelay) {
-            setTimeout(() => playSound(key, soundSettings), delay);
-        }
-        return sound;
-    }
-    sound.canPlayAfter = now + customDelay;
+    const delay = sound.customDelay ?? 0.04;
+    const targetTime = Math.max(sound.canPlayAfter || 0, currentTime);
+    sound.canPlayAfter = targetTime + delay;
     try {
-        if (sound.howl) {
-            sound.howl.mute(muted);
-            sound.howl.volume(sound.props.volume * soundSettings.soundVolume);
-            if (sound.spriteName) {
-                sound.howl.play(sound.spriteName);
-            } else {
-                sound.howl.play();
+        if (sound.audioBuffer) {
+            const instance = startAudioBufferSound(sound, seekTime, startTime);
+            if (!instance) {
+                return;
             }
-        } else if (sound.play && !muted) {
-            sound.play(soundSettings);
+            const volume = Math.min(1, sound.volume);
+            instance.gainNode.connect(soundEffectGainNode);
+            instance.gainNode.gain.setValueAtTime(volume, startTime);
+            return instance;
+
+            /*
+            instance.sourceNode = audioContext.createBufferSource();
+            instance.gainNode = audioContext.createGain();
+            const offset = sound.offset || 0;
+            instance.sourceNode.loop = sound.loop;
+            const duration = sound.duration || (sound.audioBuffer.duration - offset);
+            if (sound.loop && sound.duration) {
+                instance.sourceNode.loopEnd = offset + duration;
+            }
+            const repeatFrom = sound.repeatFrom || offset;
+            const actualEndTime = sound.duration ? (offset + sound.duration) : sound.audioBuffer.duration;
+            const firstDuration = actualEndTime - offset;
+            const otherDurations =  actualEndTime - repeatFrom;
+            // We probably wouldn't need all this custom logic if stopped supporting an initial offset
+            // time. Probably the buffer source already takes into account looping + loopStart if you
+            // start at a time value larger than the initial duration.
+            if (seekTime >= firstDuration) {
+                seekTime -= firstDuration;
+                seekTime = repeatFrom + seekTime % otherDurations;
+            } else {
+                seekTime = offset + seekTime;
+            }
+            if (sound.loop && repeatFrom) {
+                instance.sourceNode.loopStart = repeatFrom;
+            }
+            instance.sourceNode.buffer = sound.audioBuffer;
+            instance.sourceNode.connect(instance.gainNode).connect(soundEffectGainNode);
+            const volume = Math.min(1, sound.volume);
+            instance.gainNode.gain.setValueAtTime(volume, targetTime);
+            instance.sourceNode.start(targetTime, seekTime);
+            if (!sound.loop) {
+                instance.endTime = targetTime + duration;
+                instance.sourceNode.stop(instance.endTime)
+            }*/
+        } else if (sound.play) {
+            const instance: AudioInstance = {
+                sound,
+                startTime: targetTime,
+            };
+            sound.instances.push(instance);
+            sound.play(soundEffectGainNode, targetTime);
+            return instance;
         }
     } catch(e) {
         console.log(e);
         debugger;
     }
-    return sound;
 }
-export function stopSound(sound: GameSound): void {
-    if (sound.howl) {
-        sound.howl.stop();
-    } else {
-        // no logic for stopping non howl sounds.
+export function stopSound(instance?: AudioInstance, time = audioContext.currentTime): void {
+    if (!instance) {
+        return;
+    }
+    instance.stopTime = time;
+    instance.sourceNode.stop(time);
+    const index = instance.sound.instances.indexOf(instance);
+    if (index >= 0) {
+        instance.sound.instances.splice(index);
     }
 }
 window['stopSound'] = stopSound;
 
 
 let playingTracks: GameSound[] = [];
+let fadingTracks: GameSound[] = [];
 export function getPlayingTracks(): GameSound[] {
     return playingTracks;
 }
-const fadingTracks: GameSound[] = [];
-function removeFadingTrack(track: GameSound) {
-    const index = fadingTracks.indexOf(track);
-    if (index >= 0) {
-        fadingTracks.splice(index, 1);
-    }
-}
 window['playingTracks'] = playingTracks;
 
+// This is called every frame during the game.
+export function updateAudio(state: GameState) {
+    const currentTime = audioContext.currentTime;
+    // Schedule the next track to play if necessary.
+    for (const currentTrack of playingTracks) {
+        // Remove any instances that have completed.
+        currentTrack.instances = currentTrack.instances.filter(instance => !instance.endTime || instance.endTime > currentTime);
+        if (!currentTrack.nextTrack) {
+            continue;
+        }
+        for (const instance of currentTrack.instances) {
+            const nextTrack = requireSound(musicTracks[currentTrack.nextTrack]);
+            if (instance.endTime < currentTime + 0.2) {
+                if (!nextTrack.instances.length) {
+                    // console.log('Scheduling next track', currentTrack.nextTrack, instance.endTime);
+                    const track = playTrack(currentTrack.nextTrack, 0, false, false, instance.endTime);
+                    if (track) {
+                        track.baseTrack = currentTrack.baseTrack || currentTrack.key;
+                    }
+                }
+            }
+        }
+    }
+    for (let i = 0; i < state.loopingSoundEffects.length; i++) {
+        const soundEffect = state.loopingSoundEffects[i];
+        const areSoundEffectsPaused = state.paused;
+        if (areSoundEffectsPaused && !soundEffect.stopTime) {
+            stopSound(soundEffect);
+        } else if (!areSoundEffectsPaused && soundEffect.stopTime) {
+            const seekTime = currentTime - soundEffect.startTime;
+            let instance: AudioInstance|false;
+            if (seekTime >= 0) {
+                // Force sounds to play on resume so that we don't introduce an extra delay on them.
+                instance = playSound(soundEffect.sound.key, seekTime, true);
+            } else {
+                // If seekTime is negative, it means the sound was stopped before it started playing so
+                // it is still scheduled to play in the future.
+                instance = playSound(soundEffect.sound.key, 0, true, currentTime - seekTime);
+            }
+            if (instance) {
+                // If a new instance was created, overwrite the existing instance in place so
+                // that existing references to it get the updated instance.
+                for (const key in instance) {
+                    soundEffect[key] = instance[key];
+                }
+                delete soundEffect.stopTime;
+            } else {
+                // If the new instance didn't start for some reason, just remove it from the array.
+                console.log('Looping instance failed to start again', soundEffect);
+                state.loopingSoundEffects.splice(i--, 1);
+            }
+        }
+    }
+    // Remove tracks with no instances left.
+    playingTracks = playingTracks.filter(track => track.instances.length);
+}
 
 const musicTracks = {
     // Tracks from Nick
@@ -231,7 +268,7 @@ const musicTracks = {
     // Used on the title screen and world map
     mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
+    waterfallVillageTheme: {key : 'waterfallVillageTheme', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
     vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
     tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
@@ -260,60 +297,94 @@ const musicTracks = {
     bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
-export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true): GameSound|false {
-    if (!audioUnlocked) {
-        return;
-    }
+export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = true, crossFade = true, startTime = audioContext.currentTime): GameSound|false {
     const sound = requireSound(musicTracks[trackKey]);
-    if (!sound.howl || !sound.howl.duration()) {
+    if (!sound.audioBuffer) {
         return false;
     }
     // Do nothing if the sound is already playing.
-    if (playingTracks.includes(sound)) {
+    if (isTrackPlaying(trackKey)) {
         return sound;
     }
-    // Do nothing if the sound has transitioned to the next track.
-    // This allows treating preventing restarting the sound when the source is still the original track.
-    // This currently only supports one instance of nextTrack set per sound.
-    /*if (sound.nextTrack) {
-        const nextTrackSound = requireSound(musicTracks[sound.nextTrack]);
-        if (playingTracks.includes(nextTrackSound) || nextTrackSound.howl.playing()) {
-            return nextTrackSound;
-        }
-    }*/
     //console.log('playTrack', playingTracks, source, sound);
     if (fadeOutOthers) {
-        if (crossFade) fadeOutPlayingTracks();
-        else stopTrack();
+        if (crossFade) fadeOutPlayingTracks([], startTime);
+        else stopTrack(startTime);
     }
-
-    let offset = (timeOffset / 1000);
-    if (sound.howl.duration()) {
-        offset = offset % sound.howl.duration();
+    // From playTrack
+    const instance = startAudioBufferSound(sound, seekTime, startTime);
+    if (!instance) {
+        return false;
     }
-    //console.log('play', sound.props.src, timeOffset, sound.howl.duration(), offset);
-    //sound.howl.seek(offset);
-    sound.soundSettings = soundSettings;
-    sound.howl.seek(offset);
-    sound.howl.play();
-    sound.shouldPlay = true;
-    // console.log({volume});
-    // console.log('fade in new track', sound);
-    //console.log('Fade in ' + sound.props.src);
+    const volume = Math.min(1, sound.volume);
+    instance.gainNode.connect(trackGainNode);
     if (crossFade) {
-        //console.log('fade in', sound.props.src, sound.howl.volume(), sound.howl.seek(), volume);
-        sound.shouldFadeIn = true;
+        instance.gainNode.gain.setValueAtTime(0, startTime);
+        instance.gainNode.gain.linearRampToValueAtTime(volume, startTime + 1);
     } else {
-        //console.log('hard start', volume);
-        sound.howl.volume(sound.props.volume * soundSettings.musicVolume);
-        sound.shouldFadeIn = false;
+        instance.gainNode.gain.setValueAtTime(volume, startTime);
     }
-    sound.howl.mute(soundSettings.muteTracks);
     playingTracks.push(sound);
     return sound;
+
+    /*const offset = sound.offset || 0;
+    const repeatFrom = sound.repeatFrom || offset;
+    const actualEndTime = sound.duration ? (offset + sound.duration) : sound.audioBuffer.duration;
+    const firstDuration = actualEndTime - offset;
+    const otherDurations =  actualEndTime - repeatFrom;
+    // We probably wouldn't need all this custom logic if stopped supporting an initial offset
+    // time. Probably the buffer source already takes into account looping + loopStart if you
+    // start at a time value larger than the initial duration.
+    if (seekTime >= firstDuration) {
+        seekTime -= firstDuration;
+        seekTime = repeatFrom + seekTime % otherDurations;
+    } else {
+        seekTime = offset + seekTime;
+    }
+    const instance: AudioInstance = {
+        sourceNode: audioContext.createBufferSource(),
+        gainNode: audioContext.createGain(),
+        sound,
+        startTime: time,
+    };
+    instance.sourceNode.start(time, seekTime);
+    instance.sourceNode.loop = sound.loop;
+    if (!sound.loop) {
+        instance.endTime = time + actualEndTime - seekTime;
+        instance.sourceNode.stop(instance.endTime);
+    }
+    if (sound.duration) {
+        instance.sourceNode.loopEnd = sound.duration;
+    }
+    if (repeatFrom) {
+        instance.sourceNode.loopStart = repeatFrom;
+    }
+    instance.sourceNode.buffer = sound.audioBuffer;
+    instance.sourceNode.connect(instance.gainNode).connect(trackGainNode);
+    //instance.sourceNode.connect(audioContext.destination);
+    sound.instances.push(instance);
+    // console.log({volume});
+    // console.log('fade in new track', sound);
+    // console.log('Fade in ' + sound.props.src);
+    const volume = Math.min(1, sound.volume);
+    if (crossFade) {
+        instance.gainNode.gain.setValueAtTime(0, time);
+        instance.gainNode.gain.linearRampToValueAtTime(volume, time + 1);
+    } else {
+        instance.gainNode.gain.setValueAtTime(volume, time);
+    }
+    playingTracks.push(sound);
+    // I think the BufferSource nodes automatically stop when reaching the end of the buffer.
+    // instance.sourceNode.stop(audioContext.currentTime + sound.audioBuffer.duration);
+    return sound;*/
 }
 
-export function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
+export function setSoundSettings(soundSettings: SoundSettings) {
+    trackGainNode.gain.setValueAtTime(soundSettings.musicVolume, audioContext.currentTime);
+    soundEffectGainNode.gain.setValueAtTime(soundSettings.soundVolume, audioContext.currentTime);
+}
+
+export function fadeOutPlayingTracks(currentTracks: GameSound[] = [], time: number = audioContext.currentTime) {
     const keepPlayingTracks: GameSound[] = [];
     for (const trackToFadeOut of playingTracks) {
         if (currentTracks.includes(trackToFadeOut)) {
@@ -321,26 +392,24 @@ export function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
             continue;
         }
         // This will cause the track to stop playing the next time a fade completes.
-        trackToFadeOut.shouldPlay = false;
-        if (trackToFadeOut.howl.volume()) {
-            //console.log('Fade out ' + trackToFadeOut.props.src, trackToFadeOut.howl.volume());
-            trackToFadeOut.howl.fade(trackToFadeOut.howl.volume(), 0, 1000);
-            if (fadingTracks.indexOf(trackToFadeOut) < 0) {
-                fadingTracks.push(trackToFadeOut);
-            }
-        } else {
-            //console.log('Fade directly stop ' + trackToFadeOut.props.src, trackToFadeOut.howl.volume());
-            trackToFadeOut.howl.stop();
+        for (const instance of trackToFadeOut.instances) {
+            instance.gainNode.gain.linearRampToValueAtTime(instance.gainNode.gain.value, time);
+            instance.gainNode.gain.linearRampToValueAtTime(0, time + 1);
+            instance.sourceNode.stop(time + 1);
         }
+        // Remove references to tracks that are fading out and scheduled to stop.
+        trackToFadeOut.instances = [];
     }
     playingTracks = keepPlayingTracks;
     window['playingTracks'] = playingTracks;
 }
 
-export function stopTrack() {
+export function stopTrack(time: number) {
     for (const playingTrack of playingTracks) {
-        //console.log('Stopping from stopTrack ', playingTrack.props.src);
-        playingTrack.howl.stop();
+        for (const instance of playingTrack.instances) {
+            instance.sourceNode.stop(time);
+        }
+        playingTrack.instances = [];
     }
     playingTracks = [];
     window['playingTracks'] = playingTracks;
@@ -353,52 +422,56 @@ export function isATrackFadingOut(): boolean {
     return !!fadingTracks.length;
 }
 export function isTrackPlaying(trackKey: TrackKey): boolean {
-    const sound = requireSound(musicTracks[trackKey]);
-    return playingTracks.includes(sound);
+    for (const playingTrack of playingTracks) {
+        if (playingTrack.key === trackKey || playingTrack.baseTrack === trackKey) {
+            return true;
+        }
+    }
+    return false;
 }
 
 const preloadSounds = () => {
     [
-        {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, offset: '0:200', limit: 2},
+        {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, duration: 0.2, limit: 2},
         {key: 'unlock', source: 'sfx/Cube click_odrive.wav', volume: 50, limit: 2},
         {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, limit: 2},
         {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, limit: 2},
         {key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
-            offset: '0:700', volume: 60, limit: 2
+            duration: 0.7, volume: 60, limit: 2
         },
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
-            offset: '0:1400', loop: true, volume: 20, limit: 2
+            duration: 1.4, loop: true, volume: 20, limit: 2
         },
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, limit: 2},
         {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, limit: 2},
         {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 10, limit: 2},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
-        //     offset: '200:300', volume: 10, limit: 2},
+        //     offset: 0.2, duration: 0.3', volume: 10, limit: 2},
         {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
-             offset: '300:200', volume: 20, limit: 2},
+             offset: 0.3, duration: 0.2, volume: 20, limit: 2},
         {key: 'bossDeath', source: 'sfx/enemyDeath.wav',
-             offset: '170:300', volume: 20, limit: 2},
+             offset: 0.17, duration: 0.3, volume: 20, limit: 2},
         {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2},
         {key: 'getMoney', source: 'sfx/coin wood c.wav',
-            offset: '0:250', volume: 10, limit: 2},
+            duration: 0.25, volume: 10, limit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
-            offset: '0:100', volume: 20, limit: 3},
+            duration: 0.1, volume: 20, limit: 3},
         {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 100, limit: 1},
         {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 50, limit: 3},
         {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 50, limit: 2},
-        {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', offset: '300:200', volume: 100, limit: 1},
+        {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', offset: 0.3, duration: 0.2, volume: 100, limit: 1},
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 100, limit: 1},
-        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
-        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
-        //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '0:80', limit: 2},
+        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, limit: 1},
+        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, limit: 1},
+        //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: 0, duration: 80, limit: 2},
         //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
         //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
         {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, limit: 2},
         {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, limit: 2},
         {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, limit: 2},
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
-        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 4, limit: 2},
-        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 4, limit: 2},
+        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, limit: 2},
+        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, limit: 2},
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();
@@ -424,71 +497,86 @@ window['requireSound'] = requireSound;
 
 // Safari uses webkitAudioContext instead of AudioContext.
 const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
+const masterGainNode = audioContext.createGain();
+const trackGainNode = audioContext.createGain();
+const soundEffectGainNode = audioContext.createGain();
+trackGainNode.connect(masterGainNode);
+soundEffectGainNode.connect(masterGainNode);
+masterGainNode.connect(audioContext.destination);
 
-function playBeeps(frequencies, volume, duration, {
-    smooth=false,
-    swell = 0,
-    taper = 0,
-    type = 'square' as OscillatorType
-}) {
-    frequencies = Float32Array.from(frequencies);
+function playBeeps(inputFrequencies: number[], volume: number, duration: number,
+    {
+        smooth = false,
+        swell = 0,
+        taper = 0,
+        type = 'square' as OscillatorType,
+    },
+    destination: AudioNode,
+    time = audioContext.currentTime
+) {
+    const frequencies = Float32Array.from(inputFrequencies);
     const oscillator = audioContext.createOscillator();
     oscillator.type = type;
-    if (smooth) oscillator.frequency.setValueCurveAtTime(frequencies, audioContext.currentTime, duration);
-    else {
+    if (smooth) {
+        oscillator.frequency.setValueCurveAtTime(frequencies, time, duration);
+    } else {
         for (var i = 0; i < frequencies.length; i++) {
-            oscillator.frequency.setValueAtTime(frequencies[i], audioContext.currentTime + duration * i / frequencies.length);
+            oscillator.frequency.setValueAtTime(frequencies[i], time + duration * i / frequencies.length);
         }
     }
     let lastNode:AudioNode = oscillator;
 
     const gainNode = audioContext.createGain();
     if (swell) {
-        gainNode.gain.setValueAtTime(volume / 100, audioContext.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(volume, audioContext.currentTime + duration * swell);
-        //gainNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + duration * swell);
+        gainNode.gain.setValueAtTime(volume / 100, time);
+        gainNode.gain.exponentialRampToValueAtTime(volume, time + duration * swell);
+        //gainNode.gain.linearRampToValueAtTime(volume, time + duration * swell);
     } else {
-        gainNode.gain.setValueAtTime(volume, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(volume, time);
     }
     if (taper) {
-        gainNode.gain.setValueAtTime(volume, audioContext.currentTime + duration * (1 - taper));
-        // gainNode.gain.setTargetAtTime(0, audioContext.currentTime, duration / 10);
-        //gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
-        gainNode.gain.exponentialRampToValueAtTime(volume / 100, audioContext.currentTime + duration);
+        gainNode.gain.setValueAtTime(volume, time + duration * (1 - taper));
+        // gainNode.gain.setTargetAtTime(0, time, duration / 10);
+        //gainNode.gain.linearRampToValueAtTime(0, time + duration);
+        gainNode.gain.exponentialRampToValueAtTime(volume / 100, time + duration);
     }
     lastNode.connect(gainNode);
     lastNode = gainNode;
 
-
-    lastNode.connect(audioContext.destination);
-    oscillator.start();
-    oscillator.stop(audioContext.currentTime + duration);
+    lastNode.connect(destination);
+    oscillator.start(time);
+    oscillator.stop(time + duration);
 }
 window['playBeeps'] = playBeeps;
 
 
-function playBellSound(frequencies, volume, duration) {
+function playBellSound(
+    inputFrequencies: number[],
+    volume: number,
+    duration: number,
+    destination: AudioNode,
+    time = audioContext.currentTime
+) {
     const combinedGainedNode = audioContext.createGain();
-    combinedGainedNode.connect(audioContext.destination);
+    combinedGainedNode.connect(destination);
     combinedGainedNode.gain.value = volume;
 
-    const currentTime = audioContext.currentTime;
-    frequencies = Float32Array.from(frequencies);
+    const frequencies = Float32Array.from(inputFrequencies);
     const attackTime = 0.003;
     let frequencyVolume = 0.5;
     let fadeDuration = duration - attackTime;
     for (const frequency of frequencies) {
         const gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-        gainNode.gain.linearRampToValueAtTime(frequencyVolume, audioContext.currentTime + attackTime);
-        gainNode.gain.setValueAtTime(frequencyVolume, audioContext.currentTime + attackTime);
-        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + attackTime + fadeDuration);
+        gainNode.gain.setValueAtTime(0, time);
+        gainNode.gain.linearRampToValueAtTime(frequencyVolume, time + attackTime);
+        gainNode.gain.setValueAtTime(frequencyVolume, time + attackTime);
+        gainNode.gain.linearRampToValueAtTime(0, time + attackTime + fadeDuration);
         const oscillator = audioContext.createOscillator();
         oscillator.frequency.value = frequency;
         oscillator.type = 'sine';
         oscillator.connect(gainNode);
-        oscillator.start(currentTime);
-        oscillator.stop(currentTime + duration);
+        oscillator.start(time);
+        oscillator.stop(time + duration);
         frequencyVolume *= 0.5;
         fadeDuration *= 0.75;
         gainNode.connect(combinedGainedNode);
@@ -496,39 +584,45 @@ function playBellSound(frequencies, volume, duration) {
 }
 
 sounds.set('reflect', {
-    play(soundSettings: SoundSettings) {
-        playBeeps([2000, 8000, 4000], .01 * soundSettings.soundVolume, .1, {});
-    }
+    play(target: AudioNode, time: number) {
+        playBeeps([2000, 8000, 4000], .01, .1, {}, target, time);
+    },
+    instances: [],
 });
 sounds.set('fall', {
-    play(soundSettings: SoundSettings) {
+    play(target: AudioNode, time: number) {
         //playBeeps([1350, 900, 600, 400], 0.05, .15, {smooth: true, taper: 0.6, swell: 0.4});
-        playBeeps([1350, 900, 600, 400], 0.1 * soundSettings.soundVolume, .2, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'});
-    }
+        playBeeps([1350, 900, 600, 400], 0.1, .2, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'}, target, time);
+    },
+    instances: [],
 });
 sounds.set('freeze', {
-    play(soundSettings: SoundSettings) {
+    play(target: AudioNode, time: number) {
         const x = 1200;
         playBeeps(
-            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08 * soundSettings.soundVolume, .2,
-            {taper: 0.1, swell: 0.1, type: 'triangle'}
+            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08, .2,
+            {taper: 0.1, swell: 0.1, type: 'triangle'}, target, time
         );
-    }
+    },
+    instances: [],
 });
 sounds.set('ouch', {
-    play(soundSettings: SoundSettings) {
-        playBeeps([200, 400, 100, 200], 0.05 * soundSettings.soundVolume, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'});
-    }
+    play(target: AudioNode, time: number) {
+        playBeeps([200, 400, 100, 200], 0.05, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'}, target, time);
+    },
+    instances: [],
 });
 sounds.set('drink', {
-    play(soundSettings: SoundSettings) {
-        playBeeps([200, 100, 400, 800, 600, 2400], 0.03 * soundSettings.soundVolume, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'});
-    }
+    play(target: AudioNode, time: number) {
+        playBeeps([200, 100, 400, 800, 600, 2400], 0.03, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+    },
+    instances: [],
 });
 sounds.set('heart', {
-    play(soundSettings: SoundSettings) {
-        playBeeps([800, 1400, 2800, 2100], 0.05 * soundSettings.soundVolume, .2, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'});
-    }
+    play(target: AudioNode, time: number) {
+        playBeeps([800, 1400, 2800, 2100], 0.05, .2, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+    },
+    instances: [],
 });
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
@@ -542,13 +636,9 @@ const notes = Object.keys(noteFrequencies);
 
 notes.forEach((noteName) => {
     sounds.set(`bell${noteName}`, {
-        play(soundSettings: SoundSettings) {
-            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2 * soundSettings.soundVolume, 2);
-        }
+        play(target: AudioNode, time: number) {
+            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, 2, target, time);
+        },
+        instances: [],
     });
 });
-
-declare global {
-    export interface Howl extends _Howl {}
-    export type TrackKey = keyof typeof musicTracks;
-}

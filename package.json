@@ -10,11 +10,8 @@
     "server": "node server"
   },
   "dependencies": {
-    "howler": "^2.2.3"
   },
   "devDependencies": {
-    "@types/howler": "^2.2.4",
-    "@types/lodash": "^4.14.149",
     "circular-dependency-plugin": "^5.2.2",
     "express": "^4.18.2",
     "minimatch": "3.1.2",

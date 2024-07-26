@@ -140,6 +140,7 @@ export function getDefaultState(): GameState {
             queue: [],
         },
         screenShakes: [],
+        loopingSoundEffects: [],
         map: {
             needsRefresh: true,
         },

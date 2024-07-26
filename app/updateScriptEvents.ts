@@ -5,7 +5,7 @@ import { GAME_KEY } from 'app/gameConstants';
 import { prependScript } from 'app/scriptEvents';
 
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/userInput';
-import { playSound } from 'app/musicController';
+import { playSound } from 'app/utils/sounds';
 import { enterLocation } from 'app/utils/enterLocation';
 import { clearObjectFlag, setObjectFlag } from 'app/utils/objectFlags';
 import { saveGame } from 'app/utils/saveGame';
@@ -178,7 +178,7 @@ export function updateScriptEvents(state: GameState): void {
                 state.scriptEvents.blockEventQueue = true;
                 break;
             case 'playSound':
-                playSound(state, event.sound);
+                playSound(event.sound);
                 break;
             case 'playTrack':
                 state.scriptEvents.overrideMusic = event.track;

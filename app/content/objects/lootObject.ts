@@ -4,7 +4,7 @@ import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/l
 import { lootEffects } from 'app/content/lootEffects';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
-import { playSound } from 'app/musicController';
+import { playSound } from 'app/utils/sounds';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitbox } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
@@ -99,9 +99,9 @@ export class LootGetAnimation implements EffectInstance {
             } else if (this.loot.lootType === 'peachOfImmortalityPiece' || this.loot.lootType === 'money'
                 || this.loot.lootType === 'smallKey' || this.loot.lootType === 'map' || this.loot.lootType === 'peach'
             ) {
-                playSound(state, 'smallSuccessChime');
+                playSound('smallSuccessChime');
             } else {
-                playSound(state, 'bigSuccessChime');
+                playSound('bigSuccessChime');
             }
         }
         if (this.animationTime === 1000) {
@@ -174,7 +174,7 @@ export class LootObject implements ObjectInstance {
                 const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                 onPickup(state, this.definition);
                 if (this.definition.lootType === 'money') {
-                    playSound(state, 'getMoney');
+                    playSound('getMoney');
                 }
                 removeObjectFromArea(state, this);
             }
@@ -292,7 +292,7 @@ export class LootDropObject extends LootObject {
                     const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                     onPickup(state, this.definition);
                     if (this.definition.lootType === 'money') {
-                        playSound(state, 'getMoney');
+                        playSound('getMoney');
                     }
                     removeObjectFromArea(state, this);
                     break;

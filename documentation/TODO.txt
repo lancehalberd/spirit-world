@@ -52,21 +52,6 @@ Graphics Work:
             Research Lab(Fertility Temple + Underground Lab)
 
 
-Error when leaving the game in another tab for a while, when changing areas from staff tower basement to first floor.
-This would have swapped music from the boss to dungeon music since the miniboss was alive in the basement.
-Maybe a bunch of calls to switch between the A/B tracks were queued up while running in a background tab.
-RangeError: Maximum call stack size exceeded
-    at Howl._getSoundIds (howler.js:2116:27)
-    at Howl.volume (howler.js:1224:24)
-    at Object.action (howler.js:1244:27)
-    at Howl._loadQueue (howler.js:1939:16)
-    at Howl._loadQueue (howler.js:1934:16)
-    at Howl._emit (howler.js:1914:12)
-    at Howl.mute (howler.js:1198:16)
-    at Object.action (howler.js:1161:18)
-    at Howl._loadQueue (howler.js:1939:16)
-    at Howl._loadQueue (howler.js:1934:16)
-
 Graphics to Implement:
     Add slam effects for the staff.
     Sweat animation when pulling on something you cannot move.
@@ -76,10 +61,9 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add prologue sequence with placeholder graphics from Hillary.
-
-    - Continuous sounds should be paused while the game is stopped.
-    - Sound controls should apply immediately to continuous sound effects like rolling balls/key block.
+    - All audio should pause when the game stops updating.
+        - When in a background tab.
+        - When showing the game controls.
 
     - Render blue overall over underwater sections of map.
 

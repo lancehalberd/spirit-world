@@ -1,30 +1,28 @@
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import {
     fadeOutPlayingTracks,
-    isATrackFadingOut,
     isATrackPlaying,
-    isTrackPlaying,
-    playSound as playSoundProper,
+    playSound,
     playTrack,
+    stopSound,
+    updateAudio,
 } from 'app/utils/sounds';
 
-export { stopSound } from 'app/utils/sounds';
-import { getSoundSettings } from 'app/utils/soundSettings';
 export const updateMusic = (state: GameState): void => {
     if (!state?.gameHasBeenInitialized) {
         return;
     }
-    const soundSettings = getSoundSettings(state);
+    updateAudio(state);
     if (state.scene === 'prologue') {
-        playTrack('dungeonTheme', 0, soundSettings);
+        playTrack('dungeonTheme', 0);
         return;
     }
     if (state.scene !== 'game') {
-        playTrack('mainTheme', 0, soundSettings);
+        playTrack('mainTheme', 0);
         return;
     }
     if (state.scriptEvents.overrideMusic) {
-        playTrack(state.scriptEvents.overrideMusic, 0, soundSettings);
+        playTrack(state.scriptEvents.overrideMusic, 0);
         return;
     }
     const bosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
@@ -52,74 +50,61 @@ export const updateMusic = (state: GameState): void => {
                 fadeOutPlayingTracks();
             }
         } else {
-            // The boss track is several different pieces, so we want to make sure not to restart the intro
-            // when any of them are still playing. Note that the tracks will automatically transition
-            // because of built in logic so we don't need to add logic to play the other tracks.
-            // Eventually it might be fun to add logic here to manipulate which sections play based on
-            // how the fight is going, for example more intense music when the boss is enraged.
-            if (!isTrackPlaying('bossIntro') && !isTrackPlaying('bossA') && !isTrackPlaying('bossB')) {
-                if (isATrackPlaying()) {
-                    // If other tracks are still playing fade them out.
-                    fadeOutPlayingTracks();
-                } else if (!isATrackFadingOut()) {
-                    // Once all tracks are faded out, start the boss music without fading in.
-                    playTrack('bossIntro', 0, soundSettings, false, false);
-                }
-            }
+            playTrack('bossIntro', 0);
         }
     } else if (location.zoneKey === 'overworld') {
         if (!location.isSpiritWorld
             && location.areaGridCoords.x === 0 && location.areaGridCoords.y === 2
         ) {
-            playTrack('vanaraForestTheme', 0, soundSettings);
+            playTrack('vanaraForestTheme', 0);
         } else if (!location.isSpiritWorld
             && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 2
         ) {
-            playTrack('ruins', 0, soundSettings);
+            playTrack('ruins', 0);
         } else if (!location.isSpiritWorld
             && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 0
         ) {
-            playTrack('village', 0, soundSettings);
+            playTrack('village', 0);
         } else {
-            playTrack('mainTheme', 0, soundSettings);
+            playTrack('mainTheme', 0);
         }
     } else if (location.zoneKey === 'underwater') {
         if (!location.isSpiritWorld
             && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 0
         ) {
-            playTrack('village', 0, soundSettings);
+            playTrack('village', 0);
         }  else {
-            playTrack('mainTheme', 0, soundSettings);
+            playTrack('mainTheme', 0);
         }
     }  else if (location.zoneKey === 'treeVillage') {
         if (location.isSpiritWorld) {
-            playTrack('dungeonTheme', 0, soundSettings);
+            playTrack('dungeonTheme', 0);
         } else {
-            playTrack('vanaraForestTheme', 0, soundSettings);
+            playTrack('vanaraForestTheme', 0);
         }
     } else if (location.zoneKey === 'sky') {
         if (location.isSpiritWorld) {
-            playTrack('vanaraDreamTheme', 0, soundSettings);
+            playTrack('vanaraDreamTheme', 0);
         } else {
-            playTrack('skyTheme', 0, soundSettings);
+            playTrack('skyTheme', 0);
         }
     } else if (location.zoneKey === 'grandTemple' || location.zoneKey === 'jadePalace') {
-        playTrack('vanaraDreamTheme', 0, soundSettings);
+        playTrack('vanaraDreamTheme', 0);
     } else if (location.zoneKey === 'peachCave'
         || location.zoneKey === 'peachCaveWater'
         || location.zoneKey === 'lakeTunnel'
     ) {
-        playTrack('caveTheme', 0, soundSettings);
+        playTrack('caveTheme', 0);
     } else if (location.zoneKey === 'riverTemple'
         || location.zoneKey === 'riverTempleWater'
     ) {
-        playTrack('lakeTheme', 0, soundSettings);
+        playTrack('lakeTheme', 0);
     } else if (location.zoneKey === 'tomb') {
-        playTrack('tombTheme', 0, soundSettings);
+        playTrack('tombTheme', 0);
     } else if (location.zoneKey === 'holyCityInterior') {
-        playTrack('village', 0, soundSettings);
+        playTrack('village', 0);
     } else if (location.zoneKey === 'waterfallCave' ) {
-        playTrack('waterfallVillageTheme', 0, soundSettings);
+        playTrack('waterfallVillageTheme', 0);
     } else if (location.zoneKey === 'warTemple') {
         // Don't change music during transitions since the logic below that depends on x/y locations
         // may be invalid during transitions.
@@ -144,71 +129,80 @@ export const updateMusic = (state: GameState): void => {
                 || (y > 256 && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 1)
             )
         ) {
-            playTrack('ruins', 0, soundSettings);
+            playTrack('ruins', 0);
         } else {
-            playTrack('dungeonTheme', 0, soundSettings);
+            playTrack('dungeonTheme', 0);
         }
     } else if (location.zoneKey === 'cocoon') {
-        playTrack('cocoonTheme', 0, soundSettings);
+        playTrack('cocoonTheme', 0);
     } else if (location.zoneKey === 'helix') {
-        playTrack('helixTheme', 0, soundSettings);
+        playTrack('helixTheme', 0);
     } else if (location.zoneKey === 'forestTemple') {
-        playTrack('dungeonTheme', 0, soundSettings);
+        playTrack('dungeonTheme', 0);
     } else if (location.zoneKey === 'waterfallTower') {
-        playTrack('waterfallTowerTheme', 0, soundSettings);
+        playTrack('waterfallTowerTheme', 0);
     } else if (location.logicalZoneKey === 'gauntlet') {
-        playTrack('tombTheme', 0, soundSettings);
+        playTrack('tombTheme', 0);
     } else if (location.logicalZoneKey === 'forge') {
-        playTrack('forgeTheme', 0, soundSettings);
+        playTrack('forgeTheme', 0);
     } else if (location.zoneKey === 'skyPalace') {
-        playTrack('skyPalaceTheme', 0, soundSettings);
+        playTrack('skyPalaceTheme', 0);
     } else if (location.logicalZoneKey === 'holySanctum') {
-        playTrack('helixTheme', 0, soundSettings);
+        playTrack('helixTheme', 0);
     } else if (location.zoneKey === 'crater') {
-        playTrack('craterTheme', 0, soundSettings);
+        playTrack('craterTheme', 0);
     } else if (location.zoneKey === 'staffTower') {
         // Play a different track when the tower is activated later.
         const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
         if (towerIsOn) {
-            playTrack('towerTheme', 0, soundSettings);
+            playTrack('towerTheme', 0);
         } else {
-            playTrack('caveTheme', 0, soundSettings);
+            playTrack('caveTheme', 0);
         }
     } else if (location.zoneKey === 'caves') {
         if (location.areaGridCoords.x === 1 && location.areaGridCoords.y === 0) {
             // This is the fertility temple / no tools cave.
-            playTrack('idleTheme', 0, soundSettings);
+            playTrack('idleTheme', 0);
         } else {
-            playTrack('caveTheme', 0, soundSettings);
+            playTrack('caveTheme', 0);
         }
     } else if (location.zoneKey === 'lab') {
-        playTrack('forgeTheme', 0, soundSettings);
+        playTrack('forgeTheme', 0);
     } else if (location.zoneKey === 'tree') {
-        playTrack('helixTheme', 0, soundSettings);
+        playTrack('helixTheme', 0);
     } else if (location.zoneKey === 'void') {
-        playTrack('vanaraDreamTheme', 0, soundSettings);
+        playTrack('vanaraDreamTheme', 0);
     } else if (location.zoneKey === 'bellCave' ) {
-        playTrack('caveTheme', 0, soundSettings);
+        playTrack('caveTheme', 0);
     } else {
-        playTrack('idleTheme', 0, soundSettings);
+        playTrack('idleTheme', 0);
     }
 }
 
-export function playSound(state: GameState, key: string) {
-    return playSoundProper(key, getSoundSettings(state));
-}
-
-export function playAreaSound(state: GameState, area: AreaInstance, key: string): any {
+export function playAreaSound(state: GameState, area: AreaInstance, key: string): AudioInstance | undefined {
     // Do not play area sound effects during the various title scenes. We run updated code
     // during these scenes to render the location in the background, but we shouldn't be
     // playing any sound effects.
-    if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
-        state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
-    ) {
+    if (state.scene != 'game') {
         return;
     }
     if (!key || state.areaInstance !== area) {
         return;
     }
-    return playSound(state, key);
+    const audioInstance = playSound(key);
+    if (audioInstance?.sound.loop) {
+        state.loopingSoundEffects.push(audioInstance);
+    }
+    return audioInstance;
+}
+
+export function stopAreaSound(state: GameState, instance: AudioInstance) {
+    if (!instance) {
+        return;
+    }
+    const index = state.loopingSoundEffects.indexOf(instance);
+    if (index >= 0) {
+        state.loopingSoundEffects.splice(index, 1);
+    }
+    stopSound(instance);
 }

@@ -9,7 +9,7 @@ import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
 } from 'app/userInput';
-import { playSound } from 'app/musicController';
+import { playSound } from 'app/utils/sounds';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getDefaultSavedState } from 'app/savedState'
 import {
@@ -26,11 +26,11 @@ export function updateTitle(state: GameState) {
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         changedOption = true;
-        playSound(state, 'menuTick');
+        playSound('menuTick');
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % options.length;
         changedOption = true;
-        playSound(state, 'menuTick');
+        playSound('menuTick');
     }
     if (changedOption) {
         if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
@@ -42,7 +42,7 @@ export function updateTitle(state: GameState) {
         }
     }
     if (wasConfirmKeyPressed(state)) {
-        playSound(state, 'menuTick');
+        playSound('menuTick');
         switch (state.scene) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
