@@ -1,5 +1,4 @@
-import { FieldAnimationEffect, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/utils/effects';
+import { addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
 import { directionMap, getDirection, getCompositeBehaviors } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { sample } from 'app/utils/index';
@@ -204,13 +203,10 @@ function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     const y = hitbox.y + hitbox.h / 2;
     const tx = (x / 16) | 0;
     const ty = (y / 16) | 0;
-    const pitAnimation = new FieldAnimationEffect({
-        animation: enemyFallAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: tx * 16, y: ty * 16,
+    addEnemyFallAnimation(state, enemy.area, {
+        x: tx * 16 + 8,
+        y: ty * 16 + 8,
     });
-    addEffectToArea(state, enemy.area, pitAnimation);
     enemy.status = 'gone';
 }
 
@@ -220,13 +216,10 @@ function makeEnemyFallIntoWater(state: GameState, enemy: Enemy) {
     const y = hitbox.y + hitbox.h / 2;
     const tx = (x / 16) | 0;
     const ty = (y / 16) | 0;
-    const animation = new FieldAnimationEffect({
-        animation: splashAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: tx * 16, y: ty * 16,
+    addSplashAnimation(state, enemy.area, {
+        x: tx * 16 + 8,
+        y: ty * 16 + 8,
     });
-    addEffectToArea(state, enemy.area, animation);
     enemy.status = 'gone';
 }
 
