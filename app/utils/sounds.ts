@@ -5,9 +5,16 @@ window['sounds'] = sounds;
 
 // This was being used to unlock audio on player interaction, but maybe this isn't necessary any more?
 // We should test this on other browsers.
-//let audioUnlocked = true;
+let audioUnlocked = false;
 export function unlockAudio() {
-    //audioUnlocked = true;
+    if (!audioUnlocked) {
+        audioContext.createOscillator().start(audioContext.currentTime);
+        audioUnlocked = true;
+    }
+}
+// At least in firefox, audioContext.currentTime won't advance until playback is enabled.
+export function isAudioUnlocked() {
+    return audioContext.currentTime > 0;
 }
 
 export function requireSound(key): GameSound {
@@ -134,41 +141,6 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             instance.gainNode.connect(soundEffectGainNode);
             instance.gainNode.gain.setValueAtTime(volume, startTime);
             return instance;
-
-            /*
-            instance.sourceNode = audioContext.createBufferSource();
-            instance.gainNode = audioContext.createGain();
-            const offset = sound.offset || 0;
-            instance.sourceNode.loop = sound.loop;
-            const duration = sound.duration || (sound.audioBuffer.duration - offset);
-            if (sound.loop && sound.duration) {
-                instance.sourceNode.loopEnd = offset + duration;
-            }
-            const repeatFrom = sound.repeatFrom || offset;
-            const actualEndTime = sound.duration ? (offset + sound.duration) : sound.audioBuffer.duration;
-            const firstDuration = actualEndTime - offset;
-            const otherDurations =  actualEndTime - repeatFrom;
-            // We probably wouldn't need all this custom logic if stopped supporting an initial offset
-            // time. Probably the buffer source already takes into account looping + loopStart if you
-            // start at a time value larger than the initial duration.
-            if (seekTime >= firstDuration) {
-                seekTime -= firstDuration;
-                seekTime = repeatFrom + seekTime % otherDurations;
-            } else {
-                seekTime = offset + seekTime;
-            }
-            if (sound.loop && repeatFrom) {
-                instance.sourceNode.loopStart = repeatFrom;
-            }
-            instance.sourceNode.buffer = sound.audioBuffer;
-            instance.sourceNode.connect(instance.gainNode).connect(soundEffectGainNode);
-            const volume = Math.min(1, sound.volume);
-            instance.gainNode.gain.setValueAtTime(volume, targetTime);
-            instance.sourceNode.start(targetTime, seekTime);
-            if (!sound.loop) {
-                instance.endTime = targetTime + duration;
-                instance.sourceNode.stop(instance.endTime)
-            }*/
         } else if (sound.play) {
             const instance: AudioInstance = {
                 sound,
@@ -297,8 +269,15 @@ const musicTracks = {
     bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
+// Immediately load the theme for the prologue scene.
+requireSound(musicTracks.dungeonTheme);
+// Also load the theme for the title scene.
+requireSound(musicTracks.mainTheme);
 export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = true, crossFade = true, startTime = audioContext.currentTime): GameSound|false {
     const sound = requireSound(musicTracks[trackKey]);
+    if (!isAudioUnlocked()) {
+        return false;
+    }
     if (!sound.audioBuffer) {
         return false;
     }
@@ -326,57 +305,6 @@ export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = 
     }
     playingTracks.push(sound);
     return sound;
-
-    /*const offset = sound.offset || 0;
-    const repeatFrom = sound.repeatFrom || offset;
-    const actualEndTime = sound.duration ? (offset + sound.duration) : sound.audioBuffer.duration;
-    const firstDuration = actualEndTime - offset;
-    const otherDurations =  actualEndTime - repeatFrom;
-    // We probably wouldn't need all this custom logic if stopped supporting an initial offset
-    // time. Probably the buffer source already takes into account looping + loopStart if you
-    // start at a time value larger than the initial duration.
-    if (seekTime >= firstDuration) {
-        seekTime -= firstDuration;
-        seekTime = repeatFrom + seekTime % otherDurations;
-    } else {
-        seekTime = offset + seekTime;
-    }
-    const instance: AudioInstance = {
-        sourceNode: audioContext.createBufferSource(),
-        gainNode: audioContext.createGain(),
-        sound,
-        startTime: time,
-    };
-    instance.sourceNode.start(time, seekTime);
-    instance.sourceNode.loop = sound.loop;
-    if (!sound.loop) {
-        instance.endTime = time + actualEndTime - seekTime;
-        instance.sourceNode.stop(instance.endTime);
-    }
-    if (sound.duration) {
-        instance.sourceNode.loopEnd = sound.duration;
-    }
-    if (repeatFrom) {
-        instance.sourceNode.loopStart = repeatFrom;
-    }
-    instance.sourceNode.buffer = sound.audioBuffer;
-    instance.sourceNode.connect(instance.gainNode).connect(trackGainNode);
-    //instance.sourceNode.connect(audioContext.destination);
-    sound.instances.push(instance);
-    // console.log({volume});
-    // console.log('fade in new track', sound);
-    // console.log('Fade in ' + sound.props.src);
-    const volume = Math.min(1, sound.volume);
-    if (crossFade) {
-        instance.gainNode.gain.setValueAtTime(0, time);
-        instance.gainNode.gain.linearRampToValueAtTime(volume, time + 1);
-    } else {
-        instance.gainNode.gain.setValueAtTime(volume, time);
-    }
-    playingTracks.push(sound);
-    // I think the BufferSource nodes automatically stop when reaching the end of the buffer.
-    // instance.sourceNode.stop(audioContext.currentTime + sound.audioBuffer.duration);
-    return sound;*/
 }
 
 export function setSoundSettings(soundSettings: SoundSettings) {
@@ -497,6 +425,7 @@ window['requireSound'] = requireSound;
 
 // Safari uses webkitAudioContext instead of AudioContext.
 const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
+window['audioContext'] = audioContext;
 const masterGainNode = audioContext.createGain();
 const trackGainNode = audioContext.createGain();
 const soundEffectGainNode = audioContext.createGain();
