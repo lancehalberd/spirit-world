@@ -61,13 +61,17 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Improve Coccoon boss
-        - "Your weapons cannot reach me in the spirit world"
-        - Double the bosses life and make the rolling balls stagger him into the material world like Rival 2.
-        - Staggering causes the Astral Projection to lose all of its life and cannot regenerate.
-        - Teleports away once the player deals 2+ damage or after 3 seconds (they can deal 1 damage then a large hit for max damage).
+    - Ignore solid behavior on invisible objects.
 
     - Let charging beetles charge through and destroy bushes.
+
+    - First Jade Champion encounter
+        - Triggered if you try to enter the holy city before encountering her in the Summoner Ruins.
+        - Warns you to stay away from the Spirit Gate
+
+    - Second Jade Champion encounter
+        - Triggeed when leaving the War Temple after getting Astral Projection.
+        - She will bring the MC to the Grand Priest in the Grand Temple
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
@@ -78,10 +82,6 @@ Current tasks:
     - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
 
     - Fix angled southern ceiling walls have awkard bumps in cavern graphics.
-
-    - Running into solid invisible chests feels bad.
-        - At least move them out of the way.
-        - Maybe they shouldn't have collision unless you can see them?
 
     - Remove old graphics
         - Replace remaining old cave graphics.

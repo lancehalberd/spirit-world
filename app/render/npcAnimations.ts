@@ -411,6 +411,13 @@ export const vanaraBlackAnimations: ActorAnimations = {
     },
 };
 
+const kneelGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+const vanaraBlueKneelImg = 'gfx/npcs/vanara-blue-kneel.png';
+const vanaraBlueKneelDownAnimation: FrameAnimation = createAnimation(vanaraBlueKneelImg, kneelGeometry, { x: 0});
+const vanaraBlueKneelRightAnimation: FrameAnimation = createAnimation(vanaraBlueKneelImg, kneelGeometry, { x: 1});
+const vanaraBlueKneelUpAnimation: FrameAnimation = createAnimation(vanaraBlueKneelImg, kneelGeometry, { x: 2});
+const vanaraBlueKneelLeftAnimation: FrameAnimation = createAnimation(vanaraBlueKneelImg, kneelGeometry, { x: 3});
+
 export const vanaraBlueAnimations: ActorAnimations = {
     idle: {
         up: vanaraBlueUpAnimation,
@@ -423,6 +430,12 @@ export const vanaraBlueAnimations: ActorAnimations = {
         down: vanaraBlueWalkDownAnimation,
         left: vanaraBlueWalkLeftAnimation,
         right: vanaraBlueWalkRightAnimation,
+    },
+    kneel: {
+        up: vanaraBlueKneelUpAnimation,
+        down: vanaraBlueKneelDownAnimation,
+        left: vanaraBlueKneelLeftAnimation,
+        right: vanaraBlueKneelRightAnimation,
     },
 };
 

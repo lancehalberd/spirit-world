@@ -12,11 +12,11 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
 import { createAnimation } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { accelerateInDirection, hasEnemyLeftSection } from 'app/utils/enemies';
+import { accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 import { sample } from 'app/utils/index';
 import { addObjectToArea } from 'app/utils/objects';
-import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
+import { getVectorToNearbyTarget, getVectorToMovementTarget, getVectorToTarget } from 'app/utils/target';
 
 
 
@@ -64,6 +64,7 @@ interface ProjectionParams {
     modeOrder: ('area' | 'denial' | 'projectiles')[]
     chargeDirection: {x: number, y: number}
     blast: Blast
+    regenerateQuickly?: boolean
 }
 //type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 const blastAbility: EnemyAbility<true> = {
@@ -196,17 +197,27 @@ enemyDefinitions.guardianProjection = {
 };
 interface GuardianParams {
     lastDamaged: number
-    shouldTeleport: boolean
+    staggerDamage: number
     usedMarkers: Set<ObjectInstance>
 }
 enemyDefinitions.guardian = {
     // This should match the NPC style of the Tomb Guardian.
     animations: vanaraBlueAnimations,
-    life: 16, touchDamage: 0, update: updateGuardian,
+    life: 32, touchDamage: 0, update: updateGuardian,
     onHit(this: void, state: GameState, enemy: Enemy<GuardianParams>, hit: HitProperties): HitResult {
         const result = enemy.defaultOnHit(state, hit);
-        enemy.params.shouldTeleport = true;
+        if (!result.damageDealt) {
+            return result;
+        }
         enemy.params.lastDamaged = state.fieldTime;
+        if (enemy.mode === 'staggered') {
+            enemy.params.staggerDamage = (enemy.params.staggerDamage || 0) + result.damageDealt;
+            if (enemy.params.staggerDamage >= 2) {
+                enemy.setMode('recoverFromStaggered');
+            }
+        } else if (enemy.area !== state.areaInstance) {
+            staggerGuardian(state, enemy);
+        }
         return result;
     },
     taunts: {
@@ -220,7 +231,8 @@ enemyDefinitions.guardian = {
         // Triggered when damaging the projection with no damage to guardian in 30s.
         hint1: { text: `Attacking my projection will only slow me down.`, priority: 4, cooldown: 20000},
         // Triggered when damaging the projection with no damage to guardian in 45s.
-        hint2: { text: `My real body is beyond the reach of your weapons.`, priority: 4, cooldown: 20000},
+        //hint2: { text: `My real body is beyond the reach of your weapons.`, priority: 4, cooldown: 20000},
+        hint2: { text: `Your weapons cannot reach me in the spirit world.`, priority: 4, cooldown: 20000},
         // Triggered when no damage to guardian in 60s.
         hint3: { text: `Remember to use your Spirit Sight.`, priority: 4, cooldown: 20000},
         // Triggered when no damage to guardian in 75s.
@@ -235,6 +247,9 @@ enemyDefinitions.guardian = {
         elements: { text: `Energy from the Spirit Realm is limitless.`, priority: 2, limit: 1},
         // Triggered when switching to ice element for the first time.
         allElements: { text: `Are you prepared for my full power?`, priority: 2, limit: 1},
+        // Triggered when the player staggers them.
+        staggered: { text: 'Ugh!', priority: 4},
+        staggered2: { text: `Not bad!`, priority: 4},
     },
     acceleration: 0.3, speed: 2,
     params: {
@@ -244,9 +259,40 @@ enemyDefinitions.guardian = {
 function getGuardian(projection: Enemy<ProjectionParams>): Enemy<GuardianParams> {
     return projection.area.alternateArea.enemies.find(o =>
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
+    ) || projection.area.enemies.find(o =>
+        o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
     );
 }
 
+function getProjection(guardian: Enemy<GuardianParams>): Enemy<ProjectionParams> {
+    return guardian.area.alternateArea.enemies.find(o =>
+        o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
+    ) || guardian.area.enemies.find(o =>
+        o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
+    );
+}
+
+function staggerGuardian(state: GameState, enemy: Enemy<GuardianParams>): void {
+    enemy.setMode('staggered');
+    // Give the guardian slightly longer iframes here so that the ball cannot hit them twice
+    // when rolling diagonally.
+    enemy.enemyInvulnerableFrames = 30;
+    enemy.params.staggerDamage = 0;
+    enemy.changeToAnimation('kneel');
+    enemy.useTauntFromList(state, ['staggered', 'staggered2']);
+    if (enemy.area !== state.hero.area) {
+        moveGuardianToArea(state, state.hero.area, enemy);
+    }
+}
+function moveGuardianToArea(state: GameState, area: AreaInstance, enemy: Enemy<GuardianParams>): void {
+    if (enemy.area !== area) {
+        addBurstEffect(state, enemy, enemy.area);
+        addObjectToArea(state, area, enemy);
+        // Add an object doesn't currently update the enemies array immediately which can cause the boss music to
+        // restart if the boss isn't found for a frame.
+        area.enemies.push(enemy);
+    }
+}
 
 const elements: MagicElement[] = [null, 'lightning', 'ice', 'fire'];
 //const elements: MagicElement[] = ['ice', 'ice', 'ice', 'ice'];
@@ -343,8 +389,24 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         return;
     }
     const guardian = getGuardian(enemy);
+    // The projection is defeated when the guardian is defeated.
+    if (!guardian || guardian.status === 'gone' || guardian.isDefeated) {
+        enemy.life = 0;
+        enemy.showDeathAnimation(state);
+        return;
+    }
+    const isGuardianStaggered = guardian.mode === 'staggered' || guardian.mode === 'recoverFromStaggered';
+    if (isGuardianStaggered) {
+        enemy.setMode('choose');
+        if (enemy.activeAbility) {
+            enemy.activeAbility = null;
+            enemy.changeToAnimation('idle');
+        }
+        enemy.life = Math.max(0, enemy.life - 100 * FRAME_LENGTH / 1000);
+    }
     const maxLife = enemy.enemyDefinition.life;
     let targetScale = 1;
+
     if (enemy.mode === 'regenerate') {
         targetScale = 1 + 2 * enemy.life / maxLife;
     } else {
@@ -357,18 +419,12 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     if (enemy.scale < targetScale) {
         enemy.changeScale(Math.min(targetScale, enemy.scale + 0.05));
     } else if (enemy.scale > targetScale) {
-        enemy.changeScale(Math.max(targetScale, enemy.scale - 0.05));
+        enemy.changeScale(Math.max(targetScale, enemy.scale - (isGuardianStaggered ? 0.1 : 0.05)));
     }
 
-    // The projection is defeated when the guardian is defeated.
-    if (!guardian || guardian.status === 'gone' || guardian.isDefeated) {
-        enemy.life = 0;
-        enemy.showDeathAnimation(state);
-        return;
-    }
-    if (enemy.life <= 0 || enemy.mode === 'regenerate') {
+    if (enemy.life <= 0 || enemy.mode === 'regenerate' || isGuardianStaggered) {
         enemy.life = Math.max(enemy.life, 0);
-        if (enemy.mode !== 'regenerate') {
+        if (enemy.mode !== 'regenerate' && !isGuardianStaggered) {
             enemy.setMode('regenerate');
             checkToGiveHint(state, guardian);
             cancelBlastAttacks(state, enemy);
@@ -383,21 +439,27 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         }
         enemy.invulnerableFrames = 10;
         enemy.enemyInvulnerableFrames = 10;
-        const vector = getVectorToTarget(state, enemy, guardian);
-        enemy.acceleration = 1;
-        enemy.speed = 5;
-        if (vector && vector.mag >= 10) {
-            accelerateInDirection(state, enemy, vector);
-        }
-        enemy.vx *= 0.8;
-        enemy.vy *= 0.8;
-        enemy.x += enemy.vx;
-        enemy.y += enemy.vy;
-        if (vector.mag < 10) {
-            enemy.life = Math.min(maxLife, enemy.life + 4 * FRAME_LENGTH / 1000);
+        enemy.acceleration = isGuardianStaggered ? 2 : 1;
+        enemy.speed = isGuardianStaggered ? 10 : 5;
+        const hitbox = guardian.getMovementHitbox();
+        // Move slightly behind the guardian so the projection renders behind him.
+        moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 2);
+        const vector = getVectorToMovementTarget(state, enemy, guardian);
+        //if (vector && vector.mag >= 10) {
+            //accelerateInDirection(state, enemy, vector);
+        //}
+        //enemy.vx *= 0.8;
+        //enemy.vy *= 0.8;
+        //enemy.x += enemy.vx;
+        //enemy.y += enemy.vy;
+        if (vector.mag < 10 && !isGuardianStaggered) {
+            // The projection regenerates quickly after the Guardian recovers from being staggered.
+            const rate = enemy.params.regenerateQuickly ? 10 : 4;
+            enemy.life = Math.min(maxLife, enemy.life + rate * FRAME_LENGTH / 1000);
             if (enemy.life >= maxLife) {
                 switchElements(state, enemy);
                 enemy.setMode('choose');
+                enemy.params.regenerateQuickly = false;
             }
         }
         return;
@@ -405,6 +467,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     if (enemy.params.element && enemy.time % 100 === 0) {
         addSparkleAnimation(state, enemy.area, enemy.getHitbox(), {element: enemy.params.element});
     }
+
     enemy.life = Math.max(0, enemy.life - 0.5 * FRAME_LENGTH / 1000);
     if (enemy.mode === 'projectiles') {
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
@@ -610,9 +673,20 @@ function teleportToNextMarker(this: void, state: GameState, guardian: Enemy<Guar
     if (!guardian.params.usedMarkers) {
         guardian.params.usedMarkers = new Set();
     }
-    const markerId = guardian.life <= 4 ? 'guardianMarkerHard' : 'guardianMarkerEasy';
-    const markers = guardian.area.objects.filter(o => o.definition?.id === markerId && !guardian.params.usedMarkers.has(o));
-    const marker = sample(markers);
+    const markerId = guardian.life <= guardian.enemyDefinition.life / 3 ? 'guardianMarkerHard' : 'guardianMarkerEasy';
+    const availableMarkers =  guardian.area.objects.filter(o => o.definition?.id === markerId);
+    let unusedMarkers = availableMarkers.filter(o => !guardian.params.usedMarkers.has(o));
+    // If the player does not damage the guardian while they are staggered, they can go through all the marerks
+    // without defeating the Guardian, so we will need to recycle them at this point.
+    if (!unusedMarkers.length) {
+        guardian.params.usedMarkers = new Set();
+        unusedMarkers = availableMarkers.filter(
+            o => !guardian.params.usedMarkers.has(o)
+            // In this case, make sure the guardian doesn't stay in their current location.
+            && (o.x !== guardian.x || o.y !== guardian.y)
+        );
+    }
+    const marker = sample(unusedMarkers);
     if (marker) {
         guardian.x = marker.x;
         guardian.y = marker.y;
@@ -622,17 +696,33 @@ function teleportToNextMarker(this: void, state: GameState, guardian: Enemy<Guar
     }
 }
 function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'staggered') {
+        if (enemy.modeTime >= 4000) {
+            enemy.setMode('recoverFromStaggered');
+        }
+        return;
+    }
+    const projection = getProjection(enemy);
+    // Teleport away from the current location as soon as iframes run out.
+    // We don't do this immediately so the player can see the guardian for a bit after they are damaged.
+    if (enemy.mode === 'recoverFromStaggered') {
+        enemy.changeToAnimation('idle');
+        if (enemy.enemyInvulnerableFrames <= 0) {
+            enemy.setMode('normal');
+            moveGuardianToArea(state, state.areaInstance.alternateArea, enemy);
+            //addBurstEffect(state, enemy, state.hero.area);
+            teleportToNextMarker(state, enemy);
+            // Move the projection to match the position of the guardian at the start of battle.
+            const vector = getVectorToTarget(state, projection, enemy);
+            projection.x += vector.mag * vector.x;
+            projection.y += vector.mag * vector.y;
+            projection.params.regenerateQuickly = true;
+        }
+        return;
+    }
     // Do not begin updating the guardian until the hero is in the other world.
     if (state.hero.area === enemy.area) {
         enemy.healthBarTime = 0;
-        return;
-    }
-    // Teleport away from the current location as soon as iframes run out.
-    // We don't do this immediately so the player can see the guardian for a bit after they are damaged.
-    if (enemy.params.shouldTeleport && enemy.enemyInvulnerableFrames <= 0) {
-        enemy.params.shouldTeleport = false;
-        addBurstEffect(state, enemy, state.hero.area);
-        teleportToNextMarker(state, enemy);
         return;
     }
     if (!enemy.params.lastDamaged) {
@@ -641,9 +731,6 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
     if (state.fieldTime - enemy.params.lastDamaged === 2000) {
         enemy.useTaunt(state, 'intro');
     }
-    const projection = enemy.area.alternateArea.enemies.find(o =>
-        o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
-    );
     const heroProjection = state.hero.astralProjection;
     if (heroProjection?.area === enemy.area && heroProjection.overlaps(enemy.getHitbox())) {
         enemy.useTaunt(state, 'astralBody');

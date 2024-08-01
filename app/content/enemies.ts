@@ -43,8 +43,6 @@ export const enemyTypes = <const>[
     'ent',
     'floorEye',
     'elementalFlame', 'elementalFrost', 'elementalStorm',
-    // This is for the Golem Boss, use "Crusher" for a standalone enemy.
-    'golemHand',
     'lightningDrone',
     'luckyBeetle',
     'plant', 'plantFlame', 'plantFrost', 'plantStorm',
@@ -53,6 +51,10 @@ export const enemyTypes = <const>[
     'snake', 'snakeFlame', 'snakeFrost', 'snakeStorm',
     'squirrel', 'squirrelFlame', 'squirrelFrost', 'squirrelStorm',
     'vortex',
+    // Placeable boss minions, not intended to be used outside of their boss fights.
+    // This is for the Golem Boss, use "Crusher" for a standalone enemy.
+    'golemHand',
+    'guardianProjection',
 ];
 declare global {
     export type EnemyType = typeof enemyTypes[number];

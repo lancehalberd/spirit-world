@@ -41,6 +41,18 @@ export function getVectorToTarget(state: GameState, source: EffectInstance | Obj
     return {mag, x: 0, y: 1};
 }
 
+export function getVectorToMovementTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
+    const hitbox = source.getMovementHitbox();
+    const targetHitbox = target.getMovementHitbox();
+    const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
+    const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    if (mag) {
+        return {mag, x: dx / mag, y: dy / mag};
+    }
+    return {mag, x: 0, y: 1};
+}
+
 export function getVectorToHitbox(source: Rect, target: Rect):{x: number, y: number, mag: number} {
     const dx = (target.x + target.w / 2) - (source.x + source.w / 2);
     const dy = (target.y + target.h / 2) - (source.y + source.h / 2);
