@@ -61,8 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Ignore solid behavior on invisible objects.
-
     - Let charging beetles charge through and destroy bushes.
 
     - First Jade Champion encounter
@@ -1005,6 +1003,5 @@ Additional Staff Behavior:
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
 
-Add spirit element that replaces the default 'none' element when the upgrade is found. In vanilla this would require getting all other elements first.
 
 

@@ -1077,7 +1077,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 240, type: "door", style: "wooden", d: "down"},
         {status: "closedSwitch", id: "gauntletSwitchDoor", x: 240, y: 272, type: "door", style: "wooden", d: "up", saveStatus: "forever"},
         {status: "normal", id: "gauntletFirstKey", x: 440, y: 328, type: "loot", lootType: "smallKey", lootLevel: 1},
-        {status: "normal", id: "gauntletMap", x: 56, y: 352, type: "chest", lootType: "map", lootLevel: 1, isInvisible: true},
+        {status: "normal", id: "gauntletMap", x: 88, y: 304, type: "chest", lootType: "map", lootLevel: 1, isInvisible: true},
         {status: "normal", id: "gauntletSwitchD", x: 288, y: 416, toggleOnRelease: true, type: "floorSwitch", isInvisible: true, specialBehaviorKey: "gauntletSwitch", targetObjectId: "gauntletSwitchDoor"},
         {status: "normal", id: "gauntletSwitchC", x: 144, y: 416, toggleOnRelease: true, type: "floorSwitch", isInvisible: true, specialBehaviorKey: "gauntletSwitch", targetObjectId: "gauntletSwitchDoor"},
         {status: "normal", id: "gauntletSwitchA", x: 144, y: 320, toggleOnRelease: true, type: "floorSwitch", isInvisible: true, specialBehaviorKey: "gauntletSwitch", targetObjectId: "gauntletSwitchDoor"},
