@@ -17,7 +17,10 @@ const fireBallAbility: EnemyAbility<boolean> = {
         if (Math.random() < 0.01) {
             return true;
         }
-        return !!getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, enemy.d).target;
+        return !!getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, enemy.d, 128,
+            // The fireball can pass over water, pits and low walls.
+            {canSwim: true, canFall: true, canPassLowWalls: true}
+        ).target;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
         const hitbox = enemy.getHitbox(state);
@@ -83,7 +86,10 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
 type LineOfSightTargetType = ReturnType<typeof getLineOfSightTargetAndDirection>;
 const frostConeAbility: EnemyAbility<LineOfSightTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): LineOfSightTargetType {
-        const target = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets);
+        const target = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, undefined, 128,
+            // The frost can pass over water, pits and low walls.
+            {canSwim: true, canFall: true, canPassLowWalls: true}
+        );
         return target.target ? target : undefined;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: LineOfSightTargetType) {

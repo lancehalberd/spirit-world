@@ -102,14 +102,26 @@ export function getVectorToNearestTargetOrRandom(state: GameState, source: Effec
     return {x: dx / mag, y: dy / mag};
 }
 
+// Assuming a tile is solid, this will return true if the given movement properties allow moving over
+// the solid tile.
+export function canPassOverWall(behavior: TileBehaviors, movementProperties: MovementProperties): boolean {
+    if (movementProperties.canPassWalls) {
+        return true;
+    }
+    if (movementProperties.canPassMediumWalls) {
+        return behavior.low || behavior.midHeight;
+    }
+    return movementProperties.canPassLowWalls && behavior.low;
+}
+
 export function getLineOfSightTargetAndDirection(
     state: GameState,
     source: EffectInstance | ObjectInstance,
     targets: (EffectInstance | ObjectInstance)[],
     direction: Direction = null,
-    projectile: boolean = false,
     // By default enemies will not aggro you from much further than half a screen.
-    distance = 128
+    distance = 128,
+    movementProperties: MovementProperties = {},
 ): {d: Direction, target: EffectInstance | ObjectInstance} {
     if (!source.area) {
         return {d: null, target: null};
@@ -141,7 +153,17 @@ export function getLineOfSightTargetAndDirection(
             for (let y = minY; true; y += 4) {
                 const ty = Math.floor(y / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
-                if (tileBehavior.solid || tileBehavior.solidMap || (!projectile && (tileBehavior.pit || tileBehavior.pitMap || tileBehavior.water))) {
+                if ((tileBehavior.solid || tileBehavior.solidMap) && !(tileBehavior.pickupWeight <= movementProperties.crushingPower)) {
+                    if (!canPassOverWall(tileBehavior, movementProperties)) {
+                        blocked = true;
+                        break;
+                    }
+                }
+                if ((tileBehavior.pit || tileBehavior.pitMap) && !movementProperties.canFall) {
+                    blocked = true;
+                    break;
+                }
+                if (tileBehavior.water && !movementProperties.canSwim) {
                     blocked = true;
                     break;
                 }
@@ -182,7 +204,17 @@ export function getLineOfSightTargetAndDirection(
             for (let x = minX; true; x += 4) {
                 const tx = Math.floor(x / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
-                if (tileBehavior.solid || tileBehavior.solidMap || (!projectile && (tileBehavior.pit || tileBehavior.pitMap || tileBehavior.water))) {
+                if ((tileBehavior.solid || tileBehavior.solidMap) && !(tileBehavior.pickupWeight <= movementProperties.crushingPower)) {
+                    if (!canPassOverWall(tileBehavior, movementProperties)) {
+                        blocked = true;
+                        break;
+                    }
+                }
+                if ((tileBehavior.pit || tileBehavior.pitMap) && !movementProperties.canFall) {
+                    blocked = true;
+                    break;
+                }
+                if (tileBehavior.water && !movementProperties.canSwim) {
                     blocked = true;
                     break;
                 }

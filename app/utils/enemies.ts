@@ -1,5 +1,5 @@
 import { addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
-import { directionMap, getDirection, getCompositeBehaviors } from 'app/utils/field';
+import { directionMap, getDirection, getCompositeBehaviors, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { sample } from 'app/utils/index';
 import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
@@ -88,6 +88,7 @@ export function scurryAndChase(state: GameState, enemy: Enemy) {
 }
 
 export function paceAndCharge(state: GameState, enemy: Enemy) {
+    const crushingPower = enemy.params.crushingPower ?? 0;
     if (enemy.mode === 'knocked') {
         enemy.animationTime = 0;
         enemy.z += enemy.vz;
@@ -103,7 +104,9 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.setAnimation('idle', enemy.d);
         }
     } else if (enemy.mode !== 'charge') {
-        const {d, target} = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, undefined, false, enemy.aggroRadius);
+        const {d, target} = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, undefined, enemy.aggroRadius, {
+            crushingPower
+        });
         if (target) {
             enemy.d = d;
             enemy.setMode('charge');
@@ -117,13 +120,23 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.animationTime = 0;
             return;
         }
-        if (!moveEnemyFull(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true, canSwim: true, canWiggle: false})) {
+        if (!moveEnemyFull(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {
+            canFall: true, canSwim: true, canWiggle: false,
+            // By default enemies can charge through bushes, but this can be changed using enemy params.
+            crushingPower,
+        })) {
             enemy.setMode('stunned');
             enemy.canBeKnockedBack = true;
             enemy.knockBack(state, {
                 vx: -enemy.speed * directionMap[enemy.d][0],
                 vy: -enemy.speed * directionMap[enemy.d][1],
                 vz: 4,
+            });
+        } else {
+            hitTargets(state, enemy.area, {
+                crushingPower,
+                hitbox: enemy.getMovementHitbox(),
+                hitTiles: true,
             });
         }
     }

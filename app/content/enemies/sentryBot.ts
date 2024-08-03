@@ -81,6 +81,7 @@ enemyDefinitions.sentryBot = {
     lootTable: lifeLootTable,
     immunities: ['lightning'],
     canBeKnockedBack: false,
+    params: {crushingPower: 2},
     update(this: void, state: GameState, enemy: Enemy) {
         if (enemy.params.laserCooldown > 0) {
             enemy.params.laserCooldown -= FRAME_LENGTH;

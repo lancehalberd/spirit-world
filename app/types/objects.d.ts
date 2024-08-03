@@ -221,6 +221,9 @@ interface MovementProperties {
     canJump?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean
+    // Whether the mover can pass over solid walls that are low height.
+    // Many projectiles pass low walls but are blocked by medium walls.
+    canPassLowWalls?: boolean
     // Whether the mover can pass over solid walls that are low to medium height.
     // Used when throwing a clone, and maybe low flying enemies.
     canPassMediumWalls?: boolean
