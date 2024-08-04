@@ -218,14 +218,14 @@ export const SPAWN_FOREST_ENTRANCE: ZoneLocation = {
     areaGridCoords: {x: 0, y: 2},
     isSpiritWorld: true,
 };
-export const SPAWN_FOREST_BACK: ZoneLocation = {
-    zoneKey: 'treeVillage',
-    floor: 1,
-    x: 320,
-    y: 375,
+export const SPAWN_FOREST_BOSS: ZoneLocation = {
+    zoneKey: 'forestTemple',
+    floor: 0,
+    x: 356,
+    y: 488,
     z: 0,
     d: 'right',
-    areaGridCoords: {x: 0, y: 0},
+    areaGridCoords: {x: 0, y: 1},
     isSpiritWorld: true,
 };
 

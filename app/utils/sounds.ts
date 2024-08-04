@@ -20,13 +20,14 @@ export function isAudioUnlocked() {
 export function requireSound(key): GameSound {
     // Note that since sounds are cached by key, if the same key is used with different options,
     // it will be returned with the options first used for that key.
-    let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
+    let source, loop, offset, volume, customDelay, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
         [source, offset, volume] = key.split('+');
         key = source;
     } else {
         offset = key.offset;
         duration = key.duration;
+        customDelay = key.customDelay;
         volume = key.volume;
         limit = key.limit;
         loop = key.loop;
@@ -45,6 +46,7 @@ export function requireSound(key): GameSound {
         volume: volume / 50,
         offset,
         repeatFrom,
+        customDelay,
         duration,
         instances: [],
     };
@@ -129,17 +131,17 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
         return;
     }
     const delay = sound.customDelay ?? 0.04;
-    const targetTime = Math.max(sound.canPlayAfter || 0, currentTime);
+    const targetTime = Math.max(sound.canPlayAfter || 0, startTime);
     sound.canPlayAfter = targetTime + delay;
     try {
         if (sound.audioBuffer) {
-            const instance = startAudioBufferSound(sound, seekTime, startTime);
+            const instance = startAudioBufferSound(sound, seekTime, targetTime);
             if (!instance) {
                 return;
             }
             const volume = Math.min(1, sound.volume);
             instance.gainNode.connect(soundEffectGainNode);
-            instance.gainNode.gain.setValueAtTime(volume, startTime);
+            instance.gainNode.gain.setValueAtTime(volume, targetTime);
             return instance;
         } else if (sound.play) {
             const instance: AudioInstance = {
@@ -379,7 +381,7 @@ const preloadSounds = () => {
              offset: 0.3, duration: 0.2, volume: 20, limit: 2},
         {key: 'bossDeath', source: 'sfx/enemyDeath.wav',
              offset: 0.17, duration: 0.3, volume: 20, limit: 2},
-        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2},
+        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2, duration: 0.4, customDelay: 0.1},
         {key: 'getMoney', source: 'sfx/coin wood c.wav',
             duration: 0.25, volume: 10, limit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',

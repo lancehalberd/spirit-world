@@ -104,7 +104,7 @@ const helixStartState = applyItems(helixRivalStateStory, {},
 const helixEndState = applyItems(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
     ['elementalBeastsEscaped', 'vanaraCommanderBeasts']);
 const forestStartState = applyItems(helixEndState, {}, ['spiritKingForestTemple']);
-const forestBackState = applyItems(forestStartState, {cloudBoots: 1, 'forestTemple:bigKey': 1},
+const forestBossState = applyItems(forestStartState, {cloudBoots: 1, 'forestTemple:bigKey': 1},
     ['spiritKingForestTemple']);
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 
@@ -208,9 +208,9 @@ export const easyBossSpawnLocations: SpawnLocationOptions = {
         location: spawnLocations.SPAWN_LOCATION_HELIX_RIVAL,
         savedState: helixRivalStateBoss,
     },
-    'Forest Back': {
-        location: spawnLocations.SPAWN_FOREST_BACK,
-        savedState: forestBackState,
+    'Forest Boss': {
+        location: spawnLocations.SPAWN_FOREST_BOSS,
+        savedState: forestBossState,
     },
     'Collector': {
         location: spawnLocations.SPAWN_WATERFALL_BOSS,
