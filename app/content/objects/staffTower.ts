@@ -363,6 +363,7 @@ export class StaffTower implements ObjectInstance {
                 }
                 context.restore();
             }
+            this.door.area = this.area;
             this.door.render(context, state);
         context.restore();
     }
