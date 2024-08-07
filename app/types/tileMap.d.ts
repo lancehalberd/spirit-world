@@ -45,7 +45,7 @@ interface NineSlice {
 
 type MapIcon = 'door' | 'chest' | 'down' | 'up'
 
-type DefaultLayer = 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2';
+type DefaultLayer = 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
 
 interface TileBehaviors {
     // 0-1
@@ -179,6 +179,10 @@ interface TileBehaviors {
     isSouthernWall?: boolean
     // Implies the tile is >32px tall and can block projectiles even if they
     isVeryTall?: boolean
+    // If defined, this function will be called each time this tile should be rendered instead of the
+    // default drawing behavior.
+    // Used primarily to add debugging information when the editor is enabled.
+    render?: (context: CanvasRenderingContext2D, tile: FullTile, target: Rect, frame: number) => void
 }
 
 type TilePalette = number[][];

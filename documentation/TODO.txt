@@ -61,6 +61,19 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Use isLavaMap to remove solid pixels + pit pixels underneath it.
+        - Then remove 'isGround' property from lava
+        - This will need to convert solid behavior to a full solidMap first, similar for pit + pitMap
+
+    - Projectiles should be able to shoot down over solid ledges, but not up them
+        - Make crystal solid ledges actual ledges with low solid walls.
+        - Places to test:
+            Peach Cave: These mostly prevent the player from accidentally falling, so this is probably okay.
+            Forest Temple by big Lock: This can let teh player skip big lock with clone, only possible in rando.
+            Waterfall tower: Might be possible to do some strange clone throws off the ledge north of the big chest.
+            Crater: Don't seem to be any issues here as you typically aren't above the ledges here.
+        - Remedy: Just add taller obstacles any place this turns out to be a significant issue.
+
     - Arrows z value should be relative to the player.
         - So the arrow looks good when shooting while runnign with cloud boots.
 
@@ -239,13 +252,10 @@ Current tasks:
         - Grown thorns disappear when draining lava.
     - Tower staff animation freezes when used to hit switches for draining lava.
     - Change mother speech bubble in randomizer when you can finish and when you have full cleared the game?
-    - Shouldn't be able to use level 2 charge with level 1 weapon.
     - Elemental immunities are confusing, they just pass through enemies.
         - For arrows specifically, maybe they can still deal normal damage.
     - Fire/Ice arrows bounce of void hands when they are up in the air.
     - Should we prevent throwing rocks up ledges?
-    - summoner ruins ledge walls let you fire arrows up them because they aren't actually ledges
-        - Add ledges to these in addition to the solidMap that they have.
 
     - Pulling animation changes when pressing a direction while the game is paused
         - Game inputs should not be read while rendering.
@@ -547,18 +557,6 @@ Current tasks:
     - Improve projectile interactions
         - Set stopX/Y when stopping a projectile which will prevent them from appearing to into cliffs/walls that they hit.
             - if stopX > hitbox.x and direction is left, adjust x by the difference, similarly for other directions.
-        - Creating a projectile while standing over a ledge won't register it is high because it never hits the ledge.
-            - Maybe add a function that runs hits for 8px before the projectiles starting position that we run when it is
-            created to set isHigh, then clear passedLedgeTiles in case that was set to avoid accidentally throwing up ledges.
-        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
-            - You can observe this by standing halfway off a cliff then turning away from the cliff and attacking with chakram/bow
-
-    - Projectiles should be able to shoot down over solid ledges, but not up them
-        - Make solid ledges actually ledges but prevent jumping over them
-        - Might have to implement this as a one way ledge to prevent the down ledge from causing the player to ignore walls.
-            - Does not allow jumping down
-            - Blocks moving into as if going up a ledge
-            - Could implement with solidLedges+solidDiagonalLedge
 
     - Add underwater mechanics
         - allow swimming over low/medium barriers (set floorHeight to 16px on these)

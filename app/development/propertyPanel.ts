@@ -192,10 +192,15 @@ function drawBrushCanvasLayer(selectedTiles: TileGridDefinition): void {
                     drawX(brushContext, tx * 16, ty * 16);
                     continue;
                 }
+                const target = {x: tx * 16, y: ty * 16, w: 16, h: 16};
                 if (tile.behaviors?.maskFrame) {
-                    drawFrame(brushContext, tile.behaviors.maskFrame, {w: 16, h: 16, x: tx * 16, y: ty * 16});
+                    drawFrame(brushContext, tile.behaviors.maskFrame, target);
                 }
-                drawFrame(brushContext, tile.frame, {w: 16, h: 16, x: tx * 16, y: ty * 16});
+                if (tile.behaviors?.render) {
+                    tile.behaviors?.render(brushContext, tile, target, 0);
+                } else {
+                    drawFrame(brushContext, tile.frame, target);
+                }
             }
         }
     }
@@ -237,10 +242,15 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                     drawX(paletteContext, j * 16, i * 16);
                     continue;
                 }
+                const target = {x: 16 * j, y: 16 * i, w: 16, h: 16};
                 if (tile.behaviors?.maskFrame) {
-                    drawFrame(paletteContext, tile.behaviors.maskFrame, {w: 16, h: 16, x: j * 16, y: i * 16});
+                    drawFrame(paletteContext, tile.behaviors.maskFrame, target);
                 }
-                drawFrame(paletteContext, tile.frame, { x: 16 * j, y: 16 * i, w: 16, h: 16});
+                if (tile.behaviors?.render) {
+                    tile.behaviors?.render(paletteContext, tile, target, 0);
+                } else {
+                    drawFrame(paletteContext, tile.frame,target );
+                }
             }
         }
 

@@ -171,11 +171,17 @@ export const BITMAP_RIGHT_6_TOP_5: Uint16Array = new Uint16Array([
 ]);
 
 // A strip 9 px wide from TL to BR corner centered in the tile.
+//export const BITMAP_MIDDLE_DOWN_RIGHT: Uint16Array = new Uint16Array([
+//    0xF800, 0xFC00, 0xFE00, 0xFF00, 0xFF80, 0x7FC0, 0x3FE0, 0x1FF0,
+//    0x0FF8, 0x07FC, 0x03FE, 0x01FF, 0x00FF, 0x007F, 0x003F, 0x001F,
+//]);
+// TODO: Check if 5px or 3px is better for this.
+// A strip 7 px wide from TL to BR corner centered in the tile.
 export const BITMAP_MIDDLE_DOWN_RIGHT: Uint16Array = new Uint16Array([
-    0xF800, 0xFC00, 0xFE00, 0xFF00, 0xFF80, 0x7FC0, 0x3FE0, 0x1FF0,
-    0x0FF8, 0x07FC, 0x03FE, 0x01FF, 0x00FF, 0x007F, 0x003F, 0x001F,
+    0xF000, 0xF800, 0xFC00, 0xFE00, 0x7F00, 0x3F80, 0x1FC0, 0x0FE0,
+    0x07F0, 0x03F8, 0x01FC, 0x00FE, 0x007F, 0x003F, 0x001F, 0x000F,
 ]);
-// A strip 9 px wide from BL to TR corner centered in the tile.
+// A strip 7 px wide from BL to TR corner centered in the tile.
 export const BITMAP_MIDDLE_UP_RIGHT: Uint16Array = new Uint16Array([...BITMAP_MIDDLE_DOWN_RIGHT].reverse());
 
 export function orBitMasks(maskA: Uint16Array, maskeB: Uint16Array): Uint16Array {

@@ -682,14 +682,26 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
                     }
                     drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
                     maskContext.globalCompositeOperation = 'source-in';
-                    drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});
+                    if (tile.behaviors?.render) {
+                        tile.behaviors?.render(context, tile, {x: 0, y: 0, w: 16, h: 16}, 0);
+                    } else {
+                        drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});
+                    }
                     // Draw the masked content first, then the mask frame on top.
                     //window['debugCanvas'](maskCanvas);
                     context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
                 }
-                drawFrame(context, maskTile.frame, {x: x * w, y: y * h, w, h});
+                if (maskTile.behaviors?.render) {
+                    maskTile.behaviors?.render(context, maskTile, {x: x * w, y: y * h, w, h}, 0);
+                } else {
+                    drawFrame(context, maskTile.frame, {x: x * w, y: y * h, w, h});
+                }
             } else if (tile) {
-                drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
+                if (tile.behaviors?.render) {
+                    tile.behaviors?.render(context, tile, {x: x * w, y: y * h, w, h}, 0);
+                } else {
+                    drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
+                }
             }
             context.restore();
         }

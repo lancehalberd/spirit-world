@@ -134,7 +134,7 @@ function getTileChunkProperties(): PanelRows {
     rows.push({
         id: 'tileChunkStyle',
         name: 'style',
-        value: editingState.tileChunkKey,
+        value:editingState.tileChunkKey || Object.keys(chunkGenerators)[0],
         values: Object.keys(chunkGenerators),
         onChange(tileChunkKey: string) {
             editingState.tileChunkKey = tileChunkKey;
@@ -147,6 +147,7 @@ function getTileChunkProperties(): PanelRows {
 function getBrushPaletteProperties(): PanelRows {
     const state = getState();
     let rows: PanelRows = [];
+    editingState.paletteKey = editingState.paletteKey || Object.keys(paletteHash)[0];
     switch (editingState.tool) {
         case 'replace':
             rows.push({

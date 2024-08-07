@@ -10,6 +10,7 @@ import { createAnimation } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
 
 import { rareLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
+import { editingState } from 'app/development/editingState';
 
 
 export function singleTileSource(
@@ -176,6 +177,81 @@ export const emptyTile: TileSource = {
     source: {image: emptyCanvas, x: 0, y: 0, w: 16, h: 16},
     behaviors: {'0x0': {defaultLayer: 'field'}},
     paletteTargets: [],
+};
+
+export function renderEmptyLedges(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
+    if (!editingState.isEditing) {
+        return;
+    }
+    context.strokeStyle = 'orange';
+    context.lineWidth = 1;
+    context.beginPath();
+    if (tile.behaviors.ledges?.up) {
+        context.moveTo(x + 0.5, y + 0.5);
+        context.lineTo(x + 15.5, y + 0.5);
+    }
+    if (tile.behaviors.ledges?.down) {
+        context.moveTo(x + 0.5, y + 15.5);
+        context.lineTo(x + 15.5, y + 15.5);
+    }
+    if (tile.behaviors.ledges?.left) {
+        context.moveTo(x + 0.5, y + 0.5);
+        context.lineTo(x + 0.5, y + 15.5);
+    }
+    if (tile.behaviors.ledges?.right) {
+        context.moveTo(x + 15.5, y + 0.5);
+        context.lineTo(x + 15.5, y + 15.5);
+    }
+    if (tile.behaviors.diagonalLedge === 'upleft') {
+        context.moveTo(x + 0.5, y + 15.5);
+        context.lineTo(x + 15.5, y + 0.5);
+        context.moveTo(x + 0.5, y + 13.5);
+        context.lineTo(x + 13.5, y + 0.5);
+    }
+    if (tile.behaviors.diagonalLedge === 'downright') {
+        context.moveTo(x + 0.5, y + 15.5);
+        context.lineTo(x + 15.5, y + 0.5);
+        context.moveTo(x + 2.5, y + 15.5);
+        context.lineTo(x + 15.5, y + 2.5);
+    }
+    if (tile.behaviors.diagonalLedge === 'upright') {
+        context.moveTo(x + 0.5, y + 0.5);
+        context.lineTo(x + 15.5, y + 15.5);
+        context.moveTo(x + 2.5, y + 0.5);
+        context.lineTo(x + 15.5, y + 13.5);
+    }
+    if (tile.behaviors.diagonalLedge === 'downleft') {
+        context.moveTo(x + 0.5, y + 0.5);
+        context.lineTo(x + 15.5, y + 15.5);
+        context.moveTo(x + 0.5, y + 2.5);
+        context.lineTo(x + 13.5, y + 15.5);
+    }
+    context.stroke();
+}
+const baseLedgeBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyLedges};
+export const ledgeBehaviors: TileSource = {
+    ...emptyTile,
+    source: {image: emptyTile.source.image, x: 0, y: 0, w: 80, h: 48},
+    behaviors: {
+        '0x0': {...baseLedgeBehavior, ledges: {up: true, left: true} },
+        '1x0': {...baseLedgeBehavior, ledges: {up: true} },
+        '2x0': {...baseLedgeBehavior, ledges: {up: true, right: true} },
+        '0x1': {...baseLedgeBehavior, ledges: {left: true} },
+        '2x1': {...baseLedgeBehavior, ledges: {right: true} },
+        '0x2': {...baseLedgeBehavior, ledges: {down: true, left: true} },
+        '1x2': {...baseLedgeBehavior, ledges: {down: true} },
+        '2x2': {...baseLedgeBehavior, ledges: {down: true, right: true} },
+        '3x0': {...baseLedgeBehavior, diagonalLedge: 'upleft' },
+        '4x0': {...baseLedgeBehavior, diagonalLedge: 'upright' },
+        '3x1': {...baseLedgeBehavior, diagonalLedge: 'downleft' },
+        '4x1': {...baseLedgeBehavior, diagonalLedge: 'downright' },
+    },
+    paletteTargets: [{key: 'ledges', x: 0, y: 0}],
+    tileCoordinates: [
+        [0, 0],[1, 0],[2, 0], [3, 0],[4, 0],
+        [0, 1],       [2, 1], [3, 1],[4, 1],
+        [0, 2],[1, 2],[2, 2],
+    ],
 };
 
 export function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TileSource {

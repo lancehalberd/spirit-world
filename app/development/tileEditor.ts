@@ -184,6 +184,7 @@ document.addEventListener('mouseup', (event) => {
     if (!state) {
         return;
     }
+    editingState.tileChunkKey = editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
     if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
         const [x, y] = getAreaMousePosition();
         const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
@@ -529,6 +530,7 @@ export function selectAll() {
         return;
     }
     if (editingState.tool === 'tileChunk') {
+        editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
         chunkGenerators[editingState.tileChunkKey](SRandom.seed(Math.random()), state.areaInstance.definition, state.areaSection, state.alternateAreaInstance.definition);
         refreshArea(state);
         editingState.hasChanges = true;

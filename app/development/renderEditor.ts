@@ -268,7 +268,11 @@ function drawBrushLayerPreview(
                 if (tile.behaviors?.editorTransparency) {
                     context.globalAlpha *= tile.behaviors.editorTransparency;
                 }
-                drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
+                if (tile.behaviors?.render) {
+                    tile.behaviors.render(context, tile, {x: tx * w, y: ty * h, w, h}, 0);
+                } else {
+                    drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
+                }
                 context.restore();
             }
         }

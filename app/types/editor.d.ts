@@ -69,8 +69,8 @@ interface EditingState {
     brush?: {[key: string]: TileGridDefinition}
     clipboardObject?: ObjectDefinition
     needsRefresh?: boolean
-    paletteKey: string
-    tileChunkKey: string
+    paletteKey?: string
+    tileChunkKey?: string
     recentAreas: AreaInstance[]
     selectedLayerKey?: string
     refreshMinimap?: boolean
