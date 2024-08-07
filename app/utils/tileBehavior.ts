@@ -117,27 +117,34 @@ export function applyTileToBehaviorGrid(
     const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
     const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
     // Merge matching bitmasks together.
-    const baseSolidMap = behaviorGrid[y][x]?.solidMap;
+    let baseSolidMap = behaviorGrid[y][x]?.solidMap;
     const baseLavaMap = behaviorGrid[y][x]?.solidMap;
     const basePitMap = behaviorGrid[y][x]?.pitMap;
     behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
-    if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
-        behaviorGrid[y][x].solidMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-        for (let row = 0; row < 16; row++) {
-            behaviorGrid[y][x].solidMap[row] = baseSolidMap[row] | behaviors.solidMap[row];
+    if (behaviorGrid[y]?.[x]?.solid || baseSolidMap) {
+        if (behaviorGrid[y]?.[x]?.solid) {
+            baseSolidMap = new Uint16Array([
+                0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,
+                0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF
+            ]);
         }
+        if (behaviors.isLavaMap) {
+            delete behaviorGrid[y][x].solid;
+            baseSolidMap = behaviorGrid[y][x].solidMap = subtractBitmap(baseSolidMap, behaviors.isLavaMap);
+        }
+        if (behaviors.pitMap) {
+            delete behaviorGrid[y][x].solid;
+            baseSolidMap = behaviorGrid[y][x].solidMap = subtractBitmap(baseSolidMap, behaviors.pitMap);
+        }
+    }
+    if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
+        behaviorGrid[y][x].solidMap = addBitmaps(baseSolidMap, behaviors.solidMap);
     }
     if (!behaviorGrid[y]?.[x]?.isLava && baseLavaMap && behaviors.isLavaMap) {
-        behaviorGrid[y][x].isLavaMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-        for (let row = 0; row < 16; row++) {
-            behaviorGrid[y][x].isLavaMap[row] = baseLavaMap[row] | behaviors.isLavaMap[row];
-        }
+        behaviorGrid[y][x].isLavaMap = addBitmaps(baseLavaMap, behaviors.isLavaMap);
     }
     if (!behaviorGrid[y]?.[x]?.pit && basePitMap && behaviors.pitMap) {
-        behaviorGrid[y][x].pitMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-        for (let row = 0; row < 16; row++) {
-            behaviorGrid[y][x].pitMap[row] = basePitMap[row] | behaviors.pitMap[row];
-        }
+        behaviorGrid[y][x].pitMap = addBitmaps(basePitMap, behaviors.pitMap);
     }
     // It is convenient for the projectile hit detection system to assume that ledges are always defined as going down
     // from the current tile into the adjacent tile, so we conver all false ledges (which are used to specify the reverse direction)
@@ -154,4 +161,19 @@ export function applyTileToBehaviorGrid(
     if (behaviors.ledges?.right === false && x < behaviorGrid[0].length - 1) {
         applyLedgesToBehaviorGridTile(behaviorGrid, x + 1, y, {left: true});
     }
+}
+
+function addBitmaps(A: Uint16Array, B: Uint16Array): Uint16Array {
+    const result = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    for (let row = 0; row < 16; row++) {
+        result[row] = A[row] | B[row];
+    }
+    return result;
+}
+function subtractBitmap(A: Uint16Array, B: Uint16Array): Uint16Array {
+    const result = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    for (let row = 0; row < 16; row++) {
+        result[row] = A[row] & ~B[row];
+    }
+    return result;
 }

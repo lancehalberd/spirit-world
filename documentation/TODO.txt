@@ -61,10 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Use isLavaMap to remove solid pixels + pit pixels underneath it.
-        - Then remove 'isGround' property from lava
-        - This will need to convert solid behavior to a full solidMap first, similar for pit + pitMap
-
     - Projectiles should be able to shoot down over solid ledges, but not up them
         - Make crystal solid ledges actual ledges with low solid walls.
         - Places to test:
