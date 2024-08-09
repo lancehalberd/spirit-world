@@ -57,40 +57,38 @@ export function useTool(
             if (dx || dy) {
                 direction = getDirection(dx, dy, true);
             }
-            let arrow = new Arrow({
+            const baseArrowProps = {
                 chargeLevel,
                 damage,
                 element,
+                z: hero.z,
+                style: 'spirit',
+            }
+            let arrow = new Arrow({
+                ...baseArrowProps,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
                 y: hero.y + 8 * directionMap[direction][1] + 6,
                 vx: speed * directionMap[direction][0],
                 vy: speed * directionMap[direction][1],
-                style: 'spirit',
             });
             addEffectToArea(state, state.areaInstance, arrow);
             if (isUpgradedBow && chargeLevel >= 1) {
                 direction = rotateDirection(direction, -1/2);
                 arrow = new Arrow({
-                    chargeLevel,
-                    damage,
-                    element,
+                    ...baseArrowProps,
                     x: hero.x + 8 + 8 * directionMap[direction][0],
                     y: hero.y + 8 * directionMap[direction][1] + 6,
                     vx: speed * directionMap[direction][0],
                     vy: speed * directionMap[direction][1],
-                    style: 'spirit',
                 });
                 addEffectToArea(state, state.areaInstance, arrow);
                 direction = rotateDirection(direction, 1);
                 arrow = new Arrow({
-                    chargeLevel,
-                    damage,
-                    element,
+                    ...baseArrowProps,
                     x: hero.x + 8 + 8 * directionMap[direction][0],
                     y: hero.y + 8 * directionMap[direction][1] + 6,
                     vx: speed * directionMap[direction][0],
                     vy: speed * directionMap[direction][1],
-                    style: 'spirit',
                 });
                 addEffectToArea(state, state.areaInstance, arrow);
             }
@@ -101,42 +99,33 @@ export function useTool(
                 }
                 // For now level 2 charge follows up with a second slower arrow
                 arrow = new Arrow({
-                    chargeLevel,
-                    damage,
-                    element,
+                    ...baseArrowProps,
                     x: hero.x + 8 + 8 * directionMap[direction][0],
                     y: hero.y + 8 * directionMap[direction][1] + 6,
                     vx: 3 * directionMap[direction][0],
                     vy: 3 * directionMap[direction][1],
                     delay: 100,
-                    style: 'spirit',
                 });
                 addEffectToArea(state, state.areaInstance, arrow);
                 if (isUpgradedBow) {
                     direction = rotateDirection(direction, -1/2);
                     arrow = new Arrow({
-                        chargeLevel,
-                        damage,
-                        element,
+                        ...baseArrowProps,
                         x: hero.x + 8 + 8 * directionMap[direction][0],
                         y: hero.y + 8 * directionMap[direction][1] + 6,
                         vx: 3 * directionMap[direction][0],
                         vy: 3 * directionMap[direction][1],
                         delay: 100,
-                        style: 'spirit',
                     });
                     addEffectToArea(state, state.areaInstance, arrow);
                     direction = rotateDirection(direction, 1);
                     arrow = new Arrow({
-                        chargeLevel,
-                        damage,
-                        element,
+                        ...baseArrowProps,
                         x: hero.x + 8 + 8 * directionMap[direction][0],
                         y: hero.y + 8 * directionMap[direction][1] + 6,
                         vx: 3 * directionMap[direction][0],
                         vy: 3 * directionMap[direction][1],
                         delay: 100,
-                        style: 'spirit',
                     });
                     addEffectToArea(state, state.areaInstance, arrow);
                 }

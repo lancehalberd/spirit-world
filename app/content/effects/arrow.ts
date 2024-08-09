@@ -159,6 +159,7 @@ type ArrowStyle = keyof typeof arrowStyles;
 interface Props {
     x?: number
     y?: number
+    z?: number
     vx?: number
     vy?: number
     ax?: number
@@ -215,12 +216,13 @@ export class Arrow implements EffectInstance, Projectile {
     refreshIsHigh = true;
     passedLedgeTiles: TileCoords[] = [];
     constructor({
-        x = 0, y = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
+        x = 0, y = 0, z = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
         ignoreWallsDuration = 0,
     }: Props) {
         this.x = x | 0;
         this.y = y | 0;
+        this.z = z | 0;
         this.vx = vx;
         this.vy = vy;
         this.ax = ax;
