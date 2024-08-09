@@ -799,7 +799,6 @@ const caveLedges: TileSource = {
         // the actor when looking for collisions, but not for floor hazards.
         '8x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false, groundHeight: 1 },
         '9x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false, groundHeight: 1 },
-
         '8x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false, groundHeight: 1 },
         '9x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false, groundHeight: 1 },
         // Specifically avoid setting groundHeight to 1 for the down direction because we sometimes use this
@@ -812,7 +811,6 @@ const caveLedges: TileSource = {
 
         '8x10': { defaultLayer: 'floor2', ledges: { right: true }, solidMap: BITMAP_RIGHT_2, isGround: false, low: true },
         '9x10': { defaultLayer: 'floor2', ledges: { right: true }, solidMap: BITMAP_RIGHT_2, isGround: false, low: true },
-
         '8x11': { defaultLayer: 'floor2', ledges: { left: true }, solidMap: BITMAP_LEFT_2, isGround: false, low: true },
         '9x11': { defaultLayer: 'floor2', ledges: { left: true }, solidMap: BITMAP_LEFT_2, isGround: false, low: true },
         '10x11': { defaultLayer: 'floor2', ledges: { down: true }, solidMap: BITMAP_BOTTOM_2, isGround: false, low: true },
@@ -842,9 +840,9 @@ const caveLedges: TileSource = {
         '13x14': { defaultLayer: 'floor2', isGround: false},
 
         '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright' },
-        '9x15': { defaultLayer: 'floor2', /*ledges: { up: true, left: true },*/ solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft' },
-        '10x15': { defaultLayer: 'floor2', /*ledges: { up: true, right: true },*/ solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright' },
-        '11x15': { defaultLayer: 'floor2', /*ledges: { up: true, left: true },*/ solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft'},
+        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft' },
+        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright' },
+        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft'},
         '12x15': { defaultLayer: 'floor2', isGround: false},
         '13x15': { defaultLayer: 'floor2', isGround: false},
     },

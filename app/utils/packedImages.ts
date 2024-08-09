@@ -39,7 +39,6 @@ const imagePacks: PackedImageData[] = [
         {x:480,y:0,w:176,h:16,originalSource:'gfx/tiles/rocksspirit.png'},
         {x:656,y:0,w:112,h:16,originalSource:'gfx/tiles/thornsspirit.png'},
         {x:768,y:0,w:144,h:16,originalSource:'gfx/tiles/spiritplants.png'},
-        {x:0,y:16,w:496,h:256,originalSource:'gfx/tiles/crystalcavesheet.png'},
         {x:912,y:0,w:48,h:32,originalSource:'gfx/tiles/crystalgrateplain.png'},
         {x:496,y:16,w:128,h:128,originalSource:'gfx/tiles/deserttiles.png'},
         {x:624,y:16,w:128,h:128,originalSource:'gfx/tiles/ceilingtilesfancystone.png'},

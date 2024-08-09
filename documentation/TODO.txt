@@ -61,15 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Projectiles should be able to shoot down over solid ledges, but not up them
-        - Make crystal solid ledges actual ledges with low solid walls.
-        - Places to test:
-            Peach Cave: These mostly prevent the player from accidentally falling, so this is probably okay.
-            Forest Temple by big Lock: This can let teh player skip big lock with clone, only possible in rando.
-            Waterfall tower: Might be possible to do some strange clone throws off the ledge north of the big chest.
-            Crater: Don't seem to be any issues here as you typically aren't above the ledges here.
-        - Remedy: Just add taller obstacles any place this turns out to be a significant issue.
-
     - Arrows z value should be relative to the player.
         - So the arrow looks good when shooting while runnign with cloud boots.
 
@@ -999,6 +990,3 @@ Improve Tool Selection:
 Additional Staff Behavior:
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
-
-
-
