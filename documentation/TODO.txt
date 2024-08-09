@@ -61,8 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Improve pits in the elder's basement
-
     - First Jade Champion encounter
         - Triggered if you try to enter the holy city before encountering her in the Summoner Ruins.
         - Warns you to stay away from the Spirit Gate
