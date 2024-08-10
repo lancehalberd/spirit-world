@@ -72,7 +72,7 @@ export function applyTileToBehaviorGrid(
         return;
     }
     // Lava + clouds erase the behaviors of tiles underneath them.
-    if (behaviors.isLava || behaviors.cloudGround || behaviors.isGround === true) {
+    if (behaviors.isLava || behaviors.isLavaMap || behaviors.cloudGround || behaviors.isGround === true) {
         // Undo ledges that might have been set by this tile to adjacent tiles when we clear false ledges.
         if (behaviorGrid[y][x]?.ledges?.up === false && y > 0) {
             removeLedgeFromBehaviorTileGrid(behaviorGrid, x, y - 1, 'down');
