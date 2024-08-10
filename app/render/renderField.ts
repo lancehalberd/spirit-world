@@ -10,6 +10,7 @@ import {
 import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
 import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
+import { getBackgroundFrame } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { getFieldInstanceAndParts } from 'app/utils/objects';
 
@@ -109,7 +110,9 @@ export function checkToRedrawTiles(area: AreaInstance) {
         for (let y = 0; y < area.h; y++) {
             for (let x = 0; x < area.w; x++) {
                 if (!area.tilesDrawn?.[y]?.[x]) {
-                    area.context.clearRect(x * w, y * h, w, h);
+                    for (const backgroundFrame of area.backgroundFrames) {
+                        backgroundFrame.context.clearRect(x * w, y * h, w, h);
+                    }
                     if (area.foregroundContext) {
                         area.foregroundContext.clearRect(x * w, y * h, w, h);
                     }
@@ -352,7 +355,7 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
         };
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        drawCanvas(context, area.canvas, rect, rect);
+        drawCanvas(context, getBackgroundFrame(state, area).canvas, rect, rect);
     context.restore();
 }
 
@@ -639,74 +642,93 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
             16 * layer.definition.grid.h,
         );
     }
-    const context = isForeground ? area.foregroundContext : area.context;
+    const contexts = isForeground ? [area.foregroundContext] : area.backgroundFrames.map(f => f.context);
     const w = 16, h = 16;
-    context.save();
-    if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
-        if (layer.definition.visibilityOverride === 'fade') {
-            context.globalAlpha *= 0.3;
-        } else if (editingState.selectedLayerKey) {
-            context.globalAlpha *= 0.5;
+    for (let frame = 0; frame < contexts.length; frame++) {
+        const context = contexts[frame];
+        context.save();
+        if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
+            if (layer.definition.visibilityOverride === 'fade') {
+                context.globalAlpha *= 0.3;
+            } else if (editingState.selectedLayerKey) {
+                context.globalAlpha *= 0.5;
+            }
         }
-    }
-    for (let y = 0; y < layer.h; y++) {
-        if (!area.tilesDrawn[y]) {
-            area.tilesDrawn[y] = [];
-        }
-        for (let x = 0; x < layer.w; x++) {
-            if (area.tilesDrawn[y][x]) {
-                continue;
+        for (let y = 0; y < layer.h; y++) {
+            if (!area.tilesDrawn[y]) {
+                area.tilesDrawn[y] = [];
             }
-            let tile = layer.tiles[y][x];
-            const maskTile = layer.maskTiles?.[y]?.[x];
-            context.save();
-            if (tile?.behaviors?.underTile > 1 && tile?.behaviors?.showUnderTile) {
-                const underTile = allTiles[tile?.behaviors?.underTile];
-                if (underTile?.frame) {
-                    drawFrame(context, underTile.frame, {x: x * w, y: y * h, w, h});
+            for (let x = 0; x < layer.w; x++) {
+                if (area.tilesDrawn[y][x]) {
+                    continue;
                 }
-            }
-            if (editingState.isEditing) {
-                if (tile?.behaviors?.editorTransparency) {
-                    context.globalAlpha *= tile.behaviors.editorTransparency;
-                }
-            }
-            if (maskTile) {
-                // Create the masked tile to draw underneath the mask frame.
-                if (tile) {
-                    maskContext.clearRect(0, 0, 16, 16);
-                    maskContext.globalCompositeOperation = 'source-over';
-                    if (!maskTile.behaviors.maskFrame) {
-                        console.error('Mask tile was missing maskFrame. This can happen when tile indexes are shifted due to added/removed tiles.');
-                        debugger;
+                let tile = layer.tiles[y][x];
+                const maskTile = layer.maskTiles?.[y]?.[x];
+                context.save();
+                if (tile?.behaviors?.underTile > 1 && tile?.behaviors?.showUnderTile) {
+                    const underTile = allTiles[tile?.behaviors?.underTile];
+                    if (underTile?.frame) {
+                        // underTile is never animated.
+                        drawFrame(context, underTile.frame, {x: x * w, y: y * h, w, h});
                     }
-                    drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
-                    maskContext.globalCompositeOperation = 'source-in';
-                    if (tile.behaviors?.render) {
-                        tile.behaviors?.render(context, tile, {x: 0, y: 0, w: 16, h: 16}, 0);
+                }
+                if (editingState.isEditing) {
+                    if (tile?.behaviors?.editorTransparency) {
+                        context.globalAlpha *= tile.behaviors.editorTransparency;
+                    }
+                }
+                if (maskTile) {
+                    // Create the masked tile to draw underneath the mask frame.
+                    if (tile) {
+                        maskContext.clearRect(0, 0, 16, 16);
+                        maskContext.globalCompositeOperation = 'source-over';
+                        if (!maskTile.behaviors.maskFrame) {
+                            console.error('Mask tile was missing maskFrame. This can happen when tile indexes are shifted due to added/removed tiles.');
+                            debugger;
+                        }
+                        // mask frames do not support animation.
+                        drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
+                        maskContext.globalCompositeOperation = 'source-in';
+                        renderTileFrame(tile, frame, maskContext, {x: 0, y: 0, w: 16, h: 16});
+                        /*if (tile.behaviors?.render) {
+                            tile.behaviors?.render(maskContext, tile, {x: 0, y: 0, w: 16, h: 16}, 0);
+                        } else {
+                            drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});
+                        }*/
+                        // Draw the masked content first, then the mask frame on top.
+                        //window['debugCanvas'](maskCanvas);
+                        context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
+                    }
+                    renderTileFrame(maskTile, frame, context, {x: x * w, y: y * h, w, h});
+                    /*if (maskTile.behaviors?.render) {
+                        maskTile.behaviors?.render(context, maskTile, {x: x * w, y: y * h, w, h}, 0);
                     } else {
-                        drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});
-                    }
-                    // Draw the masked content first, then the mask frame on top.
-                    //window['debugCanvas'](maskCanvas);
-                    context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
+                        drawFrame(context, maskTile.frame, {x: x * w, y: y * h, w, h});
+                    }*/
+                } else if (tile) {
+                    renderTileFrame(tile, frame, context, {x: x * w, y: y * h, w, h});
+                    /*if (tile.behaviors?.render) {
+                        tile.behaviors?.render(context, tile, {x: x * w, y: y * h, w, h}, 0);
+                    } else {
+                        drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
+                    }*/
                 }
-                if (maskTile.behaviors?.render) {
-                    maskTile.behaviors?.render(context, maskTile, {x: x * w, y: y * h, w, h}, 0);
-                } else {
-                    drawFrame(context, maskTile.frame, {x: x * w, y: y * h, w, h});
-                }
-            } else if (tile) {
-                if (tile.behaviors?.render) {
-                    tile.behaviors?.render(context, tile, {x: x * w, y: y * h, w, h}, 0);
-                } else {
-                    drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
-                }
+                context.restore();
             }
-            context.restore();
         }
+        context.restore();
     }
-    context.restore();
+}
+
+function renderTileFrame(tile: FullTile, frameIndex: number, context: CanvasRenderingContext2D, target: Rect) {
+    if (tile.behaviors?.render) {
+        tile.behaviors?.render(context, tile, target, frameIndex);
+    } else if (tile.animation) {
+        const frame = tile.animation.frames[frameIndex % tile.animation.frames.length];
+        drawFrame(context, frame, target);
+    } else {
+        drawFrame(context, tile.frame, target);
+    }
 }
 
 export function renderTransition(context: CanvasRenderingContext2D, state: GameState) {

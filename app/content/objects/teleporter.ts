@@ -9,6 +9,7 @@ import {
     renderForegroundObjects,
 } from 'app/render/renderField';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { getBackgroundFrame } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
@@ -247,7 +248,7 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
             hitbox.x, hitbox.y, hitbox.w, hitbox.h,
             hitbox.x, hitbox.y, hitbox.w, hitbox.h,
         );*/
-        drawCanvas(spiritContext, area.canvas,
+        drawCanvas(spiritContext, getBackgroundFrame(state, area).canvas,
             hitbox,
             hitbox
         );

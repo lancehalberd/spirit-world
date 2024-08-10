@@ -42,8 +42,8 @@ export function updateWaterSurfaceCanvas(state: GameState): void {
     }
     if (!underwaterArea.waterSurfaceCanvas) {
         [underwaterArea.waterSurfaceCanvas, underwaterArea.waterSurfaceContext] = createCanvasAndContext(
-            Math.ceil(underwaterArea.canvas.width / waterSurfaceGranularity),
-            Math.ceil(underwaterArea.canvas.height / waterSurfaceGranularity)
+            Math.ceil(underwaterArea.w * 16 / waterSurfaceGranularity),
+            Math.ceil(underwaterArea.h * 16 / waterSurfaceGranularity)
         );
     }
     //const size = 16 / waterSurfaceGranularity;
@@ -105,8 +105,8 @@ export function drawLightGradient(
 export function updateLightingCanvas(area: AreaInstance): void {
     if (!area.lightingCanvas) {
         [area.lightingCanvas, area.lightingContext] = createCanvasAndContext(
-            Math.ceil(area.canvas.width / lightingGranularity),
-            Math.ceil(area.canvas.height / lightingGranularity),
+            Math.ceil(area.w * 16 / lightingGranularity),
+            Math.ceil(area.h * 16 / lightingGranularity),
         );
     }
     const context = area.lightingContext;

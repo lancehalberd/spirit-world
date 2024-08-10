@@ -225,16 +225,16 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
     removeAllClones(state);
     state.nextAreaInstance = createAreaInstance(state, area);
     if (direction === 'up') {
-        state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.canvas.height;
+        state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.h * 16;
     }
     if (direction === 'down') {
-        state.nextAreaInstance.cameraOffset.y = state.areaInstance.canvas.height;
+        state.nextAreaInstance.cameraOffset.y = state.areaInstance.h * 16;
     }
     if (direction === 'left') {
-        state.nextAreaInstance.cameraOffset.x = -state.nextAreaInstance.canvas.width;
+        state.nextAreaInstance.cameraOffset.x = -state.nextAreaInstance.w * 16;
     }
     if (direction === 'right') {
-        state.nextAreaInstance.cameraOffset.x = state.areaInstance.canvas.width;
+        state.nextAreaInstance.cameraOffset.x = state.areaInstance.w * 16;
     }
 }
 
@@ -323,10 +323,14 @@ export function addRecentArea(areaInstance: AreaInstance): void {
 export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
     const areaSize = getAreaDimensions(definition);
-    const [canvas, context] = createCanvasAndContext(
-        areaSize.w * 16,
-        areaSize.h * 16,
-    );
+    const backgroundFrames: AreaFrame[] = [];
+    for (let i = 0; i < 6; i++) {
+        const [canvas, context] = createCanvasAndContext(
+            areaSize.w * 16,
+            areaSize.h * 16,
+        );
+        backgroundFrames.push({canvas, context});
+    }
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
@@ -383,8 +387,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         objects: [],
         removedObjectIds: [],
         priorityObjects: [],
-        canvas,
-        context,
+        backgroundFrames,
         cameraOffset: {x: 0, y: 0},
         allyTargets: [],
         enemyTargets: [],

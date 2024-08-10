@@ -61,7 +61,12 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Lava
+    - Add lava bubble animations
+        - Make them freeze into empty frames.
+    - Fix some ledges on edge of lava in crater prevent freezing lava as expected.
+    - Fix normal snakes can walk on lava
+        - Maybe turn them into fire snakes if they touch lava instead of stopping them.
+
     - Heavy objects
     - Pots
     - New cave pits

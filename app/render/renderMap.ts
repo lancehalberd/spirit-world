@@ -381,7 +381,7 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
     }
-    context.drawImage(area.canvas,
+    context.drawImage(area.backgroundFrames[0].canvas,
         source.x, source.y, source.w, source.h,
         target.x, target.y, target.w, target.h,
     );

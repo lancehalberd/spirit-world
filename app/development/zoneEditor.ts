@@ -178,7 +178,7 @@ export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCo
         checkToRedrawTiles(area);
     }
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
-    mapContext.drawImage(area.canvas,
+    mapContext.drawImage(area.backgroundFrames[0].canvas,
         0, 0, w * 16, h * 16,
         gridCoords.x * w * tileScale, gridCoords.y * h * tileScale, w * tileScale, h * tileScale
     );

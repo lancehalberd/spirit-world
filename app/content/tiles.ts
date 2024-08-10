@@ -66,15 +66,39 @@ function addSingleTileFromTileSource(tileSource: TileSource, x: number, y: numbe
         return;
     }
     const w = 16, h = 16;
+    const frame: Frame = {
+        image: tileSource.source.image,
+        x: tileSource.source.x + x * w,
+        y: tileSource.source.y + y * h,
+        w,
+        h,
+    };
+    let animation: FrameAnimation;
+    if (tileSource.animationProps) {
+        const sourceFrames: Frame[] = [frame];
+        for (let i = 1; i < tileSource.animationProps.frames; i++) {
+            sourceFrames[i] = {
+                ...frame,
+                x: frame.x + i * tileSource.animationProps.offset.x * 16,
+                y: frame.y + i * tileSource.animationProps.offset.y * 16,
+            };
+        }
+        const frames: Frame[] = [];
+        for (const sourceframeIndex of tileSource.animationProps.frameSequence) {
+            frames.push(sourceFrames[sourceframeIndex]);
+        }
+        animation = {
+            frames,
+            // These properties won't actually be used, but let's go ahead and set them to
+            // reflect how the animations will be used.
+            frameDuration: 8,
+            duration: 960,
+        };
+    }
     allTiles[index] = {
         index,
-        frame: {
-            image: tileSource.source.image,
-            x: tileSource.source.x + x * w,
-            y: tileSource.source.y + y * h,
-            w,
-            h
-        },
+        frame,
+        animation,
         behaviors,
     };
     index++;

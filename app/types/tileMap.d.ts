@@ -30,6 +30,15 @@ interface TileSource {
     }
     tileCoordinates?: number[][]
     paletteTargets?: PaletteTarget[]
+    animationProps?: {
+        // How many source frames are in this animation
+        frames: number
+        // The sequence to display the source frames in.
+        // Should be 2, 3 or 6 long to loop smoothly
+        frameSequence: number[]
+        // The offset between each frame in tiles.
+        offset: Point
+    }
 }
 
 interface NineSlice {
@@ -220,11 +229,13 @@ interface Tile {
 
 interface FullTile {
     // The index of this tile in the `allTiles` array.
-    index: number,
-    frame: Frame,
-    behaviors?: TileBehaviors,
+    index: number
+    frame: Frame
+    // The 2,3 or 6 frame animation for an animated tile.
+    animation?: FrameAnimation
+    behaviors?: TileBehaviors
     // This will be set to the linked tile when a player is carrying a linked tile.
-    linkedTile?: FullTile,
+    linkedTile?: FullTile
 }
 
 interface TileGridDefinition {
@@ -395,6 +406,11 @@ interface Floor {
 
 type AreaGrid = AreaDefinition[][];
 
+interface AreaFrame {
+    canvas: HTMLCanvasElement
+    context: CanvasRenderingContext2D
+}
+
 interface AreaInstance {
     alternateArea: AreaInstance
     definition: AreaDefinition
@@ -415,9 +431,9 @@ interface AreaInstance {
     // Array of object ids that were created on this instance but have been removed.
     // This is used when refreshing area logic to only add objects that had not already been present.
     removedObjectIds: string[]
-    // These cached the tile backgrounds and are only updated when specific tile are marked to be redrawn.
-    canvas: HTMLCanvasElement
-    context: CanvasRenderingContext2D
+    // These cache the tile backgrounds and are only updated when specific tile are marked to be redrawn.
+    // Each as an array of 6 elements corresponding to the 6 frames of animation used for background tiles.
+    backgroundFrames: AreaFrame[]
     // Foreground is only created as needed.
     foregroundCanvas?: HTMLCanvasElement
     foregroundContext?: CanvasRenderingContext2D

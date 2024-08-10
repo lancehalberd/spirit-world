@@ -9,12 +9,16 @@ import {
 } from 'app/content/bitMasks';
 import { requireFrame } from 'app/utils/packedImages';
 
-const baseLavaBehavior: TileBehaviors = { defaultLayer: 'floor2', editorTransparency: 0.3, elementOffsets: {ice: 256} };
+const baseLavaBehavior: TileBehaviors = {
+    defaultLayer: 'floor2',
+    editorTransparency: 0.3,
+    elementOffsets: {ice: 256},
+};
 
 // First tile is 886
 export const lava: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/lava.png', {x: 0, y: 0, w: 64, h: 80}),
+    source: requireFrame('gfx/tiles/lavaAnimations.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': { ...baseLavaBehavior, isLava: true},
         // 3x3 lava square
@@ -39,12 +43,24 @@ export const lava: TileSource = {
         '2x4': { ...baseLavaBehavior, isLavaMap: BITMAP_MISSING_TOP_RIGHT_5},
         '3x4': { ...baseLavaBehavior, isLavaMap: BITMAP_MISSING_TOP_LEFT_5},
     },
+    animationProps: {
+        frames: 3,
+        frameSequence: [0,0,1,2,2,1],
+        // The offset between each frame in tiles.
+        offset: {x: 9, y: 0}
+    },
 };
 // First tile is 1142
 export const lavaStone: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/lavaStone.png', {x: 0, y: 0, w: 64, h: 80}),
+    source: requireFrame('gfx/tiles/lavaAnimations.png', {x: 0, y: 80, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor2', isGround: true, elementOffsets: {fire: -256} },
+    },
+    animationProps: {
+        frames: 3,
+        frameSequence: [0,0,1,2,2,1],
+        // The offset between each frame in tiles.
+        offset: {x: 9, y: 0}
     },
 };

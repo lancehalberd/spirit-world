@@ -76,3 +76,9 @@ export function cleanupHeroFromArea(state: GameState): void {
     }
     removeAllClones(state);
 }
+
+export const BG_FRAME_DURATION = 160, BG_FRAME_COUNT = 6;
+export function getBackgroundFrame(state: GameState, areaInstance: AreaInstance): AreaFrame {
+    const frame = Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT;
+    return areaInstance.backgroundFrames[frame];
+}
