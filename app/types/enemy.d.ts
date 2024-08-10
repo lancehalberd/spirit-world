@@ -5,7 +5,8 @@ interface EnemyAbility<T> {
     // Called when the ability becomes active at the start of its prep time.
     prepareAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
     // Called every frame during the ability prep time.
-    updateAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
+    // Can return false to cancel the ability, for example, if the target moves out of range or disappears.
+    updateAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => boolean|void
     // Called when the ability is used, at the end of its prep time.
     useAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
     // Can be set to enable the ability conditionally.

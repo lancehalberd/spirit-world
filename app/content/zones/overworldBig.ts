@@ -6837,7 +6837,7 @@ const sf0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:s0:1x0-ent-1", x: 192, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x0-ent-1", x: 192, y: 368, type: "enemy", enemyType: "mushroom", d: "down", params: {}},
         {status: "normal", id: "", x: 24, y: 104, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 120, y: 40, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 176, y: 128, type: "spawnMarker", linked: true, spirit: true},
@@ -8071,7 +8071,7 @@ const sf0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:s0:0x1-ent-1", x: 288, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-ent-1", x: 288, y: 368, type: "enemy", enemyType: "mushroom", d: "down", params: {}},
         {status: "normal", id: "", linked: true, x: 432, y: 64, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 320, y: 64, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 432, y: 176, type: "spawnMarker", spirit: true},
@@ -9611,7 +9611,7 @@ const sf0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:s0:2x1-ent-0", x: 396, y: 208, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:2x1-ent-0", x: 396, y: 208, type: "enemy", enemyType: "mushroom", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
         {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: "", linked: true},
         {status: "normal", id: "towerMarker", x: 160, y: 384, type: "marker", linked: true, spirit: true},
@@ -10507,7 +10507,7 @@ const sf0_1x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "fertilityTempleSpiritEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleSpiritEntrance"},
-        {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "mushroom", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
         {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: "", linked: true},
         {status: "normal", id: "towerMarker", x: 176, y: 128, type: "marker", linked: true, spirit: true},

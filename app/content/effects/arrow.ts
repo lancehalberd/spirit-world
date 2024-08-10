@@ -626,3 +626,62 @@ export function drawCrystal(this: void, context: CanvasRenderingContext2D, anima
         drawFrameAt(context, frame, { x: -frame.w / 2, y: -frame.h / 2});
     context.restore();
 }
+
+export class Spike extends CrystalSpike {
+    isPlayerAttack = false;
+    isEnemyAttack = true;
+    static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
+        const spike = new Spike(arrowProps);
+        addEffectToArea(state, area, spike);
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawSpike(context, this.animationTime,
+            this.x + this.w / 2, this.y - this.z + this.h / 2,
+            this.vx, this.vy
+        );
+    }
+}
+
+
+const spikeDownAnimation = createAnimation('gfx/effects/spikeDown.png', {w: 9, h: 9});
+const spikeDownLeftAnimation = createAnimation('gfx/effects/spikeDownLeft.png', {w: 9, h: 9});
+
+export function drawSpike(this: void, context: CanvasRenderingContext2D, animationTime: number, x: number, y: number, dx: number, dy: number) {
+    context.save();
+        context.translate(x, y);
+        let frame: Frame;
+        switch(getDirection(dx, dy, true)) {
+            case 'down':
+                frame = getFrame(spikeDownAnimation, animationTime);
+                break;
+            case 'right':
+                frame = getFrame(spikeDownAnimation, animationTime);
+                context.rotate(-Math.PI / 2);
+                break;
+            case 'left':
+                frame = getFrame(spikeDownAnimation, animationTime);
+                context.rotate(Math.PI / 2);
+                break;
+            case 'up':
+                frame = getFrame(spikeDownAnimation, animationTime);
+                context.rotate(Math.PI);
+                break;
+            case 'downleft':
+                frame = getFrame(spikeDownLeftAnimation, animationTime);
+                break;
+            case 'downright':
+                frame = getFrame(spikeDownLeftAnimation, animationTime);
+                context.rotate(-Math.PI / 2);
+                break;
+            case 'upleft':
+                frame = getFrame(spikeDownLeftAnimation, animationTime);
+                context.rotate(Math.PI / 2);
+                break;
+            case 'upright':
+                frame = getFrame(spikeDownLeftAnimation, animationTime);
+                context.rotate(Math.PI);
+                break;
+        }
+        drawFrameAt(context, frame, { x: -Math.floor(frame.w / 2), y: -Math.floor(frame.h / 2)});
+    context.restore();
+}

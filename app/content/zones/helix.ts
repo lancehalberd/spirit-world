@@ -626,7 +626,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 248, y: 368, type: "spawnMarker"},
         {status: "normal", id: "helix:s0:0x0-plantFlame-0", x: 196, y: 252, type: "enemy", enemyType: "plantFlame", d: "down", params: {}},
         {status: "normal", id: "helix:s0:0x0-plantFlame-1", x: 420, y: 256, type: "enemy", enemyType: "plantFlame", d: "down", params: {}},
-        {status: "normal", id: "helix:s0:0x0-ent-0", x: 112, y: 344, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "helix:s0:0x0-ent-0", x: 114, y: 362, type: "enemy", enemyType: "mushroom", d: "down", params: {}},
         {status: "normal", id: "helixShortcut", x: 480, y: 288, type: "floorSwitch", targetObjectId: "helixShortcut", saveStatus: "forever"},
         {status: "closedSwitch", id: "helixShortcut", x: 496, y: 320, type: "door", style: "ladderUp", d: "up"},
         {status: "normal", id: "helixSpiritMarker", x: 488, y: 280, locationCue: "Helix 1F", type: "marker"},

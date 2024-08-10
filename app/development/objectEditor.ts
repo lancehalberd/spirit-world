@@ -1543,6 +1543,11 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
         object.y = Math.round(object.y / 16) * 16;
         return
     }
+    if (object.type === 'enemy' || object.type === 'boss') {
+        object.x = Math.round(object.x / 2) * 2;
+        object.y = Math.round(object.y / 2) * 2;
+        return;
+    }
     // Default behavior is to snap to quarter grid.
     if (object.type !== 'loot') {
         object.x = Math.round(object.x / 4) * 4;

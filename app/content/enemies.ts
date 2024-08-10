@@ -1,12 +1,10 @@
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { GroundSpike } from 'app/content/effects/groundSpike';
 import {
     beetleAnimations,
     climbingBeetleAnimations,
     beetleHornedAnimations,
     beetleMiniAnimations,
-    entAnimations,
     floorEyeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -27,6 +25,7 @@ export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/elemental';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
+export * from 'app/content/enemies/mushroom';
 export * from 'app/content/enemies/orb';
 export * from 'app/content/enemies/plant';
 export * from 'app/content/enemies/sentryBot';
@@ -40,7 +39,7 @@ export const enemyTypes = <const>[
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini',
     'beetleWinged', 'beetleWingedFlame', 'beetleWingedFrost', 'beetleWingedStorm',
     'crusher', 'crystalBat', 'crystalGuardian',
-    'ent',
+    'mushroom',
     'floorEye',
     'elementalFlame', 'elementalFrost', 'elementalStorm',
     'lightningDrone',
@@ -84,47 +83,6 @@ enemyDefinitions.beetleMini = {
     lootTable: lifeLootTable,
 };
 
-enemyDefinitions.ent = {
-    alwaysReset: true,
-    animations: entAnimations, aggroRadius: 128,
-    life: 8, touchDamage: 2, update: updateEnt,
-    ignorePits: true,
-    elementalMultipliers: {'fire': 2},
-    // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
-    // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {touchHit: { damage: 2}, solid: true},
-    canBeKnockedBack: false,
-};
-
-function updateEnt(state: GameState, enemy: Enemy): void {
-    if (enemy.mode === 'attack') {
-        const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets, new Set([state.hero.astralProjection]));
-
-        if (enemy.modeTime > 0 && enemy.modeTime % 500 === 0 && target) {
-            const targetHitbox = target.getHitbox(state);
-            const thorns = new GrowingThorn({
-                x: targetHitbox.x + targetHitbox.w / 2,
-                y: targetHitbox.y + targetHitbox.h / 2,
-                damage: 1,
-            });
-            addEffectToArea(state, enemy.area, thorns);
-        }
-        if (enemy.modeTime >= 2000) {
-            enemy.setMode('recover')
-        }
-    } else if (enemy.mode === 'recover') {
-        if (enemy.modeTime >= 3000) {
-            enemy.setMode('wait')
-        }
-    } else {
-        if (enemy.modeTime >= 1000) {
-            const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets, new Set([state.hero.astralProjection]));
-            if (target) {
-                enemy.setMode('attack');
-            }
-        }
-    }
-}
 
 function isUnderTile(state: GameState, enemy: Enemy): boolean {
     const hitbox = enemy.getHitbox(state);

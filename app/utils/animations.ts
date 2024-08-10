@@ -44,7 +44,13 @@ export function createAnimation(
     // Say an animation has 3 frames, but you want to order them 0, 1, 2, 1, then pass frameMap = [0, 1, 2, 1],
     // to remap the order of the frames accordingly.
     if (frameMap) {
-       frames = frameMap.map(originalIndex => frames[originalIndex]);
+       frames = frameMap.map(originalIndex => {
+           if (!frames[originalIndex]) {
+               console.error('Missing frame at index', originalIndex);
+               debugger;
+           }
+           return frames[originalIndex];
+       });
     }
     return {frames, frameDuration: duration, ...props, duration: FRAME_LENGTH * frames.length * duration};
 };

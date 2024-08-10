@@ -22,7 +22,7 @@ const growingAnimations = [
     createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48}, {x: 8, cols: 2, duration: 5, frameMap: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]}),
 ];
 const burstAnimation = createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48},
-    {x: 12, cols: 5, duration: 5, frameMap: [0, 1, 2, 3, 4, 4, 5, 6]}, {loop: false});
+    {x: 12, cols: 5, duration: 3, frameMap: [0, 1, 2, 3, 4]}, {loop: false});
 
 const growDuration = growingAnimations.reduce((sum, animation) => sum + animation.duration, 0);
 const fadeDuration = burstAnimation.duration;
@@ -67,7 +67,7 @@ export class SpikePod implements EffectInstance, Props {
             const dx = Math.cos(theta + i * r - 2 * r);
             const dy = Math.sin(theta + i * r - 2 * r);
             CrystalSpike.spawn(state, this.area, {
-                delay: 100,
+                delay: 140,
                 x: this.x + this.w / 2 + this.w / 4 * dx,
                 y: this.y + this.h / 2 + this.h / 4 * dy,
                 damage: this.damage,

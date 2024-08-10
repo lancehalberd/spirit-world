@@ -165,7 +165,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.canSwim = this.enemyDefinition.canSwim;
     }
     getFrame(): Frame {
-        return getFrame(this.currentAnimation, this.animationTime);
+        const frame = getFrame(this.currentAnimation, this.animationTime);
+        if (!frame) {
+            console.log("Missing frame", this.currentAnimationKey, this.animationTime, this.currentAnimation);
+            debugger;
+        }
+        return frame;
     }
     getHitbox(state?: GameState): Rect {
         if (this.enemyDefinition.getHitbox) {
@@ -366,6 +371,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.applyDamage(state, damageDealt, 'enemyHit', hit.element === 'lightning' ? 0.5 : 1);
             if (hit.element === 'fire') {
                 this.applyBurn(hit.damage, 2000);
+            }
+            if (this.currentAnimationKey === 'idle') {
+                this.changeToAnimation('hurt', this.currentAnimationKey);
             }
         }
         // Hitting frozen enemies unfreezes them.
@@ -708,9 +716,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.activeAbility.definition.useAbility?.(state, this, this.activeAbility.target);
                 this.activeAbility.used = true;
             } else if (!this.activeAbility.used && this.activeAbility.definition.updateAbility) {
-                this.activeAbility.definition.updateAbility(state, this, this.activeAbility.target);
+                if (this.activeAbility.definition.updateAbility(state, this, this.activeAbility.target) === false) {
+                    this.activeAbility = null;
+                    this.changeToAnimation('idle');
+                }
             }
-            if (this.activeAbility.time >= (this.activeAbility.definition.prepTime || 0) + (this.activeAbility.definition.recoverTime || 0)) {
+            if (this.activeAbility && this.activeAbility.time >= (this.activeAbility.definition.prepTime || 0) + (this.activeAbility.definition.recoverTime || 0)) {
                 this.activeAbility = null;
                 this.changeToAnimation('idle');
             }

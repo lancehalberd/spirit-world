@@ -1,6 +1,12 @@
 import { createAnimation } from 'app/utils/animations';
 
 
+export function omniAnimation(animation: FrameAnimation) {
+    return {
+        up: animation, down: animation, left: animation, right: animation,
+    };
+}
+
 const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
 
@@ -264,13 +270,6 @@ export const squirrelFlameAnimations = createSquirrelAnimation('gfx/enemies/squi
 export const squirrelFrostAnimations = createSquirrelAnimation('gfx/enemies/squirrelFrost.png');
 export const squirrelStormAnimations = createSquirrelAnimation('gfx/enemies/squirrelStorm.png');
 export const superElectricSquirrelAnimations = createSquirrelAnimation('gfx/enemies/superelectricsquirrel.png');
-
-
-export function omniAnimation(animation: FrameAnimation) {
-    return {
-        up: animation, down: animation, left: animation, right: animation,
-    };
-}
 
 const floorEyeGeometry: FrameDimensions = { w: 16, h: 16 };
 const floorEyeClosedAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { cols: 1});

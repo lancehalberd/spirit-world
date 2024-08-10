@@ -2553,7 +2553,7 @@ const sf0_1x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "forestTempleLadder1", x: 336, y: 336, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder1", d: "up"},
-        {status: "normal", id: "forestTemple:s0:1x1-ent-2", x: 432, y: 108, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "forestTemple:s0:1x1-ent-2", x: 434, y: 116, type: "enemy", enemyType: "mushroom", d: "down", params: {}},
         {status: "normal", id: "", x: 472, y: 432, type: "spawnMarker"},
         {status: "normal", id: "", x: 48, y: 568, type: "spawnMarker"},
         {status: "normal", id: "", x: 24, y: 160, type: "spawnMarker"},
