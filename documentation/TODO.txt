@@ -61,14 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-
-    - Game slows down when rendering background animation
-        - Spread this out one frame at a time.
-        - Store set of up-to-date frames and clear this when checkToRedraw is set to true.
-        - Each time we call renderBackground frame we loop through all frames starting at the current frame and redraw 1 frame if necessary.
-        - Move tilesDrawn to AreaFrame
-        - Convert foregroundCanvas+Context to foregroundFrame: AreaFrame
-
     - Add lava bubble animations
         - Make them freeze into empty frames.
 
@@ -76,6 +68,9 @@ Current tasks:
     - Pots
     - New cave pits
         - Use in Tomb+Elder basement
+
+    - Fix snakes/beetles show frozen frame briefly when killed with ice.
+        - Doesn't happen for plants
 
 
     - Fix normal snakes can walk on lava

@@ -8,7 +8,7 @@ import { getCanvasScale } from 'app/development/getCanvasScale';
 import { initializeSection } from 'app/development/sections';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, overworldKeys } from 'app/gameConstants';
 import { heroIcon } from 'app/render/heroAnimations';
-import { checkToRedrawTiles } from 'app/render/renderField';
+import { checkToRedrawTiles, drawRemainingFrames } from 'app/render/renderField';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { mainCanvas } from 'app/utils/canvas';
 import { findObjectLocation } from 'app/utils/enterZoneByTarget';
@@ -380,13 +380,14 @@ const mapObjectTypes: ObjectType[] = [
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
+        drawRemainingFrames(state, area, 0);
     }
     context.drawImage(area.backgroundFrames[0].canvas,
         source.x, source.y, source.w, source.h,
         target.x, target.y, target.w, target.h,
     );
-    if (area.foregroundCanvas) {
-        context.drawImage(area.foregroundCanvas,
+    if (area.foregroundFrames[0]) {
+        context.drawImage(area.foregroundFrames[0].canvas,
             source.x, source.y, source.w, source.h,
             target.x, target.y, target.w, target.h,
         );

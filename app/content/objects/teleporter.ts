@@ -259,13 +259,13 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
         }
         renderAreaObjectsBeforeHero(spiritContext, state, area, true);
         renderAreaObjectsAfterHero(spiritContext, state, area, true);
-        if (area?.foregroundCanvas) {
+        for (const foregroundFrame of area.foregroundFrames) {
             /*spiritContext.drawImage(
                 area.foregroundCanvas,
                 hitbox.x, hitbox.y, hitbox.w, hitbox.h,
                 hitbox.x, hitbox.y, hitbox.w, hitbox.h,
             );*/
-            drawCanvas(spiritContext, area.foregroundCanvas,
+            drawCanvas(spiritContext, foregroundFrame.canvas,
                 hitbox,
                 hitbox
             );

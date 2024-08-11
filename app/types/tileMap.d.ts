@@ -409,6 +409,7 @@ type AreaGrid = AreaDefinition[][];
 interface AreaFrame {
     canvas: HTMLCanvasElement
     context: CanvasRenderingContext2D
+    tilesDrawn: boolean[][]
 }
 
 interface AreaInstance {
@@ -418,8 +419,10 @@ interface AreaInstance {
     h: number
     behaviorGrid: TileBehaviors[][]
     checkToRedrawTiles: boolean
-    dark?: number
     tilesDrawn: boolean[][]
+    // Tracks which area frames have been drawn since the last time checkToRedrawTiles was set.
+    drawnFrames: Set<AreaFrame>
+    dark?: number
     underwater?: boolean
     layers: AreaLayer[]
     effects: EffectInstance[]
@@ -434,9 +437,7 @@ interface AreaInstance {
     // These cache the tile backgrounds and are only updated when specific tile are marked to be redrawn.
     // Each as an array of 6 elements corresponding to the 6 frames of animation used for background tiles.
     backgroundFrames: AreaFrame[]
-    // Foreground is only created as needed.
-    foregroundCanvas?: HTMLCanvasElement
-    foregroundContext?: CanvasRenderingContext2D
+    foregroundFrames: AreaFrame[]
     // These cache the tile based lighting and are only created when lighting effects are in play.
     // These are recalculated when from scratch when tiles with lighting behavior are changed.
     lightingCanvas?: HTMLCanvasElement

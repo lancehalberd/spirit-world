@@ -329,8 +329,13 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             areaSize.w * 16,
             areaSize.h * 16,
         );
-        backgroundFrames.push({canvas, context});
+        backgroundFrames.push({
+            canvas,
+            context,
+            tilesDrawn: [],
+        });
     }
+    const foregroundFrames: AreaFrame[] = [];
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
@@ -340,6 +345,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         behaviorGrid,
         tilesDrawn: [],
         checkToRedrawTiles: true,
+        drawnFrames: new Set(),
         layers: definition.layers.filter((layer) => {
             if (!layer) {
                 console.error('missing layer', definition);
@@ -388,6 +394,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         removedObjectIds: [],
         priorityObjects: [],
         backgroundFrames,
+        foregroundFrames,
         cameraOffset: {x: 0, y: 0},
         allyTargets: [],
         enemyTargets: [],

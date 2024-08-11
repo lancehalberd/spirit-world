@@ -11,7 +11,7 @@ import { renderPropertyRows } from 'app/development/propertyPanel';
 import { editingState } from 'app/development/editingState';
 import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { checkToRedrawTiles } from 'app/render/renderField';
+import { checkToRedrawTiles, drawRemainingFrames } from 'app/render/renderField';
 import { getState } from 'app/state';
 import { setAreaSection } from 'app/utils/area';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -176,14 +176,15 @@ export function clearMinimap(state: GameState): void {
 export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCoords: {x: number, y: number}): void {
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
+        drawRemainingFrames(state, area, 0);
     }
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     mapContext.drawImage(area.backgroundFrames[0].canvas,
         0, 0, w * 16, h * 16,
         gridCoords.x * w * tileScale, gridCoords.y * h * tileScale, w * tileScale, h * tileScale
     );
-    if (area.foregroundCanvas) {
-        mapContext.drawImage(area.foregroundCanvas,
+    if (area.foregroundFrames[0]) {
+        mapContext.drawImage(area.foregroundFrames[0].canvas,
             0, 0, w * 16, h * 16,
             gridCoords.x * w * tileScale, gridCoords.y * h * tileScale, w * tileScale, h * tileScale
         );

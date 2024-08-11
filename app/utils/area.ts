@@ -82,3 +82,6 @@ export function getBackgroundFrame(state: GameState, areaInstance: AreaInstance)
     const frame = Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT;
     return areaInstance.backgroundFrames[frame];
 }
+export function getBackgroundFrameIndex(state: GameState, areaInstance: AreaInstance): number {
+    return Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT;
+}
