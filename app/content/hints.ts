@@ -667,6 +667,12 @@ export function getRandomizerHint(state: GameState): string {
             if (dialogueKey === 'storageVanara') {
                 return `A vanara would be grateful for an exterminator.`;
             }
+            if (dialogueKey === 'citySmith') {
+                return `The City Smith will give you something after upgrading your Chakram.`;
+            }
+            if (dialogueKey === 'forgeSmith') {
+                return `The Forge Smith will give you something after upgrading your Chakram.`;
+            }
             return `Try talking to someone called ${dialogueKey}.`;
         }
     }
