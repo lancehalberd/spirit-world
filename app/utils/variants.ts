@@ -3,7 +3,7 @@ import { variantSeed } from 'app/gameConstants';
 import { everyArea } from 'app/utils/every';
 import SRandom from 'app/utils/SRandom';
 
-const baseVarientRandom = SRandom.seed(variantSeed);
+const baseVariantRandom = SRandom.seed(variantSeed);
 
 function chooseStyleVariant(styles: string[], random: SRandom, data: VariantData) {
     if (!data.styleWeights) {
@@ -26,7 +26,7 @@ function chooseStyleVariant(styles: string[], random: SRandom, data: VariantData
 
 export function applyVariantsToArea(state: GameState, area: AreaInstance): void {
     for (const variantData of (area.definition.variants || [])) {
-        let variantRandom = baseVarientRandom.addSeed(variantData.seed);
+        let variantRandom = baseVariantRandom.addSeed(variantData.seed);
         const definition = variantHash[variantData.type];
         const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
         definition.applyToArea(style, variantRandom, state, area, variantData);
@@ -51,7 +51,7 @@ export function variantLogic(variantId: string): LogicCheck {
     if (!variantData) {
         debugger;
     }
-    let variantRandom = baseVarientRandom.addSeed(variantData.seed);
+    let variantRandom = baseVariantRandom.addSeed(variantData.seed);
     const definition = variantHash[variantData.type];
     if (!definition) {
         throw new Error(variantData.type + " variant type not found");

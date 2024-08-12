@@ -61,9 +61,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add lava bubble animations
-        - Make them freeze into empty frames.
-
     - Heavy objects
     - Pots
     - New cave pits

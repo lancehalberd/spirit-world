@@ -46,7 +46,6 @@ export const lava: TileSource = {
     animationProps: {
         frames: 3,
         frameSequence: [0,0,1,2,2,1],
-        // The offset between each frame in tiles.
         offset: {x: 9, y: 0}
     },
 };
@@ -60,7 +59,19 @@ export const lavaStone: TileSource = {
     animationProps: {
         frames: 3,
         frameSequence: [0,0,1,2,2,1],
-        // The offset between each frame in tiles.
         offset: {x: 9, y: 0}
+    },
+};
+
+export const lavaBubbles: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/lavaAnimations.png', {x: 0, y: 240, w: 16, h: 112}),
+    behaviors: {
+        'all': { defaultLayer: 'field',  elementTiles: {ice: 0} },
+    },
+    animationProps: {
+        frames: 6,
+        frameSequence: [0,1,2,3,4,5],
+        offset: {x: 1, y: 0}
     },
 };

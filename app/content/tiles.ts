@@ -42,7 +42,7 @@ import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
-import { lava, lavaStone } from 'app/content/tiles/lava';
+import { lava, lavaBubbles, lavaStone } from 'app/content/tiles/lava';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
@@ -1077,7 +1077,8 @@ addTiles([
     furniturePlantTiles,
     deletedTiles(5),
     iceTiles,
-    deletedTiles(10),
+    lavaBubbles,
+    deletedTiles(3),
     laundryTiles,
     deletedTiles(1),
     logChoppingTiles,
