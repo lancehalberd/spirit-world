@@ -16,8 +16,8 @@ export class Trampoline extends PushPullObject implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         // Move for `pushAmount` pixels after getting hit by a projectile.
         if (this.pushAmount > 0) {
-            this.pushAmount--;
-            if (!this.move(state, this.pushDirection)) {
+            this.pushAmount -= this.pushSpeed;
+            if (!this.move(state, this.pushDirection, this.pushSpeed)) {
                 this.pushAmount = 0;
             }
         }

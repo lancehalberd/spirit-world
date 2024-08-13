@@ -15,6 +15,7 @@ import { torchStyles } from 'app/content/objects/torch';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
+import { pushPullObjectStyles } from 'app/content/objects/pushPullObject'
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/loot';
 import { lightningBarrierStyles } from 'app/content/objects/lightningBarrier';
@@ -441,7 +442,6 @@ export function createObjectDefinition(
         case 'beadGrate':
         case 'cathode':
         case 'flameTurret':
-        case 'pushPull':
         case 'rollingBall':
         case 'saveStatue':
         case 'shieldingUnit':
@@ -453,6 +453,14 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 type: definition.type,
             };
+        case 'pushPull':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                style: definition.style || Object.keys(pushPullObjectStyles)[0],
+                type: definition.type,
+            };
+
         case 'tippable':
             return {
                 ...commonProps,
@@ -1398,6 +1406,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = turretStyles;
     } else if (object.type === 'pitEntrance') {
         styles = pitStyles;
+    } else if (object.type === 'pushPull') {
+        styles = pushPullObjectStyles;
     } else if (object.type === 'bell') {
         styles = bellStyles;
     } else if (object.type === 'torch') {

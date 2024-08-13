@@ -263,7 +263,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 const direction = getDirection(pulldx, pulldy);
                 hero.grabObject.onPull(state, direction, hero);
                 // grabObject may be removed during the onPull operation, so confirm it is still set first.
-                if (hero.grabObject) {
+                /*if (hero.grabObject) {
                     // Wiggle the hero in line with the object as they move it
                     const wiggleDistance = 14;
                     // If the player is not positioned correctly to pull the object, instead of pulling,
@@ -298,7 +298,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                             dy = 0
                         }
                     }
-                }
+                }*/
             }
         }
     }

@@ -61,14 +61,18 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Heavy objects
     - Pots
     - New cave pits
         - Use in Tomb+Elder basement
 
+    - Add code for adding tile based decorations periodically to the scene:
+        - Each frame deterministically choose ~10 tiles spread out across the scene.
+        - Check tile behaviors around the chosen tile and randomly add a matching animation effect
+            - For example lava bubble on lava tiles.
+        - Remove existing lava bubble animations from the background frames.
+
     - Fix snakes/beetles show frozen frame briefly when killed with ice.
         - Doesn't happen for plants
-
 
     - Fix normal snakes can walk on lava
         - Maybe turn them into fire snakes if they touch lava instead of stopping them.
@@ -90,6 +94,10 @@ Current tasks:
     - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
 
     - Fix angled southern ceiling walls have awkard bumps in cavern graphics.
+
+    - Fix clone movement is broken when controlling multiple clones while grabbing something.
+
+    - Hitting moving pots should not completely overwrite existing pot movement.
 
     - Remove old graphics
         - Replace remaining old cave graphics.

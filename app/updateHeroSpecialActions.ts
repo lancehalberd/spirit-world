@@ -740,6 +740,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 knockAwayFromHit: true,
                 isStaff: true,
                 isBonk: staff.staffBonked,
+                canPush: staff.staffBonked,
                 canDamageCrystalShields: staff.staffBonked,
             });
             hitTargets(state, state.areaInstance, {
@@ -749,6 +750,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitObjects: true,
                 isStaff: true,
                 isBonk: staff.staffBonked,
+                canPush: staff.staffBonked,
                 direction: staff.direction,
             });
             if (!staff.staffBonked) {
