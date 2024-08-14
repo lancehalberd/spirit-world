@@ -120,8 +120,11 @@ export function checkToRedrawTiles(area: AreaInstance) {
                             continue;
                         }
                         backgroundFrame.tilesDrawn[y][x] = false;
-                        // The background should be opaque, so no need to clear old tiles.
-                        // backgroundFrame.context.clearRect(x * w, y * h, w, h);
+                        // The background should be opaque, so no need to clear old tiles in general.
+                        // While editing we need to clear them because we draw many layer with transparency.
+                        if (editingState.isEditing) {
+                            backgroundFrame.context.clearRect(x * w, y * h, w, h);
+                        }
                     }
                     for (const foregroundFrame of area.foregroundFrames) {
                         if (!foregroundFrame.tilesDrawn[y]?.[x]) {
