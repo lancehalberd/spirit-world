@@ -269,7 +269,7 @@ const f0_0x0: AreaDefinition = {
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 50, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 0},
-        {x: 16, y: 0, w: 16, h: 16, index: 51, mapId: 'overworld', entranceId: 'warTempleNorthEntrance', mapX: 1, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 51, mapId: 'warTemple', floorId: '1F', mapX: 1, mapY: 0},
         {x: 16, y: 16, w: 16, h: 16, index: 52, mapId: 'warTemple', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
@@ -2024,7 +2024,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x2-empty-1", x: 416, y: 80, type: "chest", lootType: "empty", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 477, hideMap: true, mapId: 'overworld', entranceId: 'warTempleChestEntrance', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 16, index: 477, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 5},
         {x: 0, y: 16, w: 32, h: 16, index: 476, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 5},
     ],
 };
