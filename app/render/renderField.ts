@@ -143,6 +143,10 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
         return;
     }
     for (let i = 0; i < 6; i++) {
+        if (editingState.isEditing && i > 0) {
+            // Only draw the current frame while editing since we don't play animations anyway.
+            break;
+        }
         const frameIndex = (currentFrameIndex + i) % 6;
         const backgroundFrame = area.backgroundFrames[frameIndex];
         if (area.drawnFrames.has(backgroundFrame)) {
@@ -161,6 +165,10 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
         break;
     }
     for (let i = 0; i < 1; i++) {
+        if (editingState.isEditing && i > 0) {
+            // Only draw the current frame while editing since we don't play animations anyway.
+            break;
+        }
         const frameIndex = 0;
         let foregroundFrame: AreaFrame = area.foregroundFrames[frameIndex];
         if (area.drawnFrames.has(foregroundFrame)) {
