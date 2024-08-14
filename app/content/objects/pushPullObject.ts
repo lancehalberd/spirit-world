@@ -210,11 +210,10 @@ function moveObjectThenHero(this: void, state: GameState, hero: Hero, object: Ob
     ) {
         return true;
     }
-    // If the position is invalid, try resetting the movement of the second object.
+    // If the position is invalid, reset and try moving the hero first.
     hero.x = hx;
     hero.y = hy;
-    object.x = ox;
-    object.y = oy;
+    setObjectPosition(object, ox, oy);
     return moveHeroThenObject(state, hero, object, dx, dy);
 }
 
@@ -235,12 +234,19 @@ function moveHeroThenObject(this: void, state: GameState, hero: Hero, object: Ob
     ) {
         return true;
     }
-    // If the position is invalid, try resetting the movement of the second object.
-    object.x = ox;
-    object.y = oy;
+    // If the position is still invalid, reset everything.
+    setObjectPosition(object, ox, oy);
     hero.x = hx;
     hero.y = hy;
     return false;
+}
+function setObjectPosition(this: void, object: ObjectInstance, x: number, y: number) {
+    object.x = x;
+    object.y = y;
+    if (object.linkedObject) {
+        object.linkedObject.x = x;
+        object.linkedObject.y = y;
+    }
 }
 
 function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: number, excludedObjects: ObjectInstance[] = []) {

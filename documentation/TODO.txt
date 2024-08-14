@@ -61,6 +61,11 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add other interior areas to the map for the War Temple
+        - Make sure they don't use the War Temple music thuogh.
+    - Play secret chime when frozen doors unfreeze, especially the ice cave on the overworld.
+    - Add another button+ladder by the big key in the Helix so the player cannot accidentally miss the Big Key.
+
     - Pots
     - New cave pits
         - Use in Tomb+Elder basement
