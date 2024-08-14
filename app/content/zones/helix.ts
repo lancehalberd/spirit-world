@@ -310,6 +310,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 288, y: 336, type: "spawnMarker"},
         {status: "normal", id: "helixMarker", x: 120, y: 296, type: "marker", locationCue: "Helix 1F"},
         {status: "normal", id: "helixBigKey", x: 120, y: 272, type: "loot", lootType: "bigKey", lootLevel: 1},
+        {status: "closedSwitch", id: "helixBigKeyShortcut", x: 120, y: 320, type: "door", style: "ladderUp", d: "up"},
+        {status: "normal", id: "helixBigKeyShortcut", x: 120, y: 296, type: "floorSwitch", saveStatus: "forever", targetObjectId: "helixBigKeyShortcut"},
         {status: "normal", id: "", x: 512, y: 320, type: "door", style: "ladderUp", d: "up"},
     ],
     sections: [
