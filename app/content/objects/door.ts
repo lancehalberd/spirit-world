@@ -324,7 +324,7 @@ export class Door implements ObjectInstance {
             if (hit.element === 'fire') {
                 this.isFrozen = false;
                 saveObjectStatus(state, this.definition, true, 'melted');
-                playAreaSound(state, this.area, 'doorOpen');
+                playAreaSound(state, this.area, 'secretChime');
                 return { hit: true };
             }
             return { hit: true, blocked: true };
