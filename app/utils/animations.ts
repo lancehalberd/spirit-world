@@ -130,6 +130,39 @@ export function drawFrameAt(
         tx | 0, ty | 0, tw | 0, th | 0);
 }
 
+export function drawFrameReflectedAt(
+    context: CanvasRenderingContext2D,
+    {image, content, x, y, w, h}: Frame,
+    {x: tx, y: ty, w: tw, h: th}: {x: number, y: number, w?: number, h?: number}
+): void {
+    const cw = content?.w ?? w;
+    const ch = content?.h ?? h;
+    // First set tw/th to the target size of the content of the frame.
+    tw = tw ?? cw;
+    th = th ?? ch;
+    const xScale = tw / cw;
+    const yScale = th / ch;
+    const cx = (content?.x || 0) * xScale;
+    const cy = (content?.y || 0) * yScale;
+    // Before drawing, set tw/th to the target size of the entire frame.
+    tw = (xScale * w) | 0;
+    th = (yScale * h) | 0;
+    context.save();
+        context.translate(tx + cw * xScale / 2, 0);
+        context.scale(-1, 1);
+        if (image instanceof HTMLCanvasElement) {
+            drawCanvas(context, image,
+                {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
+                {x: -cw * xScale / 2 - cx | 0, y: (ty - cy) | 0, w: tw, h: th}
+            );
+            return;
+        }
+        context.drawImage(image,
+            x | 0, y | 0, w | 0, h | 0,
+            -cw * xScale / 2 - cx | 0, (ty - cy) | 0, tw, th);
+    context.restore();
+}
+
 export function drawFrameCenteredAt(
     context: CanvasRenderingContext2D,
     {image, content, x, y, w, h}: Frame,

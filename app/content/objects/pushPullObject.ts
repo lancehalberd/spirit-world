@@ -8,13 +8,16 @@ import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/direction';
 
 
-const [potFrame] = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18, content: {x: 0, y: 2, w: 16, h: 16}}).frames;
+const potGeometry = {w: 32, h: 32, content: {x: 8, y: 16, w: 16, h: 16}};
+const [potFrame] = createAnimation('gfx/objects/Pots.png', potGeometry,{y: 6, left: 8, cols: 6, duration: 4}).frames;
+const [spiritPotFrame] = createAnimation('gfx/objects/Pots.png', potGeometry,{y: 7, left: 8, cols: 6, duration: 4}).frames;
 const [largeElephantFrame] = createAnimation('gfx/objects/elephants.png', {w: 32, h: 48, content: {x: 1, y: 24, w: 30, h: 24}}).frames;
 const [smallElephantFrame] = createAnimation('gfx/objects/elephants.png',
     {w: 18, h: 26, content: {x: 1, y: 12, w: 16, h: 12}}, {left: 47, top: 22}).frames;
 
 interface PushPullObjectStyle {
     frame: Frame
+    spiritFrame?: Frame
     weight: number
     pushSpeed: number
 }
@@ -22,6 +25,7 @@ interface PushPullObjectStyle {
 export const pushPullObjectStyles: {[key in string]: PushPullObjectStyle} = {
     pot: {
         frame: potFrame,
+        spiritFrame: spiritPotFrame,
         weight: 0,
         pushSpeed: 1,
     },
@@ -187,7 +191,8 @@ export class PushPullObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        const frame = this.getStyle().frame;
+        let {spiritFrame, frame} = this.getStyle();
+        frame = this.definition.spirit ? (spiritFrame || frame) : frame;
         drawFrameAt(context, frame, {x: this.x, y: this.y - this.z});
     }
 }

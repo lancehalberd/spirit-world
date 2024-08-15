@@ -3,20 +3,21 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { PushPullObject } from 'app/content/objects/pushPullObject'
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrameAt, drawFrameReflectedAt, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 
-
-//const crackedPotFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}).frames[0];
 const particleFrames: Frame[] = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 6, cols: 5}).frames;
-//const remainsFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 3}).frames[0];
-const fallingAnimation: FrameAnimation = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18},
-    {cols: 6, duration: 4}, {loop: false}
-);
+const geometry = {w: 32, h: 32, content: {x: 8, y: 16, w: 16, h: 16}};
+const fallLeftSpiritAnimation = createAnimation('gfx/objects/Pots.png', geometry,{y: 0, left: 8, cols: 6, duration: 4}, {loop: false});
+const fallUpSpiritAnimation = createAnimation('gfx/objects/Pots.png', geometry,{y: 1, left: 8, cols: 6, duration: 4}, {loop: false});
+const fallDownSpiritAnimation = createAnimation('gfx/objects/Pots.png', geometry,{y: 2, left: 8, cols: 6, duration: 4}, {loop: false});
+const fallLeftAnimation = createAnimation('gfx/objects/Pots.png', geometry,{y: 3, left: 8, cols: 6, duration: 4}, {loop: false});
+const fallUpAnimation = createAnimation('gfx/objects/Pots.png', geometry,{y: 4, left: 8, cols: 6, duration: 4}, {loop: false});
+const fallDownAnimation = createAnimation('gfx/objects/Pots.png', geometry,{y: 5, left: 8, cols: 6, duration: 4}, {loop: false});
 
-const frozenPotFrame: Frame = createAnimation('gfx/objects/frozenPot.png', {w: 16, h: 18}).frames[0];
+const frozenPotFrame: Frame = createAnimation('gfx/objects/Pots.png', geometry, {y: 8, left: 8}).frames[0];
 
 export class TippableObject implements ObjectInstance {
     area: AreaInstance;
@@ -42,7 +43,7 @@ export class TippableObject implements ObjectInstance {
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
     shattered = this.definition.shattered || false;
-    animationTime = this.shattered ? fallingAnimation.duration : 0;
+    animationTime = this.shattered ? fallDownAnimation.duration : 0;
     constructor(state: GameState, public definition: TippableObjectDefinition) {}
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -56,6 +57,7 @@ export class TippableObject implements ObjectInstance {
         } else if (!this.fallDirection && hit.canPush ) {
             if (!this.fallInDirection(state, hit.direction)) {
                 this.fallInPlace(state);
+                this.fallDirection = hit.direction
             }
         }
         return { hit: true, stopped: true };
@@ -93,6 +95,7 @@ export class TippableObject implements ObjectInstance {
             this.fallInDirection(state, direction);
         } else {
             this.fallInPlace(state);
+            this.fallDirection = direction;
         }
     }
     onPush(state: GameState, direction: Direction): void {
@@ -180,7 +183,7 @@ export class TippableObject implements ObjectInstance {
                 this.y += directionMap[this.fallDirection][1];
             }
         }
-        if (this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
+        if (this.animationTime >= (fallDownAnimation.frames.length - 1) * FRAME_LENGTH * fallDownAnimation.frameDuration) {
             this.shattered = true;
             this.pullingHeroDirection = null;
             this.releaseBrokenPot(state);
@@ -195,8 +198,19 @@ export class TippableObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        const frame = getFrame(fallingAnimation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 2 - this.z });
+        if (this.fallDirection === 'right') {
+            const frame = getFrame(this.definition.spirit ? fallLeftSpiritAnimation : fallLeftAnimation, this.animationTime);
+            drawFrameReflectedAt(context, frame, {x: this.x, y: this.y - this.z });
+        } else {
+            let animation = this.definition.spirit ? fallUpSpiritAnimation : fallUpAnimation;
+            if (this.fallDirection === 'left') {
+                animation = this.definition.spirit ? fallLeftSpiritAnimation : fallLeftAnimation;
+            } else if (this.fallDirection === 'down' || this.fallDirection === 'downleft' || this.fallDirection === 'downright') {
+                animation = this.definition.spirit ? fallDownSpiritAnimation : fallDownAnimation;
+            }
+            const frame = getFrame(animation, this.animationTime);
+            drawFrameAt(context, frame, {x: this.x, y: this.y - this.z });
+        }
     }
 }
 objectHash.tippable = TippableObject;
@@ -231,6 +245,6 @@ class FrozenPotObject extends PushPullObject  {
         return crackedPot
     }
     render(context, state: GameState) {
-        drawFrame(context, frozenPotFrame, { ...frozenPotFrame, x: this.x, y: this.y - 2 - this.z});
+        drawFrameAt(context, frozenPotFrame, {x: this.x, y: this.y - this.z});
     }
 }

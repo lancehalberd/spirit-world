@@ -12,6 +12,9 @@ Bugs:
               or rolling stones.
             - This feels strange when an enemy is hit offscreen passively, like a squirrel running into thorn bushes.
                 - Probably enemies shouldn't run into thorn bushes anyway.
+        - Pot can render in front of you when standing on ledge above it.
+            - Not sure if this is fixable as it seems to require a real z value to correct.
+            - We should probably just avoid allowing objects to be next to vertical ledges to prevent this.
 
     Cannot reproduce:
         - Fix bug: possible to defeat frost beast without getting reward somehow
@@ -61,7 +64,9 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Pots
+    - Fix air streams shouldn't let you fall in pits when wearing the cloud boots.
+        - But you should fall with normal/iron boots.
+
     - New cave pits
         - Use in Tomb+Elder basement
 
@@ -88,6 +93,8 @@ Current tasks:
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
         - Make crystal cracked ground become crystal pits.
+
+    - Consider changing tippable pots to just fall in the direction you push them using moveObject.
 
     - Replace low stones underwater with walls or taller obstacles.
 
@@ -119,9 +126,6 @@ Current tasks:
 
     - Add a better indication for which clone(s)+staff(s) are controlled.
 
-    - Improve magma graphics
-        - Get animated frames if possible.
-
     - Add coil graphics for lightning barriers. 3x styles.
 
     - Prevent weapon knockback from triggering area transition.
@@ -132,7 +136,6 @@ Current tasks:
         - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
 
     - Possible work items:
-        - Add placeholder for prologue
         - Add final dungeon
             - Would prefer to have Vanara Ship tiles
         - Add sky city
@@ -159,11 +162,7 @@ Current tasks:
 
     - Add additional pit corner tiles to the future tile set and use them in Staff Tower to clean up corners.
 
-
     - Mechanic for breaking crystal barriers open is unintuitive.
-    - Allow equipping a third tool instead of the Chakram?
-        - This would require HUD updates to indicate all three tools.
-        - Alternatively, we could have different base weapons that you could switch between.
     - Add 4th spirit upgrade that let's you swap between worlds while meditating.
 
     - Brainstorm more clone tool puzzles.
@@ -295,9 +294,6 @@ Current tasks:
 
     - Fix push/pull interactions with ledges.
         - Minor issues:
-            - Pot can render in front of you when standing on ledge above it.
-                - Not sure if this is fixable as it seems to require a real z value to correct.
-                - We should probably just avoid allowing objects to be next to vertical ledges to prevent this.
             - Moving sideways can be blocked in a passage that is exactly 32px wide even though ideally everything would wiggle into place.
                 - This is pretty uncommon but can still happen even with code to move the player towards objects on grab.
                 - The issue is that if the player's subpixel doesn't match the pot, when the pot can no longer move forward, the player is stuck at
