@@ -66,6 +66,7 @@ export const lavaStone: TileSource = {
     },
 };
 
+// This is 3 bubbles + 4 diamond patterns.
 export const lavaBubbles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/lavaAnimations.png', {x: 0, y: 240, w: 16, h: 112}),

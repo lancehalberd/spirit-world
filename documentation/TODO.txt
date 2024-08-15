@@ -64,9 +64,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix air streams shouldn't let you fall in pits when wearing the cloud boots.
-        - But you should fall with normal/iron boots.
-
     - New cave pits
         - Use in Tomb+Elder basement
 

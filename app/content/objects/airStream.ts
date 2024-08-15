@@ -130,7 +130,7 @@ export class AirStream implements ObjectInstance {
                 // Push the actor aloft slightly.
                 // This is intended to be small enough that players still fall with normal boots
                 // but large enough to keep players with cloud boots in the air.
-                actor.z = Math.max(actor.z, Math.min(actor.z + 0.3 * windForce, 2));
+                actor.z = Math.max(actor.z, Math.min(actor.z + 0.5 * windForce, 3));
                 const vx = speed * dx, vy = speed * dy;
                 moveActor(state, actor, vx, vy, {
                     canFall: true,
