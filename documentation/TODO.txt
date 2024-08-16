@@ -64,14 +64,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix fade transitions with lava don't work.
-        - Probably something to do with animation.
-
-    - Check area transitions with foreground layers looks correct
-        - Staff tower near trees
-        - Crater lava draining
-        - Forge lava draining
-
     - Add code for adding tile based decorations periodically to the scene:
         - Each frame deterministically choose ~10 tiles spread out across the scene.
         - Check tile behaviors around the chosen tile and randomly add a matching animation effect

@@ -135,7 +135,7 @@ export function checkToRedrawTiles(area: AreaInstance) {
 */
 
 export function checkToRedrawTiles(area: AreaInstance) {
-    if (editingState.isEditing) {
+    //if (editingState.isEditing) {
         const w = 16, h = 16;
         for (let y = 0; y < area.h; y++) {
             if (!area.tilesDrawn[y]) {
@@ -148,7 +148,9 @@ export function checkToRedrawTiles(area: AreaInstance) {
                             continue;
                         }
                         backgroundFrame.tilesDrawn[y][x] = false;
-                        backgroundFrame.context.clearRect(x * w, y * h, w, h);
+                        if (editingState.isEditing) {
+                            backgroundFrame.context.clearRect(x * w, y * h, w, h);
+                        }
                     }
                     for (const foregroundFrame of area.foregroundFrames) {
                         if (!foregroundFrame.tilesDrawn[y]?.[x]) {
@@ -161,7 +163,7 @@ export function checkToRedrawTiles(area: AreaInstance) {
                 }
             }
         }
-    }
+    //}
     area.drawnFrames = new Set();
     area.checkToRedrawTiles = false;
 }
@@ -535,6 +537,7 @@ export function renderArea(context: CanvasRenderingContext2D, state: GameState, 
         checkToRedrawTiles(area);
         updateLightingCanvas(area);
     }
+    drawRemainingFrames(state, area);
     // Draw the field, enemies, objects and hero.
     renderAreaBackground(context, state, area);
     renderAreaObjectsBeforeHero(context, state, area);
@@ -959,6 +962,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             if (area.checkToRedrawTiles) {
                 checkToRedrawTiles(area);
                 updateLightingCanvas(area);
+                drawRemainingFrames(state, area);
                 if (state.underwaterAreaInstance) {
                     updateWaterSurfaceCanvas(state);
                 }

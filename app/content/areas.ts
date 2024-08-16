@@ -529,7 +529,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 }
             }
 
-            // If this is the transition currently being viewed, then apply either fast or normal transition logic.
+            // If this is the instance currently being viewed, then apply either fast or normal transition logic.
             if (state.areaInstance === instance) {
                 if (fastRefresh) {
                     state.areaInstance = nextAreaInstance;
