@@ -6,7 +6,6 @@ import {
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
     WATER_TRANSITION_DURATION,
-    variantSeed,
 } from 'app/gameConstants';
 import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
 import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
@@ -14,7 +13,6 @@ import { drawFrame } from 'app/utils/animations';
 import { getBackgroundFrame, getBackgroundFrameIndex } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { getFieldInstanceAndParts } from 'app/utils/objects';
-import SRandom from 'app/utils/SRandom';
 
 // This is the max size of the spirit sight circle.
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
@@ -247,7 +245,7 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
     }
 }
 
-const baseVariantRandom = SRandom.seed(variantSeed);
+//const baseVariantRandom = SRandom.seed(variantSeed);
 
 const [maskCanvas, maskContext] = createCanvasAndContext(16, 16);
 export function renderLayer(layer: AreaLayer, parentLayer: AreaLayerDefinition, areaFrame: AreaFrame, frameIndex: number): void {
@@ -297,40 +295,13 @@ export function renderLayer(layer: AreaLayer, parentLayer: AreaLayerDefinition, 
                     drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
                     maskContext.globalCompositeOperation = 'source-in';
                     renderTileFrame(tile, frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
-                    /*if (tile.behaviors?.render) {
-                        tile.behaviors?.render(maskContext, tile, {x: 0, y: 0, w: 16, h: 16}, 0);
-                    } else {
-                        drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});
-                    }*/
                     // Draw the masked content first, then the mask frame on top.
                     //window['debugCanvas'](maskCanvas);
                     context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
                 }
                 renderTileFrame(maskTile, frameIndex, context, {x: x * w, y: y * h, w, h});
-                /*if (maskTile.behaviors?.render) {
-                    maskTile.behaviors?.render(context, maskTile, {x: x * w, y: y * h, w, h}, 0);
-                } else {
-                    drawFrame(context, maskTile.frame, {x: x * w, y: y * h, w, h});
-                }*/
             } else if (tile) {
                 renderTileFrame(tile, frameIndex, context, {x: x * w, y: y * h, w, h});
-                /*if (tile.behaviors?.render) {
-                    tile.behaviors?.render(context, tile, {x: x * w, y: y * h, w, h}, 0);
-                } else {
-                    drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
-                }*/
-            }
-            // Automatically added lava bubble animations on top of random lava tiles.
-            // Only allow certain tiles so the bubbles will always be spread out a bit.
-            if (tile?.behaviors?.isLava && x % 11 === (4 * y) % 11) {
-                const lavaDecorationTiles = [295, 296, 297];//, 298, 299, 300, 301];
-                // TODO: Add a key for each area instance to make this pattern different.
-                let random = baseVariantRandom.addSeed(x).addSeed(y);
-                if (random.generateAndMutate() < 0.5) {
-                    const tile = random.element(lavaDecorationTiles);
-                    const frameOffset = random.range(0, 5);
-                    renderTileFrame(allTiles[tile], (frameIndex + frameOffset) % 6, context, {x: x * w, y: y * h, w, h});
-                }
             }
             context.restore();
         }

@@ -3,6 +3,7 @@ import { Enemy } from 'app/content/enemy';
 import { setEquippedElement } from 'app/content/menu';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
+import { addAmbientEffects } from 'app/scenes/field/addAmbientEffects';
 import { wasGameKeyPressed } from 'app/userInput';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
@@ -17,6 +18,7 @@ export function updateField(this: void, state: GameState) {
         updateCamera(state);
         return;
     }
+    addAmbientEffects(state);
     state.fieldTime += FRAME_LENGTH;
     state.hero.savedData.playTime += FRAME_LENGTH;
     // Remove completed screenshakes. If this is not checked each time the fieldTime is advanced
