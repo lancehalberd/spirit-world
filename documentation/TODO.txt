@@ -64,9 +64,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - New cave pits
-        - Use in Tomb+Elder basement
-
     - Add code for adding tile based decorations periodically to the scene:
         - Each frame deterministically choose ~10 tiles spread out across the scene.
         - Check tile behaviors around the chosen tile and randomly add a matching animation effect

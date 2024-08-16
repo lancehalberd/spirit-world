@@ -36,7 +36,7 @@ import {
     ledgeBehaviors,
 } from 'app/content/tiles/constants';
 import { paletteHash } from 'app/content/tiles/paletteHash';
-import { allCavePitTileSources } from 'app/content/tiles/cavePits';
+import { allCavePitTileSources, cavePitHorizontalWalls, cavePitAngledWalls } from 'app/content/tiles/cavePits';
 import { allCrystalCavePitTileSources } from 'app/content/tiles/crystalCavePits';
 import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
@@ -1088,7 +1088,9 @@ addTiles([
     ...allCavePitTileSources,
     ...allCrystalCavePitTileSources,
     ledgeBehaviors,
-    deletedTiles(14),
+    cavePitHorizontalWalls,
+    cavePitAngledWalls,
+    deletedTiles(6),
     clouds,
     railsTiles,
     spiritRailsTiles,

@@ -26,7 +26,7 @@ const cavePitEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame(cavePitsImage, {x: 112, y: 64, w: 80, h: 48}),
     behaviors: {
-        'all': { defaultLayer: 'floor2', isGround: false },
+        'all': { defaultLayer: 'field', isGround: false },
     },
     paletteTargets: [{key: 'pits', x, y}],
     tileCoordinates: [
@@ -34,6 +34,29 @@ const cavePitEdges: TileSource = {
         [0, 1],        [4, 1],
         [0, 2],        [4, 2],
     ],
+};
+
+export const cavePitAngledWalls: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(cavePitsImage, {x: 96, y: 128, w: 32, h: 32}),
+    behaviors: {
+        '0x0': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '1x0': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '0x1': { defaultLayer: 'floor2', pit: true },
+        '1x1': { defaultLayer: 'floor2', pit: true },
+    },
+};
+
+export const cavePitHorizontalWalls: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(cavePitsImage, {x: 144, y: 128, w: 32, h: 32}),
+    behaviors: {
+        '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '1x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        //'all': { defaultLayer: 'floor2', pit: true, pitWall: true },
+    },
 };
 
 // Read a single frame selected on a brush from a source image.
