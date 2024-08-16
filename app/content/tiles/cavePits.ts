@@ -55,7 +55,6 @@ export const cavePitHorizontalWalls: TileSource = {
         '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
         '0x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
         '1x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
-        //'all': { defaultLayer: 'floor2', pit: true, pitWall: true },
     },
 };
 
