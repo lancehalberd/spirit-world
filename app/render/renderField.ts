@@ -106,6 +106,34 @@ export function translateContextForAreaAndCamera(context: CanvasRenderingContext
     context.translate((-state.camera.x + area.cameraOffset.x) | 0, (-state.camera.y + area.cameraOffset.y) | 0);
 }
 
+/*
+export function checkToRedrawTiles(area: AreaInstance) {
+    if (editingState.isEditing) {
+        const w = 16, h = 16;
+        for (let y = 0; y < area.h; y++) {
+            for (let x = 0; x < area.w; x++) {
+                if (!area.tilesDrawn?.[y]?.[x]) {
+                    area.context.clearRect(x * w, y * h, w, h);
+                    if (area.foregroundContext) {
+                        area.foregroundContext.clearRect(x * w, y * h, w, h);
+                    }
+                }
+            }
+        }
+    }
+    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers?.[index]));
+    for (let y = 0; y < area.h; y++) {
+        if (!area.tilesDrawn[y]) {
+            area.tilesDrawn[y] = [];
+        }
+        for (let x = 0; x < area.w; x++) {
+            area.tilesDrawn[y][x] = true;
+        }
+    }
+    area.checkToRedrawTiles = false;
+}
+*/
+
 export function checkToRedrawTiles(area: AreaInstance) {
     if (editingState.isEditing) {
         const w = 16, h = 16;
@@ -120,11 +148,7 @@ export function checkToRedrawTiles(area: AreaInstance) {
                             continue;
                         }
                         backgroundFrame.tilesDrawn[y][x] = false;
-                        // The background should be opaque, so no need to clear old tiles in general.
-                        // While editing we need to clear them because we draw many layer with transparency.
-                        if (editingState.isEditing) {
-                            backgroundFrame.context.clearRect(x * w, y * h, w, h);
-                        }
+                        backgroundFrame.context.clearRect(x * w, y * h, w, h);
                     }
                     for (const foregroundFrame of area.foregroundFrames) {
                         if (!foregroundFrame.tilesDrawn[y]?.[x]) {
@@ -161,10 +185,18 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
             if (isForeground) {
                 continue;
             }
-            renderLayer(area, layer, area.definition.parentDefinition?.layers?.[index], backgroundFrame, frameIndex);
+            renderLayer(layer, area.definition.parentDefinition?.layers?.[index], backgroundFrame, frameIndex);
         }
         // console.log('Drawing backgroundFrame', frameIndex);
         area.drawnFrames.add(backgroundFrame);
+        for (let y = 0; y < area.h; y++) {
+            if (!backgroundFrame.tilesDrawn[y]) {
+                backgroundFrame.tilesDrawn[y] = [];
+            }
+            for (let x = 0; x < area.w; x++) {
+                backgroundFrame.tilesDrawn[y][x] = true;
+            }
+        }
         break;
     }
     for (let i = 0; i < 1; i++) {
@@ -195,11 +227,19 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
                     tilesDrawn: [],
                 }
             }
-            renderLayer(area, layer, area.definition.parentDefinition?.layers?.[index], foregroundFrame, frameIndex);
+            renderLayer(layer, area.definition.parentDefinition?.layers?.[index], foregroundFrame, frameIndex);
         }
         if (foregroundFrame) {
             // console.log('Drawing foregroundFrame', frameIndex);
             area.drawnFrames.add(foregroundFrame);
+            for (let y = 0; y < area.h; y++) {
+                if (!foregroundFrame.tilesDrawn[y]) {
+                    foregroundFrame.tilesDrawn[y] = [];
+                }
+                for (let x = 0; x < area.w; x++) {
+                    foregroundFrame.tilesDrawn[y][x] = true;
+                }
+            }
         }
         break;
     }
@@ -208,7 +248,7 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
 const baseVariantRandom = SRandom.seed(variantSeed);
 
 const [maskCanvas, maskContext] = createCanvasAndContext(16, 16);
-export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition, areaFrame: AreaFrame, frameIndex: number): void {
+export function renderLayer(layer: AreaLayer, parentLayer: AreaLayerDefinition, areaFrame: AreaFrame, frameIndex: number): void {
     const w = 16, h = 16;
     const context = areaFrame.context;
     context.save();
