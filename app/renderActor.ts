@@ -304,6 +304,8 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
 
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
     const hitbox = enemy.getMovementHitbox();
+    //context.fillStyle = 'red';
+    //context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
     if (enemy.w > 0) {
         context.save();
             context.fillStyle = 'black';

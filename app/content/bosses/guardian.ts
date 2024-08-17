@@ -22,7 +22,7 @@ import { getVectorToNearbyTarget, getVectorToMovementTarget, getVectorToTarget }
 
 // Taken from heroAnimations.ts
 export const Y_OFF = -4;
-const guardianSpiritGeometry: FrameDimensions = {w: 24, h: 32, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const guardianSpiritGeometry: FrameDimensions = {w: 24, h: 32, content: {x: 4, y: 16, w: 16, h: 16}};
 const guardianSpiritUpAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 2, duration: 5});
 const guardianSpiritDownAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 0, duration: 5});
 const guardianSpiritLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 3, duration: 5});
@@ -152,6 +152,19 @@ function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
     }
 }
 
+function getProjectionAlpha(enemy: Enemy) {
+    let alpha = Math.min(1, 0.2 + 2 * enemy.life / enemy.enemyDefinition.life);
+    if (enemy.mode === 'teleport') {
+        if (enemy.modeTime < 600) {
+            alpha *= (600 - enemy.modeTime) / 600;
+        } else if (enemy.modeTime >= 1400) {
+            alpha *= Math.min(1, (enemy.modeTime - 1400) / 600);
+        } else {
+            alpha = 0;
+        }
+    }
+    return alpha;
+}
 enemyDefinitions.guardianProjection = {
     animations: guardianSpiritAnimations, life: 20, scale: 1, update: updateProjection,
     canBeKnockedBack: false,
@@ -180,18 +193,14 @@ enemyDefinitions.guardianProjection = {
     },
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         context.save();
-            let alpha = Math.min(1, 0.2 + 2 * enemy.life / enemy.enemyDefinition.life);
-            if (enemy.mode === 'teleport') {
-                if (enemy.modeTime < 600) {
-                    alpha *= (600 - enemy.modeTime) / 600;
-                } else if (enemy.modeTime >= 1400) {
-                    alpha *= Math.min(1, (enemy.modeTime - 1400) / 600);
-                } else {
-                    alpha = 0;
-                }
-            }
-            context.globalAlpha *= alpha;
+            context.globalAlpha *= getProjectionAlpha(enemy);
             enemy.defaultRender(context, state);
+        context.restore();
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        context.save();
+            context.globalAlpha *= getProjectionAlpha(enemy);
+            enemy.defaultRenderShadow(context,state);
         context.restore();
     }
 };
@@ -511,14 +520,16 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         if (!enemy.activeAbility && enemy.modeTime < 200) {
             const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
             if (v?.mag >= 80) {
-                enemy.tryUsingAbility(state, mediumBlastAbility);
+                if (enemy.tryUsingAbility(state, mediumBlastAbility)) {
+                    enemy.life -= 2;
+                }
                 enemy.params.chargeDirection = {x: v.x, y: v.y};
                 enemy.vx = enemy.vy = 0;
                 enemy.setMode('charge');
-                enemy.life -= 2;
             } else {
-                enemy.tryUsingAbility(state, blastAbility);
-                enemy.life -= 2;
+                if (enemy.tryUsingAbility(state, blastAbility)) {
+                    enemy.life -= 2;
+                }
             }
         } else if (enemy.modeTime >= 2000) {
             enemy.setMode('choose');
