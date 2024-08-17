@@ -64,8 +64,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Render 1px shadow around base of elephant statues to make them look more moveable.
-
     - Fix push/pull animations change depending on key pressed while the game is paused.
 
     - Fix snakes/beetles show frozen frame briefly when killed with ice.

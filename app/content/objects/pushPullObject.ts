@@ -13,13 +13,14 @@ const [potFrame] = createAnimation('gfx/objects/Pots.png', potGeometry,{y: 6, le
 const [spiritPotFrame] = createAnimation('gfx/objects/Pots.png', potGeometry,{y: 7, left: 8, cols: 6, duration: 4}).frames;
 const [largeElephantFrame] = createAnimation('gfx/objects/elephants.png', {w: 32, h: 48, content: {x: 1, y: 24, w: 30, h: 24}}).frames;
 const [smallElephantFrame] = createAnimation('gfx/objects/elephants.png',
-    {w: 18, h: 26, content: {x: 1, y: 12, w: 16, h: 12}}, {left: 47, top: 22}).frames;
+    {w: 18, h: 26, content: {x: 1, y: 14, w: 16, h: 12}}, {left: 47, top: 22}).frames;
 
 interface PushPullObjectStyle {
     frame: Frame
     spiritFrame?: Frame
     weight: number
     pushSpeed: number
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance) => void
 }
 
 export const pushPullObjectStyles: {[key in string]: PushPullObjectStyle} = {
@@ -33,11 +34,30 @@ export const pushPullObjectStyles: {[key in string]: PushPullObjectStyle} = {
         frame: largeElephantFrame,
         weight: 2,
         pushSpeed: 0.5,
+        renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance) {
+            console.log('Render big shadow');
+            const x = object.x | 0, y = object.y | 0;
+            context.save();
+                context.globalAlpha *= 0.3;
+                context.fillStyle = 'black';
+                context.fillRect(x - 1, y + 4, 32, 19);
+                context.fillRect(x, y + 23, 30, 1);
+                context.fillRect(x + 1, y + 24, 28, 1);
+            context.restore();
+        },
     },
     smallStatue: {
         frame: smallElephantFrame,
         weight: 2,
         pushSpeed: 0.75,
+        renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance) {
+            const x = object.x | 0, y = object.y | 0;
+            context.save();
+                context.globalAlpha *= 0.3;
+                context.fillStyle = 'black';
+                context.fillRect(x, y + 1, 16, 12);
+            context.restore();
+        },
     },
 }
 
@@ -194,6 +214,9 @@ export class PushPullObject implements ObjectInstance {
         let {spiritFrame, frame} = this.getStyle();
         frame = this.definition.spirit ? (spiritFrame || frame) : frame;
         drawFrameAt(context, frame, {x: this.x, y: this.y - this.z});
+    }
+    renderShadow(context, state: GameState) {
+        this.getStyle().renderShadow?.(context, state, this);
     }
 }
 objectHash.pushPull = PushPullObject;
