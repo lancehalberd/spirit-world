@@ -1,5 +1,4 @@
 import { EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH } from 'app/gameConstants';
-import { getCloneMovementDeltas } from 'app/userInput';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/direction';
@@ -81,7 +80,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'grabbing':
             const [dx, dy] = directionMap[hero.d];
             const oppositeDirection = getDirection(-dx, -dy);
-            const [kdx, kdy] = getCloneMovementDeltas(state, hero);
+            const [kdx, kdy] = (hero.lastMovementDeltas || [0, 0]);
             if (hero.grabObject?.pullingHeroDirection === oppositeDirection) {
                 lastPullAnimation = hero.wading ? heroShallowAnimations.pull : heroAnimations.pull;
                 return getFrame(lastPullAnimation[hero.d], hero.animationTime);

@@ -240,6 +240,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
         return;
     }
+    if (isPlayerControlled) {
+        hero.lastMovementDeltas = getCloneMovementDeltas(state, hero);
+    }
     if (hero.action === 'grabbing') {
         hero.z = minZ;
         hero.slipping = false;
@@ -258,7 +261,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.grabTile = null;
             hero.grabObject = null;
         } else if (isPlayerControlled && hero.grabObject?.onPull) {
-            const [pulldx, pulldy] = getCloneMovementDeltas(state, hero);
+            const [pulldx, pulldy] = (hero.lastMovementDeltas || [0, 0]);
             if (pulldx || pulldy) {
                 const direction = getDirection(pulldx, pulldy);
                 hero.grabObject.onPull(state, direction, hero);
@@ -431,7 +434,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (isPlayerControlled && !isMovementBlocked) {
-        [dx, dy] = getCloneMovementDeltas(state, hero);
+        [dx, dy] = (hero.lastMovementDeltas || [0, 0]);
         if (dx || dy) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;

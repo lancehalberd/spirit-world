@@ -83,6 +83,7 @@ export class Hero implements Actor {
     jumpingVy?: number;
     jumpingVz?: number;
     jumpingDownY?: number;
+    lastMovementDeltas?: number[];
     isJumpingWrecklessly?: boolean;
     // This must be set when jumping to allow using trampolines.
     // It is set to false to prevent trampolining in certain circumstances while jumping.

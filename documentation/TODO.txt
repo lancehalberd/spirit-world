@@ -64,8 +64,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix push/pull animations change depending on key pressed while the game is paused.
-
     - Fix snakes/beetles show frozen frame briefly when killed with ice.
         - Doesn't happen for plants
 
@@ -247,10 +245,6 @@ Current tasks:
         - For arrows specifically, maybe they can still deal normal damage.
     - Fire/Ice arrows bounce of void hands when they are up in the air.
     - Should we prevent throwing rocks up ledges?
-
-    - Pulling animation changes when pressing a direction while the game is paused
-        - Game inputs should not be read while rendering.
-            - If this is needed, they need to be recorded elsewhere to the state to where they are not updated when paused.
 
     Swimming bugs:
         - Chakram/bow fire when armed and you unequip iron boots
@@ -511,9 +505,6 @@ Current tasks:
 
     - Forge
         - Gold mail offered by NPC if you bring gold ore and 500 money
-
-    - Heavy 2x2 blocks that can only be pushed if the player has mitts
-        - Make this a variation of push/pull object that is 32x32
 
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
