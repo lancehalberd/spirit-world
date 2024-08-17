@@ -139,7 +139,7 @@ const beastState = applyItems(helixEndState, {
     trueSight: 1, ironSkin: 1,
     gloves: 2, goldMail: 1,
     roll: 2, nimbusCloud: 1,
-    bow: 2, phoenixCrown: 1,
+    bow: 2,
     spiritDamage: 1, spiritRange: 1,
 });
 
@@ -174,7 +174,7 @@ const staffAquiredState = applyItems(staffBossState, {lightning: 1}, [
     'staffTowerActivated'
 ]);
 
-const warshipStartState = applyItems(staffAquiredState, {staff: 2});
+const warshipStartState = applyItems(staffAquiredState, {staff: 2, phoenixCrown: 1});
 
 const finalBoss1State = applyItems(warshipStartState, {clone: 2, maxLife: 5});
 
