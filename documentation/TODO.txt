@@ -64,6 +64,9 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Guardian projection shadow should fade out with the projection.
+    - Remove phoenix crown from equipment for elemental dungeon test states.
+
     - Fix snakes/beetles show frozen frame briefly when killed with ice.
         - Doesn't happen for plants
 
