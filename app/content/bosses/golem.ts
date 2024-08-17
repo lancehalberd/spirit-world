@@ -275,6 +275,7 @@ enemyDefinitions.golemHand = {
     flipRight: true,
     ignorePits: true,
     canBeKnockedBack: false, canBeKnockedDown: false,
+    hasCustomHurtAnimation: true,
     showHealthBar: true,
     acceleration: 0.3, speed: 4,
     immunities: ['fire', 'ice'],
@@ -393,6 +394,11 @@ enemyDefinitions.golemHand = {
         if (enemy.enemyInvulnerableFrames) {
             // This only works if golemHandHurtAnimations parallels the `golemHandAnimations`
             // that the base golem hand uses to render.
+            if (!golemHandHurtAnimations[enemy.currentAnimationKey]) {
+                debugger;
+                console.error('Missing golemHandHurtAnimations frame', enemy.currentAnimationKey);
+                return;
+            }
             const animation = golemHandHurtAnimations[enemy.currentAnimationKey][enemy.d];
             const frame = getFrame(animation, enemy.animationTime);
             enemy.defaultRender(context, state, frame);

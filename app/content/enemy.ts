@@ -278,7 +278,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.canBeKnockedBack) {
             this.activeAbility = null;
         }
-        this.changeToAnimation('hurt');
+        if (!this.enemyDefinition.hasCustomHurtAnimation) {
+            this.changeToAnimation('hurt');
+        }
         this.action = 'knocked';
         this.isAirborn = true;
         this.animationTime = 0;
@@ -372,7 +374,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (hit.element === 'fire') {
                 this.applyBurn(hit.damage, 2000);
             }
-            if (this.currentAnimationKey === 'idle') {
+            if (this.currentAnimationKey === 'idle' && !this.enemyDefinition.hasCustomHurtAnimation) {
                 this.changeToAnimation('hurt', this.currentAnimationKey);
             }
         }

@@ -66,6 +66,7 @@ interface EnemyDefinition<Params> {
     floating?: boolean
     // This is used instead of standard code for flying enemies
     updateFlyingZ?: (state: GameState, enemy: Enemy<Params>) => void
+    hasCustomHurtAnimation?: boolean
     hasShadow?: boolean
     ignorePits?: boolean
     life?: number

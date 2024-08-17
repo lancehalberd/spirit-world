@@ -579,6 +579,11 @@ enemyDefinitions.voidHand = {
         if (enemy.enemyInvulnerableFrames) {
             // This only works if golemHandHurtAnimations parallels the `golemHandAnimations`
             // that the base golem hand uses to render.
+            if (!golemHandHurtAnimations[enemy.currentAnimationKey]) {
+                debugger;
+                console.error('Missing golemHandHurtAnimations frame', enemy.currentAnimationKey);
+                return;
+            }
             const animation = golemHandHurtAnimations[enemy.currentAnimationKey][enemy.d];
             const frame = getFrame(animation, enemy.animationTime);
             enemy.defaultRender(context, state, frame);
