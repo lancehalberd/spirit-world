@@ -1,10 +1,10 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
-import { PushPullObject } from 'app/content/objects/pushPullObject'
+import { moveLinkedObject, PushPullObject } from 'app/content/objects/pushPullObject'
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrameAt, drawFrameReflectedAt, getFrame } from 'app/utils/animations';
-import { directionMap, isPointOpen } from 'app/utils/field';
+import { directionMap } from 'app/utils/field';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 
@@ -55,10 +55,7 @@ export class TippableObject implements ObjectInstance {
         if (hit.element === 'ice') {
             this.freezePot(state);
         } else if (!this.fallDirection && hit.canPush ) {
-            if (!this.fallInDirection(state, hit.direction)) {
-                this.fallInPlace(state);
-                this.fallDirection = hit.direction
-            }
+            this.fallInDirection(state, hit.direction)
         }
         return { hit: true, stopped: true };
     }
@@ -91,12 +88,7 @@ export class TippableObject implements ObjectInstance {
         if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return;
         }
-        if (this.grabDirection === direction) {
-            this.fallInDirection(state, direction);
-        } else {
-            this.fallInPlace(state);
-            this.fallDirection = direction;
-        }
+        this.fallInDirection(state, direction, this.grabDirection !== direction);
     }
     onPush(state: GameState, direction: Direction): void {
         if (this.shattered || this.fallDirection || this.fallingInPlace) {
@@ -108,50 +100,21 @@ export class TippableObject implements ObjectInstance {
             this.fallInDirection(state, direction);
         }
     }
-    fallInPlace(state: GameState): void {
-        if (this.shattered || this.fallDirection || this.fallingInPlace) {
-            return;
-        }
-        this.fallingInPlace = true;
-        this.animationTime = -80;
-        if (this.linkedObject) {
-            this.linkedObject.fallingInPlace = true;
-            this.linkedObject.animationTime = -80;
-        }
-    }
-    fallInDirection(state: GameState, direction: Direction): boolean {
-        if (direction === "downleft") {
-            return this.fallInDirection(state, 'down') || this.fallInDirection(state, 'left');
-        }
-        if (direction === "downright") {
-            return this.fallInDirection(state, 'down') || this.fallInDirection(state, 'right');
-        }
-        if (direction === "upleft") {
-            return this.fallInDirection(state, 'up') || this.fallInDirection(state, 'left');
-        }
-        if (direction === "upright") {
-            return this.fallInDirection(state, 'up') || this.fallInDirection(state, 'right');
-        }
+    fallInDirection(state: GameState, direction: Direction, fallInPlace = false): boolean {
         if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return false;
         }
-        const x = this.x + 8 + 16 * directionMap[direction][0];
-        const y = this.y + 8 + 16 * directionMap[direction][1];
-        const movementProps = { canFall: true };
-        if (isPointOpen(state, this.area, {x, y}, movementProps)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProps))
-        ) {
-            this.fallDirection = direction;
-            this.animationTime = -80;
-            this.pullingHeroDirection = direction;
-            if (this.linkedObject) {
-                this.linkedObject.fallDirection = direction;
-                this.linkedObject.animationTime = -80;
-                this.linkedObject.pullingHeroDirection = direction;
-            }
-            return true;
+        this.fallingInPlace = fallInPlace;
+        this.fallDirection = direction;
+        this.animationTime = -80;
+        this.pullingHeroDirection = fallInPlace ? direction : null;
+        if (this.linkedObject) {
+            // The linked object will be moved as the base object is updated.
+            this.linkedObject.fallingInPlace = true;
+            this.linkedObject.animationTime = -80;
+            this.linkedObject.pullingHeroDirection = fallInPlace ? direction : null;
         }
-        return false;
+        return true;
     }
     onDestroy(state: GameState, dx: number, dy: number) {
         addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 2, particleFrames);
@@ -174,13 +137,12 @@ export class TippableObject implements ObjectInstance {
             if (this.animationTime === 200) {
                 this.releaseBrokenPot(state);
             }
-        }
-        if (this.fallDirection) {
+        } else if (this.fallDirection) {
             this.animationTime += FRAME_LENGTH;
             if (this.fallFrame < 16) {
                 this.fallFrame++;
-                this.x += directionMap[this.fallDirection][0];
-                this.y += directionMap[this.fallDirection][1];
+                const [dx, dy] = directionMap[this.fallDirection];
+                moveLinkedObject(state, this, dx, dy);
             }
         }
         if (this.animationTime >= (fallDownAnimation.frames.length - 1) * FRAME_LENGTH * fallDownAnimation.frameDuration) {

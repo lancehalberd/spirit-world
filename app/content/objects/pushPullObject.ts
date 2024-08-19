@@ -289,7 +289,7 @@ function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: numb
     return moveActor(state, hero, dx, dy, movementProperties);
 }
 
-function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, excludedObjects: ObjectInstance[] = []) {
+export function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, excludedObjects: ObjectInstance[] = []) {
     const heroesAndClones = [state.hero, ...(state.hero.clones || [])];
     let blockedBoxes = heroesAndClones.filter(h => !excludedObjects.includes(h) && h.area === object.area).map(h => h.getHitbox());
     const movementProperties: MovementProperties = {
