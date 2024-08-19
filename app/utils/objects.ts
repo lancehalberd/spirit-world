@@ -31,6 +31,16 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         }
     }
 
+    // Note that this doesn't automatically update linked objects, so the `savePosition` flag should
+    // match for linked objects to avoid inconsistencies.
+    if (object.definition?.savePosition) {
+        const p = getObjectStatus(state, object.definition, 'position');
+        if (p) {
+            object.x = p[0];
+            object.y = p[1];
+        }
+    }
+
     if (object.applyBehaviorsToGrid && object.behaviors) {
         const gridRect = hitboxToGrid(object.getHitbox());
         for (let x = gridRect.x; x < gridRect.x + gridRect.w; x++) {
@@ -73,8 +83,11 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     }
 }
 
-export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean | number = true, suffix = ''): void {
+export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix = ''): void {
     let treatment = definition.saveStatus;
+    if (suffix === 'position') {
+        treatment = definition.savePosition;
+    }
     // Make sure treatment is forever for locked doors. Might as well do the same for frozen/cracked doors.
     if (definition.type === 'door' && (
         definition.status === 'locked'
@@ -121,7 +134,7 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
     }
 }
 
-export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition, suffix = ''): boolean | number | string {
+export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition, suffix = ''): boolean | number | number[] | string {
     // Lucky beetles have special logic to prevent farming the same few over and over again.
     if (definition.type === 'enemy' && definition.enemyType === 'luckyBeetle') {
         // Lucky Beetle must have an id in order to appear.

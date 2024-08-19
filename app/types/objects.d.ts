@@ -404,6 +404,8 @@ interface BaseObjectDefinition {
     // If this is unset, the default behavior depends on the object type, for examples enemies are saved for
     // the zone, bosses are saved forever, and most objects aren't saved at all.
     saveStatus?: 'forever' | 'zone' | 'never'
+    // If this is set to 'zone' the object will keep its last position when the area refreshes.
+    savePosition?: 'forever' | 'zone' | 'never'
     // Key for the associated special behaviors from the specialBehaviors hash.
     specialBehaviorKey?: string
     // Whether this is a spirit object.

@@ -6,6 +6,7 @@ import { showMessage } from 'app/scriptEvents';
 import { boxesIntersect } from 'app/utils/index';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/direction';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 
 const potGeometry = {w: 32, h: 32, content: {x: 8, y: 16, w: 16, h: 16}};
@@ -208,6 +209,13 @@ export class PushPullObject implements ObjectInstance {
             }
         } else {
             this.ignorePits = false;
+            // Check to save position if the object has stopped moving.
+            if (this.definition?.savePosition) {
+                const p = getObjectStatus(state, this.definition, 'position');
+                if (p[0] !== this.x || p[1] !== this.y) {
+                    saveObjectStatus(state, this.definition, [this.x, this.y], 'position');
+                }
+            }
         }
     }
     render(context, state: GameState) {

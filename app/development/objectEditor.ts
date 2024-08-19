@@ -457,6 +457,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 saveStatus: definition.saveStatus,
+                savePosition: definition.savePosition,
                 style: definition.style || Object.keys(pushPullObjectStyles)[0],
                 type: definition.type,
             };
@@ -689,7 +690,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         },
     }]);
     rows.push({
-        name: 'saveStatus',
+        name: 'Save Status',
         value: object.saveStatus || 'default',
         values: ['default', 'forever', 'zone', 'never'],
         onChange(saveStatus: 'default' | 'forever' | 'zone' | 'never') {
@@ -701,6 +702,31 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             updateObjectInstance(state, object);
         },
     });
+    if (object.id && object.type === 'pushPull') {
+        rows.push({
+            name: 'Save Position',
+            value: object.savePosition || 'default',
+            values: ['default', 'forever', 'zone', 'never'],
+            onChange(savePosition: 'default' | 'forever' | 'zone' | 'never') {
+                if (savePosition === 'default'){
+                    delete object.savePosition;
+                } else {
+                    object.savePosition = savePosition;
+                }
+                updateObjectInstance(state, object);
+                // Keep this flag in sync with the linked object, if any.
+                const linkedDefinition = object.linked && getLinkedDefinition(state.areaInstance.alternateArea.definition, object);
+                if (linkedDefinition) {
+                    if (savePosition === 'default'){
+                        delete linkedDefinition.savePosition;
+                    } else {
+                        linkedDefinition.savePosition = savePosition;
+                    }
+                    updateObjectInstance(state, linkedDefinition);
+                }
+            },
+        });
+    }
     rows.push({
         name: 'Logic',
         value: object.hasCustomLogic ? 'custom' : (object.logicKey || 'none'),
@@ -1647,28 +1673,27 @@ export function isPointInObject(x: number, y: number, object: ObjectDefinition):
     return isPointInShortRect(x + camera.x, y + camera.y, getObjectHitBox(object));
 }
 
-function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition): void {
-    const linkedInstance = state.alternateAreaInstance.objects.find(other =>
-        definition.x === other.definition?.x && definition.y === other.definition?.y
-    );
-    if (linkedInstance) {
-        updateObjectInstance(state, {...linkedInstance.definition, linked: definition.linked}, linkedInstance.definition, state.alternateAreaInstance);
-        return;
+function checkToAddLinkedObject(state: GameState, area: AreaInstance, definition: ObjectDefinition): void {
+    const alternateDefinition = getLinkedDefinition(area.alternateArea.definition, definition);
+    if (alternateDefinition) {
+        updateObjectInstance(state, {...alternateDefinition, linked: definition.linked}, alternateDefinition, area.alternateArea);
+    } else {
+        if (!definition.linked) {
+            return;
+        }
+        // Create a new instance if an existing instance and definition are both missing and the linked flag was enabled.
+        const alternateObject = {
+            ...definition,
+            linked: true, spirit: !definition.spirit
+        };
+        updateObjectInstance(state, alternateObject, null, area.alternateArea, true);
     }
-    if (!definition.linked) {
-        return;
-    }
-    const alternateObject = {
-        ...definition,
-        linked: true, spirit: !definition.spirit
-    };
-    updateObjectInstance(state, alternateObject, null, state.alternateAreaInstance, true);
     // Make sure to update the object links when we replace object instances.
-    const instance = state.areaInstance.objects.find(o => o.definition === definition);
+    const instance = area.objects.find(o => o.definition === definition);
     linkObject(instance);
 }
 
-export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null, create: boolean = false): void {
+export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null, create: boolean = false): ObjectInstance {
     editingState.hasChanges = true;
     if (!area) {
         area = state.areaInstance;
@@ -1694,7 +1719,7 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
         addObjectToArea(state, area, newObject);
     }
     if (area === state.areaInstance && state.alternateAreaInstance) {
-        checkToAddLinkedObject(state, object);
+        checkToAddLinkedObject(state, area, object);
     }
     linkObject(newObject);
     // If the current area has special behaviors, apply it in case it effects the updated object.
@@ -1702,6 +1727,7 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
         const specialBehavior = specialBehaviorsHash[area.definition.specialBehaviorKey] as SpecialAreaBehavior;
         specialBehavior?.apply(state, area);
     }
+    return newObject;
 }
 
 export function deleteObject(state: GameState, object: ObjectDefinition): void {

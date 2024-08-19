@@ -2,9 +2,9 @@ type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
 
 type SavedState = {
     // Flags that are set permanently for objects, like opened treasure chests or defeated bosses.
-    objectFlags: {[key: string]: boolean | number | string}
+    objectFlags: {[key: string]: boolean | number | number[] | string}
     // Flags that remain set as long as the character does not leave the current zone.
-    zoneFlags: {[key: string]: boolean | number | string}
+    zoneFlags: {[key: string]: boolean | number | number[] | string}
     savedHeroData: SavedHeroData
     dungeonInventories: {
         [key: string]: DungeonInventory

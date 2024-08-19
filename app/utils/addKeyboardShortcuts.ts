@@ -75,6 +75,10 @@ export function addKeyboardShortcuts() {
                             for (const object of areaDefinition?.objects ?? []) {
                                 delete state.savedState.objectFlags[object.id];
                                 delete state.savedState.zoneFlags[object.id];
+                                for (const suffix of ['melted', 'position']) {
+                                    delete state.savedState.objectFlags[object.id + '-' + suffix];
+                                    delete state.savedState.zoneFlags[object.id + '-' + suffix];
+                                }
                             }
                         }
                     }

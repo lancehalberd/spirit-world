@@ -164,7 +164,7 @@ export function linkObjects(state: GameState): void {
     }
 }
 export function linkObject(object: ObjectInstance): void {
-    if (!object.definition?.linked) {
+    if (!object?.definition?.linked || !object?.area) {
         return;
     }
     const linkedObject = object.area.alternateArea.objects.find(
