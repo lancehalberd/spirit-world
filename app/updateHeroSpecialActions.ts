@@ -822,7 +822,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             checkForFloorEffects(state, hero);
         } else {
             const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            const speedFactor = hero.savedData.equippedBoots === 'ironBoots' ? 0.5 : 1;
+            const areBootsHeavy = hero.savedData.equipment.ironBoots < 2 && hero.savedData.equippedBoots === 'ironBoots';
+            const speedFactor = areBootsHeavy ? 0.5 : 1;
             hero.vx = directionMap[direction][0] * speedFactor * rollSpeed[hero.actionFrame];
             hero.vy = directionMap[direction][1] * speedFactor * rollSpeed[hero.actionFrame];
             hero.actionFrame++;
