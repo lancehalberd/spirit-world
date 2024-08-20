@@ -549,7 +549,7 @@ interface DecorationDefinition extends BaseObjectDefinition {
 }
 
 interface WaterfallDefinition extends BaseObjectDefinition {
-    type: 'waterfall'
+    type: 'lavafall' | 'waterfall'
     w: number,
     h: number,
 }

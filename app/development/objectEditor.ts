@@ -168,7 +168,7 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
+    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'lavafall', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
@@ -313,12 +313,13 @@ export function createObjectDefinition(
                 h: definition.h || 16,
                 decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
             };
+        case 'lavafall':
         case 'waterfall':
             return {
                 ...commonProps,
                 type: definition.type,
-                w: definition.w || 16,
-                h: definition.h || 16,
+                w: definition.w || 48,
+                h: definition.h || 48,
             };
         case 'enemy': {
             const enemyType = definition.enemyType;
@@ -840,6 +841,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+        case 'lavafall':
         case 'waterfall':
             rows.push({
                 name: 'w',
@@ -1563,7 +1565,7 @@ export function onMouseDownSelectObject(state: GameState, editingState: EditingS
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
     if (object.type === 'escalator' || object.type === 'stairs'
-        || object.type === 'decoration' || object.type === 'waterfall'
+        || object.type === 'decoration' || object.type === 'waterfall' || object.type === 'lavafall'
         || object.type === 'pushPull'
     ) {
         //object.x = Math.round(object.x / 8) * 8;

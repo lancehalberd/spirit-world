@@ -13,6 +13,7 @@ export * from 'app/content/objects/flameTurret';
 export * from 'app/content/objects/floorSwitch';
 export * from 'app/content/objects/indicator';
 export * from 'app/content/objects/keyBlock';
+export * from 'app/content/objects/lavafall';
 export * from 'app/content/objects/lightningBarrier';
 export * from 'app/content/objects/marker';
 export * from 'app/content/objects/movingPlatform';
