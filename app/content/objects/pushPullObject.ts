@@ -233,6 +233,17 @@ function moveObjectThenHero(this: void, state: GameState, hero: Hero, object: Ob
     const ox = object.x, oy = object.y;
     const {mx, my} = moveLinkedObject(state, object, dx, dy, {excludedObjects: new Set([hero])});
     if (!mx && !my) {
+        const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
+        // The hero can move independently of the object as long as it isn't moving further away from the bounds of the object.
+        if (
+            (dx < 0 && heroHitbox.x > objectHitbox.x)
+            || (dx > 0 && heroHitbox.x + heroHitbox.w < objectHitbox.x + objectHitbox.w)
+            || (dy < 0 && heroHitbox.y > objectHitbox.y)
+            || (dy > 0 && heroHitbox.y + heroHitbox.h < objectHitbox.y + objectHitbox.h)
+        ) {
+            moveHero(state, hero, dx, dy);
+            return true;
+        }
         return moveHeroThenObject(state, hero, object, dx, dy);
     }
     const hx = hero.x, hy = hero.y;
@@ -284,6 +295,17 @@ function moveHeroThenObject(this: void, state: GameState, hero: Hero, object: Ob
     const hx = hero.x, hy = hero.y;
     const {mx, my} = moveHero(state, hero, dx, dy, {excludedObjects: new Set([object])});
     if (!mx && !my) {
+        // The object can move independently of the hero as long as it isn't moving further away from the bounds of the hero.
+        const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
+        if (
+            (dx < 0 && objectHitbox.x > heroHitbox.x)
+            || (dx > 0 && objectHitbox.x + objectHitbox.w < heroHitbox.x + heroHitbox.w)
+            || (dy < 0 && objectHitbox.y > heroHitbox.y)
+            || (dy > 0 && objectHitbox.y + objectHitbox.h < heroHitbox.y + heroHitbox.h)
+        ) {
+            moveLinkedObject(state, object, dx, dy);
+            return true;
+        }
         return false
     }
     const ox = object.x, oy = object.y;
