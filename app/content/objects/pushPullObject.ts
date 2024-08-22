@@ -231,19 +231,46 @@ objectHash.pushPull = PushPullObject;
 
 function moveObjectThenHero(this: void, state: GameState, hero: Hero, object: ObjectInstance, dx: number, dy: number): boolean {
     const ox = object.x, oy = object.y;
-    const {mx, my} = moveLinkedObject(state, object, dx, dy, [hero]);
+    const {mx, my} = moveLinkedObject(state, object, dx, dy, {excludedObjects: new Set([hero])});
     if (!mx && !my) {
         return moveHeroThenObject(state, hero, object, dx, dy);
     }
     const hx = hero.x, hy = hero.y;
     const {mx: mx1, my: my1} = moveHero(state, hero, mx, my);
+    //const {mx: mx1, my: my1} = moveHero(state, hero, mx, my, [object]);
     // The move is only valid if the hero can still be grabbing the object, and the object is not intersecting the hero.
     // Multiplying by dx/dy when comparing mx/my values allows wiggling the object to get through narrow openings by only requiring
     // matching movement in the direction the player is trying to move.
+    const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
     if (mx * dx === mx1 * dx && my * dy === my1 * dy
         && getActorTargets(state, hero).objects.includes(hero.grabObject)
-        && !boxesIntersect(hero.getHitbox(), object.getHitbox())
+        && !boxesIntersect(heroHitbox, objectHitbox)
     ) {
+        return true;
+    }
+    if (dx && my1) {
+        hero.x = hx;
+        setObjectPosition(object, ox, object.y);
+        // Try to match the wiggle of the hero only if it keeps the object closer to the hero.
+        if (my !== my1 && (
+            (objectHitbox.y > heroHitbox.y && my1 - my < 0) // if the top of the object is south of the top of the hero it can wiggle north
+            || (objectHitbox.y + objectHitbox.h < heroHitbox.y + heroHitbox.h && my1 - my > 0) // if the bottom of the object is north of the bottom of the hero it can wiggle south
+        )) {
+            // Prevent wiggling, otherwise this can move the object away from the hero.
+            moveLinkedObject(state, object, 0, my1 - my, {canWiggle: false});
+        }
+        return true;
+    } else if (dy && mx1) {
+        hero.y = hy;
+        setObjectPosition(object, object.x, oy);
+        // Try to match the wiggle of the hero only if it keeps the object closer to the hero.
+        if (mx !== mx1 && (
+            (objectHitbox.x > heroHitbox.x && mx1 - mx < 0) // if the left side of the object is right of the left of the hero it can wiggle left
+            || (objectHitbox.x + objectHitbox.w < heroHitbox.x + heroHitbox.w && mx1 - mx > 0) // if the right side of the object is left of the right side of the hero it can wiggle right
+        )) {
+            // Prevent wiggling, otherwise this can move the object away from the hero.
+            moveLinkedObject(state, object, mx1 - mx, 0, {canWiggle: false});
+        }
         return true;
     }
     // If the position is invalid, reset and try moving the hero first.
@@ -255,7 +282,7 @@ function moveObjectThenHero(this: void, state: GameState, hero: Hero, object: Ob
 
 function moveHeroThenObject(this: void, state: GameState, hero: Hero, object: ObjectInstance, dx: number, dy: number): boolean {
     const hx = hero.x, hy = hero.y;
-    const {mx, my} = moveHero(state, hero, dx, dy, [object]);
+    const {mx, my} = moveHero(state, hero, dx, dy, {excludedObjects: new Set([object])});
     if (!mx && !my) {
         return false
     }
@@ -264,10 +291,36 @@ function moveHeroThenObject(this: void, state: GameState, hero: Hero, object: Ob
     // The move is only valid if the hero can still be grabbing the object, and the object is not intersecting the hero.
     // Multiplying by dx/dy when comparing mx/my values allows wiggling the object to get through narrow openings by only requiring
     // matching movement in the direction the player is trying to move.
+    const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
     if (mx * dx === mx1 * dx && my * dy === my1 * dy
         && getActorTargets(state, hero).objects.includes(hero.grabObject)
-        && !boxesIntersect(hero.getHitbox(), object.getHitbox())
+        && !boxesIntersect(heroHitbox, objectHitbox)
     ) {
+        return true;
+    }
+    if (dx && my1) {
+        hero.x = hx;
+        setObjectPosition(object, ox, object.y);
+        // Try to match the wiggle of the object only if it keeps the hero closer to the object.
+        if (my !== my1 && (
+            (heroHitbox.y > objectHitbox.y && my1 - my < 0) // if the top of the hero is south of the top of the object it can wiggle north
+            || (heroHitbox.y + heroHitbox.h < objectHitbox.y + objectHitbox.h && my1 - my > 0) // if the bottom of the hero is north of the bottom of the object it can wiggle south
+        )) {
+            // Prevent wiggling, otherwise this can move the hero away from the object.
+            moveHero(state, hero, 0, my1 - my, {canWiggle: false});
+        }
+        return true;
+    } else if (dy && mx1) {
+        hero.y = hy;
+        setObjectPosition(object, object.x, oy);
+        // Try to match the wiggle of the object only if it keeps the hero closer to the object.
+        if (mx !== mx1 && (
+            (heroHitbox.x > objectHitbox.x && mx1 - mx < 0) // if the left side of the hero is right of the left of the object it can wiggle left
+            || (heroHitbox.x + heroHitbox.w < objectHitbox.x + objectHitbox.w && mx1 - mx > 0) // if the right side of the hero is left of the right side of the object it can wiggle right
+        )) {
+            // Prevent wiggling, otherwise this can move the hero away from the object.
+            moveHero(state, hero, mx1 - mx, 0, {canWiggle: false});
+        }
         return true;
     }
     // If the position is still invalid, reset everything.
@@ -285,29 +338,29 @@ function setObjectPosition(this: void, object: ObjectInstance, x: number, y: num
     }
 }
 
-function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: number, excludedObjects: ObjectInstance[] = []) {
-    const movementProperties: MovementProperties = {
+function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: number, movementProperties: MovementProperties = {}) {
+    movementProperties = {
         canFall: true,
         canSwim: true,
         canWiggle: true,
         direction: getDirection(dx, dy, true),
         boundingBox: getSectionBoundingBox(state, hero),
-        excludedObjects: new Set(excludedObjects)
+        ...movementProperties,
     };
     return moveActor(state, hero, dx, dy, movementProperties);
 }
 
-export function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, excludedObjects: ObjectInstance[] = []) {
+export function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, movementProperties: MovementProperties = {}) {
     const heroesAndClones = [state.hero, ...(state.hero.clones || [])];
-    let blockedBoxes = heroesAndClones.filter(h => !excludedObjects.includes(h) && h.area === object.area).map(h => h.getHitbox());
-    const movementProperties: MovementProperties = {
+    let blockedBoxes = heroesAndClones.filter(h => !movementProperties?.excludedObjects?.has(h) && h.area === object.area).map(h => h.getHitbox());
+    movementProperties = {
         canFall: true,
         canSwim: true,
         canWiggle: true,
         direction: getDirection(dx, dy, true),
         boundingBox: getSectionBoundingBox(state, object),
         blockedBoxes,
-        excludedObjects: new Set([...excludedObjects, object])
+        ...movementProperties,
     };
     const {mx, my} = moveObject(state, object, dx, dy, movementProperties);
     if (!mx && !my) {
@@ -318,7 +371,7 @@ export function moveLinkedObject(this: void, state: GameState, object: ObjectIns
     // Currently this is never true for the hero.
     if (object.linkedObject) {
         //console.log('moving linked object', mx, my, getDirection(mx, my));
-        blockedBoxes = heroesAndClones.filter(h => !excludedObjects.includes(h) && h.area === object.linkedObject.area).map(h => h.getHitbox());
+        blockedBoxes = heroesAndClones.filter(h => !movementProperties?.excludedObjects?.has(h) && h.area === object.linkedObject.area).map(h => h.getHitbox());
         const linkedResult = moveObject(state, object.linkedObject, mx, my, {
             canFall: true,
             canSwim: true,
@@ -327,7 +380,7 @@ export function moveLinkedObject(this: void, state: GameState, object: ObjectIns
             direction: getDirection(mx, my),
             boundingBox: getSectionBoundingBox(state, object.linkedObject),
             blockedBoxes,
-            excludedObjects: new Set([object.linkedObject])
+            ...movementProperties,
         });
         //console.log('linkedResult:', linkedResult);
         object.x = object.linkedObject.x;

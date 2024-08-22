@@ -64,7 +64,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix it is hard to push the pot left in the sky palace tower.
     - It is hard to get pots flush against walls
         - Pots should be able to slide independ of the player as long as they do not slide past the player.
             - so the right edge of the pot hitbox can go as far as the right edge of the player hitbox when
