@@ -282,7 +282,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.changeToAnimation('hurt');
         }
         this.action = 'knocked';
-        this.isAirborn = true;
+        if (vz > 0 || this.z > 0) {
+            this.isAirborn = true;
+        }
         this.animationTime = 0;
         this.az = Math.min(-0.2, this.az);
         this.vx = vx;
@@ -382,10 +384,17 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && this.definition.type !== 'boss' && this.enemyDefinition.canBeFrozen !== false) {
-            this.makeSound(state, 'freeze');
-            this.frozenDuration = 1500;
             this.burnDuration = 0;
-            this.vx = this.vy = 0;
+            // Do not freeze the enemy unless they will actually stay frozen for some duration:
+            // They are immortal or have life left, or they are dying but airborn.
+            if (this.isImmortal || this.life > 0 || this.z > 0 || this.vz > 0) {
+                this.makeSound(state, 'freeze');
+                this.frozenDuration = 1500;
+                // Freeze the enemy in place if they are touching the ground.
+                if (this.z <= 0 && this.vz <= 0) {
+                    this.vx = this.vy = 0;
+                }
+            }
         }
         return {
             damageDealt,
@@ -642,9 +651,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         if (this.frozenDuration > 0) {
             this.frozenDuration -= FRAME_LENGTH;
-            /*if (this.vx > 0.1 || this.vy > 0.1) {
+            if (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1) {
                 moveEnemy(state, this, this.vx, this.vy, {canFall: true});
-            }*/
+            }
             if (this.z > 0) {
                 this.z = Math.max(0, this.z + this.vz);
                 this.vz = Math.max(-8, this.vz + this.az);
@@ -658,8 +667,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 }
             }
             // Slowly slide to a stop
-            //this.vx *= 0.95;
-            //this.vy *= 0.95;
+            this.vx *= 0.95;
+            this.vy *= 0.95;
             return;
         }
         if (this.burnDuration > 0) {

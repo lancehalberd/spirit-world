@@ -66,9 +66,6 @@ Graphics to Implement:
 Current tasks:
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
-    - Fix snakes/beetles show frozen frame briefly when killed with ice.
-        - Doesn't happen for plants
-
     - Fix normal snakes can walk on lava
         - Maybe turn them into fire snakes if they touch lava instead of stopping them.
 

@@ -280,7 +280,7 @@ function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number,
     /*for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
         movementProperties.excludedObjects.add(clone);
     }*/
-    if (enemy.flying) {
+    if (enemy.flying && enemy.z > 0) {
         const hitbox = enemy.getHitbox(state);
         const ax = enemy.x + dx;
         const ay = enemy.y + dy;
