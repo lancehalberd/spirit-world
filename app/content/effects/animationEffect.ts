@@ -60,6 +60,7 @@ export class FieldAnimationEffect implements EffectInstance {
     scale: number;
     target?: ObjectInstance | EffectInstance;
     ttl: number;
+    checkToCull?: (state: GameState) => boolean;
     constructor({
         animation, boundingBox, drawPriority = 'background', drawPriorityIndex,
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,

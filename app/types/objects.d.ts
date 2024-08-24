@@ -75,6 +75,7 @@ interface BaseFieldInstance {
     renderParent?: BaseFieldInstance
     getParts?: (state: GameState) => BaseFieldInstance[]
     getHitbox?: (state?: GameState) => Readonly<Rect>
+    checkToCull?: (state?: GameState) => boolean
 }
 
 interface ObjectInstance extends BaseFieldInstance {

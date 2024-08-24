@@ -59,14 +59,14 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
     //if (tlBehaviors.isLava && trBehaviors.isLava && blBehaviors.isLava && brBehaviors.isLava) {
     if (getCompositeBehaviors(state, area, {x: x, y}).isLava) {
         if (Math.random() < 0.1) {
-            addAnimationEffectToBackground(state, area, Random.element(lavaDiamondAnimations), {x, y});
+            addLavaAnimationEffectToBackground(state, area, Random.element(lavaDiamondAnimations), {x, y});
             return;
         }
         if (Math.random() < 0.1) {
-            addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'fire' });
+            //addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'fire' });
             return;
         }
-        addAnimationEffectToBackground(state, area, Random.element(lavaBubbleAnimations), {x, y});
+        addLavaAnimationEffectToBackground(state, area, Random.element(lavaBubbleAnimations), {x, y});
         return;
     }
     if (state.areaInstance === area && state.areaSection?.isHot) {
@@ -83,6 +83,18 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
     }
 
 }
+function addLavaAnimationEffectToBackground(this: void, state: GameState, area: AreaInstance, animation: FrameAnimation, {x, y}: Point): FieldAnimationEffect {
+    const animationEffect = addAnimationEffectToBackground(state, area, animation, {x, y});
+    // Lava effects should be culled from the scene any time they are no longer over lava tiles.
+    animationEffect.checkToCull = checkToCullLavaEffect;
+    return animationEffect;
+}
+
+function checkToCullLavaEffect(this: BaseFieldInstance, state: GameState): boolean {
+    const hitbox = this.getHitbox();
+    return !getCompositeBehaviors(state, this.area, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2}).isLava;
+}
+
 
 function addAnimationEffectToBackground(this: void, state: GameState, area: AreaInstance, animation: FrameAnimation, {x, y}: Point): FieldAnimationEffect {
     const animationEffect = new FieldAnimationEffect({
