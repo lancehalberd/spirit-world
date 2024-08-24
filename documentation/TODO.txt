@@ -66,21 +66,17 @@ Graphics to Implement:
 Current tasks:
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
-    - Fix normal snakes can walk on lava
-        - Maybe turn them into fire snakes if they touch lava instead of stopping them.
-
     - First Jade Champion encounter
         - Triggered if you try to enter the holy city before encountering her in the Summoner Ruins.
         - Warns you to stay away from the Spirit Gate
 
     - Second Jade Champion encounter
-        - Triggeed when leaving the War Temple after getting Astral Projection.
+        - Triggered when leaving the War Temple after getting Astral Projection.
         - She will bring the MC to the Grand Priest in the Grand Temple
 
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
         - Make crystal cracked ground become crystal pits.
-
 
     - Replace low stones underwater with walls or taller obstacles.
 
