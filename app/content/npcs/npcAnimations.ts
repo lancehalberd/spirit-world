@@ -177,4 +177,16 @@ export const jadeChampionAnimations: ActorAnimations = {
         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10, cols: 9}),
         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11, cols: 9}),
     },
+    cast: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 0, cols: 7}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 1, cols: 7}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 7}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 7}),
+    },
+    bow: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 0, cols: 3, duration: 5}, { loop: false }),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 1, cols: 3, duration: 5}, { loop: false }),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
+    },
 };

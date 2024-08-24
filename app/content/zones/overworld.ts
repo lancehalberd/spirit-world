@@ -2527,6 +2527,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "treeCaveEntrance", x: 352, y: 352, type: "door", style: "tree", d: "up", linked: true, targetZone: "treeCave", targetObjectId: "treeCaveEntrance"},
         {status: "normal", id: "treeCavePit", x: 368, y: 320, style: "singleTile", type: "pitEntrance", targetZone: "treeCave", targetObjectId: "treeCaveMarker"},
         {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 98, y: 222, type: "staffTower", style: "ground", targetZone: "staffTower", d: "up", targetObjectId: "staffTowerEntrance", linked: true},
+        {status: "normal", id: "holyCityCentralGateMarker", x: 112, y: 20, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 836, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 2},
@@ -3476,6 +3477,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "", x: 272, y: 400, targetObjectId: "overworldWarTempleSwitchB", type: "indicator"},
         {status: "normal", id: "", x: 224, y: 368, targetObjectId: "overworldWarTemplePotA", type: "indicator"},
         {status: "normal", id: "summonerRuinsSave", x: 240, y: 432, type: "saveStatue"},
+        {status: "normal", id: "jadeChampionWarTemple", x: 240, y: 384, type: "narration", message: "{@jadeChampionWarTemple.warTempleEncounter}", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "forever", hasCustomLogic: true, customLogic: "$astralProjection"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 33, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 4},
@@ -4571,6 +4573,7 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, spirit: true, x: 288, y: 160, d: "down", behavior: "random", style: "smallSpirit", type: "npc", dialogue: "Beings from the material world are so unpredictable!", dialogueIndex: 137},
         {status: "closed", id: "jadeCityMazeExit", x: 112, y: 208, type: "door", style: "obsidianDownstairs", targetZone: "holyCityInterior", targetObjectId: "jadeCityMazeExit", d: "up", linked: true, spirit: true},
         {status: "normal", id: "jadeCityMazePeachPiece", x: 86, y: 243, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
+        {status: "normal", id: "", x: 112, y: 496, type: "spawnMarker", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 37, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 0},

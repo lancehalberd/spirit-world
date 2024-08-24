@@ -33,6 +33,23 @@ export function runBlockingCallback(state: GameState, updateCallback: (state: Ga
     });
 }
 
+export function runPlayerBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
+    appendCallback(state, (state) => {
+        state.scriptEvents.activeEvents.push({
+            type: 'update',
+            update: updateCallback,
+        });
+        state.scriptEvents.activeEvents.push({
+            type: 'wait',
+            time: 0,
+            waitingOnActiveEvents: true,
+            blockPlayerInput: true,
+        });
+        // Make sure no other scripts are processed until this finishes.
+        return true;
+    });
+}
+
 // Clears all current script events and queues up events parsed from the new script.
 export function setScript(state: GameState, script: TextScript): void {
     // console.log('setScript', script);
