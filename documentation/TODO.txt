@@ -104,8 +104,6 @@ Current tasks:
         - Controller multiple clones
         - Clone throw
 
-    - Add some sort of effect when Cloud Sommersault is held so the game doesn't just look frozen.
-
     - Add a better indication for which clone(s)+staff(s) are controlled.
 
     - Add coil graphics for lightning barriers. 3x styles.

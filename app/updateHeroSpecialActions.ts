@@ -770,7 +770,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)
-        && hero.z > minZ + 2 && (hero.savedData.equippedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
+        && hero.z > minZ + 2 && (hero.savedData.equippedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT)
+        && hero.action !== 'preparingSomersault' && hero.action !== 'roll';
     if (isFallingToGround) {
         hero.action = null;
         hero.z += hero.vz;
@@ -839,6 +840,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'preparingSomersault') {
+        hero.animationTime = (hero.animationTime + FRAME_LENGTH / 2) % heroAnimations.roll.up.duration;
         if (!isGameKeyDown(state, GAME_KEY.ROLL)) {
             hero.action = 'roll';
             hero.actionFrame = 12;
