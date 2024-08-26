@@ -49,7 +49,8 @@ export const mainOverworldNode: LogicNode = {
         {objectId: 'sideArea:noToolEntrance'},
         {objectId: 'elderEntrance'},
         {objectId: 'peachCaveTopEntrance'},
-        {objectId: 'peachCaveWaterEntrance'},
+        // This entrance becomes frozen while the frost beast is active.
+        {objectId: 'peachCaveWaterEntrance', logic: orLogic({requiredFlags: ['frostBeast']}, hasFire)},
         {objectId: 'staffTowerEntrance'},
         {objectId: 'tombEntrance', logic: hasMediumRange},
         {objectId: 'waterfallCaveEntrance'},
