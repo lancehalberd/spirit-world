@@ -1099,6 +1099,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 144, y: 320, style: "short", type: "sign", message: "Wager your fortune in the Arrow Maze, only 25 Jade!"},
         {status: "normal", id: "holyCityMarker", x: 272, y: 112, type: "marker"},
         {status: "normal", id: "cityCliffMoney", x: 48, y: 16, type: "chest", lootType: "money", lootAmount: 100},
+        {status: "normal", id: "jadeChampionFirstMeeting", x: 112, y: 432, type: "narration", message: "{@jadeChampion.firstConversation}", trigger: "touch", delay: 0, w: 64, h: 32, hasCustomLogic: true, customLogic: "jadeChampionWarTemple", invertLogic: true, linked: false},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 21, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 0},
@@ -4574,6 +4575,7 @@ const sf0_2x0: AreaDefinition = {
         {status: "closed", id: "jadeCityMazeExit", x: 112, y: 208, type: "door", style: "obsidianDownstairs", targetZone: "holyCityInterior", targetObjectId: "jadeCityMazeExit", d: "up", linked: true, spirit: true},
         {status: "normal", id: "jadeCityMazePeachPiece", x: 86, y: 243, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "", x: 112, y: 496, type: "spawnMarker", spirit: true},
+        {status: "normal", id: "jadeChampionFirstMeeting", x: 112, y: 400, type: "narration", message: "", trigger: "touch", delay: 0, w: 64, h: 32, hasCustomLogic: true, customLogic: "jadeChampionWarTemple", invertLogic: true, linked: false, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 37, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 0},

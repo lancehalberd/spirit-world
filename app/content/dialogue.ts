@@ -2,6 +2,7 @@
 export * from 'app/content/dialogue/dialogueHash';
 export * from 'app/content/dialogue/elder';
 export * from 'app/content/dialogue/jadeChampion';
+export * from 'app/content/dialogue/jadeChampionWarTemple';
 export * from 'app/content/dialogue/mom';
 export * from 'app/content/dialogue/rival';
 export * from 'app/content/dialogue/npc';
