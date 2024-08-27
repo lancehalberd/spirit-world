@@ -583,10 +583,10 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 240, y: 80, type: "turret", d: "left", fireInterval: 1000, fireOffset: 0, style: "arrow"},
         {status: "normal", id: "", x: 64, y: 24, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "arrow"},
         {status: "normal", id: "", x: 164, y: 24, type: "turret", d: "down", fireInterval: 1000, fireOffset: 500, style: "arrow"},
-        {status: "normal", id: "", x: 16, y: 304, type: "turret", d: "down", fireInterval: 2000, fireOffset: 0},
-        {status: "normal", id: "", x: 32, y: 304, type: "turret", d: "down", fireInterval: 2000, fireOffset: 0},
-        {status: "normal", id: "", x: 208, y: 304, type: "turret", d: "down", fireInterval: 1600, fireOffset: 0},
-        {status: "normal", id: "", x: 224, y: 304, type: "turret", d: "down", fireInterval: 1600, fireOffset: 800},
+        {status: "normal", id: "", x: 16, y: 304, type: "turret", d: "down", fireInterval: 2500, fireOffset: 0, style: "arrow"},
+        {status: "normal", id: "", x: 32, y: 304, type: "turret", d: "down", fireInterval: 2500, fireOffset: 0, style: "arrow"},
+        {status: "normal", id: "", x: 208, y: 304, type: "turret", d: "down", fireInterval: 2000, fireOffset: 0, style: "arrow"},
+        {status: "normal", id: "", x: 224, y: 304, type: "turret", d: "down", fireInterval: 2000, fireOffset: 1000, style: "arrow"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 185, mapId: 'tomb', floorId: 'B1', mapX: 1, mapY: 3},
@@ -2306,12 +2306,14 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "tombCrusher", x: 172, y: 40, type: "enemy", enemyType: "crusher", d: "up", saveStatus: "forever", params: {}},
         {status: "locked", id: "tombLock2", x: -16, y: 100, type: "keyBlock"},
         {status: "normal", id: "", x: 440, y: 168, type: "pushPull"},
+        {status: "normal", id: "", x: 312, y: 304, style: "short", type: "sign", message: "Twin lights pierce the darkness, revealing The Key."},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 198, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
         {x: 16, y: 0, w: 16, h: 16, index: 199, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 1},
         {x: 0, y: 16, w: 32, h: 16, index: 200, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 2},
     ],
+    dark: 75,
 };
 const f1_0x1: AreaDefinition = {
     layers: [
