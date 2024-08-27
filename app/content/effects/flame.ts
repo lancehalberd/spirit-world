@@ -3,7 +3,8 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { getDirection, getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
+import { getDirection, hitTargets } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
 import { allImagesLoaded } from 'app/utils/images';
 
 

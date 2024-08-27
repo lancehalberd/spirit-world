@@ -1,7 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles } from 'app/utils/getBehaviors';
 
 
 const waterDropFallAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {y: 3, cols: 4, duration: 8});

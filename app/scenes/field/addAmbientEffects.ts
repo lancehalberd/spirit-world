@@ -3,7 +3,7 @@ import { addSparkleAnimation, FieldAnimationEffect } from 'app/content/effects/a
 // import { editingState } from 'app/development/editingState';
 import { createAnimation } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
-import { getCompositeBehaviors } from 'app/utils/field';
+import { getCompositeBehaviors} from 'app/utils/getBehaviors';
 import Random from 'app/utils/Random';
 
 let points: Point[] = [];

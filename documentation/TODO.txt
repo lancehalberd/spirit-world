@@ -66,8 +66,6 @@ Graphics to Implement:
 Current tasks:
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
-    - Falling enemies+objects should respect pit wall tile behaviors.
-
     - First Jade Champion encounter
         - Triggered if you try to enter the holy city before encountering her in the Summoner Ruins.
         - Warns you to stay away from the Spirit Gate

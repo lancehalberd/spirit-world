@@ -2,7 +2,8 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { getTileBehaviors, hitTargets } from 'app/utils/field';
+import { hitTargets } from 'app/utils/field';
+import { getTileBehaviors} from 'app/utils/getBehaviors';
 
 
 function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {

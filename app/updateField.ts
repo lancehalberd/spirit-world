@@ -8,7 +8,7 @@ import { wasGameKeyPressed } from 'app/userInput';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
-import { getCompositeBehaviors } from 'app/utils/field';
+import { getCompositeBehaviors } from 'app/utils/getBehaviors';
 import { rectanglesOverlap } from 'app/utils/index';
 import { getFieldInstanceAndParts, removeObjectFromArea } from 'app/utils/objects';
 

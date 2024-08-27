@@ -10,13 +10,12 @@ import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { getState } from 'app/state';
 import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
 import { mainCanvas } from 'app/utils/canvas';
-import { getCompositeBehaviors } from 'app/utils/field';
+import { getCompositeBehaviors } from 'app/utils/getBehaviors';
 import { getElementRectangle, isPointInShortRect } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { setSaveSlot } from 'app/utils/saveGame';
 import { saveSettings } from 'app/utils/saveSettings';
 import { toggleAllSounds, updateSoundSettings } from 'app/utils/soundSettings';
-
 
 
 export class ContextMenu {

@@ -1,6 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import { getCompositeBehaviors } from 'app/utils/getBehaviors'
 import { rectanglesOverlap } from 'app/utils/index';
 import Random from 'app/utils/Random';
 
@@ -31,6 +32,7 @@ interface AnimationProps {
     target?: ObjectInstance | EffectInstance
     // If set to true it will adjust the coords to center the first frame of the animation.
     centerOnPoint?: boolean
+    update?: (state: GameState, effect: FieldAnimationEffect) => void
 }
 
 export class FieldAnimationEffect implements EffectInstance {
@@ -61,13 +63,14 @@ export class FieldAnimationEffect implements EffectInstance {
     target?: ObjectInstance | EffectInstance;
     ttl: number;
     checkToCull?: (state: GameState) => boolean;
+    onUpdate: (state: GameState, effect: FieldAnimationEffect) => void
     constructor({
         animation, boundingBox, drawPriority = 'background', drawPriorityIndex,
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
         ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
         friction = 0,
-        target, ttl, delay = 0, centerOnPoint = false
+        target, ttl, delay = 0, centerOnPoint = false, update
      }: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;
@@ -92,6 +95,7 @@ export class FieldAnimationEffect implements EffectInstance {
         this.delay = delay;
         this.behaviors = {};
         this.target = target;
+        this.onUpdate = update;
         if (centerOnPoint) {
             const hitbox = this.getHitbox();
             this.x -= hitbox.w / 2;
@@ -115,6 +119,9 @@ export class FieldAnimationEffect implements EffectInstance {
         return originY + this.y + frame.h;
     }
     update(state: GameState) {
+        if (this.onUpdate) {
+            this.onUpdate(state, this);
+        }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
@@ -426,12 +433,13 @@ export function addBurstParticle(
     }
 }
 
-export function addFieldAnimation(state: GameState, area: AreaInstance, animation: FrameAnimation, {x, y}: Point): FieldAnimationEffect {
+export function addFieldAnimation(state: GameState, area: AreaInstance, animation: FrameAnimation, {x, y}: Point, props: Partial<AnimationProps> = {}): FieldAnimationEffect {
     const animationEffect = new FieldAnimationEffect({
         animation,
         drawPriority: 'background',
         drawPriorityIndex: 1,
         x, y,
+        ...props,
     });
     addEffectToArea(state, area, animationEffect);
     return animationEffect;
@@ -441,10 +449,68 @@ export function addSplashAnimation(state: GameState, area: AreaInstance, {x, y}:
     return addFieldAnimation(state, area, splashAnimation, {x: x - 8, y: y - 8});
 }
 export function addObjectFallAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
-    return addFieldAnimation(state, area, objectFallAnimation, {x: x - 8, y: y - 8});
+    return addFieldAnimation(state, area, objectFallAnimation, {x: x - 8, y: y - 8}, {update: updateFallEffect});
 }
 export function addEnemyFallAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
-    return addFieldAnimation(state, area, enemyFallAnimation, {x: x - 8, y: y - 8});
+    return addFieldAnimation(state, area, enemyFallAnimation, {x: x - 8, y: y - 8}, {update: updateFallEffect});
+}
+// This logic matches similar logic in updateHeroSpecialAction, but this version uses a smaller hitbox.
+function updateFallEffect(state: GameState, effect: FieldAnimationEffect) {
+    if (!effect.area) {
+        return;
+    }
+    const hitbox = effect.getHitbox();
+    const checkPoints = [
+        {x: hitbox.x + 2, y: hitbox.y + 2, dx: 1, dy: 1},
+        {x: hitbox.x + hitbox.w - 3, y: hitbox.y + 2, dx: - 1, dy: 1},
+        {x: hitbox.x + 2, y: hitbox.y + hitbox.h - 3, dx: 1, dy: -1},
+        {x: hitbox.x + hitbox.w - 3, y: hitbox.y + hitbox.h - 3, dx: -1, dy: -1},
+    ];
+    // While the hero is falling, push them around until all their check points are over actual pit tiles.
+    let onPitWall = false, isOnSingleTilePit = false;
+    let dx = 0, dy = 0;
+    for (const p of checkPoints) {
+        const behaviors = getCompositeBehaviors(state, effect.area, p, state.nextAreaInstance);
+        if (behaviors.pitWall) {
+            onPitWall = true;
+        }
+        if (behaviors.isSingleTilePit) {
+            isOnSingleTilePit = true;
+        }
+        if (!(behaviors.pit || behaviors.cloudGround || behaviors.pitWall || behaviors.canFallUnder)) {
+            dx += p.dx;
+            dy += p.dy;
+        }
+    }
+    // Pit wall tiles always push the hero south to match the perspective.
+    if (onPitWall || dy > 0) {
+        effect.y++;
+    } else if (dy < 0) {
+        effect.y--;
+    } else if (isOnSingleTilePit) {
+        effect.y = effect.y | 0;
+        if (effect.y % 16 == 0) {
+            // do nothing.
+        } else if (effect.y % 16 < 8) {
+            effect.y--;
+        } else {
+            effect.y++;
+        }
+    }
+    if (dx > 0) {
+        effect.x++;
+    } else if (dx < 0) {
+        effect.x--;
+    } else if (isOnSingleTilePit) {
+        effect.x = effect.x | 0;
+        if (effect.x % 16 == 0) {
+            // do nothing.
+        } else if (effect.x % 16 < 8) {
+            effect.x--;
+        } else {
+            effect.x++;
+        }
+    }
 }
 
 class _FieldAnimationEffect extends FieldAnimationEffect {}

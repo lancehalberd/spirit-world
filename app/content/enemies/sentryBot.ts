@@ -10,7 +10,7 @@ import { addEffectToArea } from 'app/utils/effects';
 import {
     paceAndCharge,
 } from 'app/utils/enemies';
-import { getTileBehaviors } from 'app/utils/field';
+import { getTileBehaviors } from 'app/utils/getBehaviors';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 

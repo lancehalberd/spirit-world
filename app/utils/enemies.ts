@@ -1,10 +1,10 @@
 import { addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
-import { directionMap, getDirection, getCompositeBehaviors, hitTargets } from 'app/utils/field';
+import { directionMap, getDirection, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import { sample } from 'app/utils/index';
 import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
 import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
-
 
 
 export function moveEnemyToTargetLocation(

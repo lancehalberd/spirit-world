@@ -5,7 +5,7 @@ import { moveActor } from 'app/movement/moveActor';
 import { createAnimation, drawFrame, frameAnimation } from 'app/utils/animations';
 import { directionMap } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles } from 'app/utils/getBehaviors';
 import { intersectArea } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
