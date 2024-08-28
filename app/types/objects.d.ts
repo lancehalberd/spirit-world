@@ -48,10 +48,18 @@ interface AssignmentState {
     assignedContents: string[]
 }
 
+interface LightSource {
+    x: number
+    y: number
+    brightness: number
+    radius: number
+}
+
 interface BaseFieldInstance {
     area?: AreaInstance
     behaviors?: TileBehaviors
     getBehaviors?: (state: GameState, x?: number, y?: number) => TileBehaviors
+    getLightSources?: (state: GameState) => LightSource[]
     drawPriority?: DrawPriority
     // Only supported when drawPriority === 'background' currently.
     // Objects with lower `drawPriorityIndex` are drawn before others. Default value is 0.
