@@ -183,10 +183,101 @@ export const jadeChampionAnimations: ActorAnimations = {
         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 7}),
         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 7}),
     },
-    bow: {
+    bow: { // half of the cast animation, for praying, showing respect, thanking someone
         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 0, cols: 3, duration: 5}, { loop: false }),
         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 1, cols: 3, duration: 5}, { loop: false }),
         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
     },
 };
+
+// Frames are Up/Left/Down/Right [0-3]Castx7, [4-7]Thrustx8 [8-11]Walkx9, [12-15]Slashx6, [16-19]Shootx13 [20]Deathx6
+const grandPriestImage: string = 'gfx/npcs/grandPriest.png';
+const grandPriestGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const grandPriestAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(grandPriestImage, grandPriestGeometry, {y: 8}),
+        left: createAnimation(grandPriestImage, grandPriestGeometry, {y: 9}),
+        down: createAnimation(grandPriestImage, grandPriestGeometry, {y: 10}),
+        right: createAnimation(grandPriestImage, grandPriestGeometry, {y: 11}),
+    },
+    move: {
+        up: createAnimation(grandPriestImage, grandPriestGeometry, {y: 8, cols: 9}),
+        left: createAnimation(grandPriestImage, grandPriestGeometry, {y: 9, cols: 9}),
+        down: createAnimation(grandPriestImage, grandPriestGeometry, {y: 10, cols: 9}),
+        right: createAnimation(grandPriestImage, grandPriestGeometry, {y: 11, cols: 9}),
+    },
+    cast: {
+        up: createAnimation(grandPriestImage, grandPriestGeometry, {y: 0, cols: 7}),
+        left: createAnimation(grandPriestImage, grandPriestGeometry, {y: 1, cols: 7}),
+        down: createAnimation(grandPriestImage, grandPriestGeometry, {y: 2, cols: 7}),
+        right: createAnimation(grandPriestImage, grandPriestGeometry, {y: 3, cols: 7}),
+    },
+    bow: { // half of the cast animation, for praying, showing respect, thanking someone
+        up: createAnimation(grandPriestImage, grandPriestGeometry, {y: 0, cols: 3, duration: 5}, { loop: false }),
+        left: createAnimation(grandPriestImage, grandPriestGeometry, {y: 1, cols: 3, duration: 5}, { loop: false }),
+        down: createAnimation(grandPriestImage, grandPriestGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
+        right: createAnimation(grandPriestImage, grandPriestGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
+    },
+};
+
+// Frames are Up/Left/Down/Right [0-3]Castx7, [4-7]Thrustx8 [8-11]Walkx9, [12-15]Slashx6, [16-19]Shootx13 [20]Deathx6
+const paleLadyPriestImage: string = 'gfx/npcs/ladyPriest-white.png';
+const paleLadyPriestGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const paleLadyPriestAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 8}),
+        left: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 9}),
+        down: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 10}),
+        right: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 11}),
+    },
+    move: {
+        up: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 8, cols: 9}),
+        left: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 9, cols: 9}),
+        down: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 10, cols: 9}),
+        right: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 11, cols: 9}),
+    },
+    cast: {
+        up: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 0, cols: 7}),
+        left: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 1, cols: 7}),
+        down: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 2, cols: 7}),
+        right: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 3, cols: 7}),
+    },
+    bow: { // half of the cast animation, for praying, showing respect, thanking someone
+        up: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 0, cols: 3, duration: 5}, { loop: false }),
+        left: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 1, cols: 3, duration: 5}, { loop: false }),
+        down: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
+        right: createAnimation(paleLadyPriestImage, paleLadyPriestGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
+    },
+};
+
+// Frames are Up/Left/Down/Right [0-3]Castx7, [4-7]Thrustx8 [8-11]Walkx9, [12-15]Slashx6, [16-19]Shootx13 [20]Deathx6
+const midGuyPriestImage: string = 'gfx/npcs/guyPriest-tan.png';
+const midGuyPriestGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const midGuyPriestAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 8}),
+        left: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 9}),
+        down: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 10}),
+        right: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 11}),
+    },
+    move: {
+        up: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 8, cols: 9}),
+        left: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 9, cols: 9}),
+        down: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 10, cols: 9}),
+        right: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 11, cols: 9}),
+    },
+    cast: {
+        up: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 0, cols: 7}),
+        left: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 1, cols: 7}),
+        down: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 2, cols: 7}),
+        right: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 3, cols: 7}),
+    },
+    bow: { // half of the cast animation, for praying, showing respect, thanking someone
+        up: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 0, cols: 3, duration: 5}, { loop: false }),
+        left: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 1, cols: 3, duration: 5}, { loop: false }),
+        down: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
+        right: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
+    },
+};
+

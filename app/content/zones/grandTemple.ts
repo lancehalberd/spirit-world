@@ -476,7 +476,7 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "grandPriest", x: 248, y: 256, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "May the Spirits guide you.", dialogueIndex: 109},
+        {status: "normal", id: "grandPriest", x: 248, y: 256, d: "down", behavior: "idle", style: "grandPriest", type: "npc", dialogue: "May the Spirits guide you.", dialogueIndex: 109},
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},
         {status: "normal", id: "gauntletEntrance", x: 80, y: 32, type: "door", style: "woodenDownstairs", targetZone: "gauntlet", targetObjectId: "gauntletEntrance", d: "up", locationCue: "Grand Temple"},

@@ -1,0 +1,58 @@
+Authors: bluecarrot16, Benjamin K. Smith (BenCreating), Evert, Eliza Wyatt (ElizaWy), TheraHedwig, MuffinElZangano, Durrani, Johannes Sj?lund (wulax), Stephen Challener (Redshrike), ElizaWy, JaidynReiman, Matthew Krohn (makrohn), Johannes Sjölund (wulax), Michael Whitlock (bigbeargames), Marcel van de Steeg (MadMarcel), Nila122, Pierre Vigier (pvigier), Joe White, Luke Mehl
+
+- body/bodies/male/bronze.png: by bluecarrot16, Benjamin K. Smith (BenCreating), Evert, Eliza Wyatt (ElizaWy), TheraHedwig, MuffinElZangano, Durrani, Johannes Sj?lund (wulax), Stephen Challener (Redshrike). License(s): CC-BY-SA 3.0, GPL 3.0. see details at https://opengameart.org/content/lpc-character-bases; 'Thick' Male Revised Run/Climb by JaidynReiman (based on ElizaWy's LPC Revised)
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - https://opengameart.org/content/lpc-male-jumping-animation-by-durrani
+    - https://opengameart.org/content/lpc-runcycle-and-diagonal-walkcycle
+    - https://opengameart.org/content/lpc-revised-character-basics
+
+- head/heads/human/male_elderly/bronze.png: by Benjamin K. Smith (BenCreating), Eliza Wyatt (ElizaWy), Stephen Challener (Redshrike). License(s): OGA-BY 3.0, CC-BY 3.0. 
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+    - https://opengameart.org/content/lpc-revised-elders
+    - https://opengameart.org/content/lpc-character-bases
+
+- head/nose/elderly/adult/bronze.png: by ElizaWy. License(s): OGA-BY 3.0. 
+    - https://opengameart.org/content/lpc-revised-elders
+
+- eyes/human/adult/brown.png: by JaidynReiman, Matthew Krohn (makrohn), Stephen Challener (Redshrike). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. original by Redshrike, mapped to all frames by Matthew Krohn & JaidynReiman
+    - https://opengameart.org/content/liberated-pixel-cup-lpc-base-assets-sprites-map-tiles
+
+- eyes/eyebrows/thick/adult/white.png: by ElizaWy. License(s): OGA-BY 3.0. 
+    - https://github.com/ElizaWy/LPC/tree/main/Characters/Hair
+
+- head/wrinkles/bronze.png: by bluecarrot16. License(s): CC0. 
+
+- beards/mustache/chevron/white.png: by ElizaWy. License(s): OGA-BY 3.0. 
+    - https://github.com/ElizaWy/LPC/tree/main/Characters/Hair
+
+- hair/shortknot/adult/white.png: by JaidynReiman. License(s): OGA-BY 3.0+, CC-BY 3.0+, CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/lpc-1-hairstyle-2-hair-extensions-3-previously-unofficially-released-hairstyles
+    - https://github.com/jrconway3/Universal-LPC-spritesheet/commit/46ddcf05a0e43e7aa6ffd47d350eef0eb529ac24
+
+- hat/hair_tie/adult/yellow.png: by JaidynReiman. License(s): OGA-BY 3.0+, CC-BY 3.0+, GPL 3.0. 
+    - https://opengameart.org/content/lpc-relm-hairstyle-pieces-xlong-ponytail-bangs-and-braids-headband
+
+- arms/bracers/male/gold.png: by Matthew Krohn (makrohn), Johannes Sjölund (wulax). License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+
+- gloves/male/green.png: by Michael Whitlock (bigbeargames), Matthew Krohn (makrohn), Johannes Sjölund (wulax), bluecarrot16. License(s): OGA-BY 3.0, CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+    - http://opengameart.org/content/lpc-clothing-updates
+
+- torso/clothes/sleeveless/sleeveless/male/green.png: by bluecarrot16, Matthew Krohn (makrohn), JaidynReiman, Marcel van de Steeg (MadMarcel), Nila122, Johannes Sjölund (wulax), Stephen Challener (Redshrike). License(s): CC-BY-SA 3.0. 
+    - https://opengameart.org/content/lpc-female-orcogregoblintroll-base-walkcycle
+    - https://opengameart.org/content/lpc-curly-hair-elven-ears-white-cape-with-blue-trim-and-more
+    - https://opengameart.org/content/more-lpc-clothes-and-hair
+    - https://opengameart.org/content/lpc-pirates
+
+- torso/waist/sash_narrow/male/yellow.png: by bluecarrot16, Nila122. License(s): CC-BY-SA 3.0, GPL 2.0, GPL 3.0. 
+    - https://opengameart.org/content/more-lpc-clothes-and-hair
+    - https://opengameart.org/content/lpc-pirates
+
+- legs/skirts/plain/male/green.png: by bluecarrot16, Pierre Vigier (pvigier), Johannes Sjölund (wulax). License(s): CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/lpc-medieval-fantasy-character-sprites
+
+- feet/slippers/male/yellow.png: by bluecarrot16, Joe White, Luke Mehl. License(s): CC-BY-SA 3.0, GPL 3.0. 
+    - https://opengameart.org/content/female-mage-clothing-set
+    - http://opengameart.org/content/lpc-clothing-updates
