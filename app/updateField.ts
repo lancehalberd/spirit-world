@@ -18,7 +18,6 @@ export function updateField(this: void, state: GameState) {
         updateCamera(state);
         return;
     }
-    addAmbientEffects(state);
     state.fieldTime += FRAME_LENGTH;
     state.hero.savedData.playTime += FRAME_LENGTH;
     // Remove completed screenshakes. If this is not checked each time the fieldTime is advanced
@@ -59,6 +58,7 @@ export function updateField(this: void, state: GameState) {
         }
         return;
     }
+    addAmbientEffects(state);
     updateAllHeroes(state);
     updateCamera(state);
     if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {

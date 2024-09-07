@@ -64,6 +64,13 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Move door after Peach Cave boss further south for better visibility.
+
+    - Add oscillater SFX for activating+deactivating crystal switches.
+        - Probably something highpitches and percussive similar to the hear refill SFX.
+
+    - Normal chakram gets stopped by cliff edge when attacking away from a cliff edge similar to bow+arrow issues in the past.
+
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
@@ -91,6 +98,9 @@ Current tasks:
         - Make crystal cracked ground become crystal pits.
 
     - Replace low stones underwater with walls or taller obstacles.
+
+    - Make lucky beetle teleport away instead of showing the death animation.
+        - Make sure this still sets the flag for preventing it from respawning.
 
     - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
 
