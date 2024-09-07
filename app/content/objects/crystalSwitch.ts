@@ -14,13 +14,11 @@ const blueGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', cry
 
 export class CrystalSwitch implements ObjectInstance {
     area: AreaInstance;
-    behaviors = {
+    alwaysReset = false;
+    behaviors: TileBehaviors = {
         low: true,
         solid: true,
-        brightness: 0.5,
-        lightRadius: 16,
     };
-    alwaysReset = false;
     isNeutralTarget = true;
     drawPriority: DrawPriority = 'sprites';
     definition: CrystalSwitchDefinition = null;
@@ -41,6 +39,27 @@ export class CrystalSwitch implements ObjectInstance {
             this.status = 'active';
         }
     }
+    getLightSources(state: GameState): LightSource[] {
+        let brightness = 0.5, radius = 16;
+        if (this.status === 'active') {
+            if (this.definition.timer && this.timeLeft <= 1000 || this.timeLeft <= this.definition.timer / 4) {
+                brightness = 0.6;
+                radius = 24;
+            } else if (this.definition.timer && this.timeLeft <= 2000 || this.timeLeft <= this.definition.timer / 2) {
+                brightness = 0.8;
+                radius = 32;
+            } else {
+                brightness = 1;
+                radius = 40;
+            }
+        }
+        return [{
+            x: this.x + 8,
+            y: this.y + 3,
+            brightness,
+            radius,
+        }];
+    }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
@@ -55,8 +74,6 @@ export class CrystalSwitch implements ObjectInstance {
         saveObjectStatus(state, this.definition);
         this.animationTime = 0;
         this.timeLeft = this.definition.timer || 0;
-        this.behaviors.brightness = 1;
-        this.behaviors.lightRadius = 32;
         if (checkIfAllSwitchesAreActivated(state, this.area, this)) {
             if (this.definition.stayOnAfterActivation) {
                 this.stayOn = true;
@@ -83,8 +100,6 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
-                this.behaviors.brightness = 0.5;
-                this.behaviors.lightRadius = 16;
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
             }
         }

@@ -13,7 +13,7 @@ import { getBackgroundFrame } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
-import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles } from 'app/utils/getBehaviors';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';

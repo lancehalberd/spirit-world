@@ -566,12 +566,21 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             // The objects will be removed from the current instance, so add them back so they will render during the transition.
             //instance.objects = nextAreaInstance.objects.filter(o => instance.removedObjectIds.includes(o.definition.id));
             instance.objects = [...nextAreaInstance.objects];
+            const originalEffects = [...instance.effects];
             nextAreaInstance.effects = [];
-            for (const effect of [...instance.effects]) {
+            for (const effect of originalEffects) {
                 addEffectToArea(state, nextAreaInstance, effect);
             }
+            // Cull any effects that might not be valid in the new instance. For example, lava bubbles that are no longer
+            // over lava tiles should be removed.
+            for (const effect of [...nextAreaInstance.effects]) {
+                if (effect.checkToCull?.(state)) {
+                    removeEffectFromArea(state, effect);
+                }
+            }
             // The effects will be removed from the current instance, so add them back so they will render during the transition.
-            instance.effects = [...nextAreaInstance.effects];
+            instance.effects = originalEffects;
+
             // Since objects are on the next area now, we must also move the priority object queue to the next area.
             nextAreaInstance.priorityObjects = instance.priorityObjects;
             // Without this the HUD/music logic will briefly be unable to detect bosses in the area which can cause boss music

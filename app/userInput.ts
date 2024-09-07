@@ -110,6 +110,10 @@ function buttonIsPressed(button) {
 }
 
 const keysDown: boolean[] = [];
+// Read controller id using something like: navigator.getGamepads()[0].id
+// Chrome ps4: "Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 05c4)"
+// Chrome xbox: "Xbox 360 Controller (XInput STANDARD GAMEPAD)"
+// Firefox xbox: "xinput"
 let lastInput: 'keyboard' | 'gamepad' = null;
 export function isKeyboardKeyDown(keyCode: number): boolean {
     if (keysDown[keyCode]) {

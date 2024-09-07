@@ -139,7 +139,12 @@ function renderFadeInText(
         context.font = '15px PixelScript';
         context.textAlign = 'center';
         context.textBaseline = 'top';
-        context.fillText(text, 128, 187 + yOffset);
+        // Text metrics do not match between Safari and Chrome/FF and Safari renders this text too low.
+        // This will render the text a bit higher on Safari so that it doesn't go off the bottom of the screen.
+        if (context.measureText('H').fontBoundingBoxAscent < 5) {
+            yOffset -= 5;
+        }
+        context.fillText(text, 128, 186 + yOffset);
         //drawText(context, text, 128, 186 + yOffset, {textAlign: 'center', maxWidth: 240, textBaseline: 'top'});
     context.restore();
 }

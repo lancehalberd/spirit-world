@@ -234,6 +234,17 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
+            if (object.getLightSources) {
+                const lightSources = object.getLightSources?.(state);
+                for (const lightSource of lightSources) {
+                    drawLightGradient(lightingContext,
+                        lightSource,
+                        lightSource.brightness, lightSource.radius
+                    );
+                }
+                continue;
+            }
+
             const behaviors = getObjectBehaviors(state, object);
             if (object.getHitbox && behaviors?.brightness) {
                 const hitbox = object.getHitbox(state);

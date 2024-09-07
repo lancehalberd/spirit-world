@@ -375,16 +375,16 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
         let targetLightRadius = 20, minLightRadius = 20;
         if (hero.area.dark) {
-            const coefficient = 100 / hero.area.dark;
+            const coefficient = Math.max(1, 80 / hero.area.dark);
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
                 state.hero.spendMagic(drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient, 0);
-                targetLightRadius = 320 * coefficient;
+                targetLightRadius = 200 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.savedData.passiveTools.catEyes > 0) {
                 state.hero.spendMagic(drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient, 0);
-                targetLightRadius = 80 * coefficient;
+                targetLightRadius = 70 * coefficient;
                 minLightRadius += 10 * coefficient;
             }
             // Light radius starts dropping when spirit energy < 50% full.

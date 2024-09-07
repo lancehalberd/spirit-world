@@ -3,7 +3,8 @@ import { playAreaSound } from 'app/musicController';
 import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/direction';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { getCompositeBehaviors, hitTargets } from 'app/utils/field';;
+import { hitTargets } from 'app/utils/field';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 
 
 

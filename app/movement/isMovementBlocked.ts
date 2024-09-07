@@ -234,7 +234,10 @@ export function isMovementBlocked(
     if ((behaviors?.pit || behaviors?.isBrittleGround) && !movementProperties.canFall) {
         return {};
     }
-    if (behaviors?.isLava && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
+    // Since lava doesn't destroy enemies currently, if we allow them to move when canFall is true (such as the enemy is knocked)
+    // they will get stuck in the lava, so don't do this unless they can be destroyed or enable canMoveInLava.
+    //if (behaviors?.isLava && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
+    if (behaviors?.isLava && !movementProperties.canMoveInLava) {
         return {};
     }
     if (behaviors?.pitMap && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
