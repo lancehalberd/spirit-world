@@ -64,10 +64,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Move door after Peach Cave boss further south for better visibility.
-
-    - Add oscillater SFX for activating+deactivating crystal switches.
-        - Probably something highpitches and percussive similar to the hear refill SFX.
+    - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
 
     - Normal chakram gets stopped by cliff edge when attacking away from a cliff edge similar to bow+arrow issues in the past.
 

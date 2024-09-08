@@ -555,6 +555,19 @@ sounds.set('heart', {
     },
     instances: [],
 });
+sounds.set('activateCrystalSwitch', {
+    play(target: AudioNode, time: number) {
+        playBeeps([2400, 3200, 4000], 0.05, .20, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+    },
+    instances: [],
+});
+sounds.set('deactivateCrystalSwitch', {
+    play(target: AudioNode, time: number) {
+        playBeeps([4000, 3200, 2400], 0.05, .10, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+    },
+    instances: [],
+});
+
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
 const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];
