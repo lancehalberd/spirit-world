@@ -1,5 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { updateProjectileHeight } from 'app/movement/getLedgeDelta';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { removeEffectFromArea } from 'app/utils/effects';
@@ -82,6 +83,7 @@ export class Flame implements EffectInstance, Props {
     reflected = false;
     isEnemyTarget: boolean = true;
     groundFriction = 0;
+    isHigh = false;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, delay = 0, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8}: Props) {
         this.damage = damage;
         this.delay = delay;
@@ -102,6 +104,10 @@ export class Flame implements EffectInstance, Props {
         this.isPreparing = isPreparing
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
         this.groundFriction = groundFriction;
+    }
+    getAnchorPoint() {
+        const hitbox = this.getHitbox();
+        return {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
     }
     getHitbox() {
         const w = 3 * this.w / 5;
@@ -124,8 +130,11 @@ export class Flame implements EffectInstance, Props {
             this.delay -= FRAME_LENGTH;
             return;
         }
+        const oldAnchorPoint = this.getAnchorPoint();
         this.x += this.vx;
         this.y += this.vy;
+        const anchorPoint = this.getAnchorPoint();
+        this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, anchorPoint);
         this.z = Math.max(0, this.z + this.vz);
         if (this.ax) {
             this.vx += this.ax;
@@ -178,7 +187,8 @@ export class Flame implements EffectInstance, Props {
                     hitTiles: true,
                     vx: this.vx,
                     vy: this.vy,
-                    projectile: this,
+                    anchorPoint,
+                    isHigh: this.isHigh,
                 });
                 if (hitResult.reflected) {
                     this.reflected = true;

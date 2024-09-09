@@ -1,4 +1,5 @@
 import { allTiles } from 'app/content/tiles';
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { isUnderLedge } from 'app/movement/isUnderLedge';
 import { destroyTile } from 'app/utils/destroyTile';
 import { directionMap, getDirection } from 'app/utils/direction';
@@ -259,10 +260,6 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         if (hit.ignoreTargets?.has(object)) {
             continue;
         }
-        // Projectiles from high attacks ignore anything that isn't very tall.
-        if (hit.projectile?.isHigh && !object.behaviors?.isVeryTall) {
-            continue;
-        }
         // If the hit specifies a z range, skip objects outside of the range.
         if (hit.zRange) {
             const z = object.z || 0;
@@ -272,6 +269,23 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
         }
         const hitbox = object.getHitbox(state);
+        // Projectiles from high attacks ignore anything that isn't very tall.
+        if (hit.anchorPoint) {
+            const objectAnchor = {
+                x: hitbox.x + hitbox.w / 2,
+                y: hitbox.y + hitbox.h / 2,
+            };
+            const delta = getLedgeDelta(state, area, hit.anchorPoint, objectAnchor);
+            // At high heights, only hit objects above the anchor point or very tall objects.
+            if (hit.isHigh && !(object.behaviors?.isVeryTall || delta > 0)) {
+                continue;
+            }
+            // At normal height only hit objects on the same level
+            // This includes delta == 0 or delta < 0 for very tall objects.
+            if (hit.isHigh === false && delta && !(object.behaviors?.isVeryTall && delta <= 0)) {
+                continue;
+            }
+        }
         if (hit.hitCircle) {
             const r = hit.hitCircle.r;
             // Fudge a little by pretending the target is a circle.
@@ -339,50 +353,62 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         }
     }
     const hitTiles = hit.hitTiles ? getHitTiles(area, hit) : [];
-    let setProjectileHigh = false, setProjectileLow = false;
-    if (hit.projectile?.isHigh) {
-        hit.projectile.passedLedgeTiles = [];
-    }
     if (hit.breaksGround) {
         // Don't calculate hit tiles again if we already know them.
         breakBrittleTiles(state, area, hitTiles.length ? hitTiles : getHitTiles(area, hit));
     }
-    // TODO: Get tiles hit by ray
     for (const target of hitTiles) {
         const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-        // Projectiles from high attacks ignore anything that isn't very tall or a ledge.
-        if (hit.projectile?.isHigh) {
-            const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
-            hit.projectile.passedLedgeTiles.push(target);
-            if (!setProjectileLow && (
-                (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
-                || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
-                || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
-                || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
-                || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
-            )) {
-                setProjectileLow = true;
+        if (hit.anchorPoint) {
+            const tileAnchor = {
+                x: 16 * target.x + 8,
+                y: 16 * target.y + 8,
+            };
+            // The behavior for the center of the tile on diagonal ledges is not easy to define so for
+            // these tiles we push the tileAnchor point away from the diagonal and the hit.
+            if (behavior?.diagonalLedge === 'upright' || behavior?.diagonalLedge === 'downleft') {
+                if (hit.anchorPoint.x - hit.anchorPoint.y >= tileAnchor.x - tileAnchor.y) {
+                    tileAnchor.x -= 2;
+                    tileAnchor.y += 2;
+                } else {
+                    tileAnchor.x += 2;
+                    tileAnchor.y -= 2;
+                }
             }
-            // Ignore tiles that are not very tall.
-            if (!behavior?.isVeryTall) {
-                continue;
+            if (behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'downright') {
+                if (hit.anchorPoint.x + hit.anchorPoint.y >= tileAnchor.x + tileAnchor.y) {
+                    tileAnchor.x -= 2;
+                    tileAnchor.y -= 2;
+                } else {
+                    tileAnchor.x += 2;
+                    tileAnchor.y += 2;
+                }
             }
-        } else if (hit.projectile && !setProjectileHigh) {
-            // Check if this projectile is going down over a cliff and set isHigh to true if so.
-            const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
-            if ((direction === 'downright' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
-                || (direction === 'down' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
-                || (direction === 'downleft' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
-                || (direction === 'upright' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'up' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'upleft' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
-                || (direction === 'right' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'left' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
-            ) {
-                setProjectileHigh = true;
+            const delta = getLedgeDelta(state, area, hit.anchorPoint, tileAnchor);
+            if (hit.isHigh) {
+                // At high heights, only hit objects above the anchor point or very tall objects.
+                if (!behavior?.isVeryTall && delta <= 0) {
+                    continue;
+                }
+            } else if (hit.isHigh === false) {
+                // A positive delta here means the projectile hit a cliff
+                // We may want to change this behavior if this is causing projectiles to be blocked by hitting
+                // ledges that are not in the direction of their movement. However, this might not be a problem
+                // since when moving over ledges projectiles should be marked 'isHigh' which will prevent being
+                // stopped until they pass up another ledge.
+                if (delta > 0) {
+                    combinedResult.hit = true;
+                    combinedResult.pierced = false;
+                    combinedResult.stopped = true;
+                    if (behavior?.cuttable > hit.damage) {
+                        combinedResult.blocked = true;
+                    }
+                }
+                // At normal height only hit objects on the same level
+                // This includes delta == 0 or delta < 0 for very tall objects.
+                if (delta && !(behavior?.isVeryTall && delta <= 0)) {
+                    continue;
+                }
             }
         }
         if (behavior?.elementOffsets?.[hit.element]) {
@@ -492,7 +518,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             resetTileBehavior(area, target);
         }*/
         // Determine if this hit a solid wall that would stop a projectile:
-        const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+        //const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
 
         // This hit a tile that could be cut so we ignore
         if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
@@ -518,21 +544,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             continue;
         }
         if (
-            (
-                (behavior?.cuttable > hit.damage || behavior?.solid)
-                && (!behavior?.low || hit.cutsGround)
-                //&& (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
-            )
-            || (!hit.projectile?.passedLedgeTiles?.find(t => t.x === target.x && t.y === target.y) && (
-                (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
-                || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
-                || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
-                || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
-                || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
-                || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
-            ))
+            (behavior?.cuttable > hit.damage || behavior?.solid)
+            && (!behavior?.low || hit.cutsGround)
+            //&& (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
         ) {
             combinedResult.hit = true;
             combinedResult.pierced = false;
@@ -559,12 +573,6 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
         }
     }
-    if (setProjectileLow) {
-        hit.projectile.isHigh = false;
-    } else if (setProjectileHigh) {
-        hit.projectile.isHigh = true;
-    }
-
     return combinedResult;
 }
 

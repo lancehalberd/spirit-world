@@ -3,8 +3,6 @@ Test at http://localhost:81/alttp/public/
 Bugs:
 
     Won't Fix:
-        - Chakram can hit tiles below ledges sometimes when returning.
-            - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
         - Spirit Barrier appears above door frames when moving East/West through doors.
             - This only applies with old tile sets, so probably isn't worth fixing.
         - Enemies hit in the spirit world make noise when taking damage
@@ -66,9 +64,17 @@ Graphics to Implement:
 Current tasks:
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
 
-    - Normal chakram gets stopped by cliff edge when attacking away from a cliff edge similar to bow+arrow issues in the past.
+    - Tower staff should one shot crystal shields.
+
+    - Fix tower staff is not pushing statues...
+
+    - Storm Heart should have no invulnerability when the orbs are not active or are defeated.
 
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
+
+    - If you roll on about the same frame as you jump, it will skip the jump animation and let you roll off the ledge.
+        - See if we can reproduce by forcing roll on this frame.
+        - Make sure rolling is prevented on this frame.
 
     - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
         - Material world entrances: back of Tomb, lake teleporter, bottom of Cocoon, Helix Bridge
@@ -791,10 +797,8 @@ Tutorial Improvements:
     Add advanced combat/tool tutorials
         - Maybe NPCs in home cave, or some kind of training/tutorial dojo?
         - Hitting enemies with chakram held in hand
-        - Default Charged chakram attack
         - Enemy iframes prevent them from damaging you
         - Maybe different sections for different tools.
-        - Reflecting projectiles
 
 Add more screen shakes:
     - Lava draining transition

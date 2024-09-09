@@ -265,10 +265,6 @@ interface Projectile {
     // Once this is set the projectile can only hit objects marked very tall
     // and it can pass up ledges from low to high, which unsets the flag.
     isHigh?: boolean
-    // This array of tile coordinates gets set to have their ledges ignored when a high
-    // projectile passes up a ledge. This is done to prevent the same ledges from blocking
-    // the projectile a frame later if it is still on the same tile.
-    passedLedgeTiles?: {x: number, y: number}[]
     // Method for getting the hitbox of the projectile and used for adjusting
     // the coordinates of the projectile if it becomes stopped by hitting something.
     getHitbox: () => Rect
@@ -357,10 +353,14 @@ interface HitProperties {
     // We may need to make this more specific in the future, perhaps record the
     // tile index here, and then enemies can check for certain sets of indeces.
     isThrownObject?: boolean
-    // If defined this hit will apply special projectile only logic like only checking very tall objects/tile
-    // if the project is flagged with `isHigh`, and the hit logic may set certain properties like
-    // `isHigh` or `stopX`/`stopY` on the projectile directly.
-    projectile?: Projectile
+    // This can be set to indicate a specific point for the hit for the sake of height determination.
+    // The entire hit will be considered to be above/below ledges based on where the anchor point is
+    // relative to the ledges.
+    anchorPoint?: Point
+    // If this is true, this hit only applies when there is a positive ledge delta between the anchor point and the target.
+    // If this is false, this hit only applies when there is no ledge delta between the anchor point and the target.
+    // This is ignored if anchorPoint is not set. If this is unset the hit ignores ledges entirely.
+    isHigh?: boolean
 }
 
 interface HitResult {

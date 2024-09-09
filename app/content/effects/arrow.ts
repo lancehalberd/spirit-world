@@ -1,10 +1,10 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getLedgeDelta } from 'app/movement/getLedgeDelta';
+import { getLedgeDelta, updateProjectileHeight } from 'app/movement/getLedgeDelta';
 import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, getTilesInRectangle, hitTargets } from 'app/utils/field';
+import { directionMap, getDirection, /*getTilesInRectangle,*/ hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
@@ -214,7 +214,6 @@ export class Arrow implements EffectInstance, Projectile {
     isPlayerAttack = true;
     isHigh = false;
     refreshIsHigh = true;
-    passedLedgeTiles: TileCoords[] = [];
     constructor({
         x = 0, y = 0, z = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
@@ -241,6 +240,15 @@ export class Arrow implements EffectInstance, Projectile {
         this.style = style;
         this.reflected = reflected;
         this.hybridWorlds = hybridWorlds;
+    }
+    getAnchorPoint() {
+        const direction = getDirection(this.vx, this.vy, true);
+        const dx = directionMap[direction][0], dy = directionMap[direction][1];
+        const tileHitbox = {x: this.x - 6 * dx, y: this.y - 6 * dy, w: this.w, h: this.h};
+        return {
+            x: tileHitbox.x + tileHitbox.w / 2,
+            y: tileHitbox.y + tileHitbox.h / 2,
+        };
     }
     getHitbox() {
         return {x: this.x, y: this.y, w: this.w, h: this.h};
@@ -274,7 +282,8 @@ export class Arrow implements EffectInstance, Projectile {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
-            projectile: this,
+            anchorPoint: this.getAnchorPoint(),
+            isHigh: this.isHigh,
         };
     }
     update(state: GameState) {
@@ -293,10 +302,6 @@ export class Arrow implements EffectInstance, Projectile {
             const ledgeDelta = getLedgeDelta(state, this.area, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
             this.isHigh = ledgeDelta < 0;
             //console.log(ledgeDelta, this.isHigh, this.vx, this.vy, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
-            // Indicate that the arrow has already passed over the tile that it was shot from.
-            // This prevents the arrow from stopped by a ledge boundary that the source is standing on top of.
-            const tileHitbox = {x: this.x - 12 * dx, y: this.y - 12 * dy, w: this.w, h: this.h};
-            this.passedLedgeTiles.push(...getTilesInRectangle(this.area, tileHitbox));
         }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
@@ -333,8 +338,11 @@ export class Arrow implements EffectInstance, Projectile {
             }
             return;
         }
+        const oldAnchorPoint = this.getAnchorPoint();
         this.x += this.vx;
         this.y += this.vy;
+        const anchorPoint = this.getAnchorPoint();
+        this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, anchorPoint);
         const { section } = getAreaSize(state);
         if (this.x + this.w <= section.x || this.y + this.h <= section.y
             || this.x >= section.x + section.w || this.y  >= section.y + section.h
@@ -449,7 +457,7 @@ export class Arrow implements EffectInstance, Projectile {
             context.globalAlpha *= 0.5;
             const direction = getDirection(this.vx, this.vy, true);
             const dx = directionMap[direction][0], dy = directionMap[direction][1];
-            const tileHitbox = {x: this.x - 12 * dx, y: this.y - 12 * dy, w: this.w, h: this.h};
+            const tileHitbox = {x: this.x - 6 * dx, y: this.y - 6 * dy, w: this.w, h: this.h};
             const tiles = getTilesInRectangle(this.area, tileHitbox);
             for (const tile of tiles) {
                 context.fillRect(tile.x * 16, tile.y * 16, 16, 16);
@@ -458,6 +466,13 @@ export class Arrow implements EffectInstance, Projectile {
             context.beginPath();
             context.rect(tileHitbox.x, tileHitbox.y, tileHitbox.w, tileHitbox.h);
             context.stroke();
+
+            context.fillStyle = 'red';
+            context.globalAlpha = 1;
+            const p = this.getAnchorPoint();
+            context.beginPath();
+            context.arc(p.x, p.y, 1, 0, 2 * Math.PI);
+            context.fill();
         context.restore();*/
     }
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
@@ -523,7 +538,11 @@ export class EnemyArrow extends Arrow {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
-            projectile: this,
+            anchorPoint: {
+                x: this.x + this.w / 2,
+                y: this.y + this.h / 2,
+            },
+            isHigh: this.isHigh,
         };
     }
     update(state: GameState) {
@@ -568,7 +587,11 @@ export class CrystalSpike extends Arrow {
             hitEnemies: this.reflected,
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
-            projectile: this,
+            anchorPoint: {
+                x: this.x + this.w / 2,
+                y: this.y + this.h / 2,
+            },
+            isHigh: this.isHigh,
         };
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

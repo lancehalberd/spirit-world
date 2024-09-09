@@ -1,5 +1,6 @@
 import { makeSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
@@ -126,15 +127,49 @@ export class ThrownChakram implements EffectInstance {
             relativeSparkle.update(state);
         }
 
+        const isReturning = (this.outFrames <= 0);
 
         this.animationTime += FRAME_LENGTH;
-        if (this.outFrames > 0) {
-            this.x += this.vx;
-            this.y += this.vy;
-            for (const relativeSparkle of this.relativeSparkles) {
-                relativeSparkle.x += this.vx;
-                relativeSparkle.y += this.vy;
+
+        if (isReturning) {
+            const dx = (this.source.x + this.source.w / 2) - (this.x + this.w / 2);
+            const dy = (this.source.y - 2 + this.source.h / 2) - (this.y + this.h / 2);
+            const m = Math.sqrt(dx * dx + dy * dy);
+            this.vx = this.returnSpeed * dx / m;
+            this.vy = this.returnSpeed * dy / m;
+        }
+
+        const oldAnchorPoint = {x: this.x + this.w / 2, y: this.y + this.h / 2};
+        this.x += this.vx;
+        this.y += this.vy;
+        const anchorPoint = {x: this.x + this.w / 2, y: this.y + this.h / 2};
+        const ledgeDelta = getLedgeDelta(state, this.area, oldAnchorPoint, anchorPoint);
+        if (this.isHigh) {
+            if (ledgeDelta > 0) {
+                this.isHigh = false;
             }
+        } else {
+            if (ledgeDelta < 0) {
+                this.isHigh = true;
+            } else if (ledgeDelta > 0) {
+                // Force the chakram to return if it hits a high ledge.
+                // This shouldn't usually happen because hit detection should detect the ledge before
+                // the Chakram anchor point moves over the ledge.
+                if (!isReturning) {
+                    console.error('Chakram hit high ledge while moving out.')
+                    this.outFrames = 0;
+                }
+                // Chakram should
+                // removeEffectFromArea(state, this);
+                return;
+            }
+        }
+        for (const relativeSparkle of this.relativeSparkles) {
+            relativeSparkle.x += this.vx;
+            relativeSparkle.y += this.vy;
+        }
+
+        if (!isReturning) {
             this.outFrames--;
             const { section } = getAreaSize(state);
             if (this.x <= section.x || this.y <= section.y
@@ -142,22 +177,9 @@ export class ThrownChakram implements EffectInstance {
             ) {
                 this.outFrames = 0;
             }
-        } else {
-            const dx = (this.source.x + this.source.w / 2) - (this.x + this.w / 2);
-            const dy = (this.source.y - 2 + this.source.h / 2) - (this.y + this.h / 2);
-            const m = Math.sqrt(dx * dx + dy * dy);
-            this.vx = this.returnSpeed * dx / m;
-            this.vy = this.returnSpeed * dy / m;
-            this.x += this.vx;
-            this.y += this.vy;
-            for (const relativeSparkle of this.relativeSparkles) {
-                relativeSparkle.x += this.vx;
-                relativeSparkle.y += this.vy;
-            }
-            if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
-                removeEffectFromArea(state, this);
-                return;
-            }
+        } else if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
+            removeEffectFromArea(state, this);
+            return;
         }
 
         const direction = getDirection(this.vx, this.vy, true);
@@ -197,7 +219,8 @@ export class ThrownChakram implements EffectInstance {
             hitEnemies: this.hitCooldown <= 0,
             hitObjects: this.hitCooldown <= 0,
             source: this.source,
-            projectile: this,
+            anchorPoint,
+            isHigh: this.isHigh,
         }
         // Only push objects on the way out to prevent accidentally dragging objects towards the player.
         if (this.outFrames > 0) {
@@ -209,7 +232,7 @@ export class ThrownChakram implements EffectInstance {
         if (hitResult.blocked || hitResult.stopped) {
             this.hitCooldown = 200;
         }
-        // This is used to make torches light th chakram on fire.
+        // This is used to make torches light the chakram on fire.
         if (hitResult.setElement) {
             this.element = hitResult.setElement;
         }
@@ -225,7 +248,8 @@ export class ThrownChakram implements EffectInstance {
             vy: this.vy,
             hitbox: this,
             hitTiles: true,
-            projectile: this,
+            anchorPoint,
+            isHigh: this.isHigh,
         };
         hitResult = hitTargets(state, this.area, hit);
         // A small hitbox check for hitting tiles that stops on any impact, this allows the chakram to go partially
@@ -236,7 +260,8 @@ export class ThrownChakram implements EffectInstance {
             vy: this.vy,
             hitbox: pad(this, -4),
             hitTiles: true,
-            projectile: this,
+            anchorPoint,
+            isHigh: this.isHigh,
         };
         hitResult = hitTargets(state, this.area, hit);
         didHit = hitResult.hit || hitResult.blocked;
@@ -428,6 +453,7 @@ export class HeldChakram implements EffectInstance {
         }
         this.updatePosition();
         this.animationTime += FRAME_LENGTH;
+        const heroHitbox = this.hero.getHitbox();
 
         const hit: HitProperties = {
             damage: this.damage,
@@ -438,6 +464,9 @@ export class HeldChakram implements EffectInstance {
             hitObjects: false,
             knockAwayFrom: { x: this.hero.x + this.hero.w / 2, y: this.hero.y + this.hero.h / 2 },
             source: this.hero,
+            // These settings will prevent hitting objects that are across ledges from where the hero is standing.
+            isHigh: false,
+            anchorPoint: {x: heroHitbox.x + heroHitbox.w / 2, y: heroHitbox.y + heroHitbox.h / 2},
         };
         const hitResult = hitTargets(state, this.area, hit);
         if (hitResult.hit && !hitResult.pierced) {
