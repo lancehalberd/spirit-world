@@ -1,6 +1,34 @@
 import { allLootTypes, GAME_KEY } from 'app/gameConstants';
 import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 
+export function hideHUD(state: GameState, duration: number) {
+    // hide HUD to show that player isn't controllable
+    runBlockingCallback(state, (state: GameState) => {
+        state.hideHUD = true;
+        if (state.hudOpacity > 0) {
+            // advance once per frame, currently set to take duration frames
+            state.hudOpacity = Math.floor(state.hudOpacity*duration - 1) / duration;
+            return true;
+        } else {
+            return false;
+        }
+    });
+}
+
+export function showHUD(state: GameState, duration: number) {
+    // show HUD to tell player that control of their character has returned
+    runBlockingCallback(state, (state: GameState) => {
+        state.hideHUD = false;
+        if (state.hudOpacity < 1) {
+            // advance once per frame, currently set to take duration frames
+            state.hudOpacity = Math.floor(state.hudOpacity*duration + 1) / duration;
+            return true;
+        } else {
+            return false;
+        }
+    });
+}
+
 export function wait(state: GameState, duration: number) {
     state.scriptEvents.queue.push({
         type: 'wait',

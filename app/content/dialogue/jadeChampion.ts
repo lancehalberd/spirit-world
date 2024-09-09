@@ -1,9 +1,10 @@
 import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { appendCallback, appendScript, runBlockingCallback, runPlayerBlockingCallback } from 'app/scriptEvents';
+import { appendCallback, appendScript, runBlockingCallback, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
+import { updateCamera } from 'app/updateCamera';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { addEffectToArea } from 'app/utils/effects';
 
@@ -39,9 +40,11 @@ dialogueHash.jadeChampion = {
             appendCallback(state, (state: GameState) => {
                 addObjectToArea(state, state.hero.area, jadeChampion);
             });
+            // hide HUD to show that player isn't controllable
+            hideHUD(state, 20);
             // Move the player to a good x,y position before talking to the Jade Champion.
             // target coordinates: { x: 134, y: 446 }
-            // FIX, TODO: camera movement is jerky and weird.
+            // FIX, TODO: camera movement is jerky
             runBlockingCallback(state, (state: GameState) => {
                 const hero = state.hero;
                 // fix x coordinate
@@ -78,6 +81,7 @@ dialogueHash.jadeChampion = {
                     hero.d = 'up';
                     hero.y = Math.max(hero.y - 1, 446);
                 }
+                updateCamera(state);
                 return true;
             });
             // JC walks onscreen from the north
@@ -129,7 +133,8 @@ dialogueHash.jadeChampion = {
                 removeObjectFromArea(state, jadeChampion);
             });
             appendScript(state, '{wait:700}');
-            // FIX, TODO: Sign to tell player that they have control of their character returned
+            // show HUD to tell player that control of their character has returned
+            showHUD(state, 20);
             return ``;
         },
     },
