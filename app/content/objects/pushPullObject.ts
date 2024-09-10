@@ -36,7 +36,6 @@ export const pushPullObjectStyles: {[key in string]: PushPullObjectStyle} = {
         weight: 2,
         pushSpeed: 0.5,
         renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance) {
-            console.log('Render big shadow');
             const x = object.x | 0, y = object.y | 0;
             context.save();
                 context.globalAlpha *= 0.3;

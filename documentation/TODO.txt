@@ -62,7 +62,12 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
+    - Figure out why surfacing looks bad in peach cave.
+        - The lighting has harsh black edges that should be more transparent than they are.
+        - Maybe an interaction between darkness, it doesn't seem to happen elsewhere.
+
+    - For some reason cutting bushes in the Peach Cave climb area seems especially laggy in FF
+        - Would be worth profiling and seeing what about this area is so much worse than say cutting bushes in Vanara Village.
 
     - Tower staff should one shot crystal shields.
 
@@ -71,6 +76,9 @@ Current tasks:
     - Storm Heart should have no invulnerability when the orbs are not active or are defeated.
 
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
+
+    - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
+        - Let's make new graphics for this as a pilot of
 
     - If you roll on about the same frame as you jump, it will skip the jump animation and let you roll off the ledge.
         - See if we can reproduce by forcing roll on this frame.

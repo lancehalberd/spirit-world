@@ -130,7 +130,7 @@ export function updateLightingCanvas(area: AreaInstance): void {
 }
 
 export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
-    if (!area.waterSurfaceCanvas) {
+    if (state.surfaceAreaInstance && !area.waterSurfaceCanvas) {
         updateWaterSurfaceCanvas(state);
     }
     if (!area.waterSurfaceCanvas) {

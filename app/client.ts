@@ -24,7 +24,49 @@ import { updateMusic } from 'app/musicController';
 
 export * from 'app/development/packFont';
 
-setInterval(update, FRAME_LENGTH);
+// setInterval(update, FRAME_LENGTH);
+
+let isBrowserTimeThrottled = false, throttleCount = 0;
+
+let nextUpdateTime = Date.now();
+function updateLoop() {
+    const now = Date.now();
+    if (now - nextUpdateTime > FRAME_LENGTH + 5) {
+        throttleCount++;
+        if (throttleCount > 20) {
+            console.warn('20 consecutive frames were throttled, switching to throttled mode.');
+            isBrowserTimeThrottled = true;
+        }
+    } else {
+        throttleCount = 0;
+    }
+    if (!isBrowserTimeThrottled) {
+        setTimeout(updateLoop, FRAME_LENGTH);
+        update();
+        nextUpdateTime = now;
+        return;
+    }
+    // In throttled mode we call this loop with higher granularity but only run the actual game
+    // update based on how much real time is passed. Because the intended FPS may not nicely match
+    // the frequency of these calls, we call update up to 5MS early.
+    setTimeout(updateLoop, 5);
+    if (now >= nextUpdateTime) {
+        nextUpdateTime += FRAME_LENGTH;
+        update();
+    }
+    // If the update gets too far behind the actual time, catch up one frame.
+    /*if (now >= nextUpdateTime) {
+        nextUpdateTime += FRAME_LENGTH;
+        update();
+    }*/
+    // If we are still behind the actual time, just sync the time without catching up.
+    // This probably means the game is lagging for some reason so we just have to accept that
+    // it will appear slow in this case.
+    if (now >= nextUpdateTime) {
+        nextUpdateTime = now;
+    }
+}
+updateLoop();
 
 populateAllSections();
 populateAllDialogue();
