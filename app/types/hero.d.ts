@@ -105,6 +105,8 @@ interface Actor extends ObjectInstance {
     isControlledByObject?: boolean
     // This will get set when the actor is standing on an object that acts as ground and covers ledges.
     ignoreLedges?: boolean
+    // Used to distinguish between actors that can jump off of ledges like heroes.
+    canJumpOffLedges?: boolean
 }
 /* In case using the Hero class causes dependency issues, maybe switching to this interface could help.
 interface Hero extends Actor, SavedHeroData {

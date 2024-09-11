@@ -66,9 +66,6 @@ Current tasks:
         - The lighting has harsh black edges that should be more transparent than they are.
         - Maybe an interaction between darkness, it doesn't seem to happen elsewhere.
 
-    - For some reason cutting bushes in the Peach Cave climb area seems especially laggy in FF
-        - Would be worth profiling and seeing what about this area is so much worse than say cutting bushes in Vanara Village.
-
     - Tower staff should one shot crystal shields.
 
     - Fix tower staff is not pushing statues...

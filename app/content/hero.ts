@@ -168,6 +168,7 @@ export class Hero implements Actor {
     isUncontrollable = false;
     // Clone that you can no longer swap to is marked with this flag.layers
     cannotSwapTo = false;
+    canJumpOffLedges = true;
 
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];

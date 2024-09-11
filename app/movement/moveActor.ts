@@ -161,7 +161,7 @@ function moveActorInDirection(
     if (direction === 'right') {
         result = moveRight(state, actor, movementProperties, amount);
     }
-    if (!actor.ignoreLedges && actor.action !== 'climbing') {
+    if (actor.canJumpOffLedges && !actor.ignoreLedges && actor.action !== 'climbing') {
         const jv = getJumpVector(state, actor.area, actor.getHitbox());
         if (jv[0] !== 0 || jv[1] !== 0) {
             if (actor.pickUpObject || actor.pickUpTile) {
