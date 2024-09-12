@@ -66,9 +66,19 @@ Current tasks:
         - The lighting has harsh black edges that should be more transparent than they are.
         - Maybe an interaction between darkness, it doesn't seem to happen elsewhere.
 
-    - Tower staff should one shot crystal shields.
+    - Fix golem hand's jewels aren't displaying cracked when hit.
 
-    - Fix tower staff is not pushing statues...
+    - Improve randomizer hints:
+        - Don't give hints for peeked trash items.
+            - Track peeked items separately from checked items.
+            - Add dungeon items to list of peeked items if all remaining items have been peeked or obtained.
+                - Dungeon map is always trash
+                - Dungeon keys are trash if all remaining items are trash or dungeon items.
+        - In theory this will prevent giving hints for items that the player already knows they don't care about.
+
+    - Path on left side of forge room with fully drained lava may be hard to see.
+
+    - Block off irrelevant areas in the sky and grand temple until they have content to avoid people wasting time. Put something in the fertility shrine outside the Vanara village even if it is just an NPC.
 
     - Storm Heart should have no invulnerability when the orbs are not active or are defeated.
 
