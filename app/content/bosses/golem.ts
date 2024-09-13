@@ -3,8 +3,9 @@ import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/sho
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
+import { editingState } from 'app/development/editingState';
 import { renderDamageWarning } from 'app/render/renderDamageWarning';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import {
     accelerateInDirection,
     moveEnemy,
@@ -12,8 +13,8 @@ import {
 } from 'app/utils/enemies';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { addScreenShake, hitTargets, isTargetHit } from 'app/utils/field';
-import { pad } from 'app/utils/index';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { pad } from 'app/utils/index';
 import { addObjectToArea } from 'app/utils/objects';
 import { getNearbyTarget} from 'app/utils/target';
 
@@ -170,6 +171,106 @@ export const golemHandHurtAnimations: ActorAnimations = {
     },
 };
 
+
+export function getJewelHitbox(enemy: Enemy): Rect|undefined {
+    const hitbox = enemy.getHitbox();
+    if (enemy.currentAnimationKey === 'slamming') {
+        // The hand cannot be hit during the slamming animation.
+        const jewelX = 12;
+        const jewelHitbox = {
+            x: hitbox.x + jewelX,
+            y: hitbox.y + 2,
+            w: 13,
+            h: 9,
+        };
+        if (enemy.d === 'right') {
+            jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
+        }
+        return jewelHitbox;
+    } else if (enemy.currentAnimationKey === 'returning') {
+        // The hand cannot be hit during the returning animation.
+        const jewelX = 18;
+        const jewelHitbox = {
+            x: hitbox.x + jewelX,
+            y: hitbox.y + 2,
+            w: 12,
+            h: 11,
+        };
+        if (enemy.d === 'right') {
+            jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
+        }
+        return jewelHitbox;
+    } else if (enemy.currentAnimationKey === 'punching') {
+        const jewelX = 28;
+        const jewelHitbox = {
+            x: hitbox.x + jewelX,
+            y: hitbox.y + 12,
+            w: 6,
+            h: 13,
+        };
+        if (enemy.d === 'right') {
+            jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
+        }
+        return jewelHitbox;
+    }
+}
+
+export function getGolemHandHitbox(enemy: Enemy): Rect {
+    const hitbox = enemy.getDefaultHitbox();
+    if (enemy.currentAnimationKey === 'slamming') {
+        hitbox.y += 9;
+    } else if (enemy.currentAnimationKey === 'returning') {
+        hitbox.y += 6;
+    }
+    return hitbox;
+}
+export function getGolemTouchHitbox(enemy: Enemy): Rect {
+    const hitbox = enemy.getDefaultHitbox();
+    // When punching, we want the full hitbox to include the gem, but
+    // the touch hitbox should only include the hand itself and not the gem
+    // or the empty space above and below the gem.
+    if (enemy.currentAnimationKey === 'punching') {
+        const fistX = 3;
+        const fistHitbox = {
+            x: hitbox.x + fistX,
+            y: hitbox.y + 1,
+            w: 24,
+            h: 30,
+        };
+        if (enemy.d === 'right') {
+            fistHitbox.x = hitbox.x + (32 - fistX - fistHitbox.w);
+        }
+        return fistHitbox;
+    }
+    // The touch hitbox is the same as the normal hitbox for every other frame.
+    return getGolemHandHitbox(enemy);
+}
+export function onHitGolemHand(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+    // Thrown objects can hurt the hands as if they were ordinary enemies.
+    if (hit.isThrownObject) {
+        enemy.isInvulnerable = false;
+        const result =  enemy.defaultOnHit(state, hit);
+        enemy.isInvulnerable = (enemy.z > 16);
+        return result;
+    }
+    if (enemy.isInvulnerable || enemy.enemyInvulnerableFrames) {
+        return {};
+    }
+    const jewelHitbox = getJewelHitbox(enemy);
+    const hitJewel = jewelHitbox ? isTargetHit(pad(jewelHitbox, 2), hit) : false;
+    // hits only apply to the hand when the jewel is visible during the punching animation,
+    // otherwise the hand would block hits from most directions.
+    const hitHand = (!jewelHitbox || enemy.currentAnimationKey === 'punching') && isTargetHit(enemy.getTouchHitbox(), hit);
+    // Hands take reduced damage unless they are stunned.
+    if (hitJewel) {
+        return enemy.defaultOnHit(state, hit);
+    } else if (hitHand) {
+        return enemy.defaultBlockHit(state, hit);
+    }
+    // This is the case if the hand is too high for the hit to effect in the current frame.
+    return {};
+}
+
 enemyDefinitions.golem = {
     animations: golemHeadAnimations, life: 12, touchHit: { damage: 1, canAlwaysKnockback: true },
     acceleration: 0.3, speed: 3,
@@ -270,7 +371,7 @@ enemyDefinitions.golem = {
     },
 };
 enemyDefinitions.golemHand = {
-    animations: golemHandAnimations, life: 4, scale: 1, update: updateGolemHand,
+    animations: golemHandAnimations, life: 4, scale: 1,
     floating: true,
     flipRight: true,
     ignorePits: true,
@@ -285,83 +386,57 @@ enemyDefinitions.golemHand = {
     params: {
         enrageLevel: 0,
         side: 'none',
+        touchHit: { damage: 1, knockAwayFromHit: true}
     },
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        if (enemy.isInvulnerable || enemy.enemyInvulnerableFrames) {
-            return {};
-        }
-        // Thrown objects can hurt the hands as if they were ordinary enemies.
-        if (hit.isThrownObject) {
-            return enemy.defaultOnHit(state, hit);
-        }
-        let hitJewel = false, hitHand = false;
-        const hitbox = enemy.getHitbox(state);
-        if (enemy.currentAnimationKey === 'slamming') {
-            // The hand cannot be hit during the slamming animation.
-            const jewelX = 11;
-            const jewelHitbox = {
-                x: hitbox.x + jewelX,
-                y: hitbox.y + 11,
-                w: 13,
-                h: 9,
-            };
-            if (enemy.d === 'right') {
-                jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
-            }
-            hitJewel = isTargetHit(pad(jewelHitbox, 2), hit);
-        } else if (enemy.currentAnimationKey === 'returning') {
-            // The hand cannot be hit during the returning animation.
-            const jewelX = 14;
-            const jewelHitbox = {
-                x: hitbox.x + jewelX,
-                y: hitbox.y + 7,
-                w: 12,
-                h: 11,
-            };
-            if (enemy.d === 'right') {
-                jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
-            }
-            hitJewel = isTargetHit(pad(jewelHitbox, 2), hit);
-        } else if (enemy.currentAnimationKey === 'punching') {
-            const fistX = 1;
-            const fistHitbox = {
-                x: hitbox.x + fistX,
-                y: hitbox.y + 12,
-                w: 24,
-                h: 34,
-            };
-            if (enemy.d === 'right') {
-                fistHitbox.x = hitbox.x + (32 - fistX - fistHitbox.w);
-            }
-            hitHand = isTargetHit(fistHitbox, hit);
-            const jewelX = 28;
-            const jewelHitbox = {
-                x: hitbox.x + jewelX,
-                y: hitbox.y + 12,
-                w: 6,
-                h: 13,
-            };
-            if (enemy.d === 'right') {
-                jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
-            }
-            hitJewel = isTargetHit(jewelHitbox, hit);
+    getHitbox: getGolemHandHitbox,
+    getTouchHitbox: getGolemTouchHitbox,
+    onHit: onHitGolemHand,
+    update: updateGolemHand,
+    afterUpdate(state: GameState, enemy: Enemy) {
+        if (
+            // Disable touch hit during slam attacks, otherwise the touch damage will prevent the actual attack damage.
+            enemy.mode !== 'targetedSlam' && enemy.mode !== 'slamHand'
+            // Don't damage when the hand is resummoned
+            && enemy.mode !== 'appearing'
+            // This prevents the hero from being hit when the hands first raise into the air or when
+            // the hands return to position after an attack, which has no warning and feels a bit unfair.
+            && enemy.mode !== 'return'
+            // Disable touch hit when the hand is in the air so the player can safely walk under the hand.
+            && enemy.z <= 10
+        ) {
+            enemy.touchHit = enemy.params.touchHit || { damage: 1, knockAwayFromHit: true};
         } else {
-            hitHand = true;
+            delete enemy.touchHit;
         }
-        // Hands take reduced damage unless they are stunned.
-        if (hitJewel) {
-            return enemy.defaultOnHit(state, hit);
+        // Prevent interacting with the hand when it is too high
+        enemy.isInvulnerable = (enemy.z > 16);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (enemy.z < 6 && enemy.mode === 'appearing') {
+            context.save();
+                const hitbox = enemy.getMovementHitbox();
+                const cx = hitbox.x + hitbox.w / 2;
+                const cy = hitbox.y + hitbox.h - hitbox.w / 4;
+                context.globalAlpha *= Math.min(0.6, (enemy.z + 64) / 40, Math.max(0, 0.6 - (10 + enemy.z) / 40));
+                const s = Math.min(1, Math.max(0.1, (enemy.z + 40) / 20));
+                context.fillStyle = 'red';
+                context.translate(cx, cy);
+                context.scale(s, s / 2);
+                context.beginPath();
+                context.arc(0, 0, hitbox.w / 2, 0, Math.PI * 2);
+                context.fill();
+            context.restore();
+        } else {
+            enemy.defaultRenderShadow(context, state);
         }
-        if (hitHand) {
-            return enemy.defaultBlockHit(state, hit);
-        }
-        // This is the case if the hand is too high for the hit to effect in the current frame.
-        return {};
     },
     render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
-        if (enemy.mode === 'appearing') {
+        if (enemy.z < 6 && enemy.mode === 'appearing') {
             const frame = enemy.getFrame();
-            const h = Math.floor(frame.h * enemy.modeTime / 1000);
+            const h = Math.floor(frame.h + enemy.z - 24);
+            if (h <= 0) {
+                return;
+            }
             if (enemy.d === 'right' && enemy.enemyDefinition.flipRight) {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
@@ -371,7 +446,7 @@ enemyDefinitions.golemHand = {
                     context.scale(-1, 1);
                     drawFrame(context, {...frame, h}, { ...frame,
                         x: - (w / 2 + frame.content?.x || 0) * enemy.scale,
-                        y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
+                        y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z,
                         w: frame.w * enemy.scale,
                         h: h * enemy.scale,
                     });
@@ -379,7 +454,7 @@ enemyDefinitions.golemHand = {
             } else {
                 drawFrame(context, {...frame, h}, { ...frame,
                     x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
-                    y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
+                    y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z,
                     w: frame.w * enemy.scale,
                     h: h * enemy.scale,
                 });
@@ -392,16 +467,17 @@ enemyDefinitions.golemHand = {
         // When the hand is hurt, we draw the corresponding hurt frame on top of it
         // which will show the gem as cracked to signify the gem is what takes damage.
         if (enemy.enemyInvulnerableFrames) {
-            // This only works if golemHandHurtAnimations parallels the `golemHandAnimations`
-            // that the base golem hand uses to render.
-            if (!golemHandHurtAnimations[enemy.currentAnimationKey]) {
-                debugger;
-                console.error('Missing golemHandHurtAnimations frame', enemy.currentAnimationKey);
-                return;
+            enemy.renderUsingAnimationSet(context, state, golemHandHurtAnimations);
+        }
+        if (editingState.showHitboxes) {
+            const hitbox = getJewelHitbox(enemy);
+            if (hitbox) {
+                context.save();
+                    context.globalAlpha = 0.5;
+                    context.fillStyle = 'blue';
+                    context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+                context.restore();
             }
-            const animation = golemHandHurtAnimations[enemy.currentAnimationKey][enemy.d];
-            const frame = getFrame(animation, enemy.animationTime);
-            enemy.defaultRender(context, state, frame);
         }
     }
 };
@@ -636,9 +712,10 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 status: 'normal',
                 enemyType: 'golemHand',
                 x: hitbox.x - 16,
-                y: hitbox.y + hitbox.h - 32,
+                y: hitbox.y + hitbox.h - 16,
             });
             leftHand.setMode('appearing');
+            leftHand.z = -64;
             leftHand.params.side = 'left';
             addObjectToArea(state, enemy.area, leftHand);
         }
@@ -649,9 +726,10 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 status: 'normal',
                 enemyType: 'golemHand',
                 x: hitbox.x + hitbox.w - 16,
-                y: hitbox.y + hitbox.h - 32,
+                y: hitbox.y + hitbox.h - 16,
             });
             rightHand.setMode('appearing');
+            rightHand.z = -64;
             rightHand.params.side = 'right';
             addObjectToArea(state, enemy.area, rightHand);
         }
@@ -734,17 +812,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.params.side = 'right';
         }
     }
-    // Disable touch hit during slam attacks, otherwise the touch damage will prevent the actual attack damage.
-    if (enemy.mode !== 'targetedSlam' && enemy.mode !== 'slamHand' && enemy.z <= 10) {
-        enemy.behaviors = {
-            touchHit: {
-                damage: 1,
-                knockAwayFromHit: true,
-            },
-        };
-    } else {
-        delete enemy.behaviors;
-    }
+
     // The thumb is on the left and should face towards the middle so the hand on
     // the left side of the face (in global coordinates) needs to be reflected, which means
     // we need it to face 'right' because the 'right' frame is reflected by the engine.
@@ -754,25 +822,26 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
     if (!golem || golem.mode === 'warmup') {
         return;
     }
-    // Prevent interacting with the hand when it is too high
-    enemy.isInvulnerable = (enemy.z > 20);
-    enemy.touchHit = (enemy.z <= 20 && enemy.mode !== 'targetedSlam' && enemy.mode !== 'appearing')
-        ? enemy.enemyDefinition.touchHit : null;
     const otherHands = getOtherHands(state, enemy);
     const isSlammingHands = golem.mode === 'slamHands' || golem.mode === 'strafeSlamHands';
     if (enemy.mode === 'appearing') {
         enemy.changeToAnimation('idle');
         if (enemy.z < 10) {
             enemy.z++;
-        }
-        moveHandToPosition(state, enemy, otherHands);
-        if (enemy.modeTime >= 1000) {
+        } else if (enemy.modeTime >= 1000) {
             enemy.setMode('choose');
         }
+        moveHandToPosition(state, enemy, otherHands);
+
     } else if (enemy.mode === 'choose') {
+        /*enemy.setMode('appearing');
+        enemy.z = -64;
+        return;*/
         enemy.changeToAnimation('idle');
         if (enemy.z < 10) {
-            enemy.z++;
+            enemy.z = Math.min(10, enemy.z + 1);
+        } else if (enemy.z > 10) {
+            enemy.z = Math.max(10, enemy.z - 1);
         }
         // Hands should move apart and stay apart just before the laser fires.
         if ((golem.mode === 'chargeLaser' && golem.modeTime > LASER_CHARGE_TIME - 100)
@@ -851,12 +920,16 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('targetedSlam');
         }
     } else if (enemy.mode === 'return') {
-        enemy.changeToAnimation('returning');
         if (enemy.z < 10) {
-            enemy.z++;
+            enemy.changeToAnimation('returning');
+            enemy.z += 1;
             moveHandToPosition(state, enemy, otherHands);
         } else {
-            enemy.setMode('choose');
+            enemy.changeToAnimation('idle');
+            moveHandToPosition(state, enemy, otherHands);
+            if (enemy.modeTime > 400) {
+                enemy.setMode('choose');
+            }
         }
     } else if (enemy.mode === 'raiseHand') {
         enemy.changeToAnimation('preparing');

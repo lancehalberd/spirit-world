@@ -1,6 +1,6 @@
 import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
 import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frostBeast';
-import { addSlamEffect, golemHandAnimations, golemHandHurtAnimations } from 'app/content/bosses/golem';
+import { addSlamEffect } from 'app/content/bosses/golem';
 import { stormHeartAnimations } from 'app/content/bosses/stormBeast';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { LaserBeam } from 'app/content/effects/laserBeam';
@@ -13,7 +13,7 @@ import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
 import { lightningBoltAbility } from 'app/content/enemyAbilities/lightningBolt';
 import { certainLifeLootTable } from 'app/content/lootTables';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { rotateDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects'
@@ -22,7 +22,7 @@ import {
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { addScreenShake, isTargetHit } from 'app/utils/field';
+import { addScreenShake } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { addObjectToArea, saveObjectStatus } from 'app/utils/objects'
 import Random from 'app/utils/Random';
@@ -455,140 +455,17 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
 }
 
 enemyDefinitions.voidHand = {
-    animations: golemHandAnimations, life: 10, scale: 1, update: updateVoidHand,
-    floating: true,
-    flipRight: true,
-    canBeKnockedBack: false, canBeKnockedDown: false,
-    acceleration: 0.3, speed: 4,
-    touchHit: { damage: 4},
-    immunities: ['fire', 'ice'],
-    elementalMultipliers: {'lightning': 2},
+    ...enemyDefinitions.golemHand,
+    life: 10, scale: 1,
+    update: updateVoidHand,
     initialAnimation: 'idle',
     initialMode: 'return',
     lootTable: certainLifeLootTable,
     params: {
         enrageLevel: 0,
         side: 'none',
+        touchHit: { damage: 4, knockAwayFromHit: true},
     },
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        if (enemy.isInvulnerable || enemy.enemyInvulnerableFrames) {
-            return {};
-        }
-        // Thrown objects can hurt the hands as if they were ordinary enemies.
-        if (hit.isThrownObject) {
-            return enemy.defaultOnHit(state, hit);
-        }
-        let hitJewel = false, hitHand = false;
-        const hitbox = enemy.getHitbox(state);
-        if (enemy.currentAnimationKey === 'slamming') {
-            // The hand cannot be hit during the slamming animation.
-            const jewelX = 11;
-            const jewelHitbox = {
-                x: hitbox.x + jewelX,
-                y: hitbox.y + 11,
-                w: 13,
-                h: 9,
-            };
-            if (enemy.d === 'right') {
-                jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
-            }
-            hitJewel = isTargetHit(jewelHitbox, hit);
-        } else if (enemy.currentAnimationKey === 'returning') {
-            // The hand cannot be hit during the returning animation.
-            const jewelX = 14;
-            const jewelHitbox = {
-                x: hitbox.x + jewelX,
-                y: hitbox.y + 7,
-                w: 12,
-                h: 11,
-            };
-            if (enemy.d === 'right') {
-                jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
-            }
-            hitJewel = isTargetHit(jewelHitbox, hit);
-        } else if (enemy.currentAnimationKey === 'punching') {
-            const fistX = 1;
-            const fistHitbox = {
-                x: hitbox.x + fistX,
-                y: hitbox.y + 12,
-                w: 24,
-                h: 34,
-            };
-            if (enemy.d === 'right') {
-                fistHitbox.x = hitbox.x + (32 - fistX - fistHitbox.w);
-            }
-            hitHand = isTargetHit(fistHitbox, hit);
-            const jewelX = 28;
-            const jewelHitbox = {
-                x: hitbox.x + jewelX,
-                y: hitbox.y + 12,
-                w: 6,
-                h: 13,
-            };
-            if (enemy.d === 'right') {
-                jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
-            }
-            hitJewel = isTargetHit(jewelHitbox, hit);
-        } else {
-            hitHand = true;
-        }
-        // Hands take reduced damage unless they are stunned.
-        if (hitJewel) {
-            return enemy.defaultOnHit(state, hit);
-        }
-        if (hitHand) {
-            enemy.makeSound(state, 'blockAttack');
-            return { hit: true, blocked: true, stopped: true };
-        }
-        // This is the case if the hand is too high for the hit to effect in the current frame.
-        return {};
-    },
-    render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
-        if (enemy.mode === 'appearing') {
-            const frame = enemy.getFrame();
-            const h = Math.floor(frame.h * enemy.modeTime / 1000);
-            if (enemy.d === 'right' && enemy.enemyDefinition.flipRight) {
-                // Flip the frame when facing right. We may need an additional flag for this behavior
-                // if we don't do it for all enemies on the right frames.
-                const w = frame.content?.w ?? frame.w;
-                context.save();
-                    context.translate((enemy.x | 0) + (w / 2) * enemy.scale, 0);
-                    context.scale(-1, 1);
-                    drawFrame(context, {...frame, h}, { ...frame,
-                        x: - (w / 2 + frame.content?.x || 0) * enemy.scale,
-                        y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
-                        w: frame.w * enemy.scale,
-                        h: h * enemy.scale,
-                    });
-                context.restore();
-            } else {
-                drawFrame(context, {...frame, h}, { ...frame,
-                    x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
-                    y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
-                    w: frame.w * enemy.scale,
-                    h: h * enemy.scale,
-                });
-            }
-        } else {
-            enemy.defaultRender(context, state);
-        }
-    },
-    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        // When the hand is hurt, we draw the corresponding hurt frame on top of it
-        // which will show the gem as cracked to signify the gem is what takes damage.
-        if (enemy.enemyInvulnerableFrames) {
-            // This only works if golemHandHurtAnimations parallels the `golemHandAnimations`
-            // that the base golem hand uses to render.
-            if (!golemHandHurtAnimations[enemy.currentAnimationKey]) {
-                debugger;
-                console.error('Missing golemHandHurtAnimations frame', enemy.currentAnimationKey);
-                return;
-            }
-            const animation = golemHandHurtAnimations[enemy.currentAnimationKey][enemy.d];
-            const frame = getFrame(animation, enemy.animationTime);
-            enemy.defaultRender(context, state, frame);
-        }
-    }
 };
 
 function moveHandNorthOfTarget(this: void, state: GameState, enemy: Enemy) {
@@ -611,11 +488,6 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
     // the left side of the face (in global coordinates) needs to be reflected, which means
     // we need it to face 'right' because the 'right' frame is reflected by the engine.
     enemy.d = enemy.params.side === 'left' ? 'right' : 'left';
-
-    // Prevent interacting with the hand when it is too high
-    enemy.isInvulnerable = (enemy.z > 20);
-    enemy.touchHit = (enemy.z <= 20 && enemy.mode !== 'targetedSlam' && enemy.mode !== 'appearing')
-        ? enemy.enemyDefinition.touchHit : null;
 
     if (enemy.mode === 'appearing') {
         enemy.changeToAnimation('idle');

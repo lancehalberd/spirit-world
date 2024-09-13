@@ -4,12 +4,12 @@ import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { getDirection } from 'app/utils/direction';
+import { directionMap, getDirection } from 'app/utils/direction';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
-import { isPointInShortRect, pad } from 'app/utils/index';
+import { boxesIntersect, isPointInShortRect, pad } from 'app/utils/index';
 
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 1, y: 1, w: 14, h: 14}};
@@ -484,6 +484,37 @@ export class HeldChakram implements EffectInstance {
         hit.hitObjects = false;
         hit.hitTiles = true;
         hitTargets(state, this.area, hit);
+        // Finally check for hit damage from enemies and bounce away from them.
+        for (const enemy of this.area.enemies) {
+            if (enemy.invulnerableFrames > 0
+                || enemy.status === 'hidden' || enemy.status === 'gone' || enemy.status === 'off'
+                || enemy.mode === 'hidden'
+                || enemy.isDefeated
+            ) {
+                continue;
+            }
+            const touchHit = enemy.enemyDefinition.touchDamage
+                ? { damage: enemy.enemyDefinition.touchDamage } : enemy.touchHit;
+            if (!touchHit) {
+                continue;
+            }
+            const enemyHitbox = enemy.getTouchHitbox();
+            if (boxesIntersect(this, enemyHitbox)) {
+                playAreaSound(state, this.area, 'blockAttack');
+                let dx = (this.x + this.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
+                let dy = (this.y + this.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);
+                if (!dx && !dy) {
+                    dx = -directionMap[this.hero.d][0];
+                    dy = -directionMap[this.hero.d][1];
+                } else {
+                    const mag = Math.sqrt(dx * dx + dy * dy);
+                    dx /= mag;
+                    dy /= mag;
+                }
+                this.hero.bounce = {vx: 4 * dx, vy: 4 * dy, frames: 10};
+                break;
+            }
+        }
     }
     render(context, state: GameState) {
         if (this.animationTime < 100) {

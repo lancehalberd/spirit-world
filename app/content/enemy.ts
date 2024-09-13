@@ -7,6 +7,7 @@ import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
 import { objectHash } from 'app/content/objects/objectHash';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
@@ -171,6 +172,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             debugger;
         }
         return frame;
+    }
+    getTouchHitbox(): Rect {
+        if (this.enemyDefinition.getTouchHitbox) {
+            return this.enemyDefinition.getTouchHitbox(this);
+        }
+        return this.getHitbox();
     }
     getHitbox(state?: GameState): Rect {
         if (this.enemyDefinition.getHitbox) {
@@ -360,7 +367,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (hit.knockback) {
             this.knockBack(state, hit.knockback);
         } else if (hit.knockAwayFrom) {
-            const hitbox = this.getHitbox(state);
+            const hitbox = this.getHitbox();
             const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
             const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
             const mag = Math.sqrt(dx * dx + dy * dy);
@@ -494,7 +501,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.setAnimation('death', this.d);
             return;
         }
-        const hitbox = this.getHitbox(state);
+        const hitbox = this.getHitbox();
         const deathAnimation = new FieldAnimationEffect({
             animation: enemyDeathAnimation,
             x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * this.scale,
@@ -742,7 +749,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (this.animationTime <= 2800 &&
                 (this.animationTime % 300 === 0 || this.animationTime % 500 === 0)
             ) {
-                const hitbox = this.getHitbox(state);
+                const hitbox = this.getHitbox();
                 const animation = bossDeathExplosionAnimation;
                 const explosionAnimation = new FieldAnimationEffect({
                     animation,
@@ -819,6 +826,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // Break brittle tiles under the enemy.
         if (this.z <= 0) {
             breakBrittleTilesInRect(state, this.area, pad(this.getMovementHitbox(), -4));
+        }
+        if (this.enemyDefinition.afterUpdate) {
+            this.enemyDefinition.afterUpdate(state, this);
         }
     }
     getHealthPercent(state): number {
@@ -931,11 +941,33 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                     h: frame.h * this.scale,
                 });
             }
-            /*const hitbox = this.getHitbox(state);
-            context.globalAlpha = 0.5;
-            context.fillStyle = 'red';
-            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
         context.restore();
+        if (editingState.showHitboxes) {
+            context.save();
+                const hitbox = this.getTouchHitbox();
+                context.globalAlpha = 0.5;
+                context.fillStyle = 'red';
+                context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+            context.restore();
+        }
+    }
+    renderUsingAnimationSet(context: CanvasRenderingContext2D, state: GameState, actorAnimations: ActorAnimations) {
+        // This only works if golemHandHurtAnimations parallels the `golemHandAnimations`
+        // that the base golem hand uses to render.
+        const animationType = actorAnimations[this.currentAnimationKey]
+        if (!animationType) {
+            debugger;
+            console.error('Missing animation type', this.currentAnimationKey, actorAnimations);
+            return;
+        }
+        const animation = animationType[this.d];
+        if (!animation) {
+            debugger;
+            console.error('Missing golemHandHurtAnimations animation direction', this.currentAnimationKey, this.d);
+            return;
+        }
+        const frame = getFrame(animation, this.animationTime);
+        this.defaultRender(context, state, frame);
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.enemyDefinition.renderShadow) {

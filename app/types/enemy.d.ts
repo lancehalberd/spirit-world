@@ -91,6 +91,7 @@ interface EnemyDefinition<Params> {
     // This is a mapping of enemy types that can combine with this enemy to become the resulting enemy type.
     hybrids?: {[key in EnemyType]?: EnemyType}
     update?: (state: GameState, enemy: Enemy<Params>) => void
+    afterUpdate?: (state: GameState, enemy: Enemy<Params>) => void
     onDeath?: (state: GameState, enemy: Enemy<Params>) => void
     onHit?: (state: GameState, enemy: Enemy<Params>, hit: HitProperties) => HitResult
     // Optional render function called instead of the standard render logic.
@@ -105,5 +106,7 @@ interface EnemyDefinition<Params> {
     getHealthPercent?: (state: GameState, enemy: Enemy<Params>) => number
     getShieldPercent?: (state: GameState, enemy: Enemy<Params>) => number
     getHitbox?: (enemy: Enemy<Params>) => Rect
+    // Used for the enemies touch hitbox if different from its base hitbox.
+    getTouchHitbox?: (enemy: Enemy<Params>) => Rect
     getYDepth?: (enemy: Enemy<Params>) => number
 }
