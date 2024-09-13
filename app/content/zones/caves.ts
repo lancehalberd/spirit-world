@@ -656,6 +656,12 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "caves:noToolSideArea", x: 432, y: 144, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "sideArea:noToolEntrance", d: "down"},
         {status: "normal", id: "caves:0:1x0-money-0", x: 16, y: 176, type: "chest", lootType: "money", lootAmount: 50},
         {status: "normal", id: "fertilityTempleEntrance", linked: false, x: 352, y: 480, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleEntrance", d: "down"},
+        {status: "normal", id: "", x: 372, y: 384, d: "up", behavior: "none", style: "man", type: "npc", dialogue: "I wish this shrine was closer to the city..."},
+        {status: "normal", id: "", x: 388, y: 384, d: "up", behavior: "none", style: "woman", type: "npc", dialogue: "We are here to offer thanks for our new child."},
+        {status: "normal", id: "", x: 336, y: 327, type: "decoration", w: 16, h: 16, decorationType: "pedestal", drawPriority: "background"},
+        {status: "normal", id: "", x: 400, y: 308, style: "bellA4", type: "bell"},
+        {status: "normal", id: "", x: 352, y: 308, style: "bellA4", type: "bell"},
+        {status: "normal", id: "fertilityShrineStatue", x: 368, y: 316, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 59, mapId: 'overworld', entranceId: 'sideArea:noToolEntrance', mapX: 2, mapY: 0},

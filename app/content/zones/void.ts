@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -93,8 +92,8 @@ const f0_0x0: AreaDefinition = {
                 w: 32,
                 h: 32,
                 tiles: [
-                    [0,0,0,0,0,0,0,0,0,0,1063,1063,1064,1063,1064,1063,1064,1063,1064,1063,1064,1064,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,1017,0,0,0,0,0,0,0,0,0,0,0,0,1016,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,1017,1063,1063,1064,1063,1064,1063,1064,1063,1064,1063,1064,1064,1016,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,1017,1052,0,0,0,0,0,0,0,0,0,0,0,0,1050,1016,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,1017,0,0,1051,0,0,0,0,0,0,0,0,0,0,0,0,1049,0,0,1016,0,0,0,0,0,0],
                     [0,0,0,0,0,1017,0,0,0,1052,0,0,0,0,0,0,0,0,0,0,0,0,1050,0,0,0,1016,0,0,0,0,0],
@@ -217,8 +216,8 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "voidTree", x: 208, y: 24, type: "boss", enemyType: "voidTree", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "voidEntrance", x: 224, y: 496, type: "door", style: "wideEntrance", targetZone: "tree", targetObjectId: "voidEntrance", d: "down"},
-        {status: "normal", id: "", x: 271, y: 210, type: "waterfall", w: 32, h: 36},
-        {status: "normal", id: "", x: 208, y: 210, type: "waterfall", w: 32, h: 36},
+        {status: "normal", id: "", x: 272, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "voidFlame", invertLogic: true},
+        {status: "normal", id: "", x: 208, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "voidFlame", invertLogic: true},
         {status: "normal", id: "voidStormEntrance", x: 352, y: 424, type: "teleporter", hasCustomLogic: true, customLogic: "voidStorm", invertLogic: true},
         {status: "normal", id: "voidFrostEntrance", x: 144, y: 424, type: "teleporter", hasCustomLogic: true, invertLogic: true, customLogic: "voidFrost"},
         {status: "normal", id: "voidStoneEntrance", x: 56, y: 184, type: "teleporter", hasCustomLogic: true, customLogic: "voidStone", invertLogic: true},
@@ -325,7 +324,7 @@ const sf0_0x0: AreaDefinition = {
                 h: 32,
                 tiles: [
                     [0,0,0,0,0,0,0,0,0,0,1018,1018,1018,1018,1018,1018,1018,1018,1018,1018,1018,1018,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,1,1,0,0,0,1018,1018,1018,1018,1018,1018,1018,1018,1018,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1018,1018,1018,1018,1018,1018,1018,1018,0,0,0,0,0,0,0,0,0],
                     [0,0,0,1018,1018,1018,1018,1018,1018,1018,1018,1018,0,0,0,0,0,0,0,0,0,1018,1,1018,0,0,0,0,0,0,0,0],
                     [0,0,0,0,1017,0,1018,0,0,1016,1018,1018,1018,0,0,0,0,0,0,0,0,1018,1017,0,1018,1018,0,1016,1018,1018,1018,0],
                     [0,0,1017,0,0,1018,1018,0,0,1,1018,1016,0,0,0,0,0,0,0,0,1017,1018,1,1018,1018,1018,1018,0,1018,1016,0,0],
@@ -410,8 +409,8 @@ const sf0_0x0: AreaDefinition = {
                 w: 32,
                 h: 32,
                 tiles: [
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,1,1,1,1,1,1018,0,1018,1018,1018,1018,1018,1018,1018,1,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,1018,1018,1018,1018,1018,1018,1018,1,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,1,1,1,1,1,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -462,6 +461,7 @@ const sf0_0x0: AreaDefinition = {
 };
 zones.void = {
     key: 'void',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [

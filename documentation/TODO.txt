@@ -78,10 +78,6 @@ Current tasks:
 
     - Path on left side of forge room with fully drained lava may be hard to see.
 
-    - Block off irrelevant areas in the sky and grand temple until they have content to avoid people wasting time. Put something in the fertility shrine outside the Vanara village even if it is just an NPC.
-
-    - Storm Heart should have no invulnerability when the orbs are not active or are defeated.
-
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
