@@ -62,8 +62,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Storm Heart should have no invulnerability when the orbs are not active or are defeated.
-
     - Figure out why surfacing looks bad in peach cave.
         - The lighting has harsh black edges that should be more transparent than they are.
         - Maybe an interaction between darkness, it doesn't seem to happen elsewhere.
