@@ -150,7 +150,7 @@ export function canMoveLeft(
                     break DETERMINE_FLAGS;
                 }
             }
-            // There is a diagonal downleft in either the tile left or down from the pixel tile.
+            // There is a diagonal downleft in either the tile right or up from the pixel tile.
             const upOfPixelBehaviors = area.behaviorGrid[ty - 1]?.[tx];
             const rightOfPixelBehaviors = area.behaviorGrid[ty]?.[tx + 1];
             if (upOfPixelBehaviors?.diagonalLedge === 'downleft' || rightOfPixelBehaviors?.diagonalLedge === 'downleft') {
@@ -172,13 +172,16 @@ export function canMoveLeft(
                     break DETERMINE_FLAGS;
                 }
             }
-            // There is a diagonal upright in either the tile left or down from the pixel tile.
-            const downOfPixelBehaviors = area.behaviorGrid[ty]?.[tx + 1];
+            // There is a diagonal upleft in either the tile right or down from the pixel tile.
+            const downOfPixelBehaviors = area.behaviorGrid[ty + 1]?.[tx];
             if (rightOfPixelBehaviors?.diagonalLedge === 'upleft' || downOfPixelBehaviors?.diagonalLedge === 'upleft') {
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + 1 + tx);
                 // If the anchor is downright of the boundary, and the pixel is upleft.
-                if (ay + ax > N && y + x < N) {
+                // Subtracting 2 here simulates using the top left anchor point instead of the bottom right anchor point.
+                // This prevents the player from being considered "above" when they are moving completely adjacent
+                // to a diagonal ledge.
+                if (ay + ax - 2 > N && y + x < N) {
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }

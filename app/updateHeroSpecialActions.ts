@@ -874,6 +874,8 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
     let hitbox = hero.getHitbox();
     const startPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
     const lastOpenPosition = {x: hero.x, y: hero.y};
+    // Disable jumping during cloud sommersault.
+    hero.canJumpOffLedges = false;
     // Move 8px at a time 6 times in either area.
     for (let i = 0; i < 6; i++) {
         let result = moveActor(state, hero, moveX, moveY, {
@@ -901,6 +903,8 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         }
         addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.savedData.element });
     }
+    // Enable jumping after cloud sommersault.
+    hero.canJumpOffLedges = true;
     hitbox = hero.getHitbox();
     const endPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
     const teleportHit: HitProperties = {

@@ -62,10 +62,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Can cloud sommersault to the right across ledges(if the ground is passable in the spirit world), but not to the left
-        - Similarly, you can sommersault down across ledges but not up.
-        - This is somewhat low priority since ledges almost always coincide between worlds.
-
     - Improve randomizer hints:
         - Don't give hints for peeked trash items.
             - Track peeked items separately from checked items.
@@ -172,6 +168,10 @@ Current tasks:
 
     - Mechanic for breaking crystal barriers open is unintuitive.
     - Add 4th spirit upgrade that let's you swap between worlds while meditating.
+
+    - cannot roll/astral project around a diamond shaped set of cliffs smoothly.
+        - low priority, but this can probably be fixed by adjusting which anchor point is used when calculating
+          `isAbove` in canMoveX when adjacent to various diagonal ledges.
 
     - Brainstorm more clone tool puzzles.
         - Maybe in the back of Forest Temple scientists give you the clone tool and then agree to answer questions if you complete "tests" for them.
