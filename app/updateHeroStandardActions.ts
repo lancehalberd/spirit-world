@@ -616,6 +616,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     }
                 //}
             }
+            if (hero.action === 'jumpingDown') {
+                return;
+            }
         }
     }
     // Return the climbing animation to a neutral state any time the character isn't moving or trying to move vertically.
@@ -804,9 +807,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                             }
                         }
                     }
+                    hero.grabTile = null;
+                    return;
                 }
             }
-            hero.grabTile = null;
+            // hero.grabTile = null;
         } else if (closestObject) {
             if (closestObject.onGrab) {
                 closestObject.onGrab(state, hero.d, hero);
@@ -818,6 +823,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             const [dx, dy] = directionMap[hero.d];
             /*const {mx, my} = */moveActor(state, hero, dx, dy);
             // console.log('moving towards grabbed object', {mx, my});
+            return;
         }
     }
     if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)

@@ -62,6 +62,10 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Can cloud sommersault to the right across ledges(if the ground is passable in the spirit world), but not to the left
+        - Similarly, you can sommersault down across ledges but not up.
+        - This is somewhat low priority since ledges almost always coincide between worlds.
+
     - Improve randomizer hints:
         - Don't give hints for peeked trash items.
             - Track peeked items separately from checked items.
@@ -73,16 +77,7 @@ Current tasks:
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
-        - Let's make new graphics for this as a pilot of
-
-    - Can cloud sommersault to the right across ledges(if the ground is passable in the spirit world), but not to the left
-        - Similarly, you can sommersault down across ledges but not up.
-        - This is somewhat low priority since ledges almost always coincide between worlds.
-
-    - If you roll on about the same frame as you jump, it will skip the jump animation and let you roll off the ledge.
-        - The same issues appears to happen with meditating/astral projection allowing you to teleport across ledges.
-        - See if we can reproduce by forcing roll on this frame.
-        - Make sure rolling is prevented on this frame.
+        - Let's make new graphics for this as a pilot of the Cocoon graphics.
 
     - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
         - Material world entrances: back of Tomb, lake teleporter, bottom of Cocoon, Helix Bridge
