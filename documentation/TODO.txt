@@ -62,10 +62,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Figure out why surfacing looks bad in peach cave.
-        - The lighting has harsh black edges that should be more transparent than they are.
-        - Maybe an interaction between darkness, it doesn't seem to happen elsewhere.
-
     - Improve randomizer hints:
         - Don't give hints for peeked trash items.
             - Track peeked items separately from checked items.
@@ -74,14 +70,17 @@ Current tasks:
                 - Dungeon keys are trash if all remaining items are trash or dungeon items.
         - In theory this will prevent giving hints for items that the player already knows they don't care about.
 
-    - Path on left side of forge room with fully drained lava may be hard to see.
-
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of
 
+    - Can cloud sommersault to the right across ledges(if the ground is passable in the spirit world), but not to the left
+        - Similarly, you can sommersault down across ledges but not up.
+        - This is somewhat low priority since ledges almost always coincide between worlds.
+
     - If you roll on about the same frame as you jump, it will skip the jump animation and let you roll off the ledge.
+        - The same issues appears to happen with meditating/astral projection allowing you to teleport across ledges.
         - See if we can reproduce by forcing roll on this frame.
         - Make sure rolling is prevented on this frame.
 

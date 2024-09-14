@@ -59,6 +59,7 @@ interface EnemyDefinition<Params> {
     canBeKnockedDown?: boolean
     canBeFrozen?: boolean
     canSwim?: boolean
+    canMoveInLava?: boolean
     flipLeft?: boolean
     flipRight?: boolean
     flying?: boolean

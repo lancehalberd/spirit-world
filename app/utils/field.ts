@@ -12,32 +12,34 @@ import { resetTileBehavior } from 'app/utils/tileBehavior';
 export { directionMap, getDirection } from 'app/utils/direction';
 
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
-    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
+    return isTileOpen(state, hero.area, {x, y}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
 }
 
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
-    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
+    return isTileOpen(state, hero.area, {x, y}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
 }
 window['canSomersaultToCoords'] = canSomersaultToCoords;
 
-export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Point, movementProperties: MovementProperties): boolean {
+export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Point, movementProperties: MovementProperties = {}): boolean {
+    movementProperties = {
+        canSwim: true,
+        canFall: true,
+        canMoveInLava: true,
+        ...movementProperties,
+    };
     x = x | 0;
     y = y | 0;
     /*console.log(x, y, isPointOpen(state, area, {x: x, y: y}, movementProperties));
     console.log(x + 15, y, isPointOpen(state, area, {x: x + 15, y: y}, movementProperties));
     console.log(x, y + 15, isPointOpen(state, area, {x: x, y: y + 15}, movementProperties));
     console.log(x + 15, y + 15, isPointOpen(state, area, {x: x + 15, y: y + 15}, movementProperties));*/
-   /* return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
-        isPointOpen(state, area, {x: x + 13, y: y + 2}, movementProperties) &&
-        isPointOpen(state, area, {x: x + 2, y: y + 13}, movementProperties) &&
-        isPointOpen(state, area, {x: x + 13, y: y + 13}, movementProperties);*/
     return isPointOpen(state, area, {x: x, y: y}, movementProperties) &&
         isPointOpen(state, area, {x: x + 15, y: y}, movementProperties) &&
         isPointOpen(state, area, {x: x, y: y + 15}, movementProperties) &&
         isPointOpen(state, area, {x: x + 15, y: y + 15}, movementProperties);
 }
 
-export function isPointOpen(
+function isPointOpen(
     state: GameState,
     area: AreaInstance,
     {x, y, z}: {x: number, y: number, z?: number},
@@ -60,7 +62,7 @@ export function isPointOpen(
         return false;
     } else if (tileBehavior?.lowCeiling && z >= 3) {
         return false;
-    } else if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
+    } else if (tileBehavior?.solidMap && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return false;
@@ -69,18 +71,6 @@ export function isPointOpen(
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.up && sy === 0
-        && movementProperties.direction && movementProperties.direction !== 'up') {
-        return false;
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.down && sy === 15
-        && movementProperties.direction && movementProperties.direction !== 'down') {
-        return false;
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.left && sx === 0
-        && movementProperties.direction && movementProperties.direction !== 'left') {
-        return false;
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.right && sx === 15
-        && movementProperties.direction && movementProperties.direction !== 'right') {
-        return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
         return false;

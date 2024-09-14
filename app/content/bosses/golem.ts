@@ -171,6 +171,8 @@ export const golemHandHurtAnimations: ActorAnimations = {
     },
 };
 
+const headMovementProperties: MovementProperties = {canFall: true, canSwim: true, canMoveInLava: true};
+const handMovementProperties: MovementProperties = {canFall: true, canSwim: true, canMoveInLava: true, canPassMediumWalls: true};
 
 export function getJewelHitbox(enemy: Enemy): Rect|undefined {
     const hitbox = enemy.getHitbox();
@@ -551,9 +553,9 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             const targetHitbox = target.getHitbox(state);
             // Track the player's x position when possible.
             if (targetHitbox.x + targetHitbox.w / 2 < cx - 4) {
-                moveEnemy(state, enemy, -enemy.speed, 0, {canFall: true});
+                moveEnemy(state, enemy, -enemy.speed, 0, headMovementProperties);
             } else if (targetHitbox.x + targetHitbox.w / 2 > cx + 4) {
-                moveEnemy(state, enemy, enemy.speed, 0, {canFall: true});
+                moveEnemy(state, enemy, enemy.speed, 0, headMovementProperties);
             }
         }
     }
@@ -579,12 +581,12 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         enemy.useTaunt(state, 'doubleLaser');
         const { section }  = getAreaSize(state);
         if (hitbox.x + hitbox.w / 2 <= section.x + section.w / 2) {
-            if (moveEnemy(state, enemy, -enemy.speed, 0, {canFall: true})) {
+            if (moveEnemy(state, enemy, -enemy.speed, 0, headMovementProperties)) {
                 enemy.modeTime = 0;
             }
             enemy.vx = enemy.speed;
         } else {
-            if (moveEnemy(state, enemy, enemy.speed, 0, {canFall: true})) {
+            if (moveEnemy(state, enemy, enemy.speed, 0, headMovementProperties)) {
                 enemy.modeTime = 0;
             }
             enemy.vx = -enemy.speed;
@@ -606,7 +608,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         }
     } else if (enemy.mode === 'fireStrafeLaser') {
         enemy.changeToAnimation(isAngry ? 'angryShootEyes' : 'shootEyes');
-        if (moveEnemy(state, enemy, enemy.vx, 0, {canFall: true})) {
+        if (moveEnemy(state, enemy, enemy.vx, 0, headMovementProperties)) {
             enemy.modeTime = 0;
         }
         if (enemy.modeTime >= 400) {
@@ -624,7 +626,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.params.slamHands = false;
             }
         } else {
-            if (moveEnemy(state, enemy, enemy.vx, 0, {canFall: true})) {
+            if (moveEnemy(state, enemy, enemy.vx, 0, headMovementProperties)) {
                 enemy.modeTime = 0;
             }
             if (enemy.modeTime >= 400) {
@@ -796,8 +798,6 @@ export function addSlamEffect(this: void, state: GameState, enemy: Enemy): void 
     });
     addEffectToArea(state, enemy.area, slamAnimation);
 }
-
-const handMovementProperties: MovementProperties = {canFall: true, canPassMediumWalls: true};
 
 function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
     // For multiple golems we would need to associate hands with the golem closest to their spawn point.

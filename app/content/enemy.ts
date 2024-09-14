@@ -75,7 +75,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     groundHeight = 0;
     canBeKnockedBack: boolean = true;
     canBeKnockedDown: boolean = true;
+    // If this is true the enemy can move in water tiles and will also not sink in them.
     canSwim: boolean = false;
+    // If this is true the enemy can move on lava tiles and will not be damaged by them.
+    canMoveInLava: boolean = false;
     flying: boolean;
     isImmortal: boolean = false;
     isInvulnerable: boolean = false;
@@ -164,6 +167,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.enemyDefinition.initialize?.(state, this);
         this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
         this.canSwim = this.enemyDefinition.canSwim;
+        this.canMoveInLava = this.enemyDefinition.canMoveInLava;
     }
     getFrame(): Frame {
         const frame = getFrame(this.currentAnimation, this.animationTime);
@@ -659,7 +663,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.frozenDuration > 0) {
             this.frozenDuration -= FRAME_LENGTH;
             if (Math.abs(this.vx) > 0.1 || Math.abs(this.vy) > 0.1) {
-                moveEnemy(state, this, this.vx, this.vy, {canFall: true});
+                moveEnemy(state, this, this.vx, this.vy, {canFall: true, canSwim: true});
             }
             if (this.z > 0) {
                 this.z = Math.max(0, this.z + this.vz);
@@ -773,7 +777,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.action === 'knocked') {
             this.vz = Math.max(-8, this.vz + this.az);
             this.z += this.vz;
-            moveEnemy(state, this, this.vx, this.vy, {canFall: true});
+            moveEnemy(state, this, this.vx, this.vy, {canFall: true, canSwim: true});
             if (this.z <= minZ) {
                 this.z = minZ;
             }

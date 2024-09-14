@@ -75,7 +75,7 @@ enemyDefinitions.vortex = {
                     // The vortex will send the player down into the underwater instance if one is defined for this area.
                     if (hero === state.hero
                         && state.underwaterAreaInstance
-                        && isTileOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canSwim: true, canFall: true})
+                        && isTileOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canMoveInLava: false})
                     ) {
                         enterLocation(state, {
                             ...state.location,
@@ -111,13 +111,7 @@ enemyDefinitions.vortex = {
                 // This maxes at 4 if the hero is as close as possible (8px).
                 const dx = -256 * x / mag / mag, dy = -256 * y / mag / mag;
                 // TODO: only apply this if the hero is underwater or swimming
-                moveActor(state, hero, dx, dy, {
-                    canFall: true,
-                    canSwim: true,
-                    direction: hero.d,
-                    actor: hero,
-                    dx, dy,
-                });
+                moveActor(state, hero, dx, dy);
             }
         }
     },

@@ -57,8 +57,8 @@ enemyDefinitions.balloonMegapede = {
     aggroRadius: 512,
     alwaysReset: true,
     floating: true,
+    baseMovementProperties: {canFall: true, canSwim: true, canMoveInLava: true},
     animations: beetleHornedAnimations, speed: 1, acceleration: 0.05,
-    baseMovementProperties: {canMoveInLava: true},
     life: 8, touchDamage: 2,
     params: {length: 11, isHead: true, isControlled: true, isVulnerable: false},
     onDeath(state: GameState, enemy: Enemy) {
@@ -230,7 +230,7 @@ function updateBody(state: GameState, enemy: Enemy<BalloonMegapedeParams>) {
     } else {
         // The boss is designed so that this code should never run.
         // Slowly drift to a stop if this is a body part without a parent.
-        moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
+        moveEnemy(state, enemy, enemy.vx, enemy.vy);
         enemy.vx *= 0.98;
         enemy.vy *= 0.98;
         // Detonate automatically after a bit.
@@ -249,7 +249,7 @@ function updateTail(state: GameState, enemy: Enemy<BalloonMegapedeParams>) {
         enemy.modeTime = 0;
     } else {
         // Slowly drift to a stop if this is a body part without a parent.
-        moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
+        moveEnemy(state, enemy, enemy.vx, enemy.vy);
         enemy.vx *= 0.98;
         enemy.vy *= 0.98;
         // Detonate automatically after a bit.

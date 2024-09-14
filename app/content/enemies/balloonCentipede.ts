@@ -53,7 +53,7 @@ enemyDefinitions.balloonCentipede = {
     alwaysReset: true,
     floating: true,
     animations: beetleHornedAnimations, speed: 1, acceleration: 0.05,
-    baseMovementProperties: {canMoveInLava: true},
+    baseMovementProperties: {canMoveInLava: true, canFall: true, canSwim: true},
     life: 1, touchDamage: 1,
     params: {length: 5, isHead: true, isControlled: true},
     onDeath(state: GameState, enemy: Enemy) {
@@ -170,7 +170,7 @@ enemyDefinitions.balloonCentipede = {
             }
         } else {
             // Slowly drift to a stop if this is a body part without a parent.
-            moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
+            moveEnemy(state, enemy, enemy.vx, enemy.vy);
             enemy.vx *= 0.98;
             enemy.vy *= 0.98;
             // Detonate automatically after a bit.

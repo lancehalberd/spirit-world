@@ -240,7 +240,7 @@ export function isMovementBlocked(
     if (behaviors?.isLava && !movementProperties.canMoveInLava) {
         return {};
     }
-    if (behaviors?.pitMap && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
+    if (behaviors?.isLavaMap && !movementProperties.canMoveInLava) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return {};

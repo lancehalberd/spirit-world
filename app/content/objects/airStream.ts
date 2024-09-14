@@ -133,9 +133,7 @@ export class AirStream implements ObjectInstance {
                 actor.z = Math.max(actor.z, Math.min(actor.z + 0.5 * windForce, 3));
                 const vx = speed * dx, vy = speed * dy;
                 moveActor(state, actor, vx, vy, {
-                    canFall: true,
-                    canJump: true,
-                    canSwim: true,
+                    canMoveInLava: actor.canMoveInLava,
                     canPush: false,
                 });
                 // Accelerate the actor if it is moving slower than the wind velocity.

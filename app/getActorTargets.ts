@@ -75,7 +75,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
             },
             render() {}
         };
-        moveObject(state, object, dx, dy, {canJump: false, canWiggle: true, canFall: true, canSwim: true, canPassWalls: true});
+        moveObject(state, object, dx, dy, {canJump: false, canWiggle: true, canFall: true, canMoveInLava: true, canSwim: true, canPassWalls: true});
         const mx = object.x - x, my = object.y - y;
         if (mx === dx && my === dy) {
             // console.log(candidate.x, candidate.y, {x, y}, mx, my);

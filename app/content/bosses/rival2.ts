@@ -724,7 +724,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
         const [x, y] = directionMap[enemy.d];
         const frame = enemy.animationTime / FRAME_LENGTH;
         const speed = rollSpeed[frame] || 0;
-        moveEnemy(state, enemy, speed * x, speed * y, {});
+        moveEnemy(state, enemy, speed * x, speed * y);
     }
     if (enemy.activeAbility?.definition === staffAbility) {
         const jumpDuration = enemy.activeAbility.definition.prepTime;

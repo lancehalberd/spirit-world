@@ -239,16 +239,15 @@ interface MovementProperties {
     // Whether the mover can pass through solid tiles. Does not allow passing across ledges.
     // Used when determining whether a ledge is being crossed in `getActorTarget`.
     canPassWalls?: boolean
-    // The direction of the movement, can effect whether a tile is considered open,
-    // for example edges the player can jump off of in one or two directions.
-    direction?: Direction
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
-    // Movement will fill if any pixels in the tile are blocked.
+    // Movement will fail if any pixels in the tile are blocked.
     needsFullTile?: boolean
     // The actor moving, if an actor. This will be used for hitting damaging tiles
     actor?: Actor
     // The delta for the complete movement.
+    // Currently this is only used for knocing the actor backwards when moving into something that knocks back
+    // like a thorn bush.
     dx?: number
     dy?: number
     // If this is set, allow moving through objects that can be lifted with this power level:

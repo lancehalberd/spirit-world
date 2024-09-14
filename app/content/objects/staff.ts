@@ -90,7 +90,9 @@ export class Staff implements ObjectInstance {
         const dy = 4 * directionMap[direction][1];
         const movementProperties: MovementProperties = {
             boundingBox: getSectionBoundingBox(state, this),
-            canFall: true, canSwim: true, canWiggle: true, dx, dy,
+            canFall: true, canSwim: true,
+            canMoveInLava: true,
+            canWiggle: true, dx, dy,
             crushingPower,
         };
         for (let i = 0; i < maxLength * 4; i++) {

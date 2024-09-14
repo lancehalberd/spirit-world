@@ -598,7 +598,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'punch') {
         enemy.changeToAnimation('punching');
         accelerateInDirection(state, enemy, {x: 0, y: 1});
-        if (!moveEnemy(state, enemy, enemy.vx, enemy.vy, {})) {
+        if (!moveEnemy(state, enemy, enemy.vx, enemy.vy)) {
             enemy.makeSound(state, 'bossDeath');
             if (enemy.area === state.areaInstance) {
                 addScreenShake(state, 0, 3);

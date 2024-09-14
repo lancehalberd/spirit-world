@@ -166,7 +166,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
             if (testHero.swimming
-                && isTileOpen(state, state.surfaceAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
+                && isTileOpen(state, state.surfaceAreaInstance, {x: hero.x, y: hero.y})
             ) {
                 enterLocation(state, {
                     ...state.location,
@@ -198,7 +198,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
 
     if (hero.swimming && hero.savedData.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
-        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
+        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y})
     ) {
         /*const mx = hero.x % 16;
         if (mx > 0 && mx < 8) {
@@ -583,14 +583,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 canClimb: !encumbered && !hero.bounce && !isCharging && !hero.isAstralProjection,
                 canCrossLedges: hero.action === 'climbing',
                 // This doesn't mean the player will fall, just that they can move into tiles/objects marked as pits.
-                canFall: true,
                 canJump: !hero.isAstralProjection,
-                canSwim: true,
                 // This prevents the movement for trying to line up with the grab object from resulting in extra movement
                 // that moves the hero way from the object and causes them to stop grabbing it.
                 // This doesn't prevent the hero from wiggling with a push pu
                 canWiggle: !hero.grabObject,
-                direction: hero.d,
                 boundingBox: (hero.isAstralProjection || hero.bounce) ? getSectionBoundingBox(state, hero) : undefined,
                 actor: hero,
                 dx: moveX, dy: moveY,
@@ -819,7 +816,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             // Try moving 1px towards grabbed objects to prevent there being a gap between them and the object.
             // This helps prevent cases where the hero+object can't make it through spaces that narrowly fit them together.
             const [dx, dy] = directionMap[hero.d];
-            /*const {mx, my} = */moveActor(state, hero, dx, dy, {canFall: true, canSwim: true});
+            /*const {mx, my} = */moveActor(state, hero, dx, dy);
             // console.log('moving towards grabbed object', {mx, my});
         }
     }

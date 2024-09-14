@@ -5,7 +5,7 @@ import { moveObject } from 'app/movement/moveObject';
 // import { showMessage } from 'app/scriptEvents';
 import { boxesIntersect } from 'app/utils/index';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/direction';
+import { directionMap } from 'app/utils/direction';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 
@@ -363,15 +363,11 @@ function setObjectPosition(this: void, object: ObjectInstance, x: number, y: num
 }
 
 function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: number, movementProperties: MovementProperties = {}) {
-    movementProperties = {
-        canFall: true,
-        canSwim: true,
+    return moveActor(state, hero, dx, dy, {
         canWiggle: true,
-        direction: getDirection(dx, dy, true),
         boundingBox: getSectionBoundingBox(state, hero),
         ...movementProperties,
-    };
-    return moveActor(state, hero, dx, dy, movementProperties);
+    });
 }
 
 export function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, movementProperties: MovementProperties = {}) {
@@ -380,8 +376,8 @@ export function moveLinkedObject(this: void, state: GameState, object: ObjectIns
     movementProperties = {
         canFall: true,
         canSwim: true,
+        canMoveInLava: true,
         canWiggle: true,
-        direction: getDirection(dx, dy, true),
         boundingBox: getSectionBoundingBox(state, object),
         blockedBoxes,
         ...movementProperties,
@@ -399,9 +395,9 @@ export function moveLinkedObject(this: void, state: GameState, object: ObjectIns
         const linkedResult = moveObject(state, object.linkedObject, mx, my, {
             canFall: true,
             canSwim: true,
+            canMoveInLava: true,
             // We rely on the base object wiggling for wiggling behavior.
             canWiggle: false,
-            direction: getDirection(mx, my),
             boundingBox: getSectionBoundingBox(state, object.linkedObject),
             blockedBoxes,
             ...movementProperties,

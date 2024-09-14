@@ -183,7 +183,7 @@ enemyDefinitions.snakeStorm = {
             const choices: Direction[] = ['up', 'down', 'left', 'right'];
             while (choices.length) {
                 const d = Random.removeElement(choices);
-                if (canMoveEnemy(state, enemy, enemy.speed * directionMap[d][0], enemy.speed * directionMap[d][1], {})) {
+                if (canMoveEnemy(state, enemy, enemy.speed * directionMap[d][0], enemy.speed * directionMap[d][1])) {
                     enemy.d = d;
                     enemy.changeToAnimation('move');
                     enemy.setMode('walk')
@@ -193,7 +193,7 @@ enemyDefinitions.snakeStorm = {
         }
         if (enemy.modeTime >= 400) {
             enemy.changeToAnimation('move');
-            if (Math.random() < (enemy.modeTime - 600) / 2000 || !moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1], {})) {
+            if (Math.random() < (enemy.modeTime - 600) / 2000 || !moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1])) {
                 enemy.setMode('choose');
             }
         }

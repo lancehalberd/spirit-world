@@ -180,9 +180,8 @@ export class Escalator implements ObjectInstance {
                 && hero.z <= this.behaviors.groundHeight;
             if (this.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {
-                    canFall: true,
+                    // TODO: is this correct?
                     canJump: true,
-                    canSwim: true,
                 });
             } else if (this.speed === 'fast') {
                 if (hero.actionTarget === this && !touchingHero) {
