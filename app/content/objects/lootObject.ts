@@ -144,6 +144,29 @@ export class LootObject implements ObjectInstance {
     getHitbox(state?: GameState) {
         return getFrameHitbox(this.frame, this);
     }
+    isVisibleToPlayer(state: GameState): boolean {
+        // Not visible if beyond the edges of the screen.
+        if (this.x + 16 <= state.camera.x || this.x >= state.camera.x + CANVAS_WIDTH
+            || this.y + 16 <= state.camera.y || this.y >= state.camera.y + CANVAS_HEIGHT
+        ) {
+            return false;
+        }
+        // Visible if it is in the current area instance
+        if (this.area === state.areaInstance) {
+            return true;
+        }
+        if (state.hero.action === 'meditating') {
+            // Spirit sight originates from the middle of the top of the hero hitbox.
+            const dx = (state.hero.x + state.hero.w / 2) - (this.x + 8);
+            const dy = (state.hero.y) - (this.y + 8);
+            // Shapes of items and vision at the edge of spirit sight fades out
+            // so this is just an approximation.
+            if ((state.hero.spiritRadius + 6) ** 2 >= dx * dx + dy * dy) {
+                return true;
+            }
+        }
+        return false;
+    }
     update(state: GameState) {
         if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
@@ -157,13 +180,17 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
-        if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
-            && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
-            && this.definition.lootType === 'empty'
-        ) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            this.status = 'gone';
-            return;
+        if (this.isVisibleToPlayer(state)) {
+            // Mark any loot object as peeked if it has been seen by the player.
+            // The randomizer hint system can use this to avoid giving bad hints to the player.
+            state.savedState.objectFlags[this.definition.id + '-peeked'] = true;
+            // Mark empty loot as gone when it is peeked so it will automatically advance
+            // the check counter in randomizer when peeked.
+            if (this.definition.lootType === 'empty') {
+                state.savedState.objectFlags[this.definition.id] = true;
+                this.status = 'gone';
+                return;
+            }
         }
         if (this.area === state.hero.area && state.hero.overlaps(this)) {
             removeObjectFromArea(state, this);

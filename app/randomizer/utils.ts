@@ -801,13 +801,13 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             const flag = `${dialogueKey}-${optionKey}`;
             const flagScript = `{flag:${flag}}`;
             if (dialogueKey === 'streetVendor') {
-                addCheck(flag, 'overworld');
+                addCheck(flag, assignment, 'overworld');
             } else if (dialogueKey === 'storageVanara') {
-                addCheck(flag, 'treeVillage');
+                addCheck(flag, assignment, 'treeVillage');
             } else if (dialogueKey === 'citySmith') {
-                addCheck(flag, 'holyCityInterior');
+                addCheck(flag, assignment, 'holyCityInterior');
             } else if (dialogueKey === 'forgeSmith') {
-                addCheck(flag, 'forge');
+                addCheck(flag, assignment, 'forge');
             } else {
                 console.error('Unhandled dialogue key', dialogueKey);
             }
@@ -833,7 +833,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 const {object} = findLootById(zones[zoneKey], assignment.target.lootObject.id);
                 const npc = object as NPCDefinition;
                 const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
-                addCheck(npcKey,  assignment.target.location.logicalZoneKey);
+                addCheck(npcKey,  assignment, assignment.target.location.logicalZoneKey);
                 const lootAmount = getLootAmount(assignment);
                 let text: string;
                 if (assignment.lootType === 'empty') {
@@ -864,7 +864,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 assignment.target.lootObject.lootAmount = assignment.lootAmount;
                 assignment.target.lootObject.lootLevel = 0;
             } else {
-                addCheck(assignment.target.lootObject.id,  assignment.target.location.logicalZoneKey);
+                addCheck(assignment.target.lootObject.id, assignment, assignment.target.location.logicalZoneKey);
                 for (const target of findAllTargetObjects(assignment.target)) {
                     target.lootType = assignment.lootType;
                     target.lootAmount = assignment.lootAmount;

@@ -62,14 +62,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Improve randomizer hints:
-        - Don't give hints for peeked trash items.
-            - Track peeked items separately from checked items.
-            - Add dungeon items to list of peeked items if all remaining items have been peeked or obtained.
-                - Dungeon map is always trash
-                - Dungeon keys are trash if all remaining items are trash or dungeon items.
-        - In theory this will prevent giving hints for items that the player already knows they don't care about.
-
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
