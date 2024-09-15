@@ -456,6 +456,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
 
 enemyDefinitions.voidHand = {
     ...enemyDefinitions.golemHand,
+    showHealthBar: false,
     life: 10, scale: 1,
     update: updateVoidHand,
     initialAnimation: 'idle',

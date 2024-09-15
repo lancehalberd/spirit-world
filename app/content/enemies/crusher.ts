@@ -14,6 +14,7 @@ enemyDefinitions.crusher = {
     initialAnimation: 'idle',
     initialMode: 'choose',
     lootTable: moneyLootTable,
+    showHealthBar: false,
     update(this: void, state: GameState, enemy: Enemy) {
         // animations are only defined for left/right directions, so force left.
         if (enemy.d !== 'left' && enemy.d !== 'right') {
