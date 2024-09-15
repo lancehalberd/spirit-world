@@ -455,6 +455,7 @@ export class Hero implements Actor {
             drawPriority: 'sprites',
         });
         addEffectToArea(state, this.area, shatteredBarrier);
+        playAreaSound(state, this.area, 'barrierShatter');
     }
 
     knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {

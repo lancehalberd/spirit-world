@@ -64,11 +64,6 @@ Graphics to Implement:
 Current tasks:
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
-    - Add sound effects:
-        - Create Barrier
-        - Barrier Shatters
-        - Barrier Bursts (enemy death sound)
-
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
 
@@ -95,6 +90,10 @@ Current tasks:
     - Add new crystal pit graphics
         - Add small crystal pit tile, use in secret entrance to sky palace.
         - Make crystal cracked ground become crystal pits.
+
+    - Add sound effect using pink noise when near a waterfall.
+        - Use pink noise for barrier burst SFX.
+        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
 
     - Replace low stones underwater with walls or taller obstacles.
 
@@ -132,9 +131,6 @@ Current tasks:
     - Prevent weapon knockback from triggering area transition.
         - Update movement behavior to treat door entrances+exterior edges of the screen as walls when knocked back.
         - If nothing else, at least move stationary plant enemies far enough from transition edges to not trigger this by the forest.
-
-    - Add sound effect using pink noise when near a waterfall.
-        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
 
     - Possible work items:
         - Add final dungeon

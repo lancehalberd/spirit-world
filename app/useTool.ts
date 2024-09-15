@@ -64,6 +64,7 @@ export function useTool(
                 z: hero.z,
                 style: 'spirit',
             }
+            playAreaSound(state, hero.area, 'arrow');
             let arrow = new Arrow({
                 ...baseArrowProps,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
@@ -81,6 +82,7 @@ export function useTool(
                     vx: speed * directionMap[direction][0],
                     vy: speed * directionMap[direction][1],
                 });
+                playAreaSound(state, hero.area, 'arrow');
                 addEffectToArea(state, state.areaInstance, arrow);
                 direction = rotateDirection(direction, 1);
                 arrow = new Arrow({
@@ -90,6 +92,7 @@ export function useTool(
                     vx: speed * directionMap[direction][0],
                     vy: speed * directionMap[direction][1],
                 });
+                playAreaSound(state, hero.area, 'arrow');
                 addEffectToArea(state, state.areaInstance, arrow);
             }
             if (chargeLevel >= 2) {
@@ -160,6 +163,7 @@ export function useTool(
             }
             */
             hero.hasBarrier = true;
+            playAreaSound(state, hero.area, 'createBarrier');
             return;
         }
         case 'clone': {
