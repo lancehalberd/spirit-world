@@ -611,7 +611,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
-    if (hero.action === 'usingStaff' && hero.frozenDuration > 0) {
+    const isFrozen = hero.frozenDuration > 0;
+    if (hero.action === 'usingStaff' && isFrozen) {
         hero.action = null;
     }
     if (hero.action === 'usingStaff') {
@@ -783,7 +784,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy);
         return true;
     }
-    if (hero.action === 'roll') {
+    // Time will stay slow while frozen if we leave the hero in the 'preparingSomersault' action.
+    if (hero.action === 'preparingSomersault' && isFrozen) {
+        hero.action = 'roll';
+    }
+    if (hero.action === 'roll' && !isFrozen) {
         hero.swimming = false;
         hero.wading = false;
         // Double pressing roll performs a quick somersault.
@@ -827,7 +832,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
-    if (hero.action === 'preparingSomersault') {
+    if (hero.action === 'preparingSomersault' && !isFrozen) {
         hero.animationTime = (hero.animationTime + FRAME_LENGTH / 2) % heroAnimations.roll.up.duration;
         if (!isGameKeyDown(state, GAME_KEY.ROLL)) {
             hero.action = 'roll';
@@ -850,7 +855,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
-    if (hero.frozenDuration > 0) {
+    if (isFrozen) {
         hero.vx *= 0.99;
         hero.vy *= 0.99;
         moveActor(state, hero, hero.vx, hero.vy);
