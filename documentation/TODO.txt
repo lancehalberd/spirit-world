@@ -62,8 +62,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
-
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
 
@@ -185,6 +183,8 @@ Current tasks:
         - Player shouldn't take damage while submerged.
         - Non-deep water/water passage tiles are treated as solid for the player while submerged.
         - Player should lose spirit underwater just as when otherwise submerged
+
+    - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
