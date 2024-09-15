@@ -64,7 +64,10 @@ Graphics to Implement:
 Current tasks:
     - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
-    - Add minimum delay for crystal switch SFX
+    - Add sound effects:
+        - Create Barrier
+        - Barrier Shatters
+        - Barrier Bursts (enemy death sound)
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.

@@ -38,7 +38,7 @@ interface GameSound {
     customDelay?: number
     // Custom offset and duration can be set to play a subset of an AudioBuffer.
     offset?: number
-    duration?: number
+    duration: number
     // Whether to loop a sound.
     loop?: boolean
     // Number of seconds to seek to on repeat. Defaults to offset
