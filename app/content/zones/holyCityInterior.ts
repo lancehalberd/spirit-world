@@ -132,7 +132,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "bridgeHouse", x: 352, y: 240, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityBridgeHouse", d: "down", linked: true},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-1", x: 400, y: 176, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I love being a little outside of town. The hustle and bustle stresses me out.", dialogueIndex: 101},
         {status: "normal", id: "cityArmorSmith", x: 152, y: 72, d: "down", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I can upgrade that Chakram!", dialogueKey: "cityArmorSmith"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 40, y: 144, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending my flowers makes feel closer to the spirits.", dialogueIndex: 103},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 40, y: 144, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending to my flowers makes me feel closer to the spirits.", dialogueIndex: 103},
         {status: "normal", id: "citySmith", x: 88, y: 72, d: "down", behavior: "idle", style: "zoro", type: "npc", dialogue: "I can upgrade that Chakram!", dialogueKey: "citySmith"},
         {status: "active", id: "", x: 136, y: 76, style: "bowl", type: "torch"},
         {status: "active", id: "", x: 104, y: 76, style: "bowl", type: "torch"},
