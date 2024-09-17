@@ -20,32 +20,43 @@ function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResul
     return enemy.defaultOnHit(state, hit);
 }
 
-enemyDefinitions.stormIdol = {
+const baseIdolDefinition: Partial<EnemyDefinition<any>> = {
     alwaysReset: true,
-    animations: lightningIdolAnimations, scale: 1,
+    scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateStormIdol,
+    life: 8, touchDamage: 1,
+    onHit: onHitIdol,
+    // Instead of rendering a shield, the health bars turn grey to indicate they are invulnerable.
+    getShieldPercent: () => 0,
+    afterUpdate(state: GameState, enemy: Enemy) {
+        if (enemy.shielded) {
+            enemy.healthBarColor = '#AAA';
+        } else {
+            delete enemy.healthBarColor;
+        }
+    }
+};
+
+enemyDefinitions.stormIdol = {
+    ...baseIdolDefinition,
+    animations: lightningIdolAnimations,
+    update: updateStormIdol,
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
-    onHit: onHitIdol,
 };
 enemyDefinitions.flameIdol = {
-    alwaysReset: true,
-    animations: fireIdolAnimations, scale: 1,
-    isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFlameIdol,
+    ...baseIdolDefinition,
+    animations: fireIdolAnimations,
+    update: updateFlameIdol,
     elementalMultipliers: {'lightning': 1.5, 'ice': 2},
     immunities: ['fire'],
-    onHit: onHitIdol,
 };
 enemyDefinitions.frostIdol = {
-    alwaysReset: true,
-    animations: iceIdolAnimations, scale: 1,
-    isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFrostIdol,
+    ...baseIdolDefinition,
+    animations: iceIdolAnimations,
+    update: updateFrostIdol,
     elementalMultipliers: {'lightning': 1.5, 'fire': 2},
     immunities: ['ice'],
-    onHit: onHitIdol,
 };
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {

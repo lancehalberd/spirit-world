@@ -24,6 +24,7 @@ export function useTool(
             if (state.hero.magic <= 0) {
                 return;
             }
+
             const isUpgradedBow = state.hero.savedData.activeTools.bow & 2;
             let speed = isUpgradedBow ? 6 : 4;
             let damage = isUpgradedBow ? 4 : 2;

@@ -274,7 +274,6 @@ function renderHealthBar(context: CanvasRenderingContext2D, state: GameState, en
     const shieldWidth = (w - 4) * enemy.getShieldPercent(state) | 0;
     if (shieldWidth > 0) {
         context.fillStyle = 'white';
-        console.log(r.y);
         context.fillRect(Math.floor(r.x + r.w / 2 - shieldWidth / 2), r.y + 1, shieldWidth, 1);
         context.fillRect(Math.floor(r.x + r.w / 2 - shieldWidth / 2), r.y + 4, shieldWidth, 1);
     }
