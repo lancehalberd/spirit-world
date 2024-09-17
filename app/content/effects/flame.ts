@@ -107,14 +107,14 @@ export class Flame implements EffectInstance, Props {
     }
     getAnchorPoint() {
         const hitbox = this.getHitbox();
-        return {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
+        return {x: (hitbox.x + hitbox.w / 2) | 0, y: (hitbox.y + hitbox.h / 2) | 0};
     }
     getHitbox() {
         const w = 3 * this.w / 5;
         const h = 2 * this.h / 3;
         return {
-            x: this.x - w / 2,
-            y: this.y - h / 2,
+            x: (this.x - w / 2) | 0,
+            y: (this.y - h / 2) | 0,
             w,
             h,
         };
