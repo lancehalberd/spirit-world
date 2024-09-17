@@ -62,10 +62,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add new cave pit wall graphics
-        - Ice Cave
-        - Tomb-basement/entrance/NW puzzle
-
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
 

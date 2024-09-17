@@ -189,7 +189,9 @@ paletteHash.pits = [
     [342,343,344,382,383,358,359,360],
     [345,346,347,384,385,361,362,363],
     [348,775,349,386,387,364,1007,365],
-    [350,337,351,null,1 ,366,353,367]
+    [350,337,351,388,389,366,353,367],
+    [null,null,null,390,391,null,null,null],
+    [null,null,null,392,393,null,null,null],
 ];
 
 // Use this to export the current brush as a palette grid.
