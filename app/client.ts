@@ -28,27 +28,37 @@ export * from 'app/development/packFont';
 
 let isBrowserTimeThrottled = false, throttleCount = 0;
 
+let focused = true;
+
+window.onfocus = function() {
+    focused = true;
+};
+window.onblur = function() {
+    focused = false;
+};
+
 let nextUpdateTime = Date.now();
 function updateLoop() {
     const now = Date.now();
-    if (now - nextUpdateTime > FRAME_LENGTH + 5) {
-        throttleCount++;
-        if (throttleCount > 20) {
-            console.warn('20 consecutive frames were throttled, switching to throttled mode.');
-            isBrowserTimeThrottled = true;
-        }
-    } else {
-        throttleCount = 0;
-    }
     if (!isBrowserTimeThrottled) {
+        // Track how many excessively late frames occur in a row and turn on the
+        // isBrowserTimeThrottled once we hit 20 frames consectuive frames.
+        if (now - nextUpdateTime > FRAME_LENGTH + 5 && focused) {
+            throttleCount++;
+            if (throttleCount > 20) {
+                console.warn('20 consecutive frames were throttled, switching to throttled mode.');
+                isBrowserTimeThrottled = true;
+            }
+        } else {
+            throttleCount = 0;
+        }
         setTimeout(updateLoop, FRAME_LENGTH);
         update();
         nextUpdateTime = now;
         return;
     }
     // In throttled mode we call this loop with higher granularity but only run the actual game
-    // update based on how much real time is passed. Because the intended FPS may not nicely match
-    // the frequency of these calls, we call update up to 5MS early.
+    // update based on how much real time is passed.
     setTimeout(updateLoop, 5);
     if (now >= nextUpdateTime) {
         nextUpdateTime += FRAME_LENGTH;
