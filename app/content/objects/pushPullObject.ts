@@ -122,8 +122,8 @@ export class PushPullObject implements ObjectInstance {
         return {blocked: true, stopped: true, hit: true};
     }
     canMove(state: GameState, puller: Hero = null, forceLevel = 0): boolean {
-        for (const hero of [state.hero, ...(state.hero.clones || [])]) {
-            if (hero === puller) {
+        for (const hero of [state.hero, state.hero.astralProjection, ...(state.hero.clones || [])]) {
+            if (!hero || hero === puller) {
                 continue;
             }
             // Only the puller can move the object they have grabbed.
@@ -371,8 +371,13 @@ function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: numb
 }
 
 export function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, movementProperties: MovementProperties = {}) {
-    const heroesAndClones = [state.hero, ...(state.hero.clones || [])];
-    let blockedBoxes = heroesAndClones.filter(h => !movementProperties?.excludedObjects?.has(h) && h.area === object.area).map(h => h.getHitbox());
+    const heroesAndClones = [
+        state.hero,
+        // This might be undefined.
+        state.hero.astralProjection,
+        ...(state.hero.clones || [])
+    ];
+    let blockedBoxes = heroesAndClones.filter(h => h && !movementProperties?.excludedObjects?.has(h) && h.area === object.area).map(h => h.getHitbox());
     movementProperties = {
         canFall: true,
         canSwim: true,
@@ -391,7 +396,7 @@ export function moveLinkedObject(this: void, state: GameState, object: ObjectIns
     // Currently this is never true for the hero.
     if (object.linkedObject) {
         //console.log('moving linked object', mx, my, getDirection(mx, my));
-        blockedBoxes = heroesAndClones.filter(h => !movementProperties?.excludedObjects?.has(h) && h.area === object.linkedObject.area).map(h => h.getHitbox());
+        blockedBoxes = heroesAndClones.filter(h => h && !movementProperties?.excludedObjects?.has(h) && h.area === object.linkedObject.area).map(h => h.getHitbox());
         const linkedResult = moveObject(state, object.linkedObject, mx, my, {
             canFall: true,
             canSwim: true,
