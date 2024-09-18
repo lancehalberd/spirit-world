@@ -1085,7 +1085,7 @@ addTiles([
     lavaBubbles,
     deletedTiles(3),
     laundryTiles,
-    deletedTiles(1),
+    singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
     logChoppingTiles,
     foodBoxTiles,
     logAndFoodBagTiles,
