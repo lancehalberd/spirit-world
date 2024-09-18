@@ -1,7 +1,17 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { addBurstEffect } from 'app/content/effects/animationEffect';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 dialogueHash.tombGuardian = {
     key: 'tombGuardian',
+    mappedOptions: {
+        teleport: (state: GameState) => {
+            const guardian = state.areaInstance.objects.find(t => t.definition?.id === 'cocoonGuardian') as NPC;
+            addBurstEffect(state, guardian);
+            removeObjectFromArea(state, guardian);
+            return '';
+        },
+    },
     options: [
         {
             logicCheck: {
@@ -16,6 +26,7 @@ dialogueHash.tombGuardian = {
                     dialogueType: 'quest',
                     text: `You have come far, but there is no going back after this step.
                     {|}Show me your determination if you wish to proceed!
+                    {@tombGuardian.teleport}
                     {flag:cocoonBossStarted}
                     `,
                 },
