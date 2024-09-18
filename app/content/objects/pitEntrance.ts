@@ -10,6 +10,7 @@ import { getObjectStatus } from 'app/utils/objects';
 
 
 const pitFrame = createAnimation('gfx/tiles/cavePits.png', {w: 16, h: 16}, {left: 16, top: 48}).frames[0];
+const crystalPitFrame = createAnimation('gfx/tiles/crystalPits.png', {w: 16, h: 16}, {left: 16, top: 48}).frames[0];
 const futuristicPitFrame = createAnimation('gfx/tiles/futuristic.png', {w: 32, h: 32}, {left: 576, top: 16}).frames[0];
 const naturalPitFrame = createAnimation('gfx/tiles/cavePits.png', {w: 32, h: 32}, {left: 16, top: 16}).frames[0];
 const naturalCrystalPitFrame = createAnimation('gfx/tiles/crystalPits.png', {w: 32, h: 32}, {left: 16, top: 16}).frames[0];
@@ -60,6 +61,12 @@ export const pitStyles: {[key: string]: PitStyle} = {
     },
     singleTile: {
         frame: pitFrame,
+        getHitbox(pit: PitEntrance): Rect {
+            return {x: pit.x, y: pit.y, w: 16, h: 16};
+        }
+    },
+    smallCrystal: {
+        frame: crystalPitFrame,
         getHitbox(pit: PitEntrance): Rect {
             return {x: pit.x, y: pit.y, w: 16, h: 16};
         }

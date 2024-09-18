@@ -2524,7 +2524,7 @@ const sf0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "skyPalacePitEntrance", x: 416, y: 96, style: "singleTile", targetZone: "skyPalace", targetObjectId: "skyPalaceEntranceMarker", type: "pitEntrance"},
+        {status: "normal", id: "skyPalacePitEntrance", x: 416, y: 96, style: "smallCrystal", targetZone: "skyPalace", targetObjectId: "skyPalaceEntranceMarker", type: "pitEntrance"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 12, mapId: 'skySpirit', floorId: '1F', mapX: 0, mapY: 2},

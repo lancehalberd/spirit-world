@@ -85,9 +85,7 @@ Current tasks:
         - Triggered when leaving the War Temple after getting Astral Projection.
         - She will bring the MC to the Grand Priest in the Grand Temple
 
-    - Add new crystal pit graphics
-        - Add small crystal pit tile, use in secret entrance to sky palace.
-        - Make crystal cracked ground become crystal pits.
+    - Add more crystal pit graphics to sky palace once the finished tile set is ready.
 
     - Add sound effect using pink noise when near a waterfall.
         - Use pink noise for barrier burst SFX.
