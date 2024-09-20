@@ -62,6 +62,7 @@ dialogueHash.jadeChampion = {
                     hero.d = 'left';
                     hero.x = Math.max(hero.x - 1, 134);
                 }
+                updateCamera(state);
                 return true;
             });
             runBlockingCallback(state, (state: GameState) => {
