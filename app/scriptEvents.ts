@@ -1,14 +1,14 @@
 import { allLootTypes, GAME_KEY } from 'app/gameConstants';
 import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 
-export function hideHUD(state: GameState, duration: number) {
+export function hideHUD(state: GameState) {
     // hide HUD to show that player isn't controllable
     appendCallback(state, (state: GameState) => {
         state.hideHUD = true;
     });
 }
 
-export function showHUD(state: GameState, duration: number) {
+export function showHUD(state: GameState) {
     // show HUD to tell player that control of their character has returned
     appendCallback(state, (state: GameState) => {
         state.hideHUD = false;

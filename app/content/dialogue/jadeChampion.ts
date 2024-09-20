@@ -41,7 +41,7 @@ dialogueHash.jadeChampion = {
                 addObjectToArea(state, state.hero.area, jadeChampion);
             });
             // hide HUD to show that player isn't controllable
-            hideHUD(state, 20);
+            hideHUD(state);
             // Move the player to a good x,y position before talking to the Jade Champion.
             // target coordinates: { x: 134, y: 446 }
             // FIX, TODO: camera movement is jerky
@@ -135,7 +135,7 @@ dialogueHash.jadeChampion = {
             });
             appendScript(state, '{wait:700}');
             // show HUD to tell player that control of their character has returned
-            showHUD(state, 20);
+            showHUD(state);
             return ``;
         },
     },

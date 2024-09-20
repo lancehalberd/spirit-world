@@ -1,7 +1,7 @@
 import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { appendCallback, appendScript, runPlayerBlockingCallback } from 'app/scriptEvents';
+import { appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
@@ -77,6 +77,8 @@ dialogueHash.jadeChampionWarTemple = {
             appendCallback(state, (state: GameState) => {
                 addObjectToArea(state, state.hero.area, jadeChampion);
             });
+            // hide HUD to show that player isn't controllable
+            hideHUD(state);
             runPlayerBlockingCallback(state, (state: GameState) => {
                 jadeChampion.speed = 1;
                 jadeChampion.animationTime += FRAME_LENGTH;
@@ -366,6 +368,8 @@ dialogueHash.jadeChampionWarTemple = {
                 removeObjectFromArea(state, jadeChampion);
             });
             appendScript(state, '{wait:300}');
+            // show HUD to tell player that control of their character has returned
+            showHUD(state);
             // remove jadeChampion object
             // hero.renderParent = jadeChampion -> to make hero vanish during teleports
             // HIGH: removeobjectfromarea to get rid of champ
