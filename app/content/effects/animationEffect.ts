@@ -513,6 +513,18 @@ function updateFallEffect(state: GameState, effect: FieldAnimationEffect) {
     }
 }
 
+export function addBurstEffect(this: void, state: GameState, actor: Actor, area: AreaInstance = actor.area): void {
+    const hitbox = actor.getHitbox();
+    const animation = new FieldAnimationEffect({
+        animation: burstAnimation,
+        drawPriority: 'background',
+        drawPriorityIndex: 1,
+        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
+        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
+    });
+    addEffectToArea(state, area, animation);
+}
+
 class _FieldAnimationEffect extends FieldAnimationEffect {}
 declare global {
     export interface FieldAnimationEffect extends _FieldAnimationEffect {}

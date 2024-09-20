@@ -107,7 +107,7 @@ dialogueHash.saveStatue = {
                     dialogueIndex: 114,
                     dialogueType: 'hint',
                     text: `
-                        This was once the Capitol of a powerful and prosperous nation.
+                        This was once the capital of a powerful and prosperous nation.
                         {|}They say the Summoners who lived here made pacts with spirits to give them great powers.
                         {item:secondChance}
                     `,

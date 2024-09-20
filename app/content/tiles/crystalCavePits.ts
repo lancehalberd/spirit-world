@@ -26,7 +26,7 @@ const crystalCavePitEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame(crystalCavePitsImage, {x: 112, y: 64, w: 80, h: 48}),
     behaviors: {
-        'all': { defaultLayer: 'floor2', isGround: false },
+        'all': { defaultLayer: 'field', isGround: false },
     },
     tileCoordinates: [
         [0, 0],[1, 0 ],[4, 0],

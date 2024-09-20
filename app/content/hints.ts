@@ -1,5 +1,6 @@
 import { zones } from 'app/content/zones/zoneHash';
 import { isRandomizer } from 'app/gameConstants';
+import { isCheckTrash } from 'app/randomizer/checks';
 import { findReachableChecksFromStart } from 'app/randomizer/find';
 import { setScript } from 'app/scriptEvents';
 import { findObjectLocation } from 'app/utils/enterZoneByTarget';
@@ -642,6 +643,10 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
 export function getRandomizerHint(state: GameState): string {
     const reachableChecks: LootWithLocation[] = findReachableChecksFromStart(state);
     for (const check of Random.shuffle(reachableChecks)) {
+        // Don't suggest checks that we know aren't useful.
+        if (isCheckTrash(state, check)){
+            continue;
+        }
         if (check.location) {
             const logicalZoneKey = check.location.logicalZoneKey;
             if (check.lootObject.type === 'dialogueLoot') {
@@ -654,6 +659,7 @@ export function getRandomizerHint(state: GameState): string {
             if (state.savedState.objectFlags[check.lootObject.id]) {
                 continue;
             }
+            console.log(check.location.logicalZoneKey, check.lootObject.id);
             return `There is still something ${getRandomizerZoneDescription(logicalZoneKey)}.`;
         } else {
             const {dialogueKey, optionKey} = check;

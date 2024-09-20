@@ -127,7 +127,9 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
     // Clean up references to any instances that should have completed.
     sound.instances = sound.instances.filter(instance => instance.endTime && instance.endTime >= currentTime);
     // Ignore this sound if we have already scheduled the maximum number of simultaneous effects.
-    if (sound.instances.length >= sound.instanceLimit) {
+    const instanceLimit = sound.instanceLimit ?? 5;
+
+    if (sound.instances.length >= instanceLimit) {
         return;
     }
     const delay = sound.customDelay ?? 0.04;
@@ -147,6 +149,7 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             const instance: AudioInstance = {
                 sound,
                 startTime: targetTime,
+                endTime: targetTime + sound.duration,
             };
             sound.instances.push(instance);
             sound.play(soundEffectGainNode, targetTime);
@@ -516,45 +519,103 @@ function playBellSound(
 
 sounds.set('reflect', {
     play(target: AudioNode, time: number) {
-        playBeeps([2000, 8000, 4000], .01, .1, {}, target, time);
+        playBeeps([2000, 8000, 4000], .01, this.duration, {}, target, time);
     },
+    duration: 0.1,
+    instanceLimit: 3,
     instances: [],
 });
 sounds.set('fall', {
     play(target: AudioNode, time: number) {
         //playBeeps([1350, 900, 600, 400], 0.05, .15, {smooth: true, taper: 0.6, swell: 0.4});
-        playBeeps([1350, 900, 600, 400], 0.1, .2, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'}, target, time);
+        playBeeps([1350, 900, 600, 400], 0.1, this.duration, {smooth: true, taper: 0.6, swell: 0.4, type: 'sine'}, target, time);
     },
+    duration: 0.2,
+    instanceLimit: 1,
     instances: [],
 });
 sounds.set('freeze', {
     play(target: AudioNode, time: number) {
         const x = 1200;
         playBeeps(
-            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08, .2,
+            [x, 1.5 * x, 1.25 * x, 1.75 * x, 1.5 * x, 2 * x, 4 * x, 2 * x], 0.08, this.duration,
             {taper: 0.1, swell: 0.1, type: 'triangle'}, target, time
         );
     },
+    duration: 0.2,
+    instanceLimit: 2,
     instances: [],
 });
 sounds.set('ouch', {
     play(target: AudioNode, time: number) {
-        playBeeps([200, 400, 100, 200], 0.05, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'}, target, time);
+        playBeeps([200, 400, 100, 200], 0.05, this.duration, {smooth: true, taper: 0.2, swell: 0.2, type: 'sawtooth'}, target, time);
     },
+    duration: 0.2,
+    instanceLimit: 2,
     instances: [],
 });
 sounds.set('drink', {
     play(target: AudioNode, time: number) {
-        playBeeps([200, 100, 400, 800, 600, 2400], 0.03, .2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+        playBeeps([200, 100, 400, 800, 600, 2400], 0.03, this.duration, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
     },
+    duration: 0.2,
+    instanceLimit: 2,
     instances: [],
 });
 sounds.set('heart', {
     play(target: AudioNode, time: number) {
-        playBeeps([800, 1400, 2800, 2100], 0.05, .2, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+        playBeeps([800, 1400, 2800, 2100], 0.05, this.duration, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
     },
+    duration: 0.2,
+    instanceLimit: 2,
     instances: [],
 });
+sounds.set('activateCrystalSwitch', {
+    play(target: AudioNode, time: number) {
+        playBeeps([2400, 3200, 4000], 0.05, this.duration, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+    },
+    duration: 0.2,
+    instanceLimit: 2,
+    instances: [],
+});
+sounds.set('deactivateCrystalSwitch', {
+    play(target: AudioNode, time: number) {
+        playBeeps([4000, 3200, 2400], 0.05, this.duration, {smooth: false, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+    },
+    duration: 0.1,
+    instanceLimit: 2,
+    instances: [],
+});
+sounds.set('createBarrier', {
+    play(target: AudioNode, time: number) {
+        playBeeps([100, 500], 0.03, 0.3, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'}, target, time + 0.3);
+        // playBeeps([2400, 3200, 4000, 4000, 4000], 0.05, 0.2, {smooth: false, taper: 0.2, swell: 0.2, type: 'square'}, target, time + 0.3);
+    },
+    duration: 0.6,
+    instanceLimit: 2,
+    instances: [],
+});
+sounds.set('barrierShatter', {
+    play(target: AudioNode, time: number) {
+        const x = 1600;
+        playBeeps(
+            [2 * x, 4 * x, 2 * x, 1.5 * x, 2 * x, 4 * x, 2 * x, 1.5 * x, 1.75 * x, 1.25 * x], 0.08, this.duration,
+            {taper: 0.1, swell: 0.1, type: 'triangle'}, target, time
+        );
+    },
+    duration: 0.2,
+    instanceLimit: 2,
+    instances: [],
+});
+sounds.set('arrow', {
+    play(target: AudioNode, time: number) {
+        playBeeps([20000, 1200, 800], 0.1, 0.1, {smooth: true, taper: 0.5, swell: 0.5, type: 'sine'}, target, time);
+    },
+    duration: 0.1,
+    instanceLimit: 2,
+    instances: [],
+});
+
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
 const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];
@@ -568,8 +629,10 @@ const notes = Object.keys(noteFrequencies);
 notes.forEach((noteName) => {
     sounds.set(`bell${noteName}`, {
         play(target: AudioNode, time: number) {
-            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, 2, target, time);
+            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, this.duration, target, time);
         },
+        duration: 2,
+        instanceLimit: 5,
         instances: [],
     });
 });

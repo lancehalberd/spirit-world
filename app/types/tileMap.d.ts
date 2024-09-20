@@ -419,6 +419,8 @@ interface AreaInstance {
     h: number
     behaviorGrid: TileBehaviors[][]
     checkToRedrawTiles: boolean
+    // Flag indicating that water surface beneath this area should be redrawn.
+    checkToRedrawWaterSurface?: boolean
     tilesDrawn: boolean[][]
     // Tracks which area frames have been drawn since the last time checkToRedrawTiles was set.
     drawnFrames: Set<AreaFrame>

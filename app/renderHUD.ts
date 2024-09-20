@@ -1,10 +1,11 @@
 import { getLootFrame } from 'app/content/loot';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
-import { renderTextRow } from 'app/render/renderMessage';
+//import { renderTextRow } from 'app/render/renderMessage';
 import { renderSpiritBar } from 'app/render/spiritBar';
 import { shouldHideMenu } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
+import { requireFrame } from 'app/utils/packedImages';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { createCanvasAndContext } from 'app/utils/canvas';
 
@@ -167,56 +168,31 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
     ) as Enemy[];
     y = CANVAS_HEIGHT
     if (bossesWithHealthBars.length) {
-        const totalSpace = CANVAS_WIDTH - 32 - bossesWithHealthBars.length * 4 + 4;
+        const totalSpace = CANVAS_WIDTH - 40 - (bossesWithHealthBars.length - 1) * 20 + 4;
         const barHeight = 6;
         const barWidth = (totalSpace / bossesWithHealthBars.length) | 0;
-        y -= 16;
-        x = 16;
+        y -= 12;
+        x = 24;
         for (const boss of bossesWithHealthBars) {
-            const animatedWidth = barWidth * Math.max(0, Math.min(1, (boss.healthBarTime - 100) / 1000));
-            context.fillStyle = 'black';
-            context.fillRect(x, y, animatedWidth, barHeight);
-            const healthWidth = animatedWidth * boss.getHealthPercent(state) | 0;
-            if (healthWidth > 0) {
-                context.fillStyle = boss.healthBarColor ?? 'red';
-                context.fillRect(x, y, healthWidth, barHeight);
-            }
-            const shieldWidth = animatedWidth * boss.getShieldPercent(state) | 0;
-            if (shieldWidth > 0) {
-                context.fillStyle = 'white';
-                context.fillRect(x, y, shieldWidth, 2);
-                context.fillRect(x, y + barHeight - 2, shieldWidth, 2);
-            }
-            x += barWidth + 4;
+            renderBossHealthBar(context, state, boss, {x, y, w: barWidth, h: barHeight});
+            x += barWidth + 20;
         }
+        y -= 6;
     }
     const otherEnemiesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
         e => e.status !== 'gone' && e.definition.type !== 'boss' && e.enemyDefinition.showHealthBar
             && e.isFromCurrentSection(state) && e.healthBarTime >= 100
     );
     if (otherEnemiesWithHealthBars.length) {
-        const totalSpace = CANVAS_WIDTH - 32 - otherEnemiesWithHealthBars.length * 4 + 4;
+        const totalSpace = CANVAS_WIDTH - 32 - (otherEnemiesWithHealthBars.length - 1) * 20 + 4;
         const barHeight = 4;
         // This probably won't work when there are more than three such enemies.
         const barWidth = (totalSpace / Math.max(3, otherEnemiesWithHealthBars.length)) | 0;
         y -= barHeight;
-        x = 16;
+        x = 45;
         for (const enemy of otherEnemiesWithHealthBars) {
-            const animatedWidth = barWidth * Math.max(0, Math.min(1, (enemy.healthBarTime - 100) / 1000));
-            context.fillStyle = 'black';
-            context.fillRect(x, y, animatedWidth, barHeight);
-            const healthWidth = animatedWidth * enemy.getHealthPercent(state) | 0;
-            if (healthWidth > 0) {
-                context.fillStyle = enemy.healthBarColor ?? 'orange';
-                context.fillRect(x, y, healthWidth, barHeight);
-            }
-            const shieldWidth = animatedWidth * enemy.getShieldPercent(state) | 0;
-            if (shieldWidth > 0) {
-                context.fillStyle = 'white';
-                context.fillRect(x, y, shieldWidth, 2);
-                context.fillRect(x, y + barHeight - 2, shieldWidth, 2);
-            }
-            x += barWidth + 4;
+            renderMinionHealthBar(context, state, enemy, {x, y, w: barWidth, h: barHeight});
+            x += barWidth + 20;
         }
     }
     if (isRandomizer) {
@@ -258,6 +234,78 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         }
     }
     if (state.paused && shouldHideMenu(state)) {
-        renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
+        // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
+    }
+}
+
+const skullFrame = requireFrame('gfx/hud/bossBar.png', {x: 2, y: 93, w: 30, h: 19});
+const leftClawFrame = requireFrame('gfx/hud/bossBar.png', {x: 17, y: 65, w: 14, h: 14});
+const rightClawFrame = requireFrame('gfx/hud/bossBar.png', {x: 81, y: 65, w: 14, h: 14});
+
+const leftBarBack = requireFrame('gfx/hud/bossBar.png', {x: 23, y: 45, w: 2, h: 6});
+const middleBarBack = requireFrame('gfx/hud/bossBar.png', {x: 25, y: 45, w: 1, h: 6});
+const rightBarBack = requireFrame('gfx/hud/bossBar.png', {x: 87, y: 45, w: 2, h: 6});
+
+const leftCover = requireFrame('gfx/hud/bossBar.png', {x: 23, y: 30, w: 2, h: 6});
+const middleCover = requireFrame('gfx/hud/bossBar.png', {x: 25, y: 30, w: 1, h: 6});
+// This is quite long because of the light glare on the right part of the cover to give it a glassy effect.
+const rightCover = requireFrame('gfx/hud/bossBar.png', {x: 60, y: 30, w: 29, h: 6});
+
+function renderBossHealthBar(context: CanvasRenderingContext2D, state: GameState, boss: Enemy, r: Rect) {
+    const w = Math.floor(r.w * Math.max(0, Math.min(1, (boss.healthBarTime - 100) / 1000)));
+    if (w < 2) {
+        return;
+    }
+    renderHealthBar(context, state, boss, {...r, w});
+    drawFrameAt(context, skullFrame, {x: r.x - 20, y: r.y - 9});
+}
+
+function renderMinionHealthBar(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy, r: Rect) {
+    const w = Math.floor(r.w * Math.max(0, Math.min(1, (enemy.healthBarTime - 100) / 1000)));
+    if (w < 2) {
+        return;
+    }
+    r = {...r, x: r.x + r.w / 2 - w / 2, w};
+    renderHealthBar(context, state, enemy, r);
+    drawFrameAt(context, leftClawFrame, {x: r.x - 6, y: r.y - 5});
+    drawFrameAt(context, rightClawFrame, {x: r.x + w - 8, y: r.y - 5});
+}
+
+function renderHealthBar(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy, r: Rect) {
+    const w = r.w;
+    if (w < 2) {
+        return;
+    }
+    // Draw the expanding background of the bar.
+    drawFrameAt(context, leftBarBack, {x: r.x, y: r.y});
+    let midWidth = w - 4;
+    if (midWidth > 0) {
+        drawFrame(context, middleBarBack, {x: r.x + 2, y: r.y, w: midWidth, h: middleBarBack.h});
+    }
+    drawFrameAt(context, rightBarBack, {x: r.x + w - 2, y: r.y});
+
+    const healthWidth = (w - 2) * enemy.getHealthPercent(state) | 0;
+    if (healthWidth > 0) {
+        context.fillStyle = enemy.healthBarColor ?? (enemy.definition.type === 'boss' ? '#E31B1B' : 'orange');
+        context.fillRect(r.x + 1, r.y + 1, healthWidth, 4);
+    }
+    const shieldWidth = (w - 4) * enemy.getShieldPercent(state) | 0;
+    if (shieldWidth > 0) {
+        context.fillStyle = 'white';
+        context.fillRect(Math.floor(r.x + r.w / 2 - shieldWidth / 2), r.y + 1, shieldWidth, 1);
+        context.fillRect(Math.floor(r.x + r.w / 2 - shieldWidth / 2), r.y + 4, shieldWidth, 1);
+    }
+
+
+    drawFrameAt(context, leftCover, {x: r.x, y: r.y});
+    midWidth = w - leftCover.w - rightCover.w;
+    if (midWidth > 0) {
+        drawFrame(context, middleCover, {x: r.x + 2, y: r.y, w: midWidth, h: middleCover.h});
+    }
+    const rightWidth = Math.min(rightCover.w, w - leftCover.w);
+    if (rightWidth < rightCover.w) {
+        drawFrameAt(context, {...rightCover, x: rightCover.x + rightCover.w - rightWidth, w: rightWidth}, {x: r.x + w - rightWidth, y: r.y});
+    } else {
+        drawFrameAt(context, rightCover, {x: r.x + w - rightCover.w, y: r.y});
     }
 }

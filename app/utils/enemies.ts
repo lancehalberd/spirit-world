@@ -56,7 +56,7 @@ export function scurryRandomly(state: GameState, enemy: Enemy) {
     const ax = tvx - enemy.vx;
     const ay = tvy - enemy.vy;
     accelerateInDirection(state, enemy, {x: ax, y: ay});
-    moveEnemy(state, enemy, enemy.vx, enemy.vy, {});
+    moveEnemy(state, enemy, enemy.vx, enemy.vy);
 }
 
 export function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: number, y: number}): void {
@@ -81,7 +81,7 @@ export function scurryAndChase(state: GameState, enemy: Enemy) {
     const chaseVector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     if (chaseVector) {
         accelerateInDirection(state, enemy, chaseVector);
-        moveEnemy(state, enemy, enemy.vx, enemy.vy, {});
+        moveEnemy(state, enemy, enemy.vx, enemy.vy);
     } else {
         scurryRandomly(state, enemy);
     }
@@ -93,7 +93,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
         enemy.animationTime = 0;
         enemy.z += enemy.vz;
         enemy.vz -= 0.5;
-        moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
+        moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true, canSwim: true, canMoveInLava: true});
         if (enemy.z < 0) {
             enemy.z = 0;
         }
@@ -121,7 +121,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             return;
         }
         if (!moveEnemyFull(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {
-            canFall: true, canSwim: true, canWiggle: false,
+            canFall: true, canSwim: true, canMoveInLava: true, canWiggle: false,
             // By default enemies can charge through bushes, but this can be changed using enemy params.
             crushingPower,
         })) {
@@ -152,7 +152,7 @@ export function paceRandomly(state: GameState, enemy: Enemy, pauseDuration = 400
     }
     if (enemy.mode === 'walk') {
         if (enemy.modeTime >= pauseDuration / 2) {
-            if (!moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1], {})) {
+            if (!moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1])) {
                 enemy.setMode('choose');
                 enemy.modeTime = 200;
             }
@@ -248,12 +248,12 @@ export function hasEnemyLeftSection(state: GameState, enemy: Enemy, padding = 32
 
 
 // Returns true if the enemy moves at all.
-export function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
+export function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties = {}): boolean {
     const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);
     return mx !== 0 || my !== 0;
 }
 
-export function canMoveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
+export function canMoveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties = {}): boolean {
     const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);
     enemy.x -= mx;
     enemy.y -= my;
@@ -261,13 +261,19 @@ export function canMoveEnemy(state: GameState, enemy: Enemy, dx: number, dy: num
 }
 
 // Returns true only if the enemy moves the full amount.
-export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
+export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties = {}): boolean {
     const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);
     return Math.abs(mx - dx) < 0.01 && Math.abs(my - dy) < 0.01;
 }
 
 function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
-    movementProperties = {...movementProperties, dx, dy};
+    const isCurrentlyFlying = enemy.flying && enemy.z > 0;
+    movementProperties = {
+        canSwim: enemy.canSwim || isCurrentlyFlying,
+        canMoveInLava: enemy.canMoveInLava || isCurrentlyFlying,
+        canFall: isCurrentlyFlying,
+        ...movementProperties, dx, dy
+    };
     if (enemy.enemyDefinition.baseMovementProperties) {
         movementProperties = {...enemy.enemyDefinition.baseMovementProperties, ...movementProperties};
     }
@@ -277,10 +283,7 @@ function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number,
     movementProperties.excludedObjects.add(state.hero);
     movementProperties.excludedObjects.add(state.hero.astralProjection);
     movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, enemy, 16);
-    /*for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
-        movementProperties.excludedObjects.add(clone);
-    }*/
-    if (enemy.flying && enemy.z > 0) {
+    if (isCurrentlyFlying) {
         const hitbox = enemy.getHitbox(state);
         const ax = enemy.x + dx;
         const ay = enemy.y + dy;

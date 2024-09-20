@@ -1,4 +1,4 @@
-import { addSparkleAnimation, burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addBurstEffect, addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { Blast } from 'app/content/effects/blast';
 import { Flame } from 'app/content/effects/flame';
@@ -45,19 +45,6 @@ const guardianSpiritAnimations: ActorAnimations = {
     attack: omniAnimation(guardianSpiritAttackAnimation),
     cast: omniAnimation(guardianSpiritCastAnimation),
 };
-
-
-function addBurstEffect(this: void, state: GameState, enemy: Enemy, area: AreaInstance): void {
-    const hitbox = enemy.getHitbox();
-    const animation = new FieldAnimationEffect({
-        animation: burstAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
-        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
-    });
-    addEffectToArea(state, area, animation);
-}
 
 interface ProjectionParams {
     element: MagicElement
@@ -132,22 +119,22 @@ function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
     // Increased the time since last hit by 0.5s every time we check. This will cause the hints
     // to be given slightly faster the more often the player hits the projection, which may
     // indicate that they haven't figured out how to complete the battle yet.
-    guardian.params.lastDamaged -= 500;
+    guardian.params.lastDamaged -= 1000;
     const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
-    if (timeSinceDamaged >= 105000) {
+    if (timeSinceDamaged >= 70000) {
         guardian.useTaunt(state, 'hint6');
         // Reset the time since last damaged at the final hint so that the earlier
         // hints will repeat in case the player missed some of them.
-        guardian.params.lastDamaged = state.fieldTime - 15000;
-    } else if (timeSinceDamaged >= 90000) {
-        guardian.useTaunt(state, 'hint5');
-    } else if (timeSinceDamaged >= 75000) {
-        guardian.useTaunt(state, 'hint4');
+        guardian.params.lastDamaged = state.fieldTime - 10000;
     } else if (timeSinceDamaged >= 60000) {
+        guardian.useTaunt(state, 'hint5');
+    } else if (timeSinceDamaged >= 50000) {
+        guardian.useTaunt(state, 'hint4');
+    } else if (timeSinceDamaged >= 40000) {
         guardian.useTaunt(state, 'hint3');
-    } else if (timeSinceDamaged >= 45000) {
-        guardian.useTaunt(state, 'hint2');
     } else if (timeSinceDamaged >= 30000) {
+        guardian.useTaunt(state, 'hint2');
+    } else if (timeSinceDamaged >= 20000) {
         guardian.useTaunt(state, 'hint1');
     }
 }
@@ -237,18 +224,13 @@ enemyDefinitions.guardian = {
         // Triggered when regenerating <= 25% health
         regenerateLowHealth: { text: `I'm not done yet!`, priority: 1, cooldown: 20000},
         regenerateLowHealth2: { text: `You must be getting tired too!`, priority: 1, cooldown: 20000},
-        // Triggered when damaging the projection with no damage to guardian in 30s.
+        // Theses hints will be cycled through as the player fights the Guardian's projection without
+        // damaging the Guardian's actual body.
         hint1: { text: `Attacking my projection will only slow me down.`, priority: 4, cooldown: 20000},
-        // Triggered when damaging the projection with no damage to guardian in 45s.
-        //hint2: { text: `My real body is beyond the reach of your weapons.`, priority: 4, cooldown: 20000},
         hint2: { text: `Your weapons cannot reach me in the spirit world.`, priority: 4, cooldown: 20000},
-        // Triggered when no damage to guardian in 60s.
-        hint3: { text: `Remember to use your Spirit Sight.`, priority: 4, cooldown: 20000},
-        // Triggered when no damage to guardian in 75s.
+        hint3: { text: `You must use your Spirit Sight to find me.`, priority: 4, cooldown: 20000},
         hint4: { text: `Everything is there for a reason.`, priority: 4, cooldown: 20000},
-        // Triggered when no damage to guardian in 90s.
         hint5: { text: `You need to use the boulders.`, priority: 4, cooldown: 20000},
-        // Triggered when no damage to guardian in 105s.
         hint6: { text: `I cannot attack while my projection regenerates.`, priority: 4, cooldown: 20000},
         // Triggered when taking hit damage from the boss as the astral projection
         astralBody: { text: `Your Astral Body is too weak to harm me.`, priority: 3, cooldown: 15000, limit: 3},
@@ -435,15 +417,16 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.life = Math.max(enemy.life, 0);
         if (enemy.mode !== 'regenerate' && !isGuardianStaggered) {
             enemy.setMode('regenerate');
-            checkToGiveHint(state, guardian);
             cancelBlastAttacks(state, enemy);
             const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
-            if (timeSinceDamaged >= 20000) {
-                if (guardian.life > guardian.enemyDefinition.life / 4) {
-                    guardian.useTaunt(state, 'regenerateMidHealth')
-                } else if (!guardian.useTaunt(state, 'regenerateLowHealth')) {
+            if (guardian.life <= guardian.enemyDefinition.life / 4) {
+                // Always use the low life taunts when regenerating.
+                if (!guardian.useTaunt(state, 'regenerateLowHealth')) {
                     guardian.useTaunt(state, 'regenerateLowHealth2')
                 }
+            } else if (timeSinceDamaged >= 20000) {
+                // Only use the high life taunt if the player hasn't damaged them for a while.
+                guardian.useTaunt(state, 'regenerateMidHealth')
             }
         }
         enemy.invulnerableFrames = 10;
@@ -466,6 +449,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             const rate = enemy.params.regenerateQuickly ? 10 : 4;
             enemy.life = Math.min(maxLife, enemy.life + rate * FRAME_LENGTH / 1000);
             if (enemy.life >= maxLife) {
+                checkToGiveHint(state, guardian);
                 switchElements(state, enemy);
                 enemy.setMode('choose');
                 enemy.params.regenerateQuickly = false;

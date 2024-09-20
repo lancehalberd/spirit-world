@@ -1,5 +1,6 @@
 import { addBurstParticle } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import { renderLightningCircle } from 'app/render/renderLightning';
 import { isUnderwater } from 'app/utils/actor';
 import { createAnimation, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
@@ -51,6 +52,9 @@ export class BarrierBurstEffect implements EffectInstance {
         return frameRadii[frameIndex] ?? 0;
     }
     update(state: GameState) {
+        if (this.animationTime === 0) {
+            playAreaSound(state, this.area, 'enemyDeath');
+        }
         this.x = this.source.x + 8;
         this.y = this.source.y + 8;
         this.z = this.source.z;

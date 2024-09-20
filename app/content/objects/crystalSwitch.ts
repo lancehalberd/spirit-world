@@ -1,6 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { deactivateTargets, getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
@@ -70,6 +71,9 @@ export class CrystalSwitch implements ObjectInstance {
         return { pierced: true, hit: true };
     }
     activate(state: GameState): void {
+        if (this.status !== 'active' || (this.definition.timer && this.timeLeft < this.definition.timer - 200)) {
+            playAreaSound(state, this.area, 'activateCrystalSwitch');
+        }
         this.status = 'active';
         saveObjectStatus(state, this.definition);
         this.animationTime = 0;
@@ -101,6 +105,7 @@ export class CrystalSwitch implements ObjectInstance {
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
+                playAreaSound(state, this.area, 'deactivateCrystalSwitch');
             }
         }
     }

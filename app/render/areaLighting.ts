@@ -102,6 +102,8 @@ export function drawLightGradient(
 }
 
 // This will cause alpha values to subtract
+// This is slow on Firefox(and possibly other browsers), so try not to set darkness on areas with lots of tiles with brightness like
+// the grass filled areas in the Peach Cave.
 export function updateLightingCanvas(area: AreaInstance): void {
     if (!area.lightingCanvas) {
         [area.lightingCanvas, area.lightingContext] = createCanvasAndContext(
@@ -120,6 +122,8 @@ export function updateLightingCanvas(area: AreaInstance): void {
                     context.translate((x + 0.5) * 16 / lightingGranularity, (y + 0.5) * 16 / lightingGranularity);
                     context.scale(r / 32, r / 32);
                     context.globalAlpha = area.behaviorGrid[y][x].brightness;
+                    // This looks the same, but it is unclear which version is more efficient.
+                    // context.fillRect(-32, -32, 64, 64);
                     context.beginPath();
                     context.arc(0, 0, 32, 0, 2 * Math.PI);
                     context.fill();
@@ -130,7 +134,7 @@ export function updateLightingCanvas(area: AreaInstance): void {
 }
 
 export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
-    if (!area.waterSurfaceCanvas) {
+    if (state.surfaceAreaInstance && !area.waterSurfaceCanvas) {
         updateWaterSurfaceCanvas(state);
     }
     if (!area.waterSurfaceCanvas) {

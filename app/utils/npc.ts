@@ -1,7 +1,6 @@
 import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import { getDirection } from 'app/utils/direction';
 
-
 export function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
     movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, npc, 16);
     // By default, don't allow the enemy to move towards the outer edges of the screen.
@@ -14,9 +13,17 @@ export function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementPro
         ...(movementProperties.blockedBoxes || []),
         state.hero.getMovementHitbox(),
     ];
-    const { mx, my } = moveActor(state, npc, dx, dy, movementProperties);
+    const { mx, my } = moveActor(state, npc, dx, dy, {
+        // By default NPCs will avoid all hazards.
+        canSwim: false,
+        canJump: false,
+        canMoveInLava: false,
+        canFall: false,
+        ...movementProperties
+    });
     return mx !== 0 || my !== 0;
 }
+
 
 export function moveNPCToTargetLocation(
     state: GameState,

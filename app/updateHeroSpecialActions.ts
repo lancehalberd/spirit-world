@@ -74,7 +74,7 @@ export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, 
         return false;
     }
     if (hero.swimming && state.underwaterAreaInstance &&
-        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y}, {canSwim: true, canFall: true})
+        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y})
     ) {
         enterLocation(state, {
             ...state.location,
@@ -565,11 +565,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // The hero obeys normal collision detection when being knocked around, but they won't trigger effects
         // like jumping off of cliffs or pushing objects.
         moveActor(state, hero, hero.vx, hero.vy, {
-            canFall: true,
-            canSwim: true,
             canJump: hero.action === 'thrown' && hero.z >= 12,
             canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
-            direction: hero.d,
             boundingBox: hero.action !== 'knockedHard' ? getSectionBoundingBox(state, hero) : undefined,
             excludedObjects
         });
@@ -614,7 +611,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
-    if (hero.action === 'usingStaff' && hero.frozenDuration > 0) {
+    const isFrozen = hero.frozenDuration > 0;
+    if (hero.action === 'usingStaff' && isFrozen) {
         hero.action = null;
     }
     if (hero.action === 'usingStaff') {
@@ -783,14 +781,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.vz = 0;
             hero.isAirborn = hero.isAstralProjection;
         }
-        moveActor(state, hero, hero.vx, hero.vy, {
-            canFall: true,
-            canSwim: true,
-            direction: hero.d,
-        });
+        moveActor(state, hero, hero.vx, hero.vy);
         return true;
     }
-    if (hero.action === 'roll') {
+    // Time will stay slow while frozen if we leave the hero in the 'preparingSomersault' action.
+    if (hero.action === 'preparingSomersault' && isFrozen) {
+        hero.action = 'roll';
+    }
+    if (hero.action === 'roll' && !isFrozen) {
         hero.swimming = false;
         hero.wading = false;
         // Double pressing roll performs a quick somersault.
@@ -830,15 +828,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (hero.z >= minZ) {
                 hero.z = Math.max(minZ, hero.z - 0.4);
             }
-            moveActor(state, hero, hero.vx, hero.vy, {
-                canFall: true,
-                canSwim: true,
-                direction: hero.d,
-            });
+            moveActor(state, hero, hero.vx, hero.vy);
         }
         return true;
     }
-    if (hero.action === 'preparingSomersault') {
+    if (hero.action === 'preparingSomersault' && !isFrozen) {
         hero.animationTime = (hero.animationTime + FRAME_LENGTH / 2) % heroAnimations.roll.up.duration;
         if (!isGameKeyDown(state, GAME_KEY.ROLL)) {
             hero.action = 'roll';
@@ -861,14 +855,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
-    if (hero.frozenDuration > 0) {
+    if (isFrozen) {
         hero.vx *= 0.99;
         hero.vy *= 0.99;
-        moveActor(state, hero, hero.vx, hero.vy, {
-            canFall: true,
-            canSwim: true,
-            direction: hero.d,
-        });
+        moveActor(state, hero, hero.vx, hero.vy);
         // Returning true prevents checking for floor effects, but they should still apply while frozen.
         checkForFloorEffects(state, hero);
         return true;
@@ -889,12 +879,11 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
     let hitbox = hero.getHitbox();
     const startPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
     const lastOpenPosition = {x: hero.x, y: hero.y};
+    // Disable jumping during cloud sommersault.
+    hero.canJumpOffLedges = false;
     // Move 8px at a time 6 times in either area.
     for (let i = 0; i < 6; i++) {
         let result = moveActor(state, hero, moveX, moveY, {
-            canFall: true,
-            canSwim: true,
-            direction: hero.d,
             boundingBox: getSectionBoundingBox(state, hero),
         });
         if (result.mx || result.my) {
@@ -907,9 +896,6 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         }
         hero.area = alternateArea;
         result = moveActor(state, hero, moveX, moveY, {
-            canFall: true,
-            canSwim: true,
-            direction: hero.d,
             boundingBox: getSectionBoundingBox(state, hero),
         });
         hero.area = originalArea;
@@ -922,6 +908,8 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         }
         addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.savedData.element });
     }
+    // Enable jumping after cloud sommersault.
+    hero.canJumpOffLedges = true;
     hitbox = hero.getHitbox();
     const endPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
     const teleportHit: HitProperties = {

@@ -50,11 +50,7 @@ dialogueHash.rival = {
                         hero.d = 'up';
                         hero.action = 'walking';
                         hero.animationTime += FRAME_LENGTH;
-                        const {mx, my} = moveActor(state, hero, 0, -1, {
-                            canSwim: true,
-                            canJump: true,
-                            direction: 'up',
-                        });
+                        const {mx, my} = moveActor(state, hero, 0, -1);
                         if ((!mx && !my) || hero.y <= 96) {
                             hero.action = null;
                             return false;
@@ -74,11 +70,7 @@ dialogueHash.rival = {
                         hero.d = 'down';
                         hero.action = 'walking';
                         hero.animationTime += FRAME_LENGTH;
-                        const {mx, my} = moveActor(state, hero, 0, 1, {
-                            canSwim: true,
-                            canJump: true,
-                            direction: 'down',
-                        });
+                        const {mx, my} = moveActor(state, hero, 0, 1);
                         if ((!mx && !my) || hero.y >= 96) {
                             hero.action = null;
                             hero.d = 'up';

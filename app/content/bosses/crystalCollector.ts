@@ -180,8 +180,12 @@ enemyDefinitions.crystalCollector = {
         // If the shield is up, only fire damage can hurt it.
         if (!isPartiallyShielded && enemy.params.shieldLife > 0) {
             if (hit.canDamageCrystalShields) {
-                // Right now shield takes a flat 2 damage no matter the source.
-                if (enemy.params.shieldInvulnerableTime <= 0) {
+                // Right now shield takes a flat 2 damage no matter the source except for the
+                // Tower Staff which always destroys it.
+                if (hit.isBonk && state.hero.savedData.activeTools.staff & 2) {
+                    enemy.params.shieldLife = 0;
+                    enemy.params.shieldInvulnerableTime = 200;
+                } else if (enemy.params.shieldInvulnerableTime <= 0) {
                     enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - 2);
                     enemy.params.shieldInvulnerableTime = 200;
                 } else {

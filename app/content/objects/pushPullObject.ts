@@ -2,10 +2,10 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { getActorTargets } from 'app/getActorTargets';
 import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import { moveObject } from 'app/movement/moveObject';
-import { showMessage } from 'app/scriptEvents';
+// import { showMessage } from 'app/scriptEvents';
 import { boxesIntersect } from 'app/utils/index';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/direction';
+import { directionMap } from 'app/utils/direction';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 
@@ -36,7 +36,6 @@ export const pushPullObjectStyles: {[key in string]: PushPullObjectStyle} = {
         weight: 2,
         pushSpeed: 0.5,
         renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance) {
-            console.log('Render big shadow');
             const x = object.x | 0, y = object.y | 0;
             context.save();
                 context.globalAlpha *= 0.3;
@@ -103,10 +102,13 @@ export class PushPullObject implements ObjectInstance {
 
         if (canPush) {
             let distance = 16;
+            let forceLevel = 0;
             if (isBonk) {
                 distance *= 4;
+                forceLevel = 1;
                 if (state.hero.savedData.activeTools.staff & 2) {
                     distance *= 4;
+                    forceLevel = 2;
                 } else if (style.weight > 1) {
                     // Only level 2 staff bonk can move heavy objects.
                     return {blocked: true, hit: true};
@@ -115,13 +117,13 @@ export class PushPullObject implements ObjectInstance {
                 // Regular hits won't move weighted objects.
                 return {blocked: true, hit: true};
             }
-            this.pushInDirection(state, direction, distance);
+            this.pushInDirection(state, direction, distance, forceLevel);
         }
         return {blocked: true, stopped: true, hit: true};
     }
-    canMove(state: GameState, puller: Hero = null): boolean {
-        for (const hero of [state.hero, ...(state.hero.clones || [])]) {
-            if (hero === puller) {
+    canMove(state: GameState, puller: Hero = null, forceLevel = 0): boolean {
+        for (const hero of [state.hero, state.hero.astralProjection, ...(state.hero.clones || [])]) {
+            if (!hero || hero === puller) {
                 continue;
             }
             // Only the puller can move the object they have grabbed.
@@ -134,21 +136,21 @@ export class PushPullObject implements ObjectInstance {
             return true;
         }
         if (style.weight === 1) {
-            if (state.hero.savedData.passiveTools.gloves) {
+            if (state.hero.savedData.passiveTools.gloves || forceLevel) {
                 return true;
             }
-            showMessage(state, 'It feels like you could move this if you were a little stronger.');
+            //showMessage(state, 'It feels like you could move this if you were a little stronger.');
             return false;
         }
         if (style.weight === 2) {
-            if (state.hero.savedData.passiveTools.gloves >= 2) {
+            if (state.hero.savedData.passiveTools.gloves >= 2 || forceLevel >= 2) {
                 return true;
             }
-            if (state.hero.savedData.passiveTools.gloves) {
+            /*if (state.hero.savedData.passiveTools.gloves) {
                 showMessage(state, 'It feels like you could move this if you were a little stronger.');
             } else {
                 showMessage(state, 'Only a monster could move something this heavy!');
-            }
+            }*/
             return false;
         }
         return false;
@@ -189,9 +191,9 @@ export class PushPullObject implements ObjectInstance {
         const [dx, dy] = directionMap[direction];
         return moveLinkedObject(state, this, dx * amount, dy * amount);
     }
-    pushInDirection(state: GameState, direction: Direction, amount = 1): void {
+    pushInDirection(state: GameState, direction: Direction, amount = 1, forceLevel = 0): void {
         //console.log('pushPullObject.pushInDirection', direction, !!hero, amount);
-        if (!this.canMove(state)) {
+        if (!this.canMove(state, null, forceLevel)) {
             return;
         }
         this.pushDirection = direction;
@@ -361,25 +363,26 @@ function setObjectPosition(this: void, object: ObjectInstance, x: number, y: num
 }
 
 function moveHero(this: void, state: GameState, hero: Hero, dx: number, dy: number, movementProperties: MovementProperties = {}) {
-    movementProperties = {
-        canFall: true,
-        canSwim: true,
+    return moveActor(state, hero, dx, dy, {
         canWiggle: true,
-        direction: getDirection(dx, dy, true),
         boundingBox: getSectionBoundingBox(state, hero),
         ...movementProperties,
-    };
-    return moveActor(state, hero, dx, dy, movementProperties);
+    });
 }
 
 export function moveLinkedObject(this: void, state: GameState, object: ObjectInstance, dx: number, dy: number, movementProperties: MovementProperties = {}) {
-    const heroesAndClones = [state.hero, ...(state.hero.clones || [])];
-    let blockedBoxes = heroesAndClones.filter(h => !movementProperties?.excludedObjects?.has(h) && h.area === object.area).map(h => h.getHitbox());
+    const heroesAndClones = [
+        state.hero,
+        // This might be undefined.
+        state.hero.astralProjection,
+        ...(state.hero.clones || [])
+    ];
+    let blockedBoxes = heroesAndClones.filter(h => h && !movementProperties?.excludedObjects?.has(h) && h.area === object.area).map(h => h.getHitbox());
     movementProperties = {
         canFall: true,
         canSwim: true,
+        canMoveInLava: true,
         canWiggle: true,
-        direction: getDirection(dx, dy, true),
         boundingBox: getSectionBoundingBox(state, object),
         blockedBoxes,
         ...movementProperties,
@@ -393,13 +396,13 @@ export function moveLinkedObject(this: void, state: GameState, object: ObjectIns
     // Currently this is never true for the hero.
     if (object.linkedObject) {
         //console.log('moving linked object', mx, my, getDirection(mx, my));
-        blockedBoxes = heroesAndClones.filter(h => !movementProperties?.excludedObjects?.has(h) && h.area === object.linkedObject.area).map(h => h.getHitbox());
+        blockedBoxes = heroesAndClones.filter(h => h && !movementProperties?.excludedObjects?.has(h) && h.area === object.linkedObject.area).map(h => h.getHitbox());
         const linkedResult = moveObject(state, object.linkedObject, mx, my, {
             canFall: true,
             canSwim: true,
+            canMoveInLava: true,
             // We rely on the base object wiggling for wiggling behavior.
             canWiggle: false,
-            direction: getDirection(mx, my),
             boundingBox: getSectionBoundingBox(state, object.linkedObject),
             blockedBoxes,
             ...movementProperties,

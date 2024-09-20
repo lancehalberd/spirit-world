@@ -345,6 +345,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         behaviorGrid,
         tilesDrawn: [],
         checkToRedrawTiles: true,
+        checkToRedrawWaterSurface: false,
         drawnFrames: new Set(),
         layers: definition.layers.filter((layer) => {
             if (!layer) {

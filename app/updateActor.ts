@@ -445,7 +445,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
         if (!touchHit) {
             continue;
         }
-        const enemyHitbox = enemy.getHitbox();
+        const enemyHitbox = enemy.getTouchHitbox();
         if (boxesIntersect(heroHitbox, enemyHitbox)) {
             let dx = (heroHitbox.x + heroHitbox.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
             let dy = (heroHitbox.y + heroHitbox.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);

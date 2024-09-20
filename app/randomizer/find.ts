@@ -14,6 +14,9 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
             console.error('Found undefined node');
             return [];
         }
+        if (window['debugFindReachableNodes']) {
+            console.log(currentNode.zoneId, currentNode.nodeId);
+        }
         // console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);
         if (!zone) {
@@ -82,6 +85,7 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
 export function findReachableChecksFromStart(state: GameState) {
     return findReachableChecks(allNodes, [allNodes[0]], state);
 }
+window['findReachableChecksFromStart'] = findReachableChecksFromStart;
 
 export function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LootWithLocation[] {
     const reachableNodes: LogicNode[] = findReachableNodes(allNodes, startingNodes, state);

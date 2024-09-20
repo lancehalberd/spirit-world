@@ -231,7 +231,7 @@ const stormHeart: EnemyDefinition<CloudParams> = {
     onHit(state: GameState, enemy: Enemy<CloudParams>, hit: HitProperties): HitResult {
         const innerHitbox = getHeartHitbox(enemy);
         // Cloud cannot be damaged while it is reforming after a counter attack or while enraged
-        if (enemy.params.cloudIsReforming || enemy.params.enrageTime > 0
+        if (enemy.params.cloudIsReforming
             || !isTargetHit(innerHitbox, hit) || isOrbProtectingHeart(state, enemy.area)
         ) {
             return { hit: true, stopped: true };

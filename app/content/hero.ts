@@ -134,7 +134,7 @@ export class Hero implements Actor {
     // Until this reaches zero, magic will not regenerate.
     magicRegenCooldown: number = 0;
     // This is the maximum value magic regen cooldown can reach. It is reduced by certain items.
-    magicRegenCooldownLimit: number = 4000;
+    magicRegenCooldownLimit: number = 2000;
     // How much magic the hero has spent recently. This is drawn as a red bar on top of remaining magic
     // and is used to visualize both how much magic the hero spent and how long until magic regen starts again.
     recentMagicSpent: number = 0;
@@ -168,6 +168,8 @@ export class Hero implements Actor {
     isUncontrollable = false;
     // Clone that you can no longer swap to is marked with this flag.layers
     cannotSwapTo = false;
+    canJumpOffLedges = true;
+    canMoveInLava = true;
 
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];
@@ -453,6 +455,7 @@ export class Hero implements Actor {
             drawPriority: 'sprites',
         });
         addEffectToArea(state, this.area, shatteredBarrier);
+        playAreaSound(state, this.area, 'barrierShatter');
     }
 
     knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {
@@ -919,6 +922,10 @@ export class Hero implements Actor {
             this.magic = -0.001;
             if (amount >= 10) {
                 this.magicRegenCooldown = this.magicRegenCooldownLimit;
+            } else if (amount >= 5) {
+                this.magicRegenCooldown = Math.max(this.magicRegenCooldown, this.magicRegenCooldownLimit / 2);
+            } else {
+                this.magicRegenCooldown =  Math.max(this.magicRegenCooldown, 100);
             }
         } else if (cooldownAmount > 0) {
             this.increaseMagicRegenCooldown(cooldownAmount);

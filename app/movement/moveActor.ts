@@ -5,7 +5,7 @@ import { directionMap, getDirection } from 'app/utils/direction';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 
-export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
+export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties = {}): {mx: number, my: number} {
     let sx = dx;
     let sy = dy;
     let mx = 0, my = 0;
@@ -26,6 +26,12 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             // Move at most one pixel at a time.
             const amount = (sx < -1) ? -1 : (sx > 1 ? 1 : sx);
             const result = moveActorInDirection(state, actor, amount, d, {
+                // By default actors can move over hazards.
+                canFall: true,
+                canSwim: true,
+                canMoveInLava: true,
+                actor,
+                dx, dy,
                 ...movementProperties,
                 canPush: movementProperties.canPush && d === fullDirection,
                 canWiggle: (movementProperties.canWiggle ?? true) && !dy,
@@ -51,6 +57,12 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             // Move at most one pixel at a time.
             const amount = (sy < -1) ? -1 : (sy > 1 ? 1 : sy);
             const result = moveActorInDirection(state, actor, amount, d, {
+                // By default actors can move over hazards.
+                canFall: true,
+                canSwim: true,
+                canMoveInLava: true,
+                actor,
+                dx, dy,
                 ...movementProperties,
                 canPush: movementProperties.canPush && d === fullDirection,
                 canWiggle: (movementProperties.canWiggle ?? true) && !dx,
@@ -161,7 +173,7 @@ function moveActorInDirection(
     if (direction === 'right') {
         result = moveRight(state, actor, movementProperties, amount);
     }
-    if (!actor.ignoreLedges && actor.action !== 'climbing') {
+    if (actor.canJumpOffLedges && !actor.ignoreLedges && actor.action !== 'climbing') {
         const jv = getJumpVector(state, actor.area, actor.getHitbox());
         if (jv[0] !== 0 || jv[1] !== 0) {
             if (actor.pickUpObject || actor.pickUpTile) {

@@ -25,67 +25,67 @@ export function getLedgeDelta(
                 continue;
             }
             //console.log(tx, ty, behaviors.ledges, behaviors.diagonalLedge);
-            if (behaviors?.ledges?.left === true && start.x <= 16 * tx) {
+            if (behaviors?.ledges?.left === true && start.x < 16 * tx && end.x >= 16 * tx) {
                 delta++;
                 continue;
             }
-            if (behaviors?.ledges?.left === true && end.x <= 16 * tx) {
+            if (behaviors?.ledges?.left === true && end.x < 16 * tx && start.x >= 16 * tx) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.left === false && start.x <= 16 * tx) {
+            if (behaviors?.ledges?.left === false && start.x < 16 * tx && end.x >= 16 * tx) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.left === false && end.x <= 16 * tx) {
+            if (behaviors?.ledges?.left === false && end.x < 16 * tx && start.x >= 16 * tx) {
                 delta++;
                 continue;
             }
-            if (behaviors?.ledges?.right === true && start.x >= 16 * (tx + 1)) {
+            if (behaviors?.ledges?.right === true && start.x >= 16 * (tx + 1) && end.x < 16 * (tx + 1)) {
                 delta++;
                 continue;
             }
-            if (behaviors?.ledges?.right === true && end.x >= 16 * (tx + 1)) {
+            if (behaviors?.ledges?.right === true && end.x >= 16 * (tx + 1) && start.x < 16 * (tx + 1)) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.right === false && start.x >= 16 * (tx + 1)) {
+            if (behaviors?.ledges?.right === false && start.x >= 16 * (tx + 1) && end.x < 16 * (tx + 1)) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.right === false && end.x >= 16 * (tx + 1)) {
+            if (behaviors?.ledges?.right === false && end.x >= 16 * (tx + 1) && start.x < 16 * (tx + 1)) {
                 delta++;
                 continue;
             }
-            if (behaviors?.ledges?.up === true && start.y <= 16 * ty) {
+            if (behaviors?.ledges?.up === true && start.y < 16 * ty && end.y >= 16 * ty) {
                 delta++;
                 continue;
             }
-            if (behaviors?.ledges?.up === true && end.y <= 16 * ty) {
+            if (behaviors?.ledges?.up === true && end.y < 16 * ty && start.y >= 16 * ty) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.up === true && start.y <= 16 * ty) {
+            if (behaviors?.ledges?.up === true && start.y < 16 * ty && end.y >= 16 * ty) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.up === true && end.y <= 16 * ty) {
+            if (behaviors?.ledges?.up === true && end.y < 16 * ty && start.y >= 16 * ty) {
                 delta++
                 continue;
             }
-            if (behaviors?.ledges?.down === true && start.y >= 16 * (ty + 1)) {
+            if (behaviors?.ledges?.down === true && start.y >= 16 * (ty + 1) && end.y < 16 * (ty + 1)) {
                 delta++;
                 continue;
             }
-            if (behaviors?.ledges?.down === true && end.y >= 16 * (ty + 1)) {
+            if (behaviors?.ledges?.down === true && end.y >= 16 * (ty + 1) && start.y < 16 * (ty + 1)) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.down === false && start.y >= 16 * (ty + 1)) {
+            if (behaviors?.ledges?.down === false && start.y >= 16 * (ty + 1) && end.y < 16 * (ty + 1)) {
                 delta--;
                 continue;
             }
-            if (behaviors?.ledges?.down === false && end.y >= 16 * (ty + 1)) {
+            if (behaviors?.ledges?.down === false && end.y >= 16 * (ty + 1) && start.y < 16 * (ty + 1)) {
                 delta++;
                 continue;
             }
@@ -137,7 +137,7 @@ export function getLedgeDelta(
                     continue;
                 }
                 if (end.y + end.x >= N + 1 && start.y + start.x < N) {
-                    delta++;
+                    delta--;
                     continue;
                 }
             }
@@ -145,4 +145,21 @@ export function getLedgeDelta(
     }
 
     return delta;
+}
+window['getLedgeDelta'] = getLedgeDelta;
+
+
+export function updateProjectileHeight(this: void, state: GameState, area: AreaInstance, isHigh: boolean, oldAnchorPoint: Point, anchorPoint: Point): boolean {
+    const ledgeDelta = getLedgeDelta(state, area, oldAnchorPoint, anchorPoint);
+    // console.log(ledgeDelta, oldAnchorPoint, anchorPoint);
+    if (isHigh) {
+        if (ledgeDelta > 0) {
+            return false;
+        }
+    } else {
+        if (ledgeDelta < 0) {
+            return true;
+        }
+    }
+    return isHigh;
 }

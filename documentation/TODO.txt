@@ -4,8 +4,6 @@ Bugs:
     - Safari: graphics have antialiasing on
 
     Won't Fix:
-        - Chakram can hit tiles below ledges sometimes when returning.
-            - We can avoid this by not placing bushes directly next to ledges that the player can get on top of.
         - Spirit Barrier appears above door frames when moving East/West through doors.
             - This only applies with old tile sets, so probably isn't worth fixing.
         - Enemies hit in the spirit world make noise when taking damage
@@ -67,7 +65,8 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
+    - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
+        - Let's make new graphics for this as a pilot of the Cocoon graphics.
 
     - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
         - Material world entrances: back of Tomb, lake teleporter, bottom of Cocoon, Helix Bridge
@@ -89,11 +88,16 @@ Current tasks:
         - Triggered when leaving the War Temple after getting Astral Projection.
         - She will bring the MC to the Grand Priest in the Grand Temple
 
-    - Add new crystal pit graphics
-        - Add small crystal pit tile, use in secret entrance to sky palace.
-        - Make crystal cracked ground become crystal pits.
+    - Add more crystal pit graphics to sky palace once the finished tile set is ready.
+
+    - Add sound effect using pink noise when near a waterfall.
+        - Use pink noise for barrier burst SFX.
+        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
 
     - Replace low stones underwater with walls or taller obstacles.
+
+    - Make lucky beetle teleport away instead of showing the death animation.
+        - Make sure this still sets the flag for preventing it from respawning.
 
     - Check if fixing the hitbox on transition for beadflows removed the need for disabling input on transition.
 
@@ -127,9 +131,6 @@ Current tasks:
         - Update movement behavior to treat door entrances+exterior edges of the screen as walls when knocked back.
         - If nothing else, at least move stationary plant enemies far enough from transition edges to not trigger this by the forest.
 
-    - Add sound effect using pink noise when near a waterfall.
-        - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
-
     - Possible work items:
         - Add final dungeon
             - Would prefer to have Vanara Ship tiles
@@ -160,6 +161,10 @@ Current tasks:
     - Mechanic for breaking crystal barriers open is unintuitive.
     - Add 4th spirit upgrade that let's you swap between worlds while meditating.
 
+    - cannot roll/astral project around a diamond shaped set of cliffs smoothly.
+        - low priority, but this can probably be fixed by adjusting which anchor point is used when calculating
+          `isAbove` in canMoveX when adjacent to various diagonal ledges.
+
     - Brainstorm more clone tool puzzles.
         - Maybe in the back of Forest Temple scientists give you the clone tool and then agree to answer questions if you complete "tests" for them.
 
@@ -179,6 +184,8 @@ Current tasks:
         - Player shouldn't take damage while submerged.
         - Non-deep water/water passage tiles are treated as solid for the player while submerged.
         - Player should lose spirit underwater just as when otherwise submerged
+
+    - On area creation run ambient effect creation 50-100 times with animation timers+ position advanced by 20ms-2000ms to simulate pre existing effects.
 
     - Come up with a method for generating enemy patterns in generated areas.
         - Want to be able to have a consitent theme for an area
@@ -787,10 +794,8 @@ Tutorial Improvements:
     Add advanced combat/tool tutorials
         - Maybe NPCs in home cave, or some kind of training/tutorial dojo?
         - Hitting enemies with chakram held in hand
-        - Default Charged chakram attack
         - Enemy iframes prevent them from damaging you
         - Maybe different sections for different tools.
-        - Reflecting projectiles
 
 Add more screen shakes:
     - Lava draining transition

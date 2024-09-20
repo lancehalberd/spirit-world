@@ -375,6 +375,13 @@ export function renderField(
     if (state.areaInstance.checkToRedrawTiles) {
         checkToRedrawTiles(state.areaInstance);
         updateLightingCanvas(state.areaInstance);
+        // Don't update the water surface canvas on the same draw as updating other tiles.
+        // This won't be rendered until they leave they submerge and leave the current area so
+        // there isn't any rush to update it.
+        state.areaInstance.checkToRedrawWaterSurface = true;
+    } else if (state.areaInstance.checkToRedrawWaterSurface) {
+        // Update the canvas for displaying lights from the surface in the water area.
+        state.areaInstance.checkToRedrawWaterSurface = false;
         if (state.underwaterAreaInstance) {
             updateWaterSurfaceCanvas(state);
         }

@@ -176,6 +176,7 @@ export class RollingBallObject implements ObjectInstance {
             canFall: true,
             canWiggle: true,
             canSwim: true,
+            canMoveInLava: true,
             excludedObjects: new Set([this, state.hero]),
         });
         if (!mx && !my) {
@@ -187,6 +188,7 @@ export class RollingBallObject implements ObjectInstance {
                 canFall: true,
                 canWiggle: false,
                 canSwim: true,
+                canMoveInLava: true,
                 excludedObjects: new Set([this.linkedObject]),
             });
             this.x = this.linkedObject.x;

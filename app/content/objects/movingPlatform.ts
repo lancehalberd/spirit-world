@@ -77,9 +77,8 @@ export class MovingPlatform implements ObjectInstance {
                 && hero.action !== 'falling' && hero.action !== 'fallen';
             if (isHeroOnPlatform) {
                 moveActor(state, hero, mx, my, {
-                    canFall: true,
+                    // TODO: is this correct?
                     canJump: true,
-                    canSwim: true,
                 });
             }
         }
