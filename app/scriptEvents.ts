@@ -1,6 +1,20 @@
 import { allLootTypes, GAME_KEY } from 'app/gameConstants';
 import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 
+export function hideHUD(state: GameState) {
+    // hide HUD to show that player isn't controllable
+    appendCallback(state, (state: GameState) => {
+        state.hideHUD = true;
+    });
+}
+
+export function showHUD(state: GameState) {
+    // show HUD to tell player that control of their character has returned
+    appendCallback(state, (state: GameState) => {
+        state.hideHUD = false;
+    });
+}
+
 export function wait(state: GameState, duration: number) {
     state.scriptEvents.queue.push({
         type: 'wait',
@@ -27,6 +41,23 @@ export function runBlockingCallback(state: GameState, updateCallback: (state: Ga
             time: 0,
             waitingOnActiveEvents: true,
             blockFieldUpdates: true,
+        });
+        // Make sure no other scripts are processed until this finishes.
+        return true;
+    });
+}
+
+export function runPlayerBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
+    appendCallback(state, (state) => {
+        state.scriptEvents.activeEvents.push({
+            type: 'update',
+            update: updateCallback,
+        });
+        state.scriptEvents.activeEvents.push({
+            type: 'wait',
+            time: 0,
+            waitingOnActiveEvents: true,
+            blockPlayerInput: true,
         });
         // Make sure no other scripts are processed until this finishes.
         return true;

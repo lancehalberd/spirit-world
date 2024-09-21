@@ -1,7 +1,7 @@
 type Action =
     'attack' | 'charging' | 'roll' | 'preparingSomersault' | 'usingStaff'
     // Hero can be forced into screen transitions when knockedHard.
-    | 'knocked' | 'knockedHard'
+    | 'kneel' | 'knocked' | 'knockedHard'
     | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried'

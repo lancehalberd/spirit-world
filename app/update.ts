@@ -171,6 +171,13 @@ export function update() {
             }
             if (!messageIsAnimating) {
                 updateScriptEvents(state);
+                // Update the HUD opacity as long as script events can be run.
+                if (state.hideHUD && state.hudOpacity > 0) {
+                    state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
+                } else if (!state.hideHUD && state.hudOpacity < 1) {
+                    state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
+                }
+
                 //if (state.scriptEvents.blockPlayerInput) {
                 //    clearKeyboardState(state);
                 //}

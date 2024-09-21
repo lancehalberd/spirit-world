@@ -1,6 +1,7 @@
 Test at http://localhost:81/alttp/public/
 
 Bugs:
+    - Safari: graphics have antialiasing on
 
     Won't Fix:
         - Spirit Barrier appears above door frames when moving East/West through doors.
@@ -54,6 +55,8 @@ Graphics Work:
 
 
 Graphics to Implement:
+    Add PS controller icons, detect xbox vs ps controller
+        - check gamepad id, navigator.getGamepads()[0].id to see if it contains string '45e' (vendor id for microsoft/xbox) or 'xInput' or 'xBox' (xbox/microsoft) or '54c' (vendor id for PS/sony); issue with Safari: wireless PS4 controller called 'Wireless Controller Extended Gamepad'
     Add slam effects for the staff.
     Sweat animation when pulling on something you cannot move.
     Add Item Get Frame gfx/wukongimportantitem.png 20x28

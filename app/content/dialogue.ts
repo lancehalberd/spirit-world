@@ -1,6 +1,8 @@
 // Every zone needs to be imported here in order to be added to the zones hash.
 export * from 'app/content/dialogue/dialogueHash';
 export * from 'app/content/dialogue/elder';
+export * from 'app/content/dialogue/jadeChampion';
+export * from 'app/content/dialogue/jadeChampionWarTemple';
 export * from 'app/content/dialogue/mom';
 export * from 'app/content/dialogue/rival';
 export * from 'app/content/dialogue/npc';

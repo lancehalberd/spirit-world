@@ -8,6 +8,7 @@ import { shouldHideMenu } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
 import { drawText } from 'app/utils/simpleWhiteFont';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 
@@ -32,11 +33,28 @@ const frameSize = 24;
 const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, h: frameSize}).frames[0];
 const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h: frameSize}).frames[0];
 
+const [hudCanvas, hudContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     if (editingState.isEditing) {
         renderEditorHUD(context, state);
         return;
     }
+    if (state.hudOpacity <= 0) {
+        return;
+    }
+    if (state.hudOpacity < 1) {
+        context.save();
+            context.globalAlpha *= state.hudOpacity;
+            hudContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            renderHUDProper(hudContext, state);
+            context.drawImage(hudCanvas, 0, 0);
+        context.restore();
+        return;
+    }
+    renderHUDProper(context, state);
+}
+function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): void {
     // Draw heart backs, and fillings
     let x = 26;
     let y = 5;
