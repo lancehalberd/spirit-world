@@ -257,6 +257,7 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 timer: definition.timer || 0,
                 requireAll: definition.requireAll ?? true,
+                stayOnAfterActivation: definition.stayOnAfterActivation,
                 targetObjectId: definition.targetObjectId,
             };
         case 'door':
@@ -1154,6 +1155,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 inputClass: 'large',
                 onChange(timer: number) {
                     object.timer = timer;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'Stay On',
+                value: object.stayOnAfterActivation ?? false,
+                onChange(stayOnAfterActivation: boolean) {
+                    object.stayOnAfterActivation = stayOnAfterActivation;
                     updateObjectInstance(state, object);
                 },
             });

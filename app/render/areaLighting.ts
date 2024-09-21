@@ -103,6 +103,7 @@ export function drawLightGradient(
 
 export function drawColorLightGradient(
     context: CanvasRenderingContext2D,
+    state: GameState,
     {x, y, brightness, radius, color}: LightSource
 ): void {
     const r = (radius ?? 32) / lightingGranularity;
@@ -114,7 +115,7 @@ export function drawColorLightGradient(
         context.fillStyle = gradient;
         context.translate(x / lightingGranularity, y / lightingGranularity);
         context.scale(r / 32, r / 32);
-        context.globalAlpha = brightness;
+        context.globalAlpha = brightness * (0.5 + 0.5 * state.fadeLevel);
         context.beginPath();
         context.arc(0, 0, 32, 0, 2 * Math.PI);
         context.fill();
@@ -169,7 +170,7 @@ export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: 
 }
 
 export function renderAreaLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea: AreaInstance = null): void {
-    if (!(state.fadeLevel > 0) && editingState.isEditing) {
+    if (!(state.fadeLevel > 0) || editingState.isEditing) {
         renderLightColors(context, state, area, nextArea);
         return;
     }
@@ -370,7 +371,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
                 const lightSources = object.getLightSources?.(state);
                 for (const lightSource of lightSources) {
                     if (lightSource.color) {
-                        drawColorLightGradient(context, lightSource);
+                        drawColorLightGradient(context, state, lightSource);
                     }
                 }
                 continue;
@@ -379,7 +380,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
             const behaviors = getObjectBehaviors(state, object);
             if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
                 const hitbox = object.getHitbox(state);
-                drawColorLightGradient(context,
+                drawColorLightGradient(context, state,
                     {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
@@ -394,7 +395,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
                     const behaviors = object.pickUpTile.behaviors;
                     if (behaviors?.lightColor && behaviors?.lightRadius) {
                         const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
-                        drawColorLightGradient(context,
+                        drawColorLightGradient(context, state,
                             {
                                 x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
                                 y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
@@ -415,7 +416,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
                 const lightSources = effect.getLightSources?.(state);
                 for (const lightSource of lightSources) {
                     if (lightSource.color) {
-                        drawColorLightGradient(context, lightSource);
+                        drawColorLightGradient(context, state, lightSource);
                     }
                 }
                 continue;
@@ -423,7 +424,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
             const behaviors = getObjectBehaviors(state, effect);
             if (effect.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
                 const hitbox = effect.getHitbox(state);
-                drawColorLightGradient(context,
+                drawColorLightGradient(context, state,
                     {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
@@ -449,7 +450,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
                 const lightSources = object.getLightSources?.(state);
                 for (const lightSource of lightSources) {
                     if (lightSource.color) {
-                        drawColorLightGradient(context, lightSource);
+                        drawColorLightGradient(context, state, lightSource);
                     }
                 }
                 continue;
@@ -457,7 +458,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
             const behaviors = getObjectBehaviors(state, object);
             if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
                 const hitbox = object.getHitbox(state);
-                drawColorLightGradient(context,
+                drawColorLightGradient(context, state,
                     {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,

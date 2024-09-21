@@ -4,7 +4,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { deactivateTargets, getObjectStatus, saveObjectStatus } from 'app/utils/objects';
-import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
+import { areAllSwitchesActivated, checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
@@ -59,24 +59,31 @@ export class CrystalSwitch implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    timeLimit: number = 0;
     timeLeft: number = 0;
     animationTime: number = 0;
-    // This will be set to keep a switch on even if it has a timer.
-    stayOn: boolean = false;
     constructor(state: GameState, definition: CrystalSwitchDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        if (getObjectStatus(state, this.definition)) {
+        this.timeLimit = definition.timer;
+        if (getObjectStatus(state, this.definition) ||
+            // If the switch has a target and doesn't turn off, make sure it starts active
+            // if the target is already activated.
+            (definition.targetObjectId
+             && (!definition.timer || definition.stayOnAfterActivation)
+             && state.savedState.objectFlags[this.definition.targetObjectId])
+        ) {
             this.status = 'active';
+            this.timeLimit = 0;
         }
     }
     getOffset(state: GameState): number {
         let offset = 0;
         if (this.status === 'active') {
-            if (this.definition.timer && (this.timeLeft <= 1000 || this.timeLeft <= this.definition.timer / 4)) {
+            if (this.timeLimit && (this.timeLeft <= 1000 || this.timeLeft <= this.timeLimit / 4)) {
                 offset = 1;
-            } else if (this.definition.timer && (this.timeLeft <= 2000 || this.timeLeft <= this.definition.timer / 2)) {
+            } else if (this.timeLimit && (this.timeLeft <= 2000 || this.timeLeft <= this.timeLimit / 2)) {
                 offset = 1;
             } else {
                 offset = 2;
@@ -87,10 +94,10 @@ export class CrystalSwitch implements ObjectInstance {
     getLightSources(state: GameState): LightSource[] {
         let brightness = 0.5, radius = 16;
         if (this.status === 'active') {
-            if (this.definition.timer && (this.timeLeft <= 1000 || this.timeLeft <= this.definition.timer / 4)) {
+            if (this.timeLimit && (this.timeLeft <= 1000 || this.timeLeft <= this.timeLimit / 4)) {
                 brightness = 0.6;
                 radius = 24;
-            } else if (this.definition.timer && (this.timeLeft <= 2000 || this.timeLeft <= this.definition.timer / 2)) {
+            } else if (this.timeLimit && (this.timeLeft <= 2000 || this.timeLeft <= this.timeLimit / 2)) {
                 brightness = 0.8;
                 radius = 32;
             } else {
@@ -116,16 +123,16 @@ export class CrystalSwitch implements ObjectInstance {
         return { pierced: true, hit: true };
     }
     activate(state: GameState): void {
-        if (this.status !== 'active' || (this.definition.timer && this.timeLeft < this.definition.timer - 200)) {
+        if (this.status !== 'active' || (this.timeLimit && this.timeLeft < this.timeLimit - 200)) {
             playAreaSound(state, this.area, 'activateCrystalSwitch');
         }
         this.status = 'active';
         saveObjectStatus(state, this.definition);
         this.animationTime = 0;
-        this.timeLeft = this.definition.timer || 0;
+        this.timeLeft = this.timeLimit || 0;
         if (checkIfAllSwitchesAreActivated(state, this.area, this)) {
             if (this.definition.stayOnAfterActivation) {
-                this.stayOn = true;
+                this.timeLimit = 0;
             }
         }
         if (this.definition.specialBehaviorKey) {
@@ -135,17 +142,21 @@ export class CrystalSwitch implements ObjectInstance {
         if (this.linkedObject) {
             this.linkedObject.status = 'active';
             this.linkedObject.animationTime = 0;
-            this.linkedObject.timeLeft = this.definition.timer || 0;
+            this.linkedObject.timeLeft = this.timeLimit || 0;
             if (checkIfAllSwitchesAreActivated(state, this.linkedObject.area, this.linkedObject)) {
                 if (this.linkedObject.definition.stayOnAfterActivation) {
-                    this.linkedObject.stayOn = true;
+                    this.linkedObject.timeLimit = 0;
                 }
             }
         }
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.status === 'active' && (this.timeLeft > 0 && !this.stayOn)) {
+        if (this.status === 'active' && (this.timeLimit && this.timeLeft > 0)) {
+            if (this.definition.stayOnAfterActivation && areAllSwitchesActivated(state, this.area, this)) {
+                this.timeLimit = 0;
+                return;
+            }
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';

@@ -300,7 +300,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "iceSanctum:0:0x0-vortex-2", x: 420, y: 448, type: "enemy", enemyType: "vortex", d: "down", params: {}},
         {status: "normal", id: "iceSanctum:0:0x0-vortex-3", x: 172, y: 416, type: "enemy", enemyType: "vortex", d: "down", params: {}},
         {status: "normal", id: "", x: 48, y: 272, type: "door", style: "crystal", d: "up"},
-        {status: "hiddenSwitch", id: "iceSanctumTeleporter", x: 424, y: 48, type: "teleporter"},
+        {status: "hiddenSwitch", id: "iceSanctumTeleporter", x: 424, y: 48, type: "teleporter", saveStatus: "forever"},
         {status: "normal", id: "iceSanctum:0:0x0-snakeFrost-0", x: 432, y: 188, type: "enemy", enemyType: "snakeFrost", d: "up", params: {}},
         {status: "normal", id: "iceSanctum:0:0x0-snakeFrost-1", x: 388, y: 56, type: "enemy", enemyType: "snakeFrost", d: "up", params: {}},
     ],
