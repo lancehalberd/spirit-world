@@ -431,6 +431,15 @@ window['requireSound'] = requireSound;
 // Safari uses webkitAudioContext instead of AudioContext.
 const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
 window['audioContext'] = audioContext;
+
+let pinkNoiseNode: AudioWorkletNode;
+async function registerAndCreateAudioWorklets(): Promise<void> {
+    await audioContext.audioWorklet.addModule('audio/pink-noise-processor.js');
+    pinkNoiseNode = new AudioWorkletNode(audioContext, 'pink-noise');
+    window['pinkNoiseNode'] = pinkNoiseNode;
+}
+registerAndCreateAudioWorklets();
+
 const masterGainNode = audioContext.createGain();
 const trackGainNode = audioContext.createGain();
 const soundEffectGainNode = audioContext.createGain();
@@ -595,6 +604,38 @@ sounds.set('createBarrier', {
     instanceLimit: 2,
     instances: [],
 });
+sounds.set('barrierBurst', {
+    play(target: AudioNode, time: number) {
+        target = audioContext.destination
+        time = audioContext.currentTime;
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.setValueAtTime(0, time);
+        noiseGainNode.gain.linearRampToValueAtTime(0.2, time + 0.1);
+        noiseGainNode.gain.linearRampToValueAtTime(0, time + 0.3);
+
+        pinkNoiseNode.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+
+        const waveGainNode = audioContext.createGain();
+        waveGainNode.gain.setValueAtTime(0.1, time);
+        waveGainNode.gain.linearRampToValueAtTime(0, time + 0.1);
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(500, time);
+        oscillator.frequency.linearRampToValueAtTime(50, time + 0.02);
+        oscillator.connect(waveGainNode);
+        oscillator.start(time);
+        oscillator.stop(time + 0.1);
+
+        oscillator.onended = function() {
+            pinkNoiseNode.disconnect(noiseGainNode);
+        };
+    },
+    duration: 0.3,
+    instanceLimit: 2,
+    instances: [],
+});
+
 sounds.set('barrierShatter', {
     play(target: AudioNode, time: number) {
         const x = 1600;

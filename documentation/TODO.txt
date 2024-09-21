@@ -62,6 +62,31 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add SFX for insufficient spirit energy:
+        - For teleporting/roll/tools
+
+    - Add color to lights
+        - flame+flame wall should be red
+        - lightningBolt+lightningDischarged+spark should be yellow
+
+    - Quest marker for the Staff Tower isn't aligned correctly.
+
+    - Fix teleporting into the war palace area.
+
+    - Add trap chests to the game, like the fire turret chest?
+
+    - Prevent teleporting past the first bouncing object in Helix 3F.
+
+    - Make lava floors effect objects+enemies
+        - Should unfreeze frozen objects
+        - Make lucky beetle despawn if it takes lava damage
+
+    - Allow shooting through enemy flames to add flame to your attack
+        - This will make fire enemies immune to bow/chakram attackss that pass through their flames.
+            - Maybe change how immunities work for bow/chakram so they hit with the element first and then just physical damage.
+
+    - Block the first teleportation skip in the Helix 3F material world so the player has to use the plant.
+
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
 

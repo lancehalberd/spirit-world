@@ -31,11 +31,34 @@ interface Props {
 export class Spark implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
-    // This may need to depend on the shape of the spark.
-    behaviors = {
-        brightness: 0.6,
-        lightRadius: 16,
-    };
+    getLightSources(state: GameState): LightSource[] {
+        /*if (this.hitRay) {
+            const dx = this.hitRay.x2 - this.hitRay.x1;
+            const dy = this.hitRay.y2 - this.hitRay.y1;
+            const mag = Math.sqrt(dx*dx + dy*dy);
+            return [{
+                x: this.x + this.hitRay.x1 + 6 * dx / mag,
+                y: this.y + this.hitRay.y1 + 6 * dy / mag,
+                brightness: 0.5,
+                radius: 12,
+                color: {r:255, g: 255, b: 0},
+            },{
+                x: this.x + this.hitRay.x2 - 6 * dx / mag,
+                y: this.y + this.hitRay.y2 - 6 * dy / mag,
+                brightness: 0.5,
+                radius: 12,
+                color: {r:255, g: 255, b: 0},
+            }];
+        }*/
+        return [{
+            x: this.x,
+            y: this.y,
+            brightness: 0.8,
+            radius: this.hitCircle ? this.hitCircle.r : 16,
+            color: {r:255, g: 255, b: 0},
+            colorIntensity: 0.3,
+        }];
+    }
     isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
@@ -204,8 +227,8 @@ export function addRadialSparks(this: void,
         const dx = Math.cos(theta);
         const dy = Math.sin(theta);
         const spark = new Spark({
-            x,
-            y,
+            x: x + dx * 6,
+            y: y + dy * 6,
             vx: speed * dx,
             vy: speed * dy,
             ttl: 1000,

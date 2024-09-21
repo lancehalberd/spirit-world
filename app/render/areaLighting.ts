@@ -112,7 +112,7 @@ export function drawLightGradient(
 export function drawColorLightGradient(
     context: CanvasRenderingContext2D,
     state: GameState,
-    {x, y, brightness, radius, color}: LightSource
+    {x, y, brightness, radius, color, colorIntensity}: LightSource
 ): void {
     const r = (radius ?? 32) / lightingGranularity;
     context.save();
@@ -123,7 +123,7 @@ export function drawColorLightGradient(
         context.fillStyle = gradient;
         context.translate(x / lightingGranularity, y / lightingGranularity);
         context.scale(r / 32, r / 32);
-        context.globalAlpha = brightness * (0.5 + 0.5 * state.fadeLevel);
+        context.globalAlpha *= (colorIntensity ?? brightness) * (0.5 + 0.5 * state.fadeLevel);
         context.beginPath();
         context.arc(0, 0, 32, 0, 2 * Math.PI);
         context.fill();
@@ -311,6 +311,16 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
         }
         for (const effect of area.effects) {
             if (effect.status === 'gone') {
+                continue;
+            }
+            if (effect.getLightSources) {
+                const lightSources = effect.getLightSources?.(state);
+                for (const lightSource of lightSources) {
+                    drawLightGradient(lightingContext,
+                        lightSource,
+                        lightSource.brightness, lightSource.radius, objectLightGradient
+                    );
+                }
                 continue;
             }
             const behaviors = getObjectBehaviors(state, effect);

@@ -60,6 +60,7 @@ interface LightSource {
     brightness: number
     radius: number
     color?: LightColor
+    colorIntensity?: number
 }
 
 interface BaseFieldInstance {
