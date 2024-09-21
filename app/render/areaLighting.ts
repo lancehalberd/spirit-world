@@ -6,7 +6,7 @@ import {
 import { heroCarryAnimations } from 'app/render/heroAnimations';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { carryMap, directionMap } from 'app/utils/direction';
-import { getObjectBehaviors } from 'app/utils/objects';
+import { getObjectBehaviors, getObjectAndParts } from 'app/utils/objects';
 
 
 const lightingGranularity = 1;
@@ -14,9 +14,17 @@ const [lightingCanvas, lightingContext] = createCanvasAndContext(
     Math.ceil(CANVAS_WIDTH / lightingGranularity),
     Math.ceil(CANVAS_HEIGHT / lightingGranularity)
 );
-const gradient = lightingContext.createRadialGradient(0, 0, 8, 0, 0, 32);
-gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+const tileLightGradient = lightingContext.createRadialGradient(0, 0, 16, 0, 0, 32);
+tileLightGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+tileLightGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+const objectLightGradient = lightingContext.createRadialGradient(0, 0, 8, 0, 0, 32);
+objectLightGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+objectLightGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+const heroLightGradient = lightingContext.createRadialGradient(0, 0, 8, 0, 0, 32);
+heroLightGradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+heroLightGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
 
 const waterSurfaceGranularity = 2;
@@ -87,11 +95,11 @@ export function updateWaterSurfaceCanvas(state: GameState): void {
 export function drawLightGradient(
     context: CanvasRenderingContext2D,
     {x, y}: {x: number, y: number},
-    brightness: number, lightRadius: number
+    brightness: number, lightRadius: number, lightGradient: CanvasGradient
 ): void {
     const r = (lightRadius ?? 32) / lightingGranularity;
     context.save();
-        context.fillStyle = gradient;
+        context.fillStyle = lightGradient;
         context.translate(x / lightingGranularity, y / lightingGranularity);
         context.scale(r / 32, r / 32);
         context.globalAlpha = brightness;
@@ -134,7 +142,7 @@ export function updateLightingCanvas(area: AreaInstance): void {
     }
     const context = area.lightingContext;
     context.clearRect(0, 0, area.lightingCanvas.width, area.lightingCanvas.height);
-    context.fillStyle = gradient;
+    context.fillStyle = objectLightGradient;
     for (let y = 0; y < area.behaviorGrid?.length; y++) {
         for (let x = 0; x < area.behaviorGrid[y]?.length; x++) {
             if (area.behaviorGrid[y][x]?.brightness > 0) {
@@ -180,7 +188,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
     lightingContext.globalAlpha = state.fadeLevel;
     lightingContext.fillStyle = 'black';
     lightingContext.fillRect(0, 0, lightingCanvas.width, lightingCanvas.height);
-    lightingContext.fillStyle = gradient;
+    lightingContext.fillStyle = objectLightGradient;
 
     // Next add lighting effects from the background.
     lightingContext.globalCompositeOperation = 'destination-out';
@@ -224,7 +232,8 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             y: hero.y - hero.z + hero.h / 2 + 12 * directionMap[d][1]
                 - state.camera.y + area.cameraOffset.y
         },
-        1, Math.max(0, state.hero.lightRadius + Math.sin(state.fieldTime / 200))
+        1, Math.max(0, state.hero.lightRadius + Math.sin(state.fieldTime / 200)),
+        heroLightGradient,
     );
     if (hero.pickUpTile) {
         const behaviors = hero.pickUpTile.behaviors;
@@ -247,7 +256,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                     x: hero.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
                     y: hero.y + offset.y + 8 - state.camera.y + area.cameraOffset.y + yBounce,
                 },
-                behaviors.brightness, behaviors.lightRadius
+                behaviors.brightness, behaviors.lightRadius, tileLightGradient
             );
         }
     }
@@ -256,44 +265,46 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             Math.floor((area.cameraOffset.x - state.camera.x) / lightingGranularity),
             Math.floor((area.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
-        for (const object of area.objects) {
-            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object.getLightSources) {
-                const lightSources = object.getLightSources?.(state);
-                for (const lightSource of lightSources) {
+        for (const baseObject of area.objects) {
+            for (const object of getObjectAndParts(state, baseObject).filter(o => o.getHitbox || o.getLightSources)) {
+                if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                    continue;
+                }
+                if (object.getLightSources) {
+                    const lightSources = object.getLightSources?.(state);
+                    for (const lightSource of lightSources) {
+                        drawLightGradient(lightingContext,
+                            lightSource,
+                            lightSource.brightness, lightSource.radius, objectLightGradient
+                        );
+                    }
+                    continue;
+                }
+
+                const behaviors = getObjectBehaviors(state, object);
+                if (object.getHitbox && behaviors?.brightness) {
+                    const hitbox = object.getHitbox(state);
                     drawLightGradient(lightingContext,
-                        lightSource,
-                        lightSource.brightness, lightSource.radius
+                        {
+                            x: hitbox.x + hitbox.w / 2,
+                            y: hitbox.y + hitbox.h / 2,
+                        },
+                        behaviors.brightness, behaviors.lightRadius, objectLightGradient
                     );
                 }
-                continue;
-            }
-
-            const behaviors = getObjectBehaviors(state, object);
-            if (object.getHitbox && behaviors?.brightness) {
-                const hitbox = object.getHitbox(state);
-                drawLightGradient(lightingContext,
-                    {
-                        x: hitbox.x + hitbox.w / 2,
-                        y: hitbox.y + hitbox.h / 2,
-                    },
-                    behaviors.brightness, behaviors.lightRadius
-                );
-            }
-            if (object instanceof Hero) {
-                if (object.pickUpTile) {
-                    const behaviors = object.pickUpTile.behaviors;
-                    if (behaviors?.brightness) {
-                        const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
-                        drawLightGradient(lightingContext,
-                            {
-                                x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
-                                y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
-                            },
-                            behaviors.brightness, behaviors.lightRadius
-                        );
+                if (object instanceof Hero) {
+                    if (object.pickUpTile) {
+                        const behaviors = object.pickUpTile.behaviors;
+                        if (behaviors?.brightness) {
+                            const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
+                            drawLightGradient(lightingContext,
+                                {
+                                    x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
+                                    y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
+                                },
+                                behaviors.brightness, behaviors.lightRadius, tileLightGradient
+                            );
+                        }
                     }
                 }
             }
@@ -310,7 +321,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                     },
-                    behaviors.brightness, behaviors.lightRadius
+                    behaviors.brightness, behaviors.lightRadius, objectLightGradient
                 );
             }
         }
@@ -321,30 +332,32 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             Math.floor((nextArea.cameraOffset.x - state.camera.x) / lightingGranularity),
             Math.floor((nextArea.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
-        for (const object of nextArea.objects || []) {
-            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object.getLightSources) {
-                const lightSources = object.getLightSources?.(state);
-                for (const lightSource of lightSources) {
+        for (const baseObject of nextArea.objects) {
+            for (const object of getObjectAndParts(state, baseObject).filter(o => o.getHitbox || o.getLightSources)) {
+                if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                    continue;
+                }
+                if (object.getLightSources) {
+                    const lightSources = object.getLightSources?.(state);
+                    for (const lightSource of lightSources) {
+                        drawLightGradient(lightingContext,
+                            lightSource,
+                            lightSource.brightness, lightSource.radius, objectLightGradient
+                        );
+                    }
+                    continue;
+                }
+                const behaviors = getObjectBehaviors(state, object);
+                if (object.getHitbox && behaviors?.brightness) {
+                    const hitbox = object.getHitbox(state);
                     drawLightGradient(lightingContext,
-                        lightSource,
-                        lightSource.brightness, lightSource.radius
+                        {
+                            x: hitbox.x + hitbox.w / 2,
+                            y: hitbox.y + hitbox.h / 2,
+                        },
+                        behaviors.brightness, behaviors.lightRadius, objectLightGradient
                     );
                 }
-                continue;
-            }
-            const behaviors = getObjectBehaviors(state, object);
-            if (object.getHitbox && behaviors?.brightness) {
-                const hitbox = object.getHitbox(state);
-                drawLightGradient(lightingContext,
-                    {
-                        x: hitbox.x + hitbox.w / 2,
-                        y: hitbox.y + hitbox.h / 2,
-                    },
-                    behaviors.brightness, behaviors.lightRadius
-                );
             }
         }
         lightingContext.restore();
@@ -363,47 +376,49 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
             Math.floor((area.cameraOffset.x - state.camera.x) / lightingGranularity),
             Math.floor((area.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
-        for (const object of area.objects) {
-            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object.getLightSources) {
-                const lightSources = object.getLightSources?.(state);
-                for (const lightSource of lightSources) {
-                    if (lightSource.color) {
-                        drawColorLightGradient(context, state, lightSource);
-                    }
+        for (const baseObject of area.objects) {
+            for (const object of getObjectAndParts(state, baseObject).filter(o => o.getHitbox || o.getLightSources)) {
+                if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                    continue;
                 }
-                continue;
-            }
-
-            const behaviors = getObjectBehaviors(state, object);
-            if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
-                const hitbox = object.getHitbox(state);
-                drawColorLightGradient(context, state,
-                    {
-                        x: hitbox.x + hitbox.w / 2,
-                        y: hitbox.y + hitbox.h / 2,
-                        brightness: behaviors.brightness,
-                        radius: behaviors.lightRadius,
-                        color: behaviors?.lightColor,
+                if (object.getLightSources) {
+                    const lightSources = object.getLightSources?.(state);
+                    for (const lightSource of lightSources) {
+                        if (lightSource.color) {
+                            drawColorLightGradient(context, state, lightSource);
+                        }
                     }
-                );
-            }
-            if (object instanceof Hero) {
-                if (object.pickUpTile) {
-                    const behaviors = object.pickUpTile.behaviors;
-                    if (behaviors?.lightColor && behaviors?.lightRadius) {
-                        const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
-                        drawColorLightGradient(context, state,
-                            {
-                                x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
-                                y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
-                                brightness: behaviors.brightness,
-                                radius: behaviors.lightRadius,
-                                color: behaviors?.lightColor,
-                            }
-                        );
+                    continue;
+                }
+
+                const behaviors = getObjectBehaviors(state, object);
+                if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
+                    const hitbox = object.getHitbox(state);
+                    drawColorLightGradient(context, state,
+                        {
+                            x: hitbox.x + hitbox.w / 2,
+                            y: hitbox.y + hitbox.h / 2,
+                            brightness: behaviors.brightness,
+                            radius: behaviors.lightRadius,
+                            color: behaviors?.lightColor,
+                        }
+                    );
+                }
+                if (object instanceof Hero) {
+                    if (object.pickUpTile) {
+                        const behaviors = object.pickUpTile.behaviors;
+                        if (behaviors?.lightColor && behaviors?.lightRadius) {
+                            const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
+                            drawColorLightGradient(context, state,
+                                {
+                                    x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
+                                    y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
+                                    brightness: behaviors.brightness,
+                                    radius: behaviors.lightRadius,
+                                    color: behaviors?.lightColor,
+                                }
+                            );
+                        }
                     }
                 }
             }
@@ -442,31 +457,33 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
             Math.floor((nextArea.cameraOffset.x - state.camera.x) / lightingGranularity),
             Math.floor((nextArea.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
-        for (const object of nextArea.objects || []) {
-            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object.getLightSources) {
-                const lightSources = object.getLightSources?.(state);
-                for (const lightSource of lightSources) {
-                    if (lightSource.color) {
-                        drawColorLightGradient(context, state, lightSource);
-                    }
+        for (const baseObject of nextArea.objects) {
+            for (const object of getObjectAndParts(state, baseObject).filter(o => o.getHitbox || o.getLightSources)) {
+                if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                    continue;
                 }
-                continue;
-            }
-            const behaviors = getObjectBehaviors(state, object);
-            if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
-                const hitbox = object.getHitbox(state);
-                drawColorLightGradient(context, state,
-                    {
-                        x: hitbox.x + hitbox.w / 2,
-                        y: hitbox.y + hitbox.h / 2,
-                        brightness: behaviors.brightness,
-                        radius: behaviors.lightRadius,
-                        color: behaviors?.lightColor,
+                if (object.getLightSources) {
+                    const lightSources = object.getLightSources?.(state);
+                    for (const lightSource of lightSources) {
+                        if (lightSource.color) {
+                            drawColorLightGradient(context, state, lightSource);
+                        }
                     }
-                );
+                    continue;
+                }
+                const behaviors = getObjectBehaviors(state, object);
+                if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
+                    const hitbox = object.getHitbox(state);
+                    drawColorLightGradient(context, state,
+                        {
+                            x: hitbox.x + hitbox.w / 2,
+                            y: hitbox.y + hitbox.h / 2,
+                            brightness: behaviors.brightness,
+                            radius: behaviors.lightRadius,
+                            color: behaviors?.lightColor,
+                        }
+                    );
+                }
             }
         }
         context.restore();

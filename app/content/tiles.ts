@@ -322,9 +322,10 @@ const spiritPlantsPalette: TileSource = {
 const brightGrass: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
-    behaviors: {
+    // This slows down firefox.
+    /*behaviors: {
         '0x0': {brightness: 1, lightRadius: 16},
-    },
+    },*/
 };
 
 const lightCaveCornersPalette: TileSource = {
