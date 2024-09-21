@@ -14,7 +14,7 @@ const [lightingCanvas, lightingContext] = createCanvasAndContext(
     Math.ceil(CANVAS_WIDTH / lightingGranularity),
     Math.ceil(CANVAS_HEIGHT / lightingGranularity)
 );
-const gradient = lightingContext.createRadialGradient(0, 0, 16, 0, 0, 32);
+const gradient = lightingContext.createRadialGradient(0, 0, 8, 0, 0, 32);
 gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
@@ -101,6 +101,26 @@ export function drawLightGradient(
     context.restore();
 }
 
+export function drawColorLightGradient(
+    context: CanvasRenderingContext2D,
+    {x, y, brightness, radius, color}: LightSource
+): void {
+    const r = (radius ?? 32) / lightingGranularity;
+    context.save();
+        const gradient = context.createRadialGradient(0, 0, 16, 0, 0, 32);
+        gradient.addColorStop(0, `rgba(${color.r}, ${color.g}, ${color.b}, 0.5)`);
+        //gradient.addColorStop(0.7, 'rgba(255, 0, 0, 0.5)');
+        gradient.addColorStop(1, `rgba(${color.r}, ${color.g}, ${color.b}, 0)`);
+        context.fillStyle = gradient;
+        context.translate(x / lightingGranularity, y / lightingGranularity);
+        context.scale(r / 32, r / 32);
+        context.globalAlpha = brightness;
+        context.beginPath();
+        context.arc(0, 0, 32, 0, 2 * Math.PI);
+        context.fill();
+    context.restore();
+}
+
 // This will cause alpha values to subtract
 // This is slow on Firefox(and possibly other browsers), so try not to set darkness on areas with lots of tiles with brightness like
 // the grass filled areas in the Peach Cave.
@@ -149,7 +169,8 @@ export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: 
 }
 
 export function renderAreaLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea: AreaInstance = null): void {
-    if (!(state.fadeLevel > 0) || editingState.isEditing) {
+    if (!(state.fadeLevel > 0) && editingState.isEditing) {
+        renderLightColors(context, state, area, nextArea);
         return;
     }
     lightingContext.clearRect(0, 0, lightingCanvas.width, lightingCanvas.height);
@@ -202,7 +223,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             y: hero.y - hero.z + hero.h / 2 + 12 * directionMap[d][1]
                 - state.camera.y + area.cameraOffset.y
         },
-        1, state.hero.lightRadius
+        1, Math.max(0, state.hero.lightRadius + Math.sin(state.fieldTime / 200))
     );
     if (hero.pickUpTile) {
         const behaviors = hero.pickUpTile.behaviors;
@@ -322,5 +343,86 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
         0, 0, lightingCanvas.width, lightingCanvas.height,
         0, 0, lightingCanvas.width * lightingGranularity, lightingCanvas.height * lightingGranularity,
     );
+    renderLightColors(context, state, area, nextArea);
 }
 
+function renderLightColors(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea: AreaInstance = null): void {
+    context.save();
+        context.translate(
+            Math.floor((area.cameraOffset.x - state.camera.x) / lightingGranularity),
+            Math.floor((area.cameraOffset.y - state.camera.y) / lightingGranularity)
+        )
+        for (const object of area.objects) {
+            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                continue;
+            }
+            if (object.getLightSources) {
+                const lightSources = object.getLightSources?.(state);
+                for (const lightSource of lightSources) {
+                    if (lightSource.color) {
+                        drawColorLightGradient(context, lightSource);
+                    }
+                }
+                continue;
+            }
+
+            const behaviors = getObjectBehaviors(state, object);
+            if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
+                const hitbox = object.getHitbox(state);
+                drawColorLightGradient(context,
+                    {
+                        x: hitbox.x + hitbox.w / 2,
+                        y: hitbox.y + hitbox.h / 2,
+                        brightness: behaviors.brightness,
+                        radius: behaviors.lightRadius,
+                        color: behaviors?.lightColor,
+                    }
+                );
+            }
+            if (object instanceof Hero) {
+                if (object.pickUpTile) {
+                    const behaviors = object.pickUpTile.behaviors;
+                    if (behaviors?.lightColor && behaviors?.lightRadius) {
+                        const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
+                        drawColorLightGradient(context,
+                            {
+                                x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
+                                y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
+                                brightness: behaviors.brightness,
+                                radius: behaviors.lightRadius,
+                                color: behaviors?.lightColor,
+                            }
+                        );
+                    }
+                }
+            }
+        }
+        for (const effect of area.effects) {
+            if (effect.status === 'gone') {
+                continue;
+            }
+            if (effect.getLightSources) {
+                const lightSources = effect.getLightSources?.(state);
+                for (const lightSource of lightSources) {
+                    if (lightSource.color) {
+                        drawColorLightGradient(context, lightSource);
+                    }
+                }
+                continue;
+            }
+            const behaviors = getObjectBehaviors(state, effect);
+            if (effect.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
+                const hitbox = effect.getHitbox(state);
+                drawColorLightGradient(context,
+                    {
+                        x: hitbox.x + hitbox.w / 2,
+                        y: hitbox.y + hitbox.h / 2,
+                        brightness: behaviors.brightness,
+                        radius: behaviors.lightRadius,
+                        color: behaviors?.lightColor,
+                    }
+                );
+            }
+        }
+    context.restore();
+}

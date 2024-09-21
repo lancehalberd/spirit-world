@@ -223,6 +223,7 @@ export function addParticleAnimations(
         if (behaviors?.brightness) {
             particle.behaviors.brightness = behaviors.brightness;
             particle.behaviors.lightRadius = (behaviors.lightRadius || 32) / 2;
+            particle.behaviors.lightColor = behaviors.lightColor;
         }
         addEffectToArea(state, area, particle);
         theta += Math.PI * 2 / numParticles;
@@ -315,10 +316,12 @@ export function makeSparkleAnimation(
     const effect = new FieldAnimationEffect(animationProps);
     if (element === 'fire') {
         effect.behaviors.brightness = 0.5;
-        effect.behaviors.lightRadius = 40;
+        effect.behaviors.lightRadius = 24;
+        effect.behaviors.lightColor = {r: 255, g: 0, b: 0};
     } else if (element === 'lightning') {
         effect.behaviors.brightness = 1;
         effect.behaviors.lightRadius = 16;
+        effect.behaviors.lightColor = {r: 255, g: 255, b: 0};
     }
     return effect;
 }
