@@ -4,6 +4,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import SRandom from 'app/utils/SRandom';
 
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 
@@ -38,6 +39,17 @@ export const torchStyles = {
 export class TorchFlame implements ObjectInstance {
     get area(): AreaInstance {
         return this.torch.area;
+    }
+    getLightSources(state: GameState): LightSource[] {
+        const r = SRandom.seed(this.torch.animationTime).random();
+        return [{
+            x: this.x + 8,
+            y: this.y + 4,
+            //brightness: 0.8 + 0.05 * Math.sin(this.torch.animationTime / 150),
+            brightness: 0.8 + 0.05 * r,
+            radius: 40 + (2 * r - 1),
+            color: {r:255, g: 0, b: 0},
+        }];
     }
     drawPriority: 'sprites' = 'sprites';
     status: ObjectStatus;

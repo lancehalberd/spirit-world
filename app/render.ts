@@ -94,21 +94,14 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
                 }
             }
         context.restore();
-        // Don't draw the HUD while editing since it obscures some tiles.
-        if (!editingState.isEditing) {
-            // Draw the HUD onto the field.
-            renderHUD(context, state);
-        }
+        // Draw the HUD onto the field.
+        renderHUD(context, state);
         if (state.defeatState.time >= 2000) {
             renderDefeatedMenu(context, state);
         }
         return;
     }
-    // Don't draw the HUD while editing since it obscures some tiles.
-    if (!editingState.isEditing) {
-        // Draw the HUD onto the field.
-        renderHUD(context, state);
-    }
+    renderHUD(context, state);
     if (state.paused && !shouldHideMenu(state)) {
         if (state.showMap) {
             renderMap(context, state);

@@ -7,9 +7,10 @@ import { removeEffectFromArea } from 'app/utils/effects';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
 import { allImagesLoaded } from 'app/utils/images';
+import { editingState } from 'app/development/editingState';
 
 
-const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
+const flameGeometry = {w: 20, h: 20, content: {x: 6, y: 10, w: 8, h: 6}};
 export const [
     /* container */, fireElement, /* elementShine */
 ] = createAnimation('gfx/hud/elementhud.png',
@@ -51,10 +52,23 @@ export class Flame implements EffectInstance, Props {
     getDrawPriority(state: GameState) {
         return this.z < 24 ? 'sprites' : 'foreground';
     }
-    behaviors: TileBehaviors = {
+    /*behaviors: TileBehaviors = {
         brightness: 0.5,
         lightRadius: 24,
-    };
+        lightColor: {r: 255, g: 0, b: 0},
+    };*/
+    getLightSources(state: GameState): LightSource[] {
+        // const r = SRandom.seed(this.torch.animationTime).random();
+        const hitbox = this.getHitbox();
+        return [{
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2 - this.z,
+            //brightness: 0.8 + 0.05 * Math.sin(this.torch.animationTime / 150),
+            brightness: 0.8,
+            radius: 40,
+            color: {r:255, g: 0, b: 0},
+        }];
+    }
     isEffect = <const>true;
     isEnemyAttack = true;
     area: AreaInstance = null;
@@ -99,8 +113,7 @@ export class Flame implements EffectInstance, Props {
         this.az = az;
         this.ttl = ttl;
         this.scale = scale;
-        this.w = 12 * scale;
-        this.h = 12 * scale;
+        this.updateSize();
         this.isPreparing = isPreparing
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
         this.groundFriction = groundFriction;
@@ -110,14 +123,20 @@ export class Flame implements EffectInstance, Props {
         return {x: (hitbox.x + hitbox.w / 2) | 0, y: (hitbox.y + hitbox.h / 2) | 0};
     }
     getHitbox() {
-        const w = 3 * this.w / 5;
-        const h = 2 * this.h / 3;
+        //const w = 3 * this.w / 5;
+        //const h = 2 * this.h / 3;
         return {
-            x: (this.x - w / 2) | 0,
-            y: (this.y - h / 2) | 0,
-            w,
-            h,
+            x: (this.x - this.w / 2) | 0,
+            y: (this.y - this.h / 2) | 0,
+            w: this.w | 0,
+            h: this.h | 0,
         };
+    }
+    updateSize() {
+        const w = flameGeometry.content?.w ?? flameGeometry.w;
+        const h = flameGeometry.content?.h ?? flameGeometry.h;
+        this.w = w * this.scale;
+        this.h = h * this.scale;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (this.z <= 16 && hit.element === 'ice') {
@@ -143,8 +162,6 @@ export class Flame implements EffectInstance, Props {
             this.vy += this.ay;
         }
         this.vz = Math.max(this.minVz, this.vz + this.az);
-        this.w = 12 * this.scale;
-        this.h = 12 * this.scale;
         this.animationTime += FRAME_LENGTH;
         this.time += FRAME_LENGTH;
 
@@ -218,21 +235,23 @@ export class Flame implements EffectInstance, Props {
             // Create sparks less often when the flame is still.
             const rate = (this.vx || this.vy) ? 100 : 400;
             if (this.animationTime % rate === 0) {
-                addSparkleAnimation(state, this.area, this, { element: 'fire' });
+                addSparkleAnimation(state, this.area, {...this.getHitbox(), z: this.z}, { element: 'fire' });
             }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = getFrame(flameAnimation, this.animationTime);
         drawFrameAt(context, frame, {
-            x: this.x - 2 - this.w / 2,
-            y: this.y - 4 + 2 * Math.sin(this.animationTime / 150) - this.z - this.h,
+            x: this.x - this.w / 2,
+            y: this.y + 2 * Math.sin(this.animationTime / 150) - this.z - this.h,
             w: fireElement.content.w * this.scale,
             h: fireElement.content.h * this.scale,
         });
-        /*context.strokeStyle = 'red';
-        const {x, y, w, h} = this.getHitbox();
-        context.strokeRect(x, y, w, h);*/
+        if (editingState.showHitboxes) {
+            context.strokeStyle = 'red';
+            const {x, y, w, h} = this.getHitbox();
+            context.strokeRect(x + 0.5, y + 0.5, w, h);
+        }
     }
 
     renderShadow(context: CanvasRenderingContext2D) {

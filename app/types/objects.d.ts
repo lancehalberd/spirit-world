@@ -48,11 +48,19 @@ interface AssignmentState {
     assignedContents: string[]
 }
 
+interface LightColor {
+    r: number
+    g: number
+    b: number
+}
+
 interface LightSource {
     x: number
     y: number
     brightness: number
     radius: number
+    color?: LightColor
+    colorIntensity?: number
 }
 
 interface BaseFieldInstance {
