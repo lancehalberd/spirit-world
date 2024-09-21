@@ -924,8 +924,8 @@ export class Hero implements Actor {
                 this.magicRegenCooldown = this.magicRegenCooldownLimit;
             } else if (amount >= 5) {
                 this.magicRegenCooldown = Math.max(this.magicRegenCooldown, this.magicRegenCooldownLimit / 2);
-            } else {
-                this.magicRegenCooldown =  Math.max(this.magicRegenCooldown, 100);
+            } else if (cooldownAmount !== 0) {
+                this.magicRegenCooldown =  Math.max(this.magicRegenCooldown, cooldownAmount, 100);
             }
         } else if (cooldownAmount > 0) {
             this.increaseMagicRegenCooldown(cooldownAmount);
