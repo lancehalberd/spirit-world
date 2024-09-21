@@ -8,10 +8,6 @@ import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
-/*const [baseFrame, crystalFrame, activeCrystalFrame] = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {cols: 3}).frames;
-const whiteGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 3, cols: 3}).frames;
-const redGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 6, cols: 3}).frames;
-const blueGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 9, cols: 3}).frames;*/
 const [
     baseFrame, spiritBaseFrame,
     crystalFrame, activeCrystalFrame,
@@ -28,7 +24,6 @@ interface ElementalSwitchData {
 
 const switchMap: {[key in MagicElement | 'none']: ElementalSwitchData} = {
     none: {
-        // color: {r: 255, g: 255, b: 255},
         crystalFrame,
         activeCrystalFrame,
     },
@@ -163,21 +158,7 @@ export class CrystalSwitch implements ObjectInstance {
         drawFrameAt(context, this.definition.spirit ? baseFrame : spiritBaseFrame, this);
         const switchData = switchMap[this.definition.element ?? 'none'];
         if (this.status === 'active') {
-            /*let frame = glowFrames[2];
-            if (this.definition.timer && this.timeLeft <= 1000 || this.timeLeft <= this.definition.timer / 4) {
-                frame = glowFrames[0];
-            } else if (this.definition.timer && this.timeLeft <= 2000 || this.timeLeft <= this.definition.timer / 2) {
-                frame = glowFrames[1];
-            }*/
             drawFrameAt(context, switchData.activeCrystalFrame, {x: this.x, y: this.y - this.getOffset(state)});
-            //drawFrame(context, frame, target);
-            // Draw a small bar under the crystal indicating how much longer it will be active.
-            /*if (this.definition.timer) {
-                context.fillStyle = 'black';
-                context.fillRect(this.x, this.y + 14, 16, 1);
-                context.fillStyle = 'white';
-                context.fillRect(this.x, this.y + 14, Math.round(16 * this.timeLeft / this.definition.timer), 1);
-            }*/
         } else {
             drawFrameAt(context, switchData.crystalFrame, this);
         }

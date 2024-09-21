@@ -324,6 +324,16 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
+            if (object.getLightSources) {
+                const lightSources = object.getLightSources?.(state);
+                for (const lightSource of lightSources) {
+                    drawLightGradient(lightingContext,
+                        lightSource,
+                        lightSource.brightness, lightSource.radius
+                    );
+                }
+                continue;
+            }
             const behaviors = getObjectBehaviors(state, object);
             if (object.getHitbox && behaviors?.brightness) {
                 const hitbox = object.getHitbox(state);
@@ -425,4 +435,39 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
             }
         }
     context.restore();
+    if (nextArea) {
+        context.save();
+        context.translate(
+            Math.floor((nextArea.cameraOffset.x - state.camera.x) / lightingGranularity),
+            Math.floor((nextArea.cameraOffset.y - state.camera.y) / lightingGranularity)
+        )
+        for (const object of nextArea.objects || []) {
+            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                continue;
+            }
+            if (object.getLightSources) {
+                const lightSources = object.getLightSources?.(state);
+                for (const lightSource of lightSources) {
+                    if (lightSource.color) {
+                        drawColorLightGradient(context, lightSource);
+                    }
+                }
+                continue;
+            }
+            const behaviors = getObjectBehaviors(state, object);
+            if (object.getHitbox && behaviors?.lightRadius && behaviors?.lightColor) {
+                const hitbox = object.getHitbox(state);
+                drawColorLightGradient(context,
+                    {
+                        x: hitbox.x + hitbox.w / 2,
+                        y: hitbox.y + hitbox.h / 2,
+                        brightness: behaviors.brightness,
+                        radius: behaviors.lightRadius,
+                        color: behaviors?.lightColor,
+                    }
+                );
+            }
+        }
+        context.restore();
+    }
 }
