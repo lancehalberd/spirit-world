@@ -1725,7 +1725,7 @@ const f1_0x0: AreaDefinition = {
         {id: "tombKey2", linked: false, spirit: false, status: "hiddenSwitch", x: 360, y: 72, type: "chest", lootType: "smallKey"},
         {status: "normal", linked: false, spirit: false, x: 48, y: 144, type: "enemy", d: "down", enemyType: "beetleHorned", id: "tomb:1:0x0-beetleHorned-0"},
         {status: "normal", linked: false, spirit: false, x: 192, y: 144, type: "enemy", d: "down", enemyType: "beetleHorned", id: "tomb:1:0x0-beetleHorned-1"},
-        {status: "hiddenEnemy", linked: false, spirit: false, x: 120, y: 88, type: "chest", d: "down", lootType: "silverOre", id: "tombSilver"},
+        {status: "hiddenEnemy", linked: false, spirit: false, x: 120, y: 80, type: "chest", d: "down", lootType: "silverOre", id: "tombSilver"},
         {status: "normal", linked: false, spirit: false, x: 416, y: 64, type: "floorSwitch", d: "down", id: "", targetObjectId: "tombSwitchDoor", toggleOnRelease: true},
         {status: "normal", linked: false, spirit: false, x: 368, y: 192, type: "pushPull", d: "down", id: "tomb:1:0x0-pushPull-0"},
         {status: "normal", linked: false, spirit: false, x: 432, y: 48, type: "pushPull", d: "down", id: "tomb:1:0x0-pushPull-1"},
