@@ -66,16 +66,16 @@ Current tasks:
         - For teleporting/roll/tools
 
     - Add color to lights
-        - flame+flame wall should be red
-        - lightningBolt+lightningDischarged+spark should be yellow
+        - flame wall should be red
+        - lightningDischarge should be yellow
 
     - Quest marker for the Staff Tower isn't aligned correctly.
 
-    - Fix teleporting into the war palace area.
+    - Preload music.
+
+    - Prevent on death effects from frozen enemies in most cases.
 
     - Add trap chests to the game, like the fire turret chest?
-
-    - Prevent teleporting past the first bouncing object in Helix 3F.
 
     - Make lava floors effect objects+enemies
         - Should unfreeze frozen objects

@@ -4,7 +4,7 @@ import {
     canCross2Gaps, hasGloves,
     canCross4Gaps, canUseTeleporters, hasReleasedBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasFire, canRemoveHeavyStones, canRemoveLightStones,
-    hasIce, hasSomersault, hasTeleportation,
+    hasMitts, hasIce, hasSomersault, hasTeleportation,
     hasMediumRange, hasNimbusCloud, hasSpiritSight, hasStaff, hasTrueSight, orLogic,
     hasInvisibility, hasLightningBlessing, hasLightning,
 } from 'app/content/logic';
@@ -208,7 +208,7 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'overworldLakePiece', logic: andLogic(canUseTeleporters, canRemoveLightStones) },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
-            { nodeId: 'warTempleSpiritArea', logic: canRemoveHeavyStones },
+            { nodeId: 'warTempleSpiritArea', logic: orLogic(hasMitts, andLogic(hasTeleportation, canRemoveHeavyStones)) },
         ],
         entranceIds: [
             'fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance',
