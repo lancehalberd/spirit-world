@@ -171,7 +171,7 @@ export function getState(): GameState {
 }
 window['getState'] = getState;
 
-export function getTitleOptions(state: GameState): string[] {
+export function getFileSelectOptions(state: GameState): string[] {
     if (state.scene === 'chooseGameMode') {
         return ['Full Game', 'Quick Demo', 'Cancel'];
     }
@@ -188,6 +188,10 @@ export function getTitleOptions(state: GameState): string[] {
         return [...gameFiles, 'CANCEL'];
     }
     return [...gameFiles, 'DELETE'];
+}
+
+export function getTitleOptions(state: GameState): string[] {
+    return ['START', 'OPTIONS', 'QUIT'];
 }
 
 export function shouldHideMenu(state: GameState): boolean {

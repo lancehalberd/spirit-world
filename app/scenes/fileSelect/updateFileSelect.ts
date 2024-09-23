@@ -14,15 +14,15 @@ import { playSound } from 'app/utils/sounds';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getDefaultSavedState } from 'app/savedState'
 import {
-    getTitleOptions,
+    getFileSelectOptions,
     setSaveFileToState,
 } from 'app/state';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGamesToLocalStorage, } from 'app/utils/saveGame';
 import { parseScriptText, setScript } from 'app/scriptEvents';
 
-export function updateTitle(state: GameState) {
-    const options = getTitleOptions(state);
+export function updateFileSelect(state: GameState) {
+    const options = getFileSelectOptions(state);
     let changedOption = false;
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;

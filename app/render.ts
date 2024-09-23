@@ -9,6 +9,7 @@ import { renderInventory } from 'app/scenes/inventory/renderInventory';
 import { renderPrologue } from 'app/scenes/prologue/renderPrologue';
 import { renderMap } from 'app/render/renderMap';
 import { renderMessage } from 'app/render/renderMessage';
+import { renderFileSelect } from 'app/scenes/fileSelect/renderFileSelect';
 import { renderTitle } from 'app/scenes/title/renderTitle';
 import { getState, shouldHideMenu } from 'app/state';
 import { mainContext } from 'app/utils/canvas';
@@ -57,9 +58,13 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         }
         return;
     }
-    if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
+    if (state.scene === 'fileSelect' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
     ) {
+        renderFileSelect(context, state);
+        return;
+    }
+    if (state.scene === 'title') {
         renderTitle(context, state);
         return;
     }
