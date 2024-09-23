@@ -47,6 +47,9 @@ export * from 'app/content/zones/tileMapping';
 export * from 'app/content/zones/minimizer/light1';
 // title screen zone
 export * from 'app/content/zones/title'
+// WIP zones
+export * from 'app/content/zones/dream';
+export * from 'app/content/zones/fertility';
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {

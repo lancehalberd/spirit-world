@@ -17,7 +17,7 @@ export function enterZoneByTarget(
     state: GameState,
     zoneKey: string,
     targetObjectId: string,
-    skipObject: ObjectDefinition,
+    skipObject: ObjectDefinition = null,
     instant: boolean = true,
     callback: (state: GameState) => void = null
 ): boolean {

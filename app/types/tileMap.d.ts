@@ -62,6 +62,7 @@ interface TileBehaviors {
     defaultLayer?: DefaultLayer
     // In pixels
     lightRadius?: number
+    lightColor?: LightColor
     // Flag set to indicate tile is invalid for landing on when jumping down a cliff.
     cannotLand?: boolean
     // Sets players action to 'climbing' while on the tile.

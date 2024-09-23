@@ -1,4 +1,5 @@
 import { getLootFrame } from 'app/content/loot';
+import { editingState } from 'app/development/editingState';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
 //import { renderTextRow } from 'app/render/renderMessage';
@@ -7,6 +8,9 @@ import { shouldHideMenu } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
 import { drawText } from 'app/utils/simpleWhiteFont';
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
 
 const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
@@ -29,7 +33,28 @@ const frameSize = 24;
 const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, h: frameSize}).frames[0];
 const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h: frameSize}).frames[0];
 
+const [hudCanvas, hudContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
+    if (editingState.isEditing) {
+        renderEditorHUD(context, state);
+        return;
+    }
+    if (state.hudOpacity <= 0) {
+        return;
+    }
+    if (state.hudOpacity < 1) {
+        context.save();
+            context.globalAlpha *= state.hudOpacity;
+            hudContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            renderHUDProper(hudContext, state);
+            context.drawImage(hudCanvas, 0, 0);
+        context.restore();
+        return;
+    }
+    renderHUDProper(context, state);
+}
+function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): void {
     // Draw heart backs, and fillings
     let x = 26;
     let y = 5;
@@ -217,6 +242,32 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     if (state.paused && shouldHideMenu(state)) {
         // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
+    }
+}
+
+export function renderEditorHUD(context: CanvasRenderingContext2D, state: GameState): void {
+    const [sx, sy] = getAreaMousePosition();
+    const x = sx + state.camera.x;
+    const y = sy + state.camera.y;
+    /*drawText(context, `${x | 0}x${y | 0}`,
+        (sx > CANVAS_WIDTH / 2) ? 2 : CANVAS_WIDTH - 2,
+        (sy > CANVAS_HEIGHT / 2) ? 2 : CANVAS_HEIGHT - 2,
+        {
+            textBaseline: (sy > CANVAS_HEIGHT / 2) ? 'top' : 'bottom',
+            textAlign:  (sx > CANVAS_WIDTH / 2) ? 'left' : 'right' ,
+            size: 16,
+        }
+    );*/
+    if (isKeyboardKeyDown(KEY.SHIFT)) {
+        drawText(context, `${x | 0}x${y | 0}`,
+            CANVAS_WIDTH - 2,
+            CANVAS_HEIGHT - 2,
+            {
+                textBaseline: 'bottom',
+                textAlign: 'right' ,
+                size: 16,
+            }
+        )
     }
 }
 

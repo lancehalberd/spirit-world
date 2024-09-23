@@ -192,7 +192,6 @@ const imagePacks: PackedImageData[] = [
         {x:976,y:64,w:32,h:32,originalSource:'gfx/objects/icicleholemonster.png'},
         {x:576,y:560,w:32,h:16,originalSource:'gfx/objects/circulardepression.png'},
         {x:608,y:560,w:128,h:64,originalSource:'gfx/objects/bell.png'},
-        {x:256,y:592,w:192,h:20,originalSource:'gfx/objects/activatablecrystal.png'},
         {x:256,y:624,w:406,h:60,originalSource:'gfx/objects/spiritQuestStatue-draftSprites-58x60.png'},
         {x:448,y:592,w:64,h:32,originalSource:'gfx/objects/cavelight.png'},
         {x:928,y:592,w:96,h:64,originalSource:'gfx/decorations/largeStatuePedestal.png'},

@@ -126,6 +126,9 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'knocked':
             animations = heroAnimations.hurt;
             break;
+        case 'kneel':
+            animations = heroAnimations.kneel;
+            break;
         case 'beingCarried':
         case 'thrown':
         case 'jumpingDown':

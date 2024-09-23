@@ -15,6 +15,9 @@ import {
     womanAnimations,
     girlAnimations,
     jadeChampionAnimations,
+    grandPriestAnimations,
+    midGuyPriestAnimations,
+    paleLadyPriestAnimations,
     //testAnimations,
 } from 'app/content/npcs/npcAnimations'
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -23,8 +26,8 @@ import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
     guyAnimations, guy2Animations,
-    paleMonkAnimations,
-    midMonkAnimations, darkMonkAnimations,
+    // paleMonkAnimations, midMonkAnimations,
+    darkMonkAnimations,
     vanaraBlackAnimations, vanaraBlueAnimations,
     vanaraBrownAnimations, vanaraGoldAnimations,
     vanaraGrayAnimations, vanaraPurpleAnimations,
@@ -82,6 +85,11 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: testAnimations,
         shadowOffset: 2,
     },*/
+    grandPriest: {
+        animations: grandPriestAnimations,
+        shadowOffset: 2,
+        height: 26,
+    },
     jadeChampion: {
         animations: jadeChampionAnimations,
         shadowOffset: 2,
@@ -178,11 +186,11 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         alternateRender: renderVanaraSpirit,
     },
     paleMonk: {
-        animations: paleMonkAnimations,
+        animations: paleLadyPriestAnimations,
         shadowOffset: 1,
     },
     midMonk: {
-        animations: midMonkAnimations,
+        animations: midGuyPriestAnimations,
         shadowOffset: 1,
     },
     darkMonk: {

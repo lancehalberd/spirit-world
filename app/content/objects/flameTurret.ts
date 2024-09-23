@@ -1,11 +1,14 @@
-import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
 import { Flame } from 'app/content/effects/flame';
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrame,getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { rectanglesOverlap } from 'app/utils/index';
+
+const [, chestOpenedFrame] = createAnimation('gfx/objects/chest.png',
+    {w: 18, h: 20, content: {x: 1, y: 4, w: 16, h: 16}}, {cols: 2}
+).frames;
 
 export class FlameTurret implements ObjectInstance {
     behaviors: TileBehaviors = {
@@ -57,14 +60,14 @@ export class FlameTurret implements ObjectInstance {
             const hitbox = this.getHitbox();
             const count = 2;
             for (let i = 0; i < count; i++) {
-                const theta = this.animationTime / 1000 + i * 2 * Math.PI / count;
+                const theta = this.animationTime / 1500 + i * 2 * Math.PI / count;
                 const dx = Math.cos(theta);
                 const dy = Math.sin(theta);
                 const flame = new Flame({
                     x: hitbox.x + hitbox.w / 2 + 4 * dx,
                     y: hitbox.y + hitbox.h / 2 + 4 * dy,
-                    vx: 3 * dx,
-                    vy: 3 * dy,
+                    vx: 2.5 * dx,
+                    vy: 2.5 * dy,
                     ttl: Math.min(800, 100 + this.animationTime),
                     damage: 2,
                 });
@@ -73,8 +76,7 @@ export class FlameTurret implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = getFrame(flameHeartAnimations.idle.down, this.animationTime);
-        drawFrame(context, frame, this.getHitbox());
+        drawFrame(context, chestOpenedFrame, this.getHitbox());
     }
 }
 objectHash.flameTurret = FlameTurret;

@@ -130,6 +130,9 @@ export function getDefaultState(): GameState {
             mostRecentKeysPressed: new Set(),
         },
         fadeLevel: 0,
+        hudOpacity: 1,
+        hideHUD: false,
+        hudTime: 0,
         hotLevel: 0,
         scriptEvents: {
             activeEvents: [],

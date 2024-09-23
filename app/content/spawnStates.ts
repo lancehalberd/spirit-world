@@ -247,6 +247,10 @@ export const storySpawnLocations: SpawnLocationOptions = {
         location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
         savedState: tombRivalDefeatState,
     },
+    'Jade Champion War Temple': {
+        location: spawnLocations.SPAWN_WAR_TEMPLE_ENTRANCE,
+        savedState: cocoonStartState,
+    },
     'Helix Rival Fight': {
         location: spawnLocations.SPAWN_LOCATION_LAKE_TUNNEL,
         savedState: helixRivalStateStory,
