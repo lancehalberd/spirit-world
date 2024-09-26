@@ -57,7 +57,7 @@ enemyDefinitions.balloonCentipede = {
     life: 1, touchDamage: 1,
     params: {length: 5, isHead: true, isControlled: true},
     onDeath(state: GameState, enemy: Enemy) {
-        if (enemy.params.isHead) {
+        if (enemy.params.isHead || enemy.frozenAtDeath) {
             return;
         }
         for (let i = 0; i < 8; i++) {

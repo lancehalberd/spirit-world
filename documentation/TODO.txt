@@ -68,6 +68,12 @@ Current tasks:
     - Add SFX for insufficient spirit energy:
         - For teleporting/roll/tools
 
+    - Update spirit sky
+        - Make the Forge are more difficult to access
+            - Block off NW corner of spirit world behind Mitts, Staff tower or new portal reachable only with Iron Boots
+            - Sky requires Ice or Cloud Sommersault to reach from the North East sky section.
+            - NW spirit world mountains can be accessed by falling down
+
     - Add color to lights
         - flame wall should be red
         - lightningDischarge should be yellow
@@ -75,8 +81,6 @@ Current tasks:
     - Quest marker for the Staff Tower isn't aligned correctly.
 
     - Preload music.
-
-    - Prevent on death effects from frozen enemies in most cases.
 
     - Add trap chests to the game, like the fire turret chest?
 
