@@ -383,7 +383,7 @@ dialogueHash.jadeChampionWarTemple = {
     options: [
         {
             text: [
-                {
+                /*{
                     dialogueIndex: undefined,
                     text: `Speak to the Grand Priest.`,
                 },
@@ -391,7 +391,7 @@ dialogueHash.jadeChampionWarTemple = {
                     dialogueIndex: undefined,
                     text: `Something seems terribly wrong, and you are involved somehow.
                     {|}We will get to the bottom of this.`,
-                },
+                },*/
             ],
         },
     ],
