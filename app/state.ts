@@ -194,7 +194,12 @@ export function getFileSelectOptions(state: GameState): string[] {
 }
 
 export function getTitleOptions(state: GameState): string[] {
-    return ['START', 'OPTIONS', 'QUIT'];
+    const titleMenu = ['START', 'OPTIONS'];
+    // only display 'QUIT' if game is being played inside of Electron as a desktop app
+    if (window.electronAPI && state.gameHasBeenInitialized) {
+        return [...titleMenu, 'QUIT'];
+    }
+    return titleMenu;
 }
 
 export function shouldHideMenu(state: GameState): boolean {

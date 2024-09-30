@@ -1,11 +1,11 @@
 import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { requireImage } from 'app/utils/images';
 import { renderStandardFieldStack } from 'app/render/renderField';
-import { renderHUD } from 'app/renderHUD';
 import { getTitleOptions } from 'app/state';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-const WIDTH = 144;
+const WIDTH = 102;
 const ROW_HEIGHT = 20;
 
 const textOptions = <const>{
@@ -16,12 +16,14 @@ const textOptions = <const>{
 
 export function renderTitle(context: CanvasRenderingContext2D, state: GameState): void {
     renderStandardFieldStack(context, state);
-    renderHUD(context, state);
+
+    // draw options in a black box with a white border
+    // located in bottom right corner of screen
     const options = getTitleOptions(state);
     const h = ROW_HEIGHT * options.length + 8;
     let r = {
-        x: (CANVAS_WIDTH - WIDTH) / 2,
-        y: CANVAS_HEIGHT - h - 32,
+        x: 7 * (CANVAS_WIDTH - WIDTH) / 8,
+        y: CANVAS_HEIGHT - h - 16,
         w: WIDTH,
         h,
     };
@@ -45,4 +47,47 @@ export function renderTitle(context: CanvasRenderingContext2D, state: GameState)
         }
         y += 20;
     }
+
+    // Draw white title text as a dropshadow and gold title text on top of it
+    // in top left corner of screen
+    const goldText = requireImage('gfx/titleAssets/spiritquest-title-pixelperfect.png');
+    const whiteText = requireImage('gfx/titleAssets/spiritquest-titlewhite-pixelperfect.png')
+
+    const spiritWordDimensions = {x: 0, y: 0, height: 20, width: 52};
+    const spiritWordDestination = {x: 38, y: 8, multiplier: 3}
+    const questWordDimensions = {x: 53, y: 0, height: 20, width: 44};
+    const questWordDestination = {
+        x: spiritWordDestination.x - 32,
+        y: (spiritWordDimensions.height * spiritWordDestination.multiplier) + spiritWordDestination.y,
+        multiplier: 3
+    };
+    const whiteTextOffset = {x: 1, y: 1};
+    context.drawImage(
+        whiteText, spiritWordDimensions.x, spiritWordDimensions.y,
+        spiritWordDimensions.width, spiritWordDimensions.height,
+        spiritWordDestination.x + whiteTextOffset.x, spiritWordDestination.y + whiteTextOffset.y,
+        spiritWordDestination.multiplier * spiritWordDimensions.width,
+        spiritWordDestination.multiplier * spiritWordDimensions.height
+    );
+    context.drawImage(
+        whiteText, questWordDimensions.x, questWordDimensions.y,
+        questWordDimensions.width, questWordDimensions.height,
+        questWordDestination.x + whiteTextOffset.x, questWordDestination.y + whiteTextOffset.y,
+        questWordDestination.multiplier * questWordDimensions.width,
+        questWordDestination.multiplier * questWordDimensions.height
+    );
+    context.drawImage(
+        goldText, spiritWordDimensions.x, spiritWordDimensions.y,
+        spiritWordDimensions.width, spiritWordDimensions.height,
+        spiritWordDestination.x, spiritWordDestination.y,
+        spiritWordDestination.multiplier * spiritWordDimensions.width,
+        spiritWordDestination.multiplier * spiritWordDimensions.height
+    );
+    context.drawImage(
+        goldText, questWordDimensions.x, questWordDimensions.y,
+        questWordDimensions.width, questWordDimensions.height,
+        questWordDestination.x, questWordDestination.y,
+        questWordDestination.multiplier * questWordDimensions.width,
+        questWordDestination.multiplier * questWordDimensions.height
+    );
 }

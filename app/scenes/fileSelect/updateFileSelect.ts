@@ -1,7 +1,6 @@
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
-    SPAWN_LOCATION_TITLE,
 } from 'app/content/spawnLocations';
 import { Hero } from 'app/content/hero';
 import { showHint } from 'app/content/hints';
@@ -34,7 +33,7 @@ export function updateFileSelect(state: GameState) {
         playSound('menuTick');
     }
     if (changedOption) {
-        if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
+        if (state.scene === 'fileSelect' || state.scene === 'deleteSavedGame') {
             if (state.menuIndex < state.savedGames.length) {
                 setSaveFileToState(state.menuIndex, 0);
             }
@@ -50,13 +49,13 @@ export function updateFileSelect(state: GameState) {
                     state.savedGames[state.savedGameIndex] = null;
                     saveGamesToLocalStorage(state);
                 }
-                state.scene = 'title';
+                state.scene = 'fileSelect';
                 state.menuIndex = state.savedGameIndex;
                 setSaveFileToState(state.savedGameIndex, 0);
                 break;
             case 'deleteSavedGame':
                 if (state.menuIndex >= state.savedGames.length) {
-                    state.scene = 'title';
+                    state.scene = 'fileSelect';
                     state.menuIndex = 0;
                     setSaveFileToState(state.menuIndex, 0);
                 } else {
@@ -82,14 +81,12 @@ export function updateFileSelect(state: GameState) {
                     updateHeroMagicStats(state);
                     returnToSpawnLocation(state);
                 } else {
-                    // Title Screen of Game
-                    state.hero.savedData.spawnLocation = SPAWN_LOCATION_TITLE;
-                    state.scene = 'title';
+                    state.scene = 'fileSelect';
                     state.menuIndex = state.savedGameIndex;
                     setSaveFileToState(state.savedGameIndex, 0);
                 }
                 break;
-            case 'title':
+            case 'fileSelect':
                 if (state.menuIndex >= state.savedGames.length) {
                     state.scene = 'deleteSavedGame';
                     state.menuIndex = 0;
