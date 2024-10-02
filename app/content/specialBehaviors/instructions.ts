@@ -33,7 +33,7 @@ specialBehaviorsHash.barrierBurstInstructions = {
             if (state.hero.hasBarrier) {
                 helpText = `Hold ${toolButton} to use the Barrier Burst Technique`;
             } else {
-                helpText = `Press ${toolButton} to create a Spirit Barrier`;
+                helpText = `Tap ${toolButton} to create a Spirit Barrier`;
             }
         } else if (state.hero.savedData.activeTools.cloak) {
             helpText = `Press [B_MENU] to open your inventory and assign Spirit Cloak to [B_TOOL]`;
