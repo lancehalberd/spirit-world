@@ -4,16 +4,15 @@ import {
     wasConfirmKeyPressed,
 } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
+import { getTitleOptions } from 'app/state';
 import {
-    getTitleOptions,
+    getFileSelectOptions,
+    setSaveFileToState,
 } from 'app/state';
 
 export function updateTitle(state: GameState) {
-    state.hero.action = 'kneel';
-    const jadeChampion = state.zone.floors[0].grid[0][0].objects[4] as NPCDefinition;
-    jadeChampion.behavior = 'idle';
-    console.log({jadeChampion});
     const options = getTitleOptions(state);
+
     const selectedOption = options[state.menuIndex];
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
@@ -27,7 +26,9 @@ export function updateTitle(state: GameState) {
         console.log({selectedOption});
         switch (selectedOption) {
         case 'START':
-            console.log('start playing!');
+            state.scene = 'fileSelect';
+            getFileSelectOptions(state);
+            setSaveFileToState(0, 0);
             break;
         case 'OPTIONS':
             console.log('display options');

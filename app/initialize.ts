@@ -3,8 +3,7 @@ import { addKeyboardListeners } from 'app/userInput';
 import { getState, initializeState } from 'app/state';
 import { addKeyboardShortcuts } from 'app/utils/addKeyboardShortcuts';
 import { bindMouseListeners } from 'app/utils/mouse';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
-import { SPAWN_LOCATION_TITLE } from 'app/content/spawnLocations';
+import { initializeTitle } from 'app/scenes/title/initializeTitle';
 
 export function initializeGame() {
     bindMouseListeners();
@@ -18,10 +17,5 @@ export function initializeGame() {
     state.gameHasBeenInitialized = true;
     // Temporary: show title location initally.
     // HUD is hidden in renderHUD.ts by not drawing HUD if scene is 'title'
-    state.hero.savedData.spawnLocation = SPAWN_LOCATION_TITLE;
-    state.scene = 'title';
-    state.hero.savedData.passiveTools.spiritSight = 1;
-    state.hero.action = 'attack';
-    returnToSpawnLocation(state);
-    state.camera = { x: 46, y: 230 };
+    initializeTitle(state);
 }

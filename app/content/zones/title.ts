@@ -258,7 +258,7 @@ const f0_0x0: AreaDefinition = {
         {status: "active", id: "", linked: true, spirit: true, x: 272, y: 312, style: "torch", type: "torch"},
         {status: "active", id: "", linked: true, spirit: true, x: 212, y: 260, style: "torch", type: "torch"},
         {status: "active", id: "", linked: true, spirit: true, x: 280, y: 252, style: "torch", type: "torch"},
-        {status: "normal", id: "", linked: true, spirit: true, x: 212, y: 312, d: "left", behavior: "face", style: "jadeChampion", type: "npc"},
+        {status: "normal", id: "jadeChampion", linked: true, spirit: true, x: 212, y: 312, d: "left", behavior: "face", style: "jadeChampion", type: "npc"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 616, mapId: 'title', floorId: '1F', mapX: 0, mapY: 0},
