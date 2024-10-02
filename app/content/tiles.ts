@@ -43,7 +43,7 @@ import {
     cavePitAngledWallsOut,
 } from 'app/content/tiles/cavePits';
 import { allCrystalCavePitTileSources } from 'app/content/tiles/crystalCavePits';
-import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
+import { allCrystalCaveTileSources, crystalTransparentFloor } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
@@ -1106,7 +1106,7 @@ addTiles([
     shallowToDeepAngles,
     deepToShallow,
     deepToShallowAngles,
-    deletedTiles(1),
+    crystalTransparentFloor,
     caveFloorSpiritPalette,
     treeStump,
     treeLeavesTop,

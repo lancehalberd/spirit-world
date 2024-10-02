@@ -65,14 +65,52 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add code to fix player position if they get stuck inside walls.
+        - Check if they are on a solid tile. If so try to move them
+
+    - Re-check ps5+ps4 controllers.
+
+    - Don't show enemies taking damage in the other world unless you have spirit sight.
+
+    - Staff needs to be added to the tower render children if it intersects with the platform
+        - Probably should add a function to the tower itself that adds/removes objects as children if they are touching the platform.
+        - Do this instead: Alternatively, maybe it is better to figure out a way to just draw the bottom portion of the tower on the ground layer?
+
+    - Add a sign to the pot room in War Temple before stairs to 3F
+
+    - Remove instructions for equipping items, just rely on the overlay tutorials.
+    - Make sure to add an overlay tutorial for the Staff in he helix.
+
+    - Fix ascent cave in spirit world.
+
     - Add SFX for insufficient spirit energy:
         - For teleporting/roll/tools
 
     - Update spirit sky
         - Make the Forge are more difficult to access
             - Block off NW corner of spirit world behind Mitts, Staff tower or new portal reachable only with Iron Boots
-            - Sky requires Ice or Cloud Sommersault to reach from the North East sky section.
             - NW spirit world mountains can be accessed by falling down
+        - Figure out what to do about falling on top of brittle ground
+            - Keep the player just north of the edge of the tile if the southern tile is not a pit.
+        - Only break brittle ground if the hero is not standing on any solid ground.
+        - Force player to fall on brittle ground if they roll over it wearing cloud boots.
+        - Update randomizer logic
+            - hype cave
+            - forge
+            - northwest spirit world
+
+    - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
+
+    - Make ledge styles clearer
+        - Jump ledges should look flatter
+        - Blocked ledges should look more like walls.
+
+    - Make bells make the tink/block sound if you hit them with anything but the staff bonk.
+
+    - colored lights from the current world should render under spirit sight, not over
+        - Check what colored lights look like in the other world too.
+
+    - Hide the first rival fight if you start the second rival fight.
 
     - Add color to lights
         - flame wall should be red
@@ -151,6 +189,9 @@ Current tasks:
         - Clone Explosion
         - Controller multiple clones
         - Clone throw
+
+    - Probably shouldn't be able to bounce onto trampoline after crossing up a ledge.
+        - On the other hand this isn't a very obvious problem and is kind of fun for people that find it.
 
     - Add a better indication for which clone(s)+staff(s) are controlled.
 

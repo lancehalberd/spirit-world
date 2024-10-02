@@ -462,8 +462,6 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                         underLedges = undefined;
                         underDiagonalLedge = undefined;
                     }
-                } else {
-                    break;
                 }
             }
             if (topLayer) {
