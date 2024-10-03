@@ -190,7 +190,7 @@ export function getFileSelectOptions(state: GameState): string[] {
     if (state.scene === 'deleteSavedGame') {
         return [...gameFiles, 'CANCEL'];
     }
-    return [...gameFiles, 'DELETE'];
+    return [...gameFiles, 'DELETE', 'TITLE'];
 }
 
 export function getTitleOptions(state: GameState): string[] {

@@ -19,6 +19,7 @@ import {
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGamesToLocalStorage, } from 'app/utils/saveGame';
 import { parseScriptText, setScript } from 'app/scriptEvents';
+import { initializeTitle } from 'app/scenes/title/initializeTitle';
 
 export function updateFileSelect(state: GameState) {
     const options = getFileSelectOptions(state);
@@ -87,10 +88,16 @@ export function updateFileSelect(state: GameState) {
                 }
                 break;
             case 'fileSelect':
-                if (state.menuIndex >= state.savedGames.length) {
+                if (state.menuIndex === state.savedGames.length
+                        && options[state.menuIndex] === 'DELETE') {
                     state.scene = 'deleteSavedGame';
                     state.menuIndex = 0;
                     setSaveFileToState(state.menuIndex, 0);
+                } else if (state.menuIndex > state.savedGames.length
+                        && options[state.menuIndex] === 'TITLE') {
+                    state.scene = 'title';
+                    initializeTitle(state);
+                    state.menuIndex = 0;
                 } else {
                     selectSaveFile(state, state.menuIndex);
                 }

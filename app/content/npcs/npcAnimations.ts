@@ -189,6 +189,12 @@ export const jadeChampionAnimations: ActorAnimations = {
         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
     },
+    slash: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 12, cols: 6, duration: 5}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 6, duration: 5}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 14, cols: 6, duration: 5}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 15, cols: 6, duration: 5}),
+    },
 };
 
 // Frames are Up/Left/Down/Right [0-3]Castx7, [4-7]Thrustx8 [8-11]Walkx9, [12-15]Slashx6, [16-19]Shootx13 [20]Deathx6

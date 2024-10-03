@@ -29,9 +29,12 @@ export function updateTitle(state: GameState) {
             state.scene = 'fileSelect';
             getFileSelectOptions(state);
             setSaveFileToState(0, 0);
+            state.menuIndex = 0;
             break;
         case 'OPTIONS':
             console.log('display options');
+            state.scene = 'options';
+            state.menuIndex = 0;
             break;
         case 'QUIT':
             console.log('quit game');
