@@ -895,7 +895,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
         if (this.enemyDefinition.alternateRender) {
             this.enemyDefinition.alternateRender(context, state, this);
-        } else  if (this.enemyInvulnerableFrames > 0 || this.isDefeated) {
+        } else if (
+            // Player can briefly see damaged/defeated enemies from the other world if they have
+            // spirit sight or true sight.
+            (state.hero.savedData.passiveTools.spiritSight || state.hero.savedData.passiveTools.trueSight)
+            && (this.enemyInvulnerableFrames > 0 || this.isDefeated)
+        ) {
             context.save();
                 context.globalAlpha *= 0.3;
                 this.render(context, state);
