@@ -182,6 +182,10 @@ export class Hero implements Actor {
     savedData: SavedHeroData;
     renderParent?: BaseFieldInstance;
 
+    // Track how many frames the player has been unable to move for in order to
+    // reset their position to prevent softlocks.
+    stuckFrames: number = 0;
+
     constructor() {
         this.clones = [];
     }
