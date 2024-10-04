@@ -51,6 +51,36 @@ specialBehaviorsHash.barrierBurstInstructions = {
     },
 };
 
+specialBehaviorsHash.staffInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        if (!state.savedState.objectFlags.hideStaffInstructions) {
+            let toolButton: string;
+            if (state.hero.savedData.leftTool === 'staff') {
+                toolButton = '[B_LEFT_TOOL]';
+            } else if (state.hero.savedData.rightTool === 'staff') {
+                toolButton = '[B_RIGHT_TOOL]';
+            }
+            if (toolButton) {
+                if (state.hero.activeStaff) {
+                    helpText = `Press ${toolButton} to retrieve the staff`;
+                } else {
+                    helpText = `Press ${toolButton} to place the staff`;
+                }
+            } else if (state.hero.savedData.activeTools.staff) {
+                helpText = `Press [B_MENU] to open your inventory and assign Staff to [B_TOOL]`;
+            }
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    },
+};
+
 specialBehaviorsHash.barrierReflectInstructions = {
     type: 'narration',
     update(state: GameState, object: ObjectInstance) {

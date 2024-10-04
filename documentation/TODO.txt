@@ -65,13 +65,15 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Remove instructions for equipping items, just rely on the overlay tutorials.
-    - Make sure to add an overlay tutorial for the Staff in he helix.
-
     - Fix ascent cave in spirit world.
 
     - Add SFX for insufficient spirit energy:
         - For teleporting/roll/tools
+
+    - Add new graphics
+        - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
+        - Add fog effect to the new forest zone.
+        - Test new cocoon tiles
 
     - Update spirit sky
         - Make the Forge are more difficult to access

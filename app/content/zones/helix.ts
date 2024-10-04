@@ -313,6 +313,8 @@ const f0_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "helixBigKeyShortcut", x: 120, y: 320, type: "door", style: "ladderUp", d: "up"},
         {status: "normal", id: "helixBigKeyShortcut", x: 120, y: 296, type: "floorSwitch", saveStatus: "forever", targetObjectId: "helixBigKeyShortcut"},
         {status: "normal", id: "", x: 512, y: 320, type: "door", style: "ladderUp", d: "up"},
+        {status: "normal", id: "hideStaffInstructions", x: 276, y: 324, type: "narration", message: "", trigger: "touch", delay: 0, w: 24, h: 40, saveStatus: "forever", customLogic: "$staff", specialBehaviorKey: "staffInstructions"},
+        {status: "normal", id: "", x: 280, y: 432, type: "narration", message: "", trigger: "touch", delay: 0, w: 48, h: 32, customLogic: "$staff", specialBehaviorKey: "staffInstructions", saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 267, mapId: 'helix', floorId: '1F', mapX: 1, mapY: 2},
