@@ -3,7 +3,16 @@ import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
 
 
-
+export const SPAWN_LOCATION_TITLE: ZoneLocation = {
+    zoneKey: 'title',
+    floor: 0,
+    x: 136,
+    y: 384,
+    z: 0,
+    d: 'right',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
 export const SPAWN_LOCATION_FULL: ZoneLocation = {
     zoneKey: 'peachCave',
     floor: 0,

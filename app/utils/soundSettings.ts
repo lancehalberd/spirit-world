@@ -1,8 +1,6 @@
 import { saveSettings } from 'app/utils/saveSettings';
 import { setSoundSettings } from 'app/utils/sounds';
 
-export { setSoundSettings } from 'app/utils/sounds';
-
 export function toggleAllSounds(state: GameState) {
     state.settings.muteAllSounds = !state.settings.muteAllSounds;
     state.settings.muteMusic = false;

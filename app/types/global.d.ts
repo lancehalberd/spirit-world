@@ -1,6 +1,11 @@
 
+interface IElectronAPI {
+  loadPreferences: () => Promise<void>,
+}
+
 interface Window {
   version: string
+  electronAPI: IElectronAPI
 }
 
 type Collection<T> = {[key:string]: T} | Array<T>;
