@@ -65,8 +65,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add a sign to the pot room in War Temple before stairs to 3F
-
     - Remove instructions for equipping items, just rely on the overlay tutorials.
     - Make sure to add an overlay tutorial for the Staff in he helix.
 
@@ -87,6 +85,8 @@ Current tasks:
             - hype cave
             - forge
             - northwest spirit world
+
+    - Staff should despawn if it is completely over pit tiles.
 
     - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
 
