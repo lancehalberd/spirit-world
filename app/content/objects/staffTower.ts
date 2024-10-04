@@ -34,7 +34,10 @@ const throwTime = 800;
 export class StaffTower implements ObjectInstance {
     area: AreaInstance;
     definition: EntranceDefinition;
-    drawPriority: DrawPriority = 'sprites';
+    drawPriority: DrawPriority = 'background';
+    // The hero should fall in front of the tower, not under it, so this index has to be less than
+    // 1, which is the index used for the falling hero.
+    drawPriorityIndex = 0;
     isNeutralTarget = true;
     isObject = <const>true;
     ignorePits = true;
@@ -45,6 +48,7 @@ export class StaffTower implements ObjectInstance {
     animationTime = 0;
     door: ObjectInstance;
     balcony: Balcony;
+    top: StaffTowerTop;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -63,6 +67,7 @@ export class StaffTower implements ObjectInstance {
         // Door's normally render on the background layer, but this door must render on top of the tower, which is in the sprite layer.
         this.door.renderParent = this;
         this.balcony = new Balcony(this);
+        this.top = new StaffTowerTop(this);
     }
     collapse(state: GameState) {
         this.specialStatus = 'collapsing';
@@ -84,7 +89,7 @@ export class StaffTower implements ObjectInstance {
         this.y += dy - 2;
     }
     getParts() {
-        const parts = [this.door];
+        const parts = [this.door, this.top];
         if (this.definition.style === 'sky') {
             parts.push(this.balcony);
         }
@@ -321,6 +326,8 @@ export class StaffTower implements ObjectInstance {
                     drawFrameContentAt(context, staffTowerFrame, this);
                 }
             }
+            // HACK: Draw two additional copies of the tower when it is shrinking to make it taller
+            // to match the shape of the full tower better, since the graphic itself is truncated.
             if (scale < 1) {
                 context.save();
                 context.translate(0, -100 * (1 - scale));
@@ -332,7 +339,6 @@ export class StaffTower implements ObjectInstance {
                     } else {
                         drawFrameContentAt(context, staffTowerSkyFrame, this);
                     }
-                    this.balcony.render(context, state);
                 } else {
                     if (this.definition.spirit) {
                         drawFrameContentAt(context, staffTowerSpiritFrame, this);
@@ -353,7 +359,6 @@ export class StaffTower implements ObjectInstance {
                     } else {
                         drawFrameContentAt(context, staffTowerSkyFrame, this);
                     }
-                    this.balcony.render(context, state);
                 } else {
                     if (this.definition.spirit) {
                         drawFrameContentAt(context, staffTowerSpiritFrame, this);
@@ -363,8 +368,58 @@ export class StaffTower implements ObjectInstance {
                 }
                 context.restore();
             }
-            this.door.area = this.area;
-            this.door.render(context, state);
+        context.restore();
+    }
+}
+
+export class StaffTowerTop implements ObjectInstance {
+    get area() {
+        return this.staffTower.area;
+    }
+    drawPriority: DrawPriority = 'sprites';
+    isObject = <const>true;
+    ignorePits = true;
+    x: number = this.staffTower.x;
+    y: number = this.staffTower.y;
+    status: ObjectStatus = 'normal';
+    constructor(public staffTower: StaffTower) {}
+
+    // This draws the top 200px of the top layer of the tower, which includes all of the
+    // graphics that need to be drawn in front of objects that might pass behind it.
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        let scale = 1;
+        if (this.staffTower.specialStatus === 'collapsing') {
+            if (this.staffTower.animationTime >= shakeTime) {
+                scale = Math.max(0.03, 1 - (this.staffTower.animationTime - shakeTime) / shrinkTime);
+            }
+        }
+        if (this.staffTower.specialStatus === 'deploying' && this.staffTower.animationTime < throwTime) {
+            scale = 0.03;
+        }
+        context.save();
+            if (scale !== 1) {
+                const hitbox = this.staffTower.getHitbox();
+                context.translate(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2);
+                context.scale(scale, scale);
+                //context.scale(scale, 1 - (1 - scale) * 0.8);
+                context.translate(-(hitbox.x + hitbox.w / 2), -(hitbox.y + hitbox.h / 2));
+            }
+            //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
+            if (this.staffTower.definition.style === 'sky') {
+                if (this.staffTower.definition.spirit) {
+                    drawFrameContentAt(context, {...staffTowerSpiritSkyFrame, h: 200}, this);
+                } else {
+                    drawFrameContentAt(context, {...staffTowerSkyFrame, h: 200}, this);
+                }
+            } else {
+                if (this.staffTower.definition.spirit) {
+                    drawFrameContentAt(context, {...staffTowerSpiritFrame, h: 200}, this);
+                } else {
+                    drawFrameContentAt(context, {...staffTowerFrame, h: 200}, this);
+                }
+            }
+            this.staffTower.door.area = this.staffTower.area;
+            this.staffTower.door.render(context, state);
         context.restore();
     }
 }
