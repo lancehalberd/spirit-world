@@ -1,4 +1,4 @@
-import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { requireImage } from 'app/utils/images';
 import { renderStandardFieldStack } from 'app/render/renderField';
 import { getTitleOptions } from 'app/state';
@@ -54,10 +54,10 @@ export function renderTitle(context: CanvasRenderingContext2D, state: GameState)
     const whiteText = requireImage('gfx/titleAssets/spiritquest-titlewhite-pixelperfect.png')
 
     const spiritWordDimensions = {x: 0, y: 0, height: 20, width: 52};
-    const spiritWordDestination = {x: 38, y: 8, multiplier: 3}
+    const spiritWordDestination = {x: 26, y: 8, multiplier: 3}
     const questWordDimensions = {x: 53, y: 0, height: 20, width: 44};
     const questWordDestination = {
-        x: spiritWordDestination.x - 32,
+        x: spiritWordDestination.x - 20,
         y: (spiritWordDimensions.height * spiritWordDestination.multiplier) + spiritWordDestination.y,
         multiplier: 3
     };

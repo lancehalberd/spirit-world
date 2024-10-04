@@ -194,12 +194,21 @@ export function getFileSelectOptions(state: GameState): string[] {
 }
 
 export function getTitleOptions(state: GameState): string[] {
-    const titleMenu = ['START', 'OPTIONS'];
+    const titleMenu = ['START', 'SETTINGS'];
     // only display 'QUIT' if game is being played inside of Electron as a desktop app
     if (window.electronAPI && state.gameHasBeenInitialized) {
         return [...titleMenu, 'QUIT'];
     }
     return titleMenu;
+}
+
+export function getSettingsOptions(state: GameState): string[] {
+    const settingsMenu = ['VOLUME OFF', 'VOLUME LOW', 'VOLUME MED', 'VOLUME HI', 'VIEW CONTROLS'];
+    // only display 'FULLSCREEN' toggle if game is being played inside of Electron as a desktop app
+    if (window.electronAPI && state.gameHasBeenInitialized) {
+        return [...settingsMenu, 'FULLSCREEN', 'RESUME'];
+    }
+    return [...settingsMenu, 'RESUME'];
 }
 
 export function shouldHideMenu(state: GameState): boolean {

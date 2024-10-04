@@ -4,8 +4,8 @@ import {
     wasConfirmKeyPressed,
 } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
-import { getTitleOptions } from 'app/state';
 import {
+    getTitleOptions,
     getFileSelectOptions,
     setSaveFileToState,
 } from 'app/state';
@@ -31,8 +31,8 @@ export function updateTitle(state: GameState) {
             setSaveFileToState(0, 0);
             state.menuIndex = 0;
             break;
-        case 'OPTIONS':
-            console.log('display options');
+        case 'SETTINGS':
+            console.log('display settings');
             state.scene = 'options';
             state.menuIndex = 0;
             break;

@@ -447,7 +447,6 @@ export class NPC implements Actor, ObjectInstance  {
     render(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
         const frame = this.getFrame();
-        console.log('npc', frame.x, frame.y);
         const scale = animationStyle.scale || 1;
         if ((this.d === 'right' && animationStyle.flipRight) || (this.d === 'left' && animationStyle.flipLeft)) {
             // Some sprites only have a left or a right frame that we flip to produce the other frame.

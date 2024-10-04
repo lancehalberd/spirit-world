@@ -18,6 +18,7 @@ import { updateInventory } from 'app/scenes/inventory/updateInventory';
 import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
 import { updateFileSelect } from 'app/scenes/fileSelect/updateFileSelect';
 import { updateTitle } from 'app/scenes/title/updateTitle';
+import { updateSettings } from 'app/scenes/settings/updateSettings';
 import {
     canPauseGame,
     getState,
@@ -62,6 +63,10 @@ export function update() {
         }
         if (state.scene === 'title') {
             updateTitle(state);
+            return;
+        }
+        if (state.scene === 'options') {
+            updateSettings(state);
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
