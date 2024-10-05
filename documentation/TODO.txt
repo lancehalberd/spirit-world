@@ -65,6 +65,20 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Update randomizer logic
+        - sky nodes
+        - ascent cave logic changes
+        - NW spirit world logic changes
+        - waterfallCaveWaterEntrance
+        - War Palace area is now reachable from the sky
+        - new checks:
+            - caves-ascentSpiritPeachPiece
+            - spiritWorldPeachChest
+            - spiritWorldMoneyChest
+            - waterfallCaveWaterMoney
+            - waterfallCaveWaterPeach
+
+
     - Add SFX for insufficient spirit energy:
         - For teleporting/roll/tools
 
