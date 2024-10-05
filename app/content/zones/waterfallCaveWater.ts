@@ -172,7 +172,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 502, mapId: 'waterfallCaveWater', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -180,7 +180,7 @@ const f0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 503, mapId: 'waterfallCaveWater', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -529,11 +529,11 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", linked: true, spirit: true, x: 144, y: 172, type: "tippable"},
-        {status: "normal", id: "", linked: true, spirit: true, x: 160, y: 172, type: "tippable"},
-        {status: "normal", id: "", linked: true, spirit: true, x: 176, y: 172, type: "tippable"},
-        {status: "normal", id: "waterfallCaveWaterMoney", linked: true, spirit: true, x: 384, y: 72, type: "chest", lootType: "money", lootAmount: 300},
-        {status: "normal", id: "waterfallCaveWaterPeach", linked: true, spirit: true, x: 64, y: 40, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 300},
+        {status: "normal", id: "", linked: false, spirit: false, x: 144, y: 172, type: "tippable"},
+        {status: "normal", id: "", linked: false, spirit: false, x: 160, y: 172, type: "tippable"},
+        {status: "normal", id: "", linked: false, spirit: false, x: 176, y: 172, type: "tippable"},
+        {status: "normal", id: "waterfallCaveWaterMoney", linked: false, spirit: true, x: 384, y: 72, type: "chest", lootType: "money", lootAmount: 300},
+        {status: "normal", id: "waterfallCaveWaterPeach", linked: false, spirit: true, x: 64, y: 40, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 300},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 866, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},
@@ -547,7 +547,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, mapId: 'undefinedSpirit'},
+        {x: 0, y: 0, w: 32, h: 32, index: 510, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -557,7 +557,7 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, mapId: 'undefinedSpirit'},
+        {x: 0, y: 0, w: 32, h: 32, index: 511, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -736,7 +736,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, mapId: 'undefinedSpirit'},
+        {x: 0, y: 0, w: 32, h: 32, index: 512, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -744,16 +744,9 @@ const sf0_1x1: AreaDefinition = {
     parentDefinition: f0_1x1,
     layers: null,
     objects: [
-        {status: "normal", id: "", linked: true, spirit: false, x: 48, y: 251, style: "pot", type: "pushPull"},
-        {status: "normal", id: "", linked: true, spirit: false, x: 101, y: 215, style: "pot", type: "pushPull"},
-        {status: "normal", id: "", linked: true, spirit: false, x: 144, y: 172, type: "tippable"},
-        {status: "normal", id: "", linked: true, spirit: false, x: 160, y: 172, type: "tippable"},
-        {status: "normal", id: "", linked: true, spirit: false, x: 176, y: 172, type: "tippable"},
-        {status: "normal", id: "waterfallCaveWater:0:1x1-money-0", linked: true, spirit: false, x: 384, y: 72, type: "chest", lootType: "money", lootAmount: 300},
-        {status: "normal", id: "waterfallCaveWaterBigMoney", linked: true, spirit: false, x: 64, y: 40, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 300},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, mapId: 'undefinedSpirit'},
+        {x: 0, y: 0, w: 32, h: 32, index: 513, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 zones.waterfallCaveWater = {
