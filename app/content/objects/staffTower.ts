@@ -407,15 +407,15 @@ export class StaffTowerTop implements ObjectInstance {
             //drawFrameContentAt(context, {...maskFrame, image: glowCanvas, x: 0, y: 0}, this);
             if (this.staffTower.definition.style === 'sky') {
                 if (this.staffTower.definition.spirit) {
-                    drawFrameContentAt(context, {...staffTowerSpiritSkyFrame, h: 200}, this);
+                    drawFrameContentAt(context, {...staffTowerSpiritSkyFrame, h: 200}, this.staffTower);
                 } else {
-                    drawFrameContentAt(context, {...staffTowerSkyFrame, h: 200}, this);
+                    drawFrameContentAt(context, {...staffTowerSkyFrame, h: 200}, this.staffTower);
                 }
             } else {
                 if (this.staffTower.definition.spirit) {
-                    drawFrameContentAt(context, {...staffTowerSpiritFrame, h: 200}, this);
+                    drawFrameContentAt(context, {...staffTowerSpiritFrame, h: 200}, this.staffTower);
                 } else {
-                    drawFrameContentAt(context, {...staffTowerFrame, h: 200}, this);
+                    drawFrameContentAt(context, {...staffTowerFrame, h: 200}, this.staffTower);
                 }
             }
             this.staffTower.door.area = this.staffTower.area;

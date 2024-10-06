@@ -65,13 +65,10 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix staff tower rendering tower top when setting it up for some reason.
-        - It is likely just missing the z offset when it is falling..
     - Check that all tree/tree pit/spirit tree entrances are all randomized
     - Randomize new check in SW corner of Summoner ruins
     - Check water entrance to waterfall cave is randomized.
     - Fix storm beast is blockable by held chakram when in lightning ball form.
-    - Fix Setting up staff tower grants temporary level 1 staff if you had the staff tower equipped if you don't own it.
     - Fix bad ceiling tiles in peach cave water.
 
     - Add new graphics
