@@ -661,9 +661,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = null;
             }
         }
-        if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+        if (state.hero.savedData.passiveTools.teleportation &&
+            (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL))
+        ) {
             const preventTeleportation = hero.grabObject || hero.grabTile;
-            if (!preventTeleportation && state.hero.savedData.passiveTools.teleportation && state.hero.magic > 0
+            if (!preventTeleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.spendMagic(10);
@@ -672,6 +674,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 // match the projection to the hero eyes.
                 hero.d = 'down';
                 return;
+            } else {
+                // This needs to be played in the area with the main hero, not the astral projection.
+                playAreaSound(state, state.hero.area, 'error');
             }
         }
     }
@@ -853,31 +858,34 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         && !isActionBlocked
         && !hero.isAstralProjection
         && hero.savedData.passiveTools.roll > 0
-        && state.hero.magic > 0
         && hero.rollCooldown <= 0
     ) {
-        // Normal roll
-        hero.chargeTime = 0;
-        if (hero.heldChakram) {
-            removeEffectFromArea(state, hero.heldChakram);
-            delete hero.heldChakram;
+        if (state.hero.magic > 0) {
+            // Normal roll
+            hero.chargeTime = 0;
+            if (hero.heldChakram) {
+                removeEffectFromArea(state, hero.heldChakram);
+                delete hero.heldChakram;
+            }
+            hero.chargingLeftTool = hero.chargingRightTool = false;
+            state.hero.spendMagic(5);
+            hero.action = 'roll';
+            hero.isAirborn = true;
+            hero.actionFrame = 0;
+            hero.animationTime = 0;
+            // Rolling decreases duration of burns by 1 second.
+            if (hero.burnDuration > 0) {
+                hero.burnDuration -= 1000;
+            }
+            const direction = getDirection(
+                (dx || dy) ? dx : directionMap[hero.d][0],
+                (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+            hero.actionDx = directionMap[direction][0];
+            hero.actionDy = directionMap[direction][1];
+            return;
+        } else {
+            playAreaSound(state, hero.area, 'error');
         }
-        hero.chargingLeftTool = hero.chargingRightTool = false;
-        state.hero.spendMagic(5);
-        hero.action = 'roll';
-        hero.isAirborn = true;
-        hero.actionFrame = 0;
-        hero.animationTime = 0;
-        // Rolling decreases duration of burns by 1 second.
-        if (hero.burnDuration > 0) {
-            hero.burnDuration -= 1000;
-        }
-        const direction = getDirection(
-            (dx || dy) ? dx : directionMap[hero.d][0],
-            (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
-        hero.actionDx = directionMap[direction][0];
-        hero.actionDy = directionMap[direction][1];
-        return;
     }
     if (
         // Meditation only applies to either the main hero or to all clones, but not both at once.
