@@ -107,8 +107,6 @@ Current tasks:
     - colored lights from the current world should render under spirit sight, not over
         - Check what colored lights look like in the other world too.
 
-    - Hide the first rival fight if you start the second rival fight.
-
     - Add color to lights
         - flame wall should be red
         - lightningDischarge should be yellow
