@@ -140,6 +140,9 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'warTempleArea',
+        checks: [
+            {objectId: 'desertMoney', logic: canRemoveLightStones},
+        ],
         paths: [
             { nodeId: 'overworldMain' },
         ],
