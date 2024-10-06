@@ -1,4 +1,4 @@
-import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { appendCallback, appendScript, runBlockingCallback, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
@@ -6,19 +6,6 @@ import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
 import { updateCamera } from 'app/updateCamera';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-import { addEffectToArea } from 'app/utils/effects';
-
-function addBurstEffect(this: void, state: GameState, npc: NPC, area: AreaInstance): void {
-    const hitbox = npc.getHitbox();
-    const animation = new FieldAnimationEffect({
-        animation: burstAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
-        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
-    });
-    addEffectToArea(state, area, animation);
-}
 
 dialogueHash.jadeChampion = {
     key: 'jadeChampion',

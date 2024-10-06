@@ -1,7 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 
-import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/utils/effects';
+import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
@@ -70,15 +69,7 @@ function burstIntoLocation(state: GameState) {
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
 
-    const hitbox = state.hero.getHitbox();
-    const animation = new FieldAnimationEffect({
-        animation: burstAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
-        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
-    });
-    addEffectToArea(state, state.hero.area, animation);
+    addBurstEffect(state, state.hero)
 }
 
 dialogueHash.nimbusCloud = {

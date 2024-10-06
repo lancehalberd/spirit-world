@@ -1,25 +1,12 @@
-import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-import { addEffectToArea } from 'app/utils/effects';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
-
-function addBurstEffect(this: void, state: GameState, npc: NPC, area: AreaInstance): void {
-    const hitbox = npc.getHitbox();
-    const animation = new FieldAnimationEffect({
-        animation: burstAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
-        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
-    });
-    addEffectToArea(state, area, animation);
-}
 
 function npcAndHeroTeleportAnimation(state: GameState, npc: NPC) {
     appendScript(state, '{wait:500}');
@@ -195,6 +182,7 @@ dialogueHash.jadeChampionWarTemple = {
                 grandPriest.changeToAnimation('idle');
             });
             appendScript(state, `What do you know of the disappearance of the Spirit Beasts, child?
+                {|}...
                 {|}I can see that you don't know of what I speak.`);
             runPlayerBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;

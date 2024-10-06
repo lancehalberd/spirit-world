@@ -522,7 +522,7 @@ export function addBurstEffect(this: void, state: GameState, actor: Actor, area:
     const hitbox = actor.getHitbox();
     const animation = new FieldAnimationEffect({
         animation: burstAnimation,
-        drawPriority: 'background',
+        drawPriority: 'foreground',
         drawPriorityIndex: 1,
         x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
         y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
