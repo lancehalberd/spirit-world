@@ -2,7 +2,7 @@
 import {
     andLogic, canUseTeleporters, orLogic, canHasTowerStaff,
     hasAstralProjection, hasBossWeapon,
-    hasIce, hasInvisibility, hasIronBoots, hasCloudBoots, canRemoveHeavyStones,
+    hasIce, hasInvisibility, hasIronBoots, hasCloudBoots, hasMitts,
     hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
 } from 'app/content/logic';
 
@@ -42,7 +42,7 @@ export const gauntletNodes: LogicNode[] = [
         exits: [
             {
                 objectId: 'gauntletLeftStairs',
-                logic: orLogic(canRemoveHeavyStones, hasClone, hasIce)
+                logic: orLogic(hasMitts, hasClone, hasIce)
             },
             {
                 objectId: 'gauntletStairs',
