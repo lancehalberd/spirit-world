@@ -65,8 +65,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix bad ceiling tiles in peach cave water.
-
     - Add new graphics
         - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
         - Add fog effect to the new forest zone.
