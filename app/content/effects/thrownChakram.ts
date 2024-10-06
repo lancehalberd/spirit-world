@@ -486,7 +486,7 @@ export class HeldChakram implements EffectInstance {
         hitTargets(state, this.area, hit);
         // Finally check for hit damage from enemies and bounce away from them.
         for (const enemy of this.area.enemies) {
-            if (enemy.invulnerableFrames > 0
+            if (enemy.invulnerableFrames > 0 || enemy.isInvulnerable
                 || enemy.status === 'hidden' || enemy.status === 'gone' || enemy.status === 'off'
                 || enemy.mode === 'hidden'
                 || enemy.isDefeated
