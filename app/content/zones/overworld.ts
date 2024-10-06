@@ -1564,8 +1564,8 @@ const f0_0x1: AreaDefinition = {
     ],
     objects: [
         {id: "tombEntrance", linked: false, spirit: false, status: "closedSwitch", x: 112, y: 80, type: "door", style: "cavern", targetZone: "tomb", targetObjectId: "tombEntrance", d: "up", saveStatus: "forever"},
-        {id: "tombSwitchB", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 4000, saveStatus: "never", specialBehaviorKey: "tombEntranceSwitch"},
-        {id: "tombSwitchA", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 4000, saveStatus: "never", specialBehaviorKey: "tombEntranceSwitch"},
+        {id: "tombSwitchB", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 4000, saveStatus: "never", specialBehaviorKey: "tombEntranceSwitch", stayOnAfterActivation: true},
+        {id: "tombSwitchA", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 4000, saveStatus: "never", specialBehaviorKey: "tombEntranceSwitch", stayOnAfterActivation: true},
         {status: "normal", id: "overworld:0:0x1-squirrel-0", x: 296, y: 108, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x1-snake-1", x: 304, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "sideArea:noToolEntrance", x: 304, y: 0, type: "door", style: "cavern", d: "up", linked: false, targetZone: "caves", targetObjectId: "caves:noToolSideArea"},
