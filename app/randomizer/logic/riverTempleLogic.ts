@@ -1,5 +1,5 @@
 import {
-    andLogic, orLogic, hasReleasedBeasts, canRemoveHeavyStones, canTravelFarUnderWater,
+    andLogic, orLogic, hasReleasedBeasts, canRemoveHeavyStones,
     hasBossWeapon, hasIronBoots,  hasMediumRange,
     hasFire, hasLightning, hasSomersault, hasStaff,
 } from 'app/content/logic';
@@ -8,7 +8,7 @@ import {
 // The frostBeast flag is set correctly during simulation, so this logic works as expected.
 const canMeltIce = orLogic({requiredFlags: ['frostBeast']}, andLogic(orLogic(hasLightning, hasFire), hasMediumRange));
 
-const canCrossUnderIceSpikes = andLogic(canTravelFarUnderWater,
+const canCrossUnderIceSpikes = andLogic(hasIronBoots,
     // Defeating the frost beast removes the ice spikes allowing the player to swim over.
     // The staff or cloud sommersault can be used to pass under the ice spikes.
     orLogic({requiredFlags: ['frostBeast']}, hasSomersault, hasStaff)
@@ -21,13 +21,13 @@ export const riverTempleWaterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'riverTempleWaterEntrance',
         checks: [
-            {objectId: 'riverTempleSmallKey', logic: canTravelFarUnderWater},
-            {objectId:'riverTemplePeachPiece', logic: canTravelFarUnderWater},
+            {objectId: 'riverTempleSmallKey', logic: hasIronBoots},
+            {objectId:'riverTemplePeachPiece', logic: hasIronBoots},
         ],
         entranceIds: ['riverTempleWaterEntrance',  'riverTempleWaterStairs'],
         exits: [
-            {objectId: 'riverTempleWaterEntrance', logic: canTravelFarUnderWater},
-            {objectId: 'riverTempleWaterStairs', logic: canTravelFarUnderWater}
+            {objectId: 'riverTempleWaterEntrance', logic: hasIronBoots},
+            {objectId: 'riverTempleWaterStairs', logic: hasIronBoots}
         ],
     },
     {
@@ -36,15 +36,15 @@ export const riverTempleWaterNodes: LogicNode[] = [
         entranceIds: ['riverTempleWaterStairs'],
         paths: [{nodeId: 'riverTempleMainHall'}],
         exits: [
-            {objectId: 'riverTempleWaterStairs', logic: canTravelFarUnderWater},
+            {objectId: 'riverTempleWaterStairs', logic: hasIronBoots},
         ],
     },
     {
         zoneId,
         nodeId: 'riverTempleWaterMaze1',
         paths: [
-            {nodeId: 'riverTempleMainHall', logic: canTravelFarUnderWater},
-            {nodeId: 'riverTempleSEArea', logic: canTravelFarUnderWater},
+            {nodeId: 'riverTempleMainHall', logic: hasIronBoots},
+            {nodeId: 'riverTempleSEArea', logic: hasIronBoots},
             {nodeId: 'riverTempleWaterChest', logic: canRemoveHeavyStones},
         ],
     },
@@ -52,8 +52,8 @@ export const riverTempleWaterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'riverTempleWaterMaze2',
         paths: [
-            {nodeId: 'riverTempleSEArea', logic: canTravelFarUnderWater},
-            {nodeId: 'riverTempleSWArea', logic: canTravelFarUnderWater},
+            {nodeId: 'riverTempleSEArea', logic: hasIronBoots},
+            {nodeId: 'riverTempleSWArea', logic: hasIronBoots},
             {nodeId: 'riverTempleWaterChest', logic: canCrossUnderIceSpikes},
         ],
     },

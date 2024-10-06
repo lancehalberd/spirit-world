@@ -227,7 +227,7 @@ export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasC
 export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
 export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
-export const canTravelFarUnderWater = andLogic(hasIronBoots);
+export const canTravelFarUnderWater = andLogic(hasIronBoots, hasWaterBlessing);
 export const canUseTeleporters = orLogic(hasSpiritSight, hasTrueSight);
 
 export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);

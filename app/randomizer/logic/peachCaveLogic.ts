@@ -1,5 +1,5 @@
 import {
-    canTravelFarUnderWater, hasBossWeapon, hasCatEyes,
+    hasBossWeapon, hasCatEyes,
     hasClone, hasIronBoots, canRemoveLightStones, hasWeapon,
 } from 'app/content/logic';
 
@@ -128,7 +128,7 @@ export const peachCaveNodes: LogicNode[] = [
         ],
         entranceIds: ['peachCaveUnderwaterEntrance'],
         exits: [
-            { objectId: 'peachCaveUnderwaterEntrance', logic: canTravelFarUnderWater  },
+            { objectId: 'peachCaveUnderwaterEntrance', logic: hasIronBoots  },
         ],
     },
 ];
