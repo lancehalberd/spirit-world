@@ -1,4 +1,5 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { renderLightningCircle, renderLightningRay } from 'app/render/renderLightning'
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
@@ -90,6 +91,12 @@ export class Spark implements EffectInstance, Props {
             }
         }
     }
+    getAnchorPoint() {
+        return {
+            x: this.x,
+            y: this.y,
+        };
+    }
     // This is just used for targeting, so all we need is for the center to be at (x, y).
     getHitbox() {
         return {x: this.x, y: this.y, w: 0, h: 0};
@@ -105,6 +112,8 @@ export class Spark implements EffectInstance, Props {
             vx: this.vx,
             vy: this.vy,
             cutsGround: true,
+            anchorPoint: this.getAnchorPoint(),
+            isHigh: false,
             ...this.props.extraHitProps,
         }
         if (this.hitRay) {
@@ -138,8 +147,15 @@ export class Spark implements EffectInstance, Props {
             this.ay = y / 2;
 
         }
+        const oldAnchorPoint = this.getAnchorPoint();
         this.x += this.vx;
         this.y += this.vy;
+        // Check if this spark hit a ledge:
+        const ledgeDelta = getLedgeDelta(state, this.area, oldAnchorPoint, this.getAnchorPoint());
+        if (ledgeDelta !== 0) {
+            removeEffectFromArea(state, this);
+            return;
+        }
         this.z = Math.max(0, this.z + this.vz);
         this.vx = this.vx + this.ax;
         this.vy = this.vy + this.ay;
