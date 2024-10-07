@@ -65,10 +65,13 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Sparks in staff tower basement boss are crossing up ledges for some reason.
+
     - Add new graphics
         - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
         - Add fog effect to the new forest zone.
         - Test new cocoon tiles
+
 
     - Update spirit sky
         - Make the Forge are more difficult to access
