@@ -68,20 +68,12 @@ Current tasks:
     - Add new graphics
         - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
         - Add fog effect to the new forest zone.
-        - Test new cocoon tiles
 
     - Update spirit sky
-        - Make the Forge are more difficult to access
-            - Block off NW corner of spirit world behind Mitts, Staff tower or new portal reachable only with Iron Boots
-            - NW spirit world mountains can be accessed by falling down
         - Figure out what to do about falling on top of brittle ground
             - Keep the player just north of the edge of the tile if the southern tile is not a pit.
         - Only break brittle ground if the hero is not standing on any solid ground.
         - Force player to fall on brittle ground if they roll over it wearing cloud boots.
-        - Update randomizer logic
-            - hype cave
-            - forge
-            - northwest spirit world
 
     - Staff should despawn if it is completely over pit tiles.
 
@@ -95,6 +87,8 @@ Current tasks:
         - Forest Village
         - Jade City
         - Helix
+
+    - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
 
     - Make ledge styles clearer
         - Jump ledges should look flatter
@@ -124,8 +118,6 @@ Current tasks:
     - Allow shooting through enemy flames to add flame to your attack
         - This will make fire enemies immune to bow/chakram attackss that pass through their flames.
             - Maybe change how immunities work for bow/chakram so they hit with the element first and then just physical damage.
-
-    - Block the first teleportation skip in the Helix 3F material world so the player has to use the plant.
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.

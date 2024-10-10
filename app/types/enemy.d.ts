@@ -69,6 +69,8 @@ interface EnemyDefinition<Params> {
     updateFlyingZ?: (state: GameState, enemy: Enemy<Params>) => void
     hasCustomHurtAnimation?: boolean
     hasShadow?: boolean
+    shadowRadius?: number
+    shadowOffset?: Partial<Point>
     ignorePits?: boolean
     life?: number
     lootTable?: LootTable
