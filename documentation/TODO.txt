@@ -71,8 +71,6 @@ Current tasks:
         - New Cliff graphics probably require reviewing most zones for tiles that need adjustments.
         - cocoon graphics
 
-    - Fix missing cliff ledges on overworld just SE of bush cave.
-
     - Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
 
     - Update spirit sky
