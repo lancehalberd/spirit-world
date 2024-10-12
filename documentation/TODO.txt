@@ -68,6 +68,12 @@ Current tasks:
     - Add new graphics
         - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
         - Add fog effect to the new forest zone.
+        - New Cliff graphics probably require reviewing most zones for tiles that need adjustments.
+        - cocoon graphics
+
+    - Fix missing cliff ledges on overworld just SE of bush cave.
+
+    - Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
 
     - Update spirit sky
         - Figure out what to do about falling on top of brittle ground

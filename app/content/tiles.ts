@@ -437,6 +437,13 @@ const spiritRailsTiles: TileSource = {
     },
 };
 
+
+const waterAnimationProps = {
+    frames: 3,
+    frameSequence: [0,0,1,2,2,1],
+    offset: {x: 0, y: 5},
+};
+
 const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'field', shallowWater: true };
 const deepToShallow: TileSource = {
     w: 16, h: 16,
@@ -447,6 +454,7 @@ const deepToShallow: TileSource = {
         '0x4': deepWaterBehavior, '1x4': deepWaterBehavior,
         '3x2': { skipped: true }
     },
+    animationProps: waterAnimationProps,
 };
 const deepToShallowAngles: TileSource = {
     w: 16, h: 16,
@@ -458,6 +466,7 @@ const deepToShallowAngles: TileSource = {
         '1x1': shallowWaterBehavior, '1x2': shallowWaterBehavior,
         '2x1': shallowWaterBehavior, '2x2': shallowWaterBehavior,
     },
+    animationProps: waterAnimationProps,
 };
 const shallowToDeep: TileSource = {
     w: 16, h: 16,
@@ -468,6 +477,7 @@ const shallowToDeep: TileSource = {
         '0x4': shallowWaterBehavior, '1x4': shallowWaterBehavior,
         '3x2': { skipped: true }
     },
+    animationProps: waterAnimationProps,
 };
 const shallowToDeepAngles: TileSource = {
     w: 16, h: 16,
@@ -479,6 +489,7 @@ const shallowToDeepAngles: TileSource = {
         '1x1': deepWaterBehavior, '1x2': deepWaterBehavior,
         '2x1': deepWaterBehavior, '2x2': deepWaterBehavior,
     },
+    animationProps: waterAnimationProps,
 };
 
 const shore: TileSource = {
@@ -488,6 +499,7 @@ const shore: TileSource = {
         'all': { defaultLayer: 'floor' },
         '3x0': { skipped: true }, '3x1': { skipped: true },
     },
+    animationProps: waterAnimationProps,
 };
 const shoreAngles: TileSource = {
     w: 16, h: 16,
@@ -497,6 +509,7 @@ const shoreAngles: TileSource = {
         '0x0': { skipped: true }, '3x0': { skipped: true },
         '0x3': { skipped: true }, '3x3': { skipped: true },
     },
+    animationProps: waterAnimationProps,
 };
 
 const shoreMask: TileSource = {
