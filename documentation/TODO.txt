@@ -27,6 +27,11 @@ Bugs:
 
 Graphics Work:
     High Priority Graphics:
+        Running animation for MC
+        Thorns animation for mushroom enemy
+        Summoner Statues for War Temple Boss
+            The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
+        Large Statues for Flame and Frost Beasts
 
 
     Create icons for new items:
@@ -42,16 +47,15 @@ Graphics Work:
 
     Large objects/structures
         World tree exterior B2, B1, ground and sky, possibly vertical exterior
-        Elemental statues
 
     Boss graphics:
-        Summoner Statues for War Temple Boss
-            The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
 
     Open ended tasks
         New tile sets
             Vanara Ship(Cocoon, Helix + World Tree Variants) Material+Spirit
             Research Lab(Fertility Temple + Underground Lab)
+            Smooth crystal walls(Sky Palace)
+                +Green variant(Sky City+Jade Palace)
 
 
 Graphics to Implement:
@@ -66,6 +70,7 @@ Graphics to Implement:
 
 Current tasks:
     - Add new graphics
+        - Review new water detail animatinos for deep+shallow water
         - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
         - Add fog effect to the new forest zone.
         - New Cliff graphics probably require reviewing most zones for tiles that need adjustments.

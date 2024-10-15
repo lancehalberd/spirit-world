@@ -100,7 +100,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCapHeight + barHeight - spiritBottom.h + 1});
     }
     //const fillHeight = Math.floor(state.hero.magic);
-    const fillHeight = Math.min(state.hero.maxMagic, Math.round(state.hero.magic + state.hero.recentMagicSpent));
+    const fillHeight = Math.min(state.hero.maxMagic, Math.round(Math.max(0, state.hero.magic) + state.hero.recentMagicSpent));
     const magicSpent = fillHeight - Math.floor(Math.min(state.hero.maxMagic, state.hero.magic));
     const spentHeight = Math.min(fillHeight, magicSpent);
     if (fillHeight > 0) {
