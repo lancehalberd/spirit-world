@@ -100,7 +100,7 @@ export const thornBehavior: TileBehaviors = {
     linkedOffset: 179,
 };
 export const deepWaterBehavior: TileBehaviors = {
-    defaultLayer: 'field',
+    defaultLayer: 'water',
     water: true,
 };
 export const climbableWall: TileBehaviors = {

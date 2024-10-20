@@ -444,7 +444,7 @@ const waterAnimationProps = {
     offset: {x: 0, y: 5},
 };
 
-const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'field', shallowWater: true };
+const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'water', shallowWater: true };
 const deepToShallow: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/deeptoshallowwater.png', {x: 0, y: 0, w: 64, h: 80}),
@@ -490,6 +490,31 @@ const shallowToDeepAngles: TileSource = {
         '2x1': deepWaterBehavior, '2x2': deepWaterBehavior,
     },
     animationProps: waterAnimationProps,
+};
+
+const waterWaves: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 144, y: 0, w: 16, h: 64}),
+    behaviors: {
+        'all': {defaultLayer: 'field', isGround: false},
+    },
+    animationProps: {
+        frames: 3,
+        frameSequence: [0,0,1,2,2,1],
+        offset: {x: 1, y: 0},
+    }
+};
+const waterRocks: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 144, y: 80, w: 16, h: 48}),
+    behaviors: {
+        'all': {defaultLayer: 'field', isGround: false},
+    },
+    animationProps: {
+        frames: 3,
+        frameSequence: [0,0,1,2,2,1],
+        offset: {x: 1, y: 0},
+    }
 };
 
 const shore: TileSource = {
@@ -1096,10 +1121,11 @@ addTiles([
     furnitureWoodTiles,
     furnitureLampTiles,
     furniturePlantTiles,
-    deletedTiles(5),
+    waterWaves,
+    deletedTiles(1),
     iceTiles,
     lavaBubbles,
-    deletedTiles(3),
+    waterRocks,
     laundryTiles,
     singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
     logChoppingTiles,
