@@ -44,3 +44,43 @@ export const allCrystalCavePitTileSources: TileSource[] = [
     crystalCavePitEdges, // 7
     // = 16
 ];
+
+export const crystalCavePitHorizontalWalls: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(crystalCavePitsImage, {x: 144, y: 128, w: 32, h: 32}),
+    behaviors: {
+        '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+        '1x1': { defaultLayer: 'floor2', pit: true, pitWall: true },
+    },
+};
+export const crystalCavePitAngledWallsIn: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(crystalCavePitsImage, {x: 96, y: 112, w: 32, h: 48}),
+    behaviors: {
+        '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x1': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '1x1': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x2': { defaultLayer: 'floor2', pit: true },
+        '1x2': { defaultLayer: 'floor2', pit: true },
+    },
+};
+export const crystalCavePitAngledWallsOut: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(crystalCavePitsImage, {x: 48, y: 128, w: 32, h: 32}),
+    behaviors: {
+        '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x1': { defaultLayer: 'floor2', pit: true },
+        '1x1': { defaultLayer: 'floor2', pit: true },
+    },
+};
+
+export const crystalCaveWallToPitTileSources: TileSource[] = [
+    crystalCavePitHorizontalWalls, // 4
+    crystalCavePitAngledWallsIn, // 6
+    crystalCavePitAngledWallsOut, // 4
+    // = 14
+];

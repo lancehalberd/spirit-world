@@ -42,7 +42,7 @@ import {
     cavePitAngledWallsIn,
     cavePitAngledWallsOut,
 } from 'app/content/tiles/cavePits';
-import { allCrystalCavePitTileSources } from 'app/content/tiles/crystalCavePits';
+import { allCrystalCavePitTileSources, crystalCaveWallToPitTileSources } from 'app/content/tiles/crystalCavePits';
 import { allCrystalCaveTileSources, crystalTransparentFloor } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
@@ -1188,6 +1188,7 @@ addTiles([
     ...allFancyStoneCeilingTileSources,
     ...allObsidianTileSources,
     ...allFuturisticTileSources,
+    ...crystalCaveWallToPitTileSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

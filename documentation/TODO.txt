@@ -70,8 +70,6 @@ Graphics to Implement:
 
 Current tasks:
     - Add new graphics
-        - Review new water detail animatinos for deep+shallow water
-        - Crystal pit + pit walls to Sky Palace + Lightning Sanctum + Hype Cave.
         - Add fog effect to the new forest zone.
         - New Cliff graphics probably require reviewing most zones for tiles that need adjustments.
         - cocoon graphics
