@@ -3,7 +3,8 @@ import { PushPullObject } from 'app/content/objects/pushPullObject';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
 
-const trampolineAnimation = createAnimation('gfx/objects/bouncyObject.png', {w: 16, h: 32, content: {x: 0, y: 16, w: 16, h: 16}}, {cols: 2, duration: 20});
+const trampolineAnimation = createAnimation('gfx/objects/spring.png', {w: 20, h: 32, content: {x: 2, y: 16, w: 16, h: 16}},
+    {cols: 2, duration: 10, frameMap: [1, 0]});
 
 export class Trampoline extends PushPullObject implements ObjectInstance {
     behaviors = {
