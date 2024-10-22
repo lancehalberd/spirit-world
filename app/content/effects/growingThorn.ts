@@ -1,9 +1,12 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { removeEffectFromArea } from 'app/utils/effects';
-import { coverTile, hitTargets } from 'app/utils/field';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
+import {removeEffectFromArea} from 'app/utils/effects';
+import {canCoverTile, coverTile, hitTargets} from 'app/utils/field';
 
 
-const thornsTilesIndex = 5;
+const thornsTilesIndex = 184;
+
+const growingThornsAnimation = createAnimation('gfx/tiles/thornsspirit.png', {w: 16, h: 16}, {y: 1, cols: 11})
 
 interface Props {
     x?: number
@@ -37,55 +40,33 @@ export class GrowingThorn implements EffectInstance, Props {
         this.damage = damage;
     }
     update(state: GameState) {
+        // Cancel the effect if the tile becomes invalid.
+        const tx = (this.x / 16) | 0;
+        const ty = (this.y / 16) | 0;
+        if (!canCoverTile(this.area, tx, ty, thornsTilesIndex)) {
+            removeEffectFromArea(state, this);
+            return;
+        }
         this.animationTime += FRAME_LENGTH;
-        if (this.animationTime >= this.delay) {
-            // Grow thorns at this location if possible.
-            const tx = (this.x / 16) | 0;
-            const ty = (this.y / 16) | 0;
-            if (coverTile(state, this.area, tx, ty, thornsTilesIndex)) {
-            /*const behavior = this.area.behaviorGrid?.[ty]?.[tx];
-            // Don't grow thorns over pits/walls
-            if (!behavior?.solid && !behavior?.pit && !behavior?.pitMap) {
-                let topLayer: AreaLayer = this.area.layers[0];
-                for (const layer of this.area.layers) {
-                    if (layer.definition.drawPriority !== 'foreground') {
-                        topLayer = layer;
-                    } else {
-                        break;
-                    }
-                }
-                topLayer.tiles[ty][tx] = {
-                    ...allTiles[5],
-                    behaviors: {
-                        ...allTiles[5].behaviors,
-                    },
-                };
-                if (this.area.tilesDrawn[ty]?.[tx]) {
-                    this.area.tilesDrawn[ty][tx] = false;
-                }
-                this.area.checkToRedrawTiles = true;
-                resetTileBehavior(this.area, {x: tx, y: ty});*/
-                hitTargets(state, this.area, {
-                    damage: this.damage,
-                    hitbox: this,
-                    knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
-                    hitAllies: true,
-                });
-            }
+        // The effect starts dealing damage midway through the animation.
+        if (this.animationTime >= growingThornsAnimation.duration / 2) {
+            hitTargets(state, this.area, {
+                damage: this.damage,
+                hitbox: this,
+                knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
+                hitAllies: true,
+            });
+        }
+        // At the end of the animation, attempt to cover the ground with the matching thorns tile.
+        if (this.animationTime >= growingThornsAnimation.duration) {
+            coverTile(state, this.area, tx, ty, thornsTilesIndex);
             removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
-        // Animate a warning indicator on the ground.
-        context.save();
-            context.globalAlpha *= (0.5 + Math.min(0.3, 0.3 * this.animationTime / this.delay));
-            context.fillStyle = 'black';
-            const r = 4 + 8 * Math.min(1, 1.25 * this.animationTime / this.delay);
-            context.beginPath();
-            context.arc(this.x + this.w / 2, this.y + this.h / 2, r, 0, 2 * Math.PI);
-            context.fill();
-        context.restore();
+        const frame = getFrame(growingThornsAnimation, this.animationTime);
+        drawFrameAt(context, frame, this);
     }
 }

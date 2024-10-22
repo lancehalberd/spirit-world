@@ -699,16 +699,23 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
     }
 }
 
-export function coverTile(
-    this: void, state: GameState, area: AreaInstance, tx: number, ty: number, coverTile: number
-): boolean {
+export function canCoverTile(area: AreaInstance, tx: number, ty: number, coverTile: number): boolean {
+    const topLayer = getLayerToCover(area, tx, ty);
+    if (!topLayer) {
+        return false;
+    }
+    const currentIndex = topLayer.tiles[ty][tx]?.index || 0;
+    return currentIndex !== coverTile;
+}
+
+export function getLayerToCover(area: AreaInstance, tx: number, ty: number): AreaLayer|undefined {
     const behavior = area.behaviorGrid?.[ty]?.[tx];
     // For now solid tiles and pits cannot be covered
     if (behavior?.solid || behavior?.pit || behavior?.pitMap || behavior?.covered
         || behavior?.blocksStaff || behavior?.solidMap
         || behavior?.diagonalLedge
     ) {
-        return false;
+        return;
     }
     let topLayer: AreaLayer = area.layers[0];
     for (const layer of area.layers) {
@@ -716,6 +723,16 @@ export function coverTile(
             break;
         }
         topLayer = layer;
+    }
+    return topLayer;
+}
+
+export function coverTile(
+    this: void, state: GameState, area: AreaInstance, tx: number, ty: number, coverTile: number
+): boolean {
+    const topLayer = getLayerToCover(area, tx, ty);
+    if (!topLayer) {
+        return false;
     }
     let currentIndex = topLayer.tiles[ty][tx]?.index || 0;
     if (currentIndex === coverTile) {
