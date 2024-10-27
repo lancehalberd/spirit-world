@@ -3,7 +3,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { lootEffects } from 'app/content/lootEffects';
 import { editingState } from 'app/development/editingState';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, MAX_FLOAT_HEIGHT } from 'app/gameConstants';
 import { playSound } from 'app/utils/sounds';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitbox } from 'app/utils/animations';
@@ -192,7 +192,11 @@ export class LootObject implements ObjectInstance {
                 return;
             }
         }
-        if (this.area === state.hero.area && state.hero.overlaps(this)) {
+        if (this.area === state.hero.area
+            && state.hero.overlaps(this)
+            && state.hero.action !== 'jumpingDown'
+            && state.hero.z <= MAX_FLOAT_HEIGHT
+        ) {
             removeObjectFromArea(state, this);
             if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
