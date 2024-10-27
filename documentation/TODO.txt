@@ -77,8 +77,11 @@ Current tasks:
     - Missing shadow next to key block in forge
     - Snake is firing up a ledge when melting a floor block.
     - Flame snake gets stuck on lava
+    - Ice covers under bushes and then under cut bushses, seems wrong.
     - canCoverTile should check if an object is covering the ground and return false
         - growing thorns effect should count as covering the ground (but be ignored by its own check).
+    - hint tells me to get item in spirit world when only item left is money I have checked in the shop.
+        = let's make sure shop items are counting as peaked.
 
     - Add new graphics
         - Add fog effect to the new forest zone.

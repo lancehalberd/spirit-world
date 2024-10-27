@@ -114,10 +114,12 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'walking':
             if (isHeroFloating(state, hero)) {
                 animations =  heroUnderwaterAnimations.idle;
-            } else  if (isHeroSinking(state, hero)) {
+            } else if (isHeroSinking(state, hero)) {
                 animations =  heroUnderwaterAnimations.idle;
             } else if (hero.swimming) {
                 animations = heroSwimAnimations.move;
+            } else if (hero.isRunning && hero.magic > 0) {
+                animations = hero.wading ? heroShallowAnimations.run : heroAnimations.run;
             } else {
                 animations = hero.wading ? heroShallowAnimations.move : heroAnimations.move;
             }

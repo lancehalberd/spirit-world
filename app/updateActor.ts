@@ -163,7 +163,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.frozenDuration <= 0) {
         hero.animationTime += FRAME_LENGTH;
         if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
-            hero.animationTime += FRAME_LENGTH / 2;
+            //hero.animationTime += FRAME_LENGTH / 2;
         }
     }
     // Burns end immediately dealing no damage to swimming targets.
@@ -332,7 +332,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen = Math.max(1, state.hero.actualMagicRegen);
         }
     }
-    const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
+    const isTryingToRun = state.hero.action === 'walking' && state.hero.isRunning;
+    const isActuallyRunning = isTryingToRun && state.hero.magic > 0;
     const preventCooldownRegeneration = isInvisible
         || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
         || (!state.hero.savedData.passiveTools.phoenixCrown && hero.burnDuration > 0);
@@ -357,8 +358,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     } else if (state.hero.actualMagicRegen < 0) {
         // Magic is being drained for some reason
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
-    } else {
-        // Normal regeneration rate.
+    } else if (!isTryingToRun) {
+        // Normal regeneration rate, this doesn't apply when the hero is trying to run.
         if (state.hero.magicRegenCooldown <= 0) {
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
