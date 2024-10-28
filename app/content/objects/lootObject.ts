@@ -167,6 +167,20 @@ export class LootObject implements ObjectInstance {
         }
         return false;
     }
+    checkToMarkAsPeeked(state: GameState) {
+        if (this.isVisibleToPlayer(state)) {
+            // Mark any loot object as peeked if it has been seen by the player.
+            // The randomizer hint system can use this to avoid giving bad hints to the player.
+            state.savedState.objectFlags[this.definition.id + '-peeked'] = true;
+            // Mark empty loot as gone when it is peeked so it will automatically advance
+            // the check counter in randomizer when peeked.
+            if (this.definition.lootType === 'empty') {
+                state.savedState.objectFlags[this.definition.id] = true;
+                this.status = 'gone';
+                return;
+            }
+        }
+    }
     update(state: GameState) {
         if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
@@ -180,18 +194,7 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
-        if (this.isVisibleToPlayer(state)) {
-            // Mark any loot object as peeked if it has been seen by the player.
-            // The randomizer hint system can use this to avoid giving bad hints to the player.
-            state.savedState.objectFlags[this.definition.id + '-peeked'] = true;
-            // Mark empty loot as gone when it is peeked so it will automatically advance
-            // the check counter in randomizer when peeked.
-            if (this.definition.lootType === 'empty') {
-                state.savedState.objectFlags[this.definition.id] = true;
-                this.status = 'gone';
-                return;
-            }
-        }
+        this.checkToMarkAsPeeked(state);
         if (this.area === state.hero.area
             && state.hero.overlaps(this)
             && state.hero.action !== 'jumpingDown'
@@ -559,6 +562,7 @@ export class ShopObject extends LootObject implements ObjectInstance {
             this.status = 'gone';
             return;
         }
+        this.checkToMarkAsPeeked(state);
     }
     render(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'

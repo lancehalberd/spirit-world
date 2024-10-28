@@ -684,7 +684,7 @@ export function getRandomizerHint(state: GameState): string {
             if (state.savedState.objectFlags[check.lootObject.id]) {
                 continue;
             }
-            console.log(check.location.logicalZoneKey, check.lootObject.id);
+            // console.log(check.location.logicalZoneKey, check.lootObject.id);
             return `There is still something ${getRandomizerZoneDescription(logicalZoneKey)}.`;
         } else {
             const {dialogueKey, optionKey} = check;

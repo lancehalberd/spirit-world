@@ -68,9 +68,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - hint tells me to get item in spirit world when only item left is money I have checked in the shop.
-        - let's make sure shop items are counting as peaked.
-    - Ice covers under bushes and then under cut bushses, seems wrong.
+    - Ice covers under bushes and then under cut bushes, seems wrong.
     - Exit from peach cave water doesn't render frozen correctly.
     - Bug: Guardian projection briefly appeared and died after defeating the boss.
     - Bug: Golem boss stopped moving when hands were killed during enrage phase.
