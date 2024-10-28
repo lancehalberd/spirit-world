@@ -1,6 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { updateProjectileHeight } from 'app/movement/getLedgeDelta';
+import { getLedgeDelta, updateProjectileHeight } from 'app/movement/getLedgeDelta';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { removeEffectFromArea } from 'app/utils/effects';
@@ -153,6 +153,11 @@ export class Flame implements EffectInstance, Props {
         this.x += this.vx;
         this.y += this.vy;
         const anchorPoint = this.getAnchorPoint();
+        const ledgeDelta = getLedgeDelta(state, this.area, oldAnchorPoint, anchorPoint);
+        if (ledgeDelta > 0 && !this.isHigh) {
+            removeEffectFromArea(state, this);
+            return;
+        }
         this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, anchorPoint);
         this.z = Math.max(0, this.z + this.vz);
         if (this.ax) {

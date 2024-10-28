@@ -169,8 +169,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.healthBarColor = this.enemyDefinition.healthBarColor;
         this.enemyDefinition.initialize?.(state, this);
         this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
-        this.canSwim = this.enemyDefinition.canSwim;
-        this.canMoveInLava = this.enemyDefinition.canMoveInLava;
+        this.canSwim = this.enemyDefinition.canSwim || this.enemyDefinition.baseMovementProperties?.canSwim;
+        this.canMoveInLava = this.enemyDefinition.canMoveInLava || this.enemyDefinition.baseMovementProperties?.canMoveInLava;
     }
     getFrame(): Frame {
         const frame = getFrame(this.currentAnimation, this.animationTime);
