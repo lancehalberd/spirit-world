@@ -1,6 +1,7 @@
 import {
     hasBossWeapon, hasCatEyes,
-    hasClone, hasIronBoots, canRemoveLightStones, hasWeapon,
+    hasClone, hasFire, hasIronBoots, canRemoveLightStones, hasWeapon,
+    orLogic,
 } from 'app/content/logic';
 
 
@@ -73,8 +74,10 @@ export const peachCaveNodes: LogicNode[] = [
             { nodeId: 'peachCave:markerA', logic: hasClone },
             { nodeId: 'peachCaveWaterEntrance', logic: hasIronBoots },
         ],
-        entranceIds: ['peachCave:waterEntrance', 'peachCave:markerB'],
-        exits: [{ objectId: 'peachCave:waterEntrance' }],
+        entranceIds: ['peachCaveWaterEntrance', 'peachCave:markerB'],
+        exits: [
+            {objectId: 'peachCaveWaterEntrance', logic: orLogic({requiredFlags: ['frostBeast']}, hasFire)},
+        ],
     },
     {
         zoneId,

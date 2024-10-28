@@ -3441,7 +3441,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "cavern", targetZone: "peachCave", targetObjectId: "peachCave:waterEntrance", d: "up"},
+        {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "cavern", targetZone: "peachCave", targetObjectId: "peachCaveWaterEntrance", d: "up"},
         {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "cavern", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTempleUpperEntrance", x: 400, y: 256, type: "door", style: "stoneDownstairs", targetZone: "riverTemple", targetObjectId: "riverTempleUpperEntrance", d: "up"},
