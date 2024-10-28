@@ -27,7 +27,6 @@ Bugs:
 
 Graphics Work:
     High Priority Graphics:
-        Running animation for MC
         Summoner Statues for War Temple Boss
             The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
         Large Statues for Flame and Frost Beasts
@@ -78,8 +77,6 @@ Current tasks:
         - New Cliff graphics probably require reviewing most zones for tiles that need adjustments.
         - cocoon graphics
 
-    - Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
-
     - Update spirit sky
         - Figure out what to do about falling on top of brittle ground
             - Keep the player just north of the edge of the tile if the southern tile is not a pit.
@@ -104,6 +101,9 @@ Current tasks:
     - Make ledge styles clearer
         - Jump ledges should look flatter
         - Blocked ledges should look more like walls.
+
+    - BLocked: Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
+        - It is unclear what to do in the case when the unmaksed behavior can be frozen by enemy attacks but not by hero attacks.
 
     - Fix you can wrap around the edges of the sky using cloud sommersault from the tower platform.
 
