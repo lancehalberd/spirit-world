@@ -250,6 +250,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         if (hit.ignoreTargets?.has(object)) {
             continue;
         }
+        // Ground hits don't apply to anything with a positve z value.
+        if (hit.isGroundHit && object.z > 0) {
+            continue;
+        }
         // If the hit specifies a z range, skip objects outside of the range.
         if (hit.zRange) {
             const z = object.z || 0;

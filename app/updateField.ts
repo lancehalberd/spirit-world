@@ -193,6 +193,10 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         if (isScreenTransitioning && !effect.updateDuringTransition) {
             continue;
         }
+        // Don't update any effects that have been removed from the area.
+        if (!effect.area) {
+            continue;
+        }
         // Time passes slowly for everything but the astral projection while meditating and things it is
         // or has recently interacted with.
         if (skipFrame
