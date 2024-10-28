@@ -405,6 +405,62 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
             }
         }
+
+        // Check if the hit destroys part of the tile:
+        // This hit a tile that could be cut so we ignore
+        if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
+            // We need to find the specific cuttable layers that can be destroyed.
+            for (const layer of area.layers) {
+                const tile = layer.tiles[target.y][target.x];
+                if (tile?.behaviors?.cuttable <= hit.damage) {
+                    destroyTile(state, area, {...target, layerKey: layer.key});
+                }
+            }
+            combinedResult.hit = true;
+            continue;
+        }
+        if (behavior?.pickupWeight <= hit.crushingPower) {
+            // We need to find the specific liftable layers that can be destroyed.
+            for (const layer of area.layers) {
+                const tile = layer.tiles[target.y][target.x];
+                if (tile?.behaviors?.pickupWeight <= hit.crushingPower) {
+                    destroyTile(state, area, {...target, layerKey: layer.key});
+                }
+            }
+            combinedResult.hit = true;
+            continue;
+        }
+        if (
+            (behavior?.cuttable > hit.damage || behavior?.solid)
+            && (!behavior?.low || hit.cutsGround)
+            //&& (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
+        ) {
+            combinedResult.hit = true;
+            combinedResult.pierced = false;
+            combinedResult.stopped = true;
+            if (behavior?.cuttable > hit.damage) {
+                combinedResult.blocked = true;
+            }
+        } else if (!combinedResult.stopped && hit.hitbox && behavior?.solidMap && (!behavior?.low || hit.cutsGround)) {
+            const checkPoints = [
+                {x: hit.hitbox.x, y: hit.hitbox.y}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y},
+                {x: hit.hitbox.x, y: hit.hitbox.y + hit.hitbox.h}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y + hit.hitbox.h},
+            ];
+            for (const {x, y} of checkPoints) {
+                const sx = (x - target.x * 16) | 0, sy = (y - target.y * 16) | 0;
+                if (sx < 0 || sx > 15 || sy < 0 || sy >= 15) {
+                    continue;
+                }
+                if (behavior.solidMap[sy] >> (15 - sx) & 1) {
+                    combinedResult.hit = true;
+                    combinedResult.pierced = false;
+                    combinedResult.stopped = true;
+                    break;
+                }
+            }
+        }
+
+        // Check if the hit applies an elemental effect to the tile.
         if (behavior?.elementOffsets?.[hit.element]) {
             for (const layer of area.layers) {
                 const offset = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementOffsets?.[hit.element];
@@ -512,58 +568,6 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         // Determine if this hit a solid wall that would stop a projectile:
         //const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
 
-        // This hit a tile that could be cut so we ignore
-        if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
-            // We need to find the specific cuttable layers that can be destroyed.
-            for (const layer of area.layers) {
-                const tile = layer.tiles[target.y][target.x];
-                if (tile?.behaviors?.cuttable <= hit.damage) {
-                    destroyTile(state, area, {...target, layerKey: layer.key});
-                }
-            }
-            combinedResult.hit = true;
-            continue;
-        }
-        if (behavior?.pickupWeight <= hit.crushingPower) {
-            // We need to find the specific liftable layers that can be destroyed.
-            for (const layer of area.layers) {
-                const tile = layer.tiles[target.y][target.x];
-                if (tile?.behaviors?.pickupWeight <= hit.crushingPower) {
-                    destroyTile(state, area, {...target, layerKey: layer.key});
-                }
-            }
-            combinedResult.hit = true;
-            continue;
-        }
-        if (
-            (behavior?.cuttable > hit.damage || behavior?.solid)
-            && (!behavior?.low || hit.cutsGround)
-            //&& (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
-        ) {
-            combinedResult.hit = true;
-            combinedResult.pierced = false;
-            combinedResult.stopped = true;
-            if (behavior?.cuttable > hit.damage) {
-                combinedResult.blocked = true;
-            }
-        } else if (!combinedResult.stopped && hit.hitbox && behavior?.solidMap && (!behavior?.low || hit.cutsGround)) {
-            const checkPoints = [
-                {x: hit.hitbox.x, y: hit.hitbox.y}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y},
-                {x: hit.hitbox.x, y: hit.hitbox.y + hit.hitbox.h}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y + hit.hitbox.h},
-            ];
-            for (const {x, y} of checkPoints) {
-                const sx = (x - target.x * 16) | 0, sy = (y - target.y * 16) | 0;
-                if (sx < 0 || sx > 15 || sy < 0 || sy >= 15) {
-                    continue;
-                }
-                if (behavior.solidMap[sy] >> (15 - sx) & 1) {
-                    combinedResult.hit = true;
-                    combinedResult.pierced = false;
-                    combinedResult.stopped = true;
-                    break;
-                }
-            }
-        }
     }
     return combinedResult;
 }

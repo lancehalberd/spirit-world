@@ -55,7 +55,6 @@ Graphics Work:
             Smooth crystal walls(Sky Palace)
                 +Green variant(Sky City+Jade Palace)
 
-
 Graphics to Implement:
     Add PS controller icons, detect xbox vs ps controller
         - check gamepad id, navigator.getGamepads()[0].id to see if it contains string '45e' (vendor id for microsoft/xbox) ormu 'xInput' or 'xBox' (xbox/microsoft) or '54c' (vendor id for PS/sony); issue with Safari: wireless PS4 controller called 'Wireless Controller Extended Gamepad'
@@ -67,7 +66,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Ice covers under bushes and then under cut bushes, seems wrong.
     - Exit from peach cave water doesn't render frozen correctly.
     - Bug: Guardian projection briefly appeared and died after defeating the boss.
     - Bug: Golem boss stopped moving when hands were killed during enrage phase.
