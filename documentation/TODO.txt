@@ -66,13 +66,14 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add new cliff graphics
+        - Create mask for northern cliff tiles
+
     - Exit from peach cave water doesn't render frozen correctly.
-    - Bug: Guardian projection briefly appeared and died after defeating the boss.
     - Bug: Golem boss stopped moving when hands were killed during enrage phase.
 
     - Add new graphics
         - Add fog effect to the new forest zone.
-        - New Cliff graphics probably require reviewing most zones for tiles that need adjustments.
         - cocoon graphics
 
     - Update spirit sky

@@ -104,7 +104,8 @@ export class PitEntrance implements ObjectInstance {
         return {pit: true};
     }
     isUnderObject(state: GameState): boolean {
-        if (!this.area || this.style !== 'singleTile') {
+        // Only single tile pits can be hidden under a tile currently.
+        if (!this.area || this.getHitbox().w > 16) {
             return false;
         }
         const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});

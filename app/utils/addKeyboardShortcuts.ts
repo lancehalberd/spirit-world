@@ -68,16 +68,16 @@ export function addKeyboardShortcuts() {
         if (keyCode === KEY.R && isShiftDown) {
             // Reset the entire zone if shift is down.
             const state = getState();
+            // Reset all zone flags.
+            state.savedState.zoneFlags = {};
             for (const floor of state.zone.floors) {
                 for (const grid of [floor.grid, floor.spiritGrid]) {
                     for (const row of grid) {
                         for (const areaDefinition of row) {
                             for (const object of areaDefinition?.objects ?? []) {
                                 delete state.savedState.objectFlags[object.id];
-                                delete state.savedState.zoneFlags[object.id];
                                 for (const suffix of ['melted', 'position']) {
                                     delete state.savedState.objectFlags[object.id + '-' + suffix];
-                                    delete state.savedState.zoneFlags[object.id + '-' + suffix];
                                 }
                             }
                         }

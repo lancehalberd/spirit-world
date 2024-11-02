@@ -212,8 +212,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "hiddenEnemy", id: "", x: 248, y: 272, targetObjectId: "tombTeleporter", type: "teleporter"},
-        {status: "normal", id: "cocoonBossProjection", logicKey: "cocoonBossStarted", x: 380, y: 112, type: "enemy", enemyType: "guardianProjection", d: "down", params: {}, saveStatus: "never"},
+        {status: "normal", id: "cocoonBossEndTeleporter", x: 248, y: 272, targetObjectId: "tombTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "cocoonBoss"},
         {status: "normal", id: "", linked: true, x: 128, y: 128, type: "rollingBall", spirit: false},
         {status: "normal", id: "", x: 368, y: 128, type: "rollingBall", spirit: false},
         {status: "normal", id: "teleportTarget", x: 120, y: 376, type: "marker"},

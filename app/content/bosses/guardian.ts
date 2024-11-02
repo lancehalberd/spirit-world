@@ -7,6 +7,7 @@ import { throwMineAtLocation } from 'app/content/effects/landMine';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { Enemy } from 'app/content/enemy';
 import { Indicator } from 'app/content/objects/indicator';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
@@ -160,7 +161,7 @@ enemyDefinitions.guardianProjection = {
     acceleration: 0.3, speed: 1.5, isImmortal: true,
     // This should match the spirit energy fill color.
     healthBarColor: '#6BD657', showHealthBar: true,
-    flying: true,
+    floating: true,
     params: {
     },
     onHit(this: void, state: GameState, enemy: Enemy<ProjectionParams>, hit: HitProperties): HitResult {
@@ -255,12 +256,25 @@ function getGuardian(projection: Enemy<ProjectionParams>): Enemy<GuardianParams>
     );
 }
 
-function getProjection(guardian: Enemy<GuardianParams>): Enemy<ProjectionParams> {
-    return guardian.area.alternateArea.enemies.find(o =>
+function getOrCreateProjection(state: GameState, guardian: Enemy<GuardianParams>): Enemy<ProjectionParams> {
+    let projection: Enemy<ProjectionParams> = guardian.area.alternateArea.enemies.find(o =>
         o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
     ) || guardian.area.enemies.find(o =>
         o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
     );
+    if (!projection) {
+        projection = new Enemy(state, {
+            type: 'enemy',
+            id: 'vanaraGuardianProjection',
+            status: 'normal',
+            saveStatus: 'never',
+            enemyType: 'guardianProjection',
+            x: guardian.x,
+            y: guardian.y,
+        });
+        addObjectToArea(state, guardian.area.alternateArea, projection);
+    }
+    return projection;
 }
 
 function staggerGuardian(state: GameState, enemy: Enemy<GuardianParams>): void {
@@ -374,11 +388,7 @@ function cancelBlastAttacks(state: GameState, enemy: Enemy<ProjectionParams>): v
 }
 
 function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
-    if (state.hero.area !== enemy.area) {
-        enemy.healthBarTime = 0;
-        enemy.life = 0;
-        return;
-    }
+    enemy.z = 6;
     const guardian = getGuardian(enemy);
     // The projection is defeated when the guardian is defeated.
     if (!guardian || guardian.status === 'gone' || guardian.isDefeated) {
@@ -697,10 +707,10 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    const projection = getProjection(enemy);
     // Teleport away from the current location as soon as iframes run out.
     // We don't do this immediately so the player can see the guardian for a bit after they are damaged.
     if (enemy.mode === 'recoverFromStaggered') {
+        const projection = getOrCreateProjection(state, enemy);
         enemy.changeToAnimation('idle');
         if (enemy.enemyInvulnerableFrames <= 0) {
             enemy.setMode('normal');
@@ -720,6 +730,7 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
         enemy.healthBarTime = 0;
         return;
     }
+    const projection = getOrCreateProjection(state, enemy);
     if (!enemy.params.lastDamaged) {
         enemy.params.lastDamaged = state.fieldTime;
     }
