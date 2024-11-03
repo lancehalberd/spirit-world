@@ -62,9 +62,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || (hero.action === 'attack' && !canThrowSecondChakram)
         || hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || isClimbing;
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
-    const canAttack = canCharge && hero.savedData.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
+    const canRun = canCharge && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
+    const canAttack = canRun && hero.savedData.weapon > 0;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
-    hero.isRunning = canAttack && isPassiveButtonDown;
+    hero.isRunning = canRun && isPassiveButtonDown;
 
     let dx = 0, dy = 0;
     let movementSpeed = 2;
