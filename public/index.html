@@ -68,6 +68,7 @@
 <div style="display: flex;flex-direction: column;justify-content: space-around;height: 100%;">
 <div class="js-mainGame mainGame" style="transform: scale(4);">
     <script>
+        window.clientVersion = '0.4.51';
         window.version = '0.4.50';
         function resizeGame() {
             // This includes 1px padding for the border.
@@ -83,7 +84,7 @@
             }
         }, 200);
         const mainScript = document.createElement('script');
-        mainScript.src = `client.js?v=${version}`;
+        mainScript.src = `client.js?v=${clientVersion}`;
         document.body.append(mainScript);
         const mainStyles = document.createElement('link');
         mainStyles.type = 'text/css';
