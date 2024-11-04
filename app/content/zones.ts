@@ -46,7 +46,8 @@ export * from 'app/content/zones/tileMapping';
 // minimizer zones
 export * from 'app/content/zones/minimizer/light1';
 // title screen zone
-export * from 'app/content/zones/title'
+export * from 'app/content/zones/title';
+export * from 'app/content/zones/title-noBottomWall';
 // WIP zones
 export * from 'app/content/zones/dream';
 export * from 'app/content/zones/fertility';

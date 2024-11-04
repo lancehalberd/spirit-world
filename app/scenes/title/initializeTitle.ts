@@ -10,10 +10,15 @@ export function initializeTitle(state: GameState) {
     returnToSpawnLocation(state);
     state.camera = { x: 46, y: 230 };
 
-    state.hero.action = 'kneel';
+    state.hero.action = 'attack';
+    state.hero.animationTime = 180;
     const jadeChampion = findObjectInstanceById(state.hero.area, 'jadeChampion') as NPC;
-    jadeChampion.changeToAnimation('slash');
+    jadeChampion.changeToAnimation('thrust');
     jadeChampion.animationTime = 300;
+
+    // uncomment these lines to hide the characters from the title screen
+    // state.hero.x = -500;
+    // jadeChampion.x = -540;
 
     const titleTeleporter = findObjectInstanceById(state.hero.area, 'titleTeleporter') as Teleporter;
     titleTeleporter.actualRadius = 110;

@@ -162,20 +162,77 @@ Authors: Benjamin K. Smith (BenCreating), bluecarrot16, TheraHedwig, Evert, Muff
     - https://opengameart.org/content/lpc-relm-outfit-pieces-2-kimonos-2-sleeves-2-boots-tabi-socks
 */
 // Frames are Up/Left/Down/Right [0-3]Castx7, [4-7]Thrustx8 [8-11]Walkx9, [12-15]Slashx6, [16-19]Shootx13 [20]Deathx6
-const jadeChampionImage: string = 'gfx/npcs/jadeChampion.png';
+// const jadeChampionImage: string = 'gfx/npcs/jadeChampion.png';
+// const jadeChampionGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+// export const jadeChampionAnimations: ActorAnimations = {
+//     idle: {
+//         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8}),
+//         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9}),
+//         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10}),
+//         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11}),
+//     },
+//     move: {
+//         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 9}),
+//         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9, cols: 9}),
+//         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10, cols: 9}),
+//         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11, cols: 9}),
+//     },
+//     cast: {
+//         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 0, cols: 7}),
+//         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 1, cols: 7}),
+//         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 7}),
+//         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 7}),
+//     },
+//     bow: { // half of the cast animation, for praying, showing respect, thanking someone
+//         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 0, cols: 3, duration: 5}, { loop: false }),
+//         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 1, cols: 3, duration: 5}, { loop: false }),
+//         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
+//         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
+//     },
+//     slash: {
+//         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 12, cols: 6, duration: 5}),
+//         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 6, duration: 5}),
+//         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 14, cols: 6, duration: 5}),
+//         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 15, cols: 6, duration: 5}),
+//     },
+// };
+
+// for 36x36 frames are Up/Left/Down/Right [0-3]Castx7,  [4-7]WalkWeaponx9, [8]DeathWeaponx10, [9-12]Walkx9, [13]Deathx6
+const jadeChampionImage: string = 'gfx/npcs/jadeChampionSwordAttack-36x36-28pxnpc-Sheet.png';
 const jadeChampionGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+// for 108x108 frames for xtra large motions Up/Left/Down/Right [0-3]ThrustWeaponx8
+const jadeChampionLargeImage: string = 'gfx/npcs/jadeChampion-swordThrust-108x108-28pxnpc-Sheet.png';
+const jadeChampionLargeGeometry: FrameDimensions = {w: 108, h: 108, content: {x: 46, y: 56, w: 16, h: 16}};
 export const jadeChampionAnimations: ActorAnimations = {
     idle: {
-        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8}),
-        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9}),
-        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10}),
-        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11}),
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 12}),
     },
     move: {
-        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 9}),
-        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9, cols: 9}),
-        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10, cols: 9}),
-        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11, cols: 9}),
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9, cols: 9}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10, cols: 9}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11, cols: 9}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 12, cols: 9}),
+    },
+    moveSword: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 4, cols: 9}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 5, cols: 9}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 6, cols: 9}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 7, cols: 9}),
+    },
+    death: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 10, duration: 5}, { loop: false }),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 10, duration: 5}, { loop: false }),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 10, duration: 5}, { loop: false }),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 10, duration: 5}, { loop: false }),
+    },
+    deathSword: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 10, duration: 5}, { loop: false }),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 10, duration: 5}, { loop: false }),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 10, duration: 5}, { loop: false }),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 8, cols: 10, duration: 5}, { loop: false }),
     },
     cast: {
         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 0, cols: 7}),
@@ -189,11 +246,11 @@ export const jadeChampionAnimations: ActorAnimations = {
         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 2, cols: 3, duration: 5}, { loop: false }),
         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
     },
-    slash: {
-        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 12, cols: 6, duration: 5}),
-        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 13, cols: 6, duration: 5}),
-        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 14, cols: 6, duration: 5}),
-        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 15, cols: 6, duration: 5}),
+    thrust: {
+        up: createAnimation(jadeChampionLargeImage, jadeChampionLargeGeometry, {y: 0, cols: 8, duration: 5}),
+        left: createAnimation(jadeChampionLargeImage, jadeChampionLargeGeometry, {y: 1, cols: 8, duration: 5}),
+        down: createAnimation(jadeChampionLargeImage, jadeChampionLargeGeometry, {y: 2, cols: 8, duration: 5}),
+        right: createAnimation(jadeChampionLargeImage, jadeChampionLargeGeometry, {y: 3, cols: 8, duration: 5}),
     },
 };
 
