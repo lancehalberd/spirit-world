@@ -21,22 +21,8 @@ export function updateSettings(state: GameState) {
     }
     if (wasConfirmKeyPressed(state)) {
         playSound('menuTick');
-        console.log({selectedOption});
         switch (selectedOption) {
-        case 'VOLUME OFF':
-            console.log('volume off');
-            break;
-        case 'VOLUME LOW':
-            console.log('volume low');
-            break;
-        case 'VOLUME MED':
-            console.log('volume med');
-            break;
-        case 'VOLUME HI':
-            console.log('volume hi');
-            break;
         case 'VIEW CONTROLS':
-            console.log('view controls');
             toggleShowControls(state);
             break;
         case 'RESUME':
