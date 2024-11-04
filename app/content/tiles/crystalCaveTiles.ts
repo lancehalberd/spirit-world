@@ -170,6 +170,13 @@ const crystalCaveFloor: TileSource = {
         [12, 5], [13, 5], [14, 5],
     ],
 };
+export const crystalTransparentFloor: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 208, y: 96, w: 16, h: 16}),
+    behaviors: {
+        'all': { defaultLayer: 'field', underTile: 0, isBrittleGround: true, isGround: true},
+    },
+};
 const crystalCaveFloorEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),

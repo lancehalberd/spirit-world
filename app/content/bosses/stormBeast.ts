@@ -511,7 +511,7 @@ const stormBeastChargedLightningAbility = {
 }
 
 enemyDefinitions.stormBeast = {
-    animations: stormBeastAnimations, life: 90, scale: 1, update: updateStormBeast, flying: true,
+    animations: stormBeastAnimations, life: 90, scale: 1, flying: true,
     aggroRadius: 2000,
     abilities: [sparkAbility, stormBeastLightningAbility, stormBeastChargedLightningAbility],
     acceleration: 0.3, speed: 4,
@@ -522,11 +522,9 @@ enemyDefinitions.stormBeast = {
     params: {
         enrageLevel: 0,
     },
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        if (enemy.currentAnimationKey === 'ball') {
-            return {};
-        }
-        return enemy.defaultOnHit(state, hit);
+    update: updateStormBeast,
+    afterUpdate(state: GameState, enemy: Enemy) {
+        enemy.isInvulnerable = enemy.currentAnimationKey === 'ball';
     },
     renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         if (enemy.mode === 'hidden') {

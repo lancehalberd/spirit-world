@@ -3,7 +3,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { lootEffects } from 'app/content/lootEffects';
 import { editingState } from 'app/development/editingState';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, MAX_FLOAT_HEIGHT } from 'app/gameConstants';
 import { playSound } from 'app/utils/sounds';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitbox } from 'app/utils/animations';
@@ -167,6 +167,20 @@ export class LootObject implements ObjectInstance {
         }
         return false;
     }
+    checkToMarkAsPeeked(state: GameState) {
+        if (this.isVisibleToPlayer(state)) {
+            // Mark any loot object as peeked if it has been seen by the player.
+            // The randomizer hint system can use this to avoid giving bad hints to the player.
+            state.savedState.objectFlags[this.definition.id + '-peeked'] = true;
+            // Mark empty loot as gone when it is peeked so it will automatically advance
+            // the check counter in randomizer when peeked.
+            if (this.definition.lootType === 'empty') {
+                state.savedState.objectFlags[this.definition.id] = true;
+                this.status = 'gone';
+                return;
+            }
+        }
+    }
     update(state: GameState) {
         if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
@@ -180,19 +194,12 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
-        if (this.isVisibleToPlayer(state)) {
-            // Mark any loot object as peeked if it has been seen by the player.
-            // The randomizer hint system can use this to avoid giving bad hints to the player.
-            state.savedState.objectFlags[this.definition.id + '-peeked'] = true;
-            // Mark empty loot as gone when it is peeked so it will automatically advance
-            // the check counter in randomizer when peeked.
-            if (this.definition.lootType === 'empty') {
-                state.savedState.objectFlags[this.definition.id] = true;
-                this.status = 'gone';
-                return;
-            }
-        }
-        if (this.area === state.hero.area && state.hero.overlaps(this)) {
+        this.checkToMarkAsPeeked(state);
+        if (this.area === state.hero.area
+            && state.hero.overlaps(this)
+            && state.hero.action !== 'jumpingDown'
+            && state.hero.z <= MAX_FLOAT_HEIGHT
+        ) {
             removeObjectFromArea(state, this);
             if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
@@ -555,6 +562,7 @@ export class ShopObject extends LootObject implements ObjectInstance {
             this.status = 'gone';
             return;
         }
+        this.checkToMarkAsPeeked(state);
     }
     render(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'

@@ -380,8 +380,23 @@ const missions: Mission[] = [
                 {|}I can probably upgrade my equipment there.`;
         },
         isAvailable(state: GameState) {
-            return !!state.savedState.objectFlags.elementalBeastsEscaped
-                && !!state.hero.savedData.equipment.cloudBoots;
+            // Never show this hint before the beasts have escaped.
+            if (!state.savedState.objectFlags.elementalBeastsEscaped) {
+                return false;
+            }
+            return (
+                // The forge is easily reached by moving the Staff Tower to the mountain area.
+                state.hero.savedData.elements.lightning >= 1
+                // Otherwise we only give this hint if they have completed Waterfall Tower to reach the sky.
+                || (state.hero.savedData.activeTools.cloak >= 2
+                    && (
+                        // Freezing brittle tiles in the sky allows reaching the Forge area.
+                        state.hero.savedData.elements.ice >= 1
+                        // The Cloud Sommersault allows the player to move freely through the sky.
+                        || state.hero.savedData.passiveTools.roll >= 2
+                    )
+                )
+            );
         },
         isResolved(state: GameState) {
             return !!state.hero.savedData.passiveTools.goldMail;
@@ -393,13 +408,23 @@ const missions: Mission[] = [
             return `There is a useful treasure hidden in the Sky Palace, but I'll have to figure out how to get in.`;
         },
         isAvailable(state: GameState) {
-            return !!state.savedState.objectFlags.elementalBeastsEscaped
+            // Never show this hint before the beasts have escaped.
+            if (!state.savedState.objectFlags.elementalBeastsEscaped) {
+                return false;
+            }
+            // It is possible to reach and complete Sky Palace just using Clone, but we still don't give
+            // the hint in this case.
+            // Assume the player can reach the sky if they have completed Waterfall Tower or Staff Tower.
+            return (state.hero.savedData.activeTools.cloak >= 2 || state.hero.savedData.elements.lightning >= 1)
+                // The player will need cloud boots or ice to navigate the brittle floor in the sky.
+                && (state.hero.savedData.equipment.cloudBoots >= 1 || state.hero.savedData.elements.ice >= 1)
                 && (
-                    !!state.hero.savedData.passiveTools.lightningBlessing
-                    || state.hero.savedData.passiveTools.gloves >= 2
+                    // Any of these items can be used to get past the lightning barriers.
+                    state.hero.savedData.passiveTools.lightningBlessing >= 1
                     || state.hero.savedData.activeTools.cloak >= 2
-                    || state.hero.savedData.activeTools.clone >= 1
                     || state.hero.savedData.elements.lightning >= 1
+                    // The upgraded gloves allow entering through a secret passage.
+                    || state.hero.savedData.passiveTools.gloves >= 2
                 );
         },
         isResolved(state: GameState) {
@@ -416,7 +441,7 @@ const missions: Mission[] = [
             return !!state.savedState.objectFlags.elementalBeastsEscaped
                 && (
                     state.hero.savedData.elements.lightning >= 1
-                    || state.hero.savedData.elements.ice >= 1
+                    || (state.hero.savedData.elements.ice >= 1 && state.hero.savedData.passiveTools.waterBlessing >= 1)
                     || (state.hero.savedData.elements.fire >= 1 && state.hero.savedData.passiveTools.fireBlessing >= 1)
                 );
         },
@@ -659,7 +684,7 @@ export function getRandomizerHint(state: GameState): string {
             if (state.savedState.objectFlags[check.lootObject.id]) {
                 continue;
             }
-            console.log(check.location.logicalZoneKey, check.lootObject.id);
+            // console.log(check.location.logicalZoneKey, check.lootObject.id);
             return `There is still something ${getRandomizerZoneDescription(logicalZoneKey)}.`;
         } else {
             const {dialogueKey, optionKey} = check;

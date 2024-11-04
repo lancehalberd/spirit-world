@@ -1,8 +1,8 @@
 
 import {
-    andLogic, canUseTeleporters, orLogic, canHasTowerStaff, canTravelFarUnderWater,
+    andLogic, canUseTeleporters, orLogic, canHasTowerStaff,
     hasAstralProjection, hasBossWeapon,
-    hasIce, hasInvisibility, hasCloudBoots, canRemoveHeavyStones,
+    hasIce, hasInvisibility, hasIronBoots, hasCloudBoots, hasMitts,
     hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
 } from 'app/content/logic';
 
@@ -15,7 +15,7 @@ export const gauntletNodes: LogicNode[] = [
             { objectId: 'gauntletPeachPiece' },
         ],
         paths: [
-            {nodeId: 'gauntletWaterEntrance', logic: canTravelFarUnderWater},
+            {nodeId: 'gauntletWaterEntrance', logic: hasIronBoots},
         ],
     },
     {
@@ -26,7 +26,7 @@ export const gauntletNodes: LogicNode[] = [
             {nodeId: 'gauntletSpiritEntrance', logic: andLogic(canUseTeleporters, orLogic(hasClone, hasStaff))},
             // This door is locked in standard, the key is in the spirit world entrance.
             {nodeId: 'gauntletBigChest', doorId: 'gauntletFirstLock'},
-            {nodeId: 'gauntletWaterEntrance', logic: canTravelFarUnderWater},
+            {nodeId: 'gauntletWaterEntrance', logic: hasIronBoots},
         ],
         entranceIds: ['gauntletEntrance'],
         exits: [
@@ -42,7 +42,7 @@ export const gauntletNodes: LogicNode[] = [
         exits: [
             {
                 objectId: 'gauntletLeftStairs',
-                logic: orLogic(canRemoveHeavyStones, hasClone, hasIce)
+                logic: orLogic(hasMitts, hasClone, hasIce)
             },
             {
                 objectId: 'gauntletStairs',
@@ -101,14 +101,14 @@ export const gauntletNodes: LogicNode[] = [
         zoneId: 'gauntletWater',
         nodeId: 'gauntletWaterEntrance',
         paths: [
-            {nodeId: 'gauntletEntrance', logic: canTravelFarUnderWater},
-            {nodeId: 'gauntletSecretEntrance', logic: canTravelFarUnderWater},
+            {nodeId: 'gauntletEntrance', logic: hasIronBoots},
+            {nodeId: 'gauntletSecretEntrance', logic: hasIronBoots},
         ],
         entranceIds: [
             'gauntletWaterEntrance',
         ],
         exits: [
-            { objectId: 'gauntletWaterEntrance', logic: canTravelFarUnderWater },
+            { objectId: 'gauntletWaterEntrance', logic: hasIronBoots },
         ],
     },
     {

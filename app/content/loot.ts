@@ -4,8 +4,8 @@ import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireFrame } from 'app/utils/packedImages';
 
-const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
-    + '{|}Select a tool and press [B_TOOL] to assign it.';
+//const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
+//    + '{|}Select a tool and press [B_TOOL] to assign it.';
 
 const equipBootsMessage = '{|}Press [B_MENU] to open your menu.'
     + '{|}Select boots and press [B_WEAPON] to equip them.'
@@ -16,7 +16,7 @@ function getEquipElementMessage(state: GameState) {
         return '{|}Press [B_MENU] to open your menu.'
             + '{|}Select an element and press [B_WEAPON] to equip it.'
             + '{|}Press [B_WEAPON] again to unequip the element.'
-            + '{|}The equipped element will be applied any time you charge an attack.';
+            + '{|}The equipped element will be applied to your charged attacks and certain skills.';
     }
     return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.';
 }
@@ -148,14 +148,14 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'teleportation':
             return `You learned the ${lootName} Techique!`;
         case 'clone':
-            return `You learned the ${lootName} Techique!` + equipToolMessage;
+            return `You learned the ${lootName} Techique!`;
         // obtained tools
         case 'bow':
         case 'cloak':
-            return `You have obtained the ${lootName}!` + equipToolMessage;
+            return `You have obtained the ${lootName}!`;
         case 'staff':
             if (!state.savedState.objectFlags.readTowerStaffMessage) {
-                return `You have obtained the ${lootName}!` + equipToolMessage;
+                return `You have obtained the ${lootName}!`;
             } else {
                 return `You have obtained the ${lootName}!`;
             }

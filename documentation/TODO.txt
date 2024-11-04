@@ -16,6 +16,8 @@ Bugs:
             - We should probably just avoid allowing objects to be next to vertical ledges to prevent this.
 
     Cannot reproduce:
+        - PS5 controller some buttons don't work correctly.
+            - Works fine when testing on mac plugged in, need to test other configurations.
         - Fix bug: possible to defeat frost beast without getting reward somehow
             - Jun did this by firing fire arrows from the bottom of the screen.
                 - The door opened but he didn't get the reward, and the boss respawned on returning.
@@ -25,9 +27,10 @@ Bugs:
 
 Graphics Work:
     High Priority Graphics:
-        Ent Enemy
-            Growing Thorns attack
-            Shooting spikes attack (puff up and "explode" a ring or arc of thorns)
+        Summoner Statues for War Temple Boss
+            The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
+        Large Statues for Flame and Frost Beasts
+
 
     Create icons for new items:
         Magic Beans
@@ -42,21 +45,19 @@ Graphics Work:
 
     Large objects/structures
         World tree exterior B2, B1, ground and sky, possibly vertical exterior
-        Elemental statues
 
     Boss graphics:
-        Summoner Statues for War Temple Boss
-            The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
 
     Open ended tasks
         New tile sets
             Vanara Ship(Cocoon, Helix + World Tree Variants) Material+Spirit
             Research Lab(Fertility Temple + Underground Lab)
-
+            Smooth crystal walls(Sky Palace)
+                +Green variant(Sky City+Jade Palace)
 
 Graphics to Implement:
     Add PS controller icons, detect xbox vs ps controller
-        - check gamepad id, navigator.getGamepads()[0].id to see if it contains string '45e' (vendor id for microsoft/xbox) or 'xInput' or 'xBox' (xbox/microsoft) or '54c' (vendor id for PS/sony); issue with Safari: wireless PS4 controller called 'Wireless Controller Extended Gamepad'
+        - check gamepad id, navigator.getGamepads()[0].id to see if it contains string '45e' (vendor id for microsoft/xbox) ormu 'xInput' or 'xBox' (xbox/microsoft) or '54c' (vendor id for PS/sony); issue with Safari: wireless PS4 controller called 'Wireless Controller Extended Gamepad'
     Add slam effects for the staff.
     Sweat animation when pulling on something you cannot move.
     Add Item Get Frame gfx/wukongimportantitem.png 20x28
@@ -65,8 +66,48 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add SFX for insufficient spirit energy:
-        - For teleporting/roll/tools
+    - Add new cliff graphics
+        - Create mask for northern cliff tiles
+
+    - Exit from peach cave water doesn't render frozen correctly.
+    - Bug: Golem boss stopped moving when hands were killed during enrage phase.
+
+    - Add new graphics
+        - Add fog effect to the new forest zone.
+        - cocoon graphics
+
+    - Update spirit sky
+        - Only break brittle ground if the hero is not standing on any solid ground.
+        - Force player to fall on brittle ground if they roll over it wearing cloud boots.
+
+    - Staff should despawn if it is completely over pit tiles.
+
+    - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
+
+    - Brainstorm additional dialogue for characters:
+        - After the beasts escape/after the beasts are defeated.
+        - Holy City
+        - Grand Temple
+        - Waterfall Village
+        - Forest Village
+        - Jade City
+        - Helix
+
+    - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
+
+    - Make ledge styles clearer
+        - Jump ledges should look flatter
+        - Blocked ledges should look more like walls.
+
+    - BLocked: Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
+        - It is unclear what to do in the case when the unmaksed behavior can be frozen by enemy attacks but not by hero attacks.
+
+    - Fix you can wrap around the edges of the sky using cloud sommersault from the tower platform.
+
+    - Make bells make the tink/block sound if you hit them with anything but the staff bonk.
+
+    - colored lights from the current world should render under spirit sight, not over
+        - Check what colored lights look like in the other world too.
 
     - Add color to lights
         - flame wall should be red
@@ -75,8 +116,6 @@ Current tasks:
     - Quest marker for the Staff Tower isn't aligned correctly.
 
     - Preload music.
-
-    - Prevent on death effects from frozen enemies in most cases.
 
     - Add trap chests to the game, like the fire turret chest?
 
@@ -87,8 +126,6 @@ Current tasks:
     - Allow shooting through enemy flames to add flame to your attack
         - This will make fire enemies immune to bow/chakram attackss that pass through their flames.
             - Maybe change how immunities work for bow/chakram so they hit with the element first and then just physical damage.
-
-    - Block the first teleportation skip in the Helix 3F material world so the player has to use the plant.
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
@@ -147,6 +184,9 @@ Current tasks:
         - Clone Explosion
         - Controller multiple clones
         - Clone throw
+
+    - Probably shouldn't be able to bounce onto trampoline after crossing up a ledge.
+        - On the other hand this isn't a very obvious problem and is kind of fun for people that find it.
 
     - Add a better indication for which clone(s)+staff(s) are controlled.
 
@@ -307,13 +347,6 @@ Current tasks:
 
     - Ice mines are not cleaned up when defeating Guardian in Cocoon.
         - Same for long lasting lightning attacks
-
-    - Low priority Staff Tower Exterior
-        - Cosmetic: shadow is hidden by tower balcony
-            - Possible fix: make hero a renderChild of the balcony when the hero is standing on it.
-                - This would require defining when the hero is standing on it and then applying the same behavior
-                  to any other objects that can be on the balcony and then sorting them internally.
-                - Seems too complicated maybe we should find a different solution.
 
     - Fix push/pull interactions with ledges.
         - Minor issues:

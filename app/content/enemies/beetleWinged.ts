@@ -3,7 +3,7 @@ import { Blast } from 'app/content/effects/blast';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { simpleLootTable } from 'app/content/lootTables';
-import { addEffectToArea } from 'app/utils/effects';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { scurryAndChase } from 'app/utils/enemies';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
@@ -32,6 +32,7 @@ const flameBarrierAbility: EnemyAbility<NearbyTargetType> = {
             radius: 32,
             source: enemy,
         });
+        enemy.params.effect = blast;
         addEffectToArea(state, enemy.area, blast);
     },
     cooldown: 1000,
@@ -115,6 +116,13 @@ const baseBeetleWingedDefinition: Partial<EnemyDefinition<any>> & { animations: 
             }
         }
         scurryAndChase(state, enemy);
+    },
+    // Remove the flame blast effect or other ongoing effects from the enemy when it is frozen.
+    onFreeze(state: GameState, enemy: Enemy) {
+        if (enemy.params.effect) {
+            removeEffectFromArea(state, enemy.params.effect);
+            delete enemy.params.effect;
+        }
     },
     renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
         enemy.defaultRenderPreview(context, target);

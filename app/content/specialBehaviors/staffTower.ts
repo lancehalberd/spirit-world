@@ -181,6 +181,15 @@ specialBehaviorsHash.towerExteriorTerminal = {
             dialogueHash.towerExteriorTerminal.mappedOptions.deploy = (state: GameState) => {
                 state.savedState.staffTowerLocation = terminalLocation;
                 state.hero.savedData.activeTools.staff &= ~2;
+                // Unequip the staff if the hero has no remaining staff.
+                if (!state.hero.savedData.activeTools.staff) {
+                    if (state.hero.savedData.leftTool === 'staff') {
+                        delete state.hero.savedData.leftTool;
+                    }
+                    if (state.hero.savedData.rightTool === 'staff') {
+                        delete state.hero.savedData.rightTool;
+                    }
+                }
                 refreshAreaLogic(state, state.hero.area, true);
                 saveGame(state);
                 for (const object of state.areaInstance.objects) {

@@ -6,6 +6,9 @@ import {
     everyObject, verifyNodeConnections
 } from 'app/randomizer/utils';
 
+// Warning: The terms entrance/exit don't seem to be used consistently in this file.
+// Going forward we will try to use "entrances" for ids like 'overworld:peachCaveEntrance' (id of the object on the overworld)
+// And "exits" for ids like 'peachCave:peachCaveEntrance' (id of the object in the peach cave.)
 
 const ignoredZones = [
     // These zones are part of the 'Holy Sanctum' and should not be randomized.
@@ -16,7 +19,7 @@ const ignoredZones = [
 
 const outsideZones = overworldKeys;
 
-
+// This stores a list of zone+object ids that should be ignored, (not target zone+object ids).
 const disabledDoors = [
     // Money maze isn't designed to allow entering from the exit, so just disable this door.
     'overworld:moneyMazeExit',
@@ -32,8 +35,9 @@ interface DoorLocation {
 
 // These groups of entrances are not reachable except from one of the other exits, so at least
 // one needs to be connected to a reachable entrance using a connected exit group.
-const unreachableSpiritEntranceGroups = [
-    ['caves:caves-ascentExitSpirit'],
+const unreachableSpiritExitGroups = [
+    // There is currently a ladder leading to this cave in the Spirit World.
+    //['caves:caves-ascentExitSpirit'],
     ['holyCityInterior:jadeCityMazeExit'],
     ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
 ];
@@ -80,9 +84,6 @@ const connectedExitGroups: ConnectedExitGroup[] = [
         spiritEntranceTargets: ['overworld:staffTowerSpiritEntrance', 'sky:staffTowerSpiritSkyEntrance'],
     },
     {
-        spiritEntranceTargets: ['overworld:caves-ascentEntranceSpirit', 'sky:caves-ascentExitSpirit'],
-    },
-    {
         spiritEntranceTargets: ['overworld:fertilityTempleSpiritEntrance', 'overworld:fertilityTempleExit'],
     },
     {
@@ -91,6 +92,11 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     {
         spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
     },
+    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
+    {
+        spiritEntranceTargets: ['overworld:caves-ascentEntranceSpirit'],
+        immutableEntranceTargets: ['sky:caves-ascentExitSpirit'],
+    },*/
     /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
     have support for a one way tunnel, so this cannot currently function as a connected exit group.
     {
@@ -234,12 +240,21 @@ export function randomizeEntrances(random: typeof SRandom) {
         return;
     }
 
+    // Collect a list of all unreachable spirit entrance targets so we can easily exclude them from invalid assignments.
+    const allUnreachableSpiritExits: string[] = [];
+    for (const unreachableExit of unreachableSpiritExitGroups) {
+        allUnreachableSpiritExits.push(...unreachableExit);
+    }
+    const forbiddenSpiritExitsKeysByEntranceKey: {[key: string]: string[]} = {};
+
     //console.log('EXIT ONLY ENTRANCE ASSIGNMENTS:');
     // Assign all unreachable entrances first to a random entrance with other connections.
-    for (const unreachableEntranceTargets of unreachableSpiritEntranceGroups) {
+    // Currently this is only done for the Spirit World as the only unreachable exit in the material world
+    // is the top of the money maze which has no checks or other entrances.
+    for (const unreachableExits of unreachableSpiritExitGroups) {
         // Choose one entrance in the group to assign as a forced connection through a reachable
         // exit.
-        const unreachableEntranceTarget = random.shuffle(unreachableEntranceTargets)[0];
+        const unreachableExit = random.shuffle(unreachableExits)[0];
         for (const exitGroup of random.shuffle(connectedExitGroups)) {
             const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
             const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
@@ -251,14 +266,24 @@ export function randomizeEntrances(random: typeof SRandom) {
             ) {
                 continue;
             }
-            const exitTarget = random.removeElement(exitGroup.spiritEntranceTargets);
-            assignEntranceExitPair(unreachableEntranceTarget, exitTarget);
+            const entrance = random.removeElement(exitGroup.spiritEntranceTargets);
+            assignEntranceExitPair(unreachableExit, entrance);
+            // If only spirit world exits remain, mark them all as forbidden to match with
+            // any other unreachable spirit entrange targets, otherwise this strategy may fail
+            // to actually connect this unreachable exit group to reachable areas.
+            // For example, it may pair the other end with another unreachable exit group or even to
+            // another door in the same unreachable exit group.
+            if (normalExits + immutableExits <= 0) {
+                for (const otherEntrance of exitGroup.spiritEntranceTargets) {
+                    forbiddenSpiritExitsKeysByEntranceKey[otherEntrance] = allUnreachableSpiritExits;
+                }
+            }
             break;
         }
     }
 
     //console.log('NORMAL LOOPABLE ENTRANCE ASSIGNMENTS:');
-    // TBD: Assign loopable entrances first to make sure the entire graph is connected.
+    // Assign loopable entrances first to make sure the entire graph is connected.
     for (const loopableEntrancePair of random.shuffle(normalLoopableEntrancePairs)) {
         const exit = random.element([...connectedNormalEntrances]);
         assignEntranceExitPair(loopableEntrancePair.outerTarget, exit);
@@ -367,6 +392,14 @@ export function randomizeEntrances(random: typeof SRandom) {
         }
     }
 
+    //console.log('RESTRICTED ASSIGNMENTS:');
+    // Make sure any spirit exits with entrance restrictions are assigned first to make sure
+    // an option that satisfies the restrictions will be available.
+    for (const spiritEntranceId of Object.keys(forbiddenSpiritExitsKeysByEntranceKey)) {
+        const badEntrances = forbiddenSpiritExitsKeysByEntranceKey[spiritEntranceId];
+        const spiritExitId = random.shuffle([...spiritExits]).filter(entrance => !badEntrances.includes(entrance))[0];
+        assignEntranceExitPair(spiritEntranceId, spiritExitId);
+    }
 
     //console.log('GENERAL ASSIGNMENTS:');
     for (const entrancePairing of [

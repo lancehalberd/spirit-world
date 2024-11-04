@@ -656,7 +656,8 @@ export function renderAreaObjectsBeforeHero(
                     backgroundObjects.push(object);
                 }
             }
-            if (drawPriority === 'sprites' && object.yDepth <= heroYDepth) {
+            // If the hero has background draw priority, nothing in the sprite layer is drawn before it.
+            if (backgroundDepth === undefined && drawPriority === 'sprites' && object.yDepth <= heroYDepth) {
                 if (object.area?.definition === area.definition && object.render) {
                     spriteObjects.push(object);
                 } else if (object.area?.definition !== area.definition && object.alternateRender) {
@@ -735,7 +736,8 @@ export function renderAreaObjectsAfterHero(
                 }
                 continue;
             }
-            if (drawPriority === 'sprites'  && (object.yDepth) > heroYDepth) {
+            // If the hero has background draw priority, everything in the sprite layer is drawn after it.
+            if (drawPriority === 'sprites' && (backgroundDepth !== undefined || (object.yDepth) > heroYDepth)) {
                 if (object.area?.definition === area.definition && object.render) {
                     spriteObjects.push(object);
                 } else if (object.area?.definition !== area.definition && object.alternateRender) {

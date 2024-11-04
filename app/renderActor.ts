@@ -114,10 +114,12 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'walking':
             if (isHeroFloating(state, hero)) {
                 animations =  heroUnderwaterAnimations.idle;
-            } else  if (isHeroSinking(state, hero)) {
+            } else if (isHeroSinking(state, hero)) {
                 animations =  heroUnderwaterAnimations.idle;
             } else if (hero.swimming) {
                 animations = heroSwimAnimations.move;
+            } else if (hero.isRunning && hero.magic > 0) {
+                animations = hero.wading ? heroShallowAnimations.run : heroAnimations.run;
             } else {
                 animations = hero.wading ? heroShallowAnimations.move : heroAnimations.move;
             }
@@ -304,6 +306,7 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
     context.restore();
 }
 
+const enemyShadowYScale = 0.5;
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
     const hitbox = enemy.getMovementHitbox();
     //context.fillStyle = 'red';
@@ -313,33 +316,35 @@ export function renderEnemyShadow(context: CanvasRenderingContext2D, state: Game
             context.fillStyle = 'black';
             const cx = hitbox.x + hitbox.w / 2;
             const cy = hitbox.y + hitbox.h - hitbox.w / 4;
-            const fullScale = 0.95;
+            const shadowRadius = enemy.enemyDefinition.shadowRadius ?? hitbox.w / 2;
+            const fullScale = 1;
+            context.translate(
+                cx + (enemy.enemyDefinition.shadowOffset?.x ?? 0),
+                cy + (enemy.enemyDefinition.shadowOffset?.y ?? 0)
+            );
+            context.scale(1, enemyShadowYScale);
             if (enemy.z === 0) {
                 context.globalAlpha *= 0.6;
-                context.translate(cx, cy);
-                context.scale(1, 0.5);
                 context.scale(fullScale, fullScale);
                 context.beginPath();
-                context.arc(0, 0, hitbox.w / 2, 0, Math.PI * 2);
+                context.arc(0, 0, shadowRadius, 0, Math.PI * 2);
                 context.fill();
             } else {
                 context.globalAlpha *= 0.35;
-                context.translate(cx, cy);
-                context.scale(1, 0.5);
-                const dw = Math.min(hitbox.w / 2, enemy.z / 6);
-                if (hitbox.w / 2 - dw > 0) {
+                const dw = Math.min(shadowRadius, enemy.z / 6);
+                if (shadowRadius - dw > 0) {
                     context.save();
                         const zAlpha = 0.96 ** (enemy.z / 2);
                         context.globalAlpha *= zAlpha;
                         context.beginPath();
-                        context.arc(0, 0, hitbox.w / 2 - dw, 0, Math.PI * 2);
+                        context.arc(0, 0, shadowRadius - dw, 0, Math.PI * 2);
                         context.fill();
                     context.restore();
                 }
                 const zAlpha = 0.9 ** (enemy.z / 2);
                 context.globalAlpha *= zAlpha;
                 context.beginPath();
-                context.arc(0, 0, hitbox.w / 2 + dw, 0, Math.PI * 2);
+                context.arc(0, 0, shadowRadius + dw, 0, Math.PI * 2);
                 context.fill();
             }
         context.restore();

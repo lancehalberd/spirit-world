@@ -66,19 +66,19 @@ export function isCheckTrash(state: GameState, check: LootWithLocation): boolean
         if (dungeonLoot.includes(check.lootObject.lootType)) {
             const dungeonInventory = state.savedState.dungeonInventories[logicalZoneKey];
             // Exception: Big key is required to reach the Cocoon from the Tomb.
-            if (logicalZoneKey === 'tomb' && !dungeonInventory.bigKey) {
+            if (logicalZoneKey === 'tomb' && !dungeonInventory?.bigKey) {
                 return false;
             }
             // Exception: Crater/Staff Tower/River Temple defeating the bosses unlocks progress
-            if (logicalZoneKey === 'crater' && dungeonInventory.map) {
+            if (logicalZoneKey === 'crater' && dungeonInventory?.map) {
                 // The map is the only trash dungeon item in the crater since all keys are logically necessary to beat the boss.
                 return false;
             }
             // Small keys may be required for reaching the exit or the boss. There is no Big Key in this dungeon.
-            if (logicalZoneKey === 'staffTower' && dungeonInventory.map) {
+            if (logicalZoneKey === 'staffTower' && dungeonInventory?.map) {
                 return false;
             }
-            if (logicalZoneKey === 'riverTemple' && !dungeonInventory.bigKey) {
+            if (logicalZoneKey === 'riverTemple' && !dungeonInventory?.bigKey) {
                 // The big key is the only required dungeon item to reach the boss.
                 return false;
             }

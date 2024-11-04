@@ -377,7 +377,10 @@ export class NPC implements Actor, ObjectInstance  {
         // Remove the grab action since the hero is talking to the NPC, not grabbing it.
         hero.action = null;
     }
-    changeToAnimation(type: string) {
+    changeToAnimation(type: string, d?: Direction) {
+        if (d) {
+            this.d = d;
+        }
         this.currentAnimationKey = type;
         const animationStyle = npcStyles[this.definition.style];
         const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;

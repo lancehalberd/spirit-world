@@ -4,6 +4,18 @@ import { playAreaSound } from 'app/musicController';
 import { directionMap, getDirection } from 'app/utils/direction';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
+import { canMoveDown } from 'app/movement/canMoveDown';
+import { canMoveLeft } from 'app/movement/canMoveLeft';
+import { canMoveRight } from 'app/movement/canMoveRight';
+import { canMoveUp } from 'app/movement/canMoveUp';
+
+export function canActorMove(state: GameState, actor: Actor, movementProperties: MovementProperties = {}): boolean {
+    const hitbox = actor.getMovementHitbox?.()  || actor.getHitbox();
+    return canMoveUp(state, actor.area, hitbox, movementProperties) === true
+        || canMoveDown(state, actor.area, hitbox, movementProperties) === true
+        || canMoveLeft(state, actor.area, hitbox, movementProperties) === true
+        || canMoveRight(state, actor.area, hitbox, movementProperties) === true;
+}
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties = {}): {mx: number, my: number} {
     let sx = dx;

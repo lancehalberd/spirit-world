@@ -219,6 +219,20 @@ dialogueHash.saveStatue = {
             ],
         },
         {
+            objectId: 'warPalaceSave',
+            text: [
+                {
+                    dialogueIndex: 167,
+                    dialogueType: 'hint',
+                    text: `
+                        Before the Vanara arrived, the Summoner's War God was
+                        the supreme ruler of both realms.
+                        {item:secondChance}
+                    `,
+                },
+            ],
+        },
+        {
             logicCheck: {
                 zones: ['tree'],
             },

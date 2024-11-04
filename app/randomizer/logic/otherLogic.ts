@@ -1,7 +1,7 @@
 import {
-    andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, hasIronBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
-    hasRangedPush, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasLongSomersault, hasStaff,
-    hasMediumRange, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
+    andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
+    hasRangedPush, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasIronBoots, hasLongSomersault, hasStaff,
+    hasMediumRange, hasWaterBlessing, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
 
@@ -167,6 +167,7 @@ export const waterfallCaveNodes: LogicNode[] = [
     {
         zoneId: 'waterfallCave',
         nodeId: 'waterfallCaveMain',
+        paths: [{nodeId: 'waterfallCavePool', logic: hasIronBoots}],
         entranceIds: ['waterfallCaveLeftMain', 'waterfallCaveRightMain'],
         exits: [{ objectId: 'waterfallCaveLeftMain' }, { objectId: 'waterfallCaveRightMain' }],
     },
@@ -176,12 +177,24 @@ export const waterfallCaveNodes: LogicNode[] = [
         checks: [{ objectId: 'waterfallCavePeachPiece' }],
         paths: [{ nodeId:'waterfallCaveEntrance' }],
         entranceIds: ['waterfallCaveMarker'],
-    }
+    },
+    // Underwater nodes
+    {
+        zoneId: 'waterfallCaveWater',
+        nodeId: 'waterfallCavePool',
+        checks: [
+            {objectId:'waterfallCaveWaterMoney', logic: andLogic(hasCatEyes, hasWaterBlessing)},
+            {objectId:'waterfallCaveWaterPeach', logic: andLogic(hasCatEyes, hasWaterBlessing)},
+        ],
+        paths: [{nodeId: 'waterfallCaveMain'}],
+        entranceIds: ['waterfallCaveWaterEntrance'],
+        exits: [{objectId: 'waterfallCaveWaterEntrance'}],
+    },
 ];
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
 const canAscendToCrater = orLogic(canRemoveHeavyStones, hasIce, hasInvisibility, {requiredFlags: ['flameBeast']});
-const canAscendToCraterSpirit = orLogic(hasInvisibility, hasFireBlessing, hasPhoenixCrown, {requiredFlags: ['flameBeast']});
+const canNavigateSpiritAscentCave = orLogic(hasInvisibility, hasFireBlessing, hasPhoenixCrown, {requiredFlags: ['flameBeast']});
 export const cavesNodes: LogicNode[] = [
     // This cave connects the NW corner of the overworld to the sky and is one way.
     // It is filled with lava while the fire beast is active.
@@ -223,11 +236,24 @@ export const cavesNodes: LogicNode[] = [
     },
     {
         zoneId: 'caves',
-        nodeId: 'ascentCavesSpirit',
-        entranceIds: ['caves-ascentEntranceSpirit', 'caves-ascentExitSpirit'],
+        nodeId: 'ascentCaveSpiritTop',
+        paths: [
+            {nodeId: 'ascentCaveSpiritBottom', logic: canNavigateSpiritAscentCave },
+        ],
+        checks: [
+            {objectId: 'caves-ascentSpiritPeachPiece', logic: canNavigateSpiritAscentCave},
+        ],
+        entranceIds: ['caves-ascentExitSpirit'],
         exits: [
-            { objectId: 'caves-ascentExitSpirit', logic:canAscendToCraterSpirit },
-            { objectId: 'caves-ascentEntranceSpirit'}
+            {objectId: 'caves-ascentExitSpirit'},
+        ],
+    },
+    {
+        zoneId: 'caves',
+        nodeId: 'ascentCaveSpiritBottom',
+        entranceIds: ['caves-ascentEntranceSpirit'],
+        exits: [
+            {objectId: 'caves-ascentEntranceSpirit'}
         ],
     },
 

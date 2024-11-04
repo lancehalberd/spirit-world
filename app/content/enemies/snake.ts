@@ -117,6 +117,8 @@ const baseSnakeDefinition: Partial<EnemyDefinition<any>> = {
     alwaysReset: true,
     flipRight: true,
     life: 3,
+    //shadowRadius: 8,
+    shadowOffset: {y: 2},
     update(state: GameState, enemy: Enemy): void {
         enemy.useRandomAbility(state);
         if (!enemy.activeAbility) {

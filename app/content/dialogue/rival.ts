@@ -90,6 +90,9 @@ dialogueHash.rival = {
             });
             wait(state, 500);
             if (state.savedState.objectFlags.helixRivalIntro || isRandomizer || state.savedState.objectFlags.skipRivalHelixStory) {
+                // In randomizer, set the helixRivalIntro to make sure the rival despawns from in front of the Tomb.
+                state.savedState.objectFlags.helixRivalIntro = true;
+                saveGame(state);
                 return '';
             }
             appendScript(state, `

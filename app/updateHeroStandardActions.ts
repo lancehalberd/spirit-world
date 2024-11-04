@@ -8,7 +8,7 @@ import { EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KE
 import { getActorTargets } from 'app/getActorTargets';
 import { playAreaSound } from 'app/musicController';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
+import { canActorMove, getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import {
     getCloneMovementDeltas,
     isGameKeyDown,
@@ -62,9 +62,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || (hero.action === 'attack' && !canThrowSecondChakram)
         || hero.z > Math.max(FALLING_HEIGHT, minZ + 2) || isClimbing;
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
-    const canAttack = canCharge && hero.savedData.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
+    const canRun = canCharge && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
+    const canAttack = canRun && hero.savedData.weapon > 0;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
-    hero.isRunning = canCharge && isPassiveButtonDown;
+    hero.isRunning = canRun && isPassiveButtonDown;
 
     let dx = 0, dy = 0;
     let movementSpeed = 2;
@@ -575,7 +576,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         const moveX = (Math.abs(hero.vx) >= 0.2 || dx * hero.vx > 0) ? hero.vx : 0;
         const moveY = (Math.abs(hero.vy) >= 0.2 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
-            const {mx, my} = moveActor(state, hero, moveX, moveY, {
+            const ox = hero.x, oy = hero.y;
+            const movementProperties = {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging && !isFloating && !isSinking
                     // You can only push if you are moving the direction you are trying to move.
                     // Neither dimension can be negative, and one dimension must be positive.
@@ -592,7 +594,29 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 actor: hero,
                 dx: moveX, dy: moveY,
                 canMoveIntoEntranceTiles: hero === state.hero && hero.action !== 'knocked' && hero?.action !== 'thrown',
-            });
+            }
+            const {mx, my} = moveActor(state, hero, moveX, moveY, movementProperties);
+            // Update whether the hero is stuck.
+            // Any time the hero moves to a new pixel, reset stuckFrames to 0.
+            if ((hero.x | 0) != (ox | 0) || (hero.y | 0) != (oy | 0)) {
+                hero.stuckFrames = 0;
+            } else if (!mx && !my && !canActorMove(state, hero, movementProperties)) {
+                // If the hero tried and failed to move this frame, increment stuck frames if they cannot move in any direction.
+                // If this accumulates to 1 second of being stuck, respawn them at their last known safe location.
+                hero.stuckFrames++;
+                if (hero.stuckFrames * FRAME_LENGTH >= 1000) {
+                    hero.stuckFrames = 0;
+                    hero.vx = 0;
+                    hero.vy = 0;
+                    hero.d = hero.safeD;
+                    hero.x = hero.safeX;
+                    hero.y = hero.safeY;
+                    hero.justRespawned = true;
+                    destroyClone(state, hero);
+                    hero.action = null;
+                    return;
+                }
+            }
             // console.log([...state.scriptEvents.activeEvents], [...state.scriptEvents.queue]);
             if (hero.action !== 'knocked' && hero.action !== 'knockedHard') {
                 // This works okay, but sometimes causes the hero to press up against diagonal walls when not pressing diagonally.
@@ -638,9 +662,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = null;
             }
         }
-        if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+        if (state.hero.savedData.passiveTools.teleportation &&
+            (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL))
+        ) {
             const preventTeleportation = hero.grabObject || hero.grabTile;
-            if (!preventTeleportation && state.hero.savedData.passiveTools.teleportation && state.hero.magic > 0
+            if (!preventTeleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.spendMagic(10);
@@ -649,6 +675,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 // match the projection to the hero eyes.
                 hero.d = 'down';
                 return;
+            } else {
+                // This needs to be played in the area with the main hero, not the astral projection.
+                playAreaSound(state, state.hero.area, 'error');
             }
         }
     }
@@ -830,31 +859,34 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         && !isActionBlocked
         && !hero.isAstralProjection
         && hero.savedData.passiveTools.roll > 0
-        && state.hero.magic > 0
         && hero.rollCooldown <= 0
     ) {
-        // Normal roll
-        hero.chargeTime = 0;
-        if (hero.heldChakram) {
-            removeEffectFromArea(state, hero.heldChakram);
-            delete hero.heldChakram;
+        if (state.hero.magic > 0) {
+            // Normal roll
+            hero.chargeTime = 0;
+            if (hero.heldChakram) {
+                removeEffectFromArea(state, hero.heldChakram);
+                delete hero.heldChakram;
+            }
+            hero.chargingLeftTool = hero.chargingRightTool = false;
+            state.hero.spendMagic(5);
+            hero.action = 'roll';
+            hero.isAirborn = true;
+            hero.actionFrame = 0;
+            hero.animationTime = 0;
+            // Rolling decreases duration of burns by 1 second.
+            if (hero.burnDuration > 0) {
+                hero.burnDuration -= 1000;
+            }
+            const direction = getDirection(
+                (dx || dy) ? dx : directionMap[hero.d][0],
+                (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+            hero.actionDx = directionMap[direction][0];
+            hero.actionDy = directionMap[direction][1];
+            return;
+        } else {
+            playAreaSound(state, hero.area, 'error');
         }
-        hero.chargingLeftTool = hero.chargingRightTool = false;
-        state.hero.spendMagic(5);
-        hero.action = 'roll';
-        hero.isAirborn = true;
-        hero.actionFrame = 0;
-        hero.animationTime = 0;
-        // Rolling decreases duration of burns by 1 second.
-        if (hero.burnDuration > 0) {
-            hero.burnDuration -= 1000;
-        }
-        const direction = getDirection(
-            (dx || dy) ? dx : directionMap[hero.d][0],
-            (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
-        hero.actionDx = directionMap[direction][0];
-        hero.actionDy = directionMap[direction][1];
-        return;
     }
     if (
         // Meditation only applies to either the main hero or to all clones, but not both at once.

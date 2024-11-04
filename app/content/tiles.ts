@@ -42,8 +42,8 @@ import {
     cavePitAngledWallsIn,
     cavePitAngledWallsOut,
 } from 'app/content/tiles/cavePits';
-import { allCrystalCavePitTileSources } from 'app/content/tiles/crystalCavePits';
-import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
+import { allCrystalCavePitTileSources, crystalCaveWallToPitTileSources } from 'app/content/tiles/crystalCavePits';
+import { allCrystalCaveTileSources, crystalTransparentFloor } from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
@@ -437,7 +437,14 @@ const spiritRailsTiles: TileSource = {
     },
 };
 
-const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'field', shallowWater: true };
+
+const waterAnimationProps = {
+    frames: 3,
+    frameSequence: [0,0,1,2,2,1],
+    offset: {x: 0, y: 5},
+};
+
+const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'water', shallowWater: true };
 const deepToShallow: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/deeptoshallowwater.png', {x: 0, y: 0, w: 64, h: 80}),
@@ -447,6 +454,7 @@ const deepToShallow: TileSource = {
         '0x4': deepWaterBehavior, '1x4': deepWaterBehavior,
         '3x2': { skipped: true }
     },
+    animationProps: waterAnimationProps,
 };
 const deepToShallowAngles: TileSource = {
     w: 16, h: 16,
@@ -458,6 +466,7 @@ const deepToShallowAngles: TileSource = {
         '1x1': shallowWaterBehavior, '1x2': shallowWaterBehavior,
         '2x1': shallowWaterBehavior, '2x2': shallowWaterBehavior,
     },
+    animationProps: waterAnimationProps,
 };
 const shallowToDeep: TileSource = {
     w: 16, h: 16,
@@ -468,6 +477,7 @@ const shallowToDeep: TileSource = {
         '0x4': shallowWaterBehavior, '1x4': shallowWaterBehavior,
         '3x2': { skipped: true }
     },
+    animationProps: waterAnimationProps,
 };
 const shallowToDeepAngles: TileSource = {
     w: 16, h: 16,
@@ -479,6 +489,32 @@ const shallowToDeepAngles: TileSource = {
         '1x1': deepWaterBehavior, '1x2': deepWaterBehavior,
         '2x1': deepWaterBehavior, '2x2': deepWaterBehavior,
     },
+    animationProps: waterAnimationProps,
+};
+
+const waterWaves: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 144, y: 0, w: 16, h: 64}),
+    behaviors: {
+        'all': {defaultLayer: 'field', isGround: false},
+    },
+    animationProps: {
+        frames: 3,
+        frameSequence: [0,0,1,2,2,1],
+        offset: {x: 1, y: 0},
+    }
+};
+const waterRocks: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 144, y: 80, w: 16, h: 48}),
+    behaviors: {
+        'all': {defaultLayer: 'field', isGround: false},
+    },
+    animationProps: {
+        frames: 3,
+        frameSequence: [0,0,1,2,2,1],
+        offset: {x: 1, y: 0},
+    }
 };
 
 const shore: TileSource = {
@@ -488,6 +524,7 @@ const shore: TileSource = {
         'all': { defaultLayer: 'floor' },
         '3x0': { skipped: true }, '3x1': { skipped: true },
     },
+    animationProps: waterAnimationProps,
 };
 const shoreAngles: TileSource = {
     w: 16, h: 16,
@@ -497,6 +534,7 @@ const shoreAngles: TileSource = {
         '0x0': { skipped: true }, '3x0': { skipped: true },
         '0x3': { skipped: true }, '3x3': { skipped: true },
     },
+    animationProps: waterAnimationProps,
 };
 
 const shoreMask: TileSource = {
@@ -607,6 +645,8 @@ const treeStump: TileSource = {
     source: requireFrame('gfx/tiles/treesheet.png', {x: 0, y: 128, w: 64, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
+        '0x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, linkedOffset: 401},
+        '3x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, linkedOffset: 401},
     },
 };
 const treeLeavesTop: TileSource = {
@@ -1081,10 +1121,11 @@ addTiles([
     furnitureWoodTiles,
     furnitureLampTiles,
     furniturePlantTiles,
-    deletedTiles(5),
+    waterWaves,
+    deletedTiles(1),
     iceTiles,
     lavaBubbles,
-    deletedTiles(3),
+    waterRocks,
     laundryTiles,
     singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
     logChoppingTiles,
@@ -1104,7 +1145,7 @@ addTiles([
     shallowToDeepAngles,
     deepToShallow,
     deepToShallowAngles,
-    deletedTiles(1),
+    crystalTransparentFloor,
     caveFloorSpiritPalette,
     treeStump,
     treeLeavesTop,
@@ -1147,6 +1188,7 @@ addTiles([
     ...allFancyStoneCeilingTileSources,
     ...allObsidianTileSources,
     ...allFuturisticTileSources,
+    ...crystalCaveWallToPitTileSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

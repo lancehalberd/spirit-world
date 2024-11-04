@@ -1,7 +1,7 @@
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { DelayedEffect } from 'app/content/effects/delayedEffect';
 import { Flame } from 'app/content/effects/flame';
-import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
@@ -514,18 +514,6 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
         }
         drawFrameAt(context, frame, { x, y });
     }
-}
-
-function addBurstEffect(this: void, state: GameState, enemy: Enemy, area: AreaInstance): void {
-    const hitbox = enemy.getHitbox();
-    const animation = new FieldAnimationEffect({
-        animation: burstAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
-        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
-    });
-    addEffectToArea(state, area, animation);
 }
 
 function updateSpiritRival(this: void, state: GameState, enemy: Enemy): void {

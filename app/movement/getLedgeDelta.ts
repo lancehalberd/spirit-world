@@ -148,7 +148,6 @@ export function getLedgeDelta(
 }
 window['getLedgeDelta'] = getLedgeDelta;
 
-
 export function updateProjectileHeight(this: void, state: GameState, area: AreaInstance, isHigh: boolean, oldAnchorPoint: Point, anchorPoint: Point): boolean {
     const ledgeDelta = getLedgeDelta(state, area, oldAnchorPoint, anchorPoint);
     // console.log(ledgeDelta, oldAnchorPoint, anchorPoint);

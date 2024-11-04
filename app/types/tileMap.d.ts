@@ -54,7 +54,7 @@ interface NineSlice {
 
 type MapIcon = 'door' | 'chest' | 'down' | 'up'
 
-type DefaultLayer = 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
+type DefaultLayer = 'water' | 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
 
 interface TileBehaviors {
     // 0-1

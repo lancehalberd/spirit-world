@@ -5396,6 +5396,7 @@ const f1_1x0: AreaDefinition = {
         {status: "normal", id: "warTemplePot3", x: 176, y: 193, type: "pushPull", linked: true, style: "pot", savePosition: "zone"},
         {status: "normal", id: "warTemplePot2", x: 64, y: 192, type: "pushPull", linked: true, style: "pot", savePosition: "zone"},
         {status: "normal", id: "warTemplePot0", x: 64, y: 96, type: "pushPull", linked: true, style: "pot", savePosition: "zone"},
+        {status: "normal", id: "", x: 92, y: 64, style: "brokenPlaque", type: "sign", message: "One of these urns is different from the others."},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 463, mapId: 'warTemple', floorId: '2F', mapX: 3, mapY: 1.5},

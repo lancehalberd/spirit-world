@@ -53,6 +53,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
     frozenDuration = 0;
+    // If the enemy was killed with freezing damage, we track that here and prevent
+    // certain on death effects from occuring.
+    frozenAtDeath = false;
     burnDuration = 0;
     burnDamage = 0;
     // This ignores the default pit logic in favor of the ground effects
@@ -166,8 +169,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.healthBarColor = this.enemyDefinition.healthBarColor;
         this.enemyDefinition.initialize?.(state, this);
         this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
-        this.canSwim = this.enemyDefinition.canSwim;
-        this.canMoveInLava = this.enemyDefinition.canMoveInLava;
+        this.canSwim = this.enemyDefinition.canSwim || this.enemyDefinition.baseMovementProperties?.canSwim;
+        this.canMoveInLava = this.enemyDefinition.canMoveInLava || this.enemyDefinition.baseMovementProperties?.canMoveInLava;
     }
     getFrame(): Frame {
         const frame = getFrame(this.currentAnimation, this.animationTime);
@@ -394,6 +397,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // Hitting frozen enemies unfreezes them.
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
+            // Record the enemy as frozen if they were defeated by this hit.
+            this.frozenAtDeath = !this.isImmortal && this.life <= 0;
         } else if (hit.element === 'ice' && this.definition.type !== 'boss' && this.enemyDefinition.canBeFrozen !== false) {
             this.burnDuration = 0;
             // Do not freeze the enemy unless they will actually stay frozen for some duration:
@@ -405,6 +410,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 if (this.z <= 0 && this.vz <= 0) {
                     this.vx = this.vy = 0;
                 }
+                if (this.enemyDefinition.onFreeze) {
+                    this.enemyDefinition.onFreeze(state, this);
+                }
+            } else if (this.enemyDefinition.canBeFrozen) {
+                this.frozenAtDeath = true;
             }
         }
         return {
@@ -657,8 +667,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         // Unfreeze defeated enemies, otherwise their death animation may be delayed
         // until they are unfrozen.
-        if (!this.isImmortal && this.life <= 0 && this.z <= 0) {
+        if (!this.isImmortal && this.frozenDuration > 0 && this.life <= 0 && this.z <= 0) {
             this.frozenDuration = 0;
+            this.frozenAtDeath = true;
         }
         if (this.frozenDuration > 0) {
             this.frozenDuration -= FRAME_LENGTH;
@@ -884,7 +895,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
         if (this.enemyDefinition.alternateRender) {
             this.enemyDefinition.alternateRender(context, state, this);
-        } else  if (this.enemyInvulnerableFrames > 0 || this.isDefeated) {
+        } else if (
+            // Player can briefly see damaged/defeated enemies from the other world if they have
+            // spirit sight or true sight.
+            (state.hero.savedData.passiveTools.spiritSight || state.hero.savedData.passiveTools.trueSight)
+            && (this.enemyInvulnerableFrames > 0 || this.isDefeated)
+        ) {
             context.save();
                 context.globalAlpha *= 0.3;
                 this.render(context, state);

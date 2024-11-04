@@ -611,6 +611,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             }
             let objectInstance = instance.objects.find(o => o.definition === object);
             if (isObjectLogicValid(state, object)) {
+                if (!object.id) {
+                    console.error('Object with valid logicKey/hasCustomLogic was found with no id and will not be added.');
+                }
                 // If the object is valid but was never added to the area, add it now.
                 if (!objectInstance && object.id && !instance.removedObjectIds.includes(object.id)) {
                     objectInstance = createObjectInstance(state, object);

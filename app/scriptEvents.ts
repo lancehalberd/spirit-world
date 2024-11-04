@@ -42,6 +42,8 @@ export function runBlockingCallback(state: GameState, updateCallback: (state: Ga
             waitingOnActiveEvents: true,
             blockFieldUpdates: true,
         });
+        // Make sure these block field updates as soon as this is appended and not on the next frame.
+        state.scriptEvents.blockFieldUpdates = true;
         // Make sure no other scripts are processed until this finishes.
         return true;
     });
@@ -59,6 +61,9 @@ export function runPlayerBlockingCallback(state: GameState, updateCallback: (sta
             waitingOnActiveEvents: true,
             blockPlayerInput: true,
         });
+        // Make sure these block player/field updates as soon as this is appended and not on the next frame.
+        state.scriptEvents.blockPlayerInput = true;
+        state.scriptEvents.blockFieldUpdates = true;
         // Make sure no other scripts are processed until this finishes.
         return true;
     });

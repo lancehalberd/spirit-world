@@ -227,7 +227,7 @@ export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasC
 export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
 export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
-export const canTravelFarUnderWater = andLogic(hasIronBoots);
+export const canTravelFarUnderWater = andLogic(hasIronBoots, hasWaterBlessing);
 export const canUseTeleporters = orLogic(hasSpiritSight, hasTrueSight);
 
 export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);
@@ -248,11 +248,14 @@ export const logicHash: {[key: string]: LogicCheck} = {
         requiredFlags: ['$randomizer'],
     },
     tombRivalNpc: {
-        excludedFlags: ['tombRivalEnraged', 'tombRivalRescued', 'tombEntered', 'tombRivalAvoided'],
+        excludedFlags: ['tombRivalEnraged', 'tombRivalRescued', 'tombEntered', 'tombRivalAvoided', 'helixRivalIntro'],
     },
     tombRivalBoss: {
         requiredFlags: ['tombRivalEnraged'],
-        excludedFlags: ['tombEntered', 'tombRivalRescued', 'tombRivalAvoided'],
+        excludedFlags: [
+            'tombEntered', 'tombRivalRescued', 'tombRivalAvoided',
+            'helixRivalIntro',
+        ],
     },
     cocoonBossStarted: {
         requiredFlags: ['cocoonBossStarted'],

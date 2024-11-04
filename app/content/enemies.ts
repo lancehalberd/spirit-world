@@ -63,6 +63,7 @@ declare global {
 enemyDefinitions.beetle = {
     animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase,
     lootTable: simpleLootTable,
+    shadowRadius: 9,
 };
 enemyDefinitions.climbingBeetle = {
     animations: climbingBeetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
@@ -74,6 +75,7 @@ enemyDefinitions.beetleHorned = {
     animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge,
     aggroRadius: 128,
     lootTable: moneyLootTable,
+    shadowRadius: 9,
 };
 enemyDefinitions.beetleMini = {
     animations: beetleMiniAnimations, aggroRadius: 32,

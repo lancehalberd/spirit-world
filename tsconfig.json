@@ -5,6 +5,7 @@
     "baseUrl": "./",
     "module": "esnext",
     "noImplicitAny": false,
+    "noImplicitThis": true,
     "noUnusedLocals": true,
     "outDir": "./tsc/",
     // "strictNullChecks": true,

@@ -44,14 +44,14 @@ export function updateScriptEvents(state: GameState): void {
                         break;
                     }
                 }
+                if (event.blockPlayerInput) {
+                    state.scriptEvents.blockPlayerInput = true;
+                }
+                if (event.blockFieldUpdates) {
+                    state.scriptEvents.blockFieldUpdates = true;
+                }
                 if (!finished) {
                     state.scriptEvents.blockEventQueue = true;
-                    if (event.blockFieldUpdates) {
-                        state.scriptEvents.blockFieldUpdates = true;
-                    }
-                    if (event.blockPlayerInput) {
-                        state.scriptEvents.blockPlayerInput = true;
-                    }
                     activeEvents.push(event);
                 }
                 break;

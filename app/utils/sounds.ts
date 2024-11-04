@@ -656,7 +656,14 @@ sounds.set('arrow', {
     instanceLimit: 2,
     instances: [],
 });
-
+sounds.set('error', {
+    play(target: AudioNode, time: number) {
+        playBeeps([200, 100, 20, 200, 100, 20], 0.04, this.duration, {smooth: false, taper: 0.2, swell: 0.2, type: 'sawtooth'}, target, time);
+    },
+    duration: 0.4,
+    instanceLimit: 2,
+    instances: [],
+});
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
 const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];

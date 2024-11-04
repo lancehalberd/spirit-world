@@ -33,7 +33,7 @@ specialBehaviorsHash.barrierBurstInstructions = {
             if (state.hero.hasBarrier) {
                 helpText = `Hold ${toolButton} to use the Barrier Burst Technique`;
             } else {
-                helpText = `Press ${toolButton} to create a Spirit Barrier`;
+                helpText = `Tap ${toolButton} to create a Spirit Barrier`;
             }
         } else if (state.hero.savedData.activeTools.cloak) {
             helpText = `Press [B_MENU] to open your inventory and assign Spirit Cloak to [B_TOOL]`;
@@ -41,6 +41,36 @@ specialBehaviorsHash.barrierBurstInstructions = {
         // Stop showing this help text once the player has successfully opened the cocoon back teleporter.
         if (state.savedState.objectFlags.cocoonBackTeleporter) {
             helpText = '';
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    },
+};
+
+specialBehaviorsHash.staffInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        if (!state.savedState.objectFlags.hideStaffInstructions) {
+            let toolButton: string;
+            if (state.hero.savedData.leftTool === 'staff') {
+                toolButton = '[B_LEFT_TOOL]';
+            } else if (state.hero.savedData.rightTool === 'staff') {
+                toolButton = '[B_RIGHT_TOOL]';
+            }
+            if (toolButton) {
+                if (state.hero.activeStaff) {
+                    helpText = `Press ${toolButton} to retrieve the staff`;
+                } else {
+                    helpText = `Press ${toolButton} to place the staff`;
+                }
+            } else if (state.hero.savedData.activeTools.staff) {
+                helpText = `Press [B_MENU] to open your inventory and assign Staff to [B_TOOL]`;
+            }
         }
         const textCue = findTextCue(state);
         if (!textCue && helpText && object.area === state.areaInstance) {

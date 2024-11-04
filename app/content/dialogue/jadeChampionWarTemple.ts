@@ -1,25 +1,12 @@
-import { burstAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-import { addEffectToArea } from 'app/utils/effects';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
-
-function addBurstEffect(this: void, state: GameState, npc: NPC, area: AreaInstance): void {
-    const hitbox = npc.getHitbox();
-    const animation = new FieldAnimationEffect({
-        animation: burstAnimation,
-        drawPriority: 'background',
-        drawPriorityIndex: 1,
-        x: hitbox.x + hitbox.w / 2 - burstAnimation.frames[0].w / 2,
-        y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
-    });
-    addEffectToArea(state, area, animation);
-}
 
 function npcAndHeroTeleportAnimation(state: GameState, npc: NPC) {
     appendScript(state, '{wait:500}');
@@ -102,8 +89,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 234, 396, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'right';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'right');
             });
             appendScript(state, `
                 What did you do to the Spirit Beasts?
@@ -114,11 +100,10 @@ dialogueHash.jadeChampionWarTemple = {
             );
             runPlayerBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
-                if (moveNPCToTargetLocation(state, jadeChampion, 256, 396, 'move')) {
+                if (moveNPCToTargetLocation(state, jadeChampion, 256, 400, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'up';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'up');
             });
             npcAndHeroTeleportAnimation(state, jadeChampion);
             // ****
@@ -135,6 +120,12 @@ dialogueHash.jadeChampionWarTemple = {
                     jadeChampion.speed = 1.25;
                     addObjectToArea(state, state.hero.area, jadeChampion);
                     grandPriest = findObjectInstanceById(state.hero.area, 'grandPriest') as NPC;
+                    // Change the priests behavior to none so that the updates don't interfere
+                    // with the cutscene.
+                    grandPriest.definition = {
+                        ...grandPriest.definition,
+                        behavior: 'none',
+                    }
                     grandPriest.speed = 1;
                 });
             });
@@ -144,8 +135,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 220, 346, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'up';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'up');
             });
             appendScript(state, '{wait:50}');
             runPlayerBlockingCallback(state, (state: GameState) => {
@@ -153,8 +143,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 254, 300, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'up';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'up');
             });
             appendScript(state, '{wait:200}');
             appendScript(state, `I have brought you the Vanara child, Grand Priest.`);
@@ -167,8 +156,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 208, 276, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'right';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'right');
             });
             // UPDATE DIALOGUE
             // grandPriest: What do you know of the disappearance of the Spirit Beasts, child?
@@ -191,18 +179,17 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 300, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'down';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'down');
             });
             appendScript(state, `What do you know of the disappearance of the Spirit Beasts, child?
+                {|}...
                 {|}I can see that you don't know of what I speak.`);
             runPlayerBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'down';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'down');
             });
             appendScript(state, '{wait:500}');
             // JC is shocked, steps forward slightly to speak
@@ -214,8 +201,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 224, 286, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'right';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'right');
             });
             appendScript(state, `But this child was in the War Temple when the Beasts vanished!
                 {|}That can't be a coincidence.`);
@@ -224,8 +210,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 286, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'left';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'left');
             });
             appendScript(state, '{wait:300}');
             appendScript(state, `Peace, Champion. Nothing that happens is merely a coincidence.
@@ -236,8 +221,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'down';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'down');
             });
             appendScript(state, '{wait:300}');
             appendScript(state, `Child, the Spirit King tells me to set you free.`);
@@ -254,8 +238,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 256, 300, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'up';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'up');
             });
             appendScript(state, `It is my duty as the Jade Champion to protect the Spirit World!
                 {|}I cannot let a Vanara child roam it freely.`);
@@ -264,8 +247,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 240, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'up';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'up');
             });
             appendScript(state, `Silence! My commands are beyond the understanding of mortals.`);
             appendScript(state, '{wait:500}');
@@ -276,8 +258,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 208, 276, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'right';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'right');
             });
             appendScript(state, '{wait:500}');
             runPlayerBlockingCallback(state, (state: GameState) => {
@@ -286,8 +267,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 276, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'left';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'left');
             });
             appendScript(state, `Champion, seek out the Spirit Beasts.
                 {|}The Spirit Gods shall watch the Vanara child themselves.`);
@@ -297,8 +277,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
                     return true;
                 }
-                grandPriest.d = 'down';
-                grandPriest.changeToAnimation('idle');
+                grandPriest.changeToAnimation('idle', 'down');
             });
             appendScript(state, `Return this Vanara to the gates of our Holy City.
                 {|}This is my command.`);
@@ -309,9 +288,9 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 256, 300, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'up';
-                jadeChampion.animationTime += FRAME_LENGTH*2;
-                jadeChampion.changeToAnimation('bow');
+                // Question for Hillary: Should this be after the call to change animation?
+                // jadeChampion.animationTime += FRAME_LENGTH * 2;
+                jadeChampion.changeToAnimation('bow', 'up');
             });
             appendScript(state, '{wait:700}');
             appendScript(state, `Yes, Grand Priest.`);
@@ -322,8 +301,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 220, 332, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'right';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'right');
             });
             appendScript(state, `Come child, I will take you out of the city.`);
             // JC and hero position for teleport
@@ -333,8 +311,7 @@ dialogueHash.jadeChampionWarTemple = {
                 if (moveNPCToTargetLocation(state, jadeChampion, 240, 332, 'move')) {
                     return true;
                 }
-                jadeChampion.d = 'right';
-                jadeChampion.changeToAnimation('idle');
+                jadeChampion.changeToAnimation('idle', 'right');
                 state.hero.d = 'left';
             });
             npcAndHeroTeleportAnimation(state, jadeChampion);
@@ -367,7 +344,7 @@ dialogueHash.jadeChampionWarTemple = {
                 jadeChampion.changeToAnimation('idle');
                 removeObjectFromArea(state, jadeChampion);
             });
-            appendScript(state, '{wait:300}');
+            appendScript(state, '{wait:300}{stopTrack}');
             // show HUD to tell player that control of their character has returned
             showHUD(state);
             // remove jadeChampion object
@@ -383,7 +360,7 @@ dialogueHash.jadeChampionWarTemple = {
     options: [
         {
             text: [
-                {
+                /*{
                     dialogueIndex: undefined,
                     text: `Speak to the Grand Priest.`,
                 },
@@ -391,7 +368,7 @@ dialogueHash.jadeChampionWarTemple = {
                     dialogueIndex: undefined,
                     text: `Something seems terribly wrong, and you are involved somehow.
                     {|}We will get to the bottom of this.`,
-                },
+                },*/
             ],
         },
     ],

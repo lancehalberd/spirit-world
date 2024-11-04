@@ -677,7 +677,7 @@ interface BaseSpecialBehavior<T> {
     apply?: (state: GameState, object: T) => void
     // On Refresh Logic is called any time the area logic refreshes after the object
     // has already been initialized and added to the area.
-    onRefreshLogic?: (state: GameState, object: T) => void
+    onRefreshLogic?: (state: GameState, object: T, fresh?: boolean) => void
 }
 
 

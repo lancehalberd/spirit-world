@@ -69,6 +69,8 @@ interface EnemyDefinition<Params> {
     updateFlyingZ?: (state: GameState, enemy: Enemy<Params>) => void
     hasCustomHurtAnimation?: boolean
     hasShadow?: boolean
+    shadowRadius?: number
+    shadowOffset?: Partial<Point>
     ignorePits?: boolean
     life?: number
     lootTable?: LootTable
@@ -94,6 +96,7 @@ interface EnemyDefinition<Params> {
     update?: (state: GameState, enemy: Enemy<Params>) => void
     afterUpdate?: (state: GameState, enemy: Enemy<Params>) => void
     onDeath?: (state: GameState, enemy: Enemy<Params>) => void
+    onFreeze?: (state: GameState, enemy: Enemy<Params>) => void
     onHit?: (state: GameState, enemy: Enemy<Params>, hit: HitProperties) => HitResult
     // Optional render function called instead of the standard render logic.
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void

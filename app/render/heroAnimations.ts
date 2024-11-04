@@ -47,6 +47,15 @@ const walkShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalki
 const walkShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
 const walkShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
 
+const runUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcrun.png', walkingGeometry, { cols: 4, y: 2, duration: 4});
+const runDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcrun.png', walkingGeometry, { cols: 4, y: 0, duration: 4});
+const runLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcrun.png', walkingGeometry, { cols: 4, y: 3, duration: 4});
+const runRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcrun.png', walkingGeometry, { cols: 4, y: 1, duration: 4});
+const runShallowUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcrunshallow.png', walkingGeometry, { cols: 4, y: 2, duration: 4});
+const runShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcrunshallow.png', walkingGeometry, { cols: 4, y: 0, duration: 4});
+const runShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcrunshallow.png', walkingGeometry, { cols: 4, y: 3, duration: 4});
+const runShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcrunshallow.png', walkingGeometry, { cols: 4, y: 1, duration: 4});
+
 
 const walkChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
 const walkChargeDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
@@ -372,6 +381,12 @@ export const heroAnimations: ActorAnimations = {
         left: walkLeftAnimation,
         right: walkRightAnimation,
     },
+    run: {
+        up: runUpAnimation,
+        down: runDownAnimation,
+        left: runLeftAnimation,
+        right: runRightAnimation,
+    },
     pull: {
         up: pullUpAnimation,
         down: pullDownAnimation,
@@ -416,6 +431,12 @@ export const heroShallowAnimations: ActorAnimations = {
         down: walkShallowDownAnimation,
         left: walkShallowLeftAnimation,
         right: walkShallowRightAnimation,
+    },
+    run: {
+        up: runShallowUpAnimation,
+        down: runShallowDownAnimation,
+        left: runShallowLeftAnimation,
+        right: runShallowRightAnimation,
     },
     pull: {
         up: pullShallowUpAnimation,

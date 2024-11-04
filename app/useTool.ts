@@ -22,6 +22,7 @@ export function useTool(
     switch (tool) {
         case 'bow': {
             if (state.hero.magic <= 0) {
+                playAreaSound(state, hero.area, 'error');
                 return;
             }
 
@@ -149,6 +150,7 @@ export function useTool(
             //    magicCost += 5;
             //}
             if (state.hero.magic < magicCost) {
+                playAreaSound(state, hero.area, 'error');
                 return;
             }
             state.hero.spendMagic(magicCost);
@@ -169,6 +171,7 @@ export function useTool(
         }
         case 'clone': {
             if (state.hero.magic <= 0 || state.hero.life <= 1) {
+                playAreaSound(state, hero.area, 'error');
                 return;
             }
             const maxClones = (state.hero.savedData.activeTools.clone & 2) ? 2 : 1;
@@ -216,7 +219,11 @@ export function useTool(
                 playAreaSound(state, state.areaInstance, 'menuTick');
                 return;
             }
-            if (hero.activeStaff?.area || state.hero.magic <= 0) {
+            if (hero.activeStaff?.area) {
+                return;
+            }
+            if (state.hero.magic <= 0) {
+                playAreaSound(state, hero.area, 'error');
                 return;
             }
             state.hero.spendMagic(10);
