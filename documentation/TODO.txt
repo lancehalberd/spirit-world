@@ -77,8 +77,6 @@ Current tasks:
         - cocoon graphics
 
     - Update spirit sky
-        - Figure out what to do about falling on top of brittle ground
-            - Keep the player just north of the edge of the tile if the southern tile is not a pit.
         - Only break brittle ground if the hero is not standing on any solid ground.
         - Force player to fall on brittle ground if they roll over it wearing cloud boots.
 
