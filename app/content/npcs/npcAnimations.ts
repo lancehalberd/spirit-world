@@ -298,4 +298,3 @@ export const midGuyPriestAnimations: ActorAnimations = {
         right: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
     },
 };
-
