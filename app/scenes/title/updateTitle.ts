@@ -23,7 +23,6 @@ export function updateTitle(state: GameState) {
     }
     if (wasConfirmKeyPressed(state)) {
         playSound('menuTick');
-        console.log({selectedOption});
         switch (selectedOption) {
         case 'START':
             state.scene = 'fileSelect';
@@ -32,12 +31,12 @@ export function updateTitle(state: GameState) {
             state.menuIndex = 0;
             break;
         case 'SETTINGS':
-            console.log('display settings');
             state.scene = 'options';
             state.menuIndex = 0;
             break;
         case 'QUIT':
             console.log('quit game');
+            // Will be implemented when the game is wrapped in Electron as a desktop app, unused now
             break;
         }
     }
