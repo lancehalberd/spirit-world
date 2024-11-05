@@ -203,7 +203,8 @@ export function getTitleOptions(state: GameState): string[] {
 }
 
 export function getSettingsOptions(state: GameState): string[] {
-    const settingsMenu = ['VOLUME OFF', 'VOLUME LOW', 'VOLUME MED', 'VOLUME HI', 'VIEW CONTROLS'];
+    // add volume, other global game settings here
+    const settingsMenu = ['VIEW CONTROLS'];
     // only display 'FULLSCREEN' toggle if game is being played inside of Electron as a desktop app
     if (window.electronAPI && state.gameHasBeenInitialized) {
         return [...settingsMenu, 'FULLSCREEN', 'RESUME'];
