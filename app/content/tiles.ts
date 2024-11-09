@@ -885,9 +885,14 @@ const caveLedges: TileSource = {
         '9x11': { defaultLayer: 'floor2', ledges: { left: true }, solidMap: BITMAP_LEFT_2, isGround: false, low: true },
         '10x11': { defaultLayer: 'floor2', ledges: { down: true }, solidMap: BITMAP_BOTTOM_2, isGround: false, low: true },
         '11x11': { defaultLayer: 'floor2', ledges: { down: true }, solidMap: BITMAP_BOTTOM_2, isGround: false, low: true },
-        '12x11': { defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: false, low: true },
-        '13x11': { defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: false, low: true },
-
+        '12x11': {
+            defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: false, low: true,
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 192, y: 160, w: 16, h: 16}),
+        },
+        '13x11': {
+            defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: false, low: true,
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 208, y: 160, w: 16, h: 16}),
+        },
         '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright', isGround: false },
         '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft', isGround: false },
         '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright', isGround: false },
@@ -895,10 +900,22 @@ const caveLedges: TileSource = {
         '12x12': { defaultLayer: 'floor2'},
         '13x12': { defaultLayer: 'floor2'},
 
-        '8x13': { defaultLayer: 'floor2', diagonalLedge: 'upright', isGround: false },
-        '9x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft', isGround: false },
-        '10x13': { defaultLayer: 'floor2', diagonalLedge: 'upright', isGround: false },
-        '11x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft', isGround: false },
+        '8x13': {
+            defaultLayer: 'floor2', diagonalLedge: 'upright', isGround: false,
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 208, w: 16, h: 16}),
+        },
+        '9x13': {
+            defaultLayer: 'floor2', diagonalLedge: 'upleft', isGround: false,
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 208, w: 16, h: 16}),
+        },
+        '10x13': {
+            defaultLayer: 'floor2', diagonalLedge: 'upright', isGround: false,
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 208, w: 16, h: 16}),
+        },
+        '11x13': {
+            defaultLayer: 'floor2', diagonalLedge: 'upleft', isGround: false,
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 208, w: 16, h: 16}),
+        },
         '12x13': { defaultLayer: 'floor2', isGround: false},
         '13x13': { defaultLayer: 'floor2', isGround: false},
 
@@ -909,10 +926,21 @@ const caveLedges: TileSource = {
         '12x14': { defaultLayer: 'floor2', isGround: false},
         '13x14': { defaultLayer: 'floor2', isGround: false},
 
-        '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright' },
-        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft' },
-        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright' },
-        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft'},
+        '8x15': {
+            defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright',
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 192, w: 16, h: 16}),
+        },
+        '9x15': {
+            defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft',
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 192, w: 16, h: 16})
+        },
+        '10x15': {
+            defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false, low: true, diagonalLedge: 'upright',
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 192, w: 16, h: 16}), },
+        '11x15': {
+            defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false, low: true, diagonalLedge: 'upleft',
+            maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 192, w: 16, h: 16}),
+        },
         '12x15': { defaultLayer: 'floor2', isGround: false},
         '13x15': { defaultLayer: 'floor2', isGround: false},
     },
@@ -927,6 +955,14 @@ const caveLedges: TileSource = {
         [ 8,15],[ 9,15],[10,15],[11,15],[12,15],[13,15],
     ],
 };
+
+const caveLedgeCorners2: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 224, w: 64, h: 32}),
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+}
 
 const caveFloorDecorations: TileSource = {
     w: 16, h: 16,
@@ -1189,6 +1225,7 @@ addTiles([
     ...allObsidianTileSources,
     ...allFuturisticTileSources,
     ...crystalCaveWallToPitTileSources,
+    caveLedgeCorners2,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

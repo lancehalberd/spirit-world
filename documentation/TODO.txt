@@ -66,8 +66,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add new cliff graphics
-        - Create mask for northern cliff tiles
+    - Fix soft lock if you step on the war temple cutscene trigger from the south.
 
     - Exit from peach cave water doesn't render frozen correctly.
     - Bug: Golem boss stopped moving when hands were killed during enrage phase.
