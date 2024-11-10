@@ -117,3 +117,29 @@ export function getElementColor(element: MagicElement) {
     }
     return 'grey';
 }
+
+// Gameplay modifiers
+export const gameModifiers = {
+    globalDamageTaken: 1,
+    globalDamageDealt: 1,
+    spiritEnergyCooldown: 1,
+    spiritEnergyRegeneration: 1,
+};
+window.gameModifiers = gameModifiers;
+
+export const challenge = readGetParameter('challenge');
+if (challenge === 'easy') {
+    gameModifiers.globalDamageTaken = 0.5;
+    gameModifiers.globalDamageDealt = 2;
+    gameModifiers.spiritEnergyCooldown = 0.75;
+    gameModifiers.spiritEnergyRegeneration = 1.5;
+} else if (challenge === 'hard') {
+    gameModifiers.globalDamageTaken = 2;
+    gameModifiers.globalDamageDealt = 0.5;
+    gameModifiers.spiritEnergyCooldown = 1.5;
+    gameModifiers.spiritEnergyRegeneration = 0.75;
+}
+
+for (const key of Object.keys(gameModifiers)) {
+    gameModifiers[key] = readGetParameterAsInt(key, gameModifiers[key]);
+}

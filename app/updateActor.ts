@@ -6,7 +6,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { playAreaSound } from 'app/musicController';
 import { prependScript } from 'app/scriptEvents';
@@ -346,7 +346,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
         // Double regeneration rate while idle.
         if (state.hero.magicRegenCooldown <= 0) {
-            state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+            state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000 * gameModifiers.spiritEnergyRegeneration;
         }
     } else if (isActuallyRunning) {
         // Spirit regeneration does not apply while running, but depletion still takes effect.
@@ -361,7 +361,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     } else if (!isTryingToRun) {
         // Normal regeneration rate, this doesn't apply when the hero is trying to run.
         if (state.hero.magicRegenCooldown <= 0) {
-            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000 * gameModifiers.spiritEnergyRegeneration;
         }
     }
     if (state.hero.clones.length) {

@@ -227,18 +227,19 @@ export function readImageFromFile(): Promise<{image: HTMLImageElement, fileName:
     });
 }
 
-export function readGetParameter(parameterName: string): string {
+export function readGetParameter(parameterName: string, defaultValue: string = ''): string {
     for (const item of location.search.substr(1).split('&')) {
         const tmp = item.split('=');
         if (tmp[0] === parameterName) {
             return decodeURIComponent(tmp[1]);
         }
     }
+    return defaultValue;
 }
 
-export function readGetParameterAsInt(parameterName: string): number {
+export function readGetParameterAsInt(parameterName: string, defaultValue = 0): number {
     const number = parseInt(readGetParameter(parameterName), 10);
-    return isNaN(number) ? 0 : number;
+    return isNaN(number) ? defaultValue : number;
 }
 
 export function cloneDeep<T>(value: T): T {

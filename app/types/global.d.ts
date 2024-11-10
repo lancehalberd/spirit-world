@@ -1,6 +1,7 @@
 
 interface Window {
   version: string
+  [key: string]: any;
 }
 
 type Collection<T> = {[key:string]: T} | Array<T>;

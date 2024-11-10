@@ -8,7 +8,7 @@ import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
 import { objectHash } from 'app/content/objects/objectHash';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
 import { appendCallback } from 'app/scriptEvents';
@@ -428,6 +428,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.life <= 0) {
             return;
         }
+        damage *= gameModifiers.globalDamageDealt;
         this.life = Math.max(0, this.life - damage);
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;

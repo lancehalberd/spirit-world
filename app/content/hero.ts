@@ -8,7 +8,7 @@ import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import { ThrownObject } from 'app/content/effects/thrownObject';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 
 import {
@@ -485,6 +485,7 @@ export class Hero implements Actor {
         if (state.scriptEvents.blockPlayerInput) {
             return;
         }
+        damage *= gameModifiers.globalDamageTaken;
         // Immediately change display life to the current life so that it is obvious how much
         // damage the most recent hid did.
         this.displayLife = this.life;
@@ -940,7 +941,10 @@ export class Hero implements Actor {
     // This should only be called on `state.hero`.
     increaseMagicRegenCooldown(amount: number): void {
         //console.log('increaseMagicRegenCooldown', amount);
-        this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
+        this.magicRegenCooldown = Math.min(
+            Math.max(100 * gameModifiers.spiritEnergyCooldown, this.magicRegenCooldown + amount * gameModifiers.spiritEnergyCooldown),
+            this.magicRegenCooldownLimit * gameModifiers.spiritEnergyCooldown,
+        );
     }
 }
 
