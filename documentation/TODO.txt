@@ -66,6 +66,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Fix bad tiles in forest temple north.
     - Fix soft lock if you step on the war temple cutscene trigger from the south.
 
     - Exit from peach cave water doesn't render frozen correctly.

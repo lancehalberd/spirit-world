@@ -81,6 +81,8 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
     }
     return reachableNodes;
 }
+window['allNodes'] = allNodes;
+window['findReachableNodes'] = findReachableNodes;
 
 export function findReachableChecksFromStart(state: GameState) {
     return findReachableChecks(allNodes, [allNodes[0]], state);
