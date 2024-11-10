@@ -2,7 +2,7 @@ import { playAreaSound } from 'app/musicController';
 import { isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased } from 'app/userInput';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
-import { GAME_KEY } from 'app/gameConstants';
+import { gameModifiers, GAME_KEY } from 'app/gameConstants';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
@@ -30,6 +30,7 @@ export function useTool(
             let speed = isUpgradedBow ? 6 : 4;
             let damage = isUpgradedBow ? 4 : 2;
             damage *= (2 ** chargeLevel);
+            damage *= gameModifiers.bowDamage;
             let magicCost = 5;
             if (chargeLevel === 1) {
                 speed += 2;

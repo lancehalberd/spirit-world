@@ -1,3 +1,4 @@
+import {gameModifiers} from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 
@@ -152,6 +153,7 @@ export function updateHeroMagicStats(state: GameState) {
     state.hero.magicRegenCooldownLimit = 2000;
     state.hero.maxMagic = 20;
     state.hero.magicRegen = 4;
+    let bonusMagicRegen = 0;
     if (state.hero.savedData.passiveTools.catEyes) {
         state.hero.maxMagic += 5;
     }
@@ -161,24 +163,31 @@ export function updateHeroMagicStats(state: GameState) {
     }
     if (state.hero.savedData.elements.fire) {
         state.hero.maxMagic += 15;
-        state.hero.magicRegen += 2;
+        bonusMagicRegen += 2;
         state.hero.magicRegenCooldownLimit -= 300;
     }
     if (state.hero.savedData.elements.ice) {
         state.hero.maxMagic += 15;
-        state.hero.magicRegen += 2;
+        bonusMagicRegen += 2;
         state.hero.magicRegenCooldownLimit -= 300;
     }
     if (state.hero.savedData.elements.lightning) {
         state.hero.maxMagic += 15;
-        state.hero.magicRegen += 2;
+        bonusMagicRegen += 2;
         state.hero.magicRegenCooldownLimit -= 300;
     }
     if (state.hero.savedData.passiveTools.phoenixCrown) {
-        state.hero.maxMagic += 20;
-        state.hero.magicRegen += 6;
-        state.hero.magicRegenCooldownLimit /= 2;
+        if (gameModifiers.nerfPhoenixCrown) {
+            // The nerfed phoenix crown provides a much lower benefit to spirit energy regeneration.
+            state.hero.maxMagic += 20;
+            bonusMagicRegen += 2;
+        } else {
+            state.hero.maxMagic += 20;
+            bonusMagicRegen += 6;
+            state.hero.magicRegenCooldownLimit /= 2;
+        }
     }
+    state.hero.magicRegen += bonusMagicRegen * gameModifiers.bonusSpiritRegeneration;
     // During a normal game, magic regen is 0 until you get at least one magic item.
     // During randomizer seeds, Hero always has access to spirit energy.
     if (!state.randomizer?.seed && state.hero.maxMagic <= 20) {

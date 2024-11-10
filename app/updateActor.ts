@@ -179,7 +179,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         }
         if (hero.savedData.passiveTools.phoenixCrown > 0) {
             // If the hero has the phoenix crown, burning causes them to gain spirit instead of draining it an causing damage.
-            state.hero.magic += 5 * FRAME_LENGTH / 1000;
+            if (!gameModifiers.nerfPhoenixCrown) {
+                state.hero.magic += 5 * FRAME_LENGTH / 1000;
+            }
         } else if (hero.savedData.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
             hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - state.hero.burnDamage / 2 * FRAME_LENGTH / 1000);

@@ -377,8 +377,15 @@ export class Hero implements Actor {
                 iframeMultiplier *= 0.5;
             }
             if (state.hero.savedData.passiveTools.goldMail) {
-                damage /= 2;
-                iframeMultiplier *= 1.2;
+                if (gameModifiers.nerfGoldenMail) {
+                    // The nerfed golden mail only reduces physical damage.
+                    if (hit.element === null) {
+                        damage /= 2;
+                    }
+                } else {
+                    damage /= 2;
+                    iframeMultiplier *= 1.2;
+                }
             }
             this.takeDamage(state, damage, iframeMultiplier);
         }

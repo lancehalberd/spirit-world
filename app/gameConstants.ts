@@ -122,8 +122,20 @@ export function getElementColor(element: MagicElement) {
 export const gameModifiers = {
     globalDamageTaken: 1,
     globalDamageDealt: 1,
+    // Effects how long the cooldown is before spirity energy starts regenerating.
     spiritEnergyCooldown: 1,
+    // Effects how fast spirit energy regenerates.
     spiritEnergyRegeneration: 1,
+    // Effects how much bonus spirit regeneration certain items grant
+    // like fire/ice/lightning elements and the phoenix crown.
+    bonusSpiritRegeneration: 1,
+    // Effects how much damage the bow tool deals.
+    bowDamage: 1,
+    // If this if truthy, the golden mail will only reduce physical damage.
+    nerfGoldenMail: 0,
+    // If this is truthy, the phoenix crown will not improve spirit regeneration as much.
+    nerfPhoenixCrown: 0,
+
 };
 window.gameModifiers = gameModifiers;
 
@@ -138,6 +150,10 @@ if (challenge === 'easy') {
     gameModifiers.globalDamageDealt = 0.5;
     gameModifiers.spiritEnergyCooldown = 1.5;
     gameModifiers.spiritEnergyRegeneration = 0.75;
+    gameModifiers.bonusSpiritRegeneration = 0.75;
+    gameModifiers.bowDamage = 0.75;
+    gameModifiers.nerfGoldenMail = 1;
+    gameModifiers.nerfPhoenixCrown = 1;
 }
 
 for (const key of Object.keys(gameModifiers)) {

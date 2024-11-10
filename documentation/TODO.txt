@@ -66,6 +66,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Make staff not block ball sockets/goals.
     - Exit from peach cave water doesn't render frozen correctly.
     - Bug: Golem boss stopped moving when hands were killed during enrage phase.
 
