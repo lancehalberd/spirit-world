@@ -819,9 +819,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
             hero.animationTime = 0;
-            // Don't allow rolling for two Sframes after completing a roll.
-            // This helps keep players from rolling over pits.
-            hero.rollCooldown = 40;
+            // Don't allow rolling for two frames after completing a roll.
+            // This helps keep players from rolling over pits and brittle ground.
+            hero.rollCooldown = 60; // 20ms will immediately be removed from this, so we use 60ms for 2 frames.
             // Immediately check for floor effects so we detect pits/water/slipping as soon as the roll is over.
             checkForFloorEffects(state, hero);
         } else {

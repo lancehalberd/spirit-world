@@ -66,9 +66,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Update spirit sky
-        - Only break brittle ground if the hero is not standing on any solid ground.
-        - Force player to fall on brittle ground if they roll over it wearing cloud boots.
+    - Add particle effect or animation for broken brittle crystal ground.
 
     - Staff should despawn if it is completely over pit tiles.
 

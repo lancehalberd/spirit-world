@@ -15,10 +15,7 @@ import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
 import { removeAllClones, setNextAreaSection } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
-import {
-    breakBrittleTilesInRect,
-    directionMap,
-} from 'app/utils/field';
+import {directionMap} from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { boxesIntersect, pad } from 'app/utils/index';
@@ -103,12 +100,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // Mostly don't check for pits/damage when the player cannot control themselves
         if (!hero.isAstralProjection) {
             checkForFloorEffects(state, hero);
-            if (hero.z <= 0 && hero.action !== 'roll') {
-                // It would be nice not to break everything under the hitbox here, for example,
-                // by using a smaller hitbox. Unfortunately that would allow the player to walk
-                // over cracked tiles by walking in between them.
-                breakBrittleTilesInRect(state, hero.area, hero.getFloorHitbox());
-            }
         }
     }
     updateGenericHeroState(state, hero);
