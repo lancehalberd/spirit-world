@@ -301,27 +301,36 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'warPalaceWestDoor' },
         ],
     },
+    // This node holds paths that work from any node in the forest temple area.
     {
         zoneId,
-        nodeId: 'forestTempleSEArea',
+        nodeId: 'forestTempleNodeAll',
         paths: [
+            { nodeId: 'forestTempleSEArea', logic: orLogic(hasCloudBoots, hasIce) },
             { nodeId: 'forestTempleSWArea', logic: orLogic(hasCloudBoots, hasIce) },
             { nodeId: 'forestTempleNEArea', logic: orLogic(hasCloudBoots, hasIce) },
             { nodeId: 'forestTempleNWArea', logic: orLogic(hasCloudBoots, hasIce) },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
+    },
+    {
+        zoneId,
+        nodeId: 'forestTempleSEArea',
+        paths: [{nodeId: 'forestTempleNodeAll'}],
         entranceIds: ['forestTempleLadder1', 'fertilityTempleExit'],
         exits: [{ objectId: 'forestTempleLadder1' }, { objectId: 'fertilityTempleExit' }],
     },
     {
         zoneId,
         nodeId: 'forestTempleNEArea',
+        paths: [{nodeId: 'forestTempleNodeAll'}],
         entranceIds: ['forestTempleLadder2', 'forestTempleLadder3'],
         exits: [{ objectId: 'forestTempleLadder2' }, { objectId: 'forestTempleLadder3' }],
     },
     {
         zoneId,
         nodeId: 'forestTempleNWArea',
+        paths: [{nodeId: 'forestTempleNodeAll'}],
         entranceIds: ['forestTempleLadder4', 'forestTempleLadder5'],
         exits: [
             { objectId: 'forestTempleLadder4' },
@@ -332,6 +341,7 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'forestTempleSWArea',
+        paths: [{nodeId: 'forestTempleNodeAll'}],
         entranceIds: ['elderSpiritEntrance'],
         exits: [{ objectId: 'elderSpiritEntrance' }],
     },
@@ -544,6 +554,8 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'desertTowerSkySpirit', logic: orLogic(hasIce, hasCloudBoots, hasSomersault) },
             { nodeId: 'outsideSkyPalacePitEntrance', logic: orLogic(andLogic(hasIce, canCross2Gaps), hasCloudBoots, hasSomersault) },
+            // The player can fall to the NE section of the fertility temple if they can enter the bottom left corner of the sky.
+            { nodeId: 'forestTempleNEArea', logic: orLogic(hasCloudBoots, hasIce, hasStaff) },
         ],
         entranceIds: [],
         exits: [],

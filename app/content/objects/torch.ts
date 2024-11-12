@@ -1,5 +1,3 @@
-//import { resetTileBehavior } from 'app/content/areas';
-//import { allTiles } from 'app/content/tiles';
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
@@ -62,7 +60,7 @@ export class TorchFlame implements ObjectInstance {
        return this.y + 8;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const style = torchStyles[this.torch.definition.style] || torchStyles.torch;
+        const style = this.torch.getStyle();
         drawFrameAt(context, getFrame(style.flameAnimation, this.torch.animationTime), {
             x: this.x,
             y: this.y,
@@ -104,6 +102,9 @@ export class Torch implements ObjectInstance {
             return [this.flame];
         }
         return [];
+    }
+    getStyle() {
+        return torchStyles[this.definition.style as keyof typeof torchStyles] || torchStyles.torch;
     }
     /*getYDepth(): number {
        return this.y + 8;
@@ -149,7 +150,7 @@ export class Torch implements ObjectInstance {
         if (this.status !== 'normal' && this.status !== 'active') {
             return;
         }
-        const style = torchStyles[this.definition.style] || torchStyles.torch;
+        const style = this.getStyle();
         drawFrameAt(context, getFrame(style.baseAnimation, this.animationTime), {
             x: this.x,
             y: this.y,

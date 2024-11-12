@@ -20,7 +20,6 @@ export class FlameWall implements EffectInstance, Props {
     area: AreaInstance = null;
     isEffect = <const>true;
     isEnemyAttack = true;
-    definition = null;
     frame: Frame;
     damage: number;
     x: number;

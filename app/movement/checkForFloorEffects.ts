@@ -1,4 +1,6 @@
 import { directionMap } from 'app/utils/direction';
+import {breakBrittleTilesInRect} from 'app/utils/field';
+import {pad} from 'app/utils/index';
 import { getCompositeBehaviors } from 'app/utils/getBehaviors';
 
 export function checkForFloorEffects(state: GameState, hero: Hero) {
@@ -13,7 +15,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1},
     ];
     const pointBehaviors = checkPoints.map(point => getCompositeBehaviors(state, hero.area, point, state.nextAreaInstance));
-    let topBehaviors = [];
+    let topBehaviors: TileBehaviors[] = [];
     hero.groundHeight = 0;
     for (const behaviors of pointBehaviors) {
         const groundHeight = behaviors.groundHeight || 0;
@@ -38,6 +40,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     hero.isOverClouds = false;
     hero.isTouchingPit = false;
     hero.isOverPit = true;
+    // This will get set to true if the hero is on a non pit/water/brittle tile.
+    let isOnSolidGround = false;
     if (hero.isAstralProjection
         || (hero.isInvisible && hero.savedData.equippedBoots !== 'cloudBoots')
         || hero.savedData.equippedBoots === 'ironBoots'
@@ -70,6 +74,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                     }
                 }*/
             }
+        }
+        if (!behaviors.isBrittleGround && !behaviors.pit && !behaviors.water) {
+            isOnSolidGround = true;
         }
         if (!behaviors.water && !behaviors.outOfBounds) {
             hero.swimming = false;
@@ -167,5 +174,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // Cannot be slipping while swimming/wading/climbing.
     if (hero.swimming || (hero.wading && !bootsAreSlippery) || hero.action === 'climbing') {
         hero.slipping = false;
+    }
+    if (hero.z <= 0 && hero.action !== 'roll') {
+        // Use a smaller hitbox when the hero isn't standing partially
+        const box = !isOnSolidGround ? hero.getFloorHitbox() : pad(hero.getFloorHitbox(), -4);
+        breakBrittleTilesInRect(state, hero.area, box);
     }
 }

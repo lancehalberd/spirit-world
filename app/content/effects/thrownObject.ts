@@ -101,7 +101,7 @@ export class ThrownObject implements EffectInstance {
             }
         }
     }
-    breakOnImpact(state) {
+    breakOnImpact(state: GameState) {
         if (!this.broken) {
             this.broken = true;
             playAreaSound(state, this.area, this.behaviors.breakSound);
@@ -115,7 +115,7 @@ export class ThrownObject implements EffectInstance {
             removeEffectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y - this.z });
         /*const hitbox = this.getHitbox();
         context.fillStyle = 'red';

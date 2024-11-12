@@ -46,7 +46,7 @@ interface BalloonMegapedeParams {
     isVulnerable?: boolean
     parent?: Enemy<BalloonMegapedeParams>
     tail?: Enemy<BalloonMegapedeParams>
-    locations?: {x: number, y: number, z: number, d: Direction}[]
+    locations?: {x: number, y: number, z: number, d: CardinalDirection}[]
     targetPoint?: {x: number, y: number}
 }
 

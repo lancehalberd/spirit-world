@@ -16,7 +16,7 @@ export function getMapOptions(state: GameState, selectedSections: number[]): Men
             getChildren() {
                 return [
                     ...overworldKeys.map( zoneId => {
-                        const entranceIds = [];
+                        const entranceIds: string[] = [];
                         const zone = zones[zoneId];
                         for (let floor = 0; floor < zone.floors.length; floor++) {
                             for( const areaGrid of [zone.floors[floor].spiritGrid, zone.floors[floor].grid]){

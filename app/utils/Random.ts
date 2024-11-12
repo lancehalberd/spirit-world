@@ -13,35 +13,27 @@ const Random = {
      * @param {Collection} collection  The collection of elements to return random element from
      */
     element<T>(collection: Collection<T>): T {
-        if (collection.constructor == Object) {
-            const keys = Object.keys(collection);
-            return collection[this.element(keys)];
-        }
-        if (collection.constructor == Array) {
+        if (Array.isArray(collection)) {
             const array = collection as Array<any>;
             return array[Math.floor(Math.random() * array.length)];
         }
-        console.log("Warning @ Random.element: "+ collection + " is neither Array or Object");
-        return null;
+        const keys = Object.keys(collection);
+        return collection[this.element(keys)];
     },
 
     /**
      * @param {Array} array  The array of elements to return random element from
      */
     removeElement<T>(collection: Collection<T>): T {
-        if (collection.constructor == Object) {
-            const keys = Object.keys(collection);
-            const key = this.element(keys);
-            const value = collection[key];
-            collection[key] = null;
-            return value;
-        }
-        if (collection.constructor == Array) {
+        if (Array.isArray(collection)) {
             const array = collection as Array<any>;
             return array.splice(Math.floor(Math.random() * array.length), 1)[0];
         }
-        console.log("Warning @ Random.removeElement: "+ collection + " is neither Array or Object");
-        return null;
+        const keys = Object.keys(collection);
+        const key = this.element(keys);
+        const value = collection[key];
+        collection[key] = null;
+        return value;
     },
 
     /**

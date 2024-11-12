@@ -8,7 +8,7 @@ import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import { ThrownObject } from 'app/content/effects/thrownObject';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 
 import {
@@ -64,7 +64,7 @@ export class Hero implements Actor {
     vy: number = 0;
     vz: number = 0;
     groundHeight = 0;
-    d: Direction = 'down';
+    d: CardinalDirection = 'down';
     action?: Action;
     actionDx?: number;
     actionDy?: number;
@@ -149,7 +149,7 @@ export class Hero implements Actor {
     cloneToolReleased?: boolean
     barrierElement?: MagicElement;
     barrierLevel?: number;
-    safeD: Direction;
+    safeD: CardinalDirection;
     safeX: number;
     safeY: number;
     // This gets set when the player respawns at a location and is currently used
@@ -193,9 +193,10 @@ export class Hero implements Actor {
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
         this.savedData = {...defaultSavedHeroData};
         if (savedHeroData) {
-            for (let i in savedHeroData) {
+            Object.assign(this.savedData, savedHeroData);
+            /*for (let i in savedHeroData) {
                 this.savedData[i] = savedHeroData[i];
-            }
+            }*/
         }
         this.savedData.passiveTools = {
             ...defaultSavedHeroData.passiveTools,
@@ -234,9 +235,10 @@ export class Hero implements Actor {
 
     getCopy(this: Hero): Hero {
         const copy = new Hero();
-        for (let i in this) {
+        Object.assign(copy, this);
+        /*for (let i in this) {
             copy[i] = this[i];
-        }
+        }*/
         copy.savedData = this.exportSavedHeroData();
         return copy;
     }
@@ -377,8 +379,15 @@ export class Hero implements Actor {
                 iframeMultiplier *= 0.5;
             }
             if (state.hero.savedData.passiveTools.goldMail) {
-                damage /= 2;
-                iframeMultiplier *= 1.2;
+                if (gameModifiers.nerfGoldenMail) {
+                    // The nerfed golden mail only reduces physical damage.
+                    if (hit.element === null) {
+                        damage /= 2;
+                    }
+                } else {
+                    damage /= 2;
+                    iframeMultiplier *= 1.2;
+                }
             }
             this.takeDamage(state, damage, iframeMultiplier);
         }
@@ -485,6 +494,7 @@ export class Hero implements Actor {
         if (state.scriptEvents.blockPlayerInput) {
             return;
         }
+        damage *= gameModifiers.globalDamageTaken;
         // Immediately change display life to the current life so that it is obvious how much
         // damage the most recent hid did.
         this.displayLife = this.life;
@@ -940,7 +950,10 @@ export class Hero implements Actor {
     // This should only be called on `state.hero`.
     increaseMagicRegenCooldown(amount: number): void {
         //console.log('increaseMagicRegenCooldown', amount);
-        this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
+        this.magicRegenCooldown = Math.min(
+            Math.max(100 * gameModifiers.spiritEnergyCooldown, this.magicRegenCooldown + amount * gameModifiers.spiritEnergyCooldown),
+            this.magicRegenCooldownLimit * gameModifiers.spiritEnergyCooldown,
+        );
     }
 }
 

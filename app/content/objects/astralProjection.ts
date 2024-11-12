@@ -3,18 +3,18 @@ import { getCloneMovementDeltas } from 'app/userInput';
 import { renderCarriedTile } from 'app/renderActor';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap, getCardinalDirection } from 'app/utils/direction';
 
 
 
-let lastPullAnimation = null;
+let lastPullAnimation: AnimationSet = null;
 export function getSpiritFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
     switch (hero.action) {
         // Grabbing currently covers animations for pulling/pushing objects that are grabbed.
         case 'grabbing':
             const [dx, dy] = directionMap[hero.d];
-            const oppositeDirection = getDirection(-dx, -dy);
+            const oppositeDirection = getCardinalDirection(-dx, -dy);
             const [kdx, kdy] = getCloneMovementDeltas(state, hero);
             if (hero.grabObject?.pullingHeroDirection === oppositeDirection) {
                 lastPullAnimation = heroSpiritAnimations.pull;

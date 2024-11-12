@@ -516,7 +516,7 @@ export class HeldChakram implements EffectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.animationTime < 100) {
             return;
         }

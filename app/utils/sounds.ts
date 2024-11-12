@@ -1,7 +1,7 @@
 import { noteFrequencies } from './noteFrequencies';
 
 const sounds = new Map<string, GameSound>();
-window['sounds'] = sounds;
+window.sounds = sounds;
 
 // This was being used to unlock audio on player interaction, but maybe this isn't necessary any more?
 // We should test this on other browsers.
@@ -17,30 +17,57 @@ export function isAudioUnlocked() {
     return audioContext.currentTime > 0;
 }
 
-export function requireSound(key): GameSound {
+interface BaseSoundDefinition {
+    source: string
+    volume?: number
+    offset?: number
+    duration?: number
+    customDelay?: number
+    limit?: number
+    repeatFrom?: number
+}
+interface SoundEffectDefinition extends BaseSoundDefinition {
+    key: string
+    instanceLimit?: number
+    loop?: boolean
+}
+interface TrackDefinition extends BaseSoundDefinition {
+    key: TrackKey
+    nextTrack?: TrackKey
+}
+
+export function requireSoundEffect({
+    key, source, offset, duration, customDelay, volume, instanceLimit = 5, loop = false, repeatFrom,
+}: SoundEffectDefinition): GameSound {
+    const sound = sounds.get(key);
+    if (sound) {
+        return sound;
+    }
     // Note that since sounds are cached by key, if the same key is used with different options,
     // it will be returned with the options first used for that key.
-    let source, loop, offset, volume, customDelay, duration, limit, repeatFrom, nextTrack, type = 'default';
-    if (typeof key === 'string') {
-        [source, offset, volume] = key.split('+');
-        key = source;
-    } else {
-        offset = key.offset;
-        duration = key.duration;
-        customDelay = key.customDelay;
-        volume = key.volume;
-        limit = key.limit;
-        loop = key.loop;
-        source = key.source;
-        repeatFrom = key.repeatFrom;
-        nextTrack = key.nextTrack;
-        type = key.type || type;
-        key = key.key || source;
+    const newSound: GameSound = {
+        key,
+        volume: volume / 50,
+        offset,
+        repeatFrom,
+        customDelay,
+        duration,
+        loop,
+        instanceLimit,
+        instances: [],
+    };
+    // Add the audio buffer to the sound as soon as it is loaded.
+    assignAudioBuffer(newSound, source);
+    sounds.set(key, newSound);
+    return newSound;
+}
+export function requireTrack({
+    key, source, offset, duration, customDelay, volume, repeatFrom, nextTrack,
+}: TrackDefinition): GameSound {
+    const sound = sounds.get(key);
+    if (sound) {
+        return sound;
     }
-    if (sounds.has(key)) {
-        return sounds.get(key);
-    }
-
     const newSound: GameSound = {
         key,
         volume: volume / 50,
@@ -49,20 +76,26 @@ export function requireSound(key): GameSound {
         customDelay,
         duration,
         instances: [],
+        nextTrack,
+        loop: !nextTrack
     };
-    if (type === 'bgm') {
-        newSound.nextTrack = nextTrack;
-        newSound.loop = !nextTrack;
-    } else {
-        newSound.loop = loop || false;
-        newSound.instanceLimit = limit || 5;
-    }
-    fetch(source)
-        .then(res => res.arrayBuffer())
-        .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
-        .then(audioBuffer => newSound.audioBuffer = audioBuffer);
+    // Add the audio buffer to the sound as soon as it is loaded.
+    assignAudioBuffer(newSound, source);
     sounds.set(key, newSound);
     return newSound;
+}
+
+const audioBufferPromises = new Map<string, Promise<AudioBuffer>>();
+// Assigns an audio buffer to a GameSound, loading it if necessary and caching the result for future calls.
+async function assignAudioBuffer(sound: GameSound, source: string) {
+    let audioBufferPromise = audioBufferPromises.get(source);
+    if (!audioBufferPromise) {
+        audioBufferPromise = fetch(source).then(res => res.arrayBuffer())
+            .then(arrayBuffer => audioContext.decodeAudioData(arrayBuffer))
+            .then(audioBuffer => audioBuffer);
+        audioBufferPromises.set(source, audioBufferPromise);
+    }
+    sound.audioBuffer = await audioBufferPromise;
 }
 
 // This is used for any sounds loaded into audio buffers.
@@ -121,7 +154,11 @@ function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: nu
 }
 
 export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime): AudioInstance | undefined {
-    const sound = requireSound(key);
+    const sound = sounds.get(key);
+    if (!sound) {
+        throw new Error('Tried to play missing sound ' + key);
+        return;
+    }
     const currentTime = audioContext.currentTime;
     // Synth sounds don't support instances yet.
     // Clean up references to any instances that should have completed.
@@ -192,13 +229,13 @@ export function updateAudio(state: GameState) {
             continue;
         }
         for (const instance of currentTrack.instances) {
-            const nextTrack = requireSound(musicTracks[currentTrack.nextTrack]);
+            const nextTrack = requireTrack(musicTracks[currentTrack.nextTrack]);
             if (instance.endTime < currentTime + 0.2) {
                 if (!nextTrack.instances.length) {
                     // console.log('Scheduling next track', currentTrack.nextTrack, instance.endTime);
                     const track = playTrack(currentTrack.nextTrack, 0, false, false, instance.endTime);
                     if (track) {
-                        track.baseTrack = currentTrack.baseTrack || currentTrack.key;
+                        track.baseTrack = currentTrack.baseTrack || currentTrack.trackKey;
                     }
                 }
             }
@@ -223,9 +260,10 @@ export function updateAudio(state: GameState) {
             if (instance) {
                 // If a new instance was created, overwrite the existing instance in place so
                 // that existing references to it get the updated instance.
-                for (const key in instance) {
-                    soundEffect[key] = instance[key];
-                }
+                //for (const key in instance) {
+                //    soundEffect[key] = instance[key];
+                //}
+                Object.assign(soundEffect, instance);
                 delete soundEffect.stopTime;
             } else {
                 // If the new instance didn't start for some reason, just remove it from the array.
@@ -238,48 +276,48 @@ export function updateAudio(state: GameState) {
     playingTracks = playingTracks.filter(track => track.instances.length);
 }
 
-const musicTracks = {
+const musicTracks: {[key in string]: TrackDefinition} = {
     // Tracks from Nick
     // Used in various caves
-    caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 20 },
+    caveTheme: {key: 'caveTheme', source: 'bgm/Spirit 1.mp3', volume: 20 },
     // Used on the title screen and world map
-    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
+    mainTheme: {key: 'mainTheme', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    waterfallVillageTheme: {key : 'waterfallVillageTheme', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
-    vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
-    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
+    waterfallVillageTheme: {key : 'waterfallVillageTheme', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
+    vanaraForestTheme: {key: 'vanaraForestTheme', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
+    tombTheme: {key: 'tombTheme', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
-    cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 10 },
-    vanaraDreamTheme: {key: 'vanaraDreamTheme', type: 'bgm', source: 'bgm/Spirit 18_concept.mp3', volume: 10 },
-    helixTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10 },
-    waterfallTowerTheme: {key: 'waterfallTowerTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 10 },
-    forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 10 },
-    craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 10 },
+    cocoonTheme: {key: 'cocoonTheme', source: 'bgm/Spirit 6 Demo.mp3', volume: 10 },
+    vanaraDreamTheme: {key: 'vanaraDreamTheme', source: 'bgm/Spirit 18_concept.mp3', volume: 10 },
+    helixTheme: {key: 'helixTheme', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10 },
+    waterfallTowerTheme: {key: 'waterfallTowerTheme', source: 'bgm/Public Surface_concept.mp3', volume: 10 },
+    forgeTheme: {key: 'forgeTheme', source: 'bgm/Public Surface.b_concept.mp3', volume: 10 },
+    craterTheme: {key: 'craterTheme', source: 'bgm/Fatty Richness_demo.mp3', volume: 10 },
     // Used for the tower after it is activated.
-    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 10 },
-    skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 10 },
+    towerTheme: {key: 'towerTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10 },
+    skyTheme: {key: 'skyTheme', source: 'bgm/Spirit 14_demo.mp3', volume: 10 },
     // Used for the lake temple
-    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/ocean.mp3', volume: 8 },
-    skyPalaceTheme: {key: 'skyPalaceTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
+    lakeTheme: {key: 'lakeTheme', source: 'bgm/ocean.mp3', volume: 8 },
+    skyPalaceTheme: {key: 'skyPalaceTheme', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
+    village: {key : 'village', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
     // Used for summoner ruins.
-    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
+    ruins: {key : 'ruins', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
 
     // Tracks from Leon
     // For War Temple and other dungeons
-    dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 20 },
-    idleTheme: {key: 'idleTheme', type: 'bgm', source: 'bgm/IdleMusic.mp3', volume: 20 },
-    bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 40, nextTrack: 'bossA' },
-    bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
-    bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
+    dungeonTheme: {key: 'dungeonTheme', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 20 },
+    idleTheme: {key: 'idleTheme', source: 'bgm/IdleMusic.mp3', volume: 20 },
+    bossIntro: {key: 'bossIntro', source: 'bgm/SpookyThemeIntro.mp3', volume: 40, nextTrack: 'bossA' },
+    bossA: {key: 'bossA', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
+    bossB: {key: 'bossB', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
 // Immediately load the theme for the prologue scene.
-requireSound(musicTracks.dungeonTheme);
+requireTrack(musicTracks.dungeonTheme);
 // Also load the theme for the title scene.
-requireSound(musicTracks.mainTheme);
+requireTrack(musicTracks.mainTheme);
 export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = true, crossFade = true, startTime = audioContext.currentTime): GameSound|false {
-    const sound = requireSound(musicTracks[trackKey]);
+    const sound = requireTrack(musicTracks[trackKey]);
     if (!isAudioUnlocked()) {
         return false;
     }
@@ -405,28 +443,15 @@ const preloadSounds = () => {
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, limit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, limit: 2},
-    ].forEach(sound => requireSound(sound));
+    ].forEach(sound => requireSoundEffect(sound));
 };
 preloadSounds();
 
-
-/*
-export function getSoundDuration(key) {
-    const sound = requireSound(key);
-    if (sound.duration) {
-        return sound.duration;
-    }
-    if (!sound.howl || !sound.howl.duration()) {
-        return false;
-    }
-    sound.duration = sound.howl.duration();
-    return sound.duration;
-}*/
-
-window['playSound'] = playSound;
-window['playTrack'] = playTrack;
-window['stopTrack'] = stopTrack;
-window['requireSound'] = requireSound;
+window.playSound = playSound;
+window.playTrack = playTrack;
+window.stopTrack = stopTrack;
+window.requireTrack = requireTrack;
+window.requireSoundEffect = requireSoundEffect;
 
 // Safari uses webkitAudioContext instead of AudioContext.
 const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
@@ -672,7 +697,7 @@ function getBellFrequencies(baseFrequency: number): number[] {
     return bellFrequencies.map(n => baseFrequency * n);
 }
 
-const notes = Object.keys(noteFrequencies);
+const notes = Object.keys(noteFrequencies) as (keyof typeof noteFrequencies)[];
 
 notes.forEach((noteName) => {
     sounds.set(`bell${noteName}`, {

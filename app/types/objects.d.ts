@@ -435,7 +435,7 @@ interface BaseObjectDefinition {
     isInvisible?: boolean
     x: number
     y: number
-    d?: Direction
+    d?: CardinalDirection
 }
 
 interface BallGoalDefinition extends BaseSwitchDefinition {
@@ -454,10 +454,10 @@ interface AnodeDefinition extends BaseObjectDefinition {
     offInterval?: number
 }
 
-type TurretStyles = 'crystal' | 'arrow';
+type TurretStyle = 'crystal' | 'arrow';
 interface TurretDefinition extends BaseObjectDefinition {
     type: 'turret'
-    style?: TurretStyles
+    style?: TurretStyle
     // Milliseconds between arrows
     fireInterval?: number
     // Setting different offsets on turrets will make them fire at different times
@@ -585,7 +585,7 @@ interface ElevatorDefinition extends BaseObjectDefinition {
 }
 
 interface SimpleMovementDefinition {
-    d?: Direction
+    d?: CardinalDirection
     speed: number
     turn: 'left' | 'right' | 'bounce'
 }

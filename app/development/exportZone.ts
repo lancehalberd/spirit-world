@@ -99,13 +99,13 @@ export function serializeZone(zone: Zone) {
                         lines.push('    ],');
                     }
                     lines.push('    objects: [');
-                    for (const object of (area?.objects || [])) {
+                    for (const object of (area?.objects || []) as {[key in string]: any}[]) {
                         lines.push(`        {${Object.keys(object).filter(k => object[k] !== undefined && object[k] !== null).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
                     }
                     lines.push('    ],');
                     if (area?.variants?.length) {
                         lines.push('    variants: [');
-                        for (const variant of area.variants) {
+                        for (const variant of area.variants as {[key in string]: any}[]) {
                             lines.push(`        {${Object.keys(variant).filter(k => variant[k] !== undefined && variant[k] !== null).map(k => `${k}: ${JSON.stringify(variant[k])}` ).join(', ')}},`);
                         }
                         lines.push('    ],');
@@ -222,7 +222,7 @@ export function importZone(fileContents: string, currentZoneKey: string): string
     }
     // console.log(fileContents);
     fileContents = fileContents.replace(/zones\./, 'localZones.');
-    const localZones = {};
+    const localZones: {[key in string]: Zone} = {};
     try {
         eval(fileContents);
     } catch (error) {

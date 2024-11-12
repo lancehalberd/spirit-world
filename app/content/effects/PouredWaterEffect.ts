@@ -49,7 +49,7 @@ export class PouredWaterEffect implements EffectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = getFrame(this.hasHit ? waterDropHitAnimation : waterDropFallAnimation, this.animationTime);
         drawFrame(context, frame, {...frame, x: this.x, y: this.y});
     }

@@ -13,13 +13,16 @@ import { playAreaSound } from 'app/musicController';
 import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
 import { setAreaSection } from 'app/utils/area';
+import {
+    directionMap,
+    getCardinalDirection,
+    getDirection,
+} from 'app/utils/direction';
 import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
 import {
     canSomersaultToCoords,
-    directionMap,
-    getDirection,
     hitTargets,
     isTileOpen,
 } from 'app/utils/field';
@@ -159,7 +162,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.vx = dx;
         hero.vy = dy;
         if (dx || dy) {
-            hero.d = getDirection(dx, dy);
+            hero.d = getCardinalDirection(dx, dy);
         }
         return true;
     }
@@ -819,9 +822,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
             hero.animationTime = 0;
-            // Don't allow rolling for two Sframes after completing a roll.
-            // This helps keep players from rolling over pits.
-            hero.rollCooldown = 40;
+            // Don't allow rolling for two frames after completing a roll.
+            // This helps keep players from rolling over pits and brittle ground.
+            hero.rollCooldown = 60; // 20ms will immediately be removed from this, so we use 60ms for 2 frames.
             // Immediately check for floor effects so we detect pits/water/slipping as soon as the roll is over.
             checkForFloorEffects(state, hero);
         } else {
@@ -876,7 +879,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
     // Cloud somersault roll activated by rolling again mid roll.
     const [dx, dy] = getCloneMovementDeltas(state, hero);
     state.hero.spendMagic(10, 500);
-    hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
+    hero.d = (dx || dy) ? getCardinalDirection(dx, dy) : hero.d;
     // Default direction is the direction the current roll uses.
     const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
     const direction = getDirection(dx, dy, true, defaultDirection);

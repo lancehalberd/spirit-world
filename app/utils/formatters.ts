@@ -23,7 +23,7 @@ export function formatValue(value: any, digits: number = 1): string {
 
 // Wrapper for toFixed that strips trailing '0's and '.'s.
 // Foundt at http://stackoverflow.com/questions/7312468/javascript-round-to-a-number-of-decimal-places-but-strip-extra-zeros
-export function abbreviate(number, digits: number = null) {
+export function abbreviate(number: number, digits: number = null) {
     if (digits) {
         number = fixedDigits(number, digits);
     }
@@ -73,6 +73,6 @@ function anima(amount: any) {
     return tag('span', 'icon anima') + ' ' + tag('span', 'value anima', amount);
 }*/
 
-export function properCase(string) {
+export function properCase(string: string) {
     return string.split(' ').map(function (word) {return word.charAt(0).toUpperCase() + word.substring(1)}).join(' ');
 }

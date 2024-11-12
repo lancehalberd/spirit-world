@@ -6,12 +6,13 @@ interface IElectronAPI {
 interface Window {
   version: string
   electronAPI: IElectronAPI
+  [key: string]: any;
 }
 
 type Collection<T> = {[key:string]: T} | Array<T>;
 
 type Color = string;
-type Range = [number, number];
+// type Range = [number, number];
 
 type Tags = {[key: string]: true};
 

@@ -133,7 +133,7 @@ export class BarrierBurstEffect implements EffectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         // Debug code for viewing the hitCircle
         /*const r = this.getRadius();
         if (r > 0) {

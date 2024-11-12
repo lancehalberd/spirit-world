@@ -208,7 +208,7 @@ export function getFrameHitbox({content, w, h}: Frame, {x, y}: {x: number, y: nu
     };
 }
 
-export function drawSolidTintedFrame(context, frame: TintedFrame, target: Rect) {
+export function drawSolidTintedFrame(context: CanvasRenderingContext2D, frame: TintedFrame, target: Rect) {
     const [tintCanvas, tintContext] = createCanvasAndContext(frame.w, frame.h);
     // First make a solid color in the shape of the image to tint.
     tintContext.save();

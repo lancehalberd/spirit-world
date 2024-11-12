@@ -1,6 +1,7 @@
 import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import {moveActorTowardsLocation} from 'app/movement/moveActor';
 import { appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
@@ -69,9 +70,14 @@ dialogueHash.jadeChampionWarTemple = {
             runPlayerBlockingCallback(state, (state: GameState) => {
                 jadeChampion.speed = 1;
                 jadeChampion.animationTime += FRAME_LENGTH;
-                if (moveNPCToTargetLocation(state, jadeChampion, 162, 476, 'move')) {
+                state.hero.animationTime += FRAME_LENGTH;
+                const heroIsMoving = moveActorTowardsLocation(state, state.hero, {x: 256, y: 380}) > 0;
+                const jadeChampionIsMoving = moveNPCToTargetLocation(state, jadeChampion, 162, 476, 'move') > 0;
+                // console.log(heroIsMoving, jadeChampionIsMoving);
+                if (heroIsMoving || jadeChampionIsMoving) {
                     return true;
                 }
+                state.hero.d = 'down';
                 jadeChampion.changeToAnimation('idle');
             });
             appendScript(state, '{wait:500}');

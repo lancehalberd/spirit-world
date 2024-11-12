@@ -12,13 +12,13 @@ export function orLogic(...logicChecks: LogicCheck[]): OrLogicCheck {
 window['orLogic'] = orLogic;
 
 export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
-    let level = 1, levelString;
+    let level = 1, levelString: string;
     if (itemFlag.includes(':')) {
         [itemFlag, levelString] = itemFlag.split(':');
         level = parseInt(levelString, 10);
         if (isNaN(level)) {
             // assume levelString is item string, itemFlag is zone key
-            return !!state.savedState.dungeonInventories[itemFlag]?.[levelString];
+            return !!state.savedState.dungeonInventories[itemFlag]?.[levelString as keyof DungeonInventory];
         }
     }
     if (itemFlag === 'isSpirit') {
@@ -45,10 +45,12 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     if (itemFlag === 'goldOre') {
         return state.hero.savedData.goldOre >= level;
     }
-    return state.hero.savedData.activeTools[itemFlag] >= level || state.hero.savedData.passiveTools[itemFlag] >= level
-        || state.hero.savedData.elements[itemFlag] >= level || state.hero.savedData.equipment[itemFlag] >= level
-        || state.hero.savedData.blueprints[itemFlag]
-        || state.hero.savedData.weaponUpgrades[itemFlag];
+    return state.hero.savedData.activeTools[itemFlag as ActiveTool] >= level
+        || state.hero.savedData.passiveTools[itemFlag as PassiveTool] >= level
+        || state.hero.savedData.elements[itemFlag as MagicElement] >= level
+        || state.hero.savedData.equipment[itemFlag as Equipment] >= level
+        || state.hero.savedData.blueprints[itemFlag as Blueprints] >= level
+        || state.hero.savedData.weaponUpgrades[itemFlag as WeaponUpgrades];
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {

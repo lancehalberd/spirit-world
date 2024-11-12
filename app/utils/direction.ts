@@ -43,6 +43,15 @@ export function rotateDirection(d: Direction, leftRotations: number): Direction 
     return leftRotationsFromRightToDirection[newRotation];
 }
 
+// leftRotations is in 90 degree rotations to the left and can accept half rotations for 45 degrees.
+export function rotateCardinalDirection(d: CardinalDirection, leftRotations: number): CardinalDirection {
+    leftRotations = Math.round(leftRotations * 2);
+    // Calculates a new rotation in the range of 0-7.
+    const newRotation = ((directionToLeftRotationsFromRight[d] + leftRotations) % 8 + 8) % 8;
+    return leftRotationsFromRightToDirection[newRotation] as CardinalDirection;
+}
+
+
 // 15, 4, 4,
 // This is a map of offsets used to animate an object being picked up by the player, and is designed for use with a
 // 16x16 tile.
@@ -63,6 +72,22 @@ export const carryMap = {
     //'down': [{x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: -3}, {x: 0, y: -7}, {x: 0, y: -13}],
     'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
 };
+
+export function getCardinalDirection(dx: number, dy: number, defaultDirection: CardinalDirection = null): CardinalDirection {
+    if (Math.abs(dy) < 0.2) {
+        dy = 0;
+    }
+    if (Math.abs(dx) < 0.2) {
+        dx = 0;
+    }
+    if (defaultDirection && !dy && !dx) {
+        return defaultDirection;
+    }
+    if (Math.abs(dx) > Math.abs(dy)) {
+        return dx < 0 ? 'left' : 'right';
+    }
+    return dy < 0 ? 'up' : 'down';
+}
 
 export function getDirection(dx: number, dy: number, includeDiagonals = false, defaultDirection: Direction = null): Direction {
     if (Math.abs(dy) < 0.2) {

@@ -87,7 +87,7 @@ export function updateInventory(state: GameState) {
             showMessage(state, '{@nimbusCloud.returnMenu}');
             return;
         }
-        if (state.hero.savedData.activeTools[menuItem]) {
+        if (state.hero.savedData.activeTools[menuItem as ActiveTool]) {
             if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
                 if (state.hero.savedData.leftTool === menuItem) {
                     setLeftTool(state, state.hero.savedData.rightTool);
@@ -114,7 +114,7 @@ export function updateInventory(state: GameState) {
         if (menuItem === 'neutral' || state.hero.savedData.element === menuItem) {
             setEquippedElement(state, null);
             return;
-        } else if (state.hero.savedData.elements[menuItem]) {
+        } else if (state.hero.savedData.elements[menuItem as MagicElement]) {
             setEquippedElement(state, menuItem as MagicElement);
             return;
         }
@@ -127,7 +127,7 @@ export function updateInventory(state: GameState) {
         if (state.hero.savedData.passiveTools[menuItem as PassiveTool]) {
             state.paused = false;
             updateSoundSettings(state);
-            const helpMessage = getLootHelpMessage(state, menuItem, state.hero.savedData.passiveTools[menuItem]);
+            const helpMessage = getLootHelpMessage(state, menuItem, state.hero.savedData.passiveTools[menuItem as PassiveTool]);
             showMessage(state, helpMessage);
         }
     }

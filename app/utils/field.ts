@@ -102,7 +102,7 @@ function isPointOpen(
 }
 
 function getHitTiles(area: AreaInstance, hit: HitProperties): TileCoords[] {
-    let hitTiles = [];
+    let hitTiles: TileCoords[] = [];
     if (hit.tileHitbox || hit.hitbox) {
         hitTiles = getTilesInRectangle(area, hit.tileHitbox || hit.hitbox);
     }

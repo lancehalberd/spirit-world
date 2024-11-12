@@ -81,7 +81,7 @@ function valueMatchesConstraints(newMin: number, newMax: number, currentMin: num
     return true;
 }
 
-function areCoordsOpen(nodeMap, x: number, y: number, z: number, w: number, h: number) {
+function areCoordsOpen(nodeMap: NodeMap, x: number, y: number, z: number, w: number, h: number) {
     for (let dy = 0; dy < h; dy++) {
         for (let dx = 0; dx < w; dx++) {
             if (nodeMap[`${z}:${x + dx}x${y + dy}`]) {
@@ -94,7 +94,7 @@ function areCoordsOpen(nodeMap, x: number, y: number, z: number, w: number, h: n
 
 function attemptToPlaceChild(
     random: SRandom,
-    nodeMap: {[key in string]: TreeNode},
+    nodeMap: NodeMap,
     {xMin, xMax, yMin, yMax, zMin, zMax}: Bounds,
     constraints: ZoneConstraints,
     parent: TreeNode,
@@ -264,7 +264,7 @@ function attemptToPlaceChild(
     // the entrance direction restriction. To make sure this resolves as quickly as possible, we
     if (child.entranceDirections) {
         // Exhaust all paths that stay on the same floor first.
-        const pathMapGood: {[key in Direction]?: number[][][]} = {
+        const pathMapGood: {[key in CardinalDirection]: number[][][]} = {
             down: [
                 [[x - 1, y, z], [x - 1, y - 1, z]],
                 [[x + 1, y, z], [x + 1, y - 1, z]],
@@ -283,7 +283,7 @@ function attemptToPlaceChild(
             ],
         };
         // Fall back to paths that change floors if none of the others work.
-        const pathMapBad: {[key in Direction]?: number[][][]} = {
+        const pathMapBad: {[key in CardinalDirection]: number[][][]} = {
             down: [
                 [[x, y, z - 1], [x, y - 1, z - 1]],
                 [[x, y, z + 1], [x, y - 1, z + 1]],
@@ -303,10 +303,10 @@ function attemptToPlaceChild(
         };
         for (const pathMap of [pathMapGood, pathMapBad]) {
             random.generateAndMutate();
-            for (const direction of random.shuffle(Object.keys(pathMap))) {
-                if (child.entranceDirections.includes(direction as Direction)) {
+            for (const direction of random.shuffle(Object.keys(pathMap)  as CardinalDirection[])) {
+                if (child.entranceDirections.includes(direction)) {
                     random.generateAndMutate();
-                    for (const path of random.shuffle(pathMap[direction as Direction])) {
+                    for (const path of random.shuffle(pathMap[direction])) {
                         const [x1, y1, z1] = path[0];
                         const [x2, y2, z2] = path[1];
                         // Validate all the coordinates respect the constraints
@@ -356,7 +356,7 @@ const expandRoomChance = 0.32;
 
 function checkToExpandPlacedNode(
     random: SRandom,
-    nodeMap: {[key in string]: TreeNode},
+    nodeMap: NodeMap,
     {xMin, xMax, yMin, yMax, zMin, zMax}: Bounds,
     constraints: ZoneConstraints,
     node: TreeNode
@@ -448,7 +448,7 @@ function createZoneFromTree(props: {
     normalizeTree(random, tree);
     mutateTree(random, tree);
 
-    const nodeMap: {[key: string]: TreeNode} = {};
+    const nodeMap: NodeMap = {};
     // Choose random parity for the starting room so that the initial room is not always placed in the top left corner
     random.generateAndMutate();
     const startX = random.range(entrance.x[0], entrance.x[1]);
@@ -979,7 +979,7 @@ function createZoneFromTree(props: {
     zones[zoneId] = zone;
 }
 
-function tryPlacingNode(nodeMap, node: TreeNode, coords: Point): boolean {
+function tryPlacingNode(nodeMap: NodeMap, node: TreeNode, coords: Point): boolean {
     const {w, h} = node.dimensions;
     // We can place this node here as long as any of the covered spots are either
     // open, or already occupied by this node (in the case of trying to expand the node).

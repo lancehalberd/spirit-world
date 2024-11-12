@@ -56,7 +56,7 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
 }
 
 export class LootGetAnimation implements EffectInstance {
-    definition = null;
+    definition: LootObjectDefinition = null;
     behaviors = {
         solid: true,
         brightness: 1,
@@ -110,7 +110,7 @@ export class LootGetAnimation implements EffectInstance {
             removeEffectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = this.frame;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
@@ -214,7 +214,7 @@ export class LootObject implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {
@@ -225,7 +225,7 @@ export class LootObject implements ObjectInstance {
         }
         drawFrameAt(context, this.frame, { x: this.x, y: this.y - this.z });
     }
-    renderShadow(context, state: GameState) {
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {
@@ -426,7 +426,7 @@ export class ChestObject implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);
@@ -497,7 +497,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
             state.map.needsRefresh = true;
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.isOpen(state)) {
             drawFrameAt(context, largeChestOpenedFrame, {x: this.x, y: this.y});
         } else {
@@ -564,7 +564,7 @@ export class ShopObject extends LootObject implements ObjectInstance {
         }
         this.checkToMarkAsPeeked(state);
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {

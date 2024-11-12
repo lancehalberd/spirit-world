@@ -8,7 +8,7 @@ interface EntranceGenerationRules {
     id: string
     targetZone: string
     targetObjectId: string
-    direction: Direction
+    direction: CardinalDirection
     style?: GenerationStyle
     type: 'door'|'upstairs'|'downstairs'|'ladder'
 }
@@ -69,11 +69,11 @@ interface SlotGenerator {
 }
 
 interface RoomSlot extends Rect {
-    d?: Direction
+    d?: CardinalDirection
     id: string
 }
 interface RoomPath extends Rect {
-    d: Direction
+    d: CardinalDirection
     sourceId: string
     targetId: string
 }
@@ -95,9 +95,9 @@ interface TreeNode {
     depth?: number
     // If set, the room will generate with entrances in this direction.
     // For example if this is ['down'], then the entrance must be on the south side of the room.
-    entranceDirections?: Direction[]
+    entranceDirections?: CardinalDirection[]
     entrance?: {
-        d: Direction
+        d: CardinalDirection
         type: 'door'
         id: string
         targetZone: string
@@ -135,3 +135,5 @@ interface TreeNode {
     id?: string
     skeleton?: RoomSkeleton
 }
+
+type NodeMap = {[key in string]: TreeNode};

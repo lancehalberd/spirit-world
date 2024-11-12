@@ -8,14 +8,15 @@ import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
 import { objectHash } from 'app/content/objects/objectHash';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
 import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
+import {getCardinalDirection} from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
-import { breakBrittleTilesInRect, getDirection } from 'app/utils/field';
+import { breakBrittleTilesInRect } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
@@ -61,7 +62,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // This ignores the default pit logic in favor of the ground effects
     // code used internally.
     ignorePits = true;
-    d: Direction;
+    d: CardinalDirection;
     // Rotation is used for changing directions of certain sprites.
     rotation: number;
     spawnX: number;
@@ -237,7 +238,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         const targetHitbox = target.getHitbox();
         const dx = targetHitbox.x + targetHitbox.w / 2 - (hitbox.x + hitbox.w / 2);
         const dy = targetHitbox.y + targetHitbox.h / 2 - (hitbox.y + hitbox.h / 2);
-        this.d = getDirection(dx, dy);
+        this.d = getCardinalDirection(dx, dy);
     }
     isInCurrentSection(state: GameState): boolean {
         const { section } = getAreaSize(state);
@@ -428,6 +429,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.life <= 0) {
             return;
         }
+        damage *= gameModifiers.globalDamageDealt;
         this.life = Math.max(0, this.life - damage);
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
@@ -846,13 +848,13 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.enemyDefinition.afterUpdate(state, this);
         }
     }
-    getHealthPercent(state): number {
+    getHealthPercent(state: GameState): number {
         if (this.enemyDefinition.getHealthPercent) {
             return this.enemyDefinition.getHealthPercent(state, this);
         }
         return this.life / this.enemyDefinition.life;
     }
-    getShieldPercent(state): number {
+    getShieldPercent(state: GameState): number {
         if (this.enemyDefinition.getShieldPercent) {
             return this.enemyDefinition.getShieldPercent(state, this);
         }

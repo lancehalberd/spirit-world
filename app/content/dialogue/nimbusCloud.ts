@@ -13,7 +13,7 @@ import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 // Then we can use that exact key for returning, and use a small map
 // for things like pits to map to some reasonable alternative,
 // or add the ability for entering a zone from a pit.
-export const zoneEntranceMap = {
+export const zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     'peachCave': 'overworld:peachCaveTopEntrance',
     // peachCaveWaterEntrance
     'tomb': 'overworld:tombEntrance',

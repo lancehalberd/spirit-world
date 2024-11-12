@@ -6,7 +6,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { playAreaSound } from 'app/musicController';
 import { prependScript } from 'app/scriptEvents';
@@ -15,10 +15,7 @@ import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
 import { removeAllClones, setNextAreaSection } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
-import {
-    breakBrittleTilesInRect,
-    directionMap,
-} from 'app/utils/field';
+import {directionMap} from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { boxesIntersect, pad } from 'app/utils/index';
@@ -103,12 +100,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // Mostly don't check for pits/damage when the player cannot control themselves
         if (!hero.isAstralProjection) {
             checkForFloorEffects(state, hero);
-            if (hero.z <= 0 && hero.action !== 'roll') {
-                // It would be nice not to break everything under the hitbox here, for example,
-                // by using a smaller hitbox. Unfortunately that would allow the player to walk
-                // over cracked tiles by walking in between them.
-                breakBrittleTilesInRect(state, hero.area, hero.getFloorHitbox());
-            }
         }
     }
     updateGenericHeroState(state, hero);
@@ -179,7 +170,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         }
         if (hero.savedData.passiveTools.phoenixCrown > 0) {
             // If the hero has the phoenix crown, burning causes them to gain spirit instead of draining it an causing damage.
-            state.hero.magic += 5 * FRAME_LENGTH / 1000;
+            if (!gameModifiers.nerfPhoenixCrown) {
+                state.hero.magic += 5 * FRAME_LENGTH / 1000;
+            }
         } else if (hero.savedData.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
             hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - state.hero.burnDamage / 2 * FRAME_LENGTH / 1000);
@@ -346,7 +339,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
         // Double regeneration rate while idle.
         if (state.hero.magicRegenCooldown <= 0) {
-            state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+            state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000 * gameModifiers.spiritEnergyRegeneration;
         }
     } else if (isActuallyRunning) {
         // Spirit regeneration does not apply while running, but depletion still takes effect.
@@ -361,7 +354,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     } else if (!isTryingToRun) {
         // Normal regeneration rate, this doesn't apply when the hero is trying to run.
         if (state.hero.magicRegenCooldown <= 0) {
-            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000 * gameModifiers.spiritEnergyRegeneration;
         }
     }
     if (state.hero.clones.length) {

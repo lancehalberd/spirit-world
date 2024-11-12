@@ -3,7 +3,7 @@ import { Hero } from 'app/content/hero';
 
 import { renderHeroShadow } from 'app/renderActor';
 import { destroyClone } from 'app/utils/destroyClone';
-import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/direction';
+import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 
 
@@ -16,6 +16,7 @@ export class Clone extends Hero {
     constructor(hero: Hero) {
         super();
         for (let k in hero) {
+            // @ts-ignore: no implicity any
             this[k] = hero[k];
         }
         this.isClone = true;
@@ -78,6 +79,6 @@ export class Clone extends Hero {
         this.x = this.carrier.x + offset.x + dx;
         this.y = this.carrier.y + dy;
         this.z = -offset.y;
-        this.d = rotateDirection(this.carrier.d, this.carryRotationOffset);
+        this.d = rotateCardinalDirection(this.carrier.d, this.carryRotationOffset);
     }
 }

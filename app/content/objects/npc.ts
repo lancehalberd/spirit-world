@@ -38,7 +38,7 @@ import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { isDialogueHeard, selectDialogueOption, setDialogueHeard } from 'app/utils/dialogue';
-import { directionMap, rotateDirection } from 'app/utils/direction';
+import { directionMap, rotateCardinalDirection } from 'app/utils/direction';
 import { sample } from 'app/utils/index';
 import { moveNPC } from 'app/utils/npc';
 
@@ -311,7 +311,7 @@ export const npcBehaviors = {
 
 export class NPC implements Actor, ObjectInstance  {
     area: AreaInstance;
-    d: Direction;
+    d: CardinalDirection;
     definition: NPCDefinition;
     drawPriority: 'sprites' = 'sprites';
     isObject = <const>true;
@@ -372,12 +372,12 @@ export class NPC implements Actor, ObjectInstance  {
         }
         this.showMessage = true;
         // Face the player while talking.
-        this.d = rotateDirection(hero.d, 2);
+        this.d = rotateCardinalDirection(hero.d, 2);
         this.changeToAnimation('still');
         // Remove the grab action since the hero is talking to the NPC, not grabbing it.
         hero.action = null;
     }
-    changeToAnimation(type: string, d?: Direction) {
+    changeToAnimation(type: string, d?: CardinalDirection) {
         if (d) {
             this.d = d;
         }

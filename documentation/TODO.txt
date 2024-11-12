@@ -66,8 +66,12 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add new cliff graphics
-        - Create mask for northern cliff tiles
+    - Add particle effect or animation for broken brittle crystal ground.
+
+    - Staff should despawn if it is completely over pit tiles.
+        - Staff should destroy cracked ground when placed.
+
+    - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
 
     - Exit from peach cave water doesn't render frozen correctly.
     - Bug: Golem boss stopped moving when hands were killed during enrage phase.
@@ -75,14 +79,6 @@ Current tasks:
     - Add new graphics
         - Add fog effect to the new forest zone.
         - cocoon graphics
-
-    - Update spirit sky
-        - Only break brittle ground if the hero is not standing on any solid ground.
-        - Force player to fall on brittle ground if they roll over it wearing cloud boots.
-
-    - Staff should despawn if it is completely over pit tiles.
-
-    - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
 
     - Brainstorm additional dialogue for characters:
         - After the beasts escape/after the beasts are defeated.
@@ -94,10 +90,6 @@ Current tasks:
         - Helix
 
     - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
-
-    - Make ledge styles clearer
-        - Jump ledges should look flatter
-        - Blocked ledges should look more like walls.
 
     - BLocked: Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
         - It is unclear what to do in the case when the unmaksed behavior can be frozen by enemy attacks but not by hero attacks.

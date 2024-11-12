@@ -268,7 +268,7 @@ class EscalatorRailing implements ObjectInstance {
     get area(): AreaInstance {
         return this.escalator.area;
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const hitbox = this.getHitbox();
         const shadowH = 2;
         let x = hitbox.x;

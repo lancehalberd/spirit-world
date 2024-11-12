@@ -93,7 +93,7 @@ export class Blast implements EffectInstance {
         const p = Math.min(1, time / this.expansionDuration);
         return {x: this.x, y: this.y, r: this.minRadius + p * (this.radius - this.minRadius)};
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const circle = this.getHitCircle();
         if (circle) {
             const persistTime = this.animationTime - this.tellDuration - this.expansionDuration;

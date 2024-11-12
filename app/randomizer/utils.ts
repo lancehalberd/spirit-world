@@ -627,7 +627,7 @@ function assignItemToLocation(assignmentsState: AssignmentState, loot: LootWithL
 }
 
 let finishedRandomizerSolution = false;
-window['showRandomizerSolution'] = function () {
+window.showRandomizerSolution = function (): void {
     let currentState = getDefaultState();
     applySavedState(currentState, currentState.savedState);
     let previousState = currentState;

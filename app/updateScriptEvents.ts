@@ -228,7 +228,7 @@ export function updateScriptEvents(state: GameState): void {
     }
 }
 
-function followMessagePointer(state: GameState, pointer) {
+function followMessagePointer(state: GameState, pointer: string) {
     if (!pointer) {
         return;
     }

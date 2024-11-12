@@ -104,7 +104,7 @@ const GAME_PAD_AXIS_MAPPINGS = {
 };
 
 // Apparently, depending on the button type, either button.pressed or button == 1.0 indicates the button is pressed.
-function buttonIsPressed(button) {
+function buttonIsPressed(button: number|{pressed: boolean}): boolean {
   if (typeof(button) == "object") return button.pressed;
   return button == 1.0;
 }

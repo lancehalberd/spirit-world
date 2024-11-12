@@ -10,7 +10,7 @@ import {
     superElectricSquirrelAnimations
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
-import { directionMap, getDirection } from 'app/utils/direction';
+import { directionMap, getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import {
     moveEnemyFull,
@@ -44,7 +44,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
         const theta = Math.floor(Math.random() * 4) * Math.PI / 2 + Math.PI / 4;
         enemy.vx = enemy.speed * Math.cos(theta);
         enemy.vy = enemy.speed * Math.sin(theta);
-        enemy.d = getDirection(enemy.vx, enemy.vy);
+        enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
         enemy.changeToAnimation('idle');
         enemy.setMode('run')
     } else if (enemy.mode === 'run') {
@@ -52,7 +52,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
         const theta = (Math.round(Math.atan2(enemy.vy, enemy.vx) * 4 / 2 / Math.PI - 0.5) + 0.5) * Math.PI / 2;
         enemy.vx = enemy.speed * Math.cos(theta);
         enemy.vy = enemy.speed * Math.sin(theta);
-        enemy.d = getDirection(enemy.vx, enemy.vy);
+        enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
         checkToSparkle(state, enemy);
         enemy.changeToAnimation('move');
         // Pause sometime after moving for 4 seconds. Max time is theoretically 12s, but is likely much sooner.
@@ -71,7 +71,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
         if (!moveEnemyFull(state, enemy, 0, enemy.vy, {canWiggle: false})) {
             enemy.vy = -enemy.vy;
         }
-        enemy.d = getDirection(enemy.vx, enemy.vy);
+        enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
         //enemy.changeToAnimation('idle');
     } else if (enemy.mode === 'jumping') {
         enemy.changeToAnimation('climbing');
@@ -98,7 +98,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
 }
 
 const maxJumpSpeed = 5;
-function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}, blastRadius = 32) {
+function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}: Point, blastRadius = 32) {
     const enemyHitbox = enemy.getHitbox(state);
     const x = enemyHitbox.x + enemyHitbox.w / 2;
     const y = enemyHitbox.y + enemyHitbox.h / 2;

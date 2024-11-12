@@ -55,7 +55,7 @@ export class CloneExplosionEffect implements EffectInstance {
             removeEffectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = getFrame(bossDeathExplosionAnimation, this.animationTime);
         // Debug code to render the hitbox and makes sure it matches the animation.
         /*if (this.animationTime >= 80 && this.animationTime < 500) {

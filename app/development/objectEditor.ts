@@ -286,7 +286,7 @@ export function createObjectDefinition(
             const bossType = definition.enemyType;
             const lootType = definition.lootType || allLootTypes[0];
             const enemyDefinition = enemyDefinitions[bossType];
-            const params = {};
+            const params: {[key in string]: any} = {};
             for (let key in enemyDefinition?.params || {}) {
                 if (definition.params?.[key] && definition.params?.[key] !== enemyDefinition.params) {
                     params[key] = definition.params[key];
@@ -325,7 +325,7 @@ export function createObjectDefinition(
         case 'enemy': {
             const enemyType = definition.enemyType;
             const enemyDefinition = enemyDefinitions[enemyType];
-            const params = {};
+            const params: {[key in string]: any} = {};
             for (let key in enemyDefinition?.params || {}) {
                 if (definition.params?.[key] && definition.params?.[key] !== enemyDefinition.params) {
                     params[key] = definition.params[key];
@@ -532,7 +532,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
-                style: definition.style || turretStyles[0],
+                style: definition.style || Object.keys(turretStyles)[0] as TurretStyle,
                 d: definition.d || 'down',
                 fireInterval: definition.fireInterval || 1000,
                 fireOffset: definition.fireOffset || 0,
@@ -1387,7 +1387,7 @@ function getDirectionFields(state: GameState, object: ObjectDefinition, defaultD
         name: 'direction',
         value: object.d || defaultDirection,
         values: ['up', 'down', 'left', 'right'],
-        onChange(direction: Direction) {
+        onChange(direction: CardinalDirection) {
             object.d = direction;
             updateObjectInstance(state, object);
         },
@@ -1460,6 +1460,7 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         return [];
     }
 
+    // @ts-ignore: no implicity any
     if (!styles[object.style]) {
         // Keep this default until we remove all the old cave doors.
         if (object.type === 'door') {

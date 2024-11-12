@@ -49,8 +49,6 @@ export const turretStyles = <const>{
     },
 };
 
-export type TurretStyle = keyof typeof turretStyles;
-
 export class WallTurret implements ObjectInstance {
     area: AreaInstance;
     definition: TurretDefinition;

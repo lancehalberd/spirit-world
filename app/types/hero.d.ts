@@ -44,7 +44,7 @@ interface Actor extends ObjectInstance {
     vx: number
     vy: number
     vz: number
-    d: Direction
+    d: CardinalDirection
     action?: Action
     actionDx?: number
     actionDy?: number
@@ -129,7 +129,7 @@ interface Hero extends Actor, SavedHeroData {
     clones: Hero[]
     barrierElement?: MagicElement
     barrierLevel?: number
-    safeD: Direction
+    safeD: CardinalDirection
     safeX: number
     safeY: number
     chargingLeftTool?: boolean

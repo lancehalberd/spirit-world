@@ -32,6 +32,7 @@ interface AudioInstance {
     sound: GameSound
 }
 interface GameSound {
+    key?: string
     audioBuffer?: AudioBuffer
     instances: AudioInstance[]
     // Seconds to wait between multiple instances of a sound effect.
@@ -50,7 +51,7 @@ interface GameSound {
     // This is just used by custom audio context sounds
     play?: (target: AudioNode, time: number) => void
     // BGM Only
-    key?: TrackKey
+    trackKey?: TrackKey
     nextTrack?: TrackKey
     // Key of the initial track played for multi track sequences.
     // This is used to prevent restarting BGMs when the current key no longer matches the original key.

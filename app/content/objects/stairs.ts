@@ -181,7 +181,7 @@ class Railing implements ObjectInstance {
     get area(): AreaInstance {
         return this.stairs.area;
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const hitbox = this.getHitbox();
         const shadowH = 2;
         renderVerticalSlice(context, {...hitbox, h: hitbox.h + shadowH}, this.frames);

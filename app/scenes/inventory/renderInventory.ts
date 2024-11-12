@@ -157,7 +157,7 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
             } else if (menuItem === 'fire' || menuItem === 'ice' || menuItem === 'lightning') {
                 renderElement(menuItem as MagicElement);
             } else if (state.hero.savedData.passiveTools[menuItem as PassiveTool] || editingState.isEditing) {
-                renderLoot(menuItem as LootType, state.hero.savedData.passiveTools[menuItem]);
+                renderLoot(menuItem as LootType, state.hero.savedData.passiveTools[menuItem as PassiveTool]);
             }
             x += rowWidth;
         }
@@ -346,7 +346,14 @@ mainCanvas.addEventListener('click', function (event) {
         for (const menuItem of menuRow) {
             const r = {x, y, w: frameSize, h: frameSize};
             if (isPointInShortRect(mouseX, mouseY, r)) {
-                if (menuItem === 'help') {
+                if (menuItem === 'help' || menuItem === 'empty' || menuItem === 'weapon'
+                    || menuItem === 'spiritPower' || menuItem === 'secondChance'
+                    || menuItem === 'spikeBoots' || menuItem === 'forgeBoots' || menuItem === 'flyingBoots'
+                    || menuItem === 'peachOfImmortality' || menuItem === 'peachOfImmortalityPiece'
+                    || menuItem === 'money' || menuItem === 'peach' || menuItem === 'victoryPoint'
+                    || menuItem === 'goldOre' || menuItem === 'silverOre' || menuItem === 'unknown'
+                    || menuItem === 'smallKey' || menuItem === 'bigKey' || menuItem === 'map'
+                ) {
                     // No handling
                 } else if (menuItem === 'return') {
                     // No handling

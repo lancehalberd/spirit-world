@@ -2,6 +2,7 @@ import * as spawnLocations from 'app/content/spawnLocations';
 import { getDefaultSavedState } from 'app/savedState'
 import { cloneDeep } from 'app/utils/index';
 
+const weaponUpgradeKeys: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
     const newState: SavedState = cloneDeep(savedState);
@@ -33,8 +34,8 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
             newState.savedHeroData.weapon = items[key];
             continue;
         }
-        if (['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'].includes(key)) {
-            newState.savedHeroData.weaponUpgrades[key] = true;
+        if (weaponUpgradeKeys.includes(key as WeaponUpgrades)) {
+            newState.savedHeroData.weaponUpgrades[key as WeaponUpgrades] = true;
             continue;
         }
         if (key.indexOf(':') >= 0) {
@@ -45,20 +46,20 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
             };
             continue;
         }
-        if (typeof newState.savedHeroData.activeTools[key] !== 'undefined') {
-            newState.savedHeroData.activeTools[key] = items[key];
+        if (typeof newState.savedHeroData.activeTools[key as ActiveTool] !== 'undefined') {
+            newState.savedHeroData.activeTools[key as ActiveTool] = items[key];
             continue;
         }
-        if (typeof newState.savedHeroData.elements[key] !== 'undefined') {
-            newState.savedHeroData.elements[key] = items[key];
+        if (typeof newState.savedHeroData.elements[key as MagicElement] !== 'undefined') {
+            newState.savedHeroData.elements[key as MagicElement] = items[key];
             continue;
         }
-        if (typeof newState.savedHeroData.equipment[key] !== 'undefined') {
-            newState.savedHeroData.equipment[key] = items[key];
+        if (typeof newState.savedHeroData.equipment[key as Equipment] !== 'undefined') {
+            newState.savedHeroData.equipment[key as Equipment] = items[key];
             continue;
         }
-        if (typeof newState.savedHeroData.passiveTools[key] !== 'undefined') {
-            newState.savedHeroData.passiveTools[key] = items[key];
+        if (typeof newState.savedHeroData.passiveTools[key as PassiveTool] !== 'undefined') {
+            newState.savedHeroData.passiveTools[key as PassiveTool] = items[key];
             continue;
         }
         console.log('Could not find key', key, items[key]);

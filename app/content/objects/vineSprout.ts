@@ -173,7 +173,7 @@ export class VineSprout implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.sprouting) {
             const frame = getFrame(sproutingAnimation, this.animationTime);
             // Offset where this is drawn so that it matches where the vine will grow.

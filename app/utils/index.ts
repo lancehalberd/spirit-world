@@ -73,7 +73,7 @@ export function getCollisionArea(element1: HTMLElement, element2: HTMLElement) {
     return Math.max(Math.min(B - t, b - T), 0) * Math.max(Math.min(R - l, r - L), 0);
 }
 
-export function getElementRectangle(element: HTMLElement, container = null): Rect {
+export function getElementRectangle(element: HTMLElement, container: HTMLElement = null): Rect {
     let b = element.getBoundingClientRect();
     const rect = { x: b.left, y: b.top, w: b.width, h: b.height };
     // If container is specified, return the rectangle relative to the container's coordinates.
@@ -164,7 +164,7 @@ export function getThetaDistance(angle1: number, angle2: number): number {
     return Math.min(diff, 360 - diff);
 }
 
-export function saveToFile(content, fileName, contentType) {
+export function saveToFile(content: string, fileName: string, contentType: string) {
     const a = document.createElement('a');
     const file = new Blob([content], {type: contentType});
     a.href = URL.createObjectURL(file);
@@ -227,18 +227,19 @@ export function readImageFromFile(): Promise<{image: HTMLImageElement, fileName:
     });
 }
 
-export function readGetParameter(parameterName: string): string {
+export function readGetParameter(parameterName: string, defaultValue: string = ''): string {
     for (const item of location.search.substr(1).split('&')) {
         const tmp = item.split('=');
         if (tmp[0] === parameterName) {
             return decodeURIComponent(tmp[1]);
         }
     }
+    return defaultValue;
 }
 
-export function readGetParameterAsInt(parameterName: string): number {
+export function readGetParameterAsInt(parameterName: string, defaultValue = 0): number {
     const number = parseInt(readGetParameter(parameterName), 10);
-    return isNaN(number) ? 0 : number;
+    return isNaN(number) ? defaultValue : number;
 }
 
 export function cloneDeep<T>(value: T): T {

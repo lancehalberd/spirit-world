@@ -5,9 +5,9 @@ import { Teleporter } from 'app/content/objects/teleporter';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { zones } from 'app/content/zones';
 import { setAreaSection } from 'app/utils/area';
+import { directionMap, getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
-import { directionMap, getDirection } from 'app/utils/field';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { fixCamera } from 'app/utils/fixCamera';
 import { isPointInShortRect } from 'app/utils/index';
@@ -175,7 +175,7 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
     // If this isn't set to 0 the hero's sprite might peak over the top of door frames.
     hero.z = 0;
     // This will be the opposite direction of the door they are coming out of.
-    hero.d = getDirection(hero.actionDx, hero.actionDy);
+    hero.d = getCardinalDirection(hero.actionDx, hero.actionDy);
 }
 
 function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjectId: string) {

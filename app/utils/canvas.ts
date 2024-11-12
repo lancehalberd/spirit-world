@@ -8,7 +8,7 @@ export const mainContext = mainCanvas.getContext('2d');
 mainContext.imageSmoothingEnabled = false;
 window['mainContext'] = mainContext;
 
-export function createCanvas(width, height, classes = ''): HTMLCanvasElement {
+export function createCanvas(width: number, height: number, classes = ''): HTMLCanvasElement {
     const canvas = document.createElement('canvas');
     canvas.className = classes;
     canvas.width = width;
@@ -16,7 +16,7 @@ export function createCanvas(width, height, classes = ''): HTMLCanvasElement {
     return canvas;
 }
 
-export function createCanvasAndContext(width, height): [HTMLCanvasElement, CanvasRenderingContext2D] {
+export function createCanvasAndContext(width: number, height: number): [HTMLCanvasElement, CanvasRenderingContext2D] {
     const canvas = createCanvas(width, height);
     const context = canvas.getContext('2d');
     context.imageSmoothingEnabled = false;

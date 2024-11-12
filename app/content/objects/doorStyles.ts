@@ -803,7 +803,7 @@ const woodenDoorStyle: DoorStyleDefinition = {
     },
 };
 
-function ladderUp(topFrame, middleFrame: Frame, bottomFrame: Frame, shadowHeight = 0): DoorStyleDefinition {
+function ladderUp(topFrame: Frame, middleFrame: Frame, bottomFrame: Frame, shadowHeight = 0): DoorStyleDefinition {
     return {
         render(this: void, context, state, door) {
             if (door.status !== 'normal') {

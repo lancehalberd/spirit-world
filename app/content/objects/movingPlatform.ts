@@ -83,7 +83,7 @@ export class MovingPlatform implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame: Frame = getFrame(platformAnimation, this.animationTime);
         const w = this.w - 12, h = this.h - 12;
         // Top

@@ -31,7 +31,6 @@ export class Staff implements ObjectInstance {
         groundHeight: 2,
     };
     area: AreaInstance;
-    definition = null;
     canPressSwitches = true;
     drawPriority: DrawPriority = 'background';
     drawPriorityIndex = 3;
@@ -90,6 +89,7 @@ export class Staff implements ObjectInstance {
         const dy = 4 * directionMap[direction][1];
         const movementProperties: MovementProperties = {
             boundingBox: getSectionBoundingBox(state, this),
+            blockedBoxes: this.area.objects.filter(o => o.definition?.type === 'ballGoal').map(o => o.getHitbox()),
             canFall: true, canSwim: true,
             canMoveInLava: true,
             canWiggle: true, dx, dy,
