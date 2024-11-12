@@ -90,6 +90,7 @@ export class Staff implements ObjectInstance {
         const dy = 4 * directionMap[direction][1];
         const movementProperties: MovementProperties = {
             boundingBox: getSectionBoundingBox(state, this),
+            blockedBoxes: this.area.objects.filter(o => o.definition?.type === 'ballGoal').map(o => o.getHitbox()),
             canFall: true, canSwim: true,
             canMoveInLava: true,
             canWiggle: true, dx, dy,
