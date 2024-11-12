@@ -12,9 +12,9 @@ import { Indicator } from 'app/content/objects/indicator';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
 import { createAnimation } from 'app/utils/animations';
+import { getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation } from 'app/utils/enemies';
-import { getDirection } from 'app/utils/field';
 import { sample } from 'app/utils/index';
 import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget, getVectorToMovementTarget, getVectorToTarget } from 'app/utils/target';
@@ -643,7 +643,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.vx = enemy.vy = 0;
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
         if (v) {
-            enemy.d = getDirection(v.x, v.y);
+            enemy.d = getCardinalDirection(v.x, v.y);
         }
         if (v && enemy.modeTime >= 1000) {
             if (v.mag >= 128) {

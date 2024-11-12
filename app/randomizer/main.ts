@@ -84,8 +84,6 @@ if (itemSeed) {
     } catch (e) {
         console.error('Failed to generate seed', e);
     }
-    for (let key in SPAWN_LOCATION_WATERFALL_VILLAGE) {
-        SPAWN_LOCATION_DEMO[key] = SPAWN_LOCATION_WATERFALL_VILLAGE[key];
-        SPAWN_LOCATION_FULL[key] = SPAWN_LOCATION_WATERFALL_VILLAGE[key];
-    }
+    Object.assign(SPAWN_LOCATION_DEMO, SPAWN_LOCATION_WATERFALL_VILLAGE);
+    Object.assign(SPAWN_LOCATION_FULL, SPAWN_LOCATION_WATERFALL_VILLAGE);
 }

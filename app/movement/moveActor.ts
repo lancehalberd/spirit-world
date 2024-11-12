@@ -1,7 +1,7 @@
 import { getJumpVector } from 'app/movement/getJumpVector';
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
 import { playAreaSound } from 'app/musicController';
-import { directionMap, getDirection } from 'app/utils/direction';
+import { directionMap, getCardinalDirection, getDirection } from 'app/utils/direction';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 import { canMoveDown } from 'app/movement/canMoveDown';
@@ -256,7 +256,7 @@ export function moveActorTowardsLocation(
 ): number {
     const hitbox = actor.getMovementHitbox();
     const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
-    actor.d = getDirection(dx, dy);
+    actor.d = getCardinalDirection(dx, dy);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > speed) {
         moveActor(state, actor, speed * dx / mag, speed * dy / mag, {boundingBox: false});

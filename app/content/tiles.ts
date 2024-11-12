@@ -180,7 +180,7 @@ export async function findUniqueTiles(source: Frame) {
     }
     return Object.values(imageMap);
 }
-export function generateTileHash({ frame }): string {
+export function generateTileHash({ frame }: {frame: Frame}): string {
     const [, context] = createCanvasAndContext(16, 16);
     drawFrame(context, frame, {x: 0, y: 0, w: 16, h: 16});
     const imageData = context.getImageData(0, 0, 16, 16).data;
@@ -273,7 +273,11 @@ function stampTileSource(frame: Frame, tileCoordinates: number[][], behaviors: {
     };
 }
 
-export function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBehaviors = null): TileSource {
+export function gradientColorTile(
+    colors: string[],
+    x0: number, y0: number, x1: number, y1: number,
+    behaviors: TileBehaviors = null
+): TileSource {
     return canvasPalette(context => {
         const gradient = context.createLinearGradient(x0, y0, x1, y1);
         for (let i = 0; i < colors.length; i++) {

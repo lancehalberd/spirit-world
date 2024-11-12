@@ -30,7 +30,7 @@ export class Trampoline extends PushPullObject implements ObjectInstance {
     getFrameHitbox(): Rect {
         return {x: this.x, y: this.y - 16, w: 16, h: 32};
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = (state.fieldTime - this.lastBounceTime) < 200 ? trampolineAnimation.frames[0] : trampolineAnimation.frames[1];
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z});
     }

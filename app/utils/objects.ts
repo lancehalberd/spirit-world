@@ -35,7 +35,7 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
     // match for linked objects to avoid inconsistencies.
     if (object.definition?.savePosition) {
         const p = getObjectStatus(state, object.definition, 'position');
-        if (p) {
+        if (Array.isArray(p)) {
             object.x = p[0];
             object.y = p[1];
         }

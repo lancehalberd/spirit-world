@@ -1,10 +1,10 @@
 import { rectangleCenter } from 'app/utils/index';
 
-export function query(className): HTMLElement {
+export function query(className: string): HTMLElement {
     return document.querySelector(className);
 }
 
-export function queryAll(className): NodeListOf<HTMLElement> {
+export function queryAll(className: string): NodeListOf<HTMLElement> {
     return document.querySelectorAll(className);
 }
 
@@ -22,10 +22,10 @@ export function tagElement(type: string, classes: string = '', content: string |
 }
 
 export const divider = tag('div', 'centered medium', tag('div', 'divider'));
-export function titleDiv(titleMarkup) {
+export function titleDiv(titleMarkup: string) {
     return titleMarkup && tag('div', 'title', titleMarkup);
 }
-export function bodyDiv(bodyMarkup) {
+export function bodyDiv(bodyMarkup: string) {
     return bodyMarkup && tag('div', 'body', bodyMarkup)
 };
 
@@ -60,7 +60,7 @@ export function handleChildEvent(
     eventType: string,
     container: HTMLElement,
     selector: string,
-    handler: (HTMLElement, Event) => any,
+    handler: (element: Element, event: Event) => any,
 ) {
     container.addEventListener(eventType, event => {
         const element: HTMLElement = event.target as HTMLElement;

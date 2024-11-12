@@ -19,11 +19,7 @@ function numberToSeed(number: number) {
 
 // Seeded random number generator.
 class SRandom {
-    _seed: number;
-
-    constructor(seed) {
-        this._seed = seed;
-    }
+    constructor(public _seed: number) {}
 
     // Return an instance of SRandom with a seed based on the given value.
     seed(value: number): SRandom {
@@ -68,36 +64,27 @@ class SRandom {
      * @param {Collection} collection  The collection of elements to return random element from
      */
     element<T>(collection: Collection<T>): T {
-        if (collection.constructor == Object) {
-            const keys = Object.keys(collection);
-            return collection[this.element(keys)];
-        }
-        if (collection.constructor == Array) {
+        if (Array.isArray(collection)) {
             const array = collection as Array<any>;
             const roll = this.random();
             return array[Math.floor(roll * array.length)];
         }
-        console.log("Warning @ Random.element: "+ collection + " is neither Array or Object");
-        return null;
+        const keys = Object.keys(collection);
+        return collection[this.element(keys)];
     }
 
-    /**
-     * @param {Array} array  The array of elements to return random element from
-     */
+    // Remove a random element from the array/object.
     removeElement<T>(collection: Collection<T>): T {
-        if (collection.constructor == Object) {
-            const keys = Object.keys(collection);
-            const key = this.element(keys);
-            const value = collection[key];
-            delete collection[key];
-            return value;
-        }
-        if (collection.constructor == Array) {
+        if (Array.isArray(collection)) {
             const array = collection as Array<any>;
             return array.splice(Math.floor(this.random() * array.length), 1)[0];
         }
-        console.log("Warning @ Random.removeElement: "+ collection + " is neither Array or Object");
-        return null;
+        const object: {[key:string]: T}  = collection;
+        const keys = Object.keys(object);
+        const key = this.element(keys);
+        const value = object[key];
+        delete object[key];
+        return value;
     }
 
     /**

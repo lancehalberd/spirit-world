@@ -64,7 +64,7 @@ export class Hero implements Actor {
     vy: number = 0;
     vz: number = 0;
     groundHeight = 0;
-    d: Direction = 'down';
+    d: CardinalDirection = 'down';
     action?: Action;
     actionDx?: number;
     actionDy?: number;
@@ -149,7 +149,7 @@ export class Hero implements Actor {
     cloneToolReleased?: boolean
     barrierElement?: MagicElement;
     barrierLevel?: number;
-    safeD: Direction;
+    safeD: CardinalDirection;
     safeX: number;
     safeY: number;
     // This gets set when the player respawns at a location and is currently used
@@ -193,9 +193,10 @@ export class Hero implements Actor {
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
         this.savedData = {...defaultSavedHeroData};
         if (savedHeroData) {
-            for (let i in savedHeroData) {
+            Object.assign(this.savedData, savedHeroData);
+            /*for (let i in savedHeroData) {
                 this.savedData[i] = savedHeroData[i];
-            }
+            }*/
         }
         this.savedData.passiveTools = {
             ...defaultSavedHeroData.passiveTools,
@@ -234,9 +235,10 @@ export class Hero implements Actor {
 
     getCopy(this: Hero): Hero {
         const copy = new Hero();
-        for (let i in this) {
+        Object.assign(copy, this);
+        /*for (let i in this) {
             copy[i] = this[i];
-        }
+        }*/
         copy.savedData = this.exportSavedHeroData();
         return copy;
     }

@@ -147,7 +147,7 @@ export class PushStairs implements ObjectInstance {
             this.pushedLastFrame = false;
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         // Draw the rails underneath the stairs. Note this uses the definition x value which is static.
         context.fillStyle = 'grey';
         context.fillRect(this.definition.x, this.y + 8, this.definition.w, 3);
@@ -183,7 +183,7 @@ class PushStairsRailing implements ObjectInstance {
     get area(): AreaInstance {
         return this.pushStairs.area;
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrame(context, {...pushStairsFrame, x: pushStairsFrame.x + this.xOffset, w: 7},
             { ...pushStairsFrame, x: this.pushStairs.x + this.xOffset - pushBarWidth, w: 7, y: this.pushStairs.y - 48}
         );

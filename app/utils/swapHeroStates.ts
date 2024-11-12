@@ -4,15 +4,18 @@
 export function swapHeroStates(heroA: Hero, heroB: Hero) {
     const allKeys = [...new Set([...Object.keys(heroA), ...Object.keys(heroB)])];
     for (const key of allKeys) {
-        if (key === 'behaviors' || key === 'magic' || key === 'maxMagic'
+        if (key === 'magic' || key === 'maxMagic'
             || key === 'life' || key === 'ironSkinCooldown'
             // These are properties only meant to be set on the clone.
             || key === 'cannotSwapTo' || key === 'isUncontrollable' || key === 'explosionTime'
         ) {
             continue;
         }
+        // @ts-ignore: no implicity any
         const temp = heroA[key];
+        // @ts-ignore: no implicity any
         heroA[key] = heroB[key];
+        // @ts-ignore: no implicity any
         heroB[key] = temp;
     }
     // Update chakrams to match their correct owner.

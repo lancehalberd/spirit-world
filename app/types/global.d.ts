@@ -7,7 +7,7 @@ interface Window {
 type Collection<T> = {[key:string]: T} | Array<T>;
 
 type Color = string;
-type Range = [number, number];
+// type Range = [number, number];
 
 type Tags = {[key: string]: true};
 

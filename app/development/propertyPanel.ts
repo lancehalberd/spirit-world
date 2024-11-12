@@ -124,25 +124,26 @@ function renderPropertyRow(row: PropertyRow): HTMLElement {
 // For now stringArray is the only supported type of array prop.
 // We might be able to support other types if we check the type of the option values.
 function isStringArrayProperty(property: EditorProperty<any>): property is EditorArrayProperty<string> {
-    return Array.isArray(property?.['value']);
+    return Array.isArray((property as EditorArrayProperty<any>)?.['value']);
 }
+// The value will always be type string, but the array of values may have type {value: string, label: string} for displaying options.
 function isStringProperty(property: EditorProperty<any>): property is EditorSingleProperty<string | {value: string, label: string}> {
-    return typeof(property?.['value']) === 'string';
+    return typeof((property as EditorSingleProperty<any>)?.['value']) === 'string';
 }
 function isNumberProperty(property: EditorProperty<any>): property is EditorSingleProperty<number> {
-    return typeof(property?.['value']) === 'number';
+    return typeof((property as EditorSingleProperty<any>)?.['value']) === 'number';
 }
 function isBooleanProperty(property: EditorProperty<any>): property is EditorSingleProperty<boolean> {
-    return typeof(property?.['value']) === 'boolean';
+    return typeof((property as EditorSingleProperty<any>)?.['value']) === 'boolean';
 }
 function isButtonProperty(property: EditorProperty<any>): property is EditorButtonProperty {
-    return !!property?.['onClick'];
+    return !!(property as EditorButtonProperty)?.['onClick'];
 }
 function isPaletteProperty(property: EditorProperty<any>): property is EditorPaletteProperty {
-    return !!property?.['palette'];
+    return !!(property as EditorPaletteProperty)?.['palette'];
 }
 function isSourcePaletteProperty(property: EditorProperty<any>): property is EditorSourcePaletteProperty {
-    return !!property?.['sourcePalette'];
+    return !!(property as EditorSourcePaletteProperty)?.['sourcePalette'];
 }
 
 const paletteCanvas = createCanvas(100, 100);
@@ -263,7 +264,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                 tiles: [[palette[ty]?.[tx]]],
             });
         }
-        let dragX, dragY;
+        let dragX: number, dragY: number;
         const updateBrushSelection = (x: number, y: number): void => {
             const tx1 = Math.floor(dragX / 16);
             const ty1 = Math.floor(dragY / 16);
@@ -356,9 +357,9 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
 
         const getOrImportTile = (x: number, y: number): FullTile => {
             const gx = x / 16, gy = y / 16;
-            property.sourcePalette[gy] = property.sourcePalette[gy] || [];
-            if (property.sourcePalette[gy][gx] >= 0) {
-                return allTiles[property.sourcePalette[gy][gx]];
+            property.sourcePalette.grid[gy] = property.sourcePalette.grid[gy] || [];
+            if (property.sourcePalette.grid[gy][gx] >= 0) {
+                return allTiles[property.sourcePalette.grid[gy][gx]];
             }
             const tileHashMap = generateTileHashMap();
             const frame = {
@@ -378,7 +379,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                 paletteHash.everything[py][px] = tile.index;
                 refreshPaletteCanvas();
             }
-            property.sourcePalette[gy][gx] = tile?.index || 0;
+            property.sourcePalette.grid[gy][gx] = tile?.index || 0;
             return tile;
         }
 
@@ -392,7 +393,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                 tiles: [[tile?.index || 0]],
             });
         }
-        let dragX, dragY;
+        let dragX: number, dragY: number;
         const updateBrushSelection = (x: number, y: number): void => {
             const tx1 = Math.floor(dragX / 16);
             const ty1 = Math.floor(dragY / 16);

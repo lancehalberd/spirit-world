@@ -27,7 +27,7 @@ export const spiritBarrierMediumCracksAnimation = createAnimation('gfx/effects/c
 export const spiritBarrierLargeCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 19, cols: 6, duration: 5});
 export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 25, cols: 4, duration: 5}, { loop: false });
 
-let lastPullAnimation = null;
+let lastPullAnimation: AnimationSet = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
     if (state.defeatState.defeated) {
@@ -144,7 +144,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             const isChargingBow = (hero.chargingRightTool && hero.savedData.rightTool === 'bow')
                 || (hero.chargingLeftTool && hero.savedData.leftTool === 'bow');
             const animationSet = isChargingBow ? heroChargeBowAnimations : heroChargeChakramAnimations;
-            let direction = hero.d;
+            let direction: Direction = hero.d;
             if (!isChargingBow) {
                 if (hero.heldChakram) {
                     direction = getDirection(hero.heldChakram.vx, hero.heldChakram.vy, true, hero.d);

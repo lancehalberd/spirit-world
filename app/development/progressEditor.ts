@@ -20,12 +20,12 @@ export function renderProgressTabContainer(): HTMLElement {
     progressTabContainer.render();
     return progressTabContainer.element;
 }
-
+const weaponUpgrades: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
 function getProgressProperties() {
     const state = getState();
     let rows: PanelRows = [];
     let row: PropertyRow = [];
-    for (let upgrade of ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange']) {
+    for (let upgrade of weaponUpgrades) {
         row.push({
             name: upgrade,
             value: state.hero.savedData.weaponUpgrades[upgrade] || false,

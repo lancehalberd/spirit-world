@@ -35,9 +35,9 @@ function getChargeMessage(state: GameState) {
 
 export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
     if (!lootLevel) {
-        lootLevel = state.hero.savedData.activeTools[lootType]
-            || state.hero.savedData.passiveTools[lootType]
-            || state.hero.savedData.equipment[lootType]
+        lootLevel = state.hero.savedData.activeTools[lootType as ActiveTool]
+            || state.hero.savedData.passiveTools[lootType as PassiveTool]
+            || state.hero.savedData.equipment[lootType as Equipment]
             || 1;
     }
     switch (lootType) {
@@ -470,6 +470,7 @@ export const lootFrames = {
     smallKey: keyOutlineFrame,
     silverOre,
     goldOre,
+    neutral: neutralElement,
     fire: fireElement,
     ice: iceElement,
     lightning: lightningElement,

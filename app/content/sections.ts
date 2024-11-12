@@ -126,7 +126,7 @@ function populateSectionMapData(): void {
     }
     // Fix the maps so the floors appear in the order B(N), B(N - 1)..., B1, 1F, ... (N-1)F, (N)F.
     for (const map of Object.values(dungeonMaps)) {
-        const orderedFloors = {};
+        const orderedFloors: {[key in string]: DungeonFloorMap} = {};
         const orderedKeys = Object.keys(map.floors).sort((a, b) => {
             if (a[0] === 'B') {
                 if (b[0] === 'B') {

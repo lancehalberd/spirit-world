@@ -51,7 +51,7 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
 
     let passiveToolRow: MenuOptionType[] = [];
     for (let key in state.hero.savedData.passiveTools) {
-        if (!state.hero.savedData.passiveTools[key] && !editingState.isEditing) continue;
+        if (!state.hero.savedData.passiveTools[key as PassiveTool] && !editingState.isEditing) continue;
         // Don't show cat eyes once true sight is obtained.
         if (key === 'catEyes' && state.hero.savedData.passiveTools.trueSight && !editingState.isEditing) continue;
         passiveToolRow.push(key as MenuOptionType);

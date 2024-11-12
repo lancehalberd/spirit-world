@@ -3,8 +3,8 @@ import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { goldenBeetleAnimations } from 'app/content/enemyAnimations';
 import { LootDropObject } from 'app/content/objects/lootObject';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getCardinalDirection } from 'app/utils/direction';
 import { moveEnemyFull } from 'app/utils/enemies';
-import { getDirection } from 'app/utils/field';
 import { addObjectToArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import { getVectorToTarget } from 'app/utils/target';
@@ -63,7 +63,7 @@ enemyDefinitions.luckyBeetle = {
         if (enemy.animationTime % 100 === 0) {
             addSparkleAnimation(state, enemy.area, enemy.getHitbox(), {});
         }
-        enemy.d = getDirection(enemy.vx, enemy.vy, false, 'down');
+        enemy.d = getCardinalDirection(enemy.vx, enemy.vy, 'down');
         enemy.changeToAnimation('move');
         if (!moveEnemyFull(state, enemy, enemy.vx, 0, {canWiggle: false})) {
             enemy.vx = -enemy.vx;

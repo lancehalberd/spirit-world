@@ -1,5 +1,8 @@
 import { arrMod } from 'app/utils/index';
 
+interface Shape {
+    points: Coords[]
+}
 
 export const tolerance = .000001;
 
@@ -12,7 +15,7 @@ export class Polygon {
     _scale: number;
     currentAngle: number;
 
-    constructor(x, y, angle, color, scale = 1) {
+    constructor(x: number, y: number, angle: number, color: Color, scale = 1) {
         this.points = [[x, y]];
         this.color = color;
         this.angles = [angle];
@@ -22,7 +25,7 @@ export class Polygon {
         this.currentAngle = angle;
     }
 
-    addVertex(length, nextAngle) {
+    addVertex(length: number, nextAngle: number) {
         this.angles.push(nextAngle);
         this.lengths.push(length);
         const lastPoint = this.points[this.points.length - 1];
@@ -66,13 +69,13 @@ export class Polygon {
         const clone = new Polygon(this.points[0][0], this.points[0][1], angles.shift(), this.color, this._scale);
         return clone.addVerticesAndLengths([...this.lengths], angles);
     }
-    setPosition(x, y) {
+    setPosition(x: number, y: number) {
         return this.translate(x - this.points[0][0], y - this.points[0][1]);
     }
-    setCenterPosition(x, y) {
+    setCenterPosition(x: number, y: number) {
         return this.translate(x - this.center[0], y - this.center[1]);
     }
-    translate(x, y) {
+    translate(x: number, y: number) {
         for (let i = 0; i < this.points.length; i++) {
             this.points[i][0] += x;
             this.points[i][1] += y;
@@ -81,7 +84,7 @@ export class Polygon {
         this.center[1] += y;
         return this;
     }
-    scale(scale) {
+    scale(scale: number) {
         this._scale *= scale;
         for (let i = 0; i < this.points.length; i++) {
             this.points[i][0] *= scale;
@@ -91,11 +94,11 @@ export class Polygon {
         this.center[1] *= scale;
         return this;
     };
-    setRotation(degrees) {
+    setRotation(degrees: number) {
         this.angles[0] = degrees;
         return this.resetPoints();
     }
-    rotate(degrees) {
+    rotate(degrees: number) {
         const radians = degrees * Math.PI / 180;
         for (let i = 0; i < this.points.length; i++) {
             this.points[i] = rotatePoint(this.points[i], this.center, radians);
@@ -106,7 +109,7 @@ export class Polygon {
 }
 
 export function allPoints(shapes: Array<Polygon>) {
-    let points = [];
+    let points: Coords[] = [];
     for (let i = 0; i < shapes.length; i++) {
         points = points.concat(shapes[i].points);
     }
@@ -128,7 +131,7 @@ export function isPointInPoints(point: Coords, points: Coords[]): boolean {
 }
 
 
-export function checkForCollision(shapesA, shapesB) {
+export function checkForCollision(shapesA: Shape[], shapesB: Shape[]) {
     for (var i = 0; i < shapesA.length; i++) {
         for (var j = 0; j < shapesB.length; j++) {
             if (doShapesIntersect(shapesA[i], shapesB[j])) {
@@ -138,7 +141,7 @@ export function checkForCollision(shapesA, shapesB) {
     }
     return false;
 }
-function doShapesIntersect(shapeA, shapeB) {
+function doShapesIntersect(shapeA: Shape, shapeB: Shape) {
     for (var i = 0; i < shapeA.points.length; i++) {
         if (isSeparatingLine(shapeA, shapeB, vector(shapeA.points[i], shapeA.points[(i+1) % shapeA.points.length]))) {
             return false;
@@ -151,7 +154,7 @@ function doShapesIntersect(shapeA, shapeB) {
     }
     return true;
 }
-function isSeparatingLine(shapeA, shapeB, vector) {
+function isSeparatingLine(shapeA: Shape, shapeB: Shape, vector: number[]) {
     vector = [-vector[1], vector[0]];
     var minA = 1000000, minB = 1000000, maxA = -1000000, maxB = -1000000;
     for (var i = 0; i < shapeA.points.length; i++) {
@@ -222,7 +225,7 @@ export function getBounds(points: Array<Coords>) {
     }
     return {left, top, width: right - left, height: bottom - top};
 }
-export function centerShapesInRectangle(shapes: Array<Polygon>, rectangle): void {
+export function centerShapesInRectangle(shapes: Array<Polygon>, rectangle: {left: number, top: number, width: number, height: number}): void {
     const bounds = getBounds(allPoints(shapes));
     const targetLeft = rectangle.left + rectangle.width / 2 - bounds.width / 2;
     const targetTop = rectangle.top + rectangle.height / 2 - bounds.height / 2;
@@ -238,7 +241,7 @@ export function getIntersectionArea(shapeA: Polygon, shapeB: Polygon): number {
             //console.log('No collision');
             return 0;
         }
-        var intersection = {points: computeIntersection(shapeA, shapeB)};
+        const intersection = {points: computeIntersection(shapeA, shapeB)};
         //console.log(JSON.stringify(intersection));
         return computeArea(intersection);
     } catch (e) {
@@ -274,7 +277,7 @@ function computeIntersection(shapeA: Polygon, shapeB: Polygon) {
     return outputPoints;
 }
 // Derived from http://www.mathwords.com/a/area_convex_polygon.htm
-export function computeArea(shape) {
+export function computeArea(shape: Shape) {
     var area = 0;
     for (var i = 0; i < shape.points.length; i++) {
         var nextPoint = arrMod(shape.points, i + 1);

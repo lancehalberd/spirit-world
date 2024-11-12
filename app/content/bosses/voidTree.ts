@@ -108,7 +108,7 @@ const LASER_BARRAGE_RADIUS = 16;
 const LASER_SPOTS = [0, 1, 2, 3]
 
 function addLaserBarrageToArea(state: GameState, count: number) {
-    let spots = [];
+    let spots: number[] = [];
     for (let i = 0; i < count; i++) {
         if (!spots.length) {
             spots = Random.shuffle(LASER_SPOTS);

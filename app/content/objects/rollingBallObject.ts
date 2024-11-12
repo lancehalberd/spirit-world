@@ -22,7 +22,7 @@ export class RollingBallObject implements ObjectInstance {
     };
     isNeutralTarget = true;
     drawPriority: 'sprites' = 'sprites';
-    definition = null;
+    definition: SimpleObjectDefinition = null;
     x: number;
     y: number;
     z: number = 0;
@@ -36,9 +36,9 @@ export class RollingBallObject implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     stuck: boolean = false;
-    soundReference;
+    soundReference: AudioInstance;
     groundHeight = 0;
-    constructor(state: GameState, definition: BaseObjectDefinition) {
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -301,14 +301,14 @@ export class RollingBallObject implements ObjectInstance {
             this.pushedThisFrame = false;
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal') {
             return;
         }
         const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
-    renderShadow(context, state: GameState) {
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {

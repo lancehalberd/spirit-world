@@ -74,15 +74,15 @@ export class SpikeBall implements ObjectInstance {
             zRange: [this.z, this.z + 16],
         });
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         let frame: Frame = getFrame(spikeBallAnimation, this.animationTime);
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
     }
-    renderPreview(context, target: Rect) {
+    renderPreview(context: CanvasRenderingContext2D, target: Rect) {
         let frame: Frame = getFrame(spikeBallAnimation, this.animationTime);
         drawFrameCenteredAt(context, frame, target);
     }
-    renderShadow(context, state: GameState) {
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {

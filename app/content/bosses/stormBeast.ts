@@ -530,7 +530,7 @@ enemyDefinitions.stormBeast = {
         if (enemy.mode === 'hidden') {
             return;
         }
-        const animation = stormBeastGlowAnimations[enemy.currentAnimationKey]?.down;
+        const animation = stormBeastGlowAnimations[enemy.currentAnimationKey as keyof typeof stormBeastGlowAnimations]?.down;
         if (animation) {
             const frame = getFrame(animation, enemy.animationTime);
             enemy.defaultRender(context, state, frame);

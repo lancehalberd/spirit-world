@@ -1,7 +1,7 @@
 import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
-import { getDirection } from 'app/utils/direction';
+import { getCardinalDirection } from 'app/utils/direction';
 
-export function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
+export function moveNPC(state: GameState, npc: NPC, dx: number, dy: number, movementProperties: MovementProperties): boolean {
     movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, npc, 16);
     // By default, don't allow the enemy to move towards the outer edges of the screen.
     if (npc.flying) {
@@ -33,7 +33,7 @@ export function moveNPCToTargetLocation(
     const hitbox = npc.getHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
-        npc.d = getDirection(dx, dy);
+        npc.d = getCardinalDirection(dx, dy);
         npc.changeToAnimation(animationStyle)
     }
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];

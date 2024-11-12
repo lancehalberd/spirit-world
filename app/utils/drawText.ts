@@ -1,10 +1,23 @@
 import { requireFrame } from 'app/utils/packedImages';
 
-const cachedFonts = {};
+type CharacterMap = {[key in string]: Frame};
+type FontMap = {[key in string]: {[key in string]: HTMLCanvasElement}}
+
+interface TextParams {
+    fillStyle?: Color
+    maxWidth?: number
+    strokeStyle?: Color
+    lineWidth?: number
+    textAlign?: 'left'|'center'|'right'
+    textBaseline?: 'top'|'middle'|'bottom'
+    size?: number
+}
+
+const cachedFonts: FontMap = {};
 
 const fontSource = 'gfx/whiteFont.png';
 const aCode = 'a'.charCodeAt(0);
-const characterMap = {};
+const characterMap: CharacterMap = {};
 for (let i = 0; i < 26; i++) {
     const row = Math.floor(i / 5);
     const col = i % 5;
@@ -16,8 +29,8 @@ for (let i = 0; i < 26; i++) {
     characterMap[c] = requireFrame(fontSource, {x: col * 5, y: row * 6, w, h: 6});
 }
 
-export function drawSpecialFontText(context, text, x, y,
-    {fillStyle = 'black', maxWidth = 100, strokeStyle = null, lineWidth = 1, textAlign = 'left', textBaseline = 'bottom', size = 20}
+export function drawSpecialFontText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
+    {fillStyle = 'black', maxWidth = 100, strokeStyle = null, lineWidth = 1, textAlign = 'left', textBaseline = 'bottom', size = 20}: TextParams
 ) {
     text = `${text}`;
     x = Math.round(x / 2) * 2;
@@ -56,8 +69,8 @@ export function areFontsLoaded(): boolean {
     return true;
     // return [...document['fonts'].keys()].filter(fontFace => fontFace.status === 'loaded').length >= 1;
 }
-export function drawText(context, text, x, y,
-    {fillStyle = 'black', maxWidth = 100, strokeStyle = null, lineWidth = 1, textAlign = 'left', textBaseline = 'bottom', size = 20}
+export function drawText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
+    {fillStyle = 'black', maxWidth = 100, strokeStyle = null, lineWidth = 1, textAlign = 'left', textBaseline = 'bottom', size = 20}: TextParams
 ) {
     text = `${text}`;
     x = Math.round(x / 2) * 2;
@@ -116,6 +129,6 @@ export function drawText(context, text, x, y,
     }
     return textWidth;
 }
-export function measureText(context, text, props) {
-    return drawText(context, text, 0, 0, {...props, fillStyle: false, strokeStyle: false});
+export function measureText(context: CanvasRenderingContext2D, text: string, props: TextParams) {
+    return drawText(context, text, 0, 0, {...props, fillStyle: undefined, strokeStyle: undefined});
 }

@@ -1,5 +1,6 @@
 import { addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
-import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import {directionMap, getCardinalDirection} from 'app/utils/direction';
+import {hitTargets} from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import { sample } from 'app/utils/index';
@@ -17,7 +18,7 @@ export function moveEnemyToTargetLocation(
     const hitbox = enemy.getMovementHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
-        enemy.d = getDirection(dx, dy);
+        enemy.d = getCardinalDirection(dx, dy);
         enemy.changeToAnimation(animationStyle)
     }
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
@@ -74,7 +75,7 @@ export function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: num
 
 export function faceTarget(state: GameState, enemy: Enemy, target: ObjectInstance) {
     const vector = getVectorToTarget(state, enemy, target);
-    enemy.d = getDirection(vector.x, vector.y);
+    enemy.d = getCardinalDirection(vector.x, vector.y);
 }
 
 export function scurryAndChase(state: GameState, enemy: Enemy) {

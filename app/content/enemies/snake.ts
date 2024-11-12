@@ -182,7 +182,7 @@ enemyDefinitions.snakeStorm = {
     immunities: ['lightning'],
     update(state: GameState, enemy: Enemy) {
         if (enemy.mode === 'choose' && enemy.modeTime === 400) {
-            const choices: Direction[] = ['up', 'down', 'left', 'right'];
+            const choices: CardinalDirection[] = ['up', 'down', 'left', 'right'];
             while (choices.length) {
                 const d = Random.removeElement(choices);
                 if (canMoveEnemy(state, enemy, enemy.speed * directionMap[d][0], enemy.speed * directionMap[d][1])) {

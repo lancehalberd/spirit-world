@@ -73,7 +73,7 @@ export function getCollisionArea(element1: HTMLElement, element2: HTMLElement) {
     return Math.max(Math.min(B - t, b - T), 0) * Math.max(Math.min(R - l, r - L), 0);
 }
 
-export function getElementRectangle(element: HTMLElement, container = null): Rect {
+export function getElementRectangle(element: HTMLElement, container: HTMLElement = null): Rect {
     let b = element.getBoundingClientRect();
     const rect = { x: b.left, y: b.top, w: b.width, h: b.height };
     // If container is specified, return the rectangle relative to the container's coordinates.
@@ -164,7 +164,7 @@ export function getThetaDistance(angle1: number, angle2: number): number {
     return Math.min(diff, 360 - diff);
 }
 
-export function saveToFile(content, fileName, contentType) {
+export function saveToFile(content: string, fileName: string, contentType: string) {
     const a = document.createElement('a');
     const file = new Blob([content], {type: contentType});
     a.href = URL.createObjectURL(file);

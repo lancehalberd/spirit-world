@@ -161,7 +161,7 @@ export class KeyBlock implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         let frame: Frame = getFrame(this.animation, this.animationTime);
         if (!frame) {
             debugger;

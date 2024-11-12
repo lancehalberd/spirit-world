@@ -17,7 +17,7 @@ export type DoorData = {
 // TODO: support placing linked doors simultaneously.
 
 // This returns w/h for the entrance so we don't have to recompute it from the resulting definition.
-export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: Direction, style: GenerationStyle, type: DoorType} ): {definition: EntranceDefinition, w: number, h: number} {
+export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: CardinalDirection, style: GenerationStyle, type: DoorType} ): {definition: EntranceDefinition, w: number, h: number} {
     let w = 32, h = 32;
     let computedStyle: string = 'stone';
     switch(style) {

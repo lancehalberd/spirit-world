@@ -273,7 +273,7 @@ interface ZoneLocation {
     y: number
     // This can be set to have the player falling when they spawn.
     z?: number
-    d: Direction
+    d: CardinalDirection
 }
 
 type LogicalZoneKey =

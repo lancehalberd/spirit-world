@@ -218,7 +218,6 @@ interface BeadSectionProps {
 }
 export class BeadSection implements ObjectInstance {
     area: AreaInstance;
-    definition = null;
     animationTime: number;
     drawPriority: DrawPriority = 'background';
     // This should be higher than the player fall animation+pits but lower than the staff.
@@ -355,13 +354,13 @@ export class BeadSection implements ObjectInstance {
             }
         }
     }
-    renderForeground(context, state: GameState) {
+    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         const hitbox = this.getHitbox(state);
         if (hitbox.y < this.foregroundY) {
             drawCascade(context, {...hitbox, h: this.foregroundY - hitbox.y}, this.animationTime);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         drawCascade(context, this.getHitbox(state), this.animationTime);
     }
 }

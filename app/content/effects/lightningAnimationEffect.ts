@@ -31,7 +31,7 @@ export class LightningAnimationEffect implements EffectInstance, Props {
             removeEffectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.circle) {
             renderLightningCircle(context, this.circle, 4, Math.min(100, Math.max(40, this.circle.r | 0)));
         } else if (this.ray) {

@@ -6,11 +6,12 @@ import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
 import { appendScript } from 'app/scriptEvents';
 import { removeTextCue } from 'app/content/effects/textCue';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
+import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import {hitTargets} from 'app/utils/field';
 import { removeObjectFromArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import {
@@ -42,7 +43,7 @@ const rollAbility: EnemyAbility<RollTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: RollTargetType): void {
         let theta = Math.atan2(target.y, target.x);
         theta += (Math.random() < 0.5 ? 1 : -1) * Math.PI / 2;
-        enemy.d = getDirection(Math.cos(theta), Math.sin(theta));
+        enemy.d = getCardinalDirection(Math.cos(theta), Math.sin(theta));
         enemy.changeToAnimation('roll');
     },
     cooldown: 4000,
@@ -77,7 +78,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTaunt(state, 'throw');
-        enemy.d = getDirection(target.x, target.y);
+        enemy.d = getCardinalDirection(target.x, target.y);
         enemy.changeToAnimation('kneel');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
@@ -100,8 +101,8 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     recoverTime: 300,
 };
 
-const staffAbility: EnemyAbility<Direction> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): Direction|null {
+const staffAbility: EnemyAbility<CardinalDirection> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): CardinalDirection|null {
         for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
             if (!hero) {
                 continue;
@@ -114,12 +115,12 @@ const staffAbility: EnemyAbility<Direction> = {
         }
         return null;
     },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
         enemy.useTaunt(state, 'staff');
         enemy.d = target;
         enemy.changeToAnimation('staffJump');
     },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
+    useAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
         enemy.changeToAnimation('staffSlam');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
         enemy.makeSound(state, 'bossDeath');

@@ -21,7 +21,18 @@ const tabletOff = requireFrame('gfx/tiles/futuristic.png', {x: 102, y: 1187, w: 
 
 const tabletHideAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 48, h: 32, content: {x: 6, w: 36, y: 5, h: 26}}, {left: 0, top: 1214, cols: 18, duration: 4}, {loop: false});
 
-export const signStyles = {
+interface SignStyle {
+    w: number
+    h: number
+    getFrame?: (state: GameState, sign: Sign) => Frame
+    render?: (context: CanvasRenderingContext2D, state: GameState, sign: Sign) => void
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState, sign: Sign) => void
+    isSpiritReadable?: boolean
+    normal?: Frame
+    spirit?: Frame
+}
+
+export const signStyles: {[key in string]: SignStyle} = {
     displayScreen: {
         w: 16,
         h: 16,
@@ -128,8 +139,11 @@ export class Sign implements ObjectInstance {
     constructor(state: GameState, public definition: SignDefinition) {
     }
     getHitbox(state: GameState): Rect {
-        const style = signStyles[this.definition.style] || signStyles.short;
+        const style = this.getStyle();
         return { x: this.x, y: this.y, w: style.w, h: style.h };
+    }
+    getStyle() {
+        return signStyles[this.definition.style] || signStyles.short;
     }
     onActivate(state: GameState) {
         if (this.status === 'hidden') {
@@ -151,7 +165,7 @@ export class Sign implements ObjectInstance {
         if (direction !== 'up' || this.status !== 'normal') {
             return;
         }
-        const style = signStyles[this.definition.style] || signStyles.short;
+        const style = this.getStyle();
         if (hero.isAstralProjection && !style.isSpiritReadable) {
             return;
         }
@@ -170,8 +184,8 @@ export class Sign implements ObjectInstance {
     update() {
         this.animationTime += FRAME_LENGTH;
     }
-    render(context, state: GameState) {
-        const style = signStyles[this.definition.style] || signStyles.short;
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const style = this.getStyle();
         if (style.render) {
             style.render(context, state, this);
             return;
@@ -179,8 +193,8 @@ export class Sign implements ObjectInstance {
         const frame = this.definition.spirit ? style.spirit : style.normal;
         drawFrame(context, frame, { ...frame, x: this.x - (frame.content?.x ?? 0), y: this.y - (frame.content?.y ?? 0) });
     }
-    renderShadow(context, state: GameState) {
-        const style = signStyles[this.definition.style] || signStyles.short;
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
+        const style = this.getStyle();
         if (style.renderShadow) {
             style.renderShadow(context, state, this);
             return;

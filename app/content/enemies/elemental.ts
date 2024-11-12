@@ -134,7 +134,7 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
         if (!isTargetAvailable(state, enemy, alternateEnemy) || !alternateEnemy.isInCurrentSection(state)) {
             continue;
         }
-        const hybridEnemyType = alternateEnemy.enemyDefinition?.hybrids?.[enemy.definition.enemyType];
+        const hybridEnemyType = alternateEnemy.enemyDefinition?.hybrids?.[enemy.definition.enemyType as EnemyType];
         if (enemyDefinitions[hybridEnemyType]) {
             const mag = getVectorToTarget(state, enemy, alternateEnemy).mag;
             if (!enemy.params.possessionTarget || mag < getVectorToTarget(state, enemy, enemy.params.possessionTarget).mag) {
@@ -151,7 +151,7 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
     if (target) {
         const hitbox = target.getHitbox();
         if (moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2) < 8) {
-            const hybridEnemyType = target.enemyDefinition?.hybrids?.[enemy.definition.enemyType];
+            const hybridEnemyType = target.enemyDefinition?.hybrids?.[enemy.definition.enemyType as EnemyType];
             const hybridEnemy = new Enemy(state, {
                 id: target.definition?.id,
                 status: 'normal',

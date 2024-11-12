@@ -17,13 +17,14 @@ import { appendScript } from 'app/scriptEvents';
 import { removeTextCue } from 'app/content/effects/textCue';
 import { drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import {
     faceTarget,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import {hitTargets} from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addObjectToArea } from 'app/utils/objects';
 import Random from 'app/utils/Random';
@@ -50,7 +51,7 @@ const rollAbility: EnemyAbility<RollTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: RollTargetType): void {
         let theta = Math.atan2(target.y, target.x);
         theta += (Math.random() < 0.5 ? 1 : -1) * Math.PI / 2;
-        enemy.d = getDirection(Math.cos(theta), Math.sin(theta));
+        enemy.d = getCardinalDirection(Math.cos(theta), Math.sin(theta));
         enemy.changeToAnimation('roll');
     },
     cooldown: 4000,
@@ -101,7 +102,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTauntFromList(state, ['attack1', 'attack2']);
-        enemy.d = getDirection(target.x, target.y);
+        enemy.d = getCardinalDirection(target.x, target.y);
         enemy.changeToAnimation('kneel');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
@@ -133,7 +134,7 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
-        enemy.d = getDirection(target.x, target.y);
+        enemy.d = getCardinalDirection(target.x, target.y);
         enemy.changeToAnimation('kneel');
     },
     updateAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
@@ -141,7 +142,7 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
             const vector = getVectorToTarget(state, enemy, target.target);
             enemy.activeAbility.target.x = vector.x;
             enemy.activeAbility.target.y = vector.y;
-            enemy.d = getDirection(vector.x, vector.y);
+            enemy.d = getCardinalDirection(vector.x, vector.y);
         }
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
@@ -181,7 +182,7 @@ const flameRingAbility: EnemyAbility<true> = {
         const hitbox = enemy.getHitbox();
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
         const center = getCenterRect(state);
-        enemy.d = getDirection(center.x - (hitbox.x + hitbox.w / 2), center.y - (enemy.y + enemy.h / 2));
+        enemy.d = getCardinalDirection(center.x - (hitbox.x + hitbox.w / 2), center.y - (enemy.y + enemy.h / 2));
         enemy.changeToAnimation('kneel');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: true): void {
@@ -221,7 +222,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
-        enemy.d = getDirection(target.x, target.y);
+        enemy.d = getCardinalDirection(target.x, target.y);
         enemy.changeToAnimation('kneel');
         const dx = target.x, dy = target.y;
         const spark = new Spark({
@@ -258,8 +259,8 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
     recoverTime: 3000,
 };
 
-const staffAbility: EnemyAbility<Direction> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): Direction|null {
+const staffAbility: EnemyAbility<CardinalDirection> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): CardinalDirection|null {
         for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
             if (!hero) {
                 continue;
@@ -272,12 +273,12 @@ const staffAbility: EnemyAbility<Direction> = {
         }
         return null;
     },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
         enemy.useTaunt(state, 'staff');
         enemy.d = target;
         enemy.changeToAnimation('staffJump');
     },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
+    useAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
         enemy.changeToAnimation('staffSlam');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
         enemy.makeSound(state, 'bossDeath');

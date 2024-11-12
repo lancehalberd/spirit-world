@@ -38,7 +38,7 @@ export async function allImagesLoaded() {
 }
 allImagesLoaded().then(() => allImagesAreLoaded = true);
 
-const initialImagesToLoad = [];
+const initialImagesToLoad: string[] = [];
 for (const initialImageToLoad of initialImagesToLoad) {
     requireImage(initialImageToLoad);
 }

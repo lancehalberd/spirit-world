@@ -56,7 +56,7 @@ export function useTool(
             state.hero.spendMagic(magicCost);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'bow';
-            let direction = hero.d;
+            let direction: Direction = hero.d;
             if (dx || dy) {
                 direction = getDirection(dx, dy, true);
             }

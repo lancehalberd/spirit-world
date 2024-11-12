@@ -118,11 +118,11 @@ export function getLineOfSightTargetAndDirection(
     state: GameState,
     source: EffectInstance | ObjectInstance,
     targets: (EffectInstance | ObjectInstance)[],
-    direction: Direction = null,
+    direction: CardinalDirection = null,
     // By default enemies will not aggro you from much further than half a screen.
     distance = 128,
     movementProperties: MovementProperties = {},
-): {d: Direction, target: EffectInstance | ObjectInstance} {
+): {d: CardinalDirection, target: EffectInstance | ObjectInstance} {
     if (!source.area) {
         return {d: null, target: null};
     }

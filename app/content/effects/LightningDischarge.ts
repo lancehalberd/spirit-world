@@ -60,7 +60,7 @@ export class LightningDischarge implements EffectInstance {
             removeEffectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.animationTime < this.tellDuration) {
             renderDamageWarning(context, {
                 circle: this,

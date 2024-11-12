@@ -20,22 +20,22 @@ export function getMousePosition(container: HTMLElement = null, scale = 1): Coor
     return [mousePosition[0] / scale, mousePosition[1] / scale];
 }
 
-function onMouseMove(event) {
+function onMouseMove(event: MouseEvent) {
     mousePosition = [event.pageX, event.pageY];
     // console.log(mousePosition);
 }
-function onMouseDown(event) {
+function onMouseDown(event: MouseEvent) {
     if (event.which === 1) {
         mouseIsDown = true;
     }
 }
-function onMouseUp(event) {
+function onMouseUp(event: MouseEvent) {
     if (event.which === 1) {
         mouseIsDown = false;
     }
     unlockAudio();
 }
-function onDragEnd(event) {
+function onDragEnd(event: MouseEvent) {
     mouseIsDown = false;
 }
 

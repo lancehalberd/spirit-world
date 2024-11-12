@@ -31,7 +31,6 @@ export class Staff implements ObjectInstance {
         groundHeight: 2,
     };
     area: AreaInstance;
-    definition = null;
     canPressSwitches = true;
     drawPriority: DrawPriority = 'background';
     drawPriorityIndex = 3;

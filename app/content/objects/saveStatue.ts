@@ -83,7 +83,7 @@ export class SaveStatue implements ObjectInstance {
             addSparkleAnimation(state, this.area, this.getHitbox(state), {});
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = saveStatue;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 32 });
     }

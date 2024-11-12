@@ -38,6 +38,11 @@ function updateDungeonInventory(state: GameState, inventory: DungeonInventory, s
     }
 }
 
+const blueprints: Blueprints[] = ['spikeBoots', 'flyingBoots', 'forgeBoots'];
+function isBlueprints(lootType: LootType): lootType is Blueprints {
+    return blueprints.includes(lootType as Blueprints);
+}
+
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: AnyLootDefinition, simulate?: boolean) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'weapon') {
@@ -49,7 +54,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
                 setRightTool(state, loot.lootType as ActiveTool);
             }
             //console.log(loot.lootType, state.hero.savedData.activeTools[loot.lootType]);
-            state.hero.savedData.activeTools[loot.lootType] = applyUpgrade(state.hero.savedData.activeTools[loot.lootType], loot);
+            state.hero.savedData.activeTools[loot.lootType as ActiveTool] = applyUpgrade(state.hero.savedData.activeTools[loot.lootType as ActiveTool], loot);
             //console.log('->', loot.lootType, state.hero.savedData.activeTools[loot.lootType]);
         } else if ([
             'gloves', 'roll', 'nimbusCloud', 'catEyes', 'spiritSight',
@@ -57,19 +62,17 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
             'waterBlessing', 'fireBlessing', 'lightningBlessing',
         ].includes(loot.lootType)) {
             //console.log(loot.lootType, state.hero.savedData.passiveTools[loot.lootType]);
-            state.hero.savedData.passiveTools[loot.lootType] = applyUpgrade(state.hero.savedData.passiveTools[loot.lootType], loot);
+            state.hero.savedData.passiveTools[loot.lootType as PassiveTool] = applyUpgrade(state.hero.savedData.passiveTools[loot.lootType as PassiveTool], loot);
             //console.log('->', loot.lootType, state.hero.savedData.passiveTools[loot.lootType]);
         } else if ([
             'fire', 'lightning', 'ice'
         ].includes(loot.lootType)) {
-            state.hero.savedData.elements[loot.lootType] = applyUpgrade(state.hero.savedData.elements[loot.lootType], loot);
+            state.hero.savedData.elements[loot.lootType as MagicElement] = applyUpgrade(state.hero.savedData.elements[loot.lootType as MagicElement], loot);
         } else if ([
             'leatherBoots', 'cloudBoots', 'ironBoots'
         ].includes(loot.lootType)) {
-            state.hero.savedData.equipment[loot.lootType] = applyUpgrade(state.hero.savedData.equipment[loot.lootType], loot);
-        } else if ([
-            'spikeBoots', 'flyingBoots', 'forgeBoots'
-        ].includes(loot.lootType)) {
+            state.hero.savedData.equipment[loot.lootType as Equipment] = applyUpgrade(state.hero.savedData.equipment[loot.lootType as Equipment], loot);
+        } else if (isBlueprints(loot.lootType)) {
             state.hero.savedData.blueprints[loot.lootType] = 1;
         } else if (loot.lootType === 'money') {
             state.hero.savedData.money += (loot.lootAmount || 1);

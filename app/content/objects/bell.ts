@@ -44,7 +44,7 @@ export class Bell implements ObjectInstance {
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.isBonk) {
-            const style = bellStyles[this.definition.style] || bellStyles.bellA4;
+            const style = bellStyles[this.definition.style as keyof typeof bellStyles] || bellStyles.bellA4;
             style.playSound(state, this);
             this.animationTime = 0;
         }
@@ -55,7 +55,7 @@ export class Bell implements ObjectInstance {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         let frame: Frame = bellFrame;
         if (this.animationTime < bellAnimation.duration * 2) {
             frame = getFrame(bellAnimation, this.animationTime);

@@ -43,7 +43,7 @@ interface BalloonCentipedeParams {
     isControlled?: boolean
     parent?: Enemy<BalloonCentipedeParams>
     tail?: Enemy<BalloonCentipedeParams>
-    locations?: {x: number, y: number, z: number, d: Direction}[]
+    locations?: {x: number, y: number, z: number, d: CardinalDirection}[]
     targetTheta?: number
 }
 

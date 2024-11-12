@@ -35,7 +35,7 @@ export const chunkGenerators: {[key: string]: ChunkGenerator} = {
     }
 };
 
-for (const key of Object.keys(slices)) {
+for (const key of Object.keys(slices) as (keyof typeof slices)[]) {
     chunkGenerators[`slices-${key}`] = (random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) => {
         applyNineSlice(random, slices[key], r, area, alternateArea);
     };

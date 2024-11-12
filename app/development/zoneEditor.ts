@@ -42,6 +42,7 @@ const sectionLayouts = {
     topRow: [topRow, blSection, brSection],
     bottomRow: [tlSection, trSection, bottomRow],
 }
+type SectionLayout = keyof typeof sectionLayouts;
 
 const tileScale = 2;
 const pixelScale = tileScale / 16;
@@ -640,7 +641,7 @@ export function getZoneProperties(): PanelRows {
         id: 'select-area-layout',
         value: 'Change Layout',
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
-        onChange(sectionType: string) {
+        onChange(sectionType: SectionLayout) {
             const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
             const scaledSections = sectionLayouts[sectionType].map(section => {
                 let {x, y, w, h} = section;

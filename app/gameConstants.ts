@@ -139,6 +139,8 @@ export const gameModifiers = {
 };
 window.gameModifiers = gameModifiers;
 
+type GameModifier = keyof typeof gameModifiers;
+
 export const challenge = readGetParameter('challenge');
 if (challenge === 'easy') {
     gameModifiers.globalDamageTaken = 0.5;
@@ -156,6 +158,6 @@ if (challenge === 'easy') {
     gameModifiers.nerfPhoenixCrown = 1;
 }
 
-for (const key of Object.keys(gameModifiers)) {
+for (const key of Object.keys(gameModifiers) as GameModifier[]) {
     gameModifiers[key] = readGetParameterAsInt(key, gameModifiers[key]);
 }

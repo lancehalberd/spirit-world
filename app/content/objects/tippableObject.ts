@@ -159,7 +159,7 @@ export class TippableObject implements ObjectInstance {
             this.pushedLastFrame = false;
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.fallDirection === 'right') {
             const frame = getFrame(this.definition.spirit ? fallLeftSpiritAnimation : fallLeftAnimation, this.animationTime);
             drawFrameReflectedAt(context, frame, {x: this.x, y: this.y - this.z });
@@ -206,7 +206,7 @@ class FrozenPotObject extends PushPullObject  {
         }
         return crackedPot
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameAt(context, frozenPotFrame, {x: this.x, y: this.y - this.z});
     }
 }

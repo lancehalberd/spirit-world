@@ -29,7 +29,7 @@ export class TextCue implements EffectInstance {
     duration: number = this.props.duration ?? 3000;
     textFrames: Frame[][];
     isUsingKeyboard: boolean = false;
-    constructor(state, readonly props: TextCueProps) {
+    constructor(state: GameState, readonly props: TextCueProps) {
         // TextCue only supports a single page of messages.
         this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
         this.isUsingKeyboard = state.isUsingKeyboard;

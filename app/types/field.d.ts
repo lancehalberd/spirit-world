@@ -1,5 +1,5 @@
 
-type CardinalDirection = 'N' | 'S' | 'W' | 'E';
+type CardinalDirection = 'up' | 'down' | 'left' | 'right';
 type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' | 'downleft' | 'downright';
 
 interface ScreenShake {

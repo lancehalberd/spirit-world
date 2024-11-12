@@ -6,9 +6,9 @@ import { Enemy } from 'app/content/enemy';
 import { beetleHornedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { paceRandomly } from 'app/utils/enemies';
-import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 
@@ -271,7 +271,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'choose' && enemy.z <= 0) {
-        enemy.d = getDirection(targetVector.x, targetVector.y);
+        enemy.d = getCardinalDirection(targetVector.x, targetVector.y);
         enemy.setAnimation('idle', enemy.d);
         enemy.tryUsingAbility(state, leapStrikeAbility);
     }

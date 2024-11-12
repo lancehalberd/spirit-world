@@ -89,7 +89,7 @@ export class WaterPot implements ObjectInstance {
             this.pushedLastFrame = false;
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         let frame;
         if (!this.tipped) {
             frame = getFrame(fullPodAnimation, this.animationTime);
