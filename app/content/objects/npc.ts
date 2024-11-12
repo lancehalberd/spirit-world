@@ -480,7 +480,9 @@ export class NPC implements Actor, ObjectInstance  {
         const scale = animationStyle.scale || 1;
         // Dialogue indicators should not be drawn while script events are running since they are
         // distracting during cut scenes, and you cannot usually interract with NPCs while events are running.
-        if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length) {
+        // Also hide dialogue bubbles on the title screen
+        if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length
+            && state.scene !== 'title') {
             const dialogue = this.getNextDialogue(state);
             if (dialogue) {
                 context.save();

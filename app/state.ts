@@ -174,7 +174,7 @@ export function getState(): GameState {
 }
 window['getState'] = getState;
 
-export function getTitleOptions(state: GameState): string[] {
+export function getFileSelectOptions(state: GameState): string[] {
     if (state.scene === 'chooseGameMode') {
         return ['Full Game', 'Quick Demo', 'Cancel'];
     }
@@ -190,7 +190,26 @@ export function getTitleOptions(state: GameState): string[] {
     if (state.scene === 'deleteSavedGame') {
         return [...gameFiles, 'CANCEL'];
     }
-    return [...gameFiles, 'DELETE'];
+    return [...gameFiles, 'DELETE', 'TITLE'];
+}
+
+export function getTitleOptions(state: GameState): string[] {
+    const titleMenu = ['START', 'SETTINGS'];
+    // only display 'QUIT' if game is being played inside of Electron as a desktop app
+    if (window.electronAPI && state.gameHasBeenInitialized) {
+        return [...titleMenu, 'QUIT'];
+    }
+    return titleMenu;
+}
+
+export function getSettingsOptions(state: GameState): string[] {
+    // add volume, other global game settings here
+    const settingsMenu = ['VIEW CONTROLS'];
+    // only display 'FULLSCREEN' toggle if game is being played inside of Electron as a desktop app
+    if (window.electronAPI && state.gameHasBeenInitialized) {
+        return [...settingsMenu, 'FULLSCREEN', 'RESUME'];
+    }
+    return [...settingsMenu, 'RESUME'];
 }
 
 export function shouldHideMenu(state: GameState): boolean {

@@ -4,14 +4,12 @@ import {
     wasConfirmKeyPressed,
 } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
-import {
-    getTitleOptions,
-    getFileSelectOptions,
-    setSaveFileToState,
-} from 'app/state';
+import { getSettingsOptions } from 'app/state';
+import { initializeTitle } from 'app/scenes/title/initializeTitle';
+import { toggleShowControls } from 'app/scenes/controls/updateControls';
 
-export function updateTitle(state: GameState) {
-    const options = getTitleOptions(state);
+export function updateSettings(state: GameState) {
+    const options = getSettingsOptions(state);
 
     const selectedOption = options[state.menuIndex];
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
@@ -24,19 +22,17 @@ export function updateTitle(state: GameState) {
     if (wasConfirmKeyPressed(state)) {
         playSound('menuTick');
         switch (selectedOption) {
-        case 'START':
-            state.scene = 'fileSelect';
-            getFileSelectOptions(state);
-            setSaveFileToState(0, 0);
-            state.menuIndex = 0;
+        case 'VIEW CONTROLS':
+            toggleShowControls(state);
             break;
-        case 'SETTINGS':
-            state.scene = 'options';
-            state.menuIndex = 0;
-            break;
-        case 'QUIT':
-            console.log('quit game');
-            // Will be implemented when the game is wrapped in Electron as a desktop app, unused now
+        case 'RESUME':
+            if (state.location.zoneKey === 'title') {
+                state.scene = 'title';
+                initializeTitle(state);
+                state.menuIndex = 0;
+            } else {
+                state.scene = 'game';
+            }
             break;
         }
     }
