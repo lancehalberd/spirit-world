@@ -7,7 +7,7 @@ import { requireFrame } from 'app/utils/packedImages';
 export class Decoration implements ObjectInstance {
     area: AreaInstance;
     definition: DecorationDefinition;
-    drawPriority: DrawPriority = 'foreground';
+    drawPriority: DrawPriority = 'sprites';
     isObject = <const>true;
     ignorePits = true;
     x: number;
@@ -19,7 +19,7 @@ export class Decoration implements ObjectInstance {
     animationTime = 0;
     constructor(state: GameState, definition: DecorationDefinition) {
         this.definition = definition;
-        this.drawPriority = definition.drawPriority || 'foreground';
+        this.drawPriority = definition.drawPriority || 'sprites';
         this.x = definition.x;
         this.y = definition.y;
         this.z = definition.z || 0;
@@ -29,6 +29,10 @@ export class Decoration implements ObjectInstance {
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getBehaviors?.(state, this, x, y) || decorationType.behaviors;
+    }
+    getLightSources(state: GameState): LightSource[] {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        return decorationType.getLightSources?.(state, this);
     }
     getYDepth(): number {
         const decorationType = decorationTypes[this.definition.decorationType];
@@ -58,6 +62,7 @@ const [
 ] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 3}).frames;
 
 const entranceLightFrame = requireFrame('gfx/objects/cavelight.png', {x: 0, y: 0, w: 64, h: 32});
+const orbTreeFrame = requireFrame('gfx/objects/orbTree.png', {x: 0, y: 0, w: 26, h: 36, content: {x: 5, y: 19, w: 17, h: 12}});
 
 const pedestalGeometry = {x: 0, y: 0, w: 96, h: 64, content: {x: 0, y: 16, w: 96, h: 48}};
 const pedestalFrame = requireFrame('gfx/decorations/largeStatuePedestal.png', pedestalGeometry);
@@ -75,6 +80,7 @@ interface DecorationType {
     getHitbox?: (decoration: Decoration) => Rect
     behaviors?: TileBehaviors
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
+    getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
 }
 export const decorationTypes: {[key: string]: DecorationType} = {
@@ -104,6 +110,29 @@ export const decorationTypes: {[key: string]: DecorationType} = {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, entranceLightFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
         },
+    },
+    orbTree: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrameContentAt(context, orbTreeFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            return getFrameHitbox(orbTreeFrame, decoration);
+        },
+        getLightSources(state: GameState, decoration: Decoration): LightSource[] {
+            const common = {
+                brightness: 0.6,
+
+                color: {r:255, g: 128, b: 0},
+            };
+            return [
+                {...common, radius: 16, x: decoration.x - orbTreeFrame.content.x + 3, y: decoration.y - orbTreeFrame.content.y + 14},
+                {...common, radius: 20, x: decoration.x - orbTreeFrame.content.x + 13, y: decoration.y - orbTreeFrame.content.y + 2},
+                {...common, radius: 16, x: decoration.x - orbTreeFrame.content.x + 23, y: decoration.y - orbTreeFrame.content.y + 14},
+            ];
+        }
     },
     pedestal: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {

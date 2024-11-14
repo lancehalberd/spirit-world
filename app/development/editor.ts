@@ -11,9 +11,13 @@ import { displayPropertyPanel, hideAllPropertyPanels } from 'app/development/pro
 import { createObjectDefinition, combinedObjectTypes } from 'app/development/objectEditor';
 import { getVariantProperties, isVariantSelected } from 'app/development/variantEditor';
 import { enterLocation } from 'app/utils/enterLocation';
+import {setSaveFileToState} from 'app/state';
 
 
 export function toggleEditing(state: GameState) {
+    if (state.scene === 'title') {
+        setSaveFileToState(0, 0);
+    }
     state.scene = 'game';
     state.hero.z = 0;
     state.hero.actionTarget = null;

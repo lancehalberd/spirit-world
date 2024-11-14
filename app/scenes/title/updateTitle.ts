@@ -6,7 +6,6 @@ import {
 import { playSound } from 'app/utils/sounds';
 import {
     getTitleOptions,
-    getFileSelectOptions,
     setSaveFileToState,
 } from 'app/state';
 
@@ -26,7 +25,6 @@ export function updateTitle(state: GameState) {
         switch (selectedOption) {
         case 'START':
             state.scene = 'fileSelect';
-            getFileSelectOptions(state);
             setSaveFileToState(0, 0);
             state.menuIndex = 0;
             break;

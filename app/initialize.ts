@@ -3,7 +3,6 @@ import { addKeyboardListeners } from 'app/userInput';
 import { getState, initializeState } from 'app/state';
 import { addKeyboardShortcuts } from 'app/utils/addKeyboardShortcuts';
 import { bindMouseListeners } from 'app/utils/mouse';
-import { initializeTitle } from 'app/scenes/title/initializeTitle';
 
 export function initializeGame() {
     bindMouseListeners();
@@ -15,7 +14,4 @@ export function initializeGame() {
     query('.js-gameContent').style.display = '';
     let state = getState();
     state.gameHasBeenInitialized = true;
-    // Temporary: show title location initally.
-    // HUD is hidden in renderHUD.ts by not drawing HUD if scene is 'title'
-    initializeTitle(state);
 }
