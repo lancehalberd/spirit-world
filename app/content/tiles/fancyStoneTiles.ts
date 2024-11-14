@@ -1,5 +1,6 @@
 import {
     deletedTiles,
+    lightStoneParticles,
     southernWallBehavior,
 } from 'app/content/tiles/constants';
 import { requireFrame } from 'app/utils/packedImages';
@@ -25,7 +26,7 @@ const fancyStoneCeilingAlternateTiles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/ceilingtilesfancystone.png', {x: 32, y: 48, w: 16, h: 16}),
     behaviors: {
-        '0x1': {defaultLayer: 'floor2', underTile: 4, isBrittleGround: true},
+        '0x1': {defaultLayer: 'floor2', underTile: 4, isBrittleGround: true, particles: lightStoneParticles, breakSound: 'rockShatter'},
     },
 };
 

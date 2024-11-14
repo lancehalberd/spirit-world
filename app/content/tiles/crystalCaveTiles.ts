@@ -9,6 +9,7 @@ import {
 import {
     bottomLeftCeiling,
     bottomRightCeiling,
+    crystalParticles,
     southernWallBehavior,
     topRightWall,
     topLeftWall,
@@ -163,18 +164,19 @@ const crystalCaveFloor: TileSource = {
     source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
-        '13x5': { defaultLayer: 'field', underTile: 317, isBrittleGround: true},
+        '13x5': { defaultLayer: 'field', underTile: 317, isBrittleGround: true, particles: crystalParticles, breakSound: 'switch'},
     },
     tileCoordinates: [
         [12, 4], [13, 4], [14, 4],
         [12, 5], [13, 5], [14, 5],
     ],
 };
+
 export const crystalTransparentFloor: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 208, y: 96, w: 16, h: 16}),
     behaviors: {
-        'all': { defaultLayer: 'field', underTile: 0, isBrittleGround: true, isGround: true},
+        'all': { defaultLayer: 'field', underTile: 0, isBrittleGround: true, isGround: true, particles: crystalParticles, breakSound: 'switch'},
     },
 };
 const crystalCaveFloorEdges: TileSource = {

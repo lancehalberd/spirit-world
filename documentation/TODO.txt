@@ -31,6 +31,8 @@ Graphics Work:
             The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
         Large Statues for Flame and Frost Beasts
 
+        Dirt particles for breaking cracked dirt tiles.
+
 
     Create icons for new items:
         Magic Beans
@@ -66,10 +68,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add particle effect or animation for broken brittle crystal ground.
-
     - Staff should despawn if it is completely over pit tiles.
-        - Staff should destroy cracked ground when placed.
 
     - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
 

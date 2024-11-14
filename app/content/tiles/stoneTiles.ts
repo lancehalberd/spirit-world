@@ -11,6 +11,7 @@ import {
     bottomRightCeiling,
     bottomRightShallowCeiling,
     ceilingBehavior,
+    lightStoneParticles,
     southernWallBehavior,
     topRightWall,
     topLeftWall,
@@ -169,7 +170,7 @@ const stoneFloor: TileSource = {
     source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
-        '13x5': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
+        '13x5': { defaultLayer: 'field', underTile: 4, isBrittleGround: true, particles: lightStoneParticles, breakSound: 'rockShatter'},
     },
     tileCoordinates: [
         [12, 4],[13, 4],[14, 4],

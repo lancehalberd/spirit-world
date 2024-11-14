@@ -1,6 +1,6 @@
 import { addParticleSpray } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
-import { crystalParticles } from 'app/content/tiles';
+import {crystalParticles} from 'app/content/tiles/constants';
 import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';

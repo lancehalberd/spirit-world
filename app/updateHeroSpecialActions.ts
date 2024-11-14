@@ -22,6 +22,7 @@ import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
 import {
+    breakBrittleTilesInRect,
     canSomersaultToCoords,
     hitTargets,
     isTileOpen,
@@ -749,6 +750,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 canPush: staff.staffBonked,
                 canDamageCrystalShields: staff.staffBonked,
             });
+            breakBrittleTilesInRect(state, state.areaInstance, pad(baseTarget, 2))
             hitTargets(state, state.areaInstance, {
                 hitbox: baseTarget,
                 hitTiles: true,

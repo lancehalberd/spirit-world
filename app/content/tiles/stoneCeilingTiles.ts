@@ -1,3 +1,4 @@
+import {lightStoneParticles} from 'app/content/tiles/constants';
 import { requireFrame } from 'app/utils/packedImages';
 
 const convexStoneCeilingTiles: TileSource = {
@@ -22,7 +23,7 @@ const stoneCeilingAlternateTiles: TileSource = {
     source: requireFrame('gfx/tiles/ceilingtiles.png', {x: 16, y: 48, w: 16, h: 32}),
     behaviors: {
         '0x0': {defaultLayer: 'floor'},
-        '0x1': {defaultLayer: 'floor2', underTile: 4, isBrittleGround: true},
+        '0x1': {defaultLayer: 'floor2', underTile: 4, isBrittleGround: true, particles: lightStoneParticles, breakSound: 'rockShatter'},
     },
 };
 

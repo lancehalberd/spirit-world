@@ -17,7 +17,9 @@ import {
     bushBehavior,
     ceilingBehavior,
     climbableWall,
+    crystalParticles,
     deepWaterBehavior,
+    dirtParticles,
     heavyStoneBehavior,
     lightStoneBehavior,
     pitBehavior,
@@ -43,7 +45,7 @@ import {
     cavePitAngledWallsOut,
 } from 'app/content/tiles/cavePits';
 import { allCrystalCavePitTileSources, crystalCaveWallToPitTileSources } from 'app/content/tiles/crystalCavePits';
-import { allCrystalCaveTileSources, crystalTransparentFloor } from 'app/content/tiles/crystalCaveTiles';
+import {allCrystalCaveTileSources, crystalTransparentFloor} from 'app/content/tiles/crystalCaveTiles';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
@@ -53,7 +55,7 @@ import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
 import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
 import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
@@ -774,7 +776,7 @@ const breakableFloor: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/clifffloors.png', {x: 0, y: 0, w: 16, h: 16}),
     behaviors: {
-        'all': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
+        'all': { defaultLayer: 'field', underTile: 4, isBrittleGround: true, particles: dirtParticles, breakSound: 'rockShatter'},
     },
 };
 
@@ -1038,9 +1040,6 @@ const floorEyeTile: TileSource = {
         'all': { defaultLayer: 'floor2' },
     },
 };
-
-
-export const crystalParticles: Frame[] = createAnimation('gfx/effects/particles_beads.png', {w: 3, h: 3}, {x: 0, cols: 10}).frames;
 
 const crystalBeadFloor: TileSource = {
     w: 16, h: 16,

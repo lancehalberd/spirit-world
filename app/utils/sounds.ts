@@ -165,7 +165,6 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
     sound.instances = sound.instances.filter(instance => instance.endTime && instance.endTime >= currentTime);
     // Ignore this sound if we have already scheduled the maximum number of simultaneous effects.
     const instanceLimit = sound.instanceLimit ?? 5;
-
     if (sound.instances.length >= instanceLimit) {
         return;
     }
@@ -403,46 +402,46 @@ export function isTrackPlaying(trackKey: TrackKey): boolean {
 
 const preloadSounds = () => {
     [
-        {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, duration: 0.2, limit: 2},
-        {key: 'unlock', source: 'sfx/Cube click_odrive.wav', volume: 50, limit: 2},
-        {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, limit: 2},
-        {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, limit: 2},
+        {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, duration: 0.2, instanceLimit: 2},
+        {key: 'unlock', source: 'sfx/Cube click_odrive.wav', volume: 50, instanceLimit: 2},
+        {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, instanceLimit: 2},
+        {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, instanceLimit: 2},
         {key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
-            duration: 0.7, volume: 60, limit: 2
+            duration: 0.7, volume: 60, instanceLimit: 2
         },
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
-            duration: 1.4, loop: true, volume: 20, limit: 2
+            duration: 1.4, loop: true, volume: 20, instanceLimit: 2
         },
-        {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, limit: 2},
-        {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, limit: 2},
-        {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 10, limit: 2},
+        {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, instanceLimit: 2},
+        {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, instanceLimit: 2},
+        {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 10, instanceLimit: 2},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
-        //     offset: 0.2, duration: 0.3', volume: 10, limit: 2},
+        //     offset: 0.2, duration: 0.3', volume: 10, instanceLimit: 2},
         {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
-             offset: 0.3, duration: 0.2, volume: 20, limit: 2},
+             offset: 0.3, duration: 0.2, volume: 20, instanceLimit: 2},
         {key: 'bossDeath', source: 'sfx/enemyDeath.wav',
-             offset: 0.17, duration: 0.3, volume: 20, limit: 2},
-        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2, duration: 0.4, customDelay: 0.1},
+             offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 2},
+        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, instanceLimit: 2, duration: 0.4, customDelay: 0.1},
         {key: 'getMoney', source: 'sfx/coin wood c.wav',
-            duration: 0.25, volume: 10, limit: 2},
+            duration: 0.25, volume: 10, instanceLimit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
-            duration: 0.1, volume: 20, limit: 3},
-        {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 100, limit: 1},
-        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 50, limit: 3},
-        {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 50, limit: 2},
-        {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', offset: 0.3, duration: 0.2, volume: 100, limit: 1},
-        {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 100, limit: 1},
-        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, limit: 1},
-        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, limit: 1},
-        //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: 0, duration: 80, limit: 2},
-        //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
-        //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
-        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, limit: 2},
-        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, limit: 2},
-        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, limit: 2},
-        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
-        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, limit: 2},
-        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, limit: 2},
+            duration: 0.1, volume: 20, instanceLimit: 3},
+        {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 100, instanceLimit: 1},
+        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 50, instanceLimit: 3},
+        {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 50, instanceLimit: 2},
+        {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', offset: 0.3, duration: 0.2, volume: 100, instanceLimit: 1},
+        {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 100, instanceLimit: 1},
+        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, instanceLimit: 1},
+        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, instanceLimit: 1},
+        //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: 0, duration: 80, instanceLimit: 2},
+        //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, instanceLimit: 2},
+        //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, instanceLimit: 2},
+        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, instanceLimit: 2},
+        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, instanceLimit: 2},
+        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, instanceLimit: 2},
+        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, instanceLimit: 2},
+        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 2},
+        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 2},
     ].forEach(sound => requireSoundEffect(sound));
 };
 preloadSounds();
