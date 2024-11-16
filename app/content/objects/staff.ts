@@ -4,7 +4,9 @@ import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
 import { directionMap } from 'app/utils/direction';
-import { pad } from 'app/utils/index';
+import {getTilesInRectangle} from 'app/utils/field';
+import {pad, rectanglesOverlap} from 'app/utils/index';
+import {getObjectBehaviors} from 'app/utils/objects';
 
 
 const staffPartGeometry = {w: 20, h: 17};
@@ -168,7 +170,38 @@ export class Staff implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         if (this.isInvalid && this.animationTime > 100) {
             this.remove(state);
+            return;
         }
+        // Check if the staff should be recalled because it is completely over pits.
+        if (this.isUnsupported(state)) {
+            this.recall(state);
+            return;
+        }
+    }
+    isUnsupported(state: GameState): boolean {
+        const behaviorGrid = this.area.behaviorGrid;
+        const hitbox = this.getHitbox()
+        // The staff is supported as long as there is at least one non pit tile under it.
+        for (const {x, y} of getTilesInRectangle(this.area, hitbox)) {
+            let behaviors = behaviorGrid[y]?.[x];
+            if (!behaviors?.pit) {
+                return false;
+            }
+        }
+        // The staff is also supported as long as there is a ground object under it.
+        for (const object of this.area.allActiveObjects) {
+            if (object === this || !object.getHitbox) {
+                continue;
+            }
+            if (!rectanglesOverlap(hitbox, object.getHitbox())) {
+                continue;
+            }
+            const behaviors = getObjectBehaviors(state, object);
+            if (behaviors?.isGround || behaviors?.groundHeight > 0) {
+                return false;
+            }
+        }
+        return true;
     }
     remove(state: GameState) {
         const index = this.area.objects.indexOf(this);

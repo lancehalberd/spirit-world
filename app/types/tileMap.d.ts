@@ -430,6 +430,8 @@ interface AreaInstance {
     layers: AreaLayer[]
     effects: EffectInstance[]
     objects: ObjectInstance[]
+    // Update each frame to include all objects/effects+parts that were interactive in the area before the last round of updating objects.
+    allActiveObjects: (EffectInstance | ObjectInstance)[]
     priorityObjects: (EffectInstance | ObjectInstance)[][]
     // List of objects to render that is updated each frame.
     // This is all effects+objects as well as any parts of effects+objects.

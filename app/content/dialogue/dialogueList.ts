@@ -80,6 +80,7 @@ export function populateAllDialogue() {
                                 || object.dialogueIndex < 0
                                 // Objects with dialogue key are handled on the dialogue hash.
                                 || object.dialogueKey
+                                || !object.dialogue
                             ) {
                                 if (object.type === 'npc' && object.dialogueIndex >= 0) {
                                     delete object.dialogueIndex;

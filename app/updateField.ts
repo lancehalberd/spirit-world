@@ -81,6 +81,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
     // Time passes slowly for everything but the astral projection while meditating.
     const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) >= 20;
+    area.allActiveObjects = [];
     area.allyTargets = [];
     if (area === state.hero.area) {
         area.allyTargets.push(state.hero);
@@ -92,6 +93,15 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     area.neutralTargets = [];
     for (const baseObject of [...area?.objects || [], ...area?.effects || []]) {
         for (const object of getFieldInstanceAndParts(state, baseObject)) {
+            if (object.area !== area
+                || object.status === 'gone'
+                || object.status === 'hidden'
+                || object.status === 'hiddenEnemy'
+                || object.status === 'hiddenSwitch'
+            ) {
+                continue;
+            }
+            area.allActiveObjects.push(object);
             if (object.isAllyTarget) {
                 area.allyTargets.push(object);
             }

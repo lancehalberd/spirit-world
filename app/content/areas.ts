@@ -392,6 +392,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         })),
         effects: [],
         objects: [],
+        allActiveObjects: [],
         removedObjectIds: [],
         priorityObjects: [],
         backgroundFrames,

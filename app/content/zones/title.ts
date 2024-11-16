@@ -257,7 +257,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "titleTeleporter", x: 248, y: 280, type: "teleporter", linked: true, locationCue: "Title"},
         {status: "normal", id: "", spirit: false, x: 280, y: 248, type: "crystalSwitch", element: "lightning", timer: 0, requireAll: true},
         {status: "normal", id: "", spirit: false, x: 216, y: 248, type: "crystalSwitch", element: "fire", timer: 0, requireAll: true},
-        {status: "normal", id: "jadeChampion", linked: true, spirit: true, x: 212, y: 312, d: "left", behavior: "face", style: "jadeChampion", type: "npc", dialogueIndex: 167},
+        {status: "normal", id: "jadeChampion", linked: true, spirit: true, x: 212, y: 312, d: "left", behavior: "face", style: "jadeChampion", type: "npc"},
         {status: "normal", id: "", spirit: false, x: 276, y: 312, type: "crystalSwitch", element: "ice", timer: 0, requireAll: true},
     ],
     sections: [
