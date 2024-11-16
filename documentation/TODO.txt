@@ -71,7 +71,6 @@ Current tasks:
     - Reduce spirit sight radius to ~10px when in solid ground and disable astral projection.
 
     - Exit from peach cave water doesn't render frozen correctly.
-    - Bug: Golem boss stopped moving when hands were killed during enrage phase.
 
     - Add new graphics
         - Add fog effect to the new forest zone.

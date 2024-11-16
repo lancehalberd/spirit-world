@@ -620,8 +620,12 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'strafeSlamHands') {
-        // Don't start strafing until a hand has started slamming.
-        if (enemy.params.slamHands) {
+        // Cancel this attack if all hands are defeated.
+        if (!hands.length) {
+            enemy.params.enragedAttacks--;
+            enemy.setMode('choose');
+        } else if (enemy.params.slamHands) {
+            // Don't start strafing until a hand has started slamming.
             if (hands.some(hand => hand.mode === 'slamHand')) {
                 enemy.params.slamHands = false;
             }
