@@ -189,7 +189,7 @@ export function randomizeEntrances(random: typeof SRandom) {
         targetIdMap[targetKey] = targetIdMap[targetKey] || [];
         targetIdMap[targetKey].push({ definition: object, location });
         allTargetedKeys.add(targetKey);
-        if (zone.surfaceKey) {
+        if (zone.surfaceKey && !area.isSpiritWorld) {
             if (zone.key === 'underwater') {
                 waterExits.add(targetKey);
             } else {

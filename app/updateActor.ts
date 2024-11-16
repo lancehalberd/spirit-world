@@ -13,6 +13,7 @@ import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
+import {isUnderwater} from 'app/utils/actor';
 import { removeAllClones, setNextAreaSection } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
 import {directionMap} from 'app/utils/field';
@@ -299,7 +300,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
         }
     }
-    const isHoldingBreath = !state.hero.savedData.passiveTools.waterBlessing && state.zone.surfaceKey;
+    const isHoldingBreath = !state.hero.savedData.passiveTools.waterBlessing && isUnderwater(state, state.hero);
     // Corrosive areas drain mana unless you have the water blessing.
     const isWaterDrainingMagic = !state.hero.savedData.passiveTools.waterBlessing && hero.area.isCorrosive;
     if (activeAirBubbles) {
