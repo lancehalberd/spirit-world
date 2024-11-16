@@ -1064,7 +1064,7 @@ const sf0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 498, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 498, mapId: 'underwaterSpirit', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const sf0_1x2: AreaDefinition = {
@@ -1074,7 +1074,7 @@ const sf0_1x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 499, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 499, mapId: 'underwaterSpirit', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const sf0_2x2: AreaDefinition = {
@@ -1084,7 +1084,7 @@ const sf0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 501, mapId: 'undefinedSpirit', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 501, mapId: 'underwaterSpirit', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 zones.underwater = {

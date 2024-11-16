@@ -311,9 +311,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 72, y: 424, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 122, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 0},
-        {x: 16, y: 0, w: 16, h: 16, index: 123, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 32, h: 16, index: 124, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 1},
+        {x: 0, y: 0, w: 16, h: 16, index: 122, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
+        {x: 16, y: 0, w: 16, h: 16, index: 123, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
+        {x: 0, y: 16, w: 32, h: 16, index: 124, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
     dark: 50,
 };
@@ -673,7 +673,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 400, y: 400, d: "down", behavior: "idle", style: "mom", type: "npc", dialogueKey: "mom"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 125, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 125, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -982,8 +982,8 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "waterfallCaveEmptyRoomNpc", x: 112, y: 388, d: "right", behavior: "random", style: "vanaraGold", type: "npc", dialogue: "We recently finished digging this new room but we still need to furnish it.", dialogueIndex: 124},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 126, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},
-        {x: 0, y: 16, w: 32, h: 16, index: 127, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 126, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
+        {x: 0, y: 16, w: 32, h: 16, index: 127, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -993,9 +993,9 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 526, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 0},
-        {x: 16, y: 0, w: 16, h: 16, index: 527, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 32, h: 16, index: 528, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 1},
+        {x: 0, y: 0, w: 16, h: 16, index: 526, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
+        {x: 16, y: 0, w: 16, h: 16, index: 527, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
+        {x: 0, y: 16, w: 32, h: 16, index: 528, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -1005,7 +1005,7 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 529, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 529, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -1310,7 +1310,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 530, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 530, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -1320,8 +1320,8 @@ const sf0_1x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 531, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},
-        {x: 0, y: 16, w: 32, h: 16, index: 543, mapId: 'overworldSpirit', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 531, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
+        {x: 0, y: 16, w: 32, h: 16, index: 543, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 zones.waterfallCave = {

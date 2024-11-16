@@ -140,7 +140,7 @@ const f0_0x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 74, mapId: 'overworld', entranceId: 'overworld:holyCityGardenHouse', mapX: 0, mapY: 0},
         {x: 16, y: 0, w: 16, h: 16, index: 75, mapId: 'overworld', entranceId: 'overworld:holyCityBridgeHouse', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 32, h: 16, index: 76, mapId: 'holyCityInterior', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 76, mapId: 'overworld', entranceId: 'overworld:moneyMazeExit'},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -321,7 +321,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:1x0-npc-0", x: 200, y: 432, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!", dialogueIndex: 107},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 226, mapId: 'holyCityInterior', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 16, index: 226, mapId: 'overworld', entranceId: 'overworld:moneyMazeExit'},
         {x: 0, y: 16, w: 16, h: 16, index: 462, mapId: 'overworld', entranceId: 'overworld:holyCityFoodHouse', mapX: 2, mapY: 1},
         {x: 16, y: 16, w: 16, h: 16, index: 479, mapId: 'overworld', entranceId: 'overworld:holyCityClothesHouse', mapX: 3, mapY: 1},
     ],
@@ -331,7 +331,7 @@ const f0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 514, mapId: 'holyCityInterior', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 514, mapId: 'overworld', entranceId: 'overworld:moneyMazeExit'},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -746,9 +746,9 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 120, y: 88, d: "down", behavior: "random", style: "smallSpirit", type: "npc", dialogueKey: "curiousSpirit"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 83, mapId: 'holyCityInteriorSpirit', floorId: '1F', mapX: 0, mapY: 0},
-        {x: 16, y: 0, w: 16, h: 16, index: 84, mapId: 'overworld', entranceId: 'jadeCitySoutheastDoor', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 32, h: 16, index: 85, mapId: 'holyCityInteriorSpirit', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 0, y: 0, w: 16, h: 16, index: 83, mapId: 'overworld', entranceId: 'jadeCityNortheastDoor'},
+        {x: 16, y: 0, w: 16, h: 16, index: 84, mapId: 'overworld', entranceId: 'jadeCitySoutheastDoor'},
+        {x: 0, y: 16, w: 32, h: 16, index: 85, mapId: 'overworld', entranceId: 'overworld:moneyMazeExit'},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -931,9 +931,9 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 56, y: 352, d: "down", behavior: "idle", style: "smallSpirit", type: "npc", dialogue: "Unfortunately, I don't think there is anyway I can assist you.", dialogueIndex: 144},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 77, mapId: 'holyCityInterior', floorId: '1F', mapX: 2, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 78, mapId: 'overworld', entranceId: 'overworld:holyCityFoodHouse', mapX: 2, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 79, mapId: 'overworld', entranceId: 'overworld:holyCityClothesHouse', mapX: 3, mapY: 1},
+        {x: 0, y: 0, w: 32, h: 16, index: 77, mapId: 'overworld', entranceId: 'overworld:moneyMazeExit'},
+        {x: 0, y: 16, w: 16, h: 16, index: 78, mapId: 'overworld', entranceId: 'overworld:holyCityFoodHouse'},
+        {x: 16, y: 16, w: 16, h: 16, index: 79, mapId: 'overworld', entranceId: 'overworld:holyCityClothesHouse'},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -943,7 +943,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 515, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 515, mapId: 'overworld', entranceId: 'overworld:moneyMazeExit'},
     ],
 };
 const sf0_1x1: AreaDefinition = {

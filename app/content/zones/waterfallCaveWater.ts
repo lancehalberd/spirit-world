@@ -172,7 +172,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 502, mapId: 'waterfallCaveWater', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 502, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -180,7 +180,7 @@ const f0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 503, mapId: 'waterfallCaveWater', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 503, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -356,7 +356,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallCaveWaterEntrance", spirit: true, x: 272, y: 480, type: "door", style: "cavern", targetZone: "underwater", targetObjectId: "waterfallCaveWaterEntrance", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 865, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 865, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -536,7 +536,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "waterfallCaveWaterPeach", linked: false, spirit: true, x: 64, y: 40, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 300},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 866, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 866, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
     dark: 100,
 };
@@ -547,7 +547,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 510, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 510, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -557,7 +557,7 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 511, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 511, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -736,7 +736,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 512, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 512, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -746,7 +746,7 @@ const sf0_1x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 513, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 513, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},
     ],
 };
 zones.waterfallCaveWater = {

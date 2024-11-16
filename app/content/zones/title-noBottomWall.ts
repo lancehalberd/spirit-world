@@ -528,7 +528,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, x: 240, y: 328, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 617, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 0}, 
+        {x: 0, y: 0, w: 32, h: 32, index: 617, mapId: 'titleSpirit', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 zones.titleNoBottomWall = {

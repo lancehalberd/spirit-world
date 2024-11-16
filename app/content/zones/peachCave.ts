@@ -1334,9 +1334,9 @@ const sf0_0x0: AreaDefinition = {
         {id: "", linked: false, spirit: false, status: "closed", x: 272, y: 32, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsDown", d: "left", style: "cavern", openLogic: {"logicKey":"isRandomizer","isInverted":false}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 159, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 160, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 32, index: 161, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 0},
+        {x: 0, y: 0, w: 16, h: 16, index: 159, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 160, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 161, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 3, mapY: 1},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -1808,10 +1808,10 @@ const sf0_0x1: AreaDefinition = {
         {id: "peachCaveLowerCrackedDoor", linked: false, spirit: false, status: "cracked", x: 368, y: 272, type: "door", d: "up", style: "cavern"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 162, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 2},
-        {x: 16, y: 0, w: 16, h: 16, index: 163, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 2},
-        {x: 0, y: 16, w: 16, h: 16, index: 164, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 3},
-        {x: 16, y: 16, w: 16, h: 16, index: 165, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 0, w: 16, h: 16, index: 162, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 163, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 164, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 165, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -3014,10 +3014,10 @@ const sf1_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 173, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 0, mapY: 0},
-        {x: 16, y: 0, w: 16, h: 16, index: 174, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 175, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 0, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 176, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 1},
+        {x: 0, y: 0, w: 16, h: 16, index: 173, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 2, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 174, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 3, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 175, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 176, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 3, mapY: 2},
     ],
 };
 const sf1_0x1: AreaDefinition = {

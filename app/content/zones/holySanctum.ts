@@ -933,7 +933,7 @@ const sf1_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 571, mapId: 'undefinedSpirit', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 571, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0, mapY: 0},
     ],
 };
 const sf1_0x1: AreaDefinition = {
@@ -943,7 +943,7 @@ const sf1_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 572, mapId: 'undefinedSpirit', floorId: '2F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 572, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0, mapY: 2},
     ],
 };
 zones.holySanctum = {

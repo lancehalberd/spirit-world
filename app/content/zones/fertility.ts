@@ -1793,7 +1793,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 628, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 628, mapId: 'fertilitySpirit', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -1972,7 +1972,7 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 629, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 629, mapId: 'fertilitySpirit', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const sf0_2x0: AreaDefinition = {
@@ -2151,7 +2151,7 @@ const sf0_2x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 630, mapId: 'undefinedSpirit', floorId: '1F', mapX: 4, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 630, mapId: 'fertilitySpirit', floorId: '1F', mapX: 4, mapY: 0},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -2330,7 +2330,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 631, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 631, mapId: 'fertilitySpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -2551,7 +2551,7 @@ const sf0_1x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 632, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 632, mapId: 'fertilitySpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const sf0_2x1: AreaDefinition = {
@@ -2730,7 +2730,7 @@ const sf0_2x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 633, mapId: 'undefinedSpirit', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 633, mapId: 'fertilitySpirit', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
 const sf0_0x2: AreaDefinition = {
@@ -2909,7 +2909,7 @@ const sf0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 634, mapId: 'undefinedSpirit', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 634, mapId: 'fertilitySpirit', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const sf0_1x2: AreaDefinition = {
@@ -3088,7 +3088,7 @@ const sf0_1x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 635, mapId: 'undefinedSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 635, mapId: 'fertilitySpirit', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const sf0_2x2: AreaDefinition = {
@@ -3267,7 +3267,7 @@ const sf0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 636, mapId: 'undefinedSpirit', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 636, mapId: 'fertilitySpirit', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 zones.fertility = {

@@ -189,7 +189,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, mapId: 'undefinedSpirit'},
+        {x: 0, y: 0, w: 32, h: 32, mapId: 'dreamSpirit'},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -199,7 +199,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, mapId: 'undefinedSpirit'},
+        {x: 0, y: 0, w: 32, h: 32, mapId: 'dreamSpirit'},
     ],
 };
 zones.dream = {

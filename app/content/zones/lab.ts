@@ -381,7 +381,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 224, y: 496, type: "door", style: "cavern", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 435, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 435, mapId: 'lab', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -606,7 +606,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "lab:0:0x1-squirrel-3", x: 180, y: 316, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 436, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 436, mapId: 'lab', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -831,9 +831,9 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "", x: 112, y: 272, type: "door", style: "cavern", d: "up", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 437, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 4},
-        {x: 16, y: 0, w: 16, h: 16, index: 438, mapId: 'lab', floorId: '1F', mapX: 1, mapY: 4},
-        {x: 0, y: 16, w: 32, h: 16, index: 439, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 5},
+        {x: 0, y: 0, w: 16, h: 16, index: 437, mapId: 'lab', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 438, mapId: 'lab', floorId: '1F', mapX: 3, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 439, mapId: 'lab', floorId: '1F', mapX: 2, mapY: 5},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -1775,7 +1775,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "lab:s1:0x0-smallKey-0", linked: true, x: 72, y: 56, type: "chest", lootType: "smallKey", lootLevel: 1, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 486, mapId: 'lab', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 16, index: 486, mapId: 'lab', floorId: '2F', mapX: 2, mapY: 1},
         {x: 0, y: 16, w: 16, h: 16, index: 487, mapId: 'lab', floorId: '2F', mapX: 0, mapY: 1},
         {x: 16, y: 16, w: 16, h: 16, index: 488, mapId: 'lab', floorId: '2F', mapX: 1, mapY: 1},
     ],
@@ -1817,7 +1817,7 @@ const sf1_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 598, mapId: 'undefinedSpirit', floorId: '2F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 598, mapId: 'labSpirit', floorId: '2F', mapX: 0, mapY: 2},
     ],
 };
 const sf1_0x2: AreaDefinition = {
@@ -1827,7 +1827,7 @@ const sf1_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 599, mapId: 'undefinedSpirit', floorId: '2F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 599, mapId: 'labSpirit', floorId: '2F', mapX: 0, mapY: 4},
     ],
 };
 zones.lab = {
