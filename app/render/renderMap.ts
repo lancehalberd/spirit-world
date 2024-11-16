@@ -1,6 +1,7 @@
 import { createAreaInstance } from 'app/content/areas';
 import { convertLocationToMapCoordinates, getMapTargets } from 'app/content/hints';
 import { doorStyles } from 'app/content/objects/doorStyles';
+import {evaluateLogicDefinition} from 'app/content/logic';
 import { allSections, dungeonMaps } from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
 import { editingState } from 'app/development/editingState';
@@ -15,7 +16,7 @@ import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { isPointInShortRect, boxesIntersect, pad } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
-import { getObjectAndParts} from 'app/utils/objects';
+import { getObjectAndParts, getObjectStatus} from 'app/utils/objects';
 import { requireFrame } from 'app/utils/packedImages';
 import { isSectionExplored } from 'app/utils/sections';
 import { drawText } from 'app/utils/simpleWhiteFont';
@@ -31,8 +32,8 @@ const [
     downFrame, upFrame,
     smallLockFrame, bigLockFrame,
     verticalFrame, horizontalFrame,
-    blockedFrame,
-] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 9}).frames;
+    blockedFrame, switchDoorFrame,
+] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 10}).frames;
 // window['debugCanvas'](smallLockFrame, 5);
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
@@ -469,21 +470,29 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                 if (object.definition.status === 'cracked' && !isOpened) {
                     continue;
                 }
+                const isFrozen = evaluateLogicDefinition(state, object.definition.frozenLogic, false);
+                const isZoneDoor = object.definition.targetZone && object.definition.targetObjectId;
                 const wasClosed = object.definition.status === 'closed'
                     || object.definition.status === 'closedSwitch'
                     || object.definition.status === 'closedEnemy';
                 const doorStyle = doorStyles[object.definition.style] || doorStyles.cavern;
-                if (wasClosed && !isOpened) {
+                if (isFrozen && !getObjectStatus(state, object.definition, 'melted')) {
+                    drawFrame(context, switchDoorFrame, {...switchDoorFrame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - switchDoorFrame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - switchDoorFrame.h / 2,
+                    });
+                } else if (wasClosed && !isOpened) {
                     // Ladders are hidden when closed, so do not draw them to the map.
                     if (doorStyle.isLadderUp || doorStyle.isLadderDown) {
                         continue;
                     }
-                    drawFrame(context, blockedFrame, {...blockedFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - blockedFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - blockedFrame.h / 2,
+                    //const canOpenDoor = object.definition.price > 0 || object.definition.status !== 'closed';
+                    const frame = (isZoneDoor ? switchDoorFrame : blockedFrame);
+                    drawFrame(context, frame, {...frame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2,
                     });
                 } else if (object.definition.status === 'locked' && !isOpened) {
-
                     drawFrame(context, smallLockFrame, {...smallLockFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
@@ -493,7 +502,7 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
                     });
-                } else if (object.definition.targetZone && object.definition.targetObjectId) {
+                } else if (isZoneDoor) {
                     if (object.definition.style === 'wideEntrance' && object.definition.d === 'up') {
                         drawFrame(context, upFrame, {...upFrame,
                             x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - upFrame.w / 2,
