@@ -409,7 +409,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.y = baseY + i;
                 // If the hero reaches a point they can stop at, but they cannot stop somewhere in the next 4 pixels, reduce theire y movement
                 // to 0 so they land safeley.
-                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 1})) {
+                if (canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y + 1})) {
                     hero.jumpingVy = 0;
                     break;
                 }
@@ -470,17 +470,17 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.actionDy = 1;
                 // If the hero reaches a point they can stop at, but they cannot stop ahead of it, reduce theire y movement
                 // to 0 so they land safeley.
-                if (!hero.isJumpingWrecklessly && canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 1})) {
+                if (!hero.isJumpingWrecklessly && canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y + 1})) {
                     hero.jumpingVy = 0;
                     break;
                 }
             }
             // This will cause the hero to jump over up to 1 bad landing tile at the bottom of a cliff.
-            while (!hero.isJumpingWrecklessly && i < 1 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
+            while (!hero.isJumpingWrecklessly && i < 1 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero.area, hero) && hero.z < 48) {
                 hero.y++;
                 hero.z++;
                 i++;
-                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y + 1})) {
+                if (canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y}) && !canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y + 1})) {
                     hero.jumpingVy = 0;
                     break;
                 }
@@ -526,7 +526,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hitTargets(state, hero.area, landingHit);
             // If the hero lands somewhere invalid, damage them and return them to there last safe location,
             // similar to if they had fallen into a pit.
-            if (!canSomersaultToCoords(state, hero, hero)) {
+            if (!canSomersaultToCoords(state, hero.area, hero)) {
                 hero.vx = 0;
                 hero.vy = 0;
                 hero.d = hero.safeD;
@@ -559,7 +559,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = Math.min(24, hero.z + hero.vz);
             if (hero.vz < 0.2) {
                 if (hero.action === 'thrown') {
-                    if (!canSomersaultToCoords(state, hero, hero)) {
+                    if (!canSomersaultToCoords(state, hero.area, hero)) {
                         destroyClone(state, hero);
                         return true;
                     }
@@ -597,7 +597,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // their last safe point. This typically happens when
             // trying to throw clones over obstacles.
             if (hero.action === 'thrown') {
-                if (!canSomersaultToCoords(state, hero, hero)) {
+                if (!canSomersaultToCoords(state, hero.area, hero)) {
                     destroyClone(state, hero);
                     return true;
                 }
@@ -899,7 +899,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
             boundingBox: getSectionBoundingBox(state, hero),
         });
         if (result.mx || result.my) {
-            if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+            if (canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y})) {
                 lastOpenPosition.x = hero.x;
                 lastOpenPosition.y = hero.y;
             }
@@ -914,7 +914,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         if (!result.mx && !result.my) {
             break;
         }
-        if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+        if (canSomersaultToCoords(state, hero.area, {x: hero.x, y: hero.y})) {
             lastOpenPosition.x = hero.x;
             lastOpenPosition.y = hero.y;
         }

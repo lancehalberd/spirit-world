@@ -11,14 +11,14 @@ import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 export { directionMap, getDirection } from 'app/utils/direction';
 
-export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
-    return isTileOpen(state, hero.area, {x, y}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
+export function canTeleportToCoords(state: GameState, area: AreaInstance, {x, y}: Point): boolean {
+    return isTileOpen(state, area, {x, y}) && !isUnderLedge(state, area, {x, y, w: 16, h: 16});
 }
 
-export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Point): boolean {
-    return isTileOpen(state, hero.area, {x, y}) && !isUnderLedge(state, hero.area, {x, y, w: 16, h: 16});
+export function canSomersaultToCoords(state: GameState, area: AreaInstance, {x, y}: Point): boolean {
+    return isTileOpen(state, area, {x, y}) && !isUnderLedge(state, area, {x, y, w: 16, h: 16});
 }
-window['canSomersaultToCoords'] = canSomersaultToCoords;
+window.canSomersaultToCoords = canSomersaultToCoords;
 
 export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Point, movementProperties: MovementProperties = {}): boolean {
     movementProperties = {

@@ -351,7 +351,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
             } else if (hero.savedData.passiveTools.spiritSight) {
-                hero.spiritRadius = Math.min(hero.spiritRadius + 4, MAX_SPIRIT_RADIUS);
+                let maxSpiritRadius = MAX_SPIRIT_RADIUS;
+                if (!canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
+                    maxSpiritRadius = 10;
+                }
+                if (hero.spiritRadius <= maxSpiritRadius) {
+                    hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxSpiritRadius);
+                } else {
+                    hero.spiritRadius = Math.max(hero.spiritRadius - 8, maxSpiritRadius);
+                }
                 if (hero.savedData.passiveTools.astralProjection && hero.area.alternateArea) {
                     if (!hero.astralProjection) {
                         hero.astralProjection = new AstralProjection(state, hero);
@@ -667,7 +675,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         ) {
             const preventTeleportation = hero.grabObject || hero.grabTile;
             if (!preventTeleportation && state.hero.magic > 0
-                && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
+                && canTeleportToCoords(state, state.hero.area, {x: hero.x, y: hero.y})
             ) {
                 state.hero.spendMagic(10);
                 state.hero.x = hero.x;

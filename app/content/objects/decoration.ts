@@ -32,7 +32,7 @@ export class Decoration implements ObjectInstance {
     }
     getLightSources(state: GameState): LightSource[] {
         const decorationType = decorationTypes[this.definition.decorationType];
-        return decorationType.getLightSources?.(state, this);
+        return decorationType.getLightSources?.(state, this) || [];
     }
     getYDepth(): number {
         const decorationType = decorationTypes[this.definition.decorationType];
