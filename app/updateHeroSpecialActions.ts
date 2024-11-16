@@ -339,6 +339,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         const door: Door|undefined = hero.actionTarget as Door;
         const isUsingStairs = door?.isStairs?.(state);
         hero.action = 'walking';
+        hero.isRunning = false;
         hero.animationTime += FRAME_LENGTH;
         // Automatically move the hero forward in the direction set by the door, ignoring obstacles.
         // Reduce speed to the regular screen transition speed if the player transitions screens while
