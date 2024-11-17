@@ -2,6 +2,8 @@ import { noteFrequencies } from './noteFrequencies';
 
 const sounds = new Map<string, GameSound>();
 window.sounds = sounds;
+const tracks = new Map<string, GameTrack>();
+window.tracks = tracks;
 
 // This was being used to unlock audio on player interaction, but maybe this isn't necessary any more?
 // We should test this on other browsers.
@@ -63,12 +65,12 @@ export function requireSoundEffect({
 }
 export function requireTrack({
     key, source, offset, duration, customDelay, volume, repeatFrom, nextTrack,
-}: TrackDefinition): GameSound {
-    const sound = sounds.get(key);
-    if (sound) {
-        return sound;
+}: TrackDefinition): GameTrack {
+    const track = tracks.get(key);
+    if (track) {
+        return track;
     }
-    const newSound: GameSound = {
+    const newTrack: GameTrack = {
         key,
         volume: volume / 50,
         offset,
@@ -80,9 +82,9 @@ export function requireTrack({
         loop: !nextTrack
     };
     // Add the audio buffer to the sound as soon as it is loaded.
-    assignAudioBuffer(newSound, source);
-    sounds.set(key, newSound);
-    return newSound;
+    assignAudioBuffer(newTrack, source);
+    tracks.set(key, newTrack);
+    return newTrack;
 }
 
 const audioBufferPromises = new Map<string, Promise<AudioBuffer>>();
@@ -210,9 +212,9 @@ export function stopSound(instance?: AudioInstance, time = audioContext.currentT
 window['stopSound'] = stopSound;
 
 
-let playingTracks: GameSound[] = [];
-let fadingTracks: GameSound[] = [];
-export function getPlayingTracks(): GameSound[] {
+let playingTracks: GameTrack[] = [];
+let fadingTracks: GameTrack[] = [];
+export function getPlayingTracks(): GameTrack[] {
     return playingTracks;
 }
 window['playingTracks'] = playingTracks;
@@ -234,7 +236,7 @@ export function updateAudio(state: GameState) {
                     // console.log('Scheduling next track', currentTrack.nextTrack, instance.endTime);
                     const track = playTrack(currentTrack.nextTrack, 0, false, false, instance.endTime);
                     if (track) {
-                        track.baseTrack = currentTrack.baseTrack || currentTrack.trackKey;
+                        track.baseTrack = currentTrack.baseTrack || currentTrack.key;
                     }
                 }
             }
@@ -315,29 +317,29 @@ const musicTracks: {[key in string]: TrackDefinition} = {
 requireTrack(musicTracks.dungeonTheme);
 // Also load the theme for the title scene.
 requireTrack(musicTracks.mainTheme);
-export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = true, crossFade = true, startTime = audioContext.currentTime): GameSound|false {
-    const sound = requireTrack(musicTracks[trackKey]);
+export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = true, crossFade = true, startTime = audioContext.currentTime): GameTrack|false {
+    const track = requireTrack(musicTracks[trackKey]);
     if (!isAudioUnlocked()) {
         return false;
     }
-    if (!sound.audioBuffer) {
+    if (!track.audioBuffer) {
         return false;
     }
-    // Do nothing if the sound is already playing.
+    // Do nothing if the track is already playing.
     if (isTrackPlaying(trackKey)) {
-        return sound;
+        return track;
     }
-    //console.log('playTrack', playingTracks, source, sound);
+    //console.log('playTrack', playingTracks, trackKey, track);
     if (fadeOutOthers) {
         if (crossFade) fadeOutPlayingTracks([], startTime);
         else stopTrack(startTime);
     }
     // From playTrack
-    const instance = startAudioBufferSound(sound, seekTime, startTime);
+    const instance = startAudioBufferSound(track, seekTime, startTime);
     if (!instance) {
         return false;
     }
-    const volume = Math.min(1, sound.volume);
+    const volume = Math.min(1, track.volume);
     instance.gainNode.connect(trackGainNode);
     if (crossFade) {
         instance.gainNode.gain.setValueAtTime(0, startTime);
@@ -345,8 +347,8 @@ export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = 
     } else {
         instance.gainNode.gain.setValueAtTime(volume, startTime);
     }
-    playingTracks.push(sound);
-    return sound;
+    playingTracks.push(track);
+    return track;
 }
 
 export function setSoundSettings(soundSettings: SoundSettings) {
@@ -355,7 +357,7 @@ export function setSoundSettings(soundSettings: SoundSettings) {
 }
 
 export function fadeOutPlayingTracks(currentTracks: GameSound[] = [], time: number = audioContext.currentTime) {
-    const keepPlayingTracks: GameSound[] = [];
+    const keepPlayingTracks: GameTrack[] = [];
     for (const trackToFadeOut of playingTracks) {
         if (currentTracks.includes(trackToFadeOut)) {
             keepPlayingTracks.push(trackToFadeOut);
