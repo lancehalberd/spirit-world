@@ -404,6 +404,10 @@ export function getBehaviorProperties(): PanelRows {
         state.areaSection.definition.hotLogic = updatedLogic;
         refreshArea(state);
     })];
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Foggy?', state.areaSection.definition.fogLogic, updatedLogic => {
+        state.areaSection.definition.fogLogic = updatedLogic;
+        refreshArea(state);
+    })];
     rows.push({
         name: 'Refresh Area',
         onClick() {

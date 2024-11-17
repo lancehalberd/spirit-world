@@ -332,8 +332,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
         || (!state.hero.savedData.passiveTools.phoenixCrown && hero.burnDuration > 0);
     if (state.hero.magicRegenCooldown > 0 && !preventCooldownRegeneration) {
-        state.hero.recentMagicSpent = state.hero.recentMagicSpent * (state.hero.magicRegenCooldown - FRAME_LENGTH) / state.hero.magicRegenCooldown;
-        state.hero.magicRegenCooldown -= FRAME_LENGTH;
+        // Foggy areas double spirit energy cooldown.
+        const cooldownRecoverSpeed = state.areaSection?.isFoggy ? FRAME_LENGTH / 2 : FRAME_LENGTH;
+        const recoveryFactor = Math.max(0, (state.hero.magicRegenCooldown - cooldownRecoverSpeed)) / state.hero.magicRegenCooldown;
+        state.hero.recentMagicSpent = recoveryFactor * state.hero.recentMagicSpent;
+        state.hero.magicRegenCooldown -= cooldownRecoverSpeed;
     } else if (!preventCooldownRegeneration) {
         state.hero.recentMagicSpent = 0;
     }

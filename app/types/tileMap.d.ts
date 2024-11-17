@@ -342,6 +342,7 @@ interface AreaLayer extends AreaTileGrid {
 
 interface AreaSection extends Rect {
     hotLogic?: LogicDefinition
+    fogLogic?: LogicDefinition
     // Unique identifier for this section that can be used to look it up
     // and is used when tracking whether the player has explored a section.
     index?: number
@@ -361,6 +362,7 @@ interface AreaSection extends Rect {
 interface AreaSectionInstance extends AreaSection {
     // Just added this here for convenient access when editing.
     definition: AreaSection
+    isFoggy?: boolean
     isHot?: boolean
 }
 

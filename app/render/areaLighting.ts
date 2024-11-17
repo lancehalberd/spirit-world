@@ -392,7 +392,7 @@ function renderLightColors(context: CanvasRenderingContext2D, state: GameState, 
                     continue;
                 }
                 if (object.getLightSources) {
-                    const lightSources = object.getLightSources?.(state);
+                    const lightSources = object.getLightSources(state);
                     for (const lightSource of lightSources) {
                         if (lightSource.color) {
                             drawColorLightGradient(context, state, lightSource);

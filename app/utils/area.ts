@@ -66,7 +66,8 @@ export function getAreaSectionInstance(state: GameState, definition: AreaSection
     return {
         ...definition,
         definition,
-        isHot: evaluateLogicDefinition(state, definition.hotLogic, false)
+        isFoggy: evaluateLogicDefinition(state, definition.hotLogic, false),
+        isHot: evaluateLogicDefinition(state, definition.hotLogic, false),
     }
 }
 

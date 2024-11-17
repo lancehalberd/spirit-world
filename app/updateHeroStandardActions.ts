@@ -352,7 +352,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             ) {
             } else if (hero.savedData.passiveTools.spiritSight) {
                 let maxSpiritRadius = MAX_SPIRIT_RADIUS;
-                if (!canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
+                if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
                     maxSpiritRadius = 10;
                 }
                 if (hero.spiritRadius <= maxSpiritRadius) {
