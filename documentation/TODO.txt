@@ -68,7 +68,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix spirit sight is too transparent when the radius is small, add a separate value for tracking intensity.
     - Support fog
         - Render fog overlay for foggy sections
             - Create a fill pattern and translate linearly based on fieldTime.

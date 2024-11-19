@@ -351,24 +351,25 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
             } else if (hero.savedData.passiveTools.spiritSight) {
-                let maxSpiritRadius = MAX_SPIRIT_RADIUS;
+                hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
                 if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
-                    maxSpiritRadius = 10;
+                    hero.maxSpiritRadius = 10;
                 }
-                if (hero.spiritRadius <= maxSpiritRadius) {
-                    hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxSpiritRadius);
+                if (hero.spiritRadius <= hero.maxSpiritRadius) {
+                    hero.spiritRadius = Math.min(hero.spiritRadius + hero.maxSpiritRadius / 20, hero.maxSpiritRadius);
                 } else {
-                    hero.spiritRadius = Math.max(hero.spiritRadius - 8, maxSpiritRadius);
+                    hero.spiritRadius = Math.max(hero.spiritRadius - hero.maxSpiritRadius / 10, hero.maxSpiritRadius);
                 }
                 if (hero.savedData.passiveTools.astralProjection && hero.area.alternateArea) {
-                    if (!hero.astralProjection) {
+                    // Astral projection cannot be summoned when spirit sight radius is limited by obstacles.
+                    if (!hero.astralProjection && hero.maxSpiritRadius === MAX_SPIRIT_RADIUS) {
                         hero.astralProjection = new AstralProjection(state, hero);
                         addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
                     }
                 }
             }
         } else {
-            hero.spiritRadius = Math.max(hero.spiritRadius - 8, 0);
+            hero.spiritRadius = Math.max(hero.spiritRadius - hero.maxSpiritRadius / 10, 0);
             if (hero.astralProjection) {
                 hero.astralProjection.dropHeldObject(state);
                 hero.astralProjection.d = hero.d;

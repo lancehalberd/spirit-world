@@ -159,6 +159,7 @@ export class Hero implements Actor {
     chargingRightTool?: boolean;
     chargingHeldObject?: boolean;
     chargeTime?: number = 0;
+    maxSpiritRadius: number = 0;
     spiritRadius: number = 0;
     status: ObjectStatus = 'normal';
 

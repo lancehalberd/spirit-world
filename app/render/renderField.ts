@@ -18,12 +18,12 @@ import { getFieldInstanceAndParts } from 'app/utils/objects';
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
 
 //let spiritCanvasRadius: number;
-export function updateSpiritCanvas(state: GameState, radius: number): void {
+export function updateSpiritCanvas(state: GameState, radius: number, maxRadius: number): void {
     //if (radius === spiritCanvasRadius) {
     //    return;
     //}
     //spiritCanvasRadius = radius;
-    const spiritAlpha = 0.2 + 0.8 * radius / MAX_SPIRIT_RADIUS;
+    const spiritAlpha = 0.2 + 0.8 * radius / maxRadius;
     const x = spiritCanvas.width / 2;
     const y = spiritCanvas.height / 2
     const area = state.alternateAreaInstance;
@@ -498,11 +498,13 @@ export function renderHeatOverlay(context: CanvasRenderingContext2D, state: Game
 export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: GameState) {
     if (state.hero.spiritRadius > 0) {
         context.save();
-        context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
+        //context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
+        context.globalAlpha = state.hero.spiritRadius / state.hero.maxSpiritRadius;
         context.fillStyle = '#888';
+        context.globalCompositeOperation = 'hue';
         context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
-        updateSpiritCanvas(state, state.hero.spiritRadius);
+        updateSpiritCanvas(state, state.hero.spiritRadius, state.hero.maxSpiritRadius);
         context.drawImage(spiritCanvas,
             0, 0, spiritCanvas.width, spiritCanvas.height,
             (state.hero.x + state.hero.w / 2 - spiritCanvas.width / 2
