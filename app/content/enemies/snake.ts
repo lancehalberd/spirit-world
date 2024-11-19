@@ -171,7 +171,7 @@ enemyDefinitions.snakeFrost = {
     },
 };
 
-const maxImageCount = 13;
+const maxImageCount = 12;
 enemyDefinitions.snakeStorm = {
     ...baseSnakeDefinition,
     abilities: [],
@@ -181,6 +181,17 @@ enemyDefinitions.snakeStorm = {
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
     update(state: GameState, enemy: Enemy) {
+        enemy.params.afterFrames = enemy.params.afterFrames ?? [];
+        //if (enemy.time % 60 === 0) {
+            const afterFrames = enemy.params.afterFrames;
+            // Rough code for cloning a class instance found here:
+            // https://stackoverflow.com/questions/41474986/how-to-clone-a-javascript-es6-class-instance
+            const enemyClone = Object.assign(Object.create(Object.getPrototypeOf(enemy)), enemy);
+            afterFrames.unshift(enemyClone);
+            if (afterFrames.length > maxImageCount) {
+                afterFrames.pop();
+            }
+        //}
         if (enemy.mode === 'choose' && enemy.modeTime === 400) {
             const choices: CardinalDirection[] = ['up', 'down', 'left', 'right'];
             while (choices.length) {
@@ -199,27 +210,9 @@ enemyDefinitions.snakeStorm = {
                 enemy.setMode('choose');
             }
         }
-        enemy.params.afterFrames = enemy.params.afterFrames ?? [];
-        //if (enemy.time % 60 === 0) {
-            const afterFrames = enemy.params.afterFrames;
-            // Rough code for cloning a class instance found here:
-            // https://stackoverflow.com/questions/41474986/how-to-clone-a-javascript-es6-class-instance
-            const enemyClone = Object.assign(Object.create(Object.getPrototypeOf(enemy)), enemy);
-            afterFrames.unshift(enemyClone);
-            if (afterFrames.length > maxImageCount) {
-                afterFrames.pop();
-            }
-        //}
     },
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         const afterFrames = enemy.params.afterFrames ?? [];
-        for (let i = afterFrames.length - 1; i >= 0; i -= 2) {
-            context.save();
-                context.globalAlpha *= 0.6 * (1 - (i + 1) / (maxImageCount + 2));
-                afterFrames[i].defaultRender(context, state);
-            context.restore();
-        }
-
         const hitbox1 = enemy.getHitbox();
         let renderedRay = false;
         if (afterFrames.length >= 10) {
@@ -234,8 +227,17 @@ enemyDefinitions.snakeStorm = {
                 renderedRay = true;
             }
         }
+        for (let i = afterFrames.length - 1; i >= 0; i -= 2) {
+            context.save();
+                context.globalAlpha *= 0.6 * (1 - (i + 1) / (maxImageCount + 2));
+                afterFrames[i].defaultRender(context, state);
+            context.restore();
+        }
+
+        enemy.defaultRender(context, state);
         if (!renderedRay) {
             renderLightningCircle(context, {x: hitbox1.x + hitbox1.w / 2, y: hitbox1.y + hitbox1.h / 2, r: 12}, 2)
         }
+
     }
 };
