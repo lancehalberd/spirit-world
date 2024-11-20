@@ -68,11 +68,25 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Support fog
-        - Render fog overlay for foggy sections
-            - Create a fill pattern and translate linearly based on fieldTime.
-            - Make sure it looks good across super tile transitions.
-        -
+    - Design and add enemy scaling
+        - Give each enemy a base power rating, possibly a product of offense * defense.
+            - offense is a combination of inherent ability power, additional ability power and movement speed
+            - ability power increases with damage/coverage(space+time) and reduces with cooldown and tell durations.
+            - defense is a combination of health, movement speed and defensive abilities (barriers, immunities, evasion).
+        - Enemy power can be scaled by arbitrary amounts.
+            - 2x scaling means an enemy with power 3 would become power 6.
+            - Scaled enemies deterministically become stronger by scaling individual attributes to match the new power level.
+            - The seed for scaling can be changed to randomize how enemy scaling works.
+            - Scaling enemies is done on a per enemy basis so adding new enemies won't change the outcome for existing enemies.
+        - Ability scaling
+            - Projectile attacks
+                - Change targeting, number, spread type, range, speed, add oscillation, decay, detonation.
+    - Support enemy randomization
+        - Tag all enemy abilities and types for compatibility, such as "ice", "stationary", "flying"
+        - Using the base power for existing enemy types, remove all optional abilities from enemies, then randomly add matching abilities
+          to the enemies based on tags until the enemy matches the desired power level using the new enemies.
+        - Try to balance how many instances of each ability are used so there is still nice variety.
+        - Add additional abilities/configurations to increase variet.
 
     - Exit from peach cave water doesn't render frozen correctly.
 
@@ -88,6 +102,9 @@ Current tasks:
         - Forest Village
         - Jade City
         - Helix
+
+
+    - Frost beast can be killed without killing the snake (kill the snake, then the heart and the snake dies as well?)
 
     - Investigate: Masked tiles are not inherited in the spirit world.
 

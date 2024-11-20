@@ -119,6 +119,9 @@ export function serializeZone(zone: Zone) {
                         if (section.hotLogic) {
                             extraFields += `, hotLogic: ${JSON.stringify(section.hotLogic)}`;
                         }
+                        if (section.fogLogic) {
+                            extraFields += `, fogLogic: ${JSON.stringify(section.fogLogic)}`;
+                        }
                         if (section.hideMap) {
                             extraFields += `, hideMap: ${section.hideMap}`;
                         }

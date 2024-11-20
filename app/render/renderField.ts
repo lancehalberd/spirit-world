@@ -12,7 +12,9 @@ import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
 import { getBackgroundFrame, getBackgroundFrameIndex } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
+import {allImagesLoaded} from 'app/utils/images';
 import { getFieldInstanceAndParts } from 'app/utils/objects';
+import {requireFrame} from 'app/utils/packedImages';
 
 // This is the max size of the spirit sight circle.
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
@@ -477,7 +479,23 @@ export function renderWaterOverlay(context: CanvasRenderingContext2D, state: Gam
         context.restore();
     }
 }
+
+const fogFrame = requireFrame('gfx/effects/fog.png', {x: 0, y: 0, w: 256, h: 128});
+const [fogCanvas, fogContext] = createCanvasAndContext(256, 256);
+async function createFogTile() {
+    await allImagesLoaded();
+    const [tempCanvas, tempContext] = createCanvasAndContext(256, 256);
+    tempContext.fillStyle='rgba(255,255,255,0.5)';
+    tempContext.fillRect(0, 0, 256, 256);
+    drawFrame(tempContext, fogFrame, fogFrame);
+    drawFrame(tempContext, {...fogFrame, x: 128, w: 128}, {...fogFrame, y: 128, w: 128});
+    drawFrame(tempContext, {...fogFrame, w: 128}, {...fogFrame, x: 128, y: 128, w: 128});
+    fogContext.globalAlpha = 0.75;
+    fogContext.drawImage(tempCanvas, 0, 0, 256, 256, 0, 0, 256, 256);
+}
+createFogTile();
 //effects/fog.png 256x128 -> 256x256 then creat pattern.
+const fogV = {x: 10, y: 10};
 export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
     if (!editingState.isEditing && state.hotLevel > 0) {
         context.save();
@@ -488,9 +506,12 @@ export function renderHeatOverlay(context: CanvasRenderingContext2D, state: Game
     }
     if (!editingState.isEditing && state.areaSection?.isFoggy) {
         context.save();
-            // Translate by camera offset.
-            // Translate by velocity*fieldTime
-            // Draw fog pattern to the visible screen.
+            const fogPattern = context.createPattern(fogCanvas, 'repeat');
+            const dx = state.camera.x - fogV.x * state.fieldTime / 1000;
+            const dy = state.camera.y - fogV.y * state.fieldTime / 1000;
+            context.translate(-dx, -dy);
+            context.fillStyle = fogPattern;
+            context.fillRect(dx, dy, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
     }
 }
