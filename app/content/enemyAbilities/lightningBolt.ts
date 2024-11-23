@@ -30,6 +30,32 @@ export const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
     recoverTime: 1000,
 };
 
+export const stationaryChargedLightningBoltAbility: EnemyAbility<Target> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): Target {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets)?.target;
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: Target) {
+        enemy.changeToAnimation('attack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: Target): void {
+        const hitbox = target.getHitbox();
+        const props = {
+            damage: 4,
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+            delay: 800,
+            shockWaves: 6,
+            shockWaveTheta: 0,
+            shockWaveDelta: Math.PI / 6,
+            strikes: 2,
+        }
+        const lightningBolt = new LightningBolt(props);
+        addEffectToArea(state, target.area, lightningBolt);
+    },
+    cooldown: 3000,
+    recoverTime: 1000,
+};
+
 export const chargedLightningBoltAbility: EnemyAbility<NearbyTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
