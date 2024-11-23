@@ -26,10 +26,10 @@ export const laserBeamAbility: EnemyAbility<Point> = {
         addEffectToArea(state, enemy.area, new LaserBeam({
             sx: cx, sy: cy,
             tx: target.x, ty: target.y,
-            radius: 5, damage: 4, duration: 200, tellDuration: 400,
+            radius: 5, damage: 4, duration: 200, tellDuration: 800,
         }));
     },
-    cooldown: 4000,
+    cooldown: 3000,
     prepTime: 0,
     recoverTime: 1000,
 };

@@ -1,4 +1,5 @@
 import {growingThornsAbility} from 'app/content/enemyAbilities/growingThorns';
+import {groundSpikeAbility} from 'app/content/enemyAbilities/groundSpike';
 import { Spike } from 'app/content/effects/arrow';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -30,7 +31,7 @@ type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 
 const spikeWaveAbility: EnemyAbility<NearbyTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, 80, enemy.area.allyTargets);
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius / 2, enemy.area.allyTargets);
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('inflate');
@@ -39,17 +40,33 @@ const spikeWaveAbility: EnemyAbility<NearbyTargetType> = {
         enemy.changeToAnimation('deflate', 'idle');
         for (let i = 0; i < 8; i++) {
             const theta = 2 * Math.PI * i / 8;
-            const dx = Math.cos(theta + i * Math.PI / 5 - 2 * Math.PI / 5);
-            const dy = Math.sin(theta + i * Math.PI / 5 - 2 * Math.PI / 5);
+            const dx = Math.cos(theta);
+            const dy = Math.sin(theta);
             const hitbox = enemy.getHitbox();
+            const speed = 3;
             Spike.spawn(state, enemy.area, {
                 x: hitbox.x + hitbox.w / 2 + hitbox.w / 4 * dx,
                 y: hitbox.y + hitbox.h / 2 + hitbox.h / 4 * dy,
                 z: 4,
-                damage: 1,
-                vx: 4 * dx,
-                vy: 4 * dy,
+                damage: 2,
+                vx: speed * dx,
+                vy: speed * dy,
             });
+            if (enemy.difficulty > enemy.enemyDefinition?.naturalDifficultyRating) {
+                for (let j = 1; j <= 5; j++) {
+                    const dx = Math.cos(theta + j * Math.PI / 16);
+                    const dy = Math.sin(theta + j * Math.PI / 16);
+                    Spike.spawn(state, enemy.area, {
+                        delay: 140 * j,
+                        x: hitbox.x + hitbox.w / 2 + hitbox.w / 4 * dx,
+                        y: hitbox.y + hitbox.h / 2 + hitbox.h / 4 * dy,
+                        z: 4,
+                        damage: 1,
+                        vx: speed * dx,
+                        vy: speed * dy,
+                    });
+                }
+            }
         }
     },
     cooldown: 3000,
@@ -64,7 +81,7 @@ enemyDefinitions.mushroom = {
     naturalDifficultyRating: 5,
     abilities: [spikeWaveAbility, growingThornsAbility],
     alwaysReset: true,
-    animations: mushroomAnimations, aggroRadius: 128,
+    animations: mushroomAnimations, aggroRadius: 160,
     life: 8, touchDamage: 2, update: updateEnt,
     ignorePits: true,
     elementalMultipliers: {'fire': 2},
@@ -72,6 +89,11 @@ enemyDefinitions.mushroom = {
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     tileBehaviors: {touchHit: { damage: 2}, solid: true},
     canBeKnockedBack: false,
+    initialize(state: GameState, enemy: Enemy) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.gainAbility(groundSpikeAbility);
+        }
+    }
 };
 
 function updateEnt(state: GameState, enemy: Enemy): void {
