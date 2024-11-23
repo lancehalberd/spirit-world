@@ -205,8 +205,9 @@ interface EffectInstance extends BaseFieldInstance {
     status?: ObjectStatus
     definition?: ObjectDefinition
     getParts?: (state: GameState) => EffectInstance[]
-
 }
+
+type Target = EffectInstance | ObjectInstance;
 
 type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'gone' | 'hidden' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
@@ -627,16 +628,18 @@ interface TippableObjectDefinition extends BaseObjectDefinition {
 }
 
 interface EnemyObjectDefinition extends BaseObjectDefinition {
-    type: 'enemy',
-    enemyType: EnemyType | MinionType,
-    params?: {[key: string]: any},
+    type: 'enemy'
+    enemyType: EnemyType | MinionType
+    difficulty?: number
+    params?: {[key: string]: any}
     z?: number
 }
 
 type BossObjectDefinition = BaseObjectDefinition & LootData & {
-    type: 'boss',
-    enemyType: BossType,
-    params?: {[key: string]: any},
+    type: 'boss'
+    enemyType: BossType
+    difficulty?: number
+    params?: {[key: string]: any}
     z?: number
 }
 

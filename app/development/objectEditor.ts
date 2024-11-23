@@ -295,6 +295,8 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                // Only store difficulty when it is not the default value.
+                difficulty: definition.difficulty !== enemyDefinition.naturalDifficultyRating ? definition.difficulty : undefined,
                 id: definition.id || uniqueId(state, bossType),
                 enemyType: bossType,
                 lootType,
@@ -334,6 +336,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                difficulty: definition.difficulty ?? enemyDefinition.naturalDifficultyRating,
                 z: definition.z,
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
@@ -1417,6 +1420,14 @@ function getEnemyFields(state: GameState, editingState: EditingState, object: Ob
             },
         });
     }
+    rows.push({
+        name: 'difficulty',
+        value: object.difficulty || enemyDefinition.naturalDifficultyRating,
+        onChange(difficulty: number) {
+            object.difficulty = difficulty;
+            updateObjectInstance(state, object);
+        },
+    });
     rows.push({
         name: 'z',
         value: object.z || 0,

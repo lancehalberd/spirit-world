@@ -649,6 +649,10 @@ function getHitTestPoints(hit: HitProperties): Point[] {
 }
 
 function applyHitToObject(state: GameState, object: ObjectInstance | EffectInstance, hit: HitProperties, combinedResult: HitResult) {
+    // This could be called multiple times in a single frame, so make sure the object is still in the area before applying the hit.
+    if (!object.area) {
+        return;
+    }
     let behaviors: TileBehaviors = {solid: false, destructible: false, low: false};
     if (object.getBehaviors) {
         for (const p of getHitTestPoints(hit)) {

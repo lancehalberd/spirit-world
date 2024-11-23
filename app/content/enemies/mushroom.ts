@@ -1,10 +1,8 @@
-import { GrowingThorn } from 'app/content/effects/growingThorn';
+import {growingThornsAbility} from 'app/content/enemyAbilities/growingThorns';
 import { Spike } from 'app/content/effects/arrow';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { getVectorToTarget, isTargetVisible } from 'app/utils/target';
 import { createAnimation } from 'app/utils/animations';
-import { addEffectToArea } from 'app/utils/effects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 const mushroomGeometry: FrameDimensions = { w: 32, h: 32, content: {x: 2, y: 20, w: 28, h: 12} };
@@ -60,40 +58,11 @@ const spikeWaveAbility: EnemyAbility<NearbyTargetType> = {
     // The mushroom will deflated during the recovery time.
     recoverTime: 1000,
 };
-const growThornsAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        enemy.changeToAnimation('growThorns');
-    },
-    updateAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): boolean {
-        // Cancel the ability if the target is no longer in range
-        if (!isTargetVisible(state, enemy, target.target) || getVectorToTarget(state, enemy, target.target).mag > 160) {
-            return false;
-        }
-        if (enemy.activeAbility.time % 600 === 300) { // 300, 900, 1500, 2100
-            const targetHitbox = target.target.getHitbox();
-            const thorns = new GrowingThorn({
-                x: targetHitbox.x + targetHitbox.w / 2,
-                y: targetHitbox.y + targetHitbox.h / 2,
-                damage: 1,
-            });
-            addEffectToArea(state, enemy.area, thorns);
-        }
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        enemy.changeToAnimation('idle');
-    },
-    cooldown: 5000,
-    initialCharges: 0,
-    // This is the duration of the actual attack
-    prepTime: 2400,
-    recoverTime: 1200,
-};
+
 
 enemyDefinitions.mushroom = {
-    abilities: [spikeWaveAbility, growThornsAbility],
+    naturalDifficultyRating: 5,
+    abilities: [spikeWaveAbility, growingThornsAbility],
     alwaysReset: true,
     animations: mushroomAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2, update: updateEnt,

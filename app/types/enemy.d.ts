@@ -52,6 +52,9 @@ interface EnemyDefinition<Params> {
     taunts?: {[key in string]: TextCueTaunt}
     animations: ActorAnimations
     aggroRadius?: number
+    // The composite difficulty rating of the cannonical version of this enemy
+    // without any scaling or randomization.
+    naturalDifficultyRating: number
     baseMovementProperties?: Partial<MovementProperties>
     drawPriority?: DrawPriority
     tileBehaviors?: TileBehaviors

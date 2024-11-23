@@ -340,6 +340,7 @@ function getTargetLocation(state: GameState, enemy: Enemy): Point {
 
 const maxImageCount = 13;
 enemyDefinitions.rival2 = {
+    naturalDifficultyRating: 20,
     // This should match the NPC style of the Rival.
     animations: rivalAnimations,
     abilities: [

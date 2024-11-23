@@ -75,6 +75,7 @@ function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: num
 const chargeTime = 400;
 
 enemyDefinitions.sentryBot = {
+    naturalDifficultyRating: 12,
     animations: sentryBotAnimations,
     flying: false, acceleration: 0.2, aggroRadius: 112, speed: 2,
     life: 12, touchHit: { damage: 2, element: 'lightning'},

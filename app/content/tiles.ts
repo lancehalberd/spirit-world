@@ -65,6 +65,47 @@ import { requireFrame } from 'app/utils/packedImages';
 export const allTiles: FullTile[] = [null];
 window['allTiles'] = allTiles;
 
+/*
+const [iceFrame, iceEdgeFrame] = createAnimation('gfx/tiles/iceTile.png', {w: 16, h:16}, {cols: 2}).frames;
+const interiorMask = requireFrame('gfx/tiles/smallMasks.png', {x: 0, y: 0, w: 128, h:8});
+const edgeMask = requireFrame('gfx/tiles/smallMasks.png', {x: 0, y: 8, w: 128, h:8});
+export async function createIceTiles() {
+    await allImagesLoaded();
+    const [patternCanvas, patternContext] = createCanvasAndContext(8, 8);
+    const [maskCanvas, maskContext] = createCanvasAndContext(128, 8);
+    const [canvas, context] = createCanvasAndContext(128, 32);
+
+    let yTarget = 0;
+    for (const [x, y] of [[0, 0], [-8, 0], [0, -8], [-8, -8]]) {
+        // Draw the interior for this row.
+        patternContext.clearRect(0, 0, 8, 8);
+        drawFrame(patternContext, iceFrame, {x, y, w: 16, h: 16});
+        maskContext.globalCompositeOperation = 'source-over';
+        maskContext.clearRect(0, 0, 128, 8);
+        drawFrame(maskContext, interiorMask, {...interiorMask, x: 0, y: 0});
+        maskContext.globalCompositeOperation = 'source-in';
+        maskContext.fillStyle = maskContext.createPattern(patternCanvas, 'repeat');
+        maskContext.fillRect(0, 0, 128, 8);
+        context.drawImage(maskCanvas, 0, 0, 128, 8, 0, yTarget, 128, 8);
+
+        // Draw the exterior for this row.
+        patternContext.clearRect(0, 0, 8, 8);
+        drawFrame(patternContext, iceEdgeFrame, {x, y, w: 16, h: 16});
+        maskContext.globalCompositeOperation = 'source-over';
+        maskContext.clearRect(0, 0, 128, 8);
+        drawFrame(maskContext, edgeMask, {...edgeMask, x: 0, y: 0});
+        maskContext.globalCompositeOperation = 'source-in';
+        maskContext.fillStyle = maskContext.createPattern(patternCanvas, 'repeat');
+        maskContext.fillRect(0, 0, 128, 8);
+        context.drawImage(maskCanvas, 0, 0, 128, 8, 0, yTarget, 128, 8);
+
+        yTarget += 8;
+    }
+
+    window.debugCanvas(canvas, 4);
+}
+createIceTiles();*/
+
 
 let index = 1;
 function addSingleTileFromTileSource(tileSource: TileSource, x: number, y: number) {

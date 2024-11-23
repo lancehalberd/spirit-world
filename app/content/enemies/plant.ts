@@ -1,4 +1,5 @@
 import { Blast } from 'app/content/effects/blast';
+import {growingThornsAbility} from 'app/content/enemyAbilities/growingThorns';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Flame } from 'app/content/effects/flame';
 import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
@@ -16,6 +17,7 @@ function createPlantAnimations(source: string): ActorAnimations {
         idle: omniAnimation(createAnimation(source, plantGeometry, { x: 0, cols: 1, duration: 10})),
         prepare: omniAnimation(createAnimation(source, plantGeometry, { x: 1, cols: 1, duration: 20})),
         attack: omniAnimation(createAnimation(source, plantGeometry,  { x: 2, cols: 1, duration: 15})),
+        growThorns: omniAnimation(createAnimation(source, plantGeometry, { x: 1, cols: 2, duration: 10})),
     };
 }
 
@@ -133,6 +135,7 @@ const basePlantDefinition: Partial<EnemyDefinition<any>> = {
 
 enemyDefinitions.plant = {
     ...basePlantDefinition,
+    naturalDifficultyRating: 1,
     // Regular plants have no attacks other than contact damage.
     abilities: [],
     animations: plantAnimations,
@@ -141,11 +144,17 @@ enemyDefinitions.plant = {
         'elementalFlame': 'plantFlame',
         'elementalFrost': 'plantFrost',
         'elementalStorm': 'plantStorm',
-    }
+    },
+    initialize(state: GameState, enemy: Enemy) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.gainAbility(growingThornsAbility);
+        }
+    },
 };
 
 enemyDefinitions.plantFlame = {
     ...basePlantDefinition,
+    naturalDifficultyRating: 2,
     abilities: [volcanoAbility],
     animations: plantFlameAnimations,
     elementalMultipliers: {'ice': 2},
@@ -154,6 +163,7 @@ enemyDefinitions.plantFlame = {
 
 enemyDefinitions.plantFrost = {
     ...basePlantDefinition,
+    naturalDifficultyRating: 2,
     abilities: [plantFrostIceGrenadeAbility],
     animations: plantFrostAnimations,
     elementalMultipliers: {'fire': 2},
@@ -163,6 +173,7 @@ enemyDefinitions.plantFrost = {
 
 enemyDefinitions.plantStorm = {
     ...basePlantDefinition,
+    naturalDifficultyRating: 2,
     abilities: [dischargeAbility],
     animations: plantStormAnimations,
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},

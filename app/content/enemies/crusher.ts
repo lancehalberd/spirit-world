@@ -8,6 +8,7 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 
 enemyDefinitions.crusher = {
     ...enemyDefinitions.golemHand,
+    naturalDifficultyRating: 8,
     life: 8,
     aggroRadius: 128,
     acceleration: 1, speed: 3,

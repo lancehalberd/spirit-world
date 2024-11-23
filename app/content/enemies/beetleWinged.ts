@@ -1,5 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { Blast } from 'app/content/effects/blast';
+import {crystalProjectileAbility} from 'app/content/enemyAbilities/crystalProjectile';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { simpleLootTable } from 'app/content/lootTables';
@@ -99,11 +100,18 @@ const baseBeetleWingedDefinition: Partial<EnemyDefinition<any>> & { animations: 
     aggroRadius: 112,
     life: 1,
     lootTable: simpleLootTable,
+    initialize(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.speed = 1.8;
+            enemy.aggroRadius = 144;
+            enemy.gainAbility(crystalProjectileAbility);
+        }
+    },
     update(state: GameState, enemy: Enemy): void {
-        if (enemy.params.element && !enemy.activeAbility) {
+        if (!enemy.activeAbility) {
             enemy.changeToAnimation('idle');
             enemy.useRandomAbility(state);
-            if (enemy.time % 300 === 0) {
+            if (enemy.params.element && enemy.time % 300 === 0) {
                 const hitbox = enemy.getHitbox(state);
                 const theta = Math.PI / 2 + 2 * Math.PI * enemy.time / 900;
                 addSparkleAnimation(state, enemy.area, {
@@ -134,6 +142,7 @@ const baseBeetleWingedDefinition: Partial<EnemyDefinition<any>> & { animations: 
 
 enemyDefinitions.beetleWinged = {
     ...baseBeetleWingedDefinition,
+    naturalDifficultyRating: 1,
     touchDamage: 1,
     hybrids: {
         'elementalFlame': 'beetleWingedFlame',
@@ -144,6 +153,7 @@ enemyDefinitions.beetleWinged = {
 
 enemyDefinitions.beetleWingedFlame = {
     ...baseBeetleWingedDefinition,
+    naturalDifficultyRating: 3,
     life: 3,
     abilities: [flameBarrierAbility],
     params: {
@@ -157,6 +167,7 @@ enemyDefinitions.beetleWingedFlame = {
 
 enemyDefinitions.beetleWingedFrost = {
     ...baseBeetleWingedDefinition,
+    naturalDifficultyRating: 3,
     life: 4,
     abilities: [],
     params: {
@@ -183,6 +194,7 @@ enemyDefinitions.beetleWingedFrost = {
 
 enemyDefinitions.beetleWingedStorm = {
     ...baseBeetleWingedDefinition,
+    naturalDifficultyRating: 3,
     acceleration: 0.2,
     life: 2, touchDamage: 1,
     abilities: [lightningShieldAbility],

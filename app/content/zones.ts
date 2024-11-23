@@ -52,6 +52,7 @@ export * from 'app/content/zones/title-noBottomWall';
 // WIP zones
 export * from 'app/content/zones/dream';
 export * from 'app/content/zones/fertility';
+export * from 'app/content/zones/delve';
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {

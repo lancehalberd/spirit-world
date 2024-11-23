@@ -33,6 +33,7 @@ const updateTarget = (state: GameState, enemy: Enemy): boolean => {
 }
 
 enemyDefinitions.lightningDrone = {
+    naturalDifficultyRating: 4,
     animations: droneAnimations,
     flying: true, acceleration: 0.2, aggroRadius: 112, speed: 2,
     life: 4, touchHit: { damage: 2, element: 'lightning'},

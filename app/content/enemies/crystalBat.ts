@@ -1,9 +1,7 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import {
-    crystalBatAnimations,
-} from 'app/content/enemyAnimations';
+import {crystalProjectileArcAbility} from 'app/content/enemyAbilities/crystalProjectile';
+import {crystalBatAnimations} from 'app/content/enemyAnimations';
 import { moneyLootTable } from 'app/content/lootTables';
 import {
     moveEnemyToTargetLocation,
@@ -13,39 +11,11 @@ import { pad } from 'app/utils/index';
 import {  getVectorToNearbyTarget } from 'app/utils/target';
 
 
-type SpikeWaveTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 
-const spikeWaveAbility: EnemyAbility<SpikeWaveTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): SpikeWaveTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: SpikeWaveTargetType): void {
-        const theta = Math.atan2(target.y, target.x);
-        for (let i = 0; i < 4; i++) {
-            const dx = Math.cos(theta + i * Math.PI / 5 - 2 * Math.PI / 5);
-            const dy = Math.sin(theta + i * Math.PI / 5 - 2 * Math.PI / 5);
-            const hitbox = enemy.getHitbox();
-            CrystalSpike.spawn(state, enemy.area, {
-                ignoreWallsDuration: 200,
-                x: hitbox.x + hitbox.w / 2 + hitbox.w / 4 * dx,
-                y: hitbox.y + hitbox.h / 2 + hitbox.h / 4 * dy,
-                damage: 2,
-                vx: 4 * dx,
-                vy: 4 * dy,
-            });
-        }
-    },
-    cooldown: 5000,
-    initialCharges: 1,
-    charges: 2,
-    // During the prep time the bat will fly higher in the air.
-    prepTime: 1000,
-    // The bat will fall down during the recover time.
-    recoverTime: 1000,
-};
 
 enemyDefinitions.crystalBat = {
-    abilities: [spikeWaveAbility],
+    naturalDifficultyRating: 4,
+    abilities: [crystalProjectileArcAbility],
     animations: crystalBatAnimations,
     flipLeft: true,
     speed: 1, flying: true,

@@ -51,6 +51,7 @@ interface BalloonMegapedeParams {
 }
 
 enemyDefinitions.balloonMegapede = {
+    naturalDifficultyRating: 60,
     abilities: [spikeProjectileAbility],
     scale: 2,
     // This is only used for aiming projectiles and should effectively be the entire battlefield.

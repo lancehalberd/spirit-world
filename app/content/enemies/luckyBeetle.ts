@@ -44,6 +44,7 @@ interface LuckyBeetleParams {
 }
 
 enemyDefinitions.luckyBeetle = {
+    naturalDifficultyRating: 1,
     animations: goldenBeetleAnimations,
     speed: 1,
     life: 1, touchHit: { damage: 1},

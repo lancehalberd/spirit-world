@@ -122,6 +122,9 @@ export function getElementColor(element: MagicElement) {
 export const gameModifiers = {
     globalDamageTaken: 1,
     globalDamageDealt: 1,
+    // Increases the composite difficulty by this multiplier.
+    // Support is being added gradually for this and it does not effect all enemies or game modes.
+    globalEnemyDifficulty: 1,
     // Effects how long the cooldown is before spirity energy starts regenerating.
     spiritEnergyCooldown: 1,
     // Effects how fast spirit energy regenerates.
@@ -148,14 +151,15 @@ if (challenge === 'easy') {
     gameModifiers.spiritEnergyCooldown = 0.75;
     gameModifiers.spiritEnergyRegeneration = 1.5;
 } else if (challenge === 'hard') {
-    gameModifiers.globalDamageTaken = 2;
-    gameModifiers.globalDamageDealt = 0.5;
+    gameModifiers.globalDamageTaken = 1.5;
+    gameModifiers.globalDamageDealt = 0.75;
     gameModifiers.spiritEnergyCooldown = 1.5;
     gameModifiers.spiritEnergyRegeneration = 0.75;
     gameModifiers.bonusSpiritRegeneration = 0.75;
     gameModifiers.bowDamage = 0.75;
     gameModifiers.nerfGoldenMail = 1;
     gameModifiers.nerfPhoenixCrown = 1;
+    gameModifiers.globalEnemyDifficulty = 2;
 }
 
 for (const key of Object.keys(gameModifiers) as GameModifier[]) {

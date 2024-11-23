@@ -78,6 +78,7 @@ const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
 };
 
 enemyDefinitions.flameHeart = {
+    naturalDifficultyRating: 20,
     animations: flameHeartAnimations, life: 24, scale: 2, touchHit: { damage: 4, element: 'fire'}, update: updateFireHeart, params: {
         enrageLevel: 0,
     },
@@ -86,6 +87,7 @@ enemyDefinitions.flameHeart = {
     elementalMultipliers: {'ice': 2, 'lightning': 1.5},
 };
 enemyDefinitions.flameBeast = {
+    naturalDifficultyRating: 100,
     abilities: [leapStrikeAbility],
     animations: beetleHornedAnimations, life: 36, scale: 4, update: updateFireBeast,
     initialMode: 'hidden',

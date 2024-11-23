@@ -1,7 +1,6 @@
 import { Enemy } from 'app/content/enemy';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { CrystalSpike } from 'app/content/effects/arrow';
-
+import {crystalNovaAbility, crystalProjectileAbility} from 'app/content/enemyAbilities/crystalProjectile';
 import { beetleAnimations, beetleHornedAnimations } from 'app/content/enemyAnimations';
 import { drawFrameCenteredAt } from 'app/utils/animations';
 import { accelerateInDirection, moveEnemy, moveEnemyFull } from 'app/utils/enemies';
@@ -10,32 +9,7 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
 
-type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 
-const spikeProjectileAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        const theta = Math.atan2(target.y, target.x);
-        const dx = Math.cos(theta);
-        const dy = Math.sin(theta);
-        const hitbox = enemy.getHitbox();
-        CrystalSpike.spawn(state, enemy.area, {
-            ignoreWallsDuration: 200,
-            x: hitbox.x + hitbox.w / 2 + hitbox.w / 4 * dx,
-            y: hitbox.y + hitbox.h / 2 + hitbox.h / 4 * dy,
-            damage: 2,
-            vx: 4 * dx,
-            vy: 4 * dy,
-        });
-    },
-    cooldown: 4000,
-    initialCharges: 0,
-    charges: 1,
-    prepTime: 200,
-    recoverTime: 200,
-};
 
 interface BalloonCentipedeParams {
     length?: number
@@ -48,7 +22,8 @@ interface BalloonCentipedeParams {
 }
 
 enemyDefinitions.balloonCentipede = {
-    abilities: [spikeProjectileAbility],
+    naturalDifficultyRating: 4,
+    abilities: [crystalProjectileAbility],
     aggroRadius: 80,
     alwaysReset: true,
     floating: true,
@@ -60,20 +35,7 @@ enemyDefinitions.balloonCentipede = {
         if (enemy.params.isHead || enemy.frozenAtDeath) {
             return;
         }
-        for (let i = 0; i < 8; i++) {
-            const theta = 2 * Math.PI * i / 8;
-            const dx = Math.cos(theta);
-            const dy = Math.sin(theta);
-            const hitbox = enemy.getHitbox();
-            CrystalSpike.spawn(state, enemy.area, {
-                ignoreWallsDuration: 200,
-                x: hitbox.x + hitbox.w / 2 + hitbox.w / 4 * dx,
-                y: hitbox.y + hitbox.h / 2 + hitbox.h / 4 * dy,
-                damage: 2,
-                vx: 2 * dx,
-                vy: 2 * dy,
-            });
-        }
+        crystalNovaAbility.useAbility(state, enemy, true);
     },
     update(state: GameState, enemy: Enemy<BalloonCentipedeParams>): void {
         if (enemy.params.isHead || !enemy.params.parent?.params.isControlled) {
@@ -138,7 +100,7 @@ enemyDefinitions.balloonCentipede = {
             // This is a bit of the hack to override the defined cooldown for the projectile ability.
             // Once the ability is in use, we update the remaining cooldown based on how long the tail is.
             if (enemy.activeAbility) {
-                const spikeAbility = enemy.getAbility(spikeProjectileAbility);
+                const spikeAbility = enemy.getAbility(crystalProjectileAbility);
                 spikeAbility.cooldown = tailLength * 1000;
             }
             enemy.useRandomAbility(state);

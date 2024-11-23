@@ -274,6 +274,7 @@ export function onHitGolemHand(state: GameState, enemy: Enemy, hit: HitPropertie
 }
 
 enemyDefinitions.golem = {
+    naturalDifficultyRating: 20,
     animations: golemHeadAnimations, life: 12, touchHit: { damage: 1, canAlwaysKnockback: true },
     acceleration: 0.3, speed: 3,
     hasShadow: false,
@@ -373,6 +374,7 @@ enemyDefinitions.golem = {
     },
 };
 enemyDefinitions.golemHand = {
+    naturalDifficultyRating: 4,
     animations: golemHandAnimations, life: 4, scale: 1,
     floating: true,
     flipRight: true,

@@ -83,6 +83,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     canSwim: boolean = false;
     // If this is true the enemy can move on lava tiles and will not be damaged by them.
     canMoveInLava: boolean = false;
+    difficulty = 0;
     flying: boolean;
     isImmortal: boolean = false;
     isInvulnerable: boolean = false;
@@ -116,6 +117,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     constructor(state: GameState, definition: EnemyObjectDefinition | BossObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
+        // Calculate the actual difficulty of this enemy instance.
+        this.difficulty = gameModifiers.globalEnemyDifficulty * (definition.difficulty ?? this.enemyDefinition.naturalDifficultyRating);
         this.animations = this.enemyDefinition.animations;
         this.behaviors = {
             ...(this.enemyDefinition.tileBehaviors || {}),
@@ -154,11 +157,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.mode = this.enemyDefinition.initialMode || 'choose';
         this.touchHit = this.enemyDefinition.touchHit;
         for (const ability of this.enemyDefinition.abilities ?? []) {
-            this.abilities.push({
-                definition: ability,
-                charges: ability.initialCharges ?? 1,
-                cooldown: ability.initialCooldown || ability.cooldown || 0,
-            });
+            this.gainAbility(ability);
         }
         for (const tauntKey in this.enemyDefinition.taunts ?? []) {
             this.taunts[tauntKey] = {
@@ -172,6 +171,13 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
         this.canSwim = this.enemyDefinition.canSwim || this.enemyDefinition.baseMovementProperties?.canSwim;
         this.canMoveInLava = this.enemyDefinition.canMoveInLava || this.enemyDefinition.baseMovementProperties?.canMoveInLava;
+    }
+    gainAbility(ability: EnemyAbility<any>) {
+        this.abilities.push({
+            definition: ability,
+            charges: ability.initialCharges ?? 1,
+            cooldown: ability.initialCooldown || ability.cooldown || 0,
+        });
     }
     getFrame(): Frame {
         const frame = getFrame(this.currentAnimation, this.animationTime);

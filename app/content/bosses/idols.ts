@@ -39,6 +39,7 @@ const baseIdolDefinition: Partial<EnemyDefinition<any>> = {
 
 enemyDefinitions.stormIdol = {
     ...baseIdolDefinition,
+    naturalDifficultyRating: 8,
     animations: lightningIdolAnimations,
     update: updateStormIdol,
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
@@ -46,6 +47,7 @@ enemyDefinitions.stormIdol = {
 };
 enemyDefinitions.flameIdol = {
     ...baseIdolDefinition,
+    naturalDifficultyRating: 8,
     animations: fireIdolAnimations,
     update: updateFlameIdol,
     elementalMultipliers: {'lightning': 1.5, 'ice': 2},
@@ -53,6 +55,7 @@ enemyDefinitions.flameIdol = {
 };
 enemyDefinitions.frostIdol = {
     ...baseIdolDefinition,
+    naturalDifficultyRating: 8,
     animations: iceIdolAnimations,
     update: updateFrostIdol,
     elementalMultipliers: {'lightning': 1.5, 'fire': 2},

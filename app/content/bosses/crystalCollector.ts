@@ -104,6 +104,7 @@ function getShieldHitbox(enemy: Enemy): Rect {
 }
 
 enemyDefinitions.crystalCollector = {
+    naturalDifficultyRating: 60,
     animations: crystalCollectorAnimations, life: 24, touchDamage: 0, update: updateCrystalCollector, params: {
         shieldLife: maxShieldLife,
         shieldTime: 0,

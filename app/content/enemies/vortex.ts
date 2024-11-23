@@ -24,6 +24,7 @@ import {
 const poolAnimation = createAnimation('gfx/tiles/deeptoshallowwater.png', {w: 16, h: 16}, {x: 3, y: 0});
 
 enemyDefinitions.vortex = {
+    naturalDifficultyRating: 4,
     animations: {idle: omniAnimation(poolAnimation)},
     acceleration: 0.2, aggroRadius: 88, speed: 1.2,
     canSwim: true,

@@ -254,6 +254,7 @@ function useSpinningFrostAttack(state: GameState, enemy: Enemy): void {
 }
 
 enemyDefinitions.voidStone = {
+    naturalDifficultyRating: 20,
     animations: stoneHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false, canBeFrozen: false,
@@ -263,6 +264,7 @@ enemyDefinitions.voidStone = {
 };
 
 enemyDefinitions.voidFlame = {
+    naturalDifficultyRating: 20,
     animations: flameHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false, canBeFrozen: false,
@@ -273,6 +275,7 @@ enemyDefinitions.voidFlame = {
 };
 
 enemyDefinitions.voidFrost = {
+    naturalDifficultyRating: 20,
     animations: frostHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false, canBeFrozen: false,
@@ -283,6 +286,7 @@ enemyDefinitions.voidFrost = {
 };
 
 enemyDefinitions.voidStorm = {
+    naturalDifficultyRating: 20,
     animations: stormHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
     showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false, canBeFrozen: false,
@@ -303,6 +307,7 @@ function updateVoidHeart(this: void, state: GameState, enemy: Enemy): void {
 }
 
 enemyDefinitions.voidTree = {
+    naturalDifficultyRating: 200,
     animations: treeAnimations, life: 128, scale: 2, touchDamage: 4, update: updateVoidTree,
     aggroRadius: 256,
     abilities: [

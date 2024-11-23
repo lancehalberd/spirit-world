@@ -19,6 +19,7 @@ interface TurretParams {
 enemyDefinitions.arrowTurret = {
     animations: turretAnimations, 
     life: 4, 
+    naturalDifficultyRating: 2,
     tileBehaviors: {solid: true},
     lootTable: simpleLootTable,
     canBeKnockedBack: false,

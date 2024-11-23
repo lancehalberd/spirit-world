@@ -1,5 +1,7 @@
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { GroundSpike } from 'app/content/effects/groundSpike';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {Enemy} from 'app/content/enemy';
+import {crystalNovaAbility, crystalProjectileAbility, crystalProjectileArcAbility} from 'app/content/enemyAbilities/crystalProjectile';
+import {groundSpikeAbility, groundSpikeLineAbility} from 'app/content/enemyAbilities/groundSpike';
 import {
     beetleAnimations,
     climbingBeetleAnimations,
@@ -7,14 +9,14 @@ import {
     beetleMiniAnimations,
     floorEyeAnimations,
 } from 'app/content/enemyAnimations';
-import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { renderIndicator } from 'app/content/objects/indicator';
-import { editingState } from 'app/development/editingState';
-import {
-    paceAndCharge, scurryAndChase,
-} from 'app/utils/enemies';
+import {certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable} from 'app/content/lootTables';
+import {renderIndicator} from 'app/content/objects/indicator';
+import {editingState} from 'app/development/editingState';
+import {directionMap} from 'app/utils/direction';
+import {paceAndCharge, scurryAndChase} from 'app/utils/enemies';
+import {coverTile} from 'app/utils/field';
+import {addObjectToArea} from 'app/utils/objects';
 import { getNearbyTarget } from 'app/utils/target';
-import { addEffectToArea } from 'app/utils/effects';
 
 export * from 'app/content/enemies/arrowTurret';
 export * from 'app/content/enemies/balloonCentipede';
@@ -59,30 +61,107 @@ declare global {
     export type EnemyType = typeof enemyTypes[number];
 }
 
-
 enemyDefinitions.beetle = {
-    animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase,
+    naturalDifficultyRating: 1,
+    abilities: [],
+    animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
     lootTable: simpleLootTable,
     shadowRadius: 9,
+    initialize(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.gainAbility(crystalProjectileAbility);
+        }
+    },
+    update(state: GameState, enemy: Enemy<any>) {
+        enemy.useRandomAbility(state);
+        scurryAndChase(state, enemy);
+    },
+    onDeath(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty <= this.naturalDifficultyRating) {
+            return;
+        }
+        const baseTheta = 2 * Math.PI * Math.random();
+        const hitbox = enemy.getHitbox();
+        for (let i = 0; i < 3; i++) {
+            const theta = baseTheta + 2 * Math.PI * i / 3;
+            const dx = Math.cos(theta), dy = Math.sin(theta);
+            const miniBeetle = new Enemy(state, {
+                status: 'normal',
+                type: 'enemy',
+                enemyType: 'beetleMini',
+                x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
+                y: hitbox.y + hitbox.h / 2 + dy * hitbox.h / 2,
+            });
+            miniBeetle.vx = dx;
+            miniBeetle.vy = dy;
+            miniBeetle.z = enemy.z;
+            miniBeetle.invulnerableFrames = miniBeetle.enemyInvulnerableFrames = 20;
+            addObjectToArea(state, enemy.area, miniBeetle);
+        }
+    }
 };
+
 enemyDefinitions.climbingBeetle = {
+    naturalDifficultyRating: 1,
     animations: climbingBeetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
+    aggroRadius: 96,
     lootTable: simpleLootTable,
     tileBehaviors: {touchHit: { damage: 1}, solid: true},
     canBeKnockedBack: false,
+    initialize(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.life *= 2;
+            enemy.gainAbility(groundSpikeLineAbility);
+            enemy.gainAbility(groundSpikeAbility);
+        }
+    },
+    update(state: GameState, enemy: Enemy<any>) {
+        enemy.useRandomAbility(state);
+    },
+    onDeath(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty <= this.naturalDifficultyRating) {
+            return;
+        }
+        crystalNovaAbility.useAbility(state, enemy, true);
+    }
 };
+const thornsTilesIndex = 184;
 enemyDefinitions.beetleHorned = {
+    naturalDifficultyRating: 2,
     animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge,
     aggroRadius: 128,
     lootTable: moneyLootTable,
     shadowRadius: 9,
+    afterUpdate(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty <= this.naturalDifficultyRating) {
+            return;
+        }
+        if (enemy.mode === 'charge') {
+            const hitbox = enemy.getHitbox();
+            const tx = ((hitbox.x + hitbox.w / 2) / 16) | 0;
+            const ty = ((hitbox.y + hitbox.h / 2) / 16) | 0;
+            coverTile(state, enemy.area, tx, ty, thornsTilesIndex);
+        } else if (enemy.mode === 'stunned' && enemy.modeTime <= 0) {
+            const [x, y] = directionMap[enemy.d];
+            crystalProjectileArcAbility.useAbility(state, enemy, {x: -x, y: -y});
+        }
+    },
 };
 enemyDefinitions.beetleMini = {
+    naturalDifficultyRating: 1,
     animations: beetleMiniAnimations, aggroRadius: 32,
     acceleration: 0.02,
     speed: 0.8,
     hasShadow: false, life: 1, touchDamage: 1, update: scurryAndChase,
     lootTable: lifeLootTable,
+    initialize(state: GameState, enemy: Enemy<any>) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.life *= 1.5;
+            enemy.speed = 1.2;
+            enemy.aggroRadius = 96;
+            enemy.acceleration = 0.05;
+        }
+    },
 };
 
 
@@ -96,6 +175,8 @@ function isUnderTile(state: GameState, enemy: Enemy): boolean {
 }
 
 enemyDefinitions.floorEye = {
+    naturalDifficultyRating: 4,
+    abilities: [groundSpikeAbility],
     animations: floorEyeAnimations, aggroRadius: 96,
     hasShadow: false,
     initialMode: 'closed',
@@ -128,20 +209,11 @@ enemyDefinitions.floorEye = {
 function updateFloorEye(state: GameState, enemy: Enemy): void {
     if (enemy.mode === 'open') {
         enemy.isInvulnerable = isUnderTile(state, enemy);
-        const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
         if (enemy.animationTime >= enemy.currentAnimation.duration) {
             enemy.changeToAnimation('open');
         }
-
-        if (target && enemy.modeTime > 1000 && enemy.modeTime % 1000 === 500) {
-            enemy.changeToAnimation('attack');
-            const targetHitbox = target.getHitbox(state);
-            const spike = new GroundSpike({
-                x: targetHitbox.x + targetHitbox.w / 2,
-                y: targetHitbox.y + targetHitbox.h / 2,
-                damage: 4,
-            });
-            addEffectToArea(state, enemy.area, spike);
+        if (enemy.modeTime >= 1000) {
+            enemy.useRandomAbility(state);
         }
         if (enemy.modeTime >= 4400) {
             enemy.setMode('closing')

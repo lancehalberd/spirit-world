@@ -12,6 +12,7 @@ import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 enemyDefinitions.beetleBoss = {
+    naturalDifficultyRating: 5,
     // Reset the boss to its starting position if you leave the arena.
     alwaysReset: true,
     animations: beetleWingedAnimations, flying: true, scale: 3,
@@ -20,6 +21,7 @@ enemyDefinitions.beetleBoss = {
     life: 12, touchDamage: 1, update: updateBeetleBoss,
 };
 enemyDefinitions.beetleBossWingedMinionDefinition = {
+    naturalDifficultyRating: 1,
     // Despawn these if you leave the boss arena.
     alwaysReset: true,
     animations: beetleWingedAnimations,

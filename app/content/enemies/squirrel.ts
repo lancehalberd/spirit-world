@@ -114,17 +114,19 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}: Point,
         enemy.vy = maxJumpSpeed * enemy.vy / mag;
     }
     enemy.setMode('jumping');
-    const blast = new Blast({
-        x,
-        y,
-        damage: 2,
-        element: enemy.params.element,
-        tellDuration: 20 * duration,
-        persistDuration: 200,
-        radius: blastRadius,
-        source: enemy,
-    });
-    addEffectToArea(state, enemy.area, blast);
+    if (enemy.params.element) {
+        const blast = new Blast({
+            x,
+            y,
+            damage: 2,
+            element: enemy.params.element,
+            tellDuration: 20 * duration,
+            persistDuration: 200,
+            radius: blastRadius,
+            source: enemy,
+        });
+        addEffectToArea(state, enemy.area, blast);
+    }
 }
 
 const leaveFlameAbility: EnemyAbility<boolean> = {
@@ -211,6 +213,7 @@ function jumpOnHit(state: GameState, enemy: Enemy<SquirrelParams>, hit: HitPrope
 
 
 enemyDefinitions.squirrel = {
+    naturalDifficultyRating: 1,
     animations: squirrelAnimations,
     speed: 1.5,
     life: 2, touchHit: { damage: 1},
@@ -221,10 +224,17 @@ enemyDefinitions.squirrel = {
         elementalFrost: 'squirrelFrost',
         elementalStorm: 'squirrelStorm',
     },
+    onHit(state: GameState, enemy: Enemy<SquirrelParams>, hit: HitProperties): HitResult {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            return jumpOnHit(state, enemy, hit);
+        }
+        return enemy.defaultOnHit(state, hit);
+    },
     update: updateSquirrel,
 };
 
 enemyDefinitions.squirrelFlame = {
+    naturalDifficultyRating: 3,
     animations: squirrelFlameAnimations,
     aggroRadius: 112,
     speed: 2.5,
@@ -242,6 +252,7 @@ enemyDefinitions.squirrelFlame = {
 };
 
 enemyDefinitions.squirrelFrost = {
+    naturalDifficultyRating: 3,
     animations: squirrelFrostAnimations,
     aggroRadius: 112,
     speed: 2,
@@ -258,6 +269,7 @@ enemyDefinitions.squirrelFrost = {
 };
 
 enemyDefinitions.squirrelStorm = {
+    naturalDifficultyRating: 3,
     animations: squirrelStormAnimations,
     acceleration: 0.2,
     aggroRadius: 112,
@@ -275,6 +287,7 @@ enemyDefinitions.squirrelStorm = {
 };
 
 enemyDefinitions.superSquirrel = {
+    naturalDifficultyRating: 6,
     animations: superElectricSquirrelAnimations,
     acceleration: 0.2, aggroRadius: 112, speed: 2.5, scale: 2,
     life: 12, touchHit: { damage: 2, element: 'lightning'},

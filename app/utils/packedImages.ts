@@ -57,7 +57,7 @@ const imagePacks: PackedImageData[] = [
         {x:464,y:1952,w:448,h:160,originalSource:'gfx/tiles/cavewalls.png'},
         {x:624,y:224,w:224,h:16,originalSource:'gfx/tiles/grass.png'},
         {x:464,y:2112,w:352,h:160,originalSource:'gfx/tiles/cavewalls2temp.png'},
-        {x:960,y:0,w:16,h:16,originalSource:'gfx/tiles/iceTile.png'},
+        //{x:960,y:0,w:16,h:16,originalSource:'gfx/tiles/iceTile.png'},
         {x:960,y:16,w:64,h:32,originalSource:'gfx/tiles/rails.png'},
         //{x:896,y:224,w:128,h:80,originalSource:'gfx/tiles/deeptoshallowwater.png'},
         //{x:896,y:304,w:128,h:80,originalSource:'gfx/tiles/shallowtodeepwater1.png'},

@@ -14,7 +14,7 @@ import { createAnimation } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 import { isEnemyMissing, moveEnemyFull, moveEnemyToTargetLocation } from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import {addObjectToArea} from 'app/utils/objects';
 import { getVectorToNearbyTarget, getVectorToHitbox, getVectorToTarget } from 'app/utils/target';
 
 const orbAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 12, h: 12}, {left: 18, top: 979});
@@ -72,22 +72,6 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
             enemy.z--;
         } else {
             enemy.z = targetZ;
-        }
-    },
-    onDeath(state: GameState, enemy: Enemy) {
-        if (enemy.params.possessedTarget && enemy.params.baseTargetType) {
-            const target = enemy.params.possessedTarget;
-            const baseEnemy = new Enemy(state, {
-                id: target.definition?.id,
-                status: 'normal',
-                type: 'enemy',
-                enemyType: enemy.params.baseTargetType,
-                x: target.x,
-                y: target.y,
-            });
-            baseEnemy.z = target.z;
-            removeObjectFromArea(state, target);
-            addObjectToArea(state, enemy.area.alternateArea, baseEnemy);
         }
     },
     render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<OrbProps>) {
@@ -212,6 +196,7 @@ function applyHitKnockbackToOrb(hit: HitProperties, enemy: Enemy<OrbProps>): voi
 
 enemyDefinitions.smallOrb = {
     ...baseOrbDefinition,
+    naturalDifficultyRating: 6,
     canBeKnockedBack: false,
     animations: {idle: omniAnimation(orbAnimation)}, life: 8, touchHit: {element: 'lightning', damage: 2}, update: updateSmallOrb,
     immunities: ['lightning'],
@@ -265,6 +250,7 @@ const sparkAbility: EnemyAbility<true> = {
 
 enemyDefinitions.largeOrb = {
     ...baseOrbDefinition,
+    naturalDifficultyRating: 20,
     abilities: [sparkAbility],
     tileBehaviors: {
         brightness: 0.6,

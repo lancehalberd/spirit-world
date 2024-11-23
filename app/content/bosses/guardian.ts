@@ -154,6 +154,7 @@ function getProjectionAlpha(enemy: Enemy) {
     return alpha;
 }
 enemyDefinitions.guardianProjection = {
+    naturalDifficultyRating: 1,
     animations: guardianSpiritAnimations, life: 20, scale: 1, update: updateProjection,
     canBeKnockedBack: false,
     aggroRadius: 2000,
@@ -198,6 +199,7 @@ interface GuardianParams {
     usedMarkers: Set<ObjectInstance>
 }
 enemyDefinitions.guardian = {
+    naturalDifficultyRating: 20,
     // This should match the NPC style of the Tomb Guardian.
     animations: vanaraBlueAnimations,
     life: 32, touchDamage: 0, update: updateGuardian,

@@ -1,7 +1,7 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import {groundSpikeLineAbility} from 'app/content/enemyAbilities/groundSpike';
 import {
     crystalGuardianAnimations,
     // smallCrystalBarrierFlashFrame,
@@ -20,27 +20,6 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 const maxShieldLife = 6;
 
 type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
-
-const spikeLineAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
-        enemy.changeToAnimation('attack');
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        addLineOfSpikes({
-            state, area: enemy.area,
-            source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
-            target: [enemy.x + enemy.w / 2 + target.x * 32, enemy.y + enemy.h / 2 + target.y * 32],
-        });
-    },
-    cooldown: 5000,
-    initialCharges: 0,
-    charges: 1,
-    prepTime: crystalGuardianAnimations.attack.down.duration - 200,
-    recoverTime: 400,
-};
 
 const spikePodAbility: EnemyAbility<NearbyTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
@@ -66,8 +45,12 @@ const spikePodAbility: EnemyAbility<NearbyTargetType> = {
 };
 
 enemyDefinitions.crystalGuardian = {
+    naturalDifficultyRating: 5,
     alwaysReset: true,
-    abilities: [spikeLineAbility, spikePodAbility],
+    abilities: [{
+        ...groundSpikeLineAbility,
+        prepTime: crystalGuardianAnimations.attack.down.duration - 200
+    }, spikePodAbility],
     params: {
         shieldLife: maxShieldLife,
         shieldInvulnerableTime: 0,

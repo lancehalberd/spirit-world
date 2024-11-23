@@ -53,6 +53,7 @@ export const frostHeartAnimations = {
 };
 
 enemyDefinitions.frostHeart = {
+    naturalDifficultyRating: 20,
     animations: frostHeartAnimations, life: 16, scale: 2, touchDamage: 1, update: updateFrostHeart, params: {
         chargeLevel: 0,
         enrageLevel: 0,
@@ -98,6 +99,7 @@ enemyDefinitions.frostHeart = {
     }
 };
 enemyDefinitions.frostBeast = {
+    naturalDifficultyRating: 100,
     animations: snakeAnimations, life: 36, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
     canSwim: true,
     acceleration: 0.3, speed: 2,

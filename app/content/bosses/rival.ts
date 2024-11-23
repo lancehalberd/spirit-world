@@ -173,6 +173,7 @@ enemyDefinitions.rival = {
     // This should match the NPC style of the Rival.
     animations: rivalAnimations,
     abilities: [rollAbility, staffAbility, throwAbility],
+    naturalDifficultyRating: 20,
     taunts: {
         throw: { text: 'Get out of here!', priority: 1},
         dodge: { text: 'Nice try!', priority: 2},

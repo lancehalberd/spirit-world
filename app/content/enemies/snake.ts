@@ -1,5 +1,6 @@
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { shootFrostInCone } from 'app/content/bosses/frostBeast';
+import {Blast} from 'app/content/effects/blast';
 import { Flame } from 'app/content/effects/flame';
 import { simpleLootTable } from 'app/content/lootTables';
 import { snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations } from 'app/content/enemyAnimations';
@@ -8,7 +9,7 @@ import { directionMap, directionToRadiansMap } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { canMoveEnemy, moveEnemy, paceRandomly } from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';;
-import { getLineOfSightTargetAndDirection } from 'app/utils/target';
+import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget } from 'app/utils/target';
 import Random from 'app/utils/Random';
 
 
@@ -64,6 +65,48 @@ const fireBallAbility: EnemyAbility<boolean> = {
     prepTime: 800,
     recoverTime: 400,
 };
+const chasingFireBallAbility: EnemyAbility<boolean> = {
+    ...fireBallAbility,
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
+        const hitbox = enemy.getHitbox(state);
+        const [dx, dy] = directionMap[enemy.d];
+        const flame = new Flame({
+            x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
+            isPreparing: true,
+            vx: 0,
+            vy: 0,
+            z: 4,
+            az: 0,
+            scale: 0.1,
+            ttl: 5000,
+            beforeUpdate(state: GameState, flame: Flame) {
+                if (flame.isPreparing) {
+                    return;
+                }
+                if (flame.time < 2000) {
+                    flame.scale = Math.min(2, flame.scale + 0.05);
+                } else {
+                    flame.scale = Math.max(0.5, flame.scale - 0.01);
+                }
+                flame.updateSize();
+                const target = getVectorToNearbyTarget(state, flame, 256, flame.area.allyTargets);
+                if (target) {
+                    this.vx += target.x * 0.1;
+                    this.vy += target.y * 0.1;
+                    const mag = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    const maxSpeed = 1.5;
+                    if (mag > maxSpeed) {
+                        this.vx *= maxSpeed / mag;
+                        this.vy *= maxSpeed / mag;
+                    }
+                }
+            }
+        });
+        addEffectToArea(state, enemy.area, flame);
+        enemy.params.fireball = flame;
+    },
+}
 
 
 const leaveFlameAbility: EnemyAbility<boolean> = {
@@ -81,6 +124,26 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
     cooldown: 600,
     charges: 1,
 };
+
+/*
+const leaveGrowingFlameAbility: EnemyAbility<boolean> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): boolean {
+        return true;
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: boolean): void {
+        const hitbox = enemy.getHitbox(state);
+        const flame = new Flame({
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2 - 1,
+            beforeUpdate(state: GameState, flame: Flame) {
+                flame.scale = Math.min(3, flame.scale + 0.01);
+            },
+        });
+        addEffectToArea(state, enemy.area, flame);
+    },
+    cooldown: 1000,
+    charges: 1,
+};*/
 
 
 type LineOfSightTargetType = ReturnType<typeof getLineOfSightTargetAndDirection>;
@@ -123,12 +186,25 @@ const baseSnakeDefinition: Partial<EnemyDefinition<any>> = {
         enemy.useRandomAbility(state);
         if (!enemy.activeAbility) {
             paceRandomly(state, enemy);
+            if (enemy.difficulty >= this.naturalDifficultyRating && enemy.mode === 'walk' && enemy.modeTime < 0) {
+                const target = getVectorToNearbyTarget(state, enemy, 128, enemy.area.allyTargets);
+                if (target) {
+                    const [dx, dy] = directionMap[enemy.d];
+                    if (dx * target.x > 0 || dy * target.y > 0) {
+                        enemy.speed = 2;
+                        enemy.modeTime += 400;
+                    } else {
+                        enemy.speed = 1;
+                    }
+                }
+            }
         }
     },
 };
 
 enemyDefinitions.snake = {
     ...baseSnakeDefinition,
+    naturalDifficultyRating: 1,
     abilities: [],
     animations: snakeAnimations,
     life: 2,
@@ -143,16 +219,23 @@ enemyDefinitions.snake = {
 
 enemyDefinitions.snakeFlame = {
     ...baseSnakeDefinition,
+    naturalDifficultyRating: 3,
     abilities: [fireBallAbility, leaveFlameAbility],
     animations: snakeFlameAnimations,
     baseMovementProperties: {canMoveInLava: true},
     touchHit: {damage: 1, element: 'fire'},
     elementalMultipliers: {'ice': 2},
     immunities: ['fire'],
+    initialize(state: GameState, enemy: Enemy) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.gainAbility(chasingFireBallAbility);
+        }
+    }
 };
 
 enemyDefinitions.snakeFrost = {
     ...baseSnakeDefinition,
+    naturalDifficultyRating: 2,
     abilities: [frostConeAbility],
     animations: snakeFrostAnimations,
     baseMovementProperties: {canSwim: true},
@@ -171,15 +254,43 @@ enemyDefinitions.snakeFrost = {
     },
 };
 
+const lightningAuraAbility: EnemyAbility<true> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): true {
+        return true;
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy): void {
+        const hitbox = enemy.getHitbox(state);
+        const blast = new Blast({
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+            damage: 2,
+            element: 'lightning',
+            tellDuration: 800,
+            persistDuration: 5000,
+            radius: 24,
+            source: enemy,
+        });
+        enemy.params.blast = blast;
+        addEffectToArea(state, enemy.area, blast);
+    },
+    cooldown: 8000,
+};
+
 const maxImageCount = 12;
 enemyDefinitions.snakeStorm = {
     ...baseSnakeDefinition,
+    naturalDifficultyRating: 3,
     abilities: [],
     animations: snakeStormAnimations, speed: 10,
     // baseMovementProperties: {canSwim: true},
     touchHit: {damage: 1, element: 'lightning'},
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
+    initialize(state: GameState, enemy: Enemy) {
+        if (enemy.difficulty > this.naturalDifficultyRating) {
+            enemy.gainAbility(lightningAuraAbility);
+        }
+    },
     update(state: GameState, enemy: Enemy) {
         enemy.params.afterFrames = enemy.params.afterFrames ?? [];
         //if (enemy.time % 60 === 0) {
@@ -193,6 +304,7 @@ enemyDefinitions.snakeStorm = {
             }
         //}
         if (enemy.mode === 'choose' && enemy.modeTime === 400) {
+            enemy.useRandomAbility(state);
             const choices: CardinalDirection[] = ['up', 'down', 'left', 'right'];
             while (choices.length) {
                 const d = Random.removeElement(choices);
@@ -206,6 +318,13 @@ enemyDefinitions.snakeStorm = {
         }
         if (enemy.modeTime >= 400) {
             enemy.changeToAnimation('move');
+            // Lightning snake will stop when it is lined up with the hero on harder difficulties.
+            if (enemy.difficulty >= this.naturalDifficultyRating) {
+                const target = getLineOfSightTargetAndDirection(state, enemy, enemy.area.allyTargets, undefined, 256);
+                if (target.target && target.d !== enemy.d && Math.random() < 0.3) {
+                    enemy.setMode('choose');
+                }
+            }
             if (Math.random() < (enemy.modeTime - 600) / 2000 || !moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1])) {
                 enemy.setMode('choose');
             }
