@@ -958,8 +958,8 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "locked", id: "staffTower1F2F", x: 304, y: 48, type: "door", style: "futureUpstairs", targetZone: "staffTower", targetObjectId: "staffTower1F2F", d: "up", locationCue: "Tower 1F"},
-        {status: "normal", id: "staffTowe1-orb2", x: 504, y: 360, type: "enemy", enemyType: "smallOrb", d: "down", params: {}, logicKey: "hasReleasedBeasts"},
-        {status: "normal", id: "staffTowe1-orb1", x: 120, y: 360, type: "enemy", enemyType: "smallOrb", d: "down", params: {}, logicKey: "hasReleasedBeasts"},
+        {status: "normal", id: "staffTowe1-orb2", x: 506, y: 360, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
+        {status: "normal", id: "staffTowe1-orb1", x: 122, y: 360, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
         {status: "closedSwitch", id: "staffTowerSpiritEntrance", x: 288, y: 624, type: "door", style: "future", targetZone: "overworld", targetObjectId: "staffTowerSpiritEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
         {status: "normal", id: "", x: 240, y: 576, targetObjectId: "staffTowerSpiritEntrance", type: "floorSwitch"},
         {status: "normal", id: "", x: 304, y: 532, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
@@ -971,8 +971,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 216, y: 304, type: "tippable", linked: true, spirit: true, shattered: true},
         {status: "normal", id: "towerEscalatorDownOn", x: 431, y: 231, speed: "fast", d: "down", w: 18, h: 76, style: "escalator", type: "escalator", linked: true, spirit: true},
         {status: "normal", id: "towerEscalatorUpOn", x: 190, y: 231, speed: "slow", d: "up", w: 18, h: 76, style: "escalator", type: "escalator", linked: true, spirit: true},
-        {status: "normal", id: "staffTowe1-orb4", x: 412, y: 504, type: "enemy", enemyType: "smallOrb", d: "down", params: {}, logicKey: "hasReleasedBeasts"},
-        {status: "normal", id: "staffTowe1-orb3", x: 216, y: 504, type: "enemy", enemyType: "smallOrb", d: "down", params: {}, logicKey: "hasReleasedBeasts"},
+        {status: "normal", id: "staffTowe1-orb4", x: 410, y: 504, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
+        {status: "normal", id: "staffTowe1-orb3", x: 218, y: 504, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
         {status: "normal", id: "staffTowerLowerDoor", x: 304, y: 272, type: "door", style: "future", targetZone: "staffTower", targetObjectId: "staffTowerLowerDoor", d: "up"},
     ],
     sections: [
@@ -5171,9 +5171,9 @@ const sf3_0x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTowerLowerDoor", x: 128, y: 272, type: "door", style: "future", targetZone: "staffTower", targetObjectId: "staffTowerLowerDoor", d: "down"},
         {status: "hiddenEnemy", id: "staffTowerLowerKey", x: 152, y: 164, type: "chest", lootType: "smallKey", lootLevel: 1},
-        {status: "normal", id: "staffTower:3:0x1-smallOrb-1", x: 80, y: 192, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
-        {status: "normal", id: "staffTower:3:0x1-smallOrb-0", x: 152, y: 92, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
-        {status: "normal", id: "staffTower:3:0x1-smallOrb-2", x: 224, y: 192, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
+        {status: "normal", id: "staffTower:3:0x1-smallOrb-1", x: 82, y: 192, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
+        {status: "normal", id: "staffTower:3:0x1-smallOrb-0", x: 154, y: 92, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
+        {status: "normal", id: "staffTower:3:0x1-smallOrb-2", x: 226, y: 192, type: "enemy", enemyType: "smallOrb", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 20, h: 20, index: 842, mapId: 'staffTower', floorId: '1F', mapX: 3.5, mapY: 1},

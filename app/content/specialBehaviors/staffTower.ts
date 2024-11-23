@@ -21,13 +21,19 @@ specialBehaviorsHash.staffTower = {
             for (const object of area.objects) {
                 if (object.isEnemyTarget) {
                     const enemy = object as Enemy;
-                    if (enemy.definition.enemyType === 'lightningDrone' || enemy.definition.enemyType === 'sentryBot') {
+                    if (enemy.definition.enemyType === 'lightningDrone'
+                        || enemy.definition.enemyType === 'sentryBot'
+                        || enemy.definition.enemyType === 'smallOrb'
+                        || enemy.definition.enemyType === 'largeOrb'
+                        ) {
                         object.status = 'off';
                     }
                 }
                 switch (object.definition.type) {
                     case 'sign':
                     case 'escalator':
+                    case 'anode':
+                    case 'cathode':
                         object.status = 'off';
                 }
             }
@@ -41,12 +47,16 @@ specialBehaviorsHash.staffTower = {
                 for (const object of area.objects) {
                     if (object?.definition.type === 'escalator') {
                         (object as Escalator).speed = 'slow';
-                    } else if (object?.definition.type === 'anode') {
+                    } else if (object?.definition.type === 'anode' || object?.definition.type === 'cathode') {
                         object.status = 'off';
                     }
                     if (object.isEnemyTarget) {
                         const enemy = object as Enemy;
-                        if (enemy.definition.enemyType === 'lightningDrone' || enemy.definition.enemyType === 'sentryBot') {
+                        if (enemy.definition.enemyType === 'lightningDrone'
+                            || enemy.definition.enemyType === 'sentryBot'
+                            || enemy.definition.enemyType === 'smallOrb'
+                            || enemy.definition.enemyType === 'largeOrb'
+                            ) {
                             object.status = 'off';
                         }
                     }

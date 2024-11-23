@@ -1,5 +1,5 @@
 import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import { renderLightningRay } from 'app/render/renderLightning'
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { distanceToSegment, hitTargets } from 'app/utils/field';
@@ -23,6 +23,11 @@ function renderTransmitter(this: void, context: CanvasRenderingContext2D, state:
 const orbAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 22}, {left: 16, top: 977, cols: 3});
 
 function renderOrb(this: void, context: CanvasRenderingContext2D, state: GameState, object: Anode | Cathode) {
+    if (object.status === 'off') {
+        const frame = orbAnimation.frames[1];
+        drawFrame(context, {...frame, y: frame.y + 14, h: 8}, {...frame, h: 8, y: object.y + frame.h - 14, x: object.x})
+        return drawFrame(context, {...frame, h: 14}, {...frame, h: 14, y: object.y, x: object.x})
+    }
     const z = getOrbHeight(object);
     const frame = orbAnimation.frames[z - 9] || orbAnimation.frames[1];
     drawFrame(context, frame, {...frame, y: object.y + 12 - frame.h, x: object.x})
@@ -71,6 +76,8 @@ export class Anode implements ObjectInstance {
     time = FRAME_LENGTH * ((Math.random() * 10) | 0);
     cathodes: Cathode[] = [];
     cathodeIndex: number = 0;
+    onInterval = 0;
+    offInterval = 0
     constructor(state: GameState, definition: AnodeDefinition) {
         this.definition = definition;
         this.status = this.definition.status || 'normal';
@@ -80,6 +87,8 @@ export class Anode implements ObjectInstance {
         if (getObjectStatus(state, definition)) {
             this.status = this.definition.status === 'normal' ? 'off' : 'normal';
         }
+        this.onInterval = this.definition.onInterval * 1 / gameModifiers.trapSpeed;
+        this.offInterval = this.definition.offInterval * 1 / gameModifiers.trapSpeed;
     }
     onActivate(state: GameState) {
         if (this.definition.status === 'normal') {
@@ -132,12 +141,12 @@ export class Anode implements ObjectInstance {
         this.time += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         if (!this.isRunning(state)) {
-            if (this.definition.offInterval && this.animationTime >= this.definition.offInterval) {
+            if (this.offInterval && this.animationTime >= this.offInterval) {
                 this.turnOn(state);
             }
             return
         }
-        if (this.definition.onInterval && this.animationTime >= this.definition.onInterval) {
+        if (this.onInterval && this.animationTime >= this.onInterval) {
             this.turnOff(state);
         }
         this.updateCathodes(state);
@@ -167,7 +176,7 @@ export class Anode implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (this.status !== 'normal' && this.status !== 'off' ) {
+        if (this.status !== 'normal' && this.status !== 'off') {
             return;
         }
         const style = lightningBarrierStyles[this.definition.style] || lightningBarrierStyles.coil;
@@ -252,7 +261,7 @@ export class Cathode implements ObjectInstance {
         this.time += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (this.status !== 'normal') {
+        if (this.status !== 'normal' && this.status !== 'off') {
             return;
         }
         const style = lightningBarrierStyles[this.definition.style] || lightningBarrierStyles.coil;

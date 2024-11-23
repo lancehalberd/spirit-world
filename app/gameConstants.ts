@@ -138,6 +138,8 @@ export const gameModifiers = {
     nerfGoldenMail: 0,
     // If this is truthy, the phoenix crown will not improve spirit regeneration as much.
     nerfPhoenixCrown: 0,
+    // Increasing this makes traps like arrow traps and lightning barriers speed up.
+    trapSpeed: 1,
 
 };
 window.gameModifiers = gameModifiers;
@@ -160,6 +162,7 @@ if (challenge === 'easy') {
     gameModifiers.nerfGoldenMail = 1;
     gameModifiers.nerfPhoenixCrown = 1;
     gameModifiers.globalEnemyDifficulty = 2;
+    gameModifiers.trapSpeed = 1.8;
 }
 
 for (const key of Object.keys(gameModifiers) as GameModifier[]) {

@@ -1,6 +1,6 @@
 import { CrystalSpike, drawArrow, drawCrystal, EnemyArrow } from 'app/content/effects/arrow';
 import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { directionMap } from 'app/utils/field';
@@ -73,6 +73,8 @@ export class WallTurret implements ObjectInstance {
         this.animationTime = 0;
         this.fireInterval = this.definition.fireInterval || 3000;
         this.fireOffset = this.definition.fireOffset || 0;
+        this.fireInterval *= 1 / gameModifiers.trapSpeed;
+        this.fireOffset *= 1 / gameModifiers.trapSpeed;
     }
     getHitbox(state: GameState) {
         return this;
@@ -105,7 +107,8 @@ export class WallTurret implements ObjectInstance {
             return;
         }
         if (this.status === 'normal') {
-            if ((this.animationTime - this.fireOffset) % this.fireInterval === 0) {
+            const modValue = (this.animationTime - this.fireOffset) % this.fireInterval;
+            if (modValue < FRAME_LENGTH && modValue > -FRAME_LENGTH) {
                 this.fire(state);
             }
         }
