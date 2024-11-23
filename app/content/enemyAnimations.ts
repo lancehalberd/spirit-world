@@ -1,4 +1,4 @@
-import { createAnimation } from 'app/utils/animations';
+import {createAnimation, speedUpAnimation} from 'app/utils/animations';
 
 
 export function omniAnimation(animation: FrameAnimation) {
@@ -521,4 +521,14 @@ export const diagonalTurretAnimations: ActorAnimations = {
     idle: omniAnimation(diagonalTurretIdleAnimation),
     rotate: omniAnimation(diagonalTurretRotateAnimation),
     attack: omniAnimation(diagonalTurretAttackAnimation),
+};
+export const fastTurretAnimations: ActorAnimations = {
+    idle: omniAnimation(speedUpAnimation(turretIdleAnimation, 2)),
+    rotate: omniAnimation(speedUpAnimation(turretRotateAnimation, 2)),
+    attack: omniAnimation(speedUpAnimation(turretAttackAnimation, 2)),
+};
+export const fastDiagonalTurretAnimations: ActorAnimations = {
+    idle: omniAnimation(speedUpAnimation(diagonalTurretIdleAnimation, 2)),
+    rotate: omniAnimation(speedUpAnimation(diagonalTurretRotateAnimation, 2)),
+    attack: omniAnimation(speedUpAnimation(diagonalTurretAttackAnimation, 2)),
 };

@@ -1,8 +1,11 @@
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { EnemyArrow } from 'app/content/effects/arrow';
+import {laserBeamAbility} from 'app/content/enemyAbilities/laserBeam';
 import {
     turretAnimations,
     diagonalTurretAnimations,
+    fastDiagonalTurretAnimations,
+    fastTurretAnimations,
     turretGemAnimation,
     turretCrackedGemAnimation,
 } from 'app/content/enemyAnimations';
@@ -18,6 +21,7 @@ interface TurretParams {
 
 enemyDefinitions.arrowTurret = {
     animations: turretAnimations, 
+    aggroRadius: 192,
     life: 4, 
     naturalDifficultyRating: 2,
     tileBehaviors: {solid: true},
@@ -50,21 +54,34 @@ enemyDefinitions.arrowTurret = {
     },
     initialize(state: GameState, enemy: Enemy<TurretParams>) {
         enemy.params.isDiagonal = Math.random() < 0.5;
-        enemy.animations = enemy.params.isDiagonal ? diagonalTurretAnimations : turretAnimations;
+        setTurretAnimations(state, enemy);
         enemy.mode = 'idle';
     },
     update: spinAndShoot,
 };
+function setTurretAnimations(state: GameState, enemy: Enemy<TurretParams>) {
+    if (enemy.difficulty > enemy.enemyDefinition.naturalDifficultyRating) {
+        // Double the animation speed on harder difficulties.
+        enemy.animations = enemy.params.isDiagonal ? fastDiagonalTurretAnimations : fastTurretAnimations;
+    } else {
+        enemy.animations = enemy.params.isDiagonal ? diagonalTurretAnimations : turretAnimations;
+    }
+}
 function spinAndShoot(state: GameState, enemy: Enemy<TurretParams>): void {
+    if (!enemy.abilities.length && enemy.life <= 2 && enemy.difficulty > enemy.enemyDefinition.naturalDifficultyRating) {
+        enemy.gainAbility(laserBeamAbility);
+    }
+    enemy.useRandomAbility(state);
     if (enemy.mode === 'idle') {
-        if (enemy.modeTime >= 500) {
+        // Skip the idle state on hard difficulties.
+        if (enemy.modeTime >= 500 || enemy.difficulty > enemy.enemyDefinition.naturalDifficultyRating ) {
             enemy.setMode('rotate');
             enemy.changeToAnimation('rotate');
         }
     } else if (enemy.mode === 'rotate') {
         if (enemy.animationTime >= enemy.currentAnimation.duration) {
             enemy.params.isDiagonal = !enemy.params.isDiagonal;
-            enemy.animations = enemy.params.isDiagonal ? diagonalTurretAnimations : turretAnimations;
+            setTurretAnimations(state, enemy);
             enemy.setMode('shoot');
             enemy.changeToAnimation('attack');
         }

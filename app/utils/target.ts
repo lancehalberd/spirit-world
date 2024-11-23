@@ -1,4 +1,5 @@
 import { getLedgeDelta } from 'app/movement/getLedgeDelta';
+import { getTileBehaviors } from 'app/utils/getBehaviors';
 
 // Note this assumes the target is actually in the same area as the source.
 // Limiting the set of possible targets is handled by the set of targets passed into various targeting functions.
@@ -240,4 +241,44 @@ export function getLineOfSightTargetAndDirection(
         }
     }
     return {d: null, target: null};
+}
+
+export function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: number): {
+    x: number
+    y: number
+    mag: number
+    targetIsBelow?: boolean;
+    blocked?: boolean
+} {
+    const hitbox = enemy.getHitbox(state);
+    const cx = hitbox.x + hitbox.w / 2;
+    const cy = hitbox.y + hitbox.h / 2;
+    const dx = tx - cx, dy = ty - cy;
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    let ledgeDeltaSum = 0, lastPoint: Point;
+    for (let i = 0; i < mag; i += 4) {
+        const point = {
+            x: cx + i * dx / mag,
+            y: cy + i * dy / mag,
+        };
+        const { tileBehavior } = getTileBehaviors(state, enemy.area, point);
+        if (!tileBehavior?.low && tileBehavior?.solid) {
+            return {x: point.x, y: point.y, mag: i - 4, blocked: true};
+        }
+        if (lastPoint) {
+            const ledgeDelta = getLedgeDelta(state, enemy.area, lastPoint, point);
+            if (ledgeDelta < 0) {
+                ledgeDeltaSum--;
+            }
+            if (ledgeDelta > 0) {
+                ledgeDeltaSum++;
+            }
+            // Line of site is blocked when
+            if (ledgeDeltaSum > 0) {
+                return {x: point.x, y: point.y, mag: i - 4, blocked: true};
+            }
+        }
+        lastPoint = point;
+    }
+    return {x: tx, y: ty, mag, targetIsBelow: ledgeDeltaSum < 0};
 }

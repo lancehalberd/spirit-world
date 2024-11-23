@@ -53,7 +53,16 @@ export function createAnimation(
        });
     }
     return {frames, frameDuration: duration, ...props, duration: FRAME_LENGTH * frames.length * duration};
-};
+}
+
+export function speedUpAnimation(animation: FrameAnimation, speedFactor: number): FrameAnimation {
+    const frameDuration = Math.max(1, animation.frameDuration / speedFactor) | 0;
+    return {
+        ...animation,
+        frameDuration,
+        duration: FRAME_LENGTH * animation.frames.length * frameDuration,
+    };
+}
 
 
 const [errorCanvas, errorContext] = createCanvasAndContext(16, 16);
