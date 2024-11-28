@@ -434,11 +434,11 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "cracked", id: "bellCaveEntrance", x: 400, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "bellCaveEntrance", d: "down"},
-        {status: "normal", id: "bellCaveBell1", x: 184, y: 104, style: "bellA4", type: "bell"},
-        {status: "normal", id: "bellCaveBell2", x: 224, y: 80, style: "bellB4", type: "bell"},
-        {status: "normal", id: "bellCaveBell3", x: 272, y: 96, style: "bellA4", type: "bell"},
-        {status: "normal", id: "bellCaveBell4", x: 320, y: 80, style: "bellA4", type: "bell"},
-        {status: "normal", id: "bellCaveBell5", x: 360, y: 104, style: "bellA4", type: "bell"},
+        {status: "normal", id: "bellCaveBell1", x: 184, y: 88, style: "bellA4", type: "bell"},
+        {status: "normal", id: "bellCaveBell2", x: 224, y: 72, style: "bellB4", type: "bell"},
+        {status: "normal", id: "bellCaveBell3", x: 272, y: 84, style: "bellC5", type: "bell"},
+        {status: "normal", id: "bellCaveBell4", x: 320, y: 72, style: "bellD5", type: "bell"},
+        {status: "normal", id: "bellCaveBell5", x: 360, y: 88, style: "bellE5", type: "bell"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 73, mapId: 'overworld', entranceId: 'bellCaveEntrance', mapX: 0, mapY: 0},

@@ -1,10 +1,10 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
-import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrameContentAt, getFrame } from 'app/utils/animations';
 
 
-const bellAnimation: FrameAnimation = createAnimation('gfx/objects/bell.png', {w: 16, h: 32}, {cols: 8, y: 0});
+const bellAnimation: FrameAnimation = createAnimation('gfx/objects/bell.png', {w: 16, h: 32, content: {x: 0, y: 16, w: 16, h:16}}, {cols: 8, y: 0});
 const bellFrame: Frame = bellAnimation.frames[0];
 
 export const bellStyles = {
@@ -17,8 +17,23 @@ export const bellStyles = {
         playSound(state: GameState, bell: Bell) {
             playAreaSound(state, bell.area, 'bellB4');
         }
-    }
-}
+    },
+    bellC5: {
+        playSound(state: GameState, bell: Bell) {
+            playAreaSound(state, bell.area, 'bellC5');
+        }
+    },
+    bellD5: {
+        playSound(state: GameState, bell: Bell) {
+            playAreaSound(state, bell.area, 'bellD5');
+        }
+    },
+    bellE5: {
+        playSound(state: GameState, bell: Bell) {
+            playAreaSound(state, bell.area, 'bellE5');
+        }
+    },
+};
 
 export class Bell implements ObjectInstance {
     area: AreaInstance;
@@ -40,13 +55,15 @@ export class Bell implements ObjectInstance {
         this.y = definition.y;
     }
     getHitbox(state: GameState): Rect {
-        return { x: this.x, y: this.y, w: 16, h: 32 };
+        return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.isBonk) {
             const style = bellStyles[this.definition.style as keyof typeof bellStyles] || bellStyles.bellA4;
             style.playSound(state, this);
             this.animationTime = 0;
+        } else {
+            playAreaSound(state, this.area, 'blockAttack');
         }
         return {
             stopped: true,
@@ -63,7 +80,7 @@ export class Bell implements ObjectInstance {
         if (!frame) {
             debugger;
         }
-        drawFrameAt(context, frame, { x: this.x, y: this.y });
+        drawFrameContentAt(context, frame, { x: this.x, y: this.y });
     }
 }
 objectHash.bell = Bell;

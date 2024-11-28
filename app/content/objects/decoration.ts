@@ -8,6 +8,7 @@ export class Decoration implements ObjectInstance {
     area: AreaInstance;
     definition: DecorationDefinition;
     drawPriority: DrawPriority = 'sprites';
+    isNeutralTarget = true;
     isObject = <const>true;
     ignorePits = true;
     x: number;
@@ -63,6 +64,10 @@ const [
 
 const entranceLightFrame = requireFrame('gfx/objects/cavelight.png', {x: 0, y: 0, w: 64, h: 32});
 const orbTreeFrame = requireFrame('gfx/objects/orbTree.png', {x: 0, y: 0, w: 26, h: 36, content: {x: 5, y: 19, w: 17, h: 12}});
+const glassWindowFrame = requireFrame('gfx/objects/lab.png', {x: 0, y: 0, w: 64, h: 48});
+const tubeFrontFrame = requireFrame('gfx/objects/lab.png', {x: 0, y: 59, w: 32, h: 53});
+const tubeBackFrame = requireFrame('gfx/objects/lab.png', {x: 32, y: 59, w: 32, h: 53});
+const tubeWaterAnimation = createAnimation('gfx/objects/lab.png', {w: 32, h: 53}, {top: 123, cols: 16});
 
 const pedestalGeometry = {x: 0, y: 0, w: 96, h: 64, content: {x: 0, y: 16, w: 96, h: 48}};
 const pedestalFrame = requireFrame('gfx/decorations/largeStatuePedestal.png', pedestalGeometry);
@@ -84,6 +89,31 @@ interface DecorationType {
     getYDepth?: (decoration: Decoration) => number
 }
 export const decorationTypes: {[key: string]: DecorationType} = {
+    tube: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrameContentAt(context, tubeBackFrame, decoration);
+            const frame = getFrame(tubeWaterAnimation, decoration.animationTime);
+            drawFrameContentAt(context, frame, decoration);
+            drawFrameContentAt(context, tubeFrontFrame, decoration);
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            return {x: decoration.x, y: decoration.y + 36, w: 32, h: 17};
+        },
+    },
+    window: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrameContentAt(context, glassWindowFrame, decoration);
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            return {x: decoration.x, y: decoration.y + 32, w: 64, h: 16};
+        },
+    },
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = lightningBeastStatueFrame;

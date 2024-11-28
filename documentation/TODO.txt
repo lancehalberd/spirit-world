@@ -68,7 +68,8 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add window + test tube decorations gfx/objects/Lab.png
+    - Charged chakram should not go through solid objects.
+        - It should still pierce enemies that were not defeated.
 
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
@@ -100,11 +101,9 @@ Current tasks:
     - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
 
     - BLocked: Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
-        - It is unclear what to do in the case when the unmaksed behavior can be frozen by enemy attacks but not by hero attacks.
+        - It is unclear what to do in the case when the unmasked behavior can be frozen by enemy attacks but not by hero attacks.
 
     - Fix you can wrap around the edges of the sky using cloud sommersault from the tower platform.
-
-    - Make bells make the tink/block sound if you hit them with anything but the staff bonk.
 
     - colored lights from the current world should render under spirit sight, not over
         - Check what colored lights look like in the other world too.

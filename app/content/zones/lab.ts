@@ -600,10 +600,10 @@ const f0_0x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "", x: 48, y: 496, type: "door", style: "cavern", d: "down", linked: true},
         {status: "normal", id: "", linked: true, x: 240, y: 16, type: "door", style: "cavern", d: "up"},
-        {status: "normal", id: "lab:0:0x1-squirrel-0", x: 184, y: 188, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
-        {status: "normal", id: "lab:0:0x1-squirrel-1", x: 312, y: 188, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
-        {status: "normal", id: "lab:0:0x1-squirrel-2", x: 312, y: 316, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
-        {status: "normal", id: "lab:0:0x1-squirrel-3", x: 180, y: 316, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
+        {status: "normal", id: "lab:0:0x1-squirrel-0", x: 186, y: 172, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
+        {status: "normal", id: "lab:0:0x1-squirrel-1", x: 312, y: 178, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
+        {status: "normal", id: "lab:0:0x1-squirrel-2", x: 310, y: 310, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
+        {status: "normal", id: "lab:0:0x1-squirrel-3", x: 182, y: 304, type: "enemy", enemyType: "squirrel", d: "up", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 436, mapId: 'lab', floorId: '1F', mapX: 2, mapY: 2},
@@ -1201,6 +1201,12 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "lab:s0:0x1-elementalStorm-0", x: 376, y: 112, type: "enemy", enemyType: "elementalStorm", d: "up", params: {}},
         {status: "normal", id: "lab:s0:0x1-elementalStorm-1", x: 248, y: 236, type: "enemy", enemyType: "elementalStorm", d: "up", params: {}},
         {status: "normal", id: "lab:s0:0x1-elementalStorm-2", x: 120, y: 368, type: "enemy", enemyType: "elementalStorm", d: "up", params: {}},
+        {status: "normal", id: "", x: 288, y: 369, type: "decoration", w: 16, h: 16, decorationType: "window"},
+        {status: "normal", id: "", x: 176, y: 289, type: "decoration", w: 16, h: 16, decorationType: "tube"},
+        {status: "normal", id: "", x: 304, y: 292, type: "decoration", w: 16, h: 16, decorationType: "tube"},
+        {status: "normal", id: "", x: 177, y: 160, type: "decoration", w: 16, h: 16, decorationType: "tube"},
+        {status: "normal", id: "", x: 304, y: 160, type: "decoration", w: 16, h: 16, decorationType: "tube"},
+        {status: "normal", id: "", x: 160, y: 112, type: "decoration", w: 16, h: 16, decorationType: "window"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 441, mapId: 'labSpirit', floorId: '1F', mapX: 2, mapY: 2},
