@@ -20,6 +20,7 @@ export const growingThornsAbility: EnemyAbility<Target> = {
                 x: targetHitbox.x + targetHitbox.w / 2,
                 y: targetHitbox.y + targetHitbox.h / 2,
                 damage: 1,
+                source: enemy,
             });
             addEffectToArea(state, enemy.area, thorns);
         }

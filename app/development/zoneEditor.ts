@@ -177,7 +177,8 @@ export function clearMinimap(state: GameState): void {
 export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCoords: {x: number, y: number}): void {
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
-        drawRemainingFrames(state, area, 0);
+        let safety = 0;
+        while (drawRemainingFrames(state, area, 0) && safety++ < 100);
     }
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     mapContext.drawImage(area.backgroundFrames[0].canvas,

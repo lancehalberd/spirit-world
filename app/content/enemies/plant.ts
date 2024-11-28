@@ -47,6 +47,7 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
             expansionDuration: 100,
             persistDuration: 200,
             radius: 80,
+            boundSource: enemy,
             source: enemy,
         });
         addEffectToArea(state, enemy.area, blast);
@@ -95,6 +96,7 @@ export const volcanoAbility: EnemyAbility<NearbyTargetType> = {
                 scale: 1.5,
                 ttl: 6000,
                 groundFriction: 1,
+                source: enemy,
             })
             addEffectToArea(state, enemy.area, flame);
         }
@@ -144,6 +146,7 @@ export const fastVolcanoAbility: EnemyAbility<NearbyTargetType> = {
                 scale: 1.5,
                 ttl: 4000,
                 groundFriction: 1,
+                source: enemy,
             })
             addEffectToArea(state, enemy.area, flame);
         }

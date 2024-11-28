@@ -31,6 +31,7 @@ const flameBarrierAbility: EnemyAbility<NearbyTargetType> = {
             tellDuration: 400,
             persistDuration: 2000,
             radius: 32,
+            boundSource: enemy,
             source: enemy,
         });
         enemy.params.effect = blast;
@@ -161,7 +162,7 @@ enemyDefinitions.beetleWingedFlame = {
         shieldColor: 'red',
     },
     immunities: ['fire'],
-    touchHit: {damage: 1, element: 'fire'},
+    touchHit: {damage: 1, element: 'fire', source: null},
     elementalMultipliers: {'ice': 2},
 };
 
@@ -175,7 +176,7 @@ enemyDefinitions.beetleWingedFrost = {
         shieldColor: 'blue',
     },
     immunities: ['ice'],
-    touchHit: {damage: 1, element: 'ice'},
+    touchHit: {damage: 1, element: 'ice', source: null},
     elementalMultipliers: {'fire': 2},
     onDeath(state: GameState, enemy: Enemy) {
         const hitbox = enemy.getHitbox(state);
@@ -187,6 +188,7 @@ enemyDefinitions.beetleWingedFrost = {
             tellDuration: 0,
             persistDuration: 200,
             radius: 40,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, blast);
     }
@@ -203,7 +205,7 @@ enemyDefinitions.beetleWingedStorm = {
         shieldColor: 'yellow',
     },
     immunities: ['lightning'],
-    touchHit: {damage: 1, element: 'lightning'},
+    touchHit: {damage: 1, element: 'lightning', source: null},
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         renderShield(context, enemy.getHitbox(), enemy.shielded, enemy.params.shieldColor);

@@ -47,7 +47,7 @@ enemyDefinitions.luckyBeetle = {
     naturalDifficultyRating: 1,
     animations: goldenBeetleAnimations,
     speed: 1,
-    life: 1, touchHit: { damage: 1},
+    life: 1, touchHit: { damage: 1, source: null},
     isImmortal: true,
     params: {hits: 0, duration: 20000, switch: false},
     tileBehaviors: {brightness: 0.6, lightRadius: 32},

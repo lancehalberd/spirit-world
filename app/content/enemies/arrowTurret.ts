@@ -110,6 +110,7 @@ function getArrows(state: GameState, enemy: Enemy<TurretParams>): EnemyArrow[] {
             y: hitbox.y + hitbox.h / 2 + hitbox.h * dy,
             vx: 4 * dx,
             vy: 4 * dy,
+            source: enemy,
         });
         // Manual adjustments to certain arrow positions to line up with the animation better.
         if (enemy.params.isDiagonal) {

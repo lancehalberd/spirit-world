@@ -182,7 +182,7 @@ const stormHeart: EnemyDefinition<CloudParams> = {
     naturalDifficultyRating: 20,
     // The storm heart is smaller than other hearts, but takes up a lot of space with its cloud barrier.
     animations: stormHeartAnimations, life: 60, scale: 2,
-    tileBehaviors: { solid: true, touchHit: {damage: 0, canAlwaysKnockback: true  }},
+    tileBehaviors: { solid: true, touchHit: {damage: 0, canAlwaysKnockback: true, source: null}},
     hasShadow: false,
     update: updateStormHeart,
     params: {
@@ -315,6 +315,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                     y: hitbox.y + hitbox.h / 2,
                     tellDuration: 3000,
                     radius: 128,
+                    boundSource: enemy,
                     source: enemy,
                 });
                 addEffectToArea(state, enemy.area, discharge);
@@ -331,6 +332,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                         shockWaveTheta: enemy.params.theta,
+                        source: enemy,
                     });
                     addEffectToArea(state, enemy.area, lightningBolt);
                 } else {
@@ -370,6 +372,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                     x: hitbox.x + hitbox.w / 2 + 64 * Math.cos(theta),
                     y: hitbox.y + hitbox.h / 2 + 64 * Math.sin(theta),
                     shockWaveTheta: enemy.params.theta,
+                    source: enemy,
                 });
                 addEffectToArea(state, enemy.area, lightningBolt);
             }
@@ -437,6 +440,7 @@ const sparkAbility: EnemyAbility<NearbyTargetType> = {
             damage: 2,
             maxSpeed: 5,
             ttl: 4000,
+            source: enemy,
             //delay: 400,
         });
         /*for (let i = 0; i < sparkCount; i++) {
@@ -517,7 +521,7 @@ enemyDefinitions.stormBeast = {
     aggroRadius: 2000,
     abilities: [sparkAbility, stormBeastLightningAbility, stormBeastChargedLightningAbility],
     acceleration: 0.3, speed: 4,
-    touchHit: { damage: 4, element: 'lightning'},
+    touchHit: { damage: 4, element: 'lightning', source: null},
     immunities: ['lightning'],
     elementalMultipliers: {'ice': 1.5, 'fire': 1.5},
     initialMode: 'hidden',
@@ -644,6 +648,7 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
             damage: 4,
             element: 'lightning',
             hitAllies: true,
+            source: enemy,
         });
     } else {
         enemy.speed = 4;
@@ -830,6 +835,7 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
                 hitCircle: {
                     x: 0, y: 0, r: 8
                 },
+                source: enemy,
             });
             addEffectToArea(state, enemy.area, spark);
         }

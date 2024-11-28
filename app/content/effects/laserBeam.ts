@@ -48,6 +48,7 @@ interface Props {
     ignoreWalls?: boolean
     damage?: number
     delay?: number
+    source: Actor
 }
 
 const FADE_DURATION = 100;
@@ -77,7 +78,8 @@ export class LaserBeam implements EffectInstance, Props {
     animationTime = 0;
     done = false;
     memoizedHitRay: Ray;
-    constructor({sx, sy, tx, ty, damage = 2, delay = 0, duration = 200, ignoreWalls = false, tellDuration = 0, radius = 6}: Props) {
+    source: Actor;
+    constructor({sx, sy, tx, ty, damage = 2, delay = 0, duration = 200, ignoreWalls = false, tellDuration = 0, radius = 6, source}: Props) {
         this.sx = sx | 0;
         this.sy = sy | 0;
         this.tx = tx | 0;
@@ -89,6 +91,7 @@ export class LaserBeam implements EffectInstance, Props {
         this.tellDuration = tellDuration;
         this.ignoreWalls = ignoreWalls;
         this.damage = damage;
+        this.source = source;
     }
     getHitRay(state: GameState): Ray {
         if (this.memoizedHitRay) {
@@ -124,6 +127,7 @@ export class LaserBeam implements EffectInstance, Props {
                 hitRay: this.getHitRay(state),
                 hitAllies: true,
                 knockAwayFromHit: true,
+                source: this.source,
             });
         }
         if (this.animationTime >= this.duration + FADE_DURATION) {

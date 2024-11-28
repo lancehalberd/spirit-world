@@ -81,6 +81,7 @@ export class BarrierBurstEffect implements EffectInstance {
                     hitObjects: true,
                     hitTiles: true,
                     element: this.element,
+                    source: this.source,
                 });
             }
             hitTargets(state, this.area, {
@@ -93,6 +94,7 @@ export class BarrierBurstEffect implements EffectInstance {
                 hitObjects: true,
                 hitTiles: true,
                 element: this.element,
+                source: this.source,
             });
             let theta = 2 * Math.PI * Math.random();
             for (let i = 0; i < 4; i++) {
@@ -114,6 +116,7 @@ export class BarrierBurstEffect implements EffectInstance {
                 hitObjects: true,
                 hitTiles: true,
                 element: this.element,
+                source: this.source,
             });
             if (this.element !== 'lightning') {
                 let theta = 2 * Math.PI * Math.random();

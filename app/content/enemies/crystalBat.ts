@@ -19,7 +19,7 @@ enemyDefinitions.crystalBat = {
     animations: crystalBatAnimations,
     flipLeft: true,
     speed: 1, flying: true,
-    life: 4, touchHit: { damage: 1},
+    life: 4, touchHit: { damage: 1, source: null},
     lootTable: moneyLootTable,
     initialMode: 'chooseDirection',
     elementalMultipliers: {'lightning': 2},

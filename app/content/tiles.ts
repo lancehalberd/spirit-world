@@ -46,6 +46,7 @@ import {
 } from 'app/content/tiles/cavePits';
 import { allCrystalCavePitTileSources, crystalCaveWallToPitTileSources } from 'app/content/tiles/crystalCavePits';
 import {allCrystalCaveTileSources, crystalTransparentFloor} from 'app/content/tiles/crystalCaveTiles';
+import {allCrystalSpikeTiles} from 'app/content/tiles/crystalSpikes';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
@@ -54,6 +55,7 @@ import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
 import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
+import {allVanaraPitTileSources} from 'app/content/tiles/vanaraPits';
 import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
@@ -1133,6 +1135,7 @@ addTiles([
             damage: 1, spiritCloakDamage: 5, 
             hitAllies: true,
             hitEnemies: true,
+            source: null,
         },
     }),
     singleTileSource('gfx/tiles/cavePits.png', pitBehavior, 16, 48),
@@ -1152,7 +1155,7 @@ addTiles([
     },
     singleTileSource('gfx/tiles/bush.png', null, 16),
     singleTileSource('gfx/tiles/thorns.png', null, 16),
-    singleTileSource('gfx/tiles/thornsspirit.png', { touchHit: {damage: 1, spiritCloakDamage: 2, isGroundHit: true }, defaultLayer: 'field' }),
+    singleTileSource('gfx/tiles/thornsspirit.png', { touchHit: {damage: 1, spiritCloakDamage: 2, isGroundHit: true, source: null }, defaultLayer: 'field' }),
     breakableFloor,
     deletedTiles(2),
     // This is the 'Abyss' tile for the southern edge of walls, it uses bitmap bottom so the player can
@@ -1270,6 +1273,8 @@ addTiles([
     ...allFuturisticTileSources,
     ...crystalCaveWallToPitTileSources,
     caveLedgeCorners2,
+    ...allCrystalSpikeTiles,
+    ...allVanaraPitTileSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

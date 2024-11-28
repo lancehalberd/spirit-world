@@ -133,6 +133,7 @@ export class Torch implements ObjectInstance {
                 r: 36,
             },
             hitTiles: true,
+            source: null,
         });
         this.appliedFireToTiles = true;
     }

@@ -86,19 +86,19 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
 enemyDefinitions.elementalFlame = {
     ...baseElementalDefinition,
     naturalDifficultyRating: 3,
-    animations: {idle: omniAnimation(elementalFlameAnimation)}, life: 1, touchHit: {element: 'fire', damage: 1}, update: paceRandomlyAndPossess,
+    animations: {idle: omniAnimation(elementalFlameAnimation)}, life: 1, touchHit: {element: 'fire', damage: 1, source: null}, update: paceRandomlyAndPossess,
     immunities: ['fire', null],
 };
 enemyDefinitions.elementalFrost = {
     ...baseElementalDefinition,
     naturalDifficultyRating: 3,
-    animations: {idle: omniAnimation(elementalFrostAnimation)}, life: 1, touchHit: {element: 'ice', damage: 1}, update: paceRandomlyAndPossess,
+    animations: {idle: omniAnimation(elementalFrostAnimation)}, life: 1, touchHit: {element: 'ice', damage: 1, source: null}, update: paceRandomlyAndPossess,
     immunities: ['ice', null],
 };
 enemyDefinitions.elementalStorm = {
     ...baseElementalDefinition,
     naturalDifficultyRating: 3,
-    animations: {idle: omniAnimation(elementalStormAnimation)}, life: 1, touchHit: {element: 'lightning', damage: 1}, update: paceRandomlyAndPossess,
+    animations: {idle: omniAnimation(elementalStormAnimation)}, life: 1, touchHit: {element: 'lightning', damage: 1, source: null}, update: paceRandomlyAndPossess,
     immunities: ['lightning', null],
 };
 

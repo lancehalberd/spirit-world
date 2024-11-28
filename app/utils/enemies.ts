@@ -138,6 +138,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
                 crushingPower,
                 hitbox: enemy.getMovementHitbox(),
                 hitTiles: true,
+                source: enemy,
             });
         }
     }

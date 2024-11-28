@@ -80,9 +80,9 @@ export function cleanupHeroFromArea(state: GameState): void {
 
 export const BG_FRAME_DURATION = 160, BG_FRAME_COUNT = 6;
 export function getBackgroundFrame(state: GameState, areaInstance: AreaInstance): AreaFrame {
-    const frame = Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT;
+    const frame = editingState.isEditing ? 0 : (Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT);
     return areaInstance.backgroundFrames[frame];
 }
 export function getBackgroundFrameIndex(state: GameState, areaInstance: AreaInstance): number {
-    return Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT;
+    return editingState.isEditing ? 0 : (Math.floor(state.fieldTime / BG_FRAME_DURATION) % BG_FRAME_COUNT);
 }

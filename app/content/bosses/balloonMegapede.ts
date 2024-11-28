@@ -29,6 +29,7 @@ const spikeProjectileAbility: EnemyAbility<NearbyTargetType> = {
             damage: 2,
             vx: 4 * dx,
             vy: 4 * dy,
+            source: enemy,
         });
     },
     cooldown: 4000,
@@ -79,6 +80,7 @@ enemyDefinitions.balloonMegapede = {
                 damage: 2,
                 vx: 2 * dx,
                 vy: 2 * dy,
+                source: enemy,
             });
         }
     },

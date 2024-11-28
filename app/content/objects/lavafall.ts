@@ -12,6 +12,7 @@ export class Lavafall implements ObjectInstance {
         touchHit: {
             element: 'fire',
             damage: 4,
+            source: null,
         },
     };
     drawPriority: DrawPriority = 'background';

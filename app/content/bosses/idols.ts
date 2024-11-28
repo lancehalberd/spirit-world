@@ -69,6 +69,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
             x: state.hero.x + state.hero.w / 2,
             y: state.hero.y + state.hero.h / 2,
             shockWaveTheta: enemy.params.theta,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, lightningBolt);
     })
@@ -78,6 +79,7 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, flameWall);
     });
@@ -88,7 +90,7 @@ function updateFrostIdol(state: GameState, enemy: Enemy): void {
         throwIceGrenadeAtLocation(state, enemy, {
             tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(enemy.params.theta),
             ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta),
-        });
+        }, {source: enemy});
     })
 }
 

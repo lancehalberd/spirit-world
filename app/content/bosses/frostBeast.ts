@@ -85,7 +85,7 @@ enemyDefinitions.frostHeart = {
             enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + hit.damage);
             //console.log('healed shield', enemy.params.shieldLife);
             enemy.blockInvulnerableFrames = 50;
-            enemy.makeSound(state, 'blocked');
+            enemy.playBlockSound(state);
             return { hit: true };
         }
         if (enemy.area.underwater) {
@@ -108,7 +108,29 @@ enemyDefinitions.frostBeast = {
     params: {
         submerged: true,
     },
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        if (isFrostBeastHidden(enemy)) {
+            return {};
+        }
+        return enemy.defaultOnHit(state, hit);
+    },
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (isFrostBeastHidden(enemy)) {
+            return;
+        }
+        enemy.defaultRender(context, state);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (isFrostBeastHidden(enemy)) {
+            return;
+        }
+        enemy.defaultRenderShadow(context, state);
+    }
 };
+
+function isFrostBeastHidden(enemy: Enemy) {
+    return (enemy.area?.underwater && !enemy.params.submerged) || (!enemy.area?.underwater && enemy.params.submerged);
+}
 
 function getFrostHeart(this: void, state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostHeart') as Enemy;
@@ -166,7 +188,7 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
                     throwIceGrenadeAtLocation(state, enemy, {
                         tx: hitbox.x + hitbox.w / 2 + 2.5 * 16 * p * Math.cos(theta),
                         ty: hitbox.y + hitbox.h / 2 + 2.5 * 16 * p * Math.sin(theta),
-                    }, 2);
+                    }, {damage: 2, source: enemy});
                 }
                 enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + 1);
             }
@@ -175,7 +197,7 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
             throwIceGrenadeAtLocation(state, enemy, {
                 tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
                 ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
-            }, 2);
+            }, {damage: 2, source: enemy});
             enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + 1);
         }
         return;
@@ -202,7 +224,7 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
             throwIceGrenadeAtLocation(state, enemy, {
                 tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
                 ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
-            }, 2);
+            }, {damage: 2, source: enemy});
         }
         if (enemy.params.chargeLevel >= 4000 + 500 * enemy.params.enrageLevel) {
             enemy.params.chargeLevel = 0;
@@ -237,21 +259,12 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
         enemy.life = surfaceSerpent.life;
         surfaceSerpent.params.active = false;
         surfaceSerpent.params.submerged = false;
-        surfaceSerpent.status = 'hidden';
         enemy.params.submerged = false;
     } else if (enemy === surfaceSerpent && underwaterSerpent?.params?.active) {
         enemy.life = underwaterSerpent.life;
         underwaterSerpent.params.active = false;
         underwaterSerpent.params.submerged = true;
-        underwaterSerpent.status = 'hidden';
         enemy.params.submerged = true;
-    }
-    const isHidden = (enemy.area.underwater && !enemy.params.submerged)
-        || (!enemy.area.underwater && enemy.params.submerged);
-    if (enemy.status === 'hidden' && !isHidden) {
-        enemy.status = 'normal';
-    } else if (enemy.status === 'normal' && isHidden) {
-        enemy.status = 'hidden';
     }
     enemy.params.active = true;
     const heart = getFrostHeart(state, enemy.area);
@@ -260,6 +273,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
     enemy.isImmortal = !isEnraged;
     if (!isEnraged) {
         if (enemy.mode === 'regenerate') {
+            enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
             if (enemy.modeTime % 500 === 0) {
                 enemy.life += 0.5;
                 if (enemy.area.underwater) {
@@ -268,8 +282,6 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
             }
             if (enemy.life >= enemy.enemyDefinition.life) {
                 enemy.setMode('swimming');
-            } else {
-                enemy.status = 'hidden';
             }
             return;
         }
@@ -285,6 +297,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
             addEffectToArea(state, enemy.area, deathAnimation);
             enemy.setMode('regenerate');
             enemy.params.submerged = true;
+            enemy.burnDamage = 0;
             return;
         }
     }
@@ -314,9 +327,10 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
         }
         // Underwater behavior (not enraged only)
         if (enemy.mode === 'guard') {
-            enemy.d = getCardinalDirection(Math.cos(theta), Math.sin(theta));
             enemy.params.attackTheta = theta;
-            moveEnemyToTargetLocation(state, enemy, targetX, targetY, 'idle');
+            moveEnemyToTargetLocation(state, enemy, targetX, targetY);
+            enemy.d = getCardinalDirection(Math.cos(theta), Math.sin(theta));
+            enemy.changeToAnimation('idle')
             if (enemy.modeTime >= 2000) {
                 enemy.setMode('prepare');
             }
@@ -354,6 +368,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
                     r: 36,
                 },
                 hitTiles: true,
+                source: enemy,
             });
             return;
         }
@@ -435,6 +450,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
                     r: 36,
                 },
                 hitTiles: true,
+                source: enemy,
             });
         }
         return;
@@ -523,6 +539,7 @@ export function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, 
         vy: speed * Math.sin(attackTheta),
         hitEnemies,
         ignoreTargets: new Set([enemy]),
+        source: enemy,
     });
     addEffectToArea(state, enemy.area, frost);
 }

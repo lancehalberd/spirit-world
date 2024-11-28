@@ -27,6 +27,7 @@ export const laserBeamAbility: EnemyAbility<Point> = {
             sx: cx, sy: cy,
             tx: target.x, ty: target.y,
             radius: 5, damage: 4, duration: 200, tellDuration: 800,
+            source: enemy,
         }));
     },
     cooldown: 3000,

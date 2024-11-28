@@ -409,7 +409,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             removeAllClones(state);
         }*/
         if (state.hero.magic <= -2 && isHoldingBreath) {
-            hero.onHit(state, {damage: 1});
+            hero.onHit(state, {damage: 1, source: null});
         }
     }
     if (state.hero.magic > state.hero.maxMagic) {
@@ -457,6 +457,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
             }
             const hitResult = hero.onHit(state, {
                 ...touchHit,
+                source: enemy,
                 knockback: {
                     // vx: - 4 * directionMap[hero.d][0],
                     // vy: - 4 * directionMap[hero.d][1],

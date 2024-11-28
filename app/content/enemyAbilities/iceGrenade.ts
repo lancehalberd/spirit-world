@@ -14,7 +14,7 @@ export const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('attack');
         const hitbox = target.target.getHitbox();
-        throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2}, 1, 20);
+        throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2}, {damage: 1, z: 20, source: enemy});
     },
     cooldown: 3000,
     initialCooldown: 1000,

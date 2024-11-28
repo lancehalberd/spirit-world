@@ -93,6 +93,7 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
             ignoreWalls: true,
             tellDuration: 1500,
             duration: 2000,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, laser);
     },
@@ -107,7 +108,7 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
 const LASER_BARRAGE_RADIUS = 16;
 const LASER_SPOTS = [0, 1, 2, 3]
 
-function addLaserBarrageToArea(state: GameState, count: number) {
+function addLaserBarrageToArea(state: GameState, enemy: Enemy, count: number) {
     let spots: number[] = [];
     for (let i = 0; i < count; i++) {
         if (!spots.length) {
@@ -123,6 +124,7 @@ function addLaserBarrageToArea(state: GameState, count: number) {
                 tellDuration: 600,
                 duration: 600,
                 delay: 500 * i,
+                source: enemy,
             });
             addEffectToArea(state, state.hero.area, laser);
         }
@@ -138,6 +140,7 @@ function addLaserWarningToArea(state: GameState) {
             tellDuration: 300,
             duration: 0,
             delay: x,
+            source: null,
         });
         addEffectToArea(state, state.hero.area, laser);
     }
@@ -164,6 +167,7 @@ const flameWallAbility: EnemyAbility<NearbyTargetType> = {
         enemy.params.flameWallRotation = (enemy.params.flameWallRotation ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.flameWallRotation),
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, flameWall);
     },
@@ -222,6 +226,7 @@ const dischargeAbility: EnemyAbility<NearbyTargetType> = {
             damage: 4,
             tellDuration: 3000,
             radius: 128,
+            boundSource: enemy,
             source: enemy,
         });
         addEffectToArea(state, enemy.area, discharge);
@@ -238,7 +243,7 @@ function useSpinningSparkAttack(state: GameState, enemy: Enemy): void {
     if (enemy.modeTime % 400 === 0) {
         enemy.params.sparkTheta = (enemy.params.sparkTheta || 0) + Math.PI / 24;
         const hitbox = enemy.getHitbox();
-        addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, {damage: 4});
+        addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, {damage: 4, source: enemy});
     }
 }
 
@@ -349,7 +354,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     }
     if (enemy.params.enrageTime > 0) {
         if (enemy.modeTime === 2000) {
-            addLaserBarrageToArea(state, enemy.params.enrageLevel * 10);
+            addLaserBarrageToArea(state, enemy, enemy.params.enrageLevel * 10);
         }
         enemy.params.enrageTime -= FRAME_LENGTH;
         enemy.enemyInvulnerableFrames = 20;
@@ -578,7 +583,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 // We could increase the spark count for a more difficult version of the boss.
                 3, // + (golem?.params.enrageLevel || 0),
-                Math.PI / 2, Math.PI / 3, 20, {maxSpeed: 5, delay: 200}
+                Math.PI / 2, Math.PI / 3, 20, {maxSpeed: 5, delay: 200, source: enemy}
             );
             enemy.params.stunTime = 500;
             enemy.setMode('slammed');
@@ -596,7 +601,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
             addRadialShockWaves(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
-                6, Math.PI / 6, 20, {maxSpeed: 5, delay: 200}
+                6, Math.PI / 6, 20, {maxSpeed: 5, delay: 200, source: enemy}
             );
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');

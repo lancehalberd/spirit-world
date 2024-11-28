@@ -72,6 +72,7 @@ export class SpikeBall implements ObjectInstance {
             hitAllies: true,
             element: 'ice',
             zRange: [this.z, this.z + 16],
+            source: null,
         });
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

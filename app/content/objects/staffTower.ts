@@ -152,6 +152,7 @@ export class StaffTower implements ObjectInstance {
                     damage: 100,
                     hitbox: this.getHitbox(),
                     hitEnemies: true,
+                    source: null,
                 });
             }
         } else if (this.specialStatus === 'collapsing') {

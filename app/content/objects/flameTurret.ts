@@ -70,6 +70,7 @@ export class FlameTurret implements ObjectInstance {
                     vy: 2.5 * dy,
                     ttl: Math.min(800, 100 + this.animationTime),
                     damage: 2,
+                    source: null
                 });
                 addEffectToArea(state, this.area, flame);
             }

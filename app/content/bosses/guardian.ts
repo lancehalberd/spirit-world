@@ -74,6 +74,7 @@ const blastAbility: EnemyAbility<true> = {
             tellDuration: 800,
             persistDuration: 400,
             radius: 80,
+            boundSource: enemy,
             source: enemy,
         });
         enemy.params.blast = blast;
@@ -103,6 +104,7 @@ const mediumBlastAbility: EnemyAbility<true> = {
             tellDuration: 800,
             persistDuration: 2600,
             radius: 48,
+            boundSource: enemy,
             source: enemy,
         });
         enemy.params.blast = blast;
@@ -350,6 +352,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             vy: 4 * dy,
             damage: 1,
             hitCircle: {x: 0, y: 0, r: 10},
+            source: enemy,
         })
         addEffectToArea(state, enemy.area, spark);
     } else if (enemy.params.element === 'ice') {
@@ -359,6 +362,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             vy: 2 * dy,
             damage: 1,
             ttl: 1500,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, frost);
     } else if (enemy.params.element === 'fire') {
@@ -367,6 +371,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             vx: 3 * dx,
             vy: 3 * dy,
             damage: 1,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, flame);
     } else {
@@ -375,6 +380,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             vx: 3 * dx,
             vy: 3 * dy,
             damage: 1,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, crystalSpike);
     }
@@ -551,6 +557,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                     damage: 1,
                     ttl: 8000,
                     hitCircle: {x: 0, y: 0, r: 24},
+                    source: enemy,
                 })
                 addEffectToArea(state, enemy.area, spark);
             }
@@ -575,6 +582,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                             element: 'ice',
                             tellDuration: 500,
                         },
+                        source: enemy,
                     });
                 }
             }
@@ -591,6 +599,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                     damage: 1,
                     scale: 2,
                     ttl: 7000,
+                    source: enemy,
                 })
                 addEffectToArea(state, enemy.area, flame);
             }
@@ -606,6 +615,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                     x: tx,
                     y: ty,
                     damage: 1,
+                    source: enemy,
                 });
                 addEffectToArea(state, enemy.area, thorns);
             }

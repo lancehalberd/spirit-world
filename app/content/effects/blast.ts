@@ -14,7 +14,10 @@ export interface BlastProps {
     element?: MagicElement
     radius?: number
     minRadius?: number
-    source?: Enemy
+    // This can be set to make this blast follow a source.
+    boundSource?: Enemy
+    // This source just tracks which enemy created the blast.
+    source: Actor
     tellDuration?: number
     expansionDuration?: number
     persistDuration?: number
@@ -31,8 +34,9 @@ export class Blast implements EffectInstance {
     element: MagicElement = this.props.element ?? null;
     radius: number = this.props.radius ?? 32;
     minRadius: number = this.props.minRadius ?? 4;
-    source: Enemy = this.props.source;
-    hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.source]);
+    boundSource: Enemy = this.props.boundSource;
+    source: Actor = this.props.source;
+    hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.boundSource, this.source]);
     tellDuration: number = this.props.tellDuration ?? 1000;
     expansionDuration: number = this.props.expansionDuration ?? 140;
     persistDuration: number = this.props.persistDuration ?? 60;
@@ -40,14 +44,14 @@ export class Blast implements EffectInstance {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         // If this effect has an enemy as a source, remove it if the source disappears during the tell duration.
-        if (this.animationTime < this.tellDuration && this.source) {
-            if (this.area !== this.source.area || this.source.status === 'gone' || !this.area.objects.includes(this.source)) {
+        if (this.animationTime < this.tellDuration && this.boundSource) {
+            if (this.area !== this.boundSource.area || this.boundSource.status === 'gone' || !this.area.objects.includes(this.boundSource)) {
                 removeEffectFromArea(state, this);
                 return;
             }
         }
-        if (this.source) {
-            const enemyHitbox = this.source.getHitbox(state);
+        if (this.boundSource) {
+            const enemyHitbox = this.boundSource.getHitbox(state);
             this.x = enemyHitbox.x + enemyHitbox.w / 2;
             this.y = enemyHitbox.y + enemyHitbox.h / 2;
         }
@@ -63,6 +67,7 @@ export class Blast implements EffectInstance {
                 hitEnemies: true,
                 ignoreTargets: this.hitTargets,
                 knockAwayFromHit: true,
+                source: this.source,
             });
             this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
             // Lightning effects will be rendered as part of the render function.

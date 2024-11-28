@@ -117,3 +117,11 @@ interface EnemyDefinition<Params> {
     getTouchHitbox?: (enemy: Enemy<Params>) => Rect
     getYDepth?: (enemy: Enemy<Params>) => number
 }
+
+// Stats for experiment tracking how much damage each enemy type does to a player.
+interface EnemyDamageTrackingStats {
+    damageDealtByEnemy: number
+    burningDamageDealtByEnemy: number
+    damageDealtToEnemy: number
+    numberDefeated: number
+}

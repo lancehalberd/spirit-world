@@ -16,6 +16,7 @@ import { drawFrame, getFrame } from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
+import {trackEnemyTookDamage} from 'app/utils/enemyDamageTracking';
 import { breakBrittleTilesInRect } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
@@ -28,6 +29,7 @@ interface EnemyAbilityWithCharges {
     cooldown: number
     charges: number
 }
+
 
 export class Enemy<Params=any> implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
@@ -122,6 +124,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.animations = this.enemyDefinition.animations;
         this.behaviors = {
             ...(this.enemyDefinition.tileBehaviors || {}),
+            // Attribute touch hits to this enemy.
+            touchHit: this.enemyDefinition.tileBehaviors?.touchHit ? {
+                source: this,
+                ...this.enemyDefinition.tileBehaviors.touchHit,
+            } : undefined,
         };
         this.d = definition.d || 'down';
         this.hasShadow = this.enemyDefinition.hasShadow ?? true;
@@ -436,6 +443,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return;
         }
         damage *= gameModifiers.globalDamageDealt;
+        trackEnemyTookDamage(this, damage);
         this.life = Math.max(0, this.life - damage);
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;

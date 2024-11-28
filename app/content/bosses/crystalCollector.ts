@@ -252,6 +252,7 @@ function summonSpikeUnderPlayer(this: void, state: GameState, enemy: Enemy): voi
             x: targetHitbox.x + targetHitbox.w / 2,
             y: targetHitbox.y + targetHitbox.h / 2,
             damage: 4,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, spike);
     }
@@ -264,6 +265,7 @@ function summonSpikeAheadOfPlayer(this: void, state: GameState, enemy: Enemy): v
             x: targetHitbox.x + targetHitbox.w / 2,
             y: targetHitbox.y + targetHitbox.h / 2,
             damage: 4,
+            source: enemy,
         });
         if (target.vx < 0) {
             spike.x += Random.element([-16, -32]);
@@ -311,6 +313,7 @@ const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
                 y,
                 damage: 4,
                 delay: 260 * i,
+                source: enemy,
             });
             addEffectToArea(state, enemy.area, spike);
         }
@@ -328,6 +331,7 @@ const summonLineOfSpikes = (state: GameState, enemy: Enemy) => {
         state, area: enemy.area,
         source: [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
         target: [targetHitbox.x + targetHitbox.w / 2, targetHitbox.y + targetHitbox.h / 2],
+        spikeProps: {source: enemy},
     });
 }
 
@@ -422,7 +426,8 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             hitbox: getShieldHitbox(enemy),
             knockback: {
                 vx: 0, vy: 4, vz: 2
-            }
+            },
+            source: enemy,
         });
     }
 
@@ -539,6 +544,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                 x: enemy.x + enemy.w / 2 - (32 + 16 * enrageLevel) + Math.random() * (64 + 32 * enrageLevel),
                 y: enemy.y + enemy.h + 48 + Math.random() * (16 + 16 * enrageLevel),
                 damage: 2,
+                source: enemy,
             }));
         }
         if (enemy.modeTime >= 1000) {

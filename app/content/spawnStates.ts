@@ -1,126 +1,62 @@
 import * as spawnLocations from 'app/content/spawnLocations';
+import {SPAWN_LOCATION_GAUNTLET, gauntletStartingState} from 'app/generator/delveGauntlet';
 import { getDefaultSavedState } from 'app/savedState'
-import { cloneDeep } from 'app/utils/index';
-
-const weaponUpgradeKeys: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
-
-function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
-    const newState: SavedState = cloneDeep(savedState);
-    for (const flag of objectFlags) {
-        newState.objectFlags[flag] = true;
-    }
-    for (let key in items) {
-        if (key === 'maxLife') {
-            newState.savedHeroData.maxLife += items[key];
-            continue;
-        }
-        if (key === 'secondChance') {
-            newState.savedHeroData.hasRevive = true;
-            continue;
-        }
-        if (key === 'money') {
-            newState.savedHeroData.money += items[key];
-            continue;
-        }
-        if (key === 'silverOre') {
-            newState.savedHeroData.silverOre += items[key];
-            continue;
-        }
-        if (key === 'goldOre') {
-            newState.savedHeroData.goldOre += items[key];
-            continue;
-        }
-        if (key === 'weapon') {
-            newState.savedHeroData.weapon = items[key];
-            continue;
-        }
-        if (weaponUpgradeKeys.includes(key as WeaponUpgrades)) {
-            newState.savedHeroData.weaponUpgrades[key as WeaponUpgrades] = true;
-            continue;
-        }
-        if (key.indexOf(':') >= 0) {
-            const [zoneKey, item] = key.split(':');
-            newState.dungeonInventories[zoneKey] = {
-                ...newState.dungeonInventories[zoneKey],
-                [item]: items[key],
-            };
-            continue;
-        }
-        if (typeof newState.savedHeroData.activeTools[key as ActiveTool] !== 'undefined') {
-            newState.savedHeroData.activeTools[key as ActiveTool] = items[key];
-            continue;
-        }
-        if (typeof newState.savedHeroData.elements[key as MagicElement] !== 'undefined') {
-            newState.savedHeroData.elements[key as MagicElement] = items[key];
-            continue;
-        }
-        if (typeof newState.savedHeroData.equipment[key as Equipment] !== 'undefined') {
-            newState.savedHeroData.equipment[key as Equipment] = items[key];
-            continue;
-        }
-        if (typeof newState.savedHeroData.passiveTools[key as PassiveTool] !== 'undefined') {
-            newState.savedHeroData.passiveTools[key as PassiveTool] = items[key];
-            continue;
-        }
-        console.log('Could not find key', key, items[key]);
-    }
-    return newState;
-}
+import {applyItemsToSavedState} from 'app/utils/applyItemsToSavedState'
 
 const defaultSavedState = getDefaultSavedState();
-const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50, secondChance: 1},
+const peachBossState = applyItemsToSavedState(defaultSavedState, {weapon: 1, money: 50, secondChance: 1},
     ['peachCaveWeapon', 'peachCaveSprout1', 'peachCaveSprout2']
 );
-const peachBossDefeatedState = applyItems(peachBossState, {},
+const peachBossDefeatedState = applyItemsToSavedState(peachBossState, {},
     ['peachCaveBoss']
 );
-const peachCaveExitState = applyItems(peachBossDefeatedState, {maxLife: 1, catEyes: 1},
+const peachCaveExitState = applyItemsToSavedState(peachBossDefeatedState, {maxLife: 1, catEyes: 1},
     ['peachCaveTree', 'peachCave:fullPeach', 'homeInstructions']
 );
-const tombRivalStateStory = applyItems(peachCaveExitState, {bow: 1},
+const tombRivalStateStory = applyItemsToSavedState(peachCaveExitState, {bow: 1},
     ['momElder', 'treeVillageBow', 'closedBowDoor', 'elderTomb']
 );
 tombRivalStateStory.savedHeroData.leftTool = 'bow';
-const tombRivalStateBoss = applyItems(tombRivalStateStory, {}, ['tombRivalEnraged', 'tombRivalFightStarted', 'skipRivalTombStory']);
-const tombRivalDefeatState = applyItems(tombRivalStateStory, {}, ['tombRivalEnraged', 'tombRivalFightStarted']);
+const tombRivalStateBoss = applyItemsToSavedState(tombRivalStateStory, {}, ['tombRivalEnraged', 'tombRivalFightStarted', 'skipRivalTombStory']);
+const tombRivalDefeatState = applyItemsToSavedState(tombRivalStateStory, {}, ['tombRivalEnraged', 'tombRivalFightStarted']);
 tombRivalDefeatState.savedHeroData.life = 0.25;
-const tombStartState = applyItems(tombRivalStateStory, {},
+const tombStartState = applyItemsToSavedState(tombRivalStateStory, {},
     ['tombEntrance', 'enteredTomb']
 );
-const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, 'tomb:map': 1, silverOre: 1},
+const tombBossState = applyItemsToSavedState(tombStartState, {roll: 1, 'tomb:bigKey': 1, 'tomb:map': 1, silverOre: 1},
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tombRoll']
 );
-const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
+const warTempleStart = applyItemsToSavedState(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'tombTeleporter', 'momRuins', 'warTempleEntrance']);
-const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
-const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1, normalRange: 1},
+const warTempleBoss = applyItemsToSavedState(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
+const cocoonStartState = applyItemsToSavedState(warTempleBoss, {maxLife: 1, astralProjection: 1, normalRange: 1},
     ['warTempleBoss', 'tombExit']);
-const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
+const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
-const helixRivalStateStory = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
+const helixRivalStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter']);
-const helixRivalStateBoss = applyItems(helixRivalStateStory, {}, ['skipRivalHelixStory']);
-const helixStartState = applyItems(helixRivalStateStory, {},
+const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
+const helixStartState = applyItemsToSavedState(helixRivalStateStory, {},
     ['helixRivalBoss']);
-const helixEndState = applyItems(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
+const helixEndState = applyItemsToSavedState(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
     ['elementalBeastsEscaped', 'vanaraCommanderBeasts']);
-const forestStartState = applyItems(helixEndState, {}, ['spiritKingForestTemple']);
-const forestBossState = applyItems(forestStartState, {cloudBoots: 1, 'forestTemple:bigKey': 1},
+const forestStartState = applyItemsToSavedState(helixEndState, {}, ['spiritKingForestTemple']);
+const forestBossState = applyItemsToSavedState(forestStartState, {cloudBoots: 1, 'forestTemple:bigKey': 1},
     ['spiritKingForestTemple']);
-const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
+const waterfallBossState = applyItemsToSavedState(helixEndState, {ironBoots: 1});
 
-const gauntletStartState = applyItems(helixEndState, {
+const gauntletStartState = applyItemsToSavedState(helixEndState, {
     clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2
 }, []);
 
-const skyPalaceStartState = applyItems(helixEndState, {
+const skyPalaceStartState = applyItemsToSavedState(helixEndState, {
     maxLife: 3,
     clone: 1, cloudBoots: 1,
     ironBoots: 1, cloak: 2,
     gloves: 2, goldMail: 1,
 }, []);
 
-const holySanctumStartState = applyItems(helixEndState, {
+const holySanctumStartState = applyItemsToSavedState(helixEndState, {
     maxLife: 5,
     gloves: 2, goldMail: 1,
     cloudBoots: 1, clone: 1,
@@ -132,7 +68,7 @@ const holySanctumStartState = applyItems(helixEndState, {
     waterBlessing: 1, ice: 1,
 }, []);
 
-const beastState = applyItems(helixEndState, {
+const beastState = applyItemsToSavedState(helixEndState, {
     maxLife: 7,
     lightningBlessing: 1, goldOre: 2,
     cloudBoots: 1, clone: 1,
@@ -144,40 +80,40 @@ const beastState = applyItems(helixEndState, {
     spiritDamage: 1, spiritRange: 1,
 });
 
-const riverTempleStartState = applyItems(beastState, {
+const riverTempleStartState = applyItemsToSavedState(beastState, {
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
 }, ['flameBeast', 'stormBeast']);
-const riverTempleBossState = applyItems(riverTempleStartState,
+const riverTempleBossState = applyItemsToSavedState(riverTempleStartState,
     {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
 
-const craterStartState = applyItems(beastState, {
+const craterStartState = applyItemsToSavedState(beastState, {
     staff: 2, lightning: 1,
     waterBlessing: 1, ice: 1
 }, ['frostBeast', 'stormBeast']);
-const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
+const craterBossState = applyItemsToSavedState(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
 );
 
-const staffStartState = applyItems(beastState, {
+const staffStartState = applyItemsToSavedState(beastState, {
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1
 }, ['frostBeast', 'flameBeast']);
-const staffBossState = applyItems(staffStartState, {}, [
+const staffBossState = applyItemsToSavedState(staffStartState, {}, [
     'staffTowerSpiritEntrance', 'tower2FBarrier',
     'elevatorDropped', 'elevatorFixed',
     'tower3FBarrier', 'staffTowerSkyEntrance',
 ]);
-const staffAquiredState = applyItems(staffBossState, {lightning: 1}, [
+const staffAquiredState = applyItemsToSavedState(staffBossState, {lightning: 1}, [
     'stormBeast',
     'staffTowerActivated'
 ]);
 
-const warshipStartState = applyItems(staffAquiredState, {staff: 2, phoenixCrown: 1});
+const warshipStartState = applyItemsToSavedState(staffAquiredState, {staff: 2, phoenixCrown: 1});
 
-const finalBoss1State = applyItems(warshipStartState, {clone: 2, maxLife: 5});
+const finalBoss1State = applyItemsToSavedState(warshipStartState, {clone: 2, maxLife: 5});
 
 
 export interface SpawnLocationOptions {
@@ -367,13 +303,17 @@ export const LIGHT_1_BOSS: ZoneLocation = {
     isSpiritWorld: false,
 };
 
-const light1Start = applyItems(defaultSavedState, {weapon: 1, catEyes: 1, maxLife: 1},
+const light1Start = applyItemsToSavedState(defaultSavedState, {weapon: 1, catEyes: 1, maxLife: 1},
     []
 );
-const light1Boss = applyItems(light1Start, {bow: 1, 'light1:bigKey': 1},
+const light1Boss = applyItemsToSavedState(light1Start, {bow: 1, 'light1:bigKey': 1},
     []
 );
-export const minimizerSpawnLocations: SpawnLocationOptions = {
+export const devSpawnLocations: SpawnLocationOptions = {
+    'Delve Gauntlet': {
+        location: SPAWN_LOCATION_GAUNTLET,
+        savedState: gauntletStartingState,
+    },
     'Light 1': {
         location: LIGHT_1_START,
         savedState: light1Start,

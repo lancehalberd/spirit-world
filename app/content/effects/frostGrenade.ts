@@ -9,15 +9,16 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
 
 interface Props {
-    x: number,
-    y: number,
-    z?: number,
-    damage?: number,
-    radius?: number,
-    vx: number,
-    vy: number,
-    vz?: number,
-    az?: number,
+    x: number
+    y: number
+    z?: number
+    damage?: number
+    radius?: number
+    vx: number
+    vy: number
+    vz?: number
+    az?: number
+    source: Enemy
 }
 
 export class FrostGrenade implements EffectInstance, Props {
@@ -38,7 +39,8 @@ export class FrostGrenade implements EffectInstance, Props {
     radius: number;
     animationTime = 0;
     speed = 0;
-    constructor({x, y, z = 0, vx, vy, vz = 4, az = -0.3, damage = 1, radius = 32}: Props) {
+    source: Enemy;
+    constructor({x, y, z = 0, vx, vy, vz = 4, az = -0.3, damage = 1, radius = 32, source}: Props) {
         this.radius = radius
         this.damage = damage;
         this.x = x;
@@ -48,6 +50,7 @@ export class FrostGrenade implements EffectInstance, Props {
         this.vy = vy;
         this.vz = vz;
         this.az = az;
+        this.source = source;
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -64,6 +67,7 @@ export class FrostGrenade implements EffectInstance, Props {
                 // The trajectory of the grenade gives enough warning.
                 tellDuration: 0,
                 element: 'ice',
+                source: this.source,
             });
             addEffectToArea(state, this.area, frostBlast);
             removeEffectFromArea(state, this);
@@ -99,18 +103,29 @@ export class FrostGrenade implements EffectInstance, Props {
     }
 }
 
-export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, damage = 1, z = 8): void {
+interface ThrowGrenadeProps {
+    damage?: number
+    radius?: number
+    z?: number
+    az?: number
+    source: Enemy
+}
+
+// damage = 1, z = 8,
+export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number},  props: ThrowGrenadeProps): void {
     const hitbox = enemy.getHitbox(state);
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;
     const vz = 4;
-    const az = -0.2;
+    const az = props.az ?? -0.2;
     const duration = -2 * vz / az;
     const frostGrenade = new FrostGrenade({
-        damage,
+        // Default props.
+        damage: 1,
+        z: 8,
+        ...props,
         x,
         y,
-        z,
         vx: (tx - x) / duration,
         vy: (ty - y) / duration,
         vz,

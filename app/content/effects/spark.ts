@@ -27,6 +27,7 @@ interface Props {
     target?: ObjectInstance | EffectInstance
     hybridWorlds?: boolean
     onHit?: (state: GameState, spark: Spark) => void
+    source: Actor
 }
 
 export class Spark implements EffectInstance, Props {
@@ -79,6 +80,7 @@ export class Spark implements EffectInstance, Props {
     animationTime = 0;
     ttl: number = this.props.ttl ?? 2000;
     delay = this.props.delay;
+    source = this.props.source;
     constructor(readonly props: Props) {
         this.hitCircle = this.props.hitCircle;
         this.hitRay = this.props.hitRay;
@@ -114,6 +116,7 @@ export class Spark implements EffectInstance, Props {
             cutsGround: true,
             anchorPoint: this.getAnchorPoint(),
             isHigh: false,
+            source: this.source,
             ...this.props.extraHitProps,
         }
         if (this.hitRay) {
@@ -233,10 +236,12 @@ export class Spark implements EffectInstance, Props {
     }
 }
 
+type ExtraSparkProps = Partial<Props> & {source: Actor};
+
 export function addRadialSparks(this: void,
     state: GameState, area: AreaInstance,
     [x, y]: Coords, count: number, thetaOffset = 0, speed = 4,
-    extraProps?: Partial<Props>
+    extraProps: ExtraSparkProps
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
@@ -257,7 +262,7 @@ export function addRadialSparks(this: void,
 export function addArcOfSparks(this: void,
     state: GameState, area: AreaInstance,
     [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4,
-    extraProps?: Partial<Props>
+    extraProps: ExtraSparkProps
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = count === 1

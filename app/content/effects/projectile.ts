@@ -53,21 +53,21 @@ export type ProjectileDefinition
 
 
 export function addRadialProjectiles(this: void,
-    state: GameState, area: AreaInstance, definition: ProjectileDefinition,
+    state: GameState, area: AreaInstance, source: Actor, definition: ProjectileDefinition,
     [x, y]: Coords, count: number, thetaOffset = 0,
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
         const dx = Math.cos(theta);
         const dy = Math.sin(theta);
-        shootProjectile(state, area, definition,
+        shootProjectile(state, area, definition, source,
             [x + definition.speed * dx, y + definition.speed * dy], theta
         );
     }
 }
 
 export function addArcOfProjectiles(this: void,
-    state: GameState, area: AreaInstance, definition: ProjectileDefinition,
+    state: GameState, area: AreaInstance, definition: ProjectileDefinition, source: Actor,
     [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
 ): void {
     for (let i = 0; i < count; i++) {
@@ -82,6 +82,7 @@ export function addArcOfProjectiles(this: void,
             vx: 4 * dx,
             vy: 4 * dy,
             ttl: 1000,
+            source,
         });
         addEffectToArea(state, area, spark);
     }
@@ -89,7 +90,7 @@ export function addArcOfProjectiles(this: void,
 
 export function shootProjectile(
     state: GameState, area: AreaInstance, definition: ProjectileDefinition,
-    [x, y]: Coords, theta: number
+    source: Actor, [x, y]: Coords, theta: number
 ) {
     const dx = Math.cos(theta), dy = Math.sin(theta);
     const commonProps = {
@@ -97,6 +98,7 @@ export function shootProjectile(
         vx: definition.speed * dx,
         vy: definition.speed * dy,
         damage: definition.damage,
+        source,
     }
     if (definition.type === 'spark') {
         const spark = new Spark({

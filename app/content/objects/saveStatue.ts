@@ -31,6 +31,7 @@ export class SaveStatue implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        this.status = this.definition.status;
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x + 4, y: this.y, w: 24, h: 16 };
@@ -77,6 +78,9 @@ export class SaveStatue implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         this.time += FRAME_LENGTH;
         // The statue sparkles if you haven't used it yet.
         if (this.time % 100 === 0 && !getObjectStatus(state, this.definition)) {
@@ -84,6 +88,9 @@ export class SaveStatue implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         const frame = saveStatue;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 32 });
     }

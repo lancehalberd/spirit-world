@@ -8,9 +8,10 @@ import { getVectorToNearestTargetOrRandom } from 'app/utils/target';
 
 interface Props {
     x?: number
-    y?: number,
-    damage?: number,
-    delay?: number,
+    y?: number
+    damage?: number
+    delay?: number
+    source: Actor
 }
 
 const growingAnimations = [
@@ -46,10 +47,12 @@ export class SpikePod implements EffectInstance, Props {
     animationTime = 0;
     hasBurst: boolean = false;
     isEnemyTarget: boolean = true;
-    constructor({x = 0, y = 0, damage = 2}: Props) {
+    source: Actor
+    constructor({x = 0, y = 0, damage = 2, source}: Props) {
         this.x = x - this.w / 2;
         this.y = y - this.h / 2;
         this.damage = damage;
+        this.source = source;
     }
     getHitbox(state: GameState) {
         return this;
@@ -73,7 +76,8 @@ export class SpikePod implements EffectInstance, Props {
                 damage: this.damage,
                 vx: 4 * dx,
                 vy: 4 * dy,
-                reflected
+                reflected,
+                source: this.source
             });
         }
         // Reset animation time for the fade animation.

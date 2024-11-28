@@ -26,6 +26,7 @@ specialBehaviorsHash.peachCave = {
                         damage: 1,
                         hitbox: {x: 0, y: 0, w: 256, h: 256},
                         hitTiles: true,
+                        source: null,
                     });
                 });
                 // Hero jumps back a bit in surprise at the bushes being destroyed

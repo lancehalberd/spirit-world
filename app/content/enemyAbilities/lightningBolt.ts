@@ -19,6 +19,7 @@ export const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2,
             shockWaveTheta: enemy.params.theta,
+            source: enemy,
         });
         addEffectToArea(state, target.target.area, lightningBolt);
     },
@@ -48,6 +49,7 @@ export const stationaryChargedLightningBoltAbility: EnemyAbility<Target> = {
             shockWaveTheta: 0,
             shockWaveDelta: Math.PI / 6,
             strikes: 2,
+            source: enemy,
         }
         const lightningBolt = new LightningBolt(props);
         addEffectToArea(state, target.area, lightningBolt);
@@ -78,6 +80,7 @@ export const chargedLightningBoltAbility: EnemyAbility<NearbyTargetType> = {
             shockWaveTheta: enemy.params.theta,
             shockWaveDelta: 0, //Math.PI / 6,
             strikes: 4,
+            source: enemy,
         }
         const lightningBolt = new LightningBolt(props);
         addEffectToArea(state, target.target.area, lightningBolt);

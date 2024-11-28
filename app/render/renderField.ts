@@ -135,124 +135,215 @@ export function checkToRedrawTiles(area: AreaInstance) {
 */
 
 export function checkToRedrawTiles(area: AreaInstance) {
-    //if (editingState.isEditing) {
-        const w = 16, h = 16;
-        for (let y = 0; y < area.h; y++) {
-            if (!area.tilesDrawn[y]) {
-                area.tilesDrawn[y] = [];
+    const w = 16, h = 16;
+    for (let y = 0; y < area.h; y++) {
+        if (!area.tilesDrawn[y]) {
+            area.tilesDrawn[y] = [];
+        }
+        for (let x = 0; x < area.w; x++) {
+            if (area.tilesDrawn?.[y]?.[x]) {
+                continue;
             }
-            for (let x = 0; x < area.w; x++) {
-                if (!area.tilesDrawn?.[y]?.[x]) {
-                    for (const backgroundFrame of area.backgroundFrames) {
-                        if (!backgroundFrame.tilesDrawn[y]?.[x]) {
-                            continue;
-                        }
-                        backgroundFrame.tilesDrawn[y][x] = false;
-                        if (editingState.isEditing) {
-                            backgroundFrame.context.clearRect(x * w, y * h, w, h);
-                        }
-                    }
-                    for (const foregroundFrame of area.foregroundFrames) {
-                        if (!foregroundFrame.tilesDrawn[y]?.[x]) {
-                            continue;
-                        }
-                        foregroundFrame.tilesDrawn[y][x] = false;
-                        foregroundFrame.context.clearRect(x * w, y * h, w, h);
-                    }
-                    area.tilesDrawn[y][x] = true;
+            area.tilesDrawn[y][x] = true;
+            for (const backgroundFrame of area.backgroundFrames) {
+                if (!backgroundFrame.tilesDrawn[y]?.[x]) {
+                    continue;
+                }
+                backgroundFrame.tilesDrawn[y][x] = false;
+                if (editingState.isEditing) {
+                    backgroundFrame.context.clearRect(x * w, y * h, w, h);
                 }
             }
+            for (const foregroundFrame of area.foregroundFrames) {
+                if (!foregroundFrame.tilesDrawn[y]?.[x]) {
+                    continue;
+                }
+                foregroundFrame.tilesDrawn[y][x] = false;
+                foregroundFrame.context.clearRect(x * w, y * h, w, h);
+            }
         }
-    //}
+    }
     area.drawnFrames = new Set();
     area.checkToRedrawTiles = false;
 }
-export function drawRemainingFrames(state: GameState, area: AreaInstance, currentFrameIndex = getBackgroundFrameIndex(state, area)) {
+
+// Draws a full screen of tiles that contains all tiles necessary to display the current frame of the game for this area frame.
+export function drawDisplayedTiles(state: GameState, area: AreaInstance, frame: AreaFrame): number {
+    let tilesDrawn = 0;
+    if (!area || area.drawnFrames.has(frame)) {
+        return tilesDrawn;
+    }
+    const tx = ((state.camera.x - area.cameraOffset.x) / 16) | 0;
+    const ty = ((state.camera.y - area.cameraOffset.y) / 16) | 0;
+    // These are the maximum number of distinct tiles that can at least be partially shown at once.
+    const w = 18;
+    const h = 16;
+    const bounds: Rect = {
+        x: Math.min(area.w - w, Math.max(tx - 1, 0)),
+        y: Math.min(area.h - h, Math.max(ty - 1, 0)),
+        w,
+        h,
+    };
+    return renderTiles(area, frame, bounds);
+}
+export function drawDisplayedFrames(state: GameState, area: AreaInstance, currentFrameIndex = getBackgroundFrameIndex(state, area)) {
     if (!area) {
         return;
     }
+    drawDisplayedTiles(state, area, area.backgroundFrames[currentFrameIndex]);
+    drawDisplayedTiles(state, area, area.foregroundFrames[0]);
+}
+const tilesPerFrame = 256;
+export function drawEntireFrame(state: GameState, area: AreaInstance, frameIndex: number): void {
+   if (!area) {
+        return;
+    }
+    const bounds = {x: 0, y: 0, w: area.w, h: area.h}
+    renderTiles(area, area.backgroundFrames[frameIndex], bounds, 0);
+    renderTiles(area, area.foregroundFrames[frameIndex], bounds, 0);
+    area.drawnFrames.add(area.backgroundFrames[frameIndex]);
+    area.drawnFrames.add(area.foregroundFrames[frameIndex]);
+}
+export function drawRemainingFrames(state: GameState, area: AreaInstance, currentFrameIndex = getBackgroundFrameIndex(state, area)): number {
+    let drawCount = 0;
+    if (!area) {
+        return drawCount;
+    }
+    if (editingState.isEditing) {
+        drawEntireFrame(state, area, 0);
+        return area.w * area.h;
+    }
+    const bounds = {x: 0, y: 0, w: area.w, h: area.h}
+
+    drawDisplayedFrames(state, area, currentFrameIndex);
+    drawCount = 0;
     for (let i = 0; i < 6; i++) {
-        if (editingState.isEditing && i > 0) {
-            // Only draw the current frame while editing since we don't play animations anyway.
-            break;
-        }
         const frameIndex = (currentFrameIndex + i) % 6;
         const backgroundFrame = area.backgroundFrames[frameIndex];
         if (area.drawnFrames.has(backgroundFrame)) {
             continue;
         }
-        for (let index = 0; index < area.layers.length; index++) {
-            const layer = area.layers[index];
-            const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
-            if (isForeground) {
-                continue;
-            }
-            renderLayer(layer, area.definition.parentDefinition?.layers?.[index], backgroundFrame, frameIndex);
+        drawCount += renderTiles(area, backgroundFrame, bounds, tilesPerFrame - drawCount);
+        // If drawCount is greater than 0, this frame may not be finished.
+        if (drawCount >= tilesPerFrame) {
+            break;
         }
         // console.log('Drawing backgroundFrame', frameIndex);
         area.drawnFrames.add(backgroundFrame);
-        for (let y = 0; y < area.h; y++) {
-            if (!backgroundFrame.tilesDrawn[y]) {
-                backgroundFrame.tilesDrawn[y] = [];
-            }
-            for (let x = 0; x < area.w; x++) {
-                backgroundFrame.tilesDrawn[y][x] = true;
-            }
-        }
-        break;
     }
     for (let i = 0; i < 1; i++) {
-        if (editingState.isEditing && i > 0) {
-            // Only draw the current frame while editing since we don't play animations anyway.
-            break;
-        }
         const frameIndex = 0;
         let foregroundFrame: AreaFrame = area.foregroundFrames[frameIndex];
         if (area.drawnFrames.has(foregroundFrame)) {
             continue;
         }
-        for (let index = 0; index < area.layers.length; index++) {
-            const layer = area.layers[index];
-            const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
-            if (!isForeground) {
-                continue;
-            }
-            // Create foreground canvas only as needed.
-            if (!foregroundFrame) {
-                const [canvas, context] = createCanvasAndContext(
-                    16 * area.w,
-                    16 * area.h,
-                );
-                foregroundFrame = area.foregroundFrames[frameIndex] = {
-                    canvas,
-                    context,
-                    tilesDrawn: [],
-                }
-            }
-            renderLayer(layer, area.definition.parentDefinition?.layers?.[index], foregroundFrame, frameIndex);
+        drawCount += renderTiles(area, foregroundFrame, bounds, tilesPerFrame - drawCount);
+        if (drawCount >= tilesPerFrame) {
+            break;
         }
-        if (foregroundFrame) {
-            // console.log('Drawing foregroundFrame', frameIndex);
-            area.drawnFrames.add(foregroundFrame);
-            for (let y = 0; y < area.h; y++) {
-                if (!foregroundFrame.tilesDrawn[y]) {
-                    foregroundFrame.tilesDrawn[y] = [];
-                }
-                for (let x = 0; x < area.w; x++) {
-                    foregroundFrame.tilesDrawn[y][x] = true;
-                }
-            }
-        }
-        break;
+        // console.log('Drawing foregroundFrame', frameIndex);
+        area.drawnFrames.add(foregroundFrame);
     }
+    return drawCount;
 }
 
 //const baseVariantRandom = SRandom.seed(variantSeed);
 
 const [maskCanvas, maskContext] = createCanvasAndContext(16, 16);
-export function renderLayer(layer: AreaLayer, parentLayer: AreaLayerDefinition, areaFrame: AreaFrame, frameIndex: number): void {
+export function renderTiles(
+    area: AreaInstance,
+    areaFrame: AreaFrame,
+    r: Rect = {x: 0, y: 0, w: area.w, h: area.h},
+    maxTiles = 0,
+): number {
     const w = 16, h = 16;
     const context = areaFrame.context;
+    // Collect layers to draw to this Area Frame based on whether it is a background or foreground frame.
+    const layersToDraw: AreaLayer[] = [];
+    for (let index = 0; index < area.layers.length; index++) {
+        const layer = area.layers[index];
+        const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
+        if (isForeground !== areaFrame.isForeground) {
+            continue;
+        }
+        layersToDraw.push(layer);
+    }
+    let tilesDrawn = 0;
+    for (let y = r.y; y < r.y + r.h; y++) {
+        if (!areaFrame.tilesDrawn[y]) {
+            areaFrame.tilesDrawn[y] = [];
+        }
+        for (let x = r.x; x < r.x + r.w; x++) {
+            if (areaFrame.tilesDrawn[y][x]) {
+                continue;
+            }
+            tilesDrawn++;
+            if (maxTiles && tilesDrawn > maxTiles) {
+                // console.log(areaFrame.isForeground ? 'F' : 'B', areaFrame.frameIndex, ' drew limit ', maxTiles);
+                return maxTiles;
+            }
+            areaFrame.tilesDrawn[y][x] = true;
+            for (const layer of layersToDraw) {
+                let tile = layer.tiles[y][x];
+                const maskTile = layer.maskTiles?.[y]?.[x];
+                context.save();
+                if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
+                    if (layer.definition.visibilityOverride === 'fade') {
+                        context.globalAlpha *= 0.3;
+                    } else if (editingState.selectedLayerKey) {
+                        context.globalAlpha *= 0.5;
+                    }
+                }
+                if (tile?.behaviors?.underTile > 1 && tile?.behaviors?.showUnderTile) {
+                    const underTile = allTiles[tile?.behaviors?.underTile];
+                    if (underTile?.frame) {
+                        // underTile is never animated.
+                        drawFrame(context, underTile.frame, {x: x * w, y: y * h, w, h});
+                    }
+                }
+                if (editingState.isEditing) {
+                    if (tile?.behaviors?.editorTransparency) {
+                        context.globalAlpha *= tile.behaviors.editorTransparency;
+                    }
+                }
+                if (maskTile) {
+                    // Create the masked tile to draw underneath the mask frame.
+                    if (tile) {
+                        maskContext.clearRect(0, 0, 16, 16);
+                        maskContext.globalCompositeOperation = 'source-over';
+                        if (!maskTile.behaviors.maskFrame) {
+                            console.error('Mask tile was missing maskFrame. This can happen when tile indexes are shifted due to added/removed tiles.');
+                            debugger;
+                        }
+                        // mask frames do not support animation.
+                        drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
+                        maskContext.globalCompositeOperation = 'source-in';
+                        renderTileFrame(tile, areaFrame.frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
+                        // Draw the masked content first, then the mask frame on top.
+                        //window['debugCanvas'](maskCanvas);
+                        context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
+                    }
+                    renderTileFrame(maskTile, areaFrame.frameIndex, context, {x: x * w, y: y * h, w, h});
+                } else if (tile) {
+                    renderTileFrame(tile, areaFrame.frameIndex, context, {x: x * w, y: y * h, w, h});
+                }
+                context.restore();
+            }
+        }
+    }
+    // console.log(areaFrame.isForeground ? 'F' : 'B', areaFrame.frameIndex, ' drew ', tilesDrawn);
+    return tilesDrawn;
+}
+/*export function renderLayer(
+    layer: AreaLayer,
+    parentLayer: AreaLayerDefinition,
+    areaFrame: AreaFrame,
+    r: Rect = {x: 0, y: 0, w: layer.w, h: layer.h},
+    maxTiles = 0,
+): number {
+    const w = 16, h = 16;
+    const context = areaFrame.context;
+    let tilesDrawn = 0;
     context.save();
     if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
         if (layer.definition.visibilityOverride === 'fade') {
@@ -261,13 +352,17 @@ export function renderLayer(layer: AreaLayer, parentLayer: AreaLayerDefinition, 
             context.globalAlpha *= 0.5;
         }
     }
-    for (let y = 0; y < layer.h; y++) {
+    for (let y = r.y; y < r.y + r.h; y++) {
         if (!areaFrame.tilesDrawn[y]) {
             areaFrame.tilesDrawn[y] = [];
         }
-        for (let x = 0; x < layer.w; x++) {
+        for (let x = r.x; x < r.x + r.w; x++) {
             if (areaFrame.tilesDrawn[y][x]) {
                 continue;
+            }
+            tilesDrawn++;
+            if (maxTiles && tilesDrawn > maxTiles) {
+                return;
             }
             let tile = layer.tiles[y][x];
             const maskTile = layer.maskTiles?.[y]?.[x];
@@ -296,20 +391,21 @@ export function renderLayer(layer: AreaLayer, parentLayer: AreaLayerDefinition, 
                     // mask frames do not support animation.
                     drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
                     maskContext.globalCompositeOperation = 'source-in';
-                    renderTileFrame(tile, frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
+                    renderTileFrame(tile, areaFrame.frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
                     // Draw the masked content first, then the mask frame on top.
                     //window['debugCanvas'](maskCanvas);
                     context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
                 }
-                renderTileFrame(maskTile, frameIndex, context, {x: x * w, y: y * h, w, h});
+                renderTileFrame(maskTile, areaFrame.frameIndex, context, {x: x * w, y: y * h, w, h});
             } else if (tile) {
-                renderTileFrame(tile, frameIndex, context, {x: x * w, y: y * h, w, h});
+                renderTileFrame(tile, areaFrame.frameIndex, context, {x: x * w, y: y * h, w, h});
             }
             context.restore();
         }
     }
     context.restore();
-}
+    return tilesDrawn;
+}*/
 
 function updateObjectsToRender(this: void, state: GameState, area: AreaInstance) {
     if (!area) {
@@ -371,7 +467,11 @@ export function renderField(
     updateObjectsToRender(state, state.alternateAreaInstance);
     updateObjectsToRender(state, state.nextAreaInstance);
     if (editingState.isEditing) {
-        context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.fillStyle = 'yellow';
+        context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    } else {
+        // context.fillStyle = 'yellow';
+        // context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
     // Update any background tiles that have changed.
     if (state.areaInstance.checkToRedrawTiles) {

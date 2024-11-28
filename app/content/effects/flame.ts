@@ -47,6 +47,7 @@ interface Props {
     isPreparing?: boolean
     groundFriction?: number
     beforeUpdate?: (state: GameState, flame: Flame) => void
+    source: Actor
 }
 
 export class Flame implements EffectInstance, Props {
@@ -99,8 +100,12 @@ export class Flame implements EffectInstance, Props {
     isEnemyTarget: boolean = true;
     groundFriction = 0;
     isHigh = false;
+    source: Actor;
     beforeUpdate?: (state: GameState, flame: Flame) => void;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, delay = 0, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate}: Props) {
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3,
+        delay = 0, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
+        source,
+    }: Props) {
         this.damage = damage;
         this.delay = delay;
         this.x = x;
@@ -120,6 +125,7 @@ export class Flame implements EffectInstance, Props {
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
         this.groundFriction = groundFriction;
         this.beforeUpdate = beforeUpdate;
+        this.source = source;
     }
     getAnchorPoint() {
         const hitbox = this.getHitbox();
@@ -215,6 +221,7 @@ export class Flame implements EffectInstance, Props {
                     vy: this.vy,
                     anchorPoint,
                     isHigh: this.isHigh,
+                    source: this.source,
                 });
                 if (hitResult.reflected) {
                     this.reflected = true;

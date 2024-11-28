@@ -14,7 +14,7 @@ const [workingCanvas, workingContext] = createCanvasAndContext(16, 16);
 
 export const turretStyles = <const>{
     arrow: {
-        fire(this: void, state: GameState, turret: WallTurret) {
+        fire(this: void, state: GameState, turret: WallTurret, source: Actor) {
             const dx = directionMap[turret.definition.d][0];
             const dy = directionMap[turret.definition.d][1];
             EnemyArrow.spawn(state, turret.area, {
@@ -23,6 +23,7 @@ export const turretStyles = <const>{
                 y: turret.y + turret.h / 2 + dy * 8,
                 vx: 4 * dx,
                 vy: 4 * dy,
+                source,
             });
         },
         renderProjectile(this: void, context: CanvasRenderingContext2D, turret: WallTurret) {
@@ -31,7 +32,7 @@ export const turretStyles = <const>{
         }
     },
     crystal: {
-        fire(this: void, state: GameState, turret: WallTurret) {
+        fire(this: void, state: GameState, turret: WallTurret, source: Actor) {
             const dx = directionMap[turret.definition.d][0];
             const dy = directionMap[turret.definition.d][1];
             CrystalSpike.spawn(state, turret.area, {
@@ -40,6 +41,7 @@ export const turretStyles = <const>{
                 y: turret.y + turret.h / 2 + dy * 4,
                 vx: 4 * dx,
                 vy: 4 * dy,
+                source,
             });
         },
         renderProjectile(this: void, context: CanvasRenderingContext2D, turret: WallTurret) {
@@ -92,9 +94,9 @@ export class WallTurret implements ObjectInstance {
     fireAfter(milliseconds: number) {
         this.fireOverrideTime = milliseconds;
     }
-    fire(state: GameState) {
+    fire(state: GameState, source: Actor) {
         const style = turretStyles[this.style] || turretStyles.arrow;
-        style.fire(state, this);
+        style.fire(state, this, source);
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -102,14 +104,14 @@ export class WallTurret implements ObjectInstance {
         if (this.fireOverrideTime > 0) {
             this.fireOverrideTime -= FRAME_LENGTH;
             if (this.fireOverrideTime <= 0) {
-                this.fire(state);
+                this.fire(state, null);
             }
             return;
         }
         if (this.status === 'normal') {
             const modValue = (this.animationTime - this.fireOffset) % this.fireInterval;
             if (modValue < FRAME_LENGTH && modValue > -FRAME_LENGTH) {
-                this.fire(state);
+                this.fire(state, null);
             }
         }
     }

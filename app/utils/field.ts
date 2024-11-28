@@ -740,7 +740,7 @@ export function getLayerToCover(area: AreaInstance, tx: number, ty: number): Are
 }
 
 export function coverTile(
-    this: void, state: GameState, area: AreaInstance, tx: number, ty: number, coverTile: number
+    this: void, state: GameState, area: AreaInstance, tx: number, ty: number, coverTile: number, source?: Actor
 ): boolean {
     const topLayer = getLayerToCover(area, tx, ty);
     if (!topLayer) {
@@ -762,6 +762,11 @@ export function coverTile(
             ...allTiles[coverTile].behaviors,
             underTile: currentIndex,
             covered: true,
+            // Pass the source of the tile through to the touchHit if defined.
+            touchHit: allTiles[coverTile].behaviors?.touchHit ? {
+                ...allTiles[coverTile].behaviors.touchHit,
+                source,
+            } : undefined,
         },
     };
     if (area.tilesDrawn[ty]?.[tx]) {

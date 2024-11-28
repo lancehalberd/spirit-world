@@ -97,7 +97,7 @@ export const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true, is
 export const thornBehavior: TileBehaviors = {
     defaultLayer: 'field',
     lootTable: rareLifeLootTable,
-    low: true, touchHit: {damage: 1, spiritCloakDamage: 5, isGroundHit: true }, cuttable: 1,
+    low: true, touchHit: {damage: 1, spiritCloakDamage: 5, isGroundHit: true, source: null }, cuttable: 1,
     underTile: 23,
     particles: thornParticles,
     linkedOffset: 179,

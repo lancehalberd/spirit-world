@@ -20,6 +20,7 @@ interface Props {
     az?: number
     ttl?: number
     hitEnemies?: boolean
+    source: Actor
 }
 
 export class Frost implements EffectInstance, Props {
@@ -45,7 +46,8 @@ export class Frost implements EffectInstance, Props {
     ttl: number;
     animationOffset: number;
     hitEnemies: boolean;
-    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, hitEnemies = false, ignoreTargets}: Props) {
+    source: Actor;
+    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, hitEnemies = false, ignoreTargets, source}: Props) {
         this.damage = damage;
         this.x = x - 6;
         this.y = y - 6;
@@ -58,6 +60,7 @@ export class Frost implements EffectInstance, Props {
         this.ignoreTargets = ignoreTargets || new Set();
         this.hitEnemies = hitEnemies;
         this.animationOffset = ((Math.random() * 10) | 0) * 20;
+        this.source = source;
     }
     getHitbox() {
         return this;
@@ -82,6 +85,7 @@ export class Frost implements EffectInstance, Props {
                 hitObjects: true,
                 hitTiles: true,
                 ignoreTargets: this.ignoreTargets,
+                source: this.source,
             });
             if (this.animationTime % 200 === this.animationOffset) {
                 addSparkleAnimation(state, this.area, this, { element: 'ice' });

@@ -51,6 +51,7 @@ const spikeWaveAbility: EnemyAbility<NearbyTargetType> = {
                 damage: 2,
                 vx: speed * dx,
                 vy: speed * dy,
+                source: enemy,
             });
             if (enemy.difficulty > enemy.enemyDefinition?.naturalDifficultyRating) {
                 for (let j = 1; j <= 5; j++) {
@@ -64,6 +65,7 @@ const spikeWaveAbility: EnemyAbility<NearbyTargetType> = {
                         damage: 1,
                         vx: speed * dx,
                         vy: speed * dy,
+                        source: enemy,
                     });
                 }
             }
@@ -87,7 +89,7 @@ enemyDefinitions.mushroom = {
     elementalMultipliers: {'fire': 2},
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {touchHit: { damage: 2}, solid: true},
+    tileBehaviors: {touchHit: { damage: 2, source: null}, solid: true},
     canBeKnockedBack: false,
     initialize(state: GameState, enemy: Enemy) {
         if (enemy.difficulty > this.naturalDifficultyRating) {

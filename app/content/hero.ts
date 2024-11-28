@@ -31,6 +31,7 @@ import { getCloneMovementDeltas } from 'app/userInput';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {trackEnemyDealtDamage} from 'app/utils/enemyDamageTracking';
 import { directionMap, getDirection } from 'app/utils/field';
 import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';
@@ -347,6 +348,7 @@ export class Hero implements Actor {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                     },
+                    source: this,
                 },
             };
         }
@@ -362,10 +364,11 @@ export class Hero implements Actor {
         const preventKnockback = this.savedData.equippedBoots === 'ironBoots' || this.savedData.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
+            let burnDamage = 0;
             let iframeMultiplier = 1;
             if (hit.element === 'fire') {
                 let burnDuration = 2000;
-                const burnDamage = damage / 2;
+                burnDamage = damage / 2;
                 if (state.hero.savedData.passiveTools.fireBlessing) {
                     damage /= 2;
                     burnDuration /= 2;
@@ -389,6 +392,12 @@ export class Hero implements Actor {
                     damage /= 2;
                     iframeMultiplier *= 1.2;
                 }
+            }
+            if ((hit.source as Enemy)?.type === 'enemy') {
+                const enemy = (hit.source as Enemy);
+                trackEnemyDealtDamage(enemy, damage, burnDamage)
+            } else if (hit.source !== null) {
+                console.log('untracked player damage', hit);
             }
             this.takeDamage(state, damage, iframeMultiplier);
         }
@@ -848,6 +857,7 @@ export class Hero implements Actor {
             vx: 0,
             vy: 0,
             vz: 0,
+            source: this,
         });
         hero.lastTouchedObject = thrownObject;
         addEffectToArea(state, hero.area, thrownObject);
@@ -861,6 +871,7 @@ export class Hero implements Actor {
                 vx: 0,
                 vy: 0,
                 vz: 0,
+                source: this,
             });
             alternateThrownObject.linkedObject = thrownObject;
             thrownObject.linkedObject = alternateThrownObject;
@@ -905,6 +916,7 @@ export class Hero implements Actor {
             vx: directionMap[direction][0] * throwSpeed,
             vy: directionMap[direction][1] * throwSpeed,
             vz: 2,
+            source: this,
         });
         hero.lastTouchedObject = thrownObject;
         addEffectToArea(state, hero.area, thrownObject);
@@ -918,6 +930,7 @@ export class Hero implements Actor {
                 vx: directionMap[direction][0] * throwSpeed,
                 vy: directionMap[direction][1] * throwSpeed,
                 vz: 2,
+                source: this,
             });
             alternateThrownObject.linkedObject = thrownObject;
             thrownObject.linkedObject = alternateThrownObject;

@@ -10,9 +10,10 @@ const growingThornsAnimation = createAnimation('gfx/tiles/thornsspirit.png', {w:
 
 interface Props {
     x?: number
-    y?: number,
-    damage?: number,
-    delay?: number,
+    y?: number
+    damage?: number
+    delay?: number
+    source: Enemy
 }
 
 export class GrowingThorn implements EffectInstance, Props {
@@ -33,13 +34,15 @@ export class GrowingThorn implements EffectInstance, Props {
     h: number = 16;
     delay: number;
     animationTime = 0;
-    constructor({x = 0, y = 0, damage = 2, delay = 800}: Props) {
+    source: Enemy;
+    constructor({x = 0, y = 0, damage = 2, delay = 800, source}: Props) {
         this.x -= this.w / 2;
         this.y -= this.h / 2;
         this.x = ((x / 16) | 0) * 16;
         this.y = ((y / 16) | 0) * 16;
         this.delay = delay;
         this.damage = damage;
+        this.source = source;
     }
     getHitbox() {
         return this;
@@ -50,7 +53,7 @@ export class GrowingThorn implements EffectInstance, Props {
             const ty = (this.y / 16) | 0;
             // If the hero cuts the ground mid animation, cover and uncover it immediately
             // to show the particle effects and cut ground tile.
-            coverTile(state, this.area, tx, ty, thornsTilesIndex);
+            coverTile(state, this.area, tx, ty, thornsTilesIndex, this.source);
             uncoverTile(state, this.area, tx, ty);
             removeEffectFromArea(state, this);
         }
@@ -88,11 +91,12 @@ export class GrowingThorn implements EffectInstance, Props {
                 knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
                 hitAllies: true,
                 isGroundHit: true,
+                source: this.source,
             });
         }
         // At the end of the animation, attempt to cover the ground with the matching thorns tile.
         if (this.animationTime >= growingThornsAnimation.duration) {
-            coverTile(state, this.area, tx, ty, thornsTilesIndex);
+            coverTile(state, this.area, tx, ty, thornsTilesIndex, this.source);
             removeEffectFromArea(state, this);
         }
     }

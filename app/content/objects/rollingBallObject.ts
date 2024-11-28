@@ -134,6 +134,7 @@ export class RollingBallObject implements ObjectInstance {
             hitEnemies: true,
             knockAwayFrom: {x: this.x + 8, y: this.y + 8},
             ignoreTargets: new Set([this]),
+            source: null,
         });
 
         // Create a slightly smaller hitbox then adjust it so it only covers the front half
@@ -165,6 +166,7 @@ export class RollingBallObject implements ObjectInstance {
             hitbox: smallHitbox,
             hitAllies: true,
             knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+            source: null,
         });
 
         return hitResult.blocked || hitResult.stopped;
@@ -291,6 +293,7 @@ export class RollingBallObject implements ObjectInstance {
                     // Falling balls can destroy even some unliftable tiles.
                     crushingPower: 3,
                     knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+                    source: null,
                 });
             }
         }

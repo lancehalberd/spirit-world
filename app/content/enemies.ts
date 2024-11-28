@@ -106,7 +106,7 @@ enemyDefinitions.climbingBeetle = {
     animations: climbingBeetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
     aggroRadius: 96,
     lootTable: simpleLootTable,
-    tileBehaviors: {touchHit: { damage: 1}, solid: true},
+    tileBehaviors: {touchHit: { damage: 1, source: null}, solid: true},
     canBeKnockedBack: false,
     initialize(state: GameState, enemy: Enemy<any>) {
         if (enemy.difficulty > this.naturalDifficultyRating) {
@@ -140,7 +140,7 @@ enemyDefinitions.beetleHorned = {
             const hitbox = enemy.getHitbox();
             const tx = ((hitbox.x + hitbox.w / 2) / 16) | 0;
             const ty = ((hitbox.y + hitbox.h / 2) / 16) | 0;
-            coverTile(state, enemy.area, tx, ty, thornsTilesIndex);
+            coverTile(state, enemy.area, tx, ty, thornsTilesIndex, enemy);
         } else if (enemy.mode === 'stunned' && enemy.modeTime <= 0) {
             const [x, y] = directionMap[enemy.d];
             crystalProjectileArcAbility.useAbility(state, enemy, {x: -x, y: -y});
@@ -241,6 +241,6 @@ function updateFloorEye(state: GameState, enemy: Enemy): void {
             }
         }
     }
-    enemy.touchHit = enemy.isInvulnerable ? null : { damage: 2 };
+    enemy.touchHit = enemy.isInvulnerable ? null : { damage: 2, source: null };
 }
 

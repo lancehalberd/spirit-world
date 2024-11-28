@@ -91,6 +91,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
             damage: 1,
             vx: 4 * dx,
             vy: 4 * dy,
+            source: enemy,
         });
     },
     cooldown: 1000,
@@ -130,6 +131,7 @@ const staffAbility: EnemyAbility<CardinalDirection> = {
             hitAllies: true,
             knockAwayFromHit: true,
             isStaff: true,
+            source: enemy,
         });
         state.screenShakes.push({
             dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200

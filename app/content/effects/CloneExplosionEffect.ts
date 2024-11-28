@@ -46,6 +46,7 @@ export class CloneExplosionEffect implements EffectInstance {
                 hitObjects: true,
                 hitTiles: true,
                 ignoreTargets: this.hitTargets,
+                source: state.hero,
             });
             if (hitResult.hitTargets.size) {
                 this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);

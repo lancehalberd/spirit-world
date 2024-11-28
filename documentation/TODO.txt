@@ -68,7 +68,62 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add window + test tube decorations gfx/objects/Lab.png
+
+    - Add 8x8 ice tiles
+        - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
+            - Each set should be 14 tiles for hex values 1-14 corresponding to 4 bit number [TL,TR,BL,BR]
+            - Generate complete set of composite 14 8x8 ice tiles by combining the inner+edge masks with patterns for each tile.
+            - Generate behavior masks from the inner mask data to use for behaviors.
+        - When a tile is frozen, update behavior and graphics for it and all surround tiles
+            - For 16 8x8 tiles in a 4x4 pattern centered around the current tile set the
+
+    - Brainstorm additional dialogue for characters:
+        - After the beasts escape/after the beasts are defeated.
+        - Holy City
+        - Grand Temple
+        - Waterfall Village
+        - Forest Village
+        - Jade City
+        - Helix
+
+    - Add crystal spike graphics to:
+        - Add to Spirit sky waterfall.
+        - Add to Jade city water.
+        - Add to Ice Sanctum
+        - Add to Waterfall Tower
+
+    - Exit from peach cave water doesn't render frozen correctly.
+
+    - Investigate: Masked tiles are not inherited in the spirit world.
+
+    - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
+
+    - BLocked: Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
+        - It is unclear what to do in the case when the unmaksed behavior can be frozen by enemy attacks but not by hero attacks.
+
+    - Fix you can wrap around the edges of the sky using cloud sommersault from the tower platform.
+
+    - Make bells make the tink/block sound if you hit them with anything but the staff bonk.
+
+    - colored lights from the current world should render under spirit sight, not over
+        - Check what colored lights look like in the other world too.
+
+    - Replace lightningDischarge with blast.
+
+    - Add color to lights
+        - flame wall should be red
+        - lightningDischarge should be yellow
+
+    - Quest marker for the Staff Tower isn't aligned correctly.
+
+    - Preload music.
+
     - Design and add enemy scaling
+        - Add variant seed to enemy instance props in editor (default to 0)
+        - Add global enemy variant seed as configurable GET parameter
+        - Add optional enemy variant seed to enemy definition.
+        - Choose an enemy to support creating arbitrary power variants of using global->enemy definition->enemy instance variant composite seed.
         - Give each enemy a base power rating, possibly a product of offense * defense.
             - offense is a combination of inherent ability power, additional ability power and movement speed
             - ability power increases with damage/coverage(space+time) and reduces with cooldown and tell durations.
@@ -87,46 +142,6 @@ Current tasks:
           to the enemies based on tags until the enemy matches the desired power level using the new enemies.
         - Try to balance how many instances of each ability are used so there is still nice variety.
         - Add additional abilities/configurations to increase variet.
-
-    - Exit from peach cave water doesn't render frozen correctly.
-
-    - Add new graphics
-        - Add fog effect to the new forest zone.
-        - cocoon graphics
-
-    - Brainstorm additional dialogue for characters:
-        - After the beasts escape/after the beasts are defeated.
-        - Holy City
-        - Grand Temple
-        - Waterfall Village
-        - Forest Village
-        - Jade City
-        - Helix
-
-
-    - Frost beast can be killed without killing the snake (kill the snake, then the heart and the snake dies as well?)
-
-    - Investigate: Masked tiles are not inherited in the spirit world.
-
-    - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
-
-    - BLocked: Freezing should apply under masking tiles unless the unmasked behavior can be frozen as well.
-        - It is unclear what to do in the case when the unmaksed behavior can be frozen by enemy attacks but not by hero attacks.
-
-    - Fix you can wrap around the edges of the sky using cloud sommersault from the tower platform.
-
-    - Make bells make the tink/block sound if you hit them with anything but the staff bonk.
-
-    - colored lights from the current world should render under spirit sight, not over
-        - Check what colored lights look like in the other world too.
-
-    - Add color to lights
-        - flame wall should be red
-        - lightningDischarge should be yellow
-
-    - Quest marker for the Staff Tower isn't aligned correctly.
-
-    - Preload music.
 
     - Add trap chests to the game, like the fire turret chest?
 

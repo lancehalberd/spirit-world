@@ -198,7 +198,7 @@ enemyDefinitions.smallOrb = {
     ...baseOrbDefinition,
     naturalDifficultyRating: 6,
     canBeKnockedBack: false,
-    animations: {idle: omniAnimation(orbAnimation)}, life: 8, touchHit: {element: 'lightning', damage: 2}, update: updateSmallOrb,
+    animations: {idle: omniAnimation(orbAnimation)}, life: 8, touchHit: {element: 'lightning', damage: 2, source: null}, update: updateSmallOrb,
     immunities: ['lightning'],
     onHit(this: void, state: GameState, enemy: Enemy<OrbProps>, hit: HitProperties): HitResult {
         const largeOrb = enemy.params.largeOrb;
@@ -242,6 +242,7 @@ const sparkAbility: EnemyAbility<true> = {
             damage: 2,
             ttl: 4000,
             delay: 800,
+            source: enemy,
         });
     },
     cooldown: 2000,
@@ -264,7 +265,7 @@ enemyDefinitions.largeOrb = {
     speed: 0.8,
     canBeKnockedBack: false,
     canBeFrozen: false,
-    animations: {idle: omniAnimation(largeOrbAnimation)}, life: 48, touchHit: {element: 'lightning', damage: 2}, update: updateLargeOrb,
+    animations: {idle: omniAnimation(largeOrbAnimation)}, life: 48, touchHit: {element: 'lightning', damage: 2, source: null}, update: updateLargeOrb,
     immunities: ['lightning'],
     onHit(this: void, state: GameState, enemy: Enemy<OrbProps>, hit: HitProperties): HitResult {
         const life = enemy.life;
@@ -412,7 +413,7 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                     addRadialSparks(
                         state, enemy.area, [smallOrbHitbox.x + smallOrbHitbox.w / 2, smallOrbHitbox.y + smallOrbHitbox.h / 2],
                         4, theta, 3,
-                        {damage: 2, delay: 800}
+                        {damage: 2, delay: 800, source: enemy}
                     );
                     enemy.params.shockwaveTimer = 2000;
                     break;
@@ -429,7 +430,7 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
             addRadialSparks(
                 state, enemy.area, [smallOrbHitbox.x + smallOrbHitbox.w / 2, smallOrbHitbox.y + smallOrbHitbox.h / 2],
                 4, enemy.params.shockwaveTheta, 3,
-                {damage: 2, delay: 800}
+                {damage: 2, delay: 800, source: enemy}
             );
         }
 
@@ -503,6 +504,7 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                     },
                     hitAllies: true,
                     knockAwayFromHit: true,
+                    source: enemy,
                 });
             }
             if (inversion > 0 && v.mag < blastDistance) {
@@ -524,6 +526,7 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                     tellDuration: 400,
                     radius: blastCircle.r,
                     hitEnemies: false,
+                    source: enemy,
                 });
                 addEffectToArea(state, enemy.area, discharge);
 
@@ -535,6 +538,7 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                     delay: 800,
                     shockWaves: 6,
                     shockWaveTheta: Math.floor(2 * Math.random()) * Math.PI / 6,
+                    source: enemy,
                 }
                 const lightningBolt = new LightningBolt(props);
                 addEffectToArea(state, enemy.area.alternateArea, lightningBolt);

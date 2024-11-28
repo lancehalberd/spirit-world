@@ -412,6 +412,8 @@ type AreaGrid = AreaDefinition[][];
 interface AreaFrame {
     canvas: HTMLCanvasElement
     context: CanvasRenderingContext2D
+    frameIndex: number
+    isForeground: boolean
     tilesDrawn: boolean[][]
 }
 

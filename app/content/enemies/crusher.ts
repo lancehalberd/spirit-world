@@ -64,6 +64,7 @@ enemyDefinitions.crusher = {
                     damage: 4,
                     knockAwayFromHit: true,
                     hitAllies: true,
+                    source: enemy,
                 });
             }
             if (enemy.z <= 0) {

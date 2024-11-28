@@ -35,6 +35,7 @@ const spikePodAbility: EnemyAbility<NearbyTargetType> = {
             x: enemy.x + enemy.w / 2 + 72 * x,
             y: enemy.y + enemy.h / 2 + 72 * y,
             damage: 2,
+            source: enemy,
         }));
     },
     cooldown: 3000,
@@ -120,7 +121,7 @@ enemyDefinitions.crystalGuardian = {
     update(state: GameState, enemy: Enemy): void {
         enemy.shielded = enemy.params.shieldLife > 0;
         if (!enemy.shielded) {
-            enemy.behaviors = { solid: true, touchHit: {damage: 2 }};
+            enemy.behaviors = { solid: true, touchHit: {damage: 2, source: null}};
         }
         if (enemy.params.shieldInvulnerableTime  > 0) {
             enemy.params.shieldInvulnerableTime -= FRAME_LENGTH;

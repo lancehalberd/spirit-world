@@ -36,6 +36,7 @@ const fireBallAbility: EnemyAbility<boolean> = {
             az: 0,
             scale: 0.1,
             ttl: 2000,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, flame);
         enemy.params.fireball = flame;
@@ -80,6 +81,7 @@ const chasingFireBallAbility: EnemyAbility<boolean> = {
             az: 0,
             scale: 0.1,
             ttl: 5000,
+            source: enemy,
             beforeUpdate(state: GameState, flame: Flame) {
                 if (flame.isPreparing) {
                     return;
@@ -118,6 +120,7 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
         const flame = new Flame({
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, flame);
     },
@@ -223,7 +226,7 @@ enemyDefinitions.snakeFlame = {
     abilities: [fireBallAbility, leaveFlameAbility],
     animations: snakeFlameAnimations,
     baseMovementProperties: {canMoveInLava: true},
-    touchHit: {damage: 1, element: 'fire'},
+    touchHit: {damage: 1, element: 'fire', source: null},
     elementalMultipliers: {'ice': 2},
     immunities: ['fire'],
     initialize(state: GameState, enemy: Enemy) {
@@ -249,6 +252,7 @@ enemyDefinitions.snakeFrost = {
             hitTiles: true,
             damage: 1,
             knockAwayFromHit: true,
+            source: enemy,
         });
         baseSnakeDefinition.update(state, enemy);
     },
@@ -268,6 +272,7 @@ const lightningAuraAbility: EnemyAbility<true> = {
             tellDuration: 800,
             persistDuration: 5000,
             radius: 24,
+            boundSource: enemy,
             source: enemy,
         });
         enemy.params.blast = blast;
@@ -283,7 +288,7 @@ enemyDefinitions.snakeStorm = {
     abilities: [],
     animations: snakeStormAnimations, speed: 10,
     // baseMovementProperties: {canSwim: true},
-    touchHit: {damage: 1, element: 'lightning'},
+    touchHit: {damage: 1, element: 'lightning', source: null},
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
     initialize(state: GameState, enemy: Enemy) {

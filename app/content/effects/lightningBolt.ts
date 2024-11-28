@@ -20,6 +20,7 @@ interface LightningBoltProps {
     shockWaveTheta?: number
     // Increment shockwaveTheta by this amount each strike.
     shockWaveDelta?: number
+    source: Actor
 }
 
 // How long the lightning animation takes. Shockwaves are created at the end of this duration.
@@ -53,6 +54,7 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
     animationTime = 0;
     lastBolt: Point;
     totalDuration = this.strikes * this.delay + LIGHTNING_ANIMATION_DURATION + STRIKE_DURATION;
+    source = this.props.source;
     constructor(public props: LightningBoltProps) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -76,7 +78,7 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
         } else if (this.lastBolt && strikeTime === LIGHTNING_ANIMATION_DURATION && this.shockWaves) {
             // The lightning bolt releases sparks when they hit.
             addRadialSparks(
-                state, this.area, [this.lastBolt.x, this.lastBolt.y], this.shockWaves, this.shockWaveTheta, 4, {delay: 800}
+                state, this.area, [this.lastBolt.x, this.lastBolt.y], this.shockWaves, this.shockWaveTheta, 4, {delay: 800, source: this.source}
             );
             this.shockWaveTheta += this.shockWaveDelta;
         }
@@ -93,6 +95,7 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
                 knockAwayFrom: {x: this.x, y: this.y},
                 element: 'lightning',
                 hitAllies: true,
+                source: this.source,
             });
         }
         if (strikeTime > LIGHTNING_ANIMATION_DURATION + STRIKE_DURATION) {

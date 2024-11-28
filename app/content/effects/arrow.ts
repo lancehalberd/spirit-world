@@ -175,6 +175,7 @@ interface Props {
     reflected?: boolean
     style?: ArrowStyle
     hybridWorlds?: boolean
+    source: Actor
 }
 
 export class Arrow implements EffectInstance, Projectile {
@@ -214,10 +215,11 @@ export class Arrow implements EffectInstance, Projectile {
     isPlayerAttack = true;
     isHigh = false;
     refreshIsHigh = true;
+    source: Actor;
     constructor({
         x = 0, y = 0, z = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
-        ignoreWallsDuration = 0,
+        ignoreWallsDuration = 0, source
     }: Props) {
         this.x = x | 0;
         this.y = y | 0;
@@ -240,6 +242,7 @@ export class Arrow implements EffectInstance, Projectile {
         this.style = style;
         this.reflected = reflected;
         this.hybridWorlds = hybridWorlds;
+        this.source = source;
     }
     getAnchorPoint() {
         const direction = getDirection(this.vx, this.vy, true);
@@ -284,6 +287,7 @@ export class Arrow implements EffectInstance, Projectile {
             isArrow: true,
             anchorPoint: this.getAnchorPoint(),
             isHigh: this.isHigh,
+            source: this.source,
         };
     }
     update(state: GameState) {
@@ -374,6 +378,7 @@ export class Arrow implements EffectInstance, Projectile {
                 // arrow itself, which would disable arrow weakness on enemies if using
                 // lightning element, which seems undesirable.
                 isArrow: true,
+                source: this.source,
             }
             hitTargets(state, this.area, hitProps);
             if (this.hybridWorlds) {
@@ -538,11 +543,9 @@ export class EnemyArrow extends Arrow {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
-            anchorPoint: {
-                x: this.x + this.w / 2,
-                y: this.y + this.h / 2,
-            },
+            anchorPoint: this.getAnchorPoint(),
             isHigh: this.isHigh,
+            source: this.source,
         };
     }
     update(state: GameState) {
@@ -587,11 +590,9 @@ export class CrystalSpike extends Arrow {
             hitEnemies: this.reflected,
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
-            anchorPoint: {
-                x: this.x + this.w / 2,
-                y: this.y + this.h / 2,
-            },
+            anchorPoint: this.getAnchorPoint(),
             isHigh: this.isHigh,
+            source: this.source,
         };
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

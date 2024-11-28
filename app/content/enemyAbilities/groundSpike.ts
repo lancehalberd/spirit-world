@@ -15,6 +15,7 @@ export const groundSpikeAbility: EnemyAbility<Target> = {
             x: targetHitbox.x + targetHitbox.w / 2,
             y: targetHitbox.y + targetHitbox.h / 2,
             damage: 4,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, spike);
     },
@@ -35,6 +36,7 @@ export const groundSpikeLineAbility: EnemyAbility<Vector> = {
             state, area: enemy.area,
             source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
             target: [enemy.x + enemy.w / 2 + target.x * 32, enemy.y + enemy.h / 2 + target.y * 32],
+            spikeProps: {source: enemy},
         });
     },
     cooldown: 5000,

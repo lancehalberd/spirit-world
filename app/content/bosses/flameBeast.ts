@@ -79,7 +79,7 @@ const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
 
 enemyDefinitions.flameHeart = {
     naturalDifficultyRating: 20,
-    animations: flameHeartAnimations, life: 24, scale: 2, touchHit: { damage: 4, element: 'fire'}, update: updateFireHeart, params: {
+    animations: flameHeartAnimations, life: 24, scale: 2, touchHit: { damage: 4, element: 'fire', source: null}, update: updateFireHeart, params: {
         enrageLevel: 0,
     },
     initialMode: 'choose',
@@ -132,7 +132,7 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.modeTime === 1000) {
             const hitbox = enemy.getHitbox(state);
             FlameWall.createRadialFlameWall(state, enemy.area, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
-                isEnraged ? 8 : 4 + enemy.params.enrageLevel * 2);
+                isEnraged ? 8 : 4 + enemy.params.enrageLevel * 2, enemy);
         }
         if (enemy.modeTime >= 1500) {
             enemy.setMode('choose');
@@ -156,6 +156,7 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
                     vy: speed * dy,
                     ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
                     damage: 2,
+                    source: enemy,
                 });
                 addEffectToArea(state, enemy.area, flame);
             }
@@ -187,6 +188,7 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
         ttl: 2000 + getFlameBeastEnrageLevel(state, enemy) * 500,
         scale: 4,
         damage: 3,
+        source: enemy,
     });
     addEffectToArea(state, enemy.area, flame);
 };
@@ -223,7 +225,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     // since our heuristic of using the actual sprite overlap doesn't make sense this high in the air and
     // for these movements.
     enemy.isInvulnerable = (enemy.z > 8);
-    enemy.touchHit = (enemy.z <= 0) ? { damage: 2, element: 'fire'} : null;
+    enemy.touchHit = (enemy.z <= 0) ? { damage: 2, element: 'fire', source: null} : null;
     if (enemy.mode === 'regenerate') {
         // Fall to the ground if we start regeneration mid leap.
         if (enemy.z > 0) {

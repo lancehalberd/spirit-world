@@ -88,7 +88,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
             enemy.setMode('recover');
         }
     } else if (enemy.mode === 'recover') {
-        if (enemy.modeTime >= 500) {
+        if (enemy.modeTime >= 1200) {
             enemy.changeToAnimation('idle');
         }
         if (enemy.modeTime >= 1000) {
@@ -123,6 +123,7 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}: Point,
             tellDuration: 20 * duration,
             persistDuration: 200,
             radius: blastRadius,
+            boundSource: enemy,
             source: enemy,
         });
         addEffectToArea(state, enemy.area, blast);
@@ -138,6 +139,7 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
         const flame = new Flame({
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1,
+            source: enemy,
         });
         addEffectToArea(state, enemy.area, flame);
     },
@@ -168,6 +170,7 @@ const mediumBlastAbility: EnemyAbility<boolean> = {
             tellDuration: 800,
             persistDuration: 800,
             radius: 48,
+            boundSource: enemy,
             source: enemy,
         });
         //enemy.params.blast = blast;
@@ -183,32 +186,38 @@ const mediumBlastAbility: EnemyAbility<boolean> = {
 };
 
 function jumpOnHit(state: GameState, enemy: Enemy<SquirrelParams>, hit: HitProperties): HitResult {
+    // Ignore hits while invulnerable.
+    if (enemy.enemyInvulnerableFrames || enemy.isInvulnerable) {
+        return {};
+    }
     // Cannot be hit while jumping.
     if (enemy.mode === 'jumping') {
         return {};
     }
-    if (enemy.mode !== 'recover') {
-        if (hit.source?.getHitbox) {
-            // If the hit has a source, try jumping to it
-            const hitbox = hit.source.getHitbox(state);
-            jumpTowardsPoint(state, enemy, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2}, enemy.params.blastRadius);
-        } else if (hit.knockback?.vx || hit.knockback?.vy) {
-            // If the hit would knock the enemy back in a direction, jump in the opposite direction
-            const enemyHitbox = enemy.getHitbox(state);
-            const x = enemyHitbox.x + enemyHitbox.w / 2;
-            const y = enemyHitbox.y + enemyHitbox.h / 2;
-            jumpTowardsPoint(state, enemy, {x: x - 48 * (hit.knockback.vx || 0), y: y - 48 * (hit.knockback.vy || 0)}, enemy.params.blastRadius);
-        } else {
-            // Jumpin a random direction otherwise.
-            const theta = 2 * Math.PI * Math.random();
-            const enemyHitbox = enemy.getHitbox(state);
-            const x = enemyHitbox.x + enemyHitbox.w / 2;
-            const y = enemyHitbox.y + enemyHitbox.h / 2;
-            jumpTowardsPoint(state, enemy, {x: x + 48 * Math.cos(theta), y: y + 48 * Math.sin(theta)}, enemy.params.blastRadius);
-        }
-        return {};
+    // Can be hit a single time while recovering.
+    if (enemy.mode === 'recover') {
+        enemy.changeToAnimation('idle');
+        return enemy.defaultOnHit(state, hit);
     }
-    return enemy.defaultOnHit(state, hit);
+    if (hit.source?.getHitbox) {
+        // If the hit has a source, try jumping to it
+        const hitbox = hit.source.getHitbox(state);
+        jumpTowardsPoint(state, enemy, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2}, enemy.params.blastRadius);
+    } else if (hit.knockback?.vx || hit.knockback?.vy) {
+        // If the hit would knock the enemy back in a direction, jump in the opposite direction
+        const enemyHitbox = enemy.getHitbox(state);
+        const x = enemyHitbox.x + enemyHitbox.w / 2;
+        const y = enemyHitbox.y + enemyHitbox.h / 2;
+        jumpTowardsPoint(state, enemy, {x: x - 48 * (hit.knockback.vx || 0), y: y - 48 * (hit.knockback.vy || 0)}, enemy.params.blastRadius);
+    } else {
+        // Jumpin a random direction otherwise.
+        const theta = 2 * Math.PI * Math.random();
+        const enemyHitbox = enemy.getHitbox(state);
+        const x = enemyHitbox.x + enemyHitbox.w / 2;
+        const y = enemyHitbox.y + enemyHitbox.h / 2;
+        jumpTowardsPoint(state, enemy, {x: x + 48 * Math.cos(theta), y: y + 48 * Math.sin(theta)}, enemy.params.blastRadius);
+    }
+    return {};
 }
 
 
@@ -216,7 +225,7 @@ enemyDefinitions.squirrel = {
     naturalDifficultyRating: 1,
     animations: squirrelAnimations,
     speed: 1.5,
-    life: 2, touchHit: { damage: 1},
+    life: 2, touchHit: {damage: 1, source: null},
     lootTable: lifeLootTable,
     initialMode: 'pause',
     hybrids: {
@@ -243,7 +252,7 @@ enemyDefinitions.squirrelFlame = {
     params: {
         element: 'fire',
     },
-    touchHit: { damage: 2, element: 'fire'},
+    touchHit: { damage: 2, element: 'fire', source: null},
     baseMovementProperties: {canMoveInLava: true},
     immunities: ['fire'],
     lootTable: lifeLootTable,
@@ -261,7 +270,7 @@ enemyDefinitions.squirrelFrost = {
     params: {
         element: 'ice',
     },
-    touchHit: { damage: 2, element: 'ice'},
+    touchHit: { damage: 2, element: 'ice', source: null},
     immunities: ['ice'],
     lootTable: lifeLootTable,
     initialMode: 'pause',
@@ -274,7 +283,7 @@ enemyDefinitions.squirrelStorm = {
     acceleration: 0.2,
     aggroRadius: 112,
     speed: 3,
-    life: 4, touchHit: { damage: 2, element: 'lightning'},
+    life: 4, touchHit: { damage: 2, element: 'lightning', source: null},
     immunities: ['lightning'],
     params: {
         element: 'lightning',
@@ -290,7 +299,7 @@ enemyDefinitions.superSquirrel = {
     naturalDifficultyRating: 6,
     animations: superElectricSquirrelAnimations,
     acceleration: 0.2, aggroRadius: 112, speed: 2.5, scale: 2,
-    life: 12, touchHit: { damage: 2, element: 'lightning'},
+    life: 12, touchHit: { damage: 2, element: 'lightning', source: null},
     immunities: ['lightning'],
     params: {
         element: 'lightning',

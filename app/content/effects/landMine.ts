@@ -22,6 +22,7 @@ interface Props {
     armingTime?: number
     blastProps?: Partial<BlastProps>
     duration?: number
+    source: Actor
 }
 
 export class LandMine implements EffectInstance, Props {
@@ -43,6 +44,7 @@ export class LandMine implements EffectInstance, Props {
     armingTime = this.props.armingTime ?? 500;
     duration = this.props.duration ?? 10000;
     triggered = false;
+    source = this.props.source;
     constructor(public props: Props) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -63,10 +65,11 @@ export class LandMine implements EffectInstance, Props {
         } else  {
             // if the player walks inside the radius trigger the blast effect.
             for (const target of this.area.allyTargets) {
-                if (isTargetHit(target.getHitbox(), {hitCircle: this.getCircle()})) {
+                if (isTargetHit(target.getHitbox(), {hitCircle: this.getCircle(), source: this.source})) {
                     const blast = new Blast({
                         x: this.x,
                         y: this.y,
+                        source: this.source,
                         ...this.props.blastProps,
                     });
                     addEffectToArea(state, this.area, blast);
@@ -112,7 +115,7 @@ export class LandMine implements EffectInstance, Props {
     }
 }
 
-export function throwMineAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, props: Partial<Props>): LandMine {
+export function throwMineAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, props: Partial<Props> & {source: Actor}): LandMine {
     const hitbox = enemy.getHitbox(state);
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;

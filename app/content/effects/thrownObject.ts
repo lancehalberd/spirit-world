@@ -18,6 +18,7 @@ interface Props {
     vy?: number
     vz?: number
     damage?: number
+    source: Actor
 }
 
 export class ThrownObject implements EffectInstance {
@@ -35,7 +36,8 @@ export class ThrownObject implements EffectInstance {
     vz: number;
     damage;
     broken = false;
-    constructor({frame, behaviors, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
+    source: Actor;
+    constructor({frame, behaviors, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1, source }: Props) {
         this.frame = frame;
         this.x = x;
         this.y = y;
@@ -45,6 +47,7 @@ export class ThrownObject implements EffectInstance {
         this.vz = vz;
         this.behaviors = behaviors ?? {};
         this.damage = this.behaviors.throwDamage ?? damage;
+        this.source = source;
     }
     getHitbox() {
         // Technically it is unrealistic to use the z-component in the hitbox, but practically
@@ -75,6 +78,7 @@ export class ThrownObject implements EffectInstance {
             hitObjects: true,
             // Break the ground the object lands on in the last frame.
             breaksGround: (this.z <= 0),
+            source: this.source,
         });
         if (hitResult.hit || hitResult.blocked) {
             this.breakOnImpact(state);

@@ -36,7 +36,7 @@ enemyDefinitions.sentryBot = {
     naturalDifficultyRating: 12,
     animations: sentryBotAnimations,
     flying: false, acceleration: 0.2, aggroRadius: 112, speed: 2,
-    life: 12, touchHit: { damage: 2, element: 'lightning'},
+    life: 12, touchHit: { damage: 2, element: 'lightning', source: null},
     lootTable: lifeLootTable,
     immunities: ['lightning'],
     canBeKnockedBack: false,
@@ -70,6 +70,7 @@ enemyDefinitions.sentryBot = {
                     sx: cx, sy: cy,
                     tx: enemy.params.targetX, ty: enemy.params.targetY,
                     radius: 5, damage: 4, duration: 200,
+                    source: enemy,
                 }));
             }
             if (enemy.modeTime === chargeTime) {

@@ -116,6 +116,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
             vx: 4 * dx,
             vy: 4 * dy,
             hybridWorlds: true,
+            source: enemy,
         });
     },
     cooldown: 4000,
@@ -163,6 +164,7 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
                 vx: speed * dx,
                 vy: speed * dy,
                 hybridWorlds: true,
+                source: enemy,
             });
         }
         enemy.knockBack(state, {vx: -1 * target.x, vy: -1 * target.y, vz: 2}, true);
@@ -201,6 +203,7 @@ const flameRingAbility: EnemyAbility<true> = {
                 ay: -dy / 5,
                 vx: 0,
                 vy: 0,
+                source: enemy,
             });
             const delayedFlame = new DelayedEffect({
                 delay: 60 * i,
@@ -246,6 +249,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
                 removeEffectFromArea(state, spark);
             },
             ttl: 3000,
+            source: enemy,
         });
         addEffectToArea(state, state.hero.area, spark);
     },
@@ -288,6 +292,7 @@ const staffAbility: EnemyAbility<CardinalDirection> = {
             hitAllies: true,
             knockAwayFromHit: true,
             isStaff: true,
+            source: enemy,
         });
         state.screenShakes.push({
             dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200

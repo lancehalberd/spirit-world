@@ -18,6 +18,7 @@ export const crystalProjectileAbility: EnemyAbility<Vector> = {
             damage: 2,
             vx: 4 * dx,
             vy: 4 * dy,
+            source: enemy,
         });
     },
     cooldown: 4000,
@@ -44,6 +45,7 @@ export const crystalProjectileArcAbility: EnemyAbility<Vector> = {
                 damage: 2,
                 vx: 4 * dx,
                 vy: 4 * dy,
+                source: enemy,
             });
         }
     },
@@ -73,6 +75,7 @@ export const crystalNovaAbility: EnemyAbility<boolean> = {
                 damage: 2,
                 vx: 2 * dx,
                 vy: 2 * dy,
+                source: enemy,
             });
         }
     },

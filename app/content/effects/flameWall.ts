@@ -12,8 +12,9 @@ interface Props {
     direction: Direction
     damage?: number
     delay?: number
-    fromPoint?: {x: number, y: number}
+    fromPoint?: Point
     length?: number
+    source: Actor
 }
 
 export class FlameWall implements EffectInstance, Props {
@@ -40,13 +41,15 @@ export class FlameWall implements EffectInstance, Props {
     status: ObjectStatus = 'normal';
     speed = 0;
     distance = 0;
-    constructor({damage = 1, delay = 800, direction = 'down', length = 6, fromPoint}: Props) {
+    source: Actor
+    constructor({damage = 1, delay = 800, direction = 'down', length = 6, fromPoint, source}: Props) {
         this.delay = delay;
         this.damage = damage;
         this.direction = direction;
         this.length = length;
         this.fromPoint = fromPoint;
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
+        this.source = source;
     }
     getHitbox(state: GameState) {
         return {
@@ -128,6 +131,7 @@ export class FlameWall implements EffectInstance, Props {
                     hitAllies: true,
                     hitTiles: true,
                     knockback: {vx: 4 * directionMap[this.direction][0], vy: 4 * directionMap[this.direction][1], vz: 2},
+                    source: this.source,
                 });
                 if (this.animationTime % 100 === 0) {
                     addSparkleAnimation(state, this.area, hitbox, { element: 'fire' });
@@ -157,12 +161,13 @@ export class FlameWall implements EffectInstance, Props {
         }
     }
 
-    static createRadialFlameWall(state: GameState, area: AreaInstance, fromPoint: Props['fromPoint'], length = 4) {
+    static createRadialFlameWall(state: GameState, area: AreaInstance, fromPoint: Point, length = 4, source: Actor) {
         for (let i = 0; i < 4; i++) {
             const flameWall = new FlameWall({
                 direction: rotateDirection('down', i),
                 fromPoint,
                 length,
+                source,
             });
             addEffectToArea(state, area, flameWall);
         }

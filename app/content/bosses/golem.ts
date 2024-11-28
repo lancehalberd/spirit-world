@@ -275,7 +275,7 @@ export function onHitGolemHand(state: GameState, enemy: Enemy, hit: HitPropertie
 
 enemyDefinitions.golem = {
     naturalDifficultyRating: 20,
-    animations: golemHeadAnimations, life: 12, touchHit: { damage: 1, canAlwaysKnockback: true },
+    animations: golemHeadAnimations, life: 12, touchHit: { damage: 1, canAlwaysKnockback: true, source: null },
     acceleration: 0.3, speed: 3,
     hasShadow: false,
     update: updateGolem,
@@ -520,6 +520,7 @@ function fireLaser(this: void, state: GameState, enemy: Enemy, duration: number,
     const laser = new LaserBeam({
         sx: sx, sy, tx: sx, ty: sy + 512,
         radius, damage: 2, duration,
+        source: enemy,
     });
     addEffectToArea(state, enemy.area, laser);
     return laser;
@@ -975,6 +976,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
                 damage: 2,
                 knockAwayFromHit: true,
                 hitAllies: true,
+                source: enemy,
             });
             enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 2);
@@ -984,7 +986,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 // We could increase the spark count for a more difficult version of the boss.
                 2, // + (golem?.params.enrageLevel || 0),
-                Math.PI / 2, Math.PI / 6, 20, {maxSpeed: 5, delay: 200}
+                Math.PI / 2, Math.PI / 6, 20, {maxSpeed: 5, delay: 200, source: enemy}
             );
             if (isSlammingHands) {
                 // Continue slamming until the last N seconds of the slam attack.
@@ -1011,6 +1013,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
                 hitAllies: true,
                 hitTiles: true,
                 crushingPower: 3,
+                source: enemy,
             });
             enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 3);
@@ -1018,7 +1021,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             addRadialShockWaves(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 + 4],
-                4, Math.PI / 4, 20, {maxSpeed: 5, delay: 200}
+                4, Math.PI / 4, 20, {maxSpeed: 5, delay: 200, source: enemy}
             );
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');
@@ -1033,6 +1036,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             damage: 1,
             knockAwayFromHit: true,
             crushingPower: 3,
+            source: enemy,
         });
         if (!moveEnemy(state, enemy, enemy.vx, enemy.vy, handMovementProperties)) {
             enemy.makeSound(state, 'bossDeath');

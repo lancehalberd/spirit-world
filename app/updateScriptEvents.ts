@@ -239,5 +239,9 @@ function followMessagePointer(state: GameState, pointer: string) {
         return;
     }
     const script = dialogueSet.mappedOptions[optionKey];
+    if (!script) {
+        console.error('Missing dialogue option',  dialogueSet.mappedOptions, optionKey);
+        return;
+    }
     prependScript(state, script);
 }

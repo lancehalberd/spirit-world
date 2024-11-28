@@ -250,6 +250,7 @@ export class ThrownChakram implements EffectInstance {
             hitTiles: true,
             anchorPoint,
             isHigh: this.isHigh,
+            source: this.source,
         };
         hitResult = hitTargets(state, this.area, hit);
         // A small hitbox check for hitting tiles that stops on any impact, this allows the chakram to go partially
@@ -262,6 +263,7 @@ export class ThrownChakram implements EffectInstance {
             hitTiles: true,
             anchorPoint,
             isHigh: this.isHigh,
+            source: this.source,
         };
         hitResult = hitTargets(state, this.area, hit);
         didHit = hitResult.hit || hitResult.blocked;

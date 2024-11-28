@@ -22,6 +22,7 @@ interface Props {
     az?: number
     ttl?: number
     delay?: number
+    source: Actor
 }
 
 export class ShockWave implements EffectInstance, Props {
@@ -45,7 +46,8 @@ export class ShockWave implements EffectInstance, Props {
     maxSpeed = 0;
     ttl: number;
     delay: number;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, damage = 1, maxSpeed = 0, ttl = 2000, delay = 0}: Props) {
+    source: Actor;
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, damage = 1, maxSpeed = 0, ttl = 2000, delay = 0, source}: Props) {
         this.damage = damage;
         this.maxSpeed = maxSpeed;
         this.x = x;
@@ -59,6 +61,7 @@ export class ShockWave implements EffectInstance, Props {
         this.az = az;
         this.ttl = ttl;
         this.delay = delay;
+        this.source = source;
     }
     update(state: GameState) {
         if (this.delay > 0) {
@@ -91,6 +94,7 @@ export class ShockWave implements EffectInstance, Props {
                 vx: this.vx,
                 vy: this.vy,
                 knockAwayFrom: {x: this.x, y: this.y},
+                source: this.source,
             });
             if (hitResult.blocked || hitResult.stopped) {
                 removeEffectFromArea(state, this);
@@ -124,7 +128,7 @@ export class ShockWave implements EffectInstance, Props {
 export function addRadialShockWaves(this: void,
     state: GameState, area: AreaInstance,
     [x, y]: Coords, count: number, thetaOffset = 0, offset = 0,
-    extraProps?: Partial<Props>
+    extraProps?: Partial<Props> & {source: Actor}
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
@@ -145,7 +149,7 @@ export function addRadialShockWaves(this: void,
 export function addArcOfShockWaves(this: void,
     state: GameState, area: AreaInstance,
     [x, y]: Coords, count: number, centerTheta = 0, thetaRadius = Math.PI / 4, offset: number,
-    extraProps?: Partial<Props>
+    extraProps?: Partial<Props> & {source: Actor}
 ): void {
     for (let i = 0; i < count; i++) {
         const theta = count === 1

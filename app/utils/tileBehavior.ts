@@ -12,16 +12,47 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
         }
         const isForeground = getDrawPriority(layer.definition) === 'foreground';
         // Masked tiles are assumed not to set any behaviors as they are mostly hidden by the mask.
-        if (layer.definition.mask?.tiles?.[y]?.[x]) {
-            continue;
-        }
+        //if (layer.definition.mask?.tiles?.[y]?.[x]) {
+        //    continue;
+        //}
+        const maskTile = layer.maskTiles?.[y]?.[x];
+        // The mask tile overrides the behavior of the tile underneath it currently.
+        const behaviors = maskTile
+            ? maskTile.behaviors
+            // tile 1 is used a lot but has no meaningful behavior so skip it.
+            : (tile.index !== 1 ? tile.behaviors : undefined);
         // The behavior grid combines behaviors of all layers, with higher layers
         // overriding the behavior of lower layers.
-        if (tile.behaviors) {
+        if (behaviors) {
             if (!area.behaviorGrid[y]) {
                 area.behaviorGrid[y] = [];
             }
-            applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, tile, isForeground);
+            applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, behaviors, isForeground);
+        }
+    }
+}
+
+export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayer): void {
+    const tiles = layer.tiles;
+    const isForeground = getDrawPriority(layer) === 'foreground';
+    for (let y = 0; y < tiles.length; y++) {
+        if (!behaviorGrid[y]) {
+            behaviorGrid[y] = [];
+        }
+        for (let x = 0; x < tiles.length; x++) {
+            const tile = tiles[y]?.[x];
+            if (!tile) {
+                continue;
+            }
+            const maskTile = layer.maskTiles?.[y]?.[x];
+            // The mask tile overrides the behavior of the tile underneath it currently.
+            const behaviors = maskTile
+                ? maskTile.behaviors
+                // tile 1 is used a lot but has no meaningful behavior so skip it.
+                : (tile.index !== 1 ? tile.behaviors : undefined);
+            if (behaviors) {
+                applyTileToBehaviorGrid(behaviorGrid, {x, y}, behaviors, isForeground);
+            }
         }
     }
 }
@@ -60,15 +91,13 @@ export function removeLedgeFromBehaviorTileGrid(behaviorGrid: TileBehaviors[][],
     }
 }
 
-export function applyTileToBehaviorGrid(
+function applyTileToBehaviorGrid(
     behaviorGrid: TileBehaviors[][],
     {x, y}: Tile,
-    tile: FullTile,
+    behaviors: TileBehaviors,
     isForeground: boolean,
 ): void {
-    const behaviors = tile.behaviors;
-    // Tiles 0/1 are the null and empty tile and should not impact the tile behavior.
-    if (!behaviors || tile.index < 2) {
+    if (!behaviors) {
         return;
     }
     // Lava + clouds erase the behaviors of tiles underneath them.

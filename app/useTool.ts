@@ -74,6 +74,7 @@ export function useTool(
                 y: hero.y + 8 * directionMap[direction][1] + 6,
                 vx: speed * directionMap[direction][0],
                 vy: speed * directionMap[direction][1],
+                source: hero,
             });
             addEffectToArea(state, state.areaInstance, arrow);
             if (isUpgradedBow && chargeLevel >= 1) {
@@ -84,6 +85,7 @@ export function useTool(
                     y: hero.y + 8 * directionMap[direction][1] + 6,
                     vx: speed * directionMap[direction][0],
                     vy: speed * directionMap[direction][1],
+                    source: hero,
                 });
                 playAreaSound(state, hero.area, 'arrow');
                 addEffectToArea(state, state.areaInstance, arrow);
@@ -94,6 +96,7 @@ export function useTool(
                     y: hero.y + 8 * directionMap[direction][1] + 6,
                     vx: speed * directionMap[direction][0],
                     vy: speed * directionMap[direction][1],
+                    source: hero,
                 });
                 playAreaSound(state, hero.area, 'arrow');
                 addEffectToArea(state, state.areaInstance, arrow);
@@ -111,6 +114,7 @@ export function useTool(
                     vx: 3 * directionMap[direction][0],
                     vy: 3 * directionMap[direction][1],
                     delay: 100,
+                    source: hero,
                 });
                 addEffectToArea(state, state.areaInstance, arrow);
                 if (isUpgradedBow) {
@@ -122,6 +126,7 @@ export function useTool(
                         vx: 3 * directionMap[direction][0],
                         vy: 3 * directionMap[direction][1],
                         delay: 100,
+                        source: hero,
                     });
                     addEffectToArea(state, state.areaInstance, arrow);
                     direction = rotateDirection(direction, 1);
@@ -132,6 +137,7 @@ export function useTool(
                         vx: 3 * directionMap[direction][0],
                         vy: 3 * directionMap[direction][1],
                         delay: 100,
+                        source: hero,
                     });
                     addEffectToArea(state, state.areaInstance, arrow);
                 }

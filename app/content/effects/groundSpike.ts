@@ -11,6 +11,7 @@ interface Props {
     damage?: number
     delay?: number
     tellDuration?: number
+    source: Actor
 }
 
 const warningAnimation = createAnimation('gfx/effects/eyespike.png', {w: 24, h: 48},
@@ -42,12 +43,14 @@ export class GroundSpike implements EffectInstance, Props {
     delay: number;
     tellDuration: number;
     animationTime = 0;
-    constructor({x = 0, y = 0, damage = 2, delay = 0, tellDuration = 1000}: Props) {
+    source: Actor;
+    constructor({x = 0, y = 0, damage = 2, delay = 0, tellDuration = 1000, source}: Props) {
         this.x = x - this.w / 2;
         this.y = y - this.h / 2;
         this.delay = delay;
         this.tellDuration = tellDuration;
         this.damage = damage;
+        this.source = source;
     }
     update(state: GameState) {
         if (this.delay >= 0) {
@@ -63,6 +66,7 @@ export class GroundSpike implements EffectInstance, Props {
                 hitAllies: true,
                 hitTiles: true,
                 cutsGround: true,
+                source: this.source,
             });
         } else if (this.animationTime < this.tellDuration) {
             hitTargets(state, this.area, {
@@ -71,6 +75,7 @@ export class GroundSpike implements EffectInstance, Props {
                 hitAllies: false,
                 hitTiles: true,
                 cutsGround: true,
+                source: this.source,
             });
         }
         if (this.animationTime >= this.tellDuration + animationDuration + fadeDuration) {
@@ -122,10 +127,10 @@ interface LineProps {
     target: Coords
     spacing?: number
     length?: number
-    spikeProps?: Props
+    spikeProps: Props
 }
 export function addLineOfSpikes(this: void, {
-    state, area, source, target, spacing = 20, length = 256, spikeProps = {}
+    state, area, source, target, spacing = 20, length = 256, spikeProps
 }: LineProps): void {
     const theta = Math.atan2(target[1] - source[1], target[0] - source[0]);
     const dx = spacing * Math.cos(theta), dy = spacing * Math.sin(theta);

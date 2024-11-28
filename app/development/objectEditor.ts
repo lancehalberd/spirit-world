@@ -336,7 +336,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
-                difficulty: definition.difficulty ?? enemyDefinition.naturalDifficultyRating,
+                difficulty: definition.difficulty !== enemyDefinition.naturalDifficultyRating ? definition.difficulty : undefined,
                 z: definition.z,
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
@@ -1424,7 +1424,11 @@ function getEnemyFields(state: GameState, editingState: EditingState, object: Ob
         name: 'difficulty',
         value: object.difficulty || enemyDefinition.naturalDifficultyRating,
         onChange(difficulty: number) {
-            object.difficulty = difficulty;
+            if (difficulty === enemyDefinition.naturalDifficultyRating) {
+                delete object.difficulty;
+            } else {
+                object.difficulty = difficulty;
+            }
             updateObjectInstance(state, object);
         },
     });

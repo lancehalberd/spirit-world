@@ -101,7 +101,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             const lavaProof = hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots >= 2;
             if (!lavaProof) {
                 // Lava overrides other damaging ground.
-                touchHit = { damage: 4, element: 'fire' };
+                touchHit = { damage: 4, element: 'fire', source: null };
             }
         }
         if (behaviors.pit || behaviors.cloudGround) {

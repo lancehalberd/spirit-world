@@ -522,6 +522,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 damage: 1,
                 hitbox: pad(hero.getHitbox(), 4),
                 hitTiles: true,
+                source: hero,
             };
             hitTargets(state, hero.area, landingHit);
             // If the hero lands somewhere invalid, damage them and return them to there last safe location,
@@ -589,6 +590,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     damage: 1,
                     hitbox: pad(hero.getHitbox(), 4),
                     hitTiles: true,
+                    source: hero,
                 };
                 hitTargets(state, hero.area, landingHit);
             }
@@ -750,6 +752,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 isBonk: staff.staffBonked,
                 canPush: staff.staffBonked,
                 canDamageCrystalShields: staff.staffBonked,
+                source: hero,
             });
             breakBrittleTilesInRect(state, state.areaInstance, pad(baseTarget, 2))
             hitTargets(state, state.areaInstance, {
@@ -761,6 +764,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 isBonk: staff.staffBonked,
                 canPush: staff.staffBonked,
                 direction: staff.direction,
+                source: hero,
             });
             if (!staff.staffBonked) {
                 state.screenShakes.push({
@@ -935,6 +939,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         hitTiles: true,
         hitEnemies: true,
         hitObjects: true,
+        source: hero,
     };
     hitTargets(state, hero.area, teleportHit);
     if (hero.savedData.element === 'lightning') {
@@ -953,6 +958,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         hitTiles: true,
         hitEnemies: true,
         hitObjects: true,
+        source: hero,
     };
     for (let i = 0; i < 8; i++) {
         const theta = 2 * Math.PI * i / 8;

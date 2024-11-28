@@ -36,7 +36,7 @@ enemyDefinitions.lightningDrone = {
     naturalDifficultyRating: 4,
     animations: droneAnimations,
     flying: true, acceleration: 0.2, aggroRadius: 112, speed: 2,
-    life: 4, touchHit: { damage: 2, element: 'lightning'},
+    life: 4, touchHit: { damage: 2, element: 'lightning', source: null},
     lootTable: lifeLootTable,
     immunities: ['lightning'],
     update(this: void, state: GameState, enemy: Enemy) {
@@ -59,6 +59,7 @@ enemyDefinitions.lightningDrone = {
                         y: hitbox.y + hitbox.h / 2,
                         tellDuration: chargeTime,
                         radius: dischargeRadius,
+                        boundSource: enemy,
                         source: enemy,
                     });
                     addEffectToArea(state, enemy.area, discharge);
@@ -89,6 +90,7 @@ enemyDefinitions.lightningDrone = {
                 hitTiles: true,
                 hitEnemies: true,
                 knockAwayFrom: {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
+                source: enemy,
             });
         }
     },

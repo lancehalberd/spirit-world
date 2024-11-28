@@ -6,7 +6,7 @@ import {
     lateDungeonSpawnLocations,
     easyBossSpawnLocations,
     storySpawnLocations,
-    minimizerSpawnLocations,
+    devSpawnLocations,
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
 import { cloneDeep } from 'app/utils/index';
@@ -75,9 +75,9 @@ export function getTestStateContextMenuOption(): MenuOption {
                     }
                 },
                 {
-                    label: 'Mini',
+                    label: 'Dev',
                     getChildren() {
-                        return getSpawnLocationOptions(minimizerSpawnLocations, true);
+                        return getSpawnLocationOptions(devSpawnLocations, true);
                     }
                 },
             ];

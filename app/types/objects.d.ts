@@ -307,7 +307,8 @@ interface HitProperties {
     hitbox?: Rect
     hitCircle?: Circle
     hitRay?: Ray
-    source?: Actor
+    // Source of the hit, can be set to null for things we explicitly don't care about tracking like traps and damaging tiles.
+    source: Actor | null
     // Whether this hit can break crystal shields on certain enemies like
     // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
     canDamageCrystalShields?: boolean

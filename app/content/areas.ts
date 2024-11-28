@@ -10,10 +10,10 @@ import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefe
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
 import { getAreaDimensions } from 'app/utils/getAreaSize';
-import { getDrawPriority, initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
+import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
+import { applyLayerToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 import { applyVariantsToArea } from 'app/utils/variants';
 
 export function getDefaultArea(w = 32, h = 32): AreaDefinition {
@@ -261,29 +261,6 @@ export function switchToNextAreaSection(state: GameState): void {
     checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
 }
 
-export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayer): void {
-    const tiles = layer.tiles;
-    const isForeground = getDrawPriority(layer) === 'foreground';
-    for (let y = 0; y < tiles.length; y++) {
-        if (!behaviorGrid[y]) {
-            behaviorGrid[y] = [];
-        }
-        for (let x = 0; x < tiles.length; x++) {
-            let tile = tiles[y][x];
-            if (!tile) {
-                continue;
-            }
-            const behaviors = tile?.behaviors;
-            // The behavior grid combines behaviors of all layers, with higher layers
-            // overriding the behavior of lower layers.
-            // Masked tiles are assumed to set no behaviors as they mostly just show the tiles
-            // underneath them.
-            if (behaviors && !layer.maskTiles?.[y]?.[x]) {
-                applyTileToBehaviorGrid(behaviorGrid, {x, y}, tile, isForeground);
-            }
-        }
-    }
-}
 
 export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][] {
     if (!tileNumbers) {
@@ -337,10 +314,25 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         backgroundFrames.push({
             canvas,
             context,
+            frameIndex: i,
+            isForeground: false,
             tilesDrawn: [],
         });
     }
     const foregroundFrames: AreaFrame[] = [];
+    for (let i = 0; i < 1; i++) {
+        const [canvas, context] = createCanvasAndContext(
+            areaSize.w * 16,
+            areaSize.h * 16,
+        );
+        foregroundFrames.push({
+            canvas,
+            context,
+            frameIndex: i,
+            isForeground: true,
+            tilesDrawn: [],
+        });
+    }
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
