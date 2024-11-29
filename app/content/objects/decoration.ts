@@ -111,7 +111,7 @@ export const decorationTypes: {[key: string]: DecorationType} = {
             solid: true,
         },
         getHitbox(decoration: Decoration): Rect {
-            return {x: decoration.x, y: decoration.y + 32, w: 64, h: 16};
+            return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
         },
     },
     lightningBeastStatue: {

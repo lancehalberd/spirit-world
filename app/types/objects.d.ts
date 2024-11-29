@@ -358,6 +358,8 @@ interface HitProperties {
     // True if this is a staff attack. Staff can activate/destroy certain objects.
     isStaff?: boolean
     isBonk?: boolean
+    // Indicates this projectile attack should go through certain objects such as enemies.
+    isPiercing?: boolean
     // True if this is a thrown object attack. Thrown rocks bypass golem defense.
     // We may need to make this more specific in the future, perhaps record the
     // tile index here, and then enemies can check for certain sets of indeces.

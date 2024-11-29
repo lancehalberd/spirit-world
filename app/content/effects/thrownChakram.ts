@@ -221,6 +221,7 @@ export class ThrownChakram implements EffectInstance {
             source: this.source,
             anchorPoint,
             isHigh: this.isHigh,
+            isPiercing: this.piercing,
         }
         // Only push objects on the way out to prevent accidentally dragging objects towards the player.
         if (this.outFrames > 0) {
@@ -236,7 +237,7 @@ export class ThrownChakram implements EffectInstance {
         if (hitResult.setElement) {
             this.element = hitResult.setElement;
         }
-        if ((didHit && !this.piercing && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
+        if ((didHit && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
             this.outFrames = 0;
         }
         // A full hitbox check for hitting tiles.

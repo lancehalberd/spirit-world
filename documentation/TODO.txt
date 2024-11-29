@@ -68,9 +68,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Charged chakram should not go through solid objects.
-        - It should still pierce enemies that were not defeated.
-
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
             - Each set should be 14 tiles for hex values 1-14 corresponding to 4 bit number [TL,TR,BL,BR]

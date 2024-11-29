@@ -1,49 +1,47 @@
 import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { Enemy } from 'app/content/enemy';
-import { beetleHornedAnimations } from 'app/content/enemyAnimations';
+import {beetleHornedAnimations, omniAnimation} from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import {createAnimation} from 'app/utils/animations';
 import { getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { paceRandomly } from 'app/utils/enemies';
-import { allImagesLoaded } from 'app/utils/images';
 import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 
 
-const flameGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
-export const [fireElement] = createAnimation('gfx/hud/elementhud.png', flameGeometry, {x: 1}).frames;
-const [flameHeartCanvas, flameHeartContext] = createCanvasAndContext(fireElement.w * 4, fireElement.h * 2);
-const createFlameAnimation = async () => {
-    await allImagesLoaded();
-    drawFrame(flameHeartContext, fireElement, {x: 0, y: 0, w: fireElement.w * 2, h: fireElement.h * 2});
-    flameHeartContext.save();
-        flameHeartContext.translate((fireElement.w + fireElement.content.x + fireElement.content.w / 2) * 2, 0);
-        flameHeartContext.scale(-1, 1);
-        drawFrame(flameHeartContext, fireElement, {
-            x: 2* (-fireElement.content.w / 2 - fireElement.content.x), y: 0,
-            w: fireElement.w * 2, h: fireElement.h * 2
-        });
-    flameHeartContext.restore();
-    drawFrame(flameHeartContext, fireElement, {...fireElement, x: 0, y: 2});
-    drawFrame(flameHeartContext, fireElement, {...fireElement, x: fireElement.w, y: 0});
-    drawFrame(flameHeartContext, fireElement, {...fireElement, x: 2 * fireElement.w, y: 0});
-    drawFrame(flameHeartContext, fireElement, {...fireElement, x: 3 * fireElement.w, y: 2});
-}
-debugCanvas;//(flameHeartCanvas);
-createFlameAnimation();
-const flameHeartAnimation = createAnimation(flameHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
-
+const flameHeartGeometry = {w: 48, h: 48, content: {x: 11, y: 14, w: 26, h: 24}};
+const flameHeartIdleAnimation = createAnimation('gfx/bosses/flameHeartIdle.png', flameHeartGeometry, {cols: 9, duration: 6});
+const flameHeartHurtAnimation = createAnimation('gfx/bosses/flameHeartHurt.png', flameHeartGeometry,
+    {cols: 11, duration: 2, frameMap: [0, 1, 2, 3, 2, 1]},
+);
+const flameHeartDeathAnimation = createAnimation('gfx/bosses/flameHeartHurt.png', flameHeartGeometry,
+    {cols: 11, duration: 2, frameMap: [0, 1, 2, 3, 4, 4, 5, 5]}, {loopFrame: 4},
+);
+const flameHeartPrepareAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
+    {cols: 14, duration: 4},
+    {loop: true, loopFrame: 6},
+);
+const flameHeartPrepareEndAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
+    {x: 14, cols: 4, duration: 4}
+);
+const flameHeartAttackAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
+    {x: 18, cols: 9, duration: 4},
+    {loop: true, loopFrame: 4}
+);
+const flameHeartAttackEndAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
+    {x: 27, cols: 4, duration: 4},
+);
 
 export const flameHeartAnimations = {
-    idle: {
-        up: flameHeartAnimation,
-        down: flameHeartAnimation,
-        left: flameHeartAnimation,
-        right: flameHeartAnimation,
-    },
+    idle: omniAnimation(flameHeartIdleAnimation),
+    hurt: omniAnimation(flameHeartHurtAnimation),
+    death: omniAnimation(flameHeartDeathAnimation),
+    prepare: omniAnimation(flameHeartPrepareAnimation),
+    prepareEnd: omniAnimation(flameHeartPrepareEndAnimation),
+    attack: omniAnimation(flameHeartAttackAnimation),
+    attackEnd: omniAnimation(flameHeartAttackEndAnimation),
 };
 
 
@@ -79,21 +77,24 @@ const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
 
 enemyDefinitions.flameHeart = {
     naturalDifficultyRating: 20,
-    animations: flameHeartAnimations, life: 24, scale: 2, touchHit: { damage: 4, element: 'fire', source: null}, update: updateFireHeart, params: {
+    animations: flameHeartAnimations, life: 50, scale: 2, touchHit: { damage: 4, element: 'fire', source: null},
+    update: updateFlameHeart,
+    params: {
         enrageLevel: 0,
     },
+    tileBehaviors: {solid: true},
     initialMode: 'choose',
     immunities: ['fire'],
-    elementalMultipliers: {'ice': 2, 'lightning': 1.5},
+    elementalMultipliers: {'ice': 1.5, 'lightning': 1.2},
 };
 enemyDefinitions.flameBeast = {
     naturalDifficultyRating: 100,
     abilities: [leapStrikeAbility],
-    animations: beetleHornedAnimations, life: 36, scale: 4, update: updateFireBeast,
+    animations: beetleHornedAnimations, life: 80, scale: 4, update: updateFireBeast,
     initialMode: 'hidden',
     acceleration: 0.3, speed: 2,
     immunities: ['fire'],
-    elementalMultipliers: {'ice': 2, 'lightning': 1.5},
+    elementalMultipliers: {'ice': 1.5, 'lightning': 1.2},
     params: {
         enrageLevel: 0,
     },
@@ -112,7 +113,7 @@ function isEnemyDefeated(enemy: Enemy): boolean {
     return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }
 
-function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
+function updateFlameHeart(this: void, state: GameState, enemy: Enemy): void {
     const isEnraged = enemy.params.enrageTime > 0;
     const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 144 : 500, enemy.area.allyTargets);
     if (isEnraged) {
@@ -120,50 +121,62 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
     }
     if (enemy.mode === 'choose') {
-        if (enemy.modeTime === 1000 || isEnraged) {
-            if (target && Math.random() < 0.6) {
-                enemy.params.theta = Math.atan2(target.y, target.x) - Math.PI / 4;
-                enemy.setMode('radialFlameAttack');
-            } else {
-                enemy.setMode('flameWallsAttack');
+        if (enemy.modeTime >= 1000 || isEnraged) {
+            // Use the next animation key to transition modes at the end of the current animation loop.
+            if (enemy.currentAnimationKey === 'attack' || enemy.runAnimationSequence(['idle', 'prepare'])) {
+                if (target && Math.random() < 0.6) {
+                    enemy.params.theta = Math.atan2(target.y, target.x) - Math.PI / 4;
+                    enemy.setMode('radialFlameAttack');
+                } else {
+                    enemy.setMode('flameWallsAttack');
+                }
             }
         }
     } else if (enemy.mode === 'flameWallsAttack') {
-        if (enemy.modeTime === 1000) {
-            const hitbox = enemy.getHitbox(state);
-            FlameWall.createRadialFlameWall(state, enemy.area, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
-                isEnraged ? 8 : 4 + enemy.params.enrageLevel * 2, enemy);
-        }
-        if (enemy.modeTime >= 1500) {
-            enemy.setMode('choose');
+        if (enemy.modeTime >= 1000) {
+            if (enemy.runAnimationSequence(['prepare', 'prepareEnd', 'attack'])) {
+                const hitbox = enemy.getHitbox(state);
+                FlameWall.createRadialFlameWall(state, enemy.area, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
+                    isEnraged ? 8 : 4 + enemy.params.enrageLevel * 2, enemy);
+                enemy.setMode('endAttack');
+            }
         }
     } else if (enemy.mode === 'radialFlameAttack') {
         const timeLimit = 4000 + 500 * enemy.params.enrageLevel;
-        if (enemy.modeTime % 100 === 0 && enemy.modeTime < timeLimit) {
-            // To give the player warning, this attack powers up over 1 second and has low range at first.
-            const power = Math.min(1, enemy.modeTime / 500);
-            const speed = 1 + 2 * power;
-            const hitbox = enemy.getHitbox(state);
-            let count = 1 + enemy.params.enrageLevel;
-            for (let i = 0; i < count; i++) {
-                const theta = enemy.params.theta + i * 2 * Math.PI / count;
-                const dx = Math.cos(theta);
-                const dy = Math.sin(theta);
-                const flame = new Flame({
-                    x: hitbox.x + hitbox.w / 2 + 4 * dx,
-                    y: hitbox.y + hitbox.h / 2 + 4 * dy,
-                    vx: speed * dx,
-                    vy: speed * dy,
-                    ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
-                    damage: 2,
-                    source: enemy,
-                });
-                addEffectToArea(state, enemy.area, flame);
+        if (enemy.modeTime >= 500 && enemy.runAnimationSequence(['prepare', 'prepareEnd', 'attack'])) {
+            if (enemy.modeTime % 100 === 0 && enemy.modeTime < timeLimit) {
+                // To give the player warning, this attack powers up over 1 second and has low range at first.
+                const power = Math.min(1, enemy.modeTime / 500);
+                const speed = 1 + 2 * power;
+                const hitbox = enemy.getHitbox(state);
+                let count = 1 + enemy.params.enrageLevel;
+                for (let i = 0; i < count; i++) {
+                    const theta = enemy.params.theta + i * 2 * Math.PI / count;
+                    const dx = Math.cos(theta);
+                    const dy = Math.sin(theta);
+                    const flame = new Flame({
+                        x: hitbox.x + hitbox.w / 2 + 4 * dx,
+                        y: hitbox.y + hitbox.h / 2 + 4 * dy,
+                        vx: speed * dx,
+                        vy: speed * dy,
+                        ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
+                        damage: 2,
+                        source: enemy,
+                    });
+                    addEffectToArea(state, enemy.area, flame);
+                }
+                enemy.params.theta += Math.PI / 20;
             }
-            enemy.params.theta += Math.PI / 20;
         }
         if (enemy.modeTime >= timeLimit + 500) {
-            enemy.setMode('choose');
+            enemy.setMode('endAttack');
+        }
+    } else if (enemy.mode === 'endAttack') {
+        // The heart will stay in the attack animation while enraged.
+        if (isEnraged || enemy.runAnimationSequence(['attack', 'attackEnd', 'idle'])) {
+            if (isEnraged || enemy.modeTime >= 1000) {
+                enemy.setMode('choose');
+            }
         }
     }
     if (enemy.life <= enemy.enemyDefinition.life * 2 / 3 && enemy.params.enrageLevel === 0) {

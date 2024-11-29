@@ -280,6 +280,25 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.animationTime = 0;
         }
     }
+    // Utility function for transitioning an enemy to a certain target animation smoothly.
+    // Causes an enemy to run through a sequence of unique animations if called every update.
+    // If the enemy is currently using one of the animations, it will start at that point,
+    // otherwise it will immediately change to the initial animation.
+    // Returns true when the enemy reaches the final animation key.
+    runAnimationSequence(animationKeys: string[]): boolean {
+        const index = animationKeys.indexOf(this.currentAnimationKey);
+        if (index < 0) {
+            // Start the animation sequence from the beginning.
+            this.changeToAnimation(animationKeys[0], animationKeys[1]);
+            return false;
+        } else if (index === animationKeys.length - 1) {
+            // The final animation has been reached.
+            return true;
+        }
+        // Continue on with the current animation and transition to the next when it completes.
+        this.changeToAnimation(animationKeys[index], animationKeys[index + 1]);
+        return false;
+    }
     setAnimation(type: string, d: Direction, time: number = 0, nextAnimationKey?: string) {
         this.currentAnimationKey = type;
         this.nextAnimationKey = nextAnimationKey;
@@ -435,7 +454,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             damageDealt,
             hit: true,
             destroyed: this.life <= 0 && !this.isImmortal,
-            knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
+            knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null,
+            pierced: hit.isPiercing,
         };
     }
     applyDamage(state: GameState, damage: number, damageSound: string = 'enemyHit', iframeMultiplier = 1) {
@@ -668,9 +688,6 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
-        if (this.nextAnimationKey && this.animationTime >= this.currentAnimation.duration) {
-            this.changeToAnimation(this.nextAnimationKey);
-        }
         this.time += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
@@ -744,6 +761,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
+        // Switch to the next animation if we reach the end of the current animation.
+        if (this.nextAnimationKey && this.animationTime >= this.currentAnimation.duration) {
+            this.changeToAnimation(this.nextAnimationKey);
+        }
         for (const ability of this.abilities) {
             // Abilities don't gain charges while in use.
             if (this.activeAbility?.definition === ability.definition) {
