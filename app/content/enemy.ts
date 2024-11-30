@@ -1029,12 +1029,14 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.enemyDefinition.renderShadow) {
             this.enemyDefinition.renderShadow(context, state, this);
-        } else if (this.hasShadow && this.status !== 'gone' && this.status !== 'hidden' && this.mode !== 'hidden') {
+        } else {
             this.defaultRenderShadow(context, state);
         }
     }
     defaultRenderShadow(context: CanvasRenderingContext2D, state: GameState) {
-        renderEnemyShadow(context, state, this);
+        if (this.hasShadow && this.status !== 'gone' && this.status !== 'hidden' && this.mode !== 'hidden') {
+            renderEnemyShadow(context, state, this);
+        }
     }
     renderPreview(context: CanvasRenderingContext2D, target: Rect): void {
         if (this.enemyDefinition.renderPreview) {

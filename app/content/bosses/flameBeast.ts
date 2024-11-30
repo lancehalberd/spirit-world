@@ -2,6 +2,7 @@ import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
+import {bossLaserBeamAbility, bossQuadRotatingLaserBeamAbility, bossQuadLaserBlenderBeamAbility} from 'app/content/enemyAbilities/laserBeam';
 import {beetleHornedAnimations, omniAnimation} from 'app/content/enemyAnimations';
 import {fillFlameBeastLava} from 'app/content/specialBehaviors/crater';
 import {addLavaBubbleEffectToBackground} from 'app/scenes/field/addAmbientEffects';
@@ -199,16 +200,18 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
     enemy.z = 6;
     // The heart is now considered enraged as long as it is covered in lava.
     const isEnraged = !isExposed;
-    const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 1000 : 144, enemy.area.allyTargets);
+    const target = getVectorToNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);
     if (enemy.mode === 'choose') {
         if (enemy.modeTime >= 1000 || isEnraged) {
             // Use the next animation key to transition modes at the end of the current animation loop.
             if (enemy.currentAnimationKey === 'attack' || enemy.runAnimationSequence(['idle', 'prepare'])) {
-                if (target && Math.random() < 0.6) {
+                if (target?.mag < 100 || (isEnraged && Math.random() < 0.3)) {
                     enemy.params.theta = Math.atan2(target.y, target.x) - Math.PI / 4;
                     enemy.setMode('radialFlameAttack');
-                } else {
+                } else if (Math.random() < 0.5) {
                     enemy.setMode('flameWallsAttack');
+                } else {
+                    enemy.setMode('laserAttack');
                 }
             }
         }
@@ -220,6 +223,31 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
                     isEnraged ? 8 : 4 + enemy.params.enrageLevel * 2, enemy);
                 enemy.setMode('endAttack');
             }
+        }
+    } else if (enemy.mode === 'laserAttack') {
+        if (enemy.modeTime >= 1000) {
+            if (enemy.runAnimationSequence(['prepare', 'prepareEnd', 'attack']) && enemy.animationTime >= 200) {
+                const target = getVectorToNearbyTarget(state, enemy, 1000, enemy.area.allyTargets) || {x: Math.random(), y: Math.random()};
+                const baseTheta = target ? Math.atan2(target.y, target.x) : 2 * Math.PI * Math.random();
+                enemy.setMode('endLaserAttack');
+                if (enemy.params.enrageLevel === 2) {
+                    bossQuadLaserBlenderBeamAbility.useAbility(state, enemy, baseTheta);
+                    // Rotating laser lasts the full 5000ms.
+                    enemy.modeTime = 0;
+                } else if (enemy.params.enrageLevel === 1) {
+                    bossQuadRotatingLaserBeamAbility.useAbility(state, enemy, baseTheta);
+                    // Rotating laser lasts the full 5000ms.
+                    enemy.modeTime = 800;
+                } else {
+                    bossLaserBeamAbility.useAbility(state, enemy, baseTheta);
+                    // Laser last 1000ms.
+                    enemy.modeTime = 4000;
+                }
+            }
+        }
+    } else if (enemy.mode === 'endLaserAttack') {
+        if (enemy.modeTime >= 5000) {
+            enemy.setMode('endAttack');
         }
     } else if (enemy.mode === 'radialFlameAttack') {
         const timeLimit = 4000 + 500 * enemy.params.enrageLevel;
@@ -321,6 +349,10 @@ function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
 
 function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
+    // This is a bit brittle as it depends on the boss having a specific number of starting abilities.
+    if (!flameHeart && enemy.abilities.length < 2) {
+        enemy.gainAbility(bossLaserBeamAbility);
+    }
     if (enemy.mode === 'hidden') {
         enemy.healthBarTime = 0;
         enemy.z = 300;
@@ -387,7 +419,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'choose' && enemy.z <= 0) {
         enemy.d = getCardinalDirection(targetVector.x, targetVector.y);
         enemy.setAnimation('idle', enemy.d);
-        enemy.tryUsingAbility(state, leapStrikeAbility);
+        enemy.useRandomAbility(state);
     }
 }
 

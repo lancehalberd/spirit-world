@@ -69,9 +69,14 @@ Graphics to Implement:
 
 Current tasks:
     - Crater improvements
-        - Add single laser attack to heart
-        - Add rotating laser attack to heart during and after first enrage phase.
-        - Add double rotating laser attack to heart during and after second enrage phase.
+        - Flame vortex enemy
+            - pulls player in like water vortex.
+            - stationary
+            - does not pull player if z > MAX_CLOUD_BOOTS
+            - does not pull player in during iframes unless they are on hard mode.
+            - deals lava damage to player if they are sucked all the way in.
+            - can have a TTL to despawn them
+            - Make flame beast leave temporary flame vortex instead of flames when jumping.
 
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.

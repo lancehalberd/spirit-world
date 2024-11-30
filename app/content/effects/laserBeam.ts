@@ -49,6 +49,7 @@ interface Props {
     damage?: number
     delay?: number
     source: Actor
+    beforeUpdate?: (state: GameState, laserBeam: LaserBeam) => void
 }
 
 const FADE_DURATION = 100;
@@ -58,41 +59,24 @@ export class LaserBeam implements EffectInstance, Props {
     isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
-    damage: number;
-    sx: number;
-    sy: number;
-    tx: number;
-    ty: number;
+    damage = this.props.damage ?? 2;
+    sx = this.props.sx | 0;
+    sy = this.props.sy | 0;
+    tx = this.props.tx | 0;
+    ty = this.props.ty | 0;
+    radius = this.props.radius ?? 6;
+    delay = this.props.delay;
+    duration = this.props.duration ?? 200;
+    ignoreWalls = this.props.ignoreWalls;
+    totalTellDuration = this.props.tellDuration ?? 0;
+    tellDuration = this.props.tellDuration ?? 0;
+    source = this.props.source;
+    beforeUpdate = this.props.beforeUpdate;
     z: number = 0;
-    vz: number = 0;
-    vx: number;
-    vy: number;
-    radius: number;
-    delay: number;
-    duration: number;
-    ignoreWalls: boolean;
-    totalTellDuration: number;
-    tellDuration: number;
-    shockWaves: number;
-    shockWaveTheta: number;
     animationTime = 0;
     done = false;
     memoizedHitRay: Ray;
-    source: Actor;
-    constructor({sx, sy, tx, ty, damage = 2, delay = 0, duration = 200, ignoreWalls = false, tellDuration = 0, radius = 6, source}: Props) {
-        this.sx = sx | 0;
-        this.sy = sy | 0;
-        this.tx = tx | 0;
-        this.ty = ty | 0;
-        this.delay = delay;
-        this.radius = radius;
-        this.duration = duration;
-        this.totalTellDuration = tellDuration;
-        this.tellDuration = tellDuration;
-        this.ignoreWalls = ignoreWalls;
-        this.damage = damage;
-        this.source = source;
-    }
+    constructor(public props: Props) {}
     getHitRay(state: GameState): Ray {
         if (this.memoizedHitRay) {
             return this.memoizedHitRay;
@@ -109,6 +93,9 @@ export class LaserBeam implements EffectInstance, Props {
         return this.memoizedHitRay;
     }
     update(state: GameState) {
+        if (this.beforeUpdate) {
+            this.beforeUpdate(state, this);
+        }
         // We only memoize the hit ray for a single frame before recalculating it.
         delete this.memoizedHitRay;
         if (this.delay > 0) {
