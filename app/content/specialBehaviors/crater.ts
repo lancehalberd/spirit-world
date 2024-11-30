@@ -1,4 +1,5 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
 import { appendScript } from 'app/scriptEvents';
 import { saveGame } from 'app/utils/saveGame';
 import {updateAllHeroes} from 'app/updateActor';
@@ -28,6 +29,7 @@ specialBehaviorsHash.craterLavaSwitch = {
             startTime: state.fieldTime,
             id: 'craterLava',
         });
+        const rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
         state.scriptEvents.activeEvents.push({
             type: 'update',
             update(state: GameState) {
@@ -76,6 +78,7 @@ specialBehaviorsHash.craterLavaSwitch = {
                 }
                 delete state.mutationDuration;
                 appendScript(state, '{stopScreenShake:craterLava}');
+                stopAreaSound(state, rumbleSoundReference);
                 return false;
             }
         });
@@ -101,6 +104,7 @@ function drainFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
+    const rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
     state.scriptEvents.activeEvents.push({
         type: 'update',
         update(state: GameState) {
@@ -144,6 +148,7 @@ function drainFlameBeastLava(state: GameState) {
             }
             delete state.mutationDuration;
             appendScript(state, '{stopScreenShake:craterLava}');
+            stopAreaSound(state, rumbleSoundReference);
             return false;
         }
     });
@@ -164,6 +169,7 @@ export function fillFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
+    const rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
     state.scriptEvents.activeEvents.push({
         type: 'update',
         update(state: GameState) {
@@ -203,6 +209,7 @@ export function fillFlameBeastLava(state: GameState) {
             if (timeElapsed >= 7000) {
                 delete state.mutationDuration;
                 appendScript(state, '{stopScreenShake:craterLava}');
+                stopAreaSound(state, rumbleSoundReference);
                 return false;
             }
             return true;

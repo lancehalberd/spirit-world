@@ -27,6 +27,7 @@ interface BaseSoundDefinition {
     customDelay?: number
     limit?: number
     repeatFrom?: number
+    speed?: number
 }
 interface SoundEffectDefinition extends BaseSoundDefinition {
     key: string
@@ -39,7 +40,7 @@ interface TrackDefinition extends BaseSoundDefinition {
 }
 
 export function requireSoundEffect({
-    key, source, offset, duration, customDelay, volume, instanceLimit = 5, loop = false, repeatFrom,
+    key, source, offset, duration, customDelay, volume, instanceLimit = 5, loop = false, repeatFrom, speed,
 }: SoundEffectDefinition): GameSound {
     const sound = sounds.get(key);
     if (sound) {
@@ -57,6 +58,7 @@ export function requireSoundEffect({
         loop,
         instanceLimit,
         instances: [],
+        speed,
     };
     // Add the audio buffer to the sound as soon as it is loaded.
     assignAudioBuffer(newSound, source);
@@ -64,7 +66,7 @@ export function requireSoundEffect({
     return newSound;
 }
 export function requireTrack({
-    key, source, offset, duration, customDelay, volume, repeatFrom, nextTrack,
+    key, source, offset, duration, customDelay, volume, repeatFrom, nextTrack, speed,
 }: TrackDefinition): GameTrack {
     const track = tracks.get(key);
     if (track) {
@@ -79,7 +81,8 @@ export function requireTrack({
         duration,
         instances: [],
         nextTrack,
-        loop: !nextTrack
+        loop: !nextTrack,
+        speed,
     };
     // Add the audio buffer to the sound as soon as it is loaded.
     assignAudioBuffer(newTrack, source);
@@ -108,6 +111,9 @@ function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: nu
         gainNode: audioContext.createGain(),
         startTime,
     };
+    if (sound.speed) {
+        instance.sourceNode.playbackRate.setValueAtTime(sound.speed, startTime);
+    }
     instance.sourceNode.connect(instance.gainNode);
     instance.sourceNode.buffer = sound.audioBuffer;
     // Merged
@@ -304,6 +310,7 @@ const musicTracks: {[key in string]: TrackDefinition} = {
     village: {key : 'village', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
     // Used for summoner ruins.
     ruins: {key : 'ruins', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
+    labTheme: {key: 'labTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10, speed: 0.5 },
 
     // Tracks from Leon
     // For War Temple and other dungeons
@@ -411,6 +418,7 @@ const preloadSounds = () => {
         {key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
             duration: 0.7, volume: 60, instanceLimit: 2
         },
+        {key: 'rumble', source: 'sfx/3x3_odrive.wav', volume: 50, instanceLimit: 1, speed: 0.4, loop: true},
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
             duration: 1.4, loop: true, volume: 20, instanceLimit: 2
         },

@@ -48,6 +48,7 @@ interface GameSound {
     activeInstances?: number
     instanceLimit?: number
     volume?: number
+    speed?: number
     // This is just used by custom audio context sounds
     play?: (target: AudioNode, time: number) => void
 }
@@ -79,6 +80,7 @@ type TrackKey
     | 'village'
     | 'ruins'
     | 'dungeonTheme'
+    | 'labTheme'
     | 'idleTheme'
     | 'bossIntro'
     | 'bossA'

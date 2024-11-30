@@ -69,8 +69,6 @@ Graphics to Implement:
 
 Current tasks:
     - Crater improvements
-        - Add rumbling sound effect for lava draining
-            - Apply to lava transitions + collapsing staff tower.
         - Add single laser attack to heart
         - Add rotating laser attack to heart during and after first enrage phase.
         - Add double rotating laser attack to heart during and after second enrage phase.

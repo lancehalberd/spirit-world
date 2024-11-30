@@ -167,7 +167,7 @@ export const updateMusic = (state: GameState): void => {
             playTrack('caveTheme', 0);
         }
     } else if (location.zoneKey === 'lab') {
-        playTrack('forgeTheme', 0);
+        playTrack('labTheme', 0);
     } else if (location.zoneKey === 'tree') {
         playTrack('helixTheme', 0);
     } else if (location.zoneKey === 'void') {

@@ -156,10 +156,9 @@ export class ThrownChakram implements EffectInstance {
                 // This shouldn't usually happen because hit detection should detect the ledge before
                 // the Chakram anchor point moves over the ledge.
                 if (!isReturning) {
-                    console.error('Chakram hit high ledge while moving out.')
+                    // console.error('Chakram hit high ledge while moving out.')
                     this.outFrames = 0;
                 }
-                // Chakram should
                 // removeEffectFromArea(state, this);
                 return;
             }

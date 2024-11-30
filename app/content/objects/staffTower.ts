@@ -1,6 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
 import { appendScript } from 'app/scriptEvents';
 import { drawFrame, drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -49,6 +49,7 @@ export class StaffTower implements ObjectInstance {
     door: ObjectInstance;
     balcony: Balcony;
     top: StaffTowerTop;
+    rumbleSoundReference: AudioInstance;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -74,6 +75,7 @@ export class StaffTower implements ObjectInstance {
         this.animationTime = 0;
         // Prevent the hero from moving while the tower collapses.
         state.hero.isControlledByObject = true;
+        this.rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
         state.screenShakes = [{dx: 1, dy: 0, startTime: state.fieldTime}];
     }
     deploy(state: GameState) {
@@ -170,6 +172,7 @@ export class StaffTower implements ObjectInstance {
                 // Pick up the staff at the end of the collapsing sequence.
                 appendScript(state, '{item:staff=2}');
             } else if (this.animationTime >= shakeTime + shrinkTime) {
+                stopAreaSound(state, this.rumbleSoundReference);
                 const hitbox = this.getHitbox();
                 const heroBox = state.hero.getHitbox();
                 const dx = (heroBox.x + heroBox.w / 2) - (hitbox.x + hitbox.w / 2);
