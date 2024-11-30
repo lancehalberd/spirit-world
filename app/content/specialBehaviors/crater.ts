@@ -4,7 +4,7 @@ import { saveGame } from 'app/utils/saveGame';
 import {updateAllHeroes} from 'app/updateActor';
 
 specialBehaviorsHash.craterLavaSwitch = {
-    type: 'floorSwitch',
+    type: 'heavyFloorSwitch',
     onActivate(state: GameState, object: ObjectInstance) {
         if (state.savedState.objectFlags.craterLava1) {
             return;

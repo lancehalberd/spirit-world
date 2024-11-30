@@ -69,7 +69,6 @@ Graphics to Implement:
 
 Current tasks:
     - Crater improvements
-        - Change first switch to heavy switch and update randomizer logic to require staff/clone+iron boots to drain lava.
         - Add rumbling sound effect for lava draining
             - Apply to lava transitions + collapsing staff tower.
         - Add single laser attack to heart

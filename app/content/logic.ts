@@ -203,6 +203,7 @@ export const canRemoveHeavyStones = orLogic(hasMitts, canHasTowerStaff);
 // Eventually we plan to allow bonking with tower staff to move these as well.
 export const canMoveHeavyStairs = hasMitts;
 export const canCrossLightningBarriers = orLogic(hasLightningBlessing, hasInvisibility, hasSomersault);
+export const canPressHeavySwitches = orLogic(hasStaff, andLogic(hasClone, hasIronBoots));
 
 export const canHasSpikeBoots = {requiredFlags: ['canReachCitySmith', '$spikeBoots', '$totalSilverOre:12']};
 export const canHasFlyingBoots = {requiredFlags: ['canReachForgeSmith', '$cloudBoots', '$flyingBoots', '$totalGoldOre:4']};

@@ -1,5 +1,6 @@
 import {
     andLogic,
+    canPressHeavySwitches,
     canRemoveLightStones,
     hasFireBlessing,
     hasIce,
@@ -31,8 +32,8 @@ export const craterNodes: LogicNode[] = [
         nodeId: 'craterEntrance',
         checks: [{objectId: 'craterMap'}],
         paths: [
-            // Eventually this will also require the staff.
-            {nodeId: 'craterLevel2', logic: hasBossWeapon},
+            // The player must defeat a guardian and then press a heavy switch to drain the lava.
+            {nodeId: 'craterLevel2', logic: andLogic(hasBossWeapon, canPressHeavySwitches)},
             {nodeId: 'craterNorthLedge', logic: canCrossLava},
         ],
         entranceIds: ['craterEntrance', 'craterRightDoor'],
@@ -150,11 +151,10 @@ export const craterNodes: LogicNode[] = [
             {objectId: 'craterLavaDoor', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)},
         ],
     },
-    // There are several inner rings, but they are all accessible only after `craterLavaDoor` is traversible.
     {
         zoneId,
         nodeId: 'craterBoss',
-        checks: [{objectId: 'flameBeast', logic: andLogic(hasRoll, hasBossWeapon)}],
+        checks: [{objectId: 'flameBeast', logic: andLogic(canPressHeavySwitches, hasRoll, hasBossWeapon)}],
         entranceIds: ['craterLavaDoor'],
         exits: [
             {objectId: 'craterLavaDoor'},

@@ -29,7 +29,7 @@ import { allLootTypes } from 'app/gameConstants';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
 import { getSwitchTargetIds } from 'app/utils/switches';
 
 
@@ -1735,17 +1735,16 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
         }
         area.definition.objects.push(object);
     }
+    const index = area.objects.findIndex(o => o.definition === (oldDefinition || object));
+    if (index >= 0) {
+        removeObjectFromArea(state, area.objects[index]);
+    }
     if (!isObjectLogicValid(state, object)) {
         return;
     }
-    const index = area.objects.findIndex(o => o.definition === (oldDefinition || object));
     const newObject = createObjectInstance(state, object);
-    if (index < 0) {
-        addObjectToArea(state, area, newObject);
-    } else {
-        removeObjectFromArea(state, area.objects[index]);
-        addObjectToArea(state, area, newObject);
-    }
+    addObjectToArea(state, area, newObject);
+    initializeObject(state, newObject);
     if (area === state.areaInstance && state.alternateAreaInstance) {
         checkToAddLinkedObject(state, area, object);
     }
