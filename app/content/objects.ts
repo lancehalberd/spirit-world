@@ -11,6 +11,7 @@ export * from 'app/content/objects/elevator';
 export * from 'app/content/objects/escalator';
 export * from 'app/content/objects/flameTurret';
 export * from 'app/content/objects/floorSwitch';
+export * from 'app/content/objects/heavyFloorSwitch';
 export * from 'app/content/objects/indicator';
 export * from 'app/content/objects/keyBlock';
 export * from 'app/content/objects/lavafall';

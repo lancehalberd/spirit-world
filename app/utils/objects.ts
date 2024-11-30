@@ -1,17 +1,27 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { playAreaSound } from 'app/musicController';
 import { isPixelInShortRect } from 'app/utils/index';
-import { applyBehaviorToTile } from 'app/utils/tileBehavior';
 import { saveGame } from 'app/utils/saveGame';
 
-
-
-function hitboxToGrid(hitbox: Rect): Rect {
-    const x = (hitbox.x / 16) | 0;
-    const w = (hitbox.w / 16) | 0;
-    const y = (hitbox.y / 16) | 0;
-    const h = (hitbox.h / 16) | 0;
-    return {x, y, w, h};
+export function initializeObject(state: GameState, object: ObjectInstance): void {
+    // Do not apply special behavior here, as addObjectToArea can get called when persisting objects during
+    // transitions (like lava drain), but apply should only be called once when the object is first created.
+    if (object.definition?.specialBehaviorKey) {
+        try {
+            specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
+        } catch (error) {
+            console.error(object.definition.specialBehaviorKey, error);
+        }
+    }
+    // Note that this doesn't automatically update linked objects, so the `savePosition` flag should
+    // match for linked objects to avoid inconsistencies.
+    if (object.definition?.savePosition) {
+        const p = getObjectStatus(state, object.definition, 'position');
+        if (Array.isArray(p)) {
+            object.x = p[0];
+            object.y = p[1];
+        }
+    }
 }
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
     if (object.area && object.area !== area) {
@@ -22,32 +32,6 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         object.add(state, area);
     } else {
         area.objects.push(object);
-    }
-    if (object.definition?.specialBehaviorKey) {
-        try {
-            specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
-        } catch (error) {
-            console.error(object.definition.specialBehaviorKey, error);
-        }
-    }
-
-    // Note that this doesn't automatically update linked objects, so the `savePosition` flag should
-    // match for linked objects to avoid inconsistencies.
-    if (object.definition?.savePosition) {
-        const p = getObjectStatus(state, object.definition, 'position');
-        if (Array.isArray(p)) {
-            object.x = p[0];
-            object.y = p[1];
-        }
-    }
-
-    if (object.applyBehaviorsToGrid && object.behaviors) {
-        const gridRect = hitboxToGrid(object.getHitbox());
-        for (let x = gridRect.x; x < gridRect.x + gridRect.w; x++) {
-            for (let y = gridRect.y; y < gridRect.y + gridRect.h; y++) {
-                applyBehaviorToTile(area, x, y, object.behaviors);
-            }
-        }
     }
 }
 export function removeObjectFromArea(state: GameState, object: ObjectInstance, trackId: boolean = true): void {

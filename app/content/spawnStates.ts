@@ -94,7 +94,7 @@ const craterStartState = applyItemsToSavedState(beastState, {
     waterBlessing: 1, ice: 1
 }, ['frostBeast', 'stormBeast']);
 const craterBossState = applyItemsToSavedState(craterStartState, {fireBlessing: 1},
-    ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
+    ['craterLava1', 'craterLava2', 'craterLava3']
 );
 
 const staffStartState = applyItemsToSavedState(beastState, {

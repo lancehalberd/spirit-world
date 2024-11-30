@@ -359,8 +359,8 @@ export const SPAWN_CRATER_ENTRANCE: ZoneLocation = {
 export const SPAWN_CRATER_BOSS: ZoneLocation = {
     zoneKey: 'crater',
     floor: 0,
-    x: 250,
-    y: 180,
+    x: 246,
+    y: 408,
     z: 0,
     d: 'up',
     areaGridCoords: {y: 1, x: 1},

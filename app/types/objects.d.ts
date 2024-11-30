@@ -103,9 +103,6 @@ interface ObjectInstance extends BaseFieldInstance {
     // unambiguously so that editors can distinguish between different objects that may normally
     // look identical.
     renderPreview?: (context: CanvasRenderingContext2D, target: Rect) => void
-    // If this is true behaviors will be applied to the behavior grid when this
-    // object gets added.
-    applyBehaviorsToGrid?: boolean
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
     changesAreas?: boolean
@@ -360,6 +357,9 @@ interface HitProperties {
     isBonk?: boolean
     // Indicates this projectile attack should go through certain objects such as enemies.
     isPiercing?: boolean
+    // Indicates the hit came from something falling hard enough to depress a heavy switch,
+    // such as a hero falling at max velocity or with iron boots.
+    isStomp?: boolean
     // True if this is a thrown object attack. Thrown rocks bypass golem defense.
     // We may need to make this more specific in the future, perhaps record the
     // tile index here, and then enemies can check for certain sets of indeces.
@@ -476,13 +476,17 @@ interface AirStreamDefinition extends BaseObjectDefinition {
 
 interface BaseSwitchDefinition extends BaseObjectDefinition {
     targetObjectId?: string
-    // This will deafult to true.
+    // This will default to true.
     requireAll?: boolean
 }
 
 interface FloorSwitchDefinition extends BaseSwitchDefinition {
-    type: 'floorSwitch'
+    type: 'floorSwitch' | 'heavyFloorSw'
     toggleOnRelease?: boolean
+}
+
+interface HeavyFloorSwitchDefinition extends BaseSwitchDefinition {
+    type: 'heavyFloorSwitch'
 }
 
 interface KeyBlockDefinition extends BaseSwitchDefinition {
@@ -659,6 +663,7 @@ type ObjectDefinition = SimpleObjectDefinition
     | EnemyObjectDefinition
     | EscalatorDefinition
     | FloorSwitchDefinition
+    | HeavyFloorSwitchDefinition
     | IndicatorDefinition
     | KeyBlockDefinition
     | LootObjectDefinition
@@ -705,7 +710,7 @@ interface SpecialElevatorBehavior extends BaseSpecialBehavior<Elevator> {
 
 interface SpecialSwitchBehavior extends BaseSpecialBehavior<ObjectInstance> {
     // This could be extended for floor switches and other switches.
-    type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal'
+    type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal' | 'heavyFloorSwitch'
     onActivate?: (state: GameState, object: ObjectInstance) => void
 }
 

@@ -13,7 +13,6 @@ export class BallGoal implements ObjectInstance {
         blocksStaff: true,
         solid: false,
     };
-    applyBehaviorsToGrid = true;
     drawPriority: DrawPriority = 'background';
     definition: BallGoalDefinition = null;
     x: number;
@@ -36,7 +35,7 @@ export class BallGoal implements ObjectInstance {
         // Once a ball activates the goal, it fills the goal and it becomes solid.
         this.behaviors = { solid: true };
         if (!this.disabled) {
-            checkIfAllSwitchesAreActivated(state, this.area, this);
+            checkIfAllSwitchesAreActivated(state, this.area, this.definition);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

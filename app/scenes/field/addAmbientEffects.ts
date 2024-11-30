@@ -66,7 +66,7 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
             //addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'fire' });
             return;
         }
-        addLavaAnimationEffectToBackground(state, area, Random.element(lavaBubbleAnimations), {x, y});
+        addLavaBubbleEffectToBackground(state, area, {x, y});
         return;
     }
     if (state.areaInstance === area && state.areaSection?.isHot) {
@@ -82,6 +82,9 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
         return;
     }
 
+}
+export function addLavaBubbleEffectToBackground(this: void, state: GameState, area: AreaInstance, {x, y}: Point): FieldAnimationEffect {
+    return addLavaAnimationEffectToBackground(state, area, Random.element(lavaBubbleAnimations), {x, y});
 }
 function addLavaAnimationEffectToBackground(this: void, state: GameState, area: AreaInstance, animation: FrameAnimation, {x, y}: Point): FieldAnimationEffect {
     const animationEffect = addAnimationEffectToBackground(state, area, animation, {x, y});

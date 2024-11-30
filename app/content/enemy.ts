@@ -126,8 +126,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             ...(this.enemyDefinition.tileBehaviors || {}),
             // Attribute touch hits to this enemy.
             touchHit: this.enemyDefinition.tileBehaviors?.touchHit ? {
-                source: this,
                 ...this.enemyDefinition.tileBehaviors.touchHit,
+                source: this,
             } : undefined,
         };
         this.d = definition.d || 'down';

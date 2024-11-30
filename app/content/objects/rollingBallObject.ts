@@ -292,6 +292,7 @@ export class RollingBallObject implements ObjectInstance {
                     hitTiles: true,
                     // Falling balls can destroy even some unliftable tiles.
                     crushingPower: 3,
+                    isStomp: true,
                     knockAwayFrom: {x: this.x + 8, y: this.y + 8},
                     source: null,
                 });

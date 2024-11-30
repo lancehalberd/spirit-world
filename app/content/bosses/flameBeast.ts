@@ -3,12 +3,15 @@ import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
 import {beetleHornedAnimations, omniAnimation} from 'app/content/enemyAnimations';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import {fillFlameBeastLava} from 'app/content/specialBehaviors/crater';
+import {addLavaBubbleEffectToBackground} from 'app/scenes/field/addAmbientEffects';
 import {createAnimation} from 'app/utils/animations';
 import { getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { paceRandomly } from 'app/utils/enemies';
+import {hitTargets} from 'app/utils/field';
 import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
+import Random from 'app/utils/Random';
 
 
 const flameHeartGeometry = {w: 48, h: 48, content: {x: 11, y: 14, w: 26, h: 24}};
@@ -77,15 +80,34 @@ const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
 
 enemyDefinitions.flameHeart = {
     naturalDifficultyRating: 20,
-    animations: flameHeartAnimations, life: 50, scale: 2, touchHit: { damage: 4, element: 'fire', source: null},
+    animations: flameHeartAnimations, life: 50, scale: 2,
     update: updateFlameHeart,
+    floating: true,
     params: {
         enrageLevel: 0,
+        // This is the key that corresponds to the lava being drained enough to reveal the heart.
+        // When it is set, the heart is vulnerable. Leave this blank to make it always vulnerable.
+        lavaKey: 'craterLava4Objects',
     },
-    tileBehaviors: {solid: true},
     initialMode: 'choose',
     immunities: ['fire'],
     elementalMultipliers: {'ice': 1.5, 'lightning': 1.2},
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        if (isFlameHeartExposed(state, enemy)) {
+            return enemy.defaultOnHit(state, hit);
+        }
+        return {};
+    },
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (isFlameHeartExposed(state, enemy)) {
+            enemy.defaultRender(context, state);
+        }
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (isFlameHeartExposed(state, enemy)) {
+            enemy.defaultRenderShadow(context, state);
+        }
+    },
 };
 enemyDefinitions.flameBeast = {
     naturalDifficultyRating: 100,
@@ -100,26 +122,58 @@ enemyDefinitions.flameBeast = {
     },
 };
 
-function getFlameHeart(this: void, state: GameState, area: AreaInstance): Enemy {
+function getFlameHeart(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameHeart') as Enemy;
 }
 
-/*
-function getFireBeast(this: void, state: GameState, area: AreaInstance): Enemy {
+function isFlameHeartExposed(state: GameState, enemy: Enemy): boolean {
+    return !enemy.params.lavaKey || !!state.savedState.objectFlags[enemy.params.lavaKey];
+}
+
+
+function getFlameBeast(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameBeast') as Enemy;
-}*/
+}
 
 function isEnemyDefeated(enemy: Enemy): boolean {
     return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }
 
-function updateFlameHeart(this: void, state: GameState, enemy: Enemy): void {
-    const isEnraged = enemy.params.enrageTime > 0;
-    const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 144 : 500, enemy.area.allyTargets);
-    if (isEnraged) {
-        enemy.params.enrageTime -= FRAME_LENGTH;
-        enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
+function updateFlameHeart(state: GameState, enemy: Enemy): void {
+    const flameBeast = getFlameBeast(state, enemy.area);
+    const isExposed = isFlameHeartExposed(state, enemy);
+    // The heart does not attack before it is first exposed.
+    if (!isExposed) {
+        // Remove solid/touch damage behaviors while the enemy is submerged in lava.
+        delete enemy.behaviors;
+        const hitbox = enemy.getHitbox();
+        const x = hitbox.x + Math.random() * hitbox.w;
+        const y = hitbox.y + Math.random() * hitbox.h;
+        addLavaBubbleEffectToBackground(state, enemy.area, {x, y});
+        hitTargets(state, enemy.area, {
+            hitbox,
+            hitTiles: true,
+            element: 'fire',
+            source: enemy,
+        });
+        // The heart regenerates life will covered in lava.
+        if (enemy.time % 1000 === 0) {
+            enemy.life = Math.min(enemy.life + 0.5, enemy.enemyDefinition.life);
+        }
+        // Don't show the healthbar or attack if the heart has not been exposed yet.
+        if (flameBeast.mode === 'hidden') {
+            enemy.healthBarTime = 0;
+            // Set this so it doesn't immediately attack on reveal.
+            enemy.modeTime = 0;
+            return;
+        }
+    } else {
+        enemy.behaviors = {solid: true, touchHit: { damage: 4, element: 'fire', source: enemy}};
     }
+    enemy.z = 6;
+    // The heart is now considered enraged as long as it is covered in lava.
+    const isEnraged = !isExposed;
+    const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 144 : 500, enemy.area.allyTargets);
     if (enemy.mode === 'choose') {
         if (enemy.modeTime >= 1000 || isEnraged) {
             // Use the next animation key to transition modes at the end of the current animation loop.
@@ -174,22 +228,43 @@ function updateFlameHeart(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'endAttack') {
         // The heart will stay in the attack animation while enraged.
         if (isEnraged || enemy.runAnimationSequence(['attack', 'attackEnd', 'idle'])) {
-            if (isEnraged || enemy.modeTime >= 1000) {
+            if (enemy.modeTime >= 1000) {
                 enemy.setMode('choose');
             }
         }
     }
     if (enemy.life <= enemy.enemyDefinition.life * 2 / 3 && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
-        enemy.params.enrageTime = 6000;
         enemy.modeTime = 0;
+        fillLava(state, enemy, 2);
     } else if (enemy.life <= enemy.enemyDefinition.life * 1 / 3 && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
-        enemy.params.enrageTime = 8000;
         enemy.modeTime = 0;
+        fillLava(state, enemy, 4);
     }
 }
 
+function fillLava(state: GameState, enemy: Enemy, switchCount: number) {
+    if (!isFlameHeartExposed(state, enemy) || enemy.params.lavaKey !== 'craterLava4Objects') {
+        return;
+    }
+    let switchesRevealed = 0;
+    for (const object of Random.shuffle(enemy.area.objects)) {
+        if (object.definition?.id === 'craterBossSwitch' && object.status === 'active') {
+            object.status = 'normal';
+            switchesRevealed++;
+            if (switchesRevealed >= switchCount) {
+                break;
+            }
+        }
+    }
+    // Make the hero invulnerable to gem them a moment to escape the lava without taking damage.
+    state.hero.invulnerableFrames = 50;
+    for (const hero of state.hero.clones) {
+        hero.invulnerableFrames = 50;
+    }
+    fillFlameBeastLava(state);
+}
 
 const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
     const enemyHitbox = enemy.getHitbox(state);
@@ -223,14 +298,13 @@ function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
 
 function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
-    if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
-        if (enemy.mode === 'hidden') {
-            enemy.healthBarTime = 0;
-        }
-        return;
-    }
     if (enemy.mode === 'hidden') {
+        enemy.healthBarTime = 0;
         enemy.z = 300;
+        // If a flameheart is present, stay hidden until it is damaged.
+        if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
+            return;
+        }
         enemy.status = 'normal';
         enemy.setMode('choose');
     }

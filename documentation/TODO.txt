@@ -68,6 +68,20 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Crater improvements
+        - Change first switch to heavy switch and update randomizer logic to require staff/clone+iron boots to drain lava.
+        - Add rumbling sound effect for lava draining
+            - Apply to lava transitions + collapsing staff tower.
+        - Add single laser attack to heart
+        - Add rotating laser attack to heart during and after first enrage phase.
+        - Add double rotating laser attack to heart during and after second enrage phase.
+        - Make lava gradually fill during the enrage phase instead of all at once
+            - This has less problems than draining because it cannot leave the player stranded wall tiles.
+            - Make the screen shake for 2 seconds before it starts.
+            - Lava fills at 1s, 1s, then 500ms for the rest of the frames.
+            - Reduce mutation time to 1 frame to avoid freezing game play.
+            - Pegs pop up when the lava finishes rising.
+
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
             - Each set should be 14 tiles for hex values 1-14 corresponding to 4 bit number [TL,TR,BL,BR]
@@ -689,9 +703,6 @@ Current tasks:
     - Add doors and interiors to summoner ruin buildins in spirit world
         - Populate with War God Alcolytes and the Progenitor Spirit
 
-    - Add some additional requirement for completing crater to put the boss out of logic with few items.
-        - Switches that can only be hit with staff or clone throw + iron boots
-
     - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
 
     - Prevent grabbing tiles/objects across ledges
@@ -1011,8 +1022,6 @@ Staff Tower Improvements
 
 Crater Improvements
     - Add additional lava animations.
-    - Add platforms floating on lava.
-    - Add peg switches that require hitting with the staff to activate, replace all regular switches with these.
     - Add Flame Guardian enemies
         - Stationary like Crystal Guardian
         - Replace ents with Flame Guardians

@@ -168,7 +168,7 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'lavafall', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
+    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch','indicator', 'keyBlock', 'lavafall', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
@@ -380,6 +380,13 @@ export function createObjectDefinition(
                 toggleOnRelease: definition.toggleOnRelease,
                 type: definition.type,
             };
+        case 'heavyFloorSwitch':
+            return {
+                ...commonProps,
+                requireAll: definition.requireAll ?? true,
+                targetObjectId: definition.targetObjectId,
+                type: definition.type,
+            };
         case 'indicator':
             return {
                 ...commonProps,
@@ -573,7 +580,7 @@ function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectTyp
 export function getSwitchTargetProperties(
     state: GameState,
     editingState: EditingState,
-    object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | KeyBlockDefinition
+    object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | HeavyFloorSwitchDefinition | KeyBlockDefinition
 ): PanelRows {
     const rows: PanelRows = [];
     const objectIds = getSwitchTargetIds(state.areaInstance);
@@ -1181,6 +1188,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+        case 'heavyFloorSwitch':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'indicator':object
@@ -1601,13 +1609,6 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
         object.x = Math.round(object.x / 2) * 2;
         object.y = Math.round(object.y / 2) * 2;
         return;
-    }
-    const instance = createObjectInstance(state, object);
-    // Objects that apply their behaviors to the grid must be tile aligned.
-    if (instance.applyBehaviorsToGrid) {
-        object.x = Math.round(object.x / 16) * 16;
-        object.y = Math.round(object.y / 16) * 16;
-        return
     }
     if (object.type === 'enemy' || object.type === 'boss') {
         object.x = Math.round(object.x / 2) * 2;

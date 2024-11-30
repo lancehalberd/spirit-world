@@ -130,7 +130,7 @@ export class CrystalSwitch implements ObjectInstance {
         saveObjectStatus(state, this.definition);
         this.animationTime = 0;
         this.timeLeft = this.timeLimit || 0;
-        if (checkIfAllSwitchesAreActivated(state, this.area, this)) {
+        if (checkIfAllSwitchesAreActivated(state, this.area, this.definition)) {
             if (this.definition.stayOnAfterActivation) {
                 this.timeLimit = 0;
             }
@@ -143,7 +143,7 @@ export class CrystalSwitch implements ObjectInstance {
             this.linkedObject.status = 'active';
             this.linkedObject.animationTime = 0;
             this.linkedObject.timeLeft = this.timeLimit || 0;
-            if (checkIfAllSwitchesAreActivated(state, this.linkedObject.area, this.linkedObject)) {
+            if (checkIfAllSwitchesAreActivated(state, this.linkedObject.area, this.linkedObject.definition)) {
                 if (this.linkedObject.definition.stayOnAfterActivation) {
                     this.linkedObject.timeLimit = 0;
                 }
@@ -153,7 +153,7 @@ export class CrystalSwitch implements ObjectInstance {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.status === 'active' && (this.timeLimit && this.timeLeft > 0)) {
-            if (this.definition.stayOnAfterActivation && areAllSwitchesActivated(state, this.area, this)) {
+            if (this.definition.stayOnAfterActivation && areAllSwitchesActivated(state, this.area, this.definition)) {
                 this.timeLimit = 0;
                 return;
             }

@@ -12,7 +12,7 @@ import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById
 import { getAreaDimensions } from 'app/utils/getAreaSize';
 import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
 import { applyLayerToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 import { applyVariantsToArea } from 'app/utils/variants';
 
@@ -437,9 +437,11 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     for (const layer of instance.layers) {
         applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
-    definition.objects.filter(
-        object => isObjectLogicValid(state, object)
-    ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
+    for (const object of definition.objects.filter(object => isObjectLogicValid(state, object))) {
+        const objectInstance = createObjectInstance(state, object);
+        addObjectToArea(state, instance, objectInstance);
+        initializeObject(state, objectInstance);
+}
     instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;

@@ -523,6 +523,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitbox: pad(hero.getHitbox(), 4),
                 hitTiles: true,
                 source: hero,
+                isStomp: hero.savedData.equippedBoots === 'ironBoots' || hero.jumpingVz <= -4,
             };
             hitTargets(state, hero.area, landingHit);
             // If the hero lands somewhere invalid, damage them and return them to there last safe location,
@@ -591,6 +592,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     hitbox: pad(hero.getHitbox(), 4),
                     hitTiles: true,
                     source: hero,
+                    isStomp: hero.savedData.equippedBoots === 'ironBoots' || hero.jumpingVz <= -8,
                 };
                 hitTargets(state, hero.area, landingHit);
             }
@@ -948,7 +950,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
             duration: 100,
         }));
     }
-    const landingHit: HitProperties = {
+    const destinationHit: HitProperties = {
         damage: 5,
         element: hero.savedData.element,
         hitCircle: {
@@ -971,10 +973,10 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
             { element: hero.savedData.element }
         );
     }
-    hitTargets(state, hero.area, landingHit);
+    hitTargets(state, hero.area, destinationHit);
     if (hero.savedData.element === 'lightning') {
         addEffectToArea(state, hero.area, new LightningAnimationEffect({
-            circle: landingHit.hitCircle,
+            circle: destinationHit.hitCircle,
             duration: 200,
         }));
     }

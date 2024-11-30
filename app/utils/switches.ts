@@ -1,25 +1,29 @@
 import { activateTarget } from 'app/utils/objects'
 
 
-export function areAllSwitchesActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): boolean {
+export function areAllSwitchesActivated(state: GameState, area: AreaInstance, definition: BaseSwitchDefinition): boolean {
     return !area.objects.some(o =>
         (o.definition?.type === 'ballGoal' || o.definition?.type === 'crystalSwitch' || o.definition?.type === 'floorSwitch') &&
-        o.definition?.targetObjectId === switchInstance.definition.targetObjectId &&
+        o.definition?.targetObjectId === definition.targetObjectId &&
         o.status !== 'active' && o.disabled !== true
     );
 }
 
-export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): boolean {
-    if (!switchInstance.definition.targetObjectId || switchInstance.status !== 'active') {
+export function checkIfAllSwitchesAreActivated(
+    state: GameState,
+    area: AreaInstance,
+    definition: BaseSwitchDefinition
+): boolean {
+    if (!definition.targetObjectId/* || switchInstance.status !== 'active'*/) {
         return false;
     }
-    const requireAll = switchInstance.definition.requireAll ?? true;
-    if (requireAll && !areAllSwitchesActivated(state, area, switchInstance)) {
+    const requireAll = definition.requireAll ?? true;
+    if (requireAll && !areAllSwitchesActivated(state, area, definition)) {
         return false;
     }
     let playChime = true;
     for (const object of [...area.objects, ...(area.alternateArea?.objects || [])]) {
-        if (object.definition?.id === switchInstance.definition.targetObjectId) {
+        if (object.definition?.id === definition.targetObjectId) {
             activateTarget(state, object, playChime);
             // Only play chimes once per switch activation.
             playChime = false;

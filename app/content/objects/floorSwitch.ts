@@ -12,6 +12,7 @@ const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16
 
 export class FloorSwitch implements ObjectInstance {
     alwaysReset = true;
+    stayDepressed = false;
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: FloorSwitchDefinition = null;
@@ -26,6 +27,7 @@ export class FloorSwitch implements ObjectInstance {
         if (getObjectStatus(state, definition)) {
             this.status = 'active';
         }
+        this.stayDepressed = definition.saveStatus === 'zone' || definition.saveStatus === 'forever';
     }
     getHitbox(): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
@@ -65,7 +67,7 @@ export class FloorSwitch implements ObjectInstance {
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
             if (this.status === 'active') {
                 playAreaSound(state, this.area, 'switch');
-                checkIfAllSwitchesAreActivated(state, this.area, this);
+                checkIfAllSwitchesAreActivated(state, this.area, this.definition);
             } else {
                 playAreaSound(state, this.area, 'smallSwitch');
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
@@ -78,12 +80,17 @@ export class FloorSwitch implements ObjectInstance {
             return;
         }
         playAreaSound(state, this.area, 'switch');
-        checkIfAllSwitchesAreActivated(state, this.area, this);
+        if (this.status === 'active') {
+            checkIfAllSwitchesAreActivated(state, this.area, this.definition);
+        }
     }
 
     update(state: GameState) {
+        if (this.status === 'hidden') {
+            return;
+        }
         // Switches with save status turned on stay depressed after they are stepped on.
-        if ((this.definition.saveStatus === 'zone' || this.definition.saveStatus === 'forever') && this.status === 'active') {
+        if (this.stayDepressed && this.status === 'active') {
             return;
         }
         if (this.status === 'active' && !this.isDepressed(state)) {
@@ -93,11 +100,15 @@ export class FloorSwitch implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.status === 'hidden') {
+            return;
+        }
         if (this.status === 'active') {
             drawFrame(context, downFrame, {...downFrame, x: this.x, y: this.y});
         } else {
             drawFrame(context, upFrame, {...upFrame, x: this.x, y: this.y});
         }
+        // Indicate that this object was invisible without true sight.
         if (this.definition.isInvisible && state.hero.savedData.passiveTools.trueSight) {
             renderIndicator(context, this.getHitbox(), state.fieldTime);
         }

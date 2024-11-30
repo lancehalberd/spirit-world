@@ -434,7 +434,7 @@ enemyDefinitions.golemHand = {
             enemy.defaultRenderShadow(context, state);
         }
     },
-    render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         if (enemy.z < 6 && enemy.mode === 'appearing') {
             const frame = enemy.getFrame();
             const h = Math.floor(frame.h + enemy.z - 24);
