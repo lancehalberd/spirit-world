@@ -69,7 +69,6 @@ Graphics to Implement:
 
 Current tasks:
     - Crater improvements
-        - Slowly reveal the heart as the lava drains.
         - Add rumbling sound effect for lava draining
             - Apply to lava transitions + collapsing staff tower.
         - Add single laser attack to heart

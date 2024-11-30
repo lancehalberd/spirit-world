@@ -67,7 +67,7 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
         hero.x = best.x;
         hero.y = best.y;
         if (!inSection) {
-            setAreaSection(state);
+            setAreaSection(state, true);
         }
         fixCamera(state);
     }

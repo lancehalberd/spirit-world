@@ -5,7 +5,7 @@ import { Enemy } from 'app/content/enemy';
 import {beetleHornedAnimations, omniAnimation} from 'app/content/enemyAnimations';
 import {fillFlameBeastLava} from 'app/content/specialBehaviors/crater';
 import {addLavaBubbleEffectToBackground} from 'app/scenes/field/addAmbientEffects';
-import {createAnimation} from 'app/utils/animations';
+import {createAnimation, drawFrame} from 'app/utils/animations';
 import { getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import { paceRandomly } from 'app/utils/enemies';
@@ -109,6 +109,24 @@ enemyDefinitions.flameHeart = {
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         if (isFlameHeartExposed(state, enemy)) {
             enemy.defaultRender(context, state);
+            return;
+        }
+        let h = 0;
+        if (state.savedState.objectFlags.craterLavaAnimation4_1) {
+            h = 12;
+        } else if (state.savedState.objectFlags.craterLavaAnimation4_2) {
+            h = 24;
+        } else if (state.savedState.objectFlags.craterLavaAnimation4_3) {
+            h = 36;
+        }
+        if (h) {
+            const frame = enemy.getFrame();
+            drawFrame(context, {...frame, h}, { ...frame,
+                x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
+                y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z,
+                w: frame.w * enemy.scale,
+                h: h * enemy.scale,
+            });
         }
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {

@@ -120,14 +120,14 @@ function drainFlameBeastLava(state: GameState) {
             if (state.savedState.objectFlags.craterLavaAnimation4_2) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_2;
                 state.savedState.objectFlags.craterLavaAnimation4_3 = true;
-                // This is the frame the lava reaches the floor.
-                state.savedState.objectFlags.craterLava4Objects = true;
                 state.areaInstance.needsLogicRefresh = true;
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_3) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_3;
                 state.savedState.objectFlags.craterLavaAnimation4_4 = true;
+                // This is the frame the lava reaches the floor.
+                state.savedState.objectFlags.craterLava4Objects = true;
                 state.areaInstance.needsLogicRefresh = true;
                 return true;
             }
@@ -180,14 +180,14 @@ export function fillFlameBeastLava(state: GameState) {
             }
             if (timeElapsed >= 4000 && state.savedState.objectFlags.craterLavaAnimation4_4) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_4;
+                // This is the frame the lava starts rising vertically.
+                delete state.savedState.objectFlags.craterLava4Objects;
                 state.savedState.objectFlags.craterLavaAnimation4_3 = true;
                 state.areaInstance.needsLogicRefresh = true;
             }
             if (timeElapsed >= 4800 && state.savedState.objectFlags.craterLavaAnimation4_3) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_3;
                 state.savedState.objectFlags.craterLavaAnimation4_2 = true;
-                // This is the frame the lava starts rising vertically.
-                delete state.savedState.objectFlags.craterLava4Objects;
                 state.areaInstance.needsLogicRefresh = true;
             }
             if (timeElapsed >= 5600 && state.savedState.objectFlags.craterLavaAnimation4_2) {

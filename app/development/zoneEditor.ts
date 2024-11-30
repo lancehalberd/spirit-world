@@ -581,7 +581,7 @@ export function getZoneProperties(): PanelRows {
                 state.alternateAreaInstance = tempInstance;
                 state.hero.area = state.areaInstance;
                 setConnectedAreas(state, tempInstance);
-                setAreaSection(state);
+                setAreaSection(state, true);
                 //enterLocation(state, state.location);
                 editingState.needsRefresh = true;
             }
@@ -681,7 +681,7 @@ export function getZoneProperties(): PanelRows {
             }, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
             state.alternateAreaInstance.definition.sections = newAlternateSections;
             state.areaSection = null;
-            setAreaSection(state);
+            setAreaSection(state, true);
             return 'Change Layout';
         }
     });

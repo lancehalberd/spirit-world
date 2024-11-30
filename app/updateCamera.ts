@@ -69,9 +69,10 @@ export function updateCamera(state: GameState, speed?: number): void {
             state.hero.y -= state.areaInstance.cameraOffset.y;
             state.camera.x -= state.areaInstance.cameraOffset.x;
             state.camera.y -= state.areaInstance.cameraOffset.y;
-            state.hero.safeD = state.hero.d;
-            state.hero.safeX = state.hero.x;
-            state.hero.safeY = state.hero.y;
+            // This is done in setAreaSection.
+            //state.hero.safeD = state.hero.d;
+            //state.hero.safeX = state.hero.x;
+            //state.hero.safeY = state.hero.y;
             state.areaInstance.cameraOffset = {x: 0, y: 0};
             state.nextAreaInstance = null;
             state.scriptEvents.activeEvents.push({
@@ -88,7 +89,7 @@ export function updateCamera(state: GameState, speed?: number): void {
             state.areaInstance.alternateArea = state.alternateAreaInstance;
             state.alternateAreaInstance.alternateArea = state.areaInstance;
             linkObjects(state);
-            setAreaSection(state);
+            setAreaSection(state, true);
             setConnectedAreas(state, lastAreaInstance);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {

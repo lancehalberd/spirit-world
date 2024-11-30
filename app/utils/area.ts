@@ -12,9 +12,9 @@ export function removeAllClones(state: GameState): void {
     state.hero.clones = []
 }
 
-export function setAreaSection(state: GameState, newArea: boolean = false): void {
+export function setAreaSection(state: GameState, newArea: boolean): void {
     //console.log('setAreaSection', state.hero.x, state.hero.y);
-    const lastAreaSection = state.areaSection;
+    //const lastAreaSection = state.areaSection;
     state.areaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
@@ -29,7 +29,8 @@ export function setAreaSection(state: GameState, newArea: boolean = false): void
         }
     }
     editingState.needsRefresh = true;
-    if (newArea || lastAreaSection !== state.areaSection) {
+    // if (newArea || lastAreaSection !== state.areaSection) {
+    if (newArea) {
         cleanupHeroFromArea(state);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
