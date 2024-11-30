@@ -69,17 +69,12 @@ Graphics to Implement:
 
 Current tasks:
     - Crater improvements
+        - Slowly reveal the heart as the lava drains.
         - Add rumbling sound effect for lava draining
             - Apply to lava transitions + collapsing staff tower.
         - Add single laser attack to heart
         - Add rotating laser attack to heart during and after first enrage phase.
         - Add double rotating laser attack to heart during and after second enrage phase.
-        - Make lava gradually fill during the enrage phase instead of all at once
-            - This has less problems than draining because it cannot leave the player stranded wall tiles.
-            - Make the screen shake for 2 seconds before it starts.
-            - Lava fills at 1s, 1s, then 500ms for the rest of the frames.
-            - Reduce mutation time to 1 frame to avoid freezing game play.
-            - Pegs pop up when the lava finishes rising.
 
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.

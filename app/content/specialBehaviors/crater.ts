@@ -155,11 +155,9 @@ function drainFlameBeastLava(state: GameState) {
     });
 }
 
-
 export function fillFlameBeastLava(state: GameState) {
-    state.savedState.objectFlags.craterLavaAnimation4_5 = true;
-    state.areaInstance.needsLogicRefresh = true;
-    state.mutationDuration = 200;
+    const startTime = state.fieldTime;
+    state.mutationDuration = 20;
     state.screenShakes.push({
         dx: 0.7,
         dy: 0.7,
@@ -169,54 +167,54 @@ export function fillFlameBeastLava(state: GameState) {
     state.scriptEvents.activeEvents.push({
         type: 'update',
         update(state: GameState) {
+            const timeElapsed = state.fieldTime - startTime;
             // Do nothing if the game is still running a transition.
-            if (state.transitionState) {
-                return true;
+            if (timeElapsed === 2000) {
+                state.savedState.objectFlags.craterLavaAnimation4_5 = true;
+                state.areaInstance.needsLogicRefresh = true;
             }
-            if (state.savedState.objectFlags.craterLavaAnimation4_5) {
+            if (timeElapsed >= 3000 && state.savedState.objectFlags.craterLavaAnimation4_5) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_5;
                 state.savedState.objectFlags.craterLavaAnimation4_4 = true;
                 state.areaInstance.needsLogicRefresh = true;
-                return true;
             }
-            if (state.savedState.objectFlags.craterLavaAnimation4_4) {
+            if (timeElapsed >= 4000 && state.savedState.objectFlags.craterLavaAnimation4_4) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_4;
                 state.savedState.objectFlags.craterLavaAnimation4_3 = true;
                 state.areaInstance.needsLogicRefresh = true;
-                return true;
             }
-            if (state.savedState.objectFlags.craterLavaAnimation4_3) {
+            if (timeElapsed >= 4800 && state.savedState.objectFlags.craterLavaAnimation4_3) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_3;
                 state.savedState.objectFlags.craterLavaAnimation4_2 = true;
                 // This is the frame the lava starts rising vertically.
                 delete state.savedState.objectFlags.craterLava4Objects;
                 state.areaInstance.needsLogicRefresh = true;
-                return true;
             }
-            if (state.savedState.objectFlags.craterLavaAnimation4_2) {
+            if (timeElapsed >= 5600 && state.savedState.objectFlags.craterLavaAnimation4_2) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_2;
                 state.savedState.objectFlags.craterLavaAnimation4_1 = true;
                 state.areaInstance.needsLogicRefresh = true;
-                return true;
             }
-            if (state.savedState.objectFlags.craterLavaAnimation4_1) {
+            if (timeElapsed >= 6400 && state.savedState.objectFlags.craterLavaAnimation4_1) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_1;
                 delete state.savedState.objectFlags.craterLava4;
                 state.areaInstance.needsLogicRefresh = true;
-                return true;
             }
-            delete state.mutationDuration;
-            appendScript(state, '{stopScreenShake:craterLava}');
-            return false;
+            if (timeElapsed >= 7000) {
+                delete state.mutationDuration;
+                appendScript(state, '{stopScreenShake:craterLava}');
+                return false;
+            }
+            return true;
         }
     });
-    state.scriptEvents.activeEvents.push({
+    /*state.scriptEvents.activeEvents.push({
         type: 'wait',
         time: 0,
         waitingOnActiveEvents: true,
         blockFieldUpdates: true,
         blockPlayerInput: true,
-    });
+    });*/
 }
 
 specialBehaviorsHash.craterLavaSwitch4 = {

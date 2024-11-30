@@ -93,6 +93,14 @@ enemyDefinitions.flameHeart = {
     immunities: ['fire'],
     elementalMultipliers: {'ice': 1.5, 'lightning': 1.2},
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        // The heart becomes protected when the lava starts to fill, reducing all incoming damage by
+        // 80%
+        if (enemy.params.isProtected) {
+            hit = {
+                ...hit,
+                damage: hit.damage / 5,
+            }
+        }
         if (isFlameHeartExposed(state, enemy)) {
             return enemy.defaultOnHit(state, hit);
         }
@@ -173,7 +181,7 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
     enemy.z = 6;
     // The heart is now considered enraged as long as it is covered in lava.
     const isEnraged = !isExposed;
-    const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 144 : 500, enemy.area.allyTargets);
+    const target = getVectorToNearbyTarget(state, enemy, isEnraged ? 1000 : 144, enemy.area.allyTargets);
     if (enemy.mode === 'choose') {
         if (enemy.modeTime >= 1000 || isEnraged) {
             // Use the next animation key to transition modes at the end of the current animation loop.
@@ -234,34 +242,31 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
         }
     }
     if (enemy.life <= enemy.enemyDefinition.life * 2 / 3 && enemy.params.enrageLevel === 0) {
+        enemy.params.isProtected = true;
         enemy.params.enrageLevel = 1;
         enemy.modeTime = 0;
-        fillLava(state, enemy, 2);
+        fillLava(state, enemy);
     } else if (enemy.life <= enemy.enemyDefinition.life * 1 / 3 && enemy.params.enrageLevel === 1) {
+        enemy.params.isProtected = true;
         enemy.params.enrageLevel = 2;
         enemy.modeTime = 0;
-        fillLava(state, enemy, 4);
+        fillLava(state, enemy);
+    }
+    // After the fight starts, any time the lava is full and all switches are active, deactivate
+    // a number of switches based on the current enrage level.
+    const activeSwitches = enemy.area.objects.filter(o => o.definition?.id === 'craterBossSwitch' && o.status === 'active');
+    if (!state.savedState.objectFlags.craterLava4 && activeSwitches.length >= 8) {
+        const randomSwitches = Random.shuffle(activeSwitches);
+        for (let i = 0; i < 2 * enemy.params.enrageLevel; i++) {
+            randomSwitches[i].status = 'normal';
+        }
+        enemy.params.isProtected = false;
     }
 }
 
-function fillLava(state: GameState, enemy: Enemy, switchCount: number) {
+function fillLava(state: GameState, enemy: Enemy) {
     if (!isFlameHeartExposed(state, enemy) || enemy.params.lavaKey !== 'craterLava4Objects') {
         return;
-    }
-    let switchesRevealed = 0;
-    for (const object of Random.shuffle(enemy.area.objects)) {
-        if (object.definition?.id === 'craterBossSwitch' && object.status === 'active') {
-            object.status = 'normal';
-            switchesRevealed++;
-            if (switchesRevealed >= switchCount) {
-                break;
-            }
-        }
-    }
-    // Make the hero invulnerable to gem them a moment to escape the lava without taking damage.
-    state.hero.invulnerableFrames = 50;
-    for (const hero of state.hero.clones) {
-        hero.invulnerableFrames = 50;
     }
     fillFlameBeastLava(state);
 }
