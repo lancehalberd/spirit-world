@@ -68,15 +68,20 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Crater improvements
-        - Flame vortex enemy
-            - pulls player in like water vortex.
-            - stationary
-            - does not pull player if z > MAX_CLOUD_BOOTS
-            - does not pull player in during iframes unless they are on hard mode.
-            - deals lava damage to player if they are sucked all the way in.
-            - can have a TTL to despawn them
-            - Make flame beast leave temporary flame vortex instead of flames when jumping.
+    - Cut a new version
+        - Write release notes
+        - Test on staging
+        - Ask if anyone else wants to test staging.
+        - Release to production.
+
+    - Frost Beast improvements
+        - Add more abilities for targeting the player when they are far from the heart
+            - Spawn medium heads that can appear anywhere on the battlefield
+            - Slow moving frost blast like a frost vortex.
+            - Ice grenade attack that scatters ice mines when it hits.
+                - Freeze the water on landing, but are destroyed when hit by fire.
+        - Make the frost beast more dangerous after the heart is defeated.
+            - Gains ice mine grenade attack when the heart is defeated.
 
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
@@ -94,12 +99,6 @@ Current tasks:
         - Forest Village
         - Jade City
         - Helix
-
-    - Add crystal spike graphics to:
-        - Add to Spirit sky waterfall.
-        - Add to Jade city water.
-        - Add to Ice Sanctum
-        - Add to Waterfall Tower
 
     - Exit from peach cave water doesn't render frozen correctly.
 

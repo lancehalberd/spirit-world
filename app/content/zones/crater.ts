@@ -873,9 +873,9 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "craterSave", x: 224, y: 184, type: "saveStatue", hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterInnerRightDoor", x: 192, y: 16, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterInnerRightDoor", d: "up"},
         {status: "normal", id: "craterRightDoor", x: 400, y: 16, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterRightDoor", d: "up"},
-        {status: "normal", id: "crater:0:1x0-plantFlame-0", x: 136, y: 56, type: "enemy", enemyType: "plantFlame", d: "up", params: {}},
-        {status: "normal", id: "crater:0:1x0-plantFlame-1", x: 160, y: 88, type: "enemy", enemyType: "plantFlame", d: "up", params: {}},
-        {status: "normal", id: "crater:0:1x0-plantFlame-2", x: 212, y: 104, type: "enemy", enemyType: "plantFlame", d: "up", params: {}},
+        {status: "normal", id: "crater:0:1x0-plantFlame-0", x: 124, y: 50, type: "enemy", enemyType: "plantFlame", d: "up", params: {}},
+        {status: "normal", id: "crater:0:1x0-plantFlame-1", x: 134, y: 74, type: "enemy", enemyType: "vortexLava", d: "up", params: {}},
+        {status: "normal", id: "crater:0:1x0-plantFlame-2", x: 152, y: 108, type: "enemy", enemyType: "plantFlame", d: "up", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 517, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 0},
@@ -3725,7 +3725,8 @@ const f0_1x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "crater:0:1x2-beetleHorned-0", x: 400, y: 332, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
-        {status: "normal", id: "crater:0:2x0-snakeFlame-7", x: 256, y: 192, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-vortexLava", x: 230, y: 246, type: "enemy", enemyType: "vortexLava", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-7", x: 340, y: 140, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 523, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 4},

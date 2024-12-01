@@ -8,6 +8,7 @@ import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import {
     accelerateInDirection,
+    isEnemyDefeated,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
@@ -495,11 +496,6 @@ function getOtherHands(this: void, state: GameState, enemy: Enemy): Enemy[] {
         target !== enemy && target instanceof Enemy
         && target.definition.enemyType === 'golemHand' && !isEnemyDefeated(target)
     ) as Enemy[];
-}
-
-
-function isEnemyDefeated(enemy: Enemy): boolean {
-    return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }
 
 function getMouthLaserCoords(state: GameState, enemy: Enemy): number[] {

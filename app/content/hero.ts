@@ -261,6 +261,13 @@ export class Hero implements Actor {
     getFloorHitbox(this: Hero): Rect {
         return { x: (this.x | 0) + 2, y: (this.y | 0) + 8, w: this.w - 4, h: this.h - 8 };
     }
+    getAnchorPoint(): Point {
+        const hitbox = this.getMovementHitbox();
+        return {
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+        };
+    }
 
     overlaps(this: Hero, target: Rect | {getHitbox: () => Rect}) {
         if ((target as any).getHitbox) {

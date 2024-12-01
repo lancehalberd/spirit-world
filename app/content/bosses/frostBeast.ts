@@ -3,26 +3,31 @@ import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
 import { Enemy } from 'app/content/enemy';
-import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
+import { enemyDeathAnimation, omniAnimation, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
+import { createAnimation, getFrame, drawFrame } from 'app/utils/animations';
+//import { createCanvasAndContext } from 'app/utils/canvas';
 import {getCardinalDirection} from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 import {
     accelerateInDirection,
+    isEnemyDefeated,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
-import { allImagesLoaded } from 'app/utils/images';
+//import { allImagesLoaded } from 'app/utils/images';
 import { sample } from 'app/utils/index';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
 
-const frostGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
-export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
+// Center axies is basically at x=31
+const frostGeometry = {w: 56, h: 56, content: {x: 18, y: 30, w: 26, h: 20}};
+//const frostSurfaceGeometry = {w: 56, h: 28, content: {x: 18, y: 18, w: 26, h: 10}};
+const frostSurfaceGeometry = {w: 56, h: 32, content: {x: 18, y: 22, w: 26, h: 10}};
+const frostWaterGeometry = {w: 56, h: 28, content: {x: 18, y: 18, w: 26, h: 10}};
+/*export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
 const [frostHeartCanvas, frostHeartContext] = createCanvasAndContext(iceElement.w * 4, iceElement.h * 2);
 const createFrostAnimation = async () => {
     await allImagesLoaded();
@@ -42,27 +47,69 @@ const createFrostAnimation = async () => {
 }
 createFrostAnimation();
 const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
-
+*/
+const shallowGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 11, w: 16, h: 5}};
+const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeometry, {cols: 3, duration: 10});
+const frostHeartIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostGeometry, {cols: 8, frameMap: [0,1,2,3,4,5,6,7,6,5,4,3,2,1]});
+const frostHeartSurfaceIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostSurfaceGeometry, {cols: 8, frameMap: [0,1,2,3,4,5,6,7,6,5,4,3,2,1]});
+const frostHeartWaterIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostWaterGeometry, {top: 28, cols: 8, frameMap: [0,1,2,3,4,5,6,7,6,5,4,3,2,1]});
 export const frostHeartAnimations = {
-    idle: {
-        up: frostHeartAnimation,
-        down: frostHeartAnimation,
-        left: frostHeartAnimation,
-        right: frostHeartAnimation,
-    },
+    idle: omniAnimation(frostHeartIdleAnimation),
 };
+export const frostHeartSurfaceAnimations = {
+    idle: omniAnimation(frostHeartSurfaceIdleAnimation),
+};
+export const frostHeartWaterAnimations = {
+    idle: omniAnimation(frostHeartWaterIdleAnimation),
+};
+const frostHeartShieldAnimation = createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry);
+
 
 enemyDefinitions.frostHeart = {
     naturalDifficultyRating: 20,
-    animations: frostHeartAnimations, life: 16, scale: 2, touchDamage: 1, update: updateFrostHeart, params: {
+    floating: true,
+    animations: frostHeartSurfaceAnimations, life: 50, scale: 2, touchDamage: 1, params: {
         chargeLevel: 0,
         enrageLevel: 0,
         shieldLife: 8,
     },
     immunities: ['ice'],
-    elementalMultipliers: {'fire': 2, 'lightning': 1.5},
+    elementalMultipliers: {'fire': 1.5, 'lightning': 1.2},
     canSwim: true,
+    update: updateFrostHeart,
     renderOver: renderIceShield,
+    getHitbox(enemy: Enemy) {
+        const hitbox = enemy.getDefaultHitbox();;
+        if (enemy.params.shieldLife > 0) {
+            return {
+                x: hitbox.x - 24,
+                y: hitbox.y - 4,
+                w: hitbox.w + 48,
+                h: hitbox.h + 8,
+            }
+        }
+        return hitbox;
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        // Only the underwater instance casts a shadow, the top instance is floating in the water.
+        if (state.surfaceAreaInstance) {
+            enemy.defaultRenderShadow(context, state);
+        } else {
+            const frame = getFrame(wadingAnimation, enemy.time);
+            const hitbox = enemy.getHitbox();
+            //const targetWidth = 2 * p + hitbox.w;
+            //const targetHeight = 2 * p + hitbox.h;
+            const scale = 3;
+            //const scale = enemy.scale;// Math.round(Math.max(1, targetWidth / 24, targetHeight / 24) * 2) / 2;
+            // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+            drawFrame(context, frame, {
+                x: hitbox.x - (frame.w * scale - hitbox.w) / 2,
+                y: hitbox.y + hitbox.h - frame.h * scale + 2 * scale,
+                w: frame.w * scale,
+                h: frame.h * scale,
+            });
+        }
+    },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
         if (enemy.params.shieldLife > 0) {
@@ -100,11 +147,11 @@ enemyDefinitions.frostHeart = {
 };
 enemyDefinitions.frostBeast = {
     naturalDifficultyRating: 100,
-    animations: snakeAnimations, life: 36, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
+    animations: snakeAnimations, life: 80, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
     canSwim: true,
     acceleration: 0.3, speed: 2,
     immunities: ['ice'],
-    elementalMultipliers: {'fire': 2, 'lightning': 1.5},
+    elementalMultipliers: {'fire': 1.5, 'lightning': 1.2},
     params: {
         submerged: true,
     },
@@ -140,10 +187,6 @@ function getFrostSerpent(this: void, state: GameState, area: AreaInstance): Enem
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostBeast') as Enemy;
 }
 
-function isEnemyDefeated(enemy: Enemy): boolean {
-    return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
-}
-
 function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
     // The surface+underwater heart are actually two bosses in two different areas that
     // are combined as if a single boss. Simlarly for the serpents.
@@ -154,6 +197,16 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
     } else if (state.underwaterAreaInstance) {
         surfaceHeart = enemy;
         underwaterHeart = getFrostHeart(state, state.underwaterAreaInstance);
+    }
+    // Make sure the heart displays the correct animation.
+    if (surfaceHeart) {
+        surfaceHeart.animations = frostHeartSurfaceAnimations;
+        surfaceHeart.changeToAnimation(surfaceHeart.currentAnimationKey);
+    }
+    if (underwaterHeart) {
+        underwaterHeart.animations = frostHeartWaterAnimations;
+        underwaterHeart.changeToAnimation(underwaterHeart.currentAnimationKey);
+        underwaterHeart.z = 8;
     }
     // If either form is defeated, both are defeated.
     if (isEnemyDefeated(surfaceHeart) || isEnemyDefeated(underwaterHeart)) {
@@ -202,14 +255,14 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (enemy.life <= 10 && enemy.params.enrageLevel === 0) {
+    if (enemy.life <= enemy.enemyDefinition.life * 0.7 && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
         enemy.params.enrageTime = 5000;
         enemy.params.shieldLife++;
         enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
-    } else if (enemy.life <= 4 && enemy.params.enrageLevel === 1) {
+    } else if (enemy.life <= enemy.enemyDefinition.life * 0.3 && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
         enemy.params.enrageTime = 7000;
         enemy.params.shieldLife++;
@@ -237,7 +290,25 @@ function renderIceShield(context: CanvasRenderingContext2D, state: GameState, en
     if (enemy.area?.underwater || enemy.params.shieldLife <= 0) {
         return;
     }
-    enemy.renderFrozenEffect(context, enemy.params.shieldLife / 8);
+    //enemy.renderFrozenEffect(context, enemy.params.shieldLife / 8);
+    const p = enemy.params.shieldLife / 8;
+    const frame = getFrame(frostHeartShieldAnimation, enemy.time);
+    context.save();
+        context.globalAlpha *= (0.3 + 0.7 * p);
+        const hitbox = enemy.getHitbox();
+        //const targetWidth = 2 * p + hitbox.w;
+        //const targetHeight = 2 * p + hitbox.h;
+        const scale = enemy.scale;
+        //const scale = enemy.scale;// Math.round(Math.max(1, targetWidth / 24, targetHeight / 24) * 2) / 2;
+        // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+        drawFrame(context, frame, {
+            x: hitbox.x - (frame.w * scale - hitbox.w) / 2,
+            y: hitbox.y + hitbox.h - frame.h * scale + 8 * scale,
+            w: frame.w * scale,
+            h: frame.h * scale,
+        });
+        //drawFrameContentAt(context, frame, {x: enemy.x + 4, y: enemy.y - 20});
+    context.restore();
 }
 
 
@@ -438,8 +509,8 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
             enemy.y = 256 + Math.sin(theta) * 64 - enemyHitbox.h / 2;
             enemy.params.submerged = false;
             enemy.params.attacksLeft = 2;
-            if (!heart || heart.life <= 10) enemy.params.attacksLeft++;
-            if (!heart || heart.life <= 4) enemy.params.attacksLeft++;
+            if (!heart || heart.params.enrageLevel > 0) enemy.params.attacksLeft++;
+            if (!heart || heart.params.enrageLevel > 1) enemy.params.attacksLeft++;
             enemy.setMode('chooseTarget');
             // Destroy the ice where the serpent emerges.
             hitTargets(state, enemy.area, {

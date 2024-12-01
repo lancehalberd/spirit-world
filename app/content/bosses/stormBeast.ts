@@ -16,6 +16,7 @@ import { addEffectToArea } from 'app/utils/effects';
 import {
     accelerateInDirection,
     hasEnemyLeftSection,
+    isEnemyDefeated,
     // moveEnemy,
     moveEnemyToTargetLocation,
     //paceRandomly,
@@ -276,10 +277,6 @@ function getOrbs(this: void, state: GameState, area: AreaInstance, status: Objec
 function getStormBeast(this: void, state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameBeast') as Enemy;
 }*/
-
-function isEnemyDefeated(enemy: Enemy): boolean {
-    return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
-}
 
 function getStormHeartTargetEnrageLevel(enemy: Enemy): number {
     if (enemy.life <= enemy.enemyDefinition.life * 1 / 3) {

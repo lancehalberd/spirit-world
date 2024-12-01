@@ -9,8 +9,9 @@ import {addLavaBubbleEffectToBackground} from 'app/scenes/field/addAmbientEffect
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import { getCardinalDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { paceRandomly } from 'app/utils/enemies';
+import {isEnemyDefeated, paceRandomly} from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
+import {addObjectToArea} from 'app/utils/objects';
 import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 import Random from 'app/utils/Random';
 
@@ -70,7 +71,7 @@ const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
         enemy.vy = (ty - y) / duration;
         enemy.setAnimation('attack', enemy.d);
         enemy.setMode('leapStrike');
-        spawnGiantFlame(state, enemy);
+        spawnLavaVorex(state, enemy);
     },
     cooldown: 2000,
     initialCharges: 2,
@@ -160,10 +161,6 @@ function isFlameHeartExposed(state: GameState, enemy: Enemy): boolean {
 
 function getFlameBeast(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameBeast') as Enemy;
-}
-
-function isEnemyDefeated(enemy: Enemy): boolean {
-    return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }
 
 function updateFlameHeart(state: GameState, enemy: Enemy): void {
@@ -317,11 +314,18 @@ function fillLava(state: GameState, enemy: Enemy) {
     fillFlameBeastLava(state);
 }
 
-const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
+const spawnLavaVorex = (state: GameState, enemy: Enemy): void => {
     const enemyHitbox = enemy.getHitbox(state);
     const x = enemyHitbox.x + enemyHitbox.w / 2;
     const y = enemyHitbox.y + enemyHitbox.h / 2;
-    const flame = new Flame({
+    const lavaVortex = new Enemy(state, {
+        type: 'enemy',
+        enemyType: 'vortexLava',
+        x, y,
+    });
+    lavaVortex.params.duration = 5000;
+    addObjectToArea(state, enemy.area, lavaVortex);
+    /*const flame = new Flame({
         x,
         y,
         ttl: 2000 + getFlameBeastEnrageLevel(state, enemy) * 500,
@@ -329,7 +333,7 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
         damage: 3,
         source: enemy,
     });
-    addEffectToArea(state, enemy.area, flame);
+    addEffectToArea(state, enemy.area, flame);*/
 };
 
 function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
@@ -380,7 +384,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
         // Cannot deal or take damage whil regenerating.
         enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
         if (enemy.modeTime % 1000 === 0) {
-            enemy.life += 0.5;
+            enemy.life += 1;
         }
         if (enemy.life >= enemy.enemyDefinition.life) {
             enemy.life = enemy.enemyDefinition.life;

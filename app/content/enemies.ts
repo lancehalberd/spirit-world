@@ -51,7 +51,7 @@ export const enemyTypes = <const>[
     'sentryBot',
     'snake', 'snakeFlame', 'snakeFrost', 'snakeStorm',
     'squirrel', 'squirrelFlame', 'squirrelFrost', 'squirrelStorm',
-    'vortex',
+    'vortex', 'vortexLava',
     // Placeable boss minions, not intended to be used outside of their boss fights.
     // This is for the Golem Boss, use "Crusher" for a standalone enemy.
     'golemHand',

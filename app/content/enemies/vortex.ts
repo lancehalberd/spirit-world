@@ -3,8 +3,9 @@ import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { Hero } from 'app/content/hero';
 import { zones } from 'app/content/zones/zoneHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import {FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
 import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/movement/moveActor';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta';
 import { isUnderwater } from 'app/utils/actor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
@@ -22,6 +23,7 @@ import {
 
 
 const poolAnimation = createAnimation('gfx/tiles/deeptoshallowwater.png', {w: 16, h: 16}, {x: 3, y: 0});
+const lavaPoolAnimation = createAnimation('gfx/tiles/lavaAnimations.png', {w: 16, h: 16}, {x: 3, y: 2});
 
 enemyDefinitions.vortex = {
     naturalDifficultyRating: 4,
@@ -30,7 +32,7 @@ enemyDefinitions.vortex = {
     canSwim: true,
     params: {chaseCooldown: 0},
     life: 4,
-    update(this: void, state: GameState, enemy: Enemy) {
+    update(state: GameState, enemy: Enemy) {
         if (enemy.params.chaseCooldown > 0) {
             enemy.params.chaseCooldown -= FRAME_LENGTH;
             return;
@@ -53,7 +55,7 @@ enemyDefinitions.vortex = {
         });
         for (const hero of enemy.area.allyTargets) {
             if (!(hero instanceof Hero)) {
-                return;
+                continue;
             }
             if (hero.areaTime < 500) {
                 return;
@@ -148,6 +150,113 @@ enemyDefinitions.vortex = {
                 context.scale(1, 0.75);
                 context.rotate(enemy.animationTime / 200 + 2 * Math.PI * i / armCount);
                 for (const color of ['white', 'black', 'white', 'gray']) {
+                    const alpha = Math.min(1, Math.max(0.2, (1.2 - r / 12)));
+                    context.globalAlpha *= alpha;
+                    context.beginPath();
+                    context.strokeStyle = color;
+                    //context.lineWidth = 2;
+                    context.arc(r, 0, r, 0, Math.PI);
+                    context.stroke();
+                    context.globalAlpha /= alpha;
+                    r = r - 2;
+                    if (r < 5) {
+                        r += 5;
+                    }
+                    context.rotate(2 * Math.PI / armCount / 4);
+                }
+                r = r + 4;
+            context.restore();
+        }
+    },
+};
+
+
+enemyDefinitions.vortexLava = {
+    naturalDifficultyRating: 2,
+    animations: {idle: omniAnimation(lavaPoolAnimation)},
+    acceleration: 0.2, aggroRadius: 88, speed: 1.2,
+    params: {duration: 0},
+    life: 4,
+    update(state: GameState, enemy: Enemy) {
+        if (enemy.params.duration > 0) {
+            enemy.params.duration -= FRAME_LENGTH;
+            if (enemy.params.duration <= 0) {
+                removeObjectFromArea(state, enemy);
+                return;
+            }
+        }
+        for (const hero of enemy.area.allyTargets) {
+            if (!(hero instanceof Hero)) {
+                continue;
+            }
+            // Base difficulty cannot pull hero in while they are invulnerable.
+            if (hero.invulnerableFrames > 0 && enemy.difficulty <= this.naturalDifficultyRating) {
+                continue;
+            }
+            if (hero.action === 'falling' || hero.action === 'fallen') {
+                continue;
+            }
+            // Vortexes on the surface only suck heroes towards them that are swimming.
+            if (hero.z > MAX_FLOAT_HEIGHT) {
+                continue
+            }
+            if (getLedgeDelta(state, enemy.area, enemy, hero.getAnchorPoint())) {
+                continue;
+            }
+            const { mag, x, y } = getVectorToTarget(state, enemy, hero);
+            if (mag < 8) {
+                hero.onHit(state, {
+                    damage: 4,
+                    element: 'fire',
+                    source: enemy,
+                });
+            } else if (mag < 100){
+                const dx = -60 * x / mag, dy = -60 * y / mag;
+                moveActor(state, hero, dx, dy, {canJump: true});
+            } /*else if (mag < 36) {
+                const dx = -3 * x, dy = -3 * y;
+                moveActor(state, hero, dx, dy);
+            } else if (mag < 60) {
+                const dx = -2 * x, dy = -2 * y;
+                moveActor(state, hero, dx, dy);
+            } else if (mag < 80) {
+                const dx = -x, dy = -y;
+                moveActor(state, hero, dx, dy);
+            }*/
+        }
+    },
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties) {
+        if (hit.element === 'ice') {
+            removeObjectFromArea(state, enemy);
+        }
+        return {};
+    },
+    getHitbox(enemy: Enemy) {
+        return {x: enemy.x, y: enemy.y, w: 24, h: 24};
+    },
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (enemy.status === 'gone' || enemy.status === 'hidden') {
+            return;
+        }
+        const hitbox = enemy.getHitbox(state);
+        const armCount = 6;
+        const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
+        let r = 8 + ((enemy.animationTime / 100) | 0) % 5;
+        context.save();
+            context.translate(x, y);
+            context.scale(1, 0.75);
+            context.rotate(enemy.animationTime / 200);
+            const frame = getFrame(enemy.currentAnimation, enemy.animationTime);
+            drawFrame(context, frame, {...frame, x: -8, y: -8});
+        context.restore();
+        for (let i = 0; i < armCount; i++) {
+            context.save();
+                context.translate(x, y);
+                context.scale(1, 0.75);
+                context.rotate(enemy.animationTime / 200 + 2 * Math.PI * i / armCount);
+                for (const color of ['#F80', '#800', '#F80', '#840']) {
                     const alpha = Math.min(1, Math.max(0.2, (1.2 - r / 12)));
                     context.globalAlpha *= alpha;
                     context.beginPath();
