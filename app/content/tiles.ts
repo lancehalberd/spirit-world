@@ -590,7 +590,7 @@ const shoreMask: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/blackmaskground.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
-        'all': { defaultLayer: 'floor' },
+        'all': { defaultLayer: 'floor', isGround: false },
         '3x0': { skipped: true }, '3x1': { skipped: true },
     },
 };
@@ -598,7 +598,7 @@ const shoreAnglesMask: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/blackmaskground.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
-        'all': { defaultLayer: 'floor' },
+        'all': { defaultLayer: 'floor', isGround: false },
         '0x0': { skipped: true }, '3x0': { skipped: true },
         '0x3': { skipped: true }, '3x3': { skipped: true },
     },
@@ -672,8 +672,10 @@ function applyMask(targetSource: TileSource, maskSource: TileSource) {
             if (behaviors?.skipped) {
                 continue;
             }
+            const maskBehaviors = maskSource.behaviors?.[`${px}x${py}`] || maskSource.behaviors?.all || {};
             targetSource.behaviors[`${px}x${py}`] = {
                 ...behaviors,
+                ...maskBehaviors,
                 maskFrame: {
                     image: maskSource.source.image,
                     x: maskSource.source.x + px * w,
