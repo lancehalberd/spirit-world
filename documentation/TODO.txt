@@ -69,7 +69,6 @@ Graphics to Implement:
 
 Current tasks:
     - Cut a new version
-        - Write release notes
         - Test on staging
         - Ask if anyone else wants to test staging.
         - Release to production.
