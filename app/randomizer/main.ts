@@ -8,6 +8,7 @@ import {
 
 import { mainOverworldNode } from 'app/randomizer/logic/overworldLogic';
 import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
+import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { findLootObjects, findReachableNodes } from 'app/randomizer/find';
 import { applySavedState, getDefaultState } from 'app/state';
 import { allNodes } from 'app/randomizer/allNodes';
@@ -33,16 +34,22 @@ function testConnectivity() {
             finalState.savedState.objectFlags[flag] = true;
         }
     }
+    const entrance = craterNodes.find(node => node.nodeId === 'craterEntrance');
+    finalState.hero.savedData.activeTools.staff = 0;
+    finalState.hero.savedData.activeTools.clone = 1;
+    finalState.hero.savedData.equipment.ironBoots = 1;
     finalState = setAllFlagsInLogic(finalState, allNodes,  [mainOverworldNode]);
-    const reachableNodes = findReachableNodes(forgeNodes, [forgeNodes.find(node => node.nodeId === 'forgeEntrance')], finalState);
+    //initialState.hero.savedData.activeTools.staff = 1;
+    //initialState = setAllFlagsInLogic(initialState, craterNodes,  [entrance]);
+    const reachableNodes = findReachableNodes(craterNodes, [entrance], finalState);
     console.log(reachableNodes);
-    console.log(finalState.savedState.dungeonInventories.staffTower);
-    for (const node of forgeNodes) {
+    for (const node of craterNodes) {
         if (!reachableNodes.includes(node)) {
             console.log('Could not reach node', node);
         }
     }
 }
+window.forgeNodes = forgeNodes;
 testConnectivity;//();
 function checkForEntranceIdConflicts() {
     const idToNode: {[key in string]: LogicNode[]} = {};

@@ -236,7 +236,7 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
     return lootObjects;
 }
 
-function canOpenDoor(location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
+export function canOpenDoor(location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
     if (!door) {
         return false;
     }

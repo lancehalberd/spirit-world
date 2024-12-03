@@ -9,6 +9,7 @@ import { CHAKRAM_2_NAME, randomizerGoal, randomizerGoalType, randomizerTotal } f
 import { allNodes } from 'app/randomizer/allNodes';
 import { addCheck } from 'app/randomizer/checks';
 import {
+    canOpenDoor,
     findDoorById,
     findLootById,
     findLootObjects,
@@ -130,6 +131,11 @@ export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNod
         for (const path of (node.paths || [])) {
             if (path.doorId) {
                 checkExit(path.doorId);
+            }
+        }
+        for (const flag of (node.flags || [])) {
+            if (flag.doorId) {
+                checkExit(flag.doorId);
             }
         }
         for (const exit of (node.exits || [])) {
@@ -319,6 +325,13 @@ export function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], star
                 if (flag.logic && !isLogicValid(updatedState, flag.logic)) {
                     //console.log('Invalid logic', flag);
                     continue;
+                }
+                if (flag.doorId) {
+                    const zone = getZone(node.zoneId);
+                    const { object, location } = findDoorById(zone, flag.doorId, state);
+                    if (!canOpenDoor(location, state, object as EntranceDefinition)) {
+                        continue;
+                    }
                 }
                 if (!updatedState.savedState.objectFlags[flag.flag]) {
                     if (updatedState === state) {

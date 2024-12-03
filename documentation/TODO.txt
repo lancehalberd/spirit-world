@@ -74,6 +74,8 @@ Current tasks:
         - Ask if anyone else wants to test staging.
         - Release to production.
 
+    - Bug: Astral projection can pull linked pots on top of the hero.
+
     - Frost Beast improvements
         - Add more abilities for targeting the player when they are far from the heart
             - Spawn medium heads that can appear anywhere on the battlefield

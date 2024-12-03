@@ -13,6 +13,8 @@ import {
 } from 'app/content/logic';
 
 
+const lava1Drained = {requiredFlags: ['craterLava1']};
+const lava2Drained = {requiredFlags: ['craterLava2']};
 const canCrossLava = orLogic(hasSomersault, hasInvisibility, hasIce);
 
 // This logic does not appropriately support traversing the tower in reverse.
@@ -31,10 +33,12 @@ export const craterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'craterEntrance',
         checks: [{objectId: 'craterMap'}],
+        flags: [{flag: 'craterLava1', logic: andLogic(hasBossWeapon, canPressHeavySwitches)}],
         paths: [
             // The player must defeat a guardian and then press a heavy switch to drain the lava.
-            {nodeId: 'craterLevel2', logic: andLogic(hasBossWeapon, canPressHeavySwitches)},
-            {nodeId: 'craterNorthLedge', logic: canCrossLava},
+            {nodeId: 'craterLevel2', logic: lava1Drained },
+            // There is now a path of cooled lava patches that you can safely roll across to the northern ledge.
+            {nodeId: 'craterNorthLedge', logic: orLogic(hasRoll, canCrossLava)},
         ],
         entranceIds: ['craterEntrance', 'craterRightDoor'],
         exits: [{objectId: 'craterEntrance'}, {objectId: 'craterRightDoor'}],
@@ -43,9 +47,9 @@ export const craterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'craterLevel2',
         checks: [{objectId: 'craterSilver'}],
+        flags: [{flag: 'craterLava2', doorId: 'craterLava2'}],
         paths: [
-            // Eventually this will also require the staff.
-            {nodeId: 'craterLevel3', doorId: 'craterLava2'},
+            {nodeId: 'craterLevel3', logic: lava2Drained},
         ],
         entranceIds: ['craterLockedDoor', 'craterMidDoor', 'craterStairs'],
         exits: [{objectId: 'craterLockedDoor'}, {objectId: 'craterMidDoor'}, {objectId: 'craterStairs'}],
@@ -59,7 +63,10 @@ export const craterNodes: LogicNode[] = [
         ],
         paths: [],
         entranceIds: ['craterLowerDoor', 'craterEastDoor'],
-        exits: [{objectId: 'craterLowerDoor'}, {objectId: 'craterEastDoor'}],
+        exits: [
+            {objectId: 'craterLowerDoor', logic: lava2Drained},
+            {objectId: 'craterEastDoor'},
+        ],
     },
     {
         zoneId,
@@ -91,7 +98,7 @@ export const craterNodes: LogicNode[] = [
         nodeId: 'craterMiddlePassage',
         entranceIds: ['craterMidDoor', 'craterInnerLeftDoor'],
         exits: [
-            {objectId: 'craterMidDoor'},
+            {objectId: 'craterMidDoor', logic: lava1Drained},
             {objectId: 'craterInnerLeftDoor'},
         ],
     },

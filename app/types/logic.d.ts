@@ -116,6 +116,8 @@ interface LogicNode {
     flags?: {
         flag: string
         logic?: LogicCheck
+        // The id of a door or keyblock that needs to be used to set this flag.
+        doorId?: string
     }[]
     npcs?: {
         loot: DialogueLootDefinition
