@@ -188,10 +188,12 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     paleMonk: {
         animations: paleLadyPriestAnimations,
         shadowOffset: 1,
+        height: 26,
     },
     midMonk: {
         animations: midGuyPriestAnimations,
         shadowOffset: 1,
+        height: 26,
     },
     darkMonk: {
         animations: darkMonkAnimations,

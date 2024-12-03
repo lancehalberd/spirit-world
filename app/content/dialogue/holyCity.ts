@@ -34,6 +34,44 @@ dialogueHash.generousPriest = {
     ],
 };
 
+dialogueHash.gauntletPriest = {
+    key: 'gauntletPriest',
+    options: [
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: ['gauntletEntrance'],
+            },
+            text: [
+                {
+                    dialogueIndex: 168,
+                    text: `This is the entrance to the Jade Champion's training gauntlet.`,
+                },
+                {
+                    dialogueIndex: 169,
+                    dialogueType: 'hint',
+                    text: `You are free to enter if you can open the door,
+                           but it will take a lot of power to activate this
+                           switch.`,
+                },
+            ],
+
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['gauntletEntrance'],
+                excludedFlags: [],
+            },
+            text: [
+                {
+                    dialogueIndex: 170,
+                    text: `Impressive!{|} Maybe if you train enough you'll be as strong as the Jade Champion someday.`,
+                }
+            ],
+        },
+    ],
+};
+
 dialogueHash.meanPerson = {
     key: 'meanPerson',
     options: [

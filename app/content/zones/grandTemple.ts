@@ -479,8 +479,10 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "grandPriest", x: 248, y: 256, d: "down", behavior: "idle", style: "grandPriest", type: "npc", dialogue: "May the Spirits guide you.", dialogueIndex: 109},
         {status: "closed", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "closed", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},
-        {status: "normal", id: "gauntletEntrance", x: 80, y: 32, type: "door", style: "woodenDownstairs", targetZone: "gauntlet", targetObjectId: "gauntletEntrance", d: "up", locationCue: "Grand Temple"},
+        {status: "closedSwitch", id: "gauntletEntrance", x: 80, y: 32, type: "door", style: "woodenDownstairs", targetZone: "gauntlet", targetObjectId: "gauntletEntrance", d: "up", locationCue: "Grand Temple"},
         {status: "normal", id: "grandPriestMarker", x: 248, y: 324, type: "marker"},
+        {status: "normal", id: "gauntletEntrance", x: 128, y: 80, requireAll: true, targetObjectId: "gauntletEntrance", type: "heavyFloorSwitch", saveStatus: "forever"},
+        {status: "normal", id: "", x: 112, y: 64, d: "down", behavior: "none", style: "paleMonk", type: "npc", dialogueKey: "gauntletPriest"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 88, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 2, mapY: 0},

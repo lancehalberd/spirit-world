@@ -1,4 +1,5 @@
 import {
+    canPressHeavySwitches,
     canUseTeleporters,
 } from 'app/content/logic';
 
@@ -20,7 +21,7 @@ export const grandTempleNodes: LogicNode[] = [
         ],
         exits: [
             { objectId: 'grandTempleEntrance' },
-            { objectId: 'gauntletEntrance' },
+            { objectId: 'gauntletEntrance', logic: canPressHeavySwitches },
         ],
     },
     {
