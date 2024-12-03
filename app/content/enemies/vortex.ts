@@ -185,6 +185,11 @@ enemyDefinitions.vortexLava = {
                 return;
             }
         }
+        const hitbox = enemy.getHitbox();
+        const anchorPoint = {
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+        };
         for (const hero of enemy.area.allyTargets) {
             if (!(hero instanceof Hero)) {
                 continue;
@@ -200,7 +205,7 @@ enemyDefinitions.vortexLava = {
             if (hero.z > MAX_FLOAT_HEIGHT) {
                 continue
             }
-            if (getLedgeDelta(state, enemy.area, enemy, hero.getAnchorPoint())) {
+            if (getLedgeDelta(state, enemy.area, anchorPoint, hero.getAnchorPoint())) {
                 continue;
             }
             const { mag, x, y } = getVectorToTarget(state, enemy, hero);

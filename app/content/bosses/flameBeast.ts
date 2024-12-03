@@ -323,6 +323,9 @@ const spawnLavaVorex = (state: GameState, enemy: Enemy): void => {
         enemyType: 'vortexLava',
         x, y,
     });
+    const hitbox = lavaVortex.getHitbox();
+    lavaVortex.x -= hitbox.w / 2;
+    lavaVortex.y -= hitbox.h / 2;
     lavaVortex.params.duration = 5000;
     addObjectToArea(state, enemy.area, lavaVortex);
     /*const flame = new Flame({
