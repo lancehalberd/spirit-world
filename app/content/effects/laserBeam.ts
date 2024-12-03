@@ -2,6 +2,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { removeEffectFromArea } from 'app/utils/effects';
+import {isEnemyDefeated} from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
 import { getTileBehaviors} from 'app/utils/getBehaviors';
 
@@ -48,7 +49,7 @@ interface Props {
     ignoreWalls?: boolean
     damage?: number
     delay?: number
-    source: Actor
+    source: Enemy
     beforeUpdate?: (state: GameState, laserBeam: LaserBeam) => void
 }
 
@@ -95,6 +96,11 @@ export class LaserBeam implements EffectInstance, Props {
     update(state: GameState) {
         if (this.beforeUpdate) {
             this.beforeUpdate(state, this);
+        }
+        if (isEnemyDefeated(this.source)) {
+            this.done = true;
+            removeEffectFromArea(state, this);
+            return;
         }
         // We only memoize the hit ray for a single frame before recalculating it.
         delete this.memoizedHitRay;
