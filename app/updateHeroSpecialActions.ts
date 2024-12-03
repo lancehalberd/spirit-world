@@ -199,7 +199,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // We only let the hero move south ~6 pixels onto this tile so that they will
             // fall towards the southern part of the pitwall tile without moving too far onto
             // the non-pit tile to the south.
-            if (dy >=0 || (hitbox.y % 16) < 6) {
+            if (dy >=0 || (hitbox.y % 16) < 4) {
                 hero.y++;
             }
         } else if (dy < 0) {
