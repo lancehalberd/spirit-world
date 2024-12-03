@@ -351,10 +351,6 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
             } else if (hero.savedData.passiveTools.spiritSight) {
-                hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
-                if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
-                    hero.maxSpiritRadius = 10;
-                }
                 if (hero.spiritRadius <= hero.maxSpiritRadius) {
                     hero.spiritRadius = Math.min(hero.spiritRadius + hero.maxSpiritRadius / 20, hero.maxSpiritRadius);
                 } else {
@@ -919,6 +915,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 // You can only meditate with no clones up.
                 hero.action = 'meditating';
                 hero.spiritRadius = 0;
+                hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
+                if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
+                    hero.maxSpiritRadius = 10;
+                }
             } else if (hero.clones.filter(clone => !clone.isUncontrollable).length) {
                 // You can only charge clone explosion with at least one controllable clone.
                 hero.action = 'chargingCloneExplosion';
