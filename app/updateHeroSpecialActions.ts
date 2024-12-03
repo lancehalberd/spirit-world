@@ -374,6 +374,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Maybe we should add a jumping down animation, but for now we play the roll
         // animation slowed down a bit.
         hero.animationTime -= FRAME_LENGTH / 2;
+        hero.jumpingTime += FRAME_LENGTH;
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = 0;
@@ -446,6 +447,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }*/
             if (hero.jumpingVz <= -4 || hero.z <= groundZ) {
                 hero.animationTime = 0;
+                hero.jumpingTime = 0;
                 hero.jumpingVz = Math.max(-hero.jumpingVz, 4);
                 // Once the hero bounces off of a trampoline, they lose precise controls for landing.
                 hero.isJumpingWrecklessly = true;
@@ -517,14 +519,25 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.isAirborn = hero.isAstralProjection;
             hero.action = null;
             hero.actionDy = 0;
+            const isHardLanding = hero.savedData.equippedBoots === 'ironBoots'
+                || (hero.jumpingTime >= 540 && hero.jumpingVz <= -4);
             hero.animationTime = 0;
             const landingHit: HitProperties = {
                 damage: 1,
                 hitbox: pad(hero.getHitbox(), 4),
+                hitEnemies: true,
+                hitObjects: true,
                 hitTiles: true,
                 source: hero,
-                isStomp: hero.savedData.equippedBoots === 'ironBoots' || hero.jumpingVz <= -4,
+                isStomp: isHardLanding,
             };
+            // Run this to check if the hero is in water.
+            checkForFloorEffects(state, hero);
+            if (isHardLanding && !hero.swimming) {
+                state.screenShakes.push({
+                    dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
+                });
+            }
             hitTargets(state, hero.area, landingHit);
             // If the hero lands somewhere invalid, damage them and return them to there last safe location,
             // similar to if they had fallen into a pit.
@@ -585,14 +598,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         });
         // The astral projection stays 4px off the ground.
         if (!isFloating && hero.z <= minZ) {
-            const hardLanding = hero.vz <= -8;
-            if (hardLanding || hero.action === 'thrown') {
+            const isHardLanding = hero.vz <= -8 || hero.savedData.equippedBoots === 'ironBoots';
+            if (isHardLanding || hero.action === 'thrown') {
                 const landingHit: HitProperties = {
                     damage: 1,
                     hitbox: pad(hero.getHitbox(), 4),
+                    hitEnemies: true,
+                    hitObjects: true,
                     hitTiles: true,
                     source: hero,
-                    isStomp: hero.savedData.equippedBoots === 'ironBoots' || hero.jumpingVz <= -8,
+                    isStomp: isHardLanding,
                 };
                 hitTargets(state, hero.area, landingHit);
             }
@@ -614,7 +629,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // starting the death sequence.
             checkForFloorEffects(state, hero);
             // Shake the screen if the hero has a hard landing on a solid surface.
-            if (hardLanding && !hero.swimming && hero.action !== 'falling') {
+            if (isHardLanding && !hero.swimming && hero.action !== 'falling') {
                 state.screenShakes.push({
                     dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
                 });

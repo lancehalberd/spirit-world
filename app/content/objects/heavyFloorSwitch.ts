@@ -79,7 +79,7 @@ export class HeavyFloorSwitch implements ObjectInstance {
         }
         const isDepressed = this.isDepressed(state);
         // Make a small noise when the switch becomes partially depressed.
-        if (!this.wasDepressed && isDepressed) {
+        if (this.wasDepressed !== isDepressed) {
             playAreaSound(state, this.area, 'smallSwitch');
         }
         this.wasDepressed = isDepressed;

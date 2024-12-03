@@ -80,6 +80,7 @@ export class Hero implements Actor {
     hasBarrier?: boolean = false;
     isInvisible?: boolean = false;
     isAirborn = false;
+    jumpingTime?: number;
     jumpingVx?: number;
     jumpingVy?: number;
     jumpingVz?: number;
@@ -898,9 +899,11 @@ export class Hero implements Actor {
             clone.d = hero.d;
             clone.x = hero.x;
             clone.y = hero.y;
-            clone.vx = directionMap[direction][0] * throwSpeed;
-            clone.vy = directionMap[direction][1] * throwSpeed;
-            clone.vz = 2;
+            const isHeavy = (state.hero.savedData.equippedBoots === 'ironBoots');
+            const c = isHeavy ? 0.75 : 1;
+            clone.vx = c * directionMap[direction][0] * throwSpeed;
+            clone.vy = c * directionMap[direction][1] * throwSpeed;
+            clone.vz = c * 2;
             clone.action = 'thrown';
             clone.isAirborn = true;
             clone.animationTime = 0;

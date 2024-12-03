@@ -414,7 +414,7 @@ const preloadSounds = () => {
         {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, duration: 0.2, instanceLimit: 2},
         {key: 'unlock', source: 'sfx/Cube click_odrive.wav', volume: 50, instanceLimit: 2},
         {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, instanceLimit: 2},
-        {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, instanceLimit: 2},
+        {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 40, instanceLimit: 2},
         {key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
             duration: 0.7, volume: 60, instanceLimit: 2
         },

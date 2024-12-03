@@ -60,6 +60,9 @@ interface Actor extends ObjectInstance {
     groundHeight: number
     hasBarrier?: boolean
     isInvisible?: boolean
+    // How long the hero has been falling for in ms. Currently used to calculate if a fall is hard
+    // since we cap the fall velocity too low to calculate based on velocity.
+    jumpingTime?: number
     jumpingVx?: number
     jumpingVy?: number
     jumpingVz?: number

@@ -192,6 +192,7 @@ function moveActorInDirection(
                 (actor as Hero).throwHeldObject?.(state);
             }
             playAreaSound(state, state.areaInstance, 'fall');
+            actor.jumpingTime = 0;
             if (actor.action === 'thrown' || actor.action === 'knocked' || actor.action === 'knockedHard') {
                 actor.action = 'jumpingDown';
                 actor.jumpingVx = actor.vx;
