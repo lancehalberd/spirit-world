@@ -29,14 +29,14 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoon4NW',
         entranceIds: ['cocoonLadderNW'],
-        exits: [{objectId: 'cocoonLadderNW', logic: hasBossWeapon}],
+        exits: [{objectId: 'cocoonLadderNW', logic: andLogic(hasBossWeapon, canRemoveLightStones)}],
     },
     {
         zoneId,
         nodeId: 'cocoon4NE',
         entranceIds: ['cocoonLadderNE', 'cocoonBigLock'],
         exits: [
-            {objectId: 'cocoonLadderNE', logic: hasBossWeapon},
+            {objectId: 'cocoonLadderNE', logic: andLogic(hasBossWeapon, canRemoveLightStones)},
             {objectId: 'cocoonBigLock'},
         ],
     },
