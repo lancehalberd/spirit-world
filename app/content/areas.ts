@@ -676,6 +676,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
                 }
                 const object = createObjectInstance(state, definition);
                 addObjectToArea(state, area, object);
+                initializeObject(state, object);
             }
         }
     }
@@ -694,6 +695,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
             object = createObjectInstance(state, definition);
             if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
                 addObjectToArea(state, area, object);
+                initializeObject(state, object);
             }
         }
     }

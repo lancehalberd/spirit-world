@@ -214,7 +214,7 @@ export class PushPullObject implements ObjectInstance {
             // Check to save position if the object has stopped moving.
             if (this.definition?.savePosition) {
                 const p = getObjectStatus(state, this.definition, 'position');
-                if (Array.isArray(p) && (p[0] !== this.x || p[1] !== this.y)) {
+                if (!Array.isArray(p) || (p[0] !== this.x || p[1] !== this.y)) {
                     saveObjectStatus(state, this.definition, [this.x, this.y], 'position');
                 }
             }
