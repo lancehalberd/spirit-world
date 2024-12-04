@@ -189,7 +189,7 @@ const baseSnakeDefinition: Partial<EnemyDefinition<any>> = {
         enemy.useRandomAbility(state);
         if (!enemy.activeAbility) {
             paceRandomly(state, enemy);
-            if (enemy.difficulty >= this.naturalDifficultyRating && enemy.mode === 'walk' && enemy.modeTime < 0) {
+            if (enemy.difficulty > this.naturalDifficultyRating && enemy.mode === 'walk' && enemy.modeTime < 0) {
                 const target = getVectorToNearbyTarget(state, enemy, 128, enemy.area.allyTargets);
                 if (target) {
                     const [dx, dy] = directionMap[enemy.d];
