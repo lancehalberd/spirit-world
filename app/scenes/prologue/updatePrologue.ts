@@ -1,7 +1,7 @@
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { isGameKeyDown, isKeyboardKeyDown, KEY, wasGameKeyPressed, wasMenuConfirmKeyPressed } from 'app/userInput';
 import { isATrackPlaying } from 'app/utils/sounds';
-import { initializeTitle } from 'app/scenes/title/initializeTitle';
+import { showTitleScene } from 'app/scenes/title/showTitleScene';
 
 export function updatePrologue(state: GameState) {
     if (isKeyboardKeyDown(KEY.SHIFT)) {
@@ -30,7 +30,7 @@ export function updatePrologue(state: GameState) {
         || wasGameKeyPressed(state, GAME_KEY.MENU)
         || wasGameKeyPressed(state, GAME_KEY.MAP)
     ) {
-        initializeTitle(state);
+        showTitleScene(state);
         return;
     }
 }

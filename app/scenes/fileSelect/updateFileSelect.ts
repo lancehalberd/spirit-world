@@ -19,7 +19,7 @@ import {
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGamesToLocalStorage, } from 'app/utils/saveGame';
 import { parseScriptText, setScript } from 'app/scriptEvents';
-import { initializeTitle } from 'app/scenes/title/initializeTitle';
+import { showTitleScene } from 'app/scenes/title/showTitleScene';
 
 export function updateFileSelect(state: GameState) {
     const options = getFileSelectOptions(state);
@@ -95,9 +95,7 @@ export function updateFileSelect(state: GameState) {
                     setSaveFileToState(state.menuIndex, 0);
                 } else if (state.menuIndex > state.savedGames.length
                         && options[state.menuIndex] === 'TITLE') {
-                    state.scene = 'title';
-                    initializeTitle(state);
-                    state.menuIndex = 0;
+                    showTitleScene(state);
                 } else {
                     selectSaveFile(state, state.menuIndex);
                 }

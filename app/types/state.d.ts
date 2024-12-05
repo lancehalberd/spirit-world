@@ -50,9 +50,15 @@ interface GameState {
     hero: Hero
     camera: { x: number, y: number }
     fieldTime: number
+    // This can be used any time we want to track player idlesness,
+    // for example to show the prologue again when the player is idle
+    // on the title screen.
+    idleTime: number
     prologueTime: number
+    // Time that advances forward regardles of scene or whether the game is paused.
     time: number
-    // This marks when the last HUD revive animation started.
+    // This is set when the player gains or uses a revive
+    // and reviveAnimationTime = fieldTime - reviveTime
     reviveTime: number
     gameHasBeenInitialized: boolean
     lastTimeRendered: number

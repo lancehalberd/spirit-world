@@ -6,14 +6,12 @@ import {
     FRAME_LENGTH, GAME_KEY,
 } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
+import {showTitleScene} from 'app/scenes/title/showTitleScene';
 import {
     isGameKeyDown,
     wasGameKeyPressed,
     wasConfirmKeyPressed,
 } from 'app/userInput';
-import {
-    setSaveFileToState,
-} from 'app/state';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame } from 'app/utils/saveGame';
 
@@ -80,9 +78,7 @@ export function updateDefeated(state: GameState) {
             returnToSpawnLocation(state);
             state.paused = false;
         } else if (state.menuIndex === 1) {
-            state.scene = 'title';
-            state.menuIndex = state.savedGameIndex;
-            setSaveFileToState(state.menuIndex);
+            showTitleScene(state);
             state.paused = false;
         }
     }
