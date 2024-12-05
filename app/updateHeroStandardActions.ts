@@ -917,7 +917,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.spiritRadius = 0;
                 hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
                 if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
-                    hero.maxSpiritRadius = 10;
+                    hero.maxSpiritRadius = 24;
                 }
             } else if (hero.clones.filter(clone => !clone.isUncontrollable).length) {
                 // You can only charge clone explosion with at least one controllable clone.
