@@ -137,6 +137,7 @@ export function getDefaultState(): GameState {
             blockEventQueue: false,
             blockFieldUpdates: false,
             blockPlayerInput: false,
+            blockPlayerUpdates: false,
             handledInput: false,
             queue: [],
         },

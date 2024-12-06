@@ -14,6 +14,7 @@ export function updateScriptEvents(state: GameState): void {
     state.scriptEvents.blockEventQueue = false;
     state.scriptEvents.blockFieldUpdates = false;
     state.scriptEvents.blockPlayerInput = false;
+    state.scriptEvents.blockPlayerUpdates = false;
     state.scriptEvents.handledInput = false;
     const activeEvents: ActiveScriptEvent[] = [];
     let activeEventCountSinceLastWaitEvent = 0;
@@ -46,6 +47,9 @@ export function updateScriptEvents(state: GameState): void {
                 }
                 if (event.blockPlayerInput) {
                     state.scriptEvents.blockPlayerInput = true;
+                }
+                if (event.blockPlayerUpdates) {
+                    state.scriptEvents.blockPlayerUpdates = true;
                 }
                 if (event.blockFieldUpdates) {
                     state.scriptEvents.blockFieldUpdates = true;
@@ -103,6 +107,9 @@ export function updateScriptEvents(state: GameState): void {
                 }
                 if (event.blockPlayerInput) {
                     state.scriptEvents.blockPlayerInput = true;
+                }
+                if (event.blockPlayerUpdates) {
+                    state.scriptEvents.blockPlayerUpdates = true;
                 }
                 state.scriptEvents.blockEventQueue = true;
                 break;

@@ -3702,6 +3702,8 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 304, y: 180, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "normal", id: "", x: 368, y: 500, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "normal", id: "", x: 304, y: 453, w: 32, h: 48, style: "futuristic", type: "stairs", linked: true, spirit: false},
+        {status: "normal", id: "", linked: false, x: 304, y: 436, type: "narration", message: "{@jadeChampionStaffTower.top}", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "never", logicKey: "jadeChampionStaffTowerTop"},
+        {status: "normal", id: "jadeChampion", linked: false, x: 312, y: 536, d: "up", behavior: "none", style: "jadeChampion", type: "npc", logicKey: "jadeChampionStaffTowerTop"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 453, mapId: 'staffTower', floorId: '5F', mapX: 3, mapY: 2},

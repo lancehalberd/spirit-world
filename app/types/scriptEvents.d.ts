@@ -60,6 +60,10 @@ interface WaitScriptEvent {
     blockFieldUpdates?: boolean
     // If this is true player input will be blocked while this event is active.
     blockPlayerInput?: boolean
+    // If this is true player updates will be blocked while this event is active.
+    // This should be used when the script needs control the player behavior without
+    // interference from the default player behavior.
+    blockPlayerUpdates?: boolean
     // If defined, wait will end once this callback returns false.
     callback?: (state: GameState) => boolean
     // If this is set the event is cleared after duration milliseconds.

@@ -77,7 +77,9 @@ export function updateAllHeroes(this: void, state: GameState) {
             state.hero.astralProjection = null;
         }
     }
-    updateHero(state, state.hero);
+    if (!state.scriptEvents.blockPlayerUpdates) {
+        updateHero(state, state.hero);
+    }
     const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) >= 20;
     if (!skipFrame) {
         updatePrimaryHeroState(state, state.hero);

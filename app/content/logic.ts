@@ -303,6 +303,17 @@ export const logicHash: {[key: string]: LogicCheck} = {
         requiredFlags: ['$staff:2'],
     },
     beastsDefeated,
+    jadeChampionStaffTowerTop: (state: GameState) => {
+        // Disable once the cut scene has played.
+        if (state.savedState.objectFlags.jadeChampionStaffTowerTop) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.flameBeast && state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        return true;
+    },
 };
 
 

@@ -28,7 +28,8 @@ export function moveNPC(state: GameState, npc: NPC, dx: number, dy: number, move
 export function moveNPCToTargetLocation(
     state: GameState,
     npc: NPC, tx: number, ty: number,
-    animationStyle?: string
+    animationStyle?: string,
+    movementProperties?: MovementProperties
 ): number {
     const hitbox = npc.getHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
@@ -39,9 +40,9 @@ export function moveNPCToTargetLocation(
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > npc.speed) {
-        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {boundingBox: false});
+        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {boundingBox: false, ...movementProperties});
         return mag - npc.speed;
     }
-    moveNPC(state, npc, dx, dy, {boundingBox: false});
+    moveNPC(state, npc, dx, dy, {boundingBox: false, ...movementProperties});
     return 0;
 }

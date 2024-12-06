@@ -124,6 +124,7 @@ interface GameState {
         blockEventQueue: boolean
         blockFieldUpdates: boolean
         blockPlayerInput: boolean
+        blockPlayerUpdates: boolean
         handledInput: boolean
         overrideMusic?: TrackKey
         queue: ScriptEvent[]

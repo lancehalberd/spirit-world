@@ -338,6 +338,7 @@ export class NPC implements Actor, ObjectInstance  {
     mode = 'choose';
     modeTime = 0;
     speed = 1;
+    alpha = 1;
     status: ObjectStatus = 'normal';
     params: any;
     showMessage = false;
@@ -450,31 +451,33 @@ export class NPC implements Actor, ObjectInstance  {
         this.modeTime += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const animationStyle = npcStyles[this.definition.style];
-        const frame = this.getFrame();
-        const scale = animationStyle.scale || 1;
-        if ((this.d === 'right' && animationStyle.flipRight) || (this.d === 'left' && animationStyle.flipLeft)) {
-            // Some sprites only have a left or a right frame that we flip to produce the other frame.
-            const w = (frame.content?.w ?? frame.w) * scale;
-            context.save();
-                context.translate((this.x | 0) + w / 2, 0);
-                context.scale(-1, 1);
-                context.fillStyle = 'red';
+        this.applyAlpha(context, () => {
+            const animationStyle = npcStyles[this.definition.style];
+            const frame = this.getFrame();
+            const scale = animationStyle.scale || 1;
+            if ((this.d === 'right' && animationStyle.flipRight) || (this.d === 'left' && animationStyle.flipLeft)) {
+                // Some sprites only have a left or a right frame that we flip to produce the other frame.
+                const w = (frame.content?.w ?? frame.w) * scale;
+                context.save();
+                    context.translate((this.x | 0) + w / 2, 0);
+                    context.scale(-1, 1);
+                    context.fillStyle = 'red';
+                    drawFrame(context, frame, { ...frame,
+                        x: - w / 2 - (frame?.content?.x || 0) * scale,
+                        y: this.y - (frame?.content?.y || 0) * scale - this.z,
+                        w: frame.w * scale,
+                        h: frame.h * scale,
+                    });
+                context.restore();
+            } else {
                 drawFrame(context, frame, { ...frame,
-                    x: - w / 2 - (frame?.content?.x || 0) * scale,
+                    x: this.x - (frame?.content?.x || 0) * scale,
                     y: this.y - (frame?.content?.y || 0) * scale - this.z,
                     w: frame.w * scale,
                     h: frame.h * scale,
                 });
-            context.restore();
-        } else {
-            drawFrame(context, frame, { ...frame,
-                x: this.x - (frame?.content?.x || 0) * scale,
-                y: this.y - (frame?.content?.y || 0) * scale - this.z,
-                w: frame.w * scale,
-                h: frame.h * scale,
-            });
-        }
+            }
+        });
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
@@ -512,25 +515,39 @@ export class NPC implements Actor, ObjectInstance  {
         }
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
-        const animationStyle = npcStyles[this.definition.style];
-        if (animationStyle.noShadow) {
-            return;
-        }
-        const npcScale = animationStyle.scale || 1;
-        const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
-        const hitbox = this.getHitbox();
-        const shadowScale = Math.round(hitbox.w / shadowFrame.w);
-        const target = {
-            x: hitbox.x + (hitbox.w - frame.w * shadowScale) / 2,
-            y: hitbox.y + hitbox.h - frame.h * shadowScale + (animationStyle.shadowOffset || 0) * npcScale, // - 3 * enemy.scale,
-            w: frame.w * shadowScale,
-            h: frame.h * shadowScale,
-        };
-        drawFrame(context, frame, target);
+        this.applyAlpha(context, () => {
+            const animationStyle = npcStyles[this.definition.style];
+            if (animationStyle.noShadow) {
+                return;
+            }
+            const npcScale = animationStyle.scale || 1;
+            const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
+            const hitbox = this.getHitbox();
+            const shadowScale = Math.round(hitbox.w / shadowFrame.w);
+            const target = {
+                x: hitbox.x + (hitbox.w - frame.w * shadowScale) / 2,
+                y: hitbox.y + hitbox.h - frame.h * shadowScale + (animationStyle.shadowOffset || 0) * npcScale, // - 3 * enemy.scale,
+                w: frame.w * shadowScale,
+                h: frame.h * shadowScale,
+            };
+            drawFrame(context, frame, target);
+        });
     }
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
-        const animationStyle = npcStyles[this.definition.style];
-        animationStyle.alternateRender?.(context, state, this);
+        this.applyAlpha(context, () => {
+            const animationStyle = npcStyles[this.definition.style];
+            animationStyle.alternateRender?.(context, state, this);
+        });
+    }
+    applyAlpha(context: CanvasRenderingContext2D, callback: () => void) {
+        if (this.alpha >= 1) {
+            callback();
+            return;
+        }
+        context.save();
+            context.globalAlpha *= this.alpha;
+            callback();
+        context.restore();
     }
 }
 objectHash.npc = NPC;
