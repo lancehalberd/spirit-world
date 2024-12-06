@@ -2,7 +2,7 @@
 import {
     andLogic, canUseTeleporters, orLogic, canHasTowerStaff,
     hasAstralProjection, hasBossWeapon,
-    hasIce, hasInvisibility, hasIronBoots, hasCloudBoots, hasMitts,
+    hasInvisibility, hasIronBoots, hasCloudBoots,
     hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
 } from 'app/content/logic';
 
@@ -42,7 +42,6 @@ export const gauntletNodes: LogicNode[] = [
         exits: [
             {
                 objectId: 'gauntletLeftStairs',
-                logic: orLogic(hasMitts, hasClone, hasIce)
             },
             {
                 objectId: 'gauntletStairs',
@@ -50,7 +49,7 @@ export const gauntletNodes: LogicNode[] = [
             {
                 objectId: 'gauntletRightStairs',
                 // There are many ways to climb this escalator...
-                logic: orLogic(hasInvisibility, hasCloudBoots, hasSomersault, hasTeleportation, hasClone)
+                logic: orLogic(hasInvisibility, hasCloudBoots, hasSomersault, hasTeleportation, hasClone, hasStaff)
             },
         ],
     },
