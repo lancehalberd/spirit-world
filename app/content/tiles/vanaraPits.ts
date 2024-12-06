@@ -1,3 +1,4 @@
+import {BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT} from 'app/content/bitMasks';
 import {pitBehavior, singleTileSource} from 'app/content/tiles/constants';
 import { requireFrame } from 'app/utils/packedImages';
 
@@ -56,8 +57,8 @@ export const vanaraPitAngledWallsIn: TileSource = {
     behaviors: {
         '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
         '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
-        '0x1': { defaultLayer: 'field', solid: true, isSouthernWall: true },
-        '1x1': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true },
+        '1x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true },
         '0x2': { defaultLayer: 'floor2', pit: true },
         '1x2': { defaultLayer: 'floor2', pit: true },
     },
@@ -68,8 +69,8 @@ export const vanaraPitAngledWallsOut: TileSource = {
     w: 16, h: 16,
     source: requireFrame(vanaraPitsImage, {x: 48, y: 128, w: 32, h: 32}),
     behaviors: {
-        '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
-        '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
+        '0x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true },
         '0x1': { defaultLayer: 'floor2', pit: true },
         '1x1': { defaultLayer: 'floor2', pit: true },
     },

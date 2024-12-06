@@ -77,7 +77,6 @@ Current tasks:
         - Peach tree
         - End of rival fight, start of rival 2 fight.
 
-
     - Bug: Astral projection can pull linked pots on top of the hero.
 
     - Frost Beast improvements
