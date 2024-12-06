@@ -92,6 +92,9 @@ interface BaseFieldInstance {
     getParts?: (state: GameState) => BaseFieldInstance[]
     getHitbox?: (state?: GameState) => Readonly<Rect>
     checkToCull?: (state?: GameState) => boolean
+    // The source of this object or effect, if any. This is often set to enemies for effects that
+    // are part of enemy attacks.
+    source?: Actor
 }
 
 interface ObjectInstance extends BaseFieldInstance {

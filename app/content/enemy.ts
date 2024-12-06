@@ -14,7 +14,7 @@ import { renderEnemyShadow } from 'app/renderActor';
 import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
 import {trackEnemyTookDamage} from 'app/utils/enemyDamageTracking';
 import { breakBrittleTilesInRect } from 'app/utils/field';
@@ -1073,6 +1073,16 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         hitbox = this.getHitbox();
         this.x += (cx - hitbox.x - hitbox.w / 2);
         this.y += (by - hitbox.y - hitbox.h);
+    }
+    cancelAttacks(state: GameState) {
+        if (this.activeAbility) {
+            delete this.activeAbility;
+        }
+        for (const effect of [...state.areaInstance.effects, ...state.areaInstance.alternateArea.effects]) {
+            if (effect.source === this) {
+                removeEffectFromArea(state, effect);
+            }
+        }
     }
 }
 objectHash.enemy = Enemy;

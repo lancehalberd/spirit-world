@@ -73,6 +73,11 @@ Current tasks:
         - Ask if anyone else wants to test staging.
         - Release to production.
 
+    - Hide hud for longer cut scenes
+        - Peach tree
+        - End of rival fight, start of rival 2 fight.
+
+
     - Bug: Astral projection can pull linked pots on top of the hero.
 
     - Frost Beast improvements
@@ -376,9 +381,6 @@ Current tasks:
         - east/west doors
         - Add elevator behaviors
             - off, terminals are not animated/functional
-
-    - Ice mines are not cleaned up when defeating Guardian in Cocoon.
-        - Same for long lasting lightning attacks
 
     - Fix push/pull interactions with ledges.
         - Minor issues:

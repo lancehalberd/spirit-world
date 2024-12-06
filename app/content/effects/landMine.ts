@@ -4,6 +4,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {isEnemyDefeated} from 'app/utils/enemies';
 import { isTargetHit } from 'app/utils/field';
 
 
@@ -22,7 +23,7 @@ interface Props {
     armingTime?: number
     blastProps?: Partial<BlastProps>
     duration?: number
-    source: Actor
+    source: Enemy
 }
 
 export class LandMine implements EffectInstance, Props {
@@ -48,6 +49,10 @@ export class LandMine implements EffectInstance, Props {
     constructor(public props: Props) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        if (isEnemyDefeated(this.source)) {
+            removeEffectFromArea(state, this);
+            return;
+        }
         if (this.animationTime >= this.duration) {
             removeEffectFromArea(state, this);
             return;

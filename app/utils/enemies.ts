@@ -18,7 +18,7 @@ export function moveEnemyToTargetLocation(
     const hitbox = enemy.getMovementHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
-        enemy.d = getCardinalDirection(dx, dy);
+        enemy.d = getCardinalDirection(dx, dy, enemy.d);
         enemy.changeToAnimation(animationStyle)
     }
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];

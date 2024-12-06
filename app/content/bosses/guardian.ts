@@ -386,15 +386,6 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
     }
 }
 
-function cancelBlastAttacks(state: GameState, enemy: Enemy<ProjectionParams>): void {
-    if (enemy.activeAbility) {
-        enemy.activeAbility = null;
-    }
-    if (enemy.area === enemy.params.blast?.area) {
-        removeEffectFromArea(state, enemy.params.blast);
-    }
-}
-
 function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
     enemy.z = 6;
     const guardian = getGuardian(enemy);
@@ -435,7 +426,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.life = Math.max(enemy.life, 0);
         if (enemy.mode !== 'regenerate' && !isGuardianStaggered) {
             enemy.setMode('regenerate');
-            cancelBlastAttacks(state, enemy);
+            enemy.cancelAttacks(state);
             const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
             if (guardian.life <= guardian.enemyDefinition.life / 4) {
                 // Always use the low life taunts when regenerating.
@@ -623,7 +614,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         // This mode lasts as long as the mediumBlast ability and they are on screen.
         if (!enemy.activeAbility || hasEnemyLeftSection(state, enemy, 32)) {
             enemy.setMode('choose');
-            cancelBlastAttacks(state, enemy);
+            enemy.cancelAttacks(state);
         } else {
             enemy.acceleration = 0.1;
             accelerateInDirection(state, enemy, enemy.params.chargeDirection);
