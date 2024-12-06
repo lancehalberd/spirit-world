@@ -159,7 +159,7 @@ const imagePacks: PackedImageData[] = [
         {x:0,y:1534,w:320,h:64,originalSource:'gfx/enemies/golem_hand_slam.png'},
         {x:0,y:1872,w:384,h:64,originalSource:'gfx/enemies/golem_hand_base.png'},
         {x:390,y:1872,w:384,h:64,originalSource:'gfx/enemies/golem_hand_crack.png'},
-        {x:520,y:858,w:288,h:192,originalSource:'gfx/enemies/spiritboss.png'},
+        //{x:520,y:858,w:288,h:192,originalSource:'gfx/enemies/spiritboss.png'},
         {x:585,y:702,w:240,h:48,originalSource:'gfx/effects/eyespike.png'},
         {x:767,y:130,w:48,h:48,originalSource:'gfx/enemies/largeOrb.png'},
         {x:611,y:611,w:144,h:32,originalSource:'gfx/enemies/plant.png'},

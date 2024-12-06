@@ -17,7 +17,7 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation } from 'app/utils/enemies';
 import { sample } from 'app/utils/index';
 import { addObjectToArea } from 'app/utils/objects';
-import { getVectorToNearbyTarget, getVectorToMovementTarget, getVectorToTarget } from 'app/utils/target';
+import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
 
 
 
@@ -453,16 +453,12 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.speed = isGuardianStaggered ? 10 : 5;
         const hitbox = guardian.getMovementHitbox();
         // Move slightly behind the guardian so the projection renders behind him.
-        moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 2);
-        const vector = getVectorToMovementTarget(state, enemy, guardian);
-        //if (vector && vector.mag >= 10) {
-            //accelerateInDirection(state, enemy, vector);
-        //}
-        //enemy.vx *= 0.8;
-        //enemy.vy *= 0.8;
-        //enemy.x += enemy.vx;
-        //enemy.y += enemy.vy;
-        if (vector.mag < 10 && !isGuardianStaggered) {
+        const amount = moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 2, undefined, {
+            canPassWalls: true,
+        });
+        if (!amount && !isGuardianStaggered) {
+            enemy.d = 'down';
+            enemy.changeToAnimation('idle');
             // The projection regenerates quickly after the Guardian recovers from being staggered.
             const rate = enemy.params.regenerateQuickly ? 10 : 4;
             enemy.life = Math.min(maxLife, enemy.life + rate * FRAME_LENGTH / 1000);
