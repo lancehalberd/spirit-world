@@ -13,7 +13,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
 import { createAnimation } from 'app/utils/animations';
 import { getCardinalDirection } from 'app/utils/direction';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {addEffectToArea} from 'app/utils/effects';
 import { accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation } from 'app/utils/enemies';
 import { sample } from 'app/utils/index';
 import { addObjectToArea } from 'app/utils/objects';
