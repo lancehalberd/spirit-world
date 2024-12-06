@@ -304,6 +304,10 @@ export const logicHash: {[key: string]: LogicCheck} = {
     },
     beastsDefeated,
     jadeChampionStaffTowerTop: (state: GameState) => {
+        // Disable all cut scenes in randomizer.
+        if (isRandomizer) {
+            return false;
+        }
         // Disable once the cut scene has played.
         if (state.savedState.objectFlags.jadeChampionStaffTowerTop) {
             return false;
