@@ -2449,7 +2449,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "flameBeast", x: 230, y: 248, type: "boss", enemyType: "flameHeart", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: ""},
         {status: "normal", id: "flameBeast", x: 224, y: 144, type: "boss", enemyType: "flameBeast", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: ""},
         {status: "normal", id: "craterBossPortal", x: 248, y: 320, targetZone: "crater", targetObjectId: "craterBossPortal", type: "teleporter", hasCustomLogic: true, customLogic: "flameBeast"},
-        {status: "normal", id: "craterLavaSwitch4", x: 240, y: 368, requireAll: true, type: "heavyFloorSwitch", specialBehaviorKey: "craterLavaSwitch4", saveStatus: "forever", hasCustomLogic: true, customLogic: "craterLava3"},
+        {status: "normal", id: "craterLavaSwitch4", x: 240, y: 368, requireAll: true, type: "heavyFloorSwitch", specialBehaviorKey: "craterLavaSwitch4", saveStatus: "never", hasCustomLogic: true, customLogic: "craterLava3"},
         {status: "normal", id: "craterBossSwitch", specialBehaviorKey: "craterBossSwitch", x: 148, y: 416, requireAll: true, type: "heavyFloorSwitch", hasCustomLogic: true, customLogic: "craterLava3"},
         {status: "normal", id: "craterBossSwitch", specialBehaviorKey: "craterBossSwitch", x: 64, y: 332, requireAll: true, type: "heavyFloorSwitch", hasCustomLogic: true, customLogic: "craterLava3"},
         {status: "normal", id: "craterBossSwitch", specialBehaviorKey: "craterBossSwitch", x: 64, y: 164, requireAll: true, type: "heavyFloorSwitch", hasCustomLogic: true, customLogic: "craterLava3"},

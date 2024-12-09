@@ -226,6 +226,9 @@ export function fillFlameBeastLava(state: GameState) {
 
 specialBehaviorsHash.craterLavaSwitch4 = {
     type: 'heavyFloorSwitch',
+    apply(state: GameState, object: HeavyFloorSwitch) {
+        object.status = state.savedState.objectFlags.craterLava4Objects ? 'active' : 'normal';
+    },
     onActivate(state: GameState, object: ObjectInstance) {
         if (state.savedState.objectFlags.craterLava4) {
             return;

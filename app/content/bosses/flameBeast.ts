@@ -405,6 +405,8 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     if (!target) {
         paceRandomly(state, enemy);
         return;
+    } else if (enemy.mode === 'walk') {
+        enemy.setMode('choose');
     }
     const targetVector = getVectorToTarget(state, enemy, target);
     if (enemy.mode === 'leapStrike') {
