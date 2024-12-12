@@ -214,7 +214,12 @@ export function getSettingsOptions(state: GameState): string[] {
 export function shouldHideMenu(state: GameState): boolean {
     return !!(
         state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
-        || state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length
+        || state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput
+        || state.scriptEvents.blockPlayerInput
+        // This prevents the player from pausing during script events that don't otherwise block player
+        // input. Let's delete these if the more specific checks above don't cause any issues with allowing
+        // players to pause during cutscenes.
+        //|| state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length
         || state.messagePage || state.transitionState || state.defeatState.defeated
         || state.nextAreaSection || state.nextAreaInstance
         || state.areaInstance.priorityObjects?.length

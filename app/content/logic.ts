@@ -303,6 +303,21 @@ export const logicHash: {[key: string]: LogicCheck} = {
         requiredFlags: ['$staff:2'],
     },
     beastsDefeated,
+    jadeChampionStaffTowerEntrance: (state: GameState) => {
+        // Disable all cut scenes in randomizer.
+        if (isRandomizer) {
+            return false;
+        }
+        // Disable once the cut scene has played.
+        if (state.savedState.objectFlags.jadeChampionStaffTowerEntrance) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.flameBeast && state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        return true;
+    },
     jadeChampionStaffTowerTop: (state: GameState) => {
         // Disable all cut scenes in randomizer.
         if (isRandomizer) {
@@ -314,6 +329,69 @@ export const logicHash: {[key: string]: LogicCheck} = {
         }
         // Disable if the other two beasts are already defeated.
         if (state.savedState.objectFlags.flameBeast && state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        return true;
+    },
+    jadeChampionStormBeast: (state: GameState) => {
+        // Disable once the beast is defeated.
+        if (state.savedState.objectFlags.stormBeast) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.flameBeast && state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        return true;
+    },
+    jadeChampionStaffCraterEntrance: (state: GameState) => {
+        // Disable all cut scenes in randomizer.
+        if (isRandomizer) {
+            return false;
+        }
+        // Disable once the cut scene has played.
+        if (state.savedState.objectFlags.jadeChampionStaffCraterEntrance) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.stormBeast && state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        return true;
+    },
+    jadeChampionFlameBeast: (state: GameState) => {
+        // Disable once the beast is defeated.
+        if (state.savedState.objectFlags.flameBeast) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.stormBeast && state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        return true;
+    },
+    jadeChampionStaffLakeTempleEntrance: (state: GameState) => {
+        // Disable all cut scenes in randomizer.
+        if (isRandomizer) {
+            return false;
+        }
+        // Disable once the cut scene has played.
+        if (state.savedState.objectFlags.jadeChampionStaffLakeTempleEntrance) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.stormBeast && state.savedState.objectFlags.flameBeast) {
+            return false;
+        }
+        return true;
+    },
+    jadeChampionFrostBeast: (state: GameState) => {
+        // Disable once the beast is defeated.
+        if (state.savedState.objectFlags.frostBeast) {
+            return false;
+        }
+        // Disable if the other two beasts are already defeated.
+        if (state.savedState.objectFlags.stormBeast && state.savedState.objectFlags.flameBeast) {
             return false;
         }
         return true;

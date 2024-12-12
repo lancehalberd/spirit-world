@@ -229,7 +229,7 @@ export const droneAnimations: ActorAnimations = {
     idle: omniAnimation(droneDownAnimation),
 };
 
-export const dronDirectionalAnimations: ActorAnimations = {
+export const droneDirectionalAnimations: ActorAnimations = {
     idle: {
         up: droneUpAnimation,
         down: droneDownAnimation,

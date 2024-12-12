@@ -1,6 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import {
-    dronDirectionalAnimations, sentryBotAnimations,
+    droneDirectionalAnimations, sentryBotAnimations,
     rivalAnimations, snakeAnimations,
     omniAnimation,
 } from 'app/content/enemyAnimations';
@@ -80,6 +80,14 @@ function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state
     context.restore();
 }
 
+// The Jade champion renders the same frame in both worlds, but is faded in the world she isn't material in.
+function renderAlternateJadeChampion(this: void, context: CanvasRenderingContext2D, state: GameState, npc: NPC): void {
+    context.save();
+        context.globalAlpha = 0.3 + 0.2 * Math.cos(npc.animationTime / 100);
+        npc.render(context, state);
+    context.restore();
+}
+
 export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     /*test: {
         animations: testAnimations,
@@ -94,6 +102,7 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: jadeChampionAnimations,
         shadowOffset: 2,
         height: 26,
+        alternateRender: renderAlternateJadeChampion,
     },
     man: {
         animations: manAnimations,
@@ -134,7 +143,7 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         shadowOffset: 2,
     },
     smallSpirit: {
-        animations: dronDirectionalAnimations,
+        animations: droneDirectionalAnimations,
         z: 6,
     },
     flameSpirit: {

@@ -91,8 +91,7 @@ export function update() {
                 }
                 updateSoundSettings(state);
             }
-        }
-        if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+        } else if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
             // Don't allow pausing while dialogue is displayed.
             if (state.showMap
                 || (canPauseGame(state)

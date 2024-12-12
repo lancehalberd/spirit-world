@@ -1,6 +1,6 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
-import { appendCallback, appendScript, runBlockingCallback } from 'app/scriptEvents';
+import { appendCallback, appendScript, hideHUD, runBlockingCallback, showHUD } from 'app/scriptEvents';
 import { updateCamera } from 'app/updateCamera';
 import { directionMap, hitTargets } from 'app/utils/field';
 
@@ -19,6 +19,7 @@ specialBehaviorsHash.peachCave = {
                 state.savedState.objectFlags.peachCaveTree = true;
                 state.areaInstance.needsLogicRefresh = true;
             } else {
+                hideHUD(state);
                 appendScript(state, '{playTrack:vanaraDreamTheme}{wait:500');
                 // Clear all the bushes to unblock player movement and give some extra loot before they all disappear.
                 appendCallback(state, () => {
@@ -73,6 +74,8 @@ specialBehaviorsHash.peachCave = {
                     {|}(Please take...[-][-][-][-]...last of my strength...[-][-][-][-]...The Fruit of Life.)[-][-]`
                 );
                 appendScript(state, '{flag:peachCaveTree}{stopTrack}');
+                appendScript(state, '{wait:100');
+                showHUD(state);
             }
         }
     },
