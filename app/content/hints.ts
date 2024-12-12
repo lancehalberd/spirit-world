@@ -49,7 +49,18 @@ const getJadePalaceLocation = (state: GameState) => findSpiritWorldObject(state,
 
 const getCraterLocation = (state: GameState) => findMaterialSkyObject(state, 'craterEntrance');
 const getLakeTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'riverTempleUpperEntrance');
-const getStaffTowerLocation = (state: GameState) => findMaterialWorldObject(state, 'staffTowerEntrance');
+const getStaffTowerLocation = (state: GameState) => {
+    const location = findMaterialWorldObject(state, 'staffTowerEntrance');
+    if (!location) {
+        return false;
+    }
+    // The location is for the tower, but we want to show the hint over the door of the tower.
+    return {
+        ...location,
+        x: location.x + 80,
+        y: location.y + 160,
+    };
+};
 
 const getWarPalaceLocation = (state: GameState) => findSpiritWorldObject(state, 'warTempleEntranceSpirit');
 

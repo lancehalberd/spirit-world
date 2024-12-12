@@ -125,8 +125,6 @@ Current tasks:
         - flame wall should be red
         - lightningDischarge should be yellow
 
-    - Quest marker for the Staff Tower isn't aligned correctly.
-
     - Preload music.
 
     - Design and add enemy scaling
