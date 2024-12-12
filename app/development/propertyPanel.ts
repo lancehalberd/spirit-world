@@ -234,7 +234,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         const palette = property.palette;
         paletteCanvas.width = palette[0].length * 16;
         paletteCanvas.height = palette.length * 16;
-        const scale = Math.min(1, 1024 / paletteCanvas.height);
+        const scale = 1;//Math.min(1, 1024 / paletteCanvas.height);
 
         for (let i = 0; i < palette.length; i++) {
             for (let j = 0; j < palette[i].length; j++) {
@@ -312,7 +312,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         // a div with the correct width wrapping the palette.
         const paletteDiv = tagElement('div');
         paletteDiv.style.width = '400px';
-        paletteDiv.style.height = `${Math.min(200, 20 + paletteCanvas.height * scale)}px`;
+        paletteDiv.style.height = `${Math.min(300, 20 + paletteCanvas.height * scale)}px`;
         paletteDiv.style.textAlign = 'center';
         paletteDiv.style.marginBottom = '10px';
         paletteDiv.style.overflowY = 'auto';
@@ -442,7 +442,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         // a div with the correct width wrapping the palette.
         const paletteDiv = tagElement('div');
         paletteDiv.style.width = '400px';
-        paletteDiv.style.height = `${Math.min(200, 20 + paletteCanvas.height * scale)}px`;
+        paletteDiv.style.height = `${Math.min(300, 20 + paletteCanvas.height * scale)}px`;
         paletteDiv.style.textAlign = 'center';
         paletteDiv.style.marginBottom = '10px';
         paletteDiv.style.overflowY = 'auto';
