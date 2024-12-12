@@ -54,6 +54,10 @@ export class Decoration implements ObjectInstance {
         const decorationType = decorationTypes[this.definition.decorationType];
         decorationType.render(context, state, this);
     }
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        decorationType.renderShadow?.(context, state, this);
+    }
 }
 
 const [
@@ -80,40 +84,62 @@ const glowingPedestalAnimation = createAnimation('gfx/decorations/largeStatuePed
 
 const lightningBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
+const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
+    {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
+).frames;
+
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     getHitbox?: (decoration: Decoration) => Rect
     behaviors?: TileBehaviors
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
     getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
 }
-export const decorationTypes: {[key: string]: DecorationType} = {
-    tube: {
-        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrameContentAt(context, tubeBackFrame, decoration);
-            const frame = getFrame(tubeWaterAnimation, decoration.animationTime);
-            drawFrameContentAt(context, frame, decoration);
-            drawFrameContentAt(context, tubeFrontFrame, decoration);
-        },
-        behaviors: {
-            solid: true,
-        },
-        getHitbox(decoration: Decoration): Rect {
-            return {x: decoration.x, y: decoration.y + 36, w: 32, h: 17};
-        },
+const fireplace: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, fireplaceFrame, decoration);
     },
-    window: {
-        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrameContentAt(context, glassWindowFrame, decoration);
-        },
-        behaviors: {
-            solid: true,
-        },
-        getHitbox(decoration: Decoration): Rect {
-            return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
-        },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, fireplaceShadowFrame, decoration);
     },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(fireplaceFrame, decoration);
+    },
+};
+const tube: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, tubeBackFrame, decoration);
+        const frame = getFrame(tubeWaterAnimation, decoration.animationTime);
+        drawFrameContentAt(context, frame, decoration);
+        drawFrameContentAt(context, tubeFrontFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y + 36, w: 32, h: 17};
+    },
+};
+const window: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, glassWindowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
+    },
+};
+export const decorationTypes = {
+    fireplace,
+    tube,
+    window,
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = lightningBeastStatueFrame;
@@ -125,22 +151,22 @@ export const decorationTypes: {[key: string]: DecorationType} = {
         getHitbox(decoration: Decoration): Rect {
             return getFrameHitbox(lightningBeastStatueFrame, decoration);
         },
-    },
+    } as DecorationType,
     fireBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, fireBeastStatueImage, {...fireBeastStatueImage, x: decoration.x, y: decoration.y});
         }
-    },
+    } as DecorationType,
     iceBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
         }
-    },
+    } as DecorationType,
     entranceLight: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, entranceLightFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
         },
-    },
+    } as DecorationType,
     orbTree: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, orbTreeFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
@@ -163,7 +189,7 @@ export const decorationTypes: {[key: string]: DecorationType} = {
                 {...common, radius: 16, x: decoration.x - orbTreeFrame.content.x + 23, y: decoration.y - orbTreeFrame.content.y + 14},
             ];
         }
-    },
+    } as DecorationType,
     pedestal: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, pedestalFrame, decoration);
@@ -174,7 +200,7 @@ export const decorationTypes: {[key: string]: DecorationType} = {
         getHitbox(decoration: Decoration): Rect {
             return getFrameHitbox(pedestalFrame, decoration);
         },
-    },
+    } as DecorationType,
     pedestalGlowing: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = getFrame(glowingPedestalAnimation, decoration.animationTime);
@@ -187,7 +213,7 @@ export const decorationTypes: {[key: string]: DecorationType} = {
             const frame = getFrame(glowingPedestalAnimation, decoration.animationTime);
             return getFrameHitbox(frame, decoration);
         },
-    }
+    } as DecorationType,
 }
 
 objectHash.decoration = Decoration;
