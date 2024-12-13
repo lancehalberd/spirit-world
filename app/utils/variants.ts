@@ -24,9 +24,18 @@ function chooseStyleVariant(styles: string[], random: SRandom, data: VariantData
     return styles[0];
 }
 
+export function getVariantRandom(seedData: VariantSeedData): SRandom {
+    // Fixed variants do not depend on the base variant seed.
+    if (seedData.fixed) {
+        return SRandom.seed(seedData.seed || 0);
+    }
+    // Non-fixed variants depend on the base variant seed.
+    return baseVariantRandom.addSeed(seedData.seed || 0);
+}
+
 export function applyVariantsToArea(state: GameState, area: AreaInstance): void {
     for (const variantData of (area.definition.variants || [])) {
-        let variantRandom = baseVariantRandom.addSeed(variantData.seed);
+        const variantRandom = getVariantRandom(variantData);
         const definition = variantHash[variantData.type];
         const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
         definition.applyToArea(style, variantRandom, state, area, variantData);
@@ -51,11 +60,11 @@ export function variantLogic(variantId: string): LogicCheck {
     if (!variantData) {
         debugger;
     }
-    let variantRandom = baseVariantRandom.addSeed(variantData.seed);
     const definition = variantHash[variantData.type];
     if (!definition) {
         throw new Error(variantData.type + " variant type not found");
     }
+    const variantRandom = getVariantRandom(variantData);
     const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
     return definition.getLogic(style, variantRandom, variantData);
 }

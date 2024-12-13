@@ -565,7 +565,7 @@ interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType
 }
 
-interface DecorationDefinition extends BaseObjectDefinition {
+interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
     type: 'decoration'
     decorationType: DecorationType
     drawPriority?: DrawPriority

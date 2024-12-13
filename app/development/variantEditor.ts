@@ -76,15 +76,7 @@ export function getVariantProperties(state: GameState): PanelRows {
             refreshArea(state);
         },
     });
-    rows.push({
-        name: 'seed',
-        value: variantData.seed || 0,
-        onChange(seed: number) {
-            variantData.seed = seed;
-            refreshArea(state);
-        },
-    });
-
+    rows.push(...getVariantSeedProperties(state, variantData));
     rows.push('Weights:');
     let row: PropertyRow = [];
     for (const style of definition.styles) {
@@ -118,6 +110,36 @@ export function getVariantProperties(state: GameState): PanelRows {
         });
     }
 
+    return rows;
+}
+
+function getVariantSeedProperties(state: GameState, data: VariantSeedData): PanelRows {
+    const rows: PanelRows = [];
+    rows.push({
+        name: 'seed',
+        value: data.seed || 0,
+        onChange(seed: number) {
+            console.log({seed});
+            if (data.seed) {
+                data.seed = seed;
+            } else {
+                delete data.seed;
+            }
+            refreshArea(state);
+        },
+    });
+    rows.push({
+        name: 'fixed',
+        value: data.fixed || false,
+        onChange(fixed: boolean) {
+            if (fixed) {
+                data.fixed = true;
+            } else {
+                delete data.fixed;
+            }
+            refreshArea(state);
+        },
+    });
     return rows;
 }
 

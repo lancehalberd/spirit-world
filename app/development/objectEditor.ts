@@ -308,7 +308,7 @@ export function createObjectDefinition(
             };
         }
         case 'decoration':
-            return {
+            const decorationDefinition: DecorationDefinition = {
                 ...commonProps,
                 type: definition.type,
                 z: definition.z,
@@ -316,6 +316,13 @@ export function createObjectDefinition(
                 h: definition.h || 16,
                 decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
             };
+            if (definition.seed) {
+                decorationDefinition.seed = definition.seed;
+            }
+            if (definition.fixed) {
+                decorationDefinition.fixed = definition.fixed;
+            }
+            return decorationDefinition;
         case 'lavafall':
         case 'waterfall':
             return {
@@ -852,6 +859,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            rows.push(...getVariantSeedProperties(state, object));
         case 'lavafall':
         case 'waterfall':
             rows.push({
@@ -1550,6 +1558,39 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
             },
         });
     }
+    return rows;
+}
+
+
+function getVariantSeedProperties(state: GameState, data: ObjectDefinition): PanelRows {
+    if (data.type !== 'decoration') {
+        return [];
+    }
+    const rows: PanelRows = [];
+    rows.push({
+        name: 'seed',
+        value: data.seed || 0,
+        onChange(seed: number) {
+            if (seed) {
+                data.seed = seed;
+            } else {
+                delete data.seed;
+            }
+            updateObjectInstance(state, data);
+        },
+    });
+    rows.push({
+        name: 'fixed',
+        value: data.fixed || false,
+        onChange(fixed: boolean) {
+            if (fixed) {
+                data.fixed = true;
+            } else {
+                delete data.fixed;
+            }
+            updateObjectInstance(state, data);
+        },
+    });
     return rows;
 }
 

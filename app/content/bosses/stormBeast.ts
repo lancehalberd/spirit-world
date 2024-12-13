@@ -275,7 +275,7 @@ function getOrbs(this: void, state: GameState, area: AreaInstance, status: Objec
 
 /*
 function getStormBeast(this: void, state: GameState, area: AreaInstance): Enemy {
-    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameBeast') as Enemy;
+    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'stormBeast') as Enemy;
 }*/
 
 function getStormHeartTargetEnrageLevel(enemy: Enemy): number {

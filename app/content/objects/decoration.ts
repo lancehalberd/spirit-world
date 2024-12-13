@@ -1,7 +1,8 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrameContentAt, getFrame, getFrameHitbox } from 'app/utils/animations';
-import { requireFrame } from 'app/utils/packedImages';
+import {objectHash} from 'app/content/objects/objectHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrameContentAt, getFrame, getFrameHitbox} from 'app/utils/animations';
+import {requireFrame} from 'app/utils/packedImages';
+import {getVariantRandom} from 'app/utils/variants';
 
 
 export class Decoration implements ObjectInstance {
@@ -84,9 +85,6 @@ const glowingPedestalAnimation = createAnimation('gfx/decorations/largeStatuePed
 
 const lightningBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
-const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
-    {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
-).frames;
 
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
@@ -97,6 +95,84 @@ interface DecorationType {
     getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
 }
+
+const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
+    {w: 16, h: 24, content: {x: 0, y: 9, w: 16, h: 14}}, {top: 120, cols: 6}
+).frames;
+const logPile: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
+            if (x + 16 > decoration.x + decoration.w) {
+                drawFrameContentAt(context, oneLog, {x: x - 4, y: decoration.y});
+                return;
+            }
+            if (random.generateAndMutate() < 0.3){
+                drawFrameContentAt(context, twoLogs, {x, y: decoration.y});
+            } else {
+                drawFrameContentAt(context, threeLogs, {x, y: decoration.y});
+            }
+        }
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
+            if (x + 16 > decoration.x + decoration.w) {
+                drawFrameContentAt(context, oneLogShadow, {x: x - 4, y: decoration.y});
+                return;
+            }
+            if (random.generateAndMutate() < 0.3){
+                drawFrameContentAt(context, twoLogsShadow, {x, y: decoration.y});
+            } else {
+                drawFrameContentAt(context, threeLogsShadow, {x, y: decoration.y});
+            }
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {
+            x: decoration.x,
+            y: decoration.y,
+            w: decoration.w,
+            h: oneLog.content.h,
+        };
+    },
+    /*getYDepth(decoration: Decoration): number {
+        return decoration.y + 6;
+    },*/
+};
+
+const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
+    {w: 32, h: 23, content: {x: 8, y: 8, w: 16, h: 12}}, {top: 76, cols: 4}
+).frames;
+const stump: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, stumpFrame, decoration);
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.element([null, stumpAxe1Frame, stumpAxe2Frame]);
+        if (variantFrame){
+            drawFrameContentAt(context, variantFrame, {x: decoration.x + 2, y: decoration.y});
+        }
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, stumpShadowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(stumpFrame, decoration);
+    },
+    getYDepth(decoration: Decoration): number {
+        return decoration.y + 6;
+    },
+};
+
+const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
+    {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
+).frames;
 const fireplace: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, fireplaceFrame, decoration);
@@ -137,6 +213,8 @@ const window: DecorationType = {
     },
 };
 export const decorationTypes = {
+    stump,
+    logPile,
     fireplace,
     tube,
     window,

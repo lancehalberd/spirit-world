@@ -255,9 +255,9 @@ export function moveActorTowardsLocation(
     {x, y}: Point,
     speed = 1
 ): number {
-    const hitbox = actor.getMovementHitbox();
+    const hitbox = actor.getMovementHitbox?.() ?? actor.getHitbox();
     const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
-    actor.d = getCardinalDirection(dx, dy);
+    actor.d = getCardinalDirection(dx, dy, actor.d);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > speed) {
         moveActor(state, actor, speed * dx / mag, speed * dy / mag, {boundingBox: false});
