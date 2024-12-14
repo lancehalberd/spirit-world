@@ -187,6 +187,86 @@ const fireplace: DecorationType = {
         return getFrameHitbox(fireplaceFrame, decoration);
     },
 };
+
+const tallWideShelves = requireFrame('gfx/objects/furniture/shelves.png', {x: 0, y: 10, w: 32, h: 38, content: {x: 0, y: 22, w: 32, h: 16}});
+const shortWideShelves = requireFrame('gfx/objects/furniture/shelves.png', {x: 80, y: 28, w: 32, h: 20, content: {x: 0, y: 4, w: 32, h: 16}});
+const tallNarrowShelves = requireFrame('gfx/objects/furniture/shelves.png', {x: 48, y: 10, w: 16, h: 38, content: {x: 0, y: 22, w: 16, h: 16}});
+const shortNarrowShelves = requireFrame('gfx/objects/furniture/shelves.png', {x: 128, y: 28, w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16}});
+// A single shelf is 28x8
+const wideBookFrames = createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
+    {left: 2, top: 51, cols: 2, rows: 3, ySpace: 1}
+).frames;
+wideBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
+    {left: 2, top: 117, cols: 2, rows: 1}
+).frames);
+const narrowBookFrames = createAnimation('gfx/objects/furniture/shelves.png', {w: 12, h: 8},
+    {left: 50, top: 51, cols: 1, rows: 3, ySpace: 1}
+).frames;
+narrowBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 12, h: 8},
+    {left: 130, top: 53, cols: 1, rows: 2, ySpace: 8}
+).frames);
+const topLeftCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 2, y: 100, w: 5, h: 5});
+const topRightCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 26, y: 100, w: 4, h: 4});
+
+
+// Y value of the top of the shelves relative to the bottom of the shelves.
+const shelfYOffsets = [-10, -19, -28]
+const shelves: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        let x = decoration.x;
+        while (x < decoration.x + decoration.w) {
+            if (x <= decoration.x + decoration.w - 32) {
+                const variantFrame = random.element([tallWideShelves, shortWideShelves]);
+                drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
+                const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
+                for (const offset of shelfYOffsets) {
+                    const y = bottom + offset;
+                    drawFrameContentAt(context, random.mutate().element(wideBookFrames), {x: x + 2, y});
+                    drawFrameContentAt(context, random.mutate().element(wideBookFrames), {x: x + 16, y});
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
+                    }
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topRightCobwebs, {x: x + 25, y});
+                    }
+                    // Only render the bottom frame for short shelves.
+                    if (variantFrame === shortWideShelves) {
+                        break;
+                    }
+                }
+                x += 32;
+            } else {
+                const variantFrame = random.element([tallNarrowShelves, shortNarrowShelves]);
+                drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
+                const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
+                for (const offset of shelfYOffsets) {
+                    const y = bottom + offset;
+                    drawFrameContentAt(context, random.mutate().element(narrowBookFrames), {x: x + 2, y});
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
+                    } else if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topRightCobwebs, {x: x + 10, y});
+                    }
+                    // Only render the bottom frame for short shelves.
+                    if (variantFrame === shortNarrowShelves) {
+                        break;
+                    }
+                }
+                x += 16;
+            }
+            random.mutate();
+
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y, w: decoration.w, h: 16};
+    },
+};
+
 const tube: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, tubeBackFrame, decoration);
@@ -216,6 +296,7 @@ export const decorationTypes = {
     stump,
     logPile,
     fireplace,
+    shelves,
     tube,
     window,
     lightningBeastStatue: {
