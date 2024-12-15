@@ -144,6 +144,25 @@ const logPile: DecorationType = {
     },*/
 };
 
+
+const [anvilFrame, anvilShadowFrame] = createAnimation('gfx/objects/furniture/anvil.png',
+    {w: 32, h: 18, content: {x: 4, y: 6, w: 22, h: 10}}, {cols: 2}
+).frames;
+const anvil: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, anvilFrame, decoration);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, anvilShadowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(anvilFrame, decoration);
+    },
+};
+
 const [bedFrame, bedCoversFrame, bedShadowFrame] = createAnimation('gfx/objects/furniture/beds.png',
     {w: 32, h: 48, content: {x: 0, y: 8, w: 32, h: 38}}, {cols: 3}
 ).frames;
@@ -385,6 +404,7 @@ const window: DecorationType = {
     },
 };
 export const decorationTypes = {
+    anvil,
     bearRug,
     bed,
     floorBed,

@@ -134,11 +134,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "cityArmorSmith", x: 152, y: 72, d: "down", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I can upgrade that Chakram!", dialogueKey: "cityArmorSmith"},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 40, y: 144, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending to my flowers makes me feel closer to the spirits.", dialogueIndex: 103},
         {status: "normal", id: "citySmith", x: 88, y: 72, d: "down", behavior: "idle", style: "zoro", type: "npc", dialogue: "I can upgrade that Chakram!", dialogueKey: "citySmith"},
-        {status: "active", id: "", x: 136, y: 76, style: "bowl", type: "torch"},
-        {status: "active", id: "", x: 104, y: 76, style: "bowl", type: "torch"},
         {status: "normal", id: "", x: 106, y: 39, type: "decoration", w: 16, h: 16, decorationType: "fireplace"},
         {status: "normal", id: "", x: 336, y: 144, type: "decoration", w: 16, h: 16, decorationType: "shelves"},
         {status: "normal", id: "", x: 320, y: 47, type: "decoration", w: 48, h: 16, decorationType: "shelves", seed: 6},
+        {status: "normal", id: "", x: 116, y: 79, type: "decoration", w: 16, h: 16, decorationType: "anvil"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 74, mapId: 'overworld', entranceId: 'overworld:holyCityGardenHouse', mapX: 0, mapY: 0},

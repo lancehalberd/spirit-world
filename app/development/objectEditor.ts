@@ -844,7 +844,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows.push({
                 name: 'layer',
-                value: object.drawPriority || 'foreground',
+                value: object.drawPriority || 'sprites',
                 values: ['background', 'sprites', 'foreground'],
                 onChange(drawPriority: DrawPriority) {
                     object.drawPriority = drawPriority;
