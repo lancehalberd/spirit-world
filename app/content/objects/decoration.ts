@@ -217,32 +217,6 @@ const bearRug: DecorationType = {
     },
 };
 
-const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
-    {w: 32, h: 23, content: {x: 8, y: 8, w: 16, h: 12}}, {top: 76, cols: 4}
-).frames;
-const stump: DecorationType = {
-    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, stumpFrame, decoration);
-        const random = getVariantRandom(decoration.definition);
-        const variantFrame = random.element([null, stumpAxe1Frame, stumpAxe2Frame]);
-        if (variantFrame){
-            drawFrameContentAt(context, variantFrame, {x: decoration.x + 2, y: decoration.y});
-        }
-    },
-    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, stumpShadowFrame, decoration);
-    },
-    behaviors: {
-        solid: true,
-    },
-    getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(stumpFrame, decoration);
-    },
-    getYDepth(decoration: Decoration): number {
-        return decoration.y + 6;
-    },
-};
-
 const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
 ).frames;
@@ -258,6 +232,26 @@ const fireplace: DecorationType = {
     },
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(fireplaceFrame, decoration);
+    },
+};
+
+const pottedPlantFrames = createAnimation('gfx/objects/furniture/pottedPlants.png',
+    {w: 16, h: 32, content: {x: 3, y: 21, w: 10, h: 10}}, {cols: 3}
+).frames;
+const pottedPlant: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.element(pottedPlantFrames);
+        drawFrameContentAt(context, variantFrame, decoration);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        //drawFrameContentAt(context, stumpShadowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(pottedPlantFrames[0], decoration);
     },
 };
 
@@ -280,7 +274,6 @@ narrowBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w
 ).frames);
 const topLeftCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 2, y: 100, w: 5, h: 5});
 const topRightCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 26, y: 100, w: 4, h: 4});
-
 
 // Y value of the top of the shelves relative to the bottom of the shelves.
 const shelfYOffsets = [-10, -19, -28]
@@ -340,6 +333,32 @@ const shelves: DecorationType = {
     },
 };
 
+const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
+    {w: 32, h: 23, content: {x: 8, y: 8, w: 16, h: 12}}, {top: 76, cols: 4}
+).frames;
+const stump: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, stumpFrame, decoration);
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.element([null, stumpAxe1Frame, stumpAxe2Frame]);
+        if (variantFrame){
+            drawFrameContentAt(context, variantFrame, {x: decoration.x + 2, y: decoration.y});
+        }
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, stumpShadowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(stumpFrame, decoration);
+    },
+    getYDepth(decoration: Decoration): number {
+        return decoration.y + 6;
+    },
+};
+
 const tube: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, tubeBackFrame, decoration);
@@ -370,10 +389,11 @@ export const decorationTypes = {
     bed,
     floorBed,
     cushion,
-    stump,
     logPile,
     fireplace,
+    pottedPlant,
     shelves,
+    stump,
     tube,
     window,
     lightningBeastStatue: {
