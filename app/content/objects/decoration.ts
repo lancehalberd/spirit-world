@@ -144,6 +144,65 @@ const logPile: DecorationType = {
     },*/
 };
 
+const [bedFrame, bedCoversFrame, bedShadowFrame] = createAnimation('gfx/objects/furniture/beds.png',
+    {w: 32, h: 48, content: {x: 0, y: 8, w: 32, h: 38}}, {cols: 3}
+).frames;
+const bed: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, bedFrame, decoration);
+        drawFrameContentAt(context, bedCoversFrame, decoration);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, bedShadowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(bedFrame, decoration);
+    },
+};
+const [floorBedFrame, floorBedCoversFrame, floorBedShadowFrame] = createAnimation('gfx/objects/furniture/beds.png',
+    {w: 32, h: 48, content: {x: 3, y: 7, w: 26, h: 34}}, {y: 1, cols: 3}
+).frames;
+const floorBed: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, floorBedFrame, decoration);
+        drawFrameContentAt(context, floorBedCoversFrame, decoration);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, floorBedShadowFrame, decoration);
+    },
+    behaviors: {
+        groundHeight: 2,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(floorBedFrame, decoration);
+    },
+};
+const cushionFrames = createAnimation('gfx/objects/furniture/beds.png',
+    {w: 16, h: 16, content: {x: 1, y: 0, w: 14, h: 14}}, {top: 112, cols: 4}
+).frames;
+const [cushionShadaowFrame] = createAnimation('gfx/objects/furniture/beds.png',
+    {w: 16, h: 16, content: {x: 1, y: 0, w: 14, h: 14}}, {top: 112, x: 4}
+).frames;
+const cushion: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.element(cushionFrames);
+        drawFrameContentAt(context, variantFrame, decoration);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, cushionShadaowFrame, decoration);
+    },
+    behaviors: {
+        groundHeight: 2,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(cushionFrames[0], decoration);
+    },
+};
+
 const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 32, h: 23, content: {x: 8, y: 8, w: 16, h: 12}}, {top: 76, cols: 4}
 ).frames;
@@ -293,6 +352,9 @@ const window: DecorationType = {
     },
 };
 export const decorationTypes = {
+    bed,
+    floorBed,
+    cushion,
     stump,
     logPile,
     fireplace,
