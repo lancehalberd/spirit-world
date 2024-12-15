@@ -203,6 +203,20 @@ const cushion: DecorationType = {
     },
 };
 
+
+const verticalBearFrame = requireFrame('gfx/objects/furniture/rugs.png', {x: 0, y: 48, w: 32, h: 48});
+const horizontalBearFrame = requireFrame('gfx/objects/furniture/rugs.png', {x: 32, y: 48, w: 48, h: 32});
+const bearRug: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const frame = decoration.w >= decoration.h ? horizontalBearFrame : verticalBearFrame;
+        drawFrameContentAt(context, frame, decoration);
+    },
+    getHitbox(decoration: Decoration): Rect {
+        const frame = decoration.w >= decoration.h ? horizontalBearFrame : verticalBearFrame;
+        return getFrameHitbox(frame, decoration);
+    },
+};
+
 const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 32, h: 23, content: {x: 8, y: 8, w: 16, h: 12}}, {top: 76, cols: 4}
 ).frames;
@@ -352,6 +366,7 @@ const window: DecorationType = {
     },
 };
 export const decorationTypes = {
+    bearRug,
     bed,
     floorBed,
     cushion,

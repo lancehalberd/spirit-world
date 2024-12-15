@@ -50,6 +50,7 @@ import {allCrystalSpikeTiles} from 'app/content/tiles/crystalSpikes';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
+import {rugTiles} from 'app/content/tiles/houseInterior';
 import { lava, lavaBubbles, lavaStone } from 'app/content/tiles/lava';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
@@ -386,16 +387,6 @@ const lightCaveWallsPalette: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/cavewalls2temp.png', {x: 0, y: 32, w: 32, h: 4 * 32}),
     behaviors: {'all': {solid: true}},
-};
-
-
-const furnitureCozyTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_furniture.png', {x: 496, y: 0, w: 4 * 16, h: 3 * 16}),
-    behaviors: {
-        'all': {defaultLayer: 'field', solid: true, low: true},
-        '3x2': {pit: true},
-    },
 };
 
 const furnitureWoodTiles: TileSource = {
@@ -1202,7 +1193,8 @@ addTiles([
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),
     lightCaveWallsPalette,
     lightCaveCornersPalette,
-    furnitureCozyTiles,
+    rugTiles,
+    deletedTiles(3),
     furnitureWoodTiles,
     furnitureLampTiles,
     furniturePlantTiles,
