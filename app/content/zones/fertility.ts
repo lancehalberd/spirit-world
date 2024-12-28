@@ -3170,10 +3170,10 @@ const sf0_1x2: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 400, y: 16, type: "decoration", w: 16, h: 16, decorationType: "window"},
-        {status: "normal", id: "", x: 48, y: 16, type: "decoration", w: 16, h: 16, decorationType: "window"},
-        {status: "normal", id: "", x: 112, y: 16, type: "decoration", w: 16, h: 16, decorationType: "window"},
-        {status: "normal", id: "", x: 336, y: 16, type: "decoration", w: 16, h: 16, decorationType: "window"},
+        {status: "normal", id: "", x: 400, y: 16, type: "decoration", w: 16, h: 16, decorationType: "glassWall"},
+        {status: "normal", id: "", x: 48, y: 16, type: "decoration", w: 16, h: 16, decorationType: "glassWall"},
+        {status: "normal", id: "", x: 112, y: 16, type: "decoration", w: 16, h: 16, decorationType: "glassWall"},
+        {status: "normal", id: "", x: 336, y: 16, type: "decoration", w: 16, h: 16, decorationType: "glassWall"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 635, mapId: 'fertilitySpirit', floorId: '1F', mapX: 2, mapY: 4},

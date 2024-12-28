@@ -1,33 +1,27 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {createAnimation, drawFrameContentAt, getFrame, getFrameHitbox} from 'app/utils/animations';
+import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
+import {directionMap} from 'app/utils/direction';
 import {requireFrame} from 'app/utils/packedImages';
 import {getVariantRandom} from 'app/utils/variants';
 
 
 export class Decoration implements ObjectInstance {
     area: AreaInstance;
-    definition: DecorationDefinition;
-    drawPriority: DrawPriority = 'sprites';
     isNeutralTarget = true;
     isObject = <const>true;
     ignorePits = true;
-    x: number;
-    y: number;
-    z: number;
-    w: number;
-    h: number;
     status: ObjectStatus = 'normal';
     animationTime = 0;
-    constructor(state: GameState, definition: DecorationDefinition) {
-        this.definition = definition;
-        this.drawPriority = definition.drawPriority || 'sprites';
-        this.x = definition.x;
-        this.y = definition.y;
-        this.z = definition.z || 0;
-        this.w = definition.w;
-        this.h = definition.h;
-    }
+
+    drawPriority: DrawPriority = this.definition.drawPriority || 'sprites';
+    x = this.definition.x;
+    y = this.definition.y;
+    z = this.definition.z || 0;
+    w = this.definition.w;
+    h = this.definition.h;
+    d = this.definition.d || 'up';
+    constructor(state: GameState, public definition: DecorationDefinition) {}
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getBehaviors?.(state, this, x, y) || decorationType.behaviors;
@@ -59,6 +53,10 @@ export class Decoration implements ObjectInstance {
         const decorationType = decorationTypes[this.definition.decorationType];
         decorationType.renderShadow?.(context, state, this);
     }
+    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        decorationType.renderForeground?.(context, state, this);
+    }
 }
 
 const [
@@ -69,7 +67,6 @@ const [
 
 const entranceLightFrame = requireFrame('gfx/objects/cavelight.png', {x: 0, y: 0, w: 64, h: 32});
 const orbTreeFrame = requireFrame('gfx/objects/orbTree.png', {x: 0, y: 0, w: 26, h: 36, content: {x: 5, y: 19, w: 17, h: 12}});
-const glassWindowFrame = requireFrame('gfx/objects/labObjects.png', {x: 0, y: 0, w: 64, h: 48});
 const tubeFrontFrame = requireFrame('gfx/objects/labObjects.png', {x: 0, y: 59, w: 32, h: 53});
 const tubeBackFrame = requireFrame('gfx/objects/labObjects.png', {x: 32, y: 59, w: 32, h: 53});
 const tubeWaterAnimation = createAnimation('gfx/objects/labObjects.png', {w: 32, h: 53}, {top: 123, cols: 16});
@@ -89,6 +86,7 @@ const lightningBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     getHitbox?: (decoration: Decoration) => Rect
     behaviors?: TileBehaviors
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
@@ -163,6 +161,31 @@ const anvil: DecorationType = {
     },
 };
 
+const [
+    basketEmptyFrame, basketRiceFrame, basketBeansFrame,
+    basketClothesFrame, basketLidFrame, basketShadowFrame,
+] = createAnimation('gfx/objects/furniture/baskets.png',
+    {w: 16, h: 16, content: {x: 1, y: 6, w: 15, h: 10}}, {cols: 6}
+).frames;
+const basketFrames = [basketEmptyFrame, basketRiceFrame, basketBeansFrame,
+    basketClothesFrame, basketLidFrame];
+const basket: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.element(basketFrames);
+        drawFrameContentAt(context, variantFrame, decoration);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, basketShadowFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(basketEmptyFrame, decoration);
+    },
+};
+
 const [bedFrame, bedCoversFrame, bedShadowFrame] = createAnimation('gfx/objects/furniture/beds.png',
     {w: 32, h: 48, content: {x: 0, y: 8, w: 32, h: 38}}, {cols: 3}
 ).frames;
@@ -227,6 +250,7 @@ const verticalBearFrame = requireFrame('gfx/objects/furniture/rugs.png', {x: 0, 
 const horizontalBearFrame = requireFrame('gfx/objects/furniture/rugs.png', {x: 32, y: 48, w: 48, h: 32});
 const bearRug: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        // TODO: base this on direction and support all 4 directions.
         const frame = decoration.w >= decoration.h ? horizontalBearFrame : verticalBearFrame;
         drawFrameContentAt(context, frame, decoration);
     },
@@ -236,12 +260,40 @@ const bearRug: DecorationType = {
     },
 };
 
+const chairFrame= requireFrame('gfx/objects/furniture/table.png', {x: 48, y: 0, w: 16, h: 16, content: {x: 2, y: 0, w: 13, h: 16}});
+const chair: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, chairFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(chairFrame, decoration);
+    },
+};
+
 const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
 ).frames;
+const fireplaceLogsFrame = requireFrame('gfx/objects/furniture/woodAndFireplace.png', {x: 96, y: 32, w: 32, h: 32})
+const fireplaceAnimation = createAnimation('gfx/objects/furniture/woodAndFireplace.png', {w: 32, h:32},
+    {left: 128, top: 32, cols: 4, duration: 6}
+);
 const fireplace: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, fireplaceFrame, decoration);
+        const random = getVariantRandom(decoration.definition);
+        const target = {
+            x: decoration.x + 6,
+            y: decoration.y - 4,
+        };
+        if (random.mutateAndGenerate() < 0.5) {
+            const frame = getFrame(fireplaceAnimation, decoration.animationTime);
+            drawFrameContentAt(context, frame, target);
+        } else if (random.mutateAndGenerate() < 0.5) {
+            drawFrameContentAt(context, fireplaceLogsFrame, target);
+        }
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, fireplaceShadowFrame, decoration);
@@ -251,6 +303,178 @@ const fireplace: DecorationType = {
     },
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(fireplaceFrame, decoration);
+    },
+};
+
+const glassWallFrame = requireFrame('gfx/objects/labObjects.png', {x: 0, y: 0, w: 64, h: 48});
+const glassWall: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, glassWallFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
+    },
+};
+
+const kettleFrames = createAnimation('gfx/objects/furniture/dishware.png',
+    {w: 16, h: 16, content: {x: 4, y: 6, w: 8, h: 6}}, {top: 128, cols: 2}
+).frames;
+const kettle: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.element(kettleFrames);
+        drawFrameContentAt(context, variantFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(kettleFrames[0], decoration);
+    },
+};
+
+const [fancyPlate, fancyBowl, fancyCup, fancyMug] = createAnimation('gfx/objects/furniture/dishware.png',
+    {w: 16, h: 16}, {cols: 4}
+).frames;
+const [
+    fancyForkUp, fancyKnifeUp, fancySpoonUp,
+    fancyForkDown, fancyKnifeDown, fancySpoonDown,
+    fancyForkLeft, fancyKnifeLeft, fancySpoonLeft,
+] = createAnimation('gfx/objects/furniture/dishware.png',
+    {w: 16, h: 16}, {y: 1, cols: 3, rows: 3}
+).frames;
+const fancySilverwareMap = {
+    up: [fancyForkUp, fancyKnifeUp, fancySpoonUp],
+    down: [fancyForkDown, fancyKnifeDown, fancySpoonDown],
+    left: [fancyForkLeft, fancyKnifeLeft, fancySpoonLeft],
+    right: [fancyForkLeft, fancyKnifeLeft, fancySpoonLeft],
+};
+const placeSettingFancy: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.mutate().element([fancyPlate, fancyBowl]);
+        const elements = [{
+            frame: variantFrame,
+            x: decoration.x,
+            y: decoration.y,
+            reflected: false,
+        }];
+
+        const [dx, dy] = directionMap[decoration.d];
+        const forward = [dx, dy];
+        const right = [-dy, dx];
+        if (random.mutateAndGenerate() < 0.3) {
+            const variantFrame = random.mutate().element([fancyCup, fancyMug]);
+            elements.push({
+                frame: variantFrame,
+                x: decoration.x + 7 * forward[0] + 7 * right[0],
+                y: decoration.y + 7 * forward[1] + 7 * right[1],
+                reflected: false
+            });
+        }
+        const silverWareSet = [...fancySilverwareMap[decoration.d]];
+        if (random.mutateAndGenerate() < 0.3) {
+            const variantFrame = random.mutate().removeElement(silverWareSet);
+            elements.push({
+                frame: variantFrame,
+                x: decoration.x - 1 * forward[0] + 7 * right[0],
+                y: decoration.y - 1 * forward[1] + 7 * right[1],
+                reflected: decoration.d === 'right',
+            });
+        }
+        if (random.mutateAndGenerate() < 0.3) {
+            const variantFrame = random.mutate().removeElement(silverWareSet);
+            elements.push({
+                frame: variantFrame,
+                x: decoration.x - 1 * forward[0] - 7 * right[0],
+                y: decoration.y - 1 * forward[1] - 7 * right[1],
+                reflected: decoration.d === 'right',
+            });
+        }
+        elements.sort((a, b) => b.y - a.y);
+        for (const element of elements) {
+            if (element.reflected){
+                drawFrameContentReflectedAt(context, element.frame, element);
+            } else {
+                drawFrameContentAt(context, element.frame, element);
+            }
+        }
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y, w: 16, h: 16};
+    },
+};
+const [clayPlate, clayBowl, clayCup] = createAnimation('gfx/objects/furniture/dishware.png',
+    {w: 16, h: 16}, {y: 4, cols: 3}
+).frames;
+const [
+    clayForkUp, clayKnifeUp, claySpoonUp,
+    clayForkDown, clayKnifeDown, claySpoonDown,
+    clayForkLeft, clayKnifeLeft, claySpoonLeft,
+] = createAnimation('gfx/objects/furniture/dishware.png',
+    {w: 16, h: 16}, {y: 5, cols: 3, rows: 3}
+).frames;
+const claySilverwareMap = {
+    up: [clayForkUp, clayKnifeUp, claySpoonUp],
+    down: [clayForkDown, clayKnifeDown, claySpoonDown],
+    left: [clayForkLeft, clayKnifeLeft, claySpoonLeft],
+    right: [clayForkLeft, clayKnifeLeft, claySpoonLeft],
+};
+const placeSettingNormal: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        const variantFrame = random.mutate().element([clayPlate, clayBowl]);
+        const elements = [{
+            frame: variantFrame,
+            x: decoration.x,
+            y: decoration.y,
+            reflected: false,
+        }];
+
+        const [dx, dy] = directionMap[decoration.d];
+        const forward = [dx, dy];
+        const right = [-dy, dx];
+        if (random.mutateAndGenerate() < 0.3) {
+            elements.push({
+                frame: clayCup,
+                x: decoration.x + 7 * forward[0] + 7 * right[0],
+                y: decoration.y + 7 * forward[1] + 7 * right[1],
+                reflected: false
+            });
+        }
+        const silverWareSet = [...claySilverwareMap[decoration.d]];
+        if (random.mutateAndGenerate() < 0.3) {
+            const variantFrame = random.mutate().removeElement(silverWareSet);
+            elements.push({
+                frame: variantFrame,
+                x: decoration.x - 1 * forward[0] + 7 * right[0],
+                y: decoration.y - 1 * forward[1] + 7 * right[1],
+                reflected: decoration.d === 'right',
+            });
+        }
+        if (random.mutateAndGenerate() < 0.3) {
+            const variantFrame = random.mutate().removeElement(silverWareSet);
+            elements.push({
+                frame: variantFrame,
+                x: decoration.x - 1 * forward[0] - 7 * right[0],
+                y: decoration.y - 1 * forward[1] - 7 * right[1],
+                reflected: decoration.d === 'right',
+            });
+        }
+        elements.sort((a, b) => b.y - a.y);
+        for (const element of elements) {
+            if (element.reflected){
+                drawFrameContentReflectedAt(context, element.frame, element);
+            } else {
+                drawFrameContentAt(context, element.frame, element);
+            }
+        }
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y, w: 16, h: 16};
     },
 };
 
@@ -378,6 +602,42 @@ const stump: DecorationType = {
     },
 };
 
+export const tableFrames= createAnimation('gfx/objects/furniture/table.png',
+    {w: 16, h: 16}, {cols: 3, rows: 4}
+).frames;
+const tableTopRow = tableFrames.slice(0, 3);
+const tableMiddleRow = tableFrames.slice(3, 6);
+const tableBottomRow = tableFrames.slice(6, 9);
+const tableLegsRow = tableFrames.slice(9, 12);
+
+const table: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        for (let y = decoration.y; y < decoration.y + decoration.h; y += 16) {
+            let row = tableMiddleRow;
+            if (y === decoration.y) {
+                row = tableTopRow;
+            } else if (y >= decoration.y + decoration.h - 16) {
+                row = tableLegsRow;
+            } else if (y >= decoration.y + decoration.h - 32) {
+                row = tableBottomRow;
+            }
+            for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
+                let frame = row[1];
+                if (x === decoration.x) {
+                    frame = row[0];
+                } else if (x >= decoration.x + decoration.w - 16) {
+                    frame = row[2];
+                }
+                drawFrameContentAt(context, frame, {x, y});
+            }
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+};
+
+
 const tube: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, tubeBackFrame, decoration);
@@ -392,30 +652,102 @@ const tube: DecorationType = {
         return {x: decoration.x, y: decoration.y + 36, w: 32, h: 17};
     },
 };
-const window: DecorationType = {
+
+
+const darkWindowFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 7, y: 8, w: 19, h: 18});
+const lightWindowFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 39, y: 8, w: 19, h: 18});
+const verticalLightBeamFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 8, y: 43, w: 17, h: 47});
+const sideLightBeamFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 37, y: 53, w: 27, h: 37});
+const verticalFloorLightFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 8, y: 105, w: 17, h: 17});
+const horizontalFloorLightFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 37, y: 107, w: 19, h: 15});
+const windowOctogonal: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, glassWindowFrame, decoration);
+        if (decoration.d === 'up') {
+            const frame = decoration.definition.spirit ? darkWindowFrame : lightWindowFrame;
+            drawFrameContentAt(context, frame, decoration);
+            // Do not render light beams in the Spirit World.
+            if (decoration.area.definition.isSpiritWorld) {
+                return;
+            }
+            context.save();
+                context.globalAlpha *= 0.5;
+                drawFrameContentAt(context, verticalFloorLightFrame, {x: decoration.x + 1, y: decoration.y + 33});
+            context.restore();
+        }
+        if (decoration.d === 'right') {
+            // The window itself is not visible from the side, so we use the light on the floor as the
+            // object position.
+            // Do not render light beams in the Spirit World.
+            if (decoration.area.definition.isSpiritWorld) {
+                return;
+            }
+            context.save();
+                context.globalAlpha *= 0.5;
+                drawFrameContentAt(context, horizontalFloorLightFrame, decoration);
+            context.restore();
+        }
+        if (decoration.d === 'left') {
+            // The window itself is not visible from the side, so we use the light on the floor as the
+            // object position.
+            // Do not render light beams in the Spirit World.
+            if (decoration.area.definition.isSpiritWorld) {
+                return;
+            }
+            context.save();
+                context.globalAlpha *= 0.5;
+                drawFrameContentReflectedAt(context, horizontalFloorLightFrame, decoration);
+            context.restore();
+        }
     },
-    behaviors: {
-        solid: true,
+    renderForeground(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        // Do not render light beams in the Spirit World.
+        if (decoration.area.definition.isSpiritWorld) {
+            return;
+        }
+        if (decoration.d === 'up') {
+            context.save();
+                context.globalAlpha *= 0.1;
+                drawFrameContentAt(context, verticalLightBeamFrame, {x: decoration.x + 1, y: decoration.y + 3});
+            context.restore();
+        }
+        if (decoration.d === 'right') {
+            context.save();
+                context.globalAlpha *= 0.1;
+                drawFrameContentAt(context, sideLightBeamFrame, {x: decoration.x, y: decoration.y - 22});
+            context.restore();
+        }
+        if (decoration.d === 'left') {
+            context.save();
+                context.globalAlpha *= 0.1;
+                drawFrameContentReflectedAt(context, sideLightBeamFrame, {x: decoration.x - 8, y: decoration.y - 22});
+            context.restore();
+        }
     },
     getHitbox(decoration: Decoration): Rect {
-        return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
+        return getFrameHitbox(darkWindowFrame, decoration);
     },
 };
+
 export const decorationTypes = {
     anvil,
+    basket,
     bearRug,
     bed,
     floorBed,
+    chair,
     cushion,
+    kettle,
     logPile,
     fireplace,
+    glassWall,
+    placeSettingFancy,
+    placeSettingNormal,
     pottedPlant,
     shelves,
     stump,
+    table,
     tube,
-    window,
+    windowOctogonal,
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = lightningBeastStatueFrame;

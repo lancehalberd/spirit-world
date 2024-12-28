@@ -68,10 +68,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add furniture to villages.
-        - Windows + lights
-        - Fireplace fire
-
     - Add garden tiles to Holy City + Vanara Village:
         gfx/tiles/flower.png
         gfx/tiles/crops.png

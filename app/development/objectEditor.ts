@@ -312,12 +312,16 @@ export function createObjectDefinition(
                 ...commonProps,
                 type: definition.type,
                 z: definition.z,
+                d: definition.d || 'down',
                 w: definition.w || 16,
                 h: definition.h || 16,
                 decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
             };
             if (definition.seed) {
                 decorationDefinition.seed = definition.seed;
+            }
+            if (definition.drawPriority) {
+                decorationDefinition.drawPriority = definition.drawPriority;
             }
             if (definition.fixed) {
                 decorationDefinition.fixed = definition.fixed;
@@ -847,7 +851,11 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 value: object.drawPriority || 'sprites',
                 values: ['background', 'sprites', 'foreground'],
                 onChange(drawPriority: DrawPriority) {
-                    object.drawPriority = drawPriority;
+                    if (drawPriority !== 'sprites') {
+                        object.drawPriority = drawPriority;
+                    } else {
+                        delete object.drawPriority;
+                    }
                     updateObjectInstance(state, object);
                 },
             });
@@ -859,6 +867,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            rows.push(getDirectionFields(state, object, 'down'));
             rows.push(...getVariantSeedProperties(state, object));
         case 'lavafall':
         case 'waterfall':
@@ -1614,14 +1623,38 @@ export function onMouseDownSelectObject(state: GameState, editingState: EditingS
             changedSelection = true;
         }
     }
-    if (!state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
-        for (const object of state.areaInstance.definition.objects) {
+    let objectDirectlyUnderCursor: ObjectDefinition;
+    const backgroundObjects: ObjectDefinition[] = [];
+    const spriteObjects: ObjectDefinition[] = [];
+    const foregroundObjects: ObjectDefinition[] = [];
+    for (const object of [...state.areaInstance.definition.objects].reverse()) {
+        if (object.drawPriority === 'background') {
+            backgroundObjects.push(object);
+        } else if (object.drawPriority === 'foreground') {
+            foregroundObjects.push(object);
+        } else {
+            spriteObjects.push(object);
+        }
+    }
+    for (const layerOfObjects of [foregroundObjects, spriteObjects, backgroundObjects]) {
+        for (const object of [...layerOfObjects].reverse()) {
             if (isPointInObject(x, y, object)) {
-                editingState.selectedObject = object;
-                changedSelection = true;
+                objectDirectlyUnderCursor = object;
                 break;
             }
         }
+        if (objectDirectlyUnderCursor) {
+            break;
+        }
+    }
+    if (objectDirectlyUnderCursor) {
+        if (objectDirectlyUnderCursor !== editingState.selectedObject) {
+            editingState.selectedObject = objectDirectlyUnderCursor
+        } else {
+            // TODO: We want to do this if the user clicks and releases but not if they click and drag.
+            // unselectObject(editingState);
+        }
+        changedSelection = true;
     }
     if (changedSelection) {
         editingState.needsRefresh = true;

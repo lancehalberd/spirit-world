@@ -133,9 +133,14 @@ const baseBeetleWingedDefinition: Partial<EnemyDefinition<any>> & { animations: 
             delete enemy.params.effect;
         }
     },
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        renderShield(context, target, true, enemy.params.shieldColor);
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target?: Rect): void {
+        if (target) {
+            enemy.defaultRenderPreview(context, target);
+            renderShield(context, target, true, enemy.params.shieldColor);
+        } else {
+            enemy.defaultRender(context);
+            renderShield(context, enemy.getHitbox(), true, enemy.params.shieldColor);
+        }
     },
 };
 

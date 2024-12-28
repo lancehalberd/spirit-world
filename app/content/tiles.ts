@@ -389,14 +389,6 @@ const lightCaveWallsPalette: TileSource = {
     behaviors: {'all': {solid: true}},
 };
 
-const furnitureWoodTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_furniture.png', {x: 560, y: 272, w: 4 * 16, h: 6 * 16}),
-    behaviors: {
-        'all': {defaultLayer: 'field', solid: true, low: true},
-    },
-};
-
 const furniturePlantTiles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 112, y: 206, w: 1 * 16, h: 1 * 16}),
@@ -1194,8 +1186,7 @@ addTiles([
     lightCaveWallsPalette,
     lightCaveCornersPalette,
     rugTiles,
-    deletedTiles(3),
-    furnitureWoodTiles,
+    deletedTiles(27),
     furnitureLampTiles,
     furniturePlantTiles,
     waterWaves,

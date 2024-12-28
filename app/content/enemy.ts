@@ -1048,6 +1048,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
     }
     defaultRenderPreview(context: CanvasRenderingContext2D, target?: Rect, hitbox = this.getHitbox()): void {
+        if (!target) {
+            this.defaultRender(context);
+            return;
+        }
         context.save();
             const scale = Math.min(1, Math.min(target.w / hitbox.w, target.h / hitbox.h));
             context.translate(
