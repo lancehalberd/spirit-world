@@ -266,3 +266,9 @@ export function moveActorTowardsLocation(
     moveActor(state, actor, dx, dy, {boundingBox: false});
     return 0;
 }
+
+export function getDistanceToPoint(state: GameState, actor: Actor, {x, y}: Point) {
+    const hitbox = actor.getMovementHitbox?.() ?? actor.getHitbox();
+    const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
+    return Math.sqrt(dx * dx + dy * dy);
+}

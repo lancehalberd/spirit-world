@@ -56,7 +56,8 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
             context.restore();
             if (instance.renderPreview) {
-                instance.renderPreview(context, instance.getHitbox(state));
+                //instance.renderPreview(context, instance.getHitbox(state));
+                instance.renderPreview(context);
             } else {
                 instance.area = area;
                 instance.status = 'normal';

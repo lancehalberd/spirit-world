@@ -4333,8 +4333,9 @@ const f3_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "hidden", id: "stormBeast", x: 296, y: 120, type: "boss", enemyType: "stormBeast", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
-        {status: "normal", id: "stormBeast", x: 296, y: 208, type: "boss", enemyType: "stormHeart", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
+        {status: "normal", id: "stormBeast", x: 256, y: 154, type: "boss", enemyType: "stormHeart", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
         {status: "normal", id: "", x: 400, y: 292, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
+        {status: "normal", id: "", x: 192, y: 288, type: "narration", message: "{@jadeChampionStaffTower.stormBeast}", trigger: "touch", delay: 0, w: 64, h: 48, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 455, mapId: 'staffTower', floorId: '6F', mapX: 1, mapY: 2},
@@ -4910,6 +4911,7 @@ const sf3_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, x: 208, y: 292, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "off", id: "stormBeastOrb2", x: 296, y: 172, type: "enemy", enemyType: "largeOrb", d: "down", params: {"orbCount":3}, saveStatus: "never", logicKey: "towerStorm"},
         {status: "off", id: "stormBeastOrb2", x: 296, y: 212, type: "enemy", enemyType: "largeOrb", d: "down", params: {"orbCount":3}, saveStatus: "never", logicKey: "towerStorm"},
+        {status: "normal", id: "jadeChampion", x: 312, y: 356, d: "up", behavior: "none", style: "jadeChampion", type: "npc", dialogue: "I can sense the source of the Storm Beast's power, hidden by dense clouds in the material realm.", dialogueIndex: 171, logicKey: "jadeChampionStormBeast"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 457, mapId: 'staffTower', floorId: '6F', mapX: 3, mapY: 2},

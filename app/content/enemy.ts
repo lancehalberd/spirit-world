@@ -1038,14 +1038,16 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             renderEnemyShadow(context, state, this);
         }
     }
-    renderPreview(context: CanvasRenderingContext2D, target: Rect): void {
+    renderPreview(context: CanvasRenderingContext2D, target?: Rect): void {
         if (this.enemyDefinition.renderPreview) {
             this.enemyDefinition.renderPreview(context, this, target);
-        } else {
+        } else if (target) {
             this.defaultRenderPreview(context, target);
+        } else {
+            this.defaultRender(context);
         }
     }
-    defaultRenderPreview(context: CanvasRenderingContext2D, target: Rect, hitbox = this.getHitbox()): void {
+    defaultRenderPreview(context: CanvasRenderingContext2D, target?: Rect, hitbox = this.getHitbox()): void {
         context.save();
             const scale = Math.min(1, Math.min(target.w / hitbox.w, target.h / hitbox.h));
             context.translate(

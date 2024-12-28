@@ -208,6 +208,23 @@ export function drawFrameContentAt(
         y: y - (frame.content?.y || 0) - (z || 0),
     });
 }
+// Draw the frame reflected so that the reflected top right corner of the content rectangle,
+// which is now the top left corner, is at the position (x, y), optionally offset by -z.
+export function drawFrameContentReflectedAt(
+    context: CanvasRenderingContext2D,
+    frame: Frame,
+    {x, y, z}: {x: number, y: number, z?: number}
+): void {
+    context.save();
+        context.translate(x, y - (z || 0));
+        context.scale(-1, 1);
+        drawFrame(context, frame, {
+            ...frame,
+            x: -(frame.content?.x || 0) - (frame.content?.w || frame.w),
+            y: -(frame.content?.y || 0),
+        });
+    context.restore();
+}
 
 export function getFrameHitbox({content, w, h}: Frame, {x, y}: {x: number, y: number}): Rect {
     return {

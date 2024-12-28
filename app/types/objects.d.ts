@@ -105,7 +105,7 @@ interface ObjectInstance extends BaseFieldInstance {
     // This method draws the object to a set target rectangle and should render the object
     // unambiguously so that editors can distinguish between different objects that may normally
     // look identical.
-    renderPreview?: (context: CanvasRenderingContext2D, target: Rect) => void
+    renderPreview?: (context: CanvasRenderingContext2D, target?: Rect) => void
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
     changesAreas?: boolean
@@ -413,6 +413,8 @@ interface HitResult {
 interface BaseObjectDefinition {
     // Defaults to ''
     id?: string
+    // Draw priority to use for this object, if it is configurable.
+    drawPriority?: DrawPriority
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean
     // If true, use the inverse of the given logic check.
@@ -557,7 +559,7 @@ interface NPCDefinition extends BaseObjectDefinition {
 }
 
 type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
-    | 'flameTurret'
+    | 'flameTurret' | 'jadeChampion'
     | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';
 
@@ -568,7 +570,6 @@ interface SimpleObjectDefinition extends BaseObjectDefinition {
 interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
     type: 'decoration'
     decorationType: DecorationType
-    drawPriority?: DrawPriority
     w: number
     h: number
     // Useful for fixing the layering of decorations on top of other objects.

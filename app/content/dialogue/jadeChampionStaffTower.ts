@@ -1,4 +1,5 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {JadeChampion} from 'app/content/objects/jadeChampion';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {moveActorTowardsLocation} from 'app/movement/moveActor';
 import {playAreaSound} from 'app/musicController';
@@ -7,13 +8,29 @@ import {saveGame} from 'app/utils/saveGame';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
 import {hitTargets} from 'app/utils/field';
-import {removeObjectFromArea} from 'app/utils/objects';
+import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
 
 
 dialogueHash.jadeChampionStaffTower = {
     key: 'jadeChampionStaffTower',
     mappedOptions: {
-        top: (state: GameState) => {
+        stormBeast(state: GameState) {
+            const jadeChampionNPC = findObjectInstanceById(state.hero.area.alternateArea, 'jadeChampion') as NPC;
+            if (!jadeChampionNPC) {
+                console.log('Could not find Jade Champion NPC');
+                return '';
+            }
+            const jadeChampion = new JadeChampion(state, {
+                type: 'jadeChampion',
+                x: jadeChampionNPC.x,
+                y: jadeChampionNPC.y,
+                d: jadeChampionNPC.d,
+            });
+            removeObjectFromArea(state, jadeChampionNPC);
+            addObjectToArea(state, state.hero.area.alternateArea, jadeChampion);
+            return '';
+        },
+        top(state: GameState) {
             // hide HUD to show that player isn't controllable
             hideHUD(state);
             // add Jade Champion to the screen

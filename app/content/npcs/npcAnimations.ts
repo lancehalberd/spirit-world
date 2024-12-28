@@ -165,6 +165,13 @@ export const jadeChampionAnimations: ActorAnimations = {
         down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 11}),
         right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 12}),
     },
+    // This is just the first frame of moveSword.
+    idleSword: {
+        up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 4}),
+        left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 5}),
+        down: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 6}),
+        right: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 7}),
+    },
     move: {
         up: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 9, cols: 9}),
         left: createAnimation(jadeChampionImage, jadeChampionGeometry, {y: 10, cols: 9}),

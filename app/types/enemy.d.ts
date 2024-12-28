@@ -109,7 +109,7 @@ interface EnemyDefinition<Params> {
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
     // Optional render function called after the standard render.
     renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
-    renderPreview?: (context: CanvasRenderingContext2D, enemy: Enemy<Params>, target: Rect) => void
+    renderPreview?: (context: CanvasRenderingContext2D, enemy: Enemy<Params>, target?: Rect) => void
     getHealthPercent?: (state: GameState, enemy: Enemy<Params>) => number
     getShieldPercent?: (state: GameState, enemy: Enemy<Params>) => number
     getHitbox?: (enemy: Enemy<Params>) => Rect

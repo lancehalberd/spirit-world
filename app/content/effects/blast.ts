@@ -9,7 +9,7 @@ import Random from 'app/utils/Random';
 
 export interface BlastProps {
     x: number
-    y: number,
+    y: number
     damage?: number
     element?: MagicElement
     radius?: number
@@ -18,6 +18,8 @@ export interface BlastProps {
     boundSource?: Enemy
     // This source just tracks which enemy created the blast.
     source: Actor
+    // Time before this effect becoems active in milliseconds.
+    delay?: number
     tellDuration?: number
     expansionDuration?: number
     persistDuration?: number
@@ -37,15 +39,24 @@ export class Blast implements EffectInstance {
     boundSource: Enemy = this.props.boundSource;
     source: Actor = this.props.source;
     hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.boundSource, this.source]);
+    delay = this.props.delay ?? 0;
     tellDuration: number = this.props.tellDuration ?? 1000;
     expansionDuration: number = this.props.expansionDuration ?? 140;
     persistDuration: number = this.props.persistDuration ?? 60;
     constructor(public props: BlastProps) {}
     update(state: GameState) {
+        if (this.delay >= 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
         this.animationTime += FRAME_LENGTH;
         // If this effect has an enemy as a source, remove it if the source disappears during the tell duration.
         if (this.animationTime < this.tellDuration && this.boundSource) {
-            if (this.area !== this.boundSource.area || this.boundSource.status === 'gone' || !this.area.objects.includes(this.boundSource)) {
+            if (this.area !== this.boundSource.area
+                || this.boundSource.status === 'gone'
+                || this.boundSource.isDefeated
+                || !this.area.objects.includes(this.boundSource)
+            ) {
                 removeEffectFromArea(state, this);
                 return;
             }

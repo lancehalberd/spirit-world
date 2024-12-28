@@ -1,5 +1,6 @@
 import { getLedgeDelta } from 'app/movement/getLedgeDelta';
 import { getTileBehaviors } from 'app/utils/getBehaviors';
+import {getCardinalDirection} from 'app/utils/direction';
 
 // Note this assumes the target is actually in the same area as the source.
 // Limiting the set of possible targets is handled by the set of targets passed into various targeting functions.
@@ -40,6 +41,18 @@ export function getVectorToTarget(state: GameState, source: EffectInstance | Obj
         return {mag, x: dx / mag, y: dy / mag};
     }
     return {mag, x: 0, y: 1};
+}
+
+export function getCardinalDirectionToTarget(
+    source: EffectInstance | ObjectInstance,
+    target: EffectInstance | ObjectInstance,
+    defaultDirection: CardinalDirection = 'down'
+): CardinalDirection {
+    const hitbox = source.getHitbox();
+    const targetHitbox = target.getHitbox();
+    const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
+    const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+    return getCardinalDirection(dx, dy, defaultDirection);
 }
 
 export function getVectorToMovementTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {

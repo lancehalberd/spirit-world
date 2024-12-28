@@ -11,6 +11,7 @@ export * from 'app/content/bosses/balloonMegapede';
 export * from 'app/content/bosses/flameBeast';
 export * from 'app/content/bosses/frostBeast';
 export * from 'app/content/bosses/stormBeast';
+export * from 'app/content/bosses/stormHeart';
 export * from 'app/content/bosses/voidTree';
 
 export const bossTypes = <const>[

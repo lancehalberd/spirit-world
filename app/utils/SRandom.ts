@@ -39,7 +39,7 @@ class SRandom {
         return nextSeed(this._seed);
     }
 
-    // This generates a random number and advances *this* geneator to the next seed.
+    // This generates a random number and advances *this* generator to the next seed.
     generateAndMutate(): number {
         this._seed = nextSeed(this._seed);
         return this._seed;
@@ -48,6 +48,12 @@ class SRandom {
     mutate(): SRandom {
         this._seed = nextSeed(this._seed);
         return this;
+    }
+
+    // Advance *this* generator to the next number and then return the following number.
+    mutateAndGenerate(): number {
+        this._seed = nextSeed(this._seed);
+        return nextSeed(this._seed);
     }
 
     /**

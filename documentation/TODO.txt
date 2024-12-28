@@ -68,13 +68,39 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add furniture to villages.
+        - Windows + lights
+        - Fireplace fire
+
+    - Add garden tiles to Holy City + Vanara Village:
+        gfx/tiles/flower.png
+        gfx/tiles/crops.png
+            Allow picking crops and replacing with crop hole tile.
+
+    - Support more directions for objects
+        - Bear rug
+        - Kettle
+
+    - Test new cocoon tiles
+        - Add doors
+        - Fix tilesheet for pits
+
+    - Remove placeholder tiles for city/village
+
+    - Add new frost heart attack+damaged animations
+
+    - Jade Champion during Storm Beast
+        - Put up a barrier when the heart is enraged and add text cue telling player to come to the barrier.
+            "I'll shield us from it's fury!"
+        - if the heart is up "I'll deal with the beast, focus on the heart!"
+        - Brainstorm additional behavior improvements.
+
     - Cut a new version
         - Test on staging
         - Ask if anyone else wants to test staging.
         - Release to production.
 
     - Hide hud for longer cut scenes
-        - Peach tree
         - End of rival fight, start of rival 2 fight.
 
     - Bug: Astral projection can pull linked pots on top of the hero.

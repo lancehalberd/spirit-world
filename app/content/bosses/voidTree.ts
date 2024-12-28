@@ -1,7 +1,7 @@
 import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
 import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frostBeast';
 import { addSlamEffect } from 'app/content/bosses/golem';
-import { stormHeartAnimations } from 'app/content/bosses/stormBeast';
+import {stormHeartAnimations} from 'app/content/bosses/stormHeart';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
