@@ -68,8 +68,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add missing diagonal wall behaviors.
-
     - Test new cocoon tiles
         - Add doors
         - Fix tilesheet for pits

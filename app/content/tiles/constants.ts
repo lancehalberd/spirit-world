@@ -232,7 +232,7 @@ export function renderEmptyLedges(context: CanvasRenderingContext2D, tile: FullT
     context.stroke();
 }
 const baseLedgeBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyLedges};
-export const ledgeBehaviors: TileSource = {
+export const emptyLedgeBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 80, h: 48},
     behaviors: {
@@ -249,12 +249,48 @@ export const ledgeBehaviors: TileSource = {
         '3x1': {...baseLedgeBehavior, diagonalLedge: 'downleft' },
         '4x1': {...baseLedgeBehavior, diagonalLedge: 'downright' },
     },
-    paletteTargets: [{key: 'ledges', x: 0, y: 0}],
+    paletteTargets: [{key: 'behaviors', x: 0, y: 0}],
     tileCoordinates: [
         [0, 0],[1, 0],[2, 0], [3, 0],[4, 0],
         [0, 1],       [2, 1], [3, 1],[4, 1],
         [0, 2],[1, 2],[2, 2],
     ],
+};
+export function renderEmptyCeiling(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
+    if (!editingState.isEditing) {
+        return;
+    }
+    context.fillStyle = 'red';
+    if (tile.behaviors.solidMap === BITMAP_BOTTOM) {
+        context.fillRect(x, y + 8, 16, 8);
+    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_LEFT_24) {
+        context.beginPath();
+        context.moveTo(x, y);
+        context.lineTo(x + 8, y);
+        context.lineTo(x + 16, y + 8);
+        context.lineTo(x + 16, y + 16);
+        context.lineTo(x, y + 16);
+        context.fill();
+    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_RIGHT_24) {
+        context.beginPath();
+        context.moveTo(x, y + 8);
+        context.lineTo(x + 8, y);
+        context.lineTo(x + 16, y);
+        context.lineTo(x + 16, y + 16);
+        context.lineTo(x, y + 16);
+        context.fill();
+    }
+}
+const baseEmptyCeilingBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyCeiling, solid: false};
+export const emptyCeilingBehaviors: TileSource = {
+    ...emptyTile,
+    source: {image: emptyTile.source.image, x: 0, y: 0, w: 48, h: 16},
+    behaviors: {
+        '0x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_24 },
+        '1x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM },
+        '2x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_24 },
+    },
+    paletteTargets: [{key: 'behaviors', x: 0, y: 3}],
 };
 
 export function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TileSource {

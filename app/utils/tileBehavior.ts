@@ -158,7 +158,7 @@ function applyTileToBehaviorGrid(
     const basePitMap = behaviorGrid[y][x]?.pitMap;
     behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
     if (behaviorGrid[y]?.[x]?.solid || baseSolidMap) {
-        if (behaviorGrid[y]?.[x]?.solid) {
+        if (behaviorGrid[y]?.[x]?.solid === true) {
             baseSolidMap = new Uint16Array([
                 0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,
                 0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF
@@ -173,7 +173,15 @@ function applyTileToBehaviorGrid(
             baseSolidMap = behaviorGrid[y][x].solidMap = subtractBitmap(baseSolidMap, behaviors.pitMap);
         }
     }
-    if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
+    // An explicit value of `false` for solid will remove all solid behavior underneath it.
+    if (behaviors.solid === false) {
+        if (behaviors.solidMap) {
+            behaviorGrid[y][x].solidMap = behaviors.solidMap;
+        } else {
+            delete behaviorGrid[y][x].solidMap;
+            delete behaviorGrid[y][x].solid;
+        }
+    } else if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
         behaviorGrid[y][x].solidMap = addBitmaps(baseSolidMap, behaviors.solidMap);
     }
     if (!behaviorGrid[y]?.[x]?.isLava && baseLavaMap && behaviors.isLavaMap) {

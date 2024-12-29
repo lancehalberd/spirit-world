@@ -20,6 +20,8 @@ import {
     crystalParticles,
     deepWaterBehavior,
     dirtParticles,
+    emptyCeilingBehaviors,
+    emptyLedgeBehaviors,
     heavyStoneBehavior,
     lightStoneBehavior,
     pitBehavior,
@@ -35,7 +37,6 @@ import {
     topLeftWall,
     topRightWall,
     unliftableStoneBehavior,
-    ledgeBehaviors,
 } from 'app/content/tiles/constants';
 import { paletteHash } from 'app/content/tiles/paletteHash';
 import {
@@ -1127,12 +1128,13 @@ addTiles([
     iceTiles,
     lavaBubbles,
     waterRocks,
-    deletedTiles(12),
+    deletedTiles(9),
+    emptyCeilingBehaviors,
     singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
     ...allFlowerTiles,
     ...allCavePitTileSources,
     ...allCrystalCavePitTileSources,
-    ledgeBehaviors,
+    emptyLedgeBehaviors,
     cavePitHorizontalWalls,
     cavePitAngledWallsIn,
     cavePitAngledWallsOut,
