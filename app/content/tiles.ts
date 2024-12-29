@@ -50,6 +50,7 @@ import {allCrystalSpikeTiles} from 'app/content/tiles/crystalSpikes';
 import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
 import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
+import {allFlowerTiles, allGardenTiles} from 'app/content/tiles/garden';
 import {rugTiles} from 'app/content/tiles/houseInterior';
 import { lava, lavaBubbles, lavaStone } from 'app/content/tiles/lava';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
@@ -378,77 +379,11 @@ const brightGrass: TileSource = {
     },*/
 };
 
-const lightCaveCornersPalette: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavewalls2temp.png', {x: 32, y: 0, w: 8 * 32, h: 32}),
-    behaviors: {'all': {solid: true}},
-};
-const lightCaveWallsPalette: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavewalls2temp.png', {x: 0, y: 32, w: 32, h: 4 * 32}),
-    behaviors: {'all': {solid: true}},
-};
-
-const furniturePlantTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 112, y: 206, w: 1 * 16, h: 1 * 16}),
-    behaviors: {
-        'all': {defaultLayer: 'field', solid: true, low: true},
-    },
-};
 
 const iceTiles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
     behaviors: {'all': {isGround: true, slippery: true, elementTiles: {fire: 0}}},
-};
-
-const furnitureLampTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_furniture.png', {x: 560, y: 368, w: 1 * 16, h: 1 * 16}),
-    behaviors: {
-        'all': {defaultLayer: 'field', solid: true, low: true, brightness: 0.6, lightRadius: 32},
-    },
-};
-
-const laundryTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_laundry32.png', {x: 0, y: 0, w: 6 * 16, h: 2 * 16}),
-    behaviors: {
-        'all': {defaultLayer: 'field', solid: true, low: false},
-    },
-};
-
-const logChoppingTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 240, y: 64, w: 1 * 16, h: 1 * 16}),
-    behaviors: {
-        'all': {solid: true, low: true},
-    },
-};
-
-const foodBoxTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 192, y: 102, w: 4 * 16, h: 2 * 16}),
-    behaviors: {
-        'all': {solid: true, low: true},
-    },
-};
-
-const logAndFoodBagTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 64, y: 160, w: 5 * 16, h: 1 * 16}),
-    behaviors: {
-        'all': {solid: true, low: true},
-    },
-};
-
-const largeLogPileTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 112, y: 176, w: 2 * 16, h: 2 * 16}),
-    behaviors: {
-        'all': {solid: true, low: true},
-    },
 };
 
 const railsTiles: TileSource = {
@@ -1183,23 +1118,18 @@ addTiles([
     },
     singleTileSource('gfx/tiles/bushspirit.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),
-    lightCaveWallsPalette,
-    lightCaveCornersPalette,
+    deletedTiles(48),
     rugTiles,
-    deletedTiles(27),
-    furnitureLampTiles,
-    furniturePlantTiles,
+    deletedTiles(12),
+    ...allGardenTiles,
     waterWaves,
     deletedTiles(1),
     iceTiles,
     lavaBubbles,
     waterRocks,
-    laundryTiles,
+    deletedTiles(12),
     singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
-    logChoppingTiles,
-    foodBoxTiles,
-    logAndFoodBagTiles,
-    largeLogPileTiles,
+    ...allFlowerTiles,
     ...allCavePitTileSources,
     ...allCrystalCavePitTileSources,
     ledgeBehaviors,

@@ -23,6 +23,14 @@ for (let i = 12; i <= 21; i++) {
 for (let i = 1420; i <= 1432; i++) {
     explicitIndexMapping[i] = 0
 }
+// Garden Plot+Crops
+for (let i = 272; i <= 288; i++) {
+    explicitIndexMapping[i] = 0
+}
+// Garden Flowers
+for (let i = 318; i <= 335; i++) {
+    explicitIndexMapping[i] = 0
+}
 
 
 

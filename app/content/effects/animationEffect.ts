@@ -210,8 +210,12 @@ export function addParticleAnimations(
     }
     const numParticles = behaviors?.numberParticles ?? 3;
     let theta = Math.random() * 2 * Math.PI;
+    let remainingParticles = [...particles];
     for (let i = 0; i < numParticles; i++) {
-        const frame = Random.element(particles);
+        if (!remainingParticles.length) {
+            remainingParticles = [...particles];
+        }
+        const frame = Random.removeElement(remainingParticles);
         const vx = Math.cos(theta);
         const vy = Math.sin(theta);
         const particle = new FieldAnimationEffect({

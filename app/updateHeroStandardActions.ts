@@ -3,6 +3,7 @@ import { HeldChakram } from 'app/content/effects/thrownChakram';
 import { setEquippedBoots } from 'app/content/menu';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
+import {allTiles} from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
@@ -825,7 +826,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                 const behavior = tile?.behaviors;
                 if (behavior?.pickupWeight <= glovesLevel) {
-                    hero.pickUpTile = tile;
+                    hero.pickUpTile = behavior.pickupTile ? allTiles[behavior.pickupTile] : tile;
                     playAreaSound(state, hero.area, 'pickUpObject');
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                     if (behavior.linkableTiles) {

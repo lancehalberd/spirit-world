@@ -154,8 +154,11 @@ interface TileBehaviors {
     pickupWeight?: number
     // Tile to display if this tile is removed (picked up, cut, blown up).
     underTile?: number
+    // Tile to display when this tile is picked up, if different than the tile itself.
+    // For example, a full carrot tile is displayed when a buried carrot is picked up,
+    pickupTile?: number
     // Boolean flag indicating underTile should be rendered right before rendering this tile.
-    // Useful if the file over the underTile is intended to be transparent like for ice.
+    // Useful if the tile over the underTile is intended to be transparent like for ice.
     showUnderTile?: boolean
     shallowWater?: boolean
     slippery?: boolean
