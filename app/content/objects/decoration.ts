@@ -250,13 +250,19 @@ const verticalBearFrame = requireFrame('gfx/objects/furniture/rugs.png', {x: 0, 
 const horizontalBearFrame = requireFrame('gfx/objects/furniture/rugs.png', {x: 32, y: 48, w: 48, h: 32});
 const bearRug: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        // TODO: base this on direction and support all 4 directions.
-        const frame = decoration.w >= decoration.h ? horizontalBearFrame : verticalBearFrame;
-        drawFrameContentAt(context, frame, decoration);
+        if (decoration.d === 'left') {
+            drawFrameContentReflectedAt(context, horizontalBearFrame, decoration);
+        } else if (decoration.d === 'right') {
+            drawFrameContentAt(context, horizontalBearFrame, decoration);
+        } else {
+            drawFrameContentAt(context, verticalBearFrame, decoration);
+        }
     },
     getHitbox(decoration: Decoration): Rect {
-        const frame = decoration.w >= decoration.h ? horizontalBearFrame : verticalBearFrame;
-        return getFrameHitbox(frame, decoration);
+        if (decoration.d === 'left' || decoration.d === 'right') {
+            return getFrameHitbox(horizontalBearFrame, decoration);
+        }
+        return getFrameHitbox(verticalBearFrame, decoration);
     },
 };
 
@@ -326,7 +332,11 @@ const kettle: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         const random = getVariantRandom(decoration.definition);
         const variantFrame = random.element(kettleFrames);
-        drawFrameContentAt(context, variantFrame, decoration);
+        if (decoration.d === 'left') {
+            drawFrameContentReflectedAt(context, variantFrame, decoration);
+        } else {
+            drawFrameContentAt(context, variantFrame, decoration);
+        }
     },
     behaviors: {
         solid: true,

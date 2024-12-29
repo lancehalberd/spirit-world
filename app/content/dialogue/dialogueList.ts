@@ -22,6 +22,7 @@ interface DialogueData {
     // After all indexes are assigned, this will be used to report which
     // dialogue was moved during the assignment process.
     wasMoved?: boolean
+    oldIndex?: number
 }
 
 let nextFreeIndex = 0;
@@ -52,11 +53,17 @@ function setDialogueIndex(index: number, data: DialogueData) {
 // Sets the index to the NPCDefinition/Dialogue described by the dialoguedata and marks it as moved.
 function assignIndexToDialogueData(data: DialogueData, index: number): void {
     if (data.objectData) {
+        if (!data.oldIndex && data.objectData.definition.dialogueIndex) {
+            data.oldIndex = data.objectData.definition.dialogueIndex;
+        }
         data.objectData.definition.dialogueIndex = index;
     } else if (data.hashData) {
         const textOption = dialogueHash[data.hashData.npcKey]?.options?.[data.hashData.optionIndex]?.text?.[data.hashData.textIndex];
         if (!textOption) {
             console.error('Missing text option for ', data.hashData);
+        }
+        if (!data.oldIndex && textOption.dialogueIndex) {
+            data.oldIndex = textOption.dialogueIndex;
         }
         textOption.dialogueIndex = index;
     }
@@ -142,7 +149,7 @@ export function populateAllDialogue() {
         if (!isRandomizer && dialogue?.wasMoved) {
             console.log(dialogue.hashData
                 ? dialogue.hashData
-                : `Zone dialogue from ${dialogue.objectData.zoneKey}`,
+                : `Zone dialogue from ${dialogue.objectData.zoneKey}:${dialogue.oldIndex}`,
                 ' was moved to ', index
             );
         }
