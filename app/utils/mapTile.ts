@@ -19,10 +19,12 @@ explicitIndexMapping[11] = spiritDustGround;
 for (let i = 12; i <= 21; i++) {
     explicitIndexMapping[i] = 0
 }
-// Desert plants
-for (let i = 1420; i <= 1432; i++) {
+// Desert sand+plants
+for (let i = 1403; i <= 1440; i++) {
     explicitIndexMapping[i] = 0
 }
+// Full sand tile.
+explicitIndexMapping[1407] = spiritGround;
 // Carpet
 for (let i = 251; i <= 259; i++) {
     explicitIndexMapping[i] = 0
