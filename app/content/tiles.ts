@@ -1045,6 +1045,7 @@ const spiritFloorEdges: TileSource = {
 };
 
 const solidPitSource: TileSource = solidColorTile('#111111', {pit: true});
+const solidSkySource: TileSource = solidColorTile('#0088FF', {pit: true});
 
 addTiles([
     emptyTile,
@@ -1121,7 +1122,9 @@ addTiles([
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),
     deletedTiles(48),
     rugTiles,
-    deletedTiles(12),
+    deletedTiles(2),
+    solidSkySource,
+    deletedTiles(9),
     ...allGardenTiles,
     waterWaves,
     deletedTiles(1),
