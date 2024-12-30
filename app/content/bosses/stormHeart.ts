@@ -5,13 +5,13 @@ import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {Enemy} from 'app/content/enemy';
 import {omniAnimation} from 'app/content/enemyAnimations';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {createAnimation, getFrame } from 'app/utils/animations';
+import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame } from 'app/utils/animations';
 import {addEffectToArea} from 'app/utils/effects';
 import {isTargetHit} from 'app/utils/field';
 import {pad} from 'app/utils/index';
 import {getVectorToNearbyTarget} from 'app/utils/target';
 
-const stormHeartGeometry = {w: 64, h: 64, contenet: {x: 17, y: 17, w: 29, h: 29}};
+const stormHeartGeometry: FrameDimensions = {w: 64, h: 64, content: {x: 17, y: 17, w: 29, h: 29}};
 const stormHeartIdleAnimation = createAnimation('gfx/bosses/stormHeartIdle.png', stormHeartGeometry, {cols: 27, duration: 4});
 const stormHeartHurt1Animation = createAnimation('gfx/bosses/stormHeartDamaged.png', stormHeartGeometry, {cols: 7, duration: 4});
 const stormHeartHurt2Animation = createAnimation('gfx/bosses/stormHeartDamaged.png', stormHeartGeometry, {x: 7, cols: 7, duration: 4});
@@ -39,12 +39,13 @@ const stormHeartCloudGeometry = stormHeartGeometry;
 const stormHeartCloudBackFrames = createAnimation('gfx/bosses/stormHeartCloudBack.png', stormHeartCloudGeometry, {cols: 5}).frames;
 const stormHeartCloudMiddleFrames = createAnimation('gfx/bosses/stormHeartCloudMiddle.png', stormHeartCloudGeometry, {cols: 5}).frames;
 const stormHeartCloudFrontFrames = createAnimation('gfx/bosses/stormHeartCloudFront.png', stormHeartCloudGeometry, {cols: 5}).frames;
+const stormHeartCloudParticleGeometry: FrameDimensions = {w: 64, h: 80, content: {x: 17, y: 38, w: 29, h: 29}};
 const stormHeartCloudAnimations: FrameAnimation[] = [
-    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudGeometry, {x: 0, cols: 5}),
-    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudGeometry, {x: 5, cols: 5}),
-    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudGeometry, {x: 10, cols: 5}),
-    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudGeometry, {x: 15, cols: 5}),
-    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudGeometry, {x: 20, cols: 5}),
+    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudParticleGeometry, {x: 0, cols: 5, duration: 5}),
+    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudParticleGeometry, {x: 5, cols: 5, duration: 5}),
+    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudParticleGeometry, {x: 10, cols: 5, duration: 5}),
+    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudParticleGeometry, {x: 15, cols: 5, duration: 5}),
+    createAnimation('gfx/bosses/stormHeartCloudParticles.png', stormHeartCloudParticleGeometry, {x: 20, cols: 5, duration: 5}),
 ];
 const maxCloudLife = stormHeartCloudAnimations.length - 1;
 
@@ -57,15 +58,6 @@ interface StormHeartParams {
     theta: number
 }
 
-function getHeartHitbox(enemy: Enemy<StormHeartParams>): Rect {
-    return {
-        x: enemy.x + 40,
-        y: enemy.y + 34,
-        w: 48,
-        h: 40 + Math.max(16, enemy.params.cloudLife * 8),
-        //h: 16 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
-    };
-};
 
 const dischargeRadius = 128;
 const stormHeartDischargeAbility = {
@@ -123,6 +115,17 @@ const stormHeartLightningAbility = {
     recoverTime: 400,
 }
 
+
+function getHeartHitbox(enemy: Enemy<StormHeartParams>): Rect {
+    return {
+        x: enemy.x + 5,
+        y: enemy.y - 4,
+        w: 48,
+        h: 40 + Math.max(16, enemy.params.cloudLife * 8),
+        //h: 16 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
+    };
+};
+
 const stormHeart: EnemyDefinition<StormHeartParams> = {
     naturalDifficultyRating: 20,
     // This is intended to be able to target everything in the area.
@@ -151,7 +154,20 @@ const stormHeart: EnemyDefinition<StormHeartParams> = {
         enemy.defaultRender(context, state, stormHeartCloudMiddleFrames[index]);
         enemy.defaultRender(context, state, stormHeartCloudFrontFrames[index]);
         const particleAnimation = stormHeartCloudAnimations[index];
-        enemy.defaultRender(context, state, getFrame(particleAnimation, enemy.time));
+        // enemy.defaultRender(context, state, getFrame(particleAnimation, enemy.time));
+        drawFrameContentAt(context, getFrame(particleAnimation, Math.floor(enemy.time / 22) * 20), {
+            x: enemy.x - 12,
+            y: enemy.y + 16,
+        });
+        drawFrameContentReflectedAt(context, getFrame(particleAnimation, enemy.time + 100), {
+            x: enemy.x + 50,
+            y: enemy.y + 20,
+        });
+        //drawFrameContentReflectedAt(context, getFrame(particleAnimation, enemy.time + 300), {
+        drawFrameContentReflectedAt(context, getFrame(particleAnimation, Math.floor(enemy.time / 21) * 20), {
+            x: enemy.x - 4,
+            y: enemy.y + 32,
+        });
         /*context.save();
             context.globalAlpha *= 0.5;
             context.fillStyle = 'red';
@@ -161,8 +177,8 @@ const stormHeart: EnemyDefinition<StormHeartParams> = {
     },
     getHitbox(enemy: Enemy<StormHeartParams>): Rect {
         return {
-            x: enemy.x + 14,
-            y: enemy.y + 34,
+            x: enemy.x - 16,
+            y: enemy.y - 4,
             w: 100,
             h: 40 + Math.max(16, enemy.params.cloudLife * 8),
             //h: 32 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
