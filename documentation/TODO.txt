@@ -88,6 +88,10 @@ Current tasks:
     - Hide hud for longer cut scenes
         - End of rival fight, start of rival 2 fight.
 
+    - Add NPC options to bed decorations
+        - Maybe add the NPC separate from the bed, but have the bed target them which turns the NPC into
+          a display child of the bed and renders them below the sheets.
+
     - Bug: Astral projection can pull linked pots on top of the hero.
 
     - Frost Beast improvements
