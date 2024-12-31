@@ -12,17 +12,29 @@ export function isTargetVisible(
     return !!target && !!target.getHitbox && !target.isInvisible;
 }
 
+function getTargetingAnchor(target:EffectInstance | ObjectInstance): Point {
+     if (target.getTargetingAnchorPoint) {
+         return target.getTargetingAnchorPoint();
+     }
+     // For targeting we use the regular hitbox since most hitboxes treat y/z interchangeably.
+     const hitbox = target.getHitbox();
+     return {
+         x: hitbox.x + hitbox.w / 2,
+         y: hitbox.y + hitbox.h / 2,
+     }
+}
+
 export function getNearbyTarget(state: GameState, source: EffectInstance | ObjectInstance, radius: number,
     targets: (EffectInstance | ObjectInstance)[], ignoreTargets: Set<EffectInstance | ObjectInstance> = null
 ): EffectInstance | ObjectInstance {
-    const hitbox = source.getHitbox(state);
+    const sourceAnchor = getTargetingAnchor(source);
     for (const target of targets) {
         if (!isTargetVisible(state, source, target) || ignoreTargets?.has(target)) {
             continue;
         }
-        const targetHitbox = target.getHitbox(state);
-        const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-        const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+        const targetAnchor = getTargetingAnchor(target);
+        const dx = targetAnchor.x - sourceAnchor.x;
+        const dy = targetAnchor.y - sourceAnchor.y;
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             return target;
@@ -32,10 +44,10 @@ export function getNearbyTarget(state: GameState, source: EffectInstance | Objec
 }
 
 export function getVectorToTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
-    const hitbox = source.getHitbox(state);
-    const targetHitbox = target.getHitbox(state);
-    const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-    const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+    const sourceAnchor = getTargetingAnchor(source);
+    const targetAnchor = getTargetingAnchor(target);
+    const dx = targetAnchor.x - sourceAnchor.x;
+    const dy = targetAnchor.y - sourceAnchor.y;
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag) {
         return {mag, x: dx / mag, y: dy / mag};
@@ -48,10 +60,10 @@ export function getCardinalDirectionToTarget(
     target: EffectInstance | ObjectInstance,
     defaultDirection: CardinalDirection = 'down'
 ): CardinalDirection {
-    const hitbox = source.getHitbox();
-    const targetHitbox = target.getHitbox();
-    const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-    const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+    const sourceAnchor = getTargetingAnchor(source);
+    const targetAnchor = getTargetingAnchor(target);
+    const dx = targetAnchor.x - sourceAnchor.x;
+    const dy = targetAnchor.y - sourceAnchor.y;
     return getCardinalDirection(dx, dy, defaultDirection);
 }
 
@@ -81,14 +93,14 @@ export function getVectorToNearbyTarget(state: GameState,
     source: EffectInstance | ObjectInstance, radius: number,
     targets: (EffectInstance | ObjectInstance)[]
 ): {x: number, y: number, mag: number, target: EffectInstance | ObjectInstance} | null {
-    const hitbox = source.getHitbox(state);
+    const sourceAnchor = getTargetingAnchor(source);
     for (const target of targets) {
         if (!isTargetVisible(state, source, target)) {
             continue;
         }
-        const targetHitbox = target.getHitbox(state);
-        const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-        const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+        const targetAnchor = getTargetingAnchor(target);
+        const dx = targetAnchor.x - sourceAnchor.x;
+        const dy = targetAnchor.y - sourceAnchor.y;
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             if (mag) {

@@ -141,6 +141,8 @@ interface ObjectInstance extends BaseFieldInstance {
     getFloorHitbox?: () => Readonly<Rect>
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
+    // This point will be used as the center of the object for targeting calculations.
+    getTargetingAnchorPoint?: () => Point
     // This can be set to override the default yDepth calculation for an object.
     getYDepth?: () => number
     // The calculated yDepth for the object. This is update once per frame before rendering.
@@ -185,6 +187,8 @@ interface EffectInstance extends BaseFieldInstance {
     cleanup?: (state: GameState) => void
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
+    // This point will be used as the center of the object for targeting calculations.
+    getTargetingAnchorPoint?: () => Point
     // This can be set to override the default yDepth calculation for an object.
     getYDepth?: () => number
     // The calculated yDepth for the object. This is update once per frame before rendering.

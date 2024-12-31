@@ -23,28 +23,27 @@ const flameBeastVerticalGeometry: FrameDimensions = {
 const flameBeastHorizontalGeometry: FrameDimensions = {
     w: 156, h: 121,
     content: {x: 10, y: 69, w: 78, h: 28},
-    anchor: {x: 42, y: 98},
+    anchor: {x: 42, y: 75},
 };
 // Frame at index 5 uses the full frame width which causes artifacts on nearby frames if they render the full width when rotated
 // Instead of adding padding to all frames, we just use this smaller geometry for animations that use frame index 4 and 6.
 const flameBeastWalkDownAnimation = createAnimation('gfx/bosses/flameBeast.png',
     flameBeastVerticalGeometry, {y: 1, cols: 6, duration: 6});
-export const flameBeastWalkRightAnimation = createAnimation('gfx/bosses/flameBeast.png',
+const flameBeastWalkRightAnimation = createAnimation('gfx/bosses/flameBeast.png',
     flameBeastHorizontalGeometry, {y: 2, cols: 8, duration: 6});
 
 const flameBeastAnimations = {
-    /*idle: {
+    idle: {
         up: flameBeastWalkDownAnimation,
         down: flameBeastWalkDownAnimation,
         left: flameBeastWalkRightAnimation,
         right: flameBeastWalkRightAnimation,
-    },*/
-    idle: omniAnimation(flameBeastWalkDownAnimation),
+    },
 };
 
 
 
-const flameHeartGeometry = {w: 48, h: 48, content: {x: 11, y: 14, w: 26, h: 24}};
+const flameHeartGeometry = {w: 48, h: 48, content: {x: 11, y: 16, w: 26, h: 18}};
 const flameHeartIdleAnimation = createAnimation('gfx/bosses/flameHeartIdle.png', flameHeartGeometry, {cols: 9, duration: 6});
 const flameHeartHurtAnimation = createAnimation('gfx/bosses/flameHeartHurt.png', flameHeartGeometry,
     {cols: 11, duration: 2, frameMap: [0, 1, 2, 3, 2, 1]},
@@ -437,7 +436,6 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'walk') {
         enemy.setMode('choose');
     }
-    const targetVector = getVectorToTarget(state, enemy, target);
     if (enemy.mode === 'leapStrike') {
         if (enemy.z > 0) {
             enemy.x += enemy.vx;
@@ -455,6 +453,7 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'choose' && enemy.z <= 0) {
+        const targetVector = getVectorToTarget(state, enemy, target);
         enemy.d = getCardinalDirection(targetVector.x, targetVector.y, enemy.d);
         enemy.setAnimation('idle', enemy.d);
         enemy.useRandomAbility(state);

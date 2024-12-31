@@ -11,7 +11,7 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { createAnimation } from 'app/utils/animations';
 
-const plantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 16} };
+const plantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 12} };
 
 function createPlantAnimations(source: string): ActorAnimations {
     return {

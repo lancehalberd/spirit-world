@@ -315,7 +315,8 @@ export function renderEnemyShadow(context: CanvasRenderingContext2D, state: Game
         context.save();
             context.fillStyle = 'black';
             const cx = hitbox.x + hitbox.w / 2;
-            const cy = hitbox.y + hitbox.h - hitbox.w / 4;
+            //const cy = hitbox.y + hitbox.h - hitbox.w / 4;
+            const cy = hitbox.y + hitbox.h;
             const shadowRadius = enemy.enemyDefinition.shadowRadius ?? hitbox.w / 2;
             const fullScale = 1;
             context.translate(

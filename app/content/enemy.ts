@@ -213,23 +213,41 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         const hitbox = this.getHitbox();
         return hitbox.y + hitbox.h + this.z;
     }
+    getTargetingAnchorPoint(): Point {
+        const frame = this.getFrame();
+        if (frame.anchor) {
+            return {x: this.x, y: this.y};
+        }
+        const hitbox = this.getHitbox();
+        return {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
+    }
     getMovementHitbox(): Rect {
         const frame = this.getFrame();
-        return {
+        const hitbox = {
             x: this.x | 0,
             y: this.y | 0,
             w: ((frame.content?.w ?? frame.w) * this.scale) | 0,
             h: ((frame.content?.h ?? frame.h) * this.scale) | 0,
         };
+        if (frame.anchor) {
+            hitbox.x -= (frame.anchor.x - (frame.content.x || 0));
+            hitbox.y -= (frame.anchor.y - (frame.content.y || 0));
+        }
+        return hitbox;
     }
     getDefaultHitbox(): Rect {
         const frame = this.getFrame();
-        return {
+        const hitbox = {
             x: this.x | 0,
             y: (this.y - this.z) | 0,
             w: ((frame.content?.w ?? frame.w) * this.scale) | 0,
             h: ((frame.content?.h ?? frame.h) * this.scale) | 0,
         };
+        if (frame.anchor) {
+            hitbox.x -= (frame.anchor.x - (frame.content.x || 0));
+            hitbox.y -= (frame.anchor.y - (frame.content.y || 0));
+        }
+        return hitbox;
     }
     distanceToPoint(p: Coords): number {
         const hitbox = this.getHitbox();
@@ -956,25 +974,35 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if ((this.d === 'right' && this.enemyDefinition.flipRight)
                 || (this.d === 'left' && this.enemyDefinition.flipLeft)
             ) {
-                // Flip the frame when facing right. We may need an additional flag for this behavior
-                // if we don't do it for all enemies on the right frames.
-                const w = frame.content?.w ?? frame.w;
-                context.translate((this.x | 0) + (w / 2) * this.scale, 0);
-                context.scale(-1, 1);
-                drawFrame(context, frame, { ...frame,
-                    x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
-                    y: this.y - (frame.content?.y || 0) * this.scale - this.z,
-                    w: frame.w * this.scale,
-                    h: frame.h * this.scale,
-                });
-                /*
-                // Draw a red dot where we are flipping
-                context.fillStyle = 'red';
-                context.fillRect( -1, this.y, 2, frame.content?.h || frame.h);
-                */
+                // Draw the frame reflected horizontally if we only have a left or a right frame.
+                if (frame.anchor) {
+                    context.translate((this.x | 0), 0);
+                    context.scale(-1, 1);
+                    drawFrame(context, frame, { ...frame,
+                        x: - (frame.anchor.x) * this.scale,
+                        y: this.y - frame.anchor.y * this.scale - this.z,
+                        w: frame.w * this.scale,
+                        h: frame.h * this.scale,
+                    });
+                } else {
+                    const w = frame.content?.w ?? frame.w;
+                    context.translate((this.x | 0) + (w / 2) * this.scale, 0);
+                    context.scale(-1, 1);
+                    drawFrame(context, frame, { ...frame,
+                        x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
+                        y: this.y - (frame.content?.y || 0) * this.scale - this.z,
+                        w: frame.w * this.scale,
+                        h: frame.h * this.scale,
+                    });
+                    /*
+                    // Draw a red dot where we are flipping
+                    context.fillStyle = 'red';
+                    context.fillRect( -1, this.y, 2, frame.content?.h || frame.h);
+                    */
+                }
             } else if (this.rotation) {
-                // Flip the frame when facing right. We may need an additional flag for this behavior
-                // if we don't do it for all enemies on the right frames.
+                // Rotate the frame about a point.
+                // TODO: Support frames with anchor points and rotate around the anchor point instead of the center.
                 const w = frame.content?.w ?? frame.w;
                 const h = frame.content?.h ?? frame.h;
                 context.translate((this.x | 0) + (w / 2) * this.scale, (this.y | 0) + (h / 2) * this.scale - this.z);
@@ -991,9 +1019,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 context.fillRect( -1, this.y, 2, frame.content?.h || frame.h);
                 */
             } else {
+                // Draw the frame so that the anchor point coincides with the enemy position.
+                const anchor = frame.anchor ?? frame.content ?? {x: 0, y: 0};
                 drawFrame(context, frame, { ...frame,
-                    x: this.x - (frame.content?.x || 0) * this.scale,
-                    y: this.y - (frame.content?.y || 0) * this.scale - this.z,
+                    x: this.x - anchor.x * this.scale,
+                    y: this.y - anchor.y * this.scale - this.z,
                     w: frame.w * this.scale,
                     h: frame.h * this.scale,
                 });
@@ -1002,9 +1032,13 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (editingState.showHitboxes) {
             context.save();
                 const hitbox = this.getTouchHitbox();
-                context.globalAlpha = 0.5;
+                context.globalAlpha *= 0.5;
                 context.fillStyle = 'red';
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+            context.restore();
+            context.save();
+                context.fillStyle = 'blue';
+                context.fillRect(this.x - 1, this.y - this.z - 1, 2, 2);
             context.restore();
         }
     }
