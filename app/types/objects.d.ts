@@ -357,6 +357,9 @@ interface HitProperties {
     isArrow?: boolean
     // True if this is a staff attack. Staff can activate/destroy certain objects.
     isStaff?: boolean
+    // True if the staff could actually be placed.
+    // This is used to prevent hitting heavy switches through enemies.
+    isStaffValid?: boolean
     isBonk?: boolean
     // Indicates this projectile attack should go through certain objects such as enemies.
     isPiercing?: boolean

@@ -141,7 +141,7 @@ enemyDefinitions.balloonCentipede = {
             }
         }
     },
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect = enemy.getHitbox()): void {
         drawFrameCenteredAt(context, beetleAnimations.idle.left.frames[0], {...target, x: target.x + 15});
         drawFrameCenteredAt(context, beetleAnimations.idle.left.frames[0], {...target, x: target.x + 5, y: target.y + 3});
         drawFrameCenteredAt(context, beetleHornedAnimations.idle.left.frames[0], {...target, x: target.x - 5});

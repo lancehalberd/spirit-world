@@ -49,7 +49,7 @@ export class HeavyFloorSwitch implements ObjectInstance {
         return false;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (hit.isStomp || (hit.isStaff && !hit.isBonk)) {
+        if (hit.isStomp || (hit.isStaff && hit.isStaffValid && !hit.isBonk)) {
             this.onToggle(state);
         }
         return {};

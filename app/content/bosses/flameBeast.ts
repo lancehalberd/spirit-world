@@ -3,7 +3,7 @@ import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
 import {bossLaserBeamAbility, bossQuadRotatingLaserBeamAbility, bossQuadLaserBlenderBeamAbility} from 'app/content/enemyAbilities/laserBeam';
-import {beetleHornedAnimations, omniAnimation} from 'app/content/enemyAnimations';
+import {omniAnimation} from 'app/content/enemyAnimations';
 import {fillFlameBeastLava} from 'app/content/specialBehaviors/crater';
 import {addLavaBubbleEffectToBackground} from 'app/scenes/field/addAmbientEffects';
 import {createAnimation, drawFrame} from 'app/utils/animations';
@@ -14,6 +14,34 @@ import {hitTargets} from 'app/utils/field';
 import {addObjectToArea} from 'app/utils/objects';
 import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 import Random from 'app/utils/Random';
+
+const flameBeastVerticalGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 55, y: 26, w: 46, h: 62},
+    anchor: {x: 77, y: 43},
+};
+const flameBeastHorizontalGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 10, y: 69, w: 78, h: 28},
+    anchor: {x: 42, y: 98},
+};
+// Frame at index 5 uses the full frame width which causes artifacts on nearby frames if they render the full width when rotated
+// Instead of adding padding to all frames, we just use this smaller geometry for animations that use frame index 4 and 6.
+const flameBeastWalkDownAnimation = createAnimation('gfx/bosses/flameBeast.png',
+    flameBeastVerticalGeometry, {y: 1, cols: 6, duration: 6});
+export const flameBeastWalkRightAnimation = createAnimation('gfx/bosses/flameBeast.png',
+    flameBeastHorizontalGeometry, {y: 2, cols: 8, duration: 6});
+
+const flameBeastAnimations = {
+    /*idle: {
+        up: flameBeastWalkDownAnimation,
+        down: flameBeastWalkDownAnimation,
+        left: flameBeastWalkRightAnimation,
+        right: flameBeastWalkRightAnimation,
+    },*/
+    idle: omniAnimation(flameBeastWalkDownAnimation),
+};
+
 
 
 const flameHeartGeometry = {w: 48, h: 48, content: {x: 11, y: 14, w: 26, h: 24}};
@@ -140,7 +168,8 @@ enemyDefinitions.flameHeart = {
 enemyDefinitions.flameBeast = {
     naturalDifficultyRating: 100,
     abilities: [leapStrikeAbility],
-    animations: beetleHornedAnimations, life: 80, scale: 4, update: updateFireBeast,
+    animations: flameBeastAnimations, life: 80, update: updateFlameBeast,
+    flipLeft: true,
     initialMode: 'hidden',
     acceleration: 0.3, speed: 2,
     immunities: ['fire'],
@@ -354,7 +383,7 @@ function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
     return enrageLevel;
 }
 
-function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
+function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
     // This is a bit brittle as it depends on the boss having a specific number of starting abilities.
     if (!flameHeart && enemy.abilities.length < 2) {
@@ -426,7 +455,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'choose' && enemy.z <= 0) {
-        enemy.d = getCardinalDirection(targetVector.x, targetVector.y);
+        enemy.d = getCardinalDirection(targetVector.x, targetVector.y, enemy.d);
         enemy.setAnimation('idle', enemy.d);
         enemy.useRandomAbility(state);
     }

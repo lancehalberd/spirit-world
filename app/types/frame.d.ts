@@ -23,6 +23,9 @@ interface FrameDimensions {
     // Contrast thiis with AreaObjectTarget where the `h` value is the height of the object in the game,
     // which is typically less than the height of the image (imageContentHeight = gameHeight + gameDepth / 2).
     content?: Rect
+    // Set this if a particular point in the frame should be used as the anchor for drawing this frame to a
+    // particular point.
+    anchor?: Point
     // Optional scale that can be set on the frame. Most contexts ignore this, but those that support it
     // will multiple the w/h values by this number as well as the content values if present.
     s?: number

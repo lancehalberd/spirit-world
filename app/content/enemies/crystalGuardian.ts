@@ -150,7 +150,7 @@ enemyDefinitions.crystalGuardian = {
         } else {
             frame = smallCrystalBarrierVeryDamagedFrame;
         }
-        const hitbox = enemy.getHitbox(state);
+        const hitbox = enemy.getHitbox();
         drawFrameCenteredAt(context, frame, hitbox);
 
         // Debug the vector to where the pod will by created.
@@ -163,12 +163,14 @@ enemyDefinitions.crystalGuardian = {
             context.stroke();
         }*/
     },
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target?: Rect): void {
         enemy.defaultRenderPreview(context, target);
+        drawFrameCenteredAt(context, smallCrystalBarrierNormalFrame, target || enemy.getHitbox());
+        /*target = enemy.getHitbox();
         context.save();
             context.globalAlpha *= 0.8;
             context.fillStyle = 'white';
             context.fillRect(target.x, target.y, target.w, target.h);
-        context.restore();
+        context.restore();*/
     },
 };

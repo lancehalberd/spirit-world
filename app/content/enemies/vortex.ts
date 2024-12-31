@@ -185,6 +185,9 @@ enemyDefinitions.vortexLava = {
                 return;
             }
         }
+        if (enemy.time < 1000) {
+            return;
+        }
         const hitbox = enemy.getHitbox();
         const anchorPoint = {
             x: hitbox.x + hitbox.w / 2,
@@ -240,44 +243,48 @@ enemyDefinitions.vortexLava = {
         return {x: enemy.x, y: enemy.y, w: 24, h: 24};
     },
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        const armCount = 6;
+        let r = 8 + ((enemy.animationTime / 100) | 0) % 5;
+        const hitbox = enemy.getHitbox(state);
+        let x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
+        for (let i = 0; i < armCount; i++) {
+            r = 2;//(((enemy.animationTime / 100) | 0) % 5) / 10;
+            context.save();
+                context.translate(x, y);
+                let index = 0;
+                for (const color of ['#F80', '#800', '#F80', '#840', '#F80', '#800', '#F80', '#840']) {
+                    context.save();
+                        context.translate(0, -2 * r - index / 5);
+                        context.scale(1, 0.75);
+                        context.rotate(enemy.animationTime / 200 + 2 * Math.PI * i / armCount + index * Math.PI / 12);
+                            //const alpha = Math.min(1, Math.max(0.2, (1.2 - r / 12)));
+                            //context.globalAlpha *= alpha;
+                            context.beginPath();
+                            context.strokeStyle = color;
+                            //context.lineWidth = 2;
+                            context.arc(r, 0, r, 0, Math.PI);
+                            context.stroke();
+                            //context.globalAlpha /= alpha;
+                            r += 1.5 * Math.min(1 + 0.08 * Math.sin(enemy.time / 200), enemy.time / 1000);
+                            context.rotate(2 * Math.PI / armCount / 4);
+                    context.restore();
+                    index ++;
+                }
+             context.restore();
+        }
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         if (enemy.status === 'gone' || enemy.status === 'hidden') {
             return;
         }
         const hitbox = enemy.getHitbox(state);
-        const armCount = 6;
         const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
-        let r = 8 + ((enemy.animationTime / 100) | 0) % 5;
         context.save();
             context.translate(x, y);
-            context.scale(1, 0.75);
+            context.scale(0.5, 0.4);
             context.rotate(enemy.animationTime / 200);
             const frame = getFrame(enemy.currentAnimation, enemy.animationTime);
             drawFrame(context, frame, {...frame, x: -8, y: -8});
         context.restore();
-        for (let i = 0; i < armCount; i++) {
-            context.save();
-                context.translate(x, y);
-                context.scale(1, 0.75);
-                context.rotate(enemy.animationTime / 200 + 2 * Math.PI * i / armCount);
-                for (const color of ['#F80', '#800', '#F80', '#840']) {
-                    const alpha = Math.min(1, Math.max(0.2, (1.2 - r / 12)));
-                    context.globalAlpha *= alpha;
-                    context.beginPath();
-                    context.strokeStyle = color;
-                    //context.lineWidth = 2;
-                    context.arc(r, 0, r, 0, Math.PI);
-                    context.stroke();
-                    context.globalAlpha /= alpha;
-                    r = r - 2;
-                    if (r < 5) {
-                        r += 5;
-                    }
-                    context.rotate(2 * Math.PI / armCount / 4);
-                }
-                r = r + 4;
-            context.restore();
-        }
     },
 };
