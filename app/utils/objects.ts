@@ -34,12 +34,12 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         area.objects.push(object);
     }
 }
-export function removeObjectFromArea(state: GameState, object: ObjectInstance, trackId: boolean = true): void {
+export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
     if (!object.area) {
         return;
     }
-    if (object.definition?.id && trackId) {
-        object.area.removedObjectIds.push(object.definition.id);
+    if (object.definition) {
+        object.area.removedObjectDefinitions.add(object.definition);
     }
     if (object.remove) {
         object.remove(state);
@@ -67,12 +67,11 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     }
 }
 
-export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix = ''): void {
+export function getObjectSaveTreatment(definition: ObjectDefinition, suffix = ''): 'forever' | 'zone' | 'never' {
     let treatment = definition.saveStatus;
     if (suffix === 'position') {
         treatment = definition.savePosition;
     }
-    // Make sure treatment is forever for locked doors. Might as well do the same for frozen/cracked doors.
     if (definition.type === 'door' && (
         definition.status === 'locked'
         || definition.status === 'bigKeyLocked'
@@ -81,40 +80,43 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
         || suffix === 'melted'
     )) {
         treatment = 'forever';
-        if (!definition.id) {
-            console.error('Locked door was missing an id', this);
-            debugger;
-        }
     }
-    if (!treatment) {
-        if (definition.type === 'boss') {
-            treatment = 'forever';
-        } else if (definition.type === 'enemy') {
-            treatment = 'zone';
-        } else if (definition.type === 'narration') {
-            treatment = 'forever';
-        } else if (definition.type === 'saveStatue') {
-            treatment = 'forever';
-        } else if (definition.type === 'pushStairs') {
-            treatment = 'forever';
-        }
+    if (treatment) {
+        return treatment;
     }
+    if (definition.type === 'boss') {
+        return 'forever';
+    } else if (definition.type === 'enemy') {
+        return 'zone';
+    } else if (definition.type === 'narration') {
+        return 'forever';
+    } else if (definition.type === 'saveStatue') {
+        return 'forever';
+    } else if (definition.type === 'pushStairs') {
+        return 'forever';
+    }
+    return 'never';
+}
+
+export function saveObjectStatus(state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix = ''): void {
+    const treatment = getObjectSaveTreatment(definition, suffix);
     const fullKey =  definition.id + (suffix ? '-' + suffix : '');
-    if (treatment === 'forever' || treatment === 'zone') {
-        const hash = treatment === 'forever'
-            ? state.savedState.objectFlags
-            : state.savedState.zoneFlags;
-        if (!definition.id) {
-            console.error('Missing object id', definition);
-            return;
-        }
-        if (flag !== false && hash[fullKey] !== flag) {
-            hash[fullKey] = flag;
-            saveGame(state);
-        } else if (flag === false && hash[fullKey]) {
-            delete hash[fullKey];
-            saveGame(state);
-        }
+    if (treatment === 'never') {
+        return;
+    }
+    const hash = treatment === 'forever'
+        ? state.savedState.objectFlags
+        : state.savedState.zoneFlags;
+    if (!definition.id) {
+        console.error('Missing object id', definition);
+        return;
+    }
+    if (flag !== false && hash[fullKey] !== flag) {
+        hash[fullKey] = flag;
+        saveGame(state);
+    } else if (flag === false && hash[fullKey]) {
+        delete hash[fullKey];
+        saveGame(state);
     }
 }
 

@@ -18,6 +18,9 @@ export function canActorMove(state: GameState, actor: Actor, movementProperties:
 }
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties = {}): {mx: number, my: number} {
+    if (!actor.area) {
+        return {mx: 0, my: 0};
+    }
     let sx = dx;
     let sy = dy;
     let mx = 0, my = 0;

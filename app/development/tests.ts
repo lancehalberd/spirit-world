@@ -1,21 +1,17 @@
-import { everyObject } from 'app/utils/every';
+import {everyObject} from 'app/utils/every';
+import {getObjectSaveTreatment} from 'app/utils/objects';
 
 export const tests: {[key: string]: () => void} = {
     checkObjectsHaveIds() {
         console.log('Test "checkObjectsHaveIds":')
         everyObject((location, zone, area, objectDefinition) => {
-            if (objectDefinition.saveStatus === 'never') {
+            if (getObjectSaveTreatment(objectDefinition) === 'never') {
                 return;
             }
-            if (!objectDefinition.saveStatus
-                && objectDefinition.type !== 'boss'
-                && objectDefinition.type !== 'enemy'
-                && objectDefinition.type !== 'saveStatue'
-                && objectDefinition.type !== 'narration'
-                && objectDefinition.type !== 'pushStairs'
-            ) {
-                return;
-            }
+            // Without an id, the status of this object cannot be saved, but the definition says the object
+            // status should be saved. Fix this by adding an id to the object or changing the definition
+            // to never save the object status either through the editor, or adding a new default treatment
+            // for the object type to `getObjectSaveTreatment`.
             if (!objectDefinition.id) {
                 console.error(`Missing object id`, location, objectDefinition);
             }

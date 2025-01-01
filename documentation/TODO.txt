@@ -68,11 +68,24 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Flame Beast improvements
+        - Spawn out of lava (replacing cool lava tiles with hot lava tiles).
+        - Draw just the front half of the beast to simulate it being half out of the lava.
+        - Draw bubbles around lava for 400MS before emerging from lava to warn the player, then make the actual attacks pretty fast.
+            - Maybe can cancel emerging if the player gets too far away too quickly.
+        - Comes halfway out of the nearest lava and attacks the player:
+            - Swipe if the player is in range.
+            - Spawn a chasing fire vortex if in range
+            - Launch falling fireball barrage if the player is far away.
+        - Fully emerges from a lava pool with line of site on the player and charge to the player and into another lava pool.
+
     - Test new cocoon tiles
         - Add doors
         - Fix tilesheet for pits
 
     - Add new frost heart attack+damaged animations
+
+    - Add check to material world forge where the door is to the boss chamber.
 
     - Jade Champion during Storm Beast
         - Put up a barrier when the heart is enraged and add text cue telling player to come to the barrier.
@@ -451,7 +464,7 @@ Current tasks:
     - Overworld project
         - Add lake
             - Should have two waterfalls/rivers entering from the northwest+northeast on opposite sides of a divide
-            - The lake temple should be near the northwest on what would have been the banks of the river going to the summoner ruins before the crater wascreated
+            - The lake temple should be near the northwest on what would have been the banks of the river going to the summoner ruins before the crater was created
                 - The lake temple should be near the edge of the crater so that it is plausible that it wasn't completely destroyed when the crater was made.
                 - The direction of the creater is west southwest with most of the rim of the crater built up on the south and west.
                     - The northern rim is mostly the natural elevation of the mountains it ran into
@@ -865,10 +878,12 @@ Current tasks:
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
 
-    - Work on new waterfall graphics
-        - Email Jon about waterfall graphic updates.
+    - Add actual waterfall animations
+        - Use lava falls as a basis
+        - Maybe bake in special graphics for caves behind waterfalls.
+        - Have special effect for water splashing on objects going under the waterfall.
 
-    - Would be nice if staff could go across edges.
+    - Would be nice if staff could go across ledges.
 
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
@@ -899,7 +914,6 @@ Tutorial Improvements:
         - Maybe different sections for different tools.
 
 Add more screen shakes:
-    - Lava draining transition
     - Probably for some impactful boss attacks.
     - Scene where elemental beasts escape and attack the holy city
         - Maybe could be periodic large shake+explosion as if there is a large explosion nearby
@@ -917,13 +931,8 @@ High level list of things left to do:
         Crater midboss
     Missing mechanics:
         - Vanara dreamland boss simulator with difficulty modifiers
-        Hero helping during first elemental beast fight
-            Hero wears monk fighting attire
-            Creates a spirit barrier during rage phase that MC can hide in to prevent all damage
-            Attacks or distracts the beats while fighting the heart
-            Adds dialog cues for guiding the MC to destroy the heart
-            Heals MC or restores MC spirit energy periodically
-        Rival during last elemental beast fight
+        Hero helping during first flame beast/frost beast fights
+        Rival during last beast fight for all elements
         Spirit Gates + Spirit Keys
             - Probably do beanstalks instead of this.
         Spirit shop + Jade Idols

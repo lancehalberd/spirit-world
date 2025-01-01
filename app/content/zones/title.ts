@@ -255,10 +255,10 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "titleTeleporter", x: 248, y: 280, type: "teleporter", linked: true, locationCue: "Title"},
-        {status: "normal", id: "", spirit: false, x: 280, y: 248, type: "crystalSwitch", element: "lightning", timer: 0, requireAll: true},
-        {status: "normal", id: "", spirit: false, x: 216, y: 248, type: "crystalSwitch", element: "fire", timer: 0, requireAll: true},
+        {status: "normal", id: "", spirit: false, x: 280, y: 248, type: "crystalSwitch", element: "lightning", timer: 0, requireAll: true, saveStatus: "never"},
+        {status: "normal", id: "", spirit: false, x: 216, y: 248, type: "crystalSwitch", element: "fire", timer: 0, requireAll: true, saveStatus: "never"},
         {status: "normal", id: "jadeChampion", linked: true, spirit: true, x: 212, y: 312, d: "left", behavior: "face", style: "jadeChampion", type: "npc"},
-        {status: "normal", id: "", spirit: false, x: 276, y: 312, type: "crystalSwitch", element: "ice", timer: 0, requireAll: true},
+        {status: "normal", id: "", spirit: false, x: 276, y: 312, type: "crystalSwitch", element: "ice", timer: 0, requireAll: true, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 605, mapId: 'title', floorId: '1F', mapX: 0, mapY: 0},
@@ -523,9 +523,9 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", x: 248, y: 280, type: "teleporter", linked: true, locationCue: "Title", spirit: true},
-        {status: "normal", id: "", linked: false, x: 276, y: 292, type: "saveStatue"},
-        {status: "normal", id: "", linked: false, x: 240, y: 248, type: "saveStatue"},
-        {status: "normal", id: "", linked: false, x: 240, y: 328, type: "saveStatue"},
+        {status: "normal", id: "", linked: false, x: 276, y: 292, type: "saveStatue", saveStatus: "never"},
+        {status: "normal", id: "", linked: false, x: 240, y: 248, type: "saveStatue", saveStatus: "never"},
+        {status: "normal", id: "", linked: false, x: 240, y: 328, type: "saveStatue", saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 604, mapId: 'titleSpirit', floorId: '1F', mapX: 0, mapY: 0},

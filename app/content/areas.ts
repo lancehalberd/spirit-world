@@ -390,7 +390,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         effects: [],
         objects: [],
         allActiveObjects: [],
-        removedObjectIds: [],
+        removedObjectDefinitions: new Set(),
         priorityObjects: [],
         backgroundFrames,
         foregroundFrames,
@@ -616,16 +616,21 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                     console.error('Object with valid logicKey/hasCustomLogic was found with no id and will not be added.');
                 }
                 // If the object is valid but was never added to the area, add it now.
-                if (!objectInstance && object.id && !instance.removedObjectIds.includes(object.id)) {
+                if (!objectInstance && object.id && !instance.removedObjectDefinitions.has(object)) {
                     objectInstance = createObjectInstance(state, object);
                     // Note that special behavior is applied to objects as part of adding them to the area.
                     addObjectToArea(state, instance, objectInstance);
                 }
             } else {
-                // If the object is invalid but present, remove it from the area, but don't track it as removed by gameplay
-                // so that logical changes can bring it back.
                 if (objectInstance) {
-                    removeObjectFromArea(state, objectInstance, false);
+                    const area = objectInstance.area;
+                    removeObjectFromArea(state, objectInstance);
+                    // If the object is invalid but present, remove it from the area, but don't track it as removed by gameplay
+                    // so that logical changes can bring it back.
+                    if (area && objectInstance.definition) {
+                        area.removedObjectDefinitions.delete(objectInstance.definition);
+                    }
+
                 }
             }
         }

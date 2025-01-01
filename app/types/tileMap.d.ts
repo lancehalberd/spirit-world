@@ -443,9 +443,9 @@ interface AreaInstance {
     // List of objects to render that is updated each frame.
     // This is all effects+objects as well as any parts of effects+objects.
     objectsToRender: (EffectInstance | ObjectInstance)[]
-    // Array of object ids that were created on this instance but have been removed.
+    // Array of object definitions that were created on this instance but have been removed.
     // This is used when refreshing area logic to only add objects that had not already been present.
-    removedObjectIds: string[]
+    removedObjectDefinitions: Set<ObjectDefinition>
     // These cache the tile backgrounds and are only updated when specific tile are marked to be redrawn.
     // Each as an array of 6 elements corresponding to the 6 frames of animation used for background tiles.
     backgroundFrames: AreaFrame[]

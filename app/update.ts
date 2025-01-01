@@ -220,7 +220,6 @@ function updateTransition(state: GameState) {
             state.transitionState = null;
         }
     } else if (state.transitionState.type === 'mutating') {
-        console.log('mutating', state.transitionState.time, state.hero.vx, state.hero.vy);
         if (state.transitionState.time === (state.mutationDuration || MUTATE_DURATION)) {
             enterLocation(state, state.transitionState.nextLocation, {
                 instant: true,

@@ -98,7 +98,7 @@ function jumpToMinimapLocation() {
           x: pixelX,
           y: pixelY,
           z: 0,
-        });
+        }, {instant: true});
     } else {
         state.location.x = pixelX;
         state.location.y = pixelY;
