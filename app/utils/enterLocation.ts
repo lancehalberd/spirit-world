@@ -13,15 +13,22 @@ import { fixCamera } from 'app/utils/fixCamera';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { removeObjectFromArea } from 'app/utils/objects';
 
+interface OptionalEnterLocationParams {
+    instant?: boolean
+    callback?: () => void
+    isMutation?: boolean
+    doNotRefreshEditor?: boolean
+}
 
 export function enterLocation(
     state: GameState,
     location: ZoneLocation,
-    instant: boolean = true,
-    callback: () => void = null,
-    preserveZoneFlags = false,
-    isMutation = false,
-    doNotRefreshEditor = false,
+    {
+        callback,
+        instant = false,
+        isMutation = false,
+        doNotRefreshEditor = false
+    }: OptionalEnterLocationParams = {}
 ): void {
     // Remve astral projection when switching areas.
     if (state.hero.astralProjection) {
@@ -71,6 +78,7 @@ export function enterLocation(
         return;
     }
     // Clear zone flags when changing zones.
+    const preserveZoneFlags = false;
     if (!preserveZoneFlags && state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
         state.savedState.zoneFlags = {};
     }
@@ -120,19 +128,6 @@ export function enterLocation(
     linkObjects(state);
     state.hero.area = state.areaInstance;
     state.hero.areaTime = 0;
-    state.hero.x = location.x;
-    state.hero.y = location.y;
-    if (location.z >= 0) {
-        state.hero.z = location.z;
-        /*if (location.z > 0) {
-            state.hero.action = 'knocked';
-            // Make sure the character falls straight down.
-            state.hero.vx = 0;
-            state.hero.vy = 0;
-        }*/
-    }
-    state.hero.vx = 0;
-    state.hero.vy = 0;
     // Don't let magic become infinitely negative while being drained.
     // We could also set magic to at least 0 during any zone transition instead of this.
     state.hero.magic = Math.max(state.hero.magic, 0);
@@ -141,6 +136,19 @@ export function enterLocation(
         state.hero.safeD = state.hero.d;
         state.hero.safeX = location.x;
         state.hero.safeY = location.y;
+        state.hero.vx = 0;
+        state.hero.vy = 0;
+        state.hero.x = location.x;
+        state.hero.y = location.y;
+        if (location.z >= 0) {
+            state.hero.z = location.z;
+            /*if (location.z > 0) {
+                state.hero.action = 'knocked';
+                // Make sure the character falls straight down.
+                state.hero.vx = 0;
+                state.hero.vy = 0;
+            }*/
+        }
     }
     setAreaSection(state, !isMutation);
     state.hotLevel = state.areaSection.isHot ? 1 : 0;

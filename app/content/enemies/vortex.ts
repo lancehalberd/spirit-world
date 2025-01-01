@@ -87,7 +87,7 @@ enemyDefinitions.vortex = {
                             x: hero.x,
                             y: hero.y,
                             z: 24,
-                        }, false);
+                        });
                         hero.swimming = false;
                         hero.wading = false;
                         hero.vz = -3;

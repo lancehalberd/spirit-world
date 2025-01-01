@@ -177,7 +177,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     x: hero.x,
                     y: hero.y,
                     z: 0,
-                }, false);
+                });
                 hero.swimming = true;
                 return;
             }
@@ -202,32 +202,6 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.swimming && hero.savedData.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
         isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y})
     ) {
-        /*const mx = hero.x % 16;
-        if (mx > 0 && mx < 8) {
-            hero.x = Math.max(hero.x - mx, hero.x - 1);
-        } else if (mx >= 8) {
-            hero.x = Math.min(hero.x - mx + 16, hero.x + 1);
-        }
-        const my = hero.y % 16;
-        if (my > 0 && my < 8) {
-            hero.y = Math.max(hero.y - my, hero.y - 1);
-        } else if (my >= 8) {
-            hero.y = Math.min(hero.y - my + 16, hero.y + 1);
-        }
-        if (hero.x % 16 === 0 && hero.y % 16 === 0) {
-            enterLocation(state, {
-                ...state.location,
-                floor: zones[state.zone.underwaterKey].floors.length - 1,
-                zoneKey: state.zone.underwaterKey,
-                x: hero.x,
-                y: hero.y,
-                z: 24,
-            }, false);
-            hero.swimming = false;
-            hero.wading = false;
-        }*/
-        // Previously we only allowed transition on exact tiles, but now we are
-        // experimenting with transitioning immediately.
         if (hero === state.hero) {
             enterLocation(state, {
                 ...state.location,
@@ -236,7 +210,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 x: hero.x,
                 y: hero.y,
                 z: 24,
-            }, false);
+            });
             hero.swimming = false;
             hero.wading = false;
         }

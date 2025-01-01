@@ -73,7 +73,7 @@ mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
 }
 
 function refreshArea(state: GameState) {
-    enterLocation(state, state.location, true);
+    enterLocation(state, state.location, {instant: true});
 }
 
 function jumpToMinimapLocation() {

@@ -5,7 +5,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { addNewLayer } from 'app/utils/layers';
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
+    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
 }
 
 export function getBrushContextProperties(state: GameState): PanelRows {

@@ -87,7 +87,7 @@ export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, 
             x: hero.x,
             y: hero.y,
             z: 24,
-        }, false);
+        });
         hero.swimming = false;
         hero.wading = false;
         hero.vz = Math.min(-2, vz + 1.5);
@@ -108,7 +108,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // the player at exactly the threshold.
         if (state.nextAreaInstance.cameraOffset.x) {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
-            // otherwise horizontal doors won't work as expected.\
+            // otherwise horizontal doors won't work as expected.
             hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
         }
         if (state.nextAreaInstance.cameraOffset.y) {
@@ -250,10 +250,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 z: CANVAS_HEIGHT,
                 d: hero.d,
                 isSpiritWorld: state.location.isSpiritWorld,
-            }, false, () => {
-                hero.action = 'knocked';
-                hero.isAirborn = true;
-                moveToClosestSpawnMarker(state, hero);
+            }, {
+                callback: () => {
+                    hero.action = 'knocked';
+                    hero.isAirborn = true;
+                    moveToClosestSpawnMarker(state, hero);
+                },
             });
             return true;
         }
@@ -289,10 +291,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 z: CANVAS_HEIGHT,
                 d: hero.d,
                 isSpiritWorld: state.location.isSpiritWorld,
-            }, false, () => {
-                hero.action = 'knocked';
-                hero.isAirborn = true;
-                moveToClosestSpawnMarker(state, hero, false);
+            }, {
+                callback: () => {
+                    hero.action = 'knocked';
+                    hero.isAirborn = true;
+                    moveToClosestSpawnMarker(state, hero, false);
+                },
             });
             return true;
         }

@@ -117,22 +117,24 @@ dialogueHash.jadeChampionWarTemple = {
             // ****
             let grandPriest: NPC;
             appendCallback(state, (state: GameState) => {
-                enterZoneByTarget(state, 'grandTemple', 'grandPriestMarker', null, false, (state) => {
-                    if (state.hero.renderParent && state.hero.renderParent.area !== state.hero.area) {
-                        delete state.hero.renderParent;
+                enterZoneByTarget(state, 'grandTemple', 'grandPriestMarker', {
+                    callback: (state) => {
+                        if (state.hero.renderParent && state.hero.renderParent.area !== state.hero.area) {
+                            delete state.hero.renderParent;
+                        }
+                        jadeChampion.x = 250;
+                        jadeChampion.y = 346;
+                        jadeChampion.speed = 1.25;
+                        addObjectToArea(state, state.hero.area, jadeChampion);
+                        grandPriest = findObjectInstanceById(state.hero.area, 'grandPriest') as NPC;
+                        // Change the priests behavior to none so that the updates don't interfere
+                        // with the cutscene.
+                        grandPriest.definition = {
+                            ...grandPriest.definition,
+                            behavior: 'none',
+                        }
+                        grandPriest.speed = 1;
                     }
-                    jadeChampion.x = 250;
-                    jadeChampion.y = 346;
-                    jadeChampion.speed = 1.25;
-                    addObjectToArea(state, state.hero.area, jadeChampion);
-                    grandPriest = findObjectInstanceById(state.hero.area, 'grandPriest') as NPC;
-                    // Change the priests behavior to none so that the updates don't interfere
-                    // with the cutscene.
-                    grandPriest.definition = {
-                        ...grandPriest.definition,
-                        behavior: 'none',
-                    }
-                    grandPriest.speed = 1;
                 });
             });
             appendScript(state, '{wait:100}');
@@ -323,14 +325,16 @@ dialogueHash.jadeChampionWarTemple = {
             npcAndHeroTeleportAnimation(state, jadeChampion);
             // JC teleports the hero to the Holy City
             appendCallback(state, (state: GameState) => {
-                enterZoneByTarget(state, 'overworld', 'holyCityCentralGateMarker', null, false, (state) => {
-                    if (state.hero.renderParent && state.hero.renderParent.area !== state.hero.area) {
-                        delete state.hero.renderParent;
-                    }
-                    jadeChampion.x = 90;
-                    jadeChampion.y = 20;
-                    jadeChampion.speed = 1.75;
-                    addObjectToArea(state, state.hero.area, jadeChampion);
+                enterZoneByTarget(state, 'overworld', 'holyCityCentralGateMarker', {
+                    callback: (state) => {
+                        if (state.hero.renderParent && state.hero.renderParent.area !== state.hero.area) {
+                            delete state.hero.renderParent;
+                        }
+                        jadeChampion.x = 90;
+                        jadeChampion.y = 20;
+                        jadeChampion.speed = 1.75;
+                        addObjectToArea(state, state.hero.area, jadeChampion);
+                    },
                 });
             });
             appendScript(state, '{wait:700}');

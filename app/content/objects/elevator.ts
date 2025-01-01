@@ -521,30 +521,32 @@ export function enterZoneByElevator(
         return false;
     }
     //console.log('enterZoneByElevator', targetFloor, objectLocation);
-    enterLocation(state, objectLocation, instant, () => {
-        const elevator = findElevatorForFloor(state.areaInstance, targetFloor);
-        const hitbox = elevator.getLandingHitbox();
-        state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-        state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 16;
-        state.hero.d = 'up';
-        state.hero.renderParent = elevator;
-        state.hero.isControlledByObject = true;
-        elevator.callToCurrentFloor(state);
-        setAreaSection(state, true);
-        fixCamera(state);
-        // TODO: Make this generic so the elevator can be used in other areas, particularly generated areas.
-        const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];
-        const textCue = new TextCue(state, { text: 'Tower ' + floorName });
-        addEffectToArea(state, state.areaInstance, textCue);
-        // This means the player just dropped the elevator to the basement.
-        if (elevator.specialStatus === 'stuck') {
-            elevator.specialStatus = 'crashed';
-            elevator.floorDelta = 0;
-            elevator.elevatorY = 300;
-            state.hero.action = 'knocked';
-        }
-
-        callback?.(state);
+    enterLocation(state, objectLocation, {
+        instant,
+        callback: () => {
+            const elevator = findElevatorForFloor(state.areaInstance, targetFloor);
+            const hitbox = elevator.getLandingHitbox();
+            state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+            state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 16;
+            state.hero.d = 'up';
+            state.hero.renderParent = elevator;
+            state.hero.isControlledByObject = true;
+            elevator.callToCurrentFloor(state);
+            setAreaSection(state, true);
+            fixCamera(state);
+            // TODO: Make this generic so the elevator can be used in other areas, particularly generated areas.
+            const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];
+            const textCue = new TextCue(state, { text: 'Tower ' + floorName });
+            addEffectToArea(state, state.areaInstance, textCue);
+            // This means the player just dropped the elevator to the basement.
+            if (elevator.specialStatus === 'stuck') {
+                elevator.specialStatus = 'crashed';
+                elevator.floorDelta = 0;
+                elevator.elevatorY = 300;
+                state.hero.action = 'knocked';
+            }
+            callback?.(state);
+        },
     });
     return true;
 }

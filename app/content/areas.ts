@@ -511,7 +511,8 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         if (refreshBehavior) {
             state.map.needsRefresh = true;
             state.fadeLevel = (state.areaInstance.dark || 0) / 100;
-            state.hero.vx = state.hero.vy = 0;
+            // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
+            // state.hero.vx = state.hero.vy = 0;
             const nextAreaInstance = createAreaInstance(state, instance.definition);
             nextAreaInstance.alternateArea = instance.alternateArea;
             nextAreaInstance.alternateArea.alternateArea = nextAreaInstance;

@@ -53,7 +53,7 @@ export const zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
 };
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
-    if (enterZoneByTarget(state, zoneKey, markerId, null, true)) {
+    if (enterZoneByTarget(state, zoneKey, markerId, {instant: true})) {
         burstIntoLocation(state);
     }
     return '';
@@ -115,7 +115,7 @@ dialogueHash.nimbusCloud = {
         },
         returnToEntrance: (state: GameState) => {
             const [zoneKey, ...rest] = zoneEntranceMap[state.location.logicalZoneKey].split(':', );
-            enterZoneByTarget(state, zoneKey, rest.join(':'), null, false);
+            enterZoneByTarget(state, zoneKey, rest.join(':'));
             return '';
         },
         // Material world destinations

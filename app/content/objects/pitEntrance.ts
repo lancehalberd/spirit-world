@@ -131,7 +131,10 @@ export class PitEntrance implements ObjectInstance {
             && isObjectInsideTarget(hero.getMovementHitbox(), pad(hitbox, 4))
         ) {
             if (hero.action === 'fallen') {
-                enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, onEnterZoneFromPit);
+                enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+                    skipObject: this.definition,
+                    callback: onEnterZoneFromPit,
+                });
             } else if (hero.action !== 'falling') {
                 hero.fallIntoPit(state);
             }

@@ -144,13 +144,17 @@ export class Teleporter implements ObjectInstance {
                 y: hero.y,
                 d: hero.d,
                 isSpiritWorld: !state.location.isSpiritWorld,
-            }, false, () => {
-                if (this.linkedObject) {
-                    this.linkedObject.disabledUntilHeroLeaves = true;
-                }
+            }, {
+                callback: () => {
+                    if (this.linkedObject) {
+                        this.linkedObject.disabledUntilHeroLeaves = true;
+                    }
+                },
             });
         } else {
-            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false);
+            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+                skipObject: this.definition,
+            });
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

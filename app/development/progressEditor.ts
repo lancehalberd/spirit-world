@@ -53,7 +53,7 @@ function getProgressProperties() {
                     state.location.x = state.hero.x;
                     state.location.y = state.hero.y;
                     // Calling this will instantiate the area again and place the player back in their current location.
-                    enterLocation(state, state.location);
+                    enterLocation(state, state.location, {instant: true});
                     return;
                 }
             }

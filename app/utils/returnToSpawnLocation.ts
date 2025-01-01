@@ -31,7 +31,7 @@ export function returnToSpawnLocation(state: GameState) {
     // Do this before entering the new location, which may trigger new events.
     state.scriptEvents.queue = [];
     state.scriptEvents.activeEvents = [];
-    enterLocation(state, state.hero.savedData.spawnLocation, true, null, true);
+    enterLocation(state, state.hero.savedData.spawnLocation, {instant: true});
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
 
 

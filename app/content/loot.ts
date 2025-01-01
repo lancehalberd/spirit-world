@@ -375,7 +375,6 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
         case 'staff':
             if (state.hero.savedData.activeTools.staff & 2) {
                 // Refresh the location to hide the tower.
-                //enterLocation(state, state.location);
                 state.areaInstance.needsLogicRefresh = true;
             }
             // Use default handling for first staff.

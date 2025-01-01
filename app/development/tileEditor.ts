@@ -38,7 +38,7 @@ export * from 'app/development/packSprites';
 
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
+    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
 }
 
 function roundMapCoords(coords: {x: number, y: number}): {x: number, y: number} {

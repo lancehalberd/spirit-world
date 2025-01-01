@@ -115,7 +115,7 @@ function stopEditing(state: GameState) {
     hideAllPropertyPanels();
     if (editingState.selectedLayerKey) {
         delete editingState.selectedLayerKey;
-        enterLocation(state, state.location);
+        enterLocation(state, state.location, {instant: true});
     }
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;

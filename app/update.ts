@@ -212,32 +212,49 @@ function updateTransition(state: GameState) {
             state.hero.z = Math.min(state.transitionState.nextLocation.z, state.hero.z + 2.5);
         }
         if (state.transitionState.time === WATER_TRANSITION_DURATION) {
-            enterLocation(state, state.transitionState.nextLocation, true, state.transitionState.callback);
+            enterLocation(state, state.transitionState.nextLocation, {
+                instant: true,
+                callback: state.transitionState.callback,
+            });
             updateCamera(state);
             state.transitionState = null;
         }
     } else if (state.transitionState.type === 'mutating') {
+        console.log('mutating', state.transitionState.time, state.hero.vx, state.hero.vy);
         if (state.transitionState.time === (state.mutationDuration || MUTATE_DURATION)) {
-            enterLocation(state, state.transitionState.nextLocation, true, state.transitionState.callback, false, true);
+            enterLocation(state, state.transitionState.nextLocation, {
+                instant: true,
+                isMutation: true,
+                callback: state.transitionState.callback,
+            });
             updateCamera(state);
             state.transitionState = null;
         }
     } else if (state.transitionState.type === 'portal') {
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
-            enterLocation(state, state.transitionState.nextLocation, true, state.transitionState.callback);
+            enterLocation(state, state.transitionState.nextLocation, {
+                instant: true,
+                callback: state.transitionState.callback,
+            });
             updateCamera(state);
             state.transitionState = null;
         }
     } else if (state.transitionState.type === 'fade') {
         if (state.transitionState.time === FADE_OUT_DURATION) {
-            enterLocation(state, state.transitionState.nextLocation, true, state.transitionState.callback);
+            enterLocation(state, state.transitionState.nextLocation, {
+                instant: true,
+                callback: state.transitionState.callback,
+            });
             updateCamera(state);
         } else if (state.transitionState.time > FADE_OUT_DURATION + FADE_IN_DURATION) {
             state.transitionState = null;
         }
     } else {
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
-            enterLocation(state, state.transitionState.nextLocation, true, state.transitionState.callback);
+            enterLocation(state, state.transitionState.nextLocation, {
+                instant: true,
+                callback: state.transitionState.callback,
+            });
             updateCamera(state);
         } else if (state.transitionState.time > CIRCLE_WIPE_OUT_DURATION + CIRCLE_WIPE_IN_DURATION) {
             state.transitionState = null;

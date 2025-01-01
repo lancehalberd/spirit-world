@@ -227,7 +227,7 @@ export function updateScriptEvents(state: GameState): void {
                 state.scriptEvents.blockEventQueue = true;
                 break;
             case 'enterLocation':
-                enterLocation(state, event.location, false);
+                enterLocation(state, event.location);
                 state.scriptEvents.blockPlayerInput = true;
                 state.scriptEvents.blockEventQueue = true;
                 break;

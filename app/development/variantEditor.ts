@@ -7,7 +7,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 const variantTypes = Object.keys(variantHash) as VariantType[];
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
+    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
 }
 
 export function getVariantTypeSelector(): PanelRows {

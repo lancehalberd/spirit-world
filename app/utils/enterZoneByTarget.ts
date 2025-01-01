@@ -13,13 +13,21 @@ import { fixCamera } from 'app/utils/fixCamera';
 import { isPointInShortRect } from 'app/utils/index';
 
 
+interface OptionalEnterZoneByTargetParams {
+    instant?: boolean
+    callback?: (state: GameState) => void
+    skipObject?: ObjectDefinition
+}
+
 export function enterZoneByTarget(
     state: GameState,
     zoneKey: string,
     targetObjectId: string,
-    skipObject: ObjectDefinition = null,
-    instant: boolean = true,
-    callback: (state: GameState) => void = null
+    {
+        skipObject,
+        instant = false,
+        callback,
+    }: OptionalEnterZoneByTargetParams = {}
 ): boolean {
     const zone = zones[zoneKey];
     if (!zone) {
@@ -30,30 +38,33 @@ export function enterZoneByTarget(
     if (!objectLocation) {
         return false;
     }
-    enterLocation(state, objectLocation, instant, () => {
-        const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]);
-        if (target?.getHitbox) {
-            const hitbox = target.getHitbox(state);
-            state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-            state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-            setAreaSection(state, true);
-            checkForFloorEffects(state, state.hero);
-            fixCamera(state);
-        }
-        // Technically this could also be a MarkerDefinition.
-        const definition = target.definition as EntranceDefinition;
-        if (definition.locationCue) {
-            const textCue = new TextCue(state, { text: definition.locationCue});
-            addEffectToArea(state, state.areaInstance, textCue);
-        }
-        // Entering via a door requires some special logic to orient the
-        // character to the door properly.
-        if (definition.type === 'door') {
-            enterZoneByDoorCallback(state, targetObjectId, skipObject);
-        } else if (definition.type === 'teleporter') {
-            enterZoneByTeleporterCallback(state, targetObjectId);
-        }
-        callback?.(state);
+    enterLocation(state, objectLocation, {
+        instant,
+        callback: () => {
+            const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]);
+            if (target?.getHitbox) {
+                const hitbox = target.getHitbox(state);
+                state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+                state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+                setAreaSection(state, true);
+                checkForFloorEffects(state, state.hero);
+                fixCamera(state);
+            }
+            // Technically this could also be a MarkerDefinition.
+            const definition = target.definition as EntranceDefinition;
+            if (definition.locationCue) {
+                const textCue = new TextCue(state, { text: definition.locationCue});
+                addEffectToArea(state, state.areaInstance, textCue);
+            }
+            // Entering via a door requires some special logic to orient the
+            // character to the door properly.
+            if (definition.type === 'door') {
+                enterZoneByDoorCallback(state, targetObjectId, skipObject);
+            } else if (definition.type === 'teleporter') {
+                enterZoneByTeleporterCallback(state, targetObjectId);
+            }
+            callback?.(state);
+        },
     });
     return true;
 }

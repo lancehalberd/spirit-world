@@ -469,7 +469,9 @@ export class Door implements ObjectInstance {
         if (hero.isExitingDoor || !this.definition.targetZone || !this.definition.targetObjectId) {
             return false;
         }
-        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false);
+        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+            skipObject:this.definition,
+        });
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.definition.d === 'up' && this.status === 'closed' && this.definition.price) {
