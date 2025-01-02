@@ -230,7 +230,14 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             h: ((frame.content?.h ?? frame.h) * this.scale) | 0,
         };
         if (frame.anchor) {
-            hitbox.x -= (frame.anchor.x - (frame.content.x || 0));
+            if (
+                (this.enemyDefinition.flipRight && this.d === 'right')
+                || (this.enemyDefinition.flipLeft && this.d === 'left')
+            ) {
+                hitbox.x -= ((frame.content?.x || 0) + (frame.content?.w || frame.w) - frame.anchor.x);
+            } else {
+                hitbox.x -= (frame.anchor.x - (frame.content?.x || 0));
+            }
             hitbox.y -= (frame.anchor.y - (frame.content.y || 0));
         }
         return hitbox;
@@ -244,8 +251,15 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             h: ((frame.content?.h ?? frame.h) * this.scale) | 0,
         };
         if (frame.anchor) {
-            hitbox.x -= (frame.anchor.x - (frame.content.x || 0));
-            hitbox.y -= (frame.anchor.y - (frame.content.y || 0));
+            if (
+                (this.enemyDefinition.flipRight && this.d === 'right')
+                || (this.enemyDefinition.flipLeft && this.d === 'left')
+            ) {
+                hitbox.x -= ((frame.content?.x || 0) + (frame.content?.w || frame.w) - frame.anchor.x);
+            } else {
+                hitbox.x -= (frame.anchor.x - (frame.content?.x || 0));
+            }
+            hitbox.y -= (frame.anchor.y - (frame.content?.y || 0));
         }
         return hitbox;
     }

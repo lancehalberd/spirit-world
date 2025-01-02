@@ -748,6 +748,7 @@ interface SpecialAreaBehavior extends BaseSpecialBehavior<AreaInstance> {
 type SpecialBehavior
     = SpecialDoorBehavior
     | SpecialElevatorBehavior
+    | SpecialLootBehavior
     | SpecialNarrationBehavior
     | SpecialPushPullBehavior
     | SpecialSwitchBehavior

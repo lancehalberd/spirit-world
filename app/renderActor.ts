@@ -319,9 +319,10 @@ export function renderEnemyShadow(context: CanvasRenderingContext2D, state: Game
             const cy = hitbox.y + hitbox.h;
             const shadowRadius = enemy.enemyDefinition.shadowRadius ?? hitbox.w / 2;
             const fullScale = 1;
+            const enemyScale = enemy.enemyDefinition.scale || 1;
             context.translate(
-                cx + (enemy.enemyDefinition.shadowOffset?.x ?? 0),
-                cy + (enemy.enemyDefinition.shadowOffset?.y ?? 0)
+                cx + (enemy.enemyDefinition.shadowOffset?.x ?? 0) * enemyScale,
+                cy + (enemy.enemyDefinition.shadowOffset?.y ?? 0) * enemyScale - hitbox.w / 8,
             );
             context.scale(1, enemyShadowYScale);
             if (enemy.z === 0) {

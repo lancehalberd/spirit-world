@@ -167,6 +167,7 @@ enemyDefinitions.flameHeart = {
 enemyDefinitions.flameBeast = {
     naturalDifficultyRating: 100,
     abilities: [leapStrikeAbility],
+    shadowOffset: {x: 0, y: 6},
     animations: flameBeastAnimations, life: 80, update: updateFlameBeast,
     flipLeft: true,
     initialMode: 'hidden',
