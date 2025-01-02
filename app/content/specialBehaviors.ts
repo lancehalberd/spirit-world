@@ -9,3 +9,4 @@ export * from 'app/content/specialBehaviors/gauntlet';
 export * from 'app/content/specialBehaviors/instructions';
 export * from 'app/content/specialBehaviors/crater';
 export * from 'app/content/specialBehaviors/staffTower';
+export * from 'app/content/specialBehaviors/other';

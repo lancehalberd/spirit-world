@@ -706,6 +706,9 @@ interface BaseSpecialBehavior<T> {
 interface SpecialDoorBehavior extends BaseSpecialBehavior<Door> {
     type: 'door'
 }
+interface SpecialLootBehavior extends BaseSpecialBehavior<ObjectInstance> {
+    type: 'loot'
+}
 interface SpecialEnemyBehavior extends BaseSpecialBehavior<Enemy> {
     type: 'enemy'
 }

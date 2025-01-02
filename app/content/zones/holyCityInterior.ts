@@ -667,7 +667,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 452, y: 148, type: "loot", lootType: "money", lootAmount: 5},
         {status: "normal", id: "", x: 18, y: 210, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 65, y: 142, type: "loot", lootType: "money", lootAmount: 10},
-        {status: "normal", id: "moneyMazeMoney", x: 179, y: 83, type: "loot", lootType: "money", lootAmount: 50, hasCustomLogic: true, customLogic: "moneyMazePeachPiece", saveStatus: "never"},
+        {status: "normal", id: "moneyMazeMoney", x: 179, y: 83, type: "loot", lootType: "money", lootAmount: 50, customLogic: "moneyMazePeachPiece", saveStatus: "never", specialBehaviorKey: "moneyMazeMoneyPrize"},
         {status: "normal", id: "", x: 466, y: 66, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 194, y: 147, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 226, y: 67, type: "loot", lootType: "money", lootAmount: 10},
