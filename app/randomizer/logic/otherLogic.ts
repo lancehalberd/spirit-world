@@ -251,6 +251,9 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'caves',
         nodeId: 'ascentCaveSpiritBottom',
+        paths: [
+            {nodeId: 'ascentCaveSpiritTop', logic: andLogic(canRemoveHeavyStones, canNavigateSpiritAscentCave) },
+        ],
         entranceIds: ['caves-ascentEntranceSpirit'],
         exits: [
             {objectId: 'caves-ascentEntranceSpirit'}
