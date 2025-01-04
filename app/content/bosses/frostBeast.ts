@@ -456,7 +456,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'guard') {
             enemy.params.attackTheta = theta;
             moveEnemyToTargetLocation(state, enemy, targetX, targetY);
-            enemy.d = getCardinalDirection(Math.cos(theta), Math.sin(theta));
+            enemy.d = getCardinalDirection(Math.cos(theta), Math.sin(theta), enemy.d);
             enemy.changeToAnimation('idle')
             if (enemy.modeTime >= 2000) {
                 enemy.setMode('prepare');
@@ -507,7 +507,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             const breathRange = 128;
             let attackVector = getVectorToNearbyTarget(state, enemy, breathRange, enemy.area.allyTargets);
             if (attackVector) {
-                enemy.d = getCardinalDirection(attackVector.x, attackVector.y);
+                enemy.d = getCardinalDirection(attackVector.x, attackVector.y, enemy.d);
                 enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
                 enemy.setMode('frostBreathArc');
                 return;
@@ -515,7 +515,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             const chargeRange = 512;
             attackVector = getVectorToNearbyTarget(state, enemy, chargeRange, enemy.area.allyTargets);
             if (attackVector) {
-                enemy.d = getCardinalDirection(attackVector.x, attackVector.y);
+                enemy.d = getCardinalDirection(attackVector.x, attackVector.y, enemy.d);
                 enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
                 enemy.setMode('charge');
                 return;
@@ -533,7 +533,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                     } else if ((dTheta < 0 && dTheta >= -Math.PI) || dTheta >= Math.PI) {
                         enemy.params.attackTheta = (enemy.params.attackTheta - 0.05 + 2 * Math.PI) % (2 * Math.PI);
                     }
-                    enemy.d = getCardinalDirection(Math.cos(enemy.params.attackTheta), Math.sin(enemy.params.attackTheta));
+                    enemy.d = getCardinalDirection(Math.cos(enemy.params.attackTheta), Math.sin(enemy.params.attackTheta), enemy.d);
                 }
                 shootFrostInCone(state, enemy, enemy.params.attackTheta, 1, 5);
             }
@@ -596,27 +596,27 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         const shieldVector = getVectorToNearbyTarget(state, enemy, range, [heart]);
         // If the shield is gone, always prioritize restoring the shield.
         if (shieldVector && heart.params.shieldLevel <= 0) {
-            enemy.d = getCardinalDirection(shieldVector.x, shieldVector.y);
+            enemy.d = getCardinalDirection(shieldVector.x, shieldVector.y, enemy.d);
             enemy.params.attackTheta = atan3(shieldVector.y, shieldVector.x);
             enemy.setMode('frostBreath');
             return;
         }
         let attackVector = getVectorToNearbyTarget(state, enemy, range, enemy.area.allyTargets);
         if (attackVector) {
-            enemy.d = getCardinalDirection(attackVector.x, attackVector.y);
+            enemy.d = getCardinalDirection(attackVector.x, attackVector.y, enemy.d);
             enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
             enemy.setMode('frostBreathArc');
             return;
         }
         if (shieldVector && heart.params.shieldLevel < maxShieldLevel) {
-            enemy.d = getCardinalDirection(shieldVector.x, shieldVector.y);
+            enemy.d = getCardinalDirection(shieldVector.x, shieldVector.y, enemy.d);
             enemy.params.attackTheta = atan3(shieldVector.y, shieldVector.x);
             enemy.setMode('frostBreath');
             return;
         }
         attackVector = getVectorToNearbyTarget(state, enemy, range, enemy.area.neutralTargets.filter(o => o.definition?.type === 'torch' && o.status === 'active'));
         if (attackVector) {
-            enemy.d = getCardinalDirection(attackVector.x, attackVector.y);
+            enemy.d = getCardinalDirection(attackVector.x, attackVector.y, enemy.d);
             enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
             enemy.setMode('frostBreath');
             return;
@@ -636,7 +636,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                     } else if ((dTheta < 0 && dTheta >= -Math.PI) || dTheta >= Math.PI) {
                         enemy.params.attackTheta = (enemy.params.attackTheta - 0.05 + 2 * Math.PI) % (2 * Math.PI);
                     }
-                    enemy.d = getCardinalDirection(Math.cos(enemy.params.attackTheta), Math.sin(enemy.params.attackTheta));
+                    enemy.d = getCardinalDirection(Math.cos(enemy.params.attackTheta), Math.sin(enemy.params.attackTheta), enemy.d);
                 }
             }
             shootFrostInCone(state, enemy, enemy.params.attackTheta);
