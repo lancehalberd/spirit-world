@@ -3,7 +3,7 @@ import { appendScript, wait } from 'app/scriptEvents';
 import { enterLocation } from 'app/utils/enterLocation';
 
 
-export function returnToSpawnLocation(state: GameState) {
+export function returnToSpawnLocation(state: GameState, preserveZoneFlags = false) {
     state.hero.life = state.hero.savedData.maxLife;
     state.hero.displayLife = state.hero.life;
     // Only fill the magic bar if the hero has some magic regen.
@@ -31,7 +31,7 @@ export function returnToSpawnLocation(state: GameState) {
     // Do this before entering the new location, which may trigger new events.
     state.scriptEvents.queue = [];
     state.scriptEvents.activeEvents = [];
-    enterLocation(state, state.hero.savedData.spawnLocation, {instant: true});
+    enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags});
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
 
 

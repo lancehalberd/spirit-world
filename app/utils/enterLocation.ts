@@ -18,6 +18,7 @@ interface OptionalEnterLocationParams {
     callback?: () => void
     isMutation?: boolean
     doNotRefreshEditor?: boolean
+    preserveZoneFlags?: boolean
 }
 
 export function enterLocation(
@@ -27,7 +28,8 @@ export function enterLocation(
         callback,
         instant = false,
         isMutation = false,
-        doNotRefreshEditor = false
+        doNotRefreshEditor = false,
+        preserveZoneFlags = false,
     }: OptionalEnterLocationParams = {}
 ): void {
     // Remve astral projection when switching areas.
@@ -78,7 +80,6 @@ export function enterLocation(
         return;
     }
     // Clear zone flags when changing zones.
-    const preserveZoneFlags = false;
     if (!preserveZoneFlags && state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
         state.savedState.zoneFlags = {};
     }

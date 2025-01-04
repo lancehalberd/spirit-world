@@ -3,7 +3,7 @@ import { evaluateLogicDefinition } from 'app/content/logic';
 import { DoorStyleDefinition, doorStyles } from 'app/content/objects/doorStyles';
 import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
-import { playAreaSound } from 'app/musicController';
+import {playObjectSound} from 'app/musicController';
 import { renderHeroShadow } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
@@ -257,9 +257,9 @@ export class Door implements ObjectInstance {
             return;
         }
         if (!wasOpen && isOpen) {
-            playAreaSound(state, this.area, 'doorOpen');
+            playObjectSound(state, this, 'doorOpen');
         } else if (wasOpen && !isOpen && !this.renderOpen(state)) {
-            playAreaSound(state, this.area, 'doorClose');
+            playObjectSound(state, this, 'doorClose');
         }
     }
     getEditorHitbox(): Rect {
@@ -324,7 +324,7 @@ export class Door implements ObjectInstance {
             if (hit.element === 'fire') {
                 this.isFrozen = false;
                 saveObjectStatus(state, this.definition, true, 'melted');
-                playAreaSound(state, this.area, 'secretChime');
+                playObjectSound(state, this, 'secretChime');
                 return { hit: true };
             }
             return { hit: true, blocked: true };

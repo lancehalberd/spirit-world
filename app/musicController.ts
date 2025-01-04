@@ -1,4 +1,5 @@
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import {isObjectInCurrentSection} from 'app/utils/sections';
 import {
     fadeOutPlayingTracks,
     isATrackPlaying,
@@ -187,6 +188,26 @@ export function playAreaSound(state: GameState, area: AreaInstance, key: string)
         return;
     }
     if (!key || state.areaInstance !== area) {
+        return;
+    }
+    const audioInstance = playSound(key);
+    if (audioInstance?.sound.loop) {
+        state.loopingSoundEffects.push(audioInstance);
+    }
+    return audioInstance;
+}
+
+export function playObjectSound(state: GameState, object: ObjectInstance | EffectInstance, key: string): AudioInstance | undefined {
+    // Do not play area sound effects during the various title scenes. We run updated code
+    // during these scenes to render the location in the background, but we shouldn't be
+    // playing any sound effects.
+    if (state.scene != 'game') {
+        return;
+    }
+    if (!key || !object.area || state.areaInstance !== object.area) {
+        return;
+    }
+    if (!isObjectInCurrentSection(state, object)) {
         return;
     }
     const audioInstance = playSound(key);

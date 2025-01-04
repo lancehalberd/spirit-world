@@ -82,7 +82,8 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
     };
     fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);
-    returnToSpawnLocation(state);
+    // Preserve zone flags when entering zone initially.
+    returnToSpawnLocation(state, true);
 }
 
 export function getDefaultState(): GameState {

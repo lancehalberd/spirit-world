@@ -1,7 +1,8 @@
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { playAreaSound } from 'app/musicController';
-import { isPixelInShortRect } from 'app/utils/index';
-import { saveGame } from 'app/utils/saveGame';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {playAreaSound} from 'app/musicController';
+import {isPixelInShortRect} from 'app/utils/index';
+import {saveGame} from 'app/utils/saveGame';
+import {isObjectInCurrentSection} from 'app/utils/sections';
 
 export function initializeObject(state: GameState, object: ObjectInstance): void {
     // Do not apply special behavior here, as addObjectToArea can get called when persisting objects during
@@ -163,6 +164,8 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
 }
 
 export function activateTarget(state: GameState, target: ObjectInstance, playChime = false): void {
+    // Never play chime for objects not in the current section.
+    playChime = playChime && isObjectInCurrentSection(state, target);
     if (target.onActivate) {
         if (target.onActivate(state) && playChime) {
             playAreaSound(state, state.areaInstance, 'secretChime');
@@ -183,6 +186,7 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
         }
     }
 }
+
 
 export function deactivateTarget(state: GameState, target: ObjectInstance): void {
     if (target.onDeactivate) {

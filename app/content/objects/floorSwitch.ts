@@ -1,7 +1,7 @@
 import { renderIndicator } from 'app/content/objects/indicator';
 import { objectHash } from 'app/content/objects/objectHash';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { playAreaSound } from 'app/musicController';
+import {playObjectSound} from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 import { deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
@@ -66,20 +66,20 @@ export class FloorSwitch implements ObjectInstance {
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
             if (this.status === 'active') {
-                playAreaSound(state, this.area, 'switch');
+                playObjectSound(state, this, 'switch');
                 checkIfAllSwitchesAreActivated(state, this.area, this.definition);
             } else {
-                playAreaSound(state, this.area, 'smallSwitch');
+                playObjectSound(state, this, 'smallSwitch');
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
             }
             return;
         }
         // Don't apply the toggle effect on release unless toggleOnRelease is true.
         if (this.status === 'normal' && !this.definition.toggleOnRelease) {
-            playAreaSound(state, this.area, 'smallSwitch');
+            playObjectSound(state, this, 'smallSwitch');
             return;
         }
-        playAreaSound(state, this.area, 'switch');
+        playObjectSound(state, this, 'switch');
         if (this.status === 'active') {
             checkIfAllSwitchesAreActivated(state, this.area, this.definition);
         }
