@@ -143,7 +143,7 @@ function moveActorInDirection(
     // If this movement would move outside of the bounding rectangle, do not allow
     // it if it moves them further outside the rectangle, but do allow it otherwise.
     if (movementProperties.boundingBox) {
-        const hitbox = {...actor.getHitbox()};
+        const hitbox = {...actor.getMovementHitbox()};
         const v = directionMap[direction];
         hitbox.x += v[0] * amount;
         hitbox.y += v[1] * amount;
@@ -250,6 +250,14 @@ export function intersectRectangles({x, y, w, h}: Rect, {x: X, y: Y, w: W, h: H}
     return {x: l, y: t, w: r - l, h: b - t};
 }
 
+export function getMovementAnchor(actor: Actor): Point {
+    const hitbox = actor.getMovementHitbox?.() ?? actor.getHitbox();
+    return {
+         x: hitbox.x + hitbox.w / 2,
+         y: hitbox.y + hitbox.h / 2,
+    }
+}
+
 // Move an actor's so that the middle of their hitboxes moves towards a target location at a given speed per frame
 // and then returns the distance remaining.
 export function moveActorTowardsLocation(
@@ -258,8 +266,8 @@ export function moveActorTowardsLocation(
     {x, y}: Point,
     speed = 1
 ): number {
-    const hitbox = actor.getMovementHitbox?.() ?? actor.getHitbox();
-    const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
+    const anchor = getMovementAnchor(actor);
+    const dx = x - anchor.x, dy = y - anchor.y;
     actor.d = getCardinalDirection(dx, dy, actor.d);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > speed) {
@@ -271,7 +279,7 @@ export function moveActorTowardsLocation(
 }
 
 export function getDistanceToPoint(state: GameState, actor: Actor, {x, y}: Point) {
-    const hitbox = actor.getMovementHitbox?.() ?? actor.getHitbox();
-    const dx = x - (hitbox.x + hitbox.w / 2), dy = y - (hitbox.y + hitbox.h / 2);
+    const anchor = getMovementAnchor(actor);
+    const dx = x - anchor.x, dy = y - anchor.y;
     return Math.sqrt(dx * dx + dy * dy);
 }

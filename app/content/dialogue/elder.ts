@@ -1,8 +1,10 @@
 import { logicHash } from 'app/content/logic';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH, RIVAL_NAME } from 'app/gameConstants';
-import { appendCallback, appendScript, runBlockingCallback, wait } from 'app/scriptEvents';
+import {getMovementAnchor, moveActorTowardsLocation} from 'app/movement/moveActor';
+import {appendCallback, appendScript, runBlockingCallback, runPlayerBlockingCallback, wait} from 'app/scriptEvents';
 import { updateGenericHeroState } from 'app/updateActor';
+import {faceTarget} from 'app/utils/actor';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { saveGame } from 'app/utils/saveGame';
 import { moveEnemyToTargetLocation } from 'app/utils/enemies';
@@ -99,29 +101,22 @@ dialogueHash.elder = {
                         return false;
                     },
                 });
-                state.scriptEvents.activeEvents.push({
-                    type: 'update',
-                    update(state: GameState): boolean {
-                        state.hero.animationTime += FRAME_LENGTH;
-                        if (state.hero.x < 96) {
-                            state.hero.action = 'walking';
-                            state.hero.d = 'right';
-                            state.hero.x += 2;
-                            if (state.hero.y >= 200) {
-                                state.hero.y--;
-                            }
-                            return true;
-                        }
-                        if (state.hero.y >= 200) {
-                            state.hero.action = 'walking';
-                            state.hero.d = 'up';
-                            state.hero.y -= 2;
-                            return true;
-                        }
-                        state.hero.d = 'left';
-                        state.hero.action = null;
-                        return false;
-                    },
+                const anchor = getMovementAnchor(state.hero);
+                // Move the hero out of the line between where the rival and elder will stand during the cutscene.
+                const targetX = anchor.x < 60 ? Math.min(32, anchor.x) : Math.max(86, anchor.x);
+                // Make sure the hero is far enough south that the text box is render on the top half of the screen, otherwise
+                // the rival and the elder will be covered up.
+                const targetY = Math.max(175, Math.min(200, anchor.y));
+                runPlayerBlockingCallback(state, (state: GameState) => {
+                    state.hero.action = 'walking';
+                    // state.hero.d = 'down';
+                    state.hero.animationTime += FRAME_LENGTH;
+                    const heroIsMoving = moveActorTowardsLocation(state, state.hero, {x: targetX, y: targetY}, 1.5) > 0;
+                    if (heroIsMoving) {
+                        return true;
+                    }
+                    delete state.hero.action;
+                    faceTarget(state, state.hero, elder);
                 });
                 state.scriptEvents.activeEvents.push({
                     type: 'wait',
@@ -134,11 +129,14 @@ dialogueHash.elder = {
                 state.scriptEvents.queue.push({
                     type: 'callback',
                     callback(state: GameState) {
-                        elder.d = (elder.x < state.hero.x) ? 'right' : 'left';
+                        faceTarget(state, elder, state.hero);
                         elder.changeToAnimation('idle');
                     }
                 });
                 appendScript(state, `Here, drink this.`);
+                appendCallback(state, () => {
+                    faceTarget(state, state.hero, elder);
+                });
                 wait(state, 1000);
                 appendCallback(state, () => {
                     state.hero.life = state.hero.savedData.maxLife;
@@ -163,7 +161,7 @@ dialogueHash.elder = {
                 appendScript(state, `If you asked me you would know that they came with my blessing.`);
                 wait(state, 500);
                 appendCallback(state, (state: GameState) => {
-                    elder.d = (elder.x < state.hero.x) ? 'right' : 'left';
+                    faceTarget(state, elder, state.hero);
                     elder.changeToAnimation('idle');
                 });
                 appendScript(state, `Child, I appologize, I should have told ${RIVAL_NAME} you would be coming.`);

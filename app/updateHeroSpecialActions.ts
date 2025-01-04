@@ -597,7 +597,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy, {
             canJump: hero.action === 'thrown' && hero.z >= 12,
             canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
-            boundingBox: hero.action !== 'knockedHard' ? getSectionBoundingBox(state, hero) : undefined,
+            boundingBox: hero.action !== 'knockedHard' ? pad(getSectionBoundingBox(state, hero), -1) : undefined,
             excludedObjects
         });
         // The astral projection stays 4px off the ground.
