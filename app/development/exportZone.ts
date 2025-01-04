@@ -24,9 +24,12 @@ export function serializeZone(zone: Zone) {
                     area.layers.forEach(layer => {
                         for (let r = 0; r < layer.grid.h; r++) {
                             for (let c = 0; c < layer.grid.w; c++) {
+                                // Use tile 0 instead of tile 1 in the material world.
+                                if (!area.isSpiritWorld && layer.grid.tiles[r][c] == 1) {
+                                    layer.grid.tiles[r][c] = 0;
+                                }
                                 if (layer.grid.tiles[r][c]) {
                                     isEmpty = false;
-                                    return false;
                                 }
                             }
                         }
