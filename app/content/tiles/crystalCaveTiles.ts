@@ -145,8 +145,8 @@ const crystalCaveFloorDecorations: TileSource = {
         'all': { defaultLayer: 'floor2' },
     },
     tileCoordinates: [
-        [15, 5],                [18, 5],
-        [15, 6],        [17, 6],[18, 6],
+                [16, 5],[17, 5],[18, 5],
+                [16, 6],        [18, 6],
         [15, 7],[16, 7],[17, 7],[18, 7],
                         [17, 8],[18, 8],
                 [16, 9],[17, 9],[18, 9],

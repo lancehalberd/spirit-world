@@ -53,6 +53,7 @@ export const lava: TileSource = {
     },
 };
 // First tile is 1142
+// Tiles 1145 + 1149 used to be alternate solid lavaStone tiles, but are no longer defined.
 export const lavaStone: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/lavaAnimations.png', {x: 0, y: 80, w: 64, h: 80}),

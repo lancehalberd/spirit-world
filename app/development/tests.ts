@@ -1,4 +1,4 @@
-import {everyObject} from 'app/utils/every';
+import {everyArea, everyObject} from 'app/utils/every';
 import {getObjectSaveTreatment} from 'app/utils/objects';
 
 export const tests: {[key: string]: () => void} = {
@@ -16,7 +16,31 @@ export const tests: {[key: string]: () => void} = {
                 console.error(`Missing object id`, location, objectDefinition);
             }
         });
-    }
+    },
+    checkEmptyMaterialTiles() {
+        console.log('Test "checkEmptyMaterialTiles":')
+        const updatedZones = new Set<string>();
+        everyArea((location, zone, area) => {
+            if (area.isSpiritWorld) {
+                return;
+            }
+            for (const layer of area.layers) {
+                const tiles = layer.grid.tiles;
+                for (let y = 0; y < tiles.length; y++) {
+                    if (!tiles[y]) {
+                        continue;
+                    }
+                    for (let x = 0; x < tiles[y].length; x++) {
+                        if (tiles[y][x] === 1) {
+                            tiles[y][x] = 0;
+                            updatedZones.add(zone.key);
+                        }
+                    }
+                }
+            }
+        });
+        console.log('Removed bad empty tiles from material world in: ', [...updatedZones]);
+    },
 };
 window['tests'] = tests;
 
