@@ -10,7 +10,7 @@ const openEye = 52;
 const rectangle = 53;
 
 
-export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
     const floorLayer = getOrAddLayer('floor', area, alternateArea);
     const floor2Tiles = getOrAddLayer('floor2', area, alternateArea).grid.tiles;
     const floorTiles = floorLayer.grid.tiles;
@@ -33,7 +33,7 @@ export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, 
     }
 }
 
-export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
     const floorLayer = getOrAddLayer('floor', area, alternateArea);
     const floor2Tiles = getOrAddLayer('floor2', area, alternateArea).grid.tiles;
     const floorTiles = floorLayer.grid.tiles;
@@ -79,7 +79,7 @@ export function addCaveRoomFrame(random: SRandom, node: TreeNode) {
 
 // Adds cave walls everywhere that is currently solid in the field layer.
 // This assumes cave wall height is 2, but this could be generalized to support taller cave walls.
-export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
     const fieldLayer = getOrAddLayer('field', area, alternateArea);
     const foregroundLayer = getOrAddLayer('foreground', area, alternateArea);
     const foreground2Layer = getOrAddLayer('foreground2', area, alternateArea);

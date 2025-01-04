@@ -9,7 +9,7 @@ const fancyStoneTile = 1216;
 const fancierStoneTile = 1215;
 const fanciestStoneTile = 1214;
 
-export function createStoneFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+export function createStoneFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
     const floorLayer = getOrAddLayer('floor', area, alternateArea);
     const tiles = floorLayer.grid.tiles;
     for (let y = 0; y < r.h; y++) {
@@ -38,7 +38,7 @@ export function createStoneFloor(random: SRandom, area: AreaDefinition, r: Rect,
         }
     }
 }
-export function createSpecialStoneFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+export function createSpecialStoneFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
     const floorLayer = getOrAddLayer('floor', area, alternateArea);
     const tiles = floorLayer.grid.tiles;
     for (let y = 0; y < r.h; y++) {
@@ -69,7 +69,7 @@ export function createSpecialStoneFloor(random: SRandom, area: AreaDefinition, r
 
 // Adds stone walls everywhere that is currently solid in the field layer.
 // This assumes stone wall height is 2, but this could be generalized to support taller stone walls.
-export function applyStoneWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+export function applyStoneWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
     const fieldLayer = getOrAddLayer('field', area, alternateArea);
     const foregroundLayer = getOrAddLayer('foreground', area, alternateArea);
     const foreground2Layer = getOrAddLayer('foreground2', area, alternateArea);

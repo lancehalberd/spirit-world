@@ -3,7 +3,7 @@ import { getOrAddLayer } from 'app/utils/layers';
 
 // const floor2Tiles = [793, 796, 797, 799, 800];
 
-export function applyNineSlice(random: SRandom, slice: NineSlice, r: Rect, area: AreaDefinition, alternateArea?: AreaDefinition): void {
+export function applyNineSlice(random: SRandom, slice: NineSlice, r: Rect, area: AreaDefinition, alternateArea: AreaDefinition): void {
     // Height of bottom slice
     const B = slice.h - (slice.r.y + slice.r.h);
     // Width of right slice
@@ -12,7 +12,7 @@ export function applyNineSlice(random: SRandom, slice: NineSlice, r: Rect, area:
         const areaLayer = getOrAddLayer(sliceLayer.key, area, alternateArea);
         // If the alternate area is the spirit world, then we will automatically erase the tiles changed so that
         // the new tiles will be inherited by the spirit world.
-        const alternateAreaLayer = alternateArea?.isSpiritWorld && getOrAddLayer(sliceLayer.key, alternateArea);
+        const alternateAreaLayer = alternateArea?.isSpiritWorld && getOrAddLayer(sliceLayer.key, alternateArea, area);
         // Top
         for (let y = 0; y < r.h; y++) {
             const tY = r.y + y;

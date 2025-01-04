@@ -3,10 +3,10 @@ import { applyCaveWalls } from 'app/generator/styles/cave';
 import { createStoneFloor, createSpecialStoneFloor } from 'app/generator/styles/stone';
 
 
-type ChunkGenerator = (random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) => void
+type ChunkGenerator = (random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) => void
 
 function combinedGenerator(generators: ChunkGenerator[]): ChunkGenerator {
-    return function(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+    return function(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
         for (const generator of generators) {
             random.generateAndMutate();
             generator(random, area, r, alternateArea);
@@ -15,7 +15,7 @@ function combinedGenerator(generators: ChunkGenerator[]): ChunkGenerator {
 }
 
 export const chunkGenerators: {[key: string]: ChunkGenerator} = {
-    clear(random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) {
+    clear(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
         for (const layer of area.layers) {
             for (let y = r.y; y < r.y + r.h; y++) {
                 if (y >= layer.grid.h) {
@@ -36,7 +36,7 @@ export const chunkGenerators: {[key: string]: ChunkGenerator} = {
 };
 
 for (const key of Object.keys(slices) as (keyof typeof slices)[]) {
-    chunkGenerators[`slices-${key}`] = (random: SRandom, area: AreaDefinition, r: Rect, alternateArea?: AreaDefinition) => {
+    chunkGenerators[`slices-${key}`] = (random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) => {
         applyNineSlice(random, slices[key], r, area, alternateArea);
     };
 }

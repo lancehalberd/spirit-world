@@ -7,7 +7,7 @@ export function addNewLayer(
     layerKey: string,
     layerIndex: number,
     definition: AreaDefinition,
-    alternateDefinition?: AreaDefinition,
+    alternateDefinition: AreaDefinition,
 ): AreaLayerDefinition {
     const areaSize = getAreaDimensions(definition);
     const layerDefinition: AreaLayerDefinition = {
@@ -39,7 +39,7 @@ export function addNewLayer(
 export function addMissingLayer(
     layerKey: string,
     definition: AreaDefinition,
-    alternateDefinition?: AreaDefinition,
+    alternateDefinition: AreaDefinition,
 ): AreaLayerDefinition {
     const layerIndex = layersInOrder.indexOf(layerKey);
     for (let i = 0; i < definition.layers.length; i++) {
@@ -53,7 +53,7 @@ export function addMissingLayer(
 export function getOrAddLayer(
     layerKey: string,
     definition: AreaDefinition,
-    alternateDefinition?: AreaDefinition,
+    alternateDefinition: AreaDefinition,
 ) {
     for (const layer of definition.layers) {
         if (layer.key === layerKey) {
@@ -75,7 +75,7 @@ export function inheritLayerTilesFromParent(layerKey: string, area: AreaDefiniti
     if (!parentLayer) {
         return;
     }
-    const childLayer = getOrAddLayer(layerKey, area);
+    const childLayer = getOrAddLayer(layerKey, area, area.parentDefinition);
     const childTiles = childLayer.grid.tiles;
     r = r || {x: 0, y: 0, w: childLayer.grid.w, h: childLayer.grid.h};
     for (let y = r.y; y < r.y + r.h; y++) {

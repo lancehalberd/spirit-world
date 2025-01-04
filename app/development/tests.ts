@@ -17,20 +17,28 @@ export const tests: {[key: string]: () => void} = {
             }
         });
     },
-    checkEmptyMaterialTiles() {
-        console.log('Test "checkEmptyMaterialTiles":')
+    checkEmptyTiles() {
+        console.log('Test "checkEmptyTiles":')
         const updatedZones = new Set<string>();
         everyArea((location, zone, area) => {
-            if (area.isSpiritWorld) {
-                return;
-            }
-            for (const layer of area.layers) {
+            for (let i = 0; i < area.layers.length; i++) {
+                const layer = area.layers[i];
+                const parentLayer = area.parentDefinition?.layers?.[i];
+                if (parentLayer && parentLayer.key !== layer.key) {
+                    console.error('layer key mismatch', location, area.layers, area.parentDefinition.layers);
+                }
                 const tiles = layer.grid.tiles;
+                const parentTiles = parentLayer?.grid.tiles;
                 for (let y = 0; y < tiles.length; y++) {
                     if (!tiles[y]) {
                         continue;
                     }
                     for (let x = 0; x < tiles[y].length; x++) {
+                        // The `1` tile is valid in the spirit world as long as the parent tiles is
+                        // not falsey or 1.
+                        if (area.isSpiritWorld && parentTiles?.[y]?.[x] && parentTiles?.[y]?.[x] !== 1) {
+                            continue;
+                        }
                         if (tiles[y][x] === 1) {
                             tiles[y][x] = 0;
                             updatedZones.add(zone.key);
@@ -40,7 +48,7 @@ export const tests: {[key: string]: () => void} = {
             }
         });
         if (updatedZones.size) {
-            console.error('Removed bad empty tiles from material world in: ', [...updatedZones]);
+            console.error('Removed bad empty tiles in: ', [...updatedZones]);
         }
     },
 };

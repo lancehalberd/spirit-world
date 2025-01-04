@@ -78,7 +78,7 @@ const raisedPlanterSlot: SlotGenerator = {
             y: slot.y + 1,
             w: slot.w - 2,
             h: slot.h - 3,
-        }, baseArea);
+        }, baseArea, childArea);
         const fieldLayer = getOrAddLayer('field', baseArea, childArea);
         const y = slot.y + slot.h - 2;
         for (let x = slot.x + 2; x < slot.x + slot.w - 2; x++) {

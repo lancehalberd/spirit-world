@@ -20,7 +20,7 @@ function addStoneRoomFrame(random: SRandom, node: TreeNode) {
         x: section.x + 1,
         w: section.w - 1,
     };
-    chunkGenerators.stoneRoom(random, node.baseArea, section);
+    chunkGenerators.stoneRoom(random, node.baseArea, section, node.childArea);
     inheritAllLayerTilesFromParent(node.childArea, node.childAreaSection);
 }
 
@@ -82,7 +82,7 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
     const section = node.baseAreaSection;
     const columnXValues = [];
     const rowYValues = [];
-    const floor2Tiles = getOrAddLayer('floor2', baseArea).grid.tiles;
+    const floor2Tiles = getOrAddLayer('floor2', baseArea, node.childArea).grid.tiles;
     // Create pit columns.
     for (let tx = 6; tx <= 26; tx += 4) {
         if (tx <= section.x + 2 || tx >= section.x + section.w - 2) {
@@ -358,20 +358,20 @@ export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkele
                 y,
                 w: cx - (innerRect.x + 1) + 1,
                 h,
-            }, baseArea);
+            }, baseArea, childArea);
             applyNineSlice(random, slices.innerStoneWalls, {
                 x: cx + 1,
                 y,
                 w: innerRect.x + innerRect.w - 1 - (cx + 1),
                 h,
-            }, baseArea);
+            }, baseArea, childArea);
         } else {
             applyNineSlice(random, slices.innerStoneWalls, {
                 x: innerRect.x + 1,
                 y,
                 w: innerRect.w - 2,
                 h,
-            }, baseArea);
+            }, baseArea, childArea);
         }
     }
     const slotAndPathCount = 2 * slotCount + ((hasNorthDoor && hasSouthDoor) ? 1 : 0);
@@ -427,7 +427,7 @@ export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkelet
     const paths: RoomPath[] = [];
     let left = 1000, right = 0;
     const section = node.baseAreaSection;
-    const fieldTiles = getOrAddLayer('field', node.baseArea).grid.tiles;
+    const fieldTiles = getOrAddLayer('field', node.baseArea, node.childArea).grid.tiles;
     // Fill the entire section with walls that we will later clear out.
     for (let y = section.y; y < section.y + section.h; y++) {
         for (let x = section.x; x < section.x + section.w; x++) {

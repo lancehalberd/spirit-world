@@ -13,7 +13,7 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
     const baseArea = area.parentDefinition ? alternateArea : area;
     const childArea = area.parentDefinition ? area : alternateArea;
 
-    chunkGenerators.stoneRoom(random, baseArea, section);
+    chunkGenerators.stoneRoom(random, baseArea, section, childArea);
     const innerRect = {
         x: section.x + 1,
         y: section.y + 3,
@@ -82,20 +82,20 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
                     y,
                     w: cx - (innerRect.x + 1) + 1,
                     h,
-                }, baseArea);
+                }, baseArea, childArea);
                 applyNineSlice(random, slices.innerStoneWalls, {
                     x: cx + 1,
                     y,
                     w: innerRect.x + innerRect.w - 1 - (cx + 1),
                     h,
-                }, baseArea);
+                }, baseArea, childArea);
             } else {
                 applyNineSlice(random, slices.innerStoneWalls, {
                     x: innerRect.x + 1,
                     y,
                     w: innerRect.w - 2,
                     h,
-                }, baseArea);
+                }, baseArea, childArea);
             }
         }
         y += h;

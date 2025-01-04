@@ -18,8 +18,8 @@ export function clearTileInOneWorld(area: AreaDefinition, alternateArea: AreaDef
     if (area === baseArea) {
         // To clear tiles from the baseArea but keep them in the child area, they must be explicitly set in the child area first and then cleared
         // from the base world.
-        const baseLayer = getOrAddLayer(layerKey, area);
-        const childLayer = getOrAddLayer(layerKey, alternateArea);
+        const baseLayer = getOrAddLayer(layerKey, area, alternateArea);
+        const childLayer = getOrAddLayer(layerKey, alternateArea, area);
         baseLayer.grid.tiles[ty] = baseLayer.grid.tiles[ty] || [];
         childLayer.grid.tiles[ty] = childLayer.grid.tiles[ty] || [];
         if (!childLayer.grid.tiles[ty][tx]) {
@@ -27,7 +27,7 @@ export function clearTileInOneWorld(area: AreaDefinition, alternateArea: AreaDef
         }
         baseLayer.grid.tiles[ty][tx] = 0;
     } else {
-        const childLayer = getOrAddLayer(layerKey, area);
+        const childLayer = getOrAddLayer(layerKey, area, alternateArea);
         childLayer.grid.tiles[ty] = childLayer.grid.tiles[ty] || [];
         childLayer.grid.tiles[ty][tx] = 1;
     }
