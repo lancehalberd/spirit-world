@@ -62,26 +62,36 @@ export const frostHeartSurfaceAnimations = {
 export const frostHeartWaterAnimations = {
     idle: omniAnimation(frostHeartWaterIdleAnimation),
 };
-// idle frames 0, 5, 9, 12, 19
-const frostHeartShieldAnimations = [
-    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry),
-    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 1, cols: 5}, {loop: false}),
-    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 6, cols: 4}, {loop: false}),
-    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 10, cols: 3}, {loop: false}),
-    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 13, cols: 7}, {loop: false}),
+const frostHeartShieldDamagedAnimations = [
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 0, cols: 4}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 4, cols: 4}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 8, cols: 4}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 12, cols: 4}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 16, cols: 4}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 20, cols: 4}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 24, cols: 6}, {loop: false}),
 ];
+const frostHeartShieldGrowingAnimations = [
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 0, cols: 3}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 3, cols: 2}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 5, cols: 2}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 7, cols: 2}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 9, cols: 2}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 11, cols: 2}, {loop: false}),
+    createAnimation('gfx/bosses/frostHeartShieldGrow.png', frostGeometry, {x: 13, cols: 1}, {loop: false}),
+];
+const maxShieldLevel = frostHeartShieldGrowingAnimations.length;
 
 interface FrostHeartParams {
     chargeLevel: number
     enrageLevel: number
     enrageTime?: number
-    shieldLife: number
-    shieldAnimation: FrameAnimation
-    shieldAnimationTime: number
+    shieldLevel: number
+    targetShieldLevel: number
     active?: boolean
 }
 
-const maxShieldLife = 20;
+
 
 enemyDefinitions.frostHeart = {
     naturalDifficultyRating: 20,
@@ -89,9 +99,8 @@ enemyDefinitions.frostHeart = {
     animations: frostHeartSurfaceAnimations, life: 50, scale: 2, touchDamage: 1, params: {
         chargeLevel: 0,
         enrageLevel: 0,
-        shieldLife: maxShieldLife,
-        shieldAnimation: frostHeartShieldAnimations[0],
-        shieldAnimationTime: 0,
+        shieldLevel: maxShieldLevel,
+        targetShieldLevel: maxShieldLevel,
     },
     immunities: ['ice'],
     elementalMultipliers: {'fire': 1.5, 'lightning': 1.2},
@@ -99,7 +108,7 @@ enemyDefinitions.frostHeart = {
     renderOver: renderIceShield,
     getHitbox(enemy: Enemy<FrostHeartParams>) {
         const hitbox = enemy.getDefaultHitbox();
-        if (enemy.params.shieldLife > 0) {
+        if (enemy.params.shieldLevel > 0) {
             return {
                 x: hitbox.x - 24,
                 y: hitbox.y - 4,
@@ -131,13 +140,15 @@ enemyDefinitions.frostHeart = {
     },
     onHit(state: GameState, enemy: Enemy<FrostHeartParams>, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
-        if (enemy.params.shieldLife > 0) {
+        if (enemy.params.shieldLevel > 0) {
             if (hit.damage && hit.element === 'fire') {
                 if (enemy.enemyInvulnerableFrames > 0) {
                     return {};
                 }
-                enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
-                updateShieldAnimation(enemy);
+                // What the shield's effective max life is relative to the player's damage.
+                const maxShieldLife = 20;
+                let shieldLife = enemy.params.shieldLevel / maxShieldLevel * maxShieldLife - hit.damage;
+                enemy.params.targetShieldLevel = Math.max(0, Math.min(enemy.params.targetShieldLevel - 1, Math.floor(shieldLife / maxShieldLife * maxShieldLevel)));
                 enemy.enemyInvulnerableFrames = 20;
                 enemy.makeSound(state, 'enemyHit');
                 return { hit: true };
@@ -148,12 +159,7 @@ enemyDefinitions.frostHeart = {
             if (enemy.blockInvulnerableFrames > 0) {
                 return {};
             }
-            //console.log('healed shield', enemy.params.shieldLife, hit.damage, state.time);
-            enemy.params.shieldLife = Math.min(maxShieldLife, enemy.params.shieldLife + hit.damage);
-            updateShieldAnimation(enemy);
-            // Skip the damage frames animation when the shield is gaining life.
-            enemy.params.shieldAnimationTime = 2000;
-            //console.log('healed shield', enemy.params.shieldLife);
+            enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
             enemy.blockInvulnerableFrames = 50;
             enemy.playBlockSound(state);
             return { hit: true };
@@ -165,21 +171,10 @@ enemyDefinitions.frostHeart = {
         return enemy.defaultOnHit(state, hit);
     },
     getShieldPercent(state: GameState, enemy: Enemy<FrostHeartParams>) {
-        return enemy.params.shieldLife / maxShieldLife;
+        return enemy.params.shieldLevel / maxShieldLevel;
     },
     update: updateFrostHeart,
 };
-
-function updateShieldAnimation(enemy: Enemy<FrostHeartParams>) {
-    const maxIndex = frostHeartShieldAnimations.length - 1;
-    const animationIndex = maxIndex - Math.floor(maxIndex * enemy.params.shieldLife / maxShieldLife);
-    const oldAnimation = enemy.params.shieldAnimation;
-    enemy.params.shieldAnimation = frostHeartShieldAnimations[animationIndex];
-    // Play the damage animation if we switched to a new frame.
-    if (oldAnimation !== enemy.params.shieldAnimation) {
-        enemy.params.shieldAnimationTime = 0;
-    }
-}
 
 enemyDefinitions.frostBeast = {
     naturalDifficultyRating: 100,
@@ -215,16 +210,26 @@ function isFrostBeastHidden(enemy: Enemy) {
     return (enemy.area?.underwater && !enemy.params.submerged) || (!enemy.area?.underwater && enemy.params.submerged);
 }
 
-function getFrostHeart(state: GameState, area: AreaInstance): Enemy {
-    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostHeart') as Enemy;
+function getFrostHeart(state: GameState, area: AreaInstance): Enemy<FrostHeartParams> {
+    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostHeart') as Enemy<FrostHeartParams>;
 }
 
 function getFrostSerpent(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostBeast') as Enemy;
 }
 
+/*function getShieldLevel(enemy: Enemy<FrostHeartParams>): number {
+    return Math.ceil(enemy.params.shieldLevel);
+}*/
+
 function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): void {
-    enemy.params.shieldAnimationTime += FRAME_LENGTH;
+    if (enemy.params.shieldLevel < enemy.params.targetShieldLevel) {
+        // The shield takes a minimum of 2 seconds to fully regenerate.
+        enemy.params.shieldLevel = Math.min(enemy.params.targetShieldLevel, enemy.params.shieldLevel + FRAME_LENGTH / 1000 * maxShieldLevel / 2);
+    } else if (enemy.params.shieldLevel > enemy.params.targetShieldLevel) {
+        // The shield takes a minimum of 1 second to be fully destroyed.
+        enemy.params.shieldLevel = Math.max(enemy.params.targetShieldLevel, enemy.params.shieldLevel - FRAME_LENGTH / 1000 * maxShieldLevel);
+    }
     // The surface+underwater heart are actually two bosses in two different areas that
     // are combined as if a single boss. Simlarly for the serpents.
     let surfaceHeart, underwaterHeart;
@@ -253,7 +258,7 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
     if (enemy === underwaterHeart && surfaceHeart?.params?.active) {
         enemy.life = surfaceHeart.life;
         surfaceHeart.params.active = false;
-        surfaceHeart.params.shieldLife = maxShieldLife;
+        surfaceHeart.params.shieldLevel = maxShieldLevel;
     } else if (enemy === surfaceHeart && underwaterHeart?.params?.active) {
         enemy.life = underwaterHeart.life;
         underwaterHeart.params.active = false;
@@ -262,11 +267,11 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
     enemy.params.active = true;
     // The frost heart does nothing when attacking it from under the water.
     if (enemy.area.underwater) {
-        enemy.params.shieldLife = 0;
+        enemy.params.shieldLevel = 0;
         enemy.shielded = false;
         return;
     }
-    enemy.shielded = enemy.params.shieldLife > 0;
+    enemy.shielded = enemy.params.shieldLevel > 0;
     if (enemy.params.enrageTime > 0) {
         enemy.params.enrageTime -= FRAME_LENGTH;
         if (enemy.params.enrageTime < 3000) {
@@ -280,7 +285,7 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
                         ty: hitbox.y + hitbox.h / 2 + 2.5 * 16 * p * Math.sin(theta),
                     }, {damage: 2, source: enemy});
                 }
-                enemy.params.shieldLife = Math.min(maxShieldLife, enemy.params.shieldLife + 1);
+                enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
             }
         } else if (enemy.modeTime % 200 === 0) {
             const theta = 2 * Math.PI * Math.random();
@@ -288,21 +293,21 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
                 tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
                 ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
             }, {damage: 2, source: enemy});
-            enemy.params.shieldLife = Math.min(maxShieldLife, enemy.params.shieldLife + 1);
+            enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
         }
         return;
     }
     if (enemy.life <= enemy.enemyDefinition.life * 0.7 && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
         enemy.params.enrageTime = 5000;
-        enemy.params.shieldLife = Math.min(maxShieldLife, enemy.params.shieldLife + 1);
+        enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
         enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
     } else if (enemy.life <= enemy.enemyDefinition.life * 0.3 && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
         enemy.params.enrageTime = 7000;
-        enemy.params.shieldLife = Math.min(maxShieldLife, enemy.params.shieldLife + 1);
+        enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
         enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
@@ -328,26 +333,38 @@ function renderIceShield(context: CanvasRenderingContext2D, state: GameState, en
         return;
     }
     // Make sure we wait for the final shield animation to finish before we stop rendering the shield.
-    if (enemy.params.shieldLife <= 0 && enemy.params.shieldAnimationTime > enemy.params.shieldAnimation.duration) {
+    if (enemy.params.shieldLevel <= 0) {
         return;
     }
-    //enemy.renderFrozenEffect(context, enemy.params.shieldLife / 8);
-    const frame = getFrame(enemy.params.shieldAnimation, enemy.params.shieldAnimationTime);
-    //context.save();
-        const hitbox = enemy.getHitbox();
-        //const targetWidth = 2 * p + hitbox.w;
-        //const targetHeight = 2 * p + hitbox.h;
-        const scale = enemy.scale;
-        //const scale = enemy.scale;// Math.round(Math.max(1, targetWidth / 24, targetHeight / 24) * 2) / 2;
-        // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
-        drawFrame(context, frame, {
-            x: hitbox.x - (frame.w * scale - hitbox.w) / 2,
-            y: hitbox.y + hitbox.h - frame.h * scale + 8 * scale,
-            w: frame.w * scale,
-            h: frame.h * scale,
-        });
-        //drawFrameContentAt(context, frame, {x: enemy.x + 4, y: enemy.y - 20});
-    //context.restore();
+    // By default use the static frame for the current shield level.
+    let frame = frostHeartShieldDamagedAnimations[maxShieldLevel - Math.ceil(enemy.params.shieldLevel)].frames[0];
+    if (enemy.params.shieldLevel % 1) {
+        if (enemy.params.shieldLevel > enemy.params.targetShieldLevel) {
+            // Render shield hurt animation.
+            // The first frame of this animation is the full frame for the previous shield level.
+            const index = maxShieldLevel - Math.ceil(enemy.params.shieldLevel);
+            const animation = frostHeartShieldDamagedAnimations[index];
+            const frameIndex = Math.floor(animation.frames.length * (1 - (enemy.params.shieldLevel % 1)));
+            //console.log('hurt', index, frameIndex);
+            frame = animation.frames[frameIndex];
+        } else if (enemy.params.shieldLevel < enemy.params.targetShieldLevel) {
+            // Render shield growing animation.
+            const index = Math.floor(enemy.params.shieldLevel);
+            const animation = frostHeartShieldGrowingAnimations[index];
+            const frameIndex = Math.floor(animation.frames.length * (enemy.params.shieldLevel % 1));
+            //console.log('healed', index, frameIndex);
+            frame = animation.frames[frameIndex];
+        }
+    }
+    const hitbox = enemy.getHitbox();
+    const scale = enemy.scale;
+    // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+    drawFrame(context, frame, {
+        x: hitbox.x - (frame.w * scale - hitbox.w) / 2,
+        y: hitbox.y + hitbox.h - frame.h * scale + 8 * scale,
+        w: frame.w * scale,
+        h: frame.h * scale,
+    });
 }
 
 
@@ -578,7 +595,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         const range = 96;
         const shieldVector = getVectorToNearbyTarget(state, enemy, range, [heart]);
         // If the shield is gone, always prioritize restoring the shield.
-        if (shieldVector && heart.params.shieldLife <= 0) {
+        if (shieldVector && heart.params.shieldLevel <= 0) {
             enemy.d = getCardinalDirection(shieldVector.x, shieldVector.y);
             enemy.params.attackTheta = atan3(shieldVector.y, shieldVector.x);
             enemy.setMode('frostBreath');
@@ -591,7 +608,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             enemy.setMode('frostBreathArc');
             return;
         }
-        if (shieldVector && heart.params.shieldLife < maxShieldLife) {
+        if (shieldVector && heart.params.shieldLevel < maxShieldLevel) {
             enemy.d = getCardinalDirection(shieldVector.x, shieldVector.y);
             enemy.params.attackTheta = atan3(shieldVector.y, shieldVector.x);
             enemy.setMode('frostBreath');
