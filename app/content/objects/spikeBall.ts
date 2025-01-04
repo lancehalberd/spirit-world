@@ -79,7 +79,7 @@ export class SpikeBall implements ObjectInstance {
         let frame: Frame = getFrame(spikeBallAnimation, this.animationTime);
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
     }
-    renderPreview(context: CanvasRenderingContext2D, target: Rect) {
+    renderPreview(context: CanvasRenderingContext2D, target: Rect = this.getHitbox()) {
         let frame: Frame = getFrame(spikeBallAnimation, this.animationTime);
         drawFrameCenteredAt(context, frame, target);
     }

@@ -2,6 +2,9 @@ import { zones } from 'app/content/zones/zoneHash';
 
 export function everyZone(callback: (location: Partial<ZoneLocation>, zone: Zone) => void ) {
     for (const zoneKey in zones) {
+        if (zoneKey === 'tileMapping') {
+            continue;
+        }
         callback({zoneKey}, zones[zoneKey]);
     }
 }

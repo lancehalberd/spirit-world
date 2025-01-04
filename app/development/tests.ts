@@ -39,7 +39,9 @@ export const tests: {[key: string]: () => void} = {
                 }
             }
         });
-        console.log('Removed bad empty tiles from material world in: ', [...updatedZones]);
+        if (updatedZones.size) {
+            console.error('Removed bad empty tiles from material world in: ', [...updatedZones]);
+        }
     },
 };
 window['tests'] = tests;
