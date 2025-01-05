@@ -26,42 +26,51 @@ import { getVectorToNearbyTarget } from 'app/utils/target';
 const frostGeometry = {w: 56, h: 56, content: {x: 18, y: 30, w: 26, h: 20}};
 //const frostSurfaceGeometry = {w: 56, h: 28, content: {x: 18, y: 18, w: 26, h: 10}};
 const frostSurfaceGeometry = {w: 56, h: 32, content: {x: 18, y: 22, w: 26, h: 10}};
-const frostWaterGeometry = {w: 56, h: 28, content: {x: 18, y: 18, w: 26, h: 10}};
-/*export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
-const [frostHeartCanvas, frostHeartContext] = createCanvasAndContext(iceElement.w * 4, iceElement.h * 2);
-const createFrostAnimation = async () => {
-    await allImagesLoaded();
-    drawFrame(frostHeartContext, iceElement, {x: 0, y: 0, w: iceElement.w * 2, h: iceElement.h * 2});
-    frostHeartContext.save();
-        frostHeartContext.translate((iceElement.w + iceElement.content.x + iceElement.content.w / 2) * 2, 0);
-        frostHeartContext.scale(-1, 1);
-        drawFrame(frostHeartContext, iceElement, {
-            x: 2* (-iceElement.content.w / 2 - iceElement.content.x), y: 0,
-            w: iceElement.w * 2, h: iceElement.h * 2
-        });
-    frostHeartContext.restore();
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 0, y: iceElement.h - 2});
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: iceElement.w, y: iceElement.h});
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 2 * iceElement.w, y: iceElement.h});
-    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 3 * iceElement.w, y: iceElement.h - 2});
-}
-createFrostAnimation();
-const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
-*/
+const frostWaterGeometry = {w: 56, h: 28, content: {x: 18, y: 8, w: 26, h: 12}};
+
 const shallowGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 11, w: 16, h: 5}};
 const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeometry, {cols: 3, duration: 10});
-const frostHeartIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostGeometry, {cols: 8, frameMap: [0,1,2,3,4,5,6,7,6,5,4,3,2,1]});
-const frostHeartSurfaceIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostSurfaceGeometry, {cols: 8, frameMap: [0,1,2,3,4,5,6,7,6,5,4,3,2,1]});
-const frostHeartWaterIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostWaterGeometry, {top: 28, cols: 8, frameMap: [0,1,2,3,4,5,6,7,6,5,4,3,2,1]});
+const frameMap = [7,8,9,10,11,12,13,14,0,1,2,3,4,5,6];
+const frostHeartIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostGeometry, {cols: 15, duration: 4, frameMap});
+const frostHeartSurfaceIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostSurfaceGeometry, {cols: 15, duration: 4, frameMap});
+const frostHeartWaterIdleAnimation = createAnimation('gfx/bosses/frostHeartIdle.png', frostWaterGeometry, {top: 28, cols: 15, duration: 4, frameMap});
+
+const frostHeartSurfaceDamagedAnimation = createAnimation('gfx/bosses/frostHeartDamaged.png', frostSurfaceGeometry, {x: 8, cols: 8, duration: 3});
+const frostHeartWaterDamagedAnimation = createAnimation('gfx/bosses/frostHeartDamaged.png', frostWaterGeometry, {x: 8, top: 28, cols: 8, duration: 3});
+
+
+const frostHeartSurfaceDeathAnimation = createAnimation('gfx/bosses/frostHeartDamaged.png', frostSurfaceGeometry, {x: 10, cols: 2, duration: 3});
+const frostHeartWaterDeathAnimation = createAnimation('gfx/bosses/frostHeartDamaged.png', frostWaterGeometry, {x: 10, top: 28, cols: 2, duration: 3});
+
+// This is the frame duration for the attack animations. The animation is 300ms per frame duration.
+const duration = 2;
+// This is the animationTime at which it is ideal for the Frost Heart to emit attacks in order to line up with the attack animation.
+const frostHeartAttackFrameTime = 4 * FRAME_LENGTH * duration;
+const frostHeartSurfaceAttackAnimation = createAnimation('gfx/bosses/frostHeartAttack.png', frostSurfaceGeometry, {cols: 15, duration});
+const frostHeartWaterAttackAnimation = createAnimation('gfx/bosses/frostHeartAttack.png', frostWaterGeometry, {cols: 15, top: 28, duration});
+
+const frostHeartSurfaceGlowAnimation = createAnimation('gfx/bosses/frostHeartAttackGlow.png', frostSurfaceGeometry, {cols: 15, duration});
+const frostHeartWaterGlowAnimation = createAnimation('gfx/bosses/frostHeartAttackGlow.png', frostWaterGeometry, {cols: 15, top: 28, duration});
+
+const frostHeartSurfaceShineAnimation = createAnimation('gfx/bosses/frostHeartLightBurst.png', frostSurfaceGeometry, {cols: 15, duration});
+const frostHeartWaterShineAnimation = createAnimation('gfx/bosses/frostHeartLightBurst.png', frostWaterGeometry, {cols: 15, top: 28, duration});
 export const frostHeartAnimations = {
     idle: omniAnimation(frostHeartIdleAnimation),
 };
 export const frostHeartSurfaceAnimations = {
     idle: omniAnimation(frostHeartSurfaceIdleAnimation),
+    hurt: omniAnimation(frostHeartSurfaceDamagedAnimation),
+    death: omniAnimation(frostHeartSurfaceDeathAnimation),
+    attack: omniAnimation(frostHeartSurfaceAttackAnimation),
 };
 export const frostHeartWaterAnimations = {
     idle: omniAnimation(frostHeartWaterIdleAnimation),
+    hurt: omniAnimation(frostHeartWaterDamagedAnimation),
+    death: omniAnimation(frostHeartWaterDeathAnimation),
+    attack: omniAnimation(frostHeartWaterAttackAnimation),
 };
+window.frostHeartSurfaceAnimations = frostHeartSurfaceAnimations;
+window.frostHeartWaterAnimations = frostHeartWaterAnimations;
 const frostHeartShieldDamagedAnimations = [
     createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 0, cols: 4}, {loop: false}),
     createAnimation('gfx/bosses/frostHeartShield.png', frostGeometry, {x: 4, cols: 4}, {loop: false}),
@@ -85,7 +94,6 @@ const maxShieldLevel = frostHeartShieldGrowingAnimations.length;
 interface FrostHeartParams {
     chargeLevel: number
     enrageLevel: number
-    enrageTime?: number
     shieldLevel: number
     targetShieldLevel: number
     active?: boolean
@@ -96,6 +104,7 @@ interface FrostHeartParams {
 enemyDefinitions.frostHeart = {
     naturalDifficultyRating: 20,
     floating: true,
+    flipRight: true,
     animations: frostHeartSurfaceAnimations, life: 50, scale: 2, touchDamage: 1, params: {
         chargeLevel: 0,
         enrageLevel: 0,
@@ -105,7 +114,44 @@ enemyDefinitions.frostHeart = {
     immunities: ['ice'],
     elementalMultipliers: {'fire': 1.5, 'lightning': 1.2},
     canSwim: true,
-    renderOver: renderIceShield,
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<FrostHeartParams>) {
+        // Hack to reflect the idle animation during the second half so that it appears to do a full rotation.
+        if (enemy.currentAnimationKey === 'idle') {
+            if (Math.floor(enemy.animationTime / enemy.currentAnimation.duration) % 2 === 1) {
+                enemy.d = 'right';
+            } else {
+                enemy.d = 'left';
+            }
+        }
+        enemy.defaultRender(context, state);
+    },
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<FrostHeartParams>) {
+        if (isUnderwaterHeart(state, enemy)) {
+            if (enemy.currentAnimationKey === 'attack') {
+                const frame = getFrame(frostHeartWaterShineAnimation, enemy.animationTime);
+                enemy.defaultRender(context, state, frame);
+            }
+            const frame = getFrame(wadingAnimation, enemy.time);
+            const hitbox = enemy.getHitbox();
+            //const targetWidth = 2 * p + hitbox.w;
+            //const targetHeight = 2 * p + hitbox.h;
+            const scale = 3;
+            //const scale = enemy.scale;// Math.round(Math.max(1, targetWidth / 24, targetHeight / 24) * 2) / 2;
+            // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+            drawFrame(context, frame, {
+                x: hitbox.x - (frame.w * scale - hitbox.w) / 2,
+                y: hitbox.y - frame.h * scale - 5 * scale,
+                w: frame.w * scale,
+                h: frame.h * scale,
+            });
+        } else {
+            renderIceShield(context, state, enemy);
+            if (enemy.currentAnimationKey === 'attack') {
+                const frame = getFrame(frostHeartSurfaceShineAnimation, enemy.animationTime);
+                enemy.defaultRender(context, state, frame);
+            }
+        }
+    },
     getHitbox(enemy: Enemy<FrostHeartParams>) {
         const hitbox = enemy.getDefaultHitbox();
         if (enemy.params.shieldLevel > 0) {
@@ -120,8 +166,12 @@ enemyDefinitions.frostHeart = {
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<FrostHeartParams>) {
         // Only the underwater instance casts a shadow, the top instance is floating in the water.
-        if (state.surfaceAreaInstance) {
+        if (isUnderwaterHeart(state, enemy)) {
             enemy.defaultRenderShadow(context, state);
+            if (enemy.currentAnimationKey === 'attack') {
+                const frame = getFrame(frostHeartWaterGlowAnimation, enemy.animationTime);
+                enemy.defaultRender(context, state, frame);
+            }
         } else {
             const frame = getFrame(wadingAnimation, enemy.time);
             const hitbox = enemy.getHitbox();
@@ -136,6 +186,10 @@ enemyDefinitions.frostHeart = {
                 w: frame.w * scale,
                 h: frame.h * scale,
             });
+            if (enemy.currentAnimationKey === 'attack') {
+                const frame = getFrame(frostHeartSurfaceGlowAnimation, enemy.animationTime);
+                enemy.defaultRender(context, state, frame);
+            }
         }
     },
     onHit(state: GameState, enemy: Enemy<FrostHeartParams>, hit: HitProperties): HitResult {
@@ -175,6 +229,13 @@ enemyDefinitions.frostHeart = {
     },
     update: updateFrostHeart,
 };
+
+function isUnderwaterHeart(state: GameState, enemy: Enemy): boolean {
+    if (state.surfaceAreaInstance) {
+        return enemy.area !== state.surfaceAreaInstance;
+    }
+    return enemy.area === state.underwaterAreaInstance;
+}
 
 enemyDefinitions.frostBeast = {
     naturalDifficultyRating: 100,
@@ -241,13 +302,13 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         underwaterHeart = getFrostHeart(state, state.underwaterAreaInstance);
     }
     // Make sure the heart displays the correct animation.
-    if (surfaceHeart) {
+    if (surfaceHeart && surfaceHeart.animations !== frostHeartSurfaceAnimations) {
         surfaceHeart.animations = frostHeartSurfaceAnimations;
-        surfaceHeart.changeToAnimation(surfaceHeart.currentAnimationKey);
+        surfaceHeart.changeToAnimation(surfaceHeart.currentAnimationKey, surfaceHeart.nextAnimationKey);
     }
-    if (underwaterHeart) {
+    if (underwaterHeart && underwaterHeart.animations !== frostHeartWaterAnimations) {
         underwaterHeart.animations = frostHeartWaterAnimations;
-        underwaterHeart.changeToAnimation(underwaterHeart.currentAnimationKey);
+        underwaterHeart.changeToAnimation(underwaterHeart.currentAnimationKey, underwaterHeart.nextAnimationKey);
         underwaterHeart.z = 8;
     }
     // If either form is defeated, both are defeated.
@@ -272,22 +333,14 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         return;
     }
     enemy.shielded = enemy.params.shieldLevel > 0;
-    if (enemy.params.enrageTime > 0) {
-        enemy.params.enrageTime -= FRAME_LENGTH;
-        if (enemy.params.enrageTime < 3000) {
-            if (enemy.modeTime % 600 === 0) {
-                const hitbox = enemy.getHitbox(state);
-                const p = 1 + (3000 - enemy.params.enrageTime) / 600;
-                for (let t = 0; t < 12; t++) {
-                    const theta = 2 * Math.PI * (t + p / 2) / 12;
-                    throwIceGrenadeAtLocation(state, enemy, {
-                        tx: hitbox.x + hitbox.w / 2 + 2.5 * 16 * p * Math.cos(theta),
-                        ty: hitbox.y + hitbox.h / 2 + 2.5 * 16 * p * Math.sin(theta),
-                    }, {damage: 2, source: enemy});
-                }
-                enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
-            }
-        } else if (enemy.modeTime % 200 === 0) {
+    if (enemy.mode === 'ragePhaseOne') {
+        enemy.changeToAnimation('attack');
+        // Animation is twice as fast for this attack.
+        // enemy.animationTime += FRAME_LENGTH;
+        // We use animationTime to track the number of nova attacks in the last part of the enrage attack so
+        // we need to reset it every time the animation loops here to make sure it starts at index 1.
+        enemy.animationTime = enemy.animationTime % enemy.currentAnimation.duration;
+        if (enemy.modeTime % 200 === 0) {
             const theta = 2 * Math.PI * Math.random();
             throwIceGrenadeAtLocation(state, enemy, {
                 tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
@@ -295,33 +348,58 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
             }, {damage: 2, source: enemy});
             enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
         }
+        if (enemy.modeTime >= 2000 * enemy.params.enrageLevel && enemy.animationTime < 100) {
+            enemy.setMode('ragePhaseTwo');
+        }
         return;
     }
-    if (enemy.life <= enemy.enemyDefinition.life * 0.7 && enemy.params.enrageLevel === 0) {
-        enemy.params.enrageLevel = 1;
-        enemy.params.enrageTime = 5000;
+    if (enemy.mode === 'ragePhaseTwo') {
+        enemy.changeToAnimation('attack');
+        // Make these big bursts line up with the attack animation.
+        if (enemy.animationTime % enemy.currentAnimation.duration === frostHeartAttackFrameTime) {
+            const hitbox = enemy.getHitbox(state);
+            const index = Math.ceil(enemy.animationTime / enemy.currentAnimation.duration);
+            for (let t = 0; t < 12; t++) {
+                const theta = 2 * Math.PI * (t + index / 2) / 12;
+                throwIceGrenadeAtLocation(state, enemy, {
+                    tx: hitbox.x + hitbox.w / 2 + (32 * index + 16) * Math.cos(theta),
+                    ty: hitbox.y + hitbox.h / 2 + (32 * index + 16) * Math.sin(theta),
+                }, {damage: 2, source: enemy});
+            }
+            enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
+        }
+        if (enemy.animationTime >= enemy.currentAnimation.duration * 5) {
+            enemy.changeToAnimation('idle');
+            enemy.setMode('choose');
+        }
+        return;
+    }
+    let targetEngrageLevel = 0;
+    if (enemy.life <= enemy.enemyDefinition.life * 0.3) {
+        targetEngrageLevel = 2;
+    } else if (enemy.life <= enemy.enemyDefinition.life * 0.7) {
+        targetEngrageLevel = 1;
+    }
+    if (enemy.params.enrageLevel < targetEngrageLevel) {
+        enemy.params.enrageLevel++;
         enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
-        enemy.modeTime = 0;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
-    } else if (enemy.life <= enemy.enemyDefinition.life * 0.3 && enemy.params.enrageLevel === 1) {
-        enemy.params.enrageLevel = 2;
-        enemy.params.enrageTime = 7000;
-        enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
-        enemy.modeTime = 0;
-        // Burn damaged is reduced by 80% when entering rage phase.
-        enemy.burnDamage *= 0.2;
+        enemy.setMode('ragePhaseOne');
     }
     enemy.params.chargeLevel += FRAME_LENGTH;
     if (enemy.params.chargeLevel >= 4000) {
-        if (enemy.params.chargeLevel % 500 === 0) {
+        enemy.changeToAnimation('attack');
+        if (enemy.animationTime % enemy.currentAnimation.duration === frostHeartAttackFrameTime) {
             const theta = 2 * Math.PI * Math.random();
             throwIceGrenadeAtLocation(state, enemy, {
                 tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
                 ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
             }, {damage: 2, source: enemy});
         }
-        if (enemy.params.chargeLevel >= 4000 + 500 * enemy.params.enrageLevel) {
+        // The frost heart attacks an additional time per enrage level after charging.
+        if (enemy.animationTime >= enemy.currentAnimation.duration * (1 + enemy.params.enrageLevel)) {
+            enemy.changeToAnimation('idle');
             enemy.params.chargeLevel = 0;
         }
     }

@@ -300,6 +300,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         this.currentAnimationKey = type;
         this.nextAnimationKey = nextAnimationKey;
+        if (this.currentAnimationKey === 'hurt' && !this.nextAnimationKey) {
+            debugger;
+        }
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];

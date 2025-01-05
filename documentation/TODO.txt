@@ -68,6 +68,15 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Frost Beast improvements
+        - Add more abilities for targeting the player when they are far from the heart
+            - Spawn medium heads that can appear anywhere on the battlefield
+            - Slow moving frost blast like a frost vortex.
+            - Ice grenade attack that scatters ice mines when it hits.
+                - Freeze the water on landing, but are destroyed when hit by fire.
+        - Make the frost beast more dangerous after the heart is defeated.
+            - Gains ice mine grenade attack when the heart is defeated.
+
     - Flame Beast improvements
         - Spawn out of lava (replacing cool lava tiles with hot lava tiles).
         - Draw just the front half of the beast to simulate it being half out of the lava.
@@ -82,8 +91,6 @@ Current tasks:
     - Test new cocoon tiles
         - Add doors
         - Fix tilesheet for pits
-
-    - Add new frost heart attack+damaged animations
 
     - Add check to material world forge where the door is to the boss chamber.
 
@@ -106,15 +113,6 @@ Current tasks:
           a display child of the bed and renders them below the sheets.
 
     - Bug: Astral projection can pull linked pots on top of the hero.
-
-    - Frost Beast improvements
-        - Add more abilities for targeting the player when they are far from the heart
-            - Spawn medium heads that can appear anywhere on the battlefield
-            - Slow moving frost blast like a frost vortex.
-            - Ice grenade attack that scatters ice mines when it hits.
-                - Freeze the water on landing, but are destroyed when hit by fire.
-        - Make the frost beast more dangerous after the heart is defeated.
-            - Gains ice mine grenade attack when the heart is defeated.
 
     - Add 8x8 ice tiles
         - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
