@@ -10,6 +10,8 @@ import Random from 'app/utils/Random';
 export interface BlastProps {
     x: number
     y: number
+    vx?: number
+    vy?: number
     damage?: number
     element?: MagicElement
     radius?: number
@@ -32,6 +34,8 @@ export class Blast implements EffectInstance {
     isEnemyAttack = true;
     x: number = this.props.x ?? 0;
     y: number = this.props.y ?? 0;
+    vx: number = this.props.vx ?? 0;
+    vy: number = this.props.vy ?? 0;
     damage: number = this.props.damage ?? 2;
     element: MagicElement = this.props.element ?? null;
     radius: number = this.props.radius ?? 32;
@@ -65,6 +69,9 @@ export class Blast implements EffectInstance {
             const enemyHitbox = this.boundSource.getHitbox(state);
             this.x = enemyHitbox.x + enemyHitbox.w / 2;
             this.y = enemyHitbox.y + enemyHitbox.h / 2;
+        } else {
+            this.x += this.vx;
+            this.y += this.vy;
         }
         const circle = this.getHitCircle();
         if (circle) {

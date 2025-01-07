@@ -68,15 +68,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Frost Beast improvements
-        - Add more abilities for targeting the player when they are far from the heart
-            - Spawn medium heads that can appear anywhere on the battlefield
-            - Slow moving frost blast like a frost vortex.
-            - Ice grenade attack that scatters ice mines when it hits.
-                - Freeze the water on landing, but are destroyed when hit by fire.
-        - Make the frost beast more dangerous after the heart is defeated.
-            - Gains ice mine grenade attack when the heart is defeated.
-
     - Flame Beast improvements
         - Spawn out of lava (replacing cool lava tiles with hot lava tiles).
         - Draw just the front half of the beast to simulate it being half out of the lava.
@@ -104,6 +95,9 @@ Current tasks:
         - Test on staging
         - Ask if anyone else wants to test staging.
         - Release to production.
+
+
+    - Make floating/flying enemies fall into pits/water when frozen.
 
     - Hide hud for longer cut scenes
         - End of rival fight, start of rival 2 fight.
@@ -176,6 +170,10 @@ Current tasks:
           to the enemies based on tags until the enemy matches the desired power level using the new enemies.
         - Try to balance how many instances of each ability are used so there is still nice variety.
         - Add additional abilities/configurations to increase variet.
+
+    - Frost Beast improvements
+        - Spawn medium heads that can appear anywhere on the battlefield
+        - Make Frost Beast more dangerous underwater and when enraged.
 
     - Add trap chests to the game, like the fire turret chest?
 

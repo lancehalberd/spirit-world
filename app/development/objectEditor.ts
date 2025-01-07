@@ -168,7 +168,8 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch','indicator', 'keyBlock', 'lavafall', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
+    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch','indicator', 'keyBlock', 'lavafall', 'loot',
+    'marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
@@ -517,7 +518,7 @@ export function createObjectDefinition(
                 turn: definition.turn || 'bounce',
             };
         case 'narration':
-            return {
+            const narrationDefinition: NarrationDefinition = {
                 ...commonProps,
                 type: definition.type,
                 message: definition.message || '',
@@ -526,6 +527,10 @@ export function createObjectDefinition(
                 w: definition.w || 32,
                 h: definition.h || 32,
             };
+            if (definition.important) {
+                narrationDefinition.important = definition.important;
+            }
+            return narrationDefinition;
         case 'bell':
             return {
                 ...commonProps,
@@ -1261,6 +1266,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 values: ['touch', 'activate', 'enterArea'] as NarrationDefinition['trigger'][],
                 onChange(trigger: NarrationDefinition['trigger']) {
                     object.trigger = trigger;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'important',
+                value: object.important || false,
+                onChange(important: boolean) {
+                    object.important = important;
                     updateObjectInstance(state, object);
                 },
             });

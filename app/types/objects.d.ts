@@ -594,6 +594,9 @@ interface NarrationDefinition extends BaseObjectDefinition {
     message: string
     trigger?: 'touch' | 'activate' | 'enterSection'
     delay?: number
+    // If this flag is set, the trigger will apply in modes like randomizer that
+    // suppress unnecessary dialogue+cutscenes.
+    important?: boolean
     w: number
     h: number
 }

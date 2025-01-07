@@ -143,7 +143,7 @@ function moveActorInDirection(
     // If this movement would move outside of the bounding rectangle, do not allow
     // it if it moves them further outside the rectangle, but do allow it otherwise.
     if (movementProperties.boundingBox) {
-        const hitbox = {...actor.getMovementHitbox()};
+        const hitbox = {...(actor.getMovementHitbox?.() || actor.getHitbox())};
         const v = directionMap[direction];
         hitbox.x += v[0] * amount;
         hitbox.y += v[1] * amount;

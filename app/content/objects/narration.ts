@@ -9,23 +9,16 @@ import { isObjectInCurrentSection } from 'app/utils/sections';
 export class Narration implements ObjectInstance {
     area: AreaInstance;
     alwaysReset = true;
-    definition: NarrationDefinition;
     drawPriority = <const>'foreground';
     isObject = <const>true;
-    x: number;
-    y: number;
+    x: number = this.definition.x;
+    y: number = this.definition.y;
     ignorePits = true;
     status: ObjectStatus = 'normal';
-    trigger: NarrationDefinition['trigger'];
-    time: number;
+    trigger: NarrationDefinition['trigger'] = this.definition.trigger || 'touch';
+    time: number = 0;
     previewColor = 'yellow';
-    constructor(state: GameState, definition: NarrationDefinition) {
-        this.definition = definition;
-        this.trigger = definition.trigger || 'touch';
-        this.x = definition.x;
-        this.y = definition.y;
-        this.time = 0;
-    }
+    constructor(state: GameState, public definition: NarrationDefinition) {}
     isActive(state: GameState) {
         return this.status === 'gone';
     }
@@ -43,7 +36,7 @@ export class Narration implements ObjectInstance {
         return { x: this.x, y: this.y, w: this.definition.w, h: this.definition.h };
     }
     runScript(state: GameState): void {
-        if (isRandomizer) {
+        if (isRandomizer && !this.definition.important) {
             return;
         }
         setScript(state, this.definition.message);
@@ -52,7 +45,7 @@ export class Narration implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.status === 'gone') {
-            if (this.definition.specialBehaviorKey && !isRandomizer && isObjectInCurrentSection(state, this)) {
+            if (this.definition.specialBehaviorKey && (!isRandomizer || this.definition.important) && isObjectInCurrentSection(state, this)) {
                 const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNarrationBehavior;
                 specialBehavior?.update(state, this);
             }
@@ -63,7 +56,7 @@ export class Narration implements ObjectInstance {
             this.status = 'gone';
             return;
         }
-        if (isRandomizer) {
+        if (isRandomizer && !this.definition.important) {
             this.status = 'gone';
             saveObjectStatus(state, this.definition);
             return;

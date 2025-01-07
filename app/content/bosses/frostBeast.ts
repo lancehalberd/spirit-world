@@ -1,7 +1,9 @@
 import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
-import { Frost } from 'app/content/effects/frost';
+import {Blast} from 'app/content/effects/blast';
+import {Frost} from 'app/content/effects/frost';
+import {LandMine, throwMineAtLocation} from 'app/content/effects/landMine';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
+import {FrostGrenade, throwIceGrenadeAtLocation} from 'app/content/effects/frostGrenade';
 import { Enemy } from 'app/content/enemy';
 import { enemyDeathAnimation, omniAnimation, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -18,8 +20,7 @@ import {
 import { hitTargets } from 'app/utils/field';
 //import { allImagesLoaded } from 'app/utils/images';
 import { sample } from 'app/utils/index';
-import { getVectorToNearbyTarget } from 'app/utils/target';
-
+import {getNearbyTargetAnchor, getVectorToNearbyTarget} from 'app/utils/target';
 
 
 // Center axies is basically at x=31
@@ -156,9 +157,9 @@ enemyDefinitions.frostHeart = {
         const hitbox = enemy.getDefaultHitbox();
         if (enemy.params.shieldLevel > 0) {
             return {
-                x: hitbox.x - 24,
+                x: hitbox.x - 20,
                 y: hitbox.y - 4,
-                w: hitbox.w + 48,
+                w: hitbox.w + 40,
                 h: hitbox.h + 8,
             }
         }
@@ -279,10 +280,6 @@ function getFrostSerpent(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostBeast') as Enemy;
 }
 
-/*function getShieldLevel(enemy: Enemy<FrostHeartParams>): number {
-    return Math.ceil(enemy.params.shieldLevel);
-}*/
-
 function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): void {
     if (enemy.params.shieldLevel < enemy.params.targetShieldLevel) {
         // The shield takes a minimum of 2 seconds to fully regenerate.
@@ -341,11 +338,7 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         // we need to reset it every time the animation loops here to make sure it starts at index 1.
         enemy.animationTime = enemy.animationTime % enemy.currentAnimation.duration;
         if (enemy.modeTime % 200 === 0) {
-            const theta = 2 * Math.PI * Math.random();
-            throwIceGrenadeAtLocation(state, enemy, {
-                tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
-                ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
-            }, {damage: 2, source: enemy});
+            throwIceGrenade(state, enemy);
             enemy.params.targetShieldLevel = Math.min(maxShieldLevel, enemy.params.targetShieldLevel + 1);
         }
         if (enemy.modeTime >= 2000 * enemy.params.enrageLevel && enemy.animationTime < 100) {
@@ -370,7 +363,7 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         }
         if (enemy.animationTime >= enemy.currentAnimation.duration * 5) {
             enemy.changeToAnimation('idle');
-            enemy.setMode('choose');
+            enemy.setMode('frostVortex');
         }
         return;
     }
@@ -388,20 +381,57 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         enemy.setMode('ragePhaseOne');
     }
     enemy.params.chargeLevel += FRAME_LENGTH;
-    if (enemy.params.chargeLevel >= 4000) {
+    if (enemy.mode === 'choose') {
+        enemy.changeToAnimation('idle');
+        if (enemy.modeTime >= 4000 - enemy.params.enrageLevel * 1000) {
+            enemy.setMode('frostVortex');
+        }
+        return;
+    }
+    if (enemy.mode === 'frostGrenade') {
         enemy.changeToAnimation('attack');
         if (enemy.animationTime % enemy.currentAnimation.duration === frostHeartAttackFrameTime) {
-            const theta = 2 * Math.PI * Math.random();
-            throwIceGrenadeAtLocation(state, enemy, {
-                tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
-                ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
-            }, {damage: 2, source: enemy});
+            throwIceGrenade(state, enemy);
         }
         // The frost heart attacks an additional time per enrage level after charging.
         if (enemy.animationTime >= enemy.currentAnimation.duration * (1 + enemy.params.enrageLevel)) {
-            enemy.changeToAnimation('idle');
-            enemy.params.chargeLevel = 0;
+            enemy.setMode('choose');
         }
+        return;
+    }
+    if (enemy.mode === 'frostVortex') {
+        const interval = 1000;
+        if (enemy.modeTime % interval === 100) {
+            enemy.changeToAnimation('attack', 'idle');
+        }
+        if (enemy.currentAnimationKey === 'attack' && enemy.animationTime === frostHeartAttackFrameTime) {
+            useFrostVortex(state, enemy, 32 + 4 * enemy.params.enrageLevel, Math.floor(enemy.modeTime / interval) * Math.PI / 4);
+        }
+        if (enemy.modeTime >= interval * (enemy.params.enrageLevel + 1)) {
+            enemy.setMode('frostGrenade');
+        }
+    }
+}
+
+function useFrostVortex(state: GameState, enemy: Enemy, radius: number, baseTheta: number) {
+    const hitbox = enemy.getHitbox();
+    for (let i = 0; i < 4; i++) {
+        const theta = baseTheta + 2 * Math.PI * i / 4;
+        const vortex = new Blast({
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+            vx: 1.5 * Math.cos(theta),
+            vy: 1.5 * Math.sin(theta),
+            element: 'ice',
+            damage: 2,
+            tellDuration: 0,
+            persistDuration: 4000,
+            radius: 32 + 4 * enemy.params.enrageLevel,
+            minRadius: 20,
+            expansionDuration: 1000,
+            source: enemy,
+        });
+        addEffectToArea(state, enemy.area, vortex);
     }
 }
 
@@ -445,6 +475,49 @@ function renderIceShield(context: CanvasRenderingContext2D, state: GameState, en
     });
 }
 
+function getGrenadeTarget(state: GameState, enemy: Enemy): Point {
+    return getNearbyTargetAnchor(state, enemy, 1000, enemy.area.allyTargets) || {
+        x: Math.random() * 16 * enemy.area.w,
+        y: Math.random() * 16 * enemy.area.h,
+    }
+}
+
+function throwIceGrenade(state: GameState, enemy: Enemy) {
+    const {x, y} = getGrenadeTarget(state, enemy);
+    const theta = 2 * Math.PI * Math.random();
+    throwIceGrenadeAtLocation(state, enemy, {
+        tx: x + 16 * Math.cos(theta),
+        ty: y + 16 * Math.sin(theta),
+    }, {damage: 4, source: enemy});
+}
+
+function throwLandMineGrenade(state: GameState, enemy: Enemy) {
+    const {x, y} = getGrenadeTarget(state, enemy);
+    throwIceGrenadeAtLocation(state, enemy, {
+        tx: x,
+        ty: y,
+    }, {
+        damage: 2,
+        source: enemy,
+        activate: (state: GameState, grenade: FrostGrenade) => {
+            for (let i = 0; i < 4; i++) {
+                const theta = 2 * Math.PI * i / 4;
+                throwMineAtLocation(state, grenade, {
+                    tx: grenade.x + 32 * Math.cos(theta),
+                    ty: grenade.y + 32 * Math.sin(theta),
+                }, {
+                    blastProps: {
+                        damage: 4,
+                        element: 'ice',
+                        source: enemy,
+                        tellDuration: 200,
+                    },
+                    source: enemy,
+                })
+            }
+        },
+    });
+}
 
 function updateFrostSerpent(state: GameState, enemy: Enemy): void {
     let surfaceSerpent, underwaterSerpent;
@@ -600,6 +673,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                 enemy.setMode('charge');
                 return;
             }
+            enemy.setMode('landMines');
             return;
         } else if (enemy.mode === 'frostBreathArc' || enemy.mode === 'frostBreath') {
             if (enemy.modeTime % 40 === 0) {
@@ -705,6 +779,20 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
             enemy.setMode('frostBreath');
             return;
+        }
+        enemy.setMode('landMines');
+        return;
+    }
+    if (enemy.mode === 'landMines') {
+        if (enemy.modeTime === 100) {
+            if (enemy.area.effects.filter(v => v instanceof LandMine).length < 10) {
+                throwLandMineGrenade(state, enemy);
+            } else {
+                enemy.setMode('chooseTarget');
+            }
+        }
+        if (enemy.modeTime >= 500) {
+            enemy.setMode('chooseTarget');
         }
         return;
     }

@@ -45,6 +45,7 @@ const saveStatueDefinition: SimpleObjectDefinition = {
 const levelUpTrigger: NarrationDefinition = {
     type: 'narration',
     status: 'normal',
+    important: true,
     x: 112,
     y: 48,
     w: 32,

@@ -1,10 +1,8 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { Blast } from 'app/content/effects/blast';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-
-
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {Blast} from 'app/content/effects/blast';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 
 const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
 
@@ -19,6 +17,7 @@ interface Props {
     vz?: number
     az?: number
     source: Enemy
+    activate?: (state: GameState, grenade: FrostGrenade) => void
 }
 
 export class FrostGrenade implements EffectInstance, Props {
@@ -26,32 +25,22 @@ export class FrostGrenade implements EffectInstance, Props {
     isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
-    damage: number;
-    x: number;
-    y: number;
-    z: number = 0;
-    vz: number = 0;
-    vx: number;
-    vy: number;
-    az: number;
+    damage: number = this.props.damage ?? 1;
+    x: number = this.props.x;
+    y: number = this.props.y;
+    z: number = this.props.z ?? 0;
+    vz: number = this.props.vz ?? 4;
+    vx: number = this.props.vx;
+    vy: number = this.props.vy;
+    az: number = this.props.az ?? -0.3;
     w: number = 12;
     h: number = 12;
-    radius: number;
+    radius: number = this.props.radius ?? 32;
     animationTime = 0;
     speed = 0;
-    source: Enemy;
-    constructor({x, y, z = 0, vx, vy, vz = 4, az = -0.3, damage = 1, radius = 32, source}: Props) {
-        this.radius = radius
-        this.damage = damage;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.vx = vx;
-        this.vy = vy;
-        this.vz = vz;
-        this.az = az;
-        this.source = source;
-    }
+    source: Enemy = this.props.source;
+    activate = this.props.activate;
+    constructor(public props: Props) {}
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -59,23 +48,32 @@ export class FrostGrenade implements EffectInstance, Props {
         this.vz += this.az;
         this.animationTime += FRAME_LENGTH;
         if (this.z <= 0) {
-            const frostBlast = new Blast({
-                x: this.x,
-                y: this.y,
-                radius: this.radius,
-                damage: this.damage,
-                // The trajectory of the grenade gives enough warning.
-                tellDuration: 0,
-                element: 'ice',
-                source: this.source,
-            });
-            addEffectToArea(state, this.area, frostBlast);
+            if (this.activate) {
+                this.activate(state, this);
+            } else {
+                this.defaultActivate(state);
+            }
             removeEffectFromArea(state, this);
         } else {
             if (this.animationTime % 200 === 0) {
                 addSparkleAnimation(state, this.area, this, { element: 'ice' });
             }
         }
+    }
+    // The default behavior is to just create an ice blast, but this can be changed in
+    // the props to do other things.
+    defaultActivate(state: GameState) {
+        const frostBlast = new Blast({
+            x: this.x,
+            y: this.y,
+            radius: this.radius,
+            damage: this.damage,
+            // The trajectory of the grenade gives enough warning.
+            tellDuration: 0,
+            element: 'ice',
+            source: this.source,
+        });
+        addEffectToArea(state, this.area, frostBlast);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         // Animate a transparent orb growing in the air
@@ -109,6 +107,7 @@ interface ThrowGrenadeProps {
     z?: number
     az?: number
     source: Enemy
+    activate?: (state: GameState, grenade: FrostGrenade) => void
 }
 
 // damage = 1, z = 8,

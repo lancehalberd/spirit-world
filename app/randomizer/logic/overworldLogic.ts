@@ -211,7 +211,7 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'spiritWorldMountain', logic: canRemoveLightStones },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'overworldLakePiece', logic: andLogic(canUseTeleporters, canRemoveLightStones) },
-            { nodeId: 'warTempleSpiritArea', logic: orLogic(hasMitts, andLogic(hasTeleportation, canRemoveHeavyStones)) },
+            { nodeId: 'warTempleSpiritArea', logic: canRemoveHeavyStones },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
         entranceIds: [
@@ -254,6 +254,8 @@ export const overworldNodes: LogicNode[] = [
         paths: [
             { nodeId: 'overworldMain', logic: canUseTeleporters },
             { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
+            // It is not possible to move the large elephant statue out of the way
+            // way with the Tower Staff.
             { nodeId: 'westSpiritWorldMountain', logic: hasMitts },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],

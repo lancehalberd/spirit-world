@@ -1,11 +1,12 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { Blast, BlastProps } from 'app/content/effects/blast';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { renderDamageWarning } from 'app/render/renderDamageWarning';
-import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {Blast, BlastProps} from 'app/content/effects/blast';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {renderDamageWarning} from 'app/render/renderDamageWarning';
+import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {isEnemyDefeated} from 'app/utils/enemies';
-import { isTargetHit } from 'app/utils/field';
+import {hitTargets, isTargetHit} from 'app/utils/field';
+import {getTargetingAnchor} from 'app/utils/target';
 
 
 const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
@@ -30,6 +31,7 @@ export class LandMine implements EffectInstance, Props {
     area: AreaInstance = null;
     isEffect = <const>true;
     isEnemyAttack = true;
+    isEnemyTarget = true;
     frame: Frame = this.props.frame ?? iceElement;
     x: number = this.props.x;
     y: number = this.props.y;
@@ -65,6 +67,15 @@ export class LandMine implements EffectInstance, Props {
             this.y += this.vy;
             this.z += this.vz;
             this.vz += this.az;
+            // Freeze the ground around it on landing
+            if (this.z <= 0) {
+                hitTargets(state, this.area, {
+                    hitTiles: true,
+                    element: 'ice',
+                    hitCircle: this.getCircle(),
+                    source: this.source,
+                });
+            }
         } else if (this.armingTime > 0) {
             this.armingTime -= FRAME_LENGTH;
         } else  {
@@ -81,6 +92,20 @@ export class LandMine implements EffectInstance, Props {
                     removeEffectFromArea(state, this);
                 }
             }
+        }
+    }
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (hit.element === 'fire') {
+            removeEffectFromArea(state, this);
+        }
+        return {};
+    }
+    getHitbox() {
+        return {
+            x: this.x - this.w / 2,
+            y: this.y - this.h / 2,
+            w: this.w,
+            h: this.h,
         }
     }
     getCircle() {
@@ -120,10 +145,9 @@ export class LandMine implements EffectInstance, Props {
     }
 }
 
-export function throwMineAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, props: Partial<Props> & {source: Actor}): LandMine {
-    const hitbox = enemy.getHitbox(state);
-    const x = hitbox.x + hitbox.w / 2;
-    const y = hitbox.y + hitbox.h / 2;
+
+export function throwMineAtLocation(state: GameState, source: ObjectInstance | EffectInstance, {tx, ty}: {tx: number, ty: number}, props: Partial<Props> & {source: Actor}): LandMine {
+    const {x, y} = getTargetingAnchor(source);
     const frostMine = new LandMine({
         ...props,
         x,
@@ -132,6 +156,6 @@ export function throwMineAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {t
     const duration = -2 * frostMine.vz / frostMine.az;
     frostMine.vx = (tx - x) / duration;
     frostMine.vy = (ty - y) / duration;
-    addEffectToArea(state, enemy.area, frostMine);
+    addEffectToArea(state, source.area, frostMine);
     return frostMine;
 }

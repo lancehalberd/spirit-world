@@ -1303,7 +1303,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "helixSkyEntrance", x: 368, y: 160, type: "door", style: "future", targetZone: "helix", targetObjectId: "helixSkyEntrance", d: "up"},
         {status: "normal", id: "", x: 248, y: 264, type: "teleporter", linked: true, spirit: true},
-        {status: "closed", id: "staffTowerSkyEntrance", logicKey: "forestTower", x: 66, y: 486, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up", linked: true},
+        {status: "closed", id: "staffTowerSkyEntranceCopy", logicKey: "forestTower", x: 66, y: 486, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 4, mapId: 'sky', floorId: '1F', mapX: 2, mapY: 2},
@@ -3384,7 +3384,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 304, y: 416, type: "crystalSwitch", element: "lightning", timer: 0, targetObjectId: "skyPalaceEntranceBarrier"},
         {status: "normal", id: "", x: 248, y: 264, type: "teleporter", linked: true},
         {status: "normal", id: "skyPalaceSave", x: 168, y: 32, type: "saveStatue"},
-        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "forestTower", x: 66, y: 486, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up", linked: true, spirit: true},
+        {status: "normal", id: "staffTowerSpiritSkyEntranceCopy", logicKey: "forestTower", x: 66, y: 486, type: "staffTower", style: "sky", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 13, mapId: 'skySpirit', floorId: '1F', mapX: 2, mapY: 2},

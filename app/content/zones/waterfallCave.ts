@@ -384,7 +384,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 436, y: 31, type: "decoration", d: "right", w: 16, h: 16, decorationType: "chair", drawPriority: "background"},
         {status: "normal", id: "waterfallCaveMysteryNpc", x: 456, y: 400, d: "right", behavior: "random", style: "vanaraBrown", type: "npc", dialogue: "\"Want to know something mysterious?{|} There is a cloud above the center of the lake that never moves!\"", dialogueIndex: 161},
         {status: "normal", id: "", x: 221, y: 406, type: "decoration", d: "right", w: 64, h: 16, decorationType: "anvil", seed: 1},
-        {status: "normal", id: "", x: 362, y: 386, type: "decoration", d: "right", w: 64, h: 48, decorationType: "table", seed: 1, drawPriority: "background"},
+        {status: "normal", id: "", x: 362, y: 386, type: "decoration", d: "right", w: 64, h: 40, decorationType: "table", seed: 1, drawPriority: "background"},
         {status: "normal", id: "", x: 383, y: 304, type: "decoration", d: "down", w: 16, h: 16, decorationType: "chair"},
         {status: "normal", id: "", x: 347, y: 399, type: "decoration", d: "down", w: 16, h: 16, decorationType: "chair"},
         {status: "normal", id: "", x: 388, y: 422, type: "decoration", d: "down", w: 16, h: 16, decorationType: "chair"},

@@ -315,7 +315,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 480, y: 384, targetObjectId: "staffTowerEntranceMoney", toggleOnRelease: true, type: "floorSwitch"},
         {status: "normal", id: "", x: 512, y: 384, targetObjectId: "staffTowerEntranceMoney", toggleOnRelease: true, type: "floorSwitch"},
         {status: "normal", id: "", x: 448, y: 384, targetObjectId: "staffTowerEntranceMoney", toggleOnRelease: true, type: "floorSwitch"},
-        {status: "normal", id: "", x: 464, y: 384, type: "tippable"},
+        {status: "normal", id: "", x: 432, y: 384, type: "tippable"},
         {status: "normal", id: "", x: 496, y: 384, type: "tippable"},
         {status: "hiddenSwitch", id: "staffTowerEntranceMoney", x: 480, y: 336, type: "chest", lootType: "money", lootAmount: 50},
         {status: "normal", id: "", x: 104, y: 392, targetObjectId: "staffTowerEntranceSilver", toggleOnRelease: true, type: "floorSwitch"},
@@ -4335,7 +4335,7 @@ const f3_0x0: AreaDefinition = {
         {status: "hidden", id: "stormBeast", x: 296, y: 120, type: "boss", enemyType: "stormBeast", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
         {status: "normal", id: "stormBeast", x: 290, y: 178, type: "boss", enemyType: "stormHeart", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
         {status: "normal", id: "", x: 400, y: 292, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
-        {status: "normal", id: "", x: 192, y: 288, type: "narration", message: "{@jadeChampionStaffTower.stormBeast}", trigger: "touch", delay: 0, w: 64, h: 48, saveStatus: "never"},
+        {status: "normal", id: "", x: 192, y: 288, type: "narration", message: "{@jadeChampionStaffTower.stormBeast}", trigger: "touch", delay: 0, w: 64, h: 48, saveStatus: "never", important: true},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 455, mapId: 'staffTower', floorId: '6F', mapX: 1, mapY: 2},

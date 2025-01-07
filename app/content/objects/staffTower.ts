@@ -388,6 +388,10 @@ export class StaffTowerTop implements ObjectInstance {
     status: ObjectStatus = 'normal';
     constructor(public staffTower: StaffTower) {}
 
+    getYDepth(): number {
+        const hitbox = this.staffTower.getHitbox();
+        return hitbox.y + hitbox.h - 57;
+    }
     // This draws the top 200px of the top layer of the tower, which includes all of the
     // graphics that need to be drawn in front of objects that might pass behind it.
     render(context: CanvasRenderingContext2D, state: GameState) {

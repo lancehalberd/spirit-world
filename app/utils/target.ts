@@ -12,16 +12,33 @@ export function isTargetVisible(
     return !!target && !!target.getHitbox && !target.isInvisible;
 }
 
-function getTargetingAnchor(target:EffectInstance | ObjectInstance): Point {
-     if (target.getTargetingAnchorPoint) {
-         return target.getTargetingAnchorPoint();
-     }
-     // For targeting we use the regular hitbox since most hitboxes treat y/z interchangeably.
-     const hitbox = target.getHitbox();
-     return {
-         x: hitbox.x + hitbox.w / 2,
-         y: hitbox.y + hitbox.h / 2,
-     }
+export function getMovementAnchor(target: EffectInstance | ObjectInstance) {
+    /*if (target.getMovementAnchorPoint) {
+
+    }*/
+    const hitbox = target.getMovementHitbox?.() || target.getHitbox?.();
+    if (hitbox) {
+        return {
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+        };
+    }
+    return {x: target.x, y: target.y};
+}
+
+export function getTargetingAnchor(target:EffectInstance | ObjectInstance): Point {
+    if (target.getTargetingAnchorPoint) {
+        return target.getTargetingAnchorPoint();
+    }
+    if (target.getHitbox) {
+        // For targeting we use the regular hitbox since most hitboxes treat y/z interchangeably.
+        const hitbox = target.getHitbox();
+        return {
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+        }
+    }
+    return {x: target.x, y: target.y};
 }
 
 export function getNearbyTarget(state: GameState, source: EffectInstance | ObjectInstance, radius: number,
@@ -38,6 +55,25 @@ export function getNearbyTarget(state: GameState, source: EffectInstance | Objec
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             return target;
+        }
+    }
+    return null;
+}
+
+export function getNearbyTargetAnchor(state: GameState, source: EffectInstance | ObjectInstance, radius: number,
+    targets: (EffectInstance | ObjectInstance)[], ignoreTargets: Set<EffectInstance | ObjectInstance> = null
+): Point | null {
+    const sourceAnchor = getTargetingAnchor(source);
+    for (const target of targets) {
+        if (!isTargetVisible(state, source, target) || ignoreTargets?.has(target)) {
+            continue;
+        }
+        const targetAnchor = getTargetingAnchor(target);
+        const dx = targetAnchor.x - sourceAnchor.x;
+        const dy = targetAnchor.y - sourceAnchor.y;
+        const mag = Math.sqrt(dx * dx + dy * dy);
+        if (mag <= radius) {
+            return targetAnchor;
         }
     }
     return null;
@@ -68,10 +104,10 @@ export function getCardinalDirectionToTarget(
 }
 
 export function getVectorToMovementTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
-    const hitbox = source.getMovementHitbox();
-    const targetHitbox = target.getMovementHitbox();
-    const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-    const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+    const sourceAnchor = getMovementAnchor(source);
+    const targetAnchor = getMovementAnchor(source);
+    const dx = targetAnchor.x - sourceAnchor.x;
+    const dy = targetAnchor.y - sourceAnchor.y;
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag) {
         return {mag, x: dx / mag, y: dy / mag};
