@@ -118,6 +118,7 @@ interface TileBehaviors {
     isBrittleGround?: boolean
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean
+    // The same as pit but with pixel precision.
     pitMap?: Uint16Array
     // If a player falls over a single tile pit they will be eased towards being tile aligned.
     isSingleTilePit?: boolean
@@ -125,11 +126,14 @@ interface TileBehaviors {
     // and that the player should move south until they hit a regular pit tile while falling,
     // otherwise they will appear to fall into the wall.
     pitWall?: boolean
-    isLava?: Boolean
+    isLava?: boolean
+    // The same as isLava but with pixel precision.
     isLavaMap?: Uint16Array
     // If this is set to false, then a tile shouldn't override pit/lava behavior underneath it.
     // If this is set to true on an object then it should override ground behavior underneath it.
     isGround?: boolean
+    // The same as isGround but with pixel precision.
+    isGroundMap?: Uint16Array
     // If this is set on an object, it will override solid behavior behind it, but not ground behavior.
     isNotSolid?: boolean
     // If this is true, this tile is an overlay on top of the ground and should have cover effects applied
@@ -149,6 +153,7 @@ interface TileBehaviors {
     skipped?: boolean
     // Blocks movement
     solid?: boolean
+    // The same as solid but with pixel precision.
     solidMap?: Uint16Array
     // Can be picked up with glove
     pickupWeight?: number
@@ -162,7 +167,7 @@ interface TileBehaviors {
     showUnderTile?: boolean
     shallowWater?: boolean
     slippery?: boolean
-    // To be used if we add pixel granularity to ice floors for ice attacks.
+    // To be used if we add pixel precision to ice floors for ice attacks.
     slipperyMap?: Uint16Array
     water?: boolean
     // How much damage this tile does if thrown.

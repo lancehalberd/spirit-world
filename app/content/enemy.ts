@@ -300,9 +300,6 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         this.currentAnimationKey = type;
         this.nextAnimationKey = nextAnimationKey;
-        if (this.currentAnimationKey === 'hurt' && !this.nextAnimationKey) {
-            debugger;
-        }
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];
@@ -374,7 +371,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.vz = vz;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (this.status === 'gone' || this.status === 'hidden' || this.mode === 'hidden' || this.isDefeated || this.life <= 0) {
+        if (this.status === 'gone' || this.status === 'hidden'
+            || this.mode === 'hidden' || this.isDefeated || this.life <= 0
+        ) {
             return {};
         }
         if (this.enemyDefinition.onHit) {

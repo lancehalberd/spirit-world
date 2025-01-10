@@ -1,4 +1,5 @@
-import { getDrawPriority } from 'app/utils/layers';
+import {BITMAP_EMPTY, BITMAP_FULL} from 'app/content/bitMasks';
+import {getDrawPriority} from 'app/utils/layers';
 
 // This resets the tile behavior for a specific tile to whatever the combined behavior of the layers are.
 // This is useful when an object in a tile was overriding the tile behavior beneath it and we need to
@@ -95,7 +96,31 @@ export function removeLedgeFromBehaviorTileGrid(behaviorGrid: TileBehaviors[][],
     }
 }
 
-function applyTileToBehaviorGrid(
+
+function mergeBitmaps(baseFlag: boolean, baseMap: Uint16Array, newFlag: boolean, newMap: Uint16Array, subtractedMaps: Uint16Array[]) {
+    // If the new flag is true, it overrides all other values.
+    if (newFlag === true) {
+        return BITMAP_FULL;
+    }
+    // If the new flag is false, the base values are ignored.
+    if (newFlag === false || (!baseFlag && !baseMap)) {
+        return newMap || BITMAP_EMPTY;
+    }
+    let resultMap = baseFlag ? BITMAP_FULL : (baseMap || BITMAP_EMPTY);
+    if (resultMap !== BITMAP_EMPTY) {
+        for (const subtractedMap of subtractedMaps) {
+            if (subtractedMap) {
+                resultMap = subtractBitmap(resultMap, subtractedMap);
+            }
+        }
+    }
+    if (newMap) {
+        resultMap = addBitmaps(resultMap, newMap);
+    }
+    return resultMap;
+}
+
+export function applyTileToBehaviorGrid(
     behaviorGrid: TileBehaviors[][],
     {x, y}: Tile,
     behaviors: TileBehaviors,
@@ -107,89 +132,111 @@ function applyTileToBehaviorGrid(
     if (!behaviorGrid[y]) {
         behaviorGrid[y] = [];
     }
+    const baseBehaviors: TileBehaviors = behaviorGrid[y][x] || {};
+    let resultingBehaviors: TileBehaviors = {...baseBehaviors};
     // Lava + clouds erase the behaviors of tiles underneath them.
-    if (behaviors.isLava || behaviors.isLavaMap || behaviors.cloudGround || behaviors.isGround === true) {
+    // Technically we might do this with pit + solid tiles, but this is more of a problem with cloud+lava tiles because they are often
+    // drawn over ledges and other tiles while allowing the player to move over them.
+    // So currently, if a pit tile was drawn over a lava tile, graphically it should just be a pit
+    if (behaviors.isLava || behaviors.isLavaMap || behaviors.cloudGround || behaviors.isGround === true || behaviors.isGroundMap) {
         // Undo ledges that might have been set by this tile to adjacent tiles when we clear false ledges.
-        if (behaviorGrid[y][x]?.ledges?.up === false && y > 0) {
+        if (baseBehaviors.ledges?.up === false && y > 0) {
             removeLedgeFromBehaviorTileGrid(behaviorGrid, x, y - 1, 'down');
         }
-        if (behaviorGrid[y][x]?.ledges?.down === false && y < behaviorGrid.length - 1) {
+        if (baseBehaviors.ledges?.down === false && y < behaviorGrid.length - 1) {
             removeLedgeFromBehaviorTileGrid(behaviorGrid, x, y + 1, 'up');
         }
-        if (behaviorGrid[y][x]?.ledges?.left === false && x > 0) {
+        if (baseBehaviors.ledges?.left === false && x > 0) {
             removeLedgeFromBehaviorTileGrid(behaviorGrid, x - 1, y, 'right');
         }
-        if (behaviorGrid[y][x]?.ledges?.right === false && x < behaviorGrid[0].length - 1) {
+        if (baseBehaviors.ledges?.right === false && x < behaviorGrid[0].length - 1) {
             removeLedgeFromBehaviorTileGrid(behaviorGrid, x + 1, y, 'left');
         }
-        behaviorGrid[y][x] = {};
+        resultingBehaviors = {};
     }
     // Any background tile rendered on top of lava removes the lava behavior from it.
-    if (!isForeground && behaviorGrid[y]?.[x]
-        && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false
+    if (!isForeground && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false && !behaviors.isGroundMap
     ) {
-        delete behaviorGrid[y][x].isLava;
-        delete behaviorGrid[y][x].isLavaMap;
+        delete resultingBehaviors.isLava;
+        delete resultingBehaviors.isLavaMap;
     }
-    // Any background tile rendered on top of a pit removes the pit behavior.
+    // Any background tile rendered on top of a pit/shallow water/water/slipper tile removes that special behavior.
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
     // sky behavior that has this behavior instead of pits.
-    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit && behaviors.isGround !== false) {
-        delete behaviorGrid[y][x].pit;
+    if (!isForeground && resultingBehaviors.pit && !behaviors.pit && behaviors.isGround !== false && !behaviors.isGroundMap) {
+        delete resultingBehaviors.pit;
     }
-    if (!isForeground && behaviorGrid[y]?.[x]?.shallowWater && !behaviors.shallowWater && behaviors.isGround !== false) {
-        delete behaviorGrid[y][x].shallowWater;
+    if (!isForeground && resultingBehaviors.shallowWater && !behaviors.shallowWater && behaviors.isGround !== false) {
+        delete resultingBehaviors.shallowWater;
     }
-    if (!isForeground && behaviorGrid[y]?.[x]?.water && !behaviors.water && behaviors.isGround !== false) {
-        delete behaviorGrid[y][x].water;
+    if (!isForeground && resultingBehaviors.water && !behaviors.water && behaviors.isGround !== false) {
+        delete resultingBehaviors.water;
     }
-    if (!isForeground && behaviorGrid[y]?.[x]?.slippery && !behaviors.slippery && behaviors.isGround !== false) {
-        delete behaviorGrid[y][x].slippery;
+    if (!isForeground && resultingBehaviors.slippery && !behaviors.slippery && behaviors.isGround !== false) {
+        delete resultingBehaviors.slippery;
     }
-    if (!isForeground && behaviorGrid[y]?.[x]?.cloudGround && !behaviors.cloudGround) {
-        delete behaviorGrid[y][x].cloudGround;
+    if (!isForeground && resultingBehaviors.cloudGround && !behaviors.cloudGround) {
+        delete resultingBehaviors.cloudGround;
     }
-    const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
-    const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
-    // Merge matching bitmasks together.
-    let baseSolidMap = behaviorGrid[y][x]?.solidMap;
-    const baseLavaMap = behaviorGrid[y][x]?.solidMap;
-    const basePitMap = behaviorGrid[y][x]?.pitMap;
-    behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
-    if (behaviorGrid[y]?.[x]?.solid || baseSolidMap) {
-        if (behaviorGrid[y]?.[x]?.solid === true) {
-            baseSolidMap = new Uint16Array([
-                0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,
-                0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF,0xFFFF
-            ]);
-        }
-        if (behaviors.isLavaMap) {
-            delete behaviorGrid[y][x].solid;
-            baseSolidMap = behaviorGrid[y][x].solidMap = subtractBitmap(baseSolidMap, behaviors.isLavaMap);
-        }
-        if (behaviors.pitMap) {
-            delete behaviorGrid[y][x].solid;
-            baseSolidMap = behaviorGrid[y][x].solidMap = subtractBitmap(baseSolidMap, behaviors.pitMap);
-        }
+    const lightRadius = Math.max(baseBehaviors.lightRadius || 0, behaviors.lightRadius || 0);
+    const brightness = Math.max(baseBehaviors.brightness || 0, behaviors.brightness || 0);
+    resultingBehaviors = {...resultingBehaviors, ...behaviors, lightRadius, brightness};
+
+    const newSolidMap = mergeBitmaps(
+        baseBehaviors.solid,
+        baseBehaviors.solidMap,
+        behaviors.solid,
+        behaviors.solidMap,
+        [behaviors.isGroundMap, behaviors.isLavaMap, behaviors.pitMap],
+    );
+    if (newSolidMap === BITMAP_FULL) {
+        resultingBehaviors.solid = true;
+        delete resultingBehaviors.solidMap;
+    } else if (newSolidMap === BITMAP_EMPTY) {
+        delete resultingBehaviors.solid;
+        delete resultingBehaviors.solidMap;
+    } else {
+        delete resultingBehaviors.solid;
+        resultingBehaviors.solidMap = newSolidMap;
     }
-    // An explicit value of `false` for solid will remove all solid behavior underneath it.
-    if (behaviors.solid === false) {
-        if (behaviors.solidMap) {
-            behaviorGrid[y][x].solidMap = behaviors.solidMap;
-        } else {
-            delete behaviorGrid[y][x].solidMap;
-            delete behaviorGrid[y][x].solid;
-        }
-    } else if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
-        behaviorGrid[y][x].solidMap = addBitmaps(baseSolidMap, behaviors.solidMap);
+    const newIsLavaMap = mergeBitmaps(
+        baseBehaviors.isLava,
+        baseBehaviors.isLavaMap,
+        behaviors.isLava,
+        behaviors.isLavaMap,
+        [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
+    );
+    if (newIsLavaMap === BITMAP_FULL) {
+        resultingBehaviors.isLava = true;
+        delete resultingBehaviors.isLavaMap;
+    } else if (newIsLavaMap === BITMAP_EMPTY) {
+        delete resultingBehaviors.isLava;
+        delete resultingBehaviors.isLavaMap;
+    } else {
+        delete resultingBehaviors.isLava;
+        resultingBehaviors.isLavaMap = newIsLavaMap;
     }
-    if (!behaviorGrid[y]?.[x]?.isLava && baseLavaMap && behaviors.isLavaMap) {
-        behaviorGrid[y][x].isLavaMap = addBitmaps(baseLavaMap, behaviors.isLavaMap);
+    const newPitMap = mergeBitmaps(
+        baseBehaviors.pit,
+        baseBehaviors.pitMap,
+        behaviors.pit,
+        behaviors.pitMap,
+        [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
+    );
+    if (newPitMap === BITMAP_FULL) {
+        resultingBehaviors.pit = true;
+        delete resultingBehaviors.pitMap;
+    } else if (newPitMap === BITMAP_EMPTY) {
+        delete resultingBehaviors.pit;
+        delete resultingBehaviors.pitMap;
+    } else {
+        delete resultingBehaviors.pit;
+        resultingBehaviors.pitMap = newPitMap;
     }
-    if (!behaviorGrid[y]?.[x]?.pit && basePitMap && behaviors.pitMap) {
-        behaviorGrid[y][x].pitMap = addBitmaps(basePitMap, behaviors.pitMap);
-    }
+
+    behaviorGrid[y][x] = resultingBehaviors;
+
     // It is convenient for the projectile hit detection system to assume that ledges are always defined as going down
     // from the current tile into the adjacent tile, so we conver all false ledges (which are used to specify the reverse direction)
     // to setting true ledges on the tile they are next to.

@@ -1,9 +1,11 @@
+import { BITMAP_BOTTOM } from 'app/content/bitMasks';
 import {everyArea, everyObject} from 'app/utils/every';
 import {getObjectSaveTreatment} from 'app/utils/objects';
+import {applyTileToBehaviorGrid} from 'app/utils/tileBehavior';
 
 export const tests: {[key: string]: () => void} = {
     checkObjectsHaveIds() {
-        console.log('Test "checkObjectsHaveIds":')
+        console.log('Test "checkObjectsHaveIds":');
         everyObject((location, zone, area, objectDefinition) => {
             if (getObjectSaveTreatment(objectDefinition) === 'never') {
                 return;
@@ -18,7 +20,7 @@ export const tests: {[key: string]: () => void} = {
         });
     },
     checkEmptyTiles() {
-        console.log('Test "checkEmptyTiles":')
+        console.log('Test "checkEmptyTiles":');
         const updatedZones = new Set<string>();
         everyArea((location, zone, area) => {
             for (let i = 0; i < area.layers.length; i++) {
@@ -49,6 +51,19 @@ export const tests: {[key: string]: () => void} = {
         });
         if (updatedZones.size) {
             console.error('Removed bad empty tiles in: ', [...updatedZones]);
+        }
+    },
+    testTileBehaviorMerging() {
+        console.log('Test "tileBehaviorMerging":');
+        const behaviorGrid: TileBehaviors[][] = [[{}]];
+        applyTileToBehaviorGrid(behaviorGrid, {x: 0, y: 0}, {isLava: true}, false);
+        applyTileToBehaviorGrid(behaviorGrid, {x: 0, y: 0}, {isGroundMap: BITMAP_BOTTOM}, false);
+        const result = behaviorGrid[0][0];
+        if (result.isLava || !result.isLavaMap || result.isLavaMap[0] !== 0xFFFF || result.isLavaMap[15] !== 0x0000) {
+            console.error('Unexpected lava behavior(top half of tile is lava): ', result);
+        }
+        if (result.isGround || !result.isGroundMap || result.isGroundMap[0] !== 0x0000 || result.isGroundMap[15] !== 0xFFFF) {
+            console.error('Unexpected ground behavior(bottom half of tile is ground): ', result);
         }
     },
 };

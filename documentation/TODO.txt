@@ -69,10 +69,12 @@ Graphics to Implement:
 
 Current tasks:
     - Flame Beast improvements
-        - Spawn out of lava (replacing cool lava tiles with hot lava tiles).
-        - Draw just the front half of the beast to simulate it being half out of the lava.
-        - Draw bubbles around lava for 400MS before emerging from lava to warn the player, then make the actual attacks pretty fast.
-            - Maybe can cancel emerging if the player gets too far away too quickly.
+        - Don't cool lava when refreshing area logic.
+        - Update layout of area to make sense when lava isn't drained, in general make it larger and more organic.
+            - Make sure southern masked ledges interact with lava underneath them correctly.
+            - Also make room in the middle lava pits so the beast doesn't overlap cliffs when facing north/south.
+            - Prevent beast from attacking "up" ledges when spawning in the center
+        - Maybe can cancel emerging if the player gets too far away too quickly.
         - Comes halfway out of the nearest lava and attacks the player:
             - Swipe if the player is in range.
             - Spawn a chasing fire vortex if in range
