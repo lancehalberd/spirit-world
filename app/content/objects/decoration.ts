@@ -61,9 +61,7 @@ export class Decoration implements ObjectInstance {
 
 const [
     iceBeastStatueImage,
-    /*lightningBeastStatueImage*/,
-    fireBeastStatueImage
-] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 3}).frames;
+] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 1}).frames;
 
 const entranceLightFrame = requireFrame('gfx/objects/cavelight.png', {x: 0, y: 0, w: 64, h: 32});
 const orbTreeFrame = requireFrame('gfx/objects/orbTree.png', {x: 0, y: 0, w: 26, h: 36, content: {x: 5, y: 19, w: 17, h: 12}});
@@ -80,8 +78,9 @@ const glowingPedestalAnimation = createAnimation('gfx/decorations/largeStatuePed
     frameMap: [0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 1],
 });
 
-const lightningBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
+const stormBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
+const flameBeastStatueFrame = requireFrame('gfx/decorations/flameBeastStatue.png', {x: 0, y: 0, w: 95, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
@@ -760,20 +759,29 @@ export const decorationTypes = {
     windowOctogonal,
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            const frame = lightningBeastStatueFrame;
+            const frame = stormBeastStatueFrame;
             drawFrameContentAt(context, frame, decoration);
         },
         behaviors: {
             solid: true,
         },
         getHitbox(decoration: Decoration): Rect {
-            return getFrameHitbox(lightningBeastStatueFrame, decoration);
+            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
+            return getFrameHitbox(stormBeastStatueFrame, decoration);
         },
     } as DecorationType,
     fireBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrameContentAt(context, fireBeastStatueImage, {...fireBeastStatueImage, x: decoration.x, y: decoration.y});
-        }
+            const frame = flameBeastStatueFrame;
+            drawFrameContentAt(context, frame, decoration);
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
+            return getFrameHitbox(flameBeastStatueFrame, decoration);
+        },
     } as DecorationType,
     iceBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
