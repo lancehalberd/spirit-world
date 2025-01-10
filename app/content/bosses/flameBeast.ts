@@ -12,7 +12,14 @@ import { addEffectToArea } from 'app/utils/effects';
 import {isEnemyDefeated, paceRandomly} from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
 import {addObjectToArea} from 'app/utils/objects';
-import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
+import {
+    getCardinalDirectionToTarget,
+    getNearbyTarget,
+    getTargetingAnchor,
+    getVectorToTarget,
+    getVectorToNearbyTarget,
+    isTargetVisible,
+} from 'app/utils/target';
 import Random from 'app/utils/Random';
 
 const flameBeastVerticalGeometry: FrameDimensions = {
@@ -32,6 +39,36 @@ const flameBeastWalkDownAnimation = createAnimation('gfx/bosses/flameBeast.png',
 const flameBeastWalkRightAnimation = createAnimation('gfx/bosses/flameBeast.png',
     flameBeastHorizontalGeometry, {y: 2, cols: 8, duration: 6});
 
+const flameBeastSubmergedUpGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 57, y: 34, w: 42, h: 42},
+    anchor: {x: 78, y: 63},
+};
+const flameBeastSubmergedDownGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 57, y: 36, w: 42, h: 42},
+    anchor: {x: 77, y: 43},
+};
+const flameBeastSubmergedRightDownGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 30, y: 57, w: 58, h: 26},
+    anchor: {x: 40, y: 80},
+};
+const flameBeastEmergeUp = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedUpGeometry, {y: 3, cols: 4, duration: 6}, {loop: false});
+const flameBeastEmergeDown = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedDownGeometry, {y: 11, cols: 4, duration: 6}, {loop: false});
+const flameBeastEmergeRight = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedRightDownGeometry, {y: 14, cols: 4, duration: 6}, {loop: false});
+
+
+const flameBeastSubmergedAttackUp = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedUpGeometry, {y: 1, cols: 5, duration: 6}, {loop: false});
+const flameBeastSubmergedAttackDown = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedDownGeometry, {y: 7, cols: 5, duration: 6}, {loop: false});
+const flameBeastSubmergedAttackRight = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedRightDownGeometry, {y: 17, cols: 5, duration: 6}, {loop: false});
+
 const flameBeastAnimations = {
     idle: {
         up: flameBeastWalkDownAnimation,
@@ -39,7 +76,21 @@ const flameBeastAnimations = {
         left: flameBeastWalkRightAnimation,
         right: flameBeastWalkRightAnimation,
     },
+    emerge: {
+        up: flameBeastEmergeUp,
+        down: flameBeastEmergeDown,
+        left: flameBeastEmergeRight,
+        right: flameBeastEmergeRight,
+    },
+    submergedAttack: {
+        up: flameBeastSubmergedAttackUp,
+        down: flameBeastSubmergedAttackDown,
+        left: flameBeastSubmergedAttackRight,
+        right: flameBeastSubmergedAttackRight,
+    },
 };
+
+
 
 
 
@@ -177,7 +228,35 @@ enemyDefinitions.flameBeast = {
     params: {
         enrageLevel: 0,
     },
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        if (isFlameBeastHidden(enemy)) {
+            return {};
+        }
+        return enemy.defaultOnHit(state, hit);
+    },
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (isFlameBeastHidden(enemy)) {
+            return;
+        }
+        enemy.defaultRender(context, state);
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (isFlameBeastHidden(enemy)) {
+            return;
+        }
+        if (enemy.mode === 'emerge' || enemy.mode === 'submergedAttack') {
+            // Draw lava pool instead of shadow.
+            return;
+        }
+        enemy.defaultRenderShadow(context, state);
+    }
 };
+
+function isFlameBeastHidden(enemy: Enemy) {
+    // When the boss is hidden at the start of the fight the health bar is not rendered.
+    // We continue to render the healthbar when the boss is submerged during the fight.
+    return enemy.mode === 'hidden' || enemy.mode === 'emergeWarning' || enemy.mode === 'submerged';
+}
 
 function getFlameHeart(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameHeart') as Enemy;
@@ -383,8 +462,105 @@ function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
     return enrageLevel;
 }
 
+function getClosestLavaPoint(state: GameState, enemy: Enemy): Point {
+    let bestDistance = 10000, bestPoint: Point = undefined;
+    const visibleTargets = enemy.area.allyTargets.filter(target => isTargetVisible(state, enemy, target));
+    const lavaMarkers: ObjectInstance[] = [];
+    for (const object of enemy.area.objects) {
+        if (object.definition?.type !== 'marker' || object.definition.id !== 'craterBossPoint') {
+            continue;
+        }
+        lavaMarkers.push(object);
+        for (const target of visibleTargets) {
+            const distance = getVectorToTarget(state, object, target).mag;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                bestPoint = getTargetingAnchor(object);
+            }
+        }
+    }
+    if (!bestPoint) {
+        return getTargetingAnchor(Random.element(lavaMarkers));
+    }
+    return bestPoint;
+}
+
+
 function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
+    if (enemy.mode === 'hidden') {
+        enemy.healthBarTime = 0;
+        // If a flameheart is present, stay hidden until it is damaged.
+        if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
+            return;
+        }
+        enemy.status = 'normal';
+        enemy.setMode('submerged');
+        // Skip the normal delay to attack sooner at the start of the fight.
+        enemy.modeTime = 3000;
+
+        return;
+    }
+    if (isFlameBeastHidden(enemy)) {
+        delete enemy.behaviors;
+    } else {
+        enemy.behaviors = {touchHit: { damage: 4, element: 'fire', source: enemy}};
+    }
+
+    if (enemy.mode === 'submerged') {
+        if (enemy.modeTime >= 500) {
+            const {x, y} = getClosestLavaPoint(state, enemy);
+            enemy.x = x;
+            enemy.y = y;
+            // Face a nearby target when choosing a pool to emerge from.
+            const target = getNearbyTarget(state, enemy, 80, enemy.area.allyTargets);
+            if (target) {
+                enemy.d = getCardinalDirectionToTarget(enemy, target, enemy.d);
+            }
+            enemy.setMode('emergeWarning');
+        }
+        return;
+    }
+    if (enemy.mode === 'emergeWarning') {
+        hitTargets(state, enemy.area, {
+            hitTiles: true,
+            element: 'fire',
+            hitCircle: {
+                x: enemy.x,
+                y: enemy.y,
+                r: 20,
+            },
+            source: enemy,
+        });
+        const x = enemy.x - 16 + 32 * Math.random();
+        const y = enemy.y - 12 + 24 * Math.random();
+        addLavaBubbleEffectToBackground(state, enemy.area, {x, y});
+        if (enemy.modeTime > 800) {
+            enemy.setMode('emerge');
+            // Update target right before actually emerging.
+            const target = getNearbyTarget(state, enemy, 80, enemy.area.allyTargets);
+            if (target) {
+                enemy.d = getCardinalDirectionToTarget(enemy, target, enemy.d);
+            }
+            enemy.setAnimation('emerge', enemy.d);
+        }
+    }
+
+    if (enemy.mode === 'emerge') {
+        if (enemy.animationTime >= enemy.currentAnimation.duration) {
+            if (enemy.currentAnimationKey === 'emerge') {
+                enemy.changeToAnimation('submergedAttack')
+            } else {
+                // TODO: animate back into lava instead of just disappearing.
+                // TODO: fully emergy from lava and charge the player if the beast has line of sight for a charge attack.
+                enemy.setMode('submerged');
+            }
+        }
+        return;
+    }
+    return;
+
+
     // This is a bit brittle as it depends on the boss having a specific number of starting abilities.
     if (!flameHeart && enemy.abilities.length < 2) {
         enemy.gainAbility(bossLaserBeamAbility);
