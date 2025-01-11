@@ -9,6 +9,7 @@ export * from 'app/content/bosses/rival2';
 export * from 'app/content/bosses/crystalCollector';
 export * from 'app/content/bosses/balloonMegapede';
 export * from 'app/content/bosses/flameBeast';
+export * from 'app/content/bosses/flameHeart';
 export * from 'app/content/bosses/frostBeast';
 export * from 'app/content/bosses/stormBeast';
 export * from 'app/content/bosses/stormHeart';

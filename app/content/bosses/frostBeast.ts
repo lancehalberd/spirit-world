@@ -248,6 +248,12 @@ enemyDefinitions.frostBeast = {
     params: {
         submerged: true,
     },
+    onDeath(state: GameState) {
+        // The area will refresh after the boss is defeated. Setting this flag will cause
+        // tiles that were frozen during the fight to be restored to their original tiles
+        // so that all tiles unfreeze after the fight.
+        state.map.restoreOriginalTiles = true;
+    },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         if (isFrostBeastHidden(enemy)) {
             return {};

@@ -7,9 +7,10 @@ import {playObjectSound} from 'app/musicController';
 import { renderHeroShadow } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { enterZoneByTarget, findObjectLocation, isLocationHot } from 'app/utils/enterZoneByTarget';
+import {enterZoneByTarget, findObjectLocation} from 'app/utils/enterZoneByTarget';
 import { directionMap } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
+import {isLocationHot} from 'app/utils/isLocationHot';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { drawText } from 'app/utils/simpleWhiteFont';
 

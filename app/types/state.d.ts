@@ -143,6 +143,7 @@ interface GameState {
     loopingSoundEffects: AudioInstance[]
     map: {
         needsRefresh: boolean
+        restoreOriginalTiles?: boolean
         renderedMapId?: string
         renderedFloorId?: string
     }

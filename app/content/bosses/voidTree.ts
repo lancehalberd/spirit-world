@@ -1,4 +1,4 @@
-import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
+import {flameHeartAnimations} from 'app/content/bosses/flameHeart';
 import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frostBeast';
 import { addSlamEffect } from 'app/content/bosses/golem';
 import {stormHeartAnimations} from 'app/content/bosses/stormHeart';

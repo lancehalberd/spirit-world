@@ -8,6 +8,7 @@ import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
 import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
 import { getAreaDimensions } from 'app/utils/getAreaSize';
 import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
@@ -455,6 +456,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     if (!area) {
         return;
     }
+    const wasHot = state.areaSection?.isHot;
     if (state.areaSection) {
         state.areaSection = getAreaSectionInstance(state, state.areaSection.definition);
     }
@@ -524,13 +526,18 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             // Update any tile behaviors that may have changed as layers were added/removed.
             for (let y = 0; y < nextAreaInstance.h; y++) {
                 for (let x = 0; x < nextAreaInstance.w; x++) {
-                    for (const layer of nextAreaInstance.layers) {
-                        layer.tiles[y][x] = layer.originalTiles[y][x];
+                    // This flag is set in special examples to make sure modified tiles are reverted on logic refresh.
+                    // In particular, the Frost Beast may freeze some tiles on the field that should be reverted when
+                    // the area refreshes after beating it, otherwise most tiles will melt while some random ice tiles
+                    // remain.
+                    if (state.map.restoreOriginalTiles) {
+                        for (const layer of nextAreaInstance.layers) {
+                            layer.tiles[y][x] = layer.originalTiles[y][x];
+                        }
                     }
                     resetTileBehavior(nextAreaInstance, {x, y});
                 }
             }
-
             // If this is the instance currently being viewed, then apply either fast or normal transition logic.
             if (state.areaInstance === instance) {
                 if (fastRefresh) {
@@ -593,6 +600,12 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
 
             applyVariantsToArea(state, instance);
         }
+
+        // If the heat level of the room changed, hit all the tiles with fire to melt any ice.
+        if (!wasHot && state.areaSection?.isHot) {
+            hitTargets(state, instance, {hitbox: {x: 0, y: 0, w: 2000, h: 2000}, hitTiles: true, element: 'fire', source: null});
+        }
+
         // Call refresh logic on any objects currently in the area in case their state depends on the current logic.
         // For example, the door and signs in the Staff Tower Elevator update their state as you interact with the elevator
         // controls.
@@ -633,6 +646,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         }
         //console.log('new instance', instance.objects.map( o => o.definition?.id ));
     }
+    delete state.map.restoreOriginalTiles;
     checkIfAllEnemiesAreDefeated(state, area);
 }
 

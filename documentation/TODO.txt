@@ -68,24 +68,17 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Flame Beast improvements
-        - Don't cool lava when refreshing area logic.
-        - Update layout of area to make sense when lava isn't drained, in general make it larger and more organic.
-            - Make sure southern masked ledges interact with lava underneath them correctly.
-            - Also make room in the middle lava pits so the beast doesn't overlap cliffs when facing north/south.
-            - Prevent beast from attacking "up" ledges when spawning in the center
-        - Maybe can cancel emerging if the player gets too far away too quickly.
-        - Comes halfway out of the nearest lava and attacks the player:
-            - Swipe if the player is in range.
-            - Spawn a chasing fire vortex if in range
-            - Launch falling fireball barrage if the player is far away.
-        - Fully emerges from a lava pool with line of site on the player and charge to the player and into another lava pool.
+
+    - Allow setting progress flags for the current zone
+        - Also support zone only flags in a different tab.
 
     - Test new cocoon tiles
         - Add doors
         - Fix tilesheet for pits
 
     - Add check to material world forge where the door is to the boss chamber.
+
+    - Add function for generating a full size image of an area or area section.
 
     - Jade Champion during Storm Beast
         - Put up a barrier when the heart is enraged and add text cue telling player to come to the barrier.
@@ -173,6 +166,12 @@ Current tasks:
         - Try to balance how many instances of each ability are used so there is still nice variety.
         - Add additional abilities/configurations to increase variet.
 
+    - Flame Beast improvements
+        - Add damage frames for the beast.
+        - Prevent beast from attacking "up" ledges when spawning in the center.
+            - Probably prevent the beast from considering actors "near" spawn points if there is a ledge in between.
+        - Fully emerges from a lava pool with line of site on the player and charge to the player and into another lava pool.
+            - Need animation for entering lava pools head first.
     - Frost Beast improvements
         - Spawn medium heads that can appear anywhere on the battlefield
         - Make Frost Beast more dangerous underwater and when enraged.

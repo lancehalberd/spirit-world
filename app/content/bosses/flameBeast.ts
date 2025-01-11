@@ -1,15 +1,12 @@
-import { Flame } from 'app/content/effects/flame';
-import { FlameWall } from 'app/content/effects/flameWall';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { Enemy } from 'app/content/enemy';
-import {bossLaserBeamAbility, bossQuadRotatingLaserBeamAbility, bossQuadLaserBlenderBeamAbility} from 'app/content/enemyAbilities/laserBeam';
-import {omniAnimation} from 'app/content/enemyAnimations';
-import {fillFlameBeastLava} from 'app/content/specialBehaviors/crater';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {Enemy} from 'app/content/enemy';
+import {FRAME_LENGTH} from 'app/gameConstants';
+//import {bossLaserBeamAbility} from 'app/content/enemyAbilities/laserBeam';
+import {useFastVolcanoAbility, useVolcanoAbility} from 'app/content/enemyAbilities/volcano';
 import {addLavaBubbleEffectToBackground} from 'app/scenes/field/addAmbientEffects';
-import {createAnimation, drawFrame} from 'app/utils/animations';
-import { getCardinalDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
-import {isEnemyDefeated, paceRandomly} from 'app/utils/enemies';
+import {createAnimation, reverseAnimation} from 'app/utils/animations';
+import {directionMap} from 'app/utils/direction';
+import {isEnemyDefeated} from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
 import {addObjectToArea} from 'app/utils/objects';
 import {
@@ -22,7 +19,7 @@ import {
 } from 'app/utils/target';
 import Random from 'app/utils/Random';
 
-const flameBeastVerticalGeometry: FrameDimensions = {
+/*const flameBeastVerticalGeometry: FrameDimensions = {
     w: 156, h: 121,
     content: {x: 55, y: 26, w: 46, h: 62},
     anchor: {x: 77, y: 43},
@@ -37,7 +34,38 @@ const flameBeastHorizontalGeometry: FrameDimensions = {
 const flameBeastWalkDownAnimation = createAnimation('gfx/bosses/flameBeast.png',
     flameBeastVerticalGeometry, {y: 1, cols: 6, duration: 6});
 const flameBeastWalkRightAnimation = createAnimation('gfx/bosses/flameBeast.png',
-    flameBeastHorizontalGeometry, {y: 2, cols: 8, duration: 6});
+    flameBeastHorizontalGeometry, {y: 2, cols: 8, duration: 6});*/
+
+
+const flameBeastEmergingUpGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 57, y: 50, w: 42, h: 24},
+    anchor: {x: 78, y: 63},
+};
+const flameBeastEmergingDownGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 57, y: 30, w: 42, h: 30},
+    anchor: {x: 77, y: 43},
+};
+const flameBeastEmergingRightDownGeometry: FrameDimensions = {
+    w: 156, h: 121,
+    content: {x: 30, y: 57, w: 26, h: 26},
+    anchor: {x: 40, y: 80},
+};
+const flameBeastEmergeUp = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastEmergingUpGeometry, {y: 3, cols: 4, duration: 4}, {loop: false});
+const flameBeastEmergeDown = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastEmergingDownGeometry, {y: 11, cols: 4, duration: 4}, {loop: false});
+const flameBeastEmergeRight = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastEmergingRightDownGeometry, {y: 14, cols: 4, duration: 4}, {loop: false});
+
+const flameBeastDeathUp = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastEmergingUpGeometry, {y: 4, cols: 3, duration: 4}, {loop: false});
+const flameBeastDeathDown = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastEmergingDownGeometry, {y: 10, cols: 3, duration: 4}, {loop: false});
+const flameBeastDeathRight = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastEmergingRightDownGeometry, {y: 15, cols: 3, duration: 4}, {loop: false});
+
 
 const flameBeastSubmergedUpGeometry: FrameDimensions = {
     w: 156, h: 121,
@@ -54,27 +82,27 @@ const flameBeastSubmergedRightDownGeometry: FrameDimensions = {
     content: {x: 30, y: 57, w: 58, h: 26},
     anchor: {x: 40, y: 80},
 };
-const flameBeastEmergeUp = createAnimation('gfx/bosses/flameBeastNew.png',
-    flameBeastSubmergedUpGeometry, {y: 3, cols: 4, duration: 6}, {loop: false});
-const flameBeastEmergeDown = createAnimation('gfx/bosses/flameBeastNew.png',
-    flameBeastSubmergedDownGeometry, {y: 11, cols: 4, duration: 6}, {loop: false});
-const flameBeastEmergeRight = createAnimation('gfx/bosses/flameBeastNew.png',
-    flameBeastSubmergedRightDownGeometry, {y: 14, cols: 4, duration: 6}, {loop: false});
-
-
+const flameBeastSubmergedIdleUp = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedUpGeometry, {y: 1, cols: 1, duration: 4}, {loop: false});
+const flameBeastSubmergedIdleDown = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedDownGeometry, {y: 7, cols: 1, duration: 4}, {loop: false});
+const flameBeastSubmergedIdleRight = createAnimation('gfx/bosses/flameBeastNew.png',
+    flameBeastSubmergedRightDownGeometry, {y: 17, cols: 1, duration: 4}, {loop: false});
 const flameBeastSubmergedAttackUp = createAnimation('gfx/bosses/flameBeastNew.png',
-    flameBeastSubmergedUpGeometry, {y: 1, cols: 5, duration: 6}, {loop: false});
+    flameBeastSubmergedUpGeometry, {y: 1, cols: 5, duration: 4}, {loop: false});
 const flameBeastSubmergedAttackDown = createAnimation('gfx/bosses/flameBeastNew.png',
-    flameBeastSubmergedDownGeometry, {y: 7, cols: 5, duration: 6}, {loop: false});
+    flameBeastSubmergedDownGeometry, {y: 7, cols: 5, duration: 4}, {loop: false});
 const flameBeastSubmergedAttackRight = createAnimation('gfx/bosses/flameBeastNew.png',
-    flameBeastSubmergedRightDownGeometry, {y: 17, cols: 5, duration: 6}, {loop: false});
+    flameBeastSubmergedRightDownGeometry, {y: 17, cols: 5, duration: 4}, {loop: false});
+const flameBeastAttackActivationTime = flameBeastSubmergedAttackUp.frameDuration * 3 * FRAME_LENGTH;
+const flameBeastAttackRecoverTime = flameBeastSubmergedAttackUp.duration - flameBeastAttackActivationTime;
 
 const flameBeastAnimations = {
     idle: {
-        up: flameBeastWalkDownAnimation,
-        down: flameBeastWalkDownAnimation,
-        left: flameBeastWalkRightAnimation,
-        right: flameBeastWalkRightAnimation,
+        up: flameBeastSubmergedIdleUp,
+        down: flameBeastSubmergedIdleDown,
+        left: flameBeastSubmergedIdleRight,
+        right: flameBeastSubmergedIdleRight,
     },
     emerge: {
         up: flameBeastEmergeUp,
@@ -82,142 +110,96 @@ const flameBeastAnimations = {
         left: flameBeastEmergeRight,
         right: flameBeastEmergeRight,
     },
+    submerge: {
+        up: reverseAnimation(flameBeastEmergeUp),
+        down: reverseAnimation(flameBeastEmergeDown),
+        left: reverseAnimation(flameBeastEmergeRight),
+        right: reverseAnimation(flameBeastEmergeRight),
+    },
     submergedAttack: {
         up: flameBeastSubmergedAttackUp,
         down: flameBeastSubmergedAttackDown,
         left: flameBeastSubmergedAttackRight,
         right: flameBeastSubmergedAttackRight,
     },
+    death: {
+        up: flameBeastDeathUp,
+        down: flameBeastDeathDown,
+        left: flameBeastDeathRight,
+        right: flameBeastDeathRight,
+    },
 };
 
-
-
-
-
-const flameHeartGeometry = {w: 48, h: 48, content: {x: 11, y: 16, w: 26, h: 18}};
-const flameHeartIdleAnimation = createAnimation('gfx/bosses/flameHeartIdle.png', flameHeartGeometry, {cols: 9, duration: 6});
-const flameHeartHurtAnimation = createAnimation('gfx/bosses/flameHeartHurt.png', flameHeartGeometry,
-    {cols: 11, duration: 2, frameMap: [0, 1, 2, 3, 2, 1]},
-);
-const flameHeartDeathAnimation = createAnimation('gfx/bosses/flameHeartHurt.png', flameHeartGeometry,
-    {cols: 11, duration: 2, frameMap: [0, 1, 2, 3, 4, 4, 5, 5]}, {loopFrame: 4},
-);
-const flameHeartPrepareAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
-    {cols: 14, duration: 4},
-    {loop: true, loopFrame: 6},
-);
-const flameHeartPrepareEndAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
-    {x: 14, cols: 4, duration: 4}
-);
-const flameHeartAttackAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
-    {x: 18, cols: 9, duration: 4},
-    {loop: true, loopFrame: 4}
-);
-const flameHeartAttackEndAnimation = createAnimation('gfx/bosses/flameHeartAttack.png', flameHeartGeometry,
-    {x: 27, cols: 4, duration: 4},
-);
-
-export const flameHeartAnimations = {
-    idle: omniAnimation(flameHeartIdleAnimation),
-    hurt: omniAnimation(flameHeartHurtAnimation),
-    death: omniAnimation(flameHeartDeathAnimation),
-    prepare: omniAnimation(flameHeartPrepareAnimation),
-    prepareEnd: omniAnimation(flameHeartPrepareEndAnimation),
-    attack: omniAnimation(flameHeartAttackAnimation),
-    attackEnd: omniAnimation(flameHeartAttackEndAnimation),
+// TODO: Make lava vortex chase the player if the beast is enraged
+const flameBeastLavaVortexAbility: EnemyAbility<Target> = {
+    getTarget(state: GameState, enemy: Enemy): Target {
+        return getVectorToNearbyTarget(state, enemy, 80, enemy.area.allyTargets)?.target;
+    },
+    prepareAbility(state: GameState, enemy: Enemy, target: Target) {
+        enemy.changeToAnimation('submergedAttack');
+    },
+    useAbility(state: GameState, enemy: Enemy, target: Target): void {
+        const [dx, dy] = directionMap[enemy.d];
+        const anchor = getTargetingAnchor(enemy);
+        const x = anchor.x + 64 * dx;
+        const y = anchor.y + 64 * dy;
+        const lavaVortex = new Enemy(state, {
+            type: 'enemy',
+            enemyType: 'vortexLava',
+            x, y,
+        });
+        const hitbox = lavaVortex.getHitbox();
+        lavaVortex.x -= hitbox.w / 2;
+        lavaVortex.y -= hitbox.h / 2;
+        lavaVortex.params.duration = 5000;
+        addObjectToArea(state, enemy.area, lavaVortex);
+    },
+    // There is no limit to how often the flame beast can use this ability.
+    cooldown: 20,
+    initialCooldown: 20,
+    charges: 1,
+    prepTime: flameBeastAttackActivationTime,
+    recoverTime: flameBeastAttackRecoverTime,
 };
 
-
-type LeakStrikeTargetType = ReturnType<typeof getVectorToNearbyTarget>;
-
-const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): LeakStrikeTargetType {
-        return getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
+// Override the volcano ability to use the correct frames for the Flame Beast.
+const flameBeastVolcanoAbility: EnemyAbility<Target> = {
+    getTarget(state: GameState, enemy: Enemy): Target {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets)?.target;
     },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: LeakStrikeTargetType): void {
-        const enemyHitbox = enemy.getHitbox();
-        const targetHitbox = target.target.getHitbox();
-        const x = enemyHitbox.x + enemyHitbox.w / 2;
-        const y = enemyHitbox.y + enemyHitbox.h / 2;
-        const tx = targetHitbox.x + targetHitbox.w / 2;
-        const ty = targetHitbox.y + targetHitbox.h / 2;
-        const abilityWithCharges = enemy.getAbility(leapStrikeAbility);
-        enemy.vz = (abilityWithCharges.charges > 0) ? 3 : 4;
-        enemy.az = -0.2;
-        const duration = -2 * enemy.vz / enemy.az;
-        enemy.vx = (tx - x) / duration;
-        enemy.vy = (ty - y) / duration;
-        enemy.setAnimation('attack', enemy.d);
-        enemy.setMode('leapStrike');
-        spawnLavaVorex(state, enemy);
+    prepareAbility(state: GameState, enemy: Enemy, target: Target) {
+        enemy.changeToAnimation('submerge');
     },
-    cooldown: 2000,
-    initialCharges: 2,
-    charges: 2,
-    prepTime: 200,
-    recoverTime: 100,
-};
-
-enemyDefinitions.flameHeart = {
-    naturalDifficultyRating: 20,
-    animations: flameHeartAnimations, life: 50, scale: 2,
-    update: updateFlameHeart,
-    floating: true,
-    params: {
-        enrageLevel: 0,
-        // This is the key that corresponds to the lava being drained enough to reveal the heart.
-        // When it is set, the heart is vulnerable. Leave this blank to make it always vulnerable.
-        lavaKey: 'craterLava4Objects',
-    },
-    initialMode: 'choose',
-    immunities: ['fire'],
-    elementalMultipliers: {'ice': 1.5, 'lightning': 1.2},
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        // The heart becomes protected when the lava starts to fill, reducing all incoming damage by
-        // 80%
-        if (enemy.params.isProtected) {
-            hit = {
-                ...hit,
-                damage: hit.damage / 5,
+    updateAbility(state: GameState, enemy: Enemy, target: Target) {
+        // Freeze at frame 3, which will have the flame beast sticking its head out.
+        if (enemy.activeAbility.time < 400) {
+            enemy.animationTime = Math.min(enemy.animationTime, 2 * flameBeastEmergeUp.frameDuration * FRAME_LENGTH);
+        } else if (enemy.activeAbility.time === 400) {
+            // Adjust the point the flames come out when facing left/right to match where the mouth is.
+            const anchorDelta = {x: 20 * directionMap[enemy.d][0], y: 0};
+            if (getFlameBeastEnrageLevel(state, enemy) > 0) {
+                useFastVolcanoAbility(state, enemy, target, anchorDelta);
+            } else {
+                useVolcanoAbility(state, enemy, target, anchorDelta);
             }
-        }
-        if (isFlameHeartExposed(state, enemy)) {
-            return enemy.defaultOnHit(state, hit);
-        }
-        return {};
-    },
-    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
-        if (isFlameHeartExposed(state, enemy)) {
-            enemy.defaultRender(context, state);
-            return;
-        }
-        let h = 0;
-        if (state.savedState.objectFlags.craterLavaAnimation4_1) {
-            h = 12;
-        } else if (state.savedState.objectFlags.craterLavaAnimation4_2) {
-            h = 24;
-        } else if (state.savedState.objectFlags.craterLavaAnimation4_3) {
-            h = 36;
-        }
-        if (h) {
-            const frame = enemy.getFrame();
-            drawFrame(context, {...frame, h}, { ...frame,
-                x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
-                y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z,
-                w: frame.w * enemy.scale,
-                h: h * enemy.scale,
-            });
+            // On using the ability, switch back to the emerge animation at the same frame.
+            enemy.changeToAnimation('emerge');
+            enemy.animationTime = flameBeastEmergeUp.frameDuration * FRAME_LENGTH
+        } else {
+            enemy.animationTime = Math.min(enemy.animationTime, flameBeastEmergeUp.frameDuration * FRAME_LENGTH);
         }
     },
-    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
-        if (isFlameHeartExposed(state, enemy)) {
-            enemy.defaultRenderShadow(context, state);
-        }
-    },
+    prepTime: 800,
+    cooldown: 1000,
+    recoverTime: 800,
 };
+
+// TODO: fully emerge from lava and charge the player if the beast has line of sight for a charge attack.
+
 enemyDefinitions.flameBeast = {
     naturalDifficultyRating: 100,
-    abilities: [leapStrikeAbility],
+    aggroRadius: 128,
+    abilities: [flameBeastLavaVortexAbility, flameBeastVolcanoAbility],
     shadowOffset: {x: 0, y: 6},
     animations: flameBeastAnimations, life: 80, update: updateFlameBeast,
     flipLeft: true,
@@ -229,7 +211,7 @@ enemyDefinitions.flameBeast = {
         enrageLevel: 0,
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        if (isFlameBeastHidden(enemy)) {
+        if (!isFlameBeastHittable(enemy)) {
             return {};
         }
         return enemy.defaultOnHit(state, hit);
@@ -244,8 +226,16 @@ enemyDefinitions.flameBeast = {
         if (isFlameBeastHidden(enemy)) {
             return;
         }
-        if (enemy.mode === 'emerge' || enemy.mode === 'submergedAttack') {
-            // Draw lava pool instead of shadow.
+        if (enemy.mode === 'emerge' || enemy.mode === 'submerge' || enemy.mode === 'submergedAttack') {
+            const anchor = getTargetingAnchor(enemy);
+            context.save();
+                context.fillStyle = '#E77136';
+                context.translate(anchor.x, anchor.y);
+                context.scale(1, 0.5);
+                context.beginPath();
+                context.arc(0, 0, 24, 0, 2 * Math.PI);
+                context.fill();
+            context.restore();
             return;
         }
         enemy.defaultRenderShadow(context, state);
@@ -255,197 +245,20 @@ enemyDefinitions.flameBeast = {
 function isFlameBeastHidden(enemy: Enemy) {
     // When the boss is hidden at the start of the fight the health bar is not rendered.
     // We continue to render the healthbar when the boss is submerged during the fight.
-    return enemy.mode === 'hidden' || enemy.mode === 'emergeWarning' || enemy.mode === 'submerged';
+    return enemy.mode === 'hidden' || enemy.mode === 'emergeWarning' || enemy.mode === 'submerged' || enemy.mode === 'regenerate';
+}
+function isFlameBeastHittable(enemy: Enemy) {
+    if (isFlameBeastHidden(enemy)) {
+        return false;
+    }
+    return true;
+    // This was for when the hitboxes were bad for these animations.
+    //return enemy.currentAnimationKey !== 'submerge' && enemy.currentAnimationKey !== 'emerge';
 }
 
 function getFlameHeart(state: GameState, area: AreaInstance): Enemy {
     return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameHeart') as Enemy;
 }
-
-function isFlameHeartExposed(state: GameState, enemy: Enemy): boolean {
-    return !enemy.params.lavaKey || !!state.savedState.objectFlags[enemy.params.lavaKey];
-}
-
-
-function getFlameBeast(state: GameState, area: AreaInstance): Enemy {
-    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'flameBeast') as Enemy;
-}
-
-function updateFlameHeart(state: GameState, enemy: Enemy): void {
-    const flameBeast = getFlameBeast(state, enemy.area);
-    const isExposed = isFlameHeartExposed(state, enemy);
-    // The heart does not attack before it is first exposed.
-    if (!isExposed) {
-        // Remove solid/touch damage behaviors while the enemy is submerged in lava.
-        delete enemy.behaviors;
-        const hitbox = enemy.getHitbox();
-        const x = hitbox.x + Math.random() * hitbox.w;
-        const y = hitbox.y + Math.random() * hitbox.h;
-        addLavaBubbleEffectToBackground(state, enemy.area, {x, y});
-        hitTargets(state, enemy.area, {
-            hitbox,
-            hitTiles: true,
-            element: 'fire',
-            source: enemy,
-        });
-        // The heart regenerates life will covered in lava.
-        if (enemy.time % 1000 === 0) {
-            enemy.life = Math.min(enemy.life + 0.5, enemy.enemyDefinition.life);
-        }
-        // Don't show the healthbar or attack if the heart has not been exposed yet.
-        if (flameBeast.mode === 'hidden') {
-            enemy.healthBarTime = 0;
-            // Set this so it doesn't immediately attack on reveal.
-            enemy.modeTime = 0;
-            return;
-        }
-    } else {
-        enemy.behaviors = {solid: true, touchHit: { damage: 4, element: 'fire', source: enemy}};
-    }
-    enemy.z = 6;
-    // The heart is now considered enraged as long as it is covered in lava.
-    const isEnraged = !isExposed;
-    const target = getVectorToNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);
-    if (enemy.mode === 'choose') {
-        if (enemy.modeTime >= 1000 || isEnraged) {
-            // Use the next animation key to transition modes at the end of the current animation loop.
-            if (enemy.currentAnimationKey === 'attack' || enemy.runAnimationSequence(['idle', 'prepare'])) {
-                if (target?.mag < 100 || (isEnraged && Math.random() < 0.3)) {
-                    enemy.params.theta = Math.atan2(target.y, target.x) - Math.PI / 4;
-                    enemy.setMode('radialFlameAttack');
-                } else if (Math.random() < 0.5) {
-                    enemy.setMode('flameWallsAttack');
-                } else {
-                    enemy.setMode('laserAttack');
-                }
-            }
-        }
-    } else if (enemy.mode === 'flameWallsAttack') {
-        if (enemy.modeTime >= 1000) {
-            if (enemy.runAnimationSequence(['prepare', 'prepareEnd', 'attack'])) {
-                const hitbox = enemy.getHitbox(state);
-                FlameWall.createRadialFlameWall(state, enemy.area, {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
-                    isEnraged ? 8 : 4 + enemy.params.enrageLevel * 2, enemy);
-                enemy.setMode('endAttack');
-            }
-        }
-    } else if (enemy.mode === 'laserAttack') {
-        if (enemy.modeTime >= 1000) {
-            if (enemy.runAnimationSequence(['prepare', 'prepareEnd', 'attack']) && enemy.animationTime >= 200) {
-                const target = getVectorToNearbyTarget(state, enemy, 1000, enemy.area.allyTargets) || {x: Math.random(), y: Math.random()};
-                const baseTheta = target ? Math.atan2(target.y, target.x) : 2 * Math.PI * Math.random();
-                enemy.setMode('endLaserAttack');
-                if (enemy.params.enrageLevel === 2) {
-                    bossQuadLaserBlenderBeamAbility.useAbility(state, enemy, baseTheta);
-                    // Rotating laser lasts the full 5000ms.
-                    enemy.modeTime = 0;
-                } else if (enemy.params.enrageLevel === 1) {
-                    bossQuadRotatingLaserBeamAbility.useAbility(state, enemy, baseTheta);
-                    // Rotating laser lasts the full 5000ms.
-                    enemy.modeTime = 800;
-                } else {
-                    bossLaserBeamAbility.useAbility(state, enemy, baseTheta);
-                    // Laser last 1000ms.
-                    enemy.modeTime = 4000;
-                }
-            }
-        }
-    } else if (enemy.mode === 'endLaserAttack') {
-        if (enemy.modeTime >= 5000) {
-            enemy.setMode('endAttack');
-        }
-    } else if (enemy.mode === 'radialFlameAttack') {
-        const timeLimit = 4000 + 500 * enemy.params.enrageLevel;
-        if (enemy.modeTime >= 500 && enemy.runAnimationSequence(['prepare', 'prepareEnd', 'attack'])) {
-            if (enemy.modeTime % 100 === 0 && enemy.modeTime < timeLimit) {
-                // To give the player warning, this attack powers up over 1 second and has low range at first.
-                const power = Math.min(1, enemy.modeTime / 500);
-                const speed = 1 + 2 * power;
-                const hitbox = enemy.getHitbox(state);
-                let count = 1 + enemy.params.enrageLevel;
-                for (let i = 0; i < count; i++) {
-                    const theta = enemy.params.theta + i * 2 * Math.PI / count;
-                    const dx = Math.cos(theta);
-                    const dy = Math.sin(theta);
-                    const flame = new Flame({
-                        x: hitbox.x + hitbox.w / 2 + 4 * dx,
-                        y: hitbox.y + hitbox.h / 2 + 4 * dy,
-                        vx: speed * dx,
-                        vy: speed * dy,
-                        ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
-                        damage: 2,
-                        source: enemy,
-                    });
-                    addEffectToArea(state, enemy.area, flame);
-                }
-                enemy.params.theta += Math.PI / 20;
-            }
-        }
-        if (enemy.modeTime >= timeLimit + 500) {
-            enemy.setMode('endAttack');
-        }
-    } else if (enemy.mode === 'endAttack') {
-        // The heart will stay in the attack animation while enraged.
-        if (isEnraged || enemy.runAnimationSequence(['attack', 'attackEnd', 'idle'])) {
-            if (enemy.modeTime >= 1000) {
-                enemy.setMode('choose');
-            }
-        }
-    }
-    if (enemy.life <= enemy.enemyDefinition.life * 2 / 3 && enemy.params.enrageLevel === 0) {
-        enemy.params.isProtected = true;
-        enemy.params.enrageLevel = 1;
-        enemy.modeTime = 0;
-        fillLava(state, enemy);
-    } else if (enemy.life <= enemy.enemyDefinition.life * 1 / 3 && enemy.params.enrageLevel === 1) {
-        enemy.params.isProtected = true;
-        enemy.params.enrageLevel = 2;
-        enemy.modeTime = 0;
-        fillLava(state, enemy);
-    }
-    // After the fight starts, any time the lava is full and all switches are active, deactivate
-    // a number of switches based on the current enrage level.
-    const activeSwitches = enemy.area.objects.filter(o => o.definition?.id === 'craterBossSwitch' && o.status === 'active');
-    if (!state.savedState.objectFlags.craterLava4 && activeSwitches.length >= 8) {
-        const randomSwitches = Random.shuffle(activeSwitches);
-        for (let i = 0; i < 2 * enemy.params.enrageLevel; i++) {
-            randomSwitches[i].status = 'normal';
-        }
-        enemy.params.isProtected = false;
-    }
-}
-
-function fillLava(state: GameState, enemy: Enemy) {
-    if (!isFlameHeartExposed(state, enemy) || enemy.params.lavaKey !== 'craterLava4Objects') {
-        return;
-    }
-    fillFlameBeastLava(state);
-}
-
-const spawnLavaVorex = (state: GameState, enemy: Enemy): void => {
-    const enemyHitbox = enemy.getHitbox(state);
-    const x = enemyHitbox.x + enemyHitbox.w / 2;
-    const y = enemyHitbox.y + enemyHitbox.h / 2;
-    const lavaVortex = new Enemy(state, {
-        type: 'enemy',
-        enemyType: 'vortexLava',
-        x, y,
-    });
-    const hitbox = lavaVortex.getHitbox();
-    lavaVortex.x -= hitbox.w / 2;
-    lavaVortex.y -= hitbox.h / 2;
-    lavaVortex.params.duration = 5000;
-    addObjectToArea(state, enemy.area, lavaVortex);
-    /*const flame = new Flame({
-        x,
-        y,
-        ttl: 2000 + getFlameBeastEnrageLevel(state, enemy) * 500,
-        scale: 4,
-        damage: 3,
-        source: enemy,
-    });
-    addEffectToArea(state, enemy.area, flame);*/
-};
 
 function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
     let enrageLevel = 0;
@@ -462,20 +275,27 @@ function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
     return enrageLevel;
 }
 
-function getClosestLavaPoint(state: GameState, enemy: Enemy): Point {
-    let bestDistance = 10000, bestPoint: Point = undefined;
-    const visibleTargets = enemy.area.allyTargets.filter(target => isTargetVisible(state, enemy, target));
+function getLavaMarkers(state: GameState, enemy: Enemy): ObjectInstance[] {
     const lavaMarkers: ObjectInstance[] = [];
     for (const object of enemy.area.objects) {
         if (object.definition?.type !== 'marker' || object.definition.id !== 'craterBossPoint') {
             continue;
         }
         lavaMarkers.push(object);
+    }
+    return lavaMarkers;
+}
+
+function getClosestLavaPoint(state: GameState, enemy: Enemy): Point {
+    let bestDistance = 10000, bestPoint: Point = undefined;
+    const visibleTargets = enemy.area.allyTargets.filter(target => isTargetVisible(state, enemy, target));
+    const lavaMarkers = getLavaMarkers(state, enemy);
+    for (const lavaMarker of lavaMarkers) {
         for (const target of visibleTargets) {
-            const distance = getVectorToTarget(state, object, target).mag;
+            const distance = getVectorToTarget(state, lavaMarker, target).mag;
             if (distance < bestDistance) {
                 bestDistance = distance;
-                bestPoint = getTargetingAnchor(object);
+                bestPoint = getTargetingAnchor(lavaMarker);
             }
         }
     }
@@ -485,11 +305,15 @@ function getClosestLavaPoint(state: GameState, enemy: Enemy): Point {
     return bestPoint;
 }
 
-
 function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
     if (enemy.mode === 'hidden') {
         enemy.healthBarTime = 0;
+        // The Flame Beast is not functional without lava markers to indicate where it
+        // can emerge from/submerge into lava.
+        if (getLavaMarkers(state, enemy).length <= 0) {
+            return;
+        }
         // If a flameheart is present, stay hidden until it is damaged.
         if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
             return;
@@ -501,14 +325,42 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
 
         return;
     }
-    if (isFlameBeastHidden(enemy)) {
+    if (!isFlameBeastHittable(enemy)) {
         delete enemy.behaviors;
     } else {
         enemy.behaviors = {touchHit: { damage: 4, element: 'fire', source: enemy}};
     }
 
+    // Assuming there is a Flame Heart present, if the beast drops below 2/3 health it
+    // will become invulnerable until it submerges again, at which point it will regenerate
+    // until it reaches full life or the heart is defeated.
+    if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
+        if (!isEnemyDefeated(flameHeart)) {
+            enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
+            if (enemy.mode === 'submerged') {
+                enemy.setMode('regenerate');
+            }
+        }
+    }
+    if (enemy.mode === 'regenerate') {
+        if (isEnemyDefeated(flameHeart)) {
+            enemy.setMode('submerged');
+            return;
+        }
+        if (enemy.modeTime % 1000 === 0) {
+            enemy.life += 1;
+        }
+        if (enemy.life >= enemy.enemyDefinition.life) {
+            enemy.life = enemy.enemyDefinition.life;
+            enemy.setMode('submerged');
+        }
+        return;
+    }
+
+    const enrageLevel = getFlameBeastEnrageLevel(state, enemy);
+    const submergeTime = 3000 - 500 * enrageLevel;
     if (enemy.mode === 'submerged') {
-        if (enemy.modeTime >= 500) {
+        if (enemy.modeTime >= submergeTime || enemy.modeTime >= 1000) {
             const {x, y} = getClosestLavaPoint(state, enemy);
             enemy.x = x;
             enemy.y = y;
@@ -516,8 +368,8 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
             const target = getNearbyTarget(state, enemy, 80, enemy.area.allyTargets);
             if (target) {
                 enemy.d = getCardinalDirectionToTarget(enemy, target, enemy.d);
+                enemy.setMode('emergeWarning');
             }
-            enemy.setMode('emergeWarning');
         }
         return;
     }
@@ -535,6 +387,16 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
         const x = enemy.x - 16 + 32 * Math.random();
         const y = enemy.y - 12 + 24 * Math.random();
         addLavaBubbleEffectToBackground(state, enemy.area, {x, y});
+        // If there is no nearby target early in the attack, cancel it and search for a new target.
+        if (enemy.modeTime < 700) {
+            const target = getNearbyTarget(state, enemy, 96, enemy.area.allyTargets);
+            if (!target) {
+                enemy.setMode('submerged');
+                // The submerge time is reduced to 1s when changing targets like this.
+                enemy.modeTime = submergeTime - 1000;
+                return;
+            }
+        }
         if (enemy.modeTime > 800) {
             enemy.setMode('emerge');
             // Update target right before actually emerging.
@@ -542,98 +404,28 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
             if (target) {
                 enemy.d = getCardinalDirectionToTarget(enemy, target, enemy.d);
             }
-            enemy.setAnimation('emerge', enemy.d);
         }
     }
 
     if (enemy.mode === 'emerge') {
+        enemy.changeToAnimation('emerge');
         if (enemy.animationTime >= enemy.currentAnimation.duration) {
-            if (enemy.currentAnimationKey === 'emerge') {
-                enemy.changeToAnimation('submergedAttack')
+            enemy.setMode('submergedAttack');
+        }
+    }
+    if (enemy.mode === 'submergedAttack') {
+        if (!enemy.activeAbility) {
+            if (enemy.modeTime < 100) {
+                enemy.useRandomAbility(state);
             } else {
-                // TODO: animate back into lava instead of just disappearing.
-                // TODO: fully emergy from lava and charge the player if the beast has line of sight for a charge attack.
-                enemy.setMode('submerged');
+                enemy.setMode('submerge');
             }
         }
-        return;
     }
-    return;
-
-
-    // This is a bit brittle as it depends on the boss having a specific number of starting abilities.
-    if (!flameHeart && enemy.abilities.length < 2) {
-        enemy.gainAbility(bossLaserBeamAbility);
-    }
-    if (enemy.mode === 'hidden') {
-        enemy.healthBarTime = 0;
-        enemy.z = 300;
-        // If a flameheart is present, stay hidden until it is damaged.
-        if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
-            return;
+    if (enemy.mode === 'submerge') {
+        enemy.changeToAnimation('submerge')
+        if (enemy.animationTime >= enemy.currentAnimation.duration) {
+            enemy.setMode('submerged');
         }
-        enemy.status = 'normal';
-        enemy.setMode('choose');
-    }
-    // This enemy in particular should not deal contact damage while it is in the air
-    // since our heuristic of using the actual sprite overlap doesn't make sense this high in the air and
-    // for these movements.
-    enemy.isInvulnerable = (enemy.z > 8);
-    enemy.touchHit = (enemy.z <= 0) ? { damage: 2, element: 'fire', source: null} : null;
-    if (enemy.mode === 'regenerate') {
-        // Fall to the ground if we start regeneration mid leap.
-        if (enemy.z > 0) {
-            return;
-        }
-        if (isEnemyDefeated(flameHeart)) {
-            enemy.setMode('choose');
-            return;
-        }
-        // Cannot deal or take damage whil regenerating.
-        enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
-        if (enemy.modeTime % 1000 === 0) {
-            enemy.life += 1;
-        }
-        if (enemy.life >= enemy.enemyDefinition.life) {
-            enemy.life = enemy.enemyDefinition.life;
-            enemy.setMode('choose');
-        }
-        return;
-    }
-    if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
-        if (!isEnemyDefeated(flameHeart)) {
-            enemy.setMode('regenerate');
-            return;
-        }
-    }
-    const target = getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);
-    if (!target) {
-        paceRandomly(state, enemy);
-        return;
-    } else if (enemy.mode === 'walk') {
-        enemy.setMode('choose');
-    }
-    if (enemy.mode === 'leapStrike') {
-        if (enemy.z > 0) {
-            enemy.x += enemy.vx;
-            enemy.y += enemy.vy;
-        }
-        if (enemy.z <= 0 && enemy.vz <= 0) {
-            enemy.z = 0;
-            // Has a chance to generate a new leapstrike charge depending on enrage level.
-            const abilityWithCharges = enemy.getAbility(leapStrikeAbility);
-            if (Math.random() < getFlameBeastEnrageLevel(state, enemy) / 4) {
-                if (abilityWithCharges.charges < (leapStrikeAbility.charges || 1)) {
-                    abilityWithCharges.charges++;
-                }
-            }
-            enemy.setMode('choose');
-        }
-    } else if (enemy.mode === 'choose' && enemy.z <= 0) {
-        const targetVector = getVectorToTarget(state, enemy, target);
-        enemy.d = getCardinalDirection(targetVector.x, targetVector.y, enemy.d);
-        enemy.setAnimation('idle', enemy.d);
-        enemy.useRandomAbility(state);
     }
 }
-

@@ -97,7 +97,7 @@ export function removeLedgeFromBehaviorTileGrid(behaviorGrid: TileBehaviors[][],
 }
 
 
-function mergeBitmaps(baseFlag: boolean, baseMap: Uint16Array, newFlag: boolean, newMap: Uint16Array, subtractedMaps: Uint16Array[]) {
+function mergeBitmaps(baseFlag: boolean, baseMap: Uint16Array, newFlag: boolean, newMap: Uint16Array, overrideFlags: Boolean[], subtractedMaps: Uint16Array[]) {
     // If the new flag is true, it overrides all other values.
     if (newFlag === true) {
         return BITMAP_FULL;
@@ -107,6 +107,15 @@ function mergeBitmaps(baseFlag: boolean, baseMap: Uint16Array, newFlag: boolean,
         return newMap || BITMAP_EMPTY;
     }
     let resultMap = baseFlag ? BITMAP_FULL : (baseMap || BITMAP_EMPTY);
+    // If any override flag is set, then we ignore the values from baseFlag/baseMap.
+    if (resultMap !== BITMAP_EMPTY) {
+        for (const overrideFlag of overrideFlags) {
+            if (overrideFlag) {
+                resultMap = BITMAP_EMPTY;
+                break;
+            }
+        }
+    }
     if (resultMap !== BITMAP_EMPTY) {
         for (const subtractedMap of subtractedMaps) {
             if (subtractedMap) {
@@ -188,6 +197,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.solidMap,
         behaviors.solid,
         behaviors.solidMap,
+        [behaviors.isGround, behaviors.isLava, behaviors.pit],
         [behaviors.isGroundMap, behaviors.isLavaMap, behaviors.pitMap],
     );
     if (newSolidMap === BITMAP_FULL) {
@@ -205,6 +215,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.isLavaMap,
         behaviors.isLava,
         behaviors.isLavaMap,
+        [behaviors.isGround, behaviors.solid, behaviors.pit],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
     );
     if (newIsLavaMap === BITMAP_FULL) {
@@ -222,6 +233,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.pitMap,
         behaviors.pit,
         behaviors.pitMap,
+        [behaviors.isGround, behaviors.solid, behaviors.isLava],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
     );
     if (newPitMap === BITMAP_FULL) {

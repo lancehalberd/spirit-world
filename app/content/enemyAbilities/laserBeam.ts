@@ -139,7 +139,7 @@ export const bossQuadRotatingLaserBeamAbility: EnemyAbility<number> = {
     recoverTime: 1000,
 };
 
-export const bossQuadLaserBlenderBeamAbility: EnemyAbility<number> = {
+export const bossLaserBeamBlenderbility: EnemyAbility<number> = {
     getTarget(this: void, state: GameState, enemy: Enemy): number {
         const vector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
         if (!vector) {
@@ -148,9 +148,10 @@ export const bossQuadLaserBlenderBeamAbility: EnemyAbility<number> = {
         return Math.atan2(vector.y, vector.x);
     },
     useAbility(this: void, state: GameState, enemy: Enemy, baseTheta: number): void {
-        for (let j = 0; j < 4; j++) {
+        const numLasers = 3;
+        for (let j = 0; j < numLasers; j++) {
             for (const direction of [1, -1]) {
-                const theta = baseTheta + j * Math.PI / 2;
+                const theta = baseTheta + j * 2 * Math.PI / numLasers + (direction === -1 ? Math.PI / numLasers: 0);
                 const laserBeam = new LaserBeam({
                     sx: 0, sy: 0, tx: 0, ty: 0,
                     radius: 12, damage: 4, duration: 4000, tellDuration: 1000,

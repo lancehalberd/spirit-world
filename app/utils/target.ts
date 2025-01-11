@@ -4,15 +4,11 @@ import {getCardinalDirection} from 'app/utils/direction';
 
 // Note this assumes the target is actually in the same area as the source.
 // Limiting the set of possible targets is handled by the set of targets passed into various targeting functions.
-export function isTargetVisible(
-    state: GameState,
-    source: EffectInstance | ObjectInstance,
-    target: EffectInstance | ObjectInstance,
-): boolean {
+export function isTargetVisible(state: GameState, source: Target, target: Target): boolean {
     return !!target && !!target.getHitbox && !target.isInvisible;
 }
 
-export function getMovementAnchor(target: EffectInstance | ObjectInstance) {
+export function getMovementAnchor(target: Target) {
     /*if (target.getMovementAnchorPoint) {
 
     }*/
@@ -26,7 +22,7 @@ export function getMovementAnchor(target: EffectInstance | ObjectInstance) {
     return {x: target.x, y: target.y};
 }
 
-export function getTargetingAnchor(target:EffectInstance | ObjectInstance): Point {
+export function getTargetingAnchor(target: Target): Point {
     if (target.getTargetingAnchorPoint) {
         return target.getTargetingAnchorPoint();
     }
@@ -41,9 +37,17 @@ export function getTargetingAnchor(target:EffectInstance | ObjectInstance): Poin
     return {x: target.x, y: target.y};
 }
 
-export function getNearbyTarget(state: GameState, source: EffectInstance | ObjectInstance, radius: number,
-    targets: (EffectInstance | ObjectInstance)[], ignoreTargets: Set<EffectInstance | ObjectInstance> = null
-): EffectInstance | ObjectInstance {
+export function getTargetDistance(state: GameState, source: Target, target: Target): number {
+    const sourceAnchor = getTargetingAnchor(source);
+    const targetAnchor = getTargetingAnchor(target);
+    const dx = targetAnchor.x - sourceAnchor.x;
+    const dy = targetAnchor.y - sourceAnchor.y;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function getNearbyTarget(state: GameState, source: Target, radius: number,
+    targets: (Target)[], ignoreTargets: Set<Target> = null
+): Target {
     const sourceAnchor = getTargetingAnchor(source);
     for (const target of targets) {
         if (!isTargetVisible(state, source, target) || ignoreTargets?.has(target)) {
@@ -60,8 +64,8 @@ export function getNearbyTarget(state: GameState, source: EffectInstance | Objec
     return null;
 }
 
-export function getNearbyTargetAnchor(state: GameState, source: EffectInstance | ObjectInstance, radius: number,
-    targets: (EffectInstance | ObjectInstance)[], ignoreTargets: Set<EffectInstance | ObjectInstance> = null
+export function getNearbyTargetAnchor(state: GameState, source: Target, radius: number,
+    targets: (Target)[], ignoreTargets: Set<Target> = null
 ): Point | null {
     const sourceAnchor = getTargetingAnchor(source);
     for (const target of targets) {
@@ -79,7 +83,7 @@ export function getNearbyTargetAnchor(state: GameState, source: EffectInstance |
     return null;
 }
 
-export function getVectorToTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
+export function getVectorToTarget(state: GameState, source: Target, target: Target):{x: number, y: number, mag: number} {
     const sourceAnchor = getTargetingAnchor(source);
     const targetAnchor = getTargetingAnchor(target);
     const dx = targetAnchor.x - sourceAnchor.x;
@@ -92,8 +96,8 @@ export function getVectorToTarget(state: GameState, source: EffectInstance | Obj
 }
 
 export function getCardinalDirectionToTarget(
-    source: EffectInstance | ObjectInstance,
-    target: EffectInstance | ObjectInstance,
+    source: Target,
+    target: Target,
     defaultDirection: CardinalDirection = 'down'
 ): CardinalDirection {
     const sourceAnchor = getTargetingAnchor(source);
@@ -103,7 +107,7 @@ export function getCardinalDirectionToTarget(
     return getCardinalDirection(dx, dy, defaultDirection);
 }
 
-export function getVectorToMovementTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
+export function getVectorToMovementTarget(state: GameState, source: Target, target: Target):{x: number, y: number, mag: number} {
     const sourceAnchor = getMovementAnchor(source);
     const targetAnchor = getMovementAnchor(source);
     const dx = targetAnchor.x - sourceAnchor.x;
@@ -126,9 +130,9 @@ export function getVectorToHitbox(source: Rect, target: Rect):{x: number, y: num
 }
 
 export function getVectorToNearbyTarget(state: GameState,
-    source: EffectInstance | ObjectInstance, radius: number,
-    targets: (EffectInstance | ObjectInstance)[]
-): {x: number, y: number, mag: number, target: EffectInstance | ObjectInstance} | null {
+    source: Target, radius: number,
+    targets: (Target)[]
+): {x: number, y: number, mag: number, target: Target} | null {
     const sourceAnchor = getTargetingAnchor(source);
     for (const target of targets) {
         if (!isTargetVisible(state, source, target)) {
@@ -148,8 +152,8 @@ export function getVectorToNearbyTarget(state: GameState,
     return null;
 }
 
-export function getVectorToNearestTargetOrRandom(state: GameState, source: EffectInstance | ObjectInstance,
-    targets: (EffectInstance | ObjectInstance)[]
+export function getVectorToNearestTargetOrRandom(state: GameState, source: Target,
+    targets: (Target)[]
 ): {x: number, y: number} {
     const v = getVectorToNearbyTarget(state, source, 1000, targets);
     if (v) {
@@ -178,13 +182,13 @@ export function canPassOverWall(behavior: TileBehaviors, movementProperties: Mov
 
 export function getLineOfSightTargetAndDirection(
     state: GameState,
-    source: EffectInstance | ObjectInstance,
-    targets: (EffectInstance | ObjectInstance)[],
+    source: Target,
+    targets: (Target)[],
     direction: CardinalDirection = null,
     // By default enemies will not aggro you from much further than half a screen.
     distance = 128,
     movementProperties: MovementProperties = {},
-): {d: CardinalDirection, target: EffectInstance | ObjectInstance} {
+): {d: CardinalDirection, target: Target} {
     if (!source.area) {
         return {d: null, target: null};
     }

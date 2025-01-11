@@ -64,6 +64,13 @@ export function speedUpAnimation(animation: FrameAnimation, speedFactor: number)
     };
 }
 
+export function reverseAnimation(animation: FrameAnimation): FrameAnimation {
+    return {
+        ...animation,
+        frames: [...animation.frames].reverse(),
+    };
+}
+
 
 const [errorCanvas, errorContext] = createCanvasAndContext(16, 16);
 errorContext.fillStyle = 'red';

@@ -1,15 +1,13 @@
-import { Blast } from 'app/content/effects/blast';
+import {Blast} from 'app/content/effects/blast';
 import {growingThornsAbility} from 'app/content/enemyAbilities/growingThorns';
 import {stationaryChargedLightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { Flame } from 'app/content/effects/flame';
-import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
-import { addEffectToArea } from 'app/utils/effects';
-import { getVectorToNearbyTarget } from 'app/utils/target';
-
-
-import { omniAnimation } from 'app/content/enemyAnimations';
-import { createAnimation } from 'app/utils/animations';
+import {fastVolcanoAbility, volcanoAbility} from 'app/content/enemyAbilities/volcano';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {iceGrenadeAbility} from 'app/content/enemyAbilities/iceGrenade';
+import {addEffectToArea} from 'app/utils/effects';
+import {getVectorToNearbyTarget} from 'app/utils/target';
+import {omniAnimation} from 'app/content/enemyAnimations';
+import {createAnimation} from 'app/utils/animations';
 
 const plantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 12} };
 
@@ -60,104 +58,6 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
     recoverTime: 200,
 };
 
-export const volcanoAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
-        enemy.changeToAnimation('prepare');
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        enemy.changeToAnimation('attack');
-        const baseTheta = Math.random() * 2 * Math.PI;
-        const hitbox = enemy.getHitbox();
-        const targetHitbox = target.target.getHitbox();
-        const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
-        //const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
-        const count = 5;
-        const baseTx = (x + 2 * (targetHitbox.x + targetHitbox.w / 2)) / 3;
-        const baseTy = (y + 2 * (targetHitbox.y + targetHitbox.h / 2)) / 3;
-        for (let i = 0; i < count; i++) {
-            const theta = baseTheta + i * 2 * Math.PI / count - Math.PI / count / 2 + Math.random() * Math.PI / count;
-            const mag = 32 + 8 * i - 8 + Math.random() * 16;
-            const tx = baseTx + mag * Math.cos(theta), ty = baseTy + mag * Math.sin(theta);
-            const vz = 3 + i / 2;
-            const az = -0.1;
-            const duration = -2 * vz / az;
-
-            const flame = new Flame({
-                x, y, z: 20,
-                vx: (tx - x) / duration / 2,
-                vy: (ty - y) / duration / 2,
-                vz,
-                az,
-                minVz: -1,
-                damage: 1,
-                scale: 1.5,
-                ttl: 6000,
-                groundFriction: 1,
-                source: enemy,
-            })
-            addEffectToArea(state, enemy.area, flame);
-        }
-    },
-    cooldown: 5000,
-    initialCooldown: 1000,
-    charges: 1,
-    initialCharges: 0,
-    prepTime: 200,
-    recoverTime: 200,
-};
-
-export const fastVolcanoAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
-        enemy.changeToAnimation('prepare');
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        enemy.changeToAnimation('attack');
-        const baseTheta = Math.random() * 2 * Math.PI;
-        const hitbox = enemy.getHitbox();
-        const targetHitbox = target.target.getHitbox();
-        const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
-        //const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
-        const count = 5;
-        const baseTx = (x + 2 * (targetHitbox.x + targetHitbox.w / 2)) / 3;
-        const baseTy = (y + 2 * (targetHitbox.y + targetHitbox.h / 2)) / 3;
-        for (let i = 0; i < count; i++) {
-            const theta = baseTheta + i * 2 * Math.PI / count - Math.PI / count / 2 + Math.random() * Math.PI / count;
-            const mag = 32 + 8 * i - 8 + Math.random() * 16;
-            const tx = baseTx + mag * Math.cos(theta), ty = baseTy + mag * Math.sin(theta);
-            const vz = 8 + i / 2;
-            const az = -0.5;
-            const duration = -2 * vz / az;
-
-            const flame = new Flame({
-                delay: 100 * i,
-                x, y, z: 20,
-                vx: (tx - x) / duration / 2,
-                vy: (ty - y) / duration / 2,
-                vz,
-                az,
-                minVz: -3,
-                damage: 1,
-                scale: 1.5,
-                ttl: 4000,
-                groundFriction: 1,
-                source: enemy,
-            })
-            addEffectToArea(state, enemy.area, flame);
-        }
-    },
-    cooldown: 1200,
-    initialCooldown: 600,
-    charges: 1,
-    initialCharges: 0,
-    prepTime: 200,
-    recoverTime: 200,
-};
 
 
 const plantFrostIceGrenadeAbility = {
