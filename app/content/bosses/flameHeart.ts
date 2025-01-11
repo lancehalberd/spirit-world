@@ -237,6 +237,10 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
         enemy.modeTime = 0;
         fillLava(state, enemy);
     }
+    // Make the heart mortal again once the lava has finished filling up.
+    if (enemy.isImmortal && !state.savedState.objectFlags.craterLava4) {
+        delete enemy.isImmortal;
+    }
     // After the fight starts, any time the lava is full and all switches are active, deactivate
     // a number of switches based on the current enrage level.
     const allBossSwitches = enemy.area.objects.filter(o => o.definition?.id === 'craterBossSwitch');
@@ -259,6 +263,8 @@ function fillLava(state: GameState, enemy: Enemy) {
     if (!isFlameHeartExposed(state, enemy) || enemy.params.lavaKey !== 'craterLava4Objects') {
         return;
     }
+    // Prevent killing the heart while the lava is filling.
+    enemy.isImmortal = true;
     fillFlameBeastLava(state);
 }
 
