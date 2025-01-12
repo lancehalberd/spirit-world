@@ -636,6 +636,19 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         }
         return;
     }
+    if (enemy.mode === 'landMines') {
+        if (enemy.modeTime === 100) {
+            if (isEnraged || enemy.area.effects.filter(v => v instanceof LandMine).length < 10) {
+                throwLandMineGrenade(state, enemy);
+            } else {
+                enemy.setMode('chooseTarget');
+            }
+        }
+        if (enemy.modeTime >= 600) {
+            enemy.setMode('chooseTarget');
+        }
+        return;
+    }
     if (isEnraged) {
         if (enemy.params.submerged) {
             const enemyHitbox = enemy.getHitbox(state);
@@ -660,7 +673,6 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             if (enemy.modeTime < 1000) {
                 return;
             }
-            enemy.params.attacksLeft--;
             const breathRange = 128;
             let attackVector = getVectorToNearbyTarget(state, enemy, breathRange, enemy.area.allyTargets);
             if (attackVector) {
@@ -670,7 +682,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                 enemy.setMode('frostBreathArc');
                 return;
             }
-            const chargeRange = 512;
+            const chargeRange = 196;
             attackVector = getVectorToNearbyTarget(state, enemy, chargeRange, enemy.area.allyTargets);
             if (attackVector) {
                 enemy.d = getCardinalDirection(attackVector.x, attackVector.y, enemy.d);
@@ -787,19 +799,6 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             return;
         }
         enemy.setMode('landMines');
-        return;
-    }
-    if (enemy.mode === 'landMines') {
-        if (enemy.modeTime === 100) {
-            if (enemy.area.effects.filter(v => v instanceof LandMine).length < 10) {
-                throwLandMineGrenade(state, enemy);
-            } else {
-                enemy.setMode('chooseTarget');
-            }
-        }
-        if (enemy.modeTime >= 500) {
-            enemy.setMode('chooseTarget');
-        }
         return;
     }
     if (enemy.mode === 'frostBreath' || enemy.mode === 'frostBreathArc') {
