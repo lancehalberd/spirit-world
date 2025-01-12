@@ -68,24 +68,37 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     }
 }
 
-export function getObjectSaveTreatment(definition: ObjectDefinition, suffix = ''): 'forever' | 'zone' | 'never' {
-    let treatment = definition.saveStatus;
+type SaveFlagSuffix = '' | 'melted' | 'position';
+
+export function getObjectSaveTreatment(definition: ObjectDefinition, suffix: SaveFlagSuffix = ''): 'forever' | 'zone' | 'never' {
     if (suffix === 'position') {
-        treatment = definition.savePosition;
+        if (definition.savePosition) {
+            return definition.savePosition;
+        }
+        if (definition.type === 'pushStairs') {
+            return 'forever';
+        }
+        return 'never'
+    }
+    if (suffix === 'melted') {
+        if (definition.type === 'door') {
+            return 'forever';
+        }
+        return 'never';
     }
     if (definition.type === 'door' && (
         definition.status === 'locked'
         || definition.status === 'bigKeyLocked'
         || definition.status === 'cracked'
-        // Used for frozen doors.
-        || suffix === 'melted'
     )) {
-        treatment = 'forever';
+        return 'forever';
     }
-    if (treatment) {
-        return treatment;
+    if (definition.saveStatus) {
+        return definition.saveStatus;
     }
     if (definition.type === 'boss') {
+        return 'forever';
+    } else if (definition.type === 'loot' || definition.type === 'bigChest' || definition.type === 'chest' || definition.type === 'shopItem') {
         return 'forever';
     } else if (definition.type === 'enemy') {
         return 'zone';
@@ -93,13 +106,11 @@ export function getObjectSaveTreatment(definition: ObjectDefinition, suffix = ''
         return 'forever';
     } else if (definition.type === 'saveStatue') {
         return 'forever';
-    } else if (definition.type === 'pushStairs') {
-        return 'forever';
     }
     return 'never';
 }
 
-export function saveObjectStatus(state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix = ''): void {
+export function saveObjectStatus(state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix: SaveFlagSuffix = ''): void {
     const treatment = getObjectSaveTreatment(definition, suffix);
     const fullKey =  definition.id + (suffix ? '-' + suffix : '');
     if (treatment === 'never') {

@@ -2,6 +2,7 @@ import { renderPropertyRows } from 'app/development/propertyPanel';
 import { TabContainer } from 'app/development/tabContainer';
 import { getState } from 'app/state';
 import { enterLocation } from 'app/utils/enterLocation';
+import {findAllZoneFlags} from 'app/utils/findAllZoneFlags';
 
 
 const progressTabContainer = new TabContainer('Progress', [
@@ -42,18 +43,29 @@ function getProgressProperties() {
         rows.push(row);
     }
     const setFlags = Object.keys(state.savedState.objectFlags);
+    const availableFlags = [...new Set([...findAllZoneFlags(state.zone), ...setFlags])];
     rows.push({
         name: 'flags',
         value: setFlags,
-        values: setFlags,
-        onChange(value: string[]) {
+        values: availableFlags,
+        onChange(keys: string[]) {
             for (const key of Object.keys(state.savedState.objectFlags)) {
-                if (value.indexOf(key) < 0) {
+                if (keys.indexOf(key) < 0) {
                     delete state.savedState.objectFlags[key];
                     state.location.x = state.hero.x;
                     state.location.y = state.hero.y;
                     // Calling this will instantiate the area again and place the player back in their current location.
                     enterLocation(state, state.location, {instant: true});
+                    // Only a single key can be added/updated each frame, so stop on update.
+                    return;
+                }
+            }
+            for (const key of keys) {
+                if (!state.savedState.objectFlags[key]) {
+                    state.savedState.objectFlags[key] = true;
+                    // Calling this will instantiate the area again and place the player back in their current location.
+                    enterLocation(state, state.location, {instant: true});
+                    // Only a single key can be added/updated each frame, so stop on update.
                     return;
                 }
             }

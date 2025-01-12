@@ -46,3 +46,10 @@ export function everyObject(callback: (location: ZoneLocation, zone: Zone, area:
         }
     });
 }
+export function everyObjectInZone(zone: Zone, callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => void) {
+    everyAreaInZone(zone, (location, area) => {
+        for (let i = 0; i < area.objects.length; i++) {
+            callback(location, zone, area, area.objects[i]);
+        }
+    });
+}

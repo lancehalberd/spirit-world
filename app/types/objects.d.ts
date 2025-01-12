@@ -446,6 +446,7 @@ interface BaseObjectDefinition {
     style?: string
     // Defaults to 'normal'
     status?: ObjectStatus
+    // Currently unused in favor of more flexible `frozenLogic` used on entrances.
     isFrozen?: boolean
     // Invisible objects are only rendered if the hero has true sight.
     isInvisible?: boolean

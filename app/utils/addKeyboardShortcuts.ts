@@ -1,11 +1,13 @@
-import { editingState } from 'app/development/editingState';
-import { exportZoneToClipboard } from 'app/development/exportZone';
-import { toggleEditing } from 'app/development/editor';
-import { updateObjectInstance } from 'app/development/objectEditor';
-import { toggleShowControls } from 'app/scenes/controls/updateControls';
-import { getState } from 'app/state';
-import { isKeyboardKeyDown, KEY } from 'app/userInput'
-import { enterLocation } from 'app/utils/enterLocation';
+import {zones} from 'app/content/zones/zoneHash';
+import {editingState} from 'app/development/editingState';
+import {exportZoneToClipboard} from 'app/development/exportZone';
+import {toggleEditing} from 'app/development/editor';
+import {updateObjectInstance} from 'app/development/objectEditor';
+import {toggleShowControls} from 'app/scenes/controls/updateControls';
+import {getState} from 'app/state';
+import {isKeyboardKeyDown, KEY} from 'app/userInput'
+import {enterLocation} from 'app/utils/enterLocation';
+import {findAllZoneFlags} from 'app/utils/findAllZoneFlags';
 
 export function addKeyboardShortcuts() {
     document.addEventListener('keydown', function(event: KeyboardEvent) {
@@ -70,23 +72,9 @@ export function addKeyboardShortcuts() {
             const state = getState();
             // Reset all zone flags.
             state.savedState.zoneFlags = {};
-            for (const floor of state.zone.floors) {
-                for (const grid of [floor.grid, floor.spiritGrid]) {
-                    for (const row of grid) {
-                        for (const areaDefinition of row) {
-                            for (const object of areaDefinition?.objects ?? []) {
-                                delete state.savedState.objectFlags[object.id];
-                                for (const suffix of ['melted', 'position']) {
-                                    delete state.savedState.objectFlags[object.id + '-' + suffix];
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            // Ad Hoc overrides for keys set by script objects.
-            if (state.location.zoneKey === 'peachCave') {
-                delete state.savedState.objectFlags.peachCaveTree;
+            const flagsFromThisZone = findAllZoneFlags(zones[state.location.logicalZoneKey]);
+            for (const key of flagsFromThisZone) {
+                delete state.savedState.objectFlags[key];
             }
             state.savedState.luckyBeetles = [];
             delete state.savedState.dungeonInventories[state.location.logicalZoneKey];
