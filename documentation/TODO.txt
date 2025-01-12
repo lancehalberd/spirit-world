@@ -74,6 +74,16 @@ Current tasks:
 
     - Add function for generating a full size image of an area or area section.
 
+    - Jade Champion during Flame Beast
+        - Add Jade Champion NPC by switch to reveal the boss.
+            - "This is it, the source of the Flame Beast's power lies in this pool."
+        - Replace JC NPC with object when the lava is drained.
+            - Check this works correctly if the player loses the fight and retries.
+            - Check this works correctly in randomizer mode.
+        - JC warns: 'Focus on the heart, I'll distract the beast!'
+        - The beast can target the Jade Champion when choosing where to target.
+        - JC will teleport near the beast outside of the lava to attack it when the beast goes to 'emergeWarning'.
+
     - Jade Champion during Storm Beast
         - Put up a barrier when the heart is enraged and add text cue telling player to come to the barrier.
             "I'll shield us from it's fury!"

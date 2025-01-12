@@ -99,7 +99,10 @@ export function getObjectSaveTreatment(definition: ObjectDefinition, suffix: Sav
     if (definition.type === 'boss') {
         return 'forever';
     } else if (definition.type === 'loot' || definition.type === 'bigChest' || definition.type === 'chest' || definition.type === 'shopItem') {
-        return 'forever';
+        // Loot handles saving the object flag independently of its status.
+        // When a chest appears for solving a puzzle, we don't want to set the flag for having obtained the loot, otherwise the chest
+        // will always appear empty.
+        return 'never';
     } else if (definition.type === 'enemy') {
         return 'zone';
     } else if (definition.type === 'narration') {
