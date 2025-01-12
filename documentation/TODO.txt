@@ -75,8 +75,6 @@ Current tasks:
         - Add doors
         - Fix tilesheet for pits
 
-    - Add check to material world forge where the door is to the boss chamber.
-
     - Add function for generating a full size image of an area or area section.
 
     - Jade Champion during Storm Beast

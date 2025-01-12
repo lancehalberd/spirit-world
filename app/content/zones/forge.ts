@@ -1321,6 +1321,9 @@ const f2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "forgeMaterialStairs2", linked: true, spirit: true, x: 48, y: 352, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeMaterialStairs2", d: "up", locationCue: "Forge B2"},
         {status: "normal", id: "forgeLava4", x: 48, y: 240, type: "floorSwitch", saveStatus: "forever"},
+        {status: "normal", id: "forgePushStairs2", x: 88, y: 128, type: "pushStairs", w: 80, offset: 0, linked: true, spirit: true},
+        {status: "normal", id: "forgePushStairs2", x: 88, y: 208, type: "pushStairs", w: 80, offset: 48, linked: true, spirit: true},
+        {status: "normal", id: "forgePeachPiece", linked: false, x: 168, y: 44, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 321, mapId: 'forge', floorId: 'B2', mapX: 2, mapY: 2},
@@ -1632,8 +1635,8 @@ const sf2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "forgeStairs2", linked: true, spirit: false, x: 48, y: 352, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs2", d: "up", locationCue: "Forge B2"},
         {status: "normal", id: "forgeSmallKey", x: 72, y: 56, type: "chest", lootType: "smallKey", lootLevel: 1},
-        {status: "normal", id: "forgePushStairs2", x: 88, y: 208, type: "pushStairs", w: 80, offset: 48},
-        {status: "normal", id: "forgePushStairs2", x: 88, y: 128, type: "pushStairs", w: 80, offset: 0},
+        {status: "normal", id: "forgePushStairs2", x: 88, y: 208, type: "pushStairs", w: 80, offset: 48, linked: true},
+        {status: "normal", id: "forgePushStairs2", x: 88, y: 128, type: "pushStairs", w: 80, offset: 0, linked: true},
         {status: "bigKeyLocked", id: "forgeStairs3", x: 160, y: 16, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeBossEntrance", d: "up", locationCue: "Forge B2"},
         {status: "normal", id: "forgeShortcut", x: 288, y: 48, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeShortcut", d: "up", locationCue: "Forge B1"},
         {status: "closedEnemy", id: "", x: 304, y: 272, type: "door", style: "cavern", d: "up"},

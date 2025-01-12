@@ -63,6 +63,7 @@ export const forgeNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'forgeB2Material',
+        checks: [{objectId: 'forgePeachPiece', logic: hasMitts}],
         flags: [{flag: 'forgeLava4', logic: orLogic(canCross4Gaps, hasIce, hasInvisibility)}],
         entranceIds: ['forgeMaterialStairs2'],
         exits: [{objectId: 'forgeMaterialStairs2'}],
