@@ -188,8 +188,8 @@ export function applyTileToBehaviorGrid(
     if (!isForeground && resultingBehaviors.cloudGround && !behaviors.cloudGround) {
         delete resultingBehaviors.cloudGround;
     }
-    const lightRadius = Math.max(baseBehaviors.lightRadius || 0, behaviors.lightRadius || 0);
-    const brightness = Math.max(baseBehaviors.brightness || 0, behaviors.brightness || 0);
+    const lightRadius = Math.max(resultingBehaviors.lightRadius || 0, behaviors.lightRadius || 0);
+    const brightness = Math.max(resultingBehaviors.brightness || 0, behaviors.brightness || 0);
     resultingBehaviors = {...resultingBehaviors, ...behaviors, lightRadius, brightness};
 
     const newSolidMap = mergeBitmaps(
@@ -197,7 +197,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.solidMap,
         behaviors.solid,
         behaviors.solidMap,
-        [behaviors.isGround, behaviors.isLava, behaviors.pit],
+        [behaviors.isGround, behaviors.isLava, behaviors.pit, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.isLavaMap, behaviors.pitMap],
     );
     if (newSolidMap === BITMAP_FULL) {
@@ -215,7 +215,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.isLavaMap,
         behaviors.isLava,
         behaviors.isLavaMap,
-        [behaviors.isGround, behaviors.solid, behaviors.pit],
+        [behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
     );
     if (newIsLavaMap === BITMAP_FULL) {
@@ -233,7 +233,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.pitMap,
         behaviors.pit,
         behaviors.pitMap,
-        [behaviors.isGround, behaviors.solid, behaviors.isLava],
+        [behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
     );
     if (newPitMap === BITMAP_FULL) {
