@@ -1,12 +1,12 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { getActorTargets } from 'app/getActorTargets';
-import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
-import { moveObject } from 'app/movement/moveObject';
-// import { showMessage } from 'app/scriptEvents';
-import { boxesIntersect } from 'app/utils/index';
-import { createAnimation, drawFrameAt } from 'app/utils/animations';
-import { directionMap } from 'app/utils/direction';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import {objectHash} from 'app/content/objects/objectHash';
+import {getActorTargets} from 'app/getActorTargets';
+import {getSectionBoundingBox, moveActor} from 'app/movement/moveActor';
+import {moveObject} from 'app/movement/moveObject';
+// import {showMessage} from 'app/scriptEvents';
+import {boxesIntersect} from 'app/utils/index';
+import {createAnimation, drawFrameAt} from 'app/utils/animations';
+import {directionMap} from 'app/utils/direction';
+import {getSavedObjectPosition, saveObjectPosition} from 'app/utils/objects';
 
 
 const potGeometry = {w: 32, h: 32, content: {x: 8, y: 16, w: 16, h: 16}};
@@ -213,9 +213,9 @@ export class PushPullObject implements ObjectInstance {
             this.ignorePits = false;
             // Check to save position if the object has stopped moving.
             if (this.definition?.savePosition) {
-                const p = getObjectStatus(state, this.definition, 'position');
+                const p = getSavedObjectPosition(state, this.definition);
                 if (!Array.isArray(p) || (p[0] !== this.x || p[1] !== this.y)) {
-                    saveObjectStatus(state, this.definition, [this.x, this.y], 'position');
+                    saveObjectPosition(state, this.definition, [this.x, this.y]);
                 }
             }
         }

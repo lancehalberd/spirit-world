@@ -1,11 +1,10 @@
 import {everyObjectInZone} from 'app/utils/every';
-import {getObjectSaveTreatment} from 'app/utils/objects';
+import {getObjectSavePositionTreatment, getObjectSaveTreatment} from 'app/utils/objects';
 
 export function findAllZoneFlags(zone: Zone): string[] {
     const flags: string[] = [];
     everyObjectInZone(zone, (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => {
-
-        if (getObjectSaveTreatment(objectDefinition, 'position') === 'forever') {
+        if (getObjectSavePositionTreatment(objectDefinition) === 'forever') {
             flags.push(objectDefinition.id + '-position');
         }
         if (objectDefinition.type === 'door' && objectDefinition.frozenLogic) {

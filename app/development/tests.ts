@@ -1,11 +1,13 @@
 import { BITMAP_BOTTOM } from 'app/content/bitMasks';
 import {everyArea, everyObject} from 'app/utils/every';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import {getObjectSaveTreatment} from 'app/utils/objects';
 import {applyTileToBehaviorGrid} from 'app/utils/tileBehavior';
+import {getAreaInstanceFromLocation} from 'app/content/areas';
+import {getState} from 'app/state';
 
 export const tests: {[key: string]: () => void} = {
     checkObjectsHaveIds() {
-        console.log('Test "checkObjectsHaveIds":');
         everyObject((location, zone, area, objectDefinition) => {
             if (getObjectSaveTreatment(objectDefinition) === 'never') {
                 return;
@@ -20,7 +22,6 @@ export const tests: {[key: string]: () => void} = {
         });
     },
     checkEmptyTiles() {
-        console.log('Test "checkEmptyTiles":');
         const updatedZones = new Set<string>();
         everyArea((location, zone, area) => {
             for (let i = 0; i < area.layers.length; i++) {
@@ -54,7 +55,6 @@ export const tests: {[key: string]: () => void} = {
         }
     },
     testTileBehaviorMerging() {
-        console.log('Test "tileBehaviorMerging":');
         const behaviorGrid: TileBehaviors[][] = [[{}]];
         applyTileToBehaviorGrid(behaviorGrid, {x: 0, y: 0}, {isLava: true}, false);
         applyTileToBehaviorGrid(behaviorGrid, {x: 0, y: 0}, {isGroundMap: BITMAP_BOTTOM}, false);
@@ -66,12 +66,47 @@ export const tests: {[key: string]: () => void} = {
             console.error('Unexpected ground behavior(bottom half of tile is ground): ', result);
         }
     },
+    // There have been a few changes that caused the floor behavior in the fire sanctum to not count as safe ground.
+    testFireSanctumGround() {
+        const state = getState();
+        const fireSanctum = getAreaInstanceFromLocation(state, {
+            zoneKey: 'fireSanctum',
+            floor: 0,
+            areaGridCoords: {x: 0, y: 0},
+            isSpiritWorld: true,
+            x: 0, y: 0, d: 'down',
+        });
+        const safeBehavior = getCompositeBehaviors(state, fireSanctum, {x: 455, y: 328});
+        const lavaBehavior = getCompositeBehaviors(state, fireSanctum, {x: 403, y: 365});
+        if (safeBehavior.isLava) {
+            console.error('Expected ground to not have lava: ', safeBehavior);
+        }
+        if (!lavaBehavior.isLava) {
+            console.error('Expected ground to have lava: ', lavaBehavior);
+        }
+    },
+    // There have been a few changes that caused the floor behavior in the fire sanctum to not count as safe ground.
+    testCloudOnWallBehavior() {
+        const state = getState();
+        const fireSanctum = getAreaInstanceFromLocation(state, {
+            zoneKey: 'sky',
+            floor: 0,
+            areaGridCoords: {x: 0, y: 0},
+            isSpiritWorld: false,
+            x: 0, y: 0, d: 'down',
+        });
+        const cloudOnWallBehavior = getCompositeBehaviors(state, fireSanctum, {x: 327, y: 139});
+        if (!cloudOnWallBehavior.cloudGround || cloudOnWallBehavior.solid) {
+            console.error('Unexpected behaviors for cloud over wall: ', cloudOnWallBehavior);
+        }
+    }
 };
 window['tests'] = tests;
 
 export function runAllTests() {
     for (const key in tests) {
         try {
+            console.log(`Test "${key}":`);
             tests[key]();
         } catch (e) {
             console.error(`Text ${key} failed:`, e.message);

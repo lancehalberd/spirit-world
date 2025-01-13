@@ -163,19 +163,17 @@ export function applyTileToBehaviorGrid(
         }
         resultingBehaviors = {};
     }
-    // Any background tile rendered on top of lava removes the lava behavior from it.
-    if (!isForeground && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false && !behaviors.isGroundMap
-    ) {
-        delete resultingBehaviors.isLava;
-        delete resultingBehaviors.isLavaMap;
-    }
+    // Any background tile rendered on top of lava should remove the lava behavior from it.
+    // This requires explicitly setting isGround = false on backgrounds tiles like shadows
+    const removeLava = (!isForeground && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false && !behaviors.isGroundMap);
     // Any background tile rendered on top of a pit/shallow water/water/slipper tile removes that special behavior.
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
     // sky behavior that has this behavior instead of pits.
-    if (!isForeground && resultingBehaviors.pit && !behaviors.pit && behaviors.isGround !== false && !behaviors.isGroundMap) {
-        delete resultingBehaviors.pit;
-    }
+    const removePit = (!isForeground && !behaviors.pit && !behaviors.pitMap && behaviors.isGround !== false && !behaviors.isGroundMap);
+    // For the rest of these, we can delete these straight from the resultingBehaviors as there is no further
+    // calculation for these. If we add pixel resolution to these, we would want to handle them the same way we do
+    // for lava and pits.
     if (!isForeground && resultingBehaviors.shallowWater && !behaviors.shallowWater && behaviors.isGround !== false) {
         delete resultingBehaviors.shallowWater;
     }
@@ -215,7 +213,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.isLavaMap,
         behaviors.isLava,
         behaviors.isLavaMap,
-        [behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
+        [removeLava, behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
     );
     if (newIsLavaMap === BITMAP_FULL) {
@@ -233,7 +231,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.pitMap,
         behaviors.pit,
         behaviors.pitMap,
-        [behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
+        [removePit, behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
     );
     if (newPitMap === BITMAP_FULL) {

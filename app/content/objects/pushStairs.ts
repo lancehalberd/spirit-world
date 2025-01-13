@@ -2,7 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { getSavedObjectPosition, saveObjectPosition } from 'app/utils/objects';
 
 
 const pushStairsFrame: Frame = createAnimation('gfx/objects/pushStairs.png', {w: 36, h: 80}).frames[0];
@@ -36,7 +36,7 @@ export class PushStairs implements ObjectInstance {
     leftRailing: PushStairsRailing = new PushStairsRailing(this, 'left');
     rightRailing: PushStairsRailing = new PushStairsRailing(this, 'right');
     constructor(state: GameState, public definition: PushStairsDefinition) {
-        const savedX = getObjectStatus(state, this.definition);
+        const savedX = getSavedObjectPosition(state, this.definition);
         if (typeof savedX === 'number') {
             this.x = savedX;
         }
@@ -128,7 +128,7 @@ export class PushStairs implements ObjectInstance {
                     this.linkedObject.x = this.x;
                     this.linkedObject.y = this.y;
                 }
-                saveObjectStatus(state, this.definition, this.x);
+                saveObjectPosition(state, this.definition, this.x);
             } else if (this.pushFrame < 16) {
                 this.pushFrame++;
                 this.x += directionMap[this.pushDirection][0];
@@ -137,7 +137,7 @@ export class PushStairs implements ObjectInstance {
                     this.linkedObject.x = this.x;
                     this.linkedObject.y = this.y;
                 }
-                saveObjectStatus(state, this.definition, this.x);
+                saveObjectPosition(state, this.definition, this.x);
             } else {
                 this.stopMoving();
             }

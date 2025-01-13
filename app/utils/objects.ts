@@ -17,7 +17,7 @@ export function initializeObject(state: GameState, object: ObjectInstance): void
     // Note that this doesn't automatically update linked objects, so the `savePosition` flag should
     // match for linked objects to avoid inconsistencies.
     if (object.definition?.savePosition) {
-        const p = getObjectStatus(state, object.definition, 'position');
+        const p = getSavedObjectPosition(state, object.definition);
         if (Array.isArray(p)) {
             object.x = p[0];
             object.y = p[1];
@@ -68,18 +68,9 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     }
 }
 
-type SaveFlagSuffix = '' | 'melted' | 'position';
+type SaveFlagSuffix = '' | 'melted';
 
 export function getObjectSaveTreatment(definition: ObjectDefinition, suffix: SaveFlagSuffix = ''): 'forever' | 'zone' | 'never' {
-    if (suffix === 'position') {
-        if (definition.savePosition) {
-            return definition.savePosition;
-        }
-        if (definition.type === 'pushStairs') {
-            return 'forever';
-        }
-        return 'never'
-    }
     if (suffix === 'melted') {
         if (definition.type === 'door') {
             return 'forever';
@@ -112,6 +103,49 @@ export function getObjectSaveTreatment(definition: ObjectDefinition, suffix: Sav
     }
     return 'never';
 }
+export function saveObjectPosition(state: GameState, definition: ObjectDefinition, position: number | number[] = 0): void {
+    const treatment = getObjectSavePositionTreatment(definition);
+    if (treatment === 'never') {
+        return;
+    }
+    const hash = treatment === 'forever'
+        ? state.savedState.objectFlags
+        : state.savedState.zoneFlags;
+    if (!definition.id) {
+        console.error('Missing object id', definition);
+        return;
+    }
+    const fullKey =  definition.id + '-position';
+    if (hash[fullKey] !== position) {
+        hash[fullKey] = position;
+        saveGame(state);
+    }
+}
+
+export function getObjectSavePositionTreatment(definition: ObjectDefinition): 'forever' | 'zone' | 'never' {
+    if (definition.savePosition) {
+        return definition.savePosition;
+    }
+    if (definition.type === 'pushStairs') {
+        return 'forever';
+    }
+    return 'never';
+}
+export function getSavedObjectPosition(state: GameState, definition: ObjectDefinition): boolean | number | number[] | string {
+    if (!definition.id) {
+        return false;
+    }
+    const fullKey = definition.id + '-position';
+    if (state.savedState.zoneFlags[fullKey] !== undefined) {
+        return state.savedState.zoneFlags[fullKey];
+    }
+    if (state.savedState.objectFlags[fullKey] !== undefined) {
+        return state.savedState.objectFlags[fullKey];
+    }
+    return false;
+}
+
+
 
 export function saveObjectStatus(state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix: SaveFlagSuffix = ''): void {
     const treatment = getObjectSaveTreatment(definition, suffix);
@@ -135,7 +169,7 @@ export function saveObjectStatus(state: GameState, definition: ObjectDefinition,
     }
 }
 
-export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition, suffix = ''): boolean | number | number[] | string {
+export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition, suffix: SaveFlagSuffix = ''): boolean | number | number[] | string {
     // Lucky beetles have special logic to prevent farming the same few over and over again.
     if (definition.type === 'enemy' && definition.enemyType === 'luckyBeetle') {
         // Lucky Beetle must have an id in order to appear.
