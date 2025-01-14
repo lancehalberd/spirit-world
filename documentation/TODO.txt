@@ -68,8 +68,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Flame beast death frame shuold render lava frame, not the shadow.
-
     - Test new cocoon tiles
         - Add doors
         - Fix tilesheet for pits

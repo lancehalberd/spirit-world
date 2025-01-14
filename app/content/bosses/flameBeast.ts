@@ -226,7 +226,9 @@ enemyDefinitions.flameBeast = {
         if (isFlameBeastHidden(enemy)) {
             return;
         }
-        if (enemy.mode === 'emerge' || enemy.mode === 'submerge' || enemy.mode === 'submergedAttack') {
+        if (enemy.mode === 'emerge' || enemy.mode === 'submerge' || enemy.mode === 'submergedAttack'
+            || enemy.currentAnimationKey === 'death'
+        ) {
             const anchor = getTargetingAnchor(enemy);
             context.save();
                 context.fillStyle = '#E77136';
