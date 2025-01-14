@@ -68,11 +68,15 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Flame beast death frame shuold render lava frame, not the shadow.
+
     - Test new cocoon tiles
         - Add doors
         - Fix tilesheet for pits
 
     - Add function for generating a full size image of an area or area section.
+
+    - Add different SFX for charged bow, maybe even per element.
 
     - Jade Champion during Flame Beast
         - Add Jade Champion NPC by switch to reveal the boss.

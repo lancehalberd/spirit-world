@@ -174,6 +174,19 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
                 reachableNodes.push(nextNode);
             }
         }
+        for (const flag of (currentNode.flags || [])) {
+            if (flag.doorId) {
+                const { object, location } = findDoorById(zone, flag.doorId);
+                const exitObject = object as EntranceDefinition;
+                if (!exitObject || exitObject === exitToUpdate) {
+                    continue;
+                }
+                if (location.logicalZoneKey === logicalZoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
+                    countedDoorIds.add(exitObject.id);
+                    exitToUpdate.requiredKeysForLogic++;
+                }
+            }
+        }
         for (const exit of (currentNode.exits || [])) {
             const { object, location } = findDoorById(zone, exit.objectId);
             const exitObject = object as EntranceDefinition;
@@ -202,7 +215,7 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
             }
         }
     }
-    // console.log(exitToUpdate.id, 'calculated as', exitToUpdate.requiredKeysForLogic, 'keys');
+    //console.log(exitToUpdate.id, 'calculated as', exitToUpdate.requiredKeysForLogic, 'keys');
 }
 
 function organizeLootObjects(lootObjects: LootWithLocation[]) {
