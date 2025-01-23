@@ -71,7 +71,6 @@ Current tasks:
     - Test new cocoon tiles
         - Add doors
 
-    - Upper forge stairs is not saving.
     - Thorns growing over lava breaks Forge draining lava.
     - Add exit cutscene for Jade Champion during Storm Beast.
 
