@@ -60,10 +60,11 @@ export function updateAllHeroes(this: void, state: GameState) {
             }
         }
     }
-    for (let i = 0; i < state.hero.clones.length; i++) {
+    // Clone updates used to be before the main hero update.
+    /*for (let i = 0; i < state.hero.clones.length; i++) {
         const clone = state.hero.clones[i];
         updateHero(state, clone);
-    }
+    }*/
     // Destroy existing astral projection if it isn't in the right area.
     if (state.hero.astralProjection && state.hero.astralProjection.area !== state.hero.area.alternateArea) {
         removeObjectFromArea(state, state.hero.astralProjection);
@@ -79,6 +80,10 @@ export function updateAllHeroes(this: void, state: GameState) {
     }
     if (!state.scriptEvents.blockPlayerUpdates) {
         updateHero(state, state.hero);
+        for (let i = 0; i < state.hero.clones.length; i++) {
+            const clone = state.hero.clones[i];
+            updateHero(state, clone);
+        }
     }
     const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) >= 20;
     if (!skipFrame) {

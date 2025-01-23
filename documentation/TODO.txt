@@ -71,7 +71,6 @@ Current tasks:
     - Test new cocoon tiles
         - Add doors
 
-    - Hero should use tools before clones so that they get priority when spirit energy is low.
     - Upper forge stairs is not saving.
     - Thorns growing over lava breaks Forge draining lava.
     - Add exit cutscene for Jade Champion during Storm Beast.
