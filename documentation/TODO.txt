@@ -70,7 +70,17 @@ Graphics to Implement:
 Current tasks:
     - Test new cocoon tiles
         - Add doors
-        - Fix tilesheet for pits
+
+    - Hero should use tools before clones so that they get priority when spirit energy is low.
+    - Upper forge stairs is not saving.
+    - Thorns growing over lava breaks Forge draining lava.
+    - Add exit cutscene for Jade Champion during Storm Beast.
+
+    - Add new city tiles.
+        - Map light -> dark and dark -> light.
+        - Create doors.
+        - Create dome objects.
+        - Create window objects.
 
     - Add function for generating a full size image of an area or area section.
 
@@ -97,6 +107,13 @@ Current tasks:
         - Ask if anyone else wants to test staging.
         - Release to production.
 
+    - Add Spirit Sight training scene.
+        - "You have already awakened your Spirit Sight but you have not learned to see with it."
+        - "Look at these pots."
+        - "To normal eyes, they are identical, but you can see beyond the material."
+        - "The difference feels subtle, but once you bring it into focus, it will be as night and day."
+        - (Hold R2 to concentrate on the pot)
+        - Slowly transition to Spirit Sight, then do the Spirit Sight loot effect.
 
     - Make floating/flying enemies fall into pits/water when frozen.
 

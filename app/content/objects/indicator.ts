@@ -38,6 +38,9 @@ export class Indicator implements ObjectInstance {
             // If the target is removed, delete the target and try finding a matching target next frame.
             if ((this.target.area !== this.area && this.target.area !== this.area.alternateArea) || this.target.status === 'hidden' || this.target.status === 'gone') {
                 delete this.target;
+                if (!this.definition.targetObjectId) {
+                    this.status = 'hidden';
+                }
                 return;
             }
             const targetHitbox = this.target.getHitbox();
