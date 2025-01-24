@@ -48,13 +48,15 @@ export class GrowingThorn implements EffectInstance, Props {
         return this;
     }
     onHit(state: GameState, hit: HitProperties) {
-        if (hit.cutsGround) {
+        if (this.area && hit.cutsGround) {
             const tx = (this.x / 16) | 0;
             const ty = (this.y / 16) | 0;
             // If the hero cuts the ground mid animation, cover and uncover it immediately
             // to show the particle effects and cut ground tile.
-            coverTile(state, this.area, tx, ty, thornsTilesIndex, this.source);
-            uncoverTile(state, this.area, tx, ty);
+            if (canCoverTile(this.area, tx, ty, thornsTilesIndex)) {
+                coverTile(state, this.area, tx, ty, thornsTilesIndex, this.source);
+                uncoverTile(state, this.area, tx, ty);
+            }
             removeEffectFromArea(state, this);
         }
         return {};

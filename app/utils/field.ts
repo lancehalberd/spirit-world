@@ -462,11 +462,18 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
 
         // Check if the hit applies an elemental effect to the tile.
         if (behavior?.elementOffsets?.[hit.element]) {
-            for (const layer of area.layers) {
-                const offset = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementOffsets?.[hit.element];
+            for (const layer of [...area.layers].reverse()) {
+                const behaviors = layer.tiles?.[target.y]?.[target.x]?.behaviors;
+                const offset = behaviors?.elementOffsets?.[hit.element];
                 if (offset) {
                     const tileIndex = layer.tiles[target.y][target.x].index;
                     layer.tiles[target.y][target.x] = allTiles[tileIndex + offset];
+                }
+                if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid || behaviors?.solidMap
+                    || behaviors?.pit || behaviors?.pitMap || behaviors?.water || behaviors?.shallowWater
+                    || behaviors?.isLava || behaviors?.isLavaMap
+                ) {
+                    break;
                 }
             }
             if (area.tilesDrawn[target.y]?.[target.x]) {
@@ -475,10 +482,19 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
         } else if (behavior?.elementTiles?.[hit.element] !== undefined) {
-            for (const layer of area.layers) {
-                const tileIndex = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementTiles?.[hit.element];
+            // Only effect the layers on top of the first blocking layer.
+            // This way if a layer like lava is covering tiles, hits won't interact with the covered up tiles.
+            for (const layer of [...area.layers].reverse()) {
+                const behaviors = layer.tiles?.[target.y]?.[target.x]?.behaviors;
+                const tileIndex = behaviors?.elementTiles?.[hit.element];
                 if (tileIndex !== undefined) {
                     layer.tiles[target.y][target.x] = allTiles[tileIndex];
+                }
+                if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid || behaviors?.solidMap
+                    || behaviors?.pit || behaviors?.pitMap || behaviors?.water || behaviors?.shallowWater
+                    || behaviors?.isLava || behaviors?.isLavaMap
+                ) {
+                    break;
                 }
             }
             if (area.tilesDrawn[target.y]?.[target.x]) {
@@ -724,6 +740,7 @@ export function getLayerToCover(area: AreaInstance, tx: number, ty: number): Are
     const behavior = area.behaviorGrid?.[ty]?.[tx];
     // For now solid tiles and pits cannot be covered
     if (behavior?.solid || behavior?.pit || behavior?.pitMap || behavior?.covered
+        || behavior?.isLava || behavior?.isLavaMap
         || behavior?.blocksStaff || behavior?.solidMap
         || behavior?.diagonalLedge
     ) {
@@ -788,7 +805,7 @@ export function uncoverTile(
     // We need to find the specific cuttable layers that can be destroyed.
     for (const layer of area.layers) {
         const tile = layer.tiles[ty][tx];
-        if (tile?.behaviors?.cuttable || behavior?.underTile) {
+        if (tile?.behaviors?.cuttable || tile?.behaviors?.underTile) {
             destroyTile(state, area, {x: tx, y: ty, layerKey: layer.key});
             return true;
         }

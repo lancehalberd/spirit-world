@@ -99,6 +99,8 @@ export const thornBehavior: TileBehaviors = {
     lootTable: rareLifeLootTable,
     low: true, touchHit: {damage: 1, spiritCloakDamage: 5, isGroundHit: true, source: null }, cuttable: 1,
     underTile: 23,
+    isGround: true,
+    showUnderTile: true,
     particles: thornParticles,
     linkedOffset: 179,
 };

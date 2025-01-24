@@ -82,7 +82,9 @@ export class KeyBlock implements ObjectInstance {
             // Saving the flag immediately is important in case the player leaves the screen
             // mid animation.
             if (this.definition.targetObjectId || this.definition.freezePlayer) {
-                state.savedState.objectFlags[this.definition.targetObjectId] = true;
+                if (this.definition.targetObjectId) {
+                    state.savedState.objectFlags[this.definition.targetObjectId] = true;
+                }
                 state.scriptEvents.activeEvents.push({
                     type: 'wait',
                     time: state.time,
