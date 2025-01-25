@@ -271,11 +271,17 @@ export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: nu
 function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     const isCurrentlyFlying = enemy.flying && enemy.z > 0;
     movementProperties = {
-        canSwim: enemy.canSwim || isCurrentlyFlying,
-        canMoveInLava: enemy.canMoveInLava || isCurrentlyFlying,
-        canFall: isCurrentlyFlying,
         ...movementProperties, dx, dy
     };
+    if (isCurrentlyFlying) {
+        movementProperties.canFall = true;
+    }
+    if (isCurrentlyFlying || enemy.canSwim) {
+        movementProperties.canSwim = true;
+    }
+    if (isCurrentlyFlying || enemy.canMoveInLava) {
+        movementProperties.canMoveInLava = true;
+    }
     if (enemy.enemyDefinition.baseMovementProperties) {
         movementProperties = {...enemy.enemyDefinition.baseMovementProperties, ...movementProperties};
     }
