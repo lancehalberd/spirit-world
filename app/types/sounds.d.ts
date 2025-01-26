@@ -81,6 +81,7 @@ type TrackKey
     | 'ruins'
     | 'dungeonTheme'
     | 'labTheme'
+    | 'grandPriestTheme'
     | 'idleTheme'
     | 'bossIntro'
     | 'bossA'

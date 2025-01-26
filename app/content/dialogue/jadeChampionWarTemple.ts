@@ -137,7 +137,7 @@ dialogueHash.jadeChampionWarTemple = {
                     }
                 });
             });
-            appendScript(state, '{wait:100}');
+            appendScript(state, '{playTrack:grandPriestTheme}{wait:100}');
             runPlayerBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 220, 346, 'move')) {

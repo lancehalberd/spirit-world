@@ -311,6 +311,7 @@ const musicTracks: {[key in string]: TrackDefinition} = {
     // Used for summoner ruins.
     ruins: {key : 'ruins', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
     labTheme: {key: 'labTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10, speed: 0.5 },
+    grandPriestTheme: {key: 'grandPriestTheme', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10, speed: 0.8 },
 
     // Tracks from Leon
     // For War Temple and other dungeons
