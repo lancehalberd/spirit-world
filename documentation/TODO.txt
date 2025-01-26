@@ -221,16 +221,6 @@ Current tasks:
             - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
             - One of the crew on the Helix recommends visiting the temple to assist them.
 
-    - First Jade Champion encounter
-        - Triggered if you try to enter the holy city before encountering her in the Summoner Ruins.
-        - Warns you to stay away from the Spirit Gate
-
-    - Second Jade Champion encounter
-        - Triggered when leaving the War Temple after getting Astral Projection.
-        - She will bring the MC to the Grand Priest in the Grand Temple
-
-    - Add more crystal pit graphics to sky palace once the finished tile set is ready.
-
     - Add sound effect using pink noise when near a waterfall.
         - Use pink noise for barrier burst SFX.
         - Support spatial sounds so the waterfall changes speakers and gets fainter when you are far from them.
