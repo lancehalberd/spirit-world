@@ -43,7 +43,7 @@ const spikeProjectileAbility: EnemyAbility<NearbyTargetType> = {
     initialCharges: 0,
     charges: 1,
     prepTime: 0,
-    recoverTime: 200,
+    recoverTime: 400,
 };
 
 interface BalloonMegapedeParams {
