@@ -169,7 +169,7 @@ const stormBeastChargedLightningAbility = {
         if (isEnemyDefeated(stormHeart)) {
             return true;
         }
-        return stormHeart.life <= stormHeart.enemyDefinition.life / 2;
+        return stormHeart.life <= stormHeart.maxLife / 2;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('prepareCast');
@@ -282,7 +282,7 @@ function updateStormBeast(state: GameState, enemy: Enemy): void {
     const stormHeart = getStormHeart(state, enemy.area);
     if (enemy.mode === 'hidden') {
         // Stay hidden until the player enters the same area and damages the storm heart(or no heart is present).
-        if (enemy.area === state.areaInstance && (!stormHeart || stormHeart?.life < stormHeart?.enemyDefinition.life)) {
+        if (enemy.area === state.areaInstance && (!stormHeart || stormHeart?.life < stormHeart?.maxLife)) {
             const { section } = getAreaSize(state);
             enemy.status = 'normal';
             enemy.setMode('enter');
@@ -324,7 +324,7 @@ function updateStormBeast(state: GameState, enemy: Enemy): void {
     } else {
         enemy.speed = 4;
     }
-    const maxLife = enemy.enemyDefinition.life;
+    const maxLife = enemy.maxLife;
     if (isEnemyDefeated(stormHeart)) {
         if (enemy.life <= maxLife * 2 / 3 && enemy.params.enrageLevel === 0) {
             enemy.params.enrageLevel = 1;
@@ -343,7 +343,7 @@ function updateStormBeast(state: GameState, enemy: Enemy): void {
         if (moveEnemyToTargetLocation(state, enemy, t.x, t.y) < 10) {
             faceCenter(state, enemy);
             // Attack on cooldown once the heart stops raging unless the beast needs to regenerate.
-            if (stormHeart.params.enrageTime <= 0 && enemy.life >= enemy.enemyDefinition.life * 2 / 3) {
+            if (stormHeart.params.enrageTime <= 0 && enemy.life >= enemy.maxLife * 2 / 3) {
                 enemy.useRandomAbility(state);
             }
         } else {
@@ -415,7 +415,7 @@ function updateStormBeast(state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (!enemy.activeAbility && enemy.life < enemy.enemyDefinition.life * 2 / 3
+    if (!enemy.activeAbility && enemy.life < enemy.maxLife * 2 / 3
         && !isEnemyDefeated(stormHeart) && enemy.currentAnimationKey !== 'ball'
     ) {
         enemy.setMode('transform');

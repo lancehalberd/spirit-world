@@ -214,7 +214,7 @@ const stormHeart: EnemyDefinition<StormHeartParams> = {
         }
         // Special logic for showing different hurt animations over the course of the fight
         if (enemy.currentAnimationKey === 'idle') {
-            const maxLife = enemy.enemyDefinition.life
+            const maxLife = enemy.maxLife;
             const hurtLevel = Math.max(1, Math.min(3, Math.ceil(3 * (maxLife - enemy.life) / maxLife)));
             enemy.changeToAnimation('hurt' + hurtLevel);
         }
@@ -226,7 +226,7 @@ enemyDefinitions.stormHeart = stormHeart;
 
 function updateStormHeart(this: void, state: GameState, enemy: Enemy<StormHeartParams>): void {
     if (enemy.mode === 'waiting') {
-        if (enemy.area === state.areaInstance && enemy.life < enemy.enemyDefinition.life) {
+        if (enemy.area === state.areaInstance && enemy.life < enemy.maxLife) {
             enemy.setMode('choose');
         }
         enemy.healthBarTime = 0;
@@ -318,10 +318,10 @@ function getOrbs(this: void, state: GameState, area: AreaInstance, status: Objec
 }
 
 function getStormHeartTargetEnrageLevel(enemy: Enemy): number {
-    if (enemy.life <= enemy.enemyDefinition.life * 1 / 3) {
+    if (enemy.life <= enemy.maxLife * 1 / 3) {
         return 2;
     }
-    if (enemy.life <= enemy.enemyDefinition.life * 2 / 3) {
+    if (enemy.life <= enemy.maxLife * 2 / 3) {
         return 1;
     }
     return 0;

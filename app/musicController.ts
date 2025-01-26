@@ -26,13 +26,14 @@ export const updateMusic = (state: GameState): void => {
         playTrack(state.scriptEvents.overrideMusic, 0);
         return;
     }
-    const bosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
-        e => e.status !== 'gone' && e.healthBarTime > 100 && e.definition.type === 'boss'
+    const allBosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+        e => e.status !== 'gone' && e.definition.type === 'boss'
         && e.isFromCurrentSection(state)
     ) as Enemy[];
+    const revealedBoss = allBosses.filter(boss => boss.healthBarTime > 100);
     // The modeTime check her is to make sure that the boss music plays long enough to continue
     // if one boss is defeated and spawns a second boss, like with the Balloon Megapede boss.
-    const livingBosses = bosses.filter(boss => !boss.isDefeated || boss.modeTime <= 100);
+    const livingBosses = allBosses.filter(boss => !boss.isDefeated || boss.modeTime <= 100);
     /*
     // The logic for playing the boss music is a bit brittle and will sometimes restart if
     // a boss changes from material to spirit world. Uncomment these lines if this happens
@@ -44,13 +45,13 @@ export const updateMusic = (state: GameState): void => {
     }
     */
     const location = getFullZoneLocation(state.location);
-    if (bosses.length) {
+    if (revealedBoss.length || livingBosses.length) {
         if (!livingBosses.length) {
             // Fade out the boss music once the last boss is defeated.
             if (isATrackPlaying()) {
                 fadeOutPlayingTracks();
             }
-        } else {
+        } else if (revealedBoss.length) {
             playTrack('bossIntro', 0);
         }
     } else if (location.zoneKey === 'overworld') {

@@ -5,20 +5,31 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {accelerateInDirection, moveEnemy, moveEnemyFull} from 'app/utils/enemies';
+import {constrainAngle} from 'app/utils/index';
 import {addObjectToArea} from 'app/utils/objects';
 import {getVectorToNearbyTarget} from 'app/utils/target';
 
 
-const image = 'gfx/enemies/baloonCentipede.png';
+const image = 'gfx/enemies/balloonCentipede.png';
 const centipedeGeometry: FrameDimensions = { w: 22, h: 22, content: { x: 4, y: 2, w: 14, h: 13} };
 const frameMap = [0,1,2,1];
 const centipedeHeadDownAnimation: FrameAnimation = createAnimation(image, centipedeGeometry, { y: 0, cols: 3, frameMap});
 const centipedeHeadRightAnimation: FrameAnimation = createAnimation(image, centipedeGeometry, { y: 1, cols: 3, frameMap});
 const centipedeHeadUpAnimation: FrameAnimation = createAnimation(image, centipedeGeometry, { y: 2, cols: 3, frameMap});
 
-const centipedeBodyDownAnimation: FrameAnimation = createAnimation(image, centipedeGeometry, { y: 3});
-const centipedeBodyRightAnimation: FrameAnimation = createAnimation(image, centipedeGeometry, { y: 4});
-const centipedeBodyUpAnimation: FrameAnimation = createAnimation(image, centipedeGeometry, { y: 5});
+
+const centipedeBodyGeometry: FrameDimensions = { w: 22, h: 22, content: { x: 6, y: 4, w: 10, h: 9} };
+const centipedeBodyDownAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, { y: 3});
+const centipedeBodyRightAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, { y: 4});
+const centipedeBodyUpAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, { y: 5});
+
+const centipedeWeakBodyDownAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, {y: 3, cols: 2});
+const centipedeWeakBodyRightAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, {y: 4, cols: 2});
+const centipedeWeakBodyUpAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, {y: 5, cols: 2});
+
+const centipedeTailDownAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, {y: 3, x: 2});
+const centipedeTailRightAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, {y: 4, x: 2});
+const centipedeTailUpAnimation: FrameAnimation = createAnimation(image, centipedeBodyGeometry, {y: 5, x: 2});
 
 
 export const centipedeHeadAnimations: ActorAnimations = {
@@ -39,6 +50,24 @@ export const centipedeBodyAnimations: ActorAnimations = {
     },
 };
 
+export const centipedeWeakBodyAnimations: ActorAnimations = {
+    idle: {
+        up: centipedeWeakBodyUpAnimation,
+        down: centipedeWeakBodyDownAnimation,
+        right: centipedeWeakBodyRightAnimation,
+        left: centipedeWeakBodyRightAnimation,
+    },
+};
+
+export const centipedeTailAnimations: ActorAnimations = {
+    idle: {
+        up: centipedeTailUpAnimation,
+        down: centipedeTailDownAnimation,
+        right: centipedeTailRightAnimation,
+        left: centipedeTailRightAnimation,
+    },
+};
+
 
 interface BalloonCentipedeParams {
     length?: number
@@ -52,22 +81,10 @@ interface BalloonCentipedeParams {
     ttl?: number
 }
 
-const TWOPI = 2 * Math.PI;
-function constrainAngle(angle: number, targetAngle: number, angleRadius: number) {
-    const d1 = (2 * TWOPI + targetAngle - angle) % TWOPI;
-    const d2 = TWOPI - d1;
-    if (d1 < maxTheta || d2 < maxTheta) {
-        return angle;
-    }
-    if (d1 < d2) {
-        return (targetAngle - angleRadius) % TWOPI;
-    }
-    return (targetAngle + angleRadius) % TWOPI;
-}
-window.constrainAngle = constrainAngle;
+
 
 const radiusRange = [0, 8];
-const maxTheta = Math.PI / 2;
+const maxTheta = 3 * Math.PI / 8;
 function constrainPartToParent(parent: Enemy<BalloonCentipedeParams>, child: Enemy<BalloonCentipedeParams>) {
     const dx = parent.x - child.x, dy = parent.y - child.y;
     let r = Math.max(radiusRange[0], Math.min(radiusRange[1], Math.sqrt(dx * dx + dy * dy)));
@@ -84,7 +101,7 @@ enemyDefinitions.balloonCentipede = {
     alwaysReset: true,
     floating: true,
     flipLeft: true,
-    animations: centipedeHeadAnimations, speed: 1, acceleration: 0.05,
+    animations: centipedeHeadAnimations,
     baseMovementProperties: {canMoveInLava: true, canFall: true, canSwim: true},
     life: 4, touchDamage: 1,
     params: {length: 5, isHead: true, isControlled: true, heading: 0},
@@ -208,6 +225,8 @@ enemyDefinitions.balloonCentipede = {
                 enemy.params.ttl = (parent.params?.ttl ?? 1000) + 200 + 20 * ((Math.random() * 10) | 0);
             }
         } else {
+            enemy.animations = centipedeWeakBodyAnimations;
+            enemy.changeToAnimation('move');
             enemy.params.ttl = (enemy.params.ttl ?? 500) - FRAME_LENGTH;
             // Slowly drift to a stop if this is a body part without a parent.
             moveEnemy(state, enemy, enemy.vx, enemy.vy);

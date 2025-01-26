@@ -53,7 +53,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (enemy.life <= enemy.enemyDefinition.life / 2) {
+    if (enemy.life <= enemy.maxLife / 2) {
         enemy.speed = enemyDefinitions.beetleBoss.speed + 1;
     } else {
         enemy.speed = enemyDefinitions.beetleBoss.speed;

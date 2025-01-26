@@ -143,7 +143,7 @@ function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
 }
 
 function getProjectionAlpha(enemy: Enemy) {
-    let alpha = Math.min(1, 0.2 + 2 * enemy.life / enemy.enemyDefinition.life);
+    let alpha = Math.min(1, 0.2 + 2 * enemy.life / enemy.maxLife);
     if (enemy.mode === 'teleport') {
         if (enemy.modeTime < 600) {
             alpha *= (600 - enemy.modeTime) / 600;
@@ -310,7 +310,7 @@ function switchElements(state: GameState, enemy: Enemy<ProjectionParams>) {
     if (!guardian) {
         return;
     }
-    const maxLife = guardian.enemyDefinition.life;
+    const maxLife = guardian.maxLife;
     // Determine which elements are currently available
     let availableElements = elements;
     if (guardian.life >= maxLife) {
@@ -404,7 +404,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         }
         enemy.life = Math.max(0, enemy.life - 100 * FRAME_LENGTH / 1000);
     }
-    const maxLife = enemy.enemyDefinition.life;
+    const maxLife = enemy.maxLife;
     let targetScale = 1;
 
     if (enemy.mode === 'regenerate') {
@@ -428,7 +428,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             enemy.setMode('regenerate');
             enemy.cancelAttacks(state);
             const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
-            if (guardian.life <= guardian.enemyDefinition.life / 4) {
+            if (guardian.life <= guardian.maxLife / 4) {
                 // Always use the low life taunts when regenerating.
                 if (!guardian.useTaunt(state, 'regenerateLowHealth')) {
                     guardian.useTaunt(state, 'regenerateLowHealth2')
@@ -677,7 +677,7 @@ function teleportToNextMarker(this: void, state: GameState, guardian: Enemy<Guar
     if (!guardian.params.usedMarkers) {
         guardian.params.usedMarkers = new Set();
     }
-    const markerId = guardian.life <= guardian.enemyDefinition.life / 3 ? 'guardianMarkerHard' : 'guardianMarkerEasy';
+    const markerId = guardian.life <= guardian.maxLife / 3 ? 'guardianMarkerHard' : 'guardianMarkerEasy';
     const availableMarkers =  guardian.area.objects.filter(o => o.definition?.id === markerId);
     let unusedMarkers = availableMarkers.filter(o => !guardian.params.usedMarkers.has(o));
     // If the player does not damage the guardian while they are staggered, they can go through all the marerks

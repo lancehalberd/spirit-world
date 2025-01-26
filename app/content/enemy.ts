@@ -92,6 +92,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     isEnemyTarget: boolean = true;
     isAirborn = false;
     life: number;
+    maxLife: number;
     speed: number;
     acceleration: number;
     aggroRadius: number;
@@ -101,6 +102,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // This time starts at 0 and updates with every enemy update call and shouldn't be reset.
     time = 0;
     isDefeated = false;
+    isBoss = false;
     // Used to control animation of the healthBar for bosses.
     // This will be incremented each frame, but a boss can reset it to 0 on update to hide the
     // healthbar.
@@ -139,7 +141,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (!frame) {
             debugger;
         }
-        this.life = this.enemyDefinition.life ?? 1;
+        this.maxLife = this.enemyDefinition.life ?? 1;
+        this.life = this.maxLife;
         this.speed = this.enemyDefinition.speed ?? 1;
         this.acceleration = this.enemyDefinition.acceleration ?? .1;
         this.aggroRadius = this.enemyDefinition.aggroRadius ?? 80;
@@ -178,6 +181,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
         this.canSwim = this.enemyDefinition.canSwim || this.enemyDefinition.baseMovementProperties?.canSwim;
         this.canMoveInLava = this.enemyDefinition.canMoveInLava || this.enemyDefinition.baseMovementProperties?.canMoveInLava;
+        this.isBoss = this.definition.type === 'boss';
     }
     gainAbility(ability: EnemyAbility<any>) {
         this.abilities.push({
@@ -466,7 +470,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.frozenDuration = 0;
             // Record the enemy as frozen if they were defeated by this hit.
             this.frozenAtDeath = !this.isImmortal && this.life <= 0;
-        } else if (hit.element === 'ice' && this.definition.type !== 'boss' && this.enemyDefinition.canBeFrozen !== false) {
+        } else if (hit.element === 'ice' && !this.isBoss && this.enemyDefinition.canBeFrozen !== false) {
             this.burnDuration = 0;
             // Do not freeze the enemy unless they will actually stay frozen for some duration:
             // They are immortal or have life left, or they are dying but airborn.
@@ -506,7 +510,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.makeSound(state, damageSound);
         }
         if (this.area !== state.areaInstance) {
-            if (this.isDefeated && this.definition.type !== 'boss') {
+            if (this.isDefeated && !this.isBoss) {
                 addEffectToArea(state, state.areaInstance, new FieldAnimationEffect({
                     animation: enemyDeathAnimation,
                     x: this.x,
@@ -540,7 +544,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         this.isDefeated = true;
         this.setMode('defeated');
-        if (this.definition.type === 'boss') {
+        if (this.isBoss) {
             const bossDefinition = this.definition;
             if (this.enemyDefinition.onDeath) {
                 this.enemyDefinition.onDeath(state, this);
@@ -548,7 +552,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             // Immediately kill other enemies and remove enemy attack effects when the boss is defeated.
             // Bosses in both material+spirit realms must be defeated before the battle is over.
             const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
-            if (!allEnemies.some(object => object.definition.type === 'boss' && object.isFromCurrentSection(state)
+            if (!allEnemies.some(object => object.isBoss && object.isFromCurrentSection(state)
                     && object.status !== 'gone' && !object.isDefeated)
             ) {
                 // Remove all enemy attacks from the screen when a boss is defeated.
@@ -563,21 +567,23 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 });
                 appendCallback(state, (state: GameState) => {
                     for (const enemy of allEnemies) {
-                        if (enemy.definition.type === 'boss') {
+                        if (enemy.isBoss) {
                             enemy.status = 'gone';
                         }
                     }
-                    // Do nothing if this boss was already defeated.
-                    if (getObjectStatus(state, bossDefinition)) {
-                        return;
-                    }
-                    // Make sure to save status before gaining loot since gaining loot refreshes object status.
-                    saveObjectStatus(state, bossDefinition);
-                    // Gain loot if any is defined.
-                    if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
-                        getLoot(state, bossDefinition);
-                    } else {
-                        state.areaInstance.needsLogicRefresh = true;
+                    if (bossDefinition.type === 'boss'){
+                        // Do nothing if this boss was already defeated.
+                        if (getObjectStatus(state, bossDefinition)) {
+                            return;
+                        }
+                        // Make sure to save status before gaining loot since gaining loot refreshes object status.
+                        saveObjectStatus(state, bossDefinition);
+                        // Gain loot if any is defined.
+                        if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
+                            getLoot(state, bossDefinition);
+                        } else {
+                            state.areaInstance.needsLogicRefresh = true;
+                        }
                     }
                 });
             }
@@ -921,7 +927,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.enemyDefinition.getHealthPercent) {
             return this.enemyDefinition.getHealthPercent(state, this);
         }
-        return this.life / this.enemyDefinition.life;
+        return this.life / this.maxLife;
     }
     getShieldPercent(state: GameState): number {
         if (this.enemyDefinition.getShieldPercent) {

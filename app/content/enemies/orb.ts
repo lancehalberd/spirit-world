@@ -226,7 +226,7 @@ enemyDefinitions.smallOrb = {
     onDeath(this: void, state: GameState, enemy: Enemy<OrbProps>) {
         const largeOrb = enemy.params.largeOrb;
         if (largeOrb) {
-            largeOrb.applyDamage(state, largeOrb.enemyDefinition.life / 3)
+            largeOrb.applyDamage(state, largeOrb.maxLife / 3)
         }
     }
 };
@@ -289,7 +289,7 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
     enemy.params.largeOrb = enemy;
     const hitbox = enemy.getMovementHitbox();
     // Ranges from 24 -> 60 as the large orb goes from full to 1/3 life.
-    const orbitRadius = Math.min(60, 40 + (60 - 40) * (enemy.enemyDefinition.life - enemy.life) / (enemy.life * 2 / 3));
+    const orbitRadius = Math.min(60, 40 + (60 - 40) * (enemy.maxLife - enemy.life) / (enemy.life * 2 / 3));
     if (!enemy.params.smallOrbs) {
         enemy.params.shockwaveTimer = 2000;
         enemy.params.smallOrbs = [];
@@ -317,7 +317,7 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
     }
 
     if (!enemy.params.invertedDuration) {
-        if (enemy.life <= enemy.enemyDefinition.life / 3) {
+        if (enemy.life <= enemy.maxLife / 3) {
             enemy.vx = enemy.vy = 0;
             // The large orb will explode after this duration.
             enemy.params.invertedDuration = 8000;

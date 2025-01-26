@@ -680,8 +680,8 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     }
     // Enrage level increase for every 1/3 health missing.
     let targetEnrageLevel = 0;
-    const healthIsCritical = enemy.life <= enemy.enemyDefinition.life * 1 / 3;
-    if (enemy.life <= enemy.enemyDefinition.life * 2 / 3) {
+    const healthIsCritical = enemy.life <= enemy.maxLife * 1 / 3;
+    if (enemy.life <= enemy.maxLife * 2 / 3) {
         targetEnrageLevel++;
     }
     if (healthIsCritical) {

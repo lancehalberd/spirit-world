@@ -372,7 +372,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    const maxLife = enemy.enemyDefinition.life;
+    const maxLife = enemy.maxLife;
     if (enemy.life <= 0.75 * maxLife && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
         enemy.params.enrageTime = 7000;

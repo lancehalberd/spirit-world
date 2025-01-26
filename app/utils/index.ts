@@ -260,3 +260,17 @@ export function fillGrid<T>(value: T, w: number, h: number): T[][] {
     }
     return grid;
 }
+
+const TWOPI = 2 * Math.PI;
+export function constrainAngle(angle: number, targetAngle: number, angleRadius: number) {
+    const d1 = (2 * TWOPI + targetAngle - angle) % TWOPI;
+    const d2 = TWOPI - d1;
+    if (d1 < angleRadius || d2 < angleRadius) {
+        return angle;
+    }
+    if (d1 < d2) {
+        return (targetAngle - angleRadius) % TWOPI;
+    }
+    return (targetAngle + angleRadius) % TWOPI;
+}
+window.constrainAngle = constrainAngle;

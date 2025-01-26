@@ -124,7 +124,7 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
         });
         // The heart regenerates life will covered in lava.
         if (enemy.time % 1000 === 0) {
-            enemy.life = Math.min(enemy.life + 0.5, enemy.enemyDefinition.life);
+            enemy.life = Math.min(enemy.life + 0.5, enemy.maxLife);
         }
         // Don't show the healthbar or attack if the heart has not been exposed yet.
         if (flameBeast.mode === 'hidden') {
@@ -226,12 +226,12 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
             }
         }
     }
-    if (enemy.life <= enemy.enemyDefinition.life * 2 / 3 && enemy.params.enrageLevel === 0) {
+    if (enemy.life <= enemy.maxLife * 2 / 3 && enemy.params.enrageLevel === 0) {
         enemy.params.isProtected = true;
         enemy.params.enrageLevel = 1;
         enemy.modeTime = 0;
         fillLava(state, enemy);
-    } else if (enemy.life <= enemy.enemyDefinition.life * 1 / 3 && enemy.params.enrageLevel === 1) {
+    } else if (enemy.life <= enemy.maxLife * 1 / 3 && enemy.params.enrageLevel === 1) {
         enemy.params.isProtected = true;
         enemy.params.enrageLevel = 2;
         enemy.modeTime = 0;

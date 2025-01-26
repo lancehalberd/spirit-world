@@ -268,10 +268,10 @@ function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
     if (!flameHeart) {
         enrageLevel++;
     }
-    if (enemy.life <= enemy.enemyDefinition.life / 3) {
+    if (enemy.life <= enemy.maxLife / 3) {
         enrageLevel++;
     }
-    if (enemy.life <= 2 * enemy.enemyDefinition.life / 3) {
+    if (enemy.life <= 2 * enemy.maxLife / 3) {
         enrageLevel++;
     }
     return enrageLevel;
@@ -317,7 +317,7 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
             return;
         }
         // If a flameheart is present, stay hidden until it is damaged.
-        if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
+        if (flameHeart && flameHeart.life >= flameHeart.maxLife) {
             return;
         }
         enemy.status = 'normal';
@@ -336,7 +336,7 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
     // Assuming there is a Flame Heart present, if the beast drops below 2/3 health it
     // will become invulnerable until it submerges again, at which point it will regenerate
     // until it reaches full life or the heart is defeated.
-    if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
+    if (enemy.life < enemy.maxLife * 2 / 3) {
         if (!isEnemyDefeated(flameHeart)) {
             enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
             if (enemy.mode === 'submerged') {
@@ -352,8 +352,8 @@ function updateFlameBeast(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.modeTime % 1000 === 0) {
             enemy.life += 1;
         }
-        if (enemy.life >= enemy.enemyDefinition.life) {
-            enemy.life = enemy.enemyDefinition.life;
+        if (enemy.life >= enemy.maxLife) {
+            enemy.life = enemy.maxLife;
             enemy.setMode('submerged');
         }
         return;

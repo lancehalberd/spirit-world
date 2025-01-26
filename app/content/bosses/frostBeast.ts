@@ -374,9 +374,9 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         return;
     }
     let targetEngrageLevel = 0;
-    if (enemy.life <= enemy.enemyDefinition.life * 0.3) {
+    if (enemy.life <= enemy.maxLife * 0.3) {
         targetEngrageLevel = 2;
-    } else if (enemy.life <= enemy.enemyDefinition.life * 0.7) {
+    } else if (enemy.life <= enemy.maxLife * 0.7) {
         targetEngrageLevel = 1;
     }
     if (enemy.params.enrageLevel < targetEngrageLevel) {
@@ -564,12 +564,12 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                     enemy.life += 0.5;
                 }
             }
-            if (enemy.life >= enemy.enemyDefinition.life) {
+            if (enemy.life >= enemy.maxLife) {
                 enemy.setMode('swimming');
             }
             return;
         }
-        if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
+        if (enemy.life < enemy.maxLife * 2 / 3) {
             const hitbox = enemy.getHitbox(state);
             const deathAnimation = new FieldAnimationEffect({
                 animation: enemyDeathAnimation,

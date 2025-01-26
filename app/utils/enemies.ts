@@ -1,11 +1,11 @@
-import { addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
+import {addEnemyFallAnimation, addSplashAnimation} from 'app/content/effects/animationEffect';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {hitTargets} from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
+import {getAreaSize} from 'app/utils/getAreaSize';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
-import { sample } from 'app/utils/index';
-import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
-import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
+import {constrainAngle, sample} from 'app/utils/index';
+import {getLineOfSightTargetAndDirection, getVectorToNearbyTarget, getVectorToTarget} from 'app/utils/target';
+import {getSectionBoundingBox, moveActor} from 'app/movement/moveActor';
 
 
 export function moveEnemyToTargetLocation(
@@ -60,7 +60,15 @@ export function scurryRandomly(state: GameState, enemy: Enemy) {
     moveEnemy(state, enemy, enemy.vx, enemy.vy);
 }
 
-export function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: number, y: number}): void {
+export function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: number, y: number}, maxTurnTheta?: number): void {
+    // If maxTurnTheta is defined, accelerate in closest direction allowed based on the current velocity.
+    if (maxTurnTheta && (enemy.vx || enemy.vy)) {
+        const theta = constrainAngle(Math.atan2(a.y, a.x), Math.atan2(enemy.vy, enemy.vx), maxTurnTheta);
+        a = {
+            x: Math.cos(theta),
+            y: Math.sin(theta),
+        };
+    }
     let mag = Math.sqrt(a.x * a.x + a.y * a.y);
     if (mag) {
         enemy.vx = enemy.vx + enemy.acceleration * a.x / mag;

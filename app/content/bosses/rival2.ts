@@ -688,7 +688,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (!enemy.activeAbility && enemy.life <= enemy.enemyDefinition.life - 2/*12*/ && enemy.area === state.hero.area) {
+    if (!enemy.activeAbility && enemy.life <= enemy.maxLife - 2 && enemy.area === state.hero.area) {
         if (enemy.modeTime < 400) {
             return;
         }
@@ -707,7 +707,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
     }
 
     // These attacks are only used at the start of the fight, which is similar to the first rival encounter.
-    if (enemy.life > enemy.enemyDefinition.life - 2) {
+    if (enemy.life > enemy.maxLife - 2) {
         // Use the staff attack whenever possible. This actually makes the
         // fight a bit easier since this is when the rival is most vulnerable.
         enemy.tryUsingAbility(state, staffAbility)
