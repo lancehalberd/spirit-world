@@ -20,7 +20,9 @@ import {
     cloudPoofAnimation,
     goldBowAnimations,
     heroAnimations,
-    staffAnimations,
+    treeStaffAnimations,
+    darkTowerStaffAnimations,
+    lightTowerStaffAnimations,
 } from 'app/render/heroAnimations';
 import {
     getHeroFrame, renderCarriedTile,
@@ -639,6 +641,10 @@ export class Hero implements Actor {
     }
 
     renderStaff(this: Hero, context: CanvasRenderingContext2D, state: GameState, staffDirection: Direction): void {
+        let staffAnimations = treeStaffAnimations;
+        if (this.savedData.activeTools.staff > 1) {
+            staffAnimations = this.area.definition.isSpiritWorld ? lightTowerStaffAnimations : darkTowerStaffAnimations;
+        }
         if (this.animationTime < staffAnimations[staffDirection].duration) {
             const frame = getFrame(staffAnimations[staffDirection], this.animationTime);
             let x = this.x - 61 + 7, y = this.y - 32 - 90 + 6;

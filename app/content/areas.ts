@@ -595,8 +595,11 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             // Without this the HUD/music logic will briefly be unable to detect bosses in the area which can cause boss music
             // to restart during logic refreshes.
             nextAreaInstance.enemies = [...instance.enemies];
+            // Don't lose track of the objects that have been intentional removed from the area.
+            nextAreaInstance.removedObjectDefinitions = instance.removedObjectDefinitions;
             instance.priorityObjects = []
             instance = nextAreaInstance;
+
 
             applyVariantsToArea(state, instance);
         }

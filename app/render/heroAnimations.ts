@@ -1,9 +1,7 @@
-import { createAnimation } from 'app/utils/animations';
-import { debugCanvas } from 'app/utils/canvas';
+import {createAnimation} from 'app/utils/animations';
 
 
 export const Y_OFF = -4;
-
 
 const heroIconGeometry: FrameDimensions = {w: 16, h: 16};
 export const heroIcon: Frame = createAnimation('gfx/hud/mcIcon.png', heroIconGeometry).frames[0];
@@ -256,13 +254,21 @@ const mcStaffSlamRightAnimation: FrameAnimation = createAnimation('gfx/mc/wukong
 const mcStaffSlamUpAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 1, x: 13, duration: 9});
 const mcStaffSlamLeftAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 1, x: 18, duration: 9});
 
+
 const staffGeometry = {w: 123, h: 181};
-const staffDownAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 8, x: 0, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
+function createSwingStaffAnimationSet(source: string) {
+    return {
+        down: createAnimation(source, staffGeometry, { cols: 8, x: 0, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false}),
+        right: createAnimation(source, staffGeometry, { cols: 10, x: 8, duration: 3}, {loop: false}),
+        up: createAnimation(source, staffGeometry, { cols: 8, x: 18, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false}),
+        left:createAnimation(source, staffGeometry, { cols: 10, x: 26, duration: 3}, {loop: false}),
+    };
+}
+/*const staffDownAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 8, x: 0, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
 const staffRightAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 10, x: 8, duration: 3}, {loop: false});
 const staffUpAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 8, x: 18, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
 const staffLeftAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 10, x: 26, duration: 3}, {loop: false});
-
-debugCanvas;//(staffDownAnimation.frames[0]);
+*/
 
 export const bowAnimations: AnimationSet = {
     up: bowUpAnimation,
@@ -304,12 +310,9 @@ export const cloakAnimations: AnimationSet = {
     right: cloakRightAnimation,
 }
 
-export const staffAnimations: AnimationSet = {
-    up: staffUpAnimation,
-    down: staffDownAnimation,
-    left: staffLeftAnimation,
-    right: staffRightAnimation,
-}
+export const treeStaffAnimations: AnimationSet = createSwingStaffAnimationSet('gfx/effects/wukong_staff.png');
+export const darkTowerStaffAnimations: AnimationSet = createSwingStaffAnimationSet('gfx/effects/wukong_staff-dark.png');
+export const lightTowerStaffAnimations: AnimationSet = createSwingStaffAnimationSet('gfx/effects/wukong_staff-light.png');
 
 export const heroAnimations: ActorAnimations = {
     attack: {

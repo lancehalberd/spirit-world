@@ -11,7 +11,7 @@ import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
-    heroAnimations, staffAnimations, heroSpiritAnimations,
+    heroAnimations, treeStaffAnimations, heroSpiritAnimations,
 } from 'app/render/heroAnimations';
 import { appendScript } from 'app/scriptEvents';
 import { removeTextCue } from 'app/content/effects/textCue';
@@ -513,8 +513,8 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
     if (enemy.activeAbility.used) {
         animationTime += enemy.activeAbility.definition.prepTime;
     }
-    if (animationTime < staffAnimations[enemy.d].duration + 20) {
-        const frame = getFrame(staffAnimations[enemy.d], animationTime);
+    if (animationTime < treeStaffAnimations[enemy.d].duration + 20) {
+        const frame = getFrame(treeStaffAnimations[enemy.d], animationTime);
         let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
         if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {
             y -= enemy.z;

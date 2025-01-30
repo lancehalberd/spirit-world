@@ -715,6 +715,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const staff = new Staff(state, {
                 x: hero.x,
                 y: hero.y,
+                level: staffLevel,
                 damage: 4 * staffLevel,
                 direction: hero.d,
                 element: hero.savedData.element,

@@ -1,26 +1,59 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { getSectionBoundingBox } from 'app/movement/moveActor';
-import { moveObject } from 'app/movement/moveObject';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { debugCanvas } from 'app/utils/canvas';
-import { directionMap } from 'app/utils/direction';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {getSectionBoundingBox} from 'app/movement/moveActor';
+import {moveObject} from 'app/movement/moveObject';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {directionMap} from 'app/utils/direction';
 import {getTilesInRectangle} from 'app/utils/field';
 import {pad, rectanglesOverlap} from 'app/utils/index';
 import {getObjectBehaviors} from 'app/utils/objects';
 
+interface StaffAnimations {
+    left: FrameAnimation
+    horizontal: FrameAnimation
+    right: FrameAnimation
+    top: FrameAnimation
+    vertical: FrameAnimation
+    bottom: FrameAnimation
+    horizontalDetails: FrameAnimation[]
+    verticalDetails: FrameAnimation[]
+}
 
 const staffPartGeometry = {w: 20, h: 17};
-const leftAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
+function createStaffAnimations(source: string, details = 0): StaffAnimations {
+    const horizontalDetails: FrameAnimation[] = [];
+    const verticalDetails: FrameAnimation[] = [];
+    for (let i = 0; i < details; i++) {
+        horizontalDetails.push(createAnimation(source, staffPartGeometry, {x: 3 + i, y: 3, rows: 3, frameMap: [2, 1, 0], duration: 3}, {loop: false}));
+        verticalDetails.push(createAnimation(source, staffPartGeometry, {x: 3 + i, y: 0, rows: 3, frameMap: [1, 2, 0], duration: 3}, {loop: false}));
+    }
+    return {
+        left: createAnimation(source, staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1, 0], duration: 3}, {loop: false}),
+        horizontal: createAnimation(source, staffPartGeometry, {x: 1, y: 3, rows: 3, frameMap: [2, 1, 0], duration: 3}, {loop: false}),
+        right: createAnimation(source, staffPartGeometry, {x: 2, y: 3, rows: 3, frameMap: [2, 1, 0], duration: 3}, {loop: false}),
+        top: createAnimation(source, staffPartGeometry, {x: 0, y: 0, rows: 3, frameMap: [1, 2, 0], duration: 3}, {loop: false}),
+        vertical: createAnimation(source, staffPartGeometry, {x: 1, y: 0, rows: 3, frameMap: [1, 2, 0], duration: 3}, {loop: false}),
+        bottom: createAnimation(source, staffPartGeometry, {x: 2, y: 0, rows: 3, frameMap: [1, 2, 0], duration: 3}, {loop: false}),
+        horizontalDetails,
+        verticalDetails,
+    };
+}
+
+const treeStaffAnimations = createStaffAnimations('gfx/effects/wukong_staff_parts.png');
+const darkTowerStaffAnimations = createStaffAnimations('gfx/effects/wukong_staff_parts-dark.png', 2);
+const lightTowerStaffAnimations = createStaffAnimations('gfx/effects/wukong_staff_parts-light.png', 2);
+
+/*const leftAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
 const horizontalAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 1, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
 const rightAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 2, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
 const topAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 0, rows: 3, frameMap: [1, 2,0], duration: 3}, {loop: false});
 const verticalAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 1, y: 0, rows: 3, frameMap: [1, 2,0], duration: 3}, {loop: false});
 const bottomAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 2, y: 0, rows: 3, frameMap: [1, 2,0], duration: 3}, {loop: false});
-debugCanvas;//(leftAnimation.frames[0]);
+*/
 
 interface Props {
     x?: number
     y?: number
+    level: number
     damage?: number
     direction: Direction
     crushingPower: number
@@ -51,11 +84,16 @@ export class Staff implements ObjectInstance {
     storedBehaviors: TileBehaviors[][];
     animationTime: number = 0;
     recalling: boolean = false;
+    animations: StaffAnimations;
     // Used to track which hero to assign this staff to if it is switched to a new area.
     hero: Hero;
-    constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4, crushingPower }: Props) {
+    constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4, level = 1, crushingPower }: Props) {
         // Note this assumes the staff is always added to the area the hero is in.
         this.area = state.areaInstance;
+        this.animations = treeStaffAnimations;
+        if (level > 1) {
+            this.animations = this.area.definition.isSpiritWorld ? lightTowerStaffAnimations : darkTowerStaffAnimations;
+        }
         x = x | 0;
         y = y | 0;
         this.direction = direction;
@@ -153,7 +191,7 @@ export class Staff implements ObjectInstance {
     }
     recall(state: GameState) {
         this.recalling = true;
-        this.animationTime = leftAnimation.duration;
+        this.animationTime = this.animations.left.duration;
     }
     update(state: GameState) {
         if (this.recalling) {
@@ -226,30 +264,38 @@ export class Staff implements ObjectInstance {
             let x = this.x | 0, y = this.y | 0;
             if (this.direction === 'left' || this.direction === 'right') {
                 //x -= 3;
-                let frame = getFrame(leftAnimation, this.animationTime);
+                let frame = getFrame(this.animations.left, this.animationTime);
                 y -= 3;
                 drawFrame(context, frame, {...frame, x: x - 2, y});
                 const w = this.w - 32;
                 if (w > 0) {
-                    frame = getFrame(horizontalAnimation, this.animationTime);
+                    frame = getFrame(this.animations.horizontal, this.animationTime);
                     // This frame is 16px center in 20px space, but we need the exact rectangle to stretch it correctly.
                     drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: x + 16, y, w});
                 }
-                frame = getFrame(rightAnimation, this.animationTime);
+                frame = getFrame(this.animations.right, this.animationTime);
                 drawFrame(context, frame, {...frame, x: x + this.w - 18, y});
+                for (let i = 0; i < this.animations.horizontalDetails.length; i++) {
+                    frame = getFrame(this.animations.horizontalDetails[i], this.animationTime);
+                    drawFrame(context, frame, {...frame, x: x + Math.min(16 + this.w / 2 * i, this.w - 32), y});
+                }
             } else {
                 y -= 4;
-                let frame = getFrame(topAnimation, this.animationTime);
+                let frame = getFrame(this.animations.top, this.animationTime);
                 x -= 4;
                 drawFrame(context, frame, {...frame, x, y: y});
                 const h = this.h - 27;
                 if (h > 0) {
-                    frame = getFrame(verticalAnimation, this.animationTime);
+                    frame = getFrame(this.animations.vertical, this.animationTime);
                     // This frame is 16px offset by 1px in 17px space, but we need the exact rectangle to stretch it correctly.
                     drawFrame(context, {...frame, y: frame.y + 1, h: 16}, {...frame, x, y: y + 17, h});
                 }
-                frame = getFrame(bottomAnimation, this.animationTime);
+                frame = getFrame(this.animations.bottom, this.animationTime);
                 drawFrame(context, frame, {...frame, x, y: y + this.h - 11});
+                for (let i = 0; i < this.animations.verticalDetails.length; i++) {
+                    frame = getFrame(this.animations.verticalDetails[i], this.animationTime);
+                    drawFrame(context, frame, {...frame, x, y: y + Math.min(16 + this.h / 2 * i, this.h - 32)});
+                }
             }
         context.restore();
         /*context.save();

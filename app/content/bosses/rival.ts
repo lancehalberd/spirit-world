@@ -2,7 +2,7 @@ import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { rivalAnimations } from 'app/content/enemyAnimations';
-import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
+import { heroAnimations, treeStaffAnimations } from 'app/render/heroAnimations';
 import { appendScript } from 'app/scriptEvents';
 import { removeTextCue } from 'app/content/effects/textCue';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
@@ -225,8 +225,8 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
     if (enemy.activeAbility.used) {
         animationTime += enemy.activeAbility.definition.prepTime;
     }
-    if (animationTime < staffAnimations[enemy.d].duration + 20) {
-        const frame = getFrame(staffAnimations[enemy.d], animationTime);
+    if (animationTime < treeStaffAnimations[enemy.d].duration + 20) {
+        const frame = getFrame(treeStaffAnimations[enemy.d], animationTime);
         let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
         if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {
             y -= enemy.z;
