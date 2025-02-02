@@ -1135,7 +1135,7 @@ addTiles([
     iceTiles,
     lavaBubbles,
     waterRocks,
-    deletedTiles(9),
+    deletedTiles(8),
     emptyCeilingBehaviors,
     singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
     ...allFlowerTiles,

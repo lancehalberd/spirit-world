@@ -1,6 +1,8 @@
-import { BITMAP_BOTTOM } from 'app/content/bitMasks';
+import {BITMAP_BOTTOM} from 'app/content/bitMasks';
 import {everyArea, everyObject} from 'app/utils/every';
+import {hitTargets} from 'app/utils/field';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
+import {getDrawPriority} from 'app/utils/layers';
 import {getObjectSaveTreatment} from 'app/utils/objects';
 import {applyTileToBehaviorGrid} from 'app/utils/tileBehavior';
 import {getAreaInstanceFromLocation} from 'app/content/areas';
@@ -18,6 +20,19 @@ export const tests: {[key: string]: () => void} = {
             // for the object type to `getObjectSaveTreatment`.
             if (!objectDefinition.id) {
                 console.error(`Missing object id`, location, objectDefinition);
+            }
+        });
+    },
+    checkLayersAreOrdered() {
+        everyArea((location, zone, area) => {
+            let foundForeground = false;
+            for (let i = 0; i < area.layers.length; i++) {
+                if (getDrawPriority(area.layers[i]) === 'foreground') {
+                    foundForeground = true;
+                } else if (foundForeground) {
+                    console.error(`Non-foreground layer ${area.layers[i].key} found after foreground layer`, location);
+                    break;
+                }
             }
         });
     },
@@ -99,7 +114,38 @@ export const tests: {[key: string]: () => void} = {
         if (!cloudOnWallBehavior.cloudGround || cloudOnWallBehavior.solid) {
             console.error('Unexpected behaviors for cloud over wall: ', cloudOnWallBehavior);
         }
-    }
+    },
+    // Make sure the boss freezing walls doesn't remove their solid behavior.
+    testFreezingWarTempleWall() {
+        const state = getState();
+        const warTemple = getAreaInstanceFromLocation(state, {
+            zoneKey: 'warTemple',
+            floor: 2,
+            areaGridCoords: {x: 0, y: 0},
+            isSpiritWorld: false,
+            x: 0, y: 0, d: 'down',
+        });
+        hitTargets(state, warTemple, {
+            hitbox: {x: 224, y: 224, w: 32, h: 32},
+            // Setting this to true causes the hit to freeze a wider range of tiles.
+            hitAllies: true,
+            hitTiles: true,
+            element: 'ice',
+            source: null,
+        })
+        const floorBehavior = getCompositeBehaviors(state, warTemple, {x: 232, y: 232});
+        const eastWallBehavior = getCompositeBehaviors(state, warTemple, {x: 248, y: 232});
+        const southWallBehavior = getCompositeBehaviors(state, warTemple, {x: 232, y: 248});
+        if (!floorBehavior.slippery) {
+            console.error('Expected floor to be frozen: ', floorBehavior);
+        }
+        if (!eastWallBehavior.solid) {
+            console.error('Expected east wall to be solid: ', eastWallBehavior);
+        }
+        if (!southWallBehavior.solid) {
+            console.error('Expected south wall to be solid: ', southWallBehavior);
+        }
+    },
 };
 window['tests'] = tests;
 

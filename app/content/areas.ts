@@ -20,31 +20,35 @@ import { applyVariantsToArea } from 'app/utils/variants';
 export function getDefaultArea(w = 32, h = 32): AreaDefinition {
     return {
         default: true,
-        layers: [
-            {
-                key: 'floor',
-                grid: {
-                    // The dimensions of the grid.
-                    w,
-                    h,
-                    // The matrix of tiles
-                    tiles: [],
-                },
-            },
-            {
-                key: 'field',
-                grid: {
-                    // The dimensions of the grid.
-                    w,
-                    h,
-                    // The matrix of tiles
-                    tiles: [],
-                },
-            },
-        ],
+        layers: getDefaultLayers(w, h),
         objects: [],
         sections: [{ x: 0, y: 0, w, h}],
     };
+}
+
+export function getDefaultLayers(w = 32, h = 32): AreaLayerDefinition[] {
+    return [
+        {
+            key: 'floor',
+            grid: {
+                // The dimensions of the grid.
+                w,
+                h,
+                // The matrix of tiles
+                tiles: [],
+            },
+        },
+        {
+            key: 'field',
+            grid: {
+                // The dimensions of the grid.
+                w,
+                h,
+                // The matrix of tiles
+                tiles: [],
+            },
+        },
+    ];
 }
 
 export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefinition {
@@ -100,7 +104,7 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
             initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h));
         return grid[y][x] as AreaDefinition;
     } else if (!grid[y][x].layers) {
-        const areaDefinition = grid[y][x];
+        /*const areaDefinition = grid[y][x];
         const alternateAreaDefinition = alternateGrid[y][x];
         if (!alternateAreaDefinition) {
             debugger;
@@ -116,10 +120,23 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
                 ...areaDefinition,
                 layers: defaultLayers
             });
-        }
+        }*/
+        populateLayersFromAlternateArea(grid[y][x], alternateGrid[y][x]);
         return grid[y][x] as AreaDefinition;
     }
     return grid[y][x];
+}
+
+export function populateLayersFromAlternateArea(area: AreaDefinition, alternateArea: AreaDefinition) {
+    if (area.layers) {
+        return;
+    }
+    if (alternateArea?.layers) {
+        area.layers = alternateArea.layers.map(copyLayerTemplate);
+    } else {
+        area.layers = getDefaultLayers(area.w, area.h);
+    }
+    initializeAreaTiles(area);
 }
 
 export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation): AreaInstance {

@@ -1,3 +1,4 @@
+import {populateLayersFromAlternateArea} from 'app/content/areas';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {zones} from 'app/content/zones/zoneHash';
 import {gameModifiers} from 'app/gameConstants';
@@ -108,6 +109,7 @@ function createDelveGauntlet() {
     const randomLoot = Random.shuffle(lootPool);
     for (const row of spiritGrid) {
         for (const spiritArea of row) {
+            populateLayersFromAlternateArea(spiritArea, spiritArea.parentDefinition);
             spiritArea.parentDefinition.objects = spiritArea.parentDefinition.objects || [];
             // Make sure we never save the status of defeated enemies, otherwise they won't respawn.
             for (const object of spiritArea.parentDefinition.objects) {

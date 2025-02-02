@@ -1,12 +1,12 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { allTiles } from 'app/content/tiles';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { removeObjectFromArea } from 'app/utils/objects';
-import { saveGame } from 'app/utils/saveGame';
-import { resetTileBehavior } from 'app/utils/tileBehavior';
-
+import {objectHash} from 'app/content/objects/objectHash';
+import {allTiles} from 'app/content/tiles';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {getDrawPriority} from 'app/utils/layers';
+import {removeObjectFromArea} from 'app/utils/objects';
+import {saveGame} from 'app/utils/saveGame';
+import {resetTileBehavior} from 'app/utils/tileBehavior';
 
 
 const growFrameDuration = 4;
@@ -36,7 +36,7 @@ function setTile(area: AreaInstance, layer: AreaLayer, tx: number, ty: number, t
 function getTargetLayer(area: AreaInstance): AreaLayer {
     let targetLayer;
     for (const layer of area.layers) {
-        if (layer.definition.key === 'foreground' || layer.definition.drawPriority === 'foreground') {
+        if (getDrawPriority(layer.definition) === 'foreground') {
             break;
         }
         targetLayer = layer;

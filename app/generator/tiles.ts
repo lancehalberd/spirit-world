@@ -1,16 +1,16 @@
-
-import { getOrAddLayer } from 'app/utils/layers';
-import { mapTileIndex } from 'app/utils/mapTile';
+import {populateLayersFromAlternateArea} from 'app/content/areas';
+import {getOrAddLayer} from 'app/utils/layers';
+import {mapTileIndex} from 'app/utils/mapTile';
 
 // Assuming a tile is defined in the base world and propogating to the child world by default, this
 // will modify the two worlds so that the tile is removed from area but kept in alternate area.
 // This means that if area is the base world, then the override clear tile will be applied to the alternate area.
 // If area is the child world, then the default tiles will be explicitly added to the child world and then replace with empty tiles in the base world.
 export function clearTileInOneWorld(area: AreaDefinition, alternateArea: AreaDefinition, layerKey: string, tx: number, ty: number) {
-    // Do nothing if this layer does not exist in either area.
-    if (!alternateArea.layers) {
-        alternateArea.layers = [];
+    if (!alternateArea.layers?.length) {
+        populateLayersFromAlternateArea(alternateArea, area);
     }
+    // Do nothing if this layer does not exist in either area.
     if (!area.layers.find(l => l.key === layerKey) && !alternateArea.layers.find(l => l.key === layerKey)) {
         return;
     }

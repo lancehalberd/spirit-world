@@ -1,8 +1,8 @@
-import { logicHash } from 'app/content/logic';
-import { editingState } from 'app/development/editingState';
-import { layersInOrder } from 'app/gameConstants';
-import { enterLocation } from 'app/utils/enterLocation';
-import { addNewLayer } from 'app/utils/layers';
+import {logicHash} from 'app/content/logic';
+import {editingState} from 'app/development/editingState';
+import {layersInOrder} from 'app/gameConstants';
+import {enterLocation} from 'app/utils/enterLocation';
+import {addNewLayer, getDrawPriority} from 'app/utils/layers';
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
     enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
@@ -97,9 +97,7 @@ export function getBrushContextProperties(state: GameState): PanelRows {
             row = [{
                 name: 'Priority',
                 id: `layer-${i}-priority`,
-                value: definition.drawPriority || (
-                    definition.key === 'foreground' ? 'foreground' : 'background'
-                ),
+                value: getDrawPriority(definition),
                 values: ['background', 'foreground'] as DrawPriority[],
                 onChange(drawPriority: DrawPriority) {
                     definition.drawPriority = drawPriority;

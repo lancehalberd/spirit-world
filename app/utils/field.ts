@@ -1,15 +1,16 @@
-import { allTiles } from 'app/content/tiles';
-import { getLedgeDelta } from 'app/movement/getLedgeDelta';
-import { isUnderLedge } from 'app/movement/isUnderLedge';
-import { destroyTile } from 'app/utils/destroyTile';
-import { directionMap, getDirection } from 'app/utils/direction';
-import { removeEffectFromArea } from 'app/utils/effects';
-import { rectanglesOverlap } from 'app/utils/index';
-import { getObjectBehaviors, removeObjectFromArea } from 'app/utils/objects';
-import { resetTileBehavior } from 'app/utils/tileBehavior';
+import {allTiles} from 'app/content/tiles';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta';
+import {isUnderLedge} from 'app/movement/isUnderLedge';
+import {destroyTile} from 'app/utils/destroyTile';
+import {directionMap, getDirection} from 'app/utils/direction';
+import {removeEffectFromArea} from 'app/utils/effects';
+import {rectanglesOverlap} from 'app/utils/index';
+import {getDrawPriority} from 'app/utils/layers';
+import {getObjectBehaviors, removeObjectFromArea} from 'app/utils/objects';
+import {resetTileBehavior} from 'app/utils/tileBehavior';
 
 
-export { directionMap, getDirection } from 'app/utils/direction';
+export {directionMap, getDirection} from 'app/utils/direction';
 
 export function canTeleportToCoords(state: GameState, area: AreaInstance, {x, y}: Point): boolean {
     return isTileOpen(state, area, {x, y}) && !isUnderLedge(state, area, {x, y, w: 16, h: 16});
@@ -518,32 +519,34 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             // record any found any then include those on the frozen tile behavior.
             let underLedges: any, underDiagonalLedge: any;
             for (const layer of area.layers) {
-                // 'foreground' layer defaults to being in the foreground regardless of drawPriority.
-                if (layer.definition.key !== 'foreground' && layer.definition.drawPriority !== 'foreground') {
-                    const behaviors = layer.tiles[target.y][target.x]?.behaviors;
-                    // Blocking layers prevent freezing until another layer is found that erases the blocking behavior.
-                    if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.isLavaMap || behaviors?.cloudGround || behaviors?.isGround === true)) {
-                        continue;
-                    }
-                    foundBlockingLayer = false;
-                    if (!behaviors?.isOverlay
-                        && !behaviors?.solid && !behaviors?.solidMap
-                        && !behaviors?.pit && !behaviors?.pitMap
-                    ) {
-                        underLedges = behaviors?.ledges || underLedges;
-                        underDiagonalLedge = behaviors?.diagonalLedge || underDiagonalLedge;
-                        topLayer = layer;
-                    } else {
-                        foundBlockingLayer = true;
-                        underLedges = undefined;
-                        underDiagonalLedge = undefined;
-                    }
+                // Never freeze anything in the foreground.
+                if (getDrawPriority(layer.definition) === 'foreground') {
+                    break;
+                }
+                const behaviors = layer.tiles[target.y][target.x]?.behaviors;
+                // Blocking layers prevent freezing until another layer is found that erases the blocking behavior.
+                if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.isLavaMap || behaviors?.cloudGround || behaviors?.isGround === true)) {
+                    continue;
+                }
+                foundBlockingLayer = false;
+                if (!behaviors?.isOverlay
+                    && !behaviors?.solid && !behaviors?.solidMap
+                    && !behaviors?.pit && !behaviors?.pitMap
+                ) {
+                    underLedges = behaviors?.ledges || underLedges;
+                    underDiagonalLedge = behaviors?.diagonalLedge || underDiagonalLedge;
+                    topLayer = layer;
+                } else {
+                    foundBlockingLayer = true;
+                    underLedges = undefined;
+                    underDiagonalLedge = undefined;
                 }
             }
             if (topLayer) {
                 // Fabricate a frozen tile that has the original tile "underneath it", so it will
                 // return to the original state if exposed to fire.
                 const underTile = topLayer.tiles[target.y][target.x];
+                // console.log('freezing tile', target.x, target.y, topLayer.key, underTile);
                 topLayer.tiles[target.y][target.x] = {
                     ...allTiles[294],
                     behaviors: {
@@ -565,6 +568,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
                 area.checkToRedrawTiles = true;
                 resetTileBehavior(area, target);
+                // console.log('updated behavior', area.behaviorGrid?.[target.y]?.[target.x]);
             }
             //console.log('froze tile', area.behaviorGrid?.[target.y]?.[target.x]);
         } /*else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
@@ -748,7 +752,7 @@ export function getLayerToCover(area: AreaInstance, tx: number, ty: number): Are
     }
     let topLayer: AreaLayer = area.layers[0];
     for (const layer of area.layers) {
-        if (layer.definition.key === 'foreground' || layer.definition.drawPriority === 'foreground') {
+        if (getDrawPriority(layer.definition) === 'foreground') {
             break;
         }
         topLayer = layer;

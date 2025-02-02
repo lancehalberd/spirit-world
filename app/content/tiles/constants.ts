@@ -263,7 +263,9 @@ export function renderEmptyCeiling(context: CanvasRenderingContext2D, tile: Full
         return;
     }
     context.fillStyle = 'red';
-    if (tile.behaviors.solidMap === BITMAP_BOTTOM) {
+    if (tile.behaviors.solid) {
+        context.fillRect(x, y, 16, 16);
+    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM) {
         context.fillRect(x, y + 8, 16, 8);
     } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_LEFT_24) {
         context.beginPath();
@@ -286,11 +288,12 @@ export function renderEmptyCeiling(context: CanvasRenderingContext2D, tile: Full
 const baseEmptyCeilingBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyCeiling, solid: false};
 export const emptyCeilingBehaviors: TileSource = {
     ...emptyTile,
-    source: {image: emptyTile.source.image, x: 0, y: 0, w: 48, h: 16},
+    source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 16},
     behaviors: {
         '0x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_24 },
         '1x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM },
         '2x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_24 },
+        '3x0': {...baseEmptyCeilingBehavior, solid: true },
     },
     paletteTargets: [{key: 'behaviors', x: 0, y: 3}],
 };

@@ -107,10 +107,10 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
 }
 
 export function getDrawPriority(layer: AreaLayerDefinition): DrawPriority {
-    if (layer.drawPriority) {
-        return layer.drawPriority;
+    if (layer.key === 'behaviors' || layer.key.startsWith('foreground')) {
+        return 'foreground';
     }
-    return layer.key.startsWith('foreground') ? 'foreground' : 'background';
+    layer.drawPriority ?? 'background';
 }
 
 

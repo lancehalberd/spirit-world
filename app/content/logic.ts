@@ -360,6 +360,10 @@ export const logicHash: {[key: string]: LogicCheck} = {
         return true;
     },
     jadeChampionFlameBeast: (state: GameState) => {
+        // Disable until the lava is drained enough to reveal the boss arena where she is placed.
+        if (!state.savedState.objectFlags.craterLava3) {
+            return false;
+        }
         // Disable once the beast is defeated.
         if (state.savedState.objectFlags.flameBeast) {
             return false;
