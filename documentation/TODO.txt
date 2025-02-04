@@ -67,7 +67,13 @@ Graphics to Implement:
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
+
 Current tasks:
+    - Test new Jade graphics.
+        - Diagonal exterior
+        - All interior
+        - New windows
+
     - Test new cocoon tiles
         - Add doors
 
@@ -289,8 +295,6 @@ Current tasks:
             - Freezing and hitting with staff will instantly defeat the enemy.
         - Vulnerable to everything but fire when the shell is broken, moves faster and has more dangerous attack behavior.
         - Can move into lava. Returning to lava will regenerate the shell if missing.
-
-    - Add additional pit corner tiles to the future tile set and use them in Staff Tower to clean up corners.
 
     - Mechanic for breaking crystal barriers open is unintuitive.
     - Add 4th spirit upgrade that let's you swap between worlds while meditating.
