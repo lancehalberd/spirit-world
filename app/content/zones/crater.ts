@@ -2584,6 +2584,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "craterBossPoint", x: 340, y: 268, type: "marker"},
         {status: "normal", id: "craterBossPoint", x: 316, y: 204, type: "marker"},
         {status: "normal", id: "craterBossPoint", x: 220, y: 60, type: "marker"},
+        {status: "normal", id: "jadeChampion", x: 296, y: 388, d: "up", behavior: "none", style: "jadeChampion", type: "npc", dialogue: "This is it, the source of the Flame Beast's power lies in this pool.", dialogueIndex: 173, logicKey: "jadeChampionFlameBeast"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 520, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 2},

@@ -148,6 +148,8 @@ function drainFlameBeastLava(state: GameState) {
             }
             delete state.mutationDuration;
             appendScript(state, '{stopScreenShake:craterLava}');
+            // If the Jade Champion is present, she should enter combat mode.
+            appendScript(state, '{@jadeChampionCrater.flameBeast}');
             stopAreaSound(state, rumbleSoundReference);
             return false;
         }

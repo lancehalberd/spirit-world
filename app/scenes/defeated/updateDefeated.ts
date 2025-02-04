@@ -1,7 +1,8 @@
 import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import {
+    fixProgressFlagsOnLoad,
     fixSpawnLocationOnLoad,
-} from 'app/content/spawnLocations';
+} from 'app/utils/fixState';
 import {
     FRAME_LENGTH, GAME_KEY,
 } from 'app/gameConstants';
@@ -74,6 +75,7 @@ export function updateDefeated(state: GameState) {
         state.menuIndex = (state.menuIndex + 1) % 2;
     } else if (wasConfirmKeyPressed(state)) {
         if (state.menuIndex === 0) {
+            fixProgressFlagsOnLoad(state);
             fixSpawnLocationOnLoad(state);
             returnToSpawnLocation(state);
             state.paused = false;

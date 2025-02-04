@@ -1,15 +1,12 @@
 import { Hero } from 'app/content/hero';
-import {
-    SPAWN_LOCATION_DEMO,
-    SPAWN_LOCATION_FULL,
-    fixSpawnLocationOnLoad,
-} from 'app/content/spawnLocations';
+import {SPAWN_LOCATION_DEMO, SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import { getDefaultSavedState } from 'app/savedState'
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
 import { getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -80,6 +77,7 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
         ...savedState,
         savedHeroData: state.hero.exportSavedHeroData(),
     };
+    fixProgressFlagsOnLoad(state);
     fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);
     // Preserve zone flags when entering zone initially.
