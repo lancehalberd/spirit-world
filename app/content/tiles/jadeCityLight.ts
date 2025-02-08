@@ -72,7 +72,7 @@ const jadeCityLightEdges: TileSource = {
         '1x2': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true } },
         '3x2': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true } },
         '4x2': { defaultLayer, solidMap: BITMAP_RIGHT_6, ledges: { right: true } },
-        '0x3': { defaultLayer: ceiling, solidMap: orBitMasks(BITMAP_BOTTOM_6, BITMAP_LEFT_6), ledges: { left: true, down: true } },
+        '0x3': { defaultLayer, solidMap: orBitMasks(BITMAP_BOTTOM_6, BITMAP_LEFT_6), ledges: { left: true, down: true } },
         '1x3': { defaultLayer, solidMap: BITMAP_BOTTOM_6, ledges: { down: true } },
         '2x3': { defaultLayer, solidMap: BITMAP_BOTTOM_6, ledges: { down: true } },
         '3x3': { defaultLayer, solidMap: BITMAP_BOTTOM_6, ledges: { down: true } },
