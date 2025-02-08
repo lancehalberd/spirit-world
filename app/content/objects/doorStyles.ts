@@ -709,6 +709,79 @@ const obsidianDoorStyle: DoorStyleDefinition = {
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, obsidianDoorFrames),
 };
 
+// VANARA DOOR STYLE
+const vanaraImage = 'gfx/tiles/vanara.png';
+const vanaraStairsUp = requireFrame(vanaraImage, {x: 16, y: 208, w: 32, h: 32})
+const vanaraStairsDown = requireFrame(vanaraImage, {x: 64, y: 208, w: 32, h: 32})
+const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 32})
+
+
+//Using cavern doors to fill in for non-existant vanara doors
+const vanaraDoorFrames: V1DoorFrames = {
+    crackedBackground: cavernCrackedBackground,
+    northDoorway: vanaraDoorOpen,
+    northBlownup: cavernNorthBlownup,
+    northCrack: cavernNorthCrack,
+    westDoorEmpty: cavernWestDoorEmpty,
+    westDoorEmptyForeground: cavernWestDoorEmptyForeground,
+    westDoorOpen: cavernWestDoorOpen,
+    westDoorOpenForeground: cavernWestDoorOpenForeground,
+    westDoorClosed: cavernWestDoorClosed,
+    westCrackedWall: cavernWestCrackedWall,
+    eastDoorEmpty: cavernEastDoorEmpty,
+    eastDoorEmptyForeground: cavernEastDoorEmptyForeground,
+    eastDoorOpen: cavernEastDoorOpen,
+    eastDoorOpenForeground: cavernEastDoorOpenForeground,
+    eastDoorClosed: cavernEastDoorClosed,
+    eastCrackedWall: cavernEastCrackedWall,
+    southDoorEmpty: cavernSouthDoorEmpty,
+    southDoorOpen: cavernSouthDoorOpen,
+    southDoorClosed: cavernSouthDoorClosed,
+    southCrackedWall: cavernSouthCrackedWall,
+}
+
+const vanaraDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, vanaraDoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, vanaraDoorFrames),
+};
+
+//LIGHT JADE DOOR STYLE
+const jadeLightImage = 'gfx/tiles/jadeCityLight.png';
+const jadeLightDoorOpen = requireFrame(jadeLightImage, {x: 96, y: 112, w: 32, h: 32})
+const jadeLightStairsDown = requireFrame(jadeLightImage, {x: 128, y: 112, w: 32, h: 32})
+const jadeLightStairsUp = requireFrame(jadeLightImage, {x: 160, y: 112, w: 32, h: 32})
+
+//Using cavern doors to fill in for non-existant jade doors
+const jadeLightDoorFrames: V1DoorFrames = {
+    crackedBackground: cavernCrackedBackground,
+    northDoorway: jadeLightDoorOpen,
+    northBlownup: cavernNorthBlownup,
+    northCrack: cavernNorthCrack,
+    westDoorEmpty: cavernWestDoorEmpty,
+    westDoorEmptyForeground: cavernWestDoorEmptyForeground,
+    westDoorOpen: cavernWestDoorOpen,
+    westDoorOpenForeground: cavernWestDoorOpenForeground,
+    westDoorClosed: cavernWestDoorClosed,
+    westCrackedWall: cavernWestCrackedWall,
+    eastDoorEmpty: cavernEastDoorEmpty,
+    eastDoorEmptyForeground: cavernEastDoorEmptyForeground,
+    eastDoorOpen: cavernEastDoorOpen,
+    eastDoorOpenForeground: cavernEastDoorOpenForeground,
+    eastDoorClosed: cavernEastDoorClosed,
+    eastCrackedWall: cavernEastCrackedWall,
+    southDoorEmpty: cavernSouthDoorEmpty,
+    southDoorOpen: cavernSouthDoorOpen,
+    southDoorClosed: cavernSouthDoorClosed,
+    southCrackedWall: cavernSouthCrackedWall,
+}
+
+const jadeLightDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLightDoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLightDoorFrames),
+};
+
 // FUTURE DOOR STYLE
 const futureImage = 'gfx/tiles/futuristic.png';
 // Missing most of the frames for the obsidian doors, but we can still mostly draw southern facing obsidian doors.
@@ -898,6 +971,11 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     future: futureDoorStyle,
     futureDownstairs: stairsDoorStyle(futureDoorStyle, futureStairsDown, 'down', 6),
     futureUpstairs: stairsDoorStyle(futureDoorStyle, futureStairsUp, 'up', 6),
+    vanara: vanaraDoorStyle,
+    vanaraDownstairs: stairsDoorStyle(vanaraDoorStyle, vanaraStairsDown, 'down'),
+    vanaraUpstairs: stairsDoorStyle(vanaraDoorStyle, vanaraStairsUp, 'up'),
+    jadeLightDownstairs: stairsDoorStyle(jadeLightDoorStyle, jadeLightStairsDown, 'down'),
+    jadeLightUpstairs: stairsDoorStyle(jadeLightDoorStyle, jadeLightStairsUp, 'up'),
     cave: {
         ...oldSquareBaseDoorStyle,
         down: {

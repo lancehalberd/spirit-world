@@ -663,8 +663,14 @@ const tube: DecorationType = {
 };
 
 
+
 const darkWindowFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 7, y: 8, w: 19, h: 18});
 const lightWindowFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 39, y: 8, w: 19, h: 18});
+
+// Jade City unlit windows added here: not sure how you want these implemented.
+// const lightUnlitWindowFrame = requireFrame('gfx/tiles/jadeCityLight.png', {x: 103, y: 70, w: 19, h: 18});
+// const darkUnlitWindowFrame = requireFrame('gfx/tiles/jadeCityDark.png', {x: 103, y: 70, w: 19, h: 18});
+
 const verticalLightBeamFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 8, y: 43, w: 17, h: 47});
 const sideLightBeamFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 37, y: 53, w: 27, h: 37});
 const verticalFloorLightFrame = requireFrame('gfx/objects/furniture/windows.png', {x: 8, y: 105, w: 17, h: 17});
@@ -737,11 +743,25 @@ const windowOctogonal: DecorationType = {
     },
 };
 
+const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 22, h: 41});
+const cocoon: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, cocoonFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(cocoonFrame, decoration);
+    },
+};
+
 export const decorationTypes = {
     anvil,
     basket,
     bearRug,
     bed,
+    cocoon,
     floorBed,
     chair,
     cushion,
