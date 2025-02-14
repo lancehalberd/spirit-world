@@ -29,7 +29,7 @@ Graphics Work:
     High Priority Graphics:
         Summoner Statues for War Temple Boss
             The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
-        Large Statues for Flame and Frost Beasts
+        Large Statues for Frost Beasts
 
         Dirt particles for breaking cracked dirt tiles.
 

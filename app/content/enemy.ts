@@ -592,6 +592,22 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return;
         }
         const hitbox = this.getHitbox();
+        this.addNormalDeathEffect(state, hitbox);
+        if (this.enemyDefinition.lootTable) {
+            dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
+                hitbox.x + hitbox.w / 2,
+                hitbox.y + hitbox.h / 2
+            );
+        }
+        if (this.enemyDefinition.onDeath) {
+            this.enemyDefinition.onDeath(state, this);
+        }
+        this.status = 'gone';
+        if (this.definition.id) {
+            saveObjectStatus(state, this.definition);
+        }
+    }
+    addNormalDeathEffect(state: GameState, hitbox = this.getHitbox()) {
         const deathAnimation = new FieldAnimationEffect({
             animation: enemyDeathAnimation,
             x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * this.scale,
@@ -604,21 +620,21 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             deathAnimation.vy = this.vy;
             deathAnimation.friction = 0.1;
         }
-        this.makeSound(state, 'enemyDeath');
-        if (this.enemyDefinition.lootTable) {
-            dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
-                hitbox.x + hitbox.w / 2,
-                hitbox.y + hitbox.h / 2
-            );
-        }
         addEffectToArea(state, this.area, deathAnimation);
-        if (this.enemyDefinition.onDeath) {
-            this.enemyDefinition.onDeath(state, this);
-        }
-        this.status = 'gone';
-        if (this.definition.id) {
-            saveObjectStatus(state, this.definition);
-        }
+        this.makeSound(state, 'enemyDeath');
+    }
+    addBossDeathEffect(state: GameState, hitbox = this.getHitbox()) {
+        const animation = bossDeathExplosionAnimation;
+        const explosionAnimation = new FieldAnimationEffect({
+            animation,
+            drawPriority: 'foreground',
+            x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
+            y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
+        });
+        // Always show the explosion in the player's instance so that the animation
+        // is always visible.
+        addEffectToArea(state, state.areaInstance, explosionAnimation);
+        playAreaSound(state, state.areaInstance, 'enemyDeath');
     }
     shouldReset(state: GameState) {
         return true;
@@ -841,18 +857,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (this.animationTime <= 2800 &&
                 (this.animationTime % 300 === 0 || this.animationTime % 500 === 0)
             ) {
-                const hitbox = this.getHitbox();
-                const animation = bossDeathExplosionAnimation;
-                const explosionAnimation = new FieldAnimationEffect({
-                    animation,
-                    drawPriority: 'foreground',
-                    x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
-                    y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
-                });
-                // Always show the explosion in the player's instance so that the animation
-                // is always visible.
-                addEffectToArea(state, state.areaInstance, explosionAnimation);
-                playAreaSound(state, state.areaInstance, 'enemyDeath');
+                this.addBossDeathEffect(state);
             }
             if (this.animationTime >= 2800) {
                 this.status = 'gone';

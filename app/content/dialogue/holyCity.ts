@@ -199,7 +199,6 @@ dialogueHash.streetVendor = {
                     {choice:Buy for 100 Jade?|Yes:streetVendor.attempt1|No:streetVendor.no}`,
                 },
             ],
-
         },
         {
             logicCheck: {

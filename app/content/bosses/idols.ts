@@ -1,12 +1,43 @@
-import { LightningBolt } from 'app/content/effects/lightningBolt';
-import { FlameWall } from 'app/content/effects/flameWall';
-import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
-import { Enemy } from 'app/content/enemy';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
-import { rotateDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
+import {LightningBolt} from 'app/content/effects/lightningBolt';
+import {FlameWall} from 'app/content/effects/flameWall';
+import {throwIceGrenadeAtLocation} from 'app/content/effects/frostGrenade';
+import {Enemy} from 'app/content/enemy';
+import {createAnimation, getFrame, reverseAnimation} from 'app/utils/animations';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {iceIdolAnimations, lightningIdolAnimations, omniAnimation} from 'app/content/enemyAnimations';
+import {rotateDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
 
+const idolGeometry: FrameDimensions = {w: 48, h: 54, content: { x: 10, y: 30, w: 30, h: 22}};
+const attackMap = [0, 3, 6, 9, 12, 15, 18, 21, 24, 28];
+const flameIdolAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolCast.png', idolGeometry, {cols: 29, duration: 3, frameMap: attackMap});
+// This flame animation is played over the flame idol attack animation.
+const flameIdolAttackFireAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolCastFire.png', idolGeometry, {cols: 29, duration: 3, frameMap: attackMap});
+const flameIdolBreakingAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyed.png', idolGeometry, {cols: 4, duration: 3});
+const flameIdolBrokenIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyedIdle.png', idolGeometry, {cols: 5});
+const flameIdolBrokenAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyedAttack.png', idolGeometry, {cols: 7, duration: 3});
+const flameIdolIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolCast.png', idolGeometry);
+const flameIdolStillAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolAwaken.png', idolGeometry);
+const flameIdolWakeAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolAwaken.png', idolGeometry, {x: 6, cols: 4, duration: 3}, {loop: false});
+const flameIdolSleepAnimation: FrameAnimation = reverseAnimation(flameIdolWakeAnimation);
+const flameIdolWarningAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolAwaken.png', idolGeometry, {x: 1, cols: 5});
+// This glow animation is played over the idol during the warning mode.
+const flameIdolGlowWarningAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolGlow.png', idolGeometry, {x: 1, cols: 3, frameMap:[0,1,2,1]});
+// This glow animation is played over the idol during the broken idle animation.
+// const flameIdolGlowBrokenAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolGlow.png', idolGeometry, { x: 4});
+
+export const flameIdolAnimations: ActorAnimations = {
+    attack: omniAnimation(flameIdolAttackAnimation),
+    breaking: omniAnimation(flameIdolBreakingAnimation),
+    broken: omniAnimation(flameIdolBrokenIdleAnimation),
+    brokenAttack: omniAnimation(flameIdolBrokenAttackAnimation),
+    death: omniAnimation(flameIdolBrokenIdleAnimation),
+    idle: omniAnimation(flameIdolIdleAnimation),
+    still: omniAnimation(flameIdolStillAnimation),
+    wake: omniAnimation(flameIdolWakeAnimation),
+    sleep: omniAnimation(flameIdolSleepAnimation),
+    warning: omniAnimation(flameIdolWarningAnimation),
+};
 
 
 function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
@@ -48,10 +79,25 @@ enemyDefinitions.stormIdol = {
 enemyDefinitions.flameIdol = {
     ...baseIdolDefinition,
     naturalDifficultyRating: 8,
-    animations: fireIdolAnimations,
+    animations: flameIdolAnimations,
     update: updateFlameIdol,
     elementalMultipliers: {'lightning': 1.5, 'ice': 2},
     immunities: ['fire'],
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (enemy.currentAnimationKey === 'attack') {
+            const frame = getFrame(flameIdolAttackFireAnimation, enemy.animationTime);
+            enemy.defaultRender(context, state, frame);
+        }
+        // Show additional warning glow animation on normal difficulty, but hide it on higher difficulties.
+        if (enemy.currentAnimationKey === 'warning' && enemy.difficulty <= this.naturalDifficultyRating) {
+            const frame = getFrame(flameIdolGlowWarningAnimation, enemy.animationTime);
+            enemy.defaultRender(context, state, frame);
+        }
+        /*if (enemy.currentAnimationKey === 'brokenAttack') {
+            const frame = getFrame(flameIdolAttackFireAnimation, enemy.animationTime);
+            enemy.defaultRender(context, state, frame);
+        }*/
+    }
 };
 enemyDefinitions.frostIdol = {
     ...baseIdolDefinition,
@@ -75,7 +121,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
-    updateElementalIdol(state, enemy, () => {
+    updateNewElementalIdol(state, enemy, () => {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
@@ -92,6 +138,108 @@ function updateFrostIdol(state: GameState, enemy: Enemy): void {
             ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta),
         }, {source: enemy});
     })
+}
+
+function updateNewElementalIdol(state: GameState, enemy: Enemy, triggerSpell: () => void) {
+    // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
+    // until all statues are "destroyed".
+    if (enemy.life <= 0) {
+        enemy.params.priority = undefined;
+        if (!['broken', 'brokenAttack', 'breaking'].includes(enemy.currentAnimationKey)) {
+            enemy.changeToAnimation('breaking', 'broken');
+            enemy.shielded = true;
+            enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
+        }
+        if (enemy.currentAnimationKey === 'breaking') {
+            return;
+        }
+        // When all bosses are at 1 life or lower, all the statues get destroyed.
+        if (!enemy.area.objects.some(object =>
+            object instanceof Enemy && object.definition?.type === 'boss' && object.life > 0
+            && object.isFromCurrentSection(state)
+        )) {
+            enemy.showDeathAnimation(state);
+            return;
+        }
+        /*if (enemy.currentAnimationKey !== 'broken' && enemy.currentAnimationKey !== 'brokenAttack') {
+            const hitbox = enemy.getHitbox();
+            enemy.addBossDeathEffect(state, {x: hitbox.x + hitbox.w / 2, y: hitbox.y - 14, w: 1, h: 1,});
+            enemy.changeToAnimation('broken');
+        }*/
+        if (enemy.modeTime === 4000) {
+            enemy.changeToAnimation('brokenAttack', 'broken');
+        }
+        if (enemy.currentAnimationKey === 'brokenAttack' && enemy.animationTime === 200) {
+            triggerSpell();
+            enemy.modeTime = 0;
+        }
+        return;
+    }
+    if (enemy.currentAnimationKey === 'attack' && enemy.animationTime === 200) {
+        triggerSpell();
+    }
+    if (typeof enemy.params.priority === 'undefined') {
+        enemy.params.priority = Math.random();
+        enemy.setMode('shielded');
+        enemy.shielded = true;
+    }
+    // Immediately put up shield on entering pinch mode.
+    if (!enemy.params.pinchMode && enemy.life <= 4) {
+        enemy.params.pinchMode = true;
+        enemy.setMode('enraged');
+        return;
+    }
+    // The idol does a single quick string of 4 attacks when enraged.
+    if (enemy.mode === 'enraged') {
+        if (enemy.modeTime < 4000 && enemy.modeTime % 1000 === 20) {
+            enemy.changeToAnimation('attack', 'idle');
+        }
+        if (enemy.modeTime === 4000) {
+            enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
+            enemy.changeToAnimation('sleep', 'still');
+            enemy.shielded = true;
+            enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
+        }
+        if (enemy.currentAnimationKey === 'still') {
+            enemy.setMode('shielded');
+        }
+        return;
+    }
+    if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
+        if (enemy.mode === 'attack') {
+            if (!enemy.params.pinchMode) {
+                if (enemy.modeTime === 400) {
+                    enemy.changeToAnimation('attack', 'idle');
+                }
+            } else {
+                if (enemy.modeTime === 100 || enemy.modeTime === 1000) {
+                    enemy.changeToAnimation('attack', 'idle');
+                }
+            }
+            if (enemy.modeTime === 1700) {
+                enemy.changeToAnimation('sleep', 'still');
+                enemy.shielded = true;
+                enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
+            }
+            if (enemy.currentAnimationKey === 'still') {
+                enemy.setMode('shielded');
+                enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
+            }
+        } else {
+            if (enemy.modeTime < 800) {
+                enemy.changeToAnimation('warning');
+            } else if (enemy.modeTime === 800) {
+                enemy.changeToAnimation('wake', 'idle');
+            } else if (enemy.modeTime >= 1000) {
+                enemy.setMode('attack');
+                enemy.shielded = false;
+            }
+        }
+    } else {
+        enemy.setMode('shielded');
+        enemy.changeToAnimation('still');
+        enemy.shielded = true;
+    }
 }
 
 // attackBall: primary attack; attackBallDead: attack when idol is defeated
