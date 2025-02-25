@@ -64,6 +64,8 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
+import {allVanaraTileSources} from 'app/content/tiles/vanaraT'
+import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 
 
 
@@ -1199,6 +1201,8 @@ addTiles([
     caveLedgeCorners2,
     ...allCrystalSpikeTiles,
     ...allVanaraPitTileSources,
+    ...allVanaraTileSources,
+    ...allLightJadeCityTileSources
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
