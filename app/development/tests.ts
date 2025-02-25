@@ -1,4 +1,5 @@
 import {BITMAP_BOTTOM} from 'app/content/bitMasks';
+import {evaluateFlagString} from 'app/content/logic';
 import {everyArea, everyObject} from 'app/utils/every';
 import {hitTargets} from 'app/utils/field';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
@@ -146,6 +147,28 @@ export const tests: {[key: string]: () => void} = {
             console.error('Expected south wall to be solid: ', southWallBehavior);
         }
     },
+    testEvaluateFlagString() {
+        const state = getState();
+        state.savedState.objectFlags.T = 1;
+        for (const [string, expectedValue] of <const>[
+            ['T', true],
+            ['F', false],
+            ['!T', false],
+            ['!!T', true],
+            ['(T)', true],
+            ['!((F))', true],
+            ['T || F', true],
+            ['T && F', false],
+            ['(T && F) || T', true],
+            ['(T && F) && T', false],
+            ['!((F && T)) || (F)', true],
+            ['((T || F) && !(F && T))', true],
+        ]) {
+            if (evaluateFlagString(state, string) !== expectedValue) {
+                console.error('Expected ', string, ' to evaluate to ', expectedValue);
+            }
+        }
+    }
 };
 window['tests'] = tests;
 

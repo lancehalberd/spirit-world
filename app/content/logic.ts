@@ -101,9 +101,90 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
     return trueResult;
 }
 
+export function evaluateFlagString(state: GameState, flagString: string, invertLogic: boolean = false): boolean {
+    const tokens: string[] = [];
+    let charStack: string[] = [];
+    function finishToken() {
+        if (charStack.length) {
+            tokens.push(charStack.join(''));
+            charStack = [];
+        }
+    }
+    for (let i = 0; i < flagString.length; i++) {
+        const c = flagString[i];
+        if (c === '(' || c === ')' || c === '!') {
+            finishToken();
+            tokens.push(c);
+        } else if (c === '&') {
+            finishToken();
+            if (flagString[++i] === '&') {
+                tokens.push('&&');
+            } else {
+                console.error('Failed to parse token & in ', flagString);
+            }
+        } else if (c === '|') {
+            finishToken();
+            if (flagString[++i] === '|') {
+                tokens.push('||');
+            } else {
+                console.error('Failed to parse token | in ', flagString);
+            }
+        } else if (c !== ' ') {
+            charStack.push(c);
+        }
+    }
+    finishToken();
+    const valueStack: boolean[] = [];
+    let depth = 0;
+    const operatorStack: ('||' | '&&' | '!')[][] = [];
+    function addValue(value: boolean) {
+        const operators = operatorStack[depth] ?? [];
+        //console.log('addingValue', value, depth, valueStack[depth], [...operators]);
+        while (operators[operators.length - 1] === '!') {
+            value = !value;
+            operators.pop();
+            //console.log('Inverting value', value, [...operators]);
+        }
+        if (valueStack[depth] === undefined) {
+            valueStack[depth] = value;
+        } else {
+            const poppedOperator = operators.pop();
+            // Technically with short circuiting we can just assign to popped value in all cases...
+            if (poppedOperator === '&&') {
+                valueStack[depth] = valueStack[depth] && value;
+            } else if (poppedOperator === '||') {
+                valueStack[depth] = valueStack[depth] || value;
+            } else {
+                console.error('Expected operator && or || between values in ', flagString);
+            }
+        }
+    }
+    //console.log(tokens);
+    for (const t of tokens) {
+        if (t === '(') {
+            depth++;
+        } else if (t === ')') {
+            depth--;
+            addValue(valueStack.pop());
+        } else if (t === '&&' || t === '||' || t === '!') {
+            operatorStack[depth] = operatorStack[depth] || [];
+            operatorStack[depth].push(t);
+        } else {
+            addValue(isLogicValid(state, {requiredFlags: [t]}));
+        }
+    }
+    return valueStack.pop() || false;
+}
+window.evaluateFlagString = evaluateFlagString;
+
 export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
     if (definition.hasCustomLogic && definition.customLogic) {
-        return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
+        const result = evaluateFlagString(state, definition.customLogic);
+        if (definition.invertLogic) {
+            return !result;
+        }
+        return result;
+        //return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
     }
     if (!definition.logicKey) {
         return true;
