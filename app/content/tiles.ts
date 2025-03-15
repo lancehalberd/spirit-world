@@ -66,7 +66,7 @@ import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
 import {allVanaraTileSources} from 'app/content/tiles/vanaraT'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
-
+import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
 
 
 export const allTiles: FullTile[] = [null];
@@ -1202,7 +1202,8 @@ addTiles([
     ...allCrystalSpikeTiles,
     ...allVanaraPitTileSources,
     ...allVanaraTileSources,
-    ...allLightJadeCityTileSources
+    ...allLightJadeCityTileSources,
+    ...allDarkJadeCityTileSources
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
