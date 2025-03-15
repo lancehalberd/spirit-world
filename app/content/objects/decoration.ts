@@ -756,6 +756,33 @@ const cocoon: DecorationType = {
     },
 };
 
+const smallLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 162, y: 20, w: 26, h: 23});
+const bigLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 104, y: 3, w: 47, h: 43});
+const smallLightDome: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, smallLightDomeFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(smallLightDomeFrame, decoration);
+    },
+};
+
+const bigLightDome: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, bigLightDomeFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(bigLightDomeFrame, decoration);
+    },
+};
+
+
 export const decorationTypes = {
     anvil,
     basket,
@@ -777,6 +804,8 @@ export const decorationTypes = {
     table,
     tube,
     windowOctogonal,
+    smallLightDome,
+    bigLightDome,
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = stormBeastStatueFrame;

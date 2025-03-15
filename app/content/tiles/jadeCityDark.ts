@@ -1,6 +1,6 @@
 import {
     orBitMasks,
-    BITMAP_TOP_6, 
+    BITMAP_TOP_6,
     BITMAP_LEFT_6,
     BITMAP_RIGHT_6,
     BITMAP_BOTTOM_6,
@@ -11,11 +11,12 @@ import {
     BITMAP_TOP_LEFT_CORN_6,
     BITMAP_TOP_RIGHT_CORN_6,
     BITMAP_BOTTOM_LEFT_CORN_10,
-    BITMAP_BOTTOM_RIGHT_CORN_10, 
+    BITMAP_BOTTOM_RIGHT_CORN_10,
     BITMAP_TOP_3,
     BITMAP_DIAGONAL_TOP_LEFT_LEDGE,
     BITMAP_DIAGONAL_TOP_RIGHT_LEDGE,
 } from 'app/content/bitMasks';
+
 
 import {
     southernWallBehavior,
@@ -25,52 +26,62 @@ import {
     bottomRightWall,
 } from 'app/content/tiles/constants';
 
+
 import { requireFrame } from 'app/utils/packedImages';
+
+
 
 
 const jadeCityFloor: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 0, w: 64, h: 32}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 0, w: 64, h: 32}),
     behaviors: {
         'all': {defaultLayer: 'floor'}
     }
 }
 
-const jadeCityLightRailings: TileSource = {
+
+const jadeCityDarkRailings: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 144, y: 160, w: 112, h: 16}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 144, y: 160, w: 112, h: 16}),
     behaviors: {
         'all': southernWallBehavior,
         '0x0':{ defaultLayer: 'field', solidMap: BITMAP_BOTTOM_13},
         '1x0':{ defaultLayer: 'field', solidMap: BITMAP_VERT_MIDDLE_6},
         '2x0':{ defaultLayer: 'field', solidMap: BITMAP_VERT_MIDDLE_6}
 
+
     }
 }
 
 
-const jadeCityLightDecorations: TileSource = {
+
+
+const jadeCityDarkDecorations: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 224, w: 160, h: 64}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 224, w: 160, h: 64}),
     behaviors: {
         'all': {defaultLayer: 'floor2'}
     }
 }
 
-const jadeCityLightWalls: TileSource = {
+
+const jadeCityDarkWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 160, w: 112, h: 48}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 160, w: 112, h: 48}),
     behaviors: {
         'all': southernWallBehavior
     }
 }
 
 
+
+
 const jadeTopRight: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_RIGHT_LEDGE, isSouthernWall: true, isGround: false};
 const jadeTopLeft: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_LEFT_LEDGE, isSouthernWall: true, isGround: false};
-const jadeCityLightSlopedWalls: TileSource = {
+const jadeCityDarkSlopedWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 112, w: 128, h: 112}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 272, y: 112, w: 128, h: 112}),
     behaviors: {
         'all': southernWallBehavior,
         '6x3': bottomLeftWall, '7x3': bottomRightWall,
@@ -80,7 +91,7 @@ const jadeCityLightSlopedWalls: TileSource = {
         '2x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10},
         '3x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
         '4x1': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
-        '5x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10}, 
+        '5x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
         '2x6': jadeTopRight, '3x6': jadeTopLeft,
         '1x5': jadeTopRight, '4x5': jadeTopLeft,
         '0x4': jadeTopRight, '5x4': jadeTopLeft,
@@ -90,9 +101,10 @@ const jadeCityLightSlopedWalls: TileSource = {
     }
 }
 
-const jadeCityLightTowers: TileSource = {
+
+const jadeCityDarkTowers: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 0, w: 128, h: 112}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 272, y: 0, w: 128, h: 112}),
     behaviors: {
         'all': southernWallBehavior,
         '0x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6},
@@ -120,11 +132,13 @@ const jadeCityLightTowers: TileSource = {
 }
 
 
+
+
 //Bottom Edges go under player
 let defaultLayer: DefaultLayer = 'field';
-const jadeCityLightEdges: TileSource = {
+const jadeCityDarkEdges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 32, w: 80, h: 64}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 32, w: 80, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field' },
         '0x1': { defaultLayer, solidMap: orBitMasks(BITMAP_TOP_6, BITMAP_LEFT_6), ledges: { left: true, up: true } },
@@ -144,17 +158,19 @@ const jadeCityLightEdges: TileSource = {
     }
 }
 
-const jadeCityLightExtraEdges: TileSource = {
+
+const jadeCityDarkExtraEdges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 16, y: 144, w: 48, h: 16}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 16, y: 144, w: 48, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'field', solidMap: BITMAP_TOP_6, ledges: { down: true } }
     }
 }
 
-const jadeCityLightStairs: TileSource = {
+
+const jadeCityDarkStairs: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 192, y: 64, w: 64, h: 96}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 192, y: 64, w: 64, h: 96}),
     behaviors: {
         'all' : {defaultLayer: 'field'},
         '0x0':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_6},
@@ -168,9 +184,10 @@ const jadeCityLightStairs: TileSource = {
     }
 }
 
-const jadeCityLightColumnWall: TileSource = {
+
+const jadeCityDarkColumnWall: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 96, w: 80, h: 64}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 96, w: 80, h: 64}),
     behaviors: {
         'all': southernWallBehavior,
         '0x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_3 },
@@ -178,15 +195,17 @@ const jadeCityLightColumnWall: TileSource = {
     }
 }
 
-export const allLightJadeCityTileSources: TileSource[] = [
-    jadeCityFloor, 
-    jadeCityLightRailings,
-    jadeCityLightDecorations,
-    jadeCityLightWalls,
-    jadeCityLightEdges,
-    jadeCityLightExtraEdges,
-    jadeCityLightSlopedWalls,
-    jadeCityLightTowers,
-    jadeCityLightStairs,
-    jadeCityLightColumnWall
+
+export const allDarkJadeCityTileSources: TileSource[] = [
+    jadeCityFloor,
+    jadeCityDarkRailings,
+    jadeCityDarkDecorations,
+    jadeCityDarkWalls,
+    jadeCityDarkEdges,
+    jadeCityDarkExtraEdges,
+    jadeCityDarkSlopedWalls,
+    jadeCityDarkTowers,
+    jadeCityDarkStairs,
+    jadeCityDarkColumnWall
 ];
+

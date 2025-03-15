@@ -718,26 +718,8 @@ const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 32})
 
 //Using cavern doors to fill in for non-existant vanara doors
 const vanaraDoorFrames: V1DoorFrames = {
-    crackedBackground: cavernCrackedBackground,
+    ...cavernDoorFrames,
     northDoorway: vanaraDoorOpen,
-    northBlownup: cavernNorthBlownup,
-    northCrack: cavernNorthCrack,
-    westDoorEmpty: cavernWestDoorEmpty,
-    westDoorEmptyForeground: cavernWestDoorEmptyForeground,
-    westDoorOpen: cavernWestDoorOpen,
-    westDoorOpenForeground: cavernWestDoorOpenForeground,
-    westDoorClosed: cavernWestDoorClosed,
-    westCrackedWall: cavernWestCrackedWall,
-    eastDoorEmpty: cavernEastDoorEmpty,
-    eastDoorEmptyForeground: cavernEastDoorEmptyForeground,
-    eastDoorOpen: cavernEastDoorOpen,
-    eastDoorOpenForeground: cavernEastDoorOpenForeground,
-    eastDoorClosed: cavernEastDoorClosed,
-    eastCrackedWall: cavernEastCrackedWall,
-    southDoorEmpty: cavernSouthDoorEmpty,
-    southDoorOpen: cavernSouthDoorOpen,
-    southDoorClosed: cavernSouthDoorClosed,
-    southCrackedWall: cavernSouthCrackedWall,
 }
 
 const vanaraDoorStyle: DoorStyleDefinition = {
@@ -754,26 +736,8 @@ const jadeLightStairsUp = requireFrame(jadeLightImage, {x: 160, y: 112, w: 32, h
 
 //Using cavern doors to fill in for non-existant jade doors
 const jadeLightDoorFrames: V1DoorFrames = {
-    crackedBackground: cavernCrackedBackground,
+    ...cavernDoorFrames,
     northDoorway: jadeLightDoorOpen,
-    northBlownup: cavernNorthBlownup,
-    northCrack: cavernNorthCrack,
-    westDoorEmpty: cavernWestDoorEmpty,
-    westDoorEmptyForeground: cavernWestDoorEmptyForeground,
-    westDoorOpen: cavernWestDoorOpen,
-    westDoorOpenForeground: cavernWestDoorOpenForeground,
-    westDoorClosed: cavernWestDoorClosed,
-    westCrackedWall: cavernWestCrackedWall,
-    eastDoorEmpty: cavernEastDoorEmpty,
-    eastDoorEmptyForeground: cavernEastDoorEmptyForeground,
-    eastDoorOpen: cavernEastDoorOpen,
-    eastDoorOpenForeground: cavernEastDoorOpenForeground,
-    eastDoorClosed: cavernEastDoorClosed,
-    eastCrackedWall: cavernEastCrackedWall,
-    southDoorEmpty: cavernSouthDoorEmpty,
-    southDoorOpen: cavernSouthDoorOpen,
-    southDoorClosed: cavernSouthDoorClosed,
-    southCrackedWall: cavernSouthCrackedWall,
 }
 
 const jadeLightDoorStyle: DoorStyleDefinition = {
@@ -781,6 +745,103 @@ const jadeLightDoorStyle: DoorStyleDefinition = {
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLightDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLightDoorFrames),
 };
+
+//DARK JADE DOOR STYLE
+const jadeDarkImage = 'gfx/tiles/jadeCityDark.png';
+const jadeDarkDoorOpen = requireFrame(jadeDarkImage, {x: 96, y: 112, w: 32, h: 32})
+const jadeDarkStairsDown = requireFrame(jadeDarkImage, {x: 128, y: 112, w: 32, h: 32})
+const jadeDarkStairsUp = requireFrame(jadeDarkImage, {x: 160, y: 112, w: 32, h: 32})
+
+//Using cavern doors to fill in for non-existant jade doors
+const jadeDarkDoorFrames: V1DoorFrames = {
+    ...cavernDoorFrames,
+    northDoorway: jadeDarkDoorOpen,
+}
+
+const jadeDarkDoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDarkDoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDarkDoorFrames),
+};
+
+//JADE LIGHT INTERIOR DOOR STYLE
+const jadeLightIntImage = 'gfx/tiles/jadeInteriorLight.png';
+const jadeLight1IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 0, w: 32, h: 32})
+const jadeLight1IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 0, w: 32, h: 32})
+const jadeLight1IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 0, w: 32, h: 32})
+
+const jadeLight2IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 32, w: 32, h: 32})
+const jadeLight2IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 32, w: 32, h: 32})
+const jadeLight2IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 32, w: 32, h: 32})
+
+const jadeLight1DoorFrames: V1DoorFrames = {
+    ...cavernDoorFrames, 
+    northDoorway: jadeLight1IntDoorOpen,
+
+}
+
+const jadeLight2DoorFrames:  V1DoorFrames = {
+    ...cavernDoorFrames, 
+    northDoorway: jadeLight2IntDoorOpen,
+}
+
+
+const jadeLight1DoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight1DoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight1DoorFrames),
+};
+
+
+const jadeLight2DoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight2DoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight2DoorFrames),
+};
+
+//JADE DARK INTERIOR DOOR STYLE
+const jadeDarkIntImage = 'gfx/tiles/jadeInteriorDark.png';
+const jadeDark1IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 0, w: 32, h: 32})
+const jadeDark1IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 0, w: 32, h: 32})
+const jadeDark1IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 0, w: 32, h: 32})
+
+
+const jadeDark2IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 32, w: 32, h: 32})
+const jadeDark2IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 32, w: 32, h: 32})
+const jadeDark2IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 32, w: 32, h: 32})
+
+
+const jadeDark1DoorFrames: V1DoorFrames = {
+    ...cavernDoorFrames,
+    northDoorway: jadeDark1IntDoorOpen,
+
+
+}
+
+
+const jadeDark2DoorFrames:  V1DoorFrames = {
+    ...cavernDoorFrames,
+    northDoorway: jadeDark2IntDoorOpen,
+}
+
+
+
+
+const jadeDark1DoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark1DoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark1DoorFrames),
+};
+
+
+
+
+const jadeDark2DoorStyle: DoorStyleDefinition = {
+    ...commonBaseDoorStyle,
+    render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark2DoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark2DoorFrames),
+};
+
 
 // FUTURE DOOR STYLE
 const futureImage = 'gfx/tiles/futuristic.png';
@@ -974,8 +1035,25 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     vanara: vanaraDoorStyle,
     vanaraDownstairs: stairsDoorStyle(vanaraDoorStyle, vanaraStairsDown, 'down'),
     vanaraUpstairs: stairsDoorStyle(vanaraDoorStyle, vanaraStairsUp, 'up'),
+    jadeLight: jadeLightDoorStyle,
     jadeLightDownstairs: stairsDoorStyle(jadeLightDoorStyle, jadeLightStairsDown, 'down'),
     jadeLightUpstairs: stairsDoorStyle(jadeLightDoorStyle, jadeLightStairsUp, 'up'),
+    jadeDark: jadeDarkDoorStyle,
+    jadeDarkDownstairs: stairsDoorStyle(jadeDarkDoorStyle, jadeDarkStairsDown, 'down'),
+    jadeDarkUpstairs: stairsDoorStyle(jadeDarkDoorStyle, jadeDarkStairsUp, 'up'),
+    jadeLightInt1: jadeLight1DoorStyle,
+    jadeLightInt2:  jadeLight2DoorStyle, 
+    jadeLightInt1Downstairs: stairsDoorStyle(jadeLight1DoorStyle, jadeLight1IntStairsDown, 'down'),
+    jadeLightInt1Upstairs: stairsDoorStyle(jadeLight1DoorStyle, jadeLight1IntStairsUp, 'up'),
+    jadeLightInt2Downstairs: stairsDoorStyle(jadeLight2DoorStyle, jadeLight2IntStairsDown, 'down'),
+    jadeLightInt2Upstairs: stairsDoorStyle(jadeLight2DoorStyle, jadeLight2IntStairsUp, 'up'),
+    jadeDarkInt1: jadeDark1DoorStyle,
+    jadeDarkInt2:  jadeDark2DoorStyle,
+    jadeDarkInt1Downstairs: stairsDoorStyle(jadeDark1DoorStyle, jadeDark1IntStairsDown, 'down'),
+    jadeDarkInt1Upstairs: stairsDoorStyle(jadeDark1DoorStyle, jadeDark1IntStairsUp, 'up'),
+    jadeDarkInt2Downstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsDown, 'down'),
+    jadeDarkInt2Upstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsUp, 'up'),
+
     cave: {
         ...oldSquareBaseDoorStyle,
         down: {
