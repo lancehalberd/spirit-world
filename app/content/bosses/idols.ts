@@ -2,9 +2,10 @@ import {LightningBolt} from 'app/content/effects/lightningBolt';
 import {FlameWall} from 'app/content/effects/flameWall';
 import {throwIceGrenadeAtLocation} from 'app/content/effects/frostGrenade';
 import {Enemy} from 'app/content/enemy';
+import {FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation, getFrame, reverseAnimation} from 'app/utils/animations';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
-import {iceIdolAnimations, lightningIdolAnimations, omniAnimation} from 'app/content/enemyAnimations';
+import {iceIdolAnimations, omniAnimation} from 'app/content/enemyAnimations';
 import {rotateDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
 
@@ -15,7 +16,7 @@ const flameIdolAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/fla
 const flameIdolAttackFireAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolCastFire.png', idolGeometry, {cols: 29, duration: 3, frameMap: attackMap});
 const flameIdolBreakingAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyed.png', idolGeometry, {cols: 4, duration: 3});
 const flameIdolBrokenIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyedIdle.png', idolGeometry, {cols: 5});
-const flameIdolBrokenAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyedAttack.png', idolGeometry, {cols: 7, duration: 3});
+const flameIdolBrokenAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolDestroyedCast.png', idolGeometry, {cols: 7, duration: 3});
 const flameIdolIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolCast.png', idolGeometry);
 const flameIdolStillAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolAwaken.png', idolGeometry);
 const flameIdolWakeAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolAwaken.png', idolGeometry, {x: 6, cols: 4, duration: 3}, {loop: false});
@@ -26,7 +27,7 @@ const flameIdolGlowWarningAnimation: FrameAnimation = createAnimation('gfx/bosse
 // This glow animation is played over the idol during the broken idle animation.
 // const flameIdolGlowBrokenAnimation: FrameAnimation = createAnimation('gfx/bosses/flameIdolGlow.png', idolGeometry, { x: 4});
 
-export const flameIdolAnimations: ActorAnimations = {
+const flameIdolAnimations: ActorAnimations = {
     attack: omniAnimation(flameIdolAttackAnimation),
     breaking: omniAnimation(flameIdolBreakingAnimation),
     broken: omniAnimation(flameIdolBrokenIdleAnimation),
@@ -40,6 +41,31 @@ export const flameIdolAnimations: ActorAnimations = {
 };
 
 
+const stormIdolGeometry: FrameDimensions = {w: 58, h: 54, content: { x: 21, y: 37, w: 17, h: 20}};
+const stormIdolAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolCast.png', stormIdolGeometry, {cols: 14, duration: 3});
+// This storm animation is played over the storm idol attack animation.
+const stormIdolBreakingAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolDestroyed.png', stormIdolGeometry, {cols: 4, duration: 3});
+const stormIdolBrokenIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolDestroyedIdle.png', stormIdolGeometry, {cols: 4, duration: 3});
+const stormIdolBrokenAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolDestroyedCast.png', stormIdolGeometry, {cols: 6, duration: 3});
+const stormIdolIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolCast.png', stormIdolGeometry);
+const stormIdolStillAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolAwaken.png', stormIdolGeometry);
+const stormIdolWakeAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolAwaken.png', stormIdolGeometry, {x: 4, cols: 5, duration: 3}, {loop: false});
+const stormIdolSleepAnimation: FrameAnimation = reverseAnimation(stormIdolWakeAnimation);
+const stormIdolWarningAnimation: FrameAnimation = createAnimation('gfx/bosses/stormIdolAwaken.png', stormIdolGeometry, {x: 1, cols: 3});
+
+const stormIdolAnimations: ActorAnimations = {
+    attack: omniAnimation(stormIdolAttackAnimation),
+    breaking: omniAnimation(stormIdolBreakingAnimation),
+    broken: omniAnimation(stormIdolBrokenIdleAnimation),
+    brokenAttack: omniAnimation(stormIdolBrokenAttackAnimation),
+    death: omniAnimation(stormIdolBrokenIdleAnimation),
+    idle: omniAnimation(stormIdolIdleAnimation),
+    still: omniAnimation(stormIdolStillAnimation),
+    wake: omniAnimation(stormIdolWakeAnimation),
+    sleep: omniAnimation(stormIdolSleepAnimation),
+    warning: omniAnimation(stormIdolWarningAnimation),
+};
+
 function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
     // Idols take much less damage during their enraged phase.
     if (enemy.mode === 'enraged') {
@@ -50,8 +76,10 @@ function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResul
     }
     return enemy.defaultOnHit(state, hit);
 }
+interface IdolParams {
 
-const baseIdolDefinition: Partial<EnemyDefinition<any>> = {
+}
+const baseIdolDefinition: Partial<EnemyDefinition<IdolParams>> = {
     alwaysReset: true,
     scale: 1,
     isImmortal: true,
@@ -71,7 +99,7 @@ const baseIdolDefinition: Partial<EnemyDefinition<any>> = {
 enemyDefinitions.stormIdol = {
     ...baseIdolDefinition,
     naturalDifficultyRating: 8,
-    animations: lightningIdolAnimations,
+    animations: stormIdolAnimations,
     update: updateStormIdol,
     elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
@@ -109,7 +137,8 @@ enemyDefinitions.frostIdol = {
 };
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
-    updateElementalIdol(state, enemy, () => {
+    console.log(8 * stormIdolAttackAnimation.frameDuration);
+    updateNewElementalIdol(state, enemy, 8 * stormIdolAttackAnimation.frameDuration * FRAME_LENGTH, () => {
         enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
         const lightningBolt = new LightningBolt({
             x: state.hero.x + state.hero.w / 2,
@@ -121,7 +150,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
-    updateNewElementalIdol(state, enemy, () => {
+    updateNewElementalIdol(state, enemy, 6 * flameIdolAttackAnimation.frameDuration * FRAME_LENGTH, () => {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
@@ -140,7 +169,7 @@ function updateFrostIdol(state: GameState, enemy: Enemy): void {
     })
 }
 
-function updateNewElementalIdol(state: GameState, enemy: Enemy, triggerSpell: () => void) {
+function updateNewElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: number, triggerSpell: () => void) {
     // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
     // until all statues are "destroyed".
     if (enemy.life <= 0) {
@@ -166,16 +195,18 @@ function updateNewElementalIdol(state: GameState, enemy: Enemy, triggerSpell: ()
             enemy.addBossDeathEffect(state, {x: hitbox.x + hitbox.w / 2, y: hitbox.y - 14, w: 1, h: 1,});
             enemy.changeToAnimation('broken');
         }*/
-        if (enemy.modeTime === 4000) {
+        if (enemy.modeTime >= 4000 && enemy.currentAnimationKey !== 'brokenAttack') {
             enemy.changeToAnimation('brokenAttack', 'broken');
         }
-        if (enemy.currentAnimationKey === 'brokenAttack' && enemy.animationTime === 200) {
+        // Currently we use the same timing for all three statues, but this could be parameterized if necessary.
+        if (enemy.currentAnimationKey === 'brokenAttack' && enemy.animationTime === 180) {
             triggerSpell();
             enemy.modeTime = 0;
         }
         return;
     }
-    if (enemy.currentAnimationKey === 'attack' && enemy.animationTime === 200) {
+    // This attack time is parameterized to match the animation of each idol.
+    if (enemy.currentAnimationKey === 'attack' && enemy.animationTime === attackTriggerTime) {
         triggerSpell();
     }
     if (typeof enemy.params.priority === 'undefined') {
