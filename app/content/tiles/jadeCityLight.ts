@@ -10,6 +10,8 @@ import {
     BITMAP_TOP_LEFT_MISS_CORN_6,
     BITMAP_TOP_LEFT_CORN_6,
     BITMAP_TOP_RIGHT_CORN_6,
+    BITMAP_TOP_LEFT_6,
+    BITMAP_TOP_RIGHT_6,
     BITMAP_BOTTOM_LEFT_CORN_10,
     BITMAP_BOTTOM_RIGHT_CORN_10, 
     BITMAP_TOP_3,
@@ -116,6 +118,8 @@ const jadeCityLightTowers: TileSource = {
         '6x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_CORN_6},
         '4x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10},
         '6x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
+        '3x5': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_6},
+        '7x5': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_6}
 }
 }
 
