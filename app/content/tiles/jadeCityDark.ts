@@ -65,7 +65,7 @@ const jadeCityDarkRailings: TileSource = {
 
 const jadeCityDarkDome: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 96, y: 0, w: 64, h: 48}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 96, y: 0, w: 64, h: 48}),
     behaviors: {
         'all': southernWallBehavior,
         '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_11},
