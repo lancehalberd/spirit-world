@@ -775,10 +775,37 @@ const bigLightDome: DecorationType = {
         drawFrameContentAt(context, bigLightDomeFrame, decoration);
     },
     behaviors: {
-        solid: true,
+        solid: false,
     },
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(bigLightDomeFrame, decoration);
+    },
+};
+
+
+const smallDarkDomeFrame= requireFrame('gfx/tiles/jadeCityDark.png', {x: 162, y: 20, w: 26, h: 23});
+const bigDarkDomeFrame= requireFrame('gfx/tiles/jadeCityDark.png', {x: 104, y: 3, w: 47, h: 43});
+const smallDarkDome: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, smallDarkDomeFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(smallDarkDomeFrame, decoration);
+    },
+};
+
+const bigDarkDome: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, bigDarkDomeFrame, decoration);
+    },
+    behaviors: {
+        solid: false,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(bigDarkDomeFrame, decoration);
     },
 };
 
@@ -806,6 +833,8 @@ export const decorationTypes = {
     windowOctogonal,
     smallLightDome,
     bigLightDome,
+    smallDarkDome,
+    bigDarkDome,
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = stormBeastStatueFrame;

@@ -804,6 +804,7 @@ const jadeDarkIntImage = 'gfx/tiles/jadeInteriorDark.png';
 const jadeDark1IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 0, w: 32, h: 32})
 const jadeDark1IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 0, w: 32, h: 32})
 const jadeDark1IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 0, w: 32, h: 32})
+const jadeDark1IntSouthDoor = requireFrame(jadeDarkIntImage, {x: 304, y: 0, w: 32, h: 32})
 
 
 const jadeDark2IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 32, w: 32, h: 32})
@@ -814,8 +815,8 @@ const jadeDark2IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 32, w: 3
 const jadeDark1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames,
     northDoorway: jadeDark1IntDoorOpen,
-
-
+    southDoorEmpty: jadeDark1IntSouthDoor,
+    southDoorOpen: jadeDark1IntSouthDoor,
 }
 
 
@@ -823,8 +824,6 @@ const jadeDark2DoorFrames:  V1DoorFrames = {
     ...cavernDoorFrames,
     northDoorway: jadeDark2IntDoorOpen,
 }
-
-
 
 
 const jadeDark1DoorStyle: DoorStyleDefinition = {
