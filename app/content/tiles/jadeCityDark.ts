@@ -17,6 +17,13 @@ import {
     BITMAP_TOP_3,
     BITMAP_DIAGONAL_TOP_LEFT_LEDGE,
     BITMAP_DIAGONAL_TOP_RIGHT_LEDGE,
+    BITMAP_TOP_RIGHT_11,
+    BITMAP_TOP_LEFT_11,
+    BITMAP_LEFT,
+    BITMAP_RIGHT,
+    BITMAP_BOTTOM,
+    BITMAP_BOTTOM_LEFT_11,
+    BITMAP_BOTTOM_RIGHT_11
 } from 'app/content/bitMasks';
 
 
@@ -56,6 +63,21 @@ const jadeCityDarkRailings: TileSource = {
     }
 }
 
+const jadeCityDarkDome: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 96, y: 0, w: 64, h: 48}),
+    behaviors: {
+        'all': southernWallBehavior,
+        '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_11},
+        '0x1': { defaultLayer: 'field', solidMap: BITMAP_RIGHT},
+        '0x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_11},
+        '1x0': { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM},
+        '2x0': { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM},
+        '3x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_11},
+        '3x1': { defaultLayer: 'field', solidMap: BITMAP_LEFT},
+        '3x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_11},
+    }
+}
 
 
 
@@ -63,7 +85,10 @@ const jadeCityDarkDecorations: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 224, w: 160, h: 64}),
     behaviors: {
-        'all': {defaultLayer: 'floor2'}
+        'all': {defaultLayer: 'floor2'},
+        '0x0': {defaultLayer: 'floor'},
+        '0x1': {defaultLayer: 'floor'},
+        '0x2': {defaultLayer: 'floor'}
     }
 }
 
@@ -72,7 +97,7 @@ const jadeCityDarkWalls: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 160, w: 112, h: 48}),
     behaviors: {
-        'all': southernWallBehavior
+        'all': southernWallBehavior,
     }
 }
 
@@ -210,6 +235,7 @@ export const allDarkJadeCityTileSources: TileSource[] = [
     jadeCityDarkSlopedWalls,
     jadeCityDarkTowers,
     jadeCityDarkStairs,
-    jadeCityDarkColumnWall
+    jadeCityDarkColumnWall,
+    jadeCityDarkDome
 ];
 

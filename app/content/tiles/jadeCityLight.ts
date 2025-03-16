@@ -17,6 +17,13 @@ import {
     BITMAP_TOP_3,
     BITMAP_DIAGONAL_TOP_LEFT_LEDGE,
     BITMAP_DIAGONAL_TOP_RIGHT_LEDGE,
+    BITMAP_TOP_RIGHT_11,
+    BITMAP_TOP_LEFT_11,
+    BITMAP_LEFT,
+    BITMAP_RIGHT,
+    BITMAP_BOTTOM,
+    BITMAP_BOTTOM_LEFT_11,
+    BITMAP_BOTTOM_RIGHT_11
 } from 'app/content/bitMasks';
 
 import {
@@ -50,12 +57,31 @@ const jadeCityLightRailings: TileSource = {
     }
 }
 
+const jadeCityLightDome: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 96, y: 0, w: 64, h: 48}),
+    behaviors: {
+        'all': southernWallBehavior,
+        '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_11},
+        '0x1': { defaultLayer: 'field', solidMap: BITMAP_RIGHT},
+        '0x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_11},
+        '1x0': { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM},
+        '2x0': { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM},
+        '3x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_11},
+        '3x1': { defaultLayer: 'field', solidMap: BITMAP_LEFT},
+        '3x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_11},
+    }
+}
+
 
 const jadeCityLightDecorations: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 224, w: 160, h: 64}),
     behaviors: {
-        'all': {defaultLayer: 'floor2'}
+        'all': {defaultLayer: 'floor2'},
+        '0x0': {defaultLayer: 'floor'},
+        '0x1': {defaultLayer: 'floor'},
+        '0x2': {defaultLayer: 'floor'}
     }
 }
 
@@ -82,13 +108,16 @@ const jadeCityLightSlopedWalls: TileSource = {
         '2x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10},
         '3x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
         '4x1': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
-        '5x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10}, 
+        '5x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10},
         '2x6': jadeTopRight, '3x6': jadeTopLeft,
         '1x5': jadeTopRight, '4x5': jadeTopLeft,
         '0x4': jadeTopRight, '5x4': jadeTopLeft,
-        '2x3': bottomLeftWall, '3x3': bottomRightWall,
-        '1x2': bottomLeftWall, '4x2': bottomRightWall,
-        '0x1': bottomLeftWall, '5x1': bottomRightWall,
+        '0x1': {defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6},
+        '5x1': {defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6},
+        '1x2': {defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6},
+        '2x3': {defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6},
+        '4x2': {defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6},
+        '3x3': {defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6},
     }
 }
 
@@ -192,5 +221,6 @@ export const allLightJadeCityTileSources: TileSource[] = [
     jadeCityLightSlopedWalls,
     jadeCityLightTowers,
     jadeCityLightStairs,
-    jadeCityLightColumnWall
+    jadeCityLightColumnWall,
+    jadeCityLightDome
 ];
