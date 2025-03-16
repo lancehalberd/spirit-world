@@ -104,6 +104,8 @@ export class FrostGrenade implements EffectInstance, Props {
 interface ThrowGrenadeProps {
     damage?: number
     radius?: number
+    x?: number
+    y?: number
     z?: number
     az?: number
     source: Enemy
@@ -113,8 +115,8 @@ interface ThrowGrenadeProps {
 // damage = 1, z = 8,
 export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number},  props: ThrowGrenadeProps): void {
     const hitbox = enemy.getHitbox(state);
-    const x = hitbox.x + hitbox.w / 2;
-    const y = hitbox.y + hitbox.h / 2;
+    const x = props.x ?? (hitbox.x + hitbox.w / 2);
+    const y = props.y ?? hitbox.y + hitbox.h / 2;
     const vz = 4;
     const az = props.az ?? -0.2;
     const duration = -2 * vz / az;
