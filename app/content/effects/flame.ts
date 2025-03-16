@@ -71,6 +71,7 @@ export class Flame implements EffectInstance, Props {
             color: {r:255, g: 0, b: 0},
         }];
     }
+    drawPriority: DrawPriority = 'sprites';
     isEffect = <const>true;
     isEnemyAttack = true;
     area: AreaInstance = null;
