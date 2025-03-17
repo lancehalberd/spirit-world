@@ -62,12 +62,21 @@ const JadeInteriorLightSquareFloor: TileSource = {
     }
 }
 
-const JadeInteriorLightFloor: TileSource = { //Assuming this is floor, maybe ceiling?
+const JadeInteriorLightFloor: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 0, y: 0, w: 112, h: 128}),
     behaviors: {
         'all': {defaultLayer: 'floor2'}
-    }
+    }, tileCoordinates: [
+        [0, 0],                 [3, 0], 
+        [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
+        [0, 2],         [2, 2], [3, 2], [4, 2], [5, 2], [6, 2],
+        [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], 
+        [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4],
+        [0, 5], [1, 5],         [3, 5], [4, 5], [5, 5], [6, 5],
+        [0, 6], [1, 6],                 [4, 6], [5, 6], 
+        [0, 7], [1, 7],
+    ]
 }
 
 const JadeInteriorLightColumn: TileSource = { 
@@ -75,7 +84,14 @@ const JadeInteriorLightColumn: TileSource = {
     source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 112, y: 64, w: 32, h: 96}),
     behaviors: {
         'all': southernWallBehavior,
-    }
+    }, tileCoordinates: [
+        [0,0], [1,0],
+        [0,1], [1,1],
+        [0,2], [1,2],
+        [0,3],
+        [0,4],
+        [0,5]
+    ]
 }
 
 
