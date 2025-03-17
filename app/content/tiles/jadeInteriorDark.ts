@@ -32,7 +32,7 @@ const JadeInteriorDarkLeftCorner: TileSource = {
     }
 }
 
-
+/*
 const JadeInteriorDarkRightCorner: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 400, y: 0, w: 32, h: 160}),
@@ -44,7 +44,7 @@ const JadeInteriorDarkRightCorner: TileSource = {
         '0x5': bottomLeftWall, '1x5': bottomRightWall,
     }
 }
-
+*/
 
 const JadeInteriorDarkSquareWall: TileSource = {
     w: 16, h: 16,
@@ -54,7 +54,7 @@ const JadeInteriorDarkSquareWall: TileSource = {
     }
 }
 
-
+/*
 const JadeInteriorDarkSquareWallAlt: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 352, y: 0, w: 32, h: 64}),
@@ -62,7 +62,7 @@ const JadeInteriorDarkSquareWallAlt: TileSource = {
         'all': southernWallBehavior,
     }
 }
-
+*/
 
 
 
@@ -116,12 +116,12 @@ const JadeInteriorDarkColumn: TileSource = {
 
 
 export const allJadeInteriorDarkTileSources: TileSource[] = [
-    JadeInteriorDarkRightCorner,
+    //JadeInteriorDarkRightCorner,
     JadeInteriorDarkLeftCorner,
     JadeInteriorDarkSquareFloor,
     JadeInteriorDarkFloor,
     JadeInteriorDarkSquareWall,
-    JadeInteriorDarkSquareWallAlt,
+    //JadeInteriorDarkSquareWallAlt,
     JadeInteriorDarkColumn
 ];
 
