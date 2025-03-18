@@ -770,12 +770,12 @@ const jadeLight1IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 0, w: 
 const jadeLight1IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 0, w: 32, h: 32})
 const jadeLight1IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 0, w: 32, h: 32})
 const jadeLight1IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 256, y: 64, w: 64, h: 32})
-
+/*
 const jadeLight2IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 32, w: 32, h: 32})
 const jadeLight2IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 32, w: 32, h: 32})
 const jadeLight2IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 32, w: 32, h: 32})
 const jadeLight2IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 256, y: 64, w: 64, h: 32})
-
+*/
 const jadeLight1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames, 
     northDoorway: jadeLight1IntDoorOpen,
@@ -783,14 +783,14 @@ const jadeLight1DoorFrames: V1DoorFrames = {
     southDoorOpen: jadeLight1IntSouthDoor,
 
 }
-
+/*
 const jadeLight2DoorFrames:  V1DoorFrames = {
     ...cavernDoorFrames, 
     northDoorway: jadeLight2IntDoorOpen,
     southDoorEmpty: jadeLight2IntSouthDoor,
     southDoorOpen: jadeLight2IntSouthDoor,
 }
-
+*/
 
 const jadeLight1DoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
@@ -798,13 +798,13 @@ const jadeLight1DoorStyle: DoorStyleDefinition = {
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight1DoorFrames),
 };
 
-
+/*
 const jadeLight2DoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight2DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight2DoorFrames),
 };
-
+*/
 //JADE DARK INTERIOR DOOR STYLE
 const jadeDarkIntImage = 'gfx/tiles/jadeInteriorDark.png';
 
@@ -813,12 +813,12 @@ const jadeDark1IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 0, w: 
 const jadeDark1IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 0, w: 32, h: 32})
 const jadeDark1IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 256, y: 64, w: 64, h: 32})
 
-
+/*
 const jadeDark2IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 32, w: 32, h: 32})
 const jadeDark2IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 32, w: 32, h: 32})
 const jadeDark2IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 32, w: 32, h: 32})
 const jadeDark2IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 256, y: 96, w: 64, h: 32})
-
+*/
 
 const jadeDark1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames,
@@ -827,14 +827,14 @@ const jadeDark1DoorFrames: V1DoorFrames = {
     southDoorOpen: jadeDark1IntSouthDoor,
 }
 
-
+/*
 const jadeDark2DoorFrames:  V1DoorFrames = {
     ...cavernDoorFrames,
     northDoorway: jadeDark2IntDoorOpen,
     southDoorEmpty: jadeDark2IntSouthDoor,
     southDoorOpen: jadeDark2IntSouthDoor,
 }
-
+*/
 
 const jadeDark1DoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
@@ -844,13 +844,13 @@ const jadeDark1DoorStyle: DoorStyleDefinition = {
 
 
 
-
+/*
 const jadeDark2DoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark2DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark2DoorFrames),
 };
-
+*/
 
 // FUTURE DOOR STYLE
 const futureImage = 'gfx/tiles/futuristic.png';
@@ -1051,17 +1051,17 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     jadeDarkDownstairs: stairsDoorStyle(jadeDarkDoorStyle, jadeDarkStairsDown, 'down'),
     jadeDarkUpstairs: stairsDoorStyle(jadeDarkDoorStyle, jadeDarkStairsUp, 'up'),
     jadeLightInt1: jadeLight1DoorStyle,
-    jadeLightInt2:  jadeLight2DoorStyle, 
+    //jadeLightInt2:  jadeLight2DoorStyle, 
     jadeLightInt1Downstairs: stairsDoorStyle(jadeLight1DoorStyle, jadeLight1IntStairsDown, 'down'),
     jadeLightInt1Upstairs: stairsDoorStyle(jadeLight1DoorStyle, jadeLight1IntStairsUp, 'up'),
-    jadeLightInt2Downstairs: stairsDoorStyle(jadeLight2DoorStyle, jadeLight2IntStairsDown, 'down'),
-    jadeLightInt2Upstairs: stairsDoorStyle(jadeLight2DoorStyle, jadeLight2IntStairsUp, 'up'),
+    //jadeLightInt2Downstairs: stairsDoorStyle(jadeLight2DoorStyle, jadeLight2IntStairsDown, 'down'),
+    //jadeLightInt2Upstairs: stairsDoorStyle(jadeLight2DoorStyle, jadeLight2IntStairsUp, 'up'),
     jadeDarkInt1: jadeDark1DoorStyle,
-    jadeDarkInt2:  jadeDark2DoorStyle,
+    //jadeDarkInt2:  jadeDark2DoorStyle,
     jadeDarkInt1Downstairs: stairsDoorStyle(jadeDark1DoorStyle, jadeDark1IntStairsDown, 'down'),
     jadeDarkInt1Upstairs: stairsDoorStyle(jadeDark1DoorStyle, jadeDark1IntStairsUp, 'up'),
-    jadeDarkInt2Downstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsDown, 'down'),
-    jadeDarkInt2Upstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsUp, 'up'),
+    //jadeDarkInt2Downstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsDown, 'down'),
+    //jadeDarkInt2Upstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsUp, 'up'),
 
     cave: {
         ...oldSquareBaseDoorStyle,
