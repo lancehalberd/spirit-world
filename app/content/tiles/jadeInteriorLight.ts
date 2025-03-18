@@ -12,7 +12,7 @@ import { requireFrame } from 'app/utils/packedImages';
 
 const JadeInteriorLightLeftCorner: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 160, y: 0, w: 32, h: 160}),
+    source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 160, y: 0, w: 32, h: 80}), //160}), revert to 160 to include alternate tiles
     behaviors: {
         'all': southernWallBehavior,
         '0x4': topRightWall, '1x4': topLeftWall,
@@ -25,6 +25,7 @@ const JadeInteriorLightLeftCorner: TileSource = {
     }
 }
 
+/*
 const JadeInteriorLightRightCorner: TileSource = { 
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 400, y: 0, w: 32, h: 160}),
@@ -36,6 +37,7 @@ const JadeInteriorLightRightCorner: TileSource = {
         '0x5': bottomLeftWall, '1x5': bottomRightWall,
     }
 }
+*/
 
 const JadeInteriorLightSquareWall: TileSource = { 
     w: 16, h: 16,
@@ -44,7 +46,7 @@ const JadeInteriorLightSquareWall: TileSource = {
         'all': southernWallBehavior,
     }
 }
-
+/*
 const JadeInteriorLightSquareWallAlt: TileSource = { 
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 352, y: 0, w: 32, h: 64}),
@@ -52,7 +54,7 @@ const JadeInteriorLightSquareWallAlt: TileSource = {
         'all': southernWallBehavior,
     }
 }
-
+*/
 
 const JadeInteriorLightSquareFloor: TileSource = { 
     w: 16, h: 16,
@@ -85,9 +87,9 @@ const JadeInteriorLightColumn: TileSource = {
     behaviors: {
         'all': southernWallBehavior,
     }, tileCoordinates: [
-        [0,0], [1,0],
-        [0,1], [1,1],
-        [0,2], [1,2],
+        //[0,0], //[1,0],
+        //[0,1], //[1,1],
+        //[0,2], //[1,2],
         [0,3],
         [0,4],
         [0,5]
@@ -98,12 +100,12 @@ const JadeInteriorLightColumn: TileSource = {
 
 
 export const allJadeInteriorLightTileSources: TileSource[] = [
-    JadeInteriorLightRightCorner,
+    //JadeInteriorLightRightCorner,
     JadeInteriorLightLeftCorner,
     JadeInteriorLightSquareFloor,
     JadeInteriorLightFloor,
     JadeInteriorLightSquareWall,
-    JadeInteriorLightSquareWallAlt,
+    //JadeInteriorLightSquareWallAlt,
     JadeInteriorLightColumn
 ];
 

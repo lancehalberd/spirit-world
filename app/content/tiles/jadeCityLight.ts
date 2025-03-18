@@ -95,13 +95,14 @@ const jadeCityLightDecorations: TileSource = {
 
 const jadeCityLightWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 160, w: 112, h: 48}),
+    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 160, w: 48, h: 48}), 
+    //change width to 112 and uncomment tileCoordinates to get alternate tiles
     behaviors: {
         'all': southernWallBehavior
     }, tileCoordinates: [
-        [0, 0], [1, 0], [2, 0],         [4, 0], [5, 0], [6, 0],
-        [0, 1], [1, 1], [2, 1],         [4, 1], [5, 1], [6, 1],
-        [0, 2], [1, 2], [2, 2],         [4, 2], [5, 2], [6, 2]  
+        [0, 0], [1, 0], [2, 0],         //[4, 0], [5, 0], [6, 0],
+        [0, 1], [1, 1], [2, 1],         //[4, 1], [5, 1], [6, 1],
+        [0, 2], [1, 2], [2, 2],         //[4, 2], [5, 2], [6, 2]  
     ]
 }
 
@@ -136,13 +137,13 @@ const jadeCityLightSlopedWalls: TileSource = {
         '7x3': bottomRightWall,
         '7x6': topLeftWall
     }, tileCoordinates: [
-        [0, 0],                                 [5, 0], 
-        [0, 1], [1, 1],                 [4, 1], [5, 1], 
-        [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], [6, 2], [7, 2], 
+        //[0, 0],                                 [5, 0], 
+        //[0, 1], [1, 1],                 [4, 1], [5, 1], 
+        [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], //[6, 2], [7, 2], 
         [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], 
         [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], 
                 [1, 5], [2, 5], [3, 5], [4, 5],         [6, 5], [7, 5], 
-                        [2, 6], [3, 6],                 [6, 6], [7, 6], 
+                        [2, 6], [3, 6],                 //[6, 6], [7, 6], 
     ],
 }
 
@@ -267,7 +268,11 @@ const jadeCityLightColumnWall: TileSource = {
         'all': southernWallBehavior,
         '0x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_3 },
         '4x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_3 }
-    }
+    }, tileCoordinates: [
+        [0, 0], [1, 0],          [4, 0], 
+        [0, 1], [1, 1],          [4, 1], 
+        [0, 2], [1, 2],          [4, 2], 
+    ]
 }
 
 export const allLightJadeCityTileSources: TileSource[] = [

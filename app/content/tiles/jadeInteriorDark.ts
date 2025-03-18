@@ -16,7 +16,7 @@ import { requireFrame } from 'app/utils/packedImages';
 
 const JadeInteriorDarkLeftCorner: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 160, y: 0, w: 32, h: 160}),
+    source: requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 160, y: 0, w: 32, h: 80}), //160}), revert to 160 to include alternate tiles
     behaviors: {
         'all': southernWallBehavior,
         '0x4': topRightWall, '1x4': topLeftWall,
@@ -99,9 +99,9 @@ const JadeInteriorDarkColumn: TileSource = {
     behaviors: {
         'all': southernWallBehavior,
     }, tileCoordinates: [
-        [0,0], [1,0],
-        [0,1], [1,1],
-        [0,2], [1,2],
+        //[0,0], [1,0],
+        //[0,1], [1,1],
+        //[0,2], [1,2],
         [0,3],
         [0,4],
         [0,5]
