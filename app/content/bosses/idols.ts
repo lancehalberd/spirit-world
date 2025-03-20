@@ -79,13 +79,13 @@ const frostIdolAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/fro
 ]});
 // This frost animation is played over the frost idol attack animation.
 const frostIdolBreakingAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolDestroyed.png', frostIdolGeometry, {cols: 4, duration: 3});
-const frostIdolBrokenIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolDestroyed.png', frostIdolGeometry, {x: 3, cols: 1, duration: 3});
-const frostIdolBrokenAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolDestroyed.png', frostIdolGeometry, {x: 3, cols: 1, duration: 3});
-const frostIdolIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry, {x: 4});
+const frostIdolBrokenIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolDestroyedIdle.png', frostIdolGeometry, {cols: 5, duration: 4});
+const frostIdolBrokenAttackAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolDestroyedCast.png', frostIdolGeometry, {cols: 8, duration: 4});
+const frostIdolIdleAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry, {x: 10});
 const frostIdolStillAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry);
-const frostIdolWakeAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry, {x: 1, cols: 4, duration: 3}, {loop: false});
+const frostIdolWakeAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry, {x: 7, cols: 4, duration: 3}, {loop: false});
 const frostIdolSleepAnimation: FrameAnimation = reverseAnimation(frostIdolWakeAnimation);
-const frostIdolWarningAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry, {x: 1, cols: 3, frameMap: [0,1,2,1]});
+const frostIdolWarningAnimation: FrameAnimation = createAnimation('gfx/bosses/frostIdolAwaken.png', frostIdolGeometry, {x: 1, cols: 4});
 
 const frostIdolAnimations: ActorAnimations = {
     attack: omniAnimation(frostIdolAttackAnimation),
@@ -171,7 +171,7 @@ enemyDefinitions.frostIdol = {
 };
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
-    updateElementalIdol(state, enemy, 8 * stormIdolAttackAnimation.frameDuration * FRAME_LENGTH, () => {
+    updateElementalIdol(state, enemy, 8 * stormIdolAttackAnimation.frameDuration * FRAME_LENGTH, 180, () => {
         enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
         const lightningBolt = new LightningBolt({
             x: state.hero.x + state.hero.w / 2,
@@ -183,7 +183,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
-    updateElementalIdol(state, enemy, 4 * flameIdolAttackAnimation.frameDuration * FRAME_LENGTH, () => {
+    updateElementalIdol(state, enemy, 4 * flameIdolAttackAnimation.frameDuration * FRAME_LENGTH, 180, () => {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
@@ -193,21 +193,25 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
     });
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
-    updateElementalIdol(state, enemy, 11 * frostIdolAttackAnimation.frameDuration * FRAME_LENGTH, () => {
-        enemy.params.theta = 2 * Math.PI * Math.random();
-        const hitbox = enemy.getHitbox(state);
-        throwIceGrenadeAtLocation(state, enemy, {
-            tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(enemy.params.theta),
-            ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta),
-        }, {
-            source: enemy,
-            x: hitbox.x + 14,
-            y: hitbox.y - 6,
-        });
-    })
+    updateElementalIdol(state, enemy,
+        11 * frostIdolAttackAnimation.frameDuration * FRAME_LENGTH,
+        5 * frostIdolBrokenAttackAnimation.frameDuration * FRAME_LENGTH,
+        () => {
+            enemy.params.theta = 2 * Math.PI * Math.random();
+            const hitbox = enemy.getHitbox(state);
+            throwIceGrenadeAtLocation(state, enemy, {
+                tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(enemy.params.theta),
+                ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta),
+            }, {
+                source: enemy,
+                x: hitbox.x + 14,
+                y: hitbox.y - 6,
+            });
+        }
+    );
 }
 
-function updateElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: number, triggerSpell: () => void) {
+function updateElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: number, brokenAttackTriggerTime: number, triggerSpell: () => void) {
     // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
     // until all statues are "destroyed".
     if (enemy.life <= 0) {
@@ -237,7 +241,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: 
             enemy.changeToAnimation('brokenAttack', 'broken');
         }
         // Currently we use the same timing for all three statues, but this could be parameterized if necessary.
-        if (enemy.currentAnimationKey === 'brokenAttack' && enemy.animationTime === 180) {
+        if (enemy.currentAnimationKey === 'brokenAttack' && enemy.animationTime === brokenAttackTriggerTime) {
             triggerSpell();
             enemy.modeTime = 0;
         }
@@ -254,20 +258,26 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: 
     }
     // Immediately put up shield on entering pinch mode.
     if (!enemy.params.pinchMode && enemy.life <= 4) {
-        enemy.params.pinchMode = true;
-        enemy.setMode('enraged');
+        // Don't start pinch mode mid attack.
+        if (enemy.currentAnimationKey !== 'attack') {
+            enemy.params.pinchMode = true;
+            enemy.setMode('enraged');
+        }
         return;
     }
     // The idol does a single quick string of 4 attacks when enraged.
     if (enemy.mode === 'enraged') {
-        if (enemy.modeTime < 4000 && enemy.modeTime % 1000 === 20) {
-            enemy.changeToAnimation('attack', 'idle');
-        }
-        if (enemy.modeTime === 4000) {
-            enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
-            enemy.changeToAnimation('sleep', 'still');
-            enemy.shielded = true;
-            enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
+        if (enemy.currentAnimationKey === 'idle') {
+            // Attacks at most once per second for 4 seconds.
+            if (enemy.modeTime < 4000 && enemy.modeTime % 1000 < 500) {
+                enemy.changeToAnimation('attack', 'idle');
+            }
+            if (enemy.modeTime >= 4000) {
+                enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
+                enemy.changeToAnimation('sleep', 'still');
+                enemy.shielded = true;
+                enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
+            }
         }
         if (enemy.currentAnimationKey === 'still') {
             enemy.setMode('shielded');
