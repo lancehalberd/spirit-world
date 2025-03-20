@@ -1,5 +1,6 @@
 import { paletteHash } from 'app/content/tiles/paletteHash';
 import { addNewTile, allTiles, generateTileHash, generateTileHashMap } from 'app/content/tiles';
+import {editingState} from 'app/development/editingState';
 import { tagElement } from 'app/dom';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { drawFrame } from 'app/utils/animations';
@@ -251,6 +252,23 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                     tile.behaviors?.render(paletteContext, tile, target, 0);
                 } else {
                     drawFrame(paletteContext, tile.frame,target );
+                }
+                if (editingState.showWalls) {
+                    paletteContext.save();
+                        paletteContext.fillStyle = 'red';
+                        paletteContext.globalAlpha *= editingState.showWallsOpacity;
+                        if (tile.behaviors?.solid) {
+                            paletteContext.fillRect(target.x, target.y, target.w, target.h);
+                        } else if (tile.behaviors?.solidMap) {
+                            for (let sy = 0; sy < 16; sy++) {
+                                for (let sx = 0; sx < 16; sx++) {
+                                    if (tile.behaviors.solidMap[sy] >> (15 - sx) & 1) {
+                                        paletteContext.fillRect(target.x + sx, target.y +sy, 1, 1);
+                                    }
+                                }
+                            }
+                        }
+                    paletteContext.restore();
                 }
             }
         }

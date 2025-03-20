@@ -710,7 +710,7 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
     if (editingState.showWalls) {
         context.save();
             context.fillStyle = 'red';
-            context.globalAlpha *= 0.6;
+            context.globalAlpha *= editingState.showWallsOpacity;
             translateContextForAreaAndCamera(context, state, area);
             for (let y = 0; y < area.h; y++) {
                 if (!area.tilesDrawn[y]) {

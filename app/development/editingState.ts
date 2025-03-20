@@ -24,6 +24,7 @@ export const editingState: EditingState = {
         d: 'up',
         styleWeights: {},
     },
+    showWallsOpacity: 0.6,
 };
 window['editingState'] = editingState;
 window.onbeforeunload = () => {

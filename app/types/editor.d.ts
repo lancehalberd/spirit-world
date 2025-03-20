@@ -92,5 +92,6 @@ interface EditingState {
         movedCount: number
     }
     showWalls?: boolean
+    showWallsOpacity: number
     showHitboxes?: boolean
 }
