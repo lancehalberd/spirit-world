@@ -60,6 +60,9 @@ const jadeCityDarkRailings: TileSource = {
 
 
 
+
+
+
 const jadeCityDarkDecorations: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 224, w: 160, h: 64}),
@@ -95,7 +98,7 @@ const jadeCityDarkWalls: TileSource = {
 
 const jadeCityDarkSlopedWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 112, w: 128, h: 112}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 272, y: 112, w: 128, h: 112}),
     behaviors: {
         'all': southernWallBehavior,
         '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10 },
@@ -121,13 +124,13 @@ const jadeCityDarkSlopedWalls: TileSource = {
         '7x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6 },
         '7x6': topLeftWall
     }, tileCoordinates: [
-        //[0, 0],                                 [5, 0], 
-        //[0, 1], [1, 1],                 [4, 1], [5, 1], 
-        [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], //[6, 2], [7, 2], 
-        [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3], 
-        [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4], 
-                [1, 5], [2, 5], [3, 5], [4, 5],         [6, 5], [7, 5], 
-                        [2, 6], [3, 6],                 //[6, 6], [7, 6], 
+        //[0, 0],                                 [5, 0],
+        //[0, 1], [1, 1],                 [4, 1], [5, 1],
+        [0, 2], [1, 2], [2, 2], [3, 2], [4, 2], [5, 2], //[6, 2], [7, 2],
+        [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [6, 3], [7, 3],
+        [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4], [7, 4],
+                [1, 5], [2, 5], [3, 5], [4, 5],         [6, 5], [7, 5],
+                        [2, 6], [3, 6],                 //[6, 6], [7, 6],
     ],
 }
 
@@ -168,9 +171,9 @@ const jadeCityDarkTowers: TileSource = {
         '7x3': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6 },
         '7x4': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6 },
         '7x5': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6_CUT }
-    },tileCoordinates: [
-                [3, 0], [4, 0],         [6, 0],         // [5, 0], 
-        [0, 1], [1, 1], [2, 1], [3, 1], [4, 1],         [6, 1], [7, 1], 
+    }, tileCoordinates: [
+                                [3, 0], [4, 0],         [6, 0],         // [5, 0],
+        [0, 1], [1, 1], [2, 1], [3, 1], [4, 1],         [6, 1], [7, 1],
         [0, 2],         [2, 2], [3, 2], [4, 2],         [6, 2], [7, 2], //
         [0, 3], [1, 3], [2, 3], [3, 3],                         [7, 3], // [4, 3], [5, 3], [6, 3],
         [0, 4], [1, 4], [2, 4], [3, 4],                         [7, 4], // [4, 4], [5, 4], [6, 4],
@@ -178,7 +181,6 @@ const jadeCityDarkTowers: TileSource = {
         [0, 6], [1, 6], [2, 6],                                         // [4, 6], [5, 6], [6, 6],
     ],
 }
-
 
 
 
@@ -204,8 +206,8 @@ const jadeCityDarkEdges: TileSource = {
         '3x2': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true } },
         '4x2': { defaultLayer, solidMap: BITMAP_RIGHT_6, ledges: { right: true } },
         '0x3': { defaultLayer, solidMap: orBitMasks(BITMAP_BOTTOM_10, BITMAP_LEFT_6), ledges: { left: true, down: true } },
-        '1x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true } },
-        '2x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true } },
+        '1x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true } }, //if not approaching from the bottom, consider versions that use foreground2
+        '2x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true } }, //so PC can be covered by them.
         '3x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true } },
         '4x3': { defaultLayer, solidMap: orBitMasks(BITMAP_BOTTOM_10, BITMAP_RIGHT_6), ledges: { right: true, down: true } },
     }, tileCoordinates: [
@@ -278,4 +280,3 @@ export const allDarkJadeCityTileSources: TileSource[] = [
     jadeCityDarkStairs,
     jadeCityDarkColumnWall,
 ];
-
