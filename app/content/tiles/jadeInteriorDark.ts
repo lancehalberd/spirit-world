@@ -4,6 +4,12 @@ import {
     topLeftWall,
     bottomLeftWall,
     bottomRightWall,
+    ceilingBehavior,
+    bottomCeilingBehavior,
+    topLeftCeiling,
+    topRightCeiling,
+    bottomLeftCeiling,
+    bottomRightCeiling,
 } from 'app/content/tiles/constants';
 
 
@@ -75,22 +81,30 @@ const JadeInteriorDarkSquareFloor: TileSource = {
 }
 
 
-const JadeInteriorDarkFloor: TileSource = {
+const JadeInteriorDarkCeiling: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 0, y: 0, w: 112, h: 128}),
+    source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 0, y: 0, w: 112, h: 128}),
     behaviors: {
-        'all': {defaultLayer: 'floor2'}
+        'all': ceilingBehavior,
+        '3x0': bottomCeilingBehavior,
+        '1x1': bottomCeilingBehavior,
+        '2x2': bottomCeilingBehavior, '3x2': bottomCeilingBehavior, '4x2': bottomCeilingBehavior,
+        '0x3': bottomCeilingBehavior, '1x3': bottomCeilingBehavior, '3x3': bottomCeilingBehavior,
+        '0x4': topLeftCeiling, '4x4': topLeftCeiling, '1x7': topLeftCeiling,
+        '1x4': topRightCeiling, '5x4': topRightCeiling, '0x7': topRightCeiling,
+        '5x3': bottomLeftCeiling, '0x5': bottomLeftCeiling, '1x6': bottomLeftCeiling,
+        '4x3': bottomRightCeiling, '1x5': bottomRightCeiling, '0x6': bottomRightCeiling,
     }, tileCoordinates: [
-        [0, 0],                 [3, 0],
+        [0, 0],                 [3, 0], 
         [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], [5, 1], [6, 1],
         [0, 2],         [2, 2], [3, 2], [4, 2], [5, 2], [6, 2],
-        [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3],
-        [0, 4], [1, 4], [2, 4], [3, 4], [4, 4], [5, 4], [6, 4],
-        [0, 5], [1, 5],         [3, 5], [4, 5], [5, 5], [6, 5],
-        [0, 6], [1, 6],                 [4, 6], [5, 6],
+        [0, 3], [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], 
+        [0, 4], [1, 4], [2, 4],         [4, 4], [5, 4], //[3, 4], [6, 4],
+        [0, 5], [1, 5],       //[3, 5], [4, 5], [5, 5], [6, 5],
+        [0, 6], [1, 6],               //[4, 6], [5, 6], 
         [0, 7], [1, 7],
     ]
-}
+    }
 
 
 const JadeInteriorDarkColumn: TileSource = {
@@ -119,7 +133,7 @@ export const allJadeInteriorDarkTileSources: TileSource[] = [
     //JadeInteriorDarkRightCorner,
     JadeInteriorDarkLeftCorner,
     JadeInteriorDarkSquareFloor,
-    JadeInteriorDarkFloor,
+    JadeInteriorDarkCeiling,
     JadeInteriorDarkSquareWall,
     //JadeInteriorDarkSquareWallAlt,
     JadeInteriorDarkColumn

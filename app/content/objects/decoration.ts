@@ -775,7 +775,7 @@ const bigLightDome: DecorationType = {
         drawFrameContentAt(context, bigLightDomeFrame, decoration);
     },
     behaviors: {
-        solid: false,
+        solid: true,
     },
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(bigLightDomeFrame, decoration);

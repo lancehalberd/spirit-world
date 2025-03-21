@@ -1,9 +1,4 @@
 import {
-    BITMAP_LEFT_1,
-    BITMAP_RIGHT_1
-} from 'app/content/bitMasks';
-
-import {
     southernWallBehavior,
     topRightWall,
     topLeftWall,
@@ -49,7 +44,7 @@ const vanaraWalls: TileSource = {
         'all': southernWallBehavior,
         '3x8': bottomRightWall, '4x8': bottomLeftWall,
         '3x11': topLeftWall, '4x11': topRightWall,
-        '6x8': topRightWall, '7x8': topLeftWall,
+        '6x8': bottomRightWall, '7x8': bottomLeftWall,
     },
     tileCoordinates: [
         [1,8],      [3, 8],[4, 8],     [6,8],[7,8],
@@ -64,12 +59,6 @@ const vanaraStairs: TileSource = {
     source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
     behaviors: {
         'all': { defaultLayer: 'field' },
-        '1x17':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_1},
-        '1x18':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_1},
-        '1x19':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_1},
-        '3x17':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_1},
-        '3x18':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_1},
-        '3x19':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_1},
     },
     tileCoordinates: [
         [1, 16], [2, 16], [3, 16],
