@@ -1037,13 +1037,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             const zone = zones[zoneKey];
             // Pit entrances target markers, but other entrances target the same kind of entrnace,
             // for example teleporter => teleporter, doors => doors.
-            let targetType: ObjectType = object.type;
+            let targetTypes: ObjectType[] = [object.type];
             if (object.type === 'pitEntrance') {
-                targetType = 'marker';
-            } else if (object.type === 'staffTower') {
-                targetType = 'door';
+                targetTypes = ['marker'];
+            } else if (object.type === 'staffTower' || object.type === 'door') {
+                // Staff tower objects also function as doors.
+                targetTypes = ['door', 'staffTower'];
             }
-            const objectIds = zone ? getTargetObjectIdsByTypes(zone, [targetType]) : [];
+            const objectIds = zone ? getTargetObjectIdsByTypes(zone, targetTypes) : [];
             if (objectIds.length) {
                 if (objectIds.indexOf(object.targetObjectId) < 0) {
                     object.targetObjectId = objectIds[0];
@@ -1077,7 +1078,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     });
                 }
             } else {
-                rows.push(`No objects of type ${targetType}`);
+                rows.push(`No objects of types ${targetTypes}`);
             }
             // This intentionally continue on to the marker properties.
         case 'marker':
