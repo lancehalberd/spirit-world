@@ -64,7 +64,11 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
-
+import {allVanaraTileSources} from 'app/content/tiles/vanaraTree'
+import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
+import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
+import { allJadeInteriorLightTileSources } from './tiles/jadeInteriorLight';
+import { allJadeInteriorDarkTileSources } from './tiles/jadeInteriorDark';
 
 
 export const allTiles: FullTile[] = [null];
@@ -1199,6 +1203,11 @@ addTiles([
     caveLedgeCorners2,
     ...allCrystalSpikeTiles,
     ...allVanaraPitTileSources,
+    ...allVanaraTileSources,
+    ...allLightJadeCityTileSources,
+    ...allDarkJadeCityTileSources,
+    ...allJadeInteriorLightTileSources,
+    ...allJadeInteriorDarkTileSources
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
