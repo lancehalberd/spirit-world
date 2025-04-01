@@ -83,7 +83,7 @@ const JadeInteriorDarkSquareFloor: TileSource = {
 
 const JadeInteriorDarkCeiling: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 0, y: 0, w: 112, h: 128}),
+    source: requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 0, y: 0, w: 112, h: 128}),
     behaviors: {
         'all': ceilingBehavior,
         '3x0': bottomCeilingBehavior,

@@ -1,19 +1,41 @@
 import {
-    southernWallBehavior,
-    topRightWall,
-    topLeftWall,
-    bottomLeftWall,
-    bottomRightWall,
-    ceilingBehavior,
-    bottomCeilingBehavior,
-    topLeftCeiling,
-    topRightCeiling,
-    bottomLeftCeiling,
-    bottomRightCeiling,
+    baseCeilingBehavior,
 } from 'app/content/tiles/constants';
+
+import {
+    BITMAP_BOTTOM,
+    BITMAP_BOTTOM_LEFT,
+    BITMAP_TOP_LEFT,
+    BITMAP_TOP_RIGHT,
+    BITMAP_BOTTOM_RIGHT,
+    BITMAP_BOTTOM_LEFT_8,
+    BITMAP_BOTTOM_RIGHT_8,
+    BITMAP_TOP_LEFT_8_STRIP,
+    BITMAP_TOP_RIGHT_8_STRIP,
+} from 'app/content/bitMasks';
 
 
 import { requireFrame } from 'app/utils/packedImages';
+
+const southernWallBehavior: TileBehaviors = {
+    solid: true,
+    // Wall appear behind the player except over doorways.
+    defaultLayer: 'field',
+    isSouthernWall: true,
+    linkedOffset: 57,
+}
+const ceilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solid: true, linkedOffset: 57};
+const bottomCeilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM, linkedOffset: 57 };
+const bottomLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8, linkedOffset: 57 };
+const bottomRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8, linkedOffset: 57 };
+const topLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP, linkedOffset: 57 };
+const topRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP, linkedOffset: 57 };
+
+const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false, linkedOffset: 57 };
+const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false, linkedOffset: 57 };
+const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, isSouthernWall: true, isGround: false, linkedOffset: 57 };
+const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, isSouthernWall: true, isGround: false, linkedOffset: 57 };
+
 
 
 const JadeInteriorLightLeftCorner: TileSource = {
@@ -66,7 +88,7 @@ const JadeInteriorLightSquareFloor: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 208, y: 80, w: 32, h: 32}),
     behaviors: {
-        'all': {defaultLayer: 'floor'}
+        'all': {defaultLayer: 'floor', linkedOffset: 57}
     }
 }
 

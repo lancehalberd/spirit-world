@@ -166,13 +166,14 @@ const jadeCityDarkTowers: TileSource = {
         '6x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_CORN_6 },
         '6x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10 },
         '6x6': topLeftWall,
+        '7x0': { defaultLayer: 'field', solid: false, isSouthernWall: false },
         '7x1': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6 },
         '7x2': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6 },
         '7x3': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6 },
         '7x4': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6 },
         '7x5': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6_CUT }
     }, tileCoordinates: [
-                                [3, 0], [4, 0],         [6, 0],         // [5, 0],
+                                [3, 0], [4, 0],         [6, 0], [7, 0], // [5, 0],
         [0, 1], [1, 1], [2, 1], [3, 1], [4, 1],         [6, 1], [7, 1],
         [0, 2],         [2, 2], [3, 2], [4, 2],         [6, 2], [7, 2], //
         [0, 3], [1, 3], [2, 3], [3, 3],                         [7, 3], // [4, 3], [5, 3], [6, 3],
