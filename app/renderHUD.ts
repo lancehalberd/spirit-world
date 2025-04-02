@@ -269,6 +269,23 @@ export function renderEditorHUD(context: CanvasRenderingContext2D, state: GameSt
             }
         )
     }
+    const rightLayer = Object.keys(editingState.brush ?? {}).find(
+        key => editingState.brush?.[key]?.tiles?.[0]?.[0] !== 0  && editingState.brush?.[key]?.tiles?.[0]?.[0] !== undefined 
+    );
+    
+    if (rightLayer) {
+        drawText(
+            context,
+            String(editingState.brush?.[rightLayer]?.tiles?.[0]?.[0] ?? 0), 
+            10,
+            CANVAS_HEIGHT - 2,
+            {
+                textBaseline: 'bottom',
+                textAlign: 'left',
+                size: 16,
+            }
+        );
+    }
 }
 
 const skullFrame = requireFrame('gfx/hud/bossBar.png', {x: 2, y: 93, w: 30, h: 19});
