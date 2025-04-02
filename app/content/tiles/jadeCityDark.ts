@@ -87,7 +87,7 @@ const jadeCityDarkWalls: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 160, w: 48, h: 48}),
     //change width to 112 and uncomment tileCoordinates to get alternate tiles
     behaviors: {
-        'all': {solid: true, defaultLayer: 'field', isSouthernWall: true, linkedOffset: -159},
+        'all': {...southernWallBehavior, linkedOffset: -159},
     }, tileCoordinates: [
         [0, 0], [1, 0], [2, 0],         //[4, 0], [5, 0], [6, 0],
         [0, 1], [1, 1], [2, 1],         //[4, 1], [5, 1], [6, 1],
