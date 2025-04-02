@@ -25,6 +25,7 @@ const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP
 const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false, linkedOffset: 159};
 
 import { requireFrame } from 'app/utils/packedImages';
+import { southernWallBehavior } from './constants';
 
 
 const jadeCityFloor: TileSource = {
@@ -43,7 +44,7 @@ const jadeCityLightRailings: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 144, y: 160, w: 112, h: 16}),
     behaviors: {
-        'all': {solid: true, defaultLayer: 'field', isSouthernWall: true, linkedOffset: 159},
+        'all': {...southernWallBehavior, linkedOffset: 159},
         '0x0':{ defaultLayer: 'field', solidMap: BITMAP_BOTTOM_13, linkedOffset: 159},
         '1x0':{ defaultLayer: 'field2', solidMap: BITMAP_VERT_MIDDLE_6, linkedOffset: 159},
         '2x0':{ defaultLayer: 'field', solidMap: BITMAP_VERT_MIDDLE_6, linkedOffset: 159}
@@ -89,7 +90,7 @@ const jadeCityLightSlopedWalls: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 112, w: 128, h: 112}),
     behaviors: {
-        'all': {solid: true, defaultLayer: 'field', isSouthernWall: true, linkedOffset: 159},
+        'all': {...southernWallBehavior, linkedOffset: 159},
         '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
         '0x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '0x4': topRightWall,
@@ -127,7 +128,7 @@ const jadeCityLightTowers: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 0, w: 128, h: 112}),
     behaviors: {
-        'all': {solid: true, defaultLayer: 'field', isSouthernWall: true, linkedOffset: 159},
+        'all': {...southernWallBehavior, linkedOffset: 159},
         '0x1': { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_LEFT_LEDGE, linkedOffset: 159 },
         '0x2': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159 },
         '0x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
@@ -178,7 +179,7 @@ const jadeCityLightEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 32, w: 80, h: 64}),
     behaviors: {
-        'all': { defaultLayer: 'field', linkedOffset: 159 },
+        'all': { defaultLayer, linkedOffset: 159 },
         '0x0': { defaultLayer, solidMap: BITMAP_LEFT_6, ledges: {left: true}, linkedOffset: 159},
         '1x0': { defaultLayer, solidMap: BITMAP_LEFT_6, ledges: {left: true}, linkedOffset: 159},
         '3x0': { defaultLayer, solidMap: BITMAP_RIGHT_6, ledges: {left: true}, linkedOffset: 159},
@@ -210,10 +211,10 @@ const jadeCityLightExtraEdges: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 144, w: 48, h: 16}),
     behaviors: {
         'all': {linkedOffset: 159},
-        '0x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_3, linkedOffset: 159 },
-        '1x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
-        '3x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
-        '4x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_3, linkedOffset: 159  },
+        '0x0': { defaultLayer, solidMap: BITMAP_TOP_3, linkedOffset: 159 },
+        '1x0': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
+        '3x0': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
+        '4x0': { defaultLayer, solidMap: BITMAP_TOP_3, linkedOffset: 159  },
     }, tileCoordinates: [[0,0], [1,0],     [3,0], [4,0]]
 }
 
@@ -221,15 +222,15 @@ const jadeCityLightStairs: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 192, y: 64, w: 64, h: 96}),
     behaviors: {
-        'all' : {defaultLayer: 'field', linkedOffset: 159},
-        '0x0':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '0x1':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '0x3':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '0x4':{ defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '3x0':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159},
-        '3x1':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159},
-        '3x3':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159},
-        '3x4':{ defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159},
+        'all' : {defaultLayer, linkedOffset: 159},
+        '0x0':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
+        '0x1':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
+        '0x3':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
+        '0x4':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
+        '3x0':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
+        '3x1':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
+        '3x3':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
+        '3x4':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
     }, tileCoordinates: [
         [0, 0],                 [3, 0],
         [0, 1],                 [3, 1],
@@ -244,7 +245,7 @@ const jadeCityLightColumnWall: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 96, w: 80, h: 48}),
     behaviors: {
-        'all': {solid: true, defaultLayer: 'field', isSouthernWall: true, linkedOffset: 159}
+        'all': {solid: true, defaultLayer, isSouthernWall: true, linkedOffset: 159}
     }, tileCoordinates: [
         [0, 0], [1, 0],          [4, 0], 
         [0, 1], [1, 1],          [4, 1], 
