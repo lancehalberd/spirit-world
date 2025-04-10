@@ -26,36 +26,116 @@ Bugs:
             - Possibly fixed by other changes.
 
 Graphics Work:
-    High Priority Graphics:
-        Summoner Statues for War Temple Boss
-            The boss is now going to be statues of the former champions who were the summoners for the spirit beasts in the past.
-        Large Statues for Frost Beasts
+    Categories of types of graphics work:
+        NPCs: still frames, walking animations, flourish animations, gestures, idle animations
+        Enemies: idle, move, attack, damage, death animations
+        Bosses
+        Tilesets
+        Objects: Doors, decorations, interactive puzzles elements
+        Effects: enemy attacks, projectiles, environmental effect
+        HUD elements: item icons, panels, frames
+        Cutscenes: design direction for cutscenes and bespoke elements for cutscenes
+    Phases of graphics work:
+        Concept design: details of the asset or even which assets are needed are still being decided.
+        Concept art: conceptual art/sketches used to determine the final design.
+        Working draft: create a draft at resolution with animations that can functionally be used in the game.
+        Revision: improve an existing draft to match style/perspective/quality of the game better
+        Extend: add additional frames/tiles to an existing draft to cover more behaviors
 
+
+    High Priority Graphics:
         Dirt particles for breaking cracked dirt tiles.
 
+    Special:
+        Concept art of Rival - is both an NPC + boss
+        Concept art of Jade Champion - is both an NPC and ally in boss fights
+            - May be a playable character at some point
 
-    Create icons for new items:
-        Magic Beans
-        Consumables
+    Cutscenes:
+        Concept design for the release of the elemental beasts and the attack on the Holy City
+        Growth of the World Tree
+
+    NPCs:
+        Concept art of Vanara Elder
+        Concept art of Vanara Guardian
+        Concept art of Vanara Captain
+        Concept art of Spirit Tree manifestation(s), how the Spirit Tree presents itself to the main character
+        Concept art for denizens of the Holy City + Grand Temple
+        Concept art + design for the Vanara researchers at the Fertility Temple
+        Concept art + design for the rest of the Vanara Crew
+        Concept art + design of native spirit gods+demons
+            Spirit King or Queen
+            War God
+            Fertility God
+            Fertility Temple Lead Researcher
+            Forge master
+            Concepts for additional major gods and demons
+        Concept design of native spirit beings
+            Forge workers
+            Fertility Temple Researchers
+            War God Alcolytes (may double as an enemy)
+        Concept design for additional NPCs
+
+    Enemies:
+        Revision of Flame Vortex
+        Revision of squirrel and elemental variants
+        Concept art of Sentry Bot
+        Concept art for humanoid praying mantis soldiers
+        Concept designs for additional World Tree enemies
+        Concept design for "amphibious" lava enemy that can move on land or swim in lava.
+        Concept designs for additional aquatic enemies for Lake Temple and underwater areas.
+        Concept designs for additional Forge enemies
+        Concept designs for additional Material world enemies
+        Concept designs for additional Spirit world enemies
+        Concept designs for additional Hybrid enemies
+
+    Bosses:
+        Revision of Flame Beast
+        Concept art for Phoenix Boss in the Holy Sanctum
+        Concept art or Working draft of Frost Beast
+        Concept art for Third Rival fight: large astral projection that fights alongside the final elemental beast
+        Concept art Fourth Rival fight with elemental variations based on the final elemental beast defeated
+        Concept design for final boss(es)
+        Concept design of Crater Miniboss - currently a heat absorbing spirit that can freeze the player
+            Maybe an amalgamation of smaller spirits that join togeter in a single large colony.
+            The player has to do something to break it up into its constituent parts and defeat them before they join together again.
+            Should be vulnerable to Ice.
+        Concept design for Sky Palace Boss
+        Concept design for Forge Boss possibly some kind of robot/golem/simulacrum
+        Concept design for Fertility Temple Boss
+
+    Tilesets:
+        Concept art of World Tree(Modified fully grown Spirit Tree)
+            This would be used both for drawing the exterior in the lab and overworld and for exterior sections of the final dungeon itself.
+        Concept art of Modified Vanara interior tiles for the World Tree
+        Concept art of Researh Lab tileset for the Fertility Temple and Underground Lab dungeons
+        Concept art of Vanara dreamworld tileset
+
+    Objects:
+        Revision of Vanara statis pods
+        Revision of floating ice spikes
+        Concept art of Daughter Tree (miniature Spirit Tree)
+            Peach cave version with shriveling animation as it grows the Peach of Immortality.
+        Concept art of Helix exterior(partially grown Spirit Tree) in the Spirit World lake
+        Concept art of Helix exterior pinnacle in the sky
+        Concept art for the structure around the main Spirit Portal (material+spirit world variants)
+        Concept art for original Jade Champion Statue in the Holy City
+
+    Effects:
+        Revision of frost grenades
+
+
+    HUD:
+        Magic Beans icon
+        Icons for consumabls:
             Peach Potion
             Spirit Tonic
             Spirit Elixer
-
-        Human Champion items:
+        Jade Champion items:
             Elemental/Magic boots (apply equipped element to the ground while walking)
             Flippers (allow diving and staying submerged by holding the passive tool button) (can be used as long as iron boots are not equipped)
 
-    Large objects/structures
-        World tree exterior B2, B1, ground and sky, possibly vertical exterior
 
-    Boss graphics:
-
-    Open ended tasks
-        New tile sets
-            Vanara Ship(Cocoon, Helix + World Tree Variants) Material+Spirit
-            Research Lab(Fertility Temple + Underground Lab)
-            Smooth crystal walls(Sky Palace)
-                +Green variant(Sky City+Jade Palace)
 
 Graphics to Implement:
     Add PS controller icons, detect xbox vs ps controller

@@ -1435,7 +1435,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "warTemple:0:1x1-door-3", x: 0, y: 96, type: "door", style: "stone", d: "left", linked: true},
         {status: "normal", id: "", x: 105, y: 408, type: "decoration", w: 16, h: 80, decorationType: "fireBeastStatue", drawPriority: "sprites", z: 20},
         {status: "normal", id: "", x: 80, y: 383, type: "decoration", w: 16, h: 16, decorationType: "pedestal", drawPriority: "sprites", linked: false, z: -1},
-        {status: "normal", id: "", x: 356, y: 352, type: "decoration", w: 16, h: 80, decorationType: "iceBeastStatue", drawPriority: "sprites"},
+        {status: "normal", id: "", x: 344, y: 400, type: "decoration", w: 16, h: 80, decorationType: "iceBeastStatue", drawPriority: "sprites", z: 20},
         {status: "normal", id: "", x: 229, y: 168, type: "decoration", w: 16, h: 16, decorationType: "lightningBeastStatue", drawPriority: "sprites", z: 30},
         {status: "normal", id: "", x: 208, y: 142, type: "decoration", w: 16, h: 16, decorationType: "pedestal", drawPriority: "sprites", linked: false, z: -1},
         {status: "normal", id: "", x: 336, y: 383, type: "decoration", w: 16, h: 16, decorationType: "pedestal", drawPriority: "sprites", linked: false, z: -1},

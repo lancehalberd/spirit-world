@@ -59,10 +59,6 @@ export class Decoration implements ObjectInstance {
     }
 }
 
-const [
-    iceBeastStatueImage,
-] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 1}).frames;
-
 const entranceLightFrame = requireFrame('gfx/objects/cavelight.png', {x: 0, y: 0, w: 64, h: 32});
 const orbTreeFrame = requireFrame('gfx/objects/orbTree.png', {x: 0, y: 0, w: 26, h: 36, content: {x: 5, y: 19, w: 17, h: 12}});
 const tubeFrontFrame = requireFrame('gfx/objects/labObjects.png', {x: 0, y: 59, w: 32, h: 53});
@@ -78,9 +74,9 @@ const glowingPedestalAnimation = createAnimation('gfx/decorations/largeStatuePed
     frameMap: [0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 1],
 });
 
-const stormBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
-
 const flameBeastStatueFrame = requireFrame('gfx/decorations/flameBeastStatue.png', {x: 0, y: 0, w: 95, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
+const frostBeastStatueFrame = requireFrame('gfx/decorations/frostBeastStatue.png', {x: 0, y: 0, w: 115, h: 98, content: {x: 16, y: 58, w: 88, h: 32}});
+const stormBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
@@ -863,8 +859,15 @@ export const decorationTypes = {
     } as DecorationType,
     iceBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            drawFrameContentAt(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
-        }
+            drawFrameContentAt(context, frostBeastStatueFrame, decoration);
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
+            return getFrameHitbox(frostBeastStatueFrame, decoration);
+        },
     } as DecorationType,
     entranceLight: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {

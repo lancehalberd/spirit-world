@@ -9,6 +9,18 @@ Helix/World Tree
 - The main trunk is often constructed into a gauntlet of trials to test Vanara who want to crew ships to other planets.
 - The tree can pull out of the material world to hide itself, similar to Vanara invisibility.
 
+They are made of a pale hard material like bone or shell and grow towards the light like trees with branches and canopies. Imagine a coral reef that has evolved into a single organism.
+
+The mature trees grow large enough to extend beyond the planet's atmosphere, like organic space elevators. They produce pods in low gravity that they then disperse across space in the Spirit World to populate other planets and solar systems.
+The trees themselves house the mind of the Vanara Tree Spirits and the capacity of the spirit increases with the size and number of the spirit trees.
+
+In the game I want to depict three versions of the tree:
+Smaller versions that are about the size of other trees in the game, a little bigger than 64x64 in the game's resolution. These are special "daughter" trees that the Vanara have created in order to expand the power of the Tree Spirit without completely taking over the planet's ecology.
+
+A medium size version which would probably be rendered as a single large object on the overworld similar to how the Staff Tower is drawn. This would probably be ~128px wide "trunk" that extends up into the sky and represents a half grown Spirit Tree that stopped in the middle of its growth to prevent damaging the planet.
+
+Then there would be a large version which will probably require its own exterior tile set to render the outside of in game and it will probably be  between 196-256px wide trunk but also have special lower resolution artwork to display it from far away on the map or in cutscenes. This one is large and extends out of the atmosphere so mostly the player will just see small parts of it at once.
+
 
 Native Life
 Spirit World
