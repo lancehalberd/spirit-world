@@ -1,10 +1,11 @@
 import { allLootTypes, GAME_KEY } from 'app/gameConstants';
 import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 
-export function hideHUD(state: GameState) {
+export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
     // hide HUD to show that player isn't controllable
     appendCallback(state, (state: GameState) => {
         state.hideHUD = true;
+        state.scriptEvents.onSkipCutscene = onSkipCutscene;
     });
 }
 

@@ -1,16 +1,16 @@
-import { getLootFrame } from 'app/content/loot';
-import { editingState } from 'app/development/editingState';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType } from 'app/gameConstants';
-import { getCheckInfo } from 'app/randomizer/checks';
-//import { renderTextRow } from 'app/render/renderMessage';
-import { renderSpiritBar } from 'app/render/spiritBar';
-import { shouldHideMenu } from 'app/state';
-import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
-import { requireFrame } from 'app/utils/packedImages';
-import { drawText } from 'app/utils/simpleWhiteFont';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
-import { KEY, isKeyboardKeyDown } from 'app/userInput';
+import {getLootFrame} from 'app/content/loot';
+import {editingState} from 'app/development/editingState';
+import {CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType} from 'app/gameConstants';
+import {getCheckInfo} from 'app/randomizer/checks';
+//import {renderTextRow} from 'app/render/renderMessage';
+import {renderSpiritBar} from 'app/render/spiritBar';
+import {shouldHideMenu} from 'app/state';
+import {createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt} from 'app/utils/animations';
+import {requireFrame} from 'app/utils/packedImages';
+import {drawOutlinedText, drawText} from 'app/utils/simpleWhiteFont';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
+import {KEY, isKeyboardKeyDown} from 'app/userInput';
 
 const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
@@ -39,6 +39,22 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     if (editingState.isEditing) {
         renderEditorHUD(context, state);
         return;
+    }
+    if (state.hideHUD && state.scriptEvents.skipTime > state.time - 2000) {
+        // RENDER SKIP? in bottom right
+        context.save();
+            const t = state.time - state.scriptEvents.skipTime;
+            context.globalAlpha *= Math.max(0, Math.min(1, t / 100, (2000 - t) / 100));
+            drawOutlinedText(context, 'SKIP?',
+                CANVAS_WIDTH - 2,
+                CANVAS_HEIGHT - 2,
+                {
+                    textBaseline: 'bottom',
+                    textAlign: 'right' ,
+                    size: 16,
+                },
+            );
+        context.restore();
     }
     if (state.hudOpacity <= 0) {
         return;

@@ -11,6 +11,10 @@ dialogueHash.jadeChampion = {
     key: 'jadeChampion',
     mappedOptions: {
         firstConversation: (state: GameState) => {
+            // hide HUD to show that player isn't controllable
+            hideHUD(state, (state: GameState) => {
+                removeObjectFromArea(state, jadeChampion);
+            });
             // add Jade Champion to the screen
             const jadeChampion = createObjectInstance(state, {
                 id: 'jadeChampion',
@@ -27,8 +31,6 @@ dialogueHash.jadeChampion = {
             appendCallback(state, (state: GameState) => {
                 addObjectToArea(state, state.hero.area, jadeChampion);
             });
-            // hide HUD to show that player isn't controllable
-            hideHUD(state);
             // Move the player to a good x,y position before talking to the Jade Champion.
             // target coordinates: { x: 134, y: 446 }
             // FIX, TODO: camera movement is jerky

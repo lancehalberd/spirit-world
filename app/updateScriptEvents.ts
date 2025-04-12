@@ -10,6 +10,18 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { clearObjectFlag, setObjectFlag } from 'app/utils/objectFlags';
 import { saveGame } from 'app/utils/saveGame';
 
+
+export function skipCutscene(state: GameState) {
+    state.scriptEvents.queue = [];
+    state.scriptEvents.activeEvents = [];
+    delete state.scriptEvents.overrideMusic;
+    state.hideHUD = false;
+    delete state.hero.action;
+    state.messagePage = null;
+    state.scriptEvents.onSkipCutscene?.(state);
+    delete state.scriptEvents.onSkipCutscene;
+}
+
 export function updateScriptEvents(state: GameState): void {
     state.scriptEvents.blockEventQueue = false;
     state.scriptEvents.blockFieldUpdates = false;
@@ -18,6 +30,13 @@ export function updateScriptEvents(state: GameState): void {
     state.scriptEvents.handledInput = false;
     const activeEvents: ActiveScriptEvent[] = [];
     let activeEventCountSinceLastWaitEvent = 0;
+    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.scriptEvents.onSkipCutscene) {
+        if ((state.scriptEvents.skipTime ?? 0) + 2000 > state.time) {
+            skipCutscene(state);
+        } else {
+            state.scriptEvents.skipTime = state.time;
+        }
+    }
     for (const event of state.scriptEvents.activeEvents) {
         switch (event.type) {
             case 'update': {

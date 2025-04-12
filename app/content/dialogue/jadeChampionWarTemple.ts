@@ -48,6 +48,20 @@ dialogueHash.jadeChampionWarTemple = {
     key: 'jadeChampionWarTemple',
     mappedOptions: {
         warTempleEncounter: (state: GameState) => {
+            if (state.savedState.objectFlags.jadeChampionWarTemple) {
+                return '';
+            }
+            // hide HUD to show that player isn't controllable
+            hideHUD(state, (state: GameState) => {
+                enterZoneByTarget(state, 'overworld', 'holyCityCentralGateMarker', {
+                    callback: (state) => {
+                        if (state.hero.renderParent) {
+                            delete state.hero.renderParent;
+                        }
+                        appendScript(state, '{flag:jadeChampionWarTemple}');
+                    },
+                });
+            });
             appendScript(state, '{playTrack:village}{wait:100');
             // add Jade Champion to the screen
             const jadeChampion = createObjectInstance(state, {
@@ -65,8 +79,6 @@ dialogueHash.jadeChampionWarTemple = {
             appendCallback(state, (state: GameState) => {
                 addObjectToArea(state, state.hero.area, jadeChampion);
             });
-            // hide HUD to show that player isn't controllable
-            hideHUD(state);
             runPlayerBlockingCallback(state, (state: GameState) => {
                 jadeChampion.speed = 1;
                 jadeChampion.animationTime += FRAME_LENGTH;
@@ -355,6 +367,7 @@ dialogueHash.jadeChampionWarTemple = {
                 removeObjectFromArea(state, jadeChampion);
             });
             appendScript(state, '{wait:300}{stopTrack}');
+            appendScript(state, '{flag:jadeChampionWarTemple}');
             // show HUD to tell player that control of their character has returned
             showHUD(state);
             // remove jadeChampion object

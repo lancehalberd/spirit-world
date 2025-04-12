@@ -149,20 +149,26 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Test new Jade graphics.
-        - Diagonal exterior
-        - All interior
-        - New windows
+    - Add 8x8 ice tiles
+        - gfx/tiles/tinyIceTiles.png is 16x4 8x8 tiles
+            top to bottom is TL/TR/BL/BR corners within a given tile
+            left to right is a bitmask, 1 bit is TL, 2 bit is TR, 4 bit is BL, 8 bit is BR. So 0 is all off(no ice) and 15 is all on(all ice).
+        - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
+            - Each set should be 14 tiles for hex values 1-14 corresponding to 4 bit number [TL,TR,BL,BR]
+            - Generate complete set of composite 14 8x8 ice tiles by combining the inner+edge masks with patterns for each tile.
+            - Generate behavior masks from the inner mask data to use for behaviors.
+        - When a tile is frozen, update behavior and graphics for it and all surround tiles
+            - For 16 8x8 tiles in a 4x4 pattern centered around the current tile set the
 
-    - Test new cocoon tiles
-        - Add doors
+    - Add animated frames for archeologist
+    - Add still frames for new NPCs: blacksmith 1+ 2, merchant,
+
+    - Apply Cocoon tiles in Cocoon.
 
     - Add exit cutscene for Jade Champion during Storm Beast.
 
     - Add new city tiles.
-        - Map light -> dark and dark -> light.
-        - Create doors.
-        - Create dome objects.
+        - Fix dome object hit boxes.
         - Create window objects.
 
     - Add function for generating a full size image of an area or area section.
@@ -207,14 +213,6 @@ Current tasks:
           a display child of the bed and renders them below the sheets.
 
     - Bug: Astral projection can pull linked pots on top of the hero.
-
-    - Add 8x8 ice tiles
-        - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
-            - Each set should be 14 tiles for hex values 1-14 corresponding to 4 bit number [TL,TR,BL,BR]
-            - Generate complete set of composite 14 8x8 ice tiles by combining the inner+edge masks with patterns for each tile.
-            - Generate behavior masks from the inner mask data to use for behaviors.
-        - When a tile is frozen, update behavior and graphics for it and all surround tiles
-            - For 16 8x8 tiles in a 4x4 pattern centered around the current tile set the
 
     - Brainstorm additional dialogue for characters:
         - After the beasts escape/after the beasts are defeated.

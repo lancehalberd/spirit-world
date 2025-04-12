@@ -32,7 +32,18 @@ dialogueHash.jadeChampionStaffTower = {
         },
         top(state: GameState) {
             // hide HUD to show that player isn't controllable
-            hideHUD(state);
+            hideHUD(state, (state: GameState) => {
+                removeObjectFromArea(state, jadeChampion);
+                // Destroy the rocks that the Jade Champion removes during the cutscene.
+                hitTargets(state, state.hero.area.alternateArea, {
+                    hitCircle: {x: 472, y: 276, r: 16},
+                    hitTiles: true,
+                    crushingPower: 2,
+                    source: jadeChampion,
+                });
+                state.savedState.objectFlags.jadeChampionStaffTowerTop = true;
+                saveGame(state);
+            });
             // Find the Jade Champion NPC object.
             const jadeChampion = findObjectInstanceById(state.hero.area, 'jadeChampion') as NPC;
             jadeChampion.speed = 1.75;

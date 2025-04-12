@@ -128,6 +128,11 @@ interface GameState {
         handledInput: boolean
         overrideMusic?: TrackKey
         queue: ScriptEvent[]
+        // This is the last time the player pressed the MENU button
+        // during a cutscene. If they press it twice within 2 seconds
+        // they will skip the cutscene.
+        skipTime?: number
+        onSkipCutscene?: (state: GameState) => void
     }
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean

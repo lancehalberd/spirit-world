@@ -1,6 +1,6 @@
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { GAME_KEY } from 'app/gameConstants';
-import { createAnimation } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { requireFrame } from 'app/utils/packedImages';
 
 
@@ -22,6 +22,38 @@ const baseWidth = 8;
 for (let i = 1; i < simpleFontString.length; i++) {
     characterMap[simpleFontString[i]] = requireFrame(fontSource, {x: baseWidth * i, y: 0, w: baseWidth, h: baseHeight});
 }
+
+export const blackCharacterMap: {[key: string]: Frame} = {};
+export const outlinedCharacterMap: {[key: string]: Frame} = {};
+
+const [blackCanvas, blackContext] = createCanvasAndContext(baseWidth * simpleFontString.length, baseHeight);
+const [outlinedCanvas, outlinedContext] = createCanvasAndContext((baseWidth + 2) * simpleFontString.length, baseHeight + 2);
+requireFrame(fontSource, undefined, frame => {
+    // Make a copy of simpleWhiteFont that is solid black.
+    blackContext.save();
+        blackContext.fillStyle = '#000';
+        blackContext.fillRect(0, 0, frame.w, frame.h);
+        blackContext.globalCompositeOperation = 'destination-in';
+        drawFrame(blackContext, frame, {x: 0, y: 0, w: frame.w, h: frame.h});
+    blackContext.restore();
+    for (let i = 1; i < simpleFontString.length; i++) {
+        const character = simpleFontString[i];
+        const blackFrame: Frame = {image: blackCanvas, x: baseWidth * i, y: 0, w: baseWidth, h: baseHeight};
+        blackCharacterMap[character] = blackFrame;
+        const whiteFrame = characterMap[character];
+        // Left
+        drawFrame(outlinedContext, blackFrame, {...blackFrame, x: (baseWidth + 2) * i, y: 1});
+        // Right
+        drawFrame(outlinedContext, blackFrame, {...blackFrame, x: (baseWidth + 2) * i + 2, y: 1});
+        // Top
+        drawFrame(outlinedContext, blackFrame, {...blackFrame, x: (baseWidth + 2) * i + 1, y: 0});
+        // Bottom
+        drawFrame(outlinedContext, blackFrame, {...blackFrame, x: (baseWidth + 2) * i + 1, y: 2});
+        // Middle
+        drawFrame(outlinedContext, whiteFrame, {...whiteFrame, x: (baseWidth + 2) * i + 1, y: 1});
+        outlinedCharacterMap[character] = {image: outlinedCanvas, x: (baseWidth + 2) * i, y: 0, w: baseWidth + 2, h: baseHeight + 2};
+    }
+});
 
 const [
     xbox_y, xbox_b, xbox_a, xbox_x,
@@ -163,7 +195,6 @@ export function drawText(context: CanvasRenderingContext2D, text: string, x: num
     if (textAlign === 'center') x = Math.round(x - textWidth / 2);
     else if (textAlign === 'right') x = Math.round(x - textWidth);
 
-
     for (const c of text) {
         const frame = characterMap[c];
         if (frame) {
@@ -174,6 +205,39 @@ export function drawText(context: CanvasRenderingContext2D, text: string, x: num
             x += frame.w * scale;
         } else {
             x += baseWidth * scale;
+        }
+    }
+    return textWidth;
+}
+
+export function drawOutlinedText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
+    {maxWidth = 100, textAlign = 'left', textBaseline = 'bottom', size = baseHeight}: Partial<TextOptions>
+) {
+    const letterWidth = baseWidth + 2;
+    text = `${text}`;
+    x = x | 0;
+    y = y | 0;
+    size = Math.round(size / baseHeight) * baseHeight;
+
+    const scale = size / baseHeight;
+    let textWidth = text.length * letterWidth;
+
+    if (textBaseline === 'middle') y = Math.round(y - baseHeight * scale / 2);
+    else if (textBaseline === 'bottom') y = Math.round(y - baseHeight * scale);
+
+    if (textAlign === 'center') x = Math.round(x - textWidth / 2);
+    else if (textAlign === 'right') x = Math.round(x - textWidth);
+
+    for (const c of text) {
+        const frame = outlinedCharacterMap[c];
+        if (frame) {
+            context.drawImage(frame.image,
+                frame.x, frame.y, frame.w, frame.h,
+                x, y, frame.w * scale, frame.h * scale,
+            );
+            x += frame.w * scale;
+        } else {
+            x += letterWidth * scale;
         }
     }
     return textWidth;
