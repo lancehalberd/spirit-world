@@ -54,7 +54,8 @@ const stoneCeilingTopAngles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
-        'all': {defaultLayer: 'foreground2'},
+        '9x2': {defaultLayer: 'foreground2', solidMap: BITMAP_BOTTOM_LEFT},
+        '10x2': {defaultLayer: 'foreground2', solidMap: BITMAP_BOTTOM_RIGHT},
     },
     tileCoordinates: [
         [ 9, 2],[10, 2],
@@ -66,8 +67,8 @@ const stoneWalls: TileSource = {
     source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
-        '12x3': topRightWall, '13x3': topRightWall,
-        '14x3': topLeftWall, '15x3': topLeftWall,
+        '13x3': topRightWall,
+        '14x3': topLeftWall,
     },
     tileCoordinates: [
     [ 7, 0],[ 8, 0],[ 9, 0],[10, 0],[11, 0],

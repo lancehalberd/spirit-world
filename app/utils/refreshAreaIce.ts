@@ -49,7 +49,8 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
                     //foundFrozenTile = true;
                 }
                 // TODO: treat the mask as another layer and apply the ice rendering to the mask layer when selected.
-                // The ice should be drawn first then the mask frame
+                // The ice should be drawn first then the mask frame.
+                // The goal is for NE/NW mask tiles that include ledges render ice underneath
                 const behaviors = {
                     ...layer.tiles[ty][tx]?.behaviors,
                     ...layer.maskTiles?.[ty]?.[tx]?.behaviors,

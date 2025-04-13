@@ -504,6 +504,16 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             if (area.tilesDrawn[target.y]?.[target.x]) {
                 area.tilesDrawn[target.y][target.x] = false;
             }
+            for (const [x, y] of [
+                [target.x - 1, target.y - 1], [target.x, target.y - 1], [target.x + 1, target.y - 1],
+                [target.x - 1, target.y], [target.x + 1, target.y],
+                [target.x - 1, target.y + 1], [target.x, target.y + 1], [target.x + 1, target.y + 1],
+            ]) {
+                // Any nearby tiles that are also frozen may also need to be redrawn with new ice graphics.
+                if (area.behaviorGrid?.[y]?.[x]?.isFrozen && area.tilesDrawn[y]?.[x]) {
+                    area.tilesDrawn[y][x] = false;
+                }
+            }
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
         } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
@@ -576,15 +586,15 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 };
                 if (area.tilesDrawn[target.y]?.[target.x]) {
                     area.tilesDrawn[target.y][target.x] = false;
-                    for (const [x, y] of [
-                        [target.x - 1, target.y - 1], [target.x, target.y - 1], [target.x + 1, target.y - 1],
-                        [target.x - 1, target.y], [target.x + 1, target.y],
-                        [target.x - 1, target.y + 1], [target.x, target.y + 1], [target.x + 1, target.y + 1],
-                    ]) {
-                        // Any nearby tiles that are also frozen may also need to be redrawn with new ice graphics.
-                        if (area.behaviorGrid?.[y]?.[x]?.isFrozen && area.tilesDrawn[y]?.[x]) {
-                            area.tilesDrawn[y][x] = false;
-                        }
+                }
+                for (const [x, y] of [
+                    [target.x - 1, target.y - 1], [target.x, target.y - 1], [target.x + 1, target.y - 1],
+                    [target.x - 1, target.y], [target.x + 1, target.y],
+                    [target.x - 1, target.y + 1], [target.x, target.y + 1], [target.x + 1, target.y + 1],
+                ]) {
+                    // Any nearby tiles that are also frozen may also need to be redrawn with new ice graphics.
+                    if (area.behaviorGrid?.[y]?.[x]?.isFrozen && area.tilesDrawn[y]?.[x]) {
+                        area.tilesDrawn[y][x] = false;
                     }
                 }
                 // Indicate that ice edging needs to be added around newly frozen tiles.

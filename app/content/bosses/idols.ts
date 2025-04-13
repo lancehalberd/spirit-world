@@ -286,19 +286,16 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: 
     }
     if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
-            if (!enemy.params.pinchMode) {
-                if (enemy.modeTime === 400) {
+            if (enemy.currentAnimationKey === 'idle') {
+                const timeLimit = enemy.params.pinchMode ? 2000 : 1000;
+                if (enemy.modeTime < timeLimit && enemy.modeTime % 1000 < 500) {
                     enemy.changeToAnimation('attack', 'idle');
                 }
-            } else {
-                if (enemy.modeTime === 100 || enemy.modeTime === 1000) {
-                    enemy.changeToAnimation('attack', 'idle');
+                if (enemy.modeTime >= timeLimit) {
+                    enemy.changeToAnimation('sleep', 'still');
+                    enemy.shielded = true;
+                    enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
                 }
-            }
-            if (enemy.modeTime === 1700) {
-                enemy.changeToAnimation('sleep', 'still');
-                enemy.shielded = true;
-                enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
             }
             if (enemy.currentAnimationKey === 'still') {
                 enemy.setMode('shielded');
