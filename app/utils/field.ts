@@ -489,6 +489,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 const behaviors = layer.tiles?.[target.y]?.[target.x]?.behaviors;
                 const tileIndex = behaviors?.elementTiles?.[hit.element];
                 if (tileIndex !== undefined) {
+                    if (behaviors?.isFrozen) {
+                        area.needsIceRefresh = true;
+                    }
                     layer.tiles[target.y][target.x] = allTiles[tileIndex];
                 }
                 if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid || behaviors?.solidMap
@@ -548,7 +551,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 const underTile = topLayer.tiles[target.y][target.x];
                 // console.log('freezing tile', target.x, target.y, topLayer.key, underTile);
                 topLayer.tiles[target.y][target.x] = {
-                    ...allTiles[294],
+                    index: 294,
+                    frame: allTiles[1].frame,
                     behaviors: {
                         ...allTiles[294].behaviors,
                         // This is set to draw the underTile under the ice.
@@ -566,6 +570,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 if (area.tilesDrawn[target.y]?.[target.x]) {
                     area.tilesDrawn[target.y][target.x] = false;
                 }
+                // Indicate that ice edging needs to be added around newly frozen tiles.
+                area.needsIceRefresh = true;
                 area.checkToRedrawTiles = true;
                 resetTileBehavior(area, target);
                 // console.log('updated behavior', area.behaviorGrid?.[target.y]?.[target.x]);

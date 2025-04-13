@@ -955,7 +955,7 @@ export function renderForegroundObjects(
 
 function renderTileFrame(tile: FullTile, frameIndex: number, context: CanvasRenderingContext2D, target: Rect) {
     if (tile.behaviors?.render) {
-        tile.behaviors?.render(context, tile, target, frameIndex);
+        tile.behaviors.render(context, tile, target, frameIndex);
     } else if (tile.animation) {
         const frame = tile.animation.frames[frameIndex % tile.animation.frames.length];
         drawFrame(context, frame, target);

@@ -166,6 +166,8 @@ interface TileBehaviors {
     // Useful if the tile over the underTile is intended to be transparent like for ice.
     showUnderTile?: boolean
     shallowWater?: boolean
+    // Indicates the tile is frozen which causes it to have an ice overlay and slippery behavior.
+    isFrozen?: boolean
     slippery?: boolean
     // To be used if we add pixel precision to ice floors for ice attacks.
     slipperyMap?: Uint16Array
@@ -474,6 +476,7 @@ interface AreaInstance {
     // It is mainly used in waterfall tower, but is also used in the Ice portion of the Holy Sanctum.
     isCorrosive?: boolean
     needsLogicRefresh?: boolean
+    needsIceRefresh?: boolean
 }
 
 

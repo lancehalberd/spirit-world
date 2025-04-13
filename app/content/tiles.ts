@@ -388,7 +388,7 @@ const brightGrass: TileSource = {
 const iceTiles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
-    behaviors: {'all': {isGround: true, slippery: true, elementTiles: {fire: 0}}},
+    behaviors: {'all': {isGround: true, isFrozen: true, slippery: true, elementTiles: {fire: 0}}},
 };
 
 const railsTiles: TileSource = {

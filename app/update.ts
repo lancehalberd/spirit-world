@@ -29,6 +29,7 @@ import { updateField } from 'app/updateField';
 import { updateScriptEvents } from 'app/updateScriptEvents';
 import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
+import {refreshAreaIce} from 'app/utils/refreshAreaIce';
 import { updateSoundSettings } from 'app/utils/soundSettings';
 
 let isGameInitialized = false;
@@ -120,6 +121,11 @@ export function update() {
             refreshAreaLogic(state, state.areaInstance);
         } else if (state.alternateAreaInstance?.needsLogicRefresh) {
             refreshAreaLogic(state, state.alternateAreaInstance);
+        }
+        if (state.areaInstance?.needsIceRefresh) {
+            refreshAreaIce(state, state.areaInstance);
+        } else if (state.alternateAreaInstance?.needsIceRefresh) {
+            refreshAreaIce(state, state.alternateAreaInstance);
         }
         const hideMenu = shouldHideMenu(state);
         if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT))) {
