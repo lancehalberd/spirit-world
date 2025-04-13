@@ -324,3 +324,22 @@ export const archeologistAnimations: ActorAnimations = {
     },
     flourish: omniAnimation(createAnimation(archeologistImage, archeologistGeometry, {y: 0, cols: 7})),
 };
+
+// These NPCs currently only have south frames.
+const merchantImage: string = 'gfx/npcs/travelMerchant.png';
+const merchantGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const merchantAnimations: ActorAnimations = {
+    idle: omniAnimation(createAnimation(merchantImage, merchantGeometry, {y: 2})),
+};
+
+const blacksmithOneImage: string = 'gfx/npcs/blacksmithOne.png';
+const blacksmithOneGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const blacksmithOneAnimations: ActorAnimations = {
+    idle: omniAnimation(createAnimation(blacksmithOneImage, blacksmithOneGeometry, {y: 2})),
+};
+
+const blacksmithTwoImage: string = 'gfx/npcs/blacksmithTwo.png';
+const blacksmithTwoGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const blacksmithTwoAnimations: ActorAnimations = {
+    idle: omniAnimation(createAnimation(blacksmithTwoImage, blacksmithTwoGeometry, {y: 2})),
+};

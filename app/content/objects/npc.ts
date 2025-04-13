@@ -7,9 +7,12 @@ import {
 import { elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation } from 'app/content/enemies/elemental';
 import {
     archeologistAnimations,
+    blacksmithOneAnimations,
+    blacksmithTwoAnimations,
     crystalDragonAnimations,
     fatherAnimations,
     lightningBeastAnimations,
+    merchantAnimations,
     momAnimations,
     manAnimations,
     boyAnimations,
@@ -96,6 +99,21 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     },*/
     archeologist: {
         animations: archeologistAnimations,
+        shadowOffset: 2,
+        height: 26,
+    },
+    merchant: {
+        animations: merchantAnimations,
+        shadowOffset: 2,
+        height: 26,
+    },
+    blacksmithOne: {
+        animations: blacksmithOneAnimations,
+        shadowOffset: 2,
+        height: 26,
+    },
+    blacksmithTwo: {
+        animations: blacksmithTwoAnimations,
         shadowOffset: 2,
         height: 26,
     },

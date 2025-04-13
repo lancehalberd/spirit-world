@@ -149,9 +149,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Add animated frames for archeologist
-    - Add still frames for new NPCs: blacksmith 1+ 2, merchant,
-
     - Apply Cocoon tiles in Cocoon.
 
     - Add exit cutscene for Jade Champion during Storm Beast.
