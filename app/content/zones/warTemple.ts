@@ -2019,7 +2019,7 @@ const f0_0x2: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTempleChestEntrance", x: 224, y: 240, type: "door", style: "stone", targetZone: "overworld", targetObjectId: "warTempleChestEntrance", d: "down"},
         {status: "normal", id: "warTemple:0:0x2-gloves-0", x: 240, y: 96, type: "bigChest", lootType: "gloves", lootLevel: 1},
-        {status: "normal", id: "warTemple:0:0x2-npc-0", x: 224, y: 160, d: "up", behavior: "idle", style: "gal2", type: "npc", dialogue: "We've tried picking the lock and breaking it open,{|}\nbut nobody could open this chest!", dialogueKey: "npc"},
+        {status: "normal", id: "warTemple:0:0x2-npc-0", x: 224, y: 160, d: "up", behavior: "idle", style: "archeologist", type: "npc", dialogue: "We've tried picking the lock and breaking it open,{|}\nbut nobody could open this chest!", dialogueKey: "npc"},
         {status: "normal", id: "warTemple:0:0x2-empty-0", x: 80, y: 80, type: "chest", lootType: "empty", lootLevel: 1},
         {status: "normal", id: "warTemple:0:0x2-empty-1", x: 416, y: 80, type: "chest", lootType: "empty", lootLevel: 1},
     ],

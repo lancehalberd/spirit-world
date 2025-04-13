@@ -3688,7 +3688,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "warTempleEastEntrance", x: 432, y: 256, type: "door", style: "stone", targetZone: "warTemple", targetObjectId: "warTempleEastEntrance", d: "up"},
         {status: "normal", id: "warTemplePeachEntrance", x: 464, y: 368, targetZone: "warTemple", targetObjectId: "warTemplePitEntrance", type: "pitEntrance", style: "singleTile"},
         {status: "closed", id: "warTempleKeyDoor", x: 384, y: 416, type: "door", style: "stone", targetZone: "warTemple", targetObjectId: "warTempleKeyDoor", d: "up"},
-        {status: "normal", id: "overworld:0:2x2-npc-0", x: 276, y: 68, d: "down", behavior: "none", style: "man", type: "npc", dialogue: "Explorers have already taken most of the treasure here.{|}\nIf only we could get past those monsters or open the sealed door!", dialogueIndex: 99},
+        {status: "normal", id: "overworld:0:2x2-npc-0", x: 272, y: 64, d: "down", behavior: "face", style: "archeologist", type: "npc", dialogue: "Explorers have already taken most of the treasure here.{|}\nIf only we could get past those monsters or open the sealed door!", dialogueIndex: 99},
         {status: "normal", id: "overworld:0:2x2-sign-0", x: 352, y: 96, style: "short", type: "sign", message: "!Warning!\n{|}\nDangerous monsters and traps inside!"},
         {status: "normal", id: "", linked: true, x: 48, y: 432, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 184, y: 456, type: "spawnMarker"},

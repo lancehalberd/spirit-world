@@ -305,3 +305,22 @@ export const midGuyPriestAnimations: ActorAnimations = {
         right: createAnimation(midGuyPriestImage, midGuyPriestGeometry, {y: 3, cols: 3, duration: 5}, { loop: false }),
     },
 };
+
+
+const archeologistImage: string = 'gfx/npcs/archeologist.png';
+const archeologistGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
+export const archeologistAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(archeologistImage, archeologistGeometry, {y: 0}),
+        left: createAnimation(archeologistImage, archeologistGeometry, {y: 1}),
+        down: createAnimation(archeologistImage, archeologistGeometry, {y: 2}),
+        right: createAnimation(archeologistImage, archeologistGeometry, {y: 3}),
+    },
+    move: {
+        up: createAnimation(archeologistImage, archeologistGeometry, {y: 8, cols: 8}),
+        left: createAnimation(archeologistImage, archeologistGeometry, {y: 9, cols: 8}),
+        down: createAnimation(archeologistImage, archeologistGeometry, {y: 10, cols: 8}),
+        right: createAnimation(archeologistImage, archeologistGeometry, {y: 11, cols: 8}),
+    },
+    flourish: omniAnimation(createAnimation(archeologistImage, archeologistGeometry, {y: 0, cols: 7})),
+};

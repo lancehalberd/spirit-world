@@ -6,6 +6,7 @@ import {
 } from 'app/content/enemyAnimations';
 import { elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation } from 'app/content/enemies/elemental';
 import {
+    archeologistAnimations,
     crystalDragonAnimations,
     fatherAnimations,
     lightningBeastAnimations,
@@ -18,7 +19,7 @@ import {
     grandPriestAnimations,
     midGuyPriestAnimations,
     paleLadyPriestAnimations,
-    //testAnimations,
+    // testAnimations,
 } from 'app/content/npcs/npcAnimations'
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
@@ -93,6 +94,11 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: testAnimations,
         shadowOffset: 2,
     },*/
+    archeologist: {
+        animations: archeologistAnimations,
+        shadowOffset: 2,
+        height: 26,
+    },
     grandPriest: {
         animations: grandPriestAnimations,
         shadowOffset: 2,
