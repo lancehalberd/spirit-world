@@ -5,12 +5,18 @@ import {resetTileBehavior} from 'app/utils/tileBehavior';
 import {requireFrame} from 'app/utils/packedImages';
 
 
+// Add get layer to freeze
+
 const tinyIceTiles = requireFrame('gfx/tiles/tinyIceTiles.png', {x: 0, y: 0, w: 128, h: 32});
 
 export function refreshAreaIce(state: GameState, area: AreaInstance) {
     delete area.needsIceRefresh;
     for (let ty = 0; ty < area.h; ty++) {
         for (let tx = 0; tx < area.w; tx++) {
+            // Only process tiles that have been marked as dirty to prevent checking lots of unnecessary tiles.
+            if (area.tilesDrawn[ty]?.[tx]) {
+                continue;
+            }
             const behavior = area.behaviorGrid?.[ty]?.[tx];
             const M = behavior?.isFrozen ? 1 : 0;
             if (!M) {
@@ -33,34 +39,51 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
             let foundBlockingLayer = false;
             // We want to allow freezing on top of ledge behaviors without losing the ledge behaviors, so we have to
             // record any found any then include those on the frozen tile behavior.
-            let underLedges: any, underDiagonalLedge: any;
+            let underLedges: any, underDiagonalLedge: any;//, foundFrozenTile = false;
             for (const layer of area.layers) {
                 // Never freeze anything in the foreground.
                 if (getDrawPriority(layer.definition) === 'foreground') {
                     break;
                 }
-                const behaviors = layer.tiles[ty][tx]?.behaviors;
+                if (layer.tiles[ty][tx] === allTiles[294]) {
+                    //foundFrozenTile = true;
+                }
+                // TODO: treat the mask as another layer and apply the ice rendering to the mask layer when selected.
+                // The ice should be drawn first then the mask frame
+                const behaviors = {
+                    ...layer.tiles[ty][tx]?.behaviors,
+                    ...layer.maskTiles?.[ty]?.[tx]?.behaviors,
+                };
                 // Blocking layers prevent freezing until another layer is found that erases the blocking behavior.
                 if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.isLavaMap || behaviors?.cloudGround || behaviors?.isGround === true)) {
                     continue;
                 }
                 foundBlockingLayer = false;
-                if (!behaviors?.isOverlay
+                if (behaviors?.isFrozen || (!behaviors?.isOverlay
                     && !behaviors?.solid && !behaviors?.solidMap
                     && !behaviors?.pit && !behaviors?.pitMap
                     // Experimental: keep ledges drawn over ice for clarity and consistency with tiles
                     // that combine ledges+walls (usually SW/SE ledges).
-                    && !behaviors?.ledges
+                    && !behaviors?.ledges)
+                    //&& !behaviors?.maskFrame
                 ) {
                     underLedges = behaviors?.ledges || underLedges;
                     underDiagonalLedge = behaviors?.diagonalLedge || underDiagonalLedge;
                     topLayer = layer;
                 } else {
                     foundBlockingLayer = true;
-                    underLedges = undefined;
-                    underDiagonalLedge = undefined;
+                    underLedges = behaviors?.ledges;// undefined;
+                    underDiagonalLedge = behaviors?.diagonalLedge;//undefined;
+                    /*if (foundFrozenTile) {
+                        console.log('Clearing found frozen tile');
+                    }
+                    foundFrozenTile = false;*/
                 }
             }
+            // Don't adjust or freeze over existing frozen tiles.
+            /*if (foundFrozenTile) {
+                continue;
+            }*/
             // If this is literally the square frozen tile, don't replace it.
             if (!topLayer || topLayer.tiles[ty][tx] === allTiles[294]) {
                 continue;
@@ -68,7 +91,7 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
             // Fabricate a frozen tile that has the original tile "underneath it", so it will
             // return to the original state if exposed to fire.
             const currentTileBehaviors = topLayer.tiles[ty][tx]?.behaviors;
-            const underTile = currentTileBehaviors.isFrozen ? currentTileBehaviors.underTile : topLayer.tiles[ty][tx]?.index;
+            const underTile = currentTileBehaviors?.isFrozen ? currentTileBehaviors.underTile : topLayer.tiles[ty][tx]?.index;
             // console.log('freezing tile', tx, ty, topLayer.key, underTile);
             const offset1 = 8 * ((TL << 0) + (T << 1) + (L << 2) + (M << 3));
             const offset2 = 8 * ((T << 0) + (TR << 1) + (M << 2) + (R << 3));

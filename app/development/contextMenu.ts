@@ -150,6 +150,21 @@ export function getContextMenu(): MenuOption[] {
             }
         });
         options.push({
+            label: 'Log Tiles',
+            onSelect() {
+                const state = getState();
+                const tx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
+                const ty = Math.floor((state.camera.y + lastContextClick[1]) / 16);
+                console.log(tx, ty);
+                for (const layer of state.areaInstance.layers) {
+                    console.log(layer.key, layer.tiles[ty][tx]);
+                    if (layer.maskTiles?.[ty]?.[tx]) {
+                        console.log(layer.key + '-mask', layer.maskTiles[ty]?.[tx]);
+                    }
+                }
+            }
+        });
+        options.push({
             label: 'Log Object',
             onSelect() {
                 const state = getState();

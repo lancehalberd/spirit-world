@@ -18,7 +18,11 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
         const maskTile = layer.maskTiles?.[y]?.[x];
         if (maskTile) {
             if (maskTile?.behaviors) {
+                // For drawing frozen tiles correctly, it is important that the isFrozen behavior is kept even when masked.
+                //const behaviors = (tile.index !== 1 ? tile.behaviors : undefined);
+                //applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, {...maskTile.behaviors, isFrozen: behaviors?.isFrozen}, isForeground);
                 applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, maskTile.behaviors, isForeground);
+
             }
             continue;
         }

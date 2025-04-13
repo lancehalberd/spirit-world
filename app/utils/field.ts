@@ -513,7 +513,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             // and any ground tiles that are useful to freeze.
             && (hit.hitAllies
                 || behavior?.isBrittleGround || behavior?.isLava || behavior?.isLavaMap || behavior?.touchHit
-                || behavior?.shallowWater || behavior?.water
+                || behavior?.shallowWater || behavior?.water || behavior?.isFrozen
             )
         ) {
             let topLayer: AreaLayer;
@@ -526,7 +526,11 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 if (getDrawPriority(layer.definition) === 'foreground') {
                     break;
                 }
-                const behaviors = layer.tiles[target.y][target.x]?.behaviors;
+                //const behaviors = layer.tiles[target.y][target.x]?.behaviors;
+                const behaviors = {
+                    ...layer.tiles[target.y][target.x]?.behaviors,
+                    ...layer.maskTiles?.[target.y]?.[target.x]?.behaviors,
+                };
                 // Blocking layers prevent freezing until another layer is found that erases the blocking behavior.
                 if (foundBlockingLayer && !(behaviors?.isLava || behaviors?.isLavaMap || behaviors?.cloudGround || behaviors?.isGround === true)) {
                     continue;
@@ -572,6 +576,16 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 };
                 if (area.tilesDrawn[target.y]?.[target.x]) {
                     area.tilesDrawn[target.y][target.x] = false;
+                    for (const [x, y] of [
+                        [target.x - 1, target.y - 1], [target.x, target.y - 1], [target.x + 1, target.y - 1],
+                        [target.x - 1, target.y], [target.x + 1, target.y],
+                        [target.x - 1, target.y + 1], [target.x, target.y + 1], [target.x + 1, target.y + 1],
+                    ]) {
+                        // Any nearby tiles that are also frozen may also need to be redrawn with new ice graphics.
+                        if (area.behaviorGrid?.[y]?.[x]?.isFrozen && area.tilesDrawn[y]?.[x]) {
+                            area.tilesDrawn[y][x] = false;
+                        }
+                    }
                 }
                 // Indicate that ice edging needs to be added around newly frozen tiles.
                 area.needsIceRefresh = true;

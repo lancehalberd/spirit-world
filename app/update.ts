@@ -122,11 +122,6 @@ export function update() {
         } else if (state.alternateAreaInstance?.needsLogicRefresh) {
             refreshAreaLogic(state, state.alternateAreaInstance);
         }
-        if (state.areaInstance?.needsIceRefresh) {
-            refreshAreaIce(state, state.areaInstance);
-        } else if (state.alternateAreaInstance?.needsIceRefresh) {
-            refreshAreaIce(state, state.alternateAreaInstance);
-        }
         const hideMenu = shouldHideMenu(state);
         if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT))) {
             if (!hideMenu) {
@@ -202,6 +197,11 @@ export function update() {
                     updateField(state);
                 }
             }
+        }
+        if (state.areaInstance?.needsIceRefresh) {
+            refreshAreaIce(state, state.areaInstance);
+        } else if (state.alternateAreaInstance?.needsIceRefresh) {
+            refreshAreaIce(state, state.alternateAreaInstance);
         }
     } catch (e) {
         console.log(e.stack);
