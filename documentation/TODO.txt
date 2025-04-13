@@ -149,17 +149,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Add 8x8 ice tiles
-        - gfx/tiles/tinyIceTiles.png is 16x4 8x8 tiles
-            top to bottom is TL/TR/BL/BR corners within a given tile
-            left to right is a bitmask, 1 bit is TL, 2 bit is TR, 4 bit is BL, 8 bit is BR. So 0 is all off(no ice) and 15 is all on(all ice).
-        - Create two sets of masks, inner mask and edge mask to apply to inner ice pattern and edge ice pattern.
-            - Each set should be 14 tiles for hex values 1-14 corresponding to 4 bit number [TL,TR,BL,BR]
-            - Generate complete set of composite 14 8x8 ice tiles by combining the inner+edge masks with patterns for each tile.
-            - Generate behavior masks from the inner mask data to use for behaviors.
-        - When a tile is frozen, update behavior and graphics for it and all surround tiles
-            - For 16 8x8 tiles in a 4x4 pattern centered around the current tile set the
-
     - Add animated frames for archeologist
     - Add still frames for new NPCs: blacksmith 1+ 2, merchant,
 

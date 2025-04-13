@@ -169,7 +169,11 @@ export class Flame implements EffectInstance, Props {
             removeEffectFromArea(state, this);
             return;
         }
-        this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, anchorPoint);
+        // For attacks that move horizontally, update "isHigh" to indicate whether they are above content that is below an edge.
+        // We don't do this for attacks with vertical components since they can fall down below edges.
+        if (!this.az) {
+            this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, anchorPoint);
+        }
         this.z = Math.max(0, this.z + this.vz);
         if (this.ax) {
             this.vx += this.ax;

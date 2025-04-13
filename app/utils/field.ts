@@ -535,6 +535,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 if (!behaviors?.isOverlay
                     && !behaviors?.solid && !behaviors?.solidMap
                     && !behaviors?.pit && !behaviors?.pitMap
+                    // Experimental: keep ledges drawn over ice for clarity and consistency with tiles
+                    // that combine ledges+walls (usually SW/SE ledges).
+                    && !behaviors?.ledges
                 ) {
                     underLedges = behaviors?.ledges || underLedges;
                     underDiagonalLedge = behaviors?.diagonalLedge || underDiagonalLedge;
