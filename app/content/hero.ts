@@ -905,7 +905,7 @@ export class Hero implements Actor {
             clone.d = hero.d;
             clone.x = hero.x;
             clone.y = hero.y;
-            const isHeavy = (state.hero.savedData.equippedBoots === 'ironBoots');
+            const isHeavy = (state.hero.savedData.equippedBoots === 'ironBoots' && state.hero.savedData.equipment.ironBoots < 2);
             const c = isHeavy ? 0.75 : 1;
             clone.vx = c * directionMap[direction][0] * throwSpeed;
             clone.vy = c * directionMap[direction][1] * throwSpeed;

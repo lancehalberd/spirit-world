@@ -149,7 +149,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Forge boots shouldn't mess up clone throw.
     - Update the NPC used in the gauntlet.
     - Render Flame effects in the foreground if there z value is >= 24
     - Add new flame graphics to enemy flame attacks.
