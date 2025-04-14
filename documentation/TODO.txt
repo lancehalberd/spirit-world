@@ -149,6 +149,15 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Figure out why ice snakes are falling into pits in the helix.
+    - Forge boots shouldn't mess up clone throw.
+    - Update the NPC used in the gauntlet.
+    - Render Flame effects in the foreground if there z value is >= 24
+    - Add new flame graphics to enemy flame attacks.
+    - Add flame disperse effect when flames are removed.
+    - Investigate screenshaking when falling into narrow pits created by placing staff over pits.
+
+
     - Add test to remove empty tiles masks applied to empty layers.
         - Delete masks when setting tile to 0/1 to prevent this.
 
