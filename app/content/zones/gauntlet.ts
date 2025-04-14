@@ -803,7 +803,7 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "grandPriest", x: 248, y: 264, d: "down", behavior: "idle", style: "darkMonk", type: "npc", dialogueKey: "grandPriest"},
+        {status: "normal", id: "grandPriest", x: 248, y: 264, d: "down", behavior: "idle", style: "grandPriest", type: "npc", dialogueKey: "grandPriest"},
         {status: "closedEnemy", id: "gauntletSpiritStairs", x: 240, y: 48, type: "door", style: "woodenUpstairs", targetZone: "gauntlet", targetObjectId: "gauntletSpiritStairs", d: "up", locationCue: "Gauntlet 1F"},
         {status: "normal", id: "gauntletSpiritPitMarker", linked: true, spirit: true, x: 248, y: 312, locationCue: "Gauntlet 1F", type: "marker"},
         {status: "normal", id: "gauntlet:s0:0x0-crystalGuardian-0", x: 286, y: 74, type: "enemy", enemyType: "crystalGuardian", d: "down", params: {}},
