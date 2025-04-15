@@ -21,7 +21,10 @@ export function framesAnimation(frames: Frame[], duration = 8, props: ExtraAnima
 export function createAnimation(
     source: string | HTMLImageElement | HTMLCanvasElement,
     dimensions: FrameDimensions,
-    {x = 0, y = 0, rows = 1, cols = 1, xSpace = 0, ySpace = 0, top = 0, left = 0, duration = 8, frameMap = null}: CreateAnimationOptions = {},
+    {
+        x = 0, y = 0, rows = 1, cols = 1, xSpace = 0, ySpace = 0, top = 0, left = 0, duration = 8, frameMap = null,
+        loop, loopFrame,
+    }: CreateAnimationOptions & ExtraAnimationProperties = {},
     props: ExtraAnimationProperties = {},
 ): FrameAnimation {
     let frames: Frame[] = [];
@@ -52,7 +55,7 @@ export function createAnimation(
            return frames[originalIndex];
        });
     }
-    return {frames, frameDuration: duration, ...props, duration: FRAME_LENGTH * frames.length * duration};
+    return {frames, frameDuration: duration, loop, loopFrame, ...props, duration: FRAME_LENGTH * frames.length * duration};
 }
 
 export function speedUpAnimation(animation: FrameAnimation, speedFactor: number): FrameAnimation {

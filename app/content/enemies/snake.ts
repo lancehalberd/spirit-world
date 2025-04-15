@@ -44,8 +44,8 @@ const fireBallAbility: EnemyAbility<boolean> = {
     updateAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
         const fireball = enemy.params.fireball;
         const [dx, dy] = directionMap[enemy.d];
-        fireball.animationTime = 0;
-        fireball.scale = Math.min(1, fireball.scale + 0.05);
+        fireball.scale = Math.min(0.6, fireball.scale + 0.05);
+        fireball.updateSize();
         const hitbox = enemy.getHitbox(state);
         fireball.x = hitbox.x + hitbox.w / 2 + dx * 3 * hitbox.w / 4;
         fireball.y = hitbox.y + hitbox.h / 2 + dy * 3 * hitbox.h / 4;
@@ -121,6 +121,8 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1,
             source: enemy,
+            scale: 0.75,
+            persist: true,
         });
         addEffectToArea(state, enemy.area, flame);
     },

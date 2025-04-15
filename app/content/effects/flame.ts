@@ -1,33 +1,16 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { getLedgeDelta, updateProjectileHeight } from 'app/movement/getLedgeDelta';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { removeEffectFromArea } from 'app/utils/effects';
-import { getDirection, hitTargets } from 'app/utils/field';
-import { getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
-import { allImagesLoaded } from 'app/utils/images';
-import { editingState } from 'app/development/editingState';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {getLedgeDelta, updateProjectileHeight} from 'app/movement/getLedgeDelta';
+import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
+import {removeEffectFromArea} from 'app/utils/effects';
+import {getDirection, hitTargets} from 'app/utils/field';
+import {getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
+import {editingState} from 'app/development/editingState';
+import {clamp} from 'app/utils/index';
 
 
-const flameGeometry = {w: 20, h: 20, content: {x: 6, y: 10, w: 8, h: 6}};
-export const [
-    /* container */, fireElement, /* elementShine */
-] = createAnimation('gfx/hud/elementhud.png',
-    flameGeometry, {cols: 2}
-).frames;
-
-
-const [flameCanvas, flameContext] = createCanvasAndContext(fireElement.w * 2, fireElement.h);
-const createFlameAnimation = async () => {
-    await allImagesLoaded();
-    drawFrame(flameContext, fireElement, {...fireElement, x: 0, y: 0});
-    flameContext.translate(fireElement.w + fireElement.content.x + fireElement.content.w / 2, 0);
-    flameContext.scale(-1, 1);
-    drawFrame(flameContext, fireElement, {...fireElement, x: -fireElement.content.w / 2 - fireElement.content.x, y: 0});
-}
-createFlameAnimation();
-export const flameAnimation = createAnimation(flameCanvas, flameGeometry, {cols: 2});
+const flameAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3});
+const flameBrokenAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3, y: 1, loop: false});
 
 interface Props {
     delay?: number
@@ -46,6 +29,8 @@ interface Props {
     ttl?: number
     isPreparing?: boolean
     groundFriction?: number
+    // This will cause the flame to persist even after it hits something.
+    persist?: boolean
     beforeUpdate?: (state: GameState, flame: Flame) => void
     source: Actor
 }
@@ -61,17 +46,17 @@ export class Flame implements EffectInstance, Props {
     };*/
     getLightSources(state: GameState): LightSource[] {
         // const r = SRandom.seed(this.torch.animationTime).random();
+        const p = clamp(this.destroyed ? (1 - this.animationTime / flameBrokenAnimation.duration) : this.animationTime / 400, 0.1, 1);
         const hitbox = this.getHitbox();
         return [{
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - this.z,
             //brightness: 0.8 + 0.05 * Math.sin(this.torch.animationTime / 150),
-            brightness: 0.8,
-            radius: 40,
+            brightness: 0.8 * p,
+            radius: (40 * p) | 0,
             color: {r:255, g: 0, b: 0},
         }];
     }
-    drawPriority: DrawPriority = 'sprites';
     isEffect = <const>true;
     isEnemyAttack = true;
     area: AreaInstance = null;
@@ -100,12 +85,15 @@ export class Flame implements EffectInstance, Props {
     reflected = false;
     isEnemyTarget: boolean = true;
     groundFriction = 0;
+    // Set when the flame is destroyed and show the flameBrokenAnimation.
+    destroyed = false;
     isHigh = false;
+    persist = false;
     source: Actor;
     beforeUpdate?: (state: GameState, flame: Flame) => void;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3,
         delay = 0, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
-        source,
+        source, persist
     }: Props) {
         this.damage = damage;
         this.delay = delay;
@@ -127,6 +115,7 @@ export class Flame implements EffectInstance, Props {
         this.groundFriction = groundFriction;
         this.beforeUpdate = beforeUpdate;
         this.source = source;
+        this.persist = persist;
     }
     getAnchorPoint() {
         const hitbox = this.getHitbox();
@@ -143,18 +132,29 @@ export class Flame implements EffectInstance, Props {
         };
     }
     updateSize() {
-        const w = flameGeometry.content?.w ?? flameGeometry.w;
-        const h = flameGeometry.content?.h ?? flameGeometry.h;
+        const w = flameAnimation.frames[0].content?.w ?? flameAnimation.frames[0].w;
+        const h = flameAnimation.frames[0].content?.h ?? flameAnimation.frames[0].h;
         this.w = w * this.scale;
         this.h = h * this.scale;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (this.z <= 16 && hit.element === 'ice') {
-            removeEffectFromArea(state, this);
+            this.breakApart();
         }
         return {};
     }
+    breakApart() {
+        this.destroyed = true;
+        this.animationTime = 0;
+    }
     update(state: GameState) {
+        if (this.destroyed) {
+            this.animationTime += FRAME_LENGTH;
+            if (this.animationTime >= flameBrokenAnimation.duration) {
+                removeEffectFromArea(state, this);
+            }
+            return;
+        }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
@@ -166,7 +166,7 @@ export class Flame implements EffectInstance, Props {
         const anchorPoint = this.getAnchorPoint();
         const ledgeDelta = getLedgeDelta(state, this.area, oldAnchorPoint, anchorPoint);
         if (ledgeDelta > 0 && !this.isHigh) {
-            removeEffectFromArea(state, this);
+            this.breakApart();
             return;
         }
         // For attacks that move horizontally, update "isHigh" to indicate whether they are above content that is below an edge.
@@ -209,8 +209,16 @@ export class Flame implements EffectInstance, Props {
         }
 
         if (this.time >= this.ttl) {
-            removeEffectFromArea(state, this);
+            this.breakApart();
         } else  {
+            if (this.time >= this.ttl - 400) {
+                // Flame shrinks and slows down towards the end of its TTL.
+                this.scale = Math.max(0.1, this.scale - 0.04);
+                this.vx *= 0.95;
+                this.vy *= 0.95;
+                this.vz *= 0.95;
+                this.updateSize();
+            }
             if (!this.isPreparing && this.z <= 16) {
                 const hitResult = hitTargets(state, this.area, {
                     canPush: false,
@@ -236,7 +244,7 @@ export class Flame implements EffectInstance, Props {
                     this.vx = -this.vx;
                     this.vy = -this.vy;
                     this.time = 0;
-                } else  if (hitResult.blocked || hitResult.stopped || (hitResult.hit && !hitResult.pierced)) {
+                } else  if (!this.persist && (hitResult.blocked || hitResult.stopped || (hitResult.hit && !hitResult.pierced))) {
                     const hitbox = this.getHitbox();
                     const count = 4;
                     for (let i = 0; i < count; i++) {
@@ -249,7 +257,7 @@ export class Flame implements EffectInstance, Props {
                                 z: this.z
                             }, { element: 'fire' }, { vx: dx / 2, vy: dy / 2});
                     }
-                    removeEffectFromArea(state, this);
+                    this.breakApart();
                     return;
                 }
             }
@@ -261,12 +269,13 @@ export class Flame implements EffectInstance, Props {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = getFrame(flameAnimation, this.animationTime);
+        const frame = getFrame(this.destroyed ? flameBrokenAnimation : flameAnimation, this.animationTime);
         drawFrameAt(context, frame, {
             x: this.x - this.w / 2,
-            y: this.y + 2 * Math.sin(this.animationTime / 150) - this.z - this.h,
-            w: fireElement.content.w * this.scale,
-            h: fireElement.content.h * this.scale,
+            y: this.y - this.z - this.h / 2,
+            //y: this.y + 2 * Math.sin(this.animationTime / 150) - this.z - this.h,
+            w: (frame.content.w ?? frame.w) * this.scale,
+            h: (frame.content.h ?? frame.h) * this.scale,
         });
         if (editingState.showHitboxes) {
             context.strokeStyle = 'red';
@@ -276,10 +285,11 @@ export class Flame implements EffectInstance, Props {
     }
 
     renderShadow(context: CanvasRenderingContext2D) {
+        const p = clamp(this.destroyed ? (1 - this.animationTime / flameBrokenAnimation.duration) : this.animationTime / 400, 0.1, 1);
         const actualZ = this.z + 4 - 2 * Math.sin(this.animationTime / 150);
         const shadowRadius = Math.max(3, 6 - actualZ / 2);
         context.save();
-        context.globalAlpha = 0.5;
+        context.globalAlpha = 0.5 * p;
         context.fillStyle = 'red';
         context.translate(this.x, this.y);
         context.scale(this.w / 12, this.h / 18);

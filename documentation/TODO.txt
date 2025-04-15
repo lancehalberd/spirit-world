@@ -42,13 +42,9 @@ Graphics Work:
         Revision: improve an existing draft to match style/perspective/quality of the game better
         Extend: add additional frames/tiles to an existing draft to cover more behaviors
 
-
-    High Priority Graphics:
-        Dirt particles for breaking cracked dirt tiles.
-
     Special:
         Concept art of Rival - is both an NPC + boss
-        Concept art of Jade Champion - is both an NPC and ally in boss fights
+        In Progress: Concept art of Jade Champion - is both an NPC and ally in boss fights
             - May be a playable character at some point
 
     Cutscenes:
@@ -67,7 +63,7 @@ Graphics Work:
             Spirit King or Queen
             War God
             Fertility God
-            Fertility Temple Lead Researcher
+            Fertility Temple Lead Researcher(Demon)
             Forge master
             Concepts for additional major gods and demons
         Concept design of native spirit beings
@@ -77,8 +73,8 @@ Graphics Work:
         Concept design for additional NPCs
 
     Enemies:
-        Revision of Flame Vortex
         Revision of squirrel and elemental variants
+        Low priority: Revision of Flame Vortex
         Concept art of Sentry Bot
         Concept art for humanoid praying mantis soldiers
         Concept designs for additional World Tree enemies
@@ -108,13 +104,13 @@ Graphics Work:
         Concept art of World Tree(Modified fully grown Spirit Tree)
             This would be used both for drawing the exterior in the lab and overworld and for exterior sections of the final dungeon itself.
         Concept art of Modified Vanara interior tiles for the World Tree
-        Concept art of Researh Lab tileset for the Fertility Temple and Underground Lab dungeons
+        Concept art of Research Lab tileset for the Fertility Temple and Underground Lab dungeons
         Concept art of Vanara dreamworld tileset
 
     Objects:
-        Revision of Vanara statis pods
+        Revision of Vanara stasis pods
         Revision of floating ice spikes
-        Concept art of Daughter Tree (miniature Spirit Tree)
+        In Progress: Concept art of Daughter Tree (miniature Spirit Tree)
             Peach cave version with shriveling animation as it grows the Peach of Immortality.
         Concept art of Helix exterior(partially grown Spirit Tree) in the Spirit World lake
         Concept art of Helix exterior pinnacle in the sky
@@ -122,8 +118,8 @@ Graphics Work:
         Concept art for original Jade Champion Statue in the Holy City
 
     Effects:
+        Dirt particles for breaking cracked dirt tiles.
         Revision of frost grenades
-
 
     HUD:
         Magic Beans icon
@@ -149,11 +145,8 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Render Flame effects in the foreground if there z value is >= 24
-    - Add new flame graphics to enemy flame attacks.
-    - Add flame disperse effect when flames are removed.
+    - Add flame disperse effect to flame wall flames.
     - Investigate screenshaking when falling into narrow pits created by placing staff over pits.
-
 
     - Add test to remove empty tiles masks applied to empty layers.
         - Delete masks when setting tile to 0/1 to prevent this.

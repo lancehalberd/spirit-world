@@ -29,7 +29,7 @@ export function useVolcanoAbility(state: GameState, enemy: Enemy, target: Target
             az,
             minVz: -1,
             damage: 1,
-            scale: 1.5,
+            scale: 1,
             ttl: 6000,
             groundFriction: 1,
             source: enemy,
