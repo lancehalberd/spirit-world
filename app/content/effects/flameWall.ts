@@ -9,6 +9,7 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 
 
 const flameAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3});
+const flameBrokenAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3, y: 1, loop: false});
 
 interface Props {
     direction: Direction
@@ -46,6 +47,8 @@ export class FlameWall implements EffectInstance, Props {
     speed = 0;
     distance = 0;
     source: Actor
+    // Set when the flame is destroyed and show the flameBrokenAnimation.
+    destroyed = false;
     constructor({damage = 1, delay = 800, direction = 'down', length = 6, fromPoint, source}: Props) {
         this.delay = delay;
         this.damage = damage;
@@ -63,7 +66,18 @@ export class FlameWall implements EffectInstance, Props {
             h: this.h,
         }
     }
+    breakApart() {
+        this.destroyed = true;
+        this.animationTime = 0;
+    }
     update(state: GameState) {
+        if (this.destroyed) {
+            this.animationTime += FRAME_LENGTH;
+            if (this.animationTime >= flameBrokenAnimation.duration) {
+                removeEffectFromArea(state, this);
+            }
+            return;
+        }
         const { section } = getAreaSize(state);
         let left = section.x + 16;
         let top = section.y + 32;
@@ -125,7 +139,7 @@ export class FlameWall implements EffectInstance, Props {
                 || (this.direction === 'up' && this.y < top)
                 || (this.direction === 'down' && this.y > bottom)
             ) {
-                removeEffectFromArea(state, this);
+                this.breakApart();
             } else {
                 const hitbox = this.getHitbox(state);
                 hitTargets(state, this.area, {
@@ -148,7 +162,7 @@ export class FlameWall implements EffectInstance, Props {
         const hitbox = this.getHitbox(state);
         const isWide = hitbox.w > hitbox.h;
         const isTall = hitbox.w < hitbox.h;
-        const p = Math.min(1, 2 * this.animationTime / this.delay);
+        const p = this.destroyed ? 1 : Math.min(1, 2 * this.animationTime / this.delay);
         const spacing = 10, size = 16;
         // Number of flames is based on the final size of the wall.
         // Initially the flames will be small and bunched up, and they will grow and spread out to fill the desired hitbox.
@@ -163,10 +177,12 @@ export class FlameWall implements EffectInstance, Props {
         const drawTargets: (Rect & {frame: Frame})[] = [];
         for (let i = 0; i < flameCount; i++) {
             // Show a different frame for each flame.
-            const frame = getFrame(flameAnimation, this.animationTime + i * flameAnimation.frameDuration * FRAME_LENGTH);
+            const frame = this.destroyed
+                 ? getFrame(flameBrokenAnimation, this.animationTime)
+                 : getFrame(flameAnimation, this.animationTime + i * flameAnimation.frameDuration * FRAME_LENGTH);
             const distanceFromCenter = Math.abs(i + 0.5 - flameCount / 2);
             const flameP = distanceFromCenter * 2 / flameCount;
-            const scale = Math.min(1 - 0.2 * flameP, 2 * this.animationTime / this.delay - 0.5 * flameP);
+            const scale = Math.min(1 - 0.2 * flameP, this.destroyed ? 1 : 2 * this.animationTime / this.delay - 0.5 * flameP);
             // These deltas will make the flames near the edges fall a little behind the flames in the center when moving.
             const dx = 1.5 * this.speed * directionMap[this.direction][0] * flameP * flameP;
             const dy = 1.5 * this.speed * directionMap[this.direction][1] * flameP * flameP;

@@ -145,7 +145,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Add flame disperse effect to flame wall flames.
     - Investigate screenshaking when falling into narrow pits created by placing staff over pits.
 
     - Add test to remove empty tiles masks applied to empty layers.
