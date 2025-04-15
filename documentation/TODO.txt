@@ -145,8 +145,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Investigate screenshaking when falling into narrow pits created by placing staff over pits.
-
     - Add test to remove empty tiles masks applied to empty layers.
         - Delete masks when setting tile to 0/1 to prevent this.
 

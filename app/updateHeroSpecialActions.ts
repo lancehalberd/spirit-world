@@ -193,18 +193,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 dy += p.dy;
             }
         }
-        // Pit wall tiles always push the hero south to match the perspective.
-        if (onPitWall || dy > 0) {
-            // if dy < 0, that means that one or more tiles to the south is not a pit.
-            // We only let the hero move south ~6 pixels onto this tile so that they will
-            // fall towards the southern part of the pitwall tile without moving too far onto
-            // the non-pit tile to the south.
-            if (dy >=0 || (hitbox.y % 16) < 4) {
-                hero.y++;
-            }
-        } else if (dy < 0) {
-            hero.y--;
-        } else if (isOnSingleTilePit) {
+        if (isOnSingleTilePit) {
+            // Single tile pits force the hero to fall aligned with the tile they are in.
             hero.y = hero.y | 0;
             if (hero.y % 16 == 0) {
                 // do nothing.
@@ -213,12 +203,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             } else {
                 hero.y++;
             }
-        }
-        if (dx > 0) {
-            hero.x++;
-        } else if (dx < 0) {
-            hero.x--;
-        } else if (isOnSingleTilePit) {
             hero.x = hero.x | 0;
             if (hero.x % 16 == 0) {
                 // do nothing.
@@ -226,6 +210,24 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.x--;
             } else {
                 hero.x++;
+            }
+        } else {
+            // Pit wall tiles always push the hero south to match the perspective.
+            if (onPitWall || dy > 0) {
+                // if dy < 0, that means that one or more tiles to the south is not a pit.
+                // We only let the hero move south ~6 pixels onto this tile so that they will
+                // fall towards the southern part of the pitwall tile without moving too far onto
+                // the non-pit tile to the south.
+                if (dy >=0 || (hitbox.y % 16) < 4) {
+                    hero.y++;
+                }
+            } else if (dy < 0) {
+                hero.y--;
+            }
+            if (dx > 0) {
+                hero.x++;
+            } else if (dx < 0) {
+                hero.x--;
             }
         }
 
