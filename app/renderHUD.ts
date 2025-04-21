@@ -229,23 +229,23 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         const timeString = `${hours}:${minutesString}:${secondsString}`;
         const info = getCheckInfo(state);
         if (randomizerGoalType === 'victoryPoints') {
-            drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
+            drawOutlinedText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.victoryPoints)}`, 2, CANVAS_HEIGHT - 9 - 17, {
                 textBaseline: 'middle',
                 textAlign: 'left',
                 size: 16,
             });
         }
-        drawText(context, timeString, 2, CANVAS_HEIGHT - 8, {
+        drawOutlinedText(context, timeString, 2, CANVAS_HEIGHT - 9, {
             textBaseline: 'middle',
             textAlign: 'left',
             size: 16,
         });
-        drawText(context, `${info.zoneChecksCompleted}/${info.totalZoneChecks}`, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 8 - 16, {
+        drawOutlinedText(context, `${info.zoneChecksCompleted}/${info.totalZoneChecks}`, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 9 - 17, {
             textBaseline: 'middle',
             textAlign: 'right',
             size: 16,
         });
-        drawText(context, `${info.checksCompleted}/${info.totalChecks}`, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 8, {
+        drawOutlinedText(context, `${info.checksCompleted}/${info.totalChecks}`, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 9, {
             textBaseline: 'middle',
             textAlign: 'right',
             size: 16,
@@ -275,7 +275,7 @@ export function renderEditorHUD(context: CanvasRenderingContext2D, state: GameSt
         }
     );*/
     if (isKeyboardKeyDown(KEY.SHIFT)) {
-        drawText(context, `${x | 0}x${y | 0}`,
+        drawOutlinedText(context, `${x | 0}x${y | 0}`,
             CANVAS_WIDTH - 2,
             CANVAS_HEIGHT - 2,
             {
@@ -290,7 +290,7 @@ export function renderEditorHUD(context: CanvasRenderingContext2D, state: GameSt
     );
     
     if (rightLayer) {
-        drawText(
+        drawOutlinedText(
             context,
             String(editingState.brush?.[rightLayer]?.tiles?.[0]?.[0] ?? 0), 
             10,

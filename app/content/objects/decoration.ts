@@ -55,6 +55,11 @@ export class Decoration implements ObjectInstance {
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];
+        // If the entire decoration is rendered in the foreground, call both render
+        // functions here.
+        if (this.drawPriority === 'foreground') {
+            decorationType.render(context, state, this);
+        }
         decorationType.renderForeground?.(context, state, this);
     }
 }
@@ -739,13 +744,24 @@ const windowOctogonal: DecorationType = {
     },
 };
 
-const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 22, h: 41});
+const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 23, h: 42});
+const cocoonBackFrame= requireFrame('gfx/tiles/vanara.png', {x: 53, y: 354, w: 23, h: 42});
 const cocoon: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, cocoonFrame, decoration);
+        if (decoration.d === 'right') {
+            drawFrameContentReflectedAt(context, cocoonBackFrame, decoration);
+            // Draw contained object here.
+            drawFrameContentReflectedAt(context, cocoonFrame, decoration);
+        } else {
+            drawFrameContentAt(context, cocoonBackFrame, decoration);
+            // Draw contained object here.
+            drawFrameContentAt(context, cocoonFrame, decoration);
+        }
     },
-    behaviors: {
-        solid: true,
+    getBehaviors(state: GameState, decoration: Decoration) {
+        return {
+            solid: decoration.z < 30 && decoration.definition.drawPriority !== 'foreground',
+        };
     },
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(cocoonFrame, decoration);

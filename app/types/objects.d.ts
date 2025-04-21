@@ -452,6 +452,7 @@ interface BaseObjectDefinition {
     isInvisible?: boolean
     x: number
     y: number
+    z?: number
     d?: CardinalDirection
 }
 

@@ -1,12 +1,13 @@
-import { renderIndicator } from 'app/content/objects/indicator';
-import { objectHash } from 'app/content/objects/objectHash';
-import { playAreaSound } from 'app/musicController';
-import { CANVAS_HEIGHT } from 'app/gameConstants';
-import { createAnimation, drawFrame } from 'app/utils/animations';
-import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
-import { getTileBehaviors } from 'app/utils/getBehaviors';
-import { isObjectInsideTarget, pad } from 'app/utils/index';
-import { getObjectStatus } from 'app/utils/objects';
+import {renderIndicator} from 'app/content/objects/indicator';
+import {objectHash} from 'app/content/objects/objectHash';
+import {playAreaSound} from 'app/musicController';
+import {CANVAS_HEIGHT} from 'app/gameConstants';
+import {createAnimation, drawFrame} from 'app/utils/animations';
+import {requireFrame} from 'app/utils/packedImages';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
+import {getTileBehaviors} from 'app/utils/getBehaviors';
+import {isObjectInsideTarget, pad} from 'app/utils/index';
+import {getObjectStatus} from 'app/utils/objects';
 
 
 const pitFrame = createAnimation('gfx/tiles/cavePits.png', {w: 16, h: 16}, {left: 16, top: 48}).frames[0];
@@ -15,6 +16,7 @@ const futuristicPitFrame = createAnimation('gfx/tiles/futuristic.png', {w: 32, h
 const naturalPitFrame = createAnimation('gfx/tiles/cavePits.png', {w: 32, h: 32}, {left: 16, top: 16}).frames[0];
 const naturalCrystalPitFrame = createAnimation('gfx/tiles/crystalPits.png', {w: 32, h: 32}, {left: 16, top: 16}).frames[0];
 const smoothCrystalPitFrame = createAnimation('gfx/tiles/crystalPits.png', {w: 32, h: 32}, {left: 16, top: 80}).frames[0];
+const vanaraPitFrame = requireFrame('gfx/tiles/vanara.png', {x: 80, y: 16, w: 32, h: 32});
 
 interface PitStyle {
     frame: Frame
@@ -69,6 +71,12 @@ export const pitStyles: {[key: string]: PitStyle} = {
         frame: crystalPitFrame,
         getHitbox(pit: PitEntrance): Rect {
             return {x: pit.x, y: pit.y, w: 16, h: 16};
+        }
+    },
+    vanara: {
+        frame: vanaraPitFrame,
+        getHitbox(pit: PitEntrance): Rect {
+            return {x: pit.x, y: pit.y, w: 32, h: 32};
         }
     },
 };

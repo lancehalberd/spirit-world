@@ -1783,10 +1783,18 @@ function getObjectHitBox(object: ObjectDefinition): Rect {
     }
     return rectangle;
 }
+function getVisualObjectHitBox(object: ObjectDefinition): Rect {
+    const hitbox = getObjectHitBox(object);
+    return {
+        ...hitbox,
+        y: hitbox.y - (object.z ?? 0),
+    };
+}
 
 export function isPointInObject(x: number, y: number, object: ObjectDefinition): boolean {
     const camera = getState().camera;
-    return isPointInShortRect(x + camera.x, y + camera.y, getObjectHitBox(object));
+    return isPointInShortRect(x + camera.x, y + camera.y, getObjectHitBox(object))
+        || isPointInShortRect(x + camera.x, y + camera.y, getVisualObjectHitBox(object));
 }
 
 function checkToAddLinkedObject(state: GameState, area: AreaInstance, definition: ObjectDefinition): void {
