@@ -15,6 +15,7 @@ interface TextCueProps {
 
 }
 
+const rowHeight = 17;
 export class TextCue implements EffectInstance {
     area: AreaInstance;
     done = false;
@@ -60,19 +61,19 @@ export class TextCue implements EffectInstance {
             } else if (this.duration > 0 && this.time > this.duration - fadeDuration) {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }
-            let x = padding, y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * 16;
+            let x = padding, y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * rowHeight;
             let maxWidth = 0;
             for (const frameRow of this.textFrames) {
                 let rowWidth = 0;
                 for (const frame of frameRow) {
                     rowWidth += frame?.w ?? characterWidth;
                 }
-                maxWidth = Math.max(maxWidth, rowWidth);
+                maxWidth = Math.max(maxWidth, rowWidth + 4);
             }
             context.save();
                 context.fillStyle = 'black';
                 context.globalAlpha *= 0.4;
-                context.fillRect(((CANVAS_WIDTH - maxWidth) / 2) | 0, y - 2, maxWidth, this.textFrames.length * 16 + 4);
+                context.fillRect(((CANVAS_WIDTH - maxWidth) / 2) | 0, y - 2, maxWidth, this.textFrames.length * rowHeight + 4);
             context.restore();
             for (const frameRow of this.textFrames) {
                 let rowWidth = 0;
@@ -90,7 +91,7 @@ export class TextCue implements EffectInstance {
                         y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
                     x += frame.w;
                 }
-                y += 16;
+                y += rowHeight;
             }
         context.restore();
     }

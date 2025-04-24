@@ -8,6 +8,7 @@ import { setAreaSection } from 'app/utils/area';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea } from 'app/utils/effects';
+import {getCameraTarget} from 'app/utils/fixCamera';
 import { addObjectToArea } from 'app/utils/objects';
 import { isObjectInsideTarget } from 'app/utils/index';
 
@@ -17,7 +18,7 @@ export function updateCamera(state: GameState, speed?: number): void {
         if (state.hero.action === 'jumpingDown' && !state.nextAreaSection && !state.nextAreaInstance) {
             speed = 4;
         } else {
-            speed = editingState.isEditing ? 20 : cameraSpeed;
+            speed = editingState.isEditing ? 20 : (state.camera.speed ?? cameraSpeed);
         }
     }
     const { w, h, section } = getAreaSize(state);
@@ -113,31 +114,16 @@ export function updateCamera(state: GameState, speed?: number): void {
         }
         return;
     }
-    const hero = (state.hero.spiritRadius > 0 && state.hero.astralProjection) || state.hero;
-    let targetX = Math.floor(hero.x - CANVAS_WIDTH / 2 + 16 / 2);
-    // Constrain the camera to display only/center the current section.
-    if (section.w >= CANVAS_WIDTH) {
-        targetX = Math.max(section.x, Math.min(section.x + section.w - CANVAS_WIDTH, targetX));
-    } else {
-        // This will center on the current section if it is smaller than the screen width.
-        targetX = Math.round(section.x + section.w / 2 - CANVAS_WIDTH / 2);
+    const target = getCameraTarget(state);
+    if (state.camera.x < target.x) {
+        state.camera.x = Math.min(state.camera.x + speed, target.x);
+    } else if (state.camera.x > target.x) {
+        state.camera.x = Math.max(state.camera.x - speed, target.x);
     }
-    let targetY = Math.floor(hero.y - CANVAS_HEIGHT / 2 + 16 / 2);
-    if (section.h >= CANVAS_HEIGHT) {
-        targetY = Math.max(section.y, Math.min(section.y + section.h - CANVAS_HEIGHT, targetY));
-    } else {
-        // This will center on the current section if it is smaller than the screen height.
-        targetY = Math.round(section.y + section.h / 2 - CANVAS_HEIGHT / 2);
-    }
-    if (state.camera.x < targetX) {
-        state.camera.x = Math.min(state.camera.x + speed, targetX);
-    } else if (state.camera.x > targetX) {
-        state.camera.x = Math.max(state.camera.x - speed, targetX);
-    }
-    if (state.camera.y < targetY) {
-        state.camera.y = Math.min(state.camera.y + speed, targetY);
-    } else if (state.camera.y > targetY) {
-        state.camera.y = Math.max(state.camera.y - speed, targetY);
+    if (state.camera.y < target.y) {
+        state.camera.y = Math.min(state.camera.y + speed, target.y);
+    } else if (state.camera.y > target.y) {
+        state.camera.y = Math.max(state.camera.y - speed, target.y);
     }
     // Switch to the next area as soon as the screen is displayed entirely in the new section.
     // section is for the next area section, if one is present.

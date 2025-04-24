@@ -20,6 +20,8 @@ export function skipCutscene(state: GameState) {
     state.messagePage = null;
     state.scriptEvents.onSkipCutscene?.(state);
     delete state.scriptEvents.onSkipCutscene;
+    delete state.scriptEvents.cameraTarget;
+    delete state.camera.speed;
 }
 
 export function updateScriptEvents(state: GameState): void {

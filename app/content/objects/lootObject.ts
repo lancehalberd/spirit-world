@@ -127,6 +127,8 @@ export class LootObject implements ObjectInstance {
     x: number;
     y: number;
     z: number = 0;
+    lightColor?: LightColor;
+    vz = 0;
     groundHeight = 0;
     status: ObjectStatus;
     time = 0;
@@ -135,6 +137,7 @@ export class LootObject implements ObjectInstance {
         this.frame = getLootFrame(state, definition);
         this.x = definition.x;
         this.y = definition.y;
+        this.z = definition.z ?? 0;
         this.status = definition.status || 'normal';
         if (this.definition.id && getObjectStatus(state, this.definition)) {
             this.status = 'gone';
@@ -181,18 +184,35 @@ export class LootObject implements ObjectInstance {
             }
         }
     }
+    getLightSources(state: GameState): LightSource[] {
+        return [{
+            x: this.x + 8,
+            y: this.y + 8 - this.z,
+            brightness: Math.min(1, this.time / 2000),
+            radius: 24 * Math.min(1, this.time / 1000) + 2 * Math.sin(this.time / 500),
+            color: this.lightColor ?? {r:255, g: 255, b: 255},
+        }];
+    }
     update(state: GameState) {
         if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
             return;
         }
         this.time += FRAME_LENGTH;
-        this.behaviors.brightness = Math.min(1, this.time / 2000);
-        this.behaviors.lightRadius = 24 * Math.min(1, this.time / 1000) + 2 * Math.sin(this.time / 500);
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {
             return;
+        }
+        // Loot objects can move through the air, such as when the peach from the peach tree
+        // spawns in the air and falls to the ground.
+        if (this.z > (this.groundHeight || 0) || this.vz > 0) {
+            this.z += this.vz;
+            this.vz -= 0.3;
+            if (this.z <= 0) {
+                this.z = 0;
+                this.vz = 0;
+            }
         }
         this.checkToMarkAsPeeked(state);
         if (this.area === state.hero.area

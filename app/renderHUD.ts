@@ -56,6 +56,8 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             );
         context.restore();
     }
+    // Effects on the HUD layer aren't hidden when the HUD is hidden currently.
+    renderHudEffects(context, state);
     if (state.hudOpacity <= 0) {
         return;
     }
@@ -251,13 +253,16 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
             size: 16,
         });
     }
+    if (state.paused && shouldHideMenu(state)) {
+        // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
+    }
+}
+
+export function renderHudEffects(context: CanvasRenderingContext2D, state: GameState): void {
     for (const effects of (state.areaInstance?.effects || [])) {
         if (effects.drawPriority === 'hud' || effects.getDrawPriority?.(state) === 'hud') {
             effects.render(context, state);
         }
-    }
-    if (state.paused && shouldHideMenu(state)) {
-        // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }
 }
 

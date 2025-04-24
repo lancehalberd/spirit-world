@@ -569,7 +569,7 @@ interface NPCDefinition extends BaseObjectDefinition {
 
 type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret' | 'jadeChampion'
-    | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
+    | 'peachTree' | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';
 
 interface SimpleObjectDefinition extends BaseObjectDefinition {

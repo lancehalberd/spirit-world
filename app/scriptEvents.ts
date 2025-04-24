@@ -1,5 +1,6 @@
-import { allLootTypes, GAME_KEY } from 'app/gameConstants';
-import { parseMessage, textScriptToString } from 'app/render/renderMessage';
+import {allLootTypes, GAME_KEY} from 'app/gameConstants';
+import {parseMessage, textScriptToString} from 'app/render/renderMessage';
+import {getCameraTarget} from 'app/utils/fixCamera';
 
 export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
     // hide HUD to show that player isn't controllable
@@ -70,6 +71,44 @@ export function runPlayerBlockingCallback(state: GameState, updateCallback: (sta
     });
 }
 
+export function resetCamera(state: GameState) {
+    appendCallback(state, (state) => {
+        // Reset the camera back to its default target.
+        delete state.scriptEvents.cameraTarget;
+        // Wait to reset the camera speed until it has reached its default target again.
+        waitForCamera(state);
+        appendCallback(state, (state) => {
+            delete state.camera.speed;
+        });
+        return true;
+    });
+}
+
+export function waitForCamera(state: GameState) {
+    appendCallback(state, (state) => {
+        // Wait to reset the camera speed until it has reached its default target again.
+        state.scriptEvents.activeEvents.push({
+            type: 'update',
+            update(state: GameState) {
+                const cameraTarget = getCameraTarget(state);
+                if (state.camera.x === cameraTarget.x && state.camera.y === cameraTarget.y) {
+                    return false;
+                }
+                return true;
+            },
+        });
+        state.scriptEvents.activeEvents.push({
+            type: 'wait',
+            time: 0,
+            waitingOnActiveEvents: true,
+            blockPlayerUpdates: true,
+        });
+        // Make sure these block player/field updates as soon as this is appended and not on the next frame.
+        state.scriptEvents.blockPlayerUpdates = true;
+        return true;
+    });
+}
+
 // Clears all current script events and queues up events parsed from the new script.
 export function setScript(state: GameState, script: TextScript): void {
     // console.log('setScript', script);
@@ -93,6 +132,24 @@ export function appendScript(state: GameState, script: TextScript): void {
         ...parseEventScript(state, script),
     ];
     // console.log('prependScript', [...state.scriptEvents.queue]);
+}
+
+export function textCueWithInput(state: GameState, text: string, duration?: number) {
+    appendScript(state, `{addCue:${text}}`);
+    waitForInput(state, duration);
+    appendScript(state, `{removeCue}`);
+}
+
+export function waitForInput(state: GameState, duration = 0) {
+    appendCallback(state, (state) => {
+        state.scriptEvents.activeEvents.push({
+            type: 'wait',
+            time: duration,
+            keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
+            blockPlayerUpdates: true,
+        });
+        return true;
+    });
 }
 
 export function parseScriptText(state: GameState, text: TextScript, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {

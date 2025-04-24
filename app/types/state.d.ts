@@ -48,7 +48,7 @@ interface GameState {
     savedGames: SavedState[]
     savedGameIndex: number
     hero: Hero
-    camera: { x: number, y: number }
+    camera: { x: number, y: number, speed?: number }
     fieldTime: number
     // This can be used any time we want to track player idlesness,
     // for example to show the prologue again when the player is idle
@@ -125,6 +125,7 @@ interface GameState {
         blockFieldUpdates: boolean
         blockPlayerInput: boolean
         blockPlayerUpdates: boolean
+        cameraTarget?: Point
         handledInput: boolean
         overrideMusic?: TrackKey
         queue: ScriptEvent[]

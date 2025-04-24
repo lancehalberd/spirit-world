@@ -20,6 +20,7 @@ export * from 'app/content/objects/marker';
 export * from 'app/content/objects/movingPlatform';
 export * from 'app/content/objects/narration';
 export * from 'app/content/objects/npc';
+export * from 'app/content/objects/peachTree';
 export * from 'app/content/objects/pitEntrance';
 export * from 'app/content/objects/pushPullObject';
 export * from 'app/content/objects/pushStairs';
