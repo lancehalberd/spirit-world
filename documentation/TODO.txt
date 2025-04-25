@@ -145,10 +145,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Peach tree animations, loop first 5 frames of peachTreeDeath.png
-
-    - Fix wind cannot knock you off of ledges in the Helix.
-
     - Fix laser warning is missing from void tree rage phase.
 
     - Allow reflecting fire attack to hurt Rival 2.

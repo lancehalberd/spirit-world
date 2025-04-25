@@ -104,8 +104,9 @@ export class AirStream implements ObjectInstance {
             addWindParticle2(state, this.area, this, boundingBox);
         }
         // TODO: Spawn wind particles orthogonally to direction from the blocked point.
+        const heroes = [state.hero, ...state.hero.clones];
         const actors = [
-            ...[state.hero, ...state.hero.clones].filter(h => h.area === this.area
+            ...heroes.filter(h => h.area === this.area
                 && !h.isInvisible
                 && h.savedData.equippedBoots !== 'ironBoots' && h.action !== 'falling' && h.action !== 'fallen' && h.action !== 'grabbing'),
             ...this.area.enemies,
@@ -134,6 +135,7 @@ export class AirStream implements ObjectInstance {
                 const vx = speed * dx, vy = speed * dy;
                 moveActor(state, actor, vx, vy, {
                     canMoveInLava: actor.canMoveInLava,
+                    canJump: heroes.includes(actor as Hero),
                     canPush: false,
                 });
                 // Accelerate the actor if it is moving slower than the wind velocity.
