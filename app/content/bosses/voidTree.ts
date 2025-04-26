@@ -1,36 +1,35 @@
 import {flameHeartAnimations} from 'app/content/bosses/flameHeart';
-import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frostBeast';
-import { addSlamEffect } from 'app/content/bosses/golem';
+import {frostHeartAnimations, shootFrostInCone} from 'app/content/bosses/frostBeast';
+import {addSlamEffect} from 'app/content/bosses/golem';
 import {stormHeartAnimations} from 'app/content/bosses/stormHeart';
-import { FlameWall } from 'app/content/effects/flameWall';
-import { LaserBeam } from 'app/content/effects/laserBeam';
-import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
-import { addRadialSparks } from 'app/content/effects/spark';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { Enemy } from 'app/content/enemy';
-import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
-import { lightningBoltAbility } from 'app/content/enemyAbilities/lightningBolt';
-import { certainLifeLootTable } from 'app/content/lootTables';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { rotateDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects'
+import {FlameWall} from 'app/content/effects/flameWall';
+import {LaserBeam} from 'app/content/effects/laserBeam';
+import {LightningDischarge} from 'app/content/effects/lightningDischarge';
+import {addArcOfShockWaves, addRadialShockWaves} from 'app/content/effects/shockWave';
+import {addRadialSparks} from 'app/content/effects/spark';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {Enemy} from 'app/content/enemy';
+import {iceGrenadeAbility} from 'app/content/enemyAbilities/iceGrenade';
+import {lightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
+import {certainLifeLootTable} from 'app/content/lootTables';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrame} from 'app/utils/animations';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {rotateDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects'
 import {
     accelerateInDirection,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { addScreenShake } from 'app/utils/field';
-import { allImagesLoaded } from 'app/utils/images';
-import { addObjectToArea, saveObjectStatus } from 'app/utils/objects'
+import {addScreenShake} from 'app/utils/field';
+import {allImagesLoaded} from 'app/utils/images';
+import {addObjectToArea, saveObjectStatus} from 'app/utils/objects'
 import Random from 'app/utils/Random';
 import {
     getNearbyTarget,
     getVectorToNearbyTarget,
 } from 'app/utils/target';
-
 
 
 const stoneGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
@@ -106,6 +105,7 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
 };
 
 const LASER_BARRAGE_RADIUS = 16;
+const LASER_BARRAGE_SPACING = 40;
 const LASER_SPOTS = [0, 1, 2, 3]
 
 function addLaserBarrageToArea(state: GameState, enemy: Enemy, count: number) {
@@ -114,8 +114,8 @@ function addLaserBarrageToArea(state: GameState, enemy: Enemy, count: number) {
         if (!spots.length) {
             spots = Random.shuffle(LASER_SPOTS);
         }
-        const subX = 2 * LASER_BARRAGE_RADIUS * spots.pop();
-        for (let x = LASER_BARRAGE_RADIUS; x <= 512; x += 2 * LASER_BARRAGE_RADIUS * LASER_SPOTS.length) {
+        const subX = LASER_BARRAGE_SPACING * spots.pop();
+        for (let x = LASER_BARRAGE_SPACING / 2; x <= 512; x += LASER_BARRAGE_SPACING * LASER_SPOTS.length) {
             const sx = x + subX;
             const laser = new LaserBeam({
                 sx, sy: 0, tx: sx, ty: 512,
@@ -131,16 +131,16 @@ function addLaserBarrageToArea(state: GameState, enemy: Enemy, count: number) {
     }
 }
 
-function addLaserWarningToArea(state: GameState) {
-    for (let x = LASER_BARRAGE_RADIUS; x <= 512; x += 2 * LASER_BARRAGE_RADIUS) {
+function addLaserWarningToArea(state: GameState, source: Enemy) {
+    for (let x = LASER_BARRAGE_SPACING / 2; x <= 512; x += LASER_BARRAGE_SPACING) {
         const laser = new LaserBeam({
             sx: x, sy: 0, tx:x, ty: 512,
             radius: LASER_BARRAGE_RADIUS, damage: 0,
             ignoreWalls: true,
-            tellDuration: 300,
+            tellDuration: 400,
             duration: 0,
-            delay: x,
-            source: null,
+            delay: 2 * x,
+            source,
         });
         addEffectToArea(state, state.hero.area, laser);
     }
@@ -379,21 +379,21 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
         enemy.modeTime = 0;
-        addLaserWarningToArea(state);
+        addLaserWarningToArea(state, enemy);
     } else if (enemy.life <= 0.5 * maxLife && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
         enemy.params.enrageTime = 12000;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
         enemy.modeTime = 0;
-        addLaserWarningToArea(state);
+        addLaserWarningToArea(state, enemy);
     } else if (enemy.life <= 0.25 * maxLife && enemy.params.enrageLevel === 2) {
         enemy.params.enrageLevel = 3;
         enemy.params.enrageTime = 17000;
         // Burn damaged is reduced by 80% when entering rage phase.
         enemy.burnDamage *= 0.2;
         enemy.modeTime = 0;
-        addLaserWarningToArea(state);
+        addLaserWarningToArea(state, enemy);
     }
     enemy.enemyDefinition.immunities = [];
     let hasFlame = false, hasFrost = false, hasStone = false, hasStorm = false, heartCount = 0;

@@ -119,7 +119,6 @@ export class LootGetAnimation implements EffectInstance {
 
 export class LootObject implements ObjectInstance {
     area: AreaInstance;
-    behaviors: TileBehaviors;
     definition: LootObjectDefinition;
     drawPriority: 'sprites' = 'sprites';
     frame: Frame;
@@ -142,7 +141,6 @@ export class LootObject implements ObjectInstance {
         if (this.definition.id && getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
-        this.behaviors = { brightness: 0, lightRadius: 0 };
     }
     getHitbox(state?: GameState) {
         return getFrameHitbox(this.frame, this);
@@ -185,12 +183,13 @@ export class LootObject implements ObjectInstance {
         }
     }
     getLightSources(state: GameState): LightSource[] {
+        const hitbox = this.getHitbox();
         return [{
-            x: this.x + 8,
-            y: this.y + 8 - this.z,
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2 - this.z,
             brightness: Math.min(1, this.time / 2000),
-            radius: 24 * Math.min(1, this.time / 1000) + 2 * Math.sin(this.time / 500),
-            color: this.lightColor ?? {r:255, g: 255, b: 255},
+            radius: 20 * Math.min(1, this.time / 1000) + Math.sin(this.time / 500),
+            color: this.lightColor,// ?? {r:255, g: 255, b: 255},
         }];
     }
     update(state: GameState) {

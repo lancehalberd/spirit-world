@@ -55,6 +55,13 @@ interface Props {
 
 const FADE_DURATION = 100;
 
+// This many pixels is added to the appearance + warning box for the laser.
+// This makes it more intuitive to dodge.
+const visualPadding = 4;
+function padRay(ray: Ray, padding: number) {
+    return {...ray, r: ray.r + padding};
+}
+
 export class LaserBeam implements EffectInstance, Props {
     area: AreaInstance = null;
     isEffect = <const>true;
@@ -97,7 +104,7 @@ export class LaserBeam implements EffectInstance, Props {
         if (this.beforeUpdate) {
             this.beforeUpdate(state, this);
         }
-        if (isEnemyDefeated(this.source)) {
+        if (this.source && isEnemyDefeated(this.source)) {
             this.done = true;
             removeEffectFromArea(state, this);
             return;
@@ -138,14 +145,14 @@ export class LaserBeam implements EffectInstance, Props {
         }
         const p = (this.animationTime - this.duration) / FADE_DURATION;
         const alpha = 1 - Math.max(0, Math.min(1, p));
-        drawLaser(context, this.getHitRay(state), alpha);
+        drawLaser(context, padRay(this.getHitRay(state), visualPadding), alpha);
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
        if (this.delay > 0) {
            return;
        }
        if (this.tellDuration > 0) {
-           const ray = this.getHitRay(state);
+           const ray = padRay(this.getHitRay(state), visualPadding);
            renderDamageWarning(context, {
                 ray,
                 duration: this.totalTellDuration,
@@ -196,14 +203,14 @@ export function drawLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: nu
         // red #ef3b3b rgba(239,59,59,255)
         // dark red #cf2340 rgba(207,35,64,255)
         gradient.addColorStop(0, "rgba(207,35,64,0)");
-        gradient.addColorStop(0.1, "rgba(207,35,64,0.2)");
+        gradient.addColorStop(0.02, "rgba(207,35,64,0.2)");
         gradient.addColorStop(0.2, "rgba(207,35,64,0.8)");
         gradient.addColorStop(0.3, "rgba(239,59,59,1)");
         gradient.addColorStop(0.4, "rgba(249,200,200,1)");
         gradient.addColorStop(0.6, "rgba(249,200,200,1)");
         gradient.addColorStop(0.7, "rgba(239,59,59,1)");
         gradient.addColorStop(0.8, "rgba(207,35,64,0.8)");
-        gradient.addColorStop(0.9, "rgba(207,35,64,0.2)");
+        gradient.addColorStop(0.98, "rgba(207,35,64,0.2)");
         gradient.addColorStop(1, "rgba(207,35,64,0)");
 
         // Set the fill style and draw a rectangle

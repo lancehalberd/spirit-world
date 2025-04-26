@@ -8,7 +8,7 @@ import {addObjectToArea} from 'app/utils/objects';
 const peachTreeGeometry: FrameDimensions ={w: 92, h: 96, content: {x: 0, y: 72, w: 90, h: 20}};
 const peachTreeAnimation = createAnimation('gfx/objects/peachTree.png', peachTreeGeometry, {cols: 5});
 const peachTreeGatheringAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {cols: 5, loop: true});
-const peachTreeWeakAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {x: 10, cols: 3, frameMap: [0,1,2,1]});
+const peachTreeWeakAnimation = createAnimation('gfx/objects/peachTreeWeak.png', peachTreeGeometry, {cols: 5, duration: 20});
 const peachTreeDeathAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {x: 5, cols: 18});
 const peachTreeDeadFrame = peachTreeDeathAnimation.frames[peachTreeDeathAnimation.frames.length - 1];
 const peachGeometry: FrameDimensions ={w: 50, h: 50, content: {x: 17, y: 17, w: 16, h: 16}};
