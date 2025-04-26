@@ -158,7 +158,6 @@ Current tasks:
     - Add test to remove empty tiles masks applied to empty layers.
         - Delete masks when setting tile to 0/1 to prevent this.
 
-
     - Add exit cutscene for Jade Champion during Storm Beast.
 
     - Add new city tiles.
