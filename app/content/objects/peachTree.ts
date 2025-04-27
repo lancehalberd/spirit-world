@@ -68,6 +68,13 @@ export class PeachTree implements ObjectInstance {
         });
         return lightSources;
     }
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        // Allow the player to throw bushes over the tree to hit the boss.
+        if (hit.isThrownObject) {
+            return {};
+        }
+        return {blocked: true};
+    }
     behaviors = {solid: true};
     /*getYDepth(): number {
         const hitbox = this.getHitbox();
