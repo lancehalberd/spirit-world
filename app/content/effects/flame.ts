@@ -29,6 +29,7 @@ interface Props {
     ttl?: number
     isPreparing?: boolean
     groundFriction?: number
+    hybridWorlds?: boolean
     // This will cause the flame to persist even after it hits something.
     persist?: boolean
     beforeUpdate?: (state: GameState, flame: Flame) => void
@@ -83,6 +84,7 @@ export class Flame implements EffectInstance, Props {
     ttl: number;
     isPreparing = false;
     reflected = false;
+    hybridWorlds = false;
     isEnemyTarget: boolean = true;
     groundFriction = 0;
     // Set when the flame is destroyed and show the flameBrokenAnimation.
@@ -92,7 +94,7 @@ export class Flame implements EffectInstance, Props {
     source: Actor;
     beforeUpdate?: (state: GameState, flame: Flame) => void;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3,
-        delay = 0, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
+        delay = 0, damage = 1, scale = 1, ttl = 2000, hybridWorlds = false, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
         source, persist
     }: Props) {
         this.damage = damage;
@@ -116,6 +118,7 @@ export class Flame implements EffectInstance, Props {
         this.beforeUpdate = beforeUpdate;
         this.source = source;
         this.persist = persist;
+        this.hybridWorlds = hybridWorlds;
     }
     getAnchorPoint() {
         const hitbox = this.getHitbox();
@@ -220,7 +223,7 @@ export class Flame implements EffectInstance, Props {
                 this.updateSize();
             }
             if (!this.isPreparing && this.z <= 16) {
-                const hitResult = hitTargets(state, this.area, {
+                const hitProperties: HitProperties = {
                     canPush: false,
                     damage: this.damage,
                     direction: getDirection(this.vx, this.vy),
@@ -235,7 +238,15 @@ export class Flame implements EffectInstance, Props {
                     anchorPoint,
                     isHigh: this.isHigh,
                     source: this.source,
-                });
+                };
+                const hitResult = hitTargets(state, this.area, hitProperties);
+                let hit = hitResult.hit, stopped = hitResult.blocked || hitResult.stopped;
+
+                if (this.hybridWorlds) {
+                    const hitResult = hitTargets(state, this.area.alternateArea, hitProperties);
+                    hit = hit || hitResult.hit;
+                    stopped = stopped || hitResult.blocked || hitResult.stopped;
+                }
                 if (hitResult.reflected) {
                     this.reflected = true;
                     this.damage *= (hitResult.returnHit?.damage || 1);
@@ -244,7 +255,7 @@ export class Flame implements EffectInstance, Props {
                     this.vx = -this.vx;
                     this.vy = -this.vy;
                     this.time = 0;
-                } else  if (!this.persist && (hitResult.blocked || hitResult.stopped || (hitResult.hit && !hitResult.pierced))) {
+                } else  if (!this.persist && (hitResult.blocked || stopped || (hit && !hitResult.pierced))) {
                     const hitbox = this.getHitbox();
                     const count = 4;
                     for (let i = 0; i < count; i++) {
@@ -281,6 +292,11 @@ export class Flame implements EffectInstance, Props {
             context.strokeStyle = 'red';
             const {x, y, w, h} = this.getHitbox();
             context.strokeRect(x + 0.5, y + 0.5, w, h);
+        }
+    }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.hybridWorlds) {
+            this.render(context, state);
         }
     }
 

@@ -203,6 +203,7 @@ const flameRingAbility: EnemyAbility<true> = {
                 ay: -dy / 5,
                 vx: 0,
                 vy: 0,
+                hybridWorlds: true,
                 source: enemy,
             });
             const delayedFlame = new DelayedEffect({
@@ -420,6 +421,9 @@ enemyDefinitions.rival2 = {
             } else {
                 if (hit.element === 'ice') {
                     enemy.frozenDuration = 1000;
+                    staggerRival(state, enemy);
+                } else if (hit.element === 'fire') {
+                    enemy.burnDamage = 1;
                     staggerRival(state, enemy);
                 } else if (hit.element === 'lightning') {
                     staggerRival(state, enemy);
