@@ -5,6 +5,7 @@ import { renderControls } from 'app/scenes/controls/renderControls';
 import { renderDefeatedMenu } from 'app/scenes/defeated/renderDefeated';
 import { renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera } from 'app/render/renderField';
 import { renderHUD } from 'app/renderHUD';
+import { renderIntro } from 'app/scenes/intro/renderIntro';
 import { renderInventory } from 'app/scenes/inventory/renderInventory';
 import { renderPrologue } from 'app/scenes/prologue/renderPrologue';
 import { renderMap } from 'app/render/renderMap';
@@ -45,6 +46,10 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
     }
     if (state.scene === 'prologue') {
         renderPrologue(context, state);
+        return;
+    }
+    if (state.scene === 'intro') {
+        renderIntro(context, state);
         return;
     }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {

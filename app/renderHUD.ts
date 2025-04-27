@@ -209,7 +209,7 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
             && e.isFromCurrentSection(state) && e.healthBarTime >= 100
     );
     if (otherEnemiesWithHealthBars.length) {
-        const totalSpace = CANVAS_WIDTH - 32 - (otherEnemiesWithHealthBars.length - 1) * 20 + 4;
+        const totalSpace = CANVAS_WIDTH - 45 - (otherEnemiesWithHealthBars.length - 1) * 20 + 4;
         const barHeight = 4;
         // This probably won't work when there are more than three such enemies.
         const barWidth = (totalSpace / Math.max(3, otherEnemiesWithHealthBars.length)) | 0;

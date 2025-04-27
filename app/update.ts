@@ -14,6 +14,7 @@ import {
 } from 'app/userInput';
 import { updateControls } from 'app/scenes/controls/updateControls';
 import { updateDefeated } from 'app/scenes/defeated/updateDefeated';
+import { updateIntro } from 'app/scenes/intro/updateIntro';
 import { updateInventory } from 'app/scenes/inventory/updateInventory';
 import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
 import { updateFileSelect } from 'app/scenes/fileSelect/updateFileSelect';
@@ -54,6 +55,10 @@ export function update() {
         }
         if (state.scene === 'prologue') {
             updatePrologue(state);
+            return;
+        }
+        if (state.scene === 'intro') {
+            updateIntro(state);
             return;
         }
         if (state.scene === 'fileSelect' || state.scene === 'chooseGameMode' ||

@@ -542,7 +542,7 @@ export class ShopObject extends LootObject implements ObjectInstance {
     constructor(state: GameState, definition: LootObjectDefinition) {
         super(state, definition);
         this.price = definition.price || 100;
-        this.behaviors.solid = true;
+        this.behaviors = {solid: true};
     }
     onGrab(state: GameState, d: Direction, hero: Hero) {
         if (hero !== state.hero) {

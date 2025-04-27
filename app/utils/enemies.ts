@@ -286,12 +286,8 @@ function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number,
     }
     // Explicitly mark this as false so enemies cannot move over pits by default.
     movementProperties.canFall = !!movementProperties.canFall;
-    if (isCurrentlyFlying || enemy.canSwim) {
-        movementProperties.canSwim = true;
-    }
-    if (isCurrentlyFlying || enemy.canMoveInLava) {
-        movementProperties.canMoveInLava = true;
-    }
+    movementProperties.canSwim = !!(isCurrentlyFlying || enemy.canSwim);
+    movementProperties.canMoveInLava = !!(isCurrentlyFlying || enemy.canMoveInLava);
     if (enemy.enemyDefinition.baseMovementProperties) {
         movementProperties = {...enemy.enemyDefinition.baseMovementProperties, ...movementProperties};
     }

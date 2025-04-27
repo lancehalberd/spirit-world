@@ -1,4 +1,5 @@
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
+import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
 import {
     wasGameKeyPressed,
@@ -15,7 +16,11 @@ export function updateTitle(state: GameState) {
 
     state.idleTime += FRAME_LENGTH;
     if (state.idleTime > 60000) {
-        showPrologueScene(state);
+        if (Math.random() < 0.5) {
+            showPrologueScene(state);
+        } else {
+            showIntroScene(state);
+        }
         return;
     }
 

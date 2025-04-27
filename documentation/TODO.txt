@@ -145,6 +145,10 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Fix boss minion health bars rendering off screen when there are 3+ minions.
+
+    - Fix peach tree should not be neutral target.
+
     - Allow reflecting fire attack to hurt Rival 2.
 
     - Add 2x2 map tile frame to tile behaviors that is used when drawing the map

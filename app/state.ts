@@ -164,7 +164,7 @@ export function initializeState() {
     state = getDefaultState();
     loadSavedData();
     setSaveFileToState(0);
-    state.scene = 'prologue';
+    state.scene = Math.random() < 0.5 ? 'intro' : 'prologue';
 }
 
 export function getState(): GameState {
