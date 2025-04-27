@@ -204,20 +204,23 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         }
         y -= 6;
     }
+    // Show up to 4 minion health bars above the boss health bar.
     const otherEnemiesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
         e => e.status !== 'gone' && e.definition.type !== 'boss' && e.enemyDefinition.showHealthBar
             && e.isFromCurrentSection(state) && e.healthBarTime >= 100
-    );
+    ).slice(0, 4);
     if (otherEnemiesWithHealthBars.length) {
-        const totalSpace = CANVAS_WIDTH - 45 - (otherEnemiesWithHealthBars.length - 1) * 20 + 4;
+        // Set righEdge to 6 as we draw the right claw 6px beyond the width of the bar and we want some padding.
+        const leftEdge = 44, spacing = 16, rightEdge = 10;
+        const totalSpace = CANVAS_WIDTH - leftEdge - (otherEnemiesWithHealthBars.length - 1) * spacing - rightEdge;
         const barHeight = 4;
         // This probably won't work when there are more than three such enemies.
-        const barWidth = (totalSpace / Math.max(3, otherEnemiesWithHealthBars.length)) | 0;
+        const barWidth = Math.min(80, (totalSpace / otherEnemiesWithHealthBars.length) | 0);
         y -= barHeight;
-        x = 45;
+        x = leftEdge;
         for (const enemy of otherEnemiesWithHealthBars) {
             renderMinionHealthBar(context, state, enemy, {x, y, w: barWidth, h: barHeight});
-            x += barWidth + 20;
+            x += barWidth + spacing;
         }
     }
     if (isRandomizer) {

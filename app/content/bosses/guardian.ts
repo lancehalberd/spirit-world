@@ -1,23 +1,23 @@
-import { addBurstEffect, addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { CrystalSpike } from 'app/content/effects/arrow';
-import { Blast } from 'app/content/effects/blast';
-import { Flame } from 'app/content/effects/flame';
-import { Frost } from 'app/content/effects/frost';
-import { throwMineAtLocation } from 'app/content/effects/landMine';
-import { GrowingThorn } from 'app/content/effects/growingThorn';
-import { Spark } from 'app/content/effects/spark';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { Enemy } from 'app/content/enemy';
-import { Indicator } from 'app/content/objects/indicator';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { vanaraBlueAnimations } from 'app/render/npcAnimations';
-import { createAnimation } from 'app/utils/animations';
-import { getCardinalDirection } from 'app/utils/direction';
+import {addBurstEffect, addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {CrystalSpike} from 'app/content/effects/arrow';
+import {Blast} from 'app/content/effects/blast';
+import {Flame} from 'app/content/effects/flame';
+import {Frost} from 'app/content/effects/frost';
+import {throwMineAtLocation} from 'app/content/effects/landMine';
+import {GrowingThorn} from 'app/content/effects/growingThorn';
+import {Spark} from 'app/content/effects/spark';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {Enemy} from 'app/content/enemy';
+import {Indicator} from 'app/content/objects/indicator';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {vanaraBlueAnimations} from 'app/render/npcAnimations';
+import {createAnimation} from 'app/utils/animations';
+import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
-import { accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation } from 'app/utils/enemies';
-import { sample } from 'app/utils/index';
-import { addObjectToArea } from 'app/utils/objects';
-import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
+import {accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation} from 'app/utils/enemies';
+import {removeItemFromArray, sample} from 'app/utils/index';
+import {addObjectToArea} from 'app/utils/objects';
+import {getVectorToNearbyTarget, getVectorToTarget} from 'app/utils/target';
 
 
 
@@ -299,6 +299,8 @@ function moveGuardianToArea(state: GameState, area: AreaInstance, enemy: Enemy<G
         addObjectToArea(state, area, enemy);
         // Add an object doesn't currently update the enemies array immediately which can cause the boss music to
         // restart if the boss isn't found for a frame.
+        // Failing to remove the boss from the alternate area results in double life bars being shown briefly.
+        removeItemFromArray(area.alternateArea.enemies, enemy);
         area.enemies.push(enemy);
     }
 }
