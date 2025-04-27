@@ -1,4 +1,4 @@
-import { addBurstParticle } from 'app/content/effects/animationEffect';
+import { addBurstParticle, addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH, getElementColor } from 'app/gameConstants';
 import { renderDamageWarning } from 'app/render/renderDamageWarning';
 import { renderLightningCircle } from 'app/render/renderLightning';
@@ -63,6 +63,27 @@ export class Blast implements EffectInstance {
             ) {
                 removeEffectFromArea(state, this);
                 return;
+            }
+            if (this.animationTime % 40 === 0 && this.animationTime < this.tellDuration - Math.min(200, this.tellDuration / 3)) {
+                const count = Random.range(1, 2);
+                const baseTheta = Math.random() * 2 * Math.PI;
+                for (let i = 0; i < count; i++) {
+                    const theta = baseTheta + 2 * Math.PI * i / count;
+                    const dx = Math.cos(theta), dy = Math.sin(theta);
+                    const sparkle = addSparkleAnimation(state, this.area, {
+                        x: this.x + 0.8 * this.radius * dx,
+                        y: this.y + 0.8 * this.radius * dy, w: 0, h: 0},
+                        {
+                            velocity: { x: -dx, y: -dy, z: 1},
+                            element: this.element,
+                        }
+                    );
+                    const speed = Random.range(6, 12);
+                    sparkle.vx = -speed * dx;
+                    sparkle.vy = -speed * dy;
+                    sparkle.z = 0;
+                    sparkle.vstep = 3 * FRAME_LENGTH;
+                }
             }
         }
         if (this.boundSource) {
@@ -131,11 +152,14 @@ export class Blast implements EffectInstance {
                 renderLightningCircle(context, circle, 4, Math.min(100, Math.max(40, circle.r | 0)));
             }
         } else if (this.animationTime <= this.tellDuration) {
-            renderDamageWarning(context, {
+            /*renderDamageWarning(context, {
                 circle: {x: this.x, y: this.y, r: this.radius},
                 duration: this.tellDuration,
-                time: this.animationTime,
-            });
+                time: 0, //this.animationTime,
+            });*/
+            if (this.element === 'lightning') {
+                renderLightningCircle(context, {x: this.x, y: this.y, r: 20 * Math.min(1, 2 * this.animationTime / this.tellDuration)}, 2, 20 * Math.min(1, 2 * this.animationTime / this.tellDuration));
+            }
         }
     }
 }

@@ -647,7 +647,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 // Experimental code to allow us to prevent adding objects that have matching ids for existing objects
                 // even if they come from the same definition. This was added to allow replacing the editor defined
                 // peach loot with a special generated peach during the peach tree cutscene after the first boss.
-                || (o.definition.id && o.definition.id === object.id)
+                || (o.definition?.id && o.definition.id === object.id)
             );
             if (isObjectLogicValid(state, object)) {
                 // If the object is valid but was never added to the area, add it now.
