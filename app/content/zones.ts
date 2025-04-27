@@ -53,6 +53,10 @@ export * from 'app/content/zones/title-noBottomWall';
 export * from 'app/content/zones/dream';
 export * from 'app/content/zones/fertility';
 export * from 'app/content/zones/delve';
+export * from 'app/content/zones/jadeCityInterior';
+//Comment out below to play game normally
+export * from 'app/content/zones/overworldBig';
+
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {

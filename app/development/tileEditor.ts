@@ -558,7 +558,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         event.preventDefault();
         return;
     }
-    if (event.which === KEY.BACK_SPACE) {
+    if (event.which === KEY.BACK_SPACE || event.which === KEY.DELETE) {
         if (editingState.tool === 'brush') {
             const [x, y] = getAreaMousePosition();
             deleteTile(x, y);

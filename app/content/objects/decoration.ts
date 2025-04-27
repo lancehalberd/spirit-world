@@ -280,6 +280,19 @@ const chair: DecorationType = {
     },
 };
 
+const stoneChairFrame= requireFrame('gfx/objects/furniture/stoneTable.png', {x: 48, y: 0, w: 16, h: 16, content: {x: 2, y: 0, w: 13, h: 16}});
+const stoneChair: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, stoneChairFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(stoneChairFrame, decoration);
+    },
+};
+
 const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
 ).frames;
@@ -649,6 +662,42 @@ const table: DecorationType = {
 };
 
 
+export const stoneTableFrames= createAnimation('gfx/objects/furniture/stoneTable.png',
+    {w: 16, h: 16}, {cols: 3, rows: 4}
+).frames;
+const stoneTableTopRow = stoneTableFrames.slice(0, 3);
+const stoneTableMiddleRow = stoneTableFrames.slice(3, 6);
+const stoneTableBottomRow = stoneTableFrames.slice(6, 9);
+const stoneTableLegsRow = stoneTableFrames.slice(9, 12);
+
+const stoneTable: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        for (let y = decoration.y; y < decoration.y + decoration.h; y += 16) {
+            let row = stoneTableMiddleRow;
+            if (y === decoration.y) {
+                row = stoneTableTopRow;
+            } else if (y >= decoration.y + decoration.h - 16) {
+                row = stoneTableLegsRow;
+            } else if (y >= decoration.y + decoration.h - 32) {
+                row = stoneTableBottomRow;
+            }
+            for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
+                let frame = row[1];
+                if (x === decoration.x) {
+                    frame = row[0];
+                } else if (x >= decoration.x + decoration.w - 16) {
+                    frame = row[2];
+                }
+                drawFrameContentAt(context, frame, {x, y});
+            }
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+};
+
+
 const tube: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, tubeBackFrame, decoration);
@@ -868,6 +917,8 @@ export const decorationTypes = {
     shelves,
     stump,
     table,
+    stoneTable,
+    stoneChair,
     tube,
     windowOctogonal,
     smallLightDome,
