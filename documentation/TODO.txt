@@ -148,9 +148,6 @@ Current tasks:
     - Add 2x2 map tile frame to tile behaviors that is used when drawing the map
         - Instead of drawing areas at full scale and then scaling them down for the map, just draw them directly at the final scale.
 
-    - Improve tell for Blast other elements (ice, fire, non-elemental)
-        - Fix the effect to track when attached to moving targets.
-
     - Sparks from the chakram lightning attack should have lighting effects
 
     - Add support for placing objects/NPCs inside of beds, stasis pods, and tubes.

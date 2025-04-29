@@ -1,9 +1,8 @@
-import { addBurstParticle, addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { FRAME_LENGTH, getElementColor } from 'app/gameConstants';
-import { renderDamageWarning } from 'app/render/renderDamageWarning';
-import { renderLightningCircle } from 'app/render/renderLightning';
-import { removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
+import {addBurstParticle, addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {FRAME_LENGTH, getElementColor} from 'app/gameConstants';
+import {renderLightningCircle} from 'app/render/renderLightning';
+import {removeEffectFromArea} from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
 import Random from 'app/utils/Random';
 
 
@@ -70,19 +69,32 @@ export class Blast implements EffectInstance {
                 for (let i = 0; i < count; i++) {
                     const theta = baseTheta + 2 * Math.PI * i / count;
                     const dx = Math.cos(theta), dy = Math.sin(theta);
+                    const sparkle = this.addParticleEffect(state,  0.8 * this.radius * dx, 0.8 * this.radius * dy);
+                    /*const hitbox = this.boundSource ? {...this.boundSource.getHitbox(), x: 0, y: 0} : {x: this.x, y: this.y, w: 0, h: 0};
                     const sparkle = addSparkleAnimation(state, this.area, {
-                        x: this.x + 0.8 * this.radius * dx,
-                        y: this.y + 0.8 * this.radius * dy, w: 0, h: 0},
+                        x: hitbox.x + hitbox.w / 2 + 0.8 * this.radius * dx,
+                        y: hitbox.y + hitbox.h / 2 + 0.8 * this.radius * dy, w: 0, h: 0},
                         {
                             velocity: { x: -dx, y: -dy, z: 1},
                             element: this.element,
+                            target: this.boundSource,
                         }
-                    );
-                    const speed = Random.range(6, 12);
+                    );*/
+                    let speed = Random.range(3, 12);
+                    if (this.element === 'lightning') {
+                        // Special treatment to make lightning particle movement
+                        // more discrete.
+                        sparkle.vstep = 3 * FRAME_LENGTH;
+                    } else {
+                        sparkle.vstep = FRAME_LENGTH;
+                        speed /= 3;
+                    }
+                    // override the default velocity so that the particle
+                    // always moves in towards the center of the blast.
                     sparkle.vx = -speed * dx;
                     sparkle.vy = -speed * dy;
-                    sparkle.z = 0;
-                    sparkle.vstep = 3 * FRAME_LENGTH;
+                    sparkle.vz = 0;
+                    sparkle.z = 1;
                 }
             }
         }
@@ -112,15 +124,17 @@ export class Blast implements EffectInstance {
             // Lightning effects will be rendered as part of the render function.
             if (this.element !== 'lightning') {
                 if ((this.animationTime - this.tellDuration) % 40 === 20) {
-                    const theta = Math.random() * 2 * Math.PI;
+                    const baseTheta = Math.random() * 2 * Math.PI;
                     const count = Random.range(4, 7);
                     for (let i = 0; i < count; i++) {
-                        addBurstParticle(state, this.area,
-                            circle.x + circle.r * Math.cos(theta + i * 2 * Math.PI / count),
-                            circle.y + circle.r * Math.sin(theta + i * 2 * Math.PI / count),
+                        const theta = baseTheta + i * 2 * Math.PI / count;
+                        this.addParticleEffect(state,  circle.r * Math.cos(theta), circle.r * Math.sin(theta));
+                        /*addBurstParticle(state, this.area,
+                            circle.x + circle.r * Math.cos(baseTheta + i * 2 * Math.PI / count),
+                            circle.y + circle.r * Math.sin(baseTheta + i * 2 * Math.PI / count),
                             0,
                             this.element
-                        );
+                        );*/
                     }
                 }
             }
@@ -128,6 +142,17 @@ export class Blast implements EffectInstance {
         if (this.animationTime >=  this.tellDuration + this.expansionDuration + this.persistDuration) {
             removeEffectFromArea(state, this);
         }
+    }
+    addParticleEffect(state: GameState, dx: number, dy: number): FieldAnimationEffect {
+        const hitbox = this.boundSource ? {...this.boundSource.getHitbox(), x: 0, y: 0} : {x: this.x, y: this.y, w: 0, h: 0};
+        return addSparkleAnimation(state, this.area, {
+            x: hitbox.x + hitbox.w / 2 + dx,
+            y: hitbox.y + hitbox.h / 2 + dy, w: 0, h: 0},
+            {
+                element: this.element,
+                target: this.boundSource,
+            }
+        );
     }
     getHitCircle(): Circle | null {
         if (this.animationTime < this.tellDuration) {
