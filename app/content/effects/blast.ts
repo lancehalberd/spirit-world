@@ -1,5 +1,5 @@
-import {addBurstParticle, addSparkleAnimation} from 'app/content/effects/animationEffect';
-import {FRAME_LENGTH, getElementColor} from 'app/gameConstants';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {FRAME_LENGTH, getElementColor, getElementLightColor} from 'app/gameConstants';
 import {renderLightningCircle} from 'app/render/renderLightning';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
@@ -129,12 +129,6 @@ export class Blast implements EffectInstance {
                     for (let i = 0; i < count; i++) {
                         const theta = baseTheta + i * 2 * Math.PI / count;
                         this.addParticleEffect(state,  circle.r * Math.cos(theta), circle.r * Math.sin(theta));
-                        /*addBurstParticle(state, this.area,
-                            circle.x + circle.r * Math.cos(baseTheta + i * 2 * Math.PI / count),
-                            circle.y + circle.r * Math.sin(baseTheta + i * 2 * Math.PI / count),
-                            0,
-                            this.element
-                        );*/
                     }
                 }
             }
@@ -161,6 +155,27 @@ export class Blast implements EffectInstance {
         const time = this.animationTime - this.tellDuration;
         const p = Math.min(1, time / this.expansionDuration);
         return {x: this.x, y: this.y, r: this.minRadius + p * (this.radius - this.minRadius)};
+    }
+    getLightSources(state: GameState): LightSource[] {
+        const lights: LightSource[] = [];
+        const circle = this.getHitCircle();
+        const color = getElementLightColor(this.element);
+        if (circle) {
+            lights.push({
+                x: circle.x, y: circle.y,
+                brightness: 0.8,
+                radius: circle.r,
+                color,
+            });
+        } else if (this.animationTime <= this.tellDuration && this.element === 'lightning') {
+            lights.push({
+                x: this.x, y: this.y,
+                brightness: 0.8,
+                radius: 20 * Math.min(1, 2 * this.animationTime / this.tellDuration),
+                color,
+            });
+        }
+        return lights;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const circle = this.getHitCircle();

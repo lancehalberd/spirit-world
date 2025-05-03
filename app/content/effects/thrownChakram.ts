@@ -53,6 +53,34 @@ export class ThrownChakram implements EffectInstance {
     source: Hero;
     animationTime = 0;
     sparkles: FieldAnimationEffect[];
+    getLightSources(state: GameState): LightSource[] {
+        const hitbox = this.getHitbox();
+        const lights: LightSource[] = [];
+        if (this.level > 1 || this.chargeLevel > 0) {
+            let radius = 16;
+            if (this.element === 'lightning') {
+                radius = this.chargeLevel > 1 ? 40 : 28;
+            }
+            lights.push({
+                x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2,
+                brightness: 1,
+                radius,
+            });
+        }
+        for (const sparkle of [...this.sparkles, ...this.relativeSparkles]) {
+            if (!sparkle.behaviors?.brightness) {
+                continue;
+            }
+            const hitbox = sparkle.getHitbox();
+            lights.push({
+                x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2,
+                brightness: sparkle.behaviors.brightness,
+                radius: sparkle.behaviors.lightRadius,
+                color: sparkle.behaviors.lightColor,
+            });
+        }
+        return lights;
+    }
     relativeSparkles: FieldAnimationEffect[];
     hitCooldown: number = 0;
     isPlayerAttack = true;

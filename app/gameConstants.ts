@@ -117,6 +117,14 @@ export function getElementColor(element: MagicElement) {
     }
     return 'grey';
 }
+export function getElementLightColor(element: MagicElement): LightColor {
+    switch(element){
+        case 'fire': return {r: 255, g: 0, b: 0}
+        case 'ice': return {r: 255, g: 255, b: 255};
+        case 'lightning': return {r: 255, g: 255, b: 0};
+    }
+    return {r: 150, g: 150, b: 150};
+}
 
 // Gameplay modifiers
 export const gameModifiers = {
