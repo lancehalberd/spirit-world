@@ -246,7 +246,7 @@ export class BeadSection implements ObjectInstance {
         return this;
     }
     getHitboxForMovingObjects(state: GameState) {
-        return {x: this.x + 10, y: this.y, w: this.w - 20, h: this.h};
+        return {x: this.x + 7, y: this.y, w: this.w - 14, h: this.h};
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
