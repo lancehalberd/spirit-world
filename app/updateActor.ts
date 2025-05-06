@@ -2,26 +2,27 @@ import {
     getAreaFromLocation,
     scrollToArea,
 } from 'app/content/areas';
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { AirBubbles } from 'app/content/objects/airBubbles';
-import { Enemy } from 'app/content/enemy';
-import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { playAreaSound } from 'app/musicController';
-import { prependScript } from 'app/scriptEvents';
-import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
-import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
-import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {AirBubbles} from 'app/content/objects/airBubbles';
+import {Enemy} from 'app/content/enemy';
+import {editingState} from 'app/development/editingState';
+import {EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {playAreaSound} from 'app/musicController';
+import {prependScript} from 'app/scriptEvents';
+import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
+import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
+import {isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased} from 'app/useTool';
 import {isUnderwater} from 'app/utils/actor';
-import { removeAllClones, setNextAreaSection } from 'app/utils/area';
-import { removeEffectFromArea } from 'app/utils/effects';
+import {removeAllClones, setNextAreaSection } from 'app/utils/area';
+import {removeEffectFromArea} from 'app/utils/effects';
 import {directionMap} from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
-import { boxesIntersect, pad } from 'app/utils/index';
-import { removeObjectFromArea } from 'app/utils/objects';
-import { swapHeroStates } from 'app/utils/swapHeroStates';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
+import {boxesIntersect, pad} from 'app/utils/index';
+import {removeObjectFromArea} from 'app/utils/objects';
+import Random from 'app/utils/Random';
+import {swapHeroStates} from 'app/utils/swapHeroStates';
 
 export function updateAllHeroes(this: void, state: GameState) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
@@ -110,9 +111,49 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             checkForFloorEffects(state, hero);
         }
     }
+    updateHeroVisualEffects(state, hero);
     updateGenericHeroState(state, hero);
 }
 
+export function updateHeroVisualEffects(this: void, state: GameState, hero: Hero) {
+    // Add fire particles indicating the clone is charing to explode.
+    if (hero.explosionTime % 60 === 20 && hero.explosionTime < EXPLOSION_TIME - 100) {
+        const count = Math.ceil((EXPLOSION_TIME - hero.explosionTime) / 100);
+        const baseTheta = Math.random() * 2 * Math.PI;
+        const element = (hero.explosionTime % 240 === 200) ? 'lightning' : 'fire';
+        for (let i = 0; i < count; i++) {
+            const p = Math.max(0.1, 1 - hero.explosionTime / EXPLOSION_TIME / 2);
+            const radius = EXPLOSION_RADIUS;// * p;
+            const theta = baseTheta + 2 * Math.PI * i / count;
+            const dx = Math.cos(theta), dy = Math.sin(theta);
+            const hitbox = {...hero.getHitbox(), x: 0, y: 0};
+            const sparkle = addSparkleAnimation(state, hero.area, {
+                x: hitbox.w / 2 + radius * dx,
+                y: hitbox.h / 2 + radius * dy, w: 0, h: 0},
+                {
+                    element,
+                    target: hero,
+                }
+            );
+            let speed = Math.max(Random.range(1, 2) / p, radius * 20 / (EXPLOSION_TIME - hero.explosionTime));
+            // override the default velocity so that the particle
+            // always moves in towards the center of the blast.
+            sparkle.vx = -speed * dx;
+            sparkle.vy = -speed * dy;
+            sparkle.ttl = FRAME_LENGTH * radius / speed;
+            if (element === 'lightning') {
+                sparkle.vstep = 3;
+                sparkle.vx *= 3;
+                sparkle.vy *= 3;
+            }
+            //delete sparkle.vstep;
+            sparkle.friction = 0.01;
+            sparkle.az = 0;
+            sparkle.vz = 0;
+            sparkle.z = 1;
+        }
+    }
+}
 
 export function updateGenericHeroState(this: void, state: GameState, hero: Hero) {
     if (hero.displayLife === undefined) {

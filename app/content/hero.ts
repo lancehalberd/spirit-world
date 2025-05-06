@@ -26,7 +26,7 @@ import {
 } from 'app/render/heroAnimations';
 import {
     getHeroFrame, renderCarriedTile,
-    renderExplosionRing, renderHeroBarrier, renderHeroShadow,
+    renderHeroBarrier, renderHeroShadow,
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
 import { getCloneMovementDeltas } from 'app/userInput';
@@ -714,7 +714,6 @@ export class Hero implements Actor {
         if (hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
-        renderExplosionRing(context, state, hero);
         this.renderChargingBehind(context, state);
         if (this.isInvisible) {
             this.renderChargingFront(context, state);
