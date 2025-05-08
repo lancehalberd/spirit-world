@@ -162,9 +162,10 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         // blessed with passives
         case 'catEyes':
         case 'ironSkin':
-        case 'spiritSight':
         case 'trueSight':
             return `You have been blessed with ${lootName}!`;
+        case 'spiritSight':
+            return `You have discovered your ${lootName}!`;
         // received elements
         case 'fire':
         case 'ice':

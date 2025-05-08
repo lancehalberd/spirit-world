@@ -17,7 +17,8 @@ import { getFieldInstanceAndParts } from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
 
 // This is the max size of the spirit sight circle.
-const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
+// The canvas is slightly wider to account for the circles being centered on each eye, which are 4 pixels from the center of the face.
+const [spiritCanvas, spiritContext] = createCanvasAndContext((MAX_SPIRIT_RADIUS + 4) * 2, MAX_SPIRIT_RADIUS * 2);
 
 //let spiritCanvasRadius: number;
 export function updateSpiritCanvas(state: GameState, radius: number, maxRadius: number): void {
@@ -31,18 +32,24 @@ export function updateSpiritCanvas(state: GameState, radius: number, maxRadius: 
     const area = state.alternateAreaInstance;
     spiritContext.save();
         spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
-        const gradient = spiritContext.createRadialGradient(x, y, 0, x, y, radius);
+        spiritContext.globalAlpha = spiritAlpha;
+        let gradient = spiritContext.createRadialGradient(x - 4, y, 0, x - 4, y, radius);
         gradient.addColorStop(0.7, 'rgba(0, 0, 0, 1)');
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-        spiritContext.fillStyle = 'white';
-        spiritContext.globalAlpha = spiritAlpha;
         spiritContext.fillStyle = gradient;
         spiritContext.beginPath();
-        spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
+        spiritContext.arc(x - 5, y, radius, 0, 2 * Math.PI);
+        spiritContext.fill();
+        gradient = spiritContext.createRadialGradient(x + 4, y, 0, x + 4, y, radius);
+        gradient.addColorStop(0.7, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        spiritContext.fillStyle = gradient;
+        spiritContext.beginPath();
+        spiritContext.arc(x + 5, y, radius, 0, 2 * Math.PI);
         spiritContext.fill();
         spiritContext.translate(
-            -(state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2) | 0,
-            -(state.hero.y - state.camera.y - spiritCanvas.height / 2) | 0
+            -((state.hero.x | 0) + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2) | 0,
+            -((state.hero.y | 0) - state.camera.y - spiritCanvas.height / 2 + 1) | 0
         );
         spiritContext.globalAlpha = 1;
         spiritContext.globalCompositeOperation = 'source-atop';
@@ -619,18 +626,20 @@ export function renderHeatOverlay(context: CanvasRenderingContext2D, state: Game
 export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: GameState) {
     if (state.hero.spiritRadius > 0) {
         context.save();
-        //context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
-        context.globalAlpha = state.hero.spiritRadius / state.hero.maxSpiritRadius;
+        const effectiveMaxRadius = state.hero.savedData.passiveTools.spiritSight
+            ? state.hero.maxSpiritRadius
+            : MAX_SPIRIT_RADIUS;
+        context.globalAlpha = state.hero.spiritRadius / effectiveMaxRadius;
         context.fillStyle = '#888';
         context.globalCompositeOperation = 'hue';
         context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
-        updateSpiritCanvas(state, state.hero.spiritRadius, state.hero.maxSpiritRadius);
+        updateSpiritCanvas(state, state.hero.spiritRadius, effectiveMaxRadius);
         context.drawImage(spiritCanvas,
             0, 0, spiritCanvas.width, spiritCanvas.height,
-            (state.hero.x + state.hero.w / 2 - spiritCanvas.width / 2
+            ((state.hero.x | 0) + state.hero.w / 2 - spiritCanvas.width / 2
             - state.camera.x + state.areaInstance.cameraOffset.x) | 0,
-            (state.hero.y - spiritCanvas.height / 2
+            ((state.hero.y | 0) - spiritCanvas.height / 2 + 1
              - state.camera.y + state.areaInstance.cameraOffset.y) | 0,
             spiritCanvas.width, spiritCanvas.height
         );

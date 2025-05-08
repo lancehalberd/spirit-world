@@ -331,7 +331,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // The hero doesn't update while the loot item is displayed, so we don't
         // need to show this for many frames after the hero starts updating again.
         if (hero.actionFrame >= 5) {
-            hero.action = null;
+            hero.action = hero.spiritRadius > 0 ? 'meditating' : null;
         }
         return true;
     }

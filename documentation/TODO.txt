@@ -145,6 +145,8 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Fix graphics for southern Vanara door.
+
     - Add 2x2 map tile frame to tile behaviors that is used when drawing the map
         - Instead of drawing areas at full scale and then scaling them down for the map, just draw them directly at the final scale.
 
@@ -163,6 +165,8 @@ Current tasks:
     - Add new city tiles.
         - Fix dome object hit boxes.
         - Create window objects.
+
+    - Consider updating eye color when True Sight is unlocked, or drawing a third eye when using Spirit Sight.
 
     - Add function for generating a full size image of an area or area section.
 
@@ -187,14 +191,6 @@ Current tasks:
         - Test on staging
         - Ask if anyone else wants to test staging.
         - Release to production.
-
-    - Add Spirit Sight training scene.
-        - "You have already awakened your Spirit Sight but you have not learned to see with it."
-        - "Look at these pots."
-        - "To normal eyes, they are identical, but you can see beyond the material."
-        - "The difference feels subtle, but once you bring it into focus, it will be as night and day."
-        - (Hold R2 to concentrate on the pot)
-        - Slowly transition to Spirit Sight, then do the Spirit Sight loot effect.
 
     - Make floating/flying enemies fall into pits/water when frozen.
 

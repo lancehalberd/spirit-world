@@ -114,6 +114,10 @@ export class LootGetAnimation implements EffectInstance {
         const frame = this.frame;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        const frame = this.frame;
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+    }
 }
 
 

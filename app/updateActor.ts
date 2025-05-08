@@ -86,7 +86,8 @@ export function updateAllHeroes(this: void, state: GameState) {
             updateHero(state, clone);
         }
     }
-    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) >= 20;
+    const skipModulus = state.hero.savedData.passiveTools.spiritSight ? 100 : 40;
+    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % skipModulus) >= 20;
     if (!skipFrame) {
         updatePrimaryHeroState(state, state.hero);
     }
@@ -259,7 +260,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.action !== 'chargingCloneExplosion' && !hero.isUncontrollable) {
         hero.explosionTime = 0;
     }
-    if (hero.action !== 'meditating') {
+    if (hero.action !== 'meditating' && hero.action !== 'getItem') {
         hero.spiritRadius = 0;
     }
     if (hero.toolCooldown > 0) {

@@ -1,5 +1,8 @@
-import { addTextCue, findTextCue } from 'app/content/effects/textCue';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {addTextCue, findTextCue} from 'app/content/effects/textCue';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {MAX_SPIRIT_RADIUS} from 'app/gameConstants';
+import {showMessage} from 'app/scriptEvents';
+import {pad} from 'app/utils/index';
 
 specialBehaviorsHash.runInstructions = {
     type: 'narration',
@@ -70,6 +73,44 @@ specialBehaviorsHash.staffInstructions = {
                 }
             } else if (state.hero.savedData.activeTools.staff) {
                 helpText = `Press [B_MENU] to open your inventory and assign Staff to [B_TOOL]`;
+            }
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    },
+};
+
+
+specialBehaviorsHash.spiritSightInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        if (!state.hero.savedData.passiveTools.spiritSight && state.savedState.objectFlags.spiritSightTraining) {
+            helpText = 'Approach the pots.'
+            const pot = state.areaInstance.objects.find(o => o.definition?.id === 'tombEscapePot');
+            const isCloseToPots = pot && state.hero.overlaps(pad(pot.getHitbox(), 16));
+            if (isCloseToPots) {
+                helpText = 'Hold [B_MEDITATE] to concentrate on the pot.';
+                if (state.hero.action === 'meditating') {
+                    state.hero.maxSpiritRadius = Math.min(MAX_SPIRIT_RADIUS, (state.hero.maxSpiritRadius + 0.15) * 1.005);
+                    if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS) {
+                        // Once maximum spirit sight radius is reached, the player will learn the Spirit Sight ability.
+                        showMessage(state, '{item:spiritSight}');
+                        helpText = '';
+                    } else if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS / 2) {
+                        helpText = `...and see what lies beneath.`;
+                    } else if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS / 5) {
+                        helpText = `...let the obvious become obscure...`;
+                    } else if (state.hero.maxSpiritRadius >= 3) {
+                        helpText = 'Feel the difference...';
+                    }
+                } else {
+                    state
+                }
             }
         }
         const textCue = findTextCue(state);

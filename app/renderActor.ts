@@ -216,28 +216,29 @@ export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameSta
     const frame = heroAnimations.idle.down.frames[0];
     let xOffset = 4, yOffset = 11;
     let eyeFrame = {...frame, x: frame.x + xOffset, y: frame.y + yOffset, w: 3, h: 2};
+    const x = hero.x | 0, y = hero.y | 0, z = hero.z | 0;
     drawFrame(context, eyeFrame, {
-        x: hero.x - eyeFrame.content.x + xOffset,
-        y: hero.y - eyeFrame.content.y + yOffset - hero.z,
+        x: x - eyeFrame.content.x + xOffset,
+        y: y - eyeFrame.content.y + yOffset - hero.z,
         w: eyeFrame.w,
         h: eyeFrame.h,
     });
     // Until we get new graphics for this, just color the irises light blue for contrast.
     context.fillStyle = '#0CF';
-    context.fillRect((hero.x - eyeFrame.content.x + xOffset + 1) | 0, (hero.y - eyeFrame.content.y + yOffset - hero.z) | 0, 1, 2);
+    context.fillRect((x - eyeFrame.content.x + xOffset + 1) | 0, (y - eyeFrame.content.y + yOffset - z) | 0, 1, 2);
     /*context.fillStyle = '#08D';
-    context.fillRect(hero.x - eyeFrame.content.x + xOffset, hero.y - eyeFrame.content.y + yOffset - hero.z, 1, 1);
+    context.fillRect(x - eyeFrame.content.x + xOffset, y - eyeFrame.content.y + yOffset - z, 1, 1);
     context.fillStyle = '#0CF';
-    context.fillRect(hero.x - eyeFrame.content.x + xOffset, hero.y - eyeFrame.content.y + yOffset - hero.z + 1, 1, 1);*/
+    context.fillRect(x - eyeFrame.content.x + xOffset, y - eyeFrame.content.y + yOffset - z + 1, 1, 1);*/
     xOffset = 11;
     eyeFrame = {...frame, x: frame.x + xOffset, y: frame.y + 11, w: 3, h: 2};
     drawFrame(context, eyeFrame, {
-        x: hero.x - eyeFrame.content.x + xOffset,
-        y: hero.y - eyeFrame.content.y + yOffset - hero.z,
+        x: x - eyeFrame.content.x + xOffset,
+        y: y - eyeFrame.content.y + yOffset - z,
         w: eyeFrame.w,
         h: eyeFrame.h,
     });
-    context.fillRect((hero.x - eyeFrame.content.x + xOffset + 1) | 0, (hero.y - eyeFrame.content.y + yOffset - hero.z) | 0, 1, 2);
+    context.fillRect((x - eyeFrame.content.x + xOffset + 1) | 0, (y - eyeFrame.content.y + yOffset - z) | 0, 1, 2);
     /*context.fillStyle = '#08D';
     context.fillRect(hero.x - eyeFrame.content.x + xOffset + 2, hero.y - eyeFrame.content.y + yOffset - hero.z, 1, 1);
     context.fillStyle = '#0CF';

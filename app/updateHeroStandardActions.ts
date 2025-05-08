@@ -325,7 +325,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (hero.isUncontrollable
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
-            } else if (hero.savedData.passiveTools.spiritSight) {
+            } else if (hero.savedData.passiveTools.catEyes) {
+                // Note that the hero can use spirit sight successfully without spirit sight when they are training to
+                // use spirit sight. Normally maxSpiritRadius will be 0 without spirit sight, but the spirit sight tutorail
+                // will override this value.
                 if (hero.spiritRadius <= hero.maxSpiritRadius) {
                     hero.spiritRadius = Math.min(hero.spiritRadius + hero.maxSpiritRadius / 20, hero.maxSpiritRadius);
                 } else {
@@ -883,7 +886,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
         } else if (!hero.isAstralProjection
-            && !isActionBlocked && (hero.savedData.passiveTools.spiritSight || hero.clones.length)
+            && !isActionBlocked && (hero.savedData.passiveTools.catEyes || hero.clones.length)
             && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
         ) {
             if (!hero.clones.length) {
@@ -893,6 +896,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
                 if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
                     hero.maxSpiritRadius = 24;
+                }
+                if (!hero.savedData.passiveTools.spiritSight) {
+                    hero.maxSpiritRadius = 0;
                 }
             } else if (hero.clones.filter(clone => !clone.isUncontrollable).length) {
                 // You can only charge clone explosion with at least one controllable clone.
