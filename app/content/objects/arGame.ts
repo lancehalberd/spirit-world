@@ -19,7 +19,7 @@ export class ARGame implements ObjectInstance {
     status: ObjectStatus = 'normal';
     constructor(state: GameState, public definition: SimpleObjectDefinition) {}
     getBehaviors(state: GameState): TileBehaviors {
-        if (state.arState.active) {
+        if (!this.isVisible(state)) {
             return {}
         }
         return {
@@ -29,14 +29,17 @@ export class ARGame implements ObjectInstance {
     getHitbox(): Rect {
         return getFrameHitbox(headsetFrame, this);
     }
+    isVisible(state: GameState): boolean {
+        return state.hero.savedData.passiveTools.spiritSight > 0 && !state.arState.active
+    }
     onGrab(state: GameState) {
-        if (state.arState.active) {
+        if (!this.isVisible(state)) {
             return;
         }
         showMessage(state, '{@arGame.start}');
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (state.arState.active) {
+        if (!this.isVisible(state)) {
             return;
         }
         drawFrameContentAt(context, headsetFrame, this);

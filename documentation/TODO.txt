@@ -145,12 +145,26 @@ Graphics to Implement:
 
 
 Current tasks:
+
+    - Dodger improvements
+        - Add special levels
+            - Endless mode with difficulty increasing by 1 every 10 seconds.
+
     - Fix graphics for southern Vanara door.
+
+    - Add more AR games, global progress and rewards
+        - Milestones/achievements grant global AR progress that can unlock more difficult AR content and some small real perks (Peach Piece at most)
+        - Add AR arcade to both the Spirit City + Sky City.
+            - Can play any games at the arcade, but each one has different games that can be unlocked, as well as different prizes.
+            - Portable AR headset is an early prize in sky city
+
+    - Forest/overworld puzzle
+        - Use astral projection from the spirit world to push a water droplet to grow a vine in the material world.
 
     - Add 2x2 map tile frame to tile behaviors that is used when drawing the map
         - Instead of drawing areas at full scale and then scaling them down for the map, just draw them directly at the final scale.
 
-    - Considefer modify rolling balls/pots velocity to match the direction it actually starts moving when hit.
+    - Consider modify rolling balls/pots velocity to match the direction it actually starts moving when hit.
         - If it is hit DR but only moves R the velocity should be R.
 
     - Add support for placing objects/NPCs inside of beds, stasis pods, and tubes.

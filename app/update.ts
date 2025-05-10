@@ -20,6 +20,7 @@ import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
 import { updateFileSelect } from 'app/scenes/fileSelect/updateFileSelect';
 import { updateTitle } from 'app/scenes/title/updateTitle';
 import { updateSettings } from 'app/scenes/settings/updateSettings';
+import {showMessage} from 'app/scriptEvents';
 import {
     canPauseGame,
     getState,
@@ -76,6 +77,10 @@ export function update() {
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+            if (state.arState.active && canPauseGame(state)) {
+                showMessage(state, '{@arGame.quit}');
+                return;
+            }
             // Don't allow pausing while dialogue is displayed.
             if (state.paused
                 || (canPauseGame(state)
