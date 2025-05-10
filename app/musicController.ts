@@ -26,6 +26,10 @@ export const updateMusic = (state: GameState): void => {
         playTrack(state.scriptEvents.overrideMusic, 0);
         return;
     }
+    if (state.arState.active) {
+        playTrack('towerTheme', 0);
+        return;
+    }
     const allBosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
         e => e.status !== 'gone' && e.definition.type === 'boss'
         && e.isFromCurrentSection(state)

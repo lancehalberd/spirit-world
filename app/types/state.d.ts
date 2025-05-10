@@ -1,11 +1,16 @@
 type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
 
-type SavedState = {
+interface SavedARState {
+    gameData: {[key: string]: any}
+}
+
+interface SavedState {
     // Flags that are set permanently for objects, like opened treasure chests or defeated bosses.
     objectFlags: {[key: string]: boolean | number | number[] | string}
     // Flags that remain set as long as the character does not leave the current zone.
     zoneFlags: {[key: string]: boolean | number | number[] | string}
     savedHeroData: SavedHeroData
+    savedArData: SavedARState
     dungeonInventories: {
         [key: string]: DungeonInventory
     }
@@ -103,7 +108,7 @@ interface GameState {
         defeated: boolean
         reviving?: boolean
         time: number
-    },
+    }
     scene: Scene
     keyboard: {
         gameKeyValues: number[]
@@ -113,12 +118,12 @@ interface GameState {
         // a new key is pressed to be those keys pressed in that same frame.
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
-    },
+    }
     messagePage?: TextPageState
     randomizer?: {
         seed: number
         goal: number
-    },
+    }
     scriptEvents: {
         activeEvents: ActiveScriptEvent[]
         blockEventQueue: boolean
@@ -153,4 +158,11 @@ interface GameState {
         renderedMapId?: string
         renderedFloorId?: string
     }
+    arState: ARState
+}
+
+interface ARState {
+    active: boolean
+    scene: 'choose'|'dodger'
+    game?: any
 }

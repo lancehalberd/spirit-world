@@ -1,3 +1,4 @@
+import {renderARHUD} from 'app/arGames/arGame';
 import {getLootFrame} from 'app/content/loot';
 import {editingState} from 'app/development/editingState';
 import {CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType} from 'app/gameConstants';
@@ -259,6 +260,7 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
     if (state.paused && shouldHideMenu(state)) {
         // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }
+    renderARHUD(context, state);
 }
 
 export function renderHudEffects(context: CanvasRenderingContext2D, state: GameState): void {

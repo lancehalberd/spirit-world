@@ -1,16 +1,17 @@
-import { addObjectFallAnimation, addEnemyFallAnimation, addSplashAnimation } from 'app/content/effects/animationEffect';
-import { Enemy } from 'app/content/enemy';
-import { setEquippedElement } from 'app/content/menu';
-import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import { addAmbientEffects } from 'app/scenes/field/addAmbientEffects';
-import { wasGameKeyPressed } from 'app/userInput';
-import { updateAllHeroes } from 'app/updateActor';
-import { updateCamera } from 'app/updateCamera';
-import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
-import { getCompositeBehaviors } from 'app/utils/getBehaviors';
-import { rectanglesOverlap } from 'app/utils/index';
-import { getFieldInstanceAndParts, removeObjectFromArea } from 'app/utils/objects';
+import {updateAR} from 'app/arGames/arGame';
+import {addObjectFallAnimation, addEnemyFallAnimation, addSplashAnimation} from 'app/content/effects/animationEffect';
+import {Enemy} from 'app/content/enemy';
+import {setEquippedElement} from 'app/content/menu';
+import {editingState} from 'app/development/editingState';
+import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
+import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
+import {wasGameKeyPressed} from 'app/userInput';
+import {updateAllHeroes} from 'app/updateActor';
+import {updateCamera} from 'app/updateCamera';
+import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors';
+import {rectanglesOverlap} from 'app/utils/index';
+import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects';
 
 export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
@@ -73,6 +74,7 @@ export function updateField(this: void, state: GameState) {
         updateAreaObjects(state, state.nextAreaInstance);
     }
     updateAreaObjects(state, state.alternateAreaInstance);
+    updateAR(state)
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {

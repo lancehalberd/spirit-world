@@ -1,3 +1,4 @@
+import {renderAR} from 'app/arGames/arGame';
 import { getOrCreateAreaInstance } from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
 import { editingState } from 'app/development/editingState';
@@ -99,6 +100,10 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
         renderHeatOverlay(context, state, state.areaInstance);
         renderSpiritOverlay(context, state);
         renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+        context.save();
+            translateContextForAreaAndCamera(context, state, state.areaInstance);
+            renderAR(context, state);
+        context.restore();
     removeScreenShakes(context, state);
 }
 export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
@@ -107,6 +112,10 @@ export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRende
     renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
     renderSpiritOverlay(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    context.save();
+        translateContextForAreaAndCamera(context, state, state.areaInstance);
+        renderAR(context, state);
+    context.restore();
 }
 
 export function translateContextForAreaAndCamera(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

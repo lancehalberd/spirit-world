@@ -11,6 +11,7 @@ export function getDefaultSavedState(): SavedState {
         zoneFlags: {},
         luckyBeetles: [],
         savedHeroData: getDefaultSavedHeroData(),
+        savedArData: {gameData: {}},
         staffTowerLocation: 'desert',
     };
 }

@@ -1,6 +1,7 @@
 export * from 'app/content/objects/objectHash';
 export * from 'app/content/objects/airBubbles';
 export * from 'app/content/objects/airStream';
+export * from 'app/content/objects/arGame';
 export * from 'app/content/objects/ballGoal';
 export * from 'app/content/objects/beadCascade';
 export * from 'app/content/objects/bell';

@@ -567,7 +567,7 @@ interface NPCDefinition extends BaseObjectDefinition {
     dialogueIndex?: number
 }
 
-type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
+type SimpleObjectType = 'airBubbles' | 'arGame' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret' | 'jadeChampion'
     | 'peachTree' | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';

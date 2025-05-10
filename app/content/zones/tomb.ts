@@ -355,6 +355,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, x: 56, y: 264, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, specialBehaviorKey: "spiritSightInstructions", saveStatus: "never"},
         {status: "normal", id: "", x: 50, y: 268, type: "decoration", d: "right", w: 16, h: 16, decorationType: "bearRug", drawPriority: "background"},
         {status: "normal", id: "", x: 49, y: 203, type: "decoration", d: "right", w: 32, h: 16, decorationType: "shelves", drawPriority: "background", seed: 12},
+        {status: "normal", id: "", x: 164, y: 356, type: "arGame"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 182, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 1},

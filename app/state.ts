@@ -145,6 +145,10 @@ export function getDefaultState(): GameState {
         map: {
             needsRefresh: true,
         },
+        arState: {
+            active: false,
+            scene: 'choose',
+        },
     };
     return state;
 }
