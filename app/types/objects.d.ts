@@ -74,6 +74,8 @@ interface BaseFieldInstance {
     // Can be set to -1 to draw behind objects with the default value.
     drawPriorityIndex?: number
     doesNotFall?: boolean
+    // Set this to true to always update this every frame even when the hero is meditating.
+    neverSkipFrames?: boolean
     getDrawPriority?: (state: GameState) => DrawPriority
     render: (context: CanvasRenderingContext2D, state: GameState) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void

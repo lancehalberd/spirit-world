@@ -772,6 +772,11 @@ export function renderDodger(context: CanvasRenderingContext2D, state: GameState
     context.save();
         context.beginPath();
         context.rect(gameState.screen.x, gameState.screen.y, gameState.screen.w, gameState.screen.h);
+        context.save();
+            context.globalAlpha = 0.5;
+            context.fillStyle = 'black'
+            context.fill();
+        context.restore();
         context.strokeStyle = 'red';// 'rgba(255, 0, 0, 1)'
         context.stroke();
         if (gameState.scene === 'level') {

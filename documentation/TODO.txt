@@ -145,7 +145,6 @@ Graphics to Implement:
 
 
 Current tasks:
-
     - Dodger improvements
         - Add special levels
             - Endless mode with difficulty increasing by 1 every 10 seconds.

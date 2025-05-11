@@ -127,6 +127,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         // Time passes slowly for everything but the astral projection while meditating and things it is
         // or has recently interacted with.
         if (skipFrame
+            && !object.neverSkipFrames
             && object !== state.hero.astralProjection
             && object !== state.hero.astralProjection?.grabObject
             && object !== state.hero.astralProjection?.lastTouchedObject
@@ -213,6 +214,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         // Time passes slowly for everything but the astral projection while meditating and things it is
         // or has recently interacted with.
         if (skipFrame
+            && !effect.neverSkipFrames
             && effect !== state.hero.astralProjection?.lastTouchedObject
             && (!effect.linkedObject || effect.linkedObject !== state.hero.astralProjection?.lastTouchedObject)
         ) {

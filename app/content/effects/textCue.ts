@@ -22,6 +22,7 @@ export class TextCue implements EffectInstance {
     drawPriority: DrawPriority = 'hud';
     behaviors: TileBehaviors;
     isEffect = <const>true;
+    neverSkipFrames = true;
     x: number;
     y: number;
     // Add a slight delay to fading in text cues to prevent them from showing ahead of text dialogue when the two are triggered at the same time.

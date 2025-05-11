@@ -103,10 +103,12 @@ specialBehaviorsHash.spiritSightInstructions = {
                         helpText = '';
                     } else if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS / 2) {
                         helpText = `...and see what lies beneath.`;
-                    } else if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS / 5) {
+                    } else if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS / 4) {
                         helpText = `...let the obvious become obscure...`;
-                    } else if (state.hero.maxSpiritRadius >= 3) {
-                        helpText = 'Feel the difference...';
+                    } else if (state.hero.maxSpiritRadius >= 8) {
+                        helpText = '...feel the difference...';
+                    } else {
+                        helpText = 'Keep concentrating...';
                     }
                 } else {
                     state

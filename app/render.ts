@@ -80,7 +80,6 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
     }
     state.lastTimeRendered = state.time;
     renderStandardFieldStack(context, state);
-    renderMessage(context, state);
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
@@ -111,12 +110,14 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         context.restore();
         // Draw the HUD onto the field.
         renderHUD(context, state);
+        renderMessage(context, state);
         if (state.defeatState.time >= 2000) {
             renderDefeatedMenu(context, state);
         }
         return;
     }
     renderHUD(context, state);
+    renderMessage(context, state);
     if (state.paused && !shouldHideMenu(state)) {
         if (state.showMap) {
             renderMap(context, state);
