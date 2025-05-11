@@ -9,7 +9,7 @@ dialogueHash.arGame = {
             return `It's an AR device.{choice: Play AR?|Yes:arGame.chooseGame|No:arGame.no}`;
         },
         quit: (state: GameState) => {
-            return `{choice: Quit AR?|Yes:arGame.quitGame|No:arGame.no}`;
+            return `{choice: Quit AR?|No:arGame.no|Yes:arGame.quitGame}`;
         },
         chooseGame: (state: GameState) => {
             // TODO: save available games and read them here.

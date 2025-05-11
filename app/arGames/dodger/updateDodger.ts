@@ -9,7 +9,7 @@ import {saveGame } from 'app/utils/saveGame';
 import {typedKeys} from 'app/utils/types';
 
 type LevelKey = 'none' | 'l1' | 'l2' | 'l3' | 'l4' | 'l5' | 'l6' | 'l7' | 'l8' | 'l9' | 's1' | 's2' | 's3' | 's4' | 's5' | 's6' | 's7' | 's8' | 's9';
-type UnlockKey = LevelKey | 'life' | 'heal' | 'time' | 'size' | 'points' | 'slow' | 'shield' | 'reset';
+type UnlockKey = LevelKey | 'life' | 'heal' | 'time' | 'size' | 'points' | 'slow' | 'shield' | 'turbo' | 'reset';
 type Scene = 'shop' | 'level' | 'results' | 'reset';
 
 const baseLife = 3;
@@ -53,9 +53,27 @@ interface DodgerBullet {
     y: number
     vx: number
     vy: number
+    outerColor: string;
+    innerColor: string;
     done?: boolean
     update(state: GameState, gameState: DodgerState, savedState: DodgerSavedState): void
     render(context: CanvasRenderingContext2D, state: GameState): void
+}
+function getTurboMultiplier(savedState: DodgerSavedState): number {
+    return (savedState.unlocks.turbo > 0 ? 1.5 : 1);
+}
+function getBaseBulletSpeed(gameState: DodgerState, savedState: DodgerSavedState) {
+    return (1.5 + (gameState.difficulty - 1) / 10) * getTurboMultiplier(savedState);
+}
+function renderBullet(context: CanvasRenderingContext2D, bullet: DodgerBullet, innerColor = bullet.innerColor, outerColor = bullet.outerColor) {
+    context.beginPath();
+    context.arc(bullet.x, bullet.y, 4, 0, 2 * Math.PI);
+    context.fillStyle = outerColor;
+    context.fill();
+    context.beginPath();
+    context.arc(bullet.x, bullet.y, 2, 0, 2 * Math.PI);
+    context.fillStyle = innerColor;
+    context.fill();
 }
 class SimpleBullet implements DodgerBullet {
     x: number;
@@ -64,6 +82,8 @@ class SimpleBullet implements DodgerBullet {
     vy: number;
     ttl: number;
     done = false;
+    outerColor = '#F00';
+    innerColor = '#800';
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -73,14 +93,7 @@ class SimpleBullet implements DodgerBullet {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.beginPath();
-        context.arc(this.x, this.y, 4, 0, 2 * Math.PI);
-        context.fillStyle = '#F00'
-        context.fill();
-        context.beginPath();
-        context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
-        context.fillStyle = '#800'
-        context.fill();
+        renderBullet(context, this);
     }
 }
 class AimingBullet implements DodgerBullet {
@@ -88,9 +101,11 @@ class AimingBullet implements DodgerBullet {
     y: number;
     vx = 0;
     vy = 0;
-    ttl = 0;;
-    cooldown = 200;
+    ttl = 0;
+    cooldown = 500;
     done = false;
+    outerColor = '#FF0';
+    innerColor = '#880';
     update(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -104,10 +119,12 @@ class AimingBullet implements DodgerBullet {
         }
     }
     shoot(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
-        const speed = 2 + (gameState.difficulty - 1) / 10;
+        const speed = getBaseBulletSpeed(gameState, savedState);
         const spacing = 40 + 2 * (savedState.unlocks.slow ?? 0);
         this.cooldown = FRAME_LENGTH * Math.ceil(spacing / speed);
         const bullet = new SimpleBullet();
+        bullet.innerColor = this.innerColor;
+        bullet.outerColor = this.outerColor;
         bullet.x = this.x;
         bullet.y = this.y
         const heroHitbox = getHeroPosition(state, gameState);
@@ -120,14 +137,7 @@ class AimingBullet implements DodgerBullet {
         gameState.bullets.push(bullet);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.beginPath();
-        context.arc(this.x, this.y, 4, 0, 2 * Math.PI);
-        context.fillStyle = '#FF0'
-        context.fill();
-        context.beginPath();
-        context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
-        context.fillStyle = '#880'
-        context.fill();
+        renderBullet(context, this, this.outerColor, this.outerColor);
     }
 }
 class StrafingBullet implements DodgerBullet {
@@ -136,7 +146,9 @@ class StrafingBullet implements DodgerBullet {
     vx = 0;
     vy = 0;
     theta: number;
-    cooldown = 200;
+    cooldown = 500;
+    outerColor = '#8F0';
+    innerColor = '#480';
     update(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -146,10 +158,13 @@ class StrafingBullet implements DodgerBullet {
         }
     }
     shoot(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
-        const speed = 2 + (gameState.difficulty - 1) / 10;
+        const speed = getBaseBulletSpeed(gameState, savedState);
         const spacing = 36 + 2 * (savedState.unlocks.slow ?? 0);
-        this.cooldown = FRAME_LENGTH * Math.ceil(spacing / speed);
+        // This controls the horizontal space between bullets.
+        this.cooldown = FRAME_LENGTH * Math.ceil(spacing / (Math.sqrt(this.vx * this.vx + this.vy * this.vy)));
         const bullet = new SimpleBullet();
+        bullet.innerColor = this.innerColor;
+        bullet.outerColor = this.outerColor;
         bullet.x = this.x;
         bullet.y = this.y
         const dx = Math.cos(this.theta), dy = Math.sin(this.theta);
@@ -159,14 +174,7 @@ class StrafingBullet implements DodgerBullet {
         gameState.bullets.push(bullet);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.beginPath();
-        context.arc(this.x, this.y, 4, 0, 2 * Math.PI);
-        context.fillStyle = '#8F0'
-        context.fill();
-        context.beginPath();
-        context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
-        context.fillStyle = '#480'
-        context.fill();
+        renderBullet(context, this, this.outerColor, this.outerColor);
     }
 }
 class SpinningBullet implements DodgerBullet {
@@ -175,11 +183,13 @@ class SpinningBullet implements DodgerBullet {
     vx = 0;
     vy = 0;
     ttl = 0;;
-    cooldown = 200;
+    cooldown = 500;
     done = false;
     bulletCount = 4;
     theta = 0;
     thetaV = 0;
+    outerColor = '#F0F';
+    innerColor = '#808';
     update(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -191,13 +201,15 @@ class SpinningBullet implements DodgerBullet {
         }
     }
     shoot(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
-        const speed = 2 + (gameState.difficulty - 1) / 10;
+        const speed = getBaseBulletSpeed(gameState, savedState);
         const spacing = 36 + 2 * (savedState.unlocks.slow ?? 0);
         this.cooldown = FRAME_LENGTH * Math.ceil(spacing / Math.max(1, speed - Math.sqrt(this.vx * this.vx + this.vy * this.vy)));
         this.theta += this.thetaV;
         for (let i = 0; i < this.bulletCount; i++) {
             const theta = this.theta + i * 2 * Math.PI / this.bulletCount;
             const bullet = new SimpleBullet();
+            bullet.innerColor = this.innerColor;
+            bullet.outerColor = this.outerColor;
             bullet.x = this.x;
             bullet.y = this.y
             const dx = Math.cos(theta), dy = Math.sin(theta);
@@ -207,14 +219,7 @@ class SpinningBullet implements DodgerBullet {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.beginPath();
-        context.arc(this.x, this.y, 4, 0, 2 * Math.PI);
-        context.fillStyle = '#F0F'
-        context.fill();
-        context.beginPath();
-        context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
-        context.fillStyle = '#808'
-        context.fill();
+        renderBullet(context, this, this.outerColor, this.outerColor);
     }
 }
 class CirclingBullet implements DodgerBullet {
@@ -224,8 +229,10 @@ class CirclingBullet implements DodgerBullet {
     vx = 0;
     vy = 0;
     ttl = 0;
-    cooldown = 200;
+    cooldown = 500;
     done = false;
+    outerColor = '#80F';
+    innerColor = '#408';
     update(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
         const tx = gameState.screen.x + gameState.screen.w / 2;
         const ty = gameState.screen.y + gameState.screen.h / 2;
@@ -243,10 +250,12 @@ class CirclingBullet implements DodgerBullet {
         }
     }
     shoot(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
-        const speed = 1 + (gameState.difficulty - 1) / 10;
+        const speed = getBaseBulletSpeed(gameState, savedState);
         const spacing = 20 + 2 * (savedState.unlocks.slow ?? 0);
         this.cooldown = FRAME_LENGTH * Math.ceil(spacing / speed);
         const bullet = new SimpleBullet();
+        bullet.innerColor = this.innerColor;
+        bullet.outerColor = this.outerColor;
         bullet.x = this.x;
         bullet.y = this.y
         const tx = gameState.screen.x + gameState.screen.w / 2;
@@ -259,14 +268,7 @@ class CirclingBullet implements DodgerBullet {
         gameState.bullets.push(bullet);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.beginPath();
-        context.arc(this.x, this.y, 4, 0, 2 * Math.PI);
-        context.fillStyle = '#80F'
-        context.fill();
-        context.beginPath();
-        context.arc(this.x, this.y, 2, 0, 2 * Math.PI);
-        context.fillStyle = '#408'
-        context.fill();
+        renderBullet(context, this, this.outerColor, this.outerColor);
     }
 }
 class TargetZone {
@@ -357,6 +359,11 @@ const shopItems: ShopItem[] = [
     {key: 's6', levelKey: 's6', x: 2, y: 5, costs: [10000], label: 'Secret 6', description: '?!?!'},
     {key: 's7', levelKey: 's7', x: 2, y: 6, costs: [10000], label: 'Secret 7', description: '?!?!?!'},
     {
+        key: 'turbo', x: 1, y: 0,
+        label: 'Turbo',
+        description: 'Toggle turbo speed',
+    },
+    {
         key: 'life', x: 1, y: 1, costs: [
             10, 20, 50,
             100, 200, 500,
@@ -428,7 +435,7 @@ function shopItemRect(gameState: DodgerState, item: ShopItem): Rect {
     };
 }
 function updateShopItems(state: GameState, gameState: DodgerState, savedState: DodgerSavedState) {
-    const unlockedKeys: Set<UnlockKey> = new Set();
+    const unlockedKeys: Set<UnlockKey> = new Set(['turbo', 'l1']);
     for (const key of typedKeys(savedState.unlocks)) {
         if (savedState.unlocks[key]) {
             unlockedKeys.add(key);
@@ -460,6 +467,14 @@ function updateShop(state: GameState, gameState:DodgerState, savedState: DodgerS
     updateShopItems(state, gameState, savedState);
     const activeItem = gameState.activeShopItem;
     if (activeItem && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
+        if (activeItem.key === 'turbo') {
+            if (savedState.unlocks.turbo) {
+                savedState.unlocks.turbo = 0;
+            } else {
+                savedState.unlocks.turbo = 1;
+            }
+            return;
+        }
         if (activeItem.key === 'reset') {
             gameState.scene = 'reset';
             return;
@@ -476,22 +491,7 @@ function updateShop(state: GameState, gameState:DodgerState, savedState: DodgerS
                 playAreaSound(state, state.areaInstance, 'error');
             }
         } else if (level > 0 && activeItem.levelKey) {
-            gameState.scene = 'level';
-            if (activeItem.levelKey === 's1') {
-                gameState.difficulty = 10;
-                gameState.goal = 0;
-            } else {
-                // This is a hack, but it works for now.
-                gameState.difficulty = activeItem.y + 1;
-                gameState.goal = 4 + gameState.difficulty;
-            }
-            gameState.bullets = [];
-            gameState.targets = [];
-            gameState.score = 0;
-            gameState.timesHit = 0;
-            gameState.bulletCooldown = 200;
-            gameState.specialBulletCooldown = 500;
-            gameState.levelKey = activeItem.levelKey;
+            startLevel(state, gameState, activeItem.levelKey);
         }
     }
 }
@@ -507,7 +507,9 @@ function renderShop(context: CanvasRenderingContext2D, state: GameState, gameSta
         drawARFont(context, item.label, x + w / 2, y + 1, {textAlign: 'center', textBaseline: 'top'});
         const level = savedState.unlocks[item.key] ?? 0;
         const cost = item.costs?.[level];
-        if (cost) {
+        if (item.key === 'turbo') {
+            drawARFont(context, savedState.unlocks.turbo ? 'ON' : 'OFF', x + w / 2, y + 8, {textAlign: 'center', textBaseline: 'top'});
+        } else if (cost) {
             drawARFont(context, '' + cost, x + w / 2, y + 8, {textAlign: 'center', textBaseline: 'top'});
         } else if (!item.levelKey) {
             drawARFont(context, 'MAX', x + w / 2, y + 8, {textAlign: 'center', textBaseline: 'top'});
@@ -524,7 +526,7 @@ function spawnSimpleBullet(state: GameState, gameState:DodgerState, savedState: 
     const ty = gameState.screen.y + Math.random() * gameState.screen.h;
     const dx = tx - bullet.x, dy = ty - bullet.y;
     const mag = Math.sqrt(dx * dx + dy * dy);
-    const speed = 2 + (gameState.difficulty - 1) / 10;
+    const speed = getBaseBulletSpeed(gameState, savedState);
     bullet.vx = speed * dx / mag;
     bullet.vy = speed * dy / mag;
     gameState.bullets.push(bullet);
@@ -532,7 +534,7 @@ function spawnSimpleBullet(state: GameState, gameState:DodgerState, savedState: 
 
 function spawnStationaryAimingBullet(state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
     const bullet = new AimingBullet();
-    bullet.ttl = 1200 + 100 * gameState.difficulty;
+    bullet.ttl = 1500 + 100 * gameState.difficulty;
     const theta = 2 * Math.PI * Math.random();
     bullet.x = gameState.screen.x + gameState.screen.w / 2 + 100 * Math.cos(theta);
     bullet.y = gameState.screen.y + gameState.screen.h / 2 + 100 * Math.sin(theta);
@@ -541,7 +543,7 @@ function spawnStationaryAimingBullet(state: GameState, gameState:DodgerState, sa
 
 function spawnMovingAimingBullet(state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
     const bullet = new AimingBullet();
-    bullet.ttl = 1200 + 100 * gameState.difficulty;
+    bullet.ttl = 1500 + 100 * gameState.difficulty;
     const theta = 2 * Math.PI * Math.random();
     bullet.x = gameState.screen.x + gameState.screen.w / 2 + 100 * Math.cos(theta);
     bullet.y = gameState.screen.y + gameState.screen.h / 2 + 100 * Math.sin(theta);
@@ -559,7 +561,7 @@ function spawnStationarySpinningBullet(state: GameState, gameState:DodgerState, 
     const bullet = new SpinningBullet();
     let possibleAngles = gameState.difficulty >= 6 ? 16 : (gameState.difficulty >=4 ? 8 : 4);
     bullet.theta = 2 * Math.PI * Math.floor(Math.random() * possibleAngles) / possibleAngles;
-    bullet.ttl = 1200 + 100 * gameState.difficulty;
+    bullet.ttl = 1500 + 100 * gameState.difficulty;
     bullet.bulletCount = gameState.difficulty < 5 ? 4 : 6;
     bullet.thetaV = 2 * Math.PI / bullet.bulletCount / 4;
     const theta = 2 * Math.PI * Math.random();
@@ -571,7 +573,7 @@ function spawnMovingSpinningBullet(state: GameState, gameState:DodgerState, save
     const bullet = new SpinningBullet();
     let possibleAngles = gameState.difficulty >= 6 ? 16 : (gameState.difficulty >=4 ? 8 : 4);
     bullet.theta = 2 * Math.PI * Math.floor(Math.random() * possibleAngles) / possibleAngles;
-    bullet.ttl = 1200 + 100 * gameState.difficulty;
+    bullet.ttl = 1500 + 100 * gameState.difficulty;
     bullet.bulletCount = gameState.difficulty < 7 ? 4 : 6;
     const theta = 2 * Math.PI * Math.random();
     bullet.x = gameState.screen.x + gameState.screen.w / 2 + 100 * Math.cos(theta);
@@ -594,9 +596,10 @@ function spawnStrafingBullet(state: GameState, gameState:DodgerState, savedState
     bullet.x = gameState.screen.x + gameState.screen.w / 2 + 80 * Math.cos(theta);
     bullet.y = gameState.screen.y + gameState.screen.h / 2 + 80 * Math.sin(theta);
     const dx = Math.cos(theta + Math.PI / 2), dy = Math.sin(theta + Math.PI / 2);
-    const speed = 2 - gameState.difficulty / 8;
-    bullet.x -= 64 * dx;
-    bullet.y -= 64 * dy;
+    const speed = getBaseBulletSpeed(gameState, savedState);
+    const distance = (48 + Math.floor(Math.random() * 16) + speed * bullet.cooldown / FRAME_LENGTH)
+    bullet.x -= distance * dx;
+    bullet.y -= distance * dy;
     bullet.vx = speed * dx;
     bullet.vy = speed * dy;
     gameState.bullets.push(bullet);
@@ -610,7 +613,7 @@ function spawnCirclingBullets(state: GameState, gameState:DodgerState, savedStat
         const theta = baseTheta + i * 2 * Math.PI / bulletCount;
         const bullet = new CirclingBullet();
         bullet.cooldown += 40 * i;
-        bullet.ttl = gameState.specialBulletCooldown + 500;
+        bullet.ttl = 1500 + 100 * gameState.difficulty;
         bullet.x = gameState.screen.x + gameState.screen.w / 2 + 80 * Math.cos(theta);
         bullet.y = gameState.screen.y + gameState.screen.h / 2 + 80 * Math.sin(theta);
         bullet.speed = 2 - gameState.difficulty / 8;
@@ -618,11 +621,29 @@ function spawnCirclingBullets(state: GameState, gameState:DodgerState, savedStat
     }
 }
 
+function startLevel(state: GameState, gameState:DodgerState, levelKey: LevelKey) {
+    gameState.scene = 'level';
+    if (levelKey === 's1') {
+        gameState.difficulty = 10;
+        gameState.goal = 0;
+    } else {
+        gameState.difficulty = parseInt(levelKey.substring(1), 10);
+        // Target ranges from 3 - 10.
+        gameState.goal = 2 + gameState.difficulty;
+    }
+    gameState.bullets = [];
+    gameState.targets = [];
+    gameState.score = 0;
+    gameState.timesHit = 0;
+    gameState.bulletCooldown = 500;
+    gameState.specialBulletCooldown = 1000;
+    gameState.levelKey = levelKey;
+}
 function updateLevel(state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
     if (gameState.specialBulletCooldown > 0) {
         gameState.specialBulletCooldown -= FRAME_LENGTH;
     } else {
-        gameState.specialBulletCooldown = 3000 - (gameState.difficulty - 1) * 200 + (savedState.unlocks.slow ?? 0) * 200;
+        gameState.specialBulletCooldown = 3500 - (gameState.difficulty - 1) * 250 + (savedState.unlocks.slow ?? 0) * 200;
         if (gameState.difficulty > 6 && Math.random() < 1 / 6 && !gameState.bullets.find(b => b instanceof CirclingBullet)) {
             spawnCirclingBullets(state, gameState, savedState);
         } else if (gameState.difficulty > 5 && Math.random() < 1 / 5) {
@@ -649,7 +670,8 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
         const sizeIncrease = (1 + (savedState.unlocks.size ?? 0) * target.minSize / 2);
         target.minSize += sizeIncrease;
         target.maxSize += sizeIncrease;
-        target.targetTime -= (savedState.unlocks.time ?? 0) * 500;
+        target.targetTime -= (savedState.unlocks.time ?? 0) * 500
+        target.targetTime /= getTurboMultiplier(savedState);
         target.x = Math.round(gameState.screen.x + p + Math.random() * (gameState.screen.w - 2 * p));
         target.y = Math.round(gameState.screen.y + p + Math.random() * (gameState.screen.h - 2 * p));
         gameState.targets.push(target);
@@ -685,6 +707,8 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
                     gameState.scene = 'results';
                     saveGame(state);
                 }
+            } else {
+                playAreaSound(state, state.areaInstance, 'reflect');
             }
             gameState.bullets.splice(i--, 1);
             continue;
@@ -784,10 +808,16 @@ export function renderDodgerHUD(context: CanvasRenderingContext2D, state: GameSt
         const w = 96, h = 17;
         context.fillStyle = '#084';
         context.fillRect(CANVAS_WIDTH / 2 - w / 2, CANVAS_HEIGHT - 50, w, h);
-        drawARFont(context, (cost && item.levelKey) ? 'UNLOCK NEW LEVEL' : item.description, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 48, {textAlign: 'center', textBaseline: 'top'});
-        if (item.levelKey && !cost) {
+        if (item.levelKey) {
             const score = savedState.records[item.levelKey] ?? 0;
-            drawARFont(context, 'High Score ' + score, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, {textAlign: 'center', textBaseline: 'top'});
+            if (cost) {
+                drawARFont(context,'UNLOCK NEW LEVEL', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 42, {textAlign: 'center', textBaseline: 'middle'});
+            } else {
+                drawARFont(context, item.description, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 48, {textAlign: 'center', textBaseline: 'top'});
+                drawARFont(context, 'High Score ' + score, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, {textAlign: 'center', textBaseline: 'top'});
+            }
+        } else {
+            drawARFont(context, item.description, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 42, {textAlign: 'center', textBaseline: 'middle'});
         }
     }
     // Draw bright green square life indicators over player life, should be kept in sync with code from renderHUD
@@ -817,54 +847,79 @@ export function renderDodgerHUD(context: CanvasRenderingContext2D, state: GameSt
 }
 
 // RESULTS
+
+function getResultsBreakdown(state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
+    const pointsMultiplier = 1 + (savedState.unlocks.points ?? 0);
+    const difficultyMultiplier = 1 + 2 * (gameState.difficulty - 1);
+    let victoryMultiplier = 1;
+    let rating = '';
+    if (gameState.timesHit <= 0) {
+        victoryMultiplier = 4;
+        rating = 'flawless'
+    } else if (gameState.timesHit <= 1) {
+        victoryMultiplier = 3;
+        rating = 'excellent'
+    } else if (gameState.life > 0) {
+        victoryMultiplier = 2;
+        rating = 'victory'
+    }
+    const targetScore = gameState.score;
+    const lifeScore = gameState.life;
+    const total = Math.ceil((targetScore + lifeScore) * difficultyMultiplier * victoryMultiplier * pointsMultiplier);
+
+    return {
+        difficultyMultiplier,
+        victoryMultiplier,
+        pointsMultiplier,
+        targetScore,
+        lifeScore,
+        rating,
+        total,
+    };
+}
 function updateResults(state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
-        const pointsMultiplier = 1 + (savedState.unlocks.points ?? 0);
-        const difficultyMultiplier = 1 + 2 * (gameState.difficulty - 1);
-        let victoryMultiplier = 1;
-        if (gameState.timesHit <= 0) {
-            victoryMultiplier = 4;
-        } else if (gameState.timesHit <= 0) {
-            victoryMultiplier = 3;
-        } else if (gameState.life > 0) {
-            victoryMultiplier = 2;
-        }
-        const total = Math.ceil((gameState.score + gameState.life) * difficultyMultiplier * victoryMultiplier * pointsMultiplier);
+        const total = getResultsBreakdown(state, gameState, savedState).total;
         savedState.points += total
-        savedState.records[gameState.levelKey] = Math.max(savedState.records[gameState.levelKey] ?? 0, total)
-        gameState.scene = 'shop';
+        savedState.records[gameState.levelKey] = Math.max(savedState.records[gameState.levelKey] ?? 0, total);
+        showShop(state, gameState, savedState);
         if (gameState.life > 0 && gameState.levelKey === 'l8') {
             savedState.unlocks.s1 = 1;
         }
         saveGame(state);
     }
 }
+function showShop(state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
+    gameState.scene = 'shop';
+    gameState.shopItems = [];
+    delete gameState.activeShopItem;
+}
 
 function renderResults(context: CanvasRenderingContext2D, state: GameState, gameState:DodgerState, savedState: DodgerSavedState) {
     let y = gameState.screen.y + 4;
+    const {
+        difficultyMultiplier,
+        victoryMultiplier,
+        pointsMultiplier,
+        targetScore,
+        lifeScore,
+        rating,
+        total,
+    } = getResultsBreakdown(state, gameState, savedState);
     drawARFont(context, gameState.life > 0 ? 'VICTORY!' : 'DEFEAT!', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
+
+    // Score calculation
     y += 10;
-    drawARFont(context, gameState.score + ' targets + ' + gameState.life + ' life', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
-
-    const difficultyMultiplier = 1 + 2 * (gameState.difficulty - 1);
+    drawARFont(context, targetScore + ' targets + ' + lifeScore + ' life', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
     drawARFont(context, '*' + difficultyMultiplier + ' difficulty', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
-
-    let victoryMultiplier = 1;
-    if (gameState.timesHit <= 0) {
-        drawARFont(context, '*4 flawless', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
-        victoryMultiplier = 4;
-    } else if (gameState.timesHit <= 1) {
-        drawARFont(context, '*3 excellent', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
-        victoryMultiplier = 3;
-    } else if (gameState.life > 0) {
-        drawARFont(context, '*2 victory', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
-        victoryMultiplier = 2;
+    if (victoryMultiplier > 1) {
+        drawARFont(context, '*' + victoryMultiplier  + ' ' + rating, gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
     }
-    const pointsMultiplier = 1 + (savedState.unlocks.points ?? 0);
     if (pointsMultiplier > 1) {
         drawARFont(context, '*' + pointsMultiplier + ' GREED', gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
     }
-    const total = Math.ceil((gameState.score + gameState.life) * difficultyMultiplier * victoryMultiplier * pointsMultiplier);
+
+    // Total score and high score.
     y += 10;
     drawARFont(context, 'Total score ' + total, gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
     drawARFont(context, 'High score ' + Math.max(savedState.records[gameState.levelKey] ?? 0, total), gameState.screen.x + gameState.screen.w / 2, y += 10, {textAlign: 'center', textBaseline: 'top'});
@@ -891,11 +946,11 @@ function updateReset(state: GameState, gameState:DodgerState, savedState: Dodger
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         const heroHitbox = pad(getHeroPosition(state, gameState), -4);
         if (boxesIntersect(heroHitbox, getNoRect(gameState))) {
-            gameState.scene = 'shop';
+            showShop(state, gameState, savedState);
             return;
         }
         if (boxesIntersect(heroHitbox, getYesRect(gameState))) {
-            gameState.scene = 'shop';
+            showShop(state, gameState, savedState);
             state.savedState.savedArData.gameData.dodger = getNewDodgerSavedState();
             return;
         }
