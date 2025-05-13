@@ -145,11 +145,11 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Dodger improvements
-        - Add special levels
-            - Endless mode with difficulty increasing by 1 every 10 seconds.
+    - Switch Spirit World shopes to use credits.
+        - You can exchange large amounts of Jade for credits in either Spirit City or Sky City.
+        - You can sell certain rare artifacts for credits in the Spirit City.
+        - Credits are used to buy/sell things in certain AR games.
 
-    - Fix graphics for southern Vanara door.
 
     - Add more AR games, global progress and rewards
         - Milestones/achievements grant global AR progress that can unlock more difficult AR content and some small real perks (Peach Piece at most)
@@ -178,6 +178,10 @@ Current tasks:
     - Add new city tiles.
         - Fix dome object hit boxes.
         - Create window objects.
+
+    - AR Dodger improvements
+        - Add special levels
+            - Endless mode with difficulty increasing by 1 every 10 seconds.
 
     - Consider updating eye color when True Sight is unlocked, or drawing a third eye when using Spirit Sight.
 

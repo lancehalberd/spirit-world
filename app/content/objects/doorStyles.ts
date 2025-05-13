@@ -712,15 +712,20 @@ const obsidianDoorStyle: DoorStyleDefinition = {
 
 // VANARA DOOR STYLE
 const vanaraImage = 'gfx/tiles/vanara.png';
-const vanaraStairsUp = requireFrame(vanaraImage, {x: 16, y: 208, w: 32, h: 32})
-const vanaraStairsDown = requireFrame(vanaraImage, {x: 64, y: 208, w: 32, h: 32})
-const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 32})
+const vanaraStairsUp = requireFrame(vanaraImage, {x: 16, y: 208, w: 32, h: 32});
+const vanaraStairsDown = requireFrame(vanaraImage, {x: 64, y: 208, w: 32, h: 32});
+const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 32});
+const vanaraSouthOpen = requireFrame(vanaraImage, {x: 158, y: 208, w: 32, h: 32});
 
 
 //Using cavern doors to fill in for non-existant vanara doors
 const vanaraDoorFrames: V1DoorFrames = {
     ...cavernDoorFrames,
     northDoorway: vanaraDoorOpen,
+    southDoorEmpty: vanaraSouthOpen,
+    southDoorOpen: vanaraSouthOpen,
+    // southDoorClosed: cavernSouthDoorClosed,
+    // southCrackedWall: cavernSouthCrackedWall,
 }
 
 const vanaraDoorStyle: DoorStyleDefinition = {

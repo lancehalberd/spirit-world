@@ -77,7 +77,7 @@ export function update() {
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-            if (state.arState.active && canPauseGame(state)) {
+            if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
                 showMessage(state, '{@arGame.quit}');
                 return;
             }
