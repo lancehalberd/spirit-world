@@ -36,6 +36,10 @@ export class ARGame implements ObjectInstance {
         if (!this.isVisible(state)) {
             return;
         }
+        state.arState.scene = 'choose';
+        if (this.definition.id === 'heroesAR') {
+            state.arState.scene = 'hota';
+        }
         showMessage(state, '{@arGame.start}');
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

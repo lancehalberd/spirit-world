@@ -1,19 +1,16 @@
-import {startDodger, updateDodger, renderDodger, renderDodgerHUD} from 'app/arGames/dodger/updateDodger';
+import {dodgerGame} from 'app/arGames/dodger/dodger';
+import {hotaGame} from 'app/arGames/hota/hota';
 
-type GameID = 'dodger';
-
-export function getARScene(state: GameState) {
+export function getARScene(state: GameState): ARGame {
     if (state.arState.scene === 'dodger') {
-        return {
-            start: startDodger,
-            update: updateDodger,
-            render: renderDodger,
-            renderHUD: renderDodgerHUD,
-        };
+        return dodgerGame;
+    }
+    if (state.arState.scene === 'hota') {
+        return hotaGame;
     }
 }
 
-export function startARGame(state: GameState, game: GameID) {
+export function startARGame(state: GameState, game: ARGameID) {
     state.arState.scene = game;
     getARScene(state).start(state);
 }

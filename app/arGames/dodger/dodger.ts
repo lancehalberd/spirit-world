@@ -337,7 +337,7 @@ function getNewDodgerSavedState(): DodgerSavedState {
     };
 }
 
-export function startDodger(state: GameState) {
+function startDodger(state: GameState) {
     state.arState.game = getNewDodgerState(state);
     const savedState = state.savedState.savedArData.gameData.dodger || {};
     state.savedState.savedArData.gameData.dodger = {...getNewDodgerSavedState(), ...savedState};
@@ -728,7 +728,7 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
 
 
 
-export function updateDodger(state: GameState) {
+function updateDodger(state: GameState) {
     const gameState = state.arState.game as DodgerState;
     const savedState = state.savedState.savedArData.gameData.dodger;
     savedState.points = Math.floor(savedState.points);
@@ -766,7 +766,7 @@ function renderHero(context: CanvasRenderingContext2D, state: GameState, gameSta
     });
 }
 
-export function renderDodger(context: CanvasRenderingContext2D, state: GameState) {
+function renderDodger(context: CanvasRenderingContext2D, state: GameState) {
     const gameState = state.arState.game as DodgerState;
     const savedState = state.savedState.savedArData.gameData.dodger;
     context.save();
@@ -797,7 +797,7 @@ export function renderDodger(context: CanvasRenderingContext2D, state: GameState
         renderHero(context, state, gameState);
     context.restore();
 }
-export function renderDodgerHUD(context: CanvasRenderingContext2D, state: GameState) {
+function renderDodgerHUD(context: CanvasRenderingContext2D, state: GameState) {
     const gameState = state.arState.game as DodgerState;
     const savedState = state.savedState.savedArData.gameData.dodger;
     drawARFont(context, 'DODGER', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 16, {textAlign: 'center', textBaseline: 'top'});
@@ -972,3 +972,11 @@ function renderReset(context: CanvasRenderingContext2D, state: GameState, gameSt
     context.fillRect(r.x, r.y, r.w, r.h);
     drawARFont(context, 'NO', r.x + r.w / 2, r.y + r.h / 2, {textAlign: 'center', textBaseline: 'middle'});
 }
+
+
+export const dodgerGame: ARGame = {
+    start: startDodger,
+    update: updateDodger,
+    render: renderDodger,
+    renderHUD: renderDodgerHUD,
+};

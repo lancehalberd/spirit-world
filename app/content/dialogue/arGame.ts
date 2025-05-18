@@ -12,10 +12,16 @@ dialogueHash.arGame = {
             return `{choice: Quit AR?|No:arGame.no|Yes:arGame.quitGame}`;
         },
         chooseGame: (state: GameState) => {
-            // TODO: save available games and read them here.
-            const availableGames = ['dodger'] as const;
+            // Some AR sets only allow you play specific games, so we start
+            // the game immediately in this case.
             state.arState.active = true;
             state.areaInstance.needsLogicRefresh = true;
+            if (state.arState.scene !== 'choose') {
+                startARGame(state, state.arState.scene);
+                return '';
+            }
+            // TODO: save available games and read them here or move this all into a "game" that just let's you choose the game to play.
+            const availableGames = ['dodger'] as const;
             if (availableGames.length > 1) {
                 state.arState.scene = 'choose';
             } else {

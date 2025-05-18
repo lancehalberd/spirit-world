@@ -148,8 +148,9 @@ Current tasks:
     - Switch Spirit World shopes to use credits.
         - You can exchange large amounts of Jade for credits in either Spirit City or Sky City.
         - You can sell certain rare artifacts for credits in the Spirit City.
+            - Precursor jewels can be sold to AR collectors for credits and to unlock new AR content.
+            - Add bag to inventory to view additional collectables like jewels.
         - Credits are used to buy/sell things in certain AR games.
-
 
     - Add more AR games, global progress and rewards
         - Milestones/achievements grant global AR progress that can unlock more difficult AR content and some small real perks (Peach Piece at most)

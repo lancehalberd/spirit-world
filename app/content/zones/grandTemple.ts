@@ -3030,6 +3030,7 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 400, y: 288, type: "door", style: "wooden", d: "up"},
         {status: "normal", id: "", x: 384, y: 240, type: "door", style: "wooden", d: "down"},
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
+        {status: "normal", id: "heroesAR", x: 248, y: 136, type: "arGame"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 107, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 4, mapY: 0},

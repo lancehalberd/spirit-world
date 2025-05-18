@@ -197,7 +197,33 @@ export function drawFrameCenteredAt(
     if (image instanceof HTMLCanvasElement) {
         drawCanvas(context, image,
             {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
+            // TODO: check if this is wrong, it seems like this should use w/h not tw/th.
             {x: tx | 0, y: ty | 0, w: tw | 0, h: th | 0}
+        );
+        return;
+    }
+    // (x | 0) is faster than Math.floor(x)
+    context.drawImage(image,
+        x | 0, y | 0, w | 0, h | 0,
+        tx | 0, ty | 0, w | 0, h | 0);
+}
+
+export function drawFrameCenteredAtPoint(
+    context: CanvasRenderingContext2D,
+    {image, content, x, y, w, h}: Frame,
+    {x: tx, y: ty}: {x: number, y: number}
+): void {
+    const cw = content?.w ?? w;
+    const ch = content?.h ?? h;
+    // Adjust tx/ty so that x/y will be the top left corner of the content of the frame.
+    tx = tx - (content?.x || 0) - cw / 2;
+    ty = ty - (content?.y || 0) - ch / 2;
+    // Drawing canvas elements can fail in Safari so we use a special function
+    // to avoid this.
+    if (image instanceof HTMLCanvasElement) {
+        drawCanvas(context, image,
+            {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
+            {x: tx | 0, y: ty | 0, w: w | 0, h: h | 0}
         );
         return;
     }

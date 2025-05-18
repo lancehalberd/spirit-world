@@ -161,8 +161,17 @@ interface GameState {
     arState: ARState
 }
 
+type ARGameID = 'dodger'|'hota';
+
 interface ARState {
     active: boolean
-    scene: 'choose'|'dodger'
+    scene: 'choose'|ARGameID
     game?: any
+}
+
+interface ARGame {
+    start: (state: GameState) => void
+    update: (state: GameState) => void
+    render: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderHUD: (context: CanvasRenderingContext2D, state: GameState) => void
 }
