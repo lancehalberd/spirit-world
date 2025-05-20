@@ -10,6 +10,7 @@ import {
     blacksmithOneAnimations,
     blacksmithTwoAnimations,
     crystalDragonAnimations,
+    emptyAnimations,
     fatherAnimations,
     lightningBeastAnimations,
     merchantAnimations,
@@ -101,6 +102,11 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: archeologistAnimations,
         shadowOffset: 2,
         height: 26,
+    },
+    empty: {
+        animations: emptyAnimations,
+        height: 16,
+        noShadow: true,
     },
     merchant: {
         animations: merchantAnimations,

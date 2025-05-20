@@ -600,6 +600,59 @@ const shelves: DecorationType = {
     },
 };
 
+const emptyShelves: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        let x = decoration.x;
+        while (x < decoration.x + decoration.w) {
+            if (x <= decoration.x + decoration.w - 32) {
+                const variantFrame = decoration.h > 16 ? tallWideShelves: shortWideShelves;
+                drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
+                const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
+                for (const offset of shelfYOffsets) {
+                    const y = bottom + offset;
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
+                    }
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topRightCobwebs, {x: x + 25, y});
+                    }
+                    // Only render the bottom frame for short shelves.
+                    if (variantFrame === shortWideShelves) {
+                        break;
+                    }
+                }
+                x += 32;
+            } else {
+                const variantFrame = decoration.h > 16 ? tallNarrowShelves : shortNarrowShelves;
+                drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
+                const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
+                for (const offset of shelfYOffsets) {
+                    const y = bottom + offset;
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
+                    } else if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topRightCobwebs, {x: x + 10, y});
+                    }
+                    // Only render the bottom frame for short shelves.
+                    if (variantFrame === shortNarrowShelves) {
+                        break;
+                    }
+                }
+                x += 16;
+            }
+            random.mutate();
+
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y, w: decoration.w, h: 16};
+    },
+};
+
 const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 32, h: 23, content: {x: 8, y: 8, w: 16, h: 12}}, {top: 76, cols: 4}
 ).frames;
@@ -915,6 +968,7 @@ export const decorationTypes = {
     placeSettingNormal,
     pottedPlant,
     shelves,
+    emptyShelves,
     stump,
     table,
     stoneTable,
