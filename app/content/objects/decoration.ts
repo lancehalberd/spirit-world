@@ -143,6 +143,7 @@ const logPile: DecorationType = {
 };
 
 
+
 const [anvilFrame, anvilShadowFrame] = createAnimation('gfx/objects/furniture/anvil.png',
     {w: 32, h: 18, content: {x: 4, y: 6, w: 22, h: 10}}, {cols: 2}
 ).frames;
@@ -821,8 +822,34 @@ const bigDarkDome: DecorationType = {
     },
 };
 
+/*
+const [helixBaseFrame] = createAnimation('gfx/staging/helixBaseCombined.png',
+    {w: 128, h: 248, content: {x: 124, y: 254, w: 124, h: 72}}, {left: 118, top: 119}
+).frames;
+const helixBase: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, helixBaseFrame, decoration);
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(anvilFrame, decoration);
+    },
+};
+
+const [helixTopFrame] = createAnimation('gfx/staging/helixTop.png',
+    {w: 132, h: 292, content: {x: 124, y: 168, w: 124, h: 120}}, {left: 127, top: 2}
+).frames;
+const helixTop: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, helixTopFrame, decoration);
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(anvilFrame, decoration);
+    },
+};*/
 
 export const decorationTypes = {
+    //helixBase,
+    //helixTop,
     anvil,
     basket,
     bearRug,

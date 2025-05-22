@@ -1,8 +1,16 @@
 import {snakeAnimations} from 'app/content/enemyAnimations';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {createAnimation, getFrame, drawFrameCenteredAtPoint} from 'app/utils/animations';
+import {modifiableStat} from 'app/utils/modifiableStat';
 import {FRAME_LENGTH} from 'app/gameConstants';
 
+/**
+Add hero that scales with player progress, starts strong but is only strong at higher difficulties if player has high progression in the base game.
+Add hero with ability to freeze ALL other units when summoned.
+    Synnergy/Counter: Freeze immune units.
+Add hero with ability to prevent opponent from summoning units for a brief period. Good for preventing counters briefly.
+    Upgrade path prevent either player from summoning units for a longer period. Good for locking in an advantageous position.
+*/
 
 const fieldWidth = 224;
 const rowHeight = 32;
@@ -89,7 +97,10 @@ interface BaseBattleEffect extends Point {
     update(state: GameState, gameState: HotaState, savedState: HotaSavedState): void
     render(context: CanvasRenderingContext2D, state: GameState, gameState: HotaState, savedState: HotaSavedState): void
 }
+type HotaStats = {[key in HotaStatKey]?: ModifiableStat};
 interface BaseBattleUnit extends Point {
+    stats: HotaStats
+    modifiers: HotaStatModifierEffect[]
     getLife(): number
     getMaxLife(gameState: HotaState): number
     dx: number
@@ -102,12 +113,13 @@ interface BaseBattleUnit extends Point {
     target?: BattleObject
     done: boolean
 }
-type BattleObject = Tower | Minion;
+type BattleObject = HotaHero | Tower | Minion;
 type BattleEffect = MinionBullet;
 interface HotaState {
     scene: HotaSceneKey
     // objects: BattleObject[]
-    lanes: HotaLane[];
+    lanes: HotaLane[]
+    modifierEffects: HotaStatModifierEffect[]
     battleField: Rect
 }
 interface HotaLane {
@@ -127,13 +139,16 @@ interface TowerProps extends Point {
 }
 class Tower implements BaseBattleUnit {
     lane = this.props.lane;
-    life = this.props.life ?? 250;
-    maxLife = this.life;
+    stats: HotaStats = {
+        maxLife: modifiableStat(200, 1),
+    };
+    modifiers: HotaStatModifierEffect[] = [];
+    life = 200;
     isEnemy = this.props.isEnemy ?? false;
     dx = this.isEnemy ? -1 : 1;
     x = this.props.x;
     y = this.props.y;
-    damage = 50;
+    damage = 40;
     radius = 12;
     animationTime = 0;
     minions: Minion[] = [];
@@ -147,7 +162,7 @@ class Tower implements BaseBattleUnit {
         return this.life
     }
     getMaxLife() {
-        return this.maxLife;
+        return this.stats.maxLife();
     }
     getRange() {
         return 48;
@@ -228,8 +243,11 @@ interface MinionProps extends Point {
 }
 class Minion implements BaseBattleUnit {
     lane = this.props.lane;
+    stats: HotaStats = {
+        maxLife: modifiableStat(50, 1),
+    };
+    modifiers: HotaStatModifierEffect[] = [];
     life = 50;
-    maxLife = 50;
     isEnemy = this.props.isEnemy ?? false;
     dx = this.isEnemy ? -1 : 1;
     x = this.props.x;
@@ -247,7 +265,7 @@ class Minion implements BaseBattleUnit {
         return this.life
     }
     getMaxLife() {
-        return this.maxLife;
+        return this.stats.maxLife();
     }
     getRange() {
         return 32;
@@ -361,6 +379,188 @@ function updateTarget(attacker: BattleObject, targets: BattleObject[]) {
     }
 }
 
+class HotaHeroDefinitionProps {
+    animations: ActorAnimations
+    auras?: HotaStatModifierEffect[]
+}
+class HotaHeroDefinition {
+    animations = this.props.animations;
+    auras = this.props.auras;
+    constructor(public props: HotaHeroDefinitionProps) {}
+}
+
+interface HotaStatModifierEffect {
+    modifiers: HotaStatModifier[]
+    scope?: 'global'|'lane'
+    // If undefined will target both enemies and allies.
+    isEnemy?: boolean
+    effectsTowers?: boolean
+    effectsHeroes?: boolean
+    effectsMinions?: boolean
+}
+
+function doesEffectApplyToUnit(source: BattleObject, unit: BattleObject, effect: HotaStatModifierEffect): boolean {
+    if (effect.scope === 'lane' && unit.lane !== source.lane) {
+        return false;
+    }
+    if (!effect.effectsTowers && unit instanceof Tower) {
+        return false;
+    }
+    if (!effect.effectsHeroes && unit instanceof HotaHero) {
+        return false;
+    }
+    if (effect.effectsMinions === false && unit instanceof Minion) {
+        return false;
+    }
+    if (effect.isEnemy === true && source.isEnemy === unit.isEnemy) {
+        return false;
+    }
+    if (effect.isEnemy === false && source.isEnemy !== unit.isEnemy) {
+        return false;
+    }
+    return true;
+}
+
+function addModifierEffectsToField(state: GameState, gameState: HotaState, savedState: HotaSavedState, source: BattleObject, effects: HotaStatModifierEffect[]) {
+    for(const effect of effects) {
+        gameState.modifierEffects.push(effect);
+        for (const lane of gameState.lanes) {
+            for (const object of lane.objects) {
+                if (doesEffectApplyToUnit(source, object, effect)) {
+                    addModifierEffectToUnit(object, effect);
+                }
+            }
+        }
+    }
+}
+function removeModifierEffectsFromField(state: GameState, gameState: HotaState, savedState: HotaSavedState,source: BattleObject, effects: HotaStatModifierEffect[]) {
+    for(const effect of effects) {
+        const index = gameState.modifierEffects.indexOf(effect);
+        if (index < 0) {
+            continue;
+        }
+        gameState.modifierEffects.splice(index, 1);
+        for (const lane of gameState.lanes) {
+            for (const object of lane.objects) {
+                // This will do nothing if the effect doesn't happen to be on the unit for some reason.
+                removeModifierEffectToUnit(object, effect);
+            }
+        }
+    }
+}
+function addModifierEffectToUnit(unit: BattleObject, effect: HotaStatModifierEffect) {
+    unit.modifiers.push(effect);
+    for (const modifier of effect.modifiers) {
+        if (unit.stats[modifier.statKey]) {
+            unit.stats[modifier.statKey].addModifier(modifier);
+        }
+    }
+}
+function removeModifierEffectToUnit(unit: BattleObject, effect: HotaStatModifierEffect) {
+    const index = unit.modifiers.indexOf(effect);
+    if (index < 0) {
+        return;
+    }
+    unit.modifiers.splice(index, 1);
+    for (const modifier of effect.modifiers) {
+        if (unit.stats[modifier.statKey]) {
+            unit.stats[modifier.statKey].removeModifier(modifier);
+        }
+    }
+}
+
+interface HotaHeroProps extends Point {
+    isEnemy?: boolean
+    lane: HotaLane
+    definition: HotaHeroDefinition
+}
+class HotaHero implements BaseBattleUnit {
+    definition = this.props.definition;
+    animations = this.definition.animations;
+    auras = this.definition.auras;
+    lane = this.props.lane;
+    stats: HotaStats = {
+        maxLife: modifiableStat(100, 1),
+    };
+    modifiers: HotaStatModifierEffect[] = [];
+    life = 100;
+    isEnemy = this.props.isEnemy ?? false;
+    dx = this.isEnemy ? -1 : 1;
+    x = this.props.x;
+    y = this.props.y;
+    radius = 8;
+    animationTime = 0;
+    // Pixels per second.
+    speed = 16;
+    damage = 10;
+    target?: BattleObject;
+    attackCooldown = 0;
+    done = false;
+    constructor(public props: HotaHeroProps) {}
+    getLife() {
+        return this.life
+    }
+    buffLife() {
+        this.stats.maxLife.addModifier({flatBonus: 50, multiplier: 2});
+    }
+    getMaxLife() {
+        return this.stats.maxLife();
+    }
+    getRange() {
+        return 32;
+    }
+    onEnter(state: GameState, gameState: HotaState, savedState: HotaSavedState): void {
+        if (this.auras) {
+            addModifierEffectsToField(state, gameState, savedState, this, this.auras);
+        }
+    }
+    onLeave(state: GameState, gameState: HotaState, savedState: HotaSavedState): void {
+        if (this.auras) {
+            removeModifierEffectsFromField(state, gameState, savedState, this, this.auras);
+        }
+    }
+    onHit(state: GameState, gameState: HotaState, savedState: HotaSavedState, hit: HotaHitProperties): void {
+        this.life -= hit.damage;
+    }
+    update(state: GameState, gameState: HotaState, savedState: HotaSavedState): void {
+        if (this.life <= 0) {
+            this.done = true;
+            return;
+        }
+        this.animationTime += FRAME_LENGTH;
+        updateTarget(this, this.lane.objects.filter(o => o.isEnemy !== this.isEnemy));
+        if (this.attackCooldown > 0) {
+            this.attackCooldown -= FRAME_LENGTH;
+        }
+        if (this.target) {
+            if (this.attackCooldown <= 0) {
+                this.attackCooldown = 1000;
+                const attack = new MinionBullet({
+                    x: this.x + this.dx * this.radius,
+                    y: this.y - 10,
+                    target: this.target,
+                    hit: {damage: this.damage},
+                });
+                this.lane.effects.push(attack);
+            }
+        } else {
+            // Continue moving
+            this.x += this.dx * this.speed / FRAME_LENGTH;
+        }
+    }
+    render(context: CanvasRenderingContext2D, state: GameState, gameState: HotaState, savedState: HotaSavedState): void {
+        const frame = getFrame(this.animations.idle.left, this.animationTime);
+        context.save();
+            context.translate(this.x, this.y);
+            context.scale(-this.dx, 1);
+            drawFrameCenteredAtPoint(context, frame, {x: 0, y: -4});
+        context.restore();
+        drawUnitLifebar(context, gameState, this, -10);
+        //context.fillStyle = 'red';
+        //context.fillRect(this.x - 1, this.y - 1, 2, 2);
+    }
+}
+
 function getDistance(o1: BattleObject, o2: BattleObject): number {
     //return Math.max(0, Math.abs(o1.x - o2.x) - o1.radius - o2.radius);
     const dx = o1.x - o2.x, dy = o1.y - o2.y;
@@ -383,6 +583,7 @@ function getNewHotaState(state: GameState): HotaState {
             {objects: [], effects: []},
             {objects: [], effects: []},
         ],
+        modifierEffects: [],
         battleField,
     };
 }
@@ -425,3 +626,11 @@ export const hotaGame: ARGame = {
     render: renderHota,
     renderHUD: renderHotaHUD,
 };
+
+
+
+type HotaStatKey = 'maxLife'|'damage'|'attacksPerSecond'|'movementSpeed'|'range'
+
+interface HotaStatModifier extends StatModifier {
+    statKey: HotaStatKey
+}

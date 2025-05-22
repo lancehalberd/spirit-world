@@ -175,3 +175,23 @@ interface SavedHeroData {
     // How long the player had been playing when they "won" the game.
     winTime: number
 }
+
+type Computable<T> = T | (() => T);
+interface StatModifier {
+    flatBonus?: number
+    percentBonus?: number
+    multiplier?: number
+}
+interface ModifiableStat {
+    (): number
+    addModifier(modifier: StatModifier): void
+    removeModifier(modifier: StatModifier): void
+    baseValue: Computable<number>
+    flatBonus: number
+    percentBonus: number
+    multipliers: number[]
+    finalValue: number
+    isDirty: boolean
+    minValue?: number
+    maxValue?: number
+}
