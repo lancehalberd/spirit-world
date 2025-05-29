@@ -550,7 +550,7 @@ const shelves: DecorationType = {
         let x = decoration.x;
         while (x < decoration.x + decoration.w) {
             if (x <= decoration.x + decoration.w - 32) {
-                const variantFrame = random.element([tallWideShelves, shortWideShelves]);
+                const variantFrame = decoration.h > 16 ? tallWideShelves: shortWideShelves;
                 drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
                 const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
                 for (const offset of shelfYOffsets) {
@@ -570,7 +570,7 @@ const shelves: DecorationType = {
                 }
                 x += 32;
             } else {
-                const variantFrame = random.element([tallNarrowShelves, shortNarrowShelves]);
+                const variantFrame = decoration.h > 16 ? tallNarrowShelves : shortNarrowShelves;
                 drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
                 const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
                 for (const offset of shelfYOffsets) {
