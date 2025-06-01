@@ -1,3 +1,4 @@
+import {EXPLOSION_TIME, FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation} from 'app/utils/animations';
 
 
@@ -176,6 +177,10 @@ const swimDownAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png
 const swimLeftAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 6, x: 2, y: 3, duration: 8});
 const swimRightAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 6, x: 2, y: 1, duration: 8});
 
+
+const detonateGeometry: FrameDimensions = {w: 40, h: 28, content: {x: 12, y: 16 + Y_OFF, w: 16, h: 16}};
+const detonateAnimation: FrameAnimation = createAnimation('gfx/mc/detonate.png', detonateGeometry, {cols: 8, duration: Math.floor(EXPLOSION_TIME / 8 / FRAME_LENGTH), loop: false});
+console.log(detonateAnimation);
 
 const spiritGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const spiritUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritmovesheet.png', spiritGeometry, { cols: 8, y: 2, duration: 10});
@@ -372,6 +377,12 @@ export const heroAnimations: ActorAnimations = {
         down: deathDownAnimation,
         left: deathLeftAnimation,
         right: deathRightAnimation,
+    },
+    detonate: {
+        up: detonateAnimation,
+        down: detonateAnimation,
+        left: detonateAnimation,
+        right: detonateAnimation,
     },
     idle: {
         up: upAnimation,

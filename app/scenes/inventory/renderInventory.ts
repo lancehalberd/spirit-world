@@ -353,6 +353,7 @@ mainCanvas.addEventListener('click', function (event) {
                     || menuItem === 'money' || menuItem === 'peach' || menuItem === 'victoryPoint'
                     || menuItem === 'goldOre' || menuItem === 'silverOre' || menuItem === 'unknown'
                     || menuItem === 'smallKey' || menuItem === 'bigKey' || menuItem === 'map'
+                    || menuItem === 'arDevice' || menuItem === 'aetherCrystal'
                 ) {
                     // No handling
                 } else if (menuItem === 'return') {

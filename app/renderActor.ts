@@ -60,9 +60,9 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
     }
     if (hero.explosionTime > 0 && hero.action !== 'thrown' && hero.action !== 'falling') {
         if (hero.isUncontrollable) {
-            return getFrame(heroAnimations.kneel[hero.d], hero.animationTime);
+            return getFrame(heroAnimations.detonate.down, hero.explosionTime);
         }
-        return getFrame(heroAnimations.kneel.down, hero.animationTime);
+        return getFrame(heroAnimations.detonate.down, hero.explosionTime);
     }
     switch (hero.action) {
         case 'usingStaff':

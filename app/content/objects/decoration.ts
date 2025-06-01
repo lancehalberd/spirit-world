@@ -822,16 +822,16 @@ const bigDarkDome: DecorationType = {
     },
 };
 
-/*
+
 const [helixBaseFrame] = createAnimation('gfx/staging/helixBaseCombined.png',
-    {w: 128, h: 248, content: {x: 124, y: 254, w: 124, h: 72}}, {left: 118, top: 119}
+    {w: 356, h: 325, content: {x: 120, y: 273, w: 114, h: 46}}, {}
 ).frames;
 const helixBase: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, helixBaseFrame, decoration);
     },
     getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(anvilFrame, decoration);
+        return getFrameHitbox(helixBaseFrame, decoration);
     },
 };
 
@@ -843,13 +843,13 @@ const helixTop: DecorationType = {
         drawFrameContentAt(context, helixTopFrame, decoration);
     },
     getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(anvilFrame, decoration);
+        return getFrameHitbox(helixTopFrame, decoration);
     },
-};*/
+};
 
 export const decorationTypes = {
-    //helixBase,
-    //helixTop,
+    helixBase,
+    helixTop,
     anvil,
     basket,
     bearRug,

@@ -515,6 +515,8 @@ export const lootFrames = {
     lightningBlessing,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
+    arDevice: createLootFrame('black', 'AR'),
+    aetherCrystal: createLootFrame('black', 'C'),
 } as const;
 
 

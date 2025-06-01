@@ -44,17 +44,29 @@ function getModifiableStatValue(stat: ModifiableStat): number {
     return stat.finalValue;
 }
 function addModifierToModifiableStat(stat: ModifiableStat, modifier: StatModifier) {
-    stat.flatBonus += modifier.flatBonus;
-    stat.percentBonus += modifier.percentBonus;
-    stat.multipliers.push(modifier.multiplier);
+    if (modifier.flatBonus) {
+        stat.flatBonus += modifier.flatBonus;
+    }
+    if (modifier.percentBonus) {
+        stat.percentBonus += modifier.percentBonus;
+    }
+    if (typeof modifier.multiplier === 'number') {
+        stat.multipliers.push(modifier.multiplier);
+    }
     stat.isDirty = true;
 }
 function removeModifierFromModifiableState(stat: ModifiableStat, modifier: StatModifier) {
-    stat.flatBonus -= modifier.flatBonus;
-    stat.percentBonus -= modifier.percentBonus;
-    const index = stat.multipliers.indexOf(modifier.multiplier);
-    if (index >= 0) {
-        stat.multipliers.splice(index, 1);
+    if (modifier.flatBonus) {
+        stat.flatBonus -= modifier.flatBonus;
+    }
+    if (modifier.percentBonus) {
+        stat.percentBonus -= modifier.percentBonus;
+    }
+    if (typeof modifier.multiplier === 'number') {
+        const index = stat.multipliers.indexOf(modifier.multiplier);
+        if (index >= 0) {
+            stat.multipliers.splice(index, 1);
+        }
     }
     stat.isDirty = true;
 }

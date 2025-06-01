@@ -151,6 +151,14 @@ interface SavedHeroData {
     life?: number
     hasRevive: boolean
     money: number
+    // Aether is used as currency in the Spirit World and can be obtained by selling
+    // Aether Crystals or collectable AR content.
+    aether: number
+    // Karma is used as currency in the Vanara Dream World and can be obtained by
+    // completing Vanara quests or completing optional Dream World challenges.
+    karma: number
+    // Generic Aether Crystal can be sold for Aether.
+    aetherCrystals: number
     silverOre: number
     goldOre: number
     // Total silver/gold ore ever found, used for randomizer logic.

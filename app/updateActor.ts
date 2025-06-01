@@ -112,7 +112,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             checkForFloorEffects(state, hero);
         }
     }
-    updateHeroVisualEffects(state, hero);
+    // Currently unused as we have removed the particles from the clone explosion charge effect, but we might add it back later.
+    updateHeroVisualEffects;//(state, hero);
     updateGenericHeroState(state, hero);
 }
 

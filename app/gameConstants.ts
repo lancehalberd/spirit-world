@@ -15,7 +15,8 @@ export const RIGHT_TOOL_COLOR = 'yellow';
 export const MAX_SPIRIT_RADIUS = 80;
 
 export const EXPLOSION_RADIUS = 32;
-export const EXPLOSION_TIME = 600;
+// This should be a multiple of the number of frames in the MC detonate animation, which is currently 8 frames * 20ms long.
+export const EXPLOSION_TIME = 640;
 
 export const GAME_KEY = {
     MENU: 0,

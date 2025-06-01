@@ -23,7 +23,7 @@ const [, fullFrozenHeart, threeFrozenQuarters, halfFrozenHeart, quarterFrozenHea
     createAnimation('gfx/hud/frozenhearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
 const [coin] =
-    createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
+    createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9, cols: 2}).frames;
 
 const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
     {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {x: 2, cols: 2}

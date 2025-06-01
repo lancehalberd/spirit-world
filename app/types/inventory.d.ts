@@ -6,12 +6,14 @@ type PassiveTool = 'gloves'
     | 'catEyes' | 'spiritSight' | 'trueSight'
     | 'astralProjection' | 'teleportation'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
-    | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing';
+    | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing'
+    | 'arDevice';
 type MagicElement = 'fire' | 'ice' | 'lightning';
 type Collectible = 'peachOfImmortality'
     | 'peachOfImmortalityPiece'
     | 'silverOre'
     | 'goldOre'
+    | 'aetherCrystal'
     | 'victoryPoint';
 type Blueprints = 'spikeBoots' | 'flyingBoots' | 'forgeBoots';
 type CommonLoot = 'money' | 'peach';
