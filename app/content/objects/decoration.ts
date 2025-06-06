@@ -530,15 +530,17 @@ const shortNarrowShelves = requireFrame('gfx/objects/furniture/shelves.png', {x:
 const wideBookFrames = createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
     {left: 2, top: 51, cols: 2, rows: 3, ySpace: 1}
 ).frames;
-wideBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
+/*wideBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
     {left: 2, top: 117, cols: 2, rows: 1}
-).frames);
+).frames);*/
 const narrowBookFrames = createAnimation('gfx/objects/furniture/shelves.png', {w: 12, h: 8},
     {left: 50, top: 51, cols: 1, rows: 3, ySpace: 1}
 ).frames;
+/*
 narrowBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 12, h: 8},
     {left: 130, top: 53, cols: 1, rows: 2, ySpace: 8}
 ).frames);
+*/
 const topLeftCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 2, y: 100, w: 5, h: 5});
 const topRightCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 26, y: 100, w: 4, h: 4});
 
@@ -557,12 +559,13 @@ const shelves: DecorationType = {
                     const y = bottom + offset;
                     drawFrameContentAt(context, random.mutate().element(wideBookFrames), {x: x + 2, y});
                     drawFrameContentAt(context, random.mutate().element(wideBookFrames), {x: x + 16, y});
-                    if (random.generateAndMutate() < 0.1) {
+                    //Enable below to allow cobwebs
+                    /*if (random.generateAndMutate() < 0.1) {
                         drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
                     }
                     if (random.generateAndMutate() < 0.1) {
                         drawFrameContentAt(context, topRightCobwebs, {x: x + 25, y});
-                    }
+                    }*/ 
                     // Only render the bottom frame for short shelves.
                     if (variantFrame === shortWideShelves) {
                         break;
@@ -576,11 +579,12 @@ const shelves: DecorationType = {
                 for (const offset of shelfYOffsets) {
                     const y = bottom + offset;
                     drawFrameContentAt(context, random.mutate().element(narrowBookFrames), {x: x + 2, y});
-                    if (random.generateAndMutate() < 0.1) {
+                    //Enable below to allow cobwebs
+                    /*if (random.generateAndMutate() < 0.1) {
                         drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
                     } else if (random.generateAndMutate() < 0.1) {
                         drawFrameContentAt(context, topRightCobwebs, {x: x + 10, y});
-                    }
+                    }*/
                     // Only render the bottom frame for short shelves.
                     if (variantFrame === shortNarrowShelves) {
                         break;
