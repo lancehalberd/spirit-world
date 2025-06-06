@@ -500,9 +500,9 @@ const shore: TileSource = {
 };
 
 
-const diagonals: TileSource = {
+const halves: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 32, h: 32}),
+    source: requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 48, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
     },
@@ -531,7 +531,7 @@ const shoreMask: TileSource = {
 
 const diagMask: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/diagMask.png', {x: 0, y: 48, w: 32, h: 32}),
+    source: requireFrame('gfx/tiles/diagMask.png', {x: 0, y: 48, w: 48, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor', isGround: false },
     },
@@ -633,7 +633,7 @@ function applyMask(targetSource: TileSource, maskSource: TileSource) {
 
 applyMask(shore, shoreMask);
 applyMask(shoreAngles, shoreAnglesMask);
-applyMask(diagonals, diagMask);
+applyMask(halves, diagMask);
 
 const treeStump: TileSource = {
     w: 16, h: 16,
@@ -1229,7 +1229,7 @@ addTiles([
     ...allDarkJadeCityTileSources,
     ...allJadeInteriorLightTileSources,
     ...allJadeInteriorDarkTileSources,
-    diagonals,
+    halves,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
