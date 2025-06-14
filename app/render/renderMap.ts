@@ -376,7 +376,11 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
 
 const mapObjectTypes: ObjectType[] = [
+    'decoration',
     'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
+];
+const mapDecorationTypes = [
+    'helixBase',
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
@@ -403,6 +407,9 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
         // context.scale(4 / area.w, 4 / area.h);
         for (const object of area.objects) {
             if (!mapObjectTypes.includes(object.definition?.type)) {
+                continue;
+            }
+            if (object.definition.type === 'decoration' && !mapDecorationTypes.includes(object.definition.decorationType)) {
                 continue;
             }
             let hitbox = object.getHitbox();
