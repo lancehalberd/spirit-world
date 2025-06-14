@@ -745,8 +745,8 @@ const windowOctogonal: DecorationType = {
     },
 };
 
-const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 23, h: 42});
-const cocoonBackFrame= requireFrame('gfx/tiles/vanara.png', {x: 53, y: 354, w: 23, h: 42});
+const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 23, h: 42, content: {x: 1, y: 22, w: 20, h: 20}});
+const cocoonBackFrame= requireFrame('gfx/tiles/vanara.png', {x: 53, y: 354, w: 23, h: 42, content: {x: 1, y: 22, w: 20, h: 20}});
 const cocoon: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         if (decoration.d === 'right') {
@@ -823,7 +823,7 @@ const bigDarkDome: DecorationType = {
 };
 
 
-const [helixBaseFrame] = createAnimation('gfx/staging/helixBaseCombined.png',
+const [helixBaseFrame] = createAnimation('gfx/objects/helixBaseCombined.png',
     {w: 356, h: 325, content: {x: 120, y: 273, w: 114, h: 46}}, {}
 ).frames;
 const helixBase: DecorationType = {
@@ -835,7 +835,7 @@ const helixBase: DecorationType = {
     },
 };
 
-const [helixTopFrame] = createAnimation('gfx/staging/helixTop.png',
+const [helixTopFrame] = createAnimation('gfx/objects/helixTop.png',
     {w: 132, h: 292, content: {x: 124, y: 168, w: 124, h: 120}}, {left: 127, top: 2}
 ).frames;
 const helixTop: DecorationType = {

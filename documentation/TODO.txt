@@ -145,6 +145,17 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Add new helix exterior graphics
+        - Add helix exterior to material sky
+            - Match door support to Staff Tower door
+            - Add proper hit detection.
+        - Add helix exteroir to spirit ground surrounded by pits
+            - Request any new tiles required for this.
+
+    - Add Monk1 and Monk2 NPC graphics
+
+    - Add Drone enemy graphics.
+
     - Switch Spirit World shops to use aether.
         - You can sell certain rare artifacts for aether in the Spirit City.
             - Aether crystals can be sold to AR collectors for aether and to unlock new AR content.
