@@ -149,8 +149,6 @@ Current tasks:
         - Add helix exterior to material sky
             - Match door support to Staff Tower door
             - Add proper hit detection.
-        - Add helix exteroir to spirit ground surrounded by pits
-            - Request any new tiles required for this.
 
     - Add Monk1 and Monk2 NPC graphics
 
