@@ -6,6 +6,7 @@ export const Y_OFF = -4;
 const heroIconGeometry: FrameDimensions = {w: 16, h: 16};
 export const heroIcon: Frame = createAnimation('gfx/hud/mcIcon.png', heroIconGeometry).frames[0];
 export const heroArIcon: Frame = createAnimation('gfx/hud/arIcon.png', heroIconGeometry).frames[0];
+export const ArCrosshairIcon: Frame = createAnimation('gfx/hud/arCrosshair.png', heroIconGeometry).frames[0];
 
 const heroGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 15 + Y_OFF, w: 16, h: 16}};
 const upAnimation: FrameAnimation = createAnimation('gfx/mc/facing.png', heroGeometry, { x: 2});

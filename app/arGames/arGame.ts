@@ -1,12 +1,18 @@
 import {dodgerGame} from 'app/arGames/dodger/dodger';
 import {hotaGame} from 'app/arGames/hota/hota';
+//import {targetPracticeGame} from 'app/arGames/target_practice/target_practice_game';
+import {targetPracticeGame} from 'app/arGames/target_practice/target_practice_game_no_bullet';
 
 export function getARScene(state: GameState): ARGame {
     if (state.arState.scene === 'dodger') {
-        return dodgerGame;
+        //return dodgerGame;
+        return targetPracticeGame;
     }
     if (state.arState.scene === 'hota') {
         return hotaGame;
+    }
+    if (state.arState.scene === 'target') {
+        return targetPracticeGame;
     }
 }
 
