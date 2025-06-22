@@ -3,7 +3,6 @@ import {
     canCross2Gaps,
     canCrossDynamic2Gaps,
     canCrossDynamic4Gaps,
-    canCrossLightningBarriers,
     canHasTowerStaff,
     canMoveHeavyStairs,
     canRemoveLightStones,
@@ -250,10 +249,6 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF5North',
         checks: [ { objectId: 'staffTowerUpperKey' }],
-        paths: [
-            // Terminal is off until the beasts are released.
-            {nodeId: 'staffTowerF5South', logic: canCrossLightningBarriers},
-        ],
         entranceIds: ['staffTower4F5F'],
         exits: [
             {objectId: 'staffTower4F5F'},

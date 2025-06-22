@@ -8,7 +8,8 @@ import {
 
 import { mainOverworldNode } from 'app/randomizer/logic/overworldLogic';
 import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
-import { craterNodes } from 'app/randomizer/logic/craterLogic';
+//import { craterNodes } from 'app/randomizer/logic/craterLogic';
+import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
 import { findLootObjects, findReachableNodes } from 'app/randomizer/find';
 import { applySavedState, getDefaultState } from 'app/state';
 import { allNodes } from 'app/randomizer/allNodes';
@@ -34,16 +35,20 @@ function testConnectivity() {
             finalState.savedState.objectFlags[flag] = true;
         }
     }
-    const entrance = craterNodes.find(node => node.nodeId === 'craterEntrance');
+    const entrance1 = staffTowerNodes.find(node => node.nodeId === 'staffTowerF1Downstairs');
+    const entrance2 = staffTowerNodes.find(node => node.nodeId === 'staffTowerF4Spirit');
+    finalState.hero.savedData.elements.lightning = 0;
     finalState.hero.savedData.activeTools.staff = 0;
     finalState.hero.savedData.activeTools.clone = 1;
     finalState.hero.savedData.equipment.ironBoots = 1;
+    finalState.savedState.dungeonInventories.staffTower.smallKeys = 0;
+    finalState.savedState.dungeonInventories.staffTower.totalSmallKeys = 0;
     finalState = setAllFlagsInLogic(finalState, allNodes,  [mainOverworldNode]);
     //initialState.hero.savedData.activeTools.staff = 1;
     //initialState = setAllFlagsInLogic(initialState, craterNodes,  [entrance]);
-    const reachableNodes = findReachableNodes(craterNodes, [entrance], finalState);
+    const reachableNodes = findReachableNodes(staffTowerNodes, [entrance1, entrance2], finalState);
     console.log(reachableNodes);
-    for (const node of craterNodes) {
+    for (const node of staffTowerNodes) {
         if (!reachableNodes.includes(node)) {
             console.log('Could not reach node', node);
         }

@@ -145,6 +145,11 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Fix freezing megapede parts.
+    - Don't play boss music when fighting robots in Staff Tower.
+    - Only save at dungeon entrances when entering or leaving the area
+        - Maybe check on the handlers for the doors
+
     - Add new helix exterior graphics
         - Add helix exterior to material sky
             - Match door support to Staff Tower door

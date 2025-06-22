@@ -679,6 +679,13 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
 export function getRandomizerHint(state: GameState): string {
     const reachableChecks: LootWithLocation[] = findReachableChecksFromStart(state);
     for (const check of Random.shuffle(reachableChecks)) {
+        // Example debug code for finding source of bad check in Staff Tower.
+        // Ignore all hints for checks outside of staff tower and log any that are in logic.
+        /*if (check.location?.logicalZoneKey !== 'staffTower') {
+            continue;
+        } else {
+            console.log(check);
+        }*/
         // Don't suggest checks that we know aren't useful.
         if (isCheckTrash(state, check)){
             continue;
