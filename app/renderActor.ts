@@ -285,7 +285,15 @@ export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, 
         return;
     }
     const frame = (hero.z >= hero.groundHeight + 4) ? smallShadowFrame : shadowFrame;
-    drawFrame(context, frame, { ...frame, x: hero.x, y: hero.y - 3 - Y_OFF - hero.groundHeight });
+    if (frame === smallShadowFrame) {
+        // When the hero is high off the ground, it is intuitive to use their shadow to judge where their hitbox is.
+        // However, the shadow is normally not centered in the hitbox, so to work around these, we gradually center
+        // the hero's shadow as they get further from the ground.
+        const zOffet = Math.max(0, Math.min(6, (hero.z - hero.groundHeight - 4)/ 2));
+        drawFrame(context, frame, { ...frame, x: hero.x, y: hero.y - 3 - Y_OFF - hero.groundHeight - zOffet});
+    } else {
+        drawFrame(context, frame, { ...frame, x: hero.x, y: hero.y - 3 - Y_OFF - hero.groundHeight });
+    }
 }
 export function renderExplosionRing(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
     if (!(hero.explosionTime > 0)) {

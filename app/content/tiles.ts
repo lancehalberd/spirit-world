@@ -619,6 +619,8 @@ const treeStump: TileSource = {
     source: requireFrame('gfx/tiles/treesheet.png', {x: 0, y: 128, w: 64, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
+        '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, linkedOffset: 401},
+        '3x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, linkedOffset: 401},
         '0x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, linkedOffset: 401},
         '3x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, linkedOffset: 401},
     },

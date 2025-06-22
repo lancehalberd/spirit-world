@@ -180,7 +180,6 @@ const swimRightAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.pn
 
 const detonateGeometry: FrameDimensions = {w: 40, h: 28, content: {x: 12, y: 16 + Y_OFF, w: 16, h: 16}};
 const detonateAnimation: FrameAnimation = createAnimation('gfx/mc/detonate.png', detonateGeometry, {cols: 8, duration: Math.floor(EXPLOSION_TIME / 8 / FRAME_LENGTH), loop: false});
-console.log(detonateAnimation);
 
 const spiritGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const spiritUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritmovesheet.png', spiritGeometry, { cols: 8, y: 2, duration: 10});

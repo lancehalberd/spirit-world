@@ -260,6 +260,9 @@ export function drawRemainingFrames(state: GameState, area: AreaInstance, curren
         // console.log('Drawing foregroundFrame', frameIndex);
         area.drawnFrames.add(foregroundFrame);
     }
+    /*if (drawCount > 0) {
+        console.log(drawCount);
+    }*/
     return drawCount;
 }
 

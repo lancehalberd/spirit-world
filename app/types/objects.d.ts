@@ -585,6 +585,9 @@ interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
     h: number
     // Useful for fixing the layering of decorations on top of other objects.
     z?: number
+    // Some decorations can combine with other objects, in particular bed decorations
+    // may target NPCs to render NPCs inside of the bed.
+    targetObjectId?: string
 }
 
 interface WaterfallDefinition extends BaseObjectDefinition {

@@ -13,6 +13,7 @@ export class Decoration implements ObjectInstance {
     ignorePits = true;
     status: ObjectStatus = 'normal';
     animationTime = 0;
+    child: ObjectInstance;
 
     drawPriority: DrawPriority = this.definition.drawPriority || 'sprites';
     x = this.definition.x;
@@ -44,10 +45,19 @@ export class Decoration implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        const targetId = this.definition.targetObjectId;
+        if (targetId && targetId !== this.child?.definition?.id) {
+            this.child = this.area.objects.find(o => o.definition?.id === targetId);
+            this.child.renderParent = this;
+        }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];
         decorationType.render(context, state, this);
+    }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        decorationType.alternateRender?.(context, state, this);
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];
@@ -85,6 +95,7 @@ const stormBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png
 
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
+    alternateRender?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     getHitbox?: (decoration: Decoration) => Rect
@@ -751,12 +762,29 @@ const cocoon: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         if (decoration.d === 'right') {
             drawFrameContentReflectedAt(context, cocoonBackFrame, decoration);
+            if (decoration.child) {
+                decoration.child.x = decoration.x;
+                decoration.child.y = decoration.y;
+                decoration.child.render(context, state);
+            }
             // Draw contained object here.
             drawFrameContentReflectedAt(context, cocoonFrame, decoration);
         } else {
             drawFrameContentAt(context, cocoonBackFrame, decoration);
+            if (decoration.child) {
+                decoration.child.x = decoration.x;
+                decoration.child.y = decoration.y;
+                decoration.child.render(context, state);
+            }
             // Draw contained object here.
             drawFrameContentAt(context, cocoonFrame, decoration);
+        }
+    },
+    alternateRender(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        if (decoration.child?.alternateRender) {
+            decoration.child.x = decoration.x;
+            decoration.child.y = decoration.y;
+            decoration.child.alternateRender(context, state);
         }
     },
     getBehaviors(state: GameState, decoration: Decoration) {

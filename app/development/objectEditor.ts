@@ -630,15 +630,18 @@ export function getSwitchTargetProperties(
     return rows;
 }
 
-function getUniqueObjectIdsForBothAreas(state: GameState, editingState: EditingState): string[] {
+function getUniqueObjectIdsForAreas(state: GameState, areas: AreaInstance[]): string[] {
     const ids = [];
-    for (const object of [...state.areaInstance.definition.objects, ...state.alternateAreaInstance.definition.objects]) {
-        if (object.id) {
-            ids.push(object.id);
+    for (const area of areas) {
+        for (const object of area.definition.objects) {
+            if (object.id) {
+                ids.push(object.id);
+            }
         }
     }
     return [...new Set(ids)];
 }
+
 
 function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
     switch (type) {
@@ -853,6 +856,27 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            const supportedTypes: DecorationType[] = [
+                'bed',
+                'cocoon',
+                'floorBed',
+            ];
+            if (supportedTypes.includes(object.decorationType)) {
+                const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance]);
+                rows.push({
+                    name: 'target',
+                    value: object.targetObjectId ?? 'none',
+                    values: ['none', ...ids],
+                    onChange(targetObjectId: string) {
+                        if (targetObjectId === 'none') {
+                            delete object.targetObjectId;
+                        } else {
+                            object.targetObjectId = targetObjectId;
+                        }
+                        updateObjectInstance(state, object);
+                    },
+                });
+            }
             rows.push({
                 name: 'layer',
                 value: object.drawPriority || 'sprites',
@@ -1216,8 +1240,8 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'heavyFloorSwitch':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
-        case 'indicator':object
-            const ids = getUniqueObjectIdsForBothAreas(state, editingState);
+        case 'indicator': {
+            const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance, state.alternateAreaInstance]);
             rows.push({
                 name: 'target',
                 value: object.targetObjectId ?? 'none',
@@ -1232,6 +1256,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        }
         case 'keyBlock':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             rows.push({

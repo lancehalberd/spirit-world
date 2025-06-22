@@ -296,6 +296,7 @@ const f0_0x1: AreaDefinition = {
         {status: "locked", id: "riverTempleLockedDoor", x: 368, y: 256, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "riverTempleSmallKey", x: 384, y: 112, type: "chest", lootType: "smallKey", lootLevel: 1},
         {status: "normal", id: "", x: 336, y: 112, type: "airBubbles"},
+        {status: "normal", id: "riverTempleWater:0:0x1-octopus-0", x: 110, y: 98, type: "enemy", enemyType: "octopus", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 411, mapId: 'riverTemple', floorId: '1F', mapX: 2, mapY: 3},

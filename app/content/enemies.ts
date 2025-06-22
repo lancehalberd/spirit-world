@@ -28,6 +28,7 @@ export * from 'app/content/enemies/elemental';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
 export * from 'app/content/enemies/mushroom';
+export * from 'app/content/enemies/octopus';
 export * from 'app/content/enemies/orb';
 export * from 'app/content/enemies/plant';
 export * from 'app/content/enemies/sentryBot';
@@ -47,6 +48,7 @@ export const enemyTypes = <const>[
     'lightningDrone',
     'luckyBeetle',
     'plant', 'plantFlame', 'plantFrost', 'plantStorm',
+    'octopus',
     'smallOrb', 'largeOrb',
     'sentryBot',
     'snake', 'snakeFlame', 'snakeFrost', 'snakeStorm',
