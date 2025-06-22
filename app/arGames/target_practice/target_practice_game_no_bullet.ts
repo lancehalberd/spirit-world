@@ -8,24 +8,173 @@ import {wasGameKeyPressed} from 'app/userInput';
 import {saveGame} from 'app/utils/saveGame';
 import {typedKeys} from 'app/utils/types';
 
-type LevelKey = 'none' | 'l1' | 'l2' | 'l3' | 'l4' | 'l5' | 'l6' | 'l7' | 'l8' | 'l9' 
+type LevelKey = 'none' | 'l1' | 'l2' | 'l3' | 'l4' | 'l5' | 'l6' | 'l7' | 'l8' | 'l9' | 'l10'
 type UnlockKey = LevelKey | 'ammo' | 'speed' | 'reload' | 'accuracy' | 'points' | 'time' | 'multishot' | 'pierce' | 'reset';
 type Scene = 'shop' | 'level' | 'results' | 'reset';
 
 const baseAmmo = 10;
 
+
 const levelConfigs: {[key in LevelKey]: LevelConfig} = {
     'none': { timeLimit: 0, goal: 0, spawnInterval: 0, targetValue: 0 },
-    'l1': { timeLimit: 30000, goal: 100, spawnInterval: 2000, targetValue: 1000 },
-    'l2': { timeLimit: 30000, goal: 150, spawnInterval: 1800, targetValue: 15, targetSpeed: 2 },
-    'l3': { timeLimit: 25000, goal: 200, spawnInterval: 1500, targetValue: 20, targetSpeed: 3 },
-    'l4': { timeLimit: 25000, goal: 250, spawnInterval: 1200, targetValue: 25, targetSpeed: 4 },
-    'l5': { timeLimit: 20000, goal: 300, spawnInterval: 1000, targetValue: 30, targetSpeed: 5 },
-    'l6': { timeLimit: 20000, goal: 400, spawnInterval: 800, targetValue: 35, targetSpeed: 6 },
-    'l7': { timeLimit: 15000, goal: 500, spawnInterval: 600, targetValue: 40, targetSpeed: 7 },
-    'l8': { timeLimit: 15000, goal: 600, spawnInterval: 500, targetValue: 45, targetSpeed: 8 },
-    'l9': { timeLimit: 10000, goal: 800, spawnInterval: 400, targetValue: 50, targetSpeed: 9 },
+    'l1': { 
+        timeLimit: 30000, 
+        goal: 100, 
+        spawnInterval: 2000, 
+        targetValue: 1000,
+        targetTypes: [
+            { size: 18, points: 1000, weight: 1 }
+        ]
+    },
+    'l2': { 
+        timeLimit: 30000, 
+        goal: 150, 
+        spawnInterval: 1800, 
+        targetValue: 15, 
+        targetSpeed: 2,
+        targetTypes: [
+            { size: 18, points: 10, weight: 3 },
+            { size: 15, points: 15, weight: 1 }
+        ]
+    },
+    'l3': { 
+        timeLimit: 25000, 
+        goal: 200, 
+        spawnInterval: 1500, 
+        targetValue: 20, 
+        targetSpeed: 3, 
+        ammoTargetChance: 0.1, 
+        timeTargetChance: 0.1, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 18, points: 10, weight: 2 },
+            { size: 15, points: 20, weight: 2 },
+            { size: 12, points: 30, weight: 1 }
+        ]
+    },
+    'l4': { 
+        timeLimit: 25000, 
+        goal: 250, 
+        spawnInterval: 1200, 
+        targetValue: 25, 
+        targetSpeed: 4, 
+        ammoTargetChance: 0.1, 
+        timeTargetChance: 0.1, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 18, points: 15, weight: 2 },
+            { size: 15, points: 25, weight: 2 },
+            { size: 12, points: 35, weight: 1 },
+            { size: 10, points: 50, weight: 0.5 }
+        ]
+    },
+    'l5': { 
+        timeLimit: 20000, 
+        goal: 300, 
+        spawnInterval: 1000, 
+        targetValue: 30, 
+        targetSpeed: 5, 
+        ammoTargetChance: 0.1, 
+        timeTargetChance: 0.1, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 16, points: 20, weight: 2 },
+            { size: 13, points: 30, weight: 2 },
+            { size: 10, points: 50, weight: 1 },
+            { size: 8, points: 75, weight: 0.5 }
+        ]
+    },
+    'l6': { 
+        timeLimit: 20000, 
+        goal: 400, 
+        spawnInterval: 800, 
+        targetValue: 35, 
+        targetSpeed: 6, 
+        ammoTargetChance: 0.1, 
+        timeTargetChance: 0.1, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 15, points: 25, weight: 2 },
+            { size: 12, points: 35, weight: 2 },
+            { size: 9, points: 60, weight: 1 },
+            { size: 7, points: 100, weight: 0.3 }
+        ]
+    },
+    'l7': { 
+        timeLimit: 15000, 
+        goal: 500, 
+        spawnInterval: 600, 
+        targetValue: 40, 
+        targetSpeed: 7, 
+        ammoTargetChance: 0.1, 
+        timeTargetChance: 0.1, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 14, points: 30, weight: 2 },
+            { size: 11, points: 40, weight: 2 },
+            { size: 8, points: 75, weight: 1 },
+            { size: 6, points: 125, weight: 0.3 }
+        ]
+    },
+    'l8': { 
+        timeLimit: 15000, 
+        goal: 600, 
+        spawnInterval: 500, 
+        targetValue: 45, 
+        targetSpeed: 8, 
+        ammoTargetChance: 0.1, 
+        timeTargetChance: 0.1, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 13, points: 35, weight: 2 },
+            { size: 10, points: 45, weight: 2 },
+            { size: 7, points: 85, weight: 1 },
+            { size: 5, points: 150, weight: 0.2 }
+        ]
+    },
+    'l9': { 
+        timeLimit: 10000, 
+        goal: 800, 
+        spawnInterval: 400, 
+        targetValue: 50, 
+        targetSpeed: 9, 
+        ammoTargetChance: 0.15, 
+        timeTargetChance: 0.25, 
+        ammoBonus: 3, 
+        timeBonus: 3000,
+        targetTypes: [
+            { size: 12, points: 40, weight: 2 },
+            { size: 9, points: 50, weight: 2 },
+            { size: 6, points: 100, weight: 1 },
+            { size: 4, points: 200, weight: 0.2 }
+        ]
+    },
+    'l10': { 
+        timeLimit: 25000, 
+        goal: 0, 
+        spawnInterval: 300, 
+        targetValue: 10, 
+        targetSpeed: 5, 
+        ammoTargetChance: 0.3, 
+        timeTargetChance: 0.3, 
+        ammoBonus: 4, 
+        timeBonus: 4000,
+        targetTypes: [
+            { size: 15, points: 25, weight: 2 },
+            { size: 12, points: 35, weight: 2 },
+            { size: 9, points: 60, weight: 1 },
+            { size: 6, points: 100, weight: 0.5 },
+            { size: 4, points: 200, weight: 0.2 }
+        ]
+    },
 };
+
 
 
 interface TargetPracticeState {
@@ -41,6 +190,7 @@ interface TargetPracticeState {
     score: number
     goal: number
     timeLeft: number
+    completionTime?: number 
     maxTime: number
     shopItems: ShopItem[]
     activeShopItem?: ShopItem
@@ -79,6 +229,7 @@ interface PracticeBullet {
 }
 
 interface PracticeTarget {
+    targetType: 'points' | 'ammo' | 'time';
     x: number
     y: number
     w: number
@@ -95,17 +246,30 @@ interface PracticeTarget {
     getHitbox(): Rect
 }
 
+interface TargetDefinition {
+    size: number;
+    points: number;
+    weight: number;  
+}
+
 interface LevelConfig {
-    timeLimit: number;      
-    goal: number;         
-    spawnInterval: number; 
-    targetValue: number;   
-    targetSpeed?: number;  
-    targetSize?: number;  
-    maxTargets?: number;   
+    timeLimit: number;
+    goal: number;
+    spawnInterval: number;
+    targetValue: number; 
+    targetSpeed?: number;
+    targetSize?: number; 
+    maxTargets?: number;
+    baseAmmo?: number;
+    ammoTargetChance?: number;
+    timeTargetChance?: number;
+    ammoBonus?: number;
+    timeBonus?: number;
+    targetTypes?: TargetDefinition[];
 }
 
 class CircleTarget implements PracticeTarget {
+    targetType: 'points' | 'ammo' | 'time';
     x: number;
     y: number;
     w: number;
@@ -119,10 +283,12 @@ class CircleTarget implements PracticeTarget {
     radius: number;
     lifetime: number;
     maxLifetime: number;
+    
 
-    constructor(x: number, y: number, radius: number, points: number, speed: number = 0, lifetime: number = 3000) {
+    constructor(x: number, y: number, radius: number, points: number, speed: number = 0, lifetime: number = 3000, targetType: 'points' | 'ammo' | 'time' = 'points') {
         this.x = x;
         this.y = y;
+        this.targetType = targetType;
         this.radius = radius;
         this.w = radius * 2;
         this.h = radius * 2;
@@ -130,7 +296,13 @@ class CircleTarget implements PracticeTarget {
         this.speed = speed;
         this.vx = speed > 0 ? (Math.random() - 0.5) * speed : 0;
         this.vy = speed > 0 ? (Math.random() - 0.5) * speed : 0;
-        this.color = points >= 50 ? '#F00' : points >= 30 ? '#FA0' : points >= 20 ? '#FF0' : '#0F0';
+        if (targetType === 'ammo') {
+            this.color = '#00F'; 
+        } else if (targetType === 'time') {
+            this.color = '#0FF'; 
+        } else {
+            this.color = points >= 50 ? '#F00' : points >= 30 ? '#FA0' : points >= 20 ? '#FF0' : '#0F0';
+        }
         this.lifetime = lifetime;
         this.maxLifetime = lifetime;
     }
@@ -146,7 +318,7 @@ class CircleTarget implements PracticeTarget {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Bounce off walls
+        // Bounce off
         if (this.x - this.radius <= gameState.screen.x || this.x + this.radius >= gameState.screen.x + gameState.screen.w) {
             this.vx = -this.vx;
             this.x = Math.max(gameState.screen.x + this.radius, Math.min(gameState.screen.x + gameState.screen.w - this.radius, this.x));
@@ -173,8 +345,17 @@ class CircleTarget implements PracticeTarget {
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         context.fill();
 
+        let displayText = '';
+        if (this.targetType === 'ammo') {
+            displayText = '+A';
+        } else if (this.targetType === 'time') {
+            displayText = '+T'; 
+        } else {
+            displayText = this.points.toString();
+        }
 
-        drawARFont(context, this.points.toString(), this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
+
+        drawARFont(context, displayText, this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
     }
 
     getHitbox(): Rect {
@@ -230,15 +411,16 @@ function startTargetPractice(state: GameState) {
 }
 
 const shopItems: ShopItem[] = [
-    {key: 'l1', levelKey: 'l1', x: 0, y: 0, unlocks: ['l2', 'reset'], label: 'Level 1', description: 'Warmup'},
-    {key: 'l2', levelKey: 'l2', x: 0, y: 1, costs: [50], unlocks: ['l3', 'ammo'], label: 'Level 2', description: 'Practice'},
-    {key: 'l3', levelKey: 'l3', x: 0, y: 2, costs: [100], unlocks: ['l4'], label: 'Level 3', description: 'Deputy'},
-    {key: 'l4', levelKey: 'l4', x: 0, y: 3, costs: [200], unlocks: ['l5', 'time'], label: 'Level 4', description: 'Bandito'},
-    {key: 'l5', levelKey: 'l5', x: 0, y: 4, costs: [400], unlocks: ['l6'], label: 'Level 5', description: 'Sheriff'},
-    {key: 'l6', levelKey: 'l6', x: 0, y: 5, costs: [800], unlocks: ['l7', 'points'], label: 'Level 6', description: 'Marshall'},
-    {key: 'l7', levelKey: 'l7', x: 0, y: 6, costs: [1600], unlocks: ['l8'], label: 'Level 7', description: 'Sharpshooter'},
-    {key: 'l8', levelKey: 'l8', x: 0, y: 7, costs: [3200], unlocks: ['l9'], label: 'Level 8', description: 'Legend'},
+    {key: 'l1', levelKey: 'l1', x: 0, y: 0, unlocks: ['l5','l9','l10'], label: 'Level 1', description: 'Warmup'},
+    {key: 'l2', levelKey: 'l2', x: 0, y: 1, costs: [50], unlocks: [], label: 'Level 2', description: 'Practice'},
+    {key: 'l3', levelKey: 'l3', x: 0, y: 2, costs: [100], unlocks: [], label: 'Level 3', description: 'Deputy'},
+    {key: 'l4', levelKey: 'l4', x: 0, y: 3, costs: [200], unlocks: [], label: 'Level 4', description: 'Bandito'},
+    {key: 'l5', levelKey: 'l5', x: 0, y: 4, costs: [400], unlocks: [], label: 'Level 5', description: 'Sheriff'},
+    {key: 'l6', levelKey: 'l6', x: 0, y: 5, costs: [800], unlocks: [], label: 'Level 6', description: 'Marshall'},
+    {key: 'l7', levelKey: 'l7', x: 0, y: 6, costs: [1600], unlocks: [], label: 'Level 7', description: 'Sharpshooter'},
+    {key: 'l8', levelKey: 'l8', x: 0, y: 7, costs: [3200], unlocks: [], label: 'Level 8', description: 'Legend'},
     {key: 'l9', levelKey: 'l9', x: 0, y: 8, costs: [6400], unlocks: [], label: 'Level 9', description: 'Desperado'},
+    {key: 'l10', levelKey: 'l10', x: 1, y: 8, costs: [0], unlocks: [], label: 'Endless', description: 'Survive as long as possible'},
     {
         key: 'ammo', x: 1, y: 0, costs: [50, 100, 200, 400, 800],
         label: 'Ammo',
@@ -360,14 +542,49 @@ function renderShop(context: CanvasRenderingContext2D, state: GameState, gameSta
     }
 }
 
+function selectTargetType(targetTypes: TargetDefinition[]): TargetDefinition {
+    const totalWeight = targetTypes.reduce((sum, type) => sum + type.weight, 0);
+    let random = Math.random() * totalWeight;
+    
+    for (const targetType of targetTypes) {
+        random -= targetType.weight;
+        if (random <= 0) {
+            return targetType;
+        }
+    }
+
+    return targetTypes[0];
+}
 
 
 
 function spawnTargets(state: GameState, gameState: TargetPracticeState, levelKey: LevelKey) {
     const config = levelConfigs[levelKey];
     const difficulty = parseInt(levelKey.substring(1), 10);
-    const radius = config.targetSize ?? Math.max(8, 20 - difficulty * 1.8);
-    const points = config.targetValue;
+    
+    let targetType: 'points' | 'ammo' | 'time' = 'points';
+    const rand = Math.random();
+    const ammoChance = config.ammoTargetChance ?? 0;
+    const timeChance = config.timeTargetChance ?? 0;
+    
+    if (rand < ammoChance) {
+        targetType = 'ammo';
+    } else if (rand < ammoChance + timeChance) {
+        targetType = 'time';
+    }
+    
+    let radius: number;
+    let points: number;
+    
+    if (targetType === 'points' && config.targetTypes && config.targetTypes.length > 0) {
+        const selectedType = selectTargetType(config.targetTypes);
+        radius = selectedType.size;
+        points = selectedType.points;
+    } else {
+        radius = config.targetSize ?? Math.max(8, 20 - difficulty * 1.8);
+        points = config.targetValue;
+    }
+    
     const speed = config.targetSpeed ?? (difficulty > 2 ? Math.max(3, difficulty - 1) : 0);
     const lifetime = Math.max(500, 4000 - difficulty * 300);
     
@@ -383,7 +600,7 @@ function spawnTargets(state: GameState, gameState: TargetPracticeState, levelKey
         Math.sqrt((t.x - x) ** 2 + (t.y - y) ** 2) < radius + 15
     ));
 
-    gameState.targets.push(new CircleTarget(x, y, radius, points, speed, lifetime));
+    gameState.targets.push(new CircleTarget(x, y, radius, points, speed, lifetime, targetType));
 }
 
 
@@ -397,6 +614,11 @@ function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: 
     gameState.maxTime = config.timeLimit + timeUpgrade;
     gameState.timeLeft = gameState.maxTime;
     gameState.goal = config.goal;
+
+    const levelBaseAmmo = config.baseAmmo ?? baseAmmo;
+    gameState.maxAmmo = levelBaseAmmo + (state.savedState.savedArData.gameData.targetPractice.unlocks.ammo ?? 0) * 5;
+    gameState.ammo = gameState.maxAmmo;
+
     gameState.bullets = [];
     gameState.targets = [];
     gameState.score = 0;
@@ -412,18 +634,61 @@ function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: 
 
 
 
+function handleTargetCollisions(gameState: TargetPracticeState) {
+    for (let i = 0; i < gameState.targets.length; i++) {
+        const target1 = gameState.targets[i] as CircleTarget;
+        if (target1.hitTime !== undefined) continue;
+        
+        for (let j = i + 1; j < gameState.targets.length; j++) {
+            const target2 = gameState.targets[j] as CircleTarget;
+            if (target2.hitTime !== undefined) continue;
+            
+            const dx = target2.x - target1.x;
+            const dy = target2.y - target1.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            const minDistance = target1.radius + target2.radius;
+            
+            if (distance < minDistance && distance > 0) {
+                const nx = dx / distance;
+                const ny = dy / distance;
+                
+                const overlap = minDistance - distance;
+                const separationX = (overlap * nx) / 2;
+                const separationY = (overlap * ny) / 2;
+                
+                target1.x -= separationX;
+                target1.y -= separationY;
+                target2.x += separationX;
+                target2.y += separationY;
+                    
+                const relativeVx = target2.vx - target1.vx;
+                const relativeVy = target2.vy - target1.vy;
+                const velocityAlongNormal = relativeVx * nx + relativeVy * ny;
+                    
+                if (velocityAlongNormal <= 0) {
+                    const impulse = velocityAlongNormal;
+                    target1.vx += impulse * nx;
+                    target1.vy += impulse * ny;
+                    target2.vx -= impulse * nx;
+                    target2.vy -= impulse * ny;
+                }
+            }
+        }
+    }
+}
+
 
 
 
 function updateLevel(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
     const difficulty = parseInt(gameState.levelKey.substring(1), 10);
     const config = levelConfigs[gameState.levelKey];
+    const isEndless = gameState.levelKey === 'l10';
     
     const heroPos = getHeroPosition(state, gameState);
     gameState.crosshair.x = heroPos.x + heroPos.w / 2;
     gameState.crosshair.y = heroPos.y + heroPos.h / 2;
     
-    // Check for shooting input and target hits
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         if (gameState.ammo <= 0) {
             playAreaSound(state, state.areaInstance, 'error');
@@ -440,12 +705,20 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
                 const dist = Math.sqrt(dx * dx + dy * dy);
                 
                 if (dist <= (target as CircleTarget).radius) {
-                    const points = target.points * (1 + (savedState.unlocks.points ?? 0));
-                    gameState.score += points;
+                    if (target.targetType === 'points') {
+                        const points = target.points * (1 + (savedState.unlocks.points ?? 0));
+                        gameState.score += points;
+                    } else if (target.targetType === 'ammo') {
+                        const ammoBonus = config.ammoBonus ?? 3;
+                        gameState.ammo += ammoBonus;
+                    } else if (target.targetType === 'time') {
+                        const timeBonus = config.timeBonus ?? 3000;
+                        gameState.timeLeft = Math.min(gameState.maxTime, gameState.timeLeft + timeBonus);
+                    }
                     target.hitTime = 300;
                     hitTarget = true;
                     
-                    playAreaSound(state, state.areaInstance, 'secretChime');
+                    playAreaSound(state, state.areaInstance, 'hitShot');
                     
                     setTimeout(() => {
                         const index = gameState.targets.indexOf(target);
@@ -459,7 +732,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
         
             if (!hitTarget) {
                 gameState.missedShots++;
-                playAreaSound(state, state.areaInstance, 'action');
+                playAreaSound(state, state.areaInstance, 'rockShatter');
             }
         }
     }
@@ -471,6 +744,8 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
             gameState.targets.splice(i--, 1);
         }
     }
+
+    handleTargetCollisions(gameState);
     
     if (gameState.nextSpawnTime > 0) {
         gameState.nextSpawnTime -= FRAME_LENGTH;
@@ -488,9 +763,10 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
 
     if (gameState.timeLeft <= 0) {
         gameState.scene = 'results';
-    } else if (gameState.goal > 0 && gameState.score >= gameState.goal) {
+    } else if (!isEndless && gameState.goal > 0 && gameState.score >= gameState.goal) {
+        gameState.completionTime = gameState.maxTime - gameState.timeLeft;
         gameState.scene = 'results';
-    } else if (gameState.ammo <= 0 && gameState.goal > 0 && gameState.score < gameState.goal) {
+    } else if (gameState.ammo <= 0) {
         gameState.scene = 'results';
     }
 }
@@ -573,6 +849,7 @@ function renderTargetPractice(context: CanvasRenderingContext2D, state: GameStat
 }
 
 
+
 function updateResults(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
 
@@ -585,16 +862,32 @@ function updateResults(state: GameState, gameState: TargetPracticeState, savedSt
         
         const earnedPoints = gameState.score * multiplier;
         savedState.points += earnedPoints;
-        
-        const currentRecord = savedState.records[gameState.levelKey] ?? 0;
-        if (gameState.score > currentRecord) {
-            savedState.records[gameState.levelKey] = gameState.score;
+
+        if (gameState.levelKey === 'l10') {
+            const currentRecord = savedState.records[gameState.levelKey] ?? 0;
+            if (gameState.score > currentRecord) {
+                savedState.records[gameState.levelKey] = gameState.score;
+            }
+        } else if (gameState.completionTime !== undefined) {
+            const currentRecord = savedState.records[gameState.levelKey] ?? Infinity;
+            if (gameState.completionTime < currentRecord) {
+                savedState.records[gameState.levelKey] = gameState.completionTime;
+            }
+        }
+
+        if (gameState.goal > 0 && gameState.score >= gameState.goal) {
+            const levelNum = parseInt(gameState.levelKey.substring(1), 10);
+            const nextLevelKey = 'l' + (levelNum + 1) as LevelKey;
+            if (levelConfigs[nextLevelKey] && !savedState.unlocks[nextLevelKey]) {
+                savedState.unlocks[nextLevelKey] = 1;
+            }
         }
         
         saveGame(state);
         gameState.scene = 'shop';
     }
 }
+
 
 
 
@@ -620,7 +913,7 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
     }
     
     drawARFont(context, 'MISSED: ' + gameState.missedShots, centerX, y + 40, {textAlign: 'center', textBaseline: 'top'});
-    drawARFont(context, multiplierText, centerX, y + 55, {textAlign: 'center', textBaseline: 'top'});
+    drawARFont(context, multiplierText, centerX, y + 48, {textAlign: 'center', textBaseline: 'top'});
     
     if (gameState.goal > 0) {
         const goalMet = gameState.score >= gameState.goal;
@@ -641,19 +934,35 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
         }
         
         context.fillStyle = statusColor;
-        drawARFont(context, statusText, centerX, y + 70, {textAlign: 'center', textBaseline: 'top'});
+        drawARFont(context, statusText, centerX, y + 65, {textAlign: 'center', textBaseline: 'top'});
         context.fillStyle = '#FFF';
+
+        if (goalMet && gameState.completionTime !== undefined) {
+            const timeText = (gameState.completionTime / 1000).toFixed(1) + 's';
+            drawARFont(context, 'TIME: ' + timeText, centerX, y + 75, {textAlign: 'center', textBaseline: 'top'});
+        }
     }
     
     const earnedPoints = gameState.score * multiplier;
     drawARFont(context, 'POINTS: +' + earnedPoints, centerX, y + 85, {textAlign: 'center', textBaseline: 'top'});
 
-    const currentRecord = savedState.records[gameState.levelKey] ?? 0;
-    if (gameState.score > currentRecord) {
-        drawARFont(context, 'NEW RECORD!', centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
-    } else if (currentRecord > 0) {
-        drawARFont(context, 'RECORD: ' + currentRecord, centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
+    if (gameState.levelKey === 'l10') {
+        const currentRecord = savedState.records[gameState.levelKey] ?? 0;
+        if (gameState.score > currentRecord) {
+            drawARFont(context, 'NEW HIGH SCORE!', centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
+        } else if (currentRecord > 0) {
+            drawARFont(context, 'HIGH SCORE: ' + currentRecord, centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
+        }
+    } else if (gameState.completionTime !== undefined) {
+        const currentRecord = savedState.records[gameState.levelKey] ?? Infinity;
+        if (gameState.completionTime < currentRecord) {
+            drawARFont(context, 'NEW FASTEST TIME!', centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
+        } else if (currentRecord !== Infinity) {
+            const recordText = 'BEST TIME: ' + (currentRecord / 1000).toFixed(1) + 's';
+            drawARFont(context, recordText, centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
+        }
     }
+    
     drawARFont(context, 'PRESS SPACE', centerX, y + h - 15, {textAlign: 'center', textBaseline: 'top'});
 }
 
@@ -699,6 +1008,7 @@ function renderReset(context: CanvasRenderingContext2D, state: GameState, gameSt
     drawARFont(context, 'NO', r.x + r.w / 2, r.y + r.h / 2, {textAlign: 'center', textBaseline: 'middle'});
 }
 
+
 function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameState) {
     const gameState = state.arState.game as TargetPracticeState;
     const savedState = state.savedState.savedArData.gameData.targetPractice;
@@ -725,9 +1035,17 @@ function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameS
             const costText = 'COST: ' + cost + (canAfford ? '' : ' (NOT ENOUGH)');
             drawARFont(context, costText, CANVAS_WIDTH / 2, boxY + 12, {textAlign: 'center', textBaseline: 'top'});
         } else if (item.levelKey && level > 0) {
-            const highScore = savedState.records[item.levelKey] ?? 0;
-            const scoreText = highScore > 0 ? 'HIGH SCORE: ' + highScore : 'NO RECORD YET';
-            drawARFont(context, scoreText, CANVAS_WIDTH / 2, boxY + 12, {textAlign: 'center', textBaseline: 'top'});
+            if (item.levelKey === 'l10') {
+                const highScore = savedState.records[item.levelKey] ?? 0;
+                const scoreText = highScore > 0 ? 'HIGH SCORE: ' + highScore : 'NO RECORD YET';
+                drawARFont(context, scoreText, CANVAS_WIDTH / 2, boxY + 12, {textAlign: 'center', textBaseline: 'top'});
+            } else {
+                const fastestTime = savedState.records[item.levelKey];
+                const timeText = fastestTime !== undefined && fastestTime !== Infinity 
+                    ? 'BEST: ' + (fastestTime / 1000).toFixed(1) + 's' 
+                    : 'NO RECORD YET';
+                drawARFont(context, timeText, CANVAS_WIDTH / 2, boxY + 12, {textAlign: 'center', textBaseline: 'top'});
+            }
         } else if (!item.costs) {
             drawARFont(context, 'MAX LEVEL', CANVAS_WIDTH / 2, boxY + 12, {textAlign: 'center', textBaseline: 'top'});
         }
@@ -739,6 +1057,9 @@ function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameS
         
         const timeText = Math.ceil(gameState.timeLeft / 1000).toString();
         drawARFont(context, 'TIME: ' + timeText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 32, {textAlign: 'center', textBaseline: 'top'});
+        
+        const ammoText = 'AMMO: ' + gameState.ammo
+        drawARFont(context, ammoText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 24, {textAlign: 'center', textBaseline: 'top'});
     }
 }
 
