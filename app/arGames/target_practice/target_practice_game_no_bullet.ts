@@ -420,7 +420,7 @@ const shopItems: ShopItem[] = [
     {key: 'l7', levelKey: 'l7', x: 0, y: 6, costs: [1600], unlocks: [], label: 'Level 7', description: 'Sharpshooter'},
     {key: 'l8', levelKey: 'l8', x: 0, y: 7, costs: [3200], unlocks: [], label: 'Level 8', description: 'Legend'},
     {key: 'l9', levelKey: 'l9', x: 0, y: 8, costs: [6400], unlocks: [], label: 'Level 9', description: 'Desperado'},
-    {key: 'l10', levelKey: 'l10', x: 1, y: 8, costs: [0], unlocks: [], label: 'Endless', description: 'Survive as long as possible'},
+    {key: 'l10', levelKey: 'l10', x: 1, y: 8, costs: [1], unlocks: [], label: 'Endless', description: 'Last as long as possible'},
     {
         key: 'ammo', x: 1, y: 0, costs: [50, 100, 200, 400, 800],
         label: 'Ammo',
