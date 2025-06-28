@@ -6,7 +6,7 @@ const vanaraPitsImage = 'gfx/tiles/vanaraPits.png';
 
 const vanaraPitWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(vanaraPitsImage, {x: 64, y: 96, w: 48, h: 16}),
+    source: requireFrame(vanaraPitsImage, {x: 128, y: 48, w: 48, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'floor2', pit: true, pitWall: true },
     },

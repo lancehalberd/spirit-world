@@ -756,8 +756,8 @@ const windowOctogonal: DecorationType = {
     },
 };
 
-const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 23, h: 42, content: {x: 1, y: 22, w: 20, h: 20}});
-const cocoonBackFrame= requireFrame('gfx/tiles/vanara.png', {x: 53, y: 354, w: 23, h: 42, content: {x: 1, y: 22, w: 20, h: 20}});
+const cocoonFrame= requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
+const cocoonBackFrame= requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
 const cocoon: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         if (decoration.d === 'right') {

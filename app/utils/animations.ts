@@ -98,6 +98,25 @@ export function getFrame(animation: FrameAnimation, animationTime: number): Fram
     return animation.frames[frameIndex % animation.frames.length];
 };
 
+export function isAnimationFinished(animation: FrameAnimation, animationTime: number): boolean {
+    if (!animation) {
+        return true;
+    }
+    if (animationTime <= 0) {
+        return false;
+    }
+    // If the animation doesn't loop, the animation is considered finished once the total duration has
+    // exceeded.
+    if (!animation.loop && animationTime >= animation.duration) {
+        return true;
+    }
+    // For looping animations, an animation is considered finished each time it is about to show
+    // the loop frame.
+    const currentFrame = getFrame(animation, animationTime);
+    const previousFrame = getFrame(animation, animationTime - FRAME_LENGTH);
+    return currentFrame !== previousFrame && currentFrame === animation.frames[animation.loopFrame ?? 0];
+}
+
 export function drawFrame(
     context: CanvasRenderingContext2D,
     {image, x, y, w, h}: Frame,
