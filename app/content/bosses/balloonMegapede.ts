@@ -97,6 +97,9 @@ enemyDefinitions.balloonMegapede = {
         if (!enemy.params.isVulnerable) {
             return {blocked: true, stopped: true};
         }
+        if (hit.element === 'ice') {
+            hit.damage = 10 * enemy.maxLife;
+        }
         return enemy.defaultOnHit(state, hit);
     },
     update(state: GameState, enemy: Enemy<BalloonMegapedeParams>): void {
