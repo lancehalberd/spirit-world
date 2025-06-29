@@ -111,6 +111,11 @@ export function getTileBehaviors(
         // console.log(tileBehavior.pitMap, y, x, sy, sx, tileBehavior.pitMap[sy] >> (15 - sx));
         tileBehavior.pit = !!(tileBehavior.pitMap[sy] >> (15 - sx) & 1);
     }
+    if (!tileBehavior.pitWall && tileBehavior.pitWallMap) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        tileBehavior.pitWall = !!(tileBehavior.pitWallMap[sy] >> (15 - sx) & 1);
+    }
     return { tileBehavior, tx, ty };
 }
 

@@ -1,4 +1,4 @@
-import {BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT} from 'app/content/bitMasks';
+import {BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT, BITMAP_BOTTOM_RIGHT, BITMAP_BOTTOM_LEFT} from 'app/content/bitMasks';
 import {pitBehavior, singleTileSource} from 'app/content/tiles/constants';
 import { requireFrame } from 'app/utils/packedImages';
 
@@ -72,4 +72,23 @@ export const allVanaraPitTileSources: TileSource[] = [
     singleTileSource(vanaraPitsImage, pitBehavior, 16, 48),
     // = 26
 ];
+
+
+export const vanaraAngledPits: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(vanaraPitsImage, {x: 16, y: 176, w: 64, h: 48}),
+    behaviors: {
+        '0x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_RIGHT, pitWall: true  },
+        '1x0': { defaultLayer: 'field', pitMap: BITMAP_BOTTOM_LEFT, pitWall: true},
+        '0x1': { defaultLayer: 'floor2', pit: true, pitWallMap: BITMAP_TOP_LEFT },
+        '1x1': { defaultLayer: 'floor2', pit: true, pitWallMap: BITMAP_TOP_RIGHT },
+        '2x2': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_RIGHT },
+        '3x2': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_LEFT },
+    },
+    tileCoordinates: [
+        [0,0],[1,0],
+        [0,1],[1,1],
+                    [2, 2],[3, 2],
+    ],
+};
 

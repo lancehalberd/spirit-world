@@ -171,11 +171,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.vx = 0;
         hero.vy = 0;
         const hitbox = hero.getMovementHitbox();
+        const p = 5;
         const checkPoints = [
-            {x: hitbox.x, y: hitbox.y, dx: 1, dy: 1},
-            {x: hitbox.x + hitbox.w - 1, y: hitbox.y, dx: -1, dy: 1},
-            {x: hitbox.x, y: hitbox.y + hitbox.h - 1, dx: 1, dy: -1},
-            {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1, dx: -1, dy: -1},
+            {x: hitbox.x + p, y: hitbox.y + p, dx: 1, dy: 1},
+            {x: hitbox.x + hitbox.w - 1 - p, y: hitbox.y + p, dx: - 1, dy: 1},
+            {x: hitbox.x + p, y: hitbox.y + hitbox.h - 1 - p, dx: 1, dy: -1},
+            {x: hitbox.x + hitbox.w - 1 - p, y: hitbox.y + hitbox.h - 1 - p, dx: -1, dy: -1},
         ];
         // While the hero is falling, push them around until all their check points are over actual pit tiles.
         let onPitWall = false, isOnSingleTilePit = false;

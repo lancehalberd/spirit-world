@@ -126,6 +126,8 @@ interface TileBehaviors {
     // and that the player should move south until they hit a regular pit tile while falling,
     // otherwise they will appear to fall into the wall.
     pitWall?: boolean
+    // The same as pitWall but with pixel precision.
+    pitWallMap?: Uint16Array
     isLava?: boolean
     // The same as isLava but with pixel precision.
     isLavaMap?: Uint16Array

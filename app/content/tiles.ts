@@ -58,13 +58,13 @@ import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
 import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
-import {allVanaraPitTileSources} from 'app/content/tiles/vanaraPits';
+import {allVanaraPitTileSources, vanaraAngledPits} from 'app/content/tiles/vanaraPits';
 import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
-import {allVanaraTileSources} from 'app/content/tiles/vanaraTree'
+import {allVanaraTileSources, vanaraHoleyTransitionTile, vanaraPlainFloorTile} from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
 import { allJadeInteriorLightTileSources } from './tiles/jadeInteriorLight';
@@ -1209,7 +1209,10 @@ addTiles([
     ...allLightJadeCityTileSources,
     ...allDarkJadeCityTileSources,
     ...allJadeInteriorLightTileSources,
-    ...allJadeInteriorDarkTileSources
+    ...allJadeInteriorDarkTileSources,
+    vanaraHoleyTransitionTile,
+    vanaraPlainFloorTile,
+    vanaraAngledPits,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
