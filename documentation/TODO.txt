@@ -146,8 +146,6 @@ Graphics to Implement:
 
 Current tasks:
     - Don't play boss music when fighting robots in Staff Tower.
-    - Only save at dungeon entrances when entering or leaving the area
-        - Maybe check on the handlers for the doors
 
     - Add new helix exterior graphics
         - Add helix exterior to material sky
@@ -311,17 +309,29 @@ Current tasks:
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
 
-    - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
-        - Material world entrances: back of Tomb, lake teleporter, bottom of Cocoon, Helix Bridge
-        - Spirit world entrances: Fertility Temple, Helix Bridge + 2 more?
-        - Learn Teleportation after talking to the Spirit Tree
+    - Add Vanara Dreamland
+        - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
+            - Material world entrances: back of Tomb, lake teleporter, bottom of Cocoon, Helix Bridge
+                - Replace teleporters between tomb + lake with teleporters to dreamland once the player has teleportation.
+            - Spirit world entrances: Fertility Temple, Helix Bridge + 2 more?
+        - Design + Create the Vanara Dreamland
+            - NPC Vanara projections populate the dreamland
+            - For now use regular grass tiles + vanara plants and then see if using clouds for exterior boundaries gives it a more fantastic feel.
+            - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
+            - The dreamland will start small and expand as you save the Daughter Trees.
+                - Add indicators for where the dreamland can expand.
+                - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
+                - One of the crew on the Helix recommends visiting the temple to assist them.
+        - Add NPCs to Vanara Dreamland
+            - Design NPC dialog
+        - Add initial cutscene for meeting the Spirit Tree
+            - Learn Teleportation after talking to the Spirit Tree
             - Teleportation tutorial area required to leave
-        - NPC Vanara projections populate the dreamland
-        - For now use regular grass tiles + vanara plants and then see if using clouds for exterior boundaries gives it a more fantastic feel.
-        - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
-        - The dreamland will start small and expand as you save the Daughter Trees.
-            - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
-            - One of the crew on the Helix recommends visiting the temple to assist them.
+        - Add fade to white transition for entering/leaving dreamland
+        - Add Teleportation tutorial to Vanara Dreamland
+        - Add boss rush to Vanara Dreamland
+        - Design+comission avatar for the Spirit Tree
+
 
     - Add sound effect using pink noise when near a waterfall.
         - Use pink noise for barrier burst SFX.

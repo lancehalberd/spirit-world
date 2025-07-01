@@ -1,7 +1,6 @@
 import {
     createAreaInstance, getAreaFromLocation, linkObjects, setConnectedAreas,
 } from 'app/content/areas';
-import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
@@ -154,7 +153,6 @@ export function enterLocation(
     setAreaSection(state, !isMutation);
     state.hotLevel = state.areaSection.isHot ? 1 : 0;
     fixCamera(state);
-    checkToUpdateSpawnLocation(state);
     setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);
     for (const object of [...state.areaInstance.objects, ...state.areaInstance.effects]) {

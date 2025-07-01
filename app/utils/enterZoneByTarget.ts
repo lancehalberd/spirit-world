@@ -10,6 +10,7 @@ import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { fixCamera } from 'app/utils/fixCamera';
+import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 
 
 interface OptionalEnterZoneByTargetParams {
@@ -36,6 +37,13 @@ export function enterZoneByTarget(
     const objectLocation = findObjectLocation(state, zoneKey, targetObjectId, state.areaInstance.definition.isSpiritWorld, skipObject, true);
     if (!objectLocation) {
         return false;
+    }
+    if (state.location.zoneKey !== objectLocation.zoneKey) {
+        // When leaving a zone through a door, we check to update the spawn location for both the location you are leaving from or the
+        // location you are arriving to. This will cause you to update your spawn location when entering or exiting most dungeons
+        // to the interior of the dungeon you most recently entered or left, provided you used an entrance associated with a spawn point.
+        checkToUpdateSpawnLocation(state);
+        checkToUpdateSpawnLocation(state, objectLocation);
     }
     enterLocation(state, objectLocation, {
         instant,
