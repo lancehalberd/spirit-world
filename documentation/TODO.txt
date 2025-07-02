@@ -145,8 +145,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Don't play boss music when fighting robots in Staff Tower.
-
     - Add new helix exterior graphics
         - Add helix exterior to material sky
             - Match door support to Staff Tower door
