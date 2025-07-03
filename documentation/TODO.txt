@@ -145,6 +145,33 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Add Vanara Dreamland
+        - Implement support for isAstral flag to area sections that force using the Astral Projection instead of the normal Hero.
+            - Set the flag for the entire zone using !$teleportation so that it is removed once the player learns teleportation.
+        - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
+            - Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
+        - Design + Create the Vanara Dreamland
+            - NPC Vanara projections populate the dreamland
+            - For now use regular grass tiles + vanara plants and then see if using clouds for exterior boundaries gives it a more fantastic feel.
+            - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
+            - The dreamland will start small and expand as you save the Daughter Trees.
+                - Add indicators for where the dreamland can expand.
+                - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
+                - One of the crew on the Helix recommends visiting the temple to assist them.
+        - Add NPCs to Vanara Dreamland
+            - Design NPC dialog
+        - Add initial cutscene for meeting the Spirit Tree
+            - Learn Teleportation after talking to the Spirit Tree
+                - In order to teleport MC must learn to manifest their physical body in the Dream World.
+        - Add fade to white transition for entering/leaving dreamland
+        - Add Teleportation tutorial to Vanara Dreamland
+        - Design+comission avatar for the Spirit Tree
+            - Fully grown Helix exterior in a prominent location of the Dream World
+            - Approaching the tree will cause the avatar of the Spirit Tree to appear which looks like some kind of heavenly being?
+                - Work with artist on design details.
+        - Add boss rush to Vanara Dreamland
+
+
     - Add new helix exterior graphics
         - Add helix exterior to material sky
             - Match door support to Staff Tower door
@@ -306,30 +333,6 @@ Current tasks:
 
     - Replace closed door after Peach Cave boss with impassable plants that disappear when the tree dies.
         - Let's make new graphics for this as a pilot of the Cocoon graphics.
-
-    - Add Vanara Dreamland
-        - Add entrance to the Vanara Dreamland to the Cocoon after the boss fight.
-            - Material world entrances: back of Tomb, lake teleporter, bottom of Cocoon, Helix Bridge
-                - Replace teleporters between tomb + lake with teleporters to dreamland once the player has teleportation.
-            - Spirit world entrances: Fertility Temple, Helix Bridge + 2 more?
-        - Design + Create the Vanara Dreamland
-            - NPC Vanara projections populate the dreamland
-            - For now use regular grass tiles + vanara plants and then see if using clouds for exterior boundaries gives it a more fantastic feel.
-            - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
-            - The dreamland will start small and expand as you save the Daughter Trees.
-                - Add indicators for where the dreamland can expand.
-                - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
-                - One of the crew on the Helix recommends visiting the temple to assist them.
-        - Add NPCs to Vanara Dreamland
-            - Design NPC dialog
-        - Add initial cutscene for meeting the Spirit Tree
-            - Learn Teleportation after talking to the Spirit Tree
-            - Teleportation tutorial area required to leave
-        - Add fade to white transition for entering/leaving dreamland
-        - Add Teleportation tutorial to Vanara Dreamland
-        - Add boss rush to Vanara Dreamland
-        - Design+comission avatar for the Spirit Tree
-
 
     - Add sound effect using pink noise when near a waterfall.
         - Use pink noise for barrier burst SFX.

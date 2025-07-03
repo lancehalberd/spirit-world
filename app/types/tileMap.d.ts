@@ -355,6 +355,7 @@ interface AreaLayer extends AreaTileGrid {
 interface AreaSection extends Rect {
     hotLogic?: LogicDefinition
     fogLogic?: LogicDefinition
+    astralLogic?: LogicDefinition
     // Unique identifier for this section that can be used to look it up
     // and is used when tracking whether the player has explored a section.
     index?: number
@@ -376,6 +377,8 @@ interface AreaSectionInstance extends AreaSection {
     definition: AreaSection
     isFoggy?: boolean
     isHot?: boolean
+    // Astral areas force the player to be in their Astral body, limiting their behaviors.
+    isAstral?: boolean
 }
 
 interface AreaDefinition {

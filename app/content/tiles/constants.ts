@@ -258,7 +258,7 @@ export const emptyLedgeBehaviors: TileSource = {
         [0, 2],[1, 2],[2, 2],
     ],
 };
-export function renderEmptyCeiling(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
+export function renderEmptyWall(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
     if (!editingState.isEditing) {
         return;
     }
@@ -283,9 +283,41 @@ export function renderEmptyCeiling(context: CanvasRenderingContext2D, tile: Full
         context.lineTo(x + 16, y + 16);
         context.lineTo(x, y + 16);
         context.fill();
+    } else if (tile.behaviors.solidMap === BITMAP_TOP_LEFT) {
+        context.beginPath();
+        context.moveTo(x, y + 8);
+        context.lineTo(x + 8, y);
+        context.lineTo(x + 16, y);
+        context.lineTo(x + 16, y + 16);
+        context.lineTo(x, y + 16);
+        context.fill();
+    } else if (tile.behaviors.solidMap === BITMAP_TOP_RIGHT) {
+        context.beginPath();
+        context.moveTo(x, y + 8);
+        context.lineTo(x + 8, y);
+        context.lineTo(x + 16, y);
+        context.lineTo(x + 16, y + 16);
+        context.lineTo(x, y + 16);
+        context.fill();
+    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_LEFT) {
+        context.beginPath();
+        context.moveTo(x, y + 8);
+        context.lineTo(x + 8, y);
+        context.lineTo(x + 16, y);
+        context.lineTo(x + 16, y + 16);
+        context.lineTo(x, y + 16);
+        context.fill();
+    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_RIGHT) {
+        context.beginPath();
+        context.moveTo(x, y + 8);
+        context.lineTo(x + 8, y);
+        context.lineTo(x + 16, y);
+        context.lineTo(x + 16, y + 16);
+        context.lineTo(x, y + 16);
+        context.fill();
     }
 }
-const baseEmptyCeilingBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyCeiling, solid: false};
+const baseEmptyCeilingBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, solid: false};
 export const emptyCeilingBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 16},

@@ -348,7 +348,7 @@ const f0_1x0: AreaDefinition = {
         {status: "closed", id: "tomb:0:1x0-door-0", x: 96, y: 496, type: "door", style: "cavern", targetObjectId: "tombEntrance", d: "down"},
         {status: "closedSwitch", id: "tombExit", x: 112, y: 16, type: "door", style: "future", targetZone: "cocoon", targetObjectId: "cocoonEntrance", d: "up", linked: true, saveStatus: "forever", locationCue: "Tomb B1"},
         {status: "normal", id: "tomb:0:1x0-npc-0", x: 64, y: 272, d: "down", behavior: "none", style: "vanaraBlue", type: "npc", dialogueKey: "tombGuardian"},
-        {status: "hidden", id: "tombTeleporter", x: 176, y: 272, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, invertLogic: true, customLogic: "$AR"},
+        {status: "normal", id: "tombDreamTeleporter", x: 176, y: 240, targetZone: "dream", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && $teleportation"},
         {status: "normal", id: "tombEscapePot", linked: true, x: 64, y: 352, type: "pushPull", style: "pot", savePosition: "forever"},
         {status: "normal", id: "", x: 48, y: 352, type: "pushPull", style: "pot"},
         {status: "normal", id: "", x: 80, y: 352, type: "pushPull", style: "pot"},
@@ -357,6 +357,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 49, y: 203, type: "decoration", d: "right", w: 32, h: 16, decorationType: "shelves", drawPriority: "background", seed: 12},
         {status: "normal", id: "", x: 164, y: 356, type: "arGame"},
         {status: "normal", id: "", linked: false, x: 56, y: 264, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, specialBehaviorKey: "spiritSightInstructions", saveStatus: "never"},
+        {status: "hidden", id: "tombTeleporter", x: 176, y: 272, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && !$teleportation"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 182, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 1},

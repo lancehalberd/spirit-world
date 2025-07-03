@@ -409,6 +409,10 @@ export function getBehaviorProperties(): PanelRows {
         state.areaSection.definition.fogLogic = updatedLogic;
         refreshArea(state);
     })];
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Astral?', state.areaSection.definition.astralLogic, updatedLogic => {
+        state.areaSection.definition.astralLogic = updatedLogic;
+        refreshArea(state);
+    })];
     rows.push({
         name: 'Refresh Area',
         onClick() {

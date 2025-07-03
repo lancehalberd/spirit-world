@@ -210,7 +210,11 @@ export function evaluateLogicDefinition(state: GameState, logicDefinition?: Logi
         return !logicDefinition.isInverted;
     }
     if (logicDefinition.hasCustomLogic) {
-        return isLogicValid(state, { requiredFlags: [logicDefinition.customLogic] }, logicDefinition.isInverted);
+        const result = evaluateFlagString(state, logicDefinition.customLogic);
+        if (logicDefinition.isInverted) {
+            return !result;
+        }
+        return result;
     }
     if (logicDefinition.logicKey) {
         return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);

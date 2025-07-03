@@ -1,4 +1,4 @@
-type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud'
+type DrawPriority = 'none' | 'background' | 'foreground' | 'sprites' | 'hud'
     // Currently just used for effects that should be rendered during defeat sequence.
     | 'background-special' | 'foreground-special';
 

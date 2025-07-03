@@ -2166,7 +2166,7 @@ const f0_1x1: AreaDefinition = {
     ],
     objects: [
         {id: "peachCaveWaterEntrance", linked: false, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "cavern", targetZone: "peachCave", targetObjectId: "peachCaveWaterEntrance", d: "up", frozenLogic: {"logicKey":"frozenLake","isInverted":false}},
-        {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
+        {status: "normal", id: "lakeDreamTeleporter", x: 152, y: 432, targetZone: "dream", targetObjectId: "lakeTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "cavern", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTempleUpperEntrance", x: 240, y: 192, type: "door", style: "stoneDownstairs", targetZone: "riverTemple", targetObjectId: "riverTempleUpperEntrance", d: "up"},
         {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
@@ -2201,6 +2201,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:1x1-plant-1", x: 340, y: 432, type: "enemy", enemyType: "plant", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 80, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "", x: 248, y: 232, type: "spawnMarker"},
+        {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "!$teleportation"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 25, mapId: 'overworld', floorId: '1F', mapX: 2, mapY: 2},

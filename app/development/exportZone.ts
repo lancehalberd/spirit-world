@@ -125,6 +125,9 @@ export function serializeZone(zone: Zone) {
                         if (section.fogLogic) {
                             extraFields += `, fogLogic: ${JSON.stringify(section.fogLogic)}`;
                         }
+                        if (section.astralLogic) {
+                            extraFields += `, astralLogic: ${JSON.stringify(section.astralLogic)}`;
+                        }
                         if (section.hideMap) {
                             extraFields += `, hideMap: ${section.hideMap}`;
                         }
