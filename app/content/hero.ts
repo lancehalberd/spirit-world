@@ -11,6 +11,7 @@ import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 
+import {getSpiritFrame} from 'app/render/astralProjectionAnimations';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
@@ -278,8 +279,34 @@ export class Hero implements Actor {
         }
         return boxesIntersect(target as Rect, this.getHitbox());
     }
-
+    onHitAstralProjection(state: GameState, hit: HitProperties): HitResult {
+        if (this.invulnerableFrames > 0) {
+            return {};
+        }
+        if (hit.damage) {
+            // Astral projection damage is applied to the magic meter at 5x effectiveness.
+            state.hero.spendMagic(Math.max(10, hit.damage * 5));
+            // Astral projection has fewer invulnerability frames since it can't be killed
+            // and magic regenerates automatically.
+            this.invulnerableFrames = 20;
+        }
+        if (hit.knockback) {
+            this.throwHeldObject(state);
+            this.action = 'knocked';
+            this.animationTime = 0;
+            this.vx = hit.knockback.vx;
+            this.vy = hit.knockback.vy;
+            this.vz = hit.knockback.vz;
+        }
+        return {
+            hit: true,
+            pierced: true,
+        }
+    }
     onHit(this: Hero, state: GameState, hit: HitProperties): HitResult {
+        if (this.isAstralProjection) {
+            return this.onHitAstralProjection(state, hit);
+        }
         if (this.life <= 0) {
             return {};
         }
@@ -695,7 +722,29 @@ export class Hero implements Actor {
         return frame;
     }
 
+    renderAsAstralProjection(context: CanvasRenderingContext2D, state: GameState) {
+        const hero = this;
+        const frame = getSpiritFrame(state, hero);
+        context.save();
+            context.globalAlpha *= 0.7;
+            if (state.hero.magic <= 10 || this.invulnerableFrames > 0) {
+                // Spirit flashes when teleportation will end meditation by bringing magic under 10.
+                context.globalAlpha *= ((this.animationTime % 200 < 100) ? 0.2 : 0.4);
+            } else if (state.hero.magic < state.hero.maxMagic / 2) {
+                context.globalAlpha *= 0.7 * 2 * state.hero.magic / state.hero.maxMagic;
+            }
+            drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z / 2 });
+        context.restore();
+        if (hero.pickUpTile) {
+            renderCarriedTile(context, state, hero);
+        }
+    }
+
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
+        if (this.isAstralProjection) {
+            this.renderAsAstralProjection(context, state);
+            return;
+        }
         const hero = this;
         // 'sinkingInLava' action is currently unused, lava ground just does a lot of damage instead.
         if (hero.action === 'falling' || hero.action === 'sinkingInLava') {

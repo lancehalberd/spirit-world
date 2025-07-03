@@ -202,7 +202,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.frozenDuration > -500) {
         hero.frozenDuration -= FRAME_LENGTH;
     }
-    if (hero.frozenDuration <= 0) {
+    if ((hero.frozenDuration ?? 0) <= 0) {
         hero.animationTime += FRAME_LENGTH;
         if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
             //hero.animationTime += FRAME_LENGTH / 2;

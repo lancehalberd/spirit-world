@@ -36,6 +36,11 @@ export function setAreaSection(state: GameState, newArea: boolean): void {
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
     }
+    if (state.areaSection.isAstral) {
+        state.hero.isAstralProjection = true;
+    } else {
+        state.hero.isAstralProjection = false;
+    }
 }
 
 export function setNextAreaSection(state: GameState, d: Direction): void {
