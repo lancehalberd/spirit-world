@@ -16,17 +16,17 @@ interface Mission {
     isResolved: (state: GameState) => boolean
 }
 
-function findMaterialWorldObject(state: GameState, objectId: string) {
-    return findObjectLocation(state, 'overworld', objectId, false, null, true);
+function findMaterialWorldObject(state: GameState, objectIds: string | string[]) {
+    return findObjectLocation(state, 'overworld', objectIds, false, null, true);
 }
-function findSpiritWorldObject(state: GameState, objectId: string) {
-    return findObjectLocation(state, 'overworld', objectId, true, null, true);
+function findSpiritWorldObject(state: GameState, objectIds: string | string[]) {
+    return findObjectLocation(state, 'overworld', objectIds, true, null, true);
 }
-function findMaterialSkyObject(state: GameState, objectId: string) {
-    return findObjectLocation(state, 'sky', objectId, false, null, true);
+function findMaterialSkyObject(state: GameState, objectIds: string | string[]) {
+    return findObjectLocation(state, 'sky', objectIds, false, null, true);
 }
-function findSpiritSkyObject(state: GameState, objectId: string) {
-    return findObjectLocation(state, 'sky', objectId, true, null, true);
+function findSpiritSkyObject(state: GameState, objectIds: string | string[]) {
+    return findObjectLocation(state, 'sky', objectIds, true, null, true);
 }
 
 const getPeachCaveLocation = (state: GameState) => findMaterialWorldObject(state, 'peachCaveTopEntrance');
@@ -36,7 +36,7 @@ const getVanaraElderLocation = (state: GameState) => findMaterialWorldObject(sta
 
 const getTombLocation = (state: GameState) => findMaterialWorldObject(state, 'tombEntrance');
 const getWarTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'warTempleEntrance');
-const getLakeTeleporterLocation = (state: GameState) => findMaterialWorldObject(state, 'tombTeleporter');
+const getLakeTeleporterLocation = (state: GameState) => findMaterialWorldObject(state, ['tombTeleporter', 'lakeDreamTeleporter']);
 
 const getLakeTunnelLocation = (state: GameState) => findMaterialWorldObject(state, 'lakeTunnelEntrance');
 const getGrandTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'grandTempleEntrance');

@@ -79,12 +79,13 @@ export function enterZoneByTarget(
 export function findObjectLocation(
     state: GameState,
     zoneKey: string,
-    targetObjectId: string,
+    targetObjectIds: string | string[],
     checkSpiritWorldFirst = false,
     skipObject: ObjectDefinition = null,
     showErrorIfMissing = false
 ): ZoneLocation & {object: ObjectDefinition} | false {
     const zone = zones[zoneKey];
+    const objectIds = Array.isArray(targetObjectIds) ? targetObjectIds : [targetObjectIds];
     if (!zone) {
         debugger;
         console.error('Missing zone', zoneKey);
@@ -101,7 +102,7 @@ export function findObjectLocation(
             for (let y = 0; y < areaGrid.length; y++) {
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
-                        if (object.id === targetObjectId && object !== skipObject) {
+                        if (objectIds.includes(object.id) && object !== skipObject) {
                             if (!isObjectLogicValid(state, object)) {
                                 continue;
                             }
@@ -122,7 +123,7 @@ export function findObjectLocation(
         }
     }
     if (showErrorIfMissing) {
-        console.error('Could not find', targetObjectId, 'in', zoneKey);
+        console.error('Could not find', targetObjectIds, 'in', zoneKey);
     }
     return false;
 }
