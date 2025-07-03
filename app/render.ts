@@ -15,7 +15,9 @@ import { renderTitle } from 'app/scenes/title/renderTitle';
 import { renderSettings } from 'app/scenes/settings/renderSettings';
 import { getState, shouldHideMenu } from 'app/state';
 import { mainContext } from 'app/utils/canvas';
+import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
 
+let frameDurations: number[] = [];
 export function render() {
     const context = mainContext;
     const state = getState();
@@ -26,6 +28,7 @@ export function render() {
     if (state.lastTimeRendered >= state.time) {
         return;
     }
+    let startTime = Date.now();
     if (editingState.isEditing) {
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.save();
@@ -37,7 +40,38 @@ export function render() {
     } else {
         renderInternal(context, state);
     }
+    if (editingState.showRenderPerformance) {
+        const duration = Date.now() - startTime;
+        frameDurations.push(duration);
+        if (frameDurations.length > 128) {
+            frameDurations.shift();
+        }
+        let maxValue = 0;
+        for (const duration of frameDurations) {
+            maxValue = Math.max(maxValue, duration);
+        }
+        if (maxValue > 20) {
+            drawOutlinedText(context, '' + maxValue, 0, 0, {textAlign: 'left', textBaseline: 'top'});
+        }
+        context.strokeStyle = 'blue'
+        context.beginPath();
+        const height = 200;
+        const scale = Math.max(100, maxValue);
+        for (let i = 0; i < frameDurations.length; i++) {
+            if (frameDurations[i]) {
+                context.moveTo(2 * i, CANVAS_HEIGHT);
+                context.lineTo(2 * i, CANVAS_HEIGHT - height * frameDurations[i] / scale);
+            }
+        }
+        context.stroke();
+        context.strokeStyle = 'yellow'
+        context.beginPath();
+        context.moveTo(0,  CANVAS_HEIGHT - height * 20  / scale);
+        context.lineTo(CANVAS_WIDTH,  CANVAS_HEIGHT - height * 20  / scale);
+        context.stroke();
+    }
 }
+
 
 export function renderInternal(context: CanvasRenderingContext2D, state: GameState) {
     if (state.showControls) {

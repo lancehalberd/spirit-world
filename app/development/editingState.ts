@@ -25,6 +25,7 @@ export const editingState: EditingState = {
         styleWeights: {},
     },
     showWallsOpacity: 0.6,
+    showRenderPerformance: false,
 };
 window['editingState'] = editingState;
 window.onbeforeunload = () => {

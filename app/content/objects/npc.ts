@@ -213,6 +213,10 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: momAnimations,
         shadowOffset: 1,
     },
+    vanaraProjection: {
+        animations: heroSpiritAnimations,
+        shadowOffset: 1,
+    },
     rival: {
         animations: rivalAnimations,
         shadowOffset: 1,
@@ -577,10 +581,10 @@ export class NPC implements Actor, ObjectInstance  {
             callback();
             return;
         }
-        context.save();
+        const alpha = context.globalAlpha;
             context.globalAlpha *= this.alpha;
             callback();
-        context.restore();
+        context.globalAlpha = alpha;
     }
 }
 objectHash.npc = NPC;

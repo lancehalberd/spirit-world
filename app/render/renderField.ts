@@ -149,7 +149,6 @@ export function checkToRedrawTiles(area: AreaInstance) {
     area.checkToRedrawTiles = false;
 }
 */
-
 export function checkToRedrawTiles(area: AreaInstance) {
     const w = 16, h = 16;
     for (let y = 0; y < area.h; y++) {

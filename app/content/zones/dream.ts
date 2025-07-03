@@ -353,6 +353,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "tombTeleporter", x: 152, y: 432, targetZone: "tomb", targetObjectId: "tombDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
         {status: "normal", id: "cocoonTeleporter", x: 68, y: 340, targetZone: "cocoon", targetObjectId: "dreamTeleporter", type: "teleporter"},
         {status: "normal", id: "lakeTeleporter", x: 344, y: 436, targetZone: "overworld", targetObjectId: "lakeDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
+        {status: "normal", id: "", x: 248, y: 188, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "This is the Vanara Dream World, home of the Spirit Tree."},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 547, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 2},

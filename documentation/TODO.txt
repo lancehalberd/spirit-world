@@ -174,7 +174,6 @@ Current tasks:
                 - Work with artist on design details.
         - Add boss rush to Vanara Dreamland
 
-
     - Add new helix exterior graphics
         - Add helix exterior to material sky
             - Match door support to Staff Tower door
