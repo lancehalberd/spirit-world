@@ -751,6 +751,12 @@ interface SpecialNarrationBehavior extends BaseSpecialBehavior<ObjectInstance> {
     update?: (state: GameState, object: ObjectInstance) => void
 }
 
+
+interface SpecialNpcBehavior extends BaseSpecialBehavior<NPC> {
+    type: 'npc'
+    update?: (state: GameState, object: NPC) => void
+}
+
 interface SpecialAreaBehavior extends BaseSpecialBehavior<AreaInstance> {
     type: 'area'
 }
@@ -760,6 +766,7 @@ type SpecialBehavior
     | SpecialElevatorBehavior
     | SpecialLootBehavior
     | SpecialNarrationBehavior
+    | SpecialNpcBehavior
     | SpecialPushPullBehavior
     | SpecialSwitchBehavior
     | SpecialSignBehavior
