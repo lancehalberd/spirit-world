@@ -110,7 +110,7 @@ export function getDrawPriority(layer: AreaLayerDefinition): DrawPriority {
     if (layer.key === 'behaviors' || layer.key.startsWith('foreground')) {
         return 'foreground';
     }
-    layer.drawPriority ?? 'background';
+    return layer.drawPriority ?? 'background';
 }
 
 

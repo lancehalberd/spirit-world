@@ -77,7 +77,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         // Note that there is no movement speed penalty for level 2 iron boots.
         movementSpeed *= 0.6;
     } else if (hero.savedData.equippedBoots === 'cloudBoots') {
-        movementSpeed *= 1.4;
+        // The slipping effect of the cloud boots will cause them to have 2x max speed already.
+        movementSpeed = 2;
     } else if (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots >= 2) {
         // Spike boots give the hero a small movement speed boost in addition to preventing slipping.
         // They would be almost strictly worse than the Forge Boots without this.
@@ -100,6 +101,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.swimming) {
         hero.slipping = false;
         movementSpeed *= 0.8;
+        if (hero.savedData.equippedBoots === 'cloudBoots') {
+            movementSpeed *= 1.2;
+        }
         // Abort any unsupported actions while swimming.
         if (hero.action !== 'walking') {
             hero.action = null;
@@ -149,6 +153,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.slipping = false;
         hero.z = Math.max(hero.z - 1.5, minZ);
     } else if (isFloating) {
+        if (hero.savedData.equippedBoots === 'cloudBoots') {
+            movementSpeed *= 1.2;
+        }
         hero.slipping = false;
         hero.vz = Math.min(1, hero.vz + 0.2);
         hero.z = Math.min(24, hero.z + hero.vz);
@@ -493,63 +500,59 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.heldChakram.throw(state);
         }
     }
+    let velocityDecay = 0;
+    let moveEffectivness = 1;
+    //let maxSpeed = 2.5;
     if (hero.bounce) {
         // This happens, for example when the hero hits an enemy while holding the chakram.
         hero.bounce.frames--;
         if (!(hero.bounce.frames > 0)) {
             hero.bounce = null;
         } else {
-            dx = hero.bounce.vx;
-            dy = hero.bounce.vy;
+            velocityDecay = 0.98;
+            moveEffectivness = 1 / 20;
         }
-    }
-    if (hero.slipping || hero.swimming || isFloating) {
-        let maxSpeed = 2.5;
+    } else if (hero.slipping || hero.swimming || isFloating) {
         if (isFloating || hero.swimming) {
-            hero.vx = dx / 8 + hero.vx * 0.85;
-            hero.vy = dy / 8 + hero.vy * 0.85;
+            // Max speed ~5/6, average handling.
+            velocityDecay = 0.85;
+            moveEffectivness = 1 / 8;
         } else if (hero.savedData.equippedBoots === 'cloudBoots') {
             if (hero.savedData.equipment.cloudBoots >= 2) {
-                hero.vx = dx / 5 + hero.vx * 0.95;
-                hero.vy = dy / 5 + hero.vy * 0.95;
+                // Max speed ~2, but better handling + acceleration
+                velocityDecay = 0.9;
+                moveEffectivness = 1 / 5;
             } else {
-                hero.vx = dx / 10 + hero.vx * 0.95;
-                hero.vy = dy / 10 + hero.vy * 0.95;
+                // Max speed ~2
+                velocityDecay = 0.95;
+                moveEffectivness = 1 / 10;
             }
-            maxSpeed = 3;
         } else {
-            hero.vx = dx / 40 + hero.vx * 0.99;
-            hero.vy = dy / 40 + hero.vy * 0.99;
+            // Max speed ~2.5, with very poor handling.
+            velocityDecay = 0.99;
+            moveEffectivness = 1 / 40;
         }
-        // If the player moves less than 2px a frame while pushing, the pushed object may move out of range and
-        // cause jerky movement. Since pushed objects only move 1px per frame this won't actually cause the player to move this
-        // fast, it will just make sure they keep up with the pushed object.
-        const minSpeed = hero.action === 'pushing' ? 2 : 0.2;
-        // If dx/dy is set and the player is not moving backwards, make sure velocity is set high enough to trigger movement.
-        if (dx > 0 && hero.vx >= 0) {
-            hero.vx = Math.max(hero.vx, minSpeed);
-        }
-        if (dx < 0 && hero.vx <= 0) {
-            hero.vx = Math.min(hero.vx, -minSpeed);
-        }
-        if (dy > 0 && hero.vy >= 0) {
-            hero.vy = Math.max(hero.vy, minSpeed);
-        }
-        if (dy < 0 && hero.vy <= 0) {
-            hero.vy = Math.min(hero.vy, -minSpeed);
-        }
-        const mag = Math.sqrt(hero.vx * hero.vx + hero.vy * hero.vy);
-        // TODO: Consider fixing this so that this doesn't reduce how fast the player can move in the direction they are
-        // currently moving. For example, right now if the player is being pushed down by an air stream, this code reduces
-        // how fast they can move left or right, even though this should not depend on them being blown down.
-        if (mag > maxSpeed) {
-            hero.vx *= maxSpeed / mag;
-            hero.vy *= maxSpeed / mag;
-        }
-    } else {
-        hero.vx = dx;
-        hero.vy = dy;
     }
+    hero.vx *= velocityDecay;
+    hero.vy *= velocityDecay;
+    hero.vx += dx * moveEffectivness;
+    hero.vy += dy * moveEffectivness;
+
+    const minSpeed = hero.action === 'pushing' ? 2 : 0.2;
+    // If dx/dy is set and the player is not moving backwards, make sure velocity is set high enough to trigger movement.
+    if (dx > 0 && hero.vx >= 0) {
+        hero.vx = Math.max(hero.vx, minSpeed);
+    }
+    if (dx < 0 && hero.vx <= 0) {
+        hero.vx = Math.min(hero.vx, -minSpeed);
+    }
+    if (dy > 0 && hero.vy >= 0) {
+        hero.vy = Math.max(hero.vy, minSpeed);
+    }
+    if (dy < 0 && hero.vy <= 0) {
+        hero.vy = Math.min(hero.vy, -minSpeed);
+    }
+
     // This threshold needs to be small enough that it is reached when moving with cloud boots from a stand still.
     if (Math.abs(hero.vx) >= 0.2 || Math.abs(hero.vy) >= 0.2) {
         const isCharging = hero.action === 'charging';
@@ -579,6 +582,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 canMoveIntoEntranceTiles: hero === state.hero && hero.action !== 'knocked' && hero?.action !== 'thrown',
             }
             const {mx, my} = moveActor(state, hero, moveX, moveY, movementProperties);
+            // Don't show the pushing animation when the hero bounces off a wall.
+            if (hero.bounce && hero.action === 'pushing') {
+                delete hero.action;
+            }
             // Update whether the hero is stuck.
             // Any time the hero moves to a new pixel, reset stuckFrames to 0.
             if ((hero.x | 0) != (ox | 0) || (hero.y | 0) != (oy | 0)) {
@@ -601,7 +608,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
             // console.log([...state.scriptEvents.activeEvents], [...state.scriptEvents.queue]);
-            if (hero.action !== 'knocked' && hero.action !== 'knockedHard') {
+            if (hero.action !== 'knocked' && hero.action !== 'knockedHard' && !hero.bounce) {
                 // This works okay, but sometimes causes the hero to press up against diagonal walls when not pressing diagonally.
                 /*if (hero.slipping) {
                     if (mx || my) {
@@ -614,11 +621,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     // This code seems to work okay for slipping, but does cause the player to not slide against diagonal walls
                     // once they stop trying to move.
                     // Do not modify velocity when slipping if it is in the direction the player is attempting to move.
-                    if (moveX && !(hero.slipping && hero.vx * dx > 0)) {
+                    if (moveX && (hero.action === 'pushing' || !(hero.slipping && hero.vx * dx > 0))) {
                         hero.vx = mx;
                     }
                     // Do not modify velocity when slipping if it is in the direction the player is attempting to move.
-                    if (moveY && !(hero.slipping && hero.vy * dy > 0)) {
+                    if (moveY && (hero.action === 'pushing' || !(hero.slipping && hero.vy * dy > 0))) {
                         hero.vy = my;
                     }
                 //}

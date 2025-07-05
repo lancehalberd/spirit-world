@@ -321,7 +321,7 @@ export class Hero implements Actor {
             return {};
         }
         const hitbox = this.getHitbox();
-        // Generically knock the hero back if knockAwayFromHit is set but no actual knockbac vector is set.
+        // Generically knock the hero back if knockAwayFromHit is set but no actual knockback vector is set.
         if (hit.knockAwayFromHit && !hit.knockback) {
             let dx = -directionMap[this.d][0], dy = -directionMap[this.d][1];
             if (hit.hitbox) {
@@ -439,7 +439,11 @@ export class Hero implements Actor {
             this.takeDamage(state, damage, iframeMultiplier);
         }
         if (hit.knockback && hit.element !== 'ice' && (hit.canAlwaysKnockback || !preventKnockback)) {
-            this.knockBack(state, hit.knockback);
+            if (!hit.damage) {
+                this.applyBounce(hit.knockback.vx, hit.knockback.vy);
+            } else {
+                this.knockBack(state, hit.knockback);
+            }
         }
         // Getting hit while frozen unfreezes you.
         if (this.frozenHeartDuration > 0) {
@@ -460,6 +464,12 @@ export class Hero implements Actor {
             this.burnDuration = 0;
         }
         return { hit: true };
+    }
+
+    applyBounce(vx: number, vy: number, frames = 10) {
+        this.vx = vx;
+        this.vy = vy;
+        this.bounce = {vx, vy, frames};
     }
 
     applyBurn(burnDamage: number, burnDuration: number) {
@@ -519,6 +529,10 @@ export class Hero implements Actor {
     }
 
     knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {
+        // Experiment with preventing chained knockbacks.
+        if (this.action === 'knocked') {
+            return;
+        }
         this.throwHeldObject(state);
         this.action = 'knocked';
         this.isAirborn = true;

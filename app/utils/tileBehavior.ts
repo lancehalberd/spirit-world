@@ -7,6 +7,9 @@ import {getDrawPriority} from 'app/utils/layers';
 export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
     delete area.behaviorGrid?.[y]?.[x];
     for (const layer of area.layers) {
+        if (layer.definition.disableBehaviors) {
+            continue;
+        }
         const tile = layer.tiles[y]?.[x];
         if (!tile) {
             continue;
@@ -37,6 +40,9 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
 }
 
 export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayer): void {
+    if (layer.definition.disableBehaviors) {
+        return;
+    }
     const tiles = layer.tiles;
     const isForeground = getDrawPriority(layer) === 'foreground';
     for (let y = 0; y < tiles.length; y++) {

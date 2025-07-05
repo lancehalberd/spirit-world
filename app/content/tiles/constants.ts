@@ -263,6 +263,19 @@ export function renderEmptyWall(context: CanvasRenderingContext2D, tile: FullTil
         return;
     }
     context.fillStyle = 'red';
+    renderBitmap(context, tile, {x, y});
+}
+export function renderBouncyWall(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
+    if (!editingState.isEditing) {
+        return;
+    }
+    context.fillStyle = 'purple';
+    renderBitmap(context, tile, {x, y});
+}
+export function renderBitmap(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
+    if (!editingState.isEditing) {
+        return;
+    }
     if (tile.behaviors.solid) {
         context.fillRect(x, y, 16, 16);
     } else if (tile.behaviors.solidMap === BITMAP_BOTTOM) {
@@ -285,50 +298,59 @@ export function renderEmptyWall(context: CanvasRenderingContext2D, tile: FullTil
         context.fill();
     } else if (tile.behaviors.solidMap === BITMAP_TOP_LEFT) {
         context.beginPath();
-        context.moveTo(x, y + 8);
-        context.lineTo(x + 8, y);
+        context.moveTo(x, y);
         context.lineTo(x + 16, y);
-        context.lineTo(x + 16, y + 16);
         context.lineTo(x, y + 16);
         context.fill();
     } else if (tile.behaviors.solidMap === BITMAP_TOP_RIGHT) {
         context.beginPath();
-        context.moveTo(x, y + 8);
-        context.lineTo(x + 8, y);
+        context.moveTo(x, y);
         context.lineTo(x + 16, y);
         context.lineTo(x + 16, y + 16);
-        context.lineTo(x, y + 16);
         context.fill();
     } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_LEFT) {
         context.beginPath();
-        context.moveTo(x, y + 8);
-        context.lineTo(x + 8, y);
-        context.lineTo(x + 16, y);
-        context.lineTo(x + 16, y + 16);
+        context.moveTo(x, y);
         context.lineTo(x, y + 16);
+        context.lineTo(x + 16, y + 16);
         context.fill();
     } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_RIGHT) {
         context.beginPath();
-        context.moveTo(x, y + 8);
-        context.lineTo(x + 8, y);
-        context.lineTo(x + 16, y);
+        context.moveTo(x + 16, y);
         context.lineTo(x + 16, y + 16);
         context.lineTo(x, y + 16);
         context.fill();
     }
 }
-const baseEmptyCeilingBehavior: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, solid: false};
-export const emptyCeilingBehaviors: TileSource = {
+const baseEmptyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, solid: false};
+export const emptyWallBehaviors: TileSource = {
     ...emptyTile,
-    source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 16},
+    source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 32},
     behaviors: {
-        '0x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_24 },
-        '1x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM },
-        '2x0': {...baseEmptyCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_24 },
-        '3x0': {...baseEmptyCeilingBehavior, solid: true },
+        '0x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_TOP_LEFT },
+        '1x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_TOP_RIGHT },
+        '2x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_LEFT },
+        '3x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_RIGHT },
+        '0x1': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_LEFT_24 },
+        '1x1': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM },
+        '2x1': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_RIGHT_24 },
+        '3x1': {...baseEmptyWallBehaviors, solid: true },
     },
     paletteTargets: [{key: 'behaviors', x: 0, y: 3}],
 };
+const baseBouncyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderBouncyWall, solid: false, touchHit: {damage: 0, source: null, knockbackForce: 0.5}};
+export const bouncyWallBehaviors: TileSource = {
+    ...emptyTile,
+    source: {image: emptyTile.source.image, x: 0, y: 0, w: 80, h: 16},
+    behaviors: {
+        '0x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_TOP_LEFT },
+        '1x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_TOP_RIGHT },
+        '2x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_BOTTOM_LEFT },
+        '3x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_BOTTOM_RIGHT },
+        '4x0': {...baseBouncyWallBehaviors, solid: true },
+    },
+};
+
 
 export function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TileSource {
     const [canvas, context] = createCanvasAndContext(16, 16);

@@ -7,12 +7,14 @@ import { getObjectAndParts, getObjectBehaviors } from 'app/utils/objects';
 export function isMovementBlocked(
     state: GameState,
     area: AreaInstance,
-    behaviors: TileBehaviors,
+    tileBehaviors: TileBehaviors,
     x: number, 
     y: number,
     isAbove: boolean,
     isUnder: boolean,
-    movementProperties: MovementProperties
+    movementProperties: MovementProperties,
+    // Direction the movement is in.
+    d: CardinalDirection
 ): false | {object?: ObjectInstance | EffectInstance} {
     for (const box of (movementProperties.blockedBoxes || [])) {
         if (isPixelInShortRect(x, y, box)) {
@@ -117,10 +119,10 @@ export function isMovementBlocked(
     if (!walkableObject) {
         // Being above tiles doesn't ignore restrictions based on climbing.
         // This is because we expect climbing tiles to cross into ledge tiles frequently.
-        if (!behaviors?.climbable && movementProperties.mustClimb) {
+        if (!tileBehaviors?.climbable && movementProperties.mustClimb) {
             return {};
         }
-        if (behaviors?.climbable && !canClimb) {
+        if (tileBehaviors?.climbable && !canClimb) {
             return {};
         }
         // Actors that cannot jump are not allowed to walk over the tips of ledges, except to climb down them if they can climb.
@@ -128,34 +130,67 @@ export function isMovementBlocked(
             return {};
         }
         // Once a pixel is over the tip of a ledge, all collisions are ignored except for with very tall objects/tiles.
-        if (isAbove && !behaviors?.isVeryTall) {
+        if (isAbove && !tileBehaviors?.isVeryTall) {
             return false;
         }
         // Prevent walking over ledges onto tiles that are marked very tall unless they are also marked as southern walls.
-        if (isAbove && behaviors?.isVeryTall && !behaviors.isSouthernWall) {
+        if (isAbove && tileBehaviors?.isVeryTall && !tileBehaviors.isSouthernWall) {
             return {};
         }
         if (actor
-            && (!movementProperties.canPassMediumWalls || !(behaviors?.low || behaviors?.midHeight))
-            && behaviors?.solid
+            && (!movementProperties.canPassMediumWalls || !(tileBehaviors?.low || tileBehaviors?.midHeight))
             && (
-                behaviors?.touchHit
-                && !behaviors.touchHit?.isGroundHit
+                tileBehaviors?.solid
+                || (tileBehaviors?.solidMap && tileBehaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1)
+            )
+            && (
+                tileBehaviors?.touchHit
+                && !tileBehaviors.touchHit?.isGroundHit
                 // tile touchHit always applies to
-                && tileHitAppliesToTarget(state, behaviors.touchHit, movementProperties.actor)
+                && tileHitAppliesToTarget(state, tileBehaviors.touchHit, movementProperties.actor)
             )
         ) {
-            const mag = Math.sqrt(movementProperties.dx * movementProperties.dx + movementProperties.dy * movementProperties.dy)
-            const { returnHit } = actor.onHit?.(state, { ...behaviors.touchHit, knockback: {
-                vx: - 4 * movementProperties.dx / mag,
-                vy: - 4 * movementProperties.dy / mag,
-                vz: 2,
+            const mag = Math.sqrt(movementProperties.dx * movementProperties.dx + movementProperties.dy * movementProperties.dy);
+            const sx = x % 16, sy = y % 16;
+            let ux = movementProperties.dx / mag, uy = movementProperties.dy / mag;
+            // When the actor is knocked away from a wall, we would like it to reflect their velocity about the plane of
+            // of the wall. However, it is complicated to determine the plane of the wall from the pixel data that we have
+            // available here currently.
+            // We can make pretty good guesses about the direction of the wall based on the sub pixel and the direction the actor
+            // is moving from since we assume the sub pixel the actor is coming from is open.
+            // This could probably be improved by checking which nearby pixels are also solid and have touchHit behaviors defined.
+            if ((d === 'right' && sx === 0) || (d === 'left' && sx === 15)) {
+                // Only reflect the x component when we think we have run into a vertical wall.
+                ux = -ux;
+            } else if ((d === 'down' && sy === 0) || (d === 'up' && sy === 15)) {
+                // Only reflect the x component when we think we have run into a horizontal wall.
+                uy = -uy;
+            } else if (sx >= sy - 1 && sx <= sy + 1) {
+                // A wall sloping down and to the right swaps the x+y components.
+                const t = ux;
+                ux = uy;
+                uy = t;
+            } else if (sx >= 14 - sy && sx <= 16 - sy) {
+                // A wall sloping down and to the left swaps and inverts the x+y components.
+                const t = ux;
+                ux = -uy;
+                uy = -t;
+            } else {
+                // By default we just reflect both directions.
+                ux = -ux;
+                uy = -uy;
+            }
+            const f = tileBehaviors.touchHit.knockbackForce ?? 1;
+            const { returnHit } = actor.onHit?.(state, { ...tileBehaviors.touchHit, knockback: {
+                vx: f * 4 * ux,
+                vy: f * 4 * uy,
+                vz: f * 2,
             }});
             // Apply reflected damage to enemies if they were the source of the `touchHit`.
-            if (returnHit && behaviors.touchHit.source?.onHit) {
-                behaviors.touchHit.source.onHit(state, returnHit);
+            if (returnHit && tileBehaviors.touchHit.source?.onHit) {
+                tileBehaviors.touchHit.source.onHit(state, returnHit);
             }
-            if (behaviors.cuttable && behaviors.cuttable <= returnHit?.damage) {
+            if (tileBehaviors.cuttable && tileBehaviors.cuttable <= returnHit?.damage) {
                 const tx = (x / 16) | 0, ty = (x / 16) | 0;
                 for (const layer of actor.area.layers) {
                     const tile = layer.tiles[ty]?.[tx];
@@ -202,81 +237,81 @@ export function isMovementBlocked(
     if (isUnder && !movementProperties.canCrossLedges) {
         return {};
     }
-    if (behaviors?.groundHeight > movementProperties.maxHeight) {
+    if (tileBehaviors?.groundHeight > movementProperties.maxHeight) {
         return {};
     }
-    if (behaviors?.water && !(movementProperties.canSwim || movementProperties.mustSwim)) {
+    if (tileBehaviors?.water && !(movementProperties.canSwim || movementProperties.mustSwim)) {
         return {};
     }
-    if (!(behaviors?.water /*|| behaviors?.shallowWater*/) && movementProperties.mustSwim) {
+    if (!(tileBehaviors?.water /*|| tileBehaviors?.shallowWater*/) && movementProperties.mustSwim) {
         return {};
     }
-    if (behaviors?.pit && !movementProperties.canFall) {
+    if (tileBehaviors?.pit && !movementProperties.canFall) {
         return {};
     }
-    if (behaviors?.pitMap && !movementProperties.canFall) {
+    if (tileBehaviors?.pitMap && !movementProperties.canFall) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return {};
         }
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        if (behaviors.pitMap[y % 16] >> (15 - (x % 16)) & 1) {
+        if (tileBehaviors.pitMap[y % 16] >> (15 - (x % 16)) & 1) {
             return {};
         }
     }
-    if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
+    if (tileBehaviors?.lowCeiling && !canMoveUnderLowCeilings) {
         return {};
     }
-    if (behaviors?.isEntrance && !canMoveIntoEntranceTiles) {
+    if (tileBehaviors?.isEntrance && !canMoveIntoEntranceTiles) {
         return {};
     }
     // The second condition is a hack to prevent enemies from walking over pits.
-    if ((behaviors?.pit || behaviors?.isBrittleGround) && !movementProperties.canFall) {
+    if ((tileBehaviors?.pit || tileBehaviors?.isBrittleGround) && !movementProperties.canFall) {
         return {};
     }
     // Since lava doesn't destroy enemies currently, if we allow them to move when canFall is true (such as the enemy is knocked)
     // they will get stuck in the lava, so don't do this unless they can be destroyed or enable canMoveInLava.
-    //if (behaviors?.isLava && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
-    if (behaviors?.isLava && !movementProperties.canMoveInLava) {
+    //if (tileBehaviors?.isLava && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
+    if (tileBehaviors?.isLava && !movementProperties.canMoveInLava) {
         return {};
     }
-    if (behaviors?.isLavaMap && !movementProperties.canMoveInLava) {
+    if (tileBehaviors?.isLavaMap && !movementProperties.canMoveInLava) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return {};
         }
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        if (behaviors.isLavaMap[y % 16] >> (15 - (x % 16)) & 1) {
+        if (tileBehaviors.isLavaMap[y % 16] >> (15 - (x % 16)) & 1) {
             return {};
         }
     }
 
     // Movement is blocked on non-climbable pixels for objects that must climb.
-    if (!behaviors?.climbable && movementProperties.mustClimb) {
+    if (!tileBehaviors?.climbable && movementProperties.mustClimb) {
         return {};
     }
     // Climbing a tile allows you to ignore solid pixels on the tile.
-    const canClimbTile = behaviors?.climbable && canClimb;
+    const canClimbTile = tileBehaviors?.climbable && canClimb;
 
     // Moving over a tile when thrown allows you to ignore solid pixels on low to mid height tiles.
-    const moveOverTile = movementProperties.canPassMediumWalls && (behaviors?.low || behaviors?.midHeight);
+    const moveOverTile = movementProperties.canPassMediumWalls && (tileBehaviors?.low || tileBehaviors?.midHeight);
     const ignoreSolidPixels = movementProperties.canPassWalls || moveOverTile || canClimbTile;
     if (ignoreSolidPixels) {
         return false;
     }
-    if (behaviors?.solid) {
-        if (behaviors.pickupWeight <= movementProperties.crushingPower) {
+    if (tileBehaviors?.solid) {
+        if (tileBehaviors.pickupWeight <= movementProperties.crushingPower) {
             return false;
         }
         return {};
     }
-    if (behaviors?.solidMap) {
+    if (tileBehaviors?.solidMap) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return {};
         }
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        if (behaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1) {
+        if (tileBehaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1) {
             return {};
         }
     }

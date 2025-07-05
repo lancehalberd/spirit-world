@@ -505,7 +505,7 @@ export class HeldChakram implements EffectInstance {
             delete this.hero.heldChakram;
             // console.log(hitResult.knockback);
             if (hitResult.knockback) {
-                this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};
+                this.hero.applyBounce(hitResult.knockback.vx, hitResult.knockback.vy);
             }
             return;
         }
@@ -541,7 +541,7 @@ export class HeldChakram implements EffectInstance {
                     dx /= mag;
                     dy /= mag;
                 }
-                this.hero.bounce = {vx: 4 * dx, vy: 4 * dy, frames: 10};
+                this.hero.applyBounce(4 * dx, 4 * dy);
                 break;
             }
         }

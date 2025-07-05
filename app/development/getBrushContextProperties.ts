@@ -142,6 +142,19 @@ export function getBrushContextProperties(state: GameState): PanelRows {
             });
             rows.push(row);
             rows.push({
+                name: 'Disable behaviors',
+                id: `layer-${i}-disable-behaviors`,
+                value: !!definition.disableBehaviors,
+                onChange(disableBehaviors: boolean) {
+                    if (!disableBehaviors) {
+                        delete definition.disableBehaviors;
+                    } else {
+                        definition.disableBehaviors = true;
+                    }
+                    refreshArea(state);
+                },
+            });
+            rows.push({
                 name: 'Logic',
                 id: `layer-${i}-logic`,
                 value: definition.hasCustomLogic ? 'custom' : (definition.logicKey || 'none'),

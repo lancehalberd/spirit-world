@@ -84,7 +84,7 @@ export function canMoveLeft(
         // is on the low side of an edge
         let isAbove = false;
         const ty = (y / 16) | 0;
-        const pixelTileBehaviors = area.behaviorGrid[ty]?.[tx];
+        const tileBehaviors = area.behaviorGrid[ty]?.[tx];
         // The following code has many distinct end conditions that set the flags. This could be accomplished with a
         // function, but that would require a complicated return structure and might hurt performance, so we just
         // use this named code block and break out of it once we reach a determination for the flag state.
@@ -92,7 +92,7 @@ export function canMoveLeft(
             // Anchor is in the row below the pixel and ledge is directly above the pixel.
             if (aty === ty + 1) {
                 const downOfPixelBehaviors = area.behaviorGrid[ty + 1]?.[tx];
-                if (downOfPixelBehaviors?.ledges?.up === true || pixelTileBehaviors?.ledges?.down === false) {
+                if (downOfPixelBehaviors?.ledges?.up === true || tileBehaviors?.ledges?.down === false) {
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
@@ -101,8 +101,8 @@ export function canMoveLeft(
             if (aty === ty - 1) {
                 //console.log('Anchor in left column');
                 const upOfPixelBehaviors = area.behaviorGrid[ty - 1]?.[tx];
-                if (upOfPixelBehaviors?.ledges?.down === true || pixelTileBehaviors?.ledges?.up === false) {
-                    //console.log('Pixel is above', {leftOfPixelBehaviors, pixelTileBehaviors});
+                if (upOfPixelBehaviors?.ledges?.down === true || tileBehaviors?.ledges?.up === false) {
+                    //console.log('Pixel is above', {leftOfPixelBehaviors, tileBehaviors});
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
@@ -111,7 +111,7 @@ export function canMoveLeft(
             if (atx === tx + 1) {
                 const rightOfPixelBehaviors = area.behaviorGrid[ty]?.[tx + 1];
                 // anchor and tile are aligned in the same column.
-                if (pixelTileBehaviors?.ledges?.right === false || rightOfPixelBehaviors?.ledges?.left === true) {
+                if (tileBehaviors?.ledges?.right === false || rightOfPixelBehaviors?.ledges?.left === true) {
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
@@ -141,7 +141,7 @@ export function canMoveLeft(
                 }
             }
             // There is a diagonal downleft in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'downleft') {
+            if (tileBehaviors?.diagonalLedge === 'downleft') {
                 // The ledge boundary is y - x = N.
                 const N = 16 * (ty - tx);
                 // If the anchor is upright of the boundary, and the pixel is downleft.
@@ -163,7 +163,7 @@ export function canMoveLeft(
                 }
             }
             // There is a diagonal upleft in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'upleft') {
+            if (tileBehaviors?.diagonalLedge === 'upleft') {
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + tx);
                 // If the anchor is downright of the boundary, and the pixel is upleft.
@@ -192,7 +192,7 @@ export function canMoveLeft(
             if (aty === ty + 1) {
                 const upOfAnchorBehaviors = area.behaviorGrid[aty - 1]?.[atx];
                 if (upOfAnchorBehaviors?.ledges?.down === false || anchorTileBehaviors?.ledges?.up === true) {
-                    if (pixelTileBehaviors?.diagonalLedge) {
+                    if (tileBehaviors?.diagonalLedge) {
                         isAbove = true;
                     }
                     break DETERMINE_FLAGS;
@@ -202,7 +202,7 @@ export function canMoveLeft(
             if (aty === ty - 1) {
                 const downOfAnchorBehaviors = area.behaviorGrid[aty + 1]?.[atx];
                 if (downOfAnchorBehaviors?.ledges?.up === false || anchorTileBehaviors?.ledges?.down === true) {
-                    if (pixelTileBehaviors?.diagonalLedge) {
+                    if (tileBehaviors?.diagonalLedge) {
                         isAbove = true;
                     }
                     break DETERMINE_FLAGS;
@@ -212,7 +212,7 @@ export function canMoveLeft(
             // Anchor is in the row below the pixel and ledge is directly above the pixel.
             if (aty === ty + 1) {
                 const downOfPixelBehaviors = area.behaviorGrid[ty + 1]?.[tx];
-                if (downOfPixelBehaviors?.ledges?.up === false || pixelTileBehaviors?.ledges?.down === true) {
+                if (downOfPixelBehaviors?.ledges?.up === false || tileBehaviors?.ledges?.down === true) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
@@ -221,8 +221,8 @@ export function canMoveLeft(
             if (aty === ty - 1) {
                 //console.log('Anchor in left column');
                 const upOfPixelBehaviors = area.behaviorGrid[ty - 1]?.[tx];
-                if (upOfPixelBehaviors?.ledges?.down === false || pixelTileBehaviors?.ledges?.up === true) {
-                    //console.log('Pixel is above', {leftOfPixelBehaviors, pixelTileBehaviors});
+                if (upOfPixelBehaviors?.ledges?.down === false || tileBehaviors?.ledges?.up === true) {
+                    //console.log('Pixel is above', {leftOfPixelBehaviors, tileBehaviors});
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
@@ -231,7 +231,7 @@ export function canMoveLeft(
             if (atx === tx + 1) {
                 const rightOfPixelBehaviors = area.behaviorGrid[ty]?.[tx + 1];
                 // anchor and tile are aligned in the same column.
-                if (pixelTileBehaviors?.ledges?.right === true || rightOfPixelBehaviors?.ledges?.left === false) {
+                if (tileBehaviors?.ledges?.right === true || rightOfPixelBehaviors?.ledges?.left === false) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
@@ -261,7 +261,7 @@ export function canMoveLeft(
                 }
             }
             // There is a diagonal upright in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'upright') {
+            if (tileBehaviors?.diagonalLedge === 'upright') {
                 // The ledge boundary is y - x = N.
                 const N = 16 * (ty - tx);
                 // If the anchor is upright of the boundary, and the pixel is downleft.
@@ -271,7 +271,7 @@ export function canMoveLeft(
                 }
             }
             // There is a diagonal downleft in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'downright') {
+            if (tileBehaviors?.diagonalLedge === 'downright') {
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + tx);
                 // If the anchor is downright of the boundary, and the pixel is downleft.
@@ -283,7 +283,7 @@ export function canMoveLeft(
         }
 
         let blocked = false;
-        const result = isMovementBlocked(state, area, pixelTileBehaviors, x, y, isAbove, isUnder, movementProperties);
+        const result = isMovementBlocked(state, area, tileBehaviors, x, y, isAbove, isUnder, movementProperties, 'left');
         if (result) {
             blocked = true;
             if (result.object) {

@@ -333,6 +333,7 @@ interface AreaLayerDefinition {
     invertLogic?: boolean
     hasCustomLogic?: boolean
     customLogic?: string
+    disableBehaviors?: boolean
     drawPriority?: DrawPriority
     grid?: TileGridDefinition
     mask?: TileGridDefinition
