@@ -1164,18 +1164,19 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
         }
     } else if (state.transitionState.type === 'fade') {
         renderStandardFieldStack(context, state);
+        const fadeColor = state.transitionState.fadeColor ?? '#000';
         if (state.transitionState.time <= FADE_OUT_DURATION) {
             context.save();
                 const p = Math.min(1, 1.5 * state.transitionState.time / FADE_OUT_DURATION);
                 context.globalAlpha = p;
-                context.fillStyle = '#000';
+                context.fillStyle = fadeColor
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         } else {
             context.save();
                 const alpha = 1.5 - 1.5 * (state.transitionState.time - FADE_OUT_DURATION) / FADE_IN_DURATION;
                 context.globalAlpha = Math.max(0, Math.min(1, alpha));
-                context.fillStyle = '#000';
+                context.fillStyle = fadeColor;
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         }

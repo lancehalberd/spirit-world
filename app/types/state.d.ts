@@ -93,6 +93,8 @@ interface GameState {
         pattern?: CanvasPattern
         underCanvas?: HTMLCanvasElement
         type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating'
+        // Color to fade to, defaults to black.
+        fadeColor?: string
         // The targetZ value for the hero after the transition.
         targetZ?: number
     }

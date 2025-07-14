@@ -59,7 +59,11 @@ export function enterLocation(
         } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
         } else if (state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
-            state.transitionState.type = 'circle';
+            if (location.zoneKey === 'dream' || state.location.zoneKey === 'dream') {
+                state.transitionState.fadeColor = '#FFF';
+            } else {
+                state.transitionState.type = 'circle';
+            }
         }
         const targetAreaDefinition = getAreaFromLocation(location);
         if (state.alternateAreaInstance.definition === targetAreaDefinition) {
