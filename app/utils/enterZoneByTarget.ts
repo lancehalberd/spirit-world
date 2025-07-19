@@ -1,5 +1,5 @@
 import { TextCue } from 'app/content/effects/textCue';
-import { isObjectLogicValid } from 'app/content/logic';
+import {evaluateLogicDefinition} from 'app/content/logic';
 import { Door } from 'app/content/objects/door';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
@@ -103,7 +103,7 @@ export function findObjectLocation(
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (objectIds.includes(object.id) && object !== skipObject) {
-                            if (!isObjectLogicValid(state, object)) {
+                            if (!evaluateLogicDefinition(state, object)) {
                                 continue;
                             }
                             return {

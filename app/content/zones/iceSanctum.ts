@@ -691,7 +691,7 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "iceSanctumEntrance", x: 48, y: 272, type: "door", style: "crystalDownstairs", d: "up", targetZone: "holySanctum", targetObjectId: "iceSanctumEntrance", locationCue: "Holy Sanctum 2F"},
-        {status: "closed", id: "iceSanctumExit", x: 48, y: 16, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"iceSanctumKey","isInverted":false}, d: "up", targetZone: "holySanctum", targetObjectId: "iceSanctumExit", locationCue: "Holy Sanctum 2F"},
+        {status: "closed", id: "iceSanctumExit", x: 48, y: 16, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"iceSanctumKey"}, d: "up", targetZone: "holySanctum", targetObjectId: "iceSanctumExit", locationCue: "Holy Sanctum 2F"},
         {status: "normal", id: "", x: 424, y: 304, type: "teleporter"},
         {status: "normal", id: "", x: 160, y: 272, type: "turret", style: "crystal", d: "down", fireInterval: 1000, fireOffset: 0},
         {status: "normal", id: "", x: 192, y: 272, type: "turret", style: "crystal", d: "down", fireInterval: 1000, fireOffset: 500},
@@ -719,7 +719,7 @@ const sf0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16, index: 386, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 3.5, mapY: 4},
     ],
     dark: 100,
-    corrosiveLogic: {"isTrue":true,"isInverted":false},
+    corrosiveLogic: {"isTrue":true},
 };
 zones.iceSanctum = {
     key: 'iceSanctum',

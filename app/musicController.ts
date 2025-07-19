@@ -96,7 +96,9 @@ export const updateMusic = (state: GameState): void => {
         }
     } else if (location.zoneKey === 'grandTemple' || location.zoneKey === 'jadePalace') {
         playTrack('vanaraDreamTheme', 0);
-    } else if (location.zoneKey === 'peachCave'
+    } else if (location.zoneKey === 'dream') {
+        playTrack('vanaraDreamTheme', 0);
+    }  else if (location.zoneKey === 'peachCave'
         || location.zoneKey === 'peachCaveWater'
         || location.zoneKey === 'lakeTunnel'
     ) {

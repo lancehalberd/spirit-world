@@ -189,7 +189,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 return;
             }
         }
-    } else if (hero.savedData.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
+    } else if (!hero.isAstralProjection && hero.savedData.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
         // The intention is the the player can walk over patterns of 2 solid floor and 2 gaps indefinitely, so they have to
         // gain height fast enough on the solid floor to achieve thiese. 1 solid floor should not be enough though.
         hero.z = Math.min(hero.z + 0.15, maxCloudBootsZ);

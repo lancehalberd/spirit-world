@@ -6,7 +6,7 @@ import {createAnimation, drawFrame} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {getTileBehaviors} from 'app/utils/getBehaviors';
-import {isObjectInsideTarget, pad} from 'app/utils/index';
+import {isObjectInsideTarget, isPixelInShortRect, pad} from 'app/utils/index';
 import {getObjectStatus} from 'app/utils/objects';
 
 
@@ -49,7 +49,7 @@ export const pitStyles: {[key: string]: PitStyle} = {
             return {x: pit.x, y: pit.y, w: 32, h: 32};
         },
         getPitbox(pit: PitEntrance): Rect {
-            return {x: pit.x, y: pit.y + 16, w: 32, h: 22};
+            return {x: pit.x, y: pit.y + 16, w: 32, h: 16};
         }
     },
     smoothCrystal: {
@@ -58,7 +58,7 @@ export const pitStyles: {[key: string]: PitStyle} = {
             return {x: pit.x, y: pit.y, w: 32, h: 32};
         },
         getPitbox(pit: PitEntrance): Rect {
-            return {x: pit.x, y: pit.y + 16, w: 32, h: 22};
+            return {x: pit.x, y: pit.y + 16, w: 32, h: 16};
         }
     },
     singleTile: {
@@ -105,11 +105,18 @@ export class PitEntrance implements ObjectInstance {
     getHitbox(): Rect {
         return (pitStyles[this.style] || pitStyles.default).getHitbox(this);
     }
-    getBehaviors(state: GameState) {
+    getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors {
         if (this.status !== 'normal' || this.isUnderObject(state)) {
             return {};
         }
-        return {pit: true};
+        const pitStyle = pitStyles[this.style] || pitStyles.default;
+        const hitbox = this.getHitbox();
+        const isSingleTilePit = hitbox.w <= 16 && hitbox.h <= 16;
+        const pitbox = pitStyle.getPitbox?.(this) || hitbox;
+        if (!isPixelInShortRect(x, y, pitbox)) {
+            return {pit: true, pitWall: true, isSingleTilePit};
+        }
+        return {pit: true, isSingleTilePit};
     }
     isUnderObject(state: GameState): boolean {
         // Only single tile pits can be hidden under a tile currently.
@@ -146,6 +153,8 @@ export class PitEntrance implements ObjectInstance {
             } else if (hero.action !== 'falling') {
                 hero.fallIntoPit(state);
             }
+            // Move the hero fall animation towards the center of the pit if it is too close to the
+            // edges to improve the look of the animation.
             const pitStyle = pitStyles[this.style] || pitStyles.default;
             const pitbox = pitStyle.getPitbox?.(this) || hitbox;
             const heroBox = hero.getMovementHitbox();

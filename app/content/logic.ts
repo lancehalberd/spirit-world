@@ -56,8 +56,8 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         || state.hero.savedData.weaponUpgrades[itemFlag as WeaponUpgrades];
 }
 
-export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {
-    const trueResult = !invertLogic, falseResult = !!invertLogic;
+export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = false): boolean {
+    const trueResult = !isInverted, falseResult = !!isInverted;
     if  (logic === false) {
         return falseResult;
     }
@@ -104,7 +104,7 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
     return trueResult;
 }
 
-export function evaluateFlagString(state: GameState, flagString: string, invertLogic: boolean = false): boolean {
+export function evaluateFlagString(state: GameState, flagString: string): boolean {
     const tokens: string[] = [];
     let charStack: string[] = [];
     function finishToken() {
@@ -179,28 +179,6 @@ export function evaluateFlagString(state: GameState, flagString: string, invertL
     return valueStack.pop() || false;
 }
 window.evaluateFlagString = evaluateFlagString;
-
-export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
-    if (definition.hasCustomLogic && definition.customLogic) {
-        const result = evaluateFlagString(state, definition.customLogic);
-        if (definition.invertLogic) {
-            return !result;
-        }
-        return result;
-        //return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
-    }
-    if (!definition.logicKey) {
-        return true;
-    }
-    const logic = logicHash[definition.logicKey];
-    // Logic should never be missing, so surface an error and hide the layer.
-    if (!logic) {
-        console.error('Missing logic!', definition.logicKey);
-        debugger;
-        return false;
-    }
-    return isLogicValid(state, logic, definition.invertLogic);
-}
 
 export function evaluateLogicDefinition(state: GameState, logicDefinition?: LogicDefinition, defaultValue: boolean = true): boolean {
     if (!logicDefinition) {

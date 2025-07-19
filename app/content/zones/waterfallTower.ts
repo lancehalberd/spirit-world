@@ -347,7 +347,6 @@ const sf0_0x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 299, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 1},
     ],
-    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
@@ -610,7 +609,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 416, y: 96, type: "beadGrate"},
         {status: "normal", id: "", x: 240, y: 464, type: "beadGrate"},
         {status: "hidden", id: "waterfallTower-grateC", x: 128, y: 16, type: "beadGrate", saveStatus: "forever"},
-        {status: "hidden", id: "waterfallTower-grateA", x: 240, y: 288, type: "beadGrate", customLogic: "waterfallTowerDoorBeads", invertLogic: true},
+        {status: "hidden", id: "waterfallTower-grateA", x: 240, y: 288, type: "beadGrate", customLogic: "!waterfallTowerDoorBeads"},
         {status: "normal", id: "", x: 352, y: 416, type: "beadGrate"},
         {status: "hidden", id: "waterfallTower-grateB", x: 352, y: 224, type: "beadGrate"},
         {status: "normal", id: "", x: 128, y: 288, type: "beadGrate"},
@@ -640,7 +639,6 @@ const sf0_0x1: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 300, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 3},
     ],
-    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 const f1_0x0: AreaDefinition = {
     layers: null,
@@ -899,7 +897,6 @@ const sf1_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 16, index: 306, mapId: 'waterfallTowerSpirit', floorId: '3F', mapX: 2, mapY: 1},
         {x: 0, y: 16, w: 32, h: 16, index: 307, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 2, mapY: 2},
     ],
-    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 const sf1_0x1: AreaDefinition = {
     isSpiritWorld: true,
@@ -1255,11 +1252,11 @@ const sf1_0x1: AreaDefinition = {
         {x: 0, y: 16, w: 16, h: 16, index: 309, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 2, mapY: 4},
         {x: 16, y: 16, w: 16, h: 16, index: 310, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 3, mapY: 4},
     ],
-    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 zones.waterfallTower = {
     key: 'waterfallTower',
     areaSize: {w: 32, h: 32},
+    corrosiveLogic: {"isTrue":true},
     floors: [
         {
             grid: [

@@ -131,7 +131,9 @@ const zoneTabContainer = new TabContainer('zone', [
     {
         key: 'behaviors',
         render(container: HTMLElement) {
-            renderPropertyRows(container, getBehaviorProperties());
+            renderPropertyRows(container, getMinimapProperties());
+            behaviorTabContainer.render()
+            container.append(behaviorTabContainer.element);
         },
         refresh(container: HTMLElement) {
             this.render(container);
@@ -141,6 +143,36 @@ const zoneTabContainer = new TabContainer('zone', [
         key: 'import/export',
         render(container: HTMLElement) {
             renderPropertyRows(container, getImportExportProperties());
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+]);
+
+const behaviorTabContainer = new TabContainer('zone', [
+    {
+        key: 'zone',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getBehaviorProperties('zone'));
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+    {
+        key: 'area',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getBehaviorProperties('area'));
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+    {
+        key: 'section',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getBehaviorProperties('section'));
         },
         refresh(container: HTMLElement) {
             this.render(container);
@@ -322,95 +354,100 @@ export function getImportExportProperties(): PanelRows {
     return rows;
 }
 
-
-export function getBehaviorProperties(): PanelRows {
+export function getBehaviorProperties(scope: 'zone'|'area'|'section'): PanelRows {
     const state = getState();
     let rows: PanelRows = [];
-    rows = [...rows, ...getMinimapProperties()];
-    const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
-        key => specialBehaviorsHash[key].type === 'area'
-    );
-    if (specialBehaviorKeys.length) {
+    let scopedObject: AreaBehaviorLogic = state.areaSection.definition;
+    if (scope === 'zone') {
+        scopedObject = state.zone;
         rows.push({
-            name: 'Special Behavior',
-            value: state.areaInstance.definition.specialBehaviorKey || 'none',
-            values: ['none', ...specialBehaviorKeys],
-            onChange(specialBehaviorKey: string) {
-                if (specialBehaviorKey === 'none') {
-                    delete state.areaInstance.definition.specialBehaviorKey;
-                } else {
-                    state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
-                }
-                refreshArea(state);
-            },
-        });
-    }
-    rows.push({
-        name: 'Surface Key',
-        value: state.zone.surfaceKey || 'none',
-        values: ['none', ...Object.keys(zones)],
-        onChange(surfaceKey: string) {
-            if (state.zone.surfaceKey) {
-                delete zones[state.zone.surfaceKey].underwaterKey;
-                delete state.zone.surfaceKey;
-            }
-            if (surfaceKey !== 'none') {
-                state.zone.surfaceKey = surfaceKey;
-                zones[surfaceKey].underwaterKey = state.zone.key;
-                if (state.zone.underwaterKey) {
-                    delete zones[state.zone.underwaterKey].surfaceKey;
-                    delete state.zone.underwaterKey;
-                }
-            }
-            editingState.needsRefresh = true;
-        }
-    }, {
-        name: 'Underwater Key',
-        value: state.zone.underwaterKey || 'none',
-        values: ['none', ...Object.keys(zones)],
-        onChange(underwaterKey: string) {
-            if (state.zone.underwaterKey) {
-                delete zones[state.zone.underwaterKey].surfaceKey;
-                delete state.zone.underwaterKey;
-            }
-            if (underwaterKey !== 'none') {
-                state.zone.underwaterKey = underwaterKey;
-                zones[underwaterKey].surfaceKey = state.zone.key;
+            name: 'Surface Key',
+            value: state.zone.surfaceKey || 'none',
+            values: ['none', ...Object.keys(zones)],
+            onChange(surfaceKey: string) {
                 if (state.zone.surfaceKey) {
                     delete zones[state.zone.surfaceKey].underwaterKey;
                     delete state.zone.surfaceKey;
                 }
+                if (surfaceKey !== 'none') {
+                    state.zone.surfaceKey = surfaceKey;
+                    zones[surfaceKey].underwaterKey = state.zone.key;
+                    if (state.zone.underwaterKey) {
+                        delete zones[state.zone.underwaterKey].surfaceKey;
+                        delete state.zone.underwaterKey;
+                    }
+                }
+                editingState.needsRefresh = true;
             }
-            editingState.needsRefresh = true;
+        }, {
+            name: 'Underwater Key',
+            value: state.zone.underwaterKey || 'none',
+            values: ['none', ...Object.keys(zones)],
+            onChange(underwaterKey: string) {
+                if (state.zone.underwaterKey) {
+                    delete zones[state.zone.underwaterKey].surfaceKey;
+                    delete state.zone.underwaterKey;
+                }
+                if (underwaterKey !== 'none') {
+                    state.zone.underwaterKey = underwaterKey;
+                    zones[underwaterKey].surfaceKey = state.zone.key;
+                    if (state.zone.surfaceKey) {
+                        delete zones[state.zone.surfaceKey].underwaterKey;
+                        delete state.zone.surfaceKey;
+                    }
+                }
+                editingState.needsRefresh = true;
+            }
+        });
+    }
+    if (scope === 'area') {
+        scopedObject = state.areaInstance.definition;
+        const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
+            key => specialBehaviorsHash[key].type === 'area'
+        );
+        if (specialBehaviorKeys.length) {
+            rows.push({
+                name: 'Special Behavior',
+                value: state.areaInstance.definition.specialBehaviorKey || 'none',
+                values: ['none', ...specialBehaviorKeys],
+                onChange(specialBehaviorKey: string) {
+                    if (specialBehaviorKey === 'none') {
+                        delete state.areaInstance.definition.specialBehaviorKey;
+                    } else {
+                        state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
+                    }
+                    refreshArea(state);
+                },
+            });
         }
-    });
+    }
     rows.push({
         name: 'darkness',
-        value: state.areaInstance.definition.dark || 0,
+        value: scopedObject.dark || 0,
         values: [0, 25, 50, 75, 100],
         onChange(dark: number) {
             if (!dark) {
-                delete state.areaInstance.definition.dark;
+                delete scopedObject.dark;
             } else {
-                state.areaInstance.definition.dark = dark;
+                scopedObject.dark = dark;
             }
             refreshArea(state);
         }
     });
-    rows = [...rows, ...getLogicProperties(state, 'Drains Spirit?', state.areaInstance.definition.corrosiveLogic, updatedLogic => {
-        state.areaInstance.definition.corrosiveLogic = updatedLogic;
+    rows = [...rows, ...getLogicProperties(state, 'Drains Spirit?', scopedObject.corrosiveLogic, updatedLogic => {
+        scopedObject.corrosiveLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Section Hot?', state.areaSection.definition.hotLogic, updatedLogic => {
-        state.areaSection.definition.hotLogic = updatedLogic;
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Hot?', scopedObject.hotLogic, updatedLogic => {
+        scopedObject.hotLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Section Foggy?', state.areaSection.definition.fogLogic, updatedLogic => {
-        state.areaSection.definition.fogLogic = updatedLogic;
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Foggy?', scopedObject.fogLogic, updatedLogic => {
+        scopedObject.fogLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Section Astral?', state.areaSection.definition.astralLogic, updatedLogic => {
-        state.areaSection.definition.astralLogic = updatedLogic;
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Astral?', scopedObject.astralLogic, updatedLogic => {
+        scopedObject.astralLogic = updatedLogic;
         refreshArea(state);
     })];
     rows.push({
@@ -744,19 +781,18 @@ export function getLogicProperties(
             } else if (logicType === 'true') {
                 updateLogic({
                     isTrue: true,
-                    isInverted: !!logic?.isInverted,
                 });
             } else if (logicType === 'custom') {
                 updateLogic({
                     hasCustomLogic: true,
                     customLogic: logic?.customLogic || '',
-                    isInverted: !!logic?.isInverted,
                 });
             } else {
-                updateLogic({
-                    logicKey: logicType,
-                    isInverted: !!logic?.isInverted,
-                });
+                const newLogic: LogicDefinition = {logicKey: logicType};
+                if (logic?.isInverted) {
+                    newLogic.isInverted = true;
+                }
+                updateLogic(newLogic);
             }
         }
     }];
@@ -775,7 +811,11 @@ export function getLogicProperties(
         });
     }
     rows.push(row);
-    if (currentValue !== 'none' && currentValue !== 'true') {
+    // You can just add '!' at the front of custom logic to invert it so this flag is unnecessary.
+    if (logic?.isInverted === false) {
+        delete logic.isInverted
+    }
+    if (currentValue !== 'none' && currentValue !== 'custom' && currentValue !== 'true') {
         rows.push({
             name: 'Invert',
             id: `${label} Invert Logic`,

@@ -145,10 +145,9 @@ Graphics to Implement:
 
 
 Current tasks:
-    - allow setting zone wide behaviors that function as default values for sections.
-        - Create "Zone" + "Section" sections of the behaviors tab
-        - use for corrosiveLogic in Waterfall Tower
-        - use for astralLogic in Dream land
+    - Fix secret chime not playing when opening drains in Waterfall Tower.
+
+    - Fix "Is Frozen" door logic doesn't support custom logic.
 
     - Add Vanara Dreamland
         - Add initial cutscene for meeting the Spirit Tree

@@ -448,7 +448,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "lightningSanctumClosedDoor", x: 240, y: 32, type: "door", style: "crystal", targetObjectId: "lightningSanctumTorchDoor", d: "right", saveStatus: "zone"},
         {status: "normal", id: "", x: 272, y: 32, type: "door", style: "crystal", targetObjectId: "lightningSanctumTorchDoor", d: "left"},
         {status: "normal", id: "lightningSanctumKey", x: 416, y: 432, type: "chest", lootType: "smallKey", lootLevel: 1},
-        {status: "closed", id: "lightningSanctumExit", x: 448, y: 416, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"lightningSanctumKey","isInverted":false}, d: "up", targetZone: "holySanctum", targetObjectId: "lightningSanctumExit", locationCue: "Holy Sanctum 2F"},
+        {status: "closed", id: "lightningSanctumExit", x: 448, y: 416, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"lightningSanctumKey"}, d: "up", targetZone: "holySanctum", targetObjectId: "lightningSanctumExit", locationCue: "Holy Sanctum 2F"},
         {status: "normal", id: "lightningSanctum:0:0x0-beetleWingedStorm-0", x: 120, y: 80, type: "enemy", enemyType: "beetleWingedStorm", d: "down", params: {}},
         {status: "normal", id: "", x: 128, y: 464, type: "rollingBall"},
         {status: "normal", id: "", x: 128, y: 64, type: "ballGoal", targetObjectId: "lightningSanctumClosedDoor"},

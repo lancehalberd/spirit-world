@@ -2064,7 +2064,7 @@ const f0_2x0: AreaDefinition = {
         {status: "closed", id: "moneyMazeExit", x: 288, y: 464, type: "door", style: "woodenDownstairs", targetZone: "holyCityInterior", targetObjectId: "moneyMazeExit", d: "up"},
         {status: "normal", id: "overworld:holyCityFoodHouse", x: 320, y: 304, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "foodHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityGardenHouse", x: 752, y: 320, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "gardenHouse", d: "up"},
-        {status: "closed", id: "grandTempleEntrance", x: 480, y: 0, type: "door", style: "wideEntrance", targetZone: "grandTemple", targetObjectId: "grandTempleEntrance", d: "up", openLogic: {"logicKey":"hasReleasedBeasts","isInverted":false}},
+        {status: "closed", id: "grandTempleEntrance", x: 480, y: 0, type: "door", style: "wideEntrance", targetZone: "grandTemple", targetObjectId: "grandTempleEntrance", d: "up", openLogic: {"logicKey":"hasReleasedBeasts"}},
         {status: "normal", id: "streetVendor", x: 456, y: 340, d: "down", behavior: "idle", style: "guy2", type: "npc", dialogueKey: "streetVendor"},
         {status: "normal", id: "", x: 80, y: 432, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 160, y: 432, type: "spawnMarker", linked: true},

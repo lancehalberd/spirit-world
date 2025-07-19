@@ -171,8 +171,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -215,8 +214,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -259,8 +257,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -737,8 +734,7 @@ const f0_1x0: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -781,8 +777,7 @@ const f0_1x0: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -825,8 +820,7 @@ const f0_1x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -1090,8 +1084,7 @@ const f0_2x0: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -1134,8 +1127,7 @@ const f0_2x0: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -1178,8 +1170,7 @@ const f0_2x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -1704,8 +1695,7 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -1748,8 +1738,7 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -1792,8 +1781,7 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -1836,7 +1824,6 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'foreground',
             drawPriority: 'foreground',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -1917,7 +1904,6 @@ const f0_0x1: AreaDefinition = {
         {
             key: 'foreground2',
             drawPriority: 'foreground',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -2257,8 +2243,7 @@ const f0_1x1: AreaDefinition = {
         {
             key: 'lava4',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava4',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava4',
             grid: {
                 w: 32,
                 h: 32,
@@ -2516,8 +2501,7 @@ const f0_1x1: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -2761,8 +2745,7 @@ const f0_2x1: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -2805,8 +2788,7 @@ const f0_2x1: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -2849,8 +2831,7 @@ const f0_2x1: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -2893,7 +2874,6 @@ const f0_2x1: AreaDefinition = {
         {
             key: 'aboveLavaFloor',
             drawPriority: 'background',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -2936,7 +2916,6 @@ const f0_2x1: AreaDefinition = {
         {
             key: 'aboveLavaField',
             drawPriority: 'background',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -3198,8 +3177,7 @@ const f0_0x2: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -3242,8 +3220,7 @@ const f0_0x2: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -3370,8 +3347,7 @@ const f0_0x2: AreaDefinition = {
         {
             key: 'lava1',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3429,8 +3405,7 @@ const f0_1x2: AreaDefinition = {
         {
             key: 'aboveLavaFloor',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3473,8 +3448,7 @@ const f0_1x2: AreaDefinition = {
         {
             key: 'aboveLavaField',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3721,8 +3695,7 @@ const f0_1x2: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -3765,8 +3738,7 @@ const f0_1x2: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -3809,8 +3781,7 @@ const f0_1x2: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3865,8 +3836,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'aboveLavaFloor',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3909,8 +3879,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'aboveLavaField',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3953,8 +3922,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'aboveLava2Floor',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -3997,8 +3965,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'aboveLava2Field',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -4041,8 +4008,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'lava1',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -4289,8 +4255,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -4333,8 +4298,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -4377,8 +4341,7 @@ const f0_2x2: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -4675,8 +4638,7 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -4719,8 +4681,7 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -4763,8 +4724,7 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -4807,7 +4767,6 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'foreground',
             drawPriority: 'foreground',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -4888,7 +4847,6 @@ const sf0_0x1: AreaDefinition = {
         {
             key: 'foreground2',
             drawPriority: 'foreground',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -5156,8 +5114,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -5470,8 +5427,7 @@ const f1_1x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -5608,9 +5564,9 @@ const f1_1x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "craterKey3", x: 160, y: 448, type: "chest", lootType: "smallKey", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 536, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
-        {x: 0, y: 16, w: 16, h: 16, index: 537, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
-        {x: 16, y: 0, w: 16, h: 32, index: 538, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
+        {x: 0, y: 0, w: 16, h: 16, index: 536, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
+        {x: 0, y: 16, w: 16, h: 16, index: 537, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
+        {x: 16, y: 0, w: 16, h: 32, index: 538, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
     ],
 };
 const f1_2x0: AreaDefinition = {
@@ -5784,8 +5740,7 @@ const f1_2x0: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -5968,7 +5923,7 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 64, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 539, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 539, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 3},
         {x: 0, y: 16, w: 32, h: 16, index: 540, mapId: 'crater', floorId: 'B1', mapX: 3.5, mapY: 0},
     ],
 };
@@ -6147,8 +6102,7 @@ const sf1_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -6456,8 +6410,7 @@ const sf1_1x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -6585,9 +6538,9 @@ const sf1_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 430, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
-        {x: 0, y: 16, w: 16, h: 16, index: 431, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
-        {x: 16, y: 0, w: 16, h: 32, index: 432, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
+        {x: 0, y: 0, w: 16, h: 16, index: 430, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0.5},
+        {x: 0, y: 16, w: 16, h: 16, index: 431, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 5, mapY: 1.5},
+        {x: 16, y: 0, w: 16, h: 32, index: 432, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0.5},
     ],
 };
 const sf1_2x0: AreaDefinition = {
@@ -6765,8 +6718,7 @@ const sf1_2x0: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'craterLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!craterLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -6937,7 +6889,7 @@ const sf1_2x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 433, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 433, hotLogic: {"isTrue":true}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 3},
         {x: 0, y: 16, w: 32, h: 16, index: 434, mapId: 'crater', floorId: 'B1', mapX: 3.5, mapY: 0},
     ],
 };

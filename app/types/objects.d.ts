@@ -419,21 +419,16 @@ interface HitResult {
     debug?: any
 }
 
-interface BaseObjectDefinition {
+// Logic fields can be set to control the presence of this object with a logic check.
+// For example, doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
+interface BaseObjectDefinition extends LogicDefinition {
     // Defaults to ''
     id?: string
     // Draw priority to use for this object, if it is configurable.
     drawPriority?: DrawPriority
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean
-    // If true, use the inverse of the given logic check.
-    invertLogic?: boolean
-    // This can be set to control the presence of this object with a logic check.
-    // For example, frozen doors vs normal doors are displayed in river temple based on the status of the frost beast,
-    // and doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
-    logicKey?: string
-    hasCustomLogic?: boolean
-    customLogic?: string
+
     // Whether to save the status of this object permanently (for example switches to open dungeon doors).
     // If this is unset, the default behavior depends on the object type, for examples enemies are saved for
     // the zone, bosses are saved forever, and most objects aren't saved at all.
@@ -759,6 +754,8 @@ interface SpecialNpcBehavior extends BaseSpecialBehavior<NPC> {
 
 interface SpecialAreaBehavior extends BaseSpecialBehavior<AreaInstance> {
     type: 'area'
+    // applyToSection is called against any section instance created for a given area.
+    applyToSection?: (state: GameState, section: AreaSection) => void
 }
 
 type SpecialBehavior

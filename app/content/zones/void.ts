@@ -130,8 +130,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'voidFlame',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!voidFlame',
             grid: {
                 w: 32,
                 h: 32,
@@ -216,12 +215,12 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "voidTree", x: 208, y: 24, type: "boss", enemyType: "voidTree", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "voidEntrance", x: 224, y: 496, type: "door", style: "wideEntrance", targetZone: "tree", targetObjectId: "voidEntrance", d: "down"},
-        {status: "normal", id: "", x: 272, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "voidFlame", invertLogic: true},
-        {status: "normal", id: "", x: 208, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "voidFlame", invertLogic: true},
-        {status: "normal", id: "voidStormEntrance", x: 352, y: 424, type: "teleporter", hasCustomLogic: true, customLogic: "voidStorm", invertLogic: true},
-        {status: "normal", id: "voidFrostEntrance", x: 144, y: 424, type: "teleporter", hasCustomLogic: true, invertLogic: true, customLogic: "voidFrost"},
-        {status: "normal", id: "voidStoneEntrance", x: 56, y: 184, type: "teleporter", hasCustomLogic: true, customLogic: "voidStone", invertLogic: true},
-        {status: "normal", id: "voidFlameEntrance", x: 440, y: 184, type: "teleporter", invertLogic: true, hasCustomLogic: true, customLogic: "voidFlame"},
+        {status: "normal", id: "", x: 272, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "!voidFlame"},
+        {status: "normal", id: "", x: 208, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "!voidFlame"},
+        {status: "normal", id: "voidStormEntrance", x: 352, y: 424, type: "teleporter", hasCustomLogic: true, customLogic: "!voidStorm"},
+        {status: "normal", id: "voidFrostEntrance", x: 144, y: 424, type: "teleporter", hasCustomLogic: true, customLogic: "!voidFrost"},
+        {status: "normal", id: "voidStoneEntrance", x: 56, y: 184, type: "teleporter", hasCustomLogic: true, customLogic: "!voidStone"},
+        {status: "normal", id: "voidFlameEntrance", x: 440, y: 184, type: "teleporter", hasCustomLogic: true, customLogic: "!voidFlame"},
         {status: "normal", id: "finalMom", x: 248, y: 56, d: "down", behavior: "idle", style: "mom", type: "npc", dialogueKey: "mom", hasCustomLogic: true, customLogic: "voidTree"},
     ],
     sections: [
@@ -361,8 +360,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'voidFlame',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!voidFlame',
             grid: {
                 w: 32,
                 h: 32,
@@ -446,10 +444,10 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "voidStone", x: 88, y: 128, type: "enemy", enemyType: "voidStone", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "voidStone", invertLogic: true},
-        {status: "normal", id: "voidFlame", x: 376, y: 128, type: "enemy", enemyType: "voidFlame", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "voidFlame", invertLogic: true},
-        {status: "normal", id: "voidFrost", x: 104, y: 368, type: "enemy", enemyType: "voidFrost", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "voidFrost", invertLogic: true},
-        {status: "normal", id: "voidStorm", x: 360, y: 368, type: "enemy", enemyType: "voidStorm", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "voidStorm", invertLogic: true},
+        {status: "normal", id: "voidStone", x: 88, y: 128, type: "enemy", enemyType: "voidStone", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "!voidStone"},
+        {status: "normal", id: "voidFlame", x: 376, y: 128, type: "enemy", enemyType: "voidFlame", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "!voidFlame"},
+        {status: "normal", id: "voidFrost", x: 104, y: 368, type: "enemy", enemyType: "voidFrost", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "!voidFrost"},
+        {status: "normal", id: "voidStorm", x: 360, y: 368, type: "enemy", enemyType: "voidStorm", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "!voidStorm"},
         {status: "normal", id: "voidStoneExit", x: 104, y: 80, type: "teleporter", hasCustomLogic: true, customLogic: "voidStone"},
         {status: "normal", id: "voidFlameExit", x: 392, y: 80, type: "teleporter", hasCustomLogic: true, customLogic: "voidFlame"},
         {status: "normal", id: "voidStormExit", x: 376, y: 320, type: "teleporter", hasCustomLogic: true, customLogic: "voidStorm"},

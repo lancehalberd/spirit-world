@@ -29,7 +29,7 @@ export function updateField(this: void, state: GameState) {
             state.screenShakes.splice(i--, 1);
         }
     }
-    const targetFadeLevel = Math.max(state.areaInstance.dark || 0, state.nextAreaInstance?.dark || 0) / 100;
+    const targetFadeLevel = Math.max(state.areaSection?.dark ?? 0, state.nextAreaSection?.dark ?? 0) / 100;
     if (state.fadeLevel < targetFadeLevel) {
         state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
     } else if (state.fadeLevel > targetFadeLevel){

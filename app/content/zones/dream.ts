@@ -171,8 +171,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'switchWalls',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'teleportationTutorialSwitch',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!teleportationTutorialSwitch',
             grid: {
                 w: 32,
                 h: 32,
@@ -214,11 +213,11 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "spiritTree", x: 216, y: 76, type: "peachTree"},
+        {status: "normal", id: "spiritTree", x: 216, y: 76, type: "peachTree", linked: true},
         {status: "normal", id: "teleportationTutorialSwitch", x: 248, y: 456, requireAll: false, type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 825, astralLogic: {"hasCustomLogic":true,"customLogic":"!$teleportation","isInverted":false}, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 825, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -577,8 +576,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'switchWalls',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'teleportationTutorialSwitch',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!teleportationTutorialSwitch',
             grid: {
                 w: 32,
                 h: 32,
@@ -620,6 +618,7 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "spiritTree", x: 216, y: 76, type: "peachTree", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 548, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 0},
@@ -807,6 +806,7 @@ const sf0_0x1: AreaDefinition = {
 zones.dream = {
     key: 'dream',
     areaSize: {w: 32, h: 32},
+    astralLogic: {"hasCustomLogic":true,"customLogic":"!$teleportation"},
     floors: [
         {
             grid: [

@@ -1,5 +1,5 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { isObjectLogicValid } from 'app/content/logic';
+import {evaluateLogicDefinition} from 'app/content/logic';
 import { TextCue } from 'app/content/effects/textCue';
 import { objectHash } from 'app/content/objects/objectHash';
 import { zones } from 'app/content/zones';
@@ -576,7 +576,7 @@ export function findElevatorLocation(
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.type === 'elevator' && object.floor === targetFloor) {
-                            if (!isObjectLogicValid(state, object)) {
+                            if (!evaluateLogicDefinition(state, object)) {
                                 continue;
                             }
                             return {

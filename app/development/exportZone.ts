@@ -69,11 +69,15 @@ export function serializeZone(zone: Zone) {
                             if (layer.y) lines.push(`            y: ${layer.y},`);
                             if (layer.drawPriority) lines.push(`            drawPriority: '${layer.drawPriority}',`);
                             if (layer.disableBehaviors) lines.push(`            disableBehaviors: ${layer.disableBehaviors},`);
-                            if (layer.logicKey) lines.push(`            logicKey: '${layer.logicKey}',`);
-                            if (layer.hasCustomLogic) {
+                            if (layer.logicKey) {
+                                lines.push(`            logicKey: '${layer.logicKey}',`);
+                                if (layer.isInverted) {
+                                    lines.push(`            isInverted: true,`);
+                                }
+                            }
+                            if (layer.hasCustomLogic && layer.customLogic) {
                                 lines.push(`            hasCustomLogic: true, customLogic: '${layer.customLogic || ''}',`);
                             }
-                            if (layer.invertLogic) lines.push(`            invertLogic: true,`);
                             if (layer.grid) {
                                 lines.push('            grid: {');
                                 lines.push(`                w: ${layer.grid.w},`);
@@ -120,14 +124,9 @@ export function serializeZone(zone: Zone) {
                         if (section.index >= 0) {
                             extraFields += `, index: ${section.index}`;
                         }
-                        if (section.hotLogic) {
-                            extraFields += `, hotLogic: ${JSON.stringify(section.hotLogic)}`;
-                        }
-                        if (section.fogLogic) {
-                            extraFields += `, fogLogic: ${JSON.stringify(section.fogLogic)}`;
-                        }
-                        if (section.astralLogic) {
-                            extraFields += `, astralLogic: ${JSON.stringify(section.astralLogic)}`;
+                        const behaviors = getBehaviors(section);
+                        if (behaviors.length) {
+                            extraFields += ', ' + behaviors.join(', ');
                         }
                         if (section.hideMap) {
                             extraFields += `, hideMap: ${section.hideMap}`;
@@ -151,11 +150,8 @@ export function serializeZone(zone: Zone) {
 
                     }
                     lines.push('    ],');
-                    if (area?.dark) {
-                        lines.push(`    dark: ${area.dark},`);
-                    }
-                    if (area?.corrosiveLogic) {
-                        lines.push(`    corrosiveLogic: ${JSON.stringify(area.corrosiveLogic)},`);
+                    for (const behavior of getBehaviors(area)) {
+                        lines.push(`    ${behavior},`);
                     }
                     if (area?.specialBehaviorKey) {
                         lines.push(`    specialBehaviorKey: '${area.specialBehaviorKey}',`);
@@ -175,6 +171,9 @@ export function serializeZone(zone: Zone) {
     }
     if (zone.underwaterKey) {
         lines.push(`    underwaterKey: '${zone.underwaterKey}',`);
+    }
+    for (const behavior of getBehaviors(zone)) {
+        lines.push(`    ${behavior},`);
     }
     lines.push(`    floors: [`);
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
@@ -208,6 +207,29 @@ export function serializeZone(zone: Zone) {
     lines.push('');
 
     return lines.join("\n");
+}
+function getBehaviors(object: AreaBehaviorLogic): string[] {
+    const lines: string[] = [];
+    if (object?.dark) {
+        lines.push(`dark: ${object.dark}`);
+    }
+    if (isLogicValid(object.hotLogic)) {
+        lines.push(`hotLogic: ${JSON.stringify(object.hotLogic)}`);
+    }
+    if (isLogicValid(object.astralLogic)) {
+        lines.push(`astralLogic: ${JSON.stringify(object.astralLogic)}`);
+    }
+    if (isLogicValid(object.corrosiveLogic)) {
+        lines.push(`corrosiveLogic: ${JSON.stringify(object.corrosiveLogic)}`);
+    }
+    if (isLogicValid(object.fogLogic)) {
+        lines.push(`fogLogic: ${JSON.stringify(object.fogLogic)}`);
+    }
+    return lines;
+}
+// This check is used to prevent exporting empty logic.
+function isLogicValid(logic?: LogicDefinition): boolean {
+    return !!logic && (!!logic.logicKey || !!(logic.hasCustomLogic && logic.customLogic));
 }
 window['serializeZone'] = serializeZone;
 

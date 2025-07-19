@@ -527,8 +527,8 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closed", id: "0", x: 496, y: 352, type: "door", style: "stone", d: "right", linked: true, openLogic: {"hasCustomLogic":true,"customLogic":"warTempleSmallKey1","isInverted":false}},
-        {status: "closed", id: "", x: 0, y: 352, type: "door", style: "stone", d: "left", linked: true, openLogic: {"hasCustomLogic":true,"customLogic":"warTempleSmallKey1","isInverted":false}},
+        {status: "closed", id: "0", x: 496, y: 352, type: "door", style: "stone", d: "right", linked: true, openLogic: {"hasCustomLogic":true,"customLogic":"warTempleSmallKey1"}},
+        {status: "closed", id: "", x: 0, y: 352, type: "door", style: "stone", d: "left", linked: true, openLogic: {"hasCustomLogic":true,"customLogic":"warTempleSmallKey1"}},
         {status: "hiddenSwitch", id: "warTempleSmallKey1", x: 240, y: 368, type: "chest", lootType: "smallKey", lootLevel: 1},
         {status: "normal", id: "", x: 160, y: 368, targetObjectId: "warTempleSmallKey1", toggleOnRelease: true, type: "floorSwitch"},
         {status: "normal", id: "", x: 320, y: 368, targetObjectId: "warTempleSmallKey1", toggleOnRelease: true, type: "floorSwitch"},
@@ -1340,7 +1340,7 @@ const f0_1x1: AreaDefinition = {
             key: 'throne',
             drawPriority: 'background',
             logicKey: 'beastsDefeated',
-            invertLogic: true,
+            isInverted: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -3893,7 +3893,7 @@ const sf0_1x1: AreaDefinition = {
             key: 'throne',
             drawPriority: 'background',
             logicKey: 'beastsDefeated',
-            invertLogic: true,
+            isInverted: true,
             grid: {
                 w: 32,
                 h: 32,

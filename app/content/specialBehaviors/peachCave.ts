@@ -10,6 +10,12 @@ specialBehaviorsHash.peachCave = {
     apply(state: GameState, area: AreaInstance) {
         this.onRefreshLogic(state, area);
     },
+    applyToSection(state: GameState, section: AreaSection) {
+        const caveIsDark = !!state.savedState.objectFlags.peachCaveTree;
+        if (caveIsDark) {
+            section.dark = Math.max(section.dark, 90);
+        }
+    },
     onRefreshLogic(state: GameState, area: AreaInstance) {
         const caveIsDark = !!state.savedState.objectFlags.peachCaveTree;
         let peachTree: PeachTree|undefined;
@@ -20,7 +26,6 @@ specialBehaviorsHash.peachCave = {
             }
         }
         if (caveIsDark) {
-            area.dark = Math.max(area.definition.dark, 90);
             if (peachTree) {
                 peachTree.specialStatus = 'dead';
             }
@@ -95,7 +100,8 @@ specialBehaviorsHash.peachCave = {
                     peachTree.growPeach(state);
                 });
                 runPlayerBlockingCallback(state, (state: GameState) => {
-                    state.areaInstance.dark = Math.min(90, state.areaInstance.dark + 0.5);
+                    state.areaSection.dark = Math.min(90, state.areaSection.dark + 0.5);
+                    //state.areaInstance.dark = Math.min(90, state.areaInstance.dark + 0.5);
                     if (peachTree.specialStatus === 'dead') {
                         return false;
                     }

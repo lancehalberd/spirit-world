@@ -614,7 +614,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "cocoonBossMarker", x: 104, y: 392, type: "marker", locationCue: "Cocoon B3"},
         {status: "normal", id: "cocoonBossTeleporter", logicKey: "cocoonBossStarted", x: 144, y: 352, type: "teleporter"},
-        {status: "normal", id: "cocoonGuardian", x: 144, y: 352, d: "down", behavior: "none", style: "vanaraBlue", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}", logicKey: "cocoonBossStarted", invertLogic: true},
+        {status: "normal", id: "cocoonGuardian", x: 144, y: 352, d: "down", behavior: "none", style: "vanaraBlue", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}", logicKey: "cocoonBossStarted", isInverted: true},
         {status: "normal", id: "cocoonSilver", x: 416, y: 336, type: "chest", lootType: "silverOre", lootAmount: 50},
         {status: "normal", id: "", x: 128, y: 128, type: "rollingBall", spirit: true, linked: true},
         {status: "normal", id: "", linked: true, x: 368, y: 128, type: "rollingBall", spirit: true},

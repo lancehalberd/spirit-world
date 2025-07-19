@@ -6,6 +6,9 @@ import {getVectorToTarget} from 'app/utils/target';
 
 specialBehaviorsHash.ephemeral = {
     type: 'npc',
+    apply(state: GameState, npc: NPC) {
+        this.update(state, npc);
+    },
     update(state: GameState, npc: NPC) {
         // Ephemeral NPCs fade away and disappear instead of cycling through dialog.
         if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length && npc.hasFinishedDialog) {

@@ -1,4 +1,4 @@
-import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } from 'app/content/logic';
+import {evaluateLogicDefinition} from 'app/content/logic';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
@@ -229,7 +229,7 @@ export function findZoneTargets(
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.id === objectId && object !== skipObject) {
-                            if (checkLogic && !isObjectLogicValid(state, object)) {
+                            if (checkLogic && !evaluateLogicDefinition(state, object)) {
                                 continue;
                             }
                             results.push({ object, inSpiritWorld });
@@ -354,7 +354,6 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
-        dark: definition.dark,
         w: areaSize.w,
         h: areaSize.h,
         behaviorGrid,
@@ -378,25 +377,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             if (layer.visibilityOverride === 'hide') {
                 return false;
             }
-            // Custom logic can be specified instead of a logic key for single flag checks.
-            if (layer.hasCustomLogic && layer.customLogic) {
-                return isLogicValid(state, {
-                    requiredFlags: [layer.customLogic]
-                }, layer.invertLogic);
-            }
-            // Layers without logic are visible by default.
-            if (!layer.logicKey) {
-                return true;
-            }
-            const logic = logicHash[layer.logicKey];
-            // Logic should never be missing, so surface an error and hide the layer.
-            if (!logic) {
-                console.error('Missing logic!', layer.logicKey);
-                debugger;
-                return false;
-            }
-            // If the layer has logic, only display it if the logic is valid.
-            return isLogicValid(state, logic, layer.invertLogic);
+            return evaluateLogicDefinition(state, layer, true);
         }).map(layer => ({
             definition: layer,
             ...layer,
@@ -455,12 +436,12 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     for (const layer of instance.layers) {
         applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
-    for (const object of definition.objects.filter(object => isObjectLogicValid(state, object))) {
+    for (const object of definition.objects.filter(object => evaluateLogicDefinition(state, object))) {
         const objectInstance = createObjectInstance(state, object);
         addObjectToArea(state, instance, objectInstance);
         initializeObject(state, objectInstance);
-}
-    instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
+    }
+    // instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
         specialBehavior?.apply(state, instance);
@@ -475,7 +456,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     }
     const wasHot = state.areaSection?.isHot;
     if (state.areaSection) {
-        state.areaSection = getAreaSectionInstance(state, state.areaSection.definition);
+        state.areaSection = getAreaSectionInstance(state, state.zone, area.definition, state.areaSection.definition);
     }
     area.needsLogicRefresh = false;
     let lastLayerIndex = -1, refreshBehavior = false;
@@ -485,18 +466,19 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         if (layerIndex >= 0) {
             lastLayerIndex = layerIndex;
         }
+        // Skip evaluating layer logic altogether if no logic is set on it.
         if (!layerDefinition.hasCustomLogic && !layerDefinition.logicKey) {
             continue;
         }
-        let showLayer = false;
-        if (layerDefinition.hasCustomLogic) {
+        let showLayer = evaluateLogicDefinition(state, layerDefinition, true)
+       /* if (layerDefinition.hasCustomLogic) {
             showLayer = isLogicValid(state, {
                 requiredFlags: [layerDefinition.customLogic]
-            }, layerDefinition.invertLogic);
+            }, layerDefinition.isInverted);
         }
         if (layerDefinition.logicKey) {
-            showLayer = isLogicValid(state, logicHash[layerDefinition.logicKey], layerDefinition.invertLogic);
-        }
+            showLayer = isLogicValid(state, logicHash[layerDefinition.logicKey], layerDefinition.isInverted);
+        }*/
         if (layerIndex >= 0 && !showLayer) {
             // Remove the layer if it is present but should be hidden.
             area.layers.splice(layerIndex, 1);
@@ -529,7 +511,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     for (let instance of [area, area.alternateArea]) {
         if (refreshBehavior) {
             state.map.needsRefresh = true;
-            state.fadeLevel = (state.areaInstance.dark || 0) / 100;
+            state.fadeLevel = (state.areaSection.dark ?? 0) / 100;
             // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
             // state.hero.vx = state.hero.vy = 0;
             const nextAreaInstance = createAreaInstance(state, instance.definition);
@@ -649,7 +631,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 // peach loot with a special generated peach during the peach tree cutscene after the first boss.
                 || (o.definition?.id && o.definition.id === object.id)
             );
-            if (isObjectLogicValid(state, object)) {
+            if (evaluateLogicDefinition(state, object)) {
                 // If the object is valid but was never added to the area, add it now.
                 if (!objectInstance && !instance.removedObjectDefinitions.has(object)) {
                     objectInstance = createObjectInstance(state, object);
@@ -713,7 +695,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
             removeObjectFromArea(state, object);
             // Transient effects or minions summoned by a boss should just be despawned when reset.
             if (definition) {
-                if (!isObjectLogicValid(state, definition)) {
+                if (!evaluateLogicDefinition(state, definition)) {
                     continue;
                 }
                 const object = createObjectInstance(state, definition);
@@ -729,7 +711,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
         if (definition.x >= l + section.w * 16 || definition.x < l || definition.y >= t + section.h * 16 || definition.y < t) {
             continue;
         }
-        if (!isObjectLogicValid(state, definition)) {
+        if (!evaluateLogicDefinition(state, definition)) {
             continue;
         }
         let object = findObjectInstanceByDefinition(area, definition, true);

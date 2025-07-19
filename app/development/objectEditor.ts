@@ -4,7 +4,7 @@ import {
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { logicHash, isObjectLogicValid } from 'app/content/logic';
+import {logicHash, evaluateLogicDefinition} from 'app/content/logic';
 import { bellStyles } from 'app/content/objects/bell';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
@@ -768,8 +768,10 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             if (logicKey === 'none') {
                 delete object.logicKey;
                 delete object.hasCustomLogic;
+                delete object.isInverted;
             } else if (logicKey === 'custom') {
                 delete object.logicKey;
+                delete object.isInverted;
                 object.hasCustomLogic = true;
             } else{
                 object.logicKey = logicKey;
@@ -789,18 +791,20 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             },
         });
     }
-    rows.push({
-        name: 'Invert Logic',
-        value: object.invertLogic || false,
-        onChange(invertLogic: boolean) {
-            if (invertLogic) {
-                object.invertLogic = invertLogic;
-            } else {
-                delete object.invertLogic;
-            }
-            updateObjectInstance(state, object);
-        },
-    });
+    if (object.logicKey && object.logicKey !== 'custom') {
+        rows.push({
+            name: 'Invert Logic',
+            value: object.isInverted || false,
+            onChange(isInverted: boolean) {
+                if (isInverted) {
+                    object.isInverted = isInverted;
+                } else {
+                    delete object.isInverted;
+                }
+                updateObjectInstance(state, object);
+            },
+        });
+    }
     const possibleStatuses = getPossibleStatuses(object.type);
     if (!possibleStatuses.includes(object.status)) {
         object.status = possibleStatuses[0];
@@ -1862,7 +1866,7 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
     if (index >= 0) {
         removeObjectFromArea(state, area.objects[index]);
     }
-    if (!isObjectLogicValid(state, object)) {
+    if (!evaluateLogicDefinition(state, object)) {
         return;
     }
     const newObject = createObjectInstance(state, object);

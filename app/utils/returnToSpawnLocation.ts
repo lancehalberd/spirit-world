@@ -32,7 +32,7 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
     state.scriptEvents.queue = [];
     state.scriptEvents.activeEvents = [];
     enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags});
-    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
+    state.fadeLevel = (state.areaSection.dark || 0) / 100;
 
 
     // Don't display hints in randomizer mode.

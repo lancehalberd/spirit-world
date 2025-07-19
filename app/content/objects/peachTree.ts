@@ -82,6 +82,9 @@ export class PeachTree implements ObjectInstance {
     }*/
     onGrab(state: GameState) {
         state.hero.action = null;
+        if (this.definition.id === 'spiritTree') {
+
+        }
         if (this.specialStatus === 'dead') {
             showMessage(state, '...{|}It feels cold and lifeless.');
         }

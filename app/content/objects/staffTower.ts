@@ -1,14 +1,14 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import {objectHash} from 'app/content/objects/objectHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
-import { appendScript } from 'app/scriptEvents';
-import { drawFrame, drawFrameContentAt, getFrameHitbox } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { createObjectInstance } from 'app/utils/createObjectInstance';
-import { hitTargets } from 'app/utils/field';
-import { allImagesLoaded } from 'app/utils/images';
-import { isPixelInShortRect } from 'app/utils/index';
-import { requireFrame } from 'app/utils/packedImages';
+import {appendScript} from 'app/scriptEvents';
+import {drawFrame, drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
+import {hitTargets} from 'app/utils/field';
+import {allImagesLoaded} from 'app/utils/images';
+import {isPixelInShortRect} from 'app/utils/index';
+import {requireFrame} from 'app/utils/packedImages';
 
 const staffTowerFrame = requireFrame('gfx/objects/staffTower.png', {x: 234, y: 17, w: 172, h: 240, content: {x: 0, y: 72, w: 172, h: 167}});
 const staffTowerMaskFrame = requireFrame('gfx/objects/staffTower.png', {x: 442, y: 17, w: 172, h: 240, content: {x: 0, y: 72, w: 172, h: 167}});

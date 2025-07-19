@@ -15,7 +15,7 @@ import {setSaveFileToState} from 'app/state';
 
 
 export function toggleEditing(state: GameState) {
-    if (state.scene === 'title') {
+    if (state.scene === 'title' || state.scene === 'prologue' || state.scene === 'intro') {
         setSaveFileToState(0, 0);
     }
     state.scene = 'game';

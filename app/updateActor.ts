@@ -352,7 +352,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     const isHoldingBreath = !state.hero.savedData.passiveTools.waterBlessing && isUnderwater(state, state.hero);
     // Corrosive areas drain mana unless you have the water blessing.
-    const isWaterDrainingMagic = !state.hero.savedData.passiveTools.waterBlessing && hero.area.isCorrosive;
+    const isWaterDrainingMagic = !state.hero.savedData.passiveTools.waterBlessing && state.areaSection?.isCorrosive;
     if (activeAirBubbles) {
         // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
         state.hero.magic = Math.max(0, state.hero.magic);
@@ -422,8 +422,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
         let targetLightRadius = 20, minLightRadius = 20;
-        if (hero.area.dark) {
-            const coefficient = Math.max(1, 80 / hero.area.dark);
+        if (state.areaSection.dark) {
+            const coefficient = Math.max(1, 80 / state.areaSection.dark);
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
