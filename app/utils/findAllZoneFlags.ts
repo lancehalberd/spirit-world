@@ -4,11 +4,19 @@ import {getObjectSavePositionTreatment, getObjectSaveTreatment} from 'app/utils/
 export function findAllZoneFlags(zone: Zone): string[] {
     const flags: string[] = [];
     everyObjectInZone(zone, (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => {
+        if (!objectDefinition.id) {
+            return;
+        }
         if (getObjectSavePositionTreatment(objectDefinition) === 'forever') {
             flags.push(objectDefinition.id + '-position');
         }
         if (objectDefinition.type === 'door' && objectDefinition.frozenLogic) {
             flags.push(objectDefinition.id + '-melted');
+        }
+        // These objects all save their state automatically when it changes and ignore save treatment.
+        if (['keyBlock', 'beadGrate', 'beadCascade'].includes(objectDefinition.type)) {
+            flags.push(objectDefinition.id);
+            return;
         }
         if (objectDefinition.type === 'loot'
             || objectDefinition.type === 'bigChest'

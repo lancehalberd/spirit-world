@@ -154,10 +154,9 @@ export class KeyBlock implements ObjectInstance {
                 }
             }
             if (this.animationTime === blockedDuration) {
-
                 if (this.definition.targetObjectId) {
                     const target = findObjectInstanceById(this.area, this.definition.targetObjectId, false);
-                    activateTarget(state, target);
+                    activateTarget(state, target, true);
                 }
                 this.area.needsLogicRefresh = true;
             }
