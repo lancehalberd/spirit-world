@@ -1034,6 +1034,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 ...getLogicProperties(state, 'Is Frozen?', object.frozenLogic, updatedLogic => {
                     object.frozenLogic = updatedLogic;
                     updateObjectInstance(state, object);
+                    editingState.needsRefresh = true;
                 }),
             ];
             rows = [
