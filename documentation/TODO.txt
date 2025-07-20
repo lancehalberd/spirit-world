@@ -145,8 +145,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Fix secret chime not playing when opening drains in Waterfall Tower.
-
     - Fix "Is Frozen" door logic doesn't support custom logic.
 
     - Add Vanara Dreamland
