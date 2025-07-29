@@ -16,163 +16,104 @@ const baseAmmo = 10;
 
 
 const levelConfigs: {[key in LevelKey]: LevelConfig} = {
-    'none': { timeLimit: 0, goal: 0, spawnInterval: 0, targetValue: 0 },
+    'none': { timeLimit: 0, goal: 0, spawnInterval: 0 },
     'l1': { 
         timeLimit: 30000, 
-        goal: 100, 
-        spawnInterval: 2000, 
-        targetValue: 1000,
+        goal: 150, 
+        spawnInterval: 1000,
         targetTypes: [
-            { size: 18, points: 1000, weight: 1 }
+            { points: 30, radius: 18, speed: 3, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
         ]
     },
     'l2': { 
         timeLimit: 30000, 
         goal: 150, 
-        spawnInterval: 1800, 
-        targetValue: 15, 
-        targetSpeed: 2,
+        spawnInterval: 1000, 
         targetTypes: [
-            { size: 18, points: 10, weight: 3 },
-            { size: 15, points: 15, weight: 1 }
+            { points: 30, alternatePoints: 5, radius: 15, speed: 3.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
+            { points: 20, radius: 14, speed: 3.5, lifetime: 6000, color: '#029', weight: 3, type: 'standard' },
         ]
     },
     'l3': { 
         timeLimit: 25000, 
         goal: 200, 
-        spawnInterval: 1500, 
-        targetValue: 20, 
-        targetSpeed: 3, 
-        ammoTargetChance: 0.1, 
-        timeTargetChance: 0.1, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
+        spawnInterval: 1000, 
         targetTypes: [
-            { size: 18, points: 10, weight: 2 },
-            { size: 15, points: 20, weight: 2 },
-            { size: 12, points: 30, weight: 1 }
+            { points: 25, radius: 10, speed: 7, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
+            { points: 50, radius: 15, speed: 3.75, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 2 },
         ]
     },
     'l4': { 
         timeLimit: 25000, 
-        goal: 250, 
-        spawnInterval: 1200, 
-        targetValue: 25, 
-        targetSpeed: 4, 
-        ammoTargetChance: 0.1, 
-        timeTargetChance: 0.1, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
+        goal: 150, 
+        spawnInterval: 1000, 
         targetTypes: [
-            { size: 18, points: 15, weight: 2 },
-            { size: 15, points: 25, weight: 2 },
-            { size: 12, points: 35, weight: 1 },
-            { size: 10, points: 50, weight: 0.5 }
+            { points: 10, radius: 14, speed: 4, lifetime: 6000, color: '#0C0', weight: 4, type: 'standard' },
+            { points: 0, radius: 12, speed: 2.5, lifetime: 6000, color: '#00F', weight: 2, type: 'ammo', bonusAmount: 4 },
+            { points: 0, radius: 12, speed: 2.5, lifetime: 6000, color: '#F0F', weight: 2, type: 'time', bonusAmount: 4000 }
         ]
     },
     'l5': { 
-        timeLimit: 20000, 
-        goal: 300, 
+        timeLimit: 28000, 
+        goal: 210, 
         spawnInterval: 1000, 
-        targetValue: 30, 
-        targetSpeed: 5, 
-        ammoTargetChance: 0.1, 
-        timeTargetChance: 0.1, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
         targetTypes: [
-            { size: 16, points: 20, weight: 2 },
-            { size: 13, points: 30, weight: 2 },
-            { size: 10, points: 50, weight: 1 },
-            { size: 8, points: 75, weight: 0.5 }
+            { points: 40, alternatePoints: -40, radius: 8, speed: 2.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 800},
+            { points: 25, radius: 12, speed: 2.9, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
+            { points: 90, radius: 10, speed: 2.75, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 3 },
         ]
     },
     'l6': { 
         timeLimit: 20000, 
-        goal: 400, 
+        goal: 300, 
         spawnInterval: 800, 
-        targetValue: 35, 
-        targetSpeed: 6, 
-        ammoTargetChance: 0.1, 
-        timeTargetChance: 0.1, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
         targetTypes: [
-            { size: 15, points: 25, weight: 2 },
-            { size: 12, points: 35, weight: 2 },
-            { size: 9, points: 60, weight: 1 },
-            { size: 7, points: 100, weight: 0.3 }
+           { points: 50, alternatePoints: -50, radius: 9, speed: 3.15, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 800},
+           { points: 0, radius: 11, speed: 3, lifetime: 6000, color: '#00F', weight: 3, type: 'ammo', bonusAmount: 3 },
+           { points: 0, radius: 11, speed: 3, lifetime: 6000, color: '#F0F', weight: 3, type: 'time', bonusAmount: 4000 }
         ]
     },
     'l7': { 
-        timeLimit: 15000, 
-        goal: 500, 
-        spawnInterval: 600, 
-        targetValue: 40, 
-        targetSpeed: 7, 
-        ammoTargetChance: 0.1, 
-        timeTargetChance: 0.1, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
+        timeLimit: 35000, 
+        goal: 250, 
+        spawnInterval: 500, 
         targetTypes: [
-            { size: 14, points: 30, weight: 2 },
-            { size: 11, points: 40, weight: 2 },
-            { size: 8, points: 75, weight: 1 },
-            { size: 6, points: 125, weight: 0.3 }
+           { points: 25, radius: 8, speed: 6, lifetime: 6000, color: '#0C0', weight: 6, type: 'standard' },
+           { points: 0, radius: 8, speed: 2.3, lifetime: 10000, color: '#F80', weight: 3, type: 'explosive', explosionRadius: 80 },
         ]
     },
     'l8': { 
-        timeLimit: 15000, 
-        goal: 600, 
+        timeLimit: 50000, 
+        goal: 250, 
         spawnInterval: 500, 
-        targetValue: 45, 
-        targetSpeed: 8, 
-        ammoTargetChance: 0.1, 
-        timeTargetChance: 0.1, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
         targetTypes: [
-            { size: 13, points: 35, weight: 2 },
-            { size: 10, points: 45, weight: 2 },
-            { size: 7, points: 85, weight: 1 },
-            { size: 5, points: 150, weight: 0.2 }
+            { points: 25, radius: 6, speed: 2.75, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
+            { points: 25, radius: 12, speed: 4, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
+            { points: 50, alternatePoints: -50, radius: 10, speed: 3, lifetime: 7000, weight: 2, type: 'alternating', switchInterval: 800}
         ]
     },
     'l9': { 
-        timeLimit: 10000, 
-        goal: 800, 
-        spawnInterval: 400, 
-        targetValue: 50, 
-        targetSpeed: 9, 
-        ammoTargetChance: 0.15, 
-        timeTargetChance: 0.25, 
-        ammoBonus: 3, 
-        timeBonus: 3000,
+        timeLimit: 30000, 
+        goal: 250, 
+        spawnInterval: 600, 
         targetTypes: [
-            { size: 12, points: 40, weight: 2 },
-            { size: 9, points: 50, weight: 2 },
-            { size: 6, points: 100, weight: 1 },
-            { size: 4, points: 200, weight: 0.2 }
+           { points: 25, radius: 10, speed: 3, lifetime: 6000, color: '#0C0', weight: 4, type: 'standard' },
+           { points: 0, radius: 9, speed: 3, lifetime: 6000, color: '#00F', weight: 2, type: 'ammo', bonusAmount: 4 },
+           { points: 0, radius: 9, speed: 3, lifetime: 6000, color: '#F0F', weight: 2, type: 'time', bonusAmount: 5000 }
         ]
     },
     'l10': { 
         timeLimit: 25000, 
-        goal: 0, 
-        spawnInterval: 300, 
-        targetValue: 10, 
-        targetSpeed: 5, 
-        ammoTargetChance: 0.3, 
-        timeTargetChance: 0.3, 
-        ammoBonus: 4, 
-        timeBonus: 4000,
+        goal: 250, 
+        spawnInterval: 500, 
         targetTypes: [
-            { size: 15, points: 25, weight: 2 },
-            { size: 12, points: 35, weight: 2 },
-            { size: 9, points: 60, weight: 1 },
-            { size: 6, points: 100, weight: 0.5 },
-            { size: 4, points: 200, weight: 0.2 }
-        ]
-    },
+            { points: 25, radius: 20, speed: 2, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
+            { points: 50, alternatePoints: -50, radius: 20, speed: 2.3, lifetime: 7000, weight: 3, type: 'alternating', switchInterval: 800},
+            { points: 20, radius: 20, speed: 2.5, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
+            { points: 0, radius: 20, speed: 2, lifetime: 6000, color: '#00F', weight: 2, type: 'ammo', bonusAmount: 4 },
+            { points: 0, radius: 20, speed: 2, lifetime: 6000, color: '#F0F', weight: 2, type: 'time', bonusAmount: 5000 }
+        ], escalation: true,
+    }, 
 };
 
 
@@ -181,7 +122,7 @@ interface TargetPracticeState {
     scene: Scene
     screen: Rect
     bullets: PracticeBullet[]
-    targets: PracticeTarget[]
+    targets: Target[]
     crosshair: {x: number, y: number}
     reloadTime: number
     levelKey: LevelKey
@@ -196,7 +137,10 @@ interface TargetPracticeState {
     activeShopItem?: ShopItem
     lastShotTime: number
     missedShots: number
+    shotsFired: number
+    shotsHit: number
     nextSpawnTime: number 
+    levelTime: number 
 }
 
 interface ShopItem {
@@ -228,8 +172,7 @@ interface PracticeBullet {
     render(context: CanvasRenderingContext2D): void
 }
 
-interface PracticeTarget {
-    targetType: 'points' | 'ammo' | 'time';
+interface Target {
     x: number
     y: number
     w: number
@@ -240,36 +183,41 @@ interface PracticeTarget {
     vy: number
     color: string
     lifetime: number;
+    radius: number;
     hitTime?: number
     update(state: GameState, gameState: TargetPracticeState): void
     render(context: CanvasRenderingContext2D): void
     getHitbox(): Rect
+    onHit?(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState): void
 }
 
 interface TargetDefinition {
-    size: number;
+    radius: number;
     points: number;
     weight: number;  
+    speed: number;
+    lifetime: number;
+    color?: string;
+    type: 'standard' | 'circling' | 'armored' | 'alternating' | 'explosive' | 'ammo' | 'time';
+    maxHits?: number;
+    alternatePoints?: number;
+    altColor?: string;
+    switchInterval?: number;
+    explosionRadius?: number;
+    bonusAmount?: number;
 }
+
 
 interface LevelConfig {
     timeLimit: number;
     goal: number;
     spawnInterval: number;
-    targetValue: number; 
-    targetSpeed?: number;
-    targetSize?: number; 
     maxTargets?: number;
-    baseAmmo?: number;
-    ammoTargetChance?: number;
-    timeTargetChance?: number;
-    ammoBonus?: number;
-    timeBonus?: number;
     targetTypes?: TargetDefinition[];
+    escalation?: boolean;
 }
 
-class CircleTarget implements PracticeTarget {
-    targetType: 'points' | 'ammo' | 'time';
+class StandardTarget implements Target {
     x: number;
     y: number;
     w: number;
@@ -281,30 +229,27 @@ class CircleTarget implements PracticeTarget {
     color: string;
     hitTime?: number;
     radius: number;
-    lifetime: number;
-    maxLifetime: number;
-    
+    lifetime: number; 
+    maxLifetime: number; 
+    maxHits: number; 
+    currentHits: number; 
+    altColor: string;
 
-    constructor(x: number, y: number, radius: number, points: number, speed: number = 0, lifetime: number = 3000, targetType: 'points' | 'ammo' | 'time' = 'points') {
+    constructor(x: number, y: number, radius: number, points: number, speed: number = 0, lifetime: number = 10000, customColor?: string, maxHits: number = 1) {
         this.x = x;
         this.y = y;
-        this.targetType = targetType;
         this.radius = radius;
         this.w = radius * 2;
         this.h = radius * 2;
         this.points = points;
         this.speed = speed;
-        this.vx = speed > 0 ? (Math.random() - 0.5) * speed : 0;
-        this.vy = speed > 0 ? (Math.random() - 0.5) * speed : 0;
-        if (targetType === 'ammo') {
-            this.color = '#00F'; 
-        } else if (targetType === 'time') {
-            this.color = '#0FF'; 
-        } else {
-            this.color = points >= 50 ? '#F00' : points >= 30 ? '#FA0' : points >= 20 ? '#FF0' : '#0F0';
-        }
+        this.vx = speed > 0 ? (Math.random() - 0.5) * 0.5 * speed + (0.5 * speed) : 0;
+        this.vy = speed > 0 ? (Math.random() - 0.5) * 0.5 * speed + (0.5 * speed): 0;
+        this.color = customColor || (points >= 50 ? '#F00' : points >= 30 ? '#FA0' : points >= 20 ? '#FF0' : '#0C0');
         this.lifetime = lifetime;
         this.maxLifetime = lifetime;
+        this.maxHits = maxHits; 
+        this.currentHits = 0; 
     }
 
     update(state: GameState, gameState: TargetPracticeState) {
@@ -318,44 +263,52 @@ class CircleTarget implements PracticeTarget {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Bounce off
+        
+        const maxY = gameState.screen.y + gameState.screen.h;
+
+
         if (this.x - this.radius <= gameState.screen.x || this.x + this.radius >= gameState.screen.x + gameState.screen.w) {
             this.vx = -this.vx;
             this.x = Math.max(gameState.screen.x + this.radius, Math.min(gameState.screen.x + gameState.screen.w - this.radius, this.x));
         }
-        if (this.y - this.radius <= gameState.screen.y || this.y + this.radius >= gameState.screen.y + gameState.screen.h) {
+        if (this.y - this.radius <= gameState.screen.y || this.y + this.radius >= maxY) {
             this.vy = -this.vy;
             this.y = Math.max(gameState.screen.y + this.radius, Math.min(gameState.screen.y + gameState.screen.h - this.radius, this.y));
         }
     }
 
     render(context: CanvasRenderingContext2D) {
+        let fillColor = this.color;
+        let alpha = 1;
+
         if (this.hitTime !== undefined && this.hitTime > 0) {
-            // Blink when hit
-            context.fillStyle = Math.floor(this.hitTime / 50) % 2 ? '#FFF' : this.color;
-        } else {
-            const alpha = this.lifetime / this.maxLifetime;
-            const r = parseInt(this.color.substring(1, 2), 16) * 17;
-            const g = parseInt(this.color.substring(2, 3), 16) * 17;
-            const b = parseInt(this.color.substring(3, 4), 16) * 17;
-            context.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            fillColor = Math.floor(this.hitTime / 50) % 2 ? '#FFF' : this.color;
+        } else if (this.lifetime < 2000) {
+            alpha = this.lifetime / 2000;
+            alpha = Math.max(0.05, alpha); 
         }
         
+        context.save();
+        context.globalAlpha = alpha;
+        context.fillStyle = fillColor;
         context.beginPath();
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         context.fill();
 
-        let displayText = '';
-        if (this.targetType === 'ammo') {
-            displayText = '+A';
-        } else if (this.targetType === 'time') {
-            displayText = '+T'; 
-        } else {
-            displayText = this.points.toString();
+        if (this.maxHits > 1) {
+            const remainingHits = this.maxHits - this.currentHits - 1;
+            context.strokeStyle = '#FFF';
+            context.lineWidth = 1;
+            for (let i = 1; i <= remainingHits; i++) {
+                context.beginPath();
+                context.arc(this.x, this.y, this.radius - (i * 2), 0, 2 * Math.PI);
+                context.stroke();
+            }
         }
-
-
-        drawARFont(context, displayText, this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
+        
+        context.fillStyle = '#000';
+        drawARFont(context, this.points.toString(), this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
+        context.restore();
     }
 
     getHitbox(): Rect {
@@ -366,6 +319,260 @@ class CircleTarget implements PracticeTarget {
             h: this.radius * 2,
         };
     }
+
+    shouldRemove(): boolean {
+        return this.lifetime <= 0;
+    }
+
+    onHit(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState): void {
+        if (this.hitTime !== undefined) return;
+
+        this.currentHits++;
+        gameState.shotsHit++;
+
+        if (this.currentHits >= this.maxHits) {
+            gameState.score = Math.max(gameState.score + this.points, 0);
+            this.hitTime = 300;
+        }
+        
+        playAreaSound(state, state.areaInstance, 'hitShot');
+    }
+}
+
+class CirclingTarget extends StandardTarget {
+    centerX: number;
+    centerY: number;
+    orbitRadius: number;
+    angle: number;
+    angularSpeed: number;
+
+    constructor(x: number, y: number, radius: number, points: number, speed: number, lifetime: number) {
+        super(x, y, radius, points, 0, lifetime);
+        this.centerX = x;
+        this.centerY = y;
+        this.orbitRadius = 20 + Math.random() * 30; 
+        this.angle = Math.random() * Math.PI * 2; 
+        this.angularSpeed = (speed * 0.01) * (Math.random() > 0.5 ? 1 : -1); 
+        this.color = '#0FF'; 
+    }
+
+    update(state: GameState, gameState: TargetPracticeState) {
+        if (this.hitTime !== undefined) {
+            this.hitTime -= FRAME_LENGTH;
+            return;
+        }
+
+        this.lifetime -= FRAME_LENGTH;
+        
+        this.angle += this.angularSpeed;
+        
+        this.x = this.centerX + Math.cos(this.angle) * this.orbitRadius;
+        this.y = this.centerY + Math.sin(this.angle) * this.orbitRadius;
+        
+        if (this.centerX - this.orbitRadius <= gameState.screen.x || 
+            this.centerX + this.orbitRadius >= gameState.screen.x + gameState.screen.w) {
+            this.centerX = Math.max(gameState.screen.x + this.orbitRadius, 
+                                  Math.min(gameState.screen.x + gameState.screen.w - this.orbitRadius, this.centerX));
+        }
+        if (this.centerY - this.orbitRadius <= gameState.screen.y || 
+            this.centerY + this.orbitRadius >= gameState.screen.y + gameState.screen.h) {
+            this.centerY = Math.max(gameState.screen.y + this.orbitRadius, 
+                                  Math.min(gameState.screen.y + gameState.screen.h - this.orbitRadius, this.centerY));
+        }
+    }
+}
+
+
+class AlternatingTarget extends StandardTarget {
+    alternatePoints: number;
+    switchInterval: number;
+    currentPoints: number;
+    switchTimer: number;
+    isAlternate: boolean;
+
+    constructor(x: number, y: number, radius: number, points: number, alternatePoints: number, speed: number, lifetime: number, switchInterval: number = 2000, customColor: string = '#FF69B4', altColor: string = '#00FF00') {
+        super(x, y, radius, points, speed, lifetime);
+        this.alternatePoints = alternatePoints;
+        this.switchInterval = switchInterval;
+        this.currentPoints = points;
+        this.switchTimer = switchInterval;
+        this.isAlternate = false;
+        this.color = customColor;
+        this.altColor = altColor;
+    }
+
+    update(state: GameState, gameState: TargetPracticeState) {
+        super.update(state, gameState);
+        
+        if (this.hitTime !== undefined) return;
+
+        this.switchTimer -= FRAME_LENGTH;
+        if (this.switchTimer <= 0) {
+            this.isAlternate = !this.isAlternate;
+            this.currentPoints = this.isAlternate ? this.alternatePoints : this.points;
+            this.switchTimer = this.switchInterval;
+        }
+    }
+
+    render(context: CanvasRenderingContext2D) {
+        let fillColor = this.color;
+        let alpha = 1;
+
+        if (this.hitTime !== undefined && this.hitTime > 0) {
+            fillColor = Math.floor(this.hitTime / 50) % 2 ? '#CCC' : this.color;
+        } else if (this.lifetime < 2000) {
+            alpha = this.lifetime / 2000;
+            alpha = Math.max(0.05, alpha);
+        }
+        
+        // Pulse effect when alternating
+        if (this.switchTimer < 200) {
+            alpha *= 0.5 + 0.5 * Math.sin(this.switchTimer * Math.PI / 100);
+        }
+        
+        context.save();
+        context.globalAlpha = alpha;
+        
+        if (this.isAlternate) {
+            context.fillStyle = self.altColor;
+        } else {
+            context.fillStyle = fillColor;
+        }
+        
+        context.beginPath();
+        context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        context.fill();
+        
+        context.fillStyle = '#000';
+        const pointsText = this.currentPoints >= 0 ? this.currentPoints.toString() : `-${Math.abs(this.currentPoints)}`;
+        drawARFont(context, pointsText, this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
+        context.restore();
+    }
+
+
+    onHit(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState): void {
+        if (this.hitTime !== undefined) return;
+        gameState.score = Math.max(gameState.score + this.currentPoints, 0);
+        gameState.shotsHit++;
+        this.hitTime = 300;
+        
+        playAreaSound(state, state.areaInstance, 'hitShot');
+    }
+}
+
+class BonusTarget extends StandardTarget {
+    bonusType: 'ammo' | 'time';
+    bonusAmount: number;
+
+    constructor(x: number, y: number, radius: number, speed: number, lifetime: number, bonusType: 'ammo' | 'time', bonusAmount: number) {
+        super(x, y, radius, 0, speed, lifetime); 
+        this.bonusType = bonusType;
+        this.bonusAmount = bonusAmount;
+        this.color = bonusType === 'ammo' ? '#00F' : '#F0F'; 
+    }
+
+    render(context: CanvasRenderingContext2D) {
+        let fillColor = this.color;
+        let alpha = 1;
+
+        if (this.hitTime !== undefined && this.hitTime > 0) {
+            fillColor = Math.floor(this.hitTime / 50) % 2 ? '#FFF' : this.color;
+        } else if (this.lifetime < 2000) {
+            alpha = this.lifetime / 2000;
+            alpha = Math.max(0.05, alpha); 
+        }
+        
+        context.save();
+        context.globalAlpha = alpha;
+        context.fillStyle = fillColor;
+        context.beginPath();
+        context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        context.fill();
+        
+        context.fillStyle = '#FFF';
+        const symbol = this.bonusType === 'ammo' ? 'A' : 'T';
+        drawARFont(context, symbol, this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
+        context.restore();
+    }
+
+    onHit(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState): void {
+        if (this.hitTime !== undefined) return;
+        if (this.bonusType == 'ammo') {
+            gameState.ammo = Math.min(gameState.maxAmmo, gameState.ammo + this.bonusAmount);
+        } else if (this.bonusType == 'time') {
+            gameState.timeLeft = Math.min(this.bonusAmount + gameState.timeLeft, gameState.maxTime);
+        }
+        gameState.shotsHit++;
+        this.hitTime = 300;
+        
+        playAreaSound(state, state.areaInstance, 'hitShot');
+    }
+} 
+
+class ExplosiveTarget extends StandardTarget {
+    explosionRadius: number;
+
+    constructor(x: number, y: number, radius: number, points: number, speed: number, lifetime: number, explosionRadius: number = 30) {
+        super(x, y, radius, points, speed, lifetime);
+        this.explosionRadius = explosionRadius;
+        this.color = '#F80';
+    }
+
+    render(context: CanvasRenderingContext2D) {
+        let fillColor = this.color;
+        let alpha = 1;
+
+        if (this.hitTime !== undefined && this.hitTime > 0) {
+            fillColor = Math.floor(this.hitTime / 50) % 2 ? '#A04' : this.color;
+        } else if (this.lifetime < 2000) {
+            alpha = this.lifetime / 2000;
+            alpha = Math.max(0.05, alpha); 
+        }
+        
+        context.save();
+        context.globalAlpha = alpha;
+        context.fillStyle = fillColor;
+        context.beginPath();
+        context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        context.fill();
+        
+        context.fillStyle = '#000';
+        drawARFont(context, 'X', this.x, this.y, {textAlign: 'center', textBaseline: 'middle'});
+        context.restore();
+    }
+
+    onHit(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState): void {
+        if (this.hitTime !== undefined) return;
+        const explosionPoints = handleExplosion(gameState, savedState, this);
+        gameState.score += explosionPoints;
+        playAreaSound(state, state.areaInstance, 'bossDeath');
+        gameState.shotsHit++;
+        this.hitTime = 300;
+    }
+}
+
+
+function handleExplosion(gameState: TargetPracticeState, savedState: TargetPracticeSavedState, explosiveTarget: ExplosiveTarget): number {
+    let bonusPoints = 0;
+    const targetsToRemove: number[] = [];
+    
+    for (let i = 0; i < gameState.targets.length; i++) {
+        const target = gameState.targets[i];
+        if (target === explosiveTarget || target.hitTime !== undefined) continue;
+        
+        const dx = target.x - explosiveTarget.x;
+        const dy = target.y - explosiveTarget.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance <= explosiveTarget.explosionRadius) {
+            const points = target.points * (1 + (savedState.unlocks.points ?? 0));
+            bonusPoints += points;
+            target.hitTime = 300; 
+            targetsToRemove.push(i);
+        }
+    }
+    
+    return bonusPoints;
 }
 
 
@@ -393,6 +600,9 @@ function getNewTargetPracticeState(state: GameState): TargetPracticeState {
         lastShotTime: 0,
         missedShots: 0,
         nextSpawnTime: 0, 
+        shotsFired: 0,
+        shotsHit: 0,
+        levelTime: 0,
     };
 }
 
@@ -421,21 +631,6 @@ const shopItems: ShopItem[] = [
     {key: 'l8', levelKey: 'l8', x: 0, y: 7, costs: [3200], unlocks: [], label: 'Level 8', description: 'Legend'},
     {key: 'l9', levelKey: 'l9', x: 0, y: 8, costs: [6400], unlocks: [], label: 'Level 9', description: 'Desperado'},
     {key: 'l10', levelKey: 'l10', x: 1, y: 8, costs: [1], unlocks: [], label: 'Endless', description: 'Last as long as possible'},
-    {
-        key: 'ammo', x: 1, y: 0, costs: [50, 100, 200, 400, 800],
-        label: 'Ammo',
-        description: 'More shots per round',
-    },
-    {
-        key: 'points', x: 1, y: 4, costs: [200, 400, 800, 1600, 3200],
-        label: 'Greed',
-        description: 'Score multiplier',
-    },
-    {
-        key: 'time', x: 1, y: 2, costs: [800, 1600, 3200],
-        label: 'Time',
-        description: 'More time per level',
-    },
     {
         key: 'reset', x: 2, y: 7,
         label: 'Reset',
@@ -491,7 +686,7 @@ function updateShopItems(state: GameState, gameState: TargetPracticeState, saved
 
 
 function updateShop(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
-    gameState.maxAmmo = baseAmmo + (savedState.unlocks.ammo ?? 0) * 5;
+    gameState.maxAmmo = baseAmmo;
     gameState.ammo = gameState.maxAmmo;
     
     const heroPos = getHeroPosition(state, gameState);
@@ -512,7 +707,7 @@ function updateShop(state: GameState, gameState: TargetPracticeState, savedState
                 savedState.points -= cost;
                 savedState.unlocks[activeItem.key] = level + 1;
                 saveGame(state);
-                playAreaSound(state, state.areaInstance, 'secretChime');
+                playAreaSound(state, state.areaInstance, 'hitShot');
             } else {
                 playAreaSound(state, state.areaInstance, 'error');
             }
@@ -542,65 +737,71 @@ function renderShop(context: CanvasRenderingContext2D, state: GameState, gameSta
     }
 }
 
-function selectTargetType(targetTypes: TargetDefinition[]): TargetDefinition {
-    const totalWeight = targetTypes.reduce((sum, type) => sum + type.weight, 0);
-    let random = Math.random() * totalWeight;
+function spawnGenericTargets(state: GameState, gameState: TargetPracticeState, config: LevelConfig) {
+    const { speedMultiplier, sizeMultiplier } = getEscalationMultiplier(gameState);
     
-    for (const targetType of targetTypes) {
+    const totalWeight = config.targetTypes.reduce((sum, type) => sum + type.weight, 0);
+    let random = Math.random() * totalWeight;
+    let selectedType = config.targetTypes[0];
+    
+    
+    for (const targetType of config.targetTypes) {
         random -= targetType.weight;
         if (random <= 0) {
-            return targetType;
+            selectedType = targetType;
+            break;
         }
     }
-
-    return targetTypes[0];
-}
-
-
-
-function spawnTargets(state: GameState, gameState: TargetPracticeState, levelKey: LevelKey) {
-    const config = levelConfigs[levelKey];
-    const difficulty = parseInt(levelKey.substring(1), 10);
     
-    let targetType: 'points' | 'ammo' | 'time' = 'points';
-    const rand = Math.random();
-    const ammoChance = config.ammoTargetChance ?? 0;
-    const timeChance = config.timeTargetChance ?? 0;
-    
-    if (rand < ammoChance) {
-        targetType = 'ammo';
-    } else if (rand < ammoChance + timeChance) {
-        targetType = 'time';
-    }
-    
-    let radius: number;
-    let points: number;
-    
-    if (targetType === 'points' && config.targetTypes && config.targetTypes.length > 0) {
-        const selectedType = selectTargetType(config.targetTypes);
-        radius = selectedType.size;
-        points = selectedType.points;
-    } else {
-        radius = config.targetSize ?? Math.max(8, 20 - difficulty * 1.8);
-        points = config.targetValue;
-    }
-    
-    const speed = config.targetSpeed ?? (difficulty > 2 ? Math.max(3, difficulty - 1) : 0);
-    const lifetime = Math.max(500, 4000 - difficulty * 300);
+    const adjustedRadius = Math.max(1, selectedType.radius * sizeMultiplier);
+    const adjustedSpeed = selectedType.speed * speedMultiplier;
     
     let x = 0;
     let y = 0;
-    let attempts = 0;
+    const spawnHeight = gameState.screen.h * 0.8;
     
+    let attempts = 0;
     do {
-        x = gameState.screen.x + radius + Math.random() * (gameState.screen.w - 2 * radius);
-        y = gameState.screen.y + radius + Math.random() * (gameState.screen.h - 2 * radius);
+        x = gameState.screen.x + selectedType.radius + Math.random() * (gameState.screen.w - 2 * selectedType.radius);
+        y = gameState.screen.y + selectedType.radius + Math.random() * (spawnHeight - 2 * selectedType.radius);
         attempts++;
-    } while (attempts < 10 && gameState.targets.some(t => 
-        Math.sqrt((t.x - x) ** 2 + (t.y - y) ** 2) < radius + 15
+    } while (attempts < 20 && gameState.targets.some(t => 
+        Math.sqrt((t.x - x) ** 2 + (t.y - y) ** 2) < selectedType.radius + (t as StandardTarget).radius + 5
     ));
+    
+    let newTarget: Target;
+    switch (selectedType.type) {
+        case 'circling':
+            newTarget = new CirclingTarget(x, y, adjustedRadius, selectedType.points, adjustedSpeed, selectedType.lifetime);
+            break;
+        case 'explosive':
+            newTarget = new ExplosiveTarget(x, y, adjustedRadius, selectedType.points, adjustedSpeed, selectedType.lifetime, selectedType.explosionRadius || 30);
+            break;
+        case 'alternating':
+            newTarget = new AlternatingTarget(
+                x, y, adjustedRadius, selectedType.points, selectedType.alternatePoints || selectedType.points * 2, adjustedSpeed, selectedType.lifetime,selectedType.switchInterval || 2000 
+            );
+            break;
+        case 'armored':
+            newTarget = new StandardTarget(x, y, adjustedRadius, selectedType.points, adjustedSpeed, selectedType.lifetime, selectedType.color, selectedType.maxHits || 3);
+            break;
+        case 'ammo':
+            newTarget = new BonusTarget(x, y, adjustedRadius, adjustedSpeed, selectedType.lifetime, 'ammo', selectedType.bonusAmount || 3);
+            break;
+        case 'time':
+            newTarget = new BonusTarget(x, y, adjustedRadius, adjustedSpeed, selectedType.lifetime, 'time', selectedType.bonusAmount || 5000);
+            break;
+        case 'standard':
+        default:
+            newTarget = new StandardTarget(x, y, adjustedRadius, selectedType.points, adjustedSpeed, selectedType.lifetime);
+            break;
+    }
+    
+    gameState.targets.push(newTarget);
+}
 
-    gameState.targets.push(new CircleTarget(x, y, radius, points, speed, lifetime, targetType));
+function spawnTargets(state: GameState, gameState: TargetPracticeState, levelKey: LevelKey) {
+    return spawnGenericTargets(state, gameState, levelConfigs[levelKey]);
 }
 
 
@@ -615,8 +816,8 @@ function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: 
     gameState.timeLeft = gameState.maxTime;
     gameState.goal = config.goal;
 
-    const levelBaseAmmo = config.baseAmmo ?? baseAmmo;
-    gameState.maxAmmo = levelBaseAmmo + (state.savedState.savedArData.gameData.targetPractice.unlocks.ammo ?? 0) * 5;
+    const levelBaseAmmo = baseAmmo;
+    gameState.maxAmmo = levelBaseAmmo;
     gameState.ammo = gameState.maxAmmo;
 
     gameState.bullets = [];
@@ -626,61 +827,90 @@ function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: 
     gameState.lastShotTime = 0;
     gameState.missedShots = 0;
     gameState.nextSpawnTime = 0;
+    gameState.levelTime = 0;
+    
+    gameState.shotsFired = 0,
+    gameState.shotsHit = 0,
     gameState.crosshair.x = gameState.screen.x + gameState.screen.w / 2;
     gameState.crosshair.y = gameState.screen.y + gameState.screen.h / 2;
 
     spawnTargets(state, gameState, levelKey);
 }
 
-
-
 function handleTargetCollisions(gameState: TargetPracticeState) {
     for (let i = 0; i < gameState.targets.length; i++) {
-        const target1 = gameState.targets[i] as CircleTarget;
+        const target1 = gameState.targets[i] as Target;
         if (target1.hitTime !== undefined) continue;
-        
+       
         for (let j = i + 1; j < gameState.targets.length; j++) {
-            const target2 = gameState.targets[j] as CircleTarget;
+            const target2 = gameState.targets[j] as Target;
             if (target2.hitTime !== undefined) continue;
-            
+           
             const dx = target2.x - target1.x;
             const dy = target2.y - target1.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             const minDistance = target1.radius + target2.radius;
-            
+           
             if (distance < minDistance && distance > 0) {
                 const nx = dx / distance;
                 const ny = dy / distance;
-                
+               
                 const overlap = minDistance - distance;
                 const separationX = (overlap * nx) / 2;
                 const separationY = (overlap * ny) / 2;
-                
+               
                 target1.x -= separationX;
                 target1.y -= separationY;
                 target2.x += separationX;
                 target2.y += separationY;
+
+                const speed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
+                const speed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
+                
+                const dot1 = target1.vx * nx + target1.vy * ny;
+                const dot2 = target2.vx * nx + target2.vy * ny;
+                
+                if (dot1 > 0 || dot2 < 0) {
+                    target1.vx -= 2 * dot1 * nx;
+                    target1.vy -= 2 * dot1 * ny;
+                    target2.vx -= 2 * dot2 * nx;
+                    target2.vy -= 2 * dot2 * ny;
                     
-                const relativeVx = target2.vx - target1.vx;
-                const relativeVy = target2.vy - target1.vy;
-                const velocityAlongNormal = relativeVx * nx + relativeVy * ny;
+                    const newSpeed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
+                    const newSpeed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
                     
-                if (velocityAlongNormal <= 0) {
-                    const impulse = velocityAlongNormal;
-                    target1.vx += impulse * nx;
-                    target1.vy += impulse * ny;
-                    target2.vx -= impulse * nx;
-                    target2.vy -= impulse * ny;
+                    if (newSpeed1 > 0) {
+                        target1.vx = (target1.vx / newSpeed1) * speed1;
+                        target1.vy = (target1.vy / newSpeed1) * speed1;
+                    }
+                    
+                    if (newSpeed2 > 0) {
+                        target2.vx = (target2.vx / newSpeed2) * speed2;
+                        target2.vy = (target2.vy / newSpeed2) * speed2;
+                    }
                 }
             }
         }
     }
 }
 
-
+function getEscalationMultiplier(gameState: TargetPracticeState): { speedMultiplier: number, sizeMultiplier: number } {
+    const config = levelConfigs[gameState.levelKey];
+    if (!config.escalation) {
+        return { speedMultiplier: 1, sizeMultiplier: 1 };
+    }
+    
+    let progressRatio = gameState.levelTime / 40000;
+    const speedMultiplier = Math.min(1 + progressRatio * 1.0, 5);
+    const sizeMultiplier = Math.max(1 - progressRatio * 0.4, 0.3);
+    
+    return { speedMultiplier, sizeMultiplier };
+}
 
 
 function updateLevel(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
+    gameState.levelTime += FRAME_LENGTH;
+
     const difficulty = parseInt(gameState.levelKey.substring(1), 10);
     const config = levelConfigs[gameState.levelKey];
     const isEndless = gameState.levelKey === 'l10';
@@ -694,6 +924,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
             playAreaSound(state, state.areaInstance, 'error');
         } else {
             gameState.ammo--;
+            gameState.shotsFired++;
             
             let hitTarget = false;
             for (let j = 0; j < gameState.targets.length; j++) {
@@ -703,30 +934,10 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
                 const dx = gameState.crosshair.x - target.x;
                 const dy = gameState.crosshair.y - target.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                
-                if (dist <= (target as CircleTarget).radius) {
-                    if (target.targetType === 'points') {
-                        const points = target.points * (1 + (savedState.unlocks.points ?? 0));
-                        gameState.score += points;
-                    } else if (target.targetType === 'ammo') {
-                        const ammoBonus = config.ammoBonus ?? 3;
-                        gameState.ammo += ammoBonus;
-                    } else if (target.targetType === 'time') {
-                        const timeBonus = config.timeBonus ?? 3000;
-                        gameState.timeLeft = Math.min(gameState.maxTime, gameState.timeLeft + timeBonus);
-                    }
-                    target.hitTime = 300;
+
+                if (dist <= target.radius) {
                     hitTarget = true;
-                    
-                    playAreaSound(state, state.areaInstance, 'hitShot');
-                    
-                    setTimeout(() => {
-                        const index = gameState.targets.indexOf(target);
-                        if (index >= 0) {
-                            gameState.targets.splice(index, 1);
-                        }
-                    }, 300);
-                    break;
+                    target.onHit(state, gameState, savedState);
                 }
             }
         
@@ -736,16 +947,20 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
             }
         }
     }
+    
     for (let i = 0; i < gameState.targets.length; i++) {
-        const target = gameState.targets[i];
+        const target = gameState.targets[i] as StandardTarget;
         target.update(state, gameState);
+    }
+    
+    handleTargetCollisions(gameState);
 
-        if (target.lifetime <= 0 && target.hitTime === undefined) {
+    for (let i = 0; i < gameState.targets.length; i++) {
+        const target = gameState.targets[i] as StandardTarget;
+        if (target.shouldRemove() || (target.hitTime !== undefined && target.hitTime <= 0)) {
             gameState.targets.splice(i--, 1);
         }
     }
-
-    handleTargetCollisions(gameState);
     
     if (gameState.nextSpawnTime > 0) {
         gameState.nextSpawnTime -= FRAME_LENGTH;
@@ -818,6 +1033,7 @@ function renderTargetPractice(context: CanvasRenderingContext2D, state: GameStat
     context.save();
     context.beginPath();
     context.rect(gameState.screen.x, gameState.screen.y, gameState.screen.w, gameState.screen.h);
+    context.clip()
     context.save();
     context.globalAlpha = 0.5;
     context.fillStyle = 'black';
@@ -914,7 +1130,10 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
     
     drawARFont(context, 'MISSED: ' + gameState.missedShots, centerX, y + 40, {textAlign: 'center', textBaseline: 'top'});
     drawARFont(context, multiplierText, centerX, y + 48, {textAlign: 'center', textBaseline: 'top'});
-    
+
+    const accuracy = gameState.shotsFired > 0 ? Math.round(((gameState.shotsFired - gameState.missedShots) / gameState.shotsFired) * 100) : 100;
+    drawARFont(context, `ACCURACY: ${accuracy}% (${gameState.shotsHit}/${gameState.shotsFired})`, centerX, y + 55, {textAlign: 'center', textBaseline: 'top'});
+
     if (gameState.goal > 0) {
         const goalMet = gameState.score >= gameState.goal;
         const outOfAmmo = gameState.ammo <= 0;
@@ -1054,12 +1273,34 @@ function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameS
     if (gameState.scene === 'level') {
         const scoreText = gameState.score + (gameState.goal ? '/' + gameState.goal : '');
         drawARFont(context, scoreText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, {textAlign: 'center', textBaseline: 'top'});
+
+        const timeBarWidth = 100;
+        const timeBarHeight = 6;
+        const timeBarX = CANVAS_WIDTH / 2 - timeBarWidth / 2;
+        const timeBarY = CANVAS_HEIGHT - 32;
         
-        const timeText = Math.ceil(gameState.timeLeft / 1000).toString();
-        drawARFont(context, 'TIME: ' + timeText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 32, {textAlign: 'center', textBaseline: 'top'});
+        const timeProgress = gameState.timeLeft / gameState.maxTime;
         
-        const ammoText = 'AMMO: ' + gameState.ammo
-        drawARFont(context, ammoText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 24, {textAlign: 'center', textBaseline: 'top'});
+        context.fillStyle = '#333';
+        context.fillRect(timeBarX, timeBarY, timeBarWidth, timeBarHeight);
+        
+        context.fillStyle = timeProgress > 0.25 ? '#0F0' : '#F00';
+        context.fillRect(timeBarX, timeBarY, timeBarWidth * timeProgress, timeBarHeight);
+        
+        context.strokeStyle = '#FFF';
+        context.strokeRect(timeBarX, timeBarY, timeBarWidth, timeBarHeight);
+        
+        const dotSize = 3;
+        const dotSpacing = 6;
+        const totalDotsWidth = (gameState.maxAmmo - 1) * dotSpacing + dotSize;
+        const dotsStartX = CANVAS_WIDTH / 2 - totalDotsWidth / 2;
+        const dotsY = CANVAS_HEIGHT - 20;
+        
+        for (let i = 0; i < gameState.maxAmmo; i++) {
+            const dotX = dotsStartX + i * dotSpacing;
+            context.fillStyle = i < gameState.ammo ? '#FF0' : '#333';
+            context.fillRect(dotX, dotsY, dotSize, dotSize);
+        } 
     }
 }
 

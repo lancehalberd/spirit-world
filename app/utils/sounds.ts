@@ -450,10 +450,10 @@ const preloadSounds = () => {
         {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, instanceLimit: 2},
         {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, instanceLimit: 2},
         {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, instanceLimit: 2},
-        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, instanceLimit: 2},
+        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, instanceLimit: 5},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 2},
-        {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 4, instanceLimit: 4},
+        {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 4, instanceLimit: 4}, //Doesn't work? Not sure why
         {key: 'hitShot', source: 'sfx/chime 14_1.wav', duration: 1, volume: 4, instanceLimit: 5},
     ].forEach(sound => requireSoundEffect(sound));
 };
