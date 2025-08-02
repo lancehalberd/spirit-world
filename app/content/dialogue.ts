@@ -18,4 +18,5 @@ export * from 'app/content/dialogue/vanaraGuard';
 export * from 'app/content/dialogue/vanaraCommander';
 export * from 'app/content/dialogue/vanaraVillager';
 export * from 'app/content/dialogue/spiritKing';
+export * from 'app/content/dialogue/spiritTree';
 export * from 'app/content/dialogue/waterfallDragon';

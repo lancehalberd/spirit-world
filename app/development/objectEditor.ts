@@ -1296,7 +1296,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 name: 'trigger',
                 multiline: true,
                 value: object.trigger || 'touch',
-                values: ['touch', 'activate', 'enterArea'] as NarrationDefinition['trigger'][],
+                values: ['touch', 'activate', 'enterSection'],
                 onChange(trigger: NarrationDefinition['trigger']) {
                     object.trigger = trigger;
                     updateObjectInstance(state, object);
@@ -1873,6 +1873,7 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
     const newObject = createObjectInstance(state, object);
     addObjectToArea(state, area, newObject);
     initializeObject(state, newObject);
+    newObject.onInitialize?.(state);
     if (area === state.areaInstance && state.alternateAreaInstance) {
         checkToAddLinkedObject(state, area, object);
     }

@@ -104,7 +104,10 @@ export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = f
     return trueResult;
 }
 
-export function evaluateFlagString(state: GameState, flagString: string): boolean {
+export function evaluateFlagString(state: GameState, flagString?: string): boolean {
+    if (!flagString) {
+        return true;
+    }
     const tokens: string[] = [];
     let charStack: string[] = [];
     function finishToken() {

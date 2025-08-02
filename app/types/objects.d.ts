@@ -84,6 +84,8 @@ interface BaseFieldInstance {
     renderForeground2?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    // Called after the object is added to an area and initialized.
+    onInitialize?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
@@ -154,7 +156,6 @@ interface ObjectInstance extends BaseFieldInstance {
     onActivate?: (state: GameState) => boolean | void
     onDeactivate?: (state: GameState) => boolean | void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
-    onEnterArea?: (state: GameState) => void
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void
@@ -195,7 +196,6 @@ interface EffectInstance extends BaseFieldInstance {
     getYDepth?: () => number
     // The calculated yDepth for the object. This is update once per frame before rendering.
     yDepth?: number
-    onEnterArea?: (state: GameState) => void
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void

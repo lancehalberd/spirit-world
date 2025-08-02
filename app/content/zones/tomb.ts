@@ -593,6 +593,8 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 32, y: 304, type: "turret", d: "down", fireInterval: 2500, fireOffset: 0, style: "arrow"},
         {status: "normal", id: "", x: 208, y: 304, type: "turret", d: "down", fireInterval: 2000, fireOffset: 0, style: "arrow"},
         {status: "normal", id: "", x: 224, y: 304, type: "turret", d: "down", fireInterval: 2000, fireOffset: 1000, style: "arrow"},
+        {status: "normal", id: "tombRollInstructions", x: 112, y: 320, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "forever"},
+        {status: "normal", id: "tombRollInstructions", specialBehaviorKey: "rollInstructions", x: 112, y: 464, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 185, mapId: 'tomb', floorId: 'B1', mapX: 1, mapY: 3},

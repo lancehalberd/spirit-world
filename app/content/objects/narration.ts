@@ -27,7 +27,7 @@ export class Narration implements ObjectInstance {
             this.runScript(state);
         }
     }
-    onEnterArea(state: GameState): void {
+    onInitialize(state: GameState): void {
         if (this.status !== 'gone' && this.trigger === 'enterSection') {
             this.runScript(state);
         }

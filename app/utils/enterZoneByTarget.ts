@@ -1,16 +1,16 @@
-import { TextCue } from 'app/content/effects/textCue';
+import {TextCue} from 'app/content/effects/textCue';
 import {evaluateLogicDefinition} from 'app/content/logic';
-import { Door } from 'app/content/objects/door';
-import { Teleporter } from 'app/content/objects/teleporter';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { zones } from 'app/content/zones';
-import { setAreaSection } from 'app/utils/area';
-import { directionMap, getCardinalDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
-import { enterLocation } from 'app/utils/enterLocation';
-import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
-import { fixCamera } from 'app/utils/fixCamera';
-import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
+import {Door} from 'app/content/objects/door';
+import {Teleporter} from 'app/content/objects/teleporter';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {zones} from 'app/content/zones';
+import {updateAreaSection} from 'app/utils/area';
+import {directionMap, getCardinalDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
+import {enterLocation} from 'app/utils/enterLocation';
+import {findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import {fixCamera} from 'app/utils/fixCamera';
+import {checkToUpdateSpawnLocation} from 'app/content/spawnLocations';
 
 
 interface OptionalEnterZoneByTargetParams {
@@ -53,7 +53,7 @@ export function enterZoneByTarget(
                 const hitbox = target.getHitbox(state);
                 state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
                 state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                setAreaSection(state, true);
+                updateAreaSection(state, true);
                 checkForFloorEffects(state, state.hero);
                 fixCamera(state);
             }

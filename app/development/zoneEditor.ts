@@ -13,7 +13,7 @@ import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { checkToRedrawTiles, drawRemainingFrames } from 'app/render/renderField';
 import { getState } from 'app/state';
-import { setAreaSection } from 'app/utils/area';
+import { updateAreaSection } from 'app/utils/area';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { everyAreaInZone } from 'app/utils/every';
@@ -105,7 +105,7 @@ function jumpToMinimapLocation() {
         state.hero.x = pixelX;
         state.hero.y = pixelY;
         fixCamera(state);
-        setAreaSection(state, false);
+        updateAreaSection(state, false);
     }
 }
 
@@ -622,7 +622,7 @@ export function getZoneProperties(): PanelRows {
                 state.alternateAreaInstance = tempInstance;
                 state.hero.area = state.areaInstance;
                 setConnectedAreas(state, tempInstance);
-                setAreaSection(state, true);
+                updateAreaSection(state, true);
                 //enterLocation(state, state.location);
                 editingState.needsRefresh = true;
             }
@@ -721,8 +721,7 @@ export function getZoneProperties(): PanelRows {
                 isSpiritWorld: !state.location.isSpiritWorld,
             }, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
             state.alternateAreaInstance.definition.sections = newAlternateSections;
-            state.areaSection = null;
-            setAreaSection(state, true);
+            updateAreaSection(state, true);
             return 'Change Layout';
         }
     });

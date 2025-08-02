@@ -79,7 +79,7 @@ export const vanaraAngledPits: TileSource = {
     source: requireFrame(vanaraPitsImage, {x: 16, y: 176, w: 64, h: 48}),
     behaviors: {
         '0x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_RIGHT, pitWall: true  },
-        '1x0': { defaultLayer: 'field', pitMap: BITMAP_BOTTOM_LEFT, pitWall: true},
+        '1x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_LEFT, pitWall: true},
         '0x1': { defaultLayer: 'floor2', pit: true, pitWallMap: BITMAP_TOP_LEFT },
         '1x1': { defaultLayer: 'floor2', pit: true, pitWallMap: BITMAP_TOP_RIGHT },
         '2x2': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_RIGHT },

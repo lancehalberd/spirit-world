@@ -13,10 +13,22 @@ export function removeAllClones(state: GameState): void {
     state.hero.clones = []
 }
 
-export function setAreaSection(state: GameState, newArea: boolean): void {
-    //console.log('setAreaSection', state.hero.x, state.hero.y);
+export function setAreaSection(state: GameState, areaSection: AreaSectionInstance): void {
+    state.areaSection = areaSection;
+    if (state.areaSection.isAstral) {
+        state.hero.isAstralProjection = true;
+    } else {
+        if (state.hero.isAstralProjection) {
+            state.hero.isAstralProjection = false;
+            state.hero.z = state.hero.groundHeight;
+        }
+    }
+}
+
+export function updateAreaSection(state: GameState, newArea: boolean): void {
+    //console.log('updateAreaSection', state.hero.x, state.hero.y);
     //const lastAreaSection = state.areaSection;
-    delete state.areaSection;
+    let newAreaSection: AreaSectionInstance;
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
     // returns false for points on the edge of the rectangle.
@@ -24,16 +36,17 @@ export function setAreaSection(state: GameState, newArea: boolean): void {
     const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
-            state.areaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, section);
+            newAreaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, section);
             exploreSection(state, section.index);
             break;
         }
     }
     // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
     // currently in any of the defined sections for this area.
-    if (!state.areaSection) {
-        state.areaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, state.areaInstance.definition.sections[0]);
+    if (!newAreaSection) {
+        newAreaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, state.areaInstance.definition.sections[0]);
     }
+    setAreaSection(state, newAreaSection);
     editingState.needsRefresh = true;
     // if (newArea || lastAreaSection !== state.areaSection) {
     if (newArea) {
@@ -41,11 +54,6 @@ export function setAreaSection(state: GameState, newArea: boolean): void {
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
-    }
-    if (state.areaSection.isAstral) {
-        state.hero.isAstralProjection = true;
-    } else {
-        state.hero.isAstralProjection = false;
     }
 }
 

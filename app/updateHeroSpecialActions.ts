@@ -12,7 +12,7 @@ import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
 import { playAreaSound } from 'app/musicController';
 import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
-import { setAreaSection } from 'app/utils/area';
+import { updateAreaSection } from 'app/utils/area';
 import {
     directionMap,
     getCardinalDirection,
@@ -67,7 +67,7 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
         hero.x = best.x;
         hero.y = best.y;
         if (!inSection) {
-            setAreaSection(state, true);
+            updateAreaSection(state, true);
         }
         fixCamera(state);
     }

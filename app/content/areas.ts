@@ -1,21 +1,21 @@
 import {evaluateLogicDefinition} from 'app/content/logic';
-import { allTiles } from 'app/content/tiles';
-import { zones } from 'app/content/zones';
-import { editingState } from 'app/development/editingState';
-import { cleanupHeroFromArea, getAreaSectionInstance, removeAllClones } from 'app/utils/area';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { createObjectInstance, } from 'app/utils/createObjectInstance';
-import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {allTiles} from 'app/content/tiles';
+import {zones} from 'app/content/zones';
+import {editingState} from 'app/development/editingState';
+import {cleanupHeroFromArea, getAreaSectionInstance, removeAllClones, setAreaSection} from 'app/utils/area';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
+import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
-import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
-import { getAreaDimensions } from 'app/utils/getAreaSize';
-import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
-import { mapTile } from 'app/utils/mapTile';
-import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
-import { applyLayerToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
-import { applyVariantsToArea } from 'app/utils/variants';
+import {findObjectInstanceByDefinition} from 'app/utils/findObjectInstanceById';
+import {getAreaDimensions} from 'app/utils/getAreaSize';
+import {initializeAreaLayerTiles, initializeAreaTiles} from 'app/utils/layers';
+import {mapTile} from 'app/utils/mapTile';
+import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
+import {applyLayerToBehaviorGrid, resetTileBehavior} from 'app/utils/tileBehavior';
+import {applyVariantsToArea} from 'app/utils/variants';
 
 export function getDefaultArea(w = 32, h = 32): AreaDefinition {
     return {
@@ -139,8 +139,8 @@ export function populateLayersFromAlternateArea(area: AreaDefinition, alternateA
     initializeAreaTiles(area);
 }
 
-export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation): AreaInstance {
-    return createAreaInstance(state, getAreaFromLocation(location));
+export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
+    return createAreaInstance(state, getAreaFromLocation(location), isActiveArea);
 }
 
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
@@ -246,7 +246,7 @@ export function findZoneTargets(
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
     //console.log('scrollToArea', direction);
     removeAllClones(state);
-    state.nextAreaInstance = createAreaInstance(state, area);
+    state.nextAreaInstance = createAreaInstance(state, area, true);
     if (direction === 'up') {
         state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.h * 16;
     }
@@ -269,7 +269,7 @@ export function switchToNextAreaSection(state: GameState): void {
     refreshSection(state, state.areaInstance, state.areaSection);
     refreshSection(state, state.alternateAreaInstance, state.areaSection);
     linkObjects(state);
-    state.areaSection = state.nextAreaSection;
+    setAreaSection(state, state.nextAreaSection);
     editingState.needsRefresh = true;
     cleanupHeroFromArea(state);
     state.hero.safeD = state.hero.d;
@@ -320,7 +320,7 @@ export function addRecentArea(areaInstance: AreaInstance): void {
     }
 }
 
-export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
+export function createAreaInstance(state: GameState, definition: AreaDefinition, isActiveArea: boolean = false): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
     const areaSize = getAreaDimensions(definition);
     const backgroundFrames: AreaFrame[] = [];
@@ -440,6 +440,9 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         const objectInstance = createObjectInstance(state, object);
         addObjectToArea(state, instance, objectInstance);
         initializeObject(state, objectInstance);
+        if (isActiveArea) {
+            objectInstance.onInitialize?.(state);
+        }
     }
     // instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
@@ -456,7 +459,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     }
     const wasHot = state.areaSection?.isHot;
     if (state.areaSection) {
-        state.areaSection = getAreaSectionInstance(state, state.zone, area.definition, state.areaSection.definition);
+        setAreaSection(state, getAreaSectionInstance(state, state.zone, area.definition, state.areaSection.definition));
     }
     area.needsLogicRefresh = false;
     let lastLayerIndex = -1, refreshBehavior = false;
@@ -514,7 +517,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             state.fadeLevel = (state.areaSection.dark ?? 0) / 100;
             // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
             // state.hero.vx = state.hero.vy = 0;
-            const nextAreaInstance = createAreaInstance(state, instance.definition);
+            const nextAreaInstance = createAreaInstance(state, instance.definition, true);
             nextAreaInstance.alternateArea = instance.alternateArea;
             nextAreaInstance.alternateArea.alternateArea = nextAreaInstance;
             // Refresh tile behaviors+canvases.
@@ -701,6 +704,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
                 const object = createObjectInstance(state, definition);
                 addObjectToArea(state, area, object);
                 initializeObject(state, object);
+                object.onInitialize?.(state);
             }
         }
     }
@@ -720,6 +724,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
             if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
                 addObjectToArea(state, area, object);
                 initializeObject(state, object);
+                object.onInitialize?.(state);
             }
         }
     }

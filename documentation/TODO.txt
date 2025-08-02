@@ -145,10 +145,22 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Add new graphics
+        - Moss tiles
+        - Astral projection carry animations
+        - fireball effect
+        - ice grenade effect
+        - drone
+        - dirt particles
+
+
     - Add Vanara Dreamland
         - Add initial cutscene for meeting the Spirit Tree
             - Learn Teleportation after talking to the Spirit Tree
                 - In order to teleport MC must learn to manifest their physical body in the Dream World.
+        - Add Vanara Dreamland to logic
+            - Move check from Vanara Guardian to the Spirit tree
+            - Add logic for all teleporters
         - Update entrance to Vanara Dreamland from the cocoon to use a sleeping pod you can interact with.
         - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland

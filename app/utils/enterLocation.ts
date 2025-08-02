@@ -5,7 +5,7 @@ import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { removeTextCue } from 'app/content/effects/textCue';
-import { cleanupHeroFromArea, setAreaSection } from 'app/utils/area'
+import { cleanupHeroFromArea, updateAreaSection } from 'app/utils/area'
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { fixCamera } from 'app/utils/fixCamera';
@@ -36,7 +36,9 @@ export function enterLocation(
         removeObjectFromArea(state, state.hero.astralProjection);
         state.hero.astralProjection = null;
     }
-    removeTextCue(state);
+    if (!isMutation) {
+        removeTextCue(state);
+    }
     if (state.hero.action === 'meditating') {
         state.hero.action = null;
     }
@@ -123,9 +125,10 @@ export function enterLocation(
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
-        || createAreaInstance(state, area);
+        || createAreaInstance(state, area, true);
+
     state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
-        || createAreaInstance(state, alternateArea);
+        || createAreaInstance(state, alternateArea, true);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);
@@ -153,17 +156,12 @@ export function enterLocation(
             }*/
         }
     }
-    setAreaSection(state, !isMutation);
+    updateAreaSection(state, !isMutation);
     state.hotLevel = state.areaSection.isHot ? 1 : 0;
     state.fadeLevel = (state.areaSection.dark || 0) / 100;
     fixCamera(state);
     setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);
-    for (const object of [...state.areaInstance.objects, ...state.areaInstance.effects]) {
-        if (object.onEnterArea) {
-            object.onEnterArea(state);
-        }
-    }
     if (editingState.isEditing && !doNotRefreshEditor) {
         editingState.needsRefresh = true;
     }

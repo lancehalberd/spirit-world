@@ -4,7 +4,7 @@ import {
 } from 'app/content/areas';
 import { editingState } from 'app/development/editingState';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
-import { setAreaSection } from 'app/utils/area';
+import { updateAreaSection } from 'app/utils/area';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea } from 'app/utils/effects';
@@ -70,7 +70,7 @@ export function updateCamera(state: GameState, speed?: number): void {
             state.hero.y -= state.areaInstance.cameraOffset.y;
             state.camera.x -= state.areaInstance.cameraOffset.x;
             state.camera.y -= state.areaInstance.cameraOffset.y;
-            // This is done in setAreaSection.
+            // This is done in updateAreaSection.
             //state.hero.safeD = state.hero.d;
             //state.hero.safeX = state.hero.x;
             //state.hero.safeY = state.hero.y;
@@ -95,7 +95,7 @@ export function updateCamera(state: GameState, speed?: number): void {
             state.areaInstance.alternateArea = state.alternateAreaInstance;
             state.alternateAreaInstance.alternateArea = state.areaInstance;
             linkObjects(state);
-            setAreaSection(state, true);
+            updateAreaSection(state, true);
             setConnectedAreas(state, lastAreaInstance);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {
