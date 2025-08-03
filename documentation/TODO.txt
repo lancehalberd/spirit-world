@@ -147,6 +147,7 @@ Graphics to Implement:
 Current tasks:
     - Add new graphics
         - Moss tiles
+            - Should swap colors between worlds.
         - Astral projection carry animations
         - fireball effect
         - ice grenade effect
