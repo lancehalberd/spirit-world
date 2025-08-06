@@ -195,6 +195,19 @@ const spiritPullDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpu
 const spiritPullLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 8, y: 3, duration: 10});
 const spiritPullRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 8, y: 1, duration: 10});
 
+const spiritGrabUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 1, x: 1, y: 2, duration: 8});
+const spiritGrabDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 1, x: 1, y: 0, duration: 8});
+const spiritGrabLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 1, x: 1, y: 3, duration: 8});
+const spiritGrabRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 1, x: 1, y: 1, duration: 8});
+const spiritIdleCarryUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 1, x: 0, y: 2, duration: 8});
+const spiritIdleCarryDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 1, x: 0, y: 0, duration: 8});
+const spiritIdleCarryLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 1, x: 0, y: 3, duration: 8});
+const spiritIdleCarryRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 1, x: 0, y: 1, duration: 8});
+const spiritWalkCarryUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 8, y: 2, duration: 4});
+const spiritWalkCarryDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 8, y: 0, duration: 4});
+const spiritWalkCarryLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 8, y: 3, duration: 4});
+const spiritWalkCarryRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritCarry.png', spiritGeometry, { cols: 8, y: 1, duration: 4});
+
 const fallGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 export const fallAnimation: FrameAnimation = createAnimation('gfx/mc/mcfall.png', fallGeometry, { cols: 13, duration: 4}, { loop: false });
 
@@ -589,3 +602,24 @@ export const heroSpiritAnimations: ActorAnimations = {
         right: spiritPushRightAnimation,
     },
 };
+
+export const heroSpiritCarryAnimations: ActorAnimations = {
+    grab: {
+        up: spiritGrabUpAnimation,
+        down: spiritGrabDownAnimation,
+        left: spiritGrabLeftAnimation,
+        right: spiritGrabRightAnimation,
+    },
+    idle: {
+        up: spiritIdleCarryUpAnimation,
+        down: spiritIdleCarryDownAnimation,
+        left: spiritIdleCarryLeftAnimation,
+        right: spiritIdleCarryRightAnimation,
+    },
+    move: {
+        up: spiritWalkCarryUpAnimation,
+        down: spiritWalkCarryDownAnimation,
+        left: spiritWalkCarryLeftAnimation,
+        right: spiritWalkCarryRightAnimation,
+    },
+}

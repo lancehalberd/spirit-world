@@ -1,10 +1,22 @@
 import {getCloneMovementDeltas} from 'app/userInput';
-import {heroSpiritAnimations} from 'app/render/heroAnimations';
+import {heroSpiritAnimations, heroSpiritCarryAnimations} from 'app/render/heroAnimations';
 import {getFrame} from 'app/utils/animations';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 
 let lastPullAnimation: AnimationSet = null;
 export function getSpiritFrame(state: GameState, hero: Hero): Frame {
+    const holdingObject = hero.pickUpTile || hero.pickUpObject;
+    if (holdingObject) {
+        const grabAnimation = heroSpiritCarryAnimations.grab[hero.d];
+        const grabAnimationTime = hero.pickUpFrame * 20;
+        if (grabAnimationTime < grabAnimation.duration) {
+            return getFrame(grabAnimation, grabAnimationTime);
+        }
+        if (hero.action === 'walking') {
+            return getFrame(heroSpiritCarryAnimations.move[hero.d], hero.animationTime);
+        }
+        return getFrame(heroSpiritCarryAnimations.idle[hero.d], hero.animationTime);
+    }
     let animations: ActorAnimations['idle'];
     switch (hero.action) {
         // Grabbing currently covers animations for pulling/pushing objects that are grabbed.
