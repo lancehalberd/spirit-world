@@ -4,7 +4,7 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 
-const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
+const [iceGrenade] = createAnimation('gfx/effects/iceGrenade.png', {w: 16, h: 16}, {x: 1}).frames;
 
 interface Props {
     x: number
@@ -85,7 +85,7 @@ export class FrostGrenade implements EffectInstance, Props {
             context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
             context.fill();
         context.restore();
-        drawFrameCenteredAt(context, iceElement, {x: this.x, y: this.y - this.z, w: 0, h: 0});
+        drawFrameCenteredAt(context, iceGrenade, {x: this.x, y: this.y - this.z, w: 0, h: 0});
     }
     renderShadow(context: CanvasRenderingContext2D) {
         const shadowRadius = Math.max(3, 6 - this.z / 2);

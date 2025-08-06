@@ -148,12 +148,9 @@ Current tasks:
     - Add new graphics
         - Moss tiles
             - Should swap colors between worlds.
-        - Astral projection carry animations
         - fireball effect
-        - ice grenade effect
         - drone
         - dirt particles
-
 
     - Add Vanara Dreamland
         - Add initial cutscene for meeting the Spirit Tree
@@ -180,6 +177,16 @@ Current tasks:
             - Approaching the tree will cause the avatar of the Spirit Tree to appear which looks like some kind of heavenly being?
                 - Work with artist on design details.
         - Add boss rush to Vanara Dreamland
+
+    - Peach collection quest
+        - NPC in waterfall village storage room:
+            "You look like you need some work to keep you out of trouble."
+            "Take this basket to collect peaches. If you bring me 20 peaches I'll give you a treat! {item:peachBasket}"
+            (hint before completion) "Make sure you aren't hurt when you collect peaches, otherwise you won't be able resist eating them yourself."
+            "Wow look at all these delicious peaches. Wait one moment."
+            "Here this is for you {item:peachPotion}"
+            (hint before completion) "You can bring me 20 more peaches if you want some spending money."
+            "{choice:Give 20 peaches?|Yes:peachCollector.jadeReward|No:peachCollector.no}"
 
     - Proposal
         - Require teleportation for fully entering the Spirit World.
