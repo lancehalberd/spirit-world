@@ -220,14 +220,38 @@ export const entAnimations: ActorAnimations = {
     },
 };
 
+let frameMap = [0,1,1,1,0,4,4,4];
+const clawDroneGeometry: FrameDimensions = { w: 32, h: 32, content: { x: 8, y: 10, w: 17, h: 16} };
+const droneSpinUpAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 0, duration: 24});
+const droneSpinLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 1, duration: 24});
+const droneSpinDownAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 2, duration: 24});
+const droneSpinRightAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 3, duration: 24});
+const droneIdleUpAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 0, duration: 6, frameMap});
+const droneIdleLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 1, duration: 6, frameMap});
+const droneIdleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 2, duration: 6, frameMap});
+const droneIdleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 5, y: 3, duration: 6, frameMap});
+const droneOffAnimation: FrameAnimation = createAnimation('gfx/enemies/clawDrone.png', clawDroneGeometry, { cols: 1, y: 4});
+export const droneAnimations: ActorAnimations = {
+    idle: {
+        up: droneIdleUpAnimation,
+        down: droneIdleDownAnimation,
+        left: droneIdleLeftAnimation,
+        right: droneIdleRightAnimation,
+    },
+    spin: {
+        up: droneSpinUpAnimation,
+        down: droneSpinDownAnimation,
+        left: droneSpinLeftAnimation,
+        right: droneSpinRightAnimation,
+    },
+    off: omniAnimation(droneOffAnimation)
+};
+
 const droneGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
 const droneDownAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 0});
 const droneRightAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 1});
 const droneUpAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 2});
 const droneLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4, y: 3});
-export const droneAnimations: ActorAnimations = {
-    idle: omniAnimation(droneDownAnimation),
-};
 
 export const droneDirectionalAnimations: ActorAnimations = {
     idle: {

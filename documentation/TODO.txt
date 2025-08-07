@@ -149,7 +149,6 @@ Current tasks:
         - Moss tiles
             - Should swap colors between worlds.
         - fireball effect
-        - drone
         - dirt particles
 
     - Add Vanara Dreamland
@@ -177,6 +176,11 @@ Current tasks:
             - Approaching the tree will cause the avatar of the Spirit Tree to appear which looks like some kind of heavenly being?
                 - Work with artist on design details.
         - Add boss rush to Vanara Dreamland
+
+    - Add charge behavior to drone
+        - line up with hero within 100px
+        - Charge up for 500ms, accelerating frame rate to 4x by 300ms, strafe to align with hero quickly at first, but slow to 0 speed by 300ms
+        - Drop shield and rush forward for 1s.
 
     - Peach collection quest
         - NPC in waterfall village storage room:

@@ -109,7 +109,7 @@ export function getCardinalDirectionToTarget(
 
 export function getVectorToMovementTarget(state: GameState, source: Target, target: Target):{x: number, y: number, mag: number} {
     const sourceAnchor = getMovementAnchor(source);
-    const targetAnchor = getMovementAnchor(source);
+    const targetAnchor = getMovementAnchor(target);
     const dx = targetAnchor.x - sourceAnchor.x;
     const dy = targetAnchor.y - sourceAnchor.y;
     const mag = Math.sqrt(dx * dx + dy * dy);
