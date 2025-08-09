@@ -531,8 +531,11 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
     const isMovingThroughZoneDoor = hero.actionTarget?.definition?.type === 'door'
         && hero.actionTarget.definition.targetZone
         && hero.actionTarget.definition.targetObjectId
+    // Hero can only trigger a screen transition when they are astral projection, otherwise they could
+    // get stuck falling into a pit until they die.
+    const canTransitionSafely = !hero.isOverPit || hero.isAstralProjection;
     // Do not trigger the scrolling transition when traveling through a zone door.
-    if ((!editingState.isEditing && hero.isOverPit)
+    if ((!editingState.isEditing && !canTransitionSafely)
         || state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor
     ) {
         return;

@@ -17,7 +17,8 @@ const vanaraHoleyTile: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
     behaviors: {
-        'all': { defaultLayer: 'floor'},
+        // These tiles should transfer to the spirit realm as is.
+        'all': { defaultLayer: 'floor', linkedOffset: 0},
     },
     tileCoordinates: [
        [1,1],        [9,1],[10,1],             [13,1],[14,1],[15,1],
@@ -89,7 +90,7 @@ export const vanaraHoleyTransitionTile: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/vanara.png', {x: 272, y: 16, w: 48, h: 48}),
     behaviors: {
-        'all': { defaultLayer: 'floor'},
+        'all': { defaultLayer: 'floor', linkedOffset: 0},
     },
     tileCoordinates: [
         [0,0],[1,0],[2,0],

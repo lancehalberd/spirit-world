@@ -282,10 +282,12 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Your Astral Body can touch the Spirit World.'
                 + '{|}In your Astral Body, press [B_PASSIVE] to grab or pickup objects.';
         case 'teleportation':
-            return 'Move your Astral Body away from you in the Sprit World'
+            return '';
+            // There is a tutorial for teleportation now that probably makes this unnecessary.
+            /*return 'Move your Astral Body away from you in the Sprit World'
                 + '{|}Press [B_TOOL] to teleport your Real Body to your Astral Body.'
                 + '{|}Teleportation consumes spirit energy, stand still to recover'
-                + '{|}Use teleportation to move past obstacles in the Real World.';
+                + '{|}Use teleportation to move past obstacles in the Real World.';*/
         case 'neutral': return 'Neutral element uses less spirit energy with charged attacks.'
         case 'fire': return 'Fire can be used to light torches and melt ice.';
         case 'ice': return 'Ice can be used to freeze objects and enemies.';
