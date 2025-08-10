@@ -26,6 +26,9 @@ function getDefaultSavedHeroData(): SavedHeroData {
         previousBoots: 'leatherBoots',
         hasRevive: false,
         money: 0,
+        aether: 0,
+        karma: 0,
+        aetherCrystals: 0,
         silverOre: 0,
         totalSilverOre: 0,
         goldOre: 0,
@@ -72,6 +75,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             waterBlessing: 0,
             fireBlessing: 0,
             lightningBlessing: 0,
+            arDevice: 0,
         },
         spawnLocation: SPAWN_LOCATION_FULL,
     };

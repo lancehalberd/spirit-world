@@ -126,6 +126,8 @@ interface TileBehaviors {
     // and that the player should move south until they hit a regular pit tile while falling,
     // otherwise they will appear to fall into the wall.
     pitWall?: boolean
+    // The same as pitWall but with pixel precision.
+    pitWallMap?: Uint16Array
     isLava?: boolean
     // The same as isLava but with pixel precision.
     isLavaMap?: Uint16Array
@@ -324,13 +326,11 @@ interface FullZoneLocation extends ZoneLocation {
 }
 
 
-interface AreaLayerDefinition {
+// Logic definition allows using logic to set whether a layer is currently displayed.
+interface AreaLayerDefinition extends LogicDefinition {
     // Unique identifier for this layer.
     key: string
-    logicKey?: string
-    invertLogic?: boolean
-    hasCustomLogic?: boolean
-    customLogic?: string
+    disableBehaviors?: boolean
     drawPriority?: DrawPriority
     grid?: TileGridDefinition
     mask?: TileGridDefinition
@@ -350,9 +350,16 @@ interface AreaLayer extends AreaTileGrid {
     y?: number,
 }
 
-interface AreaSection extends Rect {
+interface AreaBehaviorLogic {
     hotLogic?: LogicDefinition
     fogLogic?: LogicDefinition
+    astralLogic?: LogicDefinition
+    corrosiveLogic?: LogicDefinition
+    // 0/undefined = fully lit, 100 = pitch black.
+    dark?: number
+}
+
+interface AreaSection extends AreaBehaviorLogic, Rect {
     // Unique identifier for this section that can be used to look it up
     // and is used when tracking whether the player has explored a section.
     index?: number
@@ -374,9 +381,15 @@ interface AreaSectionInstance extends AreaSection {
     definition: AreaSection
     isFoggy?: boolean
     isHot?: boolean
+    // Astral areas force the player to be in their Astral body, limiting their behaviors.
+    isAstral?: boolean
+    // This flag causes the hero to lose spirit energy over time unless they have the water blessing.
+    // It is mainly used in waterfall tower, but is also used in the Ice portion of the Holy Sanctum.
+    isCorrosive?: boolean
+    dark?: number
 }
 
-interface AreaDefinition {
+interface AreaDefinition extends AreaBehaviorLogic {
     default?: boolean
     w?: number
     h?: number
@@ -385,9 +398,6 @@ interface AreaDefinition {
     variants?: VariantData[]
     // Used to divide a larger super tile into smaller screens.
     sections: AreaSection[]
-    // 0/undefined = fully lit, 100 = pitch black.
-    dark?: number
-    corrosiveLogic?: LogicDefinition
     // Spirit world areas with real counterparts have this reference set
     // to make it more convenient to translate real tiles/objects to the spirit world.
     parentDefinition?: AreaDefinition
@@ -396,7 +406,7 @@ interface AreaDefinition {
     isSpiritWorld?: boolean
 }
 
-interface Zone {
+interface Zone extends AreaBehaviorLogic {
     key: string
     // If this zone is an underwater area, this key is set to the zone key of the surface area.
     // Travel to the surface is always from the top floor of the underwater zone to the bottom
@@ -439,7 +449,6 @@ interface AreaInstance {
     tilesDrawn: boolean[][]
     // Tracks which area frames have been drawn since the last time checkToRedrawTiles was set.
     drawnFrames: Set<AreaFrame>
-    dark?: number
     underwater?: boolean
     layers: AreaLayer[]
     effects: EffectInstance[]
@@ -472,9 +481,6 @@ interface AreaInstance {
     allyTargets: (EffectInstance | ObjectInstance)[]
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
-    // This flag causes the hero to lose spirit energy over time unless they have the water blessing.
-    // It is mainly used in waterfall tower, but is also used in the Ice portion of the Holy Sanctum.
-    isCorrosive?: boolean
     needsLogicRefresh?: boolean
     needsIceRefresh?: boolean
 }

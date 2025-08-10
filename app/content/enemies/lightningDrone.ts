@@ -12,6 +12,8 @@ import {
 } from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
 import {
+    getMovementAnchor,
+    getVectorToMovementTarget,
     getVectorToNearbyTarget,
 } from 'app/utils/target';
 
@@ -20,15 +22,16 @@ const chargeTime = 1000;
 const dischargeRadius = 48;
 
 const updateTarget = (state: GameState, enemy: Enemy): boolean => {
-    const vector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    if (!vector) {
+    const {target} = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets) ?? {};
+    if (!target) {
         return false;
     }
+    const vector = getVectorToMovementTarget(state, enemy, target)
     const {x, y, mag} = vector;
-    const hitbox = enemy.getHitbox(state);
+    const sourceAnchor = getMovementAnchor(enemy);
     // The idea here is to stop 40px away from the target
-    enemy.params.targetX = hitbox.x + hitbox.w / 2 + x * (mag - 40);
-    enemy.params.targetY = hitbox.y + hitbox.h / 2 + y * (mag - 40);
+    enemy.params.targetX = sourceAnchor.x + x * Math.max(0, mag - 40);
+    enemy.params.targetY = sourceAnchor.y + y * Math.max(0, mag - 40);
     return true;
 }
 
@@ -51,7 +54,7 @@ enemyDefinitions.lightningDrone = {
             if (!updateTarget(state, enemy)) {
                 enemy.setMode('choose');
             } else if (enemy.modeTime >= 500) {
-                if (moveEnemyToTargetLocation(state, enemy, enemy.params.targetX, enemy.params.targetY) === 0) {
+                if (moveEnemyToTargetLocation(state, enemy, enemy.params.targetX, enemy.params.targetY, 'idle') === 0) {
                     enemy.setMode('discharge');
                     const hitbox = enemy.getHitbox(state);
                     const discharge = new LightningDischarge({
@@ -66,6 +69,7 @@ enemyDefinitions.lightningDrone = {
                 }
             }
         } else if (enemy.mode === 'discharge') {
+            enemy.animationTime = 0;
             // Draw some extra lightning over the drone while the discharge is charging.
             if (enemy.modeTime % 100 === 60) {
                 addSparkleAnimation(state, enemy.area, enemy.getHitbox(state), { element: 'lightning' });
@@ -101,7 +105,7 @@ enemyDefinitions.lightningDrone = {
             context.save();
                 context.globalAlpha *= (0.7 + 0.3 * Math.random());
                 context.beginPath();
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, 0, 2 * Math.PI);
+                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 2, hitbox.w / 2 + 3, 0, 2 * Math.PI);
                 context.stroke();
             context.restore();
         }

@@ -447,71 +447,19 @@ const prioritizedSpawnLocations = [
     // World Tree
 ];
 
-export function checkToUpdateSpawnLocation(state: GameState): void {
+export function checkToUpdateSpawnLocation(state: GameState, location: ZoneLocation = state.location): void {
     // Only set the spawn location when in the game scene. This is to avoid accidentally setting
     // it from the title scene which can trigger unexpected saves.
     if (state.scene !== 'game') {
         return;
     }
-    // This spawn point cannot be used unless the war temple entrance is opened.
-    /*if (state.location.zoneKey === 'warTemple' && state.savedState.objectFlags['warTempleEntrance']) {
-        if (state.hero.savedData.spawnLocation.zoneKey !== 'warTemple') {
-            setSpawnLocation(state, SPAWN_WAR_TEMPLE_ENTRANCE);
-        }
-        return;
-    }
-    if (state.location.zoneKey === 'staffTower') {
-        if (
-            state.location.floor === SPAWN_STAFF_UPPER_ENTRANCE.floor
-            && state.location.isSpiritWorld === SPAWN_STAFF_UPPER_ENTRANCE.isSpiritWorld
-        ) {
-            return setSpawnLocation(state, SPAWN_STAFF_UPPER_ENTRANCE);
-        }
-        if (
-            state.location.floor === SPAWN_STAFF_LOWER_ENTRANCE.floor
-            && state.location.isSpiritWorld === SPAWN_STAFF_LOWER_ENTRANCE.isSpiritWorld
-        ) {
-            return setSpawnLocation(state, SPAWN_STAFF_LOWER_ENTRANCE);
-        }
-        // This should only apply when using the editor to bypass the normal entrances.
-        if (state.hero.savedData.spawnLocation.zoneKey !== 'staffTower') {
-            return setSpawnLocation(state, SPAWN_STAFF_LOWER_ENTRANCE);
-        }
-    }
-    if (state.location.zoneKey === 'riverTempleWater' || state.location.zoneKey === 'riverTemple') {
-        for (const spawnPoint of [RIVER_TEMPLE_LOWER_ENTRANCE, RIVER_TEMPLE_UPPER_ENTRANCE]) {
-            if (
-                state.location.zoneKey === spawnPoint.zoneKey
-                && state.location.floor === spawnPoint.floor
-                && state.location.isSpiritWorld === spawnPoint.isSpiritWorld
-            ) {
-                return setSpawnLocation(state, spawnPoint);
-            }
-        }
-        // This should only apply when using the editor to bypass the normal entrances.
-        if (state.hero.savedData.spawnLocation.zoneKey !== 'riverTempleWater'
-            && state.hero.savedData.spawnLocation.zoneKey !== 'riverTemple'
-        ) {
-            return setSpawnLocation(state, RIVER_TEMPLE_UPPER_ENTRANCE);
-        }
-    }
-    // If you are in the forest temple, or in overworld area that is part of the temple, respawn
-    // at the forest temple entrance.
-    if (state.location.zoneKey === 'forestTemple' || (
-        state.location.zoneKey === 'overworld'
-        && state.location.isSpiritWorld
-        && state.location.areaGridCoords.x === 0
-        && state.location.areaGridCoords.y === 2
-    )) {
-        return setSpawnLocation(state, SPAWN_FOREST_ENTRANCE);
-    }*/
     for (const spawnPoint of prioritizedSpawnLocations) {
         if (
-            state.location.zoneKey === spawnPoint.zoneKey
-            && state.location.floor === spawnPoint.floor
-            && state.location.isSpiritWorld === spawnPoint.isSpiritWorld
-            && state.location.areaGridCoords.x === spawnPoint.areaGridCoords.x
-            && state.location.areaGridCoords.y === spawnPoint.areaGridCoords.y
+            location.zoneKey === spawnPoint.zoneKey
+            && location.floor === spawnPoint.floor
+            && location.isSpiritWorld === spawnPoint.isSpiritWorld
+            && location.areaGridCoords.x === spawnPoint.areaGridCoords.x
+            && location.areaGridCoords.y === spawnPoint.areaGridCoords.y
         ) {
             return setSpawnLocation(state, spawnPoint);
         }

@@ -4,7 +4,7 @@ import {
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { logicHash, isObjectLogicValid } from 'app/content/logic';
+import {logicHash, evaluateLogicDefinition} from 'app/content/logic';
 import { bellStyles } from 'app/content/objects/bell';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
@@ -630,15 +630,18 @@ export function getSwitchTargetProperties(
     return rows;
 }
 
-function getUniqueObjectIdsForBothAreas(state: GameState, editingState: EditingState): string[] {
+function getUniqueObjectIdsForAreas(state: GameState, areas: AreaInstance[]): string[] {
     const ids = [];
-    for (const object of [...state.areaInstance.definition.objects, ...state.alternateAreaInstance.definition.objects]) {
-        if (object.id) {
-            ids.push(object.id);
+    for (const area of areas) {
+        for (const object of area.definition.objects) {
+            if (object.id) {
+                ids.push(object.id);
+            }
         }
     }
     return [...new Set(ids)];
 }
+
 
 function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
     switch (type) {
@@ -765,8 +768,10 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             if (logicKey === 'none') {
                 delete object.logicKey;
                 delete object.hasCustomLogic;
+                delete object.isInverted;
             } else if (logicKey === 'custom') {
                 delete object.logicKey;
+                delete object.isInverted;
                 object.hasCustomLogic = true;
             } else{
                 object.logicKey = logicKey;
@@ -786,18 +791,20 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             },
         });
     }
-    rows.push({
-        name: 'Invert Logic',
-        value: object.invertLogic || false,
-        onChange(invertLogic: boolean) {
-            if (invertLogic) {
-                object.invertLogic = invertLogic;
-            } else {
-                delete object.invertLogic;
-            }
-            updateObjectInstance(state, object);
-        },
-    });
+    if (object.logicKey && object.logicKey !== 'custom') {
+        rows.push({
+            name: 'Invert Logic',
+            value: object.isInverted || false,
+            onChange(isInverted: boolean) {
+                if (isInverted) {
+                    object.isInverted = isInverted;
+                } else {
+                    delete object.isInverted;
+                }
+                updateObjectInstance(state, object);
+            },
+        });
+    }
     const possibleStatuses = getPossibleStatuses(object.type);
     if (!possibleStatuses.includes(object.status)) {
         object.status = possibleStatuses[0];
@@ -853,6 +860,27 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            const supportedTypes: DecorationType[] = [
+                'bed',
+                'cocoon',
+                'floorBed',
+            ];
+            if (supportedTypes.includes(object.decorationType)) {
+                const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance]);
+                rows.push({
+                    name: 'target',
+                    value: object.targetObjectId ?? 'none',
+                    values: ['none', ...ids],
+                    onChange(targetObjectId: string) {
+                        if (targetObjectId === 'none') {
+                            delete object.targetObjectId;
+                        } else {
+                            object.targetObjectId = targetObjectId;
+                        }
+                        updateObjectInstance(state, object);
+                    },
+                });
+            }
             rows.push({
                 name: 'layer',
                 value: object.drawPriority || 'sprites',
@@ -1006,6 +1034,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 ...getLogicProperties(state, 'Is Frozen?', object.frozenLogic, updatedLogic => {
                     object.frozenLogic = updatedLogic;
                     updateObjectInstance(state, object);
+                    editingState.needsRefresh = true;
                 }),
             ];
             rows = [
@@ -1216,8 +1245,8 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'heavyFloorSwitch':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
-        case 'indicator':object
-            const ids = getUniqueObjectIdsForBothAreas(state, editingState);
+        case 'indicator': {
+            const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance, state.alternateAreaInstance]);
             rows.push({
                 name: 'target',
                 value: object.targetObjectId ?? 'none',
@@ -1232,6 +1261,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        }
         case 'keyBlock':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             rows.push({
@@ -1266,7 +1296,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 name: 'trigger',
                 multiline: true,
                 value: object.trigger || 'touch',
-                values: ['touch', 'activate', 'enterArea'] as NarrationDefinition['trigger'][],
+                values: ['touch', 'activate', 'enterSection'],
                 onChange(trigger: NarrationDefinition['trigger']) {
                     object.trigger = trigger;
                     updateObjectInstance(state, object);
@@ -1837,12 +1867,13 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
     if (index >= 0) {
         removeObjectFromArea(state, area.objects[index]);
     }
-    if (!isObjectLogicValid(state, object)) {
+    if (!evaluateLogicDefinition(state, object)) {
         return;
     }
     const newObject = createObjectInstance(state, object);
     addObjectToArea(state, area, newObject);
     initializeObject(state, newObject);
+    newObject.onInitialize?.(state);
     if (area === state.areaInstance && state.alternateAreaInstance) {
         checkToAddLinkedObject(state, area, object);
     }

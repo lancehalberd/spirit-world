@@ -1,4 +1,5 @@
 import { objectHash } from 'app/content/objects/objectHash';
+import {editingState} from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrameCenteredAt, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -7,7 +8,7 @@ import { hitTargets } from 'app/utils/field';
 
 
 // The key block sticks up until it reaches frame 9.
-const spikeBallAnimation = createAnimation('gfx/objects/iceSpikeBall.png', {w: 16, h: 16});
+const spikeBallAnimation = createAnimation('gfx/effects/iceGrenade.png', {w: 16, h: 16}, {x: 1});
 const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 
 export class SpikeBall implements ObjectInstance {
@@ -20,6 +21,7 @@ export class SpikeBall implements ObjectInstance {
             element: 'ice',
         }
     };*/
+    drawPriority: DrawPriority = 'sprites';
     area: AreaInstance;
     definition: SpikeBallDefinition;
     isObject = <const>true;
@@ -42,7 +44,10 @@ export class SpikeBall implements ObjectInstance {
         }
     }
     getHitbox(): Rect {
-        return { x: this.x, y: this.y, w: 16, h: 16 };
+        return {x: this.x + 2, y: this.y + 4, w: 12, h: 8};
+    }
+    getYDepth(): number {
+        return this.y + 16;
     }
     move(state: GameState) {
         // Mark canFall so it will pass over pits. Since it has a high z value it won't actually fall.
@@ -78,6 +83,11 @@ export class SpikeBall implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
         let frame: Frame = getFrame(spikeBallAnimation, this.animationTime);
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        if (editingState.showHitboxes) {
+            const {x,y,w,h} = this.getHitbox();
+            context.fillStyle = 'rgba(255, 0, 0, 0.5)';
+            context.fillRect(x,y,w,h);
+        }
     }
     renderPreview(context: CanvasRenderingContext2D, target: Rect = this.getHitbox()) {
         let frame: Frame = getFrame(spikeBallAnimation, this.animationTime);
@@ -89,7 +99,7 @@ export class SpikeBall implements ObjectInstance {
         ) {
             return;
         }
-        drawFrameAt(context, smallShadowFrame, {x: this.x, y: this.y});
+        drawFrameAt(context, smallShadowFrame, {x: this.x, y: this.y - 4});
     }
 }
 objectHash.spikeBall = SpikeBall;

@@ -1,4 +1,4 @@
-import { activateTarget } from 'app/utils/objects'
+import {activateTarget} from 'app/utils/objects'
 
 
 export function areAllSwitchesActivated(state: GameState, area: AreaInstance, definition: BaseSwitchDefinition): boolean {

@@ -11,8 +11,8 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { pad, boxesIntersect } from 'app/utils/index';
 import { setObjectFlag } from 'app/utils/objectFlags';
 import { addObjectToArea, getObjectStatus, removeObjectFromArea } from 'app/utils/objects';
-import { drawText } from 'app/utils/simpleWhiteFont';
 import { saveGame } from 'app/utils/saveGame';
+import {drawARFont} from 'app/arGames/arFont';
 
 
 /*const [coin] =
@@ -529,7 +529,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
     }
 }
 
-
+//const [aether] = createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 10}).frames;
 export class ShopObject extends LootObject implements ObjectInstance {
     area: AreaInstance;
     behaviors: TileBehaviors;
@@ -603,12 +603,12 @@ export class ShopObject extends LootObject implements ObjectInstance {
             y: hitbox.y + hitbox.h,
             w: coin.w, h: 16
         });*/
-        drawText(context, `${this.price}`,
-            hitbox.x + hitbox. w / 2, hitbox.y + hitbox.h + 2, {
-            textBaseline: 'top',
+        drawARFont(context, `$${this.price}`,
+            hitbox.x + hitbox. w / 2, hitbox.y + hitbox.h + 8, {
+            textBaseline: 'middle',
             textAlign: 'center',
-            size: 16,
         });
+        //drawFrameAt(context, aether, {x: hitbox.x + hitbox.w / 2 + 5 - textWidth / 2 - aether.w, y: hitbox.y + hitbox.h});
     }
 }
 

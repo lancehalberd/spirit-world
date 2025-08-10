@@ -14,13 +14,14 @@ import {
     solidColorTile,
     bottomLeftCeiling,
     bottomRightCeiling,
+    bouncyWallBehaviors,
     bushBehavior,
     ceilingBehavior,
     climbableWall,
     crystalParticles,
     deepWaterBehavior,
     dirtParticles,
-    emptyCeilingBehaviors,
+    emptyWallBehaviors,
     emptyLedgeBehaviors,
     heavyStoneBehavior,
     lightStoneBehavior,
@@ -58,13 +59,13 @@ import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
 import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
-import {allVanaraPitTileSources} from 'app/content/tiles/vanaraPits';
+import {allVanaraPitTileSources, vanaraAngledPits} from 'app/content/tiles/vanaraPits';
 import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
-import {allVanaraTileSources} from 'app/content/tiles/vanaraTree'
+import {allVanaraTileSources, vanaraHoleyTransitionTile, vanaraPlainFloorTile} from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
 import { allJadeInteriorLightTileSources } from './tiles/jadeInteriorLight';
@@ -574,14 +575,14 @@ const cloudAngles: TileSource = {
         'all': cloudBehavior,
         '0x0': { skipped: true }, '3x0': { skipped: true },
         '0x3': { skipped: true }, '3x3': { skipped: true },
-        '1x0': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, low: true, diagonalLedge: 'upleft'},
-        '0x1': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, low: true, diagonalLedge: 'upleft'},
-        '2x0': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, low: true, diagonalLedge: 'upright'},
-        '3x1': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, low: true, diagonalLedge: 'upright'},
-        '0x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft'},
-        '1x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft'},
-        '2x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright'},
-        '3x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright'},
+        '1x0': { ...cloudBehavior, diagonalLedge: 'upleft'},
+        '0x1': { ...cloudBehavior, diagonalLedge: 'upleft'},
+        '2x0': { ...cloudBehavior, diagonalLedge: 'upright'},
+        '3x1': { ...cloudBehavior, diagonalLedge: 'upright'},
+        '0x2': { ...cloudBehavior, diagonalLedge: 'downleft'},
+        '1x3': { ...cloudBehavior, diagonalLedge: 'downleft'},
+        '2x3': { ...cloudBehavior, diagonalLedge: 'downright'},
+        '3x2': { ...cloudBehavior, diagonalLedge: 'downright'},
     },
 };
 
@@ -640,6 +641,8 @@ const treeStump: TileSource = {
     source: requireFrame('gfx/tiles/treesheet.png', {x: 0, y: 128, w: 64, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
+        '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, linkedOffset: 401},
+        '3x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, linkedOffset: 401},
         '0x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, linkedOffset: 401},
         '3x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, linkedOffset: 401},
     },
@@ -1153,15 +1156,17 @@ addTiles([
     rugTiles,
     deletedTiles(2),
     solidSkySource,
-    deletedTiles(9),
+    bouncyWallBehaviors,
+    deletedTiles(4),
     ...allGardenTiles,
     waterWaves,
     deletedTiles(1),
     iceTiles,
     lavaBubbles,
     waterRocks,
-    deletedTiles(8),
-    emptyCeilingBehaviors,
+    // Save these slots for additional empty wall behaviors we might want.
+    deletedTiles(4),
+    emptyWallBehaviors,
     singleTileSource('gfx/tiles/crystalPits.png', pitBehavior, 16, 48),
     ...allFlowerTiles,
     ...allCavePitTileSources,
@@ -1230,6 +1235,9 @@ addTiles([
     ...allJadeInteriorLightTileSources,
     ...allJadeInteriorDarkTileSources,
     halves,
+    vanaraHoleyTransitionTile,
+    vanaraPlainFloorTile,
+    vanaraAngledPits,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

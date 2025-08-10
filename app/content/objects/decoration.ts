@@ -13,6 +13,7 @@ export class Decoration implements ObjectInstance {
     ignorePits = true;
     status: ObjectStatus = 'normal';
     animationTime = 0;
+    child: ObjectInstance;
 
     drawPriority: DrawPriority = this.definition.drawPriority || 'sprites';
     x = this.definition.x;
@@ -44,10 +45,19 @@ export class Decoration implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        const targetId = this.definition.targetObjectId;
+        if (targetId && targetId !== this.child?.definition?.id) {
+            this.child = this.area.objects.find(o => o.definition?.id === targetId);
+            this.child.renderParent = this;
+        }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];
         decorationType.render(context, state, this);
+    }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        decorationType.alternateRender?.(context, state, this);
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];
@@ -85,6 +95,7 @@ const stormBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png
 
 interface DecorationType {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
+    alternateRender?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     getHitbox?: (decoration: Decoration) => Rect
@@ -851,18 +862,35 @@ const windowOctogonal: DecorationType = {
     },
 };
 
-const cocoonFrame= requireFrame('gfx/tiles/vanara.png', {x: 21, y: 354, w: 23, h: 42});
-const cocoonBackFrame= requireFrame('gfx/tiles/vanara.png', {x: 53, y: 354, w: 23, h: 42});
+const cocoonFrame= requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
+const cocoonBackFrame= requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
 const cocoon: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         if (decoration.d === 'right') {
             drawFrameContentReflectedAt(context, cocoonBackFrame, decoration);
+            if (decoration.child) {
+                decoration.child.x = decoration.x;
+                decoration.child.y = decoration.y;
+                decoration.child.render(context, state);
+            }
             // Draw contained object here.
             drawFrameContentReflectedAt(context, cocoonFrame, decoration);
         } else {
             drawFrameContentAt(context, cocoonBackFrame, decoration);
+            if (decoration.child) {
+                decoration.child.x = decoration.x;
+                decoration.child.y = decoration.y;
+                decoration.child.render(context, state);
+            }
             // Draw contained object here.
             drawFrameContentAt(context, cocoonFrame, decoration);
+        }
+    },
+    alternateRender(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        if (decoration.child?.alternateRender) {
+            decoration.child.x = decoration.x;
+            decoration.child.y = decoration.y;
+            decoration.child.alternateRender(context, state);
         }
     },
     getBehaviors(state: GameState, decoration: Decoration) {
@@ -928,20 +956,20 @@ const bigDarkDome: DecorationType = {
     },
 };
 
-/*
-const [helixBaseFrame] = createAnimation('gfx/staging/helixBaseCombined.png',
-    {w: 128, h: 248, content: {x: 124, y: 254, w: 124, h: 72}}, {left: 118, top: 119}
+
+const [helixBaseFrame] = createAnimation('gfx/objects/helixBaseCombined.png',
+    {w: 356, h: 325, content: {x: 120, y: 273, w: 114, h: 46}}, {}
 ).frames;
 const helixBase: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, helixBaseFrame, decoration);
     },
     getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(anvilFrame, decoration);
+        return getFrameHitbox(helixBaseFrame, decoration);
     },
 };
 
-const [helixTopFrame] = createAnimation('gfx/staging/helixTop.png',
+const [helixTopFrame] = createAnimation('gfx/objects/helixTop.png',
     {w: 132, h: 292, content: {x: 124, y: 168, w: 124, h: 120}}, {left: 127, top: 2}
 ).frames;
 const helixTop: DecorationType = {
@@ -949,13 +977,13 @@ const helixTop: DecorationType = {
         drawFrameContentAt(context, helixTopFrame, decoration);
     },
     getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(anvilFrame, decoration);
+        return getFrameHitbox(helixTopFrame, decoration);
     },
-};*/
+};
 
 export const decorationTypes = {
-    //helixBase,
-    //helixTop,
+    helixBase,
+    helixTop,
     anvil,
     basket,
     bearRug,

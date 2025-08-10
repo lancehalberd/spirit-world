@@ -1,5 +1,5 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { isObjectLogicValid } from 'app/content/logic';
+import {evaluateLogicDefinition} from 'app/content/logic';
 import { TextCue } from 'app/content/effects/textCue';
 import { objectHash } from 'app/content/objects/objectHash';
 import { zones } from 'app/content/zones';
@@ -7,7 +7,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderHeroShadow } from 'app/renderActor';
 import { appendCallback, appendScript } from 'app/scriptEvents';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { setAreaSection } from 'app/utils/area';
+import { updateAreaSection } from 'app/utils/area';
 import { playAreaSound } from 'app/musicController';
 import { createCanvasAndContext, drawCanvas, debugCanvas } from 'app/utils/canvas';
 import { addEffectToArea } from 'app/utils/effects';
@@ -532,7 +532,7 @@ export function enterZoneByElevator(
             state.hero.renderParent = elevator;
             state.hero.isControlledByObject = true;
             elevator.callToCurrentFloor(state);
-            setAreaSection(state, true);
+            updateAreaSection(state, true);
             fixCamera(state);
             // TODO: Make this generic so the elevator can be used in other areas, particularly generated areas.
             const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];
@@ -576,7 +576,7 @@ export function findElevatorLocation(
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.type === 'elevator' && object.floor === targetFloor) {
-                            if (!isObjectLogicValid(state, object)) {
+                            if (!evaluateLogicDefinition(state, object)) {
                                 continue;
                             }
                             return {

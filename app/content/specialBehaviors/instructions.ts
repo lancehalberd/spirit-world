@@ -22,6 +22,28 @@ specialBehaviorsHash.runInstructions = {
     },
 };
 
+
+specialBehaviorsHash.rollInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        const id = object.definition.id;
+
+        if (state.hero.savedData.passiveTools.roll && !state.savedState.objectFlags[id]) {
+            helpText = `Press [B_ROLL] to roll through hazards.`;
+        }
+        if (!state.hero.savedData.passiveTools.roll && !state.hero.savedData.passiveTools.gloves) {
+            helpText = `You need a new skill to continue ahead.[-]Press [B_MAP] to view your map.`;
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    },
+};
+
 specialBehaviorsHash.barrierBurstInstructions = {
     type: 'narration',
     update(state: GameState, object: ObjectInstance) {
@@ -112,6 +134,28 @@ specialBehaviorsHash.spiritSightInstructions = {
                     }
                 } else {
                     state
+                }
+            }
+        }
+        const textCue = findTextCue(state);
+        if (!textCue && helpText && object.area === state.areaInstance) {
+            addTextCue(state, helpText, 0);
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+            textCue.fadeOut();
+        }
+    },
+};
+
+specialBehaviorsHash.teleportationInstructions = {
+    type: 'narration',
+    update(state: GameState, object: ObjectInstance) {
+        let helpText = '';
+        if (state.hero.savedData.passiveTools.teleportation && !state.savedState.objectFlags.teleportationTutorialSwitch) {
+            helpText = 'Hold [B_MEDITATE] to project your Astral Body.'
+            if (state.hero.astralProjection) {
+                helpText = 'Move your Astral Body to your goal.';
+                if (!state.hero.overlaps(pad(state.hero.astralProjection.getHitbox(), 16))) {
+                    helpText = 'Press [B_TOOL] to use your Spirit Energy to teleport to your Astral Body.';
                 }
             }
         }

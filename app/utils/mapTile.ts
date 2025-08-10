@@ -74,8 +74,8 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
 
 
     // Tiles with linked offsets map to different tiles than the parent definition.
-    const linkedOffset = baseTile?.behaviors?.linkedOffset || 0;
-    if (linkedOffset) {
+    const linkedOffset = baseTile?.behaviors?.linkedOffset;
+    if (linkedOffset !== undefined) {
         explicitIndexMapping[baseTile.index] = baseTile.index + linkedOffset;
         // uncomment this if you ever want a list of all linkedOffsets being used.
         /*if (!logged[baseTile.index]) {

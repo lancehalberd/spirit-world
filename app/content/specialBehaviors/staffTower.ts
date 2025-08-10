@@ -12,12 +12,23 @@ specialBehaviorsHash.staffTower = {
     apply(state: GameState, area: AreaInstance) {
         this.onRefreshLogic(state, area);
     },
+    applyToSection(state: GameState, section: AreaSection) {
+        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+        if (!towerIsOn) {
+            // Before the tower is turned on, everything is off and dark.
+            section.dark = Math.max(section.dark || 0, 50);
+        } else {
+            // Once the elevator is fixed, the basement gets brighter.
+            if (state.savedState.objectFlags.elevatorFixed) {
+                section.dark = Math.min(section.dark, 50);
+            }
+        }
+    },
     onRefreshLogic(state: GameState, area: AreaInstance) {
         const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
         const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
         if (!towerIsOn) {
             // Before the tower is turned on, everything is off and dark.
-            area.dark = Math.max(area.definition.dark || 0, 50);
             for (const object of area.objects) {
                 if (object.isEnemyTarget) {
                     const enemy = object as Enemy;
@@ -38,10 +49,6 @@ specialBehaviorsHash.staffTower = {
                 }
             }
         } else {
-            // Once the elevator is fixed, the basement gets brighter.
-            if (state.savedState.objectFlags.elevatorFixed) {
-                area.dark = Math.min(area.dark, 50);
-            }
             if (!towerIsHaywire) {
                 // After the tower is fixed, most things are on, but traps/obstacles are disbabled.
                 for (const object of area.objects) {

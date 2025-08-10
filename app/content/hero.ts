@@ -11,6 +11,7 @@ import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 
+import {getSpiritFrame} from 'app/render/astralProjectionAnimations';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
@@ -278,8 +279,34 @@ export class Hero implements Actor {
         }
         return boxesIntersect(target as Rect, this.getHitbox());
     }
-
+    onHitAstralProjection(state: GameState, hit: HitProperties): HitResult {
+        if (this.invulnerableFrames > 0) {
+            return {};
+        }
+        if (hit.damage) {
+            // Astral projection damage is applied to the magic meter at 5x effectiveness.
+            state.hero.spendMagic(Math.max(10, hit.damage * 5));
+            // Astral projection has fewer invulnerability frames since it can't be killed
+            // and magic regenerates automatically.
+            this.invulnerableFrames = 20;
+        }
+        if (hit.knockback) {
+            this.throwHeldObject(state);
+            this.action = 'knocked';
+            this.animationTime = 0;
+            this.vx = hit.knockback.vx;
+            this.vy = hit.knockback.vy;
+            this.vz = hit.knockback.vz;
+        }
+        return {
+            hit: true,
+            pierced: true,
+        }
+    }
     onHit(this: Hero, state: GameState, hit: HitProperties): HitResult {
+        if (this.isAstralProjection) {
+            return this.onHitAstralProjection(state, hit);
+        }
         if (this.life <= 0) {
             return {};
         }
@@ -294,7 +321,7 @@ export class Hero implements Actor {
             return {};
         }
         const hitbox = this.getHitbox();
-        // Generically knock the hero back if knockAwayFromHit is set but no actual knockbac vector is set.
+        // Generically knock the hero back if knockAwayFromHit is set but no actual knockback vector is set.
         if (hit.knockAwayFromHit && !hit.knockback) {
             let dx = -directionMap[this.d][0], dy = -directionMap[this.d][1];
             if (hit.hitbox) {
@@ -412,7 +439,11 @@ export class Hero implements Actor {
             this.takeDamage(state, damage, iframeMultiplier);
         }
         if (hit.knockback && hit.element !== 'ice' && (hit.canAlwaysKnockback || !preventKnockback)) {
-            this.knockBack(state, hit.knockback);
+            if (!hit.damage) {
+                this.applyBounce(hit.knockback.vx, hit.knockback.vy);
+            } else {
+                this.knockBack(state, hit.knockback);
+            }
         }
         // Getting hit while frozen unfreezes you.
         if (this.frozenHeartDuration > 0) {
@@ -433,6 +464,12 @@ export class Hero implements Actor {
             this.burnDuration = 0;
         }
         return { hit: true };
+    }
+
+    applyBounce(vx: number, vy: number, frames = 10) {
+        this.vx = vx;
+        this.vy = vy;
+        this.bounce = {vx, vy, frames};
     }
 
     applyBurn(burnDamage: number, burnDuration: number) {
@@ -492,6 +529,10 @@ export class Hero implements Actor {
     }
 
     knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {
+        // Experiment with preventing chained knockbacks.
+        if (this.action === 'knocked') {
+            return;
+        }
         this.throwHeldObject(state);
         this.action = 'knocked';
         this.isAirborn = true;
@@ -695,7 +736,29 @@ export class Hero implements Actor {
         return frame;
     }
 
+    renderAsAstralProjection(context: CanvasRenderingContext2D, state: GameState) {
+        const hero = this;
+        const frame = getSpiritFrame(state, hero);
+        context.save();
+            context.globalAlpha *= 0.7;
+            if (state.hero.magic <= 10 || this.invulnerableFrames > 0) {
+                // Spirit flashes when teleportation will end meditation by bringing magic under 10.
+                context.globalAlpha *= ((this.animationTime % 200 < 100) ? 0.2 : 0.4);
+            } else if (state.hero.magic < state.hero.maxMagic / 2) {
+                context.globalAlpha *= 0.7 * 2 * state.hero.magic / state.hero.maxMagic;
+            }
+            drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z / 2 });
+        context.restore();
+        if (hero.pickUpTile) {
+            renderCarriedTile(context, state, hero);
+        }
+    }
+
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
+        if (this.isAstralProjection) {
+            this.renderAsAstralProjection(context, state);
+            return;
+        }
         const hero = this;
         // 'sinkingInLava' action is currently unused, lava ground just does a lot of damage instead.
         if (hero.action === 'falling' || hero.action === 'sinkingInLava') {

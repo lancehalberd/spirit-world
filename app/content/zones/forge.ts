@@ -171,8 +171,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'forgeLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!forgeLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -489,8 +488,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'lava',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'forgeLava1',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!forgeLava1',
             grid: {
                 w: 32,
                 h: 32,
@@ -622,14 +620,14 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 64, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 416, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 464, y: 320, type: "teleporter", spirit: true},
-        {status: "closed", id: "forgeShortcut", x: 240, y: 304, type: "door", style: "cavernDownstairs", d: "up", customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeShortcut", locationCue: "Forge 1F", openLogic: {"hasCustomLogic":true,"customLogic":"forgeBoss","isInverted":false}},
+        {status: "closed", id: "forgeShortcut", x: 240, y: 304, type: "door", style: "cavernDownstairs", d: "up", customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeShortcut", locationCue: "Forge 1F", openLogic: {"hasCustomLogic":true,"customLogic":"forgeBoss"}},
         {status: "normal", id: "", x: 400, y: 240, type: "door", style: "cavern", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", x: 48, y: 240, type: "door", style: "cavern", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", x: 112, y: 304, type: "shieldingUnit"},
         {status: "normal", id: "forgeStairs1", x: 32, y: 48, type: "door", style: "cavernDownstairs", d: "up", hasCustomLogic: true, customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeStairs1", locationCue: "Forge 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 313, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava1","isInverted":true}, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 313, hotLogic: {"hasCustomLogic":true,"customLogic":"!forgeLava1"}, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 3},
         {x: 0, y: 16, w: 32, h: 16, index: 314, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
@@ -804,8 +802,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'lava3',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'forgeLava3',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!forgeLava3',
             grid: {
                 w: 32,
                 h: 32,
@@ -848,8 +845,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'lava2',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'forgeLava2',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!forgeLava2',
             grid: {
                 w: 32,
                 h: 32,
@@ -993,7 +989,7 @@ const f1_0x0: AreaDefinition = {
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 315, mapId: 'forge', floorId: 'B1', mapX: 0.5, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 316, hotLogic: {"hasCustomLogic":true,"customLogic":"","isInverted":false}, mapId: 'forge', floorId: 'B1', mapX: 0.5, mapY: 4},
+        {x: 0, y: 16, w: 16, h: 16, index: 316, mapId: 'forge', floorId: 'B1', mapX: 0.5, mapY: 4},
         {x: 16, y: 0, w: 16, h: 32, index: 317, mapId: 'forge', floorId: 'B1', mapX: 1.5, mapY: 3},
     ],
 };
@@ -1017,8 +1013,8 @@ const sf1_0x0: AreaDefinition = {
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 318, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 319, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 4},
-        {x: 16, y: 0, w: 16, h: 32, index: 320, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 4, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 319, hotLogic: {"hasCustomLogic":true,"customLogic":"!forgeLava3"}, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 320, hotLogic: {"hasCustomLogic":true,"customLogic":"!forgeLava3"}, mapId: 'forge', floorId: 'B1', mapX: 4, mapY: 3},
     ],
 };
 const f2_0x0: AreaDefinition = {
@@ -1150,8 +1146,7 @@ const f2_0x0: AreaDefinition = {
         {
             key: 'forgeLava4',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'forgeLava4',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!forgeLava4',
             grid: {
                 w: 32,
                 h: 32,
@@ -1464,8 +1459,7 @@ const sf2_0x0: AreaDefinition = {
         {
             key: 'forgeLava4',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'forgeLava4',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!forgeLava4',
             grid: {
                 w: 32,
                 h: 32,
@@ -1650,7 +1644,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeSmith", x: 368, y: 56, d: "down", behavior: "face", style: "flameSpirit", type: "npc", dialogueKey: "forgeSmith"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, index: 324, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava4","isInverted":true}, mapId: 'forge', floorId: 'B2', mapX: 4.5, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 32, index: 324, hotLogic: {"hasCustomLogic":true,"customLogic":"!forgeLava4"}, mapId: 'forge', floorId: 'B2', mapX: 4.5, mapY: 2},
         {x: 16, y: 0, w: 16, h: 16, index: 325, mapId: 'forge', floorId: 'B1', mapX: 4.5, mapY: 1},
         {x: 16, y: 16, w: 16, h: 16, index: 326, mapId: 'forge', floorId: 'B1', mapX: 4.5, mapY: 2},
     ],

@@ -4,7 +4,7 @@ import { query } from 'app/dom';
 export const mainCanvas:HTMLCanvasElement = query('.js-mainCanvas') as HTMLCanvasElement;
 window['mainCanvas'] = mainCanvas;
 // mainCanvas.width = mainCanvas.height = 512;
-export const mainContext = mainCanvas.getContext('2d');
+export const mainContext = mainCanvas.getContext('2d', { alpha: false });
 mainContext.imageSmoothingEnabled = false;
 window['mainContext'] = mainContext;
 

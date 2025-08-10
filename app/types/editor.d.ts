@@ -94,4 +94,5 @@ interface EditingState {
     showWalls?: boolean
     showWallsOpacity: number
     showHitboxes?: boolean
+    showRenderPerformance?: boolean
 }

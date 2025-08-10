@@ -183,7 +183,7 @@ const imagePacks: PackedImageData[] = [
         {x:976,y:0,w:18,h:18,originalSource:'gfx/hud/cloak1.png'},
         {x:944,y:32,w:18,h:18,originalSource:'gfx/hud/cloak2.png'},
         {x:784,y:544,w:54,h:90,originalSource:'gfx/hud/peaches.png'},
-        {x:816,y:64,w:160,h:16,originalSource:'gfx/hud/money.png'},
+        //{x:816,y:64,w:160,h:16,originalSource:'gfx/hud/money.png'},
         {x:848,y:544,w:80,h:80,originalSource:'gfx/hud/scrolls.png'},
         {x:816,y:80,w:144,h:16,originalSource:'gfx/hud/magicbar.png'},
         {x:256,y:560,w:320,h:20,originalSource:'gfx/hud/revive.png'},

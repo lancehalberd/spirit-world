@@ -142,6 +142,19 @@ export function getBrushContextProperties(state: GameState): PanelRows {
             });
             rows.push(row);
             rows.push({
+                name: 'Disable behaviors',
+                id: `layer-${i}-disable-behaviors`,
+                value: !!definition.disableBehaviors,
+                onChange(disableBehaviors: boolean) {
+                    if (!disableBehaviors) {
+                        delete definition.disableBehaviors;
+                    } else {
+                        definition.disableBehaviors = true;
+                    }
+                    refreshArea(state);
+                },
+            });
+            rows.push({
                 name: 'Logic',
                 id: `layer-${i}-logic`,
                 value: definition.hasCustomLogic ? 'custom' : (definition.logicKey || 'none'),
@@ -169,10 +182,16 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                             delete alternateDefinition.hasCustomLogic;
                         }
                     }
+                    if (!definition.logicKey) {
+                        delete definition.isInverted;
+                        if (alternateDefinition) {
+                            delete alternateDefinition.isInverted;
+                        }
+                    }
                     refreshArea(state);
                 },
             });
-            if (definition.hasCustomLogic ) {
+            if (definition.hasCustomLogic) {
                 rows.push({
                     name: 'Custom Logic',
                     value: definition.customLogic || '',
@@ -185,24 +204,26 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                     },
                 });
             }
-            rows.push({
-                name: 'Invert Logic',
-                value: definition.invertLogic || false,
-                onChange(invertLogic: boolean) {
-                    if (invertLogic) {
-                        definition.invertLogic = invertLogic;
-                        if (alternateDefinition) {
-                            alternateDefinition.invertLogic = invertLogic;
+            if (definition.logicKey) {
+                rows.push({
+                    name: 'Invert Logic',
+                    value: definition.isInverted || false,
+                    onChange(isInverted: boolean) {
+                        if (isInverted) {
+                            definition.isInverted = isInverted;
+                            if (alternateDefinition) {
+                                alternateDefinition.isInverted = isInverted;
+                            }
+                        } else {
+                            delete definition.isInverted;
+                            if (alternateDefinition) {
+                                delete alternateDefinition.isInverted;
+                            }
                         }
-                    } else {
-                        delete definition.invertLogic;
-                        if (alternateDefinition) {
-                            delete alternateDefinition.invertLogic;
-                        }
-                    }
-                    refreshArea(state);
-                },
-            });
+                        refreshArea(state);
+                    },
+                });
+            }
         }
     }
     rows.push({

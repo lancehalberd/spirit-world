@@ -1064,9 +1064,9 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "caves-ascentSpiritPeachPiece", spirit: true, x: 404, y: 267, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 62, hotLogic: {"logicKey":"mountainLava","isInverted":false}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 63, hotLogic: {"logicKey":"mountainLava","isInverted":false}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 32, index: 64, hotLogic: {"logicKey":"mountainLava","isInverted":false}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 1, mapY: 0},
+        {x: 0, y: 0, w: 16, h: 16, index: 62, hotLogic: {"logicKey":"mountainLava"}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 63, hotLogic: {"logicKey":"mountainLava"}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 64, hotLogic: {"logicKey":"mountainLava"}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 1, mapY: 0},
     ],
 };
 const sf0_1x0: AreaDefinition = {

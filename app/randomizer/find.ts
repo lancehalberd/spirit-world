@@ -129,7 +129,7 @@ export function findObjectById(
             for (let y = 0; y < areaGrid.length; y++) {
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     // All objects in 100% dark areas are considered out of logic unless you can see in the dark.
-                    const needsCatEyes = areaGrid[y][x]?.dark >= 100;
+                    const needsCatEyes = zone.dark >= 100 || areaGrid[y][x]?.dark >= 100;
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.id === id) {
                             if (typeFilter && !typeFilter.includes(object.type)) {

@@ -1,4 +1,4 @@
-import { objectHash } from 'app/content/objects/objectHash';
+import {objectHash} from 'app/content/objects/objectHash';
 import {
     droneDirectionalAnimations, sentryBotAnimations,
     rivalAnimations, snakeAnimations,
@@ -25,6 +25,7 @@ import {
     paleLadyPriestAnimations,
     // testAnimations,
 } from 'app/content/npcs/npcAnimations'
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
@@ -219,6 +220,10 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: momAnimations,
         shadowOffset: 1,
     },
+    vanaraProjection: {
+        animations: heroSpiritAnimations,
+        shadowOffset: 1,
+    },
     rival: {
         animations: rivalAnimations,
         shadowOffset: 1,
@@ -378,11 +383,13 @@ export class NPC implements Actor, ObjectInstance  {
     modeTime = 0;
     speed = 1;
     alpha = 1;
+    messageAlpha = 1;
     status: ObjectStatus = 'normal';
     params: any;
     showMessage = false;
     dialogueIndex = 0;
     lastDialogueOption: DialogueOption;
+    hasFinishedDialog = false;
     constructor(state: GameState, definition: NPCDefinition) {
         this.definition = definition;
         this.d = definition.d || 'down';
@@ -449,6 +456,9 @@ export class NPC implements Actor, ObjectInstance  {
             if (state.hero.astralProjection) {
                 return;
             }
+            if (advanceIndex) {
+                this.hasFinishedDialog = true;
+            }
             return {
                 text: this.definition.dialogue ?? '...',
                 dialogueIndex: this.definition.dialogueIndex ?? -1,
@@ -457,6 +467,9 @@ export class NPC implements Actor, ObjectInstance  {
         }
         const dialogueOption = selectDialogueOption(state, this.definition.dialogueKey);
         if (!dialogueOption) {
+            if (advanceIndex) {
+                this.hasFinishedDialog = true;
+            }
             return;
         }
         if (dialogueOption !== this.lastDialogueOption) {
@@ -469,11 +482,16 @@ export class NPC implements Actor, ObjectInstance  {
             this.dialogueIndex++;
             if (this.dialogueIndex >= dialogueOption.text.length) {
                 this.dialogueIndex = dialogueOption.repeatIndex ?? this.dialogueIndex - 1;
+                this.hasFinishedDialog = true;
             }
         }
         return dialogue;
     }
     update(state: GameState) {
+        if (this.definition.specialBehaviorKey) {
+            const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNpcBehavior;
+            specialBehavior?.update(state, this);
+        }
         if (this.showMessage) {
             this.showMessage = false;
             const dialogue = this.getNextDialogue(state, true);
@@ -530,6 +548,7 @@ export class NPC implements Actor, ObjectInstance  {
             const dialogue = this.getNextDialogue(state);
             if (dialogue) {
                 context.save();
+                    context.globalAlpha *= this.messageAlpha;
                     if (dialogue.dialogueType === 'reminder' || isDialogueHeard(state, dialogue.dialogueIndex)) {
                         context.globalAlpha *= 0.4;
                     }
@@ -583,10 +602,10 @@ export class NPC implements Actor, ObjectInstance  {
             callback();
             return;
         }
-        context.save();
+        const alpha = context.globalAlpha;
             context.globalAlpha *= this.alpha;
             callback();
-        context.restore();
+        context.globalAlpha = alpha;
     }
 }
 objectHash.npc = NPC;

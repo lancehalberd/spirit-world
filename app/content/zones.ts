@@ -15,6 +15,7 @@ export * from 'app/content/zones/grandTemple';
 export * from 'app/content/zones/waterfallCave';
 export * from 'app/content/zones/waterfallCaveWater';
 export * from 'app/content/zones/treeVillage';
+export * from 'app/content/zones/dream';
 export * from 'app/content/zones/cloneCave';
 export * from 'app/content/zones/peachCave';
 export * from 'app/content/zones/peachCaveWater';

@@ -181,12 +181,14 @@ export class BeadGrate implements ObjectInstance {
         if (this.status !== 'normal') {
             this.status = 'normal';
             this.animationTime = 0;
+            return true;
         }
     }
     onDeactivate(state: GameState) {
         if (this.status !== 'closed') {
             this.status = 'closed';
             this.animationTime = 0;
+            return true;
         }
     }
     update(state: GameState) {

@@ -171,8 +171,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'craterBlockage',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'elementalBeastsEscaped',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!elementalBeastsEscaped',
             grid: {
                 w: 32,
                 h: 32,
@@ -2226,8 +2225,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'craterBlockage',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'elementalBeastsEscaped',
-            invertLogic: true,
+            hasCustomLogic: true, customLogic: '!elementalBeastsEscaped',
             grid: {
                 w: 32,
                 h: 32,

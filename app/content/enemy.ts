@@ -12,7 +12,7 @@ import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
 import { appendCallback } from 'app/scriptEvents';
-import { drawFrame, getFrame } from 'app/utils/animations';
+import {drawFrame, getFrame, isAnimationFinished} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
@@ -818,7 +818,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         // Switch to the next animation if we reach the end of the current animation.
-        if (this.nextAnimationKey && this.animationTime >= this.currentAnimation.duration) {
+        if (this.nextAnimationKey && isAnimationFinished(this.currentAnimation, this.animationTime)) {
             this.changeToAnimation(this.nextAnimationKey);
         }
         for (const ability of this.abilities) {

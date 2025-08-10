@@ -1,4 +1,4 @@
-type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud'
+type DrawPriority = 'none' | 'background' | 'foreground' | 'sprites' | 'hud'
     // Currently just used for effects that should be rendered during defeat sequence.
     | 'background-special' | 'foreground-special';
 
@@ -84,6 +84,8 @@ interface BaseFieldInstance {
     renderForeground2?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    // Called after the object is added to an area and initialized.
+    onInitialize?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
@@ -154,7 +156,6 @@ interface ObjectInstance extends BaseFieldInstance {
     onActivate?: (state: GameState) => boolean | void
     onDeactivate?: (state: GameState) => boolean | void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
-    onEnterArea?: (state: GameState) => void
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void
@@ -195,7 +196,6 @@ interface EffectInstance extends BaseFieldInstance {
     getYDepth?: () => number
     // The calculated yDepth for the object. This is update once per frame before rendering.
     yDepth?: number
-    onEnterArea?: (state: GameState) => void
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
@@ -419,21 +419,16 @@ interface HitResult {
     debug?: any
 }
 
-interface BaseObjectDefinition {
+// Logic fields can be set to control the presence of this object with a logic check.
+// For example, doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
+interface BaseObjectDefinition extends LogicDefinition {
     // Defaults to ''
     id?: string
     // Draw priority to use for this object, if it is configurable.
     drawPriority?: DrawPriority
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean
-    // If true, use the inverse of the given logic check.
-    invertLogic?: boolean
-    // This can be set to control the presence of this object with a logic check.
-    // For example, frozen doors vs normal doors are displayed in river temple based on the status of the frost beast,
-    // and doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
-    logicKey?: string
-    hasCustomLogic?: boolean
-    customLogic?: string
+
     // Whether to save the status of this object permanently (for example switches to open dungeon doors).
     // If this is unset, the default behavior depends on the object type, for examples enemies are saved for
     // the zone, bosses are saved forever, and most objects aren't saved at all.
@@ -585,6 +580,9 @@ interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
     h: number
     // Useful for fixing the layering of decorations on top of other objects.
     z?: number
+    // Some decorations can combine with other objects, in particular bed decorations
+    // may target NPCs to render NPCs inside of the bed.
+    targetObjectId?: string
 }
 
 interface WaterfallDefinition extends BaseObjectDefinition {
@@ -748,8 +746,16 @@ interface SpecialNarrationBehavior extends BaseSpecialBehavior<ObjectInstance> {
     update?: (state: GameState, object: ObjectInstance) => void
 }
 
+
+interface SpecialNpcBehavior extends BaseSpecialBehavior<NPC> {
+    type: 'npc'
+    update?: (state: GameState, object: NPC) => void
+}
+
 interface SpecialAreaBehavior extends BaseSpecialBehavior<AreaInstance> {
     type: 'area'
+    // applyToSection is called against any section instance created for a given area.
+    applyToSection?: (state: GameState, section: AreaSection) => void
 }
 
 type SpecialBehavior
@@ -757,6 +763,7 @@ type SpecialBehavior
     | SpecialElevatorBehavior
     | SpecialLootBehavior
     | SpecialNarrationBehavior
+    | SpecialNpcBehavior
     | SpecialPushPullBehavior
     | SpecialSwitchBehavior
     | SpecialSignBehavior

@@ -285,6 +285,11 @@ enemyDefinitions.largeOrb = {
 
 
 function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
+    // The Large Orb is featured as a mini boss in the basement of the Staff Tower in the Spirit World.
+    // As this is not a hybrid boss battle, it doesn't make sense
+    if (enemy.area !== state.hero.area) {
+        enemy.healthBarTime = 0;
+    }
     // For convenience, mark the largeOrb on itself.
     enemy.params.largeOrb = enemy;
     const hitbox = enemy.getMovementHitbox();

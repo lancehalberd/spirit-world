@@ -469,11 +469,12 @@ function updateFallEffect(state: GameState, effect: FieldAnimationEffect) {
         return;
     }
     const hitbox = effect.getHitbox();
+    const p = 2;
     const checkPoints = [
-        {x: hitbox.x + 2, y: hitbox.y + 2, dx: 1, dy: 1},
-        {x: hitbox.x + hitbox.w - 3, y: hitbox.y + 2, dx: - 1, dy: 1},
-        {x: hitbox.x + 2, y: hitbox.y + hitbox.h - 3, dx: 1, dy: -1},
-        {x: hitbox.x + hitbox.w - 3, y: hitbox.y + hitbox.h - 3, dx: -1, dy: -1},
+        {x: hitbox.x + p, y: hitbox.y + p, dx: 1, dy: 1},
+        {x: hitbox.x + hitbox.w - 1 - p, y: hitbox.y + p, dx: - 1, dy: 1},
+        {x: hitbox.x + p, y: hitbox.y + hitbox.h - 1 - p, dx: 1, dy: -1},
+        {x: hitbox.x + hitbox.w - 1 - p, y: hitbox.y + hitbox.h - 1 - p, dx: -1, dy: -1},
     ];
     // While the hero is falling, push them around until all their check points are over actual pit tiles.
     let onPitWall = false, isOnSingleTilePit = false;

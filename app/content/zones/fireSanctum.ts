@@ -222,10 +222,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "fireSanctumPeachPiece", x: 120, y: 136, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 369, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 0.5, mapY: 3},
-        {x: 16, y: 0, w: 16, h: 16, index: 370, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 1.5, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 371, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 0.5, mapY: 4},
-        {x: 16, y: 16, w: 16, h: 16, index: 373, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 1.5, mapY: 4},
+        {x: 0, y: 0, w: 16, h: 16, index: 369, hotLogic: {"isTrue":true}, mapId: 'holySanctum', floorId: '2F', mapX: 0.5, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 370, hotLogic: {"isTrue":true}, mapId: 'holySanctum', floorId: '2F', mapX: 1.5, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 371, hotLogic: {"isTrue":true}, mapId: 'holySanctum', floorId: '2F', mapX: 0.5, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 373, hotLogic: {"isTrue":true}, mapId: 'holySanctum', floorId: '2F', mapX: 1.5, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -468,14 +468,14 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 352, y: 224, type: "tippable"},
         {status: "normal", id: "", x: 448, y: 208, type: "tippable"},
         {status: "hiddenSwitch", id: "fireSanctumKey", x: 416, y: 128, type: "chest", lootType: "smallKey", lootLevel: 1, spirit: true, linked: true},
-        {status: "closed", id: "fireSanctumExit", x: 368, y: 16, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"fireSanctumKey","isInverted":false}, d: "up", targetZone: "holySanctum", targetObjectId: "fireSanctumExit", locationCue: "Holy Sanctum 2F"},
+        {status: "closed", id: "fireSanctumExit", x: 368, y: 16, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"fireSanctumKey"}, d: "up", targetZone: "holySanctum", targetObjectId: "fireSanctumExit", locationCue: "Holy Sanctum 2F"},
         {status: "hiddenSwitch", id: "fireSanctumTeleporter", linked: true, spirit: true, x: 464, y: 120, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 374, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0.5, mapY: 3},
-        {x: 16, y: 0, w: 16, h: 16, index: 375, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 1.5, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 377, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0.5, mapY: 4},
-        {x: 16, y: 16, w: 16, h: 16, index: 378, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 1.5, mapY: 4},
+        {x: 0, y: 0, w: 16, h: 16, index: 374, hotLogic: {"isTrue":true}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0.5, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 375, hotLogic: {"isTrue":true}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 1.5, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 377, hotLogic: {"isTrue":true}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0.5, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 378, hotLogic: {"isTrue":true}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 1.5, mapY: 4},
     ],
 };
 zones.fireSanctum = {

@@ -1,8 +1,9 @@
-import { evaluateLogicDefinition } from 'app/content/logic';
-import { exploreSection } from 'app/utils/sections';
-import { editingState } from 'app/development/editingState';
-import { isPointInShortRect } from 'app/utils/index';
-import { removeObjectFromArea } from 'app/utils/objects';
+import {evaluateLogicDefinition} from 'app/content/logic';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {exploreSection} from 'app/utils/sections';
+import {editingState} from 'app/development/editingState';
+import {isPointInShortRect} from 'app/utils/index';
+import {removeObjectFromArea} from 'app/utils/objects';
 
 
 export function removeAllClones(state: GameState): void {
@@ -12,10 +13,22 @@ export function removeAllClones(state: GameState): void {
     state.hero.clones = []
 }
 
-export function setAreaSection(state: GameState, newArea: boolean): void {
-    //console.log('setAreaSection', state.hero.x, state.hero.y);
+export function setAreaSection(state: GameState, areaSection: AreaSectionInstance): void {
+    state.areaSection = areaSection;
+    if (state.areaSection.isAstral) {
+        state.hero.isAstralProjection = true;
+    } else {
+        if (state.hero.isAstralProjection) {
+            state.hero.isAstralProjection = false;
+            state.hero.z = state.hero.groundHeight;
+        }
+    }
+}
+
+export function updateAreaSection(state: GameState, newArea: boolean): void {
+    //console.log('updateAreaSection', state.hero.x, state.hero.y);
     //const lastAreaSection = state.areaSection;
-    state.areaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
+    let newAreaSection: AreaSectionInstance;
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
     // returns false for points on the edge of the rectangle.
@@ -23,11 +36,17 @@ export function setAreaSection(state: GameState, newArea: boolean): void {
     const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
-            state.areaSection = getAreaSectionInstance(state, section);
+            newAreaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, section);
             exploreSection(state, section.index);
             break;
         }
     }
+    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
+    // currently in any of the defined sections for this area.
+    if (!newAreaSection) {
+        newAreaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, state.areaInstance.definition.sections[0]);
+    }
+    setAreaSection(state, newAreaSection);
     editingState.needsRefresh = true;
     // if (newArea || lastAreaSection !== state.areaSection) {
     if (newArea) {
@@ -41,7 +60,7 @@ export function setAreaSection(state: GameState, newArea: boolean): void {
 export function setNextAreaSection(state: GameState, d: Direction): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
-    state.nextAreaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
+    delete state.nextAreaSection;
     const hero = state.hero;
     let x = hero.x / 16;
     let y = hero.y / 16;
@@ -56,20 +75,33 @@ export function setNextAreaSection(state: GameState, d: Direction): void {
     y = Math.min(h - 1, Math.max(1, y));
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
-            state.nextAreaSection = getAreaSectionInstance(state, section);
+            state.nextAreaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, section);
             exploreSection(state, section.index);
             break;
         }
     }
+    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
+    // currently in any of the defined sections for this area.
+    if (!state.nextAreaSection) {
+        state.nextAreaSection = getAreaSectionInstance(state, state.zone, state.areaInstance.definition, state.areaInstance.definition.sections[0]);
+    }
 }
 
-export function getAreaSectionInstance(state: GameState, definition: AreaSection): AreaSectionInstance {
-    return {
+export function getAreaSectionInstance(state: GameState, zone: Zone, area: AreaDefinition, definition: AreaSection): AreaSectionInstance {
+    const section = {
         ...definition,
         definition,
-        isFoggy: evaluateLogicDefinition(state, definition.fogLogic, false),
-        isHot: evaluateLogicDefinition(state, definition.hotLogic, false),
+        dark: definition.dark ?? area.dark ?? zone.dark ?? 0,
+        isFoggy: evaluateLogicDefinition(state, definition.fogLogic ?? area.fogLogic ?? zone.fogLogic, false),
+        isHot: evaluateLogicDefinition(state, definition.hotLogic ?? area.hotLogic ?? zone.hotLogic, false),
+        isAstral: evaluateLogicDefinition(state, definition.astralLogic ?? area.astralLogic ?? zone.astralLogic, false),
+        isCorrosive: evaluateLogicDefinition(state, definition.corrosiveLogic ?? area.corrosiveLogic ?? zone.corrosiveLogic, false),
+    };
+    if (area.specialBehaviorKey) {
+        const specialBehavior = specialBehaviorsHash[area.specialBehaviorKey] as SpecialAreaBehavior;
+        specialBehavior?.applyToSection(state, section);
     }
+    return section;
 }
 
 export function cleanupHeroFromArea(state: GameState): void {

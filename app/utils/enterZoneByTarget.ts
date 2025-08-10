@@ -1,15 +1,16 @@
-import { TextCue } from 'app/content/effects/textCue';
-import { isObjectLogicValid } from 'app/content/logic';
-import { Door } from 'app/content/objects/door';
-import { Teleporter } from 'app/content/objects/teleporter';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { zones } from 'app/content/zones';
-import { setAreaSection } from 'app/utils/area';
-import { directionMap, getCardinalDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
-import { enterLocation } from 'app/utils/enterLocation';
-import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
-import { fixCamera } from 'app/utils/fixCamera';
+import {TextCue} from 'app/content/effects/textCue';
+import {evaluateLogicDefinition} from 'app/content/logic';
+import {Door} from 'app/content/objects/door';
+import {Teleporter} from 'app/content/objects/teleporter';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {zones} from 'app/content/zones';
+import {updateAreaSection} from 'app/utils/area';
+import {directionMap, getCardinalDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
+import {enterLocation} from 'app/utils/enterLocation';
+import {findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import {fixCamera} from 'app/utils/fixCamera';
+import {checkToUpdateSpawnLocation} from 'app/content/spawnLocations';
 
 
 interface OptionalEnterZoneByTargetParams {
@@ -37,6 +38,13 @@ export function enterZoneByTarget(
     if (!objectLocation) {
         return false;
     }
+    if (state.location.zoneKey !== objectLocation.zoneKey) {
+        // When leaving a zone through a door, we check to update the spawn location for both the location you are leaving from or the
+        // location you are arriving to. This will cause you to update your spawn location when entering or exiting most dungeons
+        // to the interior of the dungeon you most recently entered or left, provided you used an entrance associated with a spawn point.
+        checkToUpdateSpawnLocation(state);
+        checkToUpdateSpawnLocation(state, objectLocation);
+    }
     enterLocation(state, objectLocation, {
         instant,
         callback: () => {
@@ -45,7 +53,7 @@ export function enterZoneByTarget(
                 const hitbox = target.getHitbox(state);
                 state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
                 state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                setAreaSection(state, true);
+                updateAreaSection(state, true);
                 checkForFloorEffects(state, state.hero);
                 fixCamera(state);
             }
@@ -71,12 +79,13 @@ export function enterZoneByTarget(
 export function findObjectLocation(
     state: GameState,
     zoneKey: string,
-    targetObjectId: string,
+    targetObjectIds: string | string[],
     checkSpiritWorldFirst = false,
     skipObject: ObjectDefinition = null,
     showErrorIfMissing = false
 ): ZoneLocation & {object: ObjectDefinition} | false {
     const zone = zones[zoneKey];
+    const objectIds = Array.isArray(targetObjectIds) ? targetObjectIds : [targetObjectIds];
     if (!zone) {
         debugger;
         console.error('Missing zone', zoneKey);
@@ -93,8 +102,8 @@ export function findObjectLocation(
             for (let y = 0; y < areaGrid.length; y++) {
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
-                        if (object.id === targetObjectId && object !== skipObject) {
-                            if (!isObjectLogicValid(state, object)) {
+                        if (objectIds.includes(object.id) && object !== skipObject) {
+                            if (!evaluateLogicDefinition(state, object)) {
                                 continue;
                             }
                             return {
@@ -114,7 +123,7 @@ export function findObjectLocation(
         }
     }
     if (showErrorIfMissing) {
-        console.error('Could not find', targetObjectId, 'in', zoneKey);
+        console.error('Could not find', targetObjectIds, 'in', zoneKey);
     }
     return false;
 }

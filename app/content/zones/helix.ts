@@ -3015,13 +3015,14 @@ const sf3_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixBridgeTeleporter", x: 544, y: 344, targetZone: "helix", targetObjectId: "helixBridgeTeleporter", type: "teleporter", locationCue: "Helix Bridge"},
+        {status: "normal", id: "helixBridgeDreamTeleporter", x: 404, y: 160, targetZone: "dream", targetObjectId: "helixTeleporter", type: "teleporter", locationCue: "Helix Bridge", hasCustomLogic: true, customLogic: "$teleportation && elementalBeastsEscaped"},
         {status: "normal", id: "helixVanaraCommander", x: 312, y: 152, d: "down", behavior: "none", style: "vanaraPurple", type: "npc", dialogueKey: "vanaraCommander"},
         {status: "normal", id: "helixBridgePortal", x: 80, y: 344, type: "teleporter", linked: true},
         {status: "cracked", id: "helixSkySpiritEntrance", x: 288, y: 560, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "helixSkySpiritEntrance", d: "down", locationCue: "Helix Bridge"},
         {status: "normal", id: "", x: 304, y: 96, style: "largeDisplayScreen", type: "sign", message: "The screen is full of unfamiliar characters."},
         {status: "normal", id: "", x: 224, y: 160, d: "right", behavior: "none", style: "vanaraGold", type: "npc", dialogue: "Most of the crew is assigned elsewhere.", dialogueIndex: 126},
         {status: "normal", id: "", x: 296, y: 280, d: "down", behavior: "none", style: "vanaraBlue", type: "npc", dialogue: "Guardian?\n{|}No I'm the chief of security.", dialogueIndex: 127},
+        {status: "normal", id: "helixBridgeTeleporter", x: 544, y: 344, targetZone: "helix", targetObjectId: "helixBridgeTeleporter", type: "teleporter", locationCue: "Helix Bridge"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 274, mapId: 'helix', floorId: '4F', mapX: 3, mapY: 2},
