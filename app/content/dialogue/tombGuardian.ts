@@ -87,7 +87,7 @@ dialogueHash.tombGuardian = {
                 },
             ],
         },
-        {
+        /*{
             logicCheck: {
                 requiredFlags: ['cocoonBoss'],
                 excludedFlags: ['$teleportation'],
@@ -104,7 +104,7 @@ dialogueHash.tombGuardian = {
                     {item:teleportation}`,
                 },
             ],
-        },
+        },*/
         {
             logicCheck: {
                 requiredFlags: ['$spiritSight', '$astralProjection'],
