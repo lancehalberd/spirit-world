@@ -66,8 +66,8 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         spawnInterval: 1000, 
         maxTargets: 2,
         targetTypes: [
-            { points: 25, radius: 10, speed: 7, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
-            { points: 50, radius: 15, speed: 6, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 2 },
+            { points: 25, radius: 10, speed: 6, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
+            { points: 40, radius: 15, speed: 8, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 2 },
         ]
     },
     'l4': { 
@@ -99,7 +99,7 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         maxTargets: 4,
         targetTypes: [
            { points: 50, alternatePoints: -50, radius: 9, speed: 8, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 800},
-           { points: 0, radius: 11, speed: 7, lifetime: 6000, color: '#00F', weight: 3, type: 'ammo', bonusAmount: 3 },
+           { points: 0, radius: 11, speed: 7, lifetime: 6000, color: '#00F', weight: 3, type: 'ammo', bonusAmount: 4 },
            { points: 0, radius: 11, speed: 7, lifetime: 6000, color: '#F0F', weight: 3, type: 'time', bonusAmount: 4000 }
         ]
     },
@@ -176,6 +176,7 @@ interface TargetPracticeState {
     shotsFired: number
     shotsHit: number
     levelTime: number 
+    playerStart: {x: number, y: number}
 }
 
 interface ShopItem {
@@ -218,6 +219,7 @@ interface Target {
     vy: number
     color: string
     hitTime?: number
+    radius?: number
     update(state: GameState, gameState: TargetPracticeState): void
     render(context: CanvasRenderingContext2D): void
     getHitbox(): Rect
@@ -419,9 +421,12 @@ class StandardTarget implements Target {
         if (this.currentHits >= this.maxHits) {
             gameState.score = Math.max(gameState.score + this.points, 0);
             this.hitTime = 300;
+            playAreaSound(state, state.areaInstance, 'secretChime');
         }
         
-        playAreaSound(state, state.areaInstance, 'secretChime');
+        else {
+            playAreaSound(state, state.areaInstance, 'rockShatter')
+        }
     }
 }
 
@@ -542,7 +547,12 @@ class AlternatingTarget extends StandardTarget {
         gameState.shotsHit++;
         this.hitTime = 300;
         
-        playAreaSound(state, state.areaInstance, 'secretChime');
+       if (this.currentPoints > 0) {
+            playAreaSound(state, state.areaInstance, 'hitShot');
+        }
+        else {
+            playAreaSound(state, state.areaInstance, 'error')
+        }
     }
 }
 
@@ -676,6 +686,7 @@ function getEscalationMultiplier(gameState: TargetPracticeState): { speedMultipl
 
 
 function getNewTargetPracticeState(state: GameState): TargetPracticeState {
+    const heroHitbox = state.hero.getMovementHitbox();
     return {
         scene: 'shop',
         screen: {
@@ -686,7 +697,7 @@ function getNewTargetPracticeState(state: GameState): TargetPracticeState {
         },
         bullets: [],
         targets: [],
-        crosshair: {x: 0, y: 0},
+        crosshair: {x: state.hero.x, y: state.hero.y},
         reloadTime: 0,
         shopItems: [],
         levelKey: 'none',
@@ -702,7 +713,11 @@ function getNewTargetPracticeState(state: GameState): TargetPracticeState {
         maxTargets: 5, 
         shotsFired: 0,         
         shotsHit: 0, 
-        levelTime: 0
+        levelTime: 0,
+        playerStart: { 
+            x: heroHitbox.x + heroHitbox.w / 2 - 8,
+            y: heroHitbox.y + heroHitbox.h / 2 - 8
+        }
     };
 }
 
@@ -890,7 +905,7 @@ function spawnSingleTarget(state: GameState, gameState: TargetPracticeState, lev
         y = gameState.screen.y + selectedType.radius + Math.random() * (spawnHeight - 2 * selectedType.radius);
         attempts++;
     } while (attempts < 20 && gameState.targets.some(t => 
-        Math.sqrt((t.x - x) ** 2 + (t.y - y) ** 2) < selectedType.radius + (t as StandardTarget).radius + 5
+        Math.sqrt((t.x - x) ** 2 + (t.y - y) ** 2) < selectedType.radius + t.radius + 5
     ));
     
     let newTarget: Target;
@@ -950,8 +965,8 @@ function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: 
     gameState.levelTime = 0;
     
     const heroPos = getHeroPosition(state, gameState, true);
-    gameState.crosshair.x = heroPos.x + heroPos.w / 2;
-    gameState.crosshair.y = heroPos.y + heroPos.h / 2;
+    gameState.crosshair.x = heroPos.x;
+    gameState.crosshair.y = heroPos.y;
 }
 
 function fireBullet(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
@@ -1002,11 +1017,11 @@ function fireBullet(state: GameState, gameState: TargetPracticeState, savedState
 
 function handleTargetCollisions(gameState: TargetPracticeState) {
     for (let i = 0; i < gameState.targets.length; i++) {
-        const target1 = gameState.targets[i] as StandardTarget;
+        const target1 = gameState.targets[i];
         if (target1.hitTime !== undefined) continue;
        
         for (let j = i + 1; j < gameState.targets.length; j++) {
-            const target2 = gameState.targets[j] as StandardTarget;
+            const target2 = gameState.targets[j];
             if (target2.hitTime !== undefined) continue;
            
             const dx = target2.x - target1.x;
@@ -1066,8 +1081,8 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     gameState.levelTime += FRAME_LENGTH;
 
     const heroPos = getHeroPosition(state, gameState, true);
-    gameState.crosshair.x = heroPos.x + heroPos.w / 2;
-    gameState.crosshair.y = heroPos.y + heroPos.h / 2;
+    gameState.crosshair.x = heroPos.x;
+    gameState.crosshair.y = heroPos.y;
     
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         fireBullet(state, gameState, savedState);
@@ -1095,7 +1110,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
             const target = gameState.targets[j];
             if (target.hitTime !== undefined) continue;
             
-            const targetRadius = (target as StandardTarget).radius;
+            const targetRadius = target.radius;
             const hit = lineCircleIntersection(
                 bullet.prevX, bullet.prevY, 
                 bullet.x, bullet.y,         
@@ -1119,7 +1134,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     }
     
     for (let i = 0; i < gameState.targets.length; i++) {
-        const target = gameState.targets[i] as StandardTarget;
+        const target = gameState.targets[i];
         target.update(state, gameState);
     }
     
@@ -1143,7 +1158,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
 }
 
 function updateTargetPractice(state: GameState) {
-    const gameState = state.arState.game as TargetPracticeState;
+    const gameState = state.arState.game;
     const savedState = state.savedState.savedArData.gameData.targetPractice;
     savedState.points = Math.floor(savedState.points);
     
@@ -1173,10 +1188,15 @@ function getHeroPosition(state: GameState, gameState: TargetPracticeState, restr
         minY = restrictedAreaTop;
         maxY = restrictedAreaTop + restrictedAreaHeight - 16;
     }
+
+    gameState.crosshair.y += state.hero.vy * 0.8;
+    gameState.crosshair.x += state.hero.vx * 0.8;
+    state.hero.y = gameState.playerStart.y;
+    state.hero.x = gameState.playerStart.x;
     
     return {
-        x: Math.max(gameState.screen.x, Math.min(gameState.screen.x + gameState.screen.w - 16, hitbox.x + hitbox.w / 2 - 8)),
-        y: Math.max(minY, Math.min(maxY, hitbox.y + hitbox.h / 2 - 8)),
+        x: Math.max(gameState.screen.x, Math.min(gameState.screen.x + gameState.screen.w - 16, gameState.crosshair.x + hitbox.w / 2 - 8)),
+        y: Math.max(minY, Math.min(maxY, gameState.crosshair.y + hitbox.h / 2 - 8)),
         w: 16,
         h: 16,
     };
@@ -1195,7 +1215,7 @@ function renderHero(context: CanvasRenderingContext2D, state: GameState, gameSta
 
 
 function renderTargetPractice(context: CanvasRenderingContext2D, state: GameState) {
-    const gameState = state.arState.game as TargetPracticeState;
+    const gameState = state.arState.game;
     const savedState = state.savedState.savedArData.gameData.targetPractice;
     
     context.save();
@@ -1240,6 +1260,10 @@ function renderTargetPractice(context: CanvasRenderingContext2D, state: GameStat
 
 
 function updateResults(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
+    const heroPos = getHeroPosition(state, gameState);
+    gameState.crosshair.x = heroPos.x;
+    gameState.crosshair.y = heroPos.y;
+
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         let earnedPoints = 0;
         
@@ -1419,7 +1443,7 @@ function renderReset(context: CanvasRenderingContext2D, state: GameState, gameSt
 
 
 function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameState) {
-    const gameState = state.arState.game as TargetPracticeState;
+    const gameState = state.arState.game;
     const savedState = state.savedState.savedArData.gameData.targetPractice;
 
     drawARFont(context, 'TARGET PRACTICE', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 16, {textAlign: 'center', textBaseline: 'top'});
