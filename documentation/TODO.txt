@@ -152,30 +152,39 @@ Current tasks:
         - dirt particles
 
     - Add Vanara Dreamland
-        - Add initial cutscene for meeting the Spirit Tree
-            - Learn Teleportation after talking to the Spirit Tree
-                - In order to teleport MC must learn to manifest their physical body in the Dream World.
         - Add Vanara Dreamland to logic
             - Move check from Vanara Guardian to the Spirit tree
             - Add logic for all teleporters
         - Update entrance to Vanara Dreamland from the cocoon to use a sleeping pod you can interact with.
+            - Update Guardian dialogue and layout accordingly.
+            - Move final check from Cocoon into the dream world with NPC:
+              "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave."
         - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
-            - NPC Vanara projections populate the dreamland
-            - For now use regular grass tiles + vanara plants and then see if using clouds for exterior boundaries gives it a more fantastic feel.
             - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
             - The dreamland will start small and expand as you save the Daughter Trees.
-                - Add indicators for where the dreamland can expand.
                 - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
                 - One of the crew on the Helix recommends visiting the temple to assist them.
-        - Add NPCs to Vanara Dreamland
-            - Design NPC dialog
-        - Add Teleportation tutorial to Vanara Dreamland
         - Design+comission avatar for the Spirit Tree
             - Fully grown Helix exterior in a prominent location of the Dream World
             - Approaching the tree will cause the avatar of the Spirit Tree to appear which looks like some kind of heavenly being?
                 - Work with artist on design details.
-        - Add boss rush to Vanara Dreamland
+        - Expansion(Peach Cave Tree) 1: boss rush
+            - Face any previously defeated boss.
+            - Record best time.
+            - Fight more challenging versions/modes of bosses.
+            - Unlock unique boss fights that don't appear elsewhere.
+        - Expansion(Underwater Tree) 2: dungeon rush
+            - Tree requires gloves+iron boots, easy to find with True Sight
+        - Expansion(Forest Tree) 3: farming area
+            - Tree requires dodge roll, location is described when given the Magic Seeds.
+        - Expansion(Jade Palace Tree) 4: competitive games
+            - Pit under bush leads to tree, easier to find with True Sight.
+            - Bush is ambiguous in Spirit World, but obvious in the Material World.
+        - Expansion(Underground Tree) 5: puzzle challenges
+            - Requires moving Staff Tower
+        - Expansion(Spirit Sky Tree) 6: library of memories
+            - Requires Flying Boots or complicated use of other abilities
 
     - Add charge behavior to drone
         - line up with hero within 100px
