@@ -20,7 +20,7 @@ import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
 import { updateFileSelect } from 'app/scenes/fileSelect/updateFileSelect';
 import { updateTitle } from 'app/scenes/title/updateTitle';
 import { updateSettings } from 'app/scenes/settings/updateSettings';
-import {showMessage} from 'app/scriptEvents';
+import {appendCallback, showMessage, waitForARGame} from 'app/scriptEvents';
 import {
     canPauseGame,
     getState,
@@ -78,7 +78,16 @@ export function update() {
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
             if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
+                const isWaiting = state.scriptEvents.activeEvents.length > 0;
                 showMessage(state, '{@arGame.quit}');
+                if (isWaiting) {
+                    state.scriptEvents.activeEvents = [];
+                    state.scriptEvents.blockPlayerUpdates = true;
+                    appendCallback(state, () => {
+                        waitForARGame(state);
+                        state.scriptEvents.blockPlayerUpdates = true;
+                    });
+                }
                 return;
             }
             // Don't allow pausing while dialogue is displayed.

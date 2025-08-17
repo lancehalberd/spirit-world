@@ -176,4 +176,5 @@ interface ARGame {
     update: (state: GameState) => void
     render: (context: CanvasRenderingContext2D, state: GameState) => void
     renderHUD: (context: CanvasRenderingContext2D, state: GameState) => void
+    disablesPlayerMovement?: boolean
 }

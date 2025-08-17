@@ -279,8 +279,8 @@ export function isGameKeyDown(state: GameState, keyCode: number): boolean {
     return state.keyboard.gameKeysDown.has(keyCode);
 }
 
-export function getMovementDeltas(state: GameState): [number, number] {
-    if (state.scriptEvents.blockPlayerInput) {
+export function getMovementDeltas(state: GameState, force = false): [number, number] {
+    if (!force && state.scriptEvents.blockPlayerInput) {
         return [0, 0];
     }
     const { gameKeyValues } = state.keyboard;
@@ -294,11 +294,11 @@ export function getMovementDeltas(state: GameState): [number, number] {
     return [dx, dy];
 }
 
-export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, number] {
-    if (state.scriptEvents.blockPlayerInput) {
+export function getCloneMovementDeltas(state: GameState, hero: Hero, force = false): [number, number] {
+    if (!force && state.scriptEvents.blockPlayerInput) {
         return [0, 0];
     }
-    const [dx, dy] = getMovementDeltas(state);
+    const [dx, dy] = getMovementDeltas(state, force);
     const controlledHero = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero;
     if (controlledHero.d === hero.d) {
         return [dx, dy];
