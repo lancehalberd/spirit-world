@@ -152,13 +152,14 @@ Current tasks:
         - dirt particles
 
     - Add Vanara Dreamland
-        - Add Vanara Dreamland to logic
-            - Move check from Vanara Guardian to the Spirit tree
-            - Add logic for all teleporters
+        - Save progress when talking to the Spirit Tree.
         - Update entrance to Vanara Dreamland from the cocoon to use a sleeping pod you can interact with.
             - Update Guardian dialogue and layout accordingly.
             - Move final check from Cocoon into the dream world with NPC:
               "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave."
+        - Add Vanara Dreamland to logic
+            - Move check from Vanara Guardian to the Spirit tree
+            - Add logic for all teleporters
         - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
             - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.

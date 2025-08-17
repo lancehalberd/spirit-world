@@ -100,3 +100,31 @@ export const vanaraHoleyTransitionTile: TileSource = {
 };
 
 export const vanaraPlainFloorTile = singleTileSource('gfx/tiles/vanara.png', { defaultLayer: 'floor'}, 400, 32);
+
+const shortWallBehaviors: TileBehaviors = {defaultLayer: 'field', solid: true, low: true};
+const vanaraShortWallsCross: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 16, y: 416, w: 80, h: 80}),
+    behaviors: {'all': shortWallBehaviors},
+    tileCoordinates: [
+        [0,0],      [2,0],[4,0],
+                    [2,1],
+        [0,2],[1,2],[2,2],[4,2],
+        [0,4],      [2,4],[4,4],
+    ],
+};
+
+const vanaraShortWallsSquare: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 112, y: 448, w: 48, h: 48}),
+    behaviors: {'all': shortWallBehaviors},
+};
+
+
+const vanaraShortWallsSingle = singleTileSource('gfx/tiles/vanara.png', shortWallBehaviors, 176, 480)
+
+export const vanaraShortWallSources: TileSource[] = [
+    vanaraShortWallsCross,
+    vanaraShortWallsSquare,
+    vanaraShortWallsSingle,
+];
