@@ -979,4 +979,5 @@ export const dodgerGame: ARGame = {
     update: updateDodger,
     render: renderDodger,
     renderHUD: renderDodgerHUD,
+    disablesPlayerMovement: true,
 };

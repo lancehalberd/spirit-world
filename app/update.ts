@@ -20,7 +20,7 @@ import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
 import { updateFileSelect } from 'app/scenes/fileSelect/updateFileSelect';
 import { updateTitle } from 'app/scenes/title/updateTitle';
 import { updateSettings } from 'app/scenes/settings/updateSettings';
-import {appendCallback, showMessage, waitForARGame} from 'app/scriptEvents';
+import {appendCallback, showMessage, waitForARGameToFinish} from 'app/scriptEvents';
 import {
     canPauseGame,
     getState,
@@ -84,7 +84,7 @@ export function update() {
                     state.scriptEvents.activeEvents = [];
                     state.scriptEvents.blockPlayerUpdates = true;
                     appendCallback(state, () => {
-                        waitForARGame(state);
+                        waitForARGameToFinish(state);
                         state.scriptEvents.blockPlayerUpdates = true;
                     });
                 }
