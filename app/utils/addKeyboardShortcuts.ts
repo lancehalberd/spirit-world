@@ -72,7 +72,7 @@ export function addKeyboardShortcuts() {
             const state = getState();
             // Reset all zone flags.
             state.savedState.zoneFlags = {};
-            const flagsFromThisZone = findAllZoneFlags(zones[state.location.logicalZoneKey]);
+            const flagsFromThisZone = findAllZoneFlags(zones[state.location.zoneKey]);
             for (const key of flagsFromThisZone) {
                 delete state.savedState.objectFlags[key];
             }
