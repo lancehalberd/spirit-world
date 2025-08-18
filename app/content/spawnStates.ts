@@ -33,8 +33,10 @@ const cocoonStartState = applyItemsToSavedState(warTempleBoss, {maxLife: 1, astr
     ['warTempleBoss', 'tombExit']);
 const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
-const helixRivalStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1, teleportation: 1},
+const vanaraDreamStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1},
     ['cocoonTeleporter']);
+const helixRivalStateStory = applyItemsToSavedState(vanaraDreamStateStory, {teleportation: 1},
+    ['teleportationTutorialSwitch']);
 const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
 const helixStartState = applyItemsToSavedState(helixRivalStateStory, {},
     ['helixRivalBoss']);
@@ -187,6 +189,10 @@ export const storySpawnLocations: SpawnLocationOptions = {
     'Jade Champion War Temple': {
         location: spawnLocations.SPAWN_WAR_TEMPLE_ENTRANCE,
         savedState: cocoonStartState,
+    },
+    'The Dreaming': {
+        location: spawnLocations.SPAWN_DREAM_ENTRANCE,
+        savedState: vanaraDreamStateStory,
     },
     'Helix Rival Fight': {
         location: spawnLocations.SPAWN_LOCATION_LAKE_TUNNEL,

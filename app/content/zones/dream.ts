@@ -1,6 +1,38 @@
 import { zones } from 'app/content/zones/zoneHash';
 
 const f0_0x0: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 572, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 0},
+    ],
+};
+const f0_1x0: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 606, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 0},
+    ],
+};
+const f0_2x0: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 607, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 0},
+    ],
+};
+const f0_0x1: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 608, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 2},
+    ],
+};
+const f0_1x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -329,10 +361,26 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 40, y: 88, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Some Vanara like to spend their time in the Dreaming creating and solving puzzles.\n{|}Some of their puzzles are used in the Cocoon and the Helix, but don't worry, the more challenging ones are always optional.", hasCustomLogic: true, customLogic: "", dialogueIndex: 188},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 825, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 1},
+        {x: 0, y: 0, w: 40, h: 40, index: 825, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_2x1: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 609, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 2},
+    ],
+};
+const f0_0x2: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 610, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 4},
+    ],
+};
+const f0_1x2: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -654,12 +702,56 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "cocoonTeleporter", x: 64, y: 408, targetZone: "cocoon", targetObjectId: "dreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 547, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 0, y: 0, w: 40, h: 40, index: 547, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 4},
+    ],
+};
+const f0_2x2: AreaDefinition = {
+    layers: null,
+    objects: [
+    ],
+    sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 611, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_0x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
+const sf0_1x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
+const sf0_2x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_2x0,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
+const sf0_0x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
+const sf0_1x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x1,
     layers: [
         {
             key: 'floor',
@@ -971,9 +1063,27 @@ const sf0_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 40, h: 40, index: 548, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
-const sf0_0x1: AreaDefinition = {
+const sf0_2x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_0x1,
+    parentDefinition: f0_2x1,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
+const sf0_0x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x2,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
+const sf0_1x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x2,
     layers: [
         {
             key: 'floor',
@@ -1284,6 +1394,15 @@ const sf0_0x1: AreaDefinition = {
         {x: 0, y: 0, w: 40, h: 40, index: 571, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
+const sf0_2x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_2x2,
+    layers: null,
+    objects: [
+    ],
+    sections: [
+    ],
+};
 zones.dream = {
     key: 'dream',
     areaSize: {w: 40, h: 40},
@@ -1291,12 +1410,14 @@ zones.dream = {
     floors: [
         {
             grid: [
-                [f0_0x0,],
-                [f0_0x1,],
+                [f0_0x0,f0_1x0,f0_2x0,],
+                [f0_0x1,f0_1x1,f0_2x1,],
+                [f0_0x2,f0_1x2,f0_2x2,],
             ],
             spiritGrid: [
-                [sf0_0x0,],
-                [sf0_0x1,],
+                [sf0_0x0,sf0_1x0,sf0_2x0,],
+                [sf0_0x1,sf0_1x1,sf0_2x1,],
+                [sf0_0x2,sf0_1x2,sf0_2x2,],
             ],
         },
     ],

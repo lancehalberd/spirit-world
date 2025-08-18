@@ -213,16 +213,16 @@ function getBehaviors(object: AreaBehaviorLogic): string[] {
     if (object?.dark) {
         lines.push(`dark: ${object.dark}`);
     }
-    if (isLogicValid(object.hotLogic)) {
+    if (isLogicValid(object?.hotLogic)) {
         lines.push(`hotLogic: ${JSON.stringify(object.hotLogic)}`);
     }
-    if (isLogicValid(object.astralLogic)) {
+    if (isLogicValid(object?.astralLogic)) {
         lines.push(`astralLogic: ${JSON.stringify(object.astralLogic)}`);
     }
-    if (isLogicValid(object.corrosiveLogic)) {
+    if (isLogicValid(object?.corrosiveLogic)) {
         lines.push(`corrosiveLogic: ${JSON.stringify(object.corrosiveLogic)}`);
     }
-    if (isLogicValid(object.fogLogic)) {
+    if (isLogicValid(object?.fogLogic)) {
         lines.push(`fogLogic: ${JSON.stringify(object.fogLogic)}`);
     }
     return lines;

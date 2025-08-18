@@ -158,6 +158,36 @@ export const SPAWN_COCOON_BOSS: ZoneLocation = {
     isSpiritWorld: true,
 };
 
+export const SPAWN_DREAM_ENTRANCE: ZoneLocation = {
+    zoneKey: 'dream',
+    floor: 0,
+    x: 312,
+    y: 312,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 1, y: 2},
+    isSpiritWorld: false,
+};
+export const SPAWN_DREAM_SPIRIT_ENTRANCE: ZoneLocation = {
+    zoneKey: 'dream',
+    floor: 0,
+    x: 312,
+    y: 312,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 1, y: 2},
+    isSpiritWorld: false,
+};
+export const SPAWN_SPIRIT_TREE: ZoneLocation = {
+    zoneKey: 'dream',
+    floor: 0,
+    x: 320,
+    y: 192,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 1, y: 1},
+    isSpiritWorld: false,
+};
 
 export const SPAWN_LOCATION_LAKE_TUNNEL: ZoneLocation = {
     zoneKey: 'lakeTunnel',
@@ -429,6 +459,8 @@ const prioritizedSpawnLocations = [
     SPAWN_LOCATION_TOMB_ENTRANCE,
     SPAWN_WAR_TEMPLE_ENTRANCE,
     SPAWN_COCOON_ENTRANCE,
+    SPAWN_DREAM_ENTRANCE,
+    SPAWN_DREAM_SPIRIT_ENTRANCE,
     SPAWN_HELIX_ENTRANCE,
     SPAWN_HELIX_MATERIAL_EXIT,
     SPAWN_HELIX_SPIRIT_EXIT,

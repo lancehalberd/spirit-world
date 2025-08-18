@@ -152,7 +152,6 @@ Current tasks:
         - dirt particles
 
     - Add Vanara Dreamland
-        - Save progress when talking to the Spirit Tree.
         - Update entrance to Vanara Dreamland from the cocoon to use a sleeping pod you can interact with.
             - Update Guardian dialogue and layout accordingly.
             - Move final check from Cocoon into the dream world with NPC:

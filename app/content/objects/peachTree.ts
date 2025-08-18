@@ -2,6 +2,7 @@ import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation, drawFrameContentAt, getFrame, getFrameHitbox } from 'app/utils/animations';
 import {LootObject} from 'app/content/objects/lootObject';
+import {setSpawnLocation} from 'app/content/spawnLocations';
 import {appendScript, showMessage} from 'app/scriptEvents';
 import {addObjectToArea} from 'app/utils/objects';
 
@@ -83,6 +84,11 @@ export class PeachTree implements ObjectInstance {
     onGrab(state: GameState) {
         state.hero.action = null;
         if (this.definition.id === 'spiritTree') {
+            setSpawnLocation(state, {
+                ...state.location,
+                x: this.x + peachTreeGeometry.content.w / 2 - 8,
+                y: this.y + peachTreeGeometry.content.h + 4,
+            });
             appendScript(state, '{@spiritTree.interact}');
             return;
         }
