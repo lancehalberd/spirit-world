@@ -1077,7 +1077,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior, 16),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 96),
-    singleTileSource('gfx/tiles/rocks.png', unliftableStoneBehavior, 160),
+    singleTileSource('gfx/tiles/rocks.png', {...unliftableStoneBehavior, linkedOffset: 179}, 160),
     {
         w: 16, h: 16,
         source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
