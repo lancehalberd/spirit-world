@@ -2,6 +2,7 @@ import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {requireFrame} from 'app/utils/packedImages';
 import {getVariantRandom} from 'app/utils/variants';
 
@@ -42,6 +43,10 @@ export class Decoration implements ObjectInstance {
     getHitbox(): Rect {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getHitbox?.(this) || this;
+    }
+    onGrab(state: GameState) {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        decorationType.onGrab?.(state, this);
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -103,6 +108,7 @@ interface DecorationType {
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
     getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
+    onGrab?:(state: GameState, decoration: Decoration) => void
 }
 
 const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
@@ -795,6 +801,12 @@ const cocoon: DecorationType = {
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(cocoonFrame, decoration);
     },
+    onGrab(state: GameState, decoration: Decoration) {
+        state.hero.action = null;
+        if (decoration.definition.id === 'dreamPod') {
+            enterZoneByTarget(state, 'dream', 'cocoonTeleporter');
+        }
+    }
 };
 
 const smallLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 162, y: 20, w: 26, h: 23});

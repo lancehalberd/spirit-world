@@ -634,9 +634,9 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "guardianMarkerEasy", x: 104, y: 416, type: "marker"},
         {status: "normal", id: "guardianMarkerEasy", x: 80, y: 144, type: "marker"},
         {status: "normal", id: "guardianMarkerEasy", x: 352, y: 80, type: "marker"},
-        {status: "normal", id: "", x: 258, y: 282, type: "decoration", d: "right", w: 16, h: 16, decorationType: "cocoon"},
-        {status: "normal", id: "", x: 234, y: 281, type: "decoration", z: 0, d: "down", w: 16, h: 16, decorationType: "cocoon"},
-        {status: "normal", id: "dreamTeleporter", x: 288, y: 196, targetZone: "dream", targetObjectId: "cocoonTeleporter", type: "teleporter"},
+        {status: "normal", id: "dreamPod", x: 258, y: 282, type: "decoration", d: "right", w: 16, h: 16, decorationType: "cocoon"},
+        {status: "normal", id: "dreamPod", x: 234, y: 281, type: "decoration", z: 0, d: "down", w: 16, h: 16, decorationType: "cocoon"},
+        {status: "normal", id: "cocoonDreamTeleporter", x: 248, y: 304, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 252, mapId: 'cocoon', floorId: 'B3', mapX: 3, mapY: 2},

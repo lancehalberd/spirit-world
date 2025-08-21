@@ -376,7 +376,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
 
 const mapObjectTypes: ObjectType[] = [
-    'decoration',
+    'decoration', 'helixTop',
     'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
 ];
 const mapDecorationTypes = [

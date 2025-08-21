@@ -524,7 +524,7 @@ interface CrystalSwitchDefinition extends BaseSwitchDefinition {
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
-    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter'
+    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter' | 'helixTop'
     targetZone?: string
     targetObjectId?: string
     // This can be set to force a door to be open if the logic is true.
