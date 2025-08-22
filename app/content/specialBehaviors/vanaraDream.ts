@@ -22,3 +22,15 @@ specialBehaviorsHash.ephemeral = {
         npc.messageAlpha = npc.alpha = Math.min(1, Math.max(0, 1 - (mag - 32) / 64));
     }
 };
+
+specialBehaviorsHash.proximal = {
+    type: 'npc',
+    apply(state: GameState, npc: NPC) {
+        this.update(state, npc);
+    },
+    update(state: GameState, npc: NPC) {
+        // Proximate NPCs are permanent but fade away when you are distant from them.
+        const {mag} = getVectorToTarget(state, npc, state.hero);
+        npc.messageAlpha = npc.alpha = Math.min(1, Math.max(0, 1 - (mag - 32) / 64));
+    }
+};

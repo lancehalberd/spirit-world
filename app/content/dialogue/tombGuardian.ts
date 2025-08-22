@@ -65,8 +65,8 @@ dialogueHash.tombGuardian = {
                 {
                     dialogueIndex: 61,
                     dialogueType: 'hint',
-                    text:`You can use your teleportation skill to leave here through that portal.
-                    {|} Move your Astral Body where you want to go and press [B_TOOL] to teleport.
+                    text:`Now that you can teleport you can travel through the Dreaming to reach
+                    different places.{|}Look for a portal that will take you back to the lake.
                     `,
                 },
             ],
@@ -83,7 +83,7 @@ dialogueHash.tombGuardian = {
                 {
                     dialogueIndex: 98,
                     text:`I am impressed!{|}
-                    Step through the portal and speak to me to learn my final technique.`
+                    Step through the portal and I'll show you the way to the Spirit Tree.`
                 },
             ],
         },
@@ -98,10 +98,10 @@ dialogueHash.tombGuardian = {
                 {
                     dialogueIndex: 62,
                     dialogueType: 'quest',
-                    text:`You are ready to learn my final technique.{|}
-                    You won't be able to travel between the material and spirit worlds as freely
-                    as a pure blooded Vanara, but this should be enough for you to climb the Helix.
-                    {item:teleportation}`,
+                    text:`You have proven you are ready to meet the Spirit Tree, but you will not find her even here in the Spirit World.{|}
+                    She presides over the Realm of the Dreaming where the Vanara rest and prepare to join our waking world.{|}
+                    You may now use one of these empty pods to visit the Dreaming yourself.
+                    {addCue: Face a pod and press [B_PASSIVE] to get in}`,
                 },
             ],
         },

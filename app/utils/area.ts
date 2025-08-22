@@ -87,7 +87,12 @@ export function setNextAreaSection(state: GameState, d: Direction): void {
     }
 }
 
-export function getAreaSectionInstance(state: GameState, zone: Zone, area: AreaDefinition, definition: AreaSection): AreaSectionInstance {
+export function getAreaSectionInstance(
+    state: GameState,
+    zone: Zone,
+    area: AreaDefinition,
+    definition: AreaSection = {x: 0, y: 0, w: area.w, h: area.h}
+): AreaSectionInstance {
     const section = {
         ...definition,
         definition,

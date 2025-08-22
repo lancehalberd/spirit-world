@@ -168,12 +168,13 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airStream', 'anode', 'cathode', 'airBubbles', 'arGame', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch','indicator', 'keyBlock', 'lavafall', 'loot',
+    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch', 'helixTop', 'indicator', 'keyBlock', 'lavafall', 'loot',
     'marker', 'movingPlatform', 'narration', 'npc', 'peachTree', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
+export const doorTypes: ObjectType[] = ['door', 'helixTop', 'staffTower'];
 
 export function createObjectDefinition(
     state: GameState,
@@ -262,6 +263,7 @@ export function createObjectDefinition(
                 targetObjectId: definition.targetObjectId,
             };
         case 'door':
+        case 'helixTop':
         case 'staffTower':
             return {
                 ...commonProps,
@@ -1046,6 +1048,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 }),
             ];
             // This intentionally continue on to the marker properties.
+        case 'helixTop':
         case 'pitEntrance':
         case 'staffTower':
         case 'teleporter':
@@ -1071,9 +1074,11 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             let targetTypes: ObjectType[] = [object.type];
             if (object.type === 'pitEntrance') {
                 targetTypes = ['marker'];
-            } else if (object.type === 'staffTower' || object.type === 'door') {
+            } else if (object.type === 'teleporter') {
+                targetTypes = ['teleporter', 'marker'];
+            } else if (doorTypes.includes(object.type)) {
                 // Staff tower objects also function as doors.
-                targetTypes = ['door', 'staffTower'];
+                targetTypes = doorTypes;
             }
             const objectIds = zone ? getTargetObjectIdsByTypes(zone, targetTypes) : [];
             if (objectIds.length) {

@@ -196,6 +196,12 @@ export function applyTileToBehaviorGrid(
     if (!isForeground && resultingBehaviors.cloudGround && !behaviors.cloudGround) {
         delete resultingBehaviors.cloudGround;
     }
+    if (!isForeground && resultingBehaviors.touchHit && !behaviors.touchHit && behaviors.isGround !== false) {
+        delete resultingBehaviors.touchHit;
+    }
+    if (!isForeground && resultingBehaviors.isBrittleGround && !behaviors.isBrittleGround && behaviors.isGround !== false) {
+        delete resultingBehaviors.isBrittleGround;
+    }
     const lightRadius = Math.max(resultingBehaviors.lightRadius || 0, behaviors.lightRadius || 0);
     const brightness = Math.max(resultingBehaviors.brightness || 0, behaviors.brightness || 0);
     resultingBehaviors = {...resultingBehaviors, ...behaviors, lightRadius, brightness};

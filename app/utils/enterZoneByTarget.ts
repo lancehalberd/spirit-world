@@ -197,8 +197,9 @@ function findEntranceById(state: GameState, areaInstance: AreaInstance, id: stri
             && object.definition.type !== 'boss'
             && object.definition.id === id
         ) {
-            // The "staffTower" has a door subcomponent that should be targeted rather than the tower itself.
-            if (object.definition.type === 'staffTower') {
+            // The "staffTower" and "helixTop" objects each have a door subcomponent
+            // that should be targeted rather than the tower itself.
+            if (object.definition.type === 'staffTower' || object.definition.type === 'helixTop') {
                 return object.getParts(state).find(object => object.definition?.id === id);
             }
             return object;

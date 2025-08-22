@@ -301,7 +301,8 @@ const oldSquareBaseDoorStyle = {
     },
     getPathHitbox(door: Door) {
         return (door.definition.d === 'up' || door.definition.d === 'down')
-            ? {x: door.x + 8, y: door.y, w: 16, h: 32}
+            // This is made as wide was possible to support using this with the helixTop object.
+            ? {x: door.x + 3, y: door.y, w: 26, h: 32}
             // This is slightly lower than you would naively place it in order to prevent
             // the MCs head from peaking over the top of the frame as they move left/right.
             : {x: door.x, y: door.y + 10, w: 32, h: 16};

@@ -2,12 +2,14 @@ import {
     BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
 } from 'app/content/bitMasks';
 import {
+    lowWallBehavior,
     southernWallBehavior,
     topRightWall,
     topLeftWall,
     bottomLeftWall,
     bottomRightWall,
     singleTileSource,
+    unliftableStoneBehavior,
 } from 'app/content/tiles/constants';
 
 
@@ -100,3 +102,30 @@ export const vanaraHoleyTransitionTile: TileSource = {
 };
 
 export const vanaraPlainFloorTile = singleTileSource('gfx/tiles/vanara.png', { defaultLayer: 'floor'}, 400, 32);
+
+const vanaraShortWallsCross: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 16, y: 416, w: 80, h: 80}),
+    behaviors: {'all': lowWallBehavior},
+    tileCoordinates: [
+        [0,0],      [2,0],[4,0],
+                    [2,1],
+        [0,2],[1,2],[2,2],[4,2],
+        [0,4],      [2,4],[4,4],
+    ],
+};
+
+const vanaraShortWallsSquare: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 112, y: 448, w: 48, h: 48}),
+    behaviors: {'all': lowWallBehavior},
+};
+
+
+const vanaraShortWallsSingle = singleTileSource('gfx/tiles/vanara.png', unliftableStoneBehavior, 176, 480)
+
+export const vanaraShortWallSources: TileSource[] = [
+    vanaraShortWallsCross,
+    vanaraShortWallsSquare,
+    vanaraShortWallsSingle,
+];

@@ -1,9 +1,10 @@
 //import {dodgerGame} from 'app/arGames/dodger/dodger';
 import {hotaGame} from 'app/arGames/hota/hota';
+import {waitForARGameToFinish} from 'app/scriptEvents';
 //import {targetPracticeGame} from 'app/arGames/target_practice/target_practice_game';
 import {targetPracticeGame} from 'app/arGames/target_practice/target_practice_game_no_bullet';
 
-export function getARScene(state: GameState): ARGame {
+export function getARGame(state: GameState): ARGame {
     if (state.arState.scene === 'dodger') {
         //return dodgerGame;
         return targetPracticeGame;
@@ -18,26 +19,30 @@ export function getARScene(state: GameState): ARGame {
 
 export function startARGame(state: GameState, game: ARGameID) {
     state.arState.scene = game;
-    getARScene(state).start(state);
+    const arGame = getARGame(state);
+    arGame.start(state);
+    if (arGame.disablesPlayerMovement) {
+        waitForARGameToFinish(state);
+    }
 }
 
 export function updateAR(state: GameState) {
     if (!state.arState.active) {
         return;
     }
-    getARScene(state).update(state);
+    getARGame(state).update(state);
 }
 
 export function renderAR(context: CanvasRenderingContext2D, state: GameState) {
     if (!state.arState.active) {
         return;
     }
-    getARScene(state).render(context, state);
+    getARGame(state).render(context, state);
 }
 
 export function renderARHUD(context: CanvasRenderingContext2D, state: GameState) {
     if (!state.arState.active) {
         return;
     }
-    getARScene(state).renderHUD(context, state);
+    getARGame(state).renderHUD(context, state);
 }

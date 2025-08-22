@@ -65,7 +65,7 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
-import {allVanaraTileSources, vanaraHoleyTransitionTile, vanaraPlainFloorTile} from 'app/content/tiles/vanaraTree'
+import {allVanaraTileSources, vanaraHoleyTransitionTile, vanaraPlainFloorTile, vanaraShortWallSources} from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
 import { allJadeInteriorLightTileSources } from './tiles/jadeInteriorLight';
@@ -1098,7 +1098,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior, 16),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 96),
-    singleTileSource('gfx/tiles/rocks.png', unliftableStoneBehavior, 160),
+    singleTileSource('gfx/tiles/rocks.png', {...unliftableStoneBehavior, linkedOffset: 179}, 160),
     {
         w: 16, h: 16,
         source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
@@ -1238,6 +1238,7 @@ addTiles([
     vanaraHoleyTransitionTile,
     vanaraPlainFloorTile,
     vanaraAngledPits,
+    ...vanaraShortWallSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

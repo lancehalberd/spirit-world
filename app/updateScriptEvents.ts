@@ -225,6 +225,8 @@ export function updateScriptEvents(state: GameState): void {
                 prependScript(state, script);
                 // Since this overwrites remaining events, don't continue processing events this frame.
                 state.scriptEvents.blockEventQueue = true;
+                // Block the player input so that the player doesn't move during the frame the event queue is blocked.
+                state.scriptEvents.blockPlayerInput = true;
                 break;
             case 'attemptPurchase':
                 if (event.cost <= state.hero.savedData.money) {

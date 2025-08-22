@@ -85,7 +85,6 @@ export const unliftableStoneBehavior: TileBehaviors = {
     throwDamage: 8,
     particles: heavyStoneParticles,
     breakSound: 'rockShatter',
-    linkedOffset: 179,
 };
 export const southernWallBehavior: TileBehaviors = {
     solid: true,
