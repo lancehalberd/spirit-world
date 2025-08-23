@@ -65,7 +65,13 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
-import {allVanaraTileSources, vanaraHoleyTransitionTile, vanaraPlainFloorTile, vanaraShortWallSources} from 'app/content/tiles/vanaraTree'
+import {
+    allVanaraTileSources,
+    vanaraHoleyTransitionTile,
+    vanaraPlainFloorTile,
+    vanaraShortWallSources,
+    vanaraWallEdges,
+} from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
 import { allJadeInteriorLightTileSources } from './tiles/jadeInteriorLight';
@@ -169,6 +175,9 @@ function addTiles(palettes: TileSource[]) {
         // Use specified array of coordinates if found.
         if (palette.tileCoordinates) {
             for (const coordinates of palette.tileCoordinates) {
+                if (!coordinates) {
+                    continue;
+                }
                 const [x, y] = coordinates;
                 addSingleTileFromTileSource(palette, x, y);
                 for (const target of (palette.paletteTargets || [])) {
@@ -1217,6 +1226,7 @@ addTiles([
     vanaraPlainFloorTile,
     vanaraAngledPits,
     ...vanaraShortWallSources,
+    vanaraWallEdges,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
