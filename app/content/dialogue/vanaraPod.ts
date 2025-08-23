@@ -13,6 +13,7 @@ dialogueHash.vanaraPod = {
             },
             text: [
                 {
+                    dialogueIndex: 193,
                     text: `Do the Vanara in the dreaming even need bodies?`,
                 },
             ],
@@ -24,6 +25,7 @@ dialogueHash.vanaraPod = {
             },
             text: [
                 {
+                    dialogueIndex: 192,
                     text: `Are these the Vanara I met in the dreaming?`,
                 },
             ],
@@ -35,10 +37,12 @@ dialogueHash.vanaraPod = {
             },
             text: [
                 {
+                    dialogueIndex: 190,
                     text: `No reaction at all...
-                            {|}It's like their sleeping with their eyes wide open.`,
+                            {|}It's like they're sleeping with their eyes wide open.`,
                 },
                 {
+                    dialogueIndex: 191,
                     text: `Will they ever wakeup?`,
                 },
             ],
