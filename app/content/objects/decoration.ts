@@ -44,9 +44,9 @@ export class Decoration implements ObjectInstance {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getHitbox?.(this) || this;
     }
-    onGrab(state: GameState) {
+    onGrab(state: GameState, direction: Direction, hero: Hero) {
         const decorationType = decorationTypes[this.definition.decorationType];
-        decorationType.onGrab?.(state, this);
+        decorationType.onGrab?.(state, this, direction, hero);
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -108,7 +108,7 @@ interface DecorationType {
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
     getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
-    onGrab?:(state: GameState, decoration: Decoration) => void
+    onGrab?:(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) => void
 }
 
 const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
@@ -801,16 +801,19 @@ const cocoon: DecorationType = {
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(cocoonFrame, decoration);
     },
-    onGrab(state: GameState, decoration: Decoration) {
-        state.hero.action = null;
+    onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
+        hero.action = null;
         if (decoration.definition.id === 'dreamPod') {
             enterZoneByTarget(state, 'dream', 'cocoonTeleporter');
+        } else if (decoration.child) {
+            decoration.child.onGrab?.(state, direction, hero);
         }
     }
 };
 
-const smallLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 162, y: 20, w: 26, h: 23});
-const bigLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 104, y: 3, w: 47, h: 43});
+
+const smallLightDomeFrame = requireFrame('gfx/tiles/jadeCityLight.png', {x: 162, y: 20, w: 26, h: 23});
+const bigLightDomeFrame = requireFrame('gfx/tiles/jadeCityLight.png', {x: 104, y: 3, w: 47, h: 43});
 const smallLightDome: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, smallLightDomeFrame, decoration);

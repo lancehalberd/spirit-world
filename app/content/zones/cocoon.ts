@@ -134,8 +134,8 @@ const f0_0x0: AreaDefinition = {
                 h: 32,
                 tiles: [
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,2383,0,0,0,0,0,0,0,0,0,0,0,0,2382,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,2383,0,0,0,0,0,0,0,0,0,0,0,0,2382,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1402,8 +1402,8 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 219, y: 200, type: "decoration", d: "left", w: 16, h: 16, decorationType: "cocoon", targetObjectId: "sleepingVanaraLeft"},
         {status: "normal", id: "", x: 202, y: 207, type: "decoration", d: "left", w: 16, h: 16, decorationType: "cocoon", targetObjectId: "sleepingVanaraLeft"},
         {status: "normal", id: "", x: 174, y: 240, type: "decoration", d: "left", w: 16, h: 16, decorationType: "cocoon", targetObjectId: "sleepingVanaraLeft"},
-        {status: "normal", id: "sleepingVanaraRight", x: 312, y: 376, d: "right", behavior: "none", style: "vanaraRed", type: "npc"},
-        {status: "normal", id: "sleepingVanaraLeft", x: 176, y: 392, d: "left", behavior: "none", style: "vanaraRed", type: "npc"},
+        {status: "normal", id: "sleepingVanaraRight", x: 312, y: 376, d: "right", behavior: "none", style: "vanaraRed", type: "npc", dialogueKey: "vanaraPod"},
+        {status: "normal", id: "sleepingVanaraLeft", x: 176, y: 392, d: "left", behavior: "none", style: "vanaraRed", type: "npc", dialogueKey: "vanaraPod"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 254, mapId: 'cocoon', floorId: 'B2', mapX: 3, mapY: 2},
