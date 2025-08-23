@@ -4,7 +4,7 @@ import {drawFrame} from 'app/utils/animations';
 import {boxesIntersect, pad} from 'app/utils/index';
 import {drawARFont} from 'app/arGames/arFont';
 import {playAreaSound} from 'app/musicController';
-import {wasGameKeyPressed} from 'app/userInput';
+import {wasGameKeyPressed, getMovementDeltas} from 'app/userInput';
 import {saveGame} from 'app/utils/saveGame';
 import {typedKeys} from 'app/utils/types';
 
@@ -48,7 +48,7 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         spawnInterval: 1000,
         maxTargets: 2,
         targetTypes: [
-            { points: 30, radius: 11, speed: 5.5, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
+            { points: 30, radius: 11, speed: 4, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
         ]
     },
     'l2': { 
@@ -57,7 +57,7 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         spawnInterval: 800, 
         maxTargets: 2,
         targetTypes: [
-            { points: 30, alternatePoints: -10, radius: 15, speed: 6, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
+            { points: 30, alternatePoints: -10, radius: 15, speed: 4.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
         ]
     },
     'l3': { 
@@ -66,8 +66,8 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         spawnInterval: 1000, 
         maxTargets: 2,
         targetTypes: [
-            { points: 25, radius: 10, speed: 6, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
-            { points: 40, radius: 15, speed: 8, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 2 },
+            { points: 25, radius: 10, speed: 5, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
+            { points: 40, radius: 15, speed: 6.5, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 2 },
         ]
     },
     'l4': { 
@@ -1029,7 +1029,7 @@ function handleTargetCollisions(gameState: TargetPracticeState) {
             const distance = Math.sqrt(dx * dx + dy * dy);
             const minDistance = target1.radius + target2.radius;
            
-            if (distance < minDistance && distance > 0) {
+            if (distance < minDistance && distance > 0 ) {
                 if (target1 instanceof StandardTarget && !(target1 instanceof CirclingTarget) &&
                     target2 instanceof StandardTarget && !(target2 instanceof CirclingTarget)) {
                     const nx = dx / distance;
@@ -1080,9 +1080,7 @@ function handleTargetCollisions(gameState: TargetPracticeState) {
 function updateLevel(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
     gameState.levelTime += FRAME_LENGTH;
 
-    const heroPos = getHeroPosition(state, gameState, true);
-    gameState.crosshair.x = heroPos.x;
-    gameState.crosshair.y = heroPos.y;
+    getHeroPosition(state, gameState, true);
     
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         fireBullet(state, gameState, savedState);
@@ -1177,30 +1175,47 @@ function updateTargetPractice(state: GameState) {
 }
 
 function getHeroPosition(state: GameState, gameState: TargetPracticeState, restrictMovement: boolean = false): Rect {
-    const hitbox = state.hero.getMovementHitbox();
-    
+    const cursorSpeed = 1.5;
+    const [dx, dy] = getMovementDeltas(state, true);
+    const cursorSize = 16;
+
     let minY = gameState.screen.y;
-    let maxY = gameState.screen.y + gameState.screen.h - 16;
-    
+    let maxY = gameState.screen.y + gameState.screen.h - cursorSize;
+
     if (restrictMovement) {
         const restrictedAreaTop = gameState.screen.y + (gameState.screen.h * 0.75);
         const restrictedAreaHeight = gameState.screen.h * 0.25;
         minY = restrictedAreaTop;
-        maxY = restrictedAreaTop + restrictedAreaHeight - 16;
+        maxY = restrictedAreaTop + restrictedAreaHeight - cursorSize;
     }
 
-    gameState.crosshair.y += state.hero.vy * 0.8;
-    gameState.crosshair.x += state.hero.vx * 0.8;
-    state.hero.y = gameState.playerStart.y;
-    state.hero.x = gameState.playerStart.x;
-    
+    let diagMultiplier = (dx !== 0 && dy !== 0) ? 0.7 : 1;
+
+    gameState.crosshair.x = Math.max(
+        gameState.screen.x + cursorSize / 2,
+        Math.min(
+            gameState.screen.x + gameState.screen.w - cursorSize / 2,
+            gameState.crosshair.x + cursorSpeed * dx * diagMultiplier
+        )
+    );
+
+    gameState.crosshair.y = Math.max(
+        minY + cursorSize / 2,
+        Math.min(
+            maxY + cursorSize / 2,
+            gameState.crosshair.y + cursorSpeed * dy * diagMultiplier
+        )
+    );
+
     return {
-        x: Math.max(gameState.screen.x, Math.min(gameState.screen.x + gameState.screen.w - 16, gameState.crosshair.x + hitbox.w / 2 - 8)),
-        y: Math.max(minY, Math.min(maxY, gameState.crosshair.y + hitbox.h / 2 - 8)),
-        w: 16,
-        h: 16,
+        x: gameState.crosshair.x - cursorSize / 2,
+        y: gameState.crosshair.y - cursorSize / 2,
+        w: cursorSize,
+        h: cursorSize,
     };
 }
+
+
 
 
 function renderHero(context: CanvasRenderingContext2D, state: GameState, gameState: TargetPracticeState) {
@@ -1260,9 +1275,7 @@ function renderTargetPractice(context: CanvasRenderingContext2D, state: GameStat
 
 
 function updateResults(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
-    const heroPos = getHeroPosition(state, gameState);
-    gameState.crosshair.x = heroPos.x;
-    gameState.crosshair.y = heroPos.y;
+    getHeroPosition(state, gameState);
 
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         let earnedPoints = 0;
@@ -1531,4 +1544,5 @@ export const targetPracticeGame: ARGame = {
     update: updateTargetPractice,
     render: renderTargetPractice,
     renderHUD: renderTargetPracticeHUD,
+    disablesPlayerMovement: true,
 };
