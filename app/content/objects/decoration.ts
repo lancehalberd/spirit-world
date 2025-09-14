@@ -48,13 +48,15 @@ export class Decoration implements ObjectInstance {
         const decorationType = decorationTypes[this.definition.decorationType];
         decorationType.onGrab?.(state, this, direction, hero);
     }
-    update(state: GameState) {
-        this.animationTime += FRAME_LENGTH;
+    onInitialize(state: GameState) {
         const targetId = this.definition.targetObjectId;
         if (targetId && targetId !== this.child?.definition?.id) {
             this.child = this.area.objects.find(o => o.definition?.id === targetId);
             this.child.renderParent = this;
         }
+    }
+    update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];

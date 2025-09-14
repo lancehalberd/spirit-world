@@ -1877,8 +1877,7 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
     }
     const newObject = createObjectInstance(state, object);
     addObjectToArea(state, area, newObject);
-    initializeObject(state, newObject);
-    newObject.onInitialize?.(state);
+    initializeObject(state, newObject, true);
     if (area === state.areaInstance && state.alternateAreaInstance) {
         checkToAddLinkedObject(state, area, object);
     }

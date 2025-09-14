@@ -283,68 +283,89 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     },
 };
 
-export const npcBehaviors = {
-    none() {
+export const npcBehaviors: {[key in string]?: {
+    interact?: (state: GameState, npc: NPC) => void
+    update?: (state: GameState, npc: NPC) => void
+}} = {
+    none: {
         // Do nothing for this behavior.
     },
-    face(state: GameState, npc: NPC) {
-        // Always update to face original direction.
-        npc.d = npc.definition.d || 'down';
-        npc.changeToAnimation('still');
-    },
-    random(state: GameState, npc: NPC) {
-        if (npc.mode === 'choose' && npc.modeTime > 200) {
+    sleeping: {
+        interact(state: GameState, npc: NPC) {
+            // Always update to face original direction.
+            npc.d = npc.definition.d || 'down';
             npc.changeToAnimation('still');
-            if (Math.random() < 0.2) {
-                npc.setMode('rest');
-            } else {
-                npc.setMode('walk');
-                npc.d = sample(['up', 'down', 'left', 'right']);
-            }
-        }
-        if (npc.mode === 'walk') {
-            npc.changeToAnimation('move');
-            if (!moveNPC(state, npc, npc.speed * directionMap[npc.d][0], npc.speed * directionMap[npc.d][1], {})) {
-                npc.setMode('choose');
-            }
-            if (npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
-                npc.setMode('choose');
-            }
-        }
-        if (npc.mode === 'rest') {
+        },
+        update(state: GameState, npc: NPC) {
+            // Always update to face original direction.
+            npc.d = npc.definition.d || 'down';
             npc.changeToAnimation('still');
-            if (Math.random() < 0.01) {
-                npc.setMode('idleAnimation');
-            }
-            if (npc.modeTime > 1000) {
-                npc.setMode('choose');
-            }
-        }
-        if (npc.mode === 'idleAnimation') {
-            npc.changeToAnimation('idle');
-            if (npc.animationTime >= npc.currentAnimation.duration) {
-                npc.setMode('choose');
-            }
-        }
+        },
     },
-    idle(state: GameState, npc: NPC) {
-        const { animations } = npcStyles[npc.definition.style];
-        const stillSet = animations.still || animations.idle;
-        if (npc.currentAnimation === stillSet[npc.d]) {
-            const defaultDirection = npc.definition.d || 'down';
-            if (npc.d !== defaultDirection) {
-                npc.d = defaultDirection;
+    face: {
+        update(state: GameState, npc: NPC) {
+            // Always update to face original direction.
+            npc.d = npc.definition.d || 'down';
+            npc.changeToAnimation('still');
+        },
+    },
+    random: {
+        update(state: GameState, npc: NPC) {
+            if (npc.mode === 'choose' && npc.modeTime > 200) {
                 npc.changeToAnimation('still');
+                if (Math.random() < 0.2) {
+                    npc.setMode('rest');
+                } else {
+                    npc.setMode('walk');
+                    npc.d = sample(['up', 'down', 'left', 'right']);
+                }
             }
-            if (Math.random() < (npc.animationTime - 3000) / 7000) {
-                npc.setAnimation('idle', npc.d);
+            if (npc.mode === 'walk') {
+                npc.changeToAnimation('move');
+                if (!moveNPC(state, npc, npc.speed * directionMap[npc.d][0], npc.speed * directionMap[npc.d][1], {})) {
+                    npc.setMode('choose');
+                }
+                if (npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
+                    npc.setMode('choose');
+                }
             }
-        } else {
-            if (npc.animationTime >= npc.currentAnimation.duration) {
-                npc.setAnimation('still', npc.d);
+            if (npc.mode === 'rest') {
+                npc.changeToAnimation('still');
+                if (Math.random() < 0.01) {
+                    npc.setMode('idleAnimation');
+                }
+                if (npc.modeTime > 1000) {
+                    npc.setMode('choose');
+                }
             }
-        }
-    }
+            if (npc.mode === 'idleAnimation') {
+                npc.changeToAnimation('idle');
+                if (npc.animationTime >= npc.currentAnimation.duration) {
+                    npc.setMode('choose');
+                }
+            }
+        },
+    },
+    idle: {
+        update(state: GameState, npc: NPC) {
+            const { animations } = npcStyles[npc.definition.style];
+            const stillSet = animations.still || animations.idle;
+            if (npc.currentAnimation === stillSet[npc.d]) {
+                const defaultDirection = npc.definition.d || 'down';
+                if (npc.d !== defaultDirection) {
+                    npc.d = defaultDirection;
+                    npc.changeToAnimation('still');
+                }
+                if (Math.random() < (npc.animationTime - 3000) / 7000) {
+                    npc.setAnimation('idle', npc.d);
+                }
+            } else {
+                if (npc.animationTime >= npc.currentAnimation.duration) {
+                    npc.setAnimation('still', npc.d);
+                }
+            }
+        },
+    },
 }
 
 
@@ -419,6 +440,8 @@ export class NPC implements Actor, ObjectInstance  {
         this.changeToAnimation('still');
         // Remove the grab action since the hero is talking to the NPC, not grabbing it.
         hero.action = null;
+        npcBehaviors[this.definition.behavior]?.interact?.(state, this);
+
     }
     changeToAnimation(type: string, d?: CardinalDirection) {
         if (d) {
@@ -497,7 +520,7 @@ export class NPC implements Actor, ObjectInstance  {
             }
             return;
         }
-        npcBehaviors[this.definition.behavior]?.(state, this);
+        npcBehaviors[this.definition.behavior]?.update?.(state, this);
         this.animationTime += FRAME_LENGTH;
         this.modeTime += FRAME_LENGTH;
     }

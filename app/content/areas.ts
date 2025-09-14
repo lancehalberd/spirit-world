@@ -436,13 +436,14 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition,
     for (const layer of instance.layers) {
         applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
+    const newObjectInstances: ObjectInstance[] = [];
     for (const object of definition.objects.filter(object => evaluateLogicDefinition(state, object))) {
         const objectInstance = createObjectInstance(state, object);
         addObjectToArea(state, instance, objectInstance);
-        initializeObject(state, objectInstance);
-        if (isActiveArea) {
-            objectInstance.onInitialize?.(state);
-        }
+        newObjectInstances.push(objectInstance);
+    }
+    for (const objectInstance of newObjectInstances) {
+        initializeObject(state, objectInstance, isActiveArea);
     }
     // instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
@@ -685,6 +686,9 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
     }
     const l = section.x * 16;
     const t = section.y * 16;
+    // Objects will be initialized after all objects are added to the area since some object initialization will depend on
+    // other objects, for example beds/cocoons placing target NPC objects inside of them.
+    const objectsToInitialize: ObjectInstance[] = [];
     // Remove any objects from that area that should be reset.
     // This will permanently remove any objects that reset and don't have definitions, like loot drops.
     for (const object of [...area.objects]) {
@@ -703,8 +707,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
                 }
                 const object = createObjectInstance(state, definition);
                 addObjectToArea(state, area, object);
-                initializeObject(state, object);
-                object.onInitialize?.(state);
+                objectsToInitialize.push(object);
             }
         }
     }
@@ -723,12 +726,13 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
             object = createObjectInstance(state, definition);
             if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
                 addObjectToArea(state, area, object);
-                initializeObject(state, object);
-                object.onInitialize?.(state);
+                objectsToInitialize.push(object);
             }
         }
     }
-
+    for (const object of objectsToInitialize) {
+        initializeObject(state, object, true);
+    }
     applyVariantsToArea(state, area);
 }
 

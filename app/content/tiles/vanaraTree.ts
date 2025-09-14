@@ -135,8 +135,8 @@ export const vanaraWallEdges: TileSource = {
     source: requireFrame('gfx/tiles/vanara.png', {x: 160, y: 368, w: 48, h: 48}),
     behaviors: {
         'all': {defaultLayer: 'floor2', isGround: false},
-        '0x0': {defaultLayer: 'field'},
-        '2x0': {defaultLayer: 'field'},
+        '0x0': topLeftWall,
+        '2x0': topRightWall,
     },
     tileCoordinates: [
         [0,0],[1,0],[2,0],
