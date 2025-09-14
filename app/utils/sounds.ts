@@ -425,7 +425,7 @@ const preloadSounds = () => {
         },
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, instanceLimit: 2},
         {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, instanceLimit: 2},
-        {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 10, instanceLimit: 2},
+        {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 30, instanceLimit: 2},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
         //     offset: 0.2, duration: 0.3', volume: 10, instanceLimit: 2},
         {key: 'enemyHit', source: 'sfx/enemyDeath.wav',

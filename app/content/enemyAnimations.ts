@@ -11,9 +11,11 @@ const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
 
 // 252x28
-const bossDeathExplosionGeometry: FrameDimensions = {w: 28, h: 28};
-export const bossDeathExplosionAnimation: FrameAnimation
-    = createAnimation('gfx/effects/powersource_explosion.png', bossDeathExplosionGeometry, { cols: 9, duration: 4}, { loop: false });
+//const bossDeathExplosionGeometry: FrameDimensions = {w: 28, h: 28};
+//export const bossDeathExplosionAnimation: FrameAnimation
+//    = createAnimation('gfx/effects/powersource_explosion.png', bossDeathExplosionGeometry, { cols: 9, duration: 4}, { loop: false });
+const explosionGeometry: FrameDimensions = {w: 32, h: 32};
+export const bossDeathExplosionAnimation = createAnimation('gfx/effects/explosion.png', explosionGeometry, { cols: 6, duration: 4}, { loop: false });
 
 
 
