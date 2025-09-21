@@ -161,10 +161,7 @@ Current tasks:
         - Updated pods
 
     - Add Vanara Dreamland
-        - Add new check(20 Jade) to dream world near NPC:
-          "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave."
         - Add Vanara Dreamland to logic
-            - Move check from Vanara Guardian to the Spirit tree
             - Add logic for all teleporters
         - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland

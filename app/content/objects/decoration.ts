@@ -789,11 +789,11 @@ const cocoon: DecorationType = {
         }
     },
     alternateRender(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        if (decoration.child?.alternateRender) {
+        /*if (decoration.child?.alternateRender) {
             decoration.child.x = decoration.x;
             decoration.child.y = decoration.y;
             decoration.child.alternateRender(context, state);
-        }
+        }*/
     },
     getBehaviors(state: GameState, decoration: Decoration) {
         return {
