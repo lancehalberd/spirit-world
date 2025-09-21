@@ -229,7 +229,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.isLavaMap,
         behaviors.isLava,
         behaviors.isLavaMap,
-        [removeLava, behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
+        isForeground ? [removeLava] : [removeLava, behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
     );
     if (newIsLavaMap === BITMAP_FULL) {
@@ -247,7 +247,7 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.pitMap,
         behaviors.pit,
         behaviors.pitMap,
-        [removePit, behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
+        isForeground ? [removePit] : [removePit, behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
         [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
     );
     if (newPitMap === BITMAP_FULL) {

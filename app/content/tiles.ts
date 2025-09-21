@@ -55,6 +55,7 @@ import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
 import {allFlowerTiles, allGardenTiles} from 'app/content/tiles/garden';
 import {rugTiles} from 'app/content/tiles/houseInterior';
 import { lava, lavaBubbles, lavaStone } from 'app/content/tiles/lava';
+import {allMossTiles} from 'app/content/tiles/moss';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
@@ -1227,6 +1228,7 @@ addTiles([
     vanaraAngledPits,
     ...vanaraShortWallSources,
     vanaraWallEdges,
+    ...allMossTiles,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

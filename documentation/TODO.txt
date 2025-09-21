@@ -145,10 +145,10 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Deleting tiles in spirit world temporarily does not show the correct linked tiles.
+    - Make Vanara bushes linked between worlds like other bushes.
+
     - Add new graphics
-        - Updated pods
-        - Moss tiles
-            - Should swap colors between worlds.
         - fireball effect
         - dirt particles
         - tinted Vanara spirit NPCs
@@ -158,6 +158,7 @@ Current tasks:
             - consumables
             - AR device
             - medallions
+        - Updated pods
 
     - Add Vanara Dreamland
         - Add new check(20 Jade) to dream world near NPC:
