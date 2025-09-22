@@ -723,6 +723,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 548, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -732,6 +733,7 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 612, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const sf0_2x0: AreaDefinition = {
@@ -741,6 +743,7 @@ const sf0_2x0: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 613, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 0},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -750,6 +753,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 614, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -1073,6 +1077,7 @@ const sf0_2x1: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 615, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
 const sf0_0x2: AreaDefinition = {
@@ -1082,6 +1087,7 @@ const sf0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 618, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const sf0_1x2: AreaDefinition = {
@@ -1395,7 +1401,7 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "dream:0:1x2-money-0", linked: true, spirit: false, x: 304, y: 396, type: "chest", lootType: "money", lootAmount: 20},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 571, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 571, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const sf0_2x2: AreaDefinition = {
@@ -1405,6 +1411,7 @@ const sf0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
+        {x: 0, y: 0, w: 40, h: 40, index: 637, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 zones.dream = {
