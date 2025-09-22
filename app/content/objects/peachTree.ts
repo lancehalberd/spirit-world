@@ -2,8 +2,7 @@ import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {createAnimation, drawFrameContentAt, getFrame, getFrameHitbox } from 'app/utils/animations';
 import {LootObject} from 'app/content/objects/lootObject';
-import {setSpawnLocation} from 'app/content/spawnLocations';
-import {appendScript, showMessage} from 'app/scriptEvents';
+import {showMessage} from 'app/scriptEvents';
 import {addObjectToArea} from 'app/utils/objects';
 
 const peachTreeGeometry: FrameDimensions ={w: 92, h: 96, content: {x: 0, y: 72, w: 90, h: 20}};
@@ -83,15 +82,6 @@ export class PeachTree implements ObjectInstance {
     }*/
     onGrab(state: GameState) {
         state.hero.action = null;
-        if (this.definition.id === 'spiritTree') {
-            setSpawnLocation(state, {
-                ...state.location,
-                x: this.x + peachTreeGeometry.content.w / 2 - 8,
-                y: this.y + peachTreeGeometry.content.h + 4,
-            });
-            appendScript(state, '{@spiritTree.interact}');
-            return;
-        }
         if (this.specialStatus === 'dead') {
             showMessage(state, '...{|}It feels cold and lifeless.');
         }

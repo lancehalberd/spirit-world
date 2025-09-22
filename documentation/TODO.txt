@@ -149,6 +149,8 @@ Current tasks:
     - Make Vanara bushes linked between worlds like other bushes.
 
     - Add new graphics
+        - AR Device
+        - Cherry tree
         - fireball effect
         - dirt particles
         - tinted Vanara spirit NPCs

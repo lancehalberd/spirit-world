@@ -125,10 +125,10 @@ export function enterLocation(
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
-        || createAreaInstance(state, area, true);
+        || createAreaInstance(state, zones[state.location.zoneKey], area, true);
 
     state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
-        || createAreaInstance(state, alternateArea, true);
+        || createAreaInstance(state, zones[state.location.zoneKey], alternateArea, true);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);

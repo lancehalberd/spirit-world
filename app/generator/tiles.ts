@@ -8,7 +8,7 @@ import {mapTileIndex} from 'app/utils/mapTile';
 // If area is the child world, then the default tiles will be explicitly added to the child world and then replace with empty tiles in the base world.
 export function clearTileInOneWorld(area: AreaDefinition, alternateArea: AreaDefinition, layerKey: string, tx: number, ty: number) {
     if (!alternateArea.layers?.length) {
-        populateLayersFromAlternateArea(alternateArea, area);
+        populateLayersFromAlternateArea(null, alternateArea, area);
     }
     // Do nothing if this layer does not exist in either area.
     if (!area.layers.find(l => l.key === layerKey) && !alternateArea.layers.find(l => l.key === layerKey)) {

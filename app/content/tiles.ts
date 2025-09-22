@@ -71,6 +71,7 @@ import {
     vanaraHoleyTransitionTile,
     vanaraPlainFloorTile,
     vanaraShortWallSources,
+    vanaraWallTrim,
     vanaraWallEdges,
 } from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
@@ -1227,8 +1228,9 @@ addTiles([
     vanaraPlainFloorTile,
     vanaraAngledPits,
     ...vanaraShortWallSources,
-    vanaraWallEdges,
+    vanaraWallTrim,
     ...allMossTiles,
+    ...vanaraWallEdges,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

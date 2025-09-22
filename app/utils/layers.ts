@@ -9,7 +9,7 @@ export function addNewLayer(
     definition: AreaDefinition,
     alternateDefinition: AreaDefinition,
 ): AreaLayerDefinition {
-    const areaSize = getAreaDimensions(definition);
+    const areaSize = getAreaDimensions(definition, null);
     const layerDefinition: AreaLayerDefinition = {
         drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
         key: layerKey,

@@ -336,7 +336,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "spiritTree", x: 280, y: 152, type: "peachTree", linked: true},
+        {status: "normal", id: "spiritTree", linked: true, x: 252, y: 151, type: "decoration", d: "down", w: 16, h: 16, decorationType: "spiritTree"},
         {status: "normal", id: "teleportationTutorialSwitch", x: 312, y: 568, requireAll: false, type: "floorSwitch", saveStatus: "forever"},
         {status: "normal", id: "", x: 392, y: 176, type: "narration", message: "", trigger: "enterSection", delay: 0, w: 32, h: 32, saveStatus: "never", specialBehaviorKey: "teleportationInstructions", customLogic: "$teleportation"},
         {status: "normal", id: "", x: 296, y: 376, type: "spawnMarker"},
@@ -361,7 +361,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 40, y: 88, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Some Vanara like to spend their time in the Dreaming creating and solving puzzles.\n{|}Some of their puzzles are used in the Cocoon and the Helix, but don't worry, the more challenging ones are always optional.", hasCustomLogic: true, customLogic: "", dialogueIndex: 188, specialBehaviorKey: "proximal"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 825, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 1018, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -698,7 +698,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "", x: 312, y: 112, type: "spawnMarker"},
         {status: "normal", id: "", x: 176, y: 292, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Spirit World?{|}\nNo, this is the Vanara Dream World, home of the Spirit Tree.", dialogueIndex: 189, specialBehaviorKey: "ephemeral"},
         {status: "normal", id: "", x: 272, y: 208, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "The Spirit Tree awaits you just north of here.", dialogueIndex: 181, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: "!$teleportation"},
-        {status: "normal", id: "", x: 320, y: 396, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave.", dialogueIndex: 179, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: ""},
+        {status: "normal", id: "", x: 320, y: 396, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave.", dialogueIndex: 194, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: ""},
         {status: "normal", id: "cocoonTeleporter", x: 64, y: 408, targetZone: "cocoon", targetObjectId: "cocoonDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
         {status: "normal", id: "cocoonTeleporter", x: 68, y: 404, type: "marker", hasCustomLogic: true, customLogic: "!$teleportation"},
         {status: "normal", id: "dreamSmallMoney", linked: true, spirit: true, x: 304, y: 396, type: "chest", lootType: "money", lootAmount: 20},
@@ -1060,10 +1060,10 @@ const sf0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "spiritTree", x: 280, y: 152, type: "peachTree", linked: true, spirit: true},
+        {status: "normal", id: "spiritTree", linked: true, x: 252, y: 151, type: "decoration", d: "down", w: 16, h: 16, decorationType: "spiritTree", spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 548, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 1019, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const sf0_2x1: AreaDefinition = {

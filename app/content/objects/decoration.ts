@@ -1,8 +1,11 @@
 import {objectHash} from 'app/content/objects/objectHash';
+import {setSpawnLocation} from 'app/content/spawnLocations';
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {appendScript} from 'app/scriptEvents';
 import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
+import {isPointInShortRect} from 'app/utils/index';
 import {requireFrame} from 'app/utils/packedImages';
 import {getVariantRandom} from 'app/utils/variants';
 
@@ -892,6 +895,48 @@ const helixTop: DecorationType = {
     },
 };
 
+// Walls for the spirit tree, as rectangles relative to the top left corner of the frame.
+const spiritTreeWalls: Rect[] = [
+    {x: 57, y: 241, w: 125, h: 27},
+    {x: 62, y: 268, w: 29, h: 16},
+    {x: 105, y: 266, w: 33, h: 23},
+    {x: 144, y: 251, w: 27, h: 31},
+];
+const spiritTreeFrame = requireFrame('gfx/objects/spiritTree.png', {x: 0, y: 0, w: 240, h: 304, content: {x: 50, y: 230, w: 135, h: 60}});
+const spiritTree: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, spiritTreeFrame, decoration);
+    },
+    getBehaviors(state: GameState, decoration: Decoration, x?: number, y?: number): TileBehaviors|undefined {
+        // Adjust the x/y values to be relative to the top left corner of the frame, to match the coordinates
+        // used when defining the walls.
+        x = x - (decoration.x - spiritTreeFrame.content.x);
+        y = y - (decoration.y - spiritTreeFrame.content.y);
+        for (const r of spiritTreeWalls) {
+            if (isPointInShortRect(x, y, r)) {
+                return {solid: true};
+            }
+        }
+        return {};
+    },
+    getYDepth(decoration: Decoration): number {
+        return decoration.y + 16;
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(spiritTreeFrame, decoration);
+    },
+    onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
+        state.hero.action = null;
+        setSpawnLocation(state, {
+            ...state.location,
+            x: decoration.x + spiritTreeFrame.content.w / 2 - 8,
+            y: decoration.y + spiritTreeFrame.content.h + 4,
+        });
+        appendScript(state, '{@spiritTree.interact}');
+        return;
+    }
+};
+
 export const decorationTypes = {
     helixBase,
     helixTop,
@@ -1009,6 +1054,7 @@ export const decorationTypes = {
             return getFrameHitbox(frame, decoration);
         },
     } as DecorationType,
+    spiritTree,
 }
 
 objectHash.decoration = Decoration;
