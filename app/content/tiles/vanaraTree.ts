@@ -101,7 +101,7 @@ export const vanaraHoleyTransitionTile: TileSource = {
     ],
 };
 
-export const vanaraPlainFloorTile = singleTileSource('gfx/tiles/vanara.png', { defaultLayer: 'floor'}, 400, 32);
+export const vanaraPlainFloorTile = singleTileSource('gfx/tiles/vanara.png', {defaultLayer: 'floor', linkedOffset: 0}, 400, 32);
 
 const vanaraShortWallsCross: TileSource = {
     w: 16, h: 16,
