@@ -158,7 +158,6 @@ Current tasks:
         - new icons
             - peach basket
             - consumables
-            - AR device
             - medallions
         - Updated pods
 
