@@ -127,7 +127,7 @@ dialogueHash.tombGuardian = {
         },
         {
             logicCheck: {
-                requiredFlags: ['$spiritSight'],
+                requiredFlags: ['$spiritSight', 'tombTeleporter'],
                 excludedFlags: ['tombExit'],
             },
             isExclusive: true,

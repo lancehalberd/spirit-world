@@ -158,6 +158,10 @@ interface ObjectInstance extends BaseFieldInstance {
     onActivate?: (state: GameState) => boolean | void
     onDeactivate?: (state: GameState) => boolean | void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
+    // Optional method returning whether this object can be grabbed.
+    // By default if this method is undefined, an object can be grabbed if it is solid
+    // or defines the onGrab method.
+    canGrab?: (state: GameState) => boolean
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void

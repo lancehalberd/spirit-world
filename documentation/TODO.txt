@@ -148,8 +148,9 @@ Current tasks:
     - Deleting tiles in spirit world temporarily does not show the correct linked tiles.
     - Make Vanara bushes linked between worlds like other bushes.
 
+    - Add moss to Peach Cave
+
     - Add new graphics
-        - AR Device
         - Cherry tree
         - fireball effect
         - dirt particles

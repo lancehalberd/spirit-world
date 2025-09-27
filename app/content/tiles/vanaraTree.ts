@@ -150,12 +150,12 @@ export const vanaraWallTrim: TileSource = {
 const vanaraWallLeftEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/vanara.png', {x: 256, y: 208, w: 16, h: 64}),
-    behaviors: {'all': {defaultLayer: 'field'}},
+    behaviors: {'all': {defaultLayer: 'field', isGround: false}},
 };
 const vanaraWallRightEdges: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/vanara.png', {x: 288, y: 208, w: 16, h: 64}),
-    behaviors: {'all': {defaultLayer: 'field'}},
+    behaviors: {'all': {defaultLayer: 'field', isGround: false}},
 };
 export const vanaraWallEdges: TileSource[] = [
     vanaraWallLeftEdges,

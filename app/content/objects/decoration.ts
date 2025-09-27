@@ -47,6 +47,10 @@ export class Decoration implements ObjectInstance {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getHitbox?.(this) || this;
     }
+    canGrab(state: GameState): boolean {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        return !!decorationType.onGrab || !!this.getBehaviors(state)?.solid;
+    }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         const decorationType = decorationTypes[this.definition.decorationType];
         decorationType.onGrab?.(state, this, direction, hero);

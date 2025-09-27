@@ -434,14 +434,22 @@ export const [
     goldMail, ironSkin,
     goldOre, silverOre,
     spikeBoots, forgeBoots, flyingBoots,
+    magicBeans,
+    healthPotion, magicPotion, magicElixer,
+    frostBoots, flameBoots, stormBoots,
+    arDevice,
+    flippers,
+    emptyPeachBasket, fullPeachBasket
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 48}
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 59}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
 ] = createAnimation('gfx/hud/elementhud.png',
     {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 6}
 ).frames;
+
+//window.debugCanvas(stormBoots, 4);
 
 const [spiritCloak] = createAnimation('gfx/hud/cloak1.png',
     {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}

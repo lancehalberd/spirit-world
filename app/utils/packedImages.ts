@@ -178,7 +178,7 @@ const imagePacks: PackedImageData[] = [
         {x:912,y:0,w:64,h:32,originalSource:'gfx/objects/cave-pits.png'},
         {x:256,y:528,w:752,h:16,originalSource:'gfx/hud/whiteFont8x16.png'},
         {x:256,y:544,w:522,h:10,originalSource:'gfx/hud/habbo16.png'},
-        {x:0,y:784,w:960,h:40,originalSource:'gfx/hud/icons.png'},
+        //{x:0,y:784,w:960,h:40,originalSource:'gfx/hud/icons.png'},
         {x:816,y:32,w:120,h:20,originalSource:'gfx/hud/elementhud.png'},
         {x:976,y:0,w:18,h:18,originalSource:'gfx/hud/cloak1.png'},
         {x:944,y:32,w:18,h:18,originalSource:'gfx/hud/cloak2.png'},

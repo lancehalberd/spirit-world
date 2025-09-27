@@ -403,6 +403,10 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
         }
         console.error('Unhandled action token', actionToken);
     }
-    events.push({ type: 'clearTextBox' });
+    if (events.length) {
+        //console.log('extra clear textbox');
+        //console.log([...events]);
+        events.push({ type: 'clearTextBox' });
+    }
     return events;
 }

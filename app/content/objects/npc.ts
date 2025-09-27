@@ -587,6 +587,10 @@ export class NPC implements Actor, ObjectInstance  {
                     }
                 context.restore();
             }
+        } else {
+            /*console.log('Hide dialog indicator');
+            console.log([...state.scriptEvents.activeEvents]);
+            console.log([...state.scriptEvents.queue]);*/
         }
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {

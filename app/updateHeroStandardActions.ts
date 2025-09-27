@@ -790,21 +790,26 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 continue;
             }
             const behavior = getObjectBehaviors(state, object);
+            let canGrabObject = object.canGrab?.(state) ?? (!!object.onGrab || !!behavior?.solid);
+            if (!canGrabObject) {
+                continue;
+            }
             if (behavior?.solid) {
                 hero.action = 'grabbing';
             }
-            if (object.getHitbox && (behavior?.solid || object.onGrab)) {
-                const frame = object.getHitbox();
-                // This is an unusual distance, but should do what we want still.
-                const distance = (
-                    Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
-                    Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
-                );
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestObject = object;
-                    closestLiftableTileCoords = null;
-                }
+            if (!object.getHitbox) {
+                continue;
+            }
+            const frame = object.getHitbox();
+            // This is an unusual distance, but should do what we want still.
+            const distance = (
+                Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
+                Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
+            );
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestObject = object;
+                closestLiftableTileCoords = null;
             }
         }
         hero.pickUpFrame = 0;

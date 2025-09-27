@@ -77,6 +77,9 @@ export const pitStyles: {[key: string]: PitStyle} = {
         frame: vanaraPitFrame,
         getHitbox(pit: PitEntrance): Rect {
             return {x: pit.x, y: pit.y, w: 32, h: 32};
+        },
+        getPitbox(pit: PitEntrance): Rect {
+            return {x: pit.x, y: pit.y + 16, w: 32, h: 16};
         }
     },
 };
