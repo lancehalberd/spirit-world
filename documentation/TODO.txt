@@ -149,7 +149,6 @@ Current tasks:
 
 
     Stream notes:
-        - Fix Tomb Guardian music doesn't stop if you don't talk to him enough.
         - Prevent golem from chaining laser eyes more than twice in a row. Give it a cooldown and 2 max charges.
         - Render Spirit Beast statues in War Temple Map.
         - Fix remaining floor tiles in War Temple

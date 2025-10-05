@@ -139,8 +139,7 @@ dialogueHash.tombGuardian = {
                     {|}Did you know your mother is a descendant of the summoner clan?
                     {|}They weren't supposed to pass their knowledge on but it still survives in certain families.
                     {|}The summoners used special tools to enhance their powers,
-                    perhaps your mother could tell you more.
-                    {stopTrack}`,
+                    perhaps your mother could tell you more.`,
                 },
             ],
         },
