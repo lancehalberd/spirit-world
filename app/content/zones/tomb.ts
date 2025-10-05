@@ -2317,11 +2317,10 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 312, y: 304, style: "short", type: "sign", message: "Twin lights pierce the darkness, revealing The Key."},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 198, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 16, index: 199, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 1},
-        {x: 0, y: 16, w: 32, h: 16, index: 200, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 16, index: 198, dark: 25, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 199, dark: 50, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 200, dark: 75, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 2},
     ],
-    dark: 75,
 };
 const f1_0x1: AreaDefinition = {
     layers: [
@@ -2579,7 +2578,7 @@ const f1_0x1: AreaDefinition = {
     objects: [
         {id: "tomb:1:0x1-door-1", linked: false, spirit: false, status: "closedEnemy", x: 64, y: 240, type: "door", style: "cavern", d: "down", openLogic: {"logicKey":"hasWeapon","isInverted":true}},
         {id: "tomb:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 80, y: 272, type: "door", style: "cavern", d: "up"},
-        {id: "tomb:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 496, y: 96, type: "door", style: "cavern", d: "right"},
+        {id: "tomb:1:0x1-door-3", linked: false, spirit: false, status: "closedEnemy", x: 496, y: 96, type: "door", style: "cavern", d: "right", openLogic: {"hasCustomLogic":true,"customLogic":"!$weapon"}},
         {id: "tomb:1:0x1-door-4", linked: false, spirit: false, status: "closedEnemy", x: 368, y: 16, type: "door", style: "cavern", d: "up"},
         {id: "tombKey1", linked: false, spirit: false, status: "hiddenEnemy", x: 88, y: 72, type: "chest", lootType: "smallKey"},
         {id: "tomb:1:0x1-snake-0", linked: false, spirit: false, status: "normal", x: 44, y: 76, type: "enemy", enemyType: "snake"},

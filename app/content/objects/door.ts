@@ -94,7 +94,7 @@ export class Door implements ObjectInstance {
     x = this.definition.x;
     y = this.definition.y;
     status: ObjectStatus = 'normal';
-    style: DoorStyleDefinition = doorStyles[this.definition.style] || doorStyles.cave;
+    style: DoorStyleDefinition = doorStyles[this.definition.style] || doorStyles.cavern;
     doorPath = new OpenDoorPath(this);
     // This gets set to true if this instance has been opened and is used to prevent the door
     // from closing automatically when logic is refreshed.
@@ -427,9 +427,18 @@ export class Door implements ObjectInstance {
                 hero.actionDx = directionMap[this.definition.d][0];
                 hero.actionDy = directionMap[this.definition.d][1];
             }
+            const hitbox = this.getHitbox();
+            // Doorways to the south look wider than doorways to the north.
+            // We allow the player to enter the southern door in the wider area,
+            // but then we need to align them towards the middle of the door as they move
+            // so that they correctly line up with the narrower northern doorway.
+            if (hero.actionDy > 0) {
+                const x = hero.getMovementHitbox().x;
+                const delta = (hitbox.x + hitbox.w / 2 - 8) - x;
+                hero.x += Math.max(-1, Math.min(1, delta));
+            }
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
-            const hitbox = this.getHitbox();
             if (this.style.isLadderUp) {
                 const reachedTop = hero.y <= this.y;
                 if (reachedTop) {

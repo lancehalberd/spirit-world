@@ -136,11 +136,11 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'rush') {
         // Just accelerate in the direction the boss chose when it entered this mode.
         accelerateInDirection(state, enemy, {x: enemy.vx, y: enemy.vy});
-        if (enemy.modeTime <= 1000) {
+        if (enemy.modeTime <= 1300) {
             enemy.x += enemy.vx;
             enemy.y += enemy.vy;
         }
-        if (enemy.modeTime >= 1500) {
+        if (enemy.modeTime >= 2000) {
             // If the player has less than 2 health always return immediately.
             const returnChance = 0.4 + Math.max(0, 0.6 * (4 - state.hero.life) / 2);
             if (enemy.life > 8 || Math.random() < returnChance) {
@@ -151,6 +151,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;
                     enemy.vy = vector.y;
+                    enemy.modeTime = 700;
                 } else {
                     enemy.setMode('return');
                 }

@@ -235,6 +235,7 @@ function checkToRenderFrozenDoorForeground(this: void, context: CanvasRenderingC
     }
 }
 
+`
 const [
     southCrackedWall, southCaveFrame, southCaveCeiling, southCave,
     southCaveDoorFrame, southCaveDoorCeiling, /*southCaveDoorClosed*/,
@@ -282,6 +283,7 @@ const [
     lightWestCrackedWall, lightWestCaveFrame, lightWestCaveCeiling, /*lightWestCave*/,
     lightWestCaveDoorFrame, lightWestCaveDoorCeiling,
 ] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 6}).frames;
+`;
 
 
 const [ treeDoorOpen ] = createAnimation('gfx/tiles/treesheet.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
@@ -324,7 +326,7 @@ const commonBaseDoorStyle = {
             return {x: door.x + 8, y: door.y, w: 16, h: 32};
         }
         if (door.definition.d === 'down') {
-            return {x: door.x + 24, y: door.y + 8, w: 16, h: 8};
+            return {x: door.x + 16, y: door.y + 8, w: 32, h: 8};
         }
         return {x: door.x, y: door.y + 32, w: 16, h: 16};
     },
@@ -947,7 +949,7 @@ const woodenDoorStyle: DoorStyleDefinition = {
             return {x: door.x + 8, y: door.y, w: 16, h: 32};
         }
         if (door.definition.d === 'down') {
-            return {x: door.x + 24, y: door.y + 8, w: 16, h: 8};
+            return {x: door.x + 12, y: door.y + 8, w: 40, h: 8};
         }
         return {x: door.x, y: door.y + 16, w: 16, h: 32};
     },
@@ -1070,7 +1072,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     //jadeDarkInt2Downstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsDown, 'down'),
     //jadeDarkInt2Upstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsUp, 'up'),
 
-    cave: {
+    /*cave: {
         ...oldSquareBaseDoorStyle,
         down: {
             doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southTrapDoor,
@@ -1147,7 +1149,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             locked: westLockedDoorSteel,
             bigKeyLocked: westLockedDoorBig,
         },
-    },
+    },*/
     tree: {
         ...oldSquareBaseDoorStyle,
         up: {

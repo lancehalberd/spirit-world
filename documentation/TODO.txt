@@ -145,10 +145,29 @@ Graphics to Implement:
 
 
 Current tasks:
+    - For staff animations to render all but the bottom Npx in the foreground.
+
+
+    Stream notes:
+        - Fix Tomb Guardian music doesn't stop if you don't talk to him enough.
+        - Prevent golem from chaining laser eyes more than twice in a row. Give it a cooldown and 2 max charges.
+        - Render Spirit Beast statues in War Temple Map.
+        - Fix remaining floor tiles in War Temple
+        - Force the player to center when going up/down stairs, right now they are clipping the walls too much.
+        - Remove hit damage from stone idle statues?
+        - Add wall/floor transitions to exterior of cocoon in the tomb.
+
+
     - Deleting tiles in spirit world temporarily does not show the correct linked tiles.
     - Make Vanara bushes linked between worlds like other bushes.
 
     - Add moss to Peach Cave
+    - Remove glowing grass layer from Peach Cave
+
+    - Add new save statue
+        - Adjust placement of all statues.
+        - Move top floors of peach cave down 1 tile to keep statue from being behind hearts.
+        - Add old save statue graphics as a decoration.
 
     - Add new graphics
         - Cherry tree

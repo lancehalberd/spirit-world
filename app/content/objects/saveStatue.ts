@@ -3,15 +3,17 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import { isRandomizer } from 'app/gameConstants';
 import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import {drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
+import {requireFrame} from 'app/utils/packedImages';
 import { selectDialogueOption } from 'app/utils/dialogue';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
 
-const geometry = {w: 32, h: 48};
-const [saveStatue] = createAnimation('gfx/tiles/savepoint.png', geometry).frames;
-
+//const [saveStatue] = createAnimation('gfx/tiles/savepoint.png', geometry).frames;
+const saveStatue = requireFrame('gfx/objects/fairyStatue.png', {x: 0, y: 0, w: 100, h: 100, content: {x: 38, y: 65, w: 24, h: 16}});
+const sparkleBox: Rect = {x: 37, y: 24, w: 24, h: 50};
+const foregroundHeight = 48;
 
 export class SaveStatue implements ObjectInstance {
     area: AreaInstance;
@@ -34,7 +36,10 @@ export class SaveStatue implements ObjectInstance {
         this.status = this.definition.status;
     }
     getHitbox(state: GameState): Rect {
-        return { x: this.x + 4, y: this.y, w: 24, h: 16 };
+        return getFrameHitbox(saveStatue, this);
+    }
+    getSparkleBox(state: GameState): Rect {
+        return getFrameHitbox(saveStatue, this, sparkleBox);
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         // Don't take actions that would start new scripts while running scripts.
@@ -83,8 +88,8 @@ export class SaveStatue implements ObjectInstance {
         }
         this.time += FRAME_LENGTH;
         // The statue sparkles if you haven't used it yet.
-        if (this.time % 100 === 0 && !getObjectStatus(state, this.definition)) {
-            addSparkleAnimation(state, this.area, this.getHitbox(state), {});
+        if ((this.time % 800 === 0 || this.time % 800 === 100 || this.time % 800 === 300) && !getObjectStatus(state, this.definition)) {
+            addSparkleAnimation(state, this.area, this.getSparkleBox(state), {});
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -92,7 +97,12 @@ export class SaveStatue implements ObjectInstance {
             return;
         }
         const frame = saveStatue;
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 32 });
+        //drawFrameContentAt(context, frame, this);
+        drawFrameContentAt(context, {...frame, y: foregroundHeight, h: frame.h - foregroundHeight}, {x: this.x, y: this.y + foregroundHeight});
+    }
+    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        const frame = saveStatue;
+        drawFrameContentAt(context, {...frame, h: frame.h - foregroundHeight}, {x: this.x, y: this.y});
     }
 }
 objectHash.saveStatue = SaveStatue;

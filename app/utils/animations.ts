@@ -281,7 +281,15 @@ export function drawFrameContentReflectedAt(
     context.restore();
 }
 
-export function getFrameHitbox({content, w, h}: Frame, {x, y}: {x: number, y: number}): Rect {
+export function getFrameHitbox({content, w, h}: Frame, {x, y}: {x: number, y: number}, alternateContent?: Rect): Rect {
+    if (alternateContent) {
+        return {
+            x: x - (content?.x ?? 0) + alternateContent.x,
+            y: y - (content?.y ?? 0) + alternateContent.y,
+            w: alternateContent.w,
+            h: alternateContent.h,
+        }
+    }
     return {
         x, y,
         w: content?.w ?? w,
