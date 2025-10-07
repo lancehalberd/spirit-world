@@ -149,7 +149,6 @@ Current tasks:
 
 
     Stream notes:
-        - Render Spirit Beast statues in War Temple Map.
         - Fix remaining floor tiles in War Temple
         - Force the player to center when going up/down stairs, right now they are clipping the walls too much.
         - Remove hit damage from stone idle statues?

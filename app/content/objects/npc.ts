@@ -11,7 +11,7 @@ import {
     blacksmithTwoAnimations,
     crystalDragonAnimations,
     fatherAnimations,
-    lightningBeastAnimations,
+    stormBeastAnimations,
     merchantAnimations,
     momAnimations,
     manAnimations,
@@ -186,8 +186,8 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         z: 6,
         scale: 2,
     },
-    sleepingLightningBeast: {
-        animations: lightningBeastAnimations,
+    sleepingStormBeast: {
+        animations: stormBeastAnimations,
         shadowOffset: -20,
     },
     gal: {

@@ -968,20 +968,7 @@ export const decorationTypes = {
     bigLightDome,
     smallDarkDome,
     bigDarkDome,
-    lightningBeastStatue: {
-        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            const frame = stormBeastStatueFrame;
-            drawFrameContentAt(context, frame, decoration);
-        },
-        behaviors: {
-            solid: true,
-        },
-        getHitbox(decoration: Decoration): Rect {
-            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
-            return getFrameHitbox(stormBeastStatueFrame, decoration);
-        },
-    } as DecorationType,
-    fireBeastStatue: {
+    flameBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = flameBeastStatueFrame;
             drawFrameContentAt(context, frame, decoration);
@@ -994,7 +981,7 @@ export const decorationTypes = {
             return getFrameHitbox(flameBeastStatueFrame, decoration);
         },
     } as DecorationType,
-    iceBeastStatue: {
+    frostBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, frostBeastStatueFrame, decoration);
         },
@@ -1004,6 +991,19 @@ export const decorationTypes = {
         getHitbox(decoration: Decoration): Rect {
             // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
             return getFrameHitbox(frostBeastStatueFrame, decoration);
+        },
+    } as DecorationType,
+    stormBeastStatue: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            const frame = stormBeastStatueFrame;
+            drawFrameContentAt(context, frame, decoration);
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
+            return getFrameHitbox(stormBeastStatueFrame, decoration);
         },
     } as DecorationType,
     entranceLight: {

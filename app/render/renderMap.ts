@@ -380,7 +380,7 @@ const mapObjectTypes: ObjectType[] = [
     'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
 ];
 const mapDecorationTypes = [
-    'helixBase', 'spiritTree',
+    'helixBase', 'spiritTree', 'flameBeastStatue', 'frostBeastStatue', 'stormBeastStatue'
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
