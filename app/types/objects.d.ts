@@ -85,7 +85,9 @@ interface BaseFieldInstance {
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     // Called after the object is added to an area and initialized.
-    onInitialize?: (state: GameState) => void
+    // isActiveArea will be set to false when this object is being initialized in an inactive area,
+    // for example areas initialized when drawing maps.
+    onInitialize?: (state: GameState, isActiveArea: boolean) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
@@ -156,6 +158,10 @@ interface ObjectInstance extends BaseFieldInstance {
     onActivate?: (state: GameState) => boolean | void
     onDeactivate?: (state: GameState) => boolean | void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
+    // Optional method returning whether this object can be grabbed.
+    // By default if this method is undefined, an object can be grabbed if it is solid
+    // or defines the onGrab method.
+    canGrab?: (state: GameState) => boolean
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void

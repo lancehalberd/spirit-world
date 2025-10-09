@@ -224,9 +224,9 @@ const f0_1x0: AreaDefinition = {
                 w: 32,
                 h: 32,
                 tiles: [
-                    [1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,1634,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [1634,1634,1634,1634,1634,1634,1634,1631,1631,1634,1634,1634,1634,1634,1634,1634,0,0,753,754,753,754,753,754,753,754,753,754,753,754,0,0],
-                    [1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,1637,0,764,762,763,762,763,762,763,762,763,762,763,762,763,764,0],
+                    [1906,1903,1896,1896,1896,1896,1896,1896,1896,1896,1896,1896,1896,1896,1902,1905,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [1908,1906,1901,1901,1901,1901,1901,1901,1901,1901,1901,1901,1901,1901,1905,1907,0,0,753,754,753,754,753,754,753,754,753,754,753,754,0,0],
+                    [1904,1908,1904,1904,1904,1904,1904,1904,1904,1904,1904,1904,1904,1904,1907,1904,0,764,762,763,762,763,762,763,762,763,762,763,762,763,764,0],
                     [0,0,0,0,0,0,0,53,53,0,0,0,0,0,0,0,0,773,0,0,0,0,0,0,0,0,0,0,0,0,772,0],
                     [0,0,0,52,52,52,0,53,53,0,52,52,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,52,51,52,0,0,0,0,52,51,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -308,7 +308,7 @@ const f0_1x0: AreaDefinition = {
                 w: 32,
                 h: 32,
                 tiles: [
-                    [745,0,0,0,0,0,0,0,0,0,0,0,0,0,0,744,0,0,732,733,732,733,732,733,732,733,732,733,732,733,0,0],
+                    [747,0,0,0,0,0,0,0,0,0,0,0,0,0,0,748,0,0,732,733,732,733,732,733,732,733,732,733,732,733,0,0],
                     [0,747,0,0,0,0,0,0,0,0,0,0,0,0,748,0,0,884,0,0,0,0,0,0,0,0,0,0,0,0,883,0],
                     [0,741,0,0,0,0,0,0,0,0,0,0,0,0,736,0,737,0,0,0,0,0,0,0,0,0,0,0,0,0,0,736],
                     [0,737,0,0,0,0,0,0,0,0,0,0,0,0,740,0,741,0,0,0,0,0,0,0,0,0,0,0,0,0,0,740],
@@ -346,16 +346,16 @@ const f0_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "closed", id: "tomb:0:1x0-door-0", x: 96, y: 496, type: "door", style: "cavern", targetObjectId: "tombEntrance", d: "down"},
-        {status: "closedSwitch", id: "tombExit", x: 112, y: 16, type: "door", style: "future", targetZone: "cocoon", targetObjectId: "cocoonEntrance", d: "up", linked: true, saveStatus: "forever", locationCue: "Tomb B1"},
+        {status: "closedSwitch", id: "tombExit", x: 112, y: 16, type: "door", style: "vanara", targetZone: "cocoon", targetObjectId: "cocoonEntrance", d: "up", linked: true, saveStatus: "forever", locationCue: "Tomb B1"},
         {status: "normal", id: "tomb:0:1x0-npc-0", x: 64, y: 272, d: "down", behavior: "none", style: "vanaraBlue", type: "npc", dialogueKey: "tombGuardian"},
-        {status: "normal", id: "tombDreamTeleporter", x: 176, y: 240, targetZone: "dream", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && $teleportation"},
+        {status: "normal", id: "tombDreamTeleporter", x: 176, y: 272, targetZone: "dream", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && $teleportation"},
         {status: "normal", id: "tombEscapePot", linked: true, x: 64, y: 352, type: "pushPull", style: "pot", savePosition: "forever"},
         {status: "normal", id: "", x: 48, y: 352, type: "pushPull", style: "pot"},
         {status: "normal", id: "", x: 80, y: 352, type: "pushPull", style: "pot"},
-        {status: "normal", id: "guardianAR", linked: false, x: 156, y: 348, type: "narration", message: "\"Have you seen one of these devices before?\"\n{|}\"I come across these in the Spirit World on occasion, they allow you to interact with various artificial worlds.\"\n{|}\"This one is tuned to some sort of training simulation or game.\"\n{|}\"It can be a fun diversion with the right handicaps.\"", trigger: "touch", delay: 0, w: 32, h: 32, hasCustomLogic: true, customLogic: "$spiritSight"},
+        {status: "normal", id: "guardianAR", linked: false, x: 144, y: 296, type: "narration", message: "\"Have you seen one of these devices before?\"\n{|}\"I come across these in the Spirit World on occasion, they allow you to interact with various artificial worlds.\"\n{|}\"This one is tuned to some sort of training simulation or game.\"\n{|}\"It can be a fun diversion with the right handicaps.\"", trigger: "touch", delay: 0, w: 32, h: 32, hasCustomLogic: true, customLogic: "$spiritSight"},
         {status: "normal", id: "", x: 50, y: 268, type: "decoration", d: "right", w: 16, h: 16, decorationType: "bearRug", drawPriority: "background"},
         {status: "normal", id: "", x: 49, y: 203, type: "decoration", d: "right", w: 32, h: 16, decorationType: "shelves", drawPriority: "background", seed: 12},
-        {status: "normal", id: "", x: 164, y: 356, type: "arGame"},
+        {status: "normal", id: "", x: 152, y: 304, type: "arGame"},
         {status: "normal", id: "", linked: false, x: 56, y: 264, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, specialBehaviorKey: "spiritSightInstructions", saveStatus: "never"},
         {status: "hidden", id: "tombTeleporter", x: 176, y: 272, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && !$teleportation"},
     ],
@@ -1012,7 +1012,7 @@ const sf0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closedSwitch", id: "tombSpiritExit", x: 112, y: 16, type: "door", style: "future", targetObjectId: "tombSpiritExit", d: "up", linked: true, spirit: true, targetZone: "tomb"},
+        {status: "closedSwitch", id: "tombSpiritExit", x: 112, y: 16, type: "door", style: "vanara", targetObjectId: "tombSpiritExit", d: "up", linked: true, spirit: true, targetZone: "tomb"},
         {status: "normal", id: "tomb:s0:1x0-pushPull-0", x: 95, y: 80, type: "pushPull", spirit: true, style: "pot"},
         {status: "normal", id: "tomb:s0:1x0-pushPull-1", x: 144, y: 80, type: "pushPull", spirit: true, style: "pot"},
         {status: "normal", id: "tomb:s0:1x0-floorSwitch-0", x: 176, y: 80, toggleOnRelease: true, type: "floorSwitch", spirit: true, targetObjectId: "tombSpiritExit"},
@@ -2317,11 +2317,10 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 312, y: 304, style: "short", type: "sign", message: "Twin lights pierce the darkness, revealing The Key."},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 198, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 16, index: 199, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 1},
-        {x: 0, y: 16, w: 32, h: 16, index: 200, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 16, index: 198, dark: 25, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 199, dark: 50, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 200, dark: 75, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 2},
     ],
-    dark: 75,
 };
 const f1_0x1: AreaDefinition = {
     layers: [
@@ -2579,7 +2578,7 @@ const f1_0x1: AreaDefinition = {
     objects: [
         {id: "tomb:1:0x1-door-1", linked: false, spirit: false, status: "closedEnemy", x: 64, y: 240, type: "door", style: "cavern", d: "down", openLogic: {"logicKey":"hasWeapon","isInverted":true}},
         {id: "tomb:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 80, y: 272, type: "door", style: "cavern", d: "up"},
-        {id: "tomb:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 496, y: 96, type: "door", style: "cavern", d: "right"},
+        {id: "tomb:1:0x1-door-3", linked: false, spirit: false, status: "closedEnemy", x: 496, y: 96, type: "door", style: "cavern", d: "right", openLogic: {"hasCustomLogic":true,"customLogic":"!$weapon"}},
         {id: "tomb:1:0x1-door-4", linked: false, spirit: false, status: "closedEnemy", x: 368, y: 16, type: "door", style: "cavern", d: "up"},
         {id: "tombKey1", linked: false, spirit: false, status: "hiddenEnemy", x: 88, y: 72, type: "chest", lootType: "smallKey"},
         {id: "tomb:1:0x1-snake-0", linked: false, spirit: false, status: "normal", x: 44, y: 76, type: "enemy", enemyType: "snake"},

@@ -4,8 +4,8 @@ import {isPixelInShortRect} from 'app/utils/index';
 import {saveGame} from 'app/utils/saveGame';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 
-export function initializeObject(state: GameState, object: ObjectInstance): void {
-    // Do not apply special behavior here, as addObjectToArea can get called when persisting objects during
+export function initializeObject(state: GameState, object: ObjectInstance, isActiveArea: boolean): void {
+    // Apply special behavior here, not in addObjectToArea, as addObjecToArea can get called when persisting objects during
     // transitions (like lava drain), but apply should only be called once when the object is first created.
     if (object.definition?.specialBehaviorKey) {
         try {
@@ -23,6 +23,7 @@ export function initializeObject(state: GameState, object: ObjectInstance): void
             object.y = p[1];
         }
     }
+    object.onInitialize?.(state, isActiveArea);
 }
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
     if (object.area && object.area !== area) {

@@ -152,7 +152,7 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
             hero.y += 3;
         }
         // This is for new side doors.
-        if (hitbox.w === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
+        if (hitbox.h === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
             hero.y += 8;
         }
         hero.renderParent = target;

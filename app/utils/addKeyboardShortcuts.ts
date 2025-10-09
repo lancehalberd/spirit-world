@@ -3,6 +3,7 @@ import {editingState} from 'app/development/editingState';
 import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
 import {updateObjectInstance} from 'app/development/objectEditor';
+import {clearScriptEvents} from 'app/scriptEvents';
 import {toggleShowControls} from 'app/scenes/controls/updateControls';
 import {getState} from 'app/state';
 import {isKeyboardKeyDown, KEY} from 'app/userInput'
@@ -82,6 +83,7 @@ export function addKeyboardShortcuts() {
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location, {instant: true});
+            clearScriptEvents(state);
         } else if (keyCode === KEY.R) {
             // Reset the current screen as if you left and returned to it.
             const state = getState();

@@ -55,6 +55,7 @@ import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
 import {allFlowerTiles, allGardenTiles} from 'app/content/tiles/garden';
 import {rugTiles} from 'app/content/tiles/houseInterior';
 import { lava, lavaBubbles, lavaStone } from 'app/content/tiles/lava';
+import {allMossTiles} from 'app/content/tiles/moss';
 import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
 import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
@@ -65,7 +66,14 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded } from 'app/utils/images';
 import { requireFrame } from 'app/utils/packedImages';
-import {allVanaraTileSources, vanaraHoleyTransitionTile, vanaraPlainFloorTile, vanaraShortWallSources} from 'app/content/tiles/vanaraTree'
+import {
+    allVanaraTileSources,
+    vanaraHoleyTransitionTile,
+    vanaraPlainFloorTile,
+    vanaraShortWallSources,
+    vanaraWallTrim,
+    vanaraWallEdges,
+} from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
 import { allJadeInteriorLightTileSources } from './tiles/jadeInteriorLight';
@@ -169,6 +177,9 @@ function addTiles(palettes: TileSource[]) {
         // Use specified array of coordinates if found.
         if (palette.tileCoordinates) {
             for (const coordinates of palette.tileCoordinates) {
+                if (!coordinates) {
+                    continue;
+                }
                 const [x, y] = coordinates;
                 addSingleTileFromTileSource(palette, x, y);
                 for (const target of (palette.paletteTargets || [])) {
@@ -1239,6 +1250,9 @@ addTiles([
     vanaraPlainFloorTile,
     vanaraAngledPits,
     ...vanaraShortWallSources,
+    vanaraWallTrim,
+    ...allMossTiles,
+    ...vanaraWallEdges,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

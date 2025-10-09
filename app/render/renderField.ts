@@ -302,7 +302,7 @@ export function renderTiles(
             }
             areaFrame.tilesDrawn[y][x] = true;
             for (const layer of layersToDraw) {
-                let tile = layer.tiles[y][x];
+                let tile = layer.tiles[y]?.[x];
                 const maskTile = layer.maskTiles?.[y]?.[x];
                 context.save();
                 if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
@@ -717,7 +717,7 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
     renderForegroundObjects(context, state, area);
 
     if (editingState.isEditing) {
-        context.strokeStyle = 'white';
+        context.strokeStyle = '#FFF';
         context.save();
             translateContextForAreaAndCamera(context, state, area);
             for (const section of area.definition.sections) {

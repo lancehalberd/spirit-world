@@ -245,23 +245,23 @@ function drawBrushLayerPreview(
             let tile: FullTile|undefined|null = null;
             // The brush is used if it is defined.
             if (brush) {
-                tile = allTiles[brush.tiles[y][x]];
+                tile = allTiles[brush.tiles[y]?.[x]];
             } else if (defaultBrush) {
                 // If no brush is defined, check if the default brush applies, otherwise use the existing
                 // layer tile if present.
-                const defaultTile = allTiles[defaultBrush.tiles[y][x]];
+                const defaultTile = allTiles[defaultBrush.tiles[y]?.[x]];
                 const defaultLayer = defaultTile ? (defaultTile.behaviors?.defaultLayer ?? 'floor') : 'field';
                 if (defaultLayer === layerKey) {
                     tile = defaultTile;
                 } else if (layer) {
-                    tile = allTiles[layer.grid.tiles[ty][tx]];
+                    tile = allTiles[layer.grid.tiles[ty]?.[tx]];
                 }
             }else if (layer) {
                 // If there is no brush or default brush just use the existing layer tile if present
-                tile = allTiles[layer.grid.tiles[ty][tx]];
+                tile = allTiles[layer.grid.tiles[ty]?.[tx]];
             }
             if (!tile && parentLayer) {
-                const parentTile = allTiles[parentLayer.grid?.tiles[ty][tx]];
+                const parentTile = allTiles[parentLayer.grid?.tiles[ty]?.[tx]];
                 tile = mapTile(parentTile);
             }
             if (tile) {

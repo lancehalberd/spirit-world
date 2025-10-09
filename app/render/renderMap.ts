@@ -139,7 +139,7 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
     const grid = state.location.isSpiritWorld ? zone.floors[0].spiritGrid : zone.floors[0].grid;
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, grid[row][column]);
+            const areaInstance = createAreaInstance(state, zone, grid[row][column]);
             renderActualMapTile(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
             renderMapObjects(mapContext, state, areaInstance,
@@ -207,7 +207,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 w: section.w * 16 * 4 / w,
                 h: section.h * 16 * 4 / h,
             },
-            area: createAreaInstance(state, area),
+            area: createAreaInstance(state, zone, area),
         });
     }
 
@@ -380,7 +380,7 @@ const mapObjectTypes: ObjectType[] = [
     'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
 ];
 const mapDecorationTypes = [
-    'helixBase',
+    'helixBase', 'spiritTree', 'flameBeastStatue', 'frostBeastStatue', 'stormBeastStatue'
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {

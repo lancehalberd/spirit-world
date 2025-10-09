@@ -28,7 +28,7 @@ const vanaraHoleyTile: TileSource = {
                 [8,3],           [11,3],       [13,3],[14,3],[15,3],
                      [9,4],[10,4] 
     ],
-}
+};
 
 
 const vanaraCeilingTrim: TileSource = {
@@ -46,7 +46,7 @@ const vanaraCeilingTrim: TileSource = {
         [0,6],[1, 6],       [3, 6],[4, 6],
               [1, 7],[2,7], [3, 7],
     ],
-}
+};
 
 const vanaraWalls: TileSource = {
     w: 16, h: 16,
@@ -63,7 +63,7 @@ const vanaraWalls: TileSource = {
         [1,10],     [3,10],[4,10],
                     [3,11],[4,11]
     ],
-}
+};
 
 const vanaraStairs: TileSource = {
     w: 16, h: 16,
@@ -78,7 +78,7 @@ const vanaraStairs: TileSource = {
         [1, 19], [2, 19], [3, 19],
         [1, 20], [2, 20], [3, 20],
     ],
-}
+};
 
 export const allVanaraTileSources: TileSource[] = [
     vanaraHoleyTile,
@@ -101,7 +101,7 @@ export const vanaraHoleyTransitionTile: TileSource = {
     ],
 };
 
-export const vanaraPlainFloorTile = singleTileSource('gfx/tiles/vanara.png', { defaultLayer: 'floor'}, 400, 32);
+export const vanaraPlainFloorTile = singleTileSource('gfx/tiles/vanara.png', {defaultLayer: 'floor', linkedOffset: 0}, 400, 32);
 
 const vanaraShortWallsCross: TileSource = {
     w: 16, h: 16,
@@ -128,4 +128,36 @@ export const vanaraShortWallSources: TileSource[] = [
     vanaraShortWallsCross,
     vanaraShortWallsSquare,
     vanaraShortWallsSingle,
+];
+
+// transition from vanara wall to floor
+export const vanaraWallTrim: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 160, y: 368, w: 48, h: 48}),
+    behaviors: {
+        'all': {defaultLayer: 'floor2', isGround: false},
+        '0x0': topLeftWall,
+        '2x0': topRightWall,
+    },
+    tileCoordinates: [
+        [0,0],[1,0],[2,0],
+        [0,1],      [2,1],
+        [0,2],      [2,2],
+    ],
+};
+
+// transition from vanara wall to empty space
+const vanaraWallLeftEdges: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 256, y: 208, w: 16, h: 64}),
+    behaviors: {'all': {defaultLayer: 'field', isGround: false}},
+};
+const vanaraWallRightEdges: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/vanara.png', {x: 288, y: 208, w: 16, h: 64}),
+    behaviors: {'all': {defaultLayer: 'field', isGround: false}},
+};
+export const vanaraWallEdges: TileSource[] = [
+    vanaraWallLeftEdges,
+    vanaraWallRightEdges,
 ];

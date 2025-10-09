@@ -1,9 +1,11 @@
-import { EXPLOSION_RADIUS, FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrame, getFrame } from 'app/utils/animations';
-import { removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
-import { bossDeathExplosionAnimation } from 'app/content/enemyAnimations';
+import {EXPLOSION_RADIUS, FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {removeEffectFromArea} from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
 
+
+const explosionGeometry: FrameDimensions = {w: 32, h: 32};
+const explosionAnimation = createAnimation('gfx/effects/explosion.png', explosionGeometry, { cols: 6, duration: 4}, { loop: false });
 
 
 interface Props {
@@ -52,12 +54,12 @@ export class CloneExplosionEffect implements EffectInstance {
                 this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
             }
         }
-        if (this.animationTime >= bossDeathExplosionAnimation.duration) {
+        if (this.animationTime >= explosionAnimation.duration) {
             removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = getFrame(bossDeathExplosionAnimation, this.animationTime);
+        const frame = getFrame(explosionAnimation, this.animationTime);
         // Debug code to render the hitbox and makes sure it matches the animation.
         /*if (this.animationTime >= 80 && this.animationTime < 500) {
             const r = this.getRadius();

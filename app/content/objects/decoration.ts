@@ -1,8 +1,11 @@
 import {objectHash} from 'app/content/objects/objectHash';
+import {setSpawnLocation} from 'app/content/spawnLocations';
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {appendScript} from 'app/scriptEvents';
 import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
+import {isPointInShortRect} from 'app/utils/index';
 import {requireFrame} from 'app/utils/packedImages';
 import {getVariantRandom} from 'app/utils/variants';
 
@@ -44,17 +47,23 @@ export class Decoration implements ObjectInstance {
         const decorationType = decorationTypes[this.definition.decorationType];
         return decorationType.getHitbox?.(this) || this;
     }
-    onGrab(state: GameState) {
+    canGrab(state: GameState): boolean {
         const decorationType = decorationTypes[this.definition.decorationType];
-        decorationType.onGrab?.(state, this);
+        return !!decorationType.onGrab || !!this.getBehaviors(state)?.solid;
     }
-    update(state: GameState) {
-        this.animationTime += FRAME_LENGTH;
+    onGrab(state: GameState, direction: Direction, hero: Hero) {
+        const decorationType = decorationTypes[this.definition.decorationType];
+        decorationType.onGrab?.(state, this, direction, hero);
+    }
+    onInitialize(state: GameState) {
         const targetId = this.definition.targetObjectId;
         if (targetId && targetId !== this.child?.definition?.id) {
             this.child = this.area.objects.find(o => o.definition?.id === targetId);
             this.child.renderParent = this;
         }
+    }
+    update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const decorationType = decorationTypes[this.definition.decorationType];
@@ -108,7 +117,7 @@ interface DecorationType {
     getBehaviors?: (state: GameState, decoration: Decoration, x?: number, y?: number) => TileBehaviors
     getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
-    onGrab?:(state: GameState, decoration: Decoration) => void
+    onGrab?:(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) => void
 }
 
 const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
@@ -893,11 +902,11 @@ const cocoon: DecorationType = {
         }
     },
     alternateRender(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        if (decoration.child?.alternateRender) {
+        /*if (decoration.child?.alternateRender) {
             decoration.child.x = decoration.x;
             decoration.child.y = decoration.y;
             decoration.child.alternateRender(context, state);
-        }
+        }*/
     },
     getBehaviors(state: GameState, decoration: Decoration) {
         return {
@@ -907,16 +916,19 @@ const cocoon: DecorationType = {
     getHitbox(decoration: Decoration): Rect {
         return getFrameHitbox(cocoonFrame, decoration);
     },
-    onGrab(state: GameState, decoration: Decoration) {
-        state.hero.action = null;
+    onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
+        hero.action = null;
         if (decoration.definition.id === 'dreamPod') {
             enterZoneByTarget(state, 'dream', 'cocoonTeleporter');
+        } else if (decoration.child) {
+            decoration.child.onGrab?.(state, direction, hero);
         }
     }
 };
 
-const smallLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 162, y: 20, w: 26, h: 23});
-const bigLightDomeFrame= requireFrame('gfx/tiles/jadeCityLight.png', {x: 104, y: 3, w: 47, h: 43});
+
+const smallLightDomeFrame = requireFrame('gfx/tiles/jadeCityLight.png', {x: 162, y: 20, w: 26, h: 23});
+const bigLightDomeFrame = requireFrame('gfx/tiles/jadeCityLight.png', {x: 104, y: 3, w: 47, h: 43});
 const smallLightDome: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, smallLightDomeFrame, decoration);
@@ -993,6 +1005,48 @@ const helixTop: DecorationType = {
     },
 };
 
+// Walls for the spirit tree, as rectangles relative to the top left corner of the frame.
+const spiritTreeWalls: Rect[] = [
+    {x: 57, y: 241, w: 125, h: 27},
+    {x: 62, y: 268, w: 29, h: 16},
+    {x: 105, y: 266, w: 33, h: 23},
+    {x: 144, y: 251, w: 27, h: 31},
+];
+const spiritTreeFrame = requireFrame('gfx/objects/spiritTree.png', {x: 0, y: 0, w: 240, h: 304, content: {x: 50, y: 230, w: 135, h: 60}});
+const spiritTree: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, spiritTreeFrame, decoration);
+    },
+    getBehaviors(state: GameState, decoration: Decoration, x?: number, y?: number): TileBehaviors|undefined {
+        // Adjust the x/y values to be relative to the top left corner of the frame, to match the coordinates
+        // used when defining the walls.
+        x = x - (decoration.x - spiritTreeFrame.content.x);
+        y = y - (decoration.y - spiritTreeFrame.content.y);
+        for (const r of spiritTreeWalls) {
+            if (isPointInShortRect(x, y, r)) {
+                return {solid: true};
+            }
+        }
+        return {};
+    },
+    getYDepth(decoration: Decoration): number {
+        return decoration.y + 16;
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(spiritTreeFrame, decoration);
+    },
+    onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
+        state.hero.action = null;
+        setSpawnLocation(state, {
+            ...state.location,
+            x: decoration.x + spiritTreeFrame.content.w / 2 - 8,
+            y: decoration.y + spiritTreeFrame.content.h + 4,
+        });
+        appendScript(state, '{@spiritTree.interact}');
+        return;
+    }
+};
+
 export const decorationTypes = {
     helixBase,
     helixTop,
@@ -1023,20 +1077,7 @@ export const decorationTypes = {
     bigLightDome,
     smallDarkDome,
     bigDarkDome,
-    lightningBeastStatue: {
-        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-            const frame = stormBeastStatueFrame;
-            drawFrameContentAt(context, frame, decoration);
-        },
-        behaviors: {
-            solid: true,
-        },
-        getHitbox(decoration: Decoration): Rect {
-            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
-            return getFrameHitbox(stormBeastStatueFrame, decoration);
-        },
-    } as DecorationType,
-    fireBeastStatue: {
+    flameBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             const frame = flameBeastStatueFrame;
             drawFrameContentAt(context, frame, decoration);
@@ -1049,7 +1090,7 @@ export const decorationTypes = {
             return getFrameHitbox(flameBeastStatueFrame, decoration);
         },
     } as DecorationType,
-    iceBeastStatue: {
+    frostBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrameContentAt(context, frostBeastStatueFrame, decoration);
         },
@@ -1059,6 +1100,19 @@ export const decorationTypes = {
         getHitbox(decoration: Decoration): Rect {
             // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
             return getFrameHitbox(frostBeastStatueFrame, decoration);
+        },
+    } as DecorationType,
+    stormBeastStatue: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            const frame = stormBeastStatueFrame;
+            drawFrameContentAt(context, frame, decoration);
+        },
+        behaviors: {
+            solid: true,
+        },
+        getHitbox(decoration: Decoration): Rect {
+            // If the hitbox looks strange in the editor, remember that the statues are placed at high z values in the game.
+            return getFrameHitbox(stormBeastStatueFrame, decoration);
         },
     } as DecorationType,
     entranceLight: {
@@ -1113,6 +1167,7 @@ export const decorationTypes = {
             return getFrameHitbox(frame, decoration);
         },
     } as DecorationType,
+    spiritTree,
 }
 
 objectHash.decoration = Decoration;

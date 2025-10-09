@@ -1,11 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {showMessage} from 'app/scriptEvents';
-import {createAnimation, drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
-
-
-const headsetFrame = createAnimation('gfx/objects/furniture/dishware.png',
-    {w: 16, h: 16}, {top: 128, cols: 2}
-).frames[0];
+import {drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
+import {arDevice} from 'app/content/loot';
 
 
 export class ARGame implements ObjectInstance {
@@ -27,7 +23,7 @@ export class ARGame implements ObjectInstance {
         };
     }
     getHitbox(): Rect {
-        return getFrameHitbox(headsetFrame, this);
+        return getFrameHitbox(arDevice, this);
     }
     isVisible(state: GameState): boolean {
         return state.hero.savedData.passiveTools.spiritSight > 0 && !state.arState.active
@@ -46,7 +42,7 @@ export class ARGame implements ObjectInstance {
         if (!this.isVisible(state)) {
             return;
         }
-        drawFrameContentAt(context, headsetFrame, this);
+        drawFrameContentAt(context, arDevice, this);
     }
 }
 objectHash.arGame = ARGame;

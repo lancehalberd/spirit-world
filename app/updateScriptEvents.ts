@@ -2,7 +2,7 @@ import { addTextCue, removeTextCue } from 'app/content/effects/textCue';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { getLoot } from 'app/content/objects/lootObject';
 import { GAME_KEY } from 'app/gameConstants';
-import { prependScript } from 'app/scriptEvents';
+import {clearScriptEvents, prependScript} from 'app/scriptEvents';
 
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
@@ -12,16 +12,9 @@ import { saveGame } from 'app/utils/saveGame';
 
 
 export function skipCutscene(state: GameState) {
-    state.scriptEvents.queue = [];
-    state.scriptEvents.activeEvents = [];
-    delete state.scriptEvents.overrideMusic;
-    state.hideHUD = false;
-    delete state.hero.action;
-    state.messagePage = null;
-    state.scriptEvents.onSkipCutscene?.(state);
-    delete state.scriptEvents.onSkipCutscene;
-    delete state.scriptEvents.cameraTarget;
-    delete state.camera.speed;
+    const onSkipCutscene = state.scriptEvents.onSkipCutscene;
+    clearScriptEvents(state);
+    onSkipCutscene?.(state);
 }
 
 export function updateScriptEvents(state: GameState): void {

@@ -422,7 +422,7 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
     let fullTile = allTiles[tile];
     // If this tile was erased, replace it with the tile dictated by the parent definition if there is one.
     if (!fullTile && parentDefinition) {
-        const parentTile = allTiles[parentDefinition.grid?.tiles[y][x]];
+        const parentTile = allTiles[parentDefinition.grid?.tiles[y]?.[x]];
         fullTile = mapTile(parentTile);
     }
     if (fullTile?.behaviors?.maskFrame) {

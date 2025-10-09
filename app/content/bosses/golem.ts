@@ -528,7 +528,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     const hands = getOtherHands(state, enemy);
     // Boss moves slower for each hand remaining.
     enemy.speed = Math.max(1, enemy.enemyDefinition.speed - hands.length);
-    const isAngry = enemy.params.enragedAttacks > 0;
+    const isAngry = enemy.params.enragedAttacks >= 1;
     if (isAngry) {
         if (enemy.params.slamHands && hands.length) {
             enemy.speed = 1.5;
@@ -569,7 +569,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         }
     } else if (enemy.mode === 'choose') {
         enemy.changeToAnimation(isAngry ? 'angryIdle' : 'idle');
-        if (enemy.params.enragedAttacks > 0) {
+        if (enemy.params.enragedAttacks >= 1) {
             enemy.setMode('prepareStrafe');
             return;
         }
@@ -639,11 +639,13 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         }
     } else if (enemy.mode === 'prepareAttack') {
         if (hands.every(hand => hand.mode === 'choose')) {
-            // Golem has a 30% chance to use an enrage attack at enrage level 2.
-            const enrageAttackChance = enemy.params.enrageLevel >= 2 ? 0.3 : 0;
-            if (Math.random() <= enrageAttackChance) {
+            // During rage phase 2 the golem gains ~0.5 enraged attacks per attack cycle on average.
+            // This occasionally permits an 80% chance of 2 enraged attacks in a row.
+            if (enemy.params.enrageLevel >= 2 && Math.random() <= 0.8) {
+                enemy.params.enragedAttacks += 0.6;
+            }
+            if (enemy.params.enragedAttacks >= 1) {
                 enemy.params.slamHands = Math.random() < hands.length / 3;
-                enemy.params.enragedAttacks = 1;
                 enemy.setMode('choose');
             } else if (hands.length >= 2 && enemy.params.enrageLevel && Math.random() <= 0.75) {
                 enemy.setMode('slamHands');
@@ -670,7 +672,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         }
     } else if (enemy.mode === 'cooldown') {
         enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
-        if (enemy.modeTime >= 1000 || enemy.params.enragedAttacks > 0) {
+        if (enemy.modeTime >= 1000 || enemy.params.enragedAttacks >= 1) {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'slamHands') {

@@ -121,7 +121,7 @@ specialBehaviorsHash.spiritSightInstructions = {
                     state.hero.maxSpiritRadius = Math.min(MAX_SPIRIT_RADIUS, (state.hero.maxSpiritRadius + 0.15) * 1.005);
                     if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS) {
                         // Once maximum spirit sight radius is reached, the player will learn the Spirit Sight ability.
-                        showMessage(state, '{item:spiritSight}');
+                        showMessage(state, '{item:spiritSight}{stopTrack}');
                         helpText = '';
                     } else if (state.hero.maxSpiritRadius >= MAX_SPIRIT_RADIUS / 2) {
                         helpText = `...and see what lies beneath.`;

@@ -291,12 +291,12 @@ const missions: Mission[] = [
         getMarkerLocation: getLakeTunnelLocation,
         getScript(state: GameState) {
             if (state.location.zoneKey === 'helix') {
-                return `The Guardian said I should seek answers at the top of this Helix.`;
+                return `The Spirit Tree said I should seek answers at the top of this Helix.`;
             } else if (state.location.zoneKey === 'lakeTunnel') {
-                return `The Guardian said there is something called the Helix beyond this tunnel.`;
+                return `The Spirit Tree said there is a trial awaiting me beyond this tunnel.`;
             } else {
-                return `The Guardian said there is something called the Helix beyond the Lake Tunnel.
-                    {|}With all my spirit abilities, I should be able to get through now.`;
+                return `The Spirit Tree asked me to challenge the Trial of the Helix beyond the Lake Tunnel.
+                    {|}My spirit abilities should be powerful enough to get through now.`;
             }
         },
         isAvailable(state: GameState) {

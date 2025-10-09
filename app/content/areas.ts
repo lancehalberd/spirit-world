@@ -17,7 +17,10 @@ import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils
 import {applyLayerToBehaviorGrid, resetTileBehavior} from 'app/utils/tileBehavior';
 import {applyVariantsToArea} from 'app/utils/variants';
 
-export function getDefaultArea(w = 32, h = 32): AreaDefinition {
+export function getDefaultArea(w: number, h: number): AreaDefinition {
+    if (!w || !h) {
+        debugger;
+    }
     return {
         default: true,
         layers: getDefaultLayers(w, h),
@@ -26,7 +29,10 @@ export function getDefaultArea(w = 32, h = 32): AreaDefinition {
     };
 }
 
-export function getDefaultLayers(w = 32, h = 32): AreaLayerDefinition[] {
+export function getDefaultLayers(w: number, h: number): AreaLayerDefinition[] {
+    if (!w || !h) {
+        debugger;
+    }
     return [
         {
             key: 'floor',
@@ -52,6 +58,9 @@ export function getDefaultLayers(w = 32, h = 32): AreaLayerDefinition[] {
 }
 
 export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefinition {
+    if (!layer.grid.w || !layer.grid.h) {
+        debugger;
+    }
     return {
         ...layer,
         drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
@@ -71,7 +80,7 @@ export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefiniti
 
 export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
     const parentDefinition = getAreaFromLocation({...location, isSpiritWorld: false});
-    return {
+    const definition: AreaDefinition = {
         default: true,
         parentDefinition,
         isSpiritWorld: true,
@@ -86,6 +95,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
             mapId: section.mapId ? section.mapId + 'Spirit' : undefined
         })),
     };
+    return definition;
 }
 
 export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
@@ -95,6 +105,7 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     const alternateGrid = location.isSpiritWorld ? floor.grid : floor.spiritGrid;
     const {w, h} = zone.areaSize ?? {w: 32, h: 32};
 
+
     const {x, y} = location.areaGridCoords;
     if (!grid[y]) {
         grid[y] = [];
@@ -102,45 +113,50 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     if (!grid[y][x]) {
         grid[y][x] =
             initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h));
-        return grid[y][x] as AreaDefinition;
+        return addMissingSection(zone, grid[y][x], alternateGrid[y]?.[x]);
     } else if (!grid[y][x].layers) {
-        /*const areaDefinition = grid[y][x];
-        const alternateAreaDefinition = alternateGrid[y][x];
-        if (!alternateAreaDefinition) {
-            debugger;
-        }
-        if (alternateAreaDefinition.layers) {
-            grid[y][x] = initializeAreaTiles({
-                ...areaDefinition,
-                layers: alternateAreaDefinition.layers.map(copyLayerTemplate),
-            });
-        } else {
-            const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h)).layers;
-            grid[y][x] = initializeAreaTiles({
-                ...areaDefinition,
-                layers: defaultLayers
-            });
-        }*/
-        populateLayersFromAlternateArea(grid[y][x], alternateGrid[y][x]);
-        return grid[y][x] as AreaDefinition;
+        populateLayersFromAlternateArea(zone, grid[y][x], alternateGrid[y]?.[x]);
+        return addMissingSection(zone, grid[y][x], alternateGrid[y]?.[x]);
     }
     return grid[y][x];
 }
 
-export function populateLayersFromAlternateArea(area: AreaDefinition, alternateArea: AreaDefinition) {
+export function addMissingSection(zone: Zone, area: AreaDefinition, alternateArea?: AreaDefinition): AreaDefinition {
+    if (!area.w || !area.h) {
+        const {w, h} = getAreaDimensions(area, zone);
+        area.w = w;
+        area.h = h;
+    }
+    if (!area.sections?.length) {
+        if (alternateArea?.sections?.length) {
+            area.sections = alternateArea.sections.map(({x, y, w, h}) => ({x, y, w, h}));
+        } else {
+            area.sections = [{
+                x: 0,
+                y: 0,
+                w: area.w,
+                h: area.h
+            }];
+        }
+    }
+    return area;
+}
+
+export function populateLayersFromAlternateArea(zone: Zone|null, area: AreaDefinition, alternateArea: AreaDefinition) {
     if (area.layers) {
         return;
     }
     if (alternateArea?.layers) {
         area.layers = alternateArea.layers.map(copyLayerTemplate);
     } else {
-        area.layers = getDefaultLayers(area.w, area.h);
+        const {w, h} = getAreaDimensions(area, zone);
+        area.layers = getDefaultLayers(w, h);
     }
     initializeAreaTiles(area);
 }
 
 export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
-    return createAreaInstance(state, getAreaFromLocation(location), isActiveArea);
+    return createAreaInstance(state, zones[location.zoneKey], getAreaFromLocation(location), isActiveArea);
 }
 
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
@@ -158,7 +174,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
         if (lastAreaInstance?.definition === underwaterArea) {
             state.underwaterAreaInstance = lastAreaInstance;
         } else {
-            state.underwaterAreaInstance = createAreaInstance(state, underwaterArea);
+            state.underwaterAreaInstance = createAreaInstance(state, zones[state.zone.underwaterKey], underwaterArea);
         }
     }
     state.surfaceAreaInstance = null;
@@ -175,7 +191,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
         if (lastAreaInstance?.definition === surfaceArea) {
             state.surfaceAreaInstance = lastAreaInstance;
         } else {
-            state.surfaceAreaInstance = createAreaInstance(state, surfaceArea);
+            state.surfaceAreaInstance = createAreaInstance(state, zones[state.zone.surfaceKey], surfaceArea);
         }
     }
     state.areaInstance.underwater = !!state.surfaceAreaInstance;
@@ -246,7 +262,7 @@ export function findZoneTargets(
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
     //console.log('scrollToArea', direction);
     removeAllClones(state);
-    state.nextAreaInstance = createAreaInstance(state, area, true);
+    state.nextAreaInstance = createAreaInstance(state, state.zone, area, true);
     if (direction === 'up') {
         state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.h * 16;
     }
@@ -305,7 +321,7 @@ export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation
             return area;
         }
     }
-    return createAreaInstance(state, definition);
+    return createAreaInstance(state, zones[location.zoneKey], definition);
 }
 
 export function addRecentArea(areaInstance: AreaInstance): void {
@@ -320,9 +336,9 @@ export function addRecentArea(areaInstance: AreaInstance): void {
     }
 }
 
-export function createAreaInstance(state: GameState, definition: AreaDefinition, isActiveArea: boolean = false): AreaInstance {
+export function createAreaInstance(state: GameState, zone: Zone, definition: AreaDefinition, isActiveArea: boolean = false): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
-    const areaSize = getAreaDimensions(definition);
+    const areaSize = getAreaDimensions(definition, zone);
     const backgroundFrames: AreaFrame[] = [];
     for (let i = 0; i < 6; i++) {
         const [canvas, context] = createCanvasAndContext(
@@ -436,13 +452,14 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition,
     for (const layer of instance.layers) {
         applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
+    const newObjectInstances: ObjectInstance[] = [];
     for (const object of definition.objects.filter(object => evaluateLogicDefinition(state, object))) {
         const objectInstance = createObjectInstance(state, object);
         addObjectToArea(state, instance, objectInstance);
-        initializeObject(state, objectInstance);
-        if (isActiveArea) {
-            objectInstance.onInitialize?.(state);
-        }
+        newObjectInstances.push(objectInstance);
+    }
+    for (const objectInstance of newObjectInstances) {
+        initializeObject(state, objectInstance, isActiveArea);
     }
     // instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
@@ -517,7 +534,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             state.fadeLevel = (state.areaSection.dark ?? 0) / 100;
             // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
             // state.hero.vx = state.hero.vy = 0;
-            const nextAreaInstance = createAreaInstance(state, instance.definition, true);
+            const nextAreaInstance = createAreaInstance(state, state.zone, instance.definition, true);
             nextAreaInstance.alternateArea = instance.alternateArea;
             nextAreaInstance.alternateArea.alternateArea = nextAreaInstance;
             // Refresh tile behaviors+canvases.
@@ -685,6 +702,9 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
     }
     const l = section.x * 16;
     const t = section.y * 16;
+    // Objects will be initialized after all objects are added to the area since some object initialization will depend on
+    // other objects, for example beds/cocoons placing target NPC objects inside of them.
+    const objectsToInitialize: ObjectInstance[] = [];
     // Remove any objects from that area that should be reset.
     // This will permanently remove any objects that reset and don't have definitions, like loot drops.
     for (const object of [...area.objects]) {
@@ -703,8 +723,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
                 }
                 const object = createObjectInstance(state, definition);
                 addObjectToArea(state, area, object);
-                initializeObject(state, object);
-                object.onInitialize?.(state);
+                objectsToInitialize.push(object);
             }
         }
     }
@@ -723,12 +742,13 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
             object = createObjectInstance(state, definition);
             if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
                 addObjectToArea(state, area, object);
-                initializeObject(state, object);
-                object.onInitialize?.(state);
+                objectsToInitialize.push(object);
             }
         }
     }
-
+    for (const object of objectsToInitialize) {
+        initializeObject(state, object, true);
+    }
     applyVariantsToArea(state, area);
 }
 

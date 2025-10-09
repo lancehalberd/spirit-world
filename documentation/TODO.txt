@@ -145,19 +145,41 @@ Graphics to Implement:
 
 
 Current tasks:
+    - For staff animations to render all but the bottom Npx in the foreground.
+
+
+    Stream notes:
+        - Fix remaining floor tiles in War Temple
+        - Force the player to center when going up/down stairs, right now they are clipping the walls too much.
+        - Remove hit damage from stone idle statues?
+        - Add wall/floor transitions to exterior of cocoon in the tomb.
+
+
+    - Deleting tiles in spirit world temporarily does not show the correct linked tiles.
+    - Make Vanara bushes linked between worlds like other bushes.
+
+    - Add moss to Peach Cave
+    - Remove glowing grass layer from Peach Cave
+
+    - Add new save statue
+        - Adjust placement of all statues.
+        - Move top floors of peach cave down 1 tile to keep statue from being behind hearts.
+        - Add old save statue graphics as a decoration.
+
     - Add new graphics
-        - Moss tiles
-            - Should swap colors between worlds.
+        - Cherry tree
         - fireball effect
         - dirt particles
+        - tinted Vanara spirit NPCs
+        - test new lab tiles
+        - new icons
+            - peach basket
+            - consumables
+            - medallions
+        - Updated pods
 
     - Add Vanara Dreamland
-        - Update entrance to Vanara Dreamland from the cocoon to use a sleeping pod you can interact with.
-            - Update Guardian dialogue and layout accordingly.
-            - Move final check from Cocoon into the dream world with NPC:
-              "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave."
         - Add Vanara Dreamland to logic
-            - Move check from Vanara Guardian to the Spirit tree
             - Add logic for all teleporters
         - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
@@ -186,6 +208,9 @@ Current tasks:
         - Expansion(Spirit Sky Tree) 6: library of memories
             - Requires Flying Boots or complicated use of other abilities
 
+    - Add sleeping pod to Helix bridge
+        - Prevent the player from using it before talking to the captain "You can use this pod to visit the Dreaming after you've talked to the captain."
+
     - Add charge behavior to drone
         - line up with hero within 100px
         - Charge up for 500ms, accelerating frame rate to 4x by 300ms, strafe to align with hero quickly at first, but slow to 0 speed by 300ms
@@ -207,14 +232,7 @@ Current tasks:
         - Losing all Spirit Energy returns you to the last location you were in the Material World.
         - This would require modifying Spirit World sections in Cocoon to only require Astral Projection.
 
-    - Add new helix exterior graphics
-        - Add helix exterior to material sky
-            - Match door support to Staff Tower door
-            - Add proper hit detection.
-
     - Add Monk1 and Monk2 NPC graphics
-
-    - Add Drone enemy graphics.
 
     - Switch Spirit World shops to use aether.
         - You can sell certain rare artifacts for aether in the Spirit City.
@@ -230,6 +248,11 @@ Current tasks:
 
     - Forest/overworld puzzle
         - Use astral projection from the spirit world to push a water droplet to grow a vine in the material world.
+
+    - Helix Top fixes
+        - Shadow is hidden under the balcony. Probably need to split the bottom off and draw it as a background piece.
+            - Also moving this background to the same display index as pits would be good to make the cloud poof animation appear over it.
+        - Player should go under the vines. This will require removing the black pixels from the base image.
 
     - Add 2x2 map tile frame to tile behaviors that is used when drawing the map
         - Instead of drawing areas at full scale and then scaling them down for the map, just draw them directly at the final scale.
