@@ -235,57 +235,6 @@ function checkToRenderFrozenDoorForeground(this: void, context: CanvasRenderingC
     }
 }
 
-`
-const [
-    southCrackedWall, southCaveFrame, southCaveCeiling, southCave,
-    southCaveDoorFrame, southCaveDoorCeiling, /*southCaveDoorClosed*/,
-    /*southLockedDoorWood*/, southLockedDoorSteel, southLockedDoorBig,
-] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 1, cols: 10}).frames;
-
-const [
-    eastCrackedWall, eastCaveFrame, eastCaveCeiling, eastCave,
-    eastCaveDoorFrame, eastCaveDoorCeiling, /*eastCaveDoorClosed*/,
-    /*eastLockedDoorWood*/, eastLockedDoorSteel, eastLockedDoorBig,
-] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 2, cols: 10}).frames;
-
-const [
-    northCrackedWall, northCaveFrame, northCaveCeiling, northCave,
-    northCaveDoorFrame, northCaveDoorCeiling, /*northCaveDoorClosed*/,
-    /*northLockedDoorWood*/, northLockedDoorSteel, northLockedDoorBig,
-] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 3, cols: 10}).frames;
-
-const [
-    westCrackedWall, westCaveFrame, westCaveCeiling, westCave,
-    westCaveDoorFrame, westCaveDoorCeiling, /*westCaveDoorClosed*/,
-    /*westLockedDoorWood*/, westLockedDoorSteel, westLockedDoorBig,
-] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 10}).frames;
-
-const [
-    southTrapDoor, eastTrapDoor, northTrapDoor, westTrapDoor,
-] = createAnimation('gfx/tiles/trapdoor.png', {w: 32, h: 32}, {rows: 4}).frames;
-
-const [
-    lightSouthCrackedWall, lightSouthCaveFrame, lightSouthCaveCeiling, /*southCave*/,
-    lightSouthCaveDoorFrame, lightSouthCaveDoorCeiling,
-] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 1, cols: 6}).frames;
-
-const [
-    lightEastCrackedWall, lightEastCaveFrame, lightEastCaveCeiling, /*lightEastCave*/,
-    lightEastCaveDoorFrame, lightEastCaveDoorCeiling,
-] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 2, cols: 6}).frames;
-
-const [
-    lightNorthCrackedWall, lightNorthCaveFrame, lightNorthCaveCeiling, /*lightNorthCave*/,
-    lightNorthCaveDoorFrame, lightNorthCaveDoorCeiling,
-] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 3, cols: 6}).frames;
-
-const [
-    lightWestCrackedWall, lightWestCaveFrame, lightWestCaveCeiling, /*lightWestCave*/,
-    lightWestCaveDoorFrame, lightWestCaveDoorCeiling,
-] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 6}).frames;
-`;
-
-
 const [ treeDoorOpen ] = createAnimation('gfx/tiles/treesheet.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
 const [ knobbyTreeDoorOpen ] = createAnimation('gfx/tiles/knobbytrees.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
 
@@ -296,8 +245,8 @@ const [
     futureLadderTop, futureLadderMiddle, futureLadderBottom, /*futureLadderTop*/, futureLadderDownFrame
 ] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 832, rows: 5}).frames;
 
-
-const oldSquareBaseDoorStyle = {
+// This is primarily used for holes in
+const wideSquareDoorStyle = {
     getHitbox(door: Door) {
         return {x: door.x, y: door.y, w: 32, h: 32};
     },
@@ -911,7 +860,17 @@ const futureDoorStyle: DoorStyleDefinition = {
 
 function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, mapIcon: MapIcon, h = 12): DoorStyleDefinition {
     return {
-        ...oldSquareBaseDoorStyle,
+        getHitbox(door: Door) {
+            return {x: door.x, y: door.y, w: 32, h: 32};
+        },
+        getPathHitbox(door: Door) {
+            return (door.definition.d === 'up' || door.definition.d === 'down')
+                // This is made as wide was possible to support using this with the helixTop object.
+                ? {x: door.x + 8, y: door.y, w: 16, h: 32}
+                // This is slightly lower than you would naively place it in order to prevent
+                // the MCs head from peaking over the top of the frame as they move left/right.
+                : {x: door.x, y: door.y + 10, w: 32, h: 16};
+        },
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
@@ -1071,87 +1030,8 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     jadeDarkInteriorUpstairs: stairsDoorStyle(jadeDark1DoorStyle, jadeDark1IntStairsUp, 'up'),
     //jadeDarkInt2Downstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsDown, 'down'),
     //jadeDarkInt2Upstairs: stairsDoorStyle(jadeDark2DoorStyle, jadeDark2IntStairsUp, 'up'),
-
-    /*cave: {
-        ...oldSquareBaseDoorStyle,
-        down: {
-            doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southTrapDoor,
-            cracked: southCrackedWall,
-            caveFrame: southCaveFrame,
-            caveCeiling: southCaveCeiling,
-            cave: southCave,
-            locked: southLockedDoorSteel,
-            bigKeyLocked: southLockedDoorBig,
-        },
-        right: {
-            doorFrame: eastCaveDoorFrame, doorCeiling: eastCaveDoorCeiling, doorClosed: eastTrapDoor,
-            cracked: eastCrackedWall,
-            caveFrame: eastCaveFrame,
-            caveCeiling: eastCaveCeiling,
-            cave: eastCave,
-            locked: eastLockedDoorSteel,
-            bigKeyLocked: eastLockedDoorBig,
-        },
-        up: {
-            doorFrame: northCaveDoorFrame, doorCeiling: northCaveDoorCeiling, doorClosed: northTrapDoor,
-            cracked: northCrackedWall,
-            caveFrame: northCaveFrame,
-            caveCeiling: northCaveCeiling,
-            cave: northCave,
-            locked: northLockedDoorSteel,
-            bigKeyLocked: northLockedDoorBig,
-        },
-        left: {
-            doorFrame: westCaveDoorFrame, doorCeiling: westCaveDoorCeiling, doorClosed: westTrapDoor,
-            cracked: westCrackedWall,
-            caveFrame: westCaveFrame,
-            caveCeiling: westCaveCeiling,
-            cave: westCave,
-            locked: westLockedDoorSteel,
-            bigKeyLocked: westLockedDoorBig,
-        },
-    },
-    lightCave: {
-        ...oldSquareBaseDoorStyle,
-        down: {
-            doorFrame: lightSouthCaveDoorFrame, doorCeiling: lightSouthCaveDoorCeiling, doorClosed: southTrapDoor,
-            cracked: lightSouthCrackedWall,
-            caveFrame: lightSouthCaveFrame,
-            caveCeiling: lightSouthCaveCeiling,
-            cave: southCave,
-            locked: southLockedDoorSteel,
-            bigKeyLocked: southLockedDoorBig,
-        },
-        right: {
-            doorFrame: lightEastCaveDoorFrame, doorCeiling: lightEastCaveDoorCeiling, doorClosed: eastTrapDoor,
-            cracked: lightEastCrackedWall,
-            caveFrame: lightEastCaveFrame,
-            caveCeiling: lightEastCaveCeiling,
-            cave: eastCave,
-            locked: eastLockedDoorSteel,
-            bigKeyLocked: eastLockedDoorBig,
-        },
-        up: {
-            doorFrame: lightNorthCaveDoorFrame, doorCeiling: lightNorthCaveDoorCeiling, doorClosed: northTrapDoor,
-            cracked: lightNorthCrackedWall,
-            caveFrame: lightNorthCaveFrame,
-            caveCeiling: lightNorthCaveCeiling,
-            cave: northCave,
-            locked: northLockedDoorSteel,
-            bigKeyLocked: northLockedDoorBig,
-        },
-        left: {
-            doorFrame: lightWestCaveDoorFrame, doorCeiling: lightWestCaveDoorCeiling, doorClosed: westTrapDoor,
-            cracked: lightWestCrackedWall,
-            caveFrame: lightWestCaveFrame,
-            caveCeiling: lightWestCaveCeiling,
-            cave: westCave,
-            locked: westLockedDoorSteel,
-            bigKeyLocked: westLockedDoorBig,
-        },
-    },*/
     tree: {
-        ...oldSquareBaseDoorStyle,
+        ...wideSquareDoorStyle,
         up: {
             doorFrame: treeDoorOpen,
             doorClosed: treeDoorOpen,
@@ -1164,7 +1044,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     knobbyTree: {
-        ...oldSquareBaseDoorStyle,
+        ...wideSquareDoorStyle,
         up: {
             doorFrame: knobbyTreeDoorOpen,
             doorClosed: knobbyTreeDoorOpen,
@@ -1182,7 +1062,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     futureLadderUp: ladderUp(futureLadderTop, futureLadderMiddle, futureLadderBottom, 1),
     futureLadderUpTall: tallLadderUp(futureLadderMiddle, futureLadderBottom, 1),
     futureLadderDown: ladderDown(futureLadderTop, futureLadderDownFrame),
-    square: oldSquareBaseDoorStyle,
+    square: wideSquareDoorStyle,
     wideEntrance: {
         // We use isNotSolid here since we see the ground type for this entrance.
         // for example the player should swim through water or wade through shallow water behind this entrance.

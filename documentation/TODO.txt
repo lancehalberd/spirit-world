@@ -150,7 +150,6 @@ Current tasks:
 
     Stream notes:
         - Fix remaining floor tiles in War Temple
-        - Force the player to center when going up/down stairs, right now they are clipping the walls too much.
         - Remove hit damage from stone idle statues?
         - Add wall/floor transitions to exterior of cocoon in the tomb.
 
