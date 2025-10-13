@@ -117,7 +117,8 @@ const baseIdolDefinition: Partial<EnemyDefinition<IdolParams>> = {
     alwaysReset: true,
     scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1,
+    life: 8,
+    tileBehaviors: {solid: true},
     onHit: onHitIdol,
     // Instead of rendering a shield, the health bars turn grey to indicate they are invulnerable.
     getShieldPercent: () => 0,
