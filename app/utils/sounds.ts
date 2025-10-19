@@ -454,7 +454,8 @@ const preloadSounds = () => {
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 2},
         {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 100, instanceLimit: 4}, 
-        {key: 'hitShot', source: 'sfx/chime 14_1.wav', duration: 1, volume: 4, instanceLimit: 5},
+        {key: 'hitShot', source: 'sfx/enemyDeath.wav', offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 5},
+        {key: 'hitBullseye', source: 'sfx/chime 14_1.wav', duration: 1, volume: 4, instanceLimit: 5},
     ].forEach(sound => requireSoundEffect(sound));
 };
 preloadSounds();

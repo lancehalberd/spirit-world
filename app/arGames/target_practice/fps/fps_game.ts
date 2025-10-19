@@ -34,8 +34,49 @@ function updateTargetPractice(state: GameState) {
     }
 }
 
+function renderBullseyeEffects(context: CanvasRenderingContext2D, gameState: TargetPracticeState): void {
+    if (!gameState.bullseyeEffects) return;
+    
+    context.save();
+    
+    for (const effect of gameState.bullseyeEffects) {
+        const progress = 1 - (effect.lifetime / effect.maxLifetime);
+        const alpha = Math.max(0, 1 - progress * 2); 
+        
+        context.save();
+        context.globalAlpha = alpha;
+        context.translate(effect.x, effect.y);
+        context.scale(effect.scale, effect.scale);
+        
+        context.fillStyle = '#FFD700'; 
+        context.strokeStyle = '#FF4500'; 
+        context.lineWidth = 2;
+        context.font = 'bold 20px Arial';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        
+        context.strokeText('BULLSEYE!', 0, 0);
+        context.fillText('BULLSEYE!', 0, 0);
+        
+        context.strokeStyle = '#FFD700';
+        context.lineWidth = 3;
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const length = 30 + progress * 20;
+            context.beginPath();
+            context.moveTo(Math.cos(angle) * 15, Math.sin(angle) * 15);
+            context.lineTo(Math.cos(angle) * length, Math.sin(angle) * length);
+            context.stroke();
+        }
+        
+        context.restore();
+    }
+    
+    context.restore();
+}
+
 function renderTargetPractice(context: CanvasRenderingContext2D, state: GameState) {
-    const gameState = state.arState.game;// as TargetPracticeState;
+    const gameState = state.arState.game;
     const savedState = state.savedState.savedArData.gameData.targetPractice;
     
     state.hideHUD = true;
@@ -71,6 +112,7 @@ function renderTargetPractice(context: CanvasRenderingContext2D, state: GameStat
     }
     
     renderHero(context, state, gameState);
+    renderBullseyeEffects(context, gameState);
     context.restore();
 }
 

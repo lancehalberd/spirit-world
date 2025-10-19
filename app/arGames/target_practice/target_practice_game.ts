@@ -57,7 +57,7 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         spawnInterval: 800, 
         maxTargets: 2,
         targetTypes: [
-            { points: 30, alternatePoints: -10, radius: 15, speed: 4.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
+            { points: 30, alternatePoints: -10, radius: 15, speed: 4.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1600},
         ]
     },
     'l3': { 
@@ -87,7 +87,7 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         spawnInterval: 1000, 
         maxTargets: 4,
         targetTypes: [
-            { points: 40, alternatePoints: -40, radius: 8, speed: 6.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 800},
+            { points: 40, alternatePoints: -40, radius: 8, speed: 6.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
             { points: 25, radius: 12, speed: 7, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
             { points: 90, radius: 10, speed: 9, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 3 },
         ]
@@ -690,10 +690,10 @@ function getNewTargetPracticeState(state: GameState): TargetPracticeState {
     return {
         scene: 'shop',
         screen: {
-            x: (((state.hero.x - 64) / 8) | 0) * 8,
-            y: (((state.hero.y - 64) / 8) | 0) * 8,
-            w: 128,
-            h: 128,
+            x: state.camera.x,
+            y: state.camera.y,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
         },
         bullets: [],
         targets: [],
@@ -737,64 +737,77 @@ function startTargetPractice(state: GameState) {
 }
 
 const shopItems: ShopItem[] = [
-    {key: 'l1', levelKey: 'l1', x: 0, y: 0, unlocks: ['l2', 'reset'], label: 'Level 1', description: 'Warm Up'},
-    {key: 'l2', levelKey: 'l2', x: 0, y: 1, costs: [50], unlocks: ['l3', 'ammo'], label: 'Level 2', description: 'Practice'},
-    {key: 'l3', levelKey: 'l3', x: 0, y: 2, costs: [100], unlocks: ['l4', 'speed'], label: 'Level 3', description: 'Deputy'},
-    {key: 'l4', levelKey: 'l4', x: 0, y: 3, costs: [200], unlocks: ['l5', 'reload'], label: 'Level 4', description: 'Bandito'},
-    {key: 'l5', levelKey: 'l5', x: 0, y: 4, costs: [400], unlocks: ['l6'], label: 'Level 5', description: 'Sheriff'},
-    {key: 'l6', levelKey: 'l6', x: 0, y: 5, costs: [800], unlocks: ['l7', 'points'], label: 'Level 6', description: 'Marshall'},
-    {key: 'l7', levelKey: 'l7', x: 0, y: 6, costs: [1600], unlocks: ['l8', 'time'], label: 'Level 7', description: 'Sharpshooter'},
-    {key: 'l8', levelKey: 'l8', x: 0, y: 7, costs: [3200], unlocks: ['l9', 'multishot'], label: 'Level 8', description: 'Legend'},
-    {key: 'l9', levelKey: 'l9', x: 0, y: 8, costs: [6400], unlocks: ['pierce', 'endless'], label: 'Level 9', description: 'Desperado'},
-    {key: 'endless', levelKey: 'endless', x: 2, y: 0, costs: [12800], label: 'Endless', description: 'Survive as long as possible!'},
+    {key: 'l1', levelKey: 'l1', x: 0, y: 1, unlocks: ['l2', 'reset'], label: 'Level 1', description: 'Warm Up'},
+    {key: 'l2', levelKey: 'l2', x: 0, y: 2, costs: [50], unlocks: ['l3', 'ammo'], label: 'Level 2', description: 'Practice'},
+    {key: 'l3', levelKey: 'l3', x: 0, y: 3, costs: [100], unlocks: ['l4', 'speed'], label: 'Level 3', description: 'Deputy'},
+    {key: 'l4', levelKey: 'l4', x: 0, y: 4, costs: [200], unlocks: ['l5', 'reload'], label: 'Level 4', description: 'Bandito'},
+    {key: 'l5', levelKey: 'l5', x: 0, y: 5, costs: [400], unlocks: ['l6'], label: 'Level 5', description: 'Sheriff'},
+    {key: 'l6', levelKey: 'l6', x: 1, y: 1, costs: [800], unlocks: ['l7', 'points'], label: 'Level 6', description: 'Marshall'},
+    {key: 'l7', levelKey: 'l7', x: 1, y: 2, costs: [1600], unlocks: ['l8', 'time'], label: 'Level 7', description: 'Sharpshooter'},
+    {key: 'l8', levelKey: 'l8', x: 1, y: 3, costs: [3200], unlocks: ['l9', 'multishot'], label: 'Level 8', description: 'Legend'},
+    {key: 'l9', levelKey: 'l9', x: 1, y: 4, costs: [6400], unlocks: ['pierce', 'endless'], label: 'Level 9', description: 'Desperado'},
+    {key: 'endless', levelKey: 'endless', x: 1, y: 5, costs: [12800], label: 'Endless', description: 'Survive as long as possible!'},
     {
-        key: 'ammo', x: 1, y: 0, costs: [50, 100, 200, 400, 800],
+        key: 'ammo', x: 3, y: 1, costs: [50, 100, 200, 400, 800],
         label: 'Ammo',
         description: 'More shots per round',
     },
     {
-        key: 'speed', x: 1, y: 1, costs: [100, 200, 400, 800],
+        key: 'speed', x: 3, y: 2, costs: [100, 200, 400, 800],
         label: 'Speed',
         description: 'Faster bullet velocity',
     },
     {
-        key: 'reload', x: 1, y: 2, costs: [200, 400, 800, 1600],
+        key: 'reload', x: 3, y: 3, costs: [200, 400, 800, 1600],
         label: 'Reload',
         description: 'Faster shooting rate',
     },
     {
-        key: 'points', x: 1, y: 4, costs: [200, 400, 800, 1600, 3200],
+        key: 'points', x: 3, y: 4, costs: [200, 400, 800, 1600, 3200],
         label: 'Greed',
         description: 'Score multiplier',
     },
     {
-        key: 'time', x: 1, y: 5, costs: [800, 1600, 3200],
+        key: 'time', x: 3, y: 5, costs: [800, 1600, 3200],
         label: 'Time',
         description: 'More time per level',
     },
     {
-        key: 'multishot', x: 1, y: 6, costs: [1600, 3200, 6400, 11],
+        key: 'multishot', x: 4, y: 1, costs: [1600, 3200, 6400, 12800],
         label: 'Multishot',
         description: 'Fire multiple bullets',
     },
     {
-        key: 'pierce', x: 1, y: 7, costs: [3200, 6400],
+        key: 'pierce', x: 4, y: 2, costs: [3200, 6400],
         label: 'Pierce',
         description: 'Bullets go through targets',
     },
     {
-        key: 'reset', x: 2, y: 7,
+        key: 'reset', x: 4, y: 5,
         label: 'Reset',
         description: 'Clear data',
     },
 ];
 
-function shopItemRect(gameState: TargetPracticeState, item: ShopItem): Rect {
+/*function shopItemRect(gameState: TargetPracticeState, item: ShopItem): Rect {
     return {
         x: gameState.screen.x + 4 + item.x * 42,
         y: gameState.screen.y + 3 + item.y * 13,
         w: 36,
         h: 12,
+    };
+}*/
+
+function shopItemRect(gameState: TargetPracticeState, item: ShopItem): Rect {
+    const itemWidth = 40;
+    const itemHeight = 20;
+    const padding = 10;
+    
+    return {
+        x: gameState.screen.x + padding + item.x * (itemWidth + padding),
+        y: gameState.screen.y + padding + item.y * (itemHeight + padding),
+        w: itemWidth,
+        h: itemHeight,
     };
 }
 
@@ -1012,69 +1025,101 @@ function fireBullet(state: GameState, gameState: TargetPracticeState, savedState
     gameState.reloadTime = Math.max(100, 300 - (savedState.unlocks.reload ?? 0) * 50);
     gameState.lastShotTime = 200;
     
-    playAreaSound(state, state.areaInstance, 'error');
+    playAreaSound(state, state.areaInstance, 'menuTick');
 }
 
-function handleTargetCollisions(gameState: TargetPracticeState) {
-    for (let i = 0; i < gameState.targets.length; i++) {
-        const target1 = gameState.targets[i];
-        if (target1.hitTime !== undefined) continue;
-       
-        for (let j = i + 1; j < gameState.targets.length; j++) {
-            const target2 = gameState.targets[j];
-            if (target2.hitTime !== undefined) continue;
-           
-            const dx = target2.x - target1.x;
-            const dy = target2.y - target1.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = target1.radius + target2.radius;
-           
-            if (distance < minDistance && distance > 0 ) {
-                if (target1 instanceof StandardTarget && !(target1 instanceof CirclingTarget) &&
-                    target2 instanceof StandardTarget && !(target2 instanceof CirclingTarget)) {
-                    const nx = dx / distance;
-                    const ny = dy / distance;
-                   
-                    const overlap = minDistance - distance;
-                    const separationX = (overlap * nx) / 2;
-                    const separationY = (overlap * ny) / 2;
-                   
-                    target1.x -= separationX;
-                    target1.y -= separationY;
-                    target2.x += separationX;
-                    target2.y += separationY;
-                   
-                    const speed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
-                    const speed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
-                   
-                    const relativeVx = target2.vx - target1.vx;
-                    const relativeVy = target2.vy - target1.vy;
-                    const velocityAlongNormal = relativeVx * nx + relativeVy * ny;
-                   
-                    if (velocityAlongNormal <= 0) {
-                        const impulse = velocityAlongNormal;
-                        target1.vx += impulse * nx;
-                        target1.vy += impulse * ny;
-                        target2.vx -= impulse * nx;
-                        target2.vy -= impulse * ny;
-                        
-                        const newSpeed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
-                        const newSpeed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
-                        
-                        if (newSpeed1 > 0) {
-                            target1.vx = (target1.vx / newSpeed1) * speed1;
-                            target1.vy = (target1.vy / newSpeed1) * speed1;
-                        }
-                        
-                        if (newSpeed2 > 0) {
-                            target2.vx = (target2.vx / newSpeed2) * speed2;
-                            target2.vy = (target2.vy / newSpeed2) * speed2;
-                        }
-                    }
-                }
+function handleTargetCollisions(gameState: TargetPracticeState): void {
+    const activeTargets = gameState.targets.filter(isActiveTarget);
+    
+    if (activeTargets.length < 2) return;
+    
+    for (let i = 0; i < activeTargets.length - 1; i++) {
+        const target1 = activeTargets[i];
+        
+        for (let j = i + 1; j < activeTargets.length; j++) {
+            const target2 = activeTargets[j];
+            
+            if (areTargetsNearby(target1, target2)) {
+                resolveCollision(target1, target2);
             }
         }
     }
+}
+
+function isActiveTarget(target: Target): boolean {
+    return target.hitTime === undefined && !(target instanceof CirclingTarget);
+}
+
+function areTargetsNearby(target1: Target, target2: Target): boolean {
+    const maxDistance = target1.radius + target2.radius;
+    const dx = target2.x - target1.x;
+    const dy = target2.y - target1.y;
+    const distanceSquared = dx * dx + dy * dy;
+    const maxDistanceSquared = maxDistance * maxDistance;
+    
+    return distanceSquared <= maxDistanceSquared;
+}
+
+function resolveCollision(target1: Target, target2: Target): boolean {
+    const dx = target2.x - target1.x;
+    const dy = target2.y - target1.y;
+    const distanceSquared = dx * dx + dy * dy;
+    const minDistance = target1.radius + target2.radius;
+    const minDistanceSquared = minDistance * minDistance;
+    
+    if (distanceSquared >= minDistanceSquared || distanceSquared === 0) {
+        return false;
+    }
+    
+    const distance = Math.sqrt(distanceSquared);
+    const overlap = minDistance - distance;
+    const nx = dx / distance;
+    const ny = dy / distance;
+    
+    separateTargets(target1, target2, nx, ny, overlap);
+    changeVelocities(target1, target2, nx, ny);
+    
+    return true;
+}
+
+function separateTargets(
+    target1: Target,
+    target2: Target,
+    nx: number,
+    ny: number,
+    overlap: number
+): void {
+    const separationDistance = overlap * 0.5;
+    
+    target1.x -= nx * separationDistance;
+    target1.y -= ny * separationDistance;
+    target2.x += nx * separationDistance;
+    target2.y += ny * separationDistance;
+}
+
+function changeVelocities(
+    target1: Target,
+    target2: Target,
+    nx: number,
+    ny: number
+): void {
+    const relativeVx = target2.vx - target1.vx;
+    const relativeVy = target2.vy - target1.vy;
+    const relativeVelocityInNormal = relativeVx * nx + relativeVy * ny;
+    
+    if (relativeVelocityInNormal > 0) {
+        return;
+    }
+
+    const restitution = 0.8;
+    const impulseScalar = -(1 + restitution) * relativeVelocityInNormal / 2;
+    const impulsex = impulseScalar * nx;
+    const impulsey = impulseScalar * ny;
+    
+    target1.vx -= impulsex;
+    target1.vy -= impulsey;
+    target2.vx += impulsex;
+    target2.vy += impulsey;
 }
 
 function updateLevel(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
@@ -1298,7 +1343,7 @@ function updateResults(state: GameState, gameState: TargetPracticeState, savedSt
             }
         }
         
-        savedState.points += earnedPoints * (1 + (savedState.unlocks.points ?? 0));;
+        savedState.points += earnedPoints;
         
         // WIP: Want to save fastest time for normal levels, high score for endless
         if (gameState.completionTime !== undefined) {
@@ -1341,9 +1386,9 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
         drawARFont(context, 'SCORE: ' + gameState.score, centerX, y + 25, {textAlign: 'center', textBaseline: 'top'});
     }
     
-    const accuracy = gameState.shotsFired > 0 ? Math.round((gameState.shotsHit / gameState.shotsFired) * 100) : 100;
-    const missedShots = gameState.shotsFired - gameState.shotsHit;
-    drawARFont(context, `ACCURACY: ${accuracy}% (${gameState.shotsHit}/${gameState.shotsFired})`, centerX, y + 55, {textAlign: 'center', textBaseline: 'top'});
+    const accuracy = gameState.shotsFired > 0 ? Math.min(Math.round((gameState.shotsHit / gameState.shotsFired) * 100), 100) : 100;
+    const missedShots = Math.max(gameState.shotsFired - gameState.shotsHit, 0); //NOTE: multishot currently lets you 'make up' a miss by hitting multiple targets at once, might change, might not
+    drawARFont(context, `ACCURACY: ${accuracy}% (${Math.min(gameState.shotsHit, gameState.shotsFired)}/${gameState.shotsFired})`, centerX, y + 55, {textAlign: 'center', textBaseline: 'top'});
     
     if (gameState.goal > 0 && gameState.levelKey !== 'endless') {
         const success = gameState.score >= gameState.goal;
@@ -1366,6 +1411,7 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
     if (gameState.levelKey === 'endless') {
         const survivalTime = gameState.completionTime ?? 0;
         earnedPoints = Math.floor(survivalTime / 100);
+        earnedPoints *= (1 + (savedState.unlocks.points ?? 0));
         
         if (accuracy >= 90) {
             earnedPoints *= 2;
@@ -1375,7 +1421,7 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
             bonusText = ' (ACCURATE x1.5!)';
         }
     } else {
-        earnedPoints = gameState.score;
+        earnedPoints = gameState.score  * (1 + (savedState.unlocks.points ?? 0));
         
         if (missedShots === 0) {
             earnedPoints *= 3;
@@ -1384,9 +1430,11 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
             earnedPoints *= 2;
             bonusText = ' (GREAT x2!)';
         }
+    } if (savedState.unlocks.points > 0) {
+        bonusText += ` (GREED x${savedState.unlocks.points + 1}!)`
     }
     
-    drawARFont(context, 'POINTS: +' + earnedPoints + bonusText, centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
+    drawARFont(context, 'TOTAL POINTS: +' + earnedPoints + bonusText, centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
     
     if (gameState.completionTime !== undefined) {
         const currentRecord = savedState.records[gameState.levelKey] ?? (gameState.levelKey === 'endless' ? 0 : Infinity);
@@ -1408,7 +1456,7 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
         }
     }
 
-    drawARFont(context, 'PRESS SPACE', centerX, y + h - 15, {textAlign: 'center', textBaseline: 'top'});
+    drawARFont(context, 'PRESS SPACE', centerX, y + h - 40, {textAlign: 'center', textBaseline: 'top'}); //WIP: Adjust more?
 }
 
 function getYesRect(gameState:TargetPracticeState) {
@@ -1459,9 +1507,11 @@ function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameS
     const gameState = state.arState.game;
     const savedState = state.savedState.savedArData.gameData.targetPractice;
 
-    drawARFont(context, 'TARGET PRACTICE', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 16, {textAlign: 'center', textBaseline: 'top'});
-    drawARFont(context, 'POINTS: ' + savedState.points, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 8, {textAlign: 'center', textBaseline: 'top'});
-
+    state.hideHUD = true;
+    if (gameState.scene !== 'level') {
+        drawARFont(context, 'TARGET PRACTICE', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 16, { textAlign: 'center', textBaseline: 'top' });
+        drawARFont(context, 'POINTS: ' + savedState.points, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 8, { textAlign: 'center', textBaseline: 'top' });
+    }
     if (gameState.scene === 'shop' && gameState.activeShopItem) {
         const item = gameState.activeShopItem;
         const level = savedState.unlocks[item.key] ?? 0;
@@ -1503,39 +1553,38 @@ function renderTargetPracticeHUD(context: CanvasRenderingContext2D, state: GameS
             drawARFont(context, 'HITS: ' + gameState.score, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, {textAlign: 'center', textBaseline: 'top'});
         } else {
             const scoreText = gameState.score + (gameState.goal ? '/' + gameState.goal : '');
-            drawARFont(context, scoreText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 40, {textAlign: 'center', textBaseline: 'top'});
+            drawARFont(context, scoreText, CANVAS_WIDTH / 2, CANVAS_HEIGHT - 16, {textAlign: 'center', textBaseline: 'top'});
         }
 
-        const timeBarWidth = 100;
-        const timeBarHeight = 6;
-        const timeBarX = CANVAS_WIDTH / 2 - timeBarWidth / 2;
-        const timeBarY = CANVAS_HEIGHT - 32;
-        
+        const barWidth = 8;
+        const barHeight = 100;
+
+        const timeBarX = 0;
+        const timeBarY = CANVAS_HEIGHT / 2 - barHeight / 2;
         const timeProgress = gameState.timeLeft / gameState.maxTime;
-        
+
         context.fillStyle = '#333';
-        context.fillRect(timeBarX, timeBarY, timeBarWidth, timeBarHeight);
-        
+        context.fillRect(timeBarX, timeBarY, barWidth, barHeight);
+
         context.fillStyle = timeProgress > 0.25 ? '#0F0' : '#F00';
-        context.fillRect(timeBarX, timeBarY, timeBarWidth * timeProgress, timeBarHeight);
-        
+        context.fillRect(timeBarX, timeBarY + barHeight * (1 - timeProgress), barWidth, barHeight * timeProgress);
+
         context.strokeStyle = '#FFF';
-        context.strokeRect(timeBarX, timeBarY, timeBarWidth, timeBarHeight);
-        
-        const ammoBarWidth = 100;
-        const ammoBarHeight = 6;
-        const ammoBarX = CANVAS_WIDTH / 2 - ammoBarWidth / 2;
-        const ammoBarY = CANVAS_HEIGHT - 20;
-        
-        context.fillStyle = '#333';
-        context.fillRect(ammoBarX, ammoBarY, ammoBarWidth, ammoBarHeight);
-        
+        context.strokeRect(timeBarX, timeBarY, barWidth, barHeight);
+
+        const ammoBarX = CANVAS_WIDTH - barWidth;
+        const ammoBarY = CANVAS_HEIGHT / 2 - barHeight / 2;
+
         const ammoProgress = gameState.ammo / gameState.maxAmmo;
+
+        context.fillStyle = '#333';
+        context.fillRect(ammoBarX, ammoBarY, barWidth, barHeight);
+
         context.fillStyle = '#FF0';
-        context.fillRect(ammoBarX, ammoBarY, ammoBarWidth * ammoProgress, ammoBarHeight);
-        
+        context.fillRect(ammoBarX, ammoBarY + barHeight * (1 - ammoProgress), barWidth, barHeight * ammoProgress);
+
         context.strokeStyle = '#FFF';
-        context.strokeRect(ammoBarX, ammoBarY, ammoBarWidth, ammoBarHeight);
+        context.strokeRect(ammoBarX, ammoBarY, barWidth, barHeight);
     }
 }
 

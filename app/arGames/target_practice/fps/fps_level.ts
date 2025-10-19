@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { wasGameKeyPressed } from 'app/userInput';
 import { playAreaSound } from 'app/musicController';
-import { getHeroPosition } from './fps_utility';
+import { updateHeroPosition } from './fps_utility';
 import { TargetPracticeState, TargetPracticeSavedState, LevelKey, LevelConfig, FpsTarget } from './fps_types';
 import { baseAmmo, levelConfigs } from './fps_config';
 import { CirclingTarget, ExplosiveTarget, AlternatingTarget, StandardTarget, BonusTarget } from './fps_targets';
@@ -37,7 +37,7 @@ function getNewTargetPracticeState(state: GameState): TargetPracticeState {
         playerStart: { 
             x: heroHitbox.x + heroHitbox.w / 2 - 8,
             y: heroHitbox.y + heroHitbox.h / 2 - 8
-        }
+        }, bullseyeEffects: []
         
     };
 }
@@ -124,6 +124,23 @@ function spawnTargets(state: GameState, gameState: TargetPracticeState, levelKey
 }
 
 
+
+
+function updateBullseyeEffects(gameState: TargetPracticeState): void {
+    if (!gameState.bullseyeEffects) return;
+    
+    for (let i = gameState.bullseyeEffects.length - 1; i >= 0; i--) {
+        const effect = gameState.bullseyeEffects[i];
+        effect.lifetime -= FRAME_LENGTH;
+
+        const progress = 1 - (effect.lifetime / effect.maxLifetime);
+        effect.scale = 0.1 + (progress * 1.5); // goes from 0.1 to 1.6
+        
+        if (effect.lifetime <= 0) {
+            gameState.bullseyeEffects.splice(i, 1);
+        }
+    }
+}
 
 
 function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: LevelKey) {
@@ -269,9 +286,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     const config = levelConfigs[gameState.levelKey];
     const isEndless = gameState.levelKey === 'l10';
     
-    const heroPos = getHeroPosition(state, gameState);
-    gameState.crosshair.x = heroPos.x;
-    gameState.crosshair.y = heroPos.y;
+    updateHeroPosition(state, gameState);
     
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         if (gameState.ammo <= 0) {
@@ -310,6 +325,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     }
     
     handleTargetCollisions(gameState);
+    updateBullseyeEffects(gameState);
 
     for (let i = 0; i < gameState.targets.length; i++) {
         const target = gameState.targets[i] as StandardTarget; //FIGURE OUT HOW TO MAKE BEHAVE
@@ -333,11 +349,14 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     gameState.timeLeft -= FRAME_LENGTH;
 
     if (gameState.timeLeft <= 0) {
+        gameState.bullseyeEffects.length = 0;
         gameState.scene = 'results';
     } else if (!isEndless && gameState.goal > 0 && gameState.score >= gameState.goal) {
+        gameState.bullseyeEffects.length = 0;
         gameState.completionTime = gameState.maxTime - gameState.timeLeft;
         gameState.scene = 'results';
     } else if (gameState.ammo <= 0) {
+        gameState.bullseyeEffects.length = 0;
         gameState.scene = 'results';
     }
 }

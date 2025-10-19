@@ -1,7 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawARFont } from 'app/arGames/arFont';
 import { playAreaSound } from 'app/musicController';
-import { TargetPracticeState, TargetPracticeSavedState, FpsTarget } from './fps_types';
+import { TargetPracticeState, TargetPracticeSavedState, FpsTarget, BullseyeEffect } from './fps_types';
 
 
 
@@ -83,7 +83,7 @@ class StandardTarget implements FpsTarget {
         context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
         context.fill();
 
-        const bullseyeColor = lightenColor(this.color, 0.35);
+        const bullseyeColor = lightenColor(this.color, 0.55);
         context.fillStyle = bullseyeColor;
         context.beginPath();
         context.arc(this.x, this.y, this.radius / 3, 0, 2 * Math.PI);
@@ -125,18 +125,21 @@ class StandardTarget implements FpsTarget {
         gameState.shotsHit++;
 
         if (this.currentHits >= this.maxHits) {
-            bullseye ? gameState.score += this.points * 2: 
-                       gameState.score += this.points;
+            if (bullseye) {
+                gameState.score += this.points * 2;
+                // Create bullseye visual effect
+                createBullseyeEffect(this.x, this.y, gameState);
+                playAreaSound(state, state.areaInstance, 'hitBullseye');
+            } else {
+                gameState.score += this.points;
+                playAreaSound(state, state.areaInstance, 'hitShot');
+            }
             gameState.score = Math.max(gameState.score, 0);
             this.hitTime = 300;
-            playAreaSound(state, state.areaInstance, 'hitShot');
-        }
-
-        else {
-            playAreaSound(state, state.areaInstance, 'rockShatter')
-        }
-        
+        } else {
+            playAreaSound(state, state.areaInstance, 'rockShatter');
     }
+}
 }
 
 class CirclingTarget extends StandardTarget {
@@ -396,5 +399,21 @@ function lightenColor(hex: string, percent: number): string {
     return "#" + [r, g, b].map(x => x.toString(16).padStart(2, "0")).join("");
 }
 
+function createBullseyeEffect(x: number, y: number, gameState: TargetPracticeState): void {
+    const effect: BullseyeEffect = {
+        x: x,
+        y: y,
+        lifetime: 1000, // 1 second duration
+        maxLifetime: 1000,
+        scale: 0.1
+    };
+    
+    // Initialize the array if it doesn't exist
+    if (!gameState.bullseyeEffects) {
+        gameState.bullseyeEffects = [];
+    }
+    
+    gameState.bullseyeEffects.push(effect);
+}
 
 export { StandardTarget, CirclingTarget, AlternatingTarget, BonusTarget, ExplosiveTarget, handleExplosion };

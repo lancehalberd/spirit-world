@@ -26,6 +26,7 @@ export interface TargetPracticeState {
     nextSpawnTime: number 
     levelTime: number 
     playerStart: {x: number, y: number}
+    bullseyeEffects: BullseyeEffect[]
 }
 
 export interface ShopItem {
@@ -99,4 +100,12 @@ export interface LevelConfig {
     maxTargets?: number;
     targetTypes?: TargetDefinition[];
     escalation?: boolean;
+}
+
+export interface BullseyeEffect {
+    x: number;
+    y: number;
+    lifetime: number;
+    maxLifetime: number;
+    scale: number;
 }

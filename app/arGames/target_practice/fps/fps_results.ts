@@ -4,15 +4,13 @@ import { GAME_KEY } from 'app/gameConstants';
 import { boxesIntersect, pad } from 'app/utils/index';
 import { playAreaSound } from 'app/musicController';
 import { saveGame } from 'app/utils/saveGame';
-import { getHeroPosition } from './fps_utility';
+import { updateHeroPosition, getHeroPosition } from './fps_utility';
 import { levelConfigs } from './fps_config';
 import { TargetPracticeState, TargetPracticeSavedState, LevelKey} from './fps_types';
 import { getNewTargetPracticeSavedState } from './fps_level';
 
 function updateResults(state: GameState, gameState: TargetPracticeState, savedState: TargetPracticeSavedState) {
-    const heroPos = getHeroPosition(state, gameState);
-    gameState.crosshair.x = heroPos.x;
-    gameState.crosshair.y = heroPos.y;
+    updateHeroPosition(state, gameState);
 
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         if (gameState.levelKey === 'l10') {
@@ -122,9 +120,8 @@ function getNoRect(gameState:TargetPracticeState) {
 }
 function updateReset(state: GameState, gameState:TargetPracticeState, savedState: TargetPracticeSavedState) {
 
-    const heroPos = getHeroPosition(state, gameState);
-    gameState.crosshair.x = heroPos.x;
-    gameState.crosshair.y = heroPos.y;
+    updateHeroPosition(state, gameState);
+
 
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         const heroHitbox = pad(getHeroPosition(state, gameState), -4);

@@ -1245,7 +1245,6 @@ addTiles([
     ...allDarkJadeCityTileSources,
     ...allJadeInteriorLightTileSources,
     ...allJadeInteriorDarkTileSources,
-    halves,
     vanaraHoleyTransitionTile,
     vanaraPlainFloorTile,
     vanaraAngledPits,
@@ -1253,6 +1252,7 @@ addTiles([
     vanaraWallTrim,
     ...allMossTiles,
     ...vanaraWallEdges,
+    halves,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

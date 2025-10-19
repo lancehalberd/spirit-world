@@ -17,7 +17,7 @@ export const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         goal: 150, 
         spawnInterval: 1000, 
         targetTypes: [
-            { points: 30, alternatePoints: 5, radius: 15, speed: 3.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
+            { points: 30, alternatePoints: 5, radius: 15, speed: 3.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1600},
             { points: 20, radius: 14, speed: 3.5, lifetime: 6000, color: '#029', weight: 3, type: 'standard' },
         ]
     },
@@ -45,7 +45,7 @@ export const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         goal: 210, 
         spawnInterval: 1000, 
         targetTypes: [
-            { points: 40, alternatePoints: -40, radius: 8, speed: 2.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 800},
+            { points: 40, alternatePoints: -40, radius: 8, speed: 2.5, lifetime: 8000, weight: 5, type: 'alternating', switchInterval: 1000},
             { points: 25, radius: 12, speed: 2.9, lifetime: 6000, color: '#0C0', weight: 3, type: 'standard' },
             { points: 90, radius: 10, speed: 2.75, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 3 },
         ]
@@ -105,17 +105,17 @@ export const levelConfigs: {[key in LevelKey]: LevelConfig} = {
 
 export const shopItems: ShopItem[] = [
     {key: 'l1', levelKey: 'l1', x: 0, y: 0, unlocks: ['l10'], label: 'Level 1', description: 'Warmup'},
-    {key: 'l2', levelKey: 'l2', x: 0, y: 1, unlocks: [], label: 'Level 2', description: 'Practice'},
-    {key: 'l3', levelKey: 'l3', x: 0, y: 2, unlocks: [], label: 'Level 3', description: 'Deputy'},
-    {key: 'l4', levelKey: 'l4', x: 0, y: 3, unlocks: [], label: 'Level 4', description: 'Bandito'},
-    {key: 'l5', levelKey: 'l5', x: 0, y: 4, unlocks: [], label: 'Level 5', description: 'Sheriff'},
-    {key: 'l6', levelKey: 'l6', x: 0, y: 5, unlocks: [], label: 'Level 6', description: 'Marshall'},
-    {key: 'l7', levelKey: 'l7', x: 0, y: 6, unlocks: [], label: 'Level 7', description: 'Sharpshooter'},
-    {key: 'l8', levelKey: 'l8', x: 0, y: 7, unlocks: [], label: 'Level 8', description: 'Legend'},
-    {key: 'l9', levelKey: 'l9', x: 0, y: 8, unlocks: [], label: 'Level 9', description: 'Desperado'},
-    {key: 'l10', levelKey: 'l10', x: 1, y: 8, label: 'Endless', description: 'Last as long as possible'},
+    {key: 'l2', levelKey: 'l2', x: 1, y: 0, unlocks: [], label: 'Level 2', description: 'Practice'},
+    {key: 'l3', levelKey: 'l3', x: 2, y: 0, unlocks: [], label: 'Level 3', description: 'Deputy'},
+    {key: 'l4', levelKey: 'l4', x: 0, y: 1, unlocks: [], label: 'Level 4', description: 'Bandito'},
+    {key: 'l5', levelKey: 'l5', x: 1, y: 1, unlocks: [], label: 'Level 5', description: 'Sheriff'},
+    {key: 'l6', levelKey: 'l6', x: 2, y: 1, unlocks: [], label: 'Level 6', description: 'Marshall'},
+    {key: 'l7', levelKey: 'l7', x: 0, y: 2, unlocks: [], label: 'Level 7', description: 'Sharpshooter'},
+    {key: 'l8', levelKey: 'l8', x: 1, y: 2, unlocks: [], label: 'Level 8', description: 'Legend'},
+    {key: 'l9', levelKey: 'l9', x: 2, y: 2, unlocks: [], label: 'Level 9', description: 'Desperado'},
+    {key: 'l10', levelKey: 'l10', x: 0, y: 0, label: 'Endless', description: 'Last as long as possible'},
     {
-        key: 'reset', x: 2, y: 0,
+        key: 'reset', x: 1, y: 0,
         label: 'Reset',
         description: 'Clear data',
     },
