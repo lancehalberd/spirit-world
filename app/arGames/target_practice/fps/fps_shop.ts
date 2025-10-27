@@ -14,7 +14,7 @@ function shopItemRect(gameState: TargetPracticeState, item: ShopItem): Rect {
     if (isBottomItem) {
         return {
             x: gameState.screen.x + 20 + item.x * 70 + 50,
-            y: gameState.screen.y + gameState.screen.h * 0.7 + item.y * 30, 
+            y: gameState.screen.y + Math.floor(gameState.screen.h * 0.7) + item.y * 30, 
             w: 40,
             h: 20,
         };

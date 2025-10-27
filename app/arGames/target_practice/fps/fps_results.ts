@@ -91,7 +91,7 @@ function renderResults(context: CanvasRenderingContext2D, state: GameState, game
         }
     } else if (gameState.completionTime !== undefined) {
         const currentRecord = savedState.records[gameState.levelKey] ?? Infinity;
-        if (gameState.completionTime < currentRecord) {
+        if (gameState.completionTime < currentRecord && gameState.score >= gameState.goal) {
             drawARFont(context, 'NEW FASTEST TIME!', centerX, y + 100, {textAlign: 'center', textBaseline: 'top'});
         } else if (currentRecord !== Infinity) {
             const recordText = 'BEST TIME: ' + (currentRecord / 1000).toFixed(1) + 's';

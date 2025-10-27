@@ -4,7 +4,7 @@ import {drawFrame} from 'app/utils/animations';
 import {boxesIntersect, pad} from 'app/utils/index';
 import {drawARFont} from 'app/arGames/arFont';
 import {playAreaSound} from 'app/musicController';
-import {wasGameKeyPressed} from 'app/userInput';
+import {wasGameKeyPressed, getMovementDeltas} from 'app/userInput';
 import {saveGame} from 'app/utils/saveGame';
 import {typedKeys} from 'app/utils/types';
 
@@ -39,7 +39,7 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         goal: 200, 
         spawnInterval: 1000, 
         targetTypes: [
-            { points: 25, radius: 10, speed: 8.5, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
+            { points: 25, radius: 10, speed: 6.5, lifetime: 8000, color: '#0C0', weight: 4, type: 'circling' },
             { points: 25, radius: 15, speed: 3.7, lifetime: 12000, color: '#888', weight: 6, type: 'armored', maxHits: 2 },
         ]
     },
@@ -116,8 +116,6 @@ const levelConfigs: {[key in LevelKey]: LevelConfig} = {
         ], escalation: true,
     }, 
 };
-
-
 
 interface TargetPracticeState {
     scene: Scene
@@ -357,7 +355,7 @@ class CirclingTarget extends StandardTarget {
         this.centerY = y;
         this.orbitRadius = 20 + Math.random() * 30; 
         this.angle = Math.random() * Math.PI * 2; 
-        this.angularSpeed = (speed * 0.01) * (Math.random() > 0.5 ? 1 : -1); 
+        this.angularSpeed = (speed * 0.01) * (Math.random() > 0.5 ? 1 : -1) * (30 / this.orbitRadius); 
         this.color = '#0FF'; 
     }
 
@@ -591,10 +589,11 @@ function getNewTargetPracticeState(state: GameState): TargetPracticeState {
     return {
         scene: 'shop',
         screen: {
-            x: (((state.hero.x - 64) / 8) | 0) * 8,
-            y: (((state.hero.y - 64) / 8) | 0) * 8,
-            w: 128,
-            h: 128,
+            //x: (((state.hero.x - 64) / 8) | 0) * 8,
+            x: state.camera.x,
+            y: state.camera.y + 70,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT - 70,
         },
         bullets: [],
         targets: [],
@@ -835,60 +834,114 @@ function startLevel(state: GameState, gameState: TargetPracticeState, levelKey: 
     spawnTargets(state, gameState, levelKey);
 }
 
-function handleTargetCollisions(gameState: TargetPracticeState) {
-    for (let i = 0; i < gameState.targets.length; i++) {
-        const target1 = gameState.targets[i]; //as Target;
-        if (target1.hitTime !== undefined) continue;
-       
-        for (let j = i + 1; j < gameState.targets.length; j++) {
-            const target2 = gameState.targets[j];// as Target;
-            if (target2.hitTime !== undefined) continue;
-           
-            const dx = target2.x - target1.x;
-            const dy = target2.y - target1.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            const minDistance = target1.radius + target2.radius;
-           
-            if (distance < minDistance && distance > 0) {
-                const nx = dx / distance;
-                const ny = dy / distance;
-               
-                const overlap = minDistance - distance;
-                const separationX = (overlap * nx) / 2;
-                const separationY = (overlap * ny) / 2;
-               
-                target1.x -= separationX;
-                target1.y -= separationY;
-                target2.x += separationX;
-                target2.y += separationY;
-
-                const speed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
-                const speed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
-                
-                const dot1 = target1.vx * nx + target1.vy * ny;
-                const dot2 = target2.vx * nx + target2.vy * ny;
-                
-                if (dot1 > 0 || dot2 < 0) {
-                    target1.vx -= 2 * dot1 * nx;
-                    target1.vy -= 2 * dot1 * ny;
-                    target2.vx -= 2 * dot2 * nx;
-                    target2.vy -= 2 * dot2 * ny;
-                    
-                    const newSpeed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
-                    const newSpeed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
-                    
-                    if (newSpeed1 > 0) {
-                        target1.vx = (target1.vx / newSpeed1) * speed1;
-                        target1.vy = (target1.vy / newSpeed1) * speed1;
-                    }
-                    
-                    if (newSpeed2 > 0) {
-                        target2.vx = (target2.vx / newSpeed2) * speed2;
-                        target2.vy = (target2.vy / newSpeed2) * speed2;
-                    }
-                }
+function handleTargetCollisions(gameState: TargetPracticeState): void {
+    const targets = gameState.targets;
+    
+    for (let i = 0; i < targets.length; i++) {
+        const target1 = targets[i];
+        
+        // Skip if target is hit or is a circling target
+        if (target1.hitTime !== undefined || target1 instanceof CirclingTarget) {
+            continue;
+        }
+        
+        for (let j = i + 1; j < targets.length; j++) {
+            const target2 = targets[j];
+            
+            // Skip if target is hit or is a circling target
+            if (target2.hitTime !== undefined || target2 instanceof CirclingTarget) {
+                continue;
+            }
+            
+            // Calculate collision
+            if (checkAndResolveCollision(target1, target2)) {
+                // Collision was resolved, continue checking other pairs
             }
         }
+    }
+}
+
+function checkAndResolveCollision(target1: Target, target2: Target): boolean {
+    const dx = target2.x - target1.x;
+    const dy = target2.y - target1.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+    const minDistance = target1.radius + target2.radius;
+    
+    // No collision if targets are far enough apart or overlapping completely
+    if (distance >= minDistance || distance === 0) {
+        return false;
+    }
+    
+    // Normalize collision vector
+    const nx = dx / distance;
+    const ny = dy / distance;
+    
+    // Separate overlapping targets
+    separateTargets(target1, target2, nx, ny, minDistance - distance);
+    
+    // Apply collision response (preserve speed, change direction)
+    applyCollisionResponse(target1, target2, nx, ny);
+    
+    return true;
+}
+
+function separateTargets(
+    target1: Target, 
+    target2: Target, 
+    nx: number, 
+    ny: number, 
+    overlap: number
+): void {
+    const separationX = (overlap * nx) / 2;
+    const separationY = (overlap * ny) / 2;
+    
+    target1.x -= separationX;
+    target1.y -= separationY;
+    target2.x += separationX;
+    target2.y += separationY;
+}
+
+function applyCollisionResponse(
+    target1: Target, 
+    target2: Target, 
+    nx: number, 
+    ny: number
+): void {
+    // Store original speeds
+    const speed1 = Math.sqrt(target1.vx * target1.vx + target1.vy * target1.vy);
+    const speed2 = Math.sqrt(target2.vx * target2.vx + target2.vy * target2.vy);
+    
+    // Calculate velocity components along collision normal
+    const v1n = target1.vx * nx + target1.vy * ny;
+    const v2n = target2.vx * nx + target2.vy * ny;
+    
+    // Only apply collision if targets are moving toward each other
+    if (v1n <= v2n) {
+        return; // Targets are separating or moving parallel
+    }
+    
+    // For equal mass elastic collision, velocities along normal are exchanged
+    const newV1n = v2n;
+    const newV2n = v1n;
+    
+    // Calculate new velocities by replacing normal components
+    const newVx1 = target1.vx + (newV1n - v1n) * nx;
+    const newVy1 = target1.vy + (newV1n - v1n) * ny;
+    const newVx2 = target2.vx + (newV2n - v2n) * nx;
+    const newVy2 = target2.vy + (newV2n - v2n) * ny;
+    
+    // Normalize to preserve original speeds
+    const newSpeed1 = Math.sqrt(newVx1 * newVx1 + newVy1 * newVy1);
+    const newSpeed2 = Math.sqrt(newVx2 * newVx2 + newVy2 * newVy2);
+    
+    if (newSpeed1 > 0) {
+        target1.vx = (newVx1 / newSpeed1) * speed1;
+        target1.vy = (newVy1 / newSpeed1) * speed1;
+    }
+    
+    if (newSpeed2 > 0) {
+        target2.vx = (newVx2 / newSpeed2) * speed2;
+        target2.vy = (newVy2 / newSpeed2) * speed2;
     }
 }
 
@@ -932,7 +985,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
                 const dy = gameState.crosshair.y - target.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
-                if (dist <= target.radius) {
+                if (dist <= target.radius + 3) { //Add 3 to give a little leeway to near-misses
                     hitTarget = true;
                     target.onHit(state, gameState, savedState);
                 }
@@ -1005,16 +1058,19 @@ function updateTargetPractice(state: GameState) {
 
 
 function getHeroPosition(state: GameState, gameState: TargetPracticeState): Rect {
-    const hitbox = state.hero.getMovementHitbox();
-    const speedChange = 1.4;
-
-    gameState.crosshair.y += state.hero.vy * speedChange;
-    gameState.crosshair.x += state.hero.vx * speedChange;
-    state.hero.y = gameState.playerStart.y;
-    state.hero.x = gameState.playerStart.x;
+    const cursorSpeed = 3;
+    const [dx, dy] = getMovementDeltas(state, true);
+    const cursorSize = 16;
+    let diag_movement = 1;
+    if (dx != 0 && dy != 0) {diag_movement = 0.7}
+    
     return {
-        x: Math.max(gameState.screen.x, Math.min(gameState.screen.x + gameState.screen.w, gameState.crosshair.x + hitbox.w / 2 - 8)),
-        y: Math.max(gameState.screen.y, Math.min(gameState.screen.y + gameState.screen.h, gameState.crosshair.y + hitbox.h / 2 - 8)),
+        x: Math.max(
+            gameState.screen.x + cursorSize / 2,
+            Math.min(gameState.screen.x + gameState.screen.w - cursorSize / 2, gameState.crosshair.x + cursorSpeed * dx * diag_movement)),
+        y: Math.max(
+            gameState.screen.y + cursorSize / 2,
+            Math.min(gameState.screen.y + gameState.screen.h - cursorSize / 2, gameState.crosshair.y + cursorSpeed * dy * diag_movement)),
         w: 16,
         h: 16,
     };
@@ -1292,4 +1348,5 @@ export const targetPracticeGame: ARGame = {
     update: updateTargetPractice,
     render: renderTargetPractice,
     renderHUD: renderTargetPracticeHUD,
+    disablesPlayerMovement: true,
 };
