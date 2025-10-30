@@ -163,7 +163,7 @@ interface GameState {
     arState: ARState
 }
 
-type ARGameID = 'dodger'|'hota'|'target';
+type ARGameID = 'dodger'|'hota'|'target'|'targetFPS';
 
 interface ARState {
     active: boolean
