@@ -306,6 +306,19 @@ const chair: DecorationType = {
     },
 };
 
+const stoneChairFrame= requireFrame('gfx/objects/furniture/stoneTable.png', {x: 48, y: 0, w: 16, h: 16, content: {x: 2, y: 0, w: 13, h: 16}});
+const stoneChair: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, stoneChairFrame, decoration);
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(stoneChairFrame, decoration);
+    },
+};
+
 const [fireplaceFrame, fireplaceShadowFrame] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
     {w: 48, h: 64, content: {x: 2, y: 36, w: 44, h: 16}}, {cols: 2}
 ).frames;
@@ -543,15 +556,17 @@ const shortNarrowShelves = requireFrame('gfx/objects/furniture/shelves.png', {x:
 const wideBookFrames = createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
     {left: 2, top: 51, cols: 2, rows: 3, ySpace: 1}
 ).frames;
-wideBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
+/*wideBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 14, h: 8},
     {left: 2, top: 117, cols: 2, rows: 1}
-).frames);
+).frames);*/
 const narrowBookFrames = createAnimation('gfx/objects/furniture/shelves.png', {w: 12, h: 8},
     {left: 50, top: 51, cols: 1, rows: 3, ySpace: 1}
 ).frames;
+/*
 narrowBookFrames.push(...createAnimation('gfx/objects/furniture/shelves.png', {w: 12, h: 8},
     {left: 130, top: 53, cols: 1, rows: 2, ySpace: 8}
 ).frames);
+*/
 const topLeftCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 2, y: 100, w: 5, h: 5});
 const topRightCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 26, y: 100, w: 4, h: 4});
 
@@ -563,13 +578,69 @@ const shelves: DecorationType = {
         let x = decoration.x;
         while (x < decoration.x + decoration.w) {
             if (x <= decoration.x + decoration.w - 32) {
-                const variantFrame = random.element([tallWideShelves, shortWideShelves]);
+                const variantFrame = decoration.h > 16 ? tallWideShelves: shortWideShelves;
                 drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
                 const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
                 for (const offset of shelfYOffsets) {
                     const y = bottom + offset;
                     drawFrameContentAt(context, random.mutate().element(wideBookFrames), {x: x + 2, y});
                     drawFrameContentAt(context, random.mutate().element(wideBookFrames), {x: x + 16, y});
+                    //Enable below to allow cobwebs
+                    /*if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
+                    }
+                    if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topRightCobwebs, {x: x + 25, y});
+                    }*/ 
+                    // Only render the bottom frame for short shelves.
+                    if (variantFrame === shortWideShelves) {
+                        break;
+                    }
+                }
+                x += 32;
+            } else {
+                const variantFrame = decoration.h > 16 ? tallNarrowShelves : shortNarrowShelves;
+                drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
+                const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
+                for (const offset of shelfYOffsets) {
+                    const y = bottom + offset;
+                    drawFrameContentAt(context, random.mutate().element(narrowBookFrames), {x: x + 2, y});
+                    //Enable below to allow cobwebs
+                    /*if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
+                    } else if (random.generateAndMutate() < 0.1) {
+                        drawFrameContentAt(context, topRightCobwebs, {x: x + 10, y});
+                    }*/
+                    // Only render the bottom frame for short shelves.
+                    if (variantFrame === shortNarrowShelves) {
+                        break;
+                    }
+                }
+                x += 16;
+            }
+            random.mutate();
+
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y, w: decoration.w, h: 16};
+    },
+};
+
+const emptyShelves: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        const random = getVariantRandom(decoration.definition);
+        let x = decoration.x;
+        while (x < decoration.x + decoration.w) {
+            if (x <= decoration.x + decoration.w - 32) {
+                const variantFrame = decoration.h > 16 ? tallWideShelves: shortWideShelves;
+                drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
+                const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
+                for (const offset of shelfYOffsets) {
+                    const y = bottom + offset;
                     if (random.generateAndMutate() < 0.1) {
                         drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
                     }
@@ -583,12 +654,11 @@ const shelves: DecorationType = {
                 }
                 x += 32;
             } else {
-                const variantFrame = random.element([tallNarrowShelves, shortNarrowShelves]);
+                const variantFrame = decoration.h > 16 ? tallNarrowShelves : shortNarrowShelves;
                 drawFrameContentAt(context, variantFrame, {x, y: decoration.y});
                 const bottom = decoration.y - variantFrame.content.y + variantFrame.h;
                 for (const offset of shelfYOffsets) {
                     const y = bottom + offset;
-                    drawFrameContentAt(context, random.mutate().element(narrowBookFrames), {x: x + 2, y});
                     if (random.generateAndMutate() < 0.1) {
                         drawFrameContentAt(context, topLeftCobwebs, {x: x + 2, y});
                     } else if (random.generateAndMutate() < 0.1) {
@@ -657,6 +727,42 @@ const table: DecorationType = {
                 row = tableLegsRow;
             } else if (y >= decoration.y + decoration.h - 32) {
                 row = tableBottomRow;
+            }
+            for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
+                let frame = row[1];
+                if (x === decoration.x) {
+                    frame = row[0];
+                } else if (x >= decoration.x + decoration.w - 16) {
+                    frame = row[2];
+                }
+                drawFrameContentAt(context, frame, {x, y});
+            }
+        }
+    },
+    behaviors: {
+        solid: true,
+    },
+};
+
+
+export const stoneTableFrames= createAnimation('gfx/objects/furniture/stoneTable.png',
+    {w: 16, h: 16}, {cols: 3, rows: 4}
+).frames;
+const stoneTableTopRow = stoneTableFrames.slice(0, 3);
+const stoneTableMiddleRow = stoneTableFrames.slice(3, 6);
+const stoneTableBottomRow = stoneTableFrames.slice(6, 9);
+const stoneTableLegsRow = stoneTableFrames.slice(9, 12);
+
+const stoneTable: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        for (let y = decoration.y; y < decoration.y + decoration.h; y += 16) {
+            let row = stoneTableMiddleRow;
+            if (y === decoration.y) {
+                row = stoneTableTopRow;
+            } else if (y >= decoration.y + decoration.h - 16) {
+                row = stoneTableLegsRow;
+            } else if (y >= decoration.y + decoration.h - 32) {
+                row = stoneTableBottomRow;
             }
             for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
                 let frame = row[1];
@@ -960,8 +1066,11 @@ export const decorationTypes = {
     placeSettingNormal,
     pottedPlant,
     shelves,
+    emptyShelves,
     stump,
     table,
+    stoneTable,
+    stoneChair,
     tube,
     windowOctogonal,
     smallLightDome,

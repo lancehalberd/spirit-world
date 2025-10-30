@@ -2,6 +2,16 @@ import { createHumanNpcActorAnimations } from 'app/development/npcBuilder';
 import { createAnimation, omniAnimation } from 'app/utils/animations';
 
 
+const emptyImage: string = 'gfx/npcs/empty.png';
+const emptyGeometry: FrameDimensions = {w: 16, h: 16, content: {x: 0, y: 0, w: 16, h: 16}};
+const emptyIdleAnimation: FrameAnimation = createAnimation(emptyImage, emptyGeometry);
+
+export const emptyAnimations: ActorAnimations = {
+    idle: omniAnimation(emptyIdleAnimation),
+};
+
+
+
 export const manAnimations: ActorAnimations = createHumanNpcActorAnimations({
     skin: 2,
     hairColor: 1,

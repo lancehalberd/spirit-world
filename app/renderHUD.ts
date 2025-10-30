@@ -59,6 +59,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     // Effects on the HUD layer aren't hidden when the HUD is hidden currently.
     renderHudEffects(context, state);
+    renderARHUD(context, state);
     if (state.hudOpacity <= 0) {
         return;
     }
@@ -260,7 +261,7 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
     if (state.paused && shouldHideMenu(state)) {
         // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }
-    renderARHUD(context, state);
+    //renderARHUD(context, state);
 }
 
 export function renderHudEffects(context: CanvasRenderingContext2D, state: GameState): void {

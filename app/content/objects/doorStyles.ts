@@ -664,10 +664,10 @@ const obsidianDoorStyle: DoorStyleDefinition = {
 
 // VANARA DOOR STYLE
 const vanaraImage = 'gfx/tiles/vanara.png';
-const vanaraStairsUp = requireFrame(vanaraImage, {x: 16, y: 208, w: 32, h: 32});
-const vanaraStairsDown = requireFrame(vanaraImage, {x: 64, y: 208, w: 32, h: 32});
-const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 32});
-const vanaraSouthOpen = requireFrame(vanaraImage, {x: 158, y: 208, w: 32, h: 32});
+const vanaraStairsUp = requireFrame(vanaraImage, {x: 16, y: 208, w: 32, h: 36})
+const vanaraStairsDown = requireFrame(vanaraImage, {x: 64, y: 208, w: 32, h: 36})
+const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 36})
+const vanaraSouthOpen = requireFrame(vanaraImage, {x: 158, y: 208, w: 32, h: 36});
 
 
 //Using cavern doors to fill in for non-existant vanara doors
@@ -688,9 +688,9 @@ const vanaraDoorStyle: DoorStyleDefinition = {
 
 //LIGHT JADE DOOR STYLE
 const jadeLightImage = 'gfx/tiles/jadeCityLight.png';
-const jadeLightDoorOpen = requireFrame(jadeLightImage, {x: 96, y: 112, w: 32, h: 32})
-const jadeLightStairsDown = requireFrame(jadeLightImage, {x: 128, y: 112, w: 32, h: 32})
-const jadeLightStairsUp = requireFrame(jadeLightImage, {x: 160, y: 112, w: 32, h: 32})
+const jadeLightDoorOpen = requireFrame(jadeLightImage, {x: 96, y: 110, w: 32, h: 36})
+const jadeLightStairsDown = requireFrame(jadeLightImage, {x: 128, y: 110, w: 32, h: 36})
+const jadeLightStairsUp = requireFrame(jadeLightImage, {x: 160, y: 110, w: 32, h: 36})
 
 //Using cavern doors to fill in for non-existant jade doors
 const jadeLightDoorFrames: V1DoorFrames = {
@@ -706,9 +706,9 @@ const jadeLightDoorStyle: DoorStyleDefinition = {
 
 //DARK JADE DOOR STYLE
 const jadeDarkImage = 'gfx/tiles/jadeCityDark.png';
-const jadeDarkDoorOpen = requireFrame(jadeDarkImage, {x: 96, y: 112, w: 32, h: 32})
-const jadeDarkStairsDown = requireFrame(jadeDarkImage, {x: 128, y: 112, w: 32, h: 32})
-const jadeDarkStairsUp = requireFrame(jadeDarkImage, {x: 160, y: 112, w: 32, h: 32})
+const jadeDarkDoorOpen = requireFrame(jadeDarkImage, {x: 96, y: 110, w: 32, h: 36})
+const jadeDarkStairsDown = requireFrame(jadeDarkImage, {x: 128, y: 110, w: 32, h: 36})
+const jadeDarkStairsUp = requireFrame(jadeDarkImage, {x: 160, y: 110, w: 32, h: 36})
 
 //Using cavern doors to fill in for non-existant jade doors
 const jadeDarkDoorFrames: V1DoorFrames = {

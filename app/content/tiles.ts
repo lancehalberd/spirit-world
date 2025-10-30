@@ -510,6 +510,17 @@ const shore: TileSource = {
     },
     animationProps: waterAnimationProps,
 };
+
+
+const halves: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 48, h: 32}),
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+    },
+};
+
+
 const shoreAngles: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/watershore.png', {x: 64, y: 0, w: 64, h: 64}),
@@ -529,6 +540,15 @@ const shoreMask: TileSource = {
         '3x0': { skipped: true }, '3x1': { skipped: true },
     },
 };
+
+const diagMask: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/diagMask.png', {x: 0, y: 48, w: 48, h: 32}),
+    behaviors: {
+        'all': { defaultLayer: 'floor', isGround: false },
+    },
+};
+
 const shoreAnglesMask: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/blackmaskground.png', {x: 64, y: 0, w: 64, h: 64}),
@@ -625,6 +645,7 @@ function applyMask(targetSource: TileSource, maskSource: TileSource) {
 
 applyMask(shore, shoreMask);
 applyMask(shoreAngles, shoreAnglesMask);
+applyMask(halves, diagMask);
 
 const treeStump: TileSource = {
     w: 16, h: 16,
@@ -1231,6 +1252,7 @@ addTiles([
     vanaraWallTrim,
     ...allMossTiles,
     ...vanaraWallEdges,
+    halves,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
