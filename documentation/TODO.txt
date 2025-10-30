@@ -146,10 +146,6 @@ Graphics to Implement:
 
 Current tasks:
     - For staff animations to render all but the bottom Npx in the foreground.
-
-    Stream notes:
-        - Fix remaining floor tiles in War Temple
-
     - Deleting tiles in spirit world temporarily does not show the correct linked tiles.
     - Make Vanara bushes linked between worlds like other bushes.
 
