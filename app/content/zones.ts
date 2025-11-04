@@ -55,6 +55,7 @@ export * from 'app/content/zones/dream';
 export * from 'app/content/zones/fertility';
 export * from 'app/content/zones/delve';
 export * from 'app/content/zones/jadeCityInterior';
+export * from 'app/content/zones/bossRefights';
 //Comment out below to play game normally
 export * from 'app/content/zones/overworldBig';
 

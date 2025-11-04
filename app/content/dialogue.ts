@@ -21,3 +21,4 @@ export * from 'app/content/dialogue/vanaraVillager';
 export * from 'app/content/dialogue/spiritKing';
 export * from 'app/content/dialogue/spiritTree';
 export * from 'app/content/dialogue/waterfallDragon';
+export * from 'app/content/dialogue/refightVanara';
