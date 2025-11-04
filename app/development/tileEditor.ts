@@ -294,7 +294,7 @@ function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: 
         // And set the instance to use the tile from the parent definition.
         const parentLayer = definition.parentDefinition?.layers?.find(parentLayer => parentLayer.key === layer.key);
         if (parentLayer) {
-            layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = allTiles[parentLayer.grid.tiles[ty][tx]];
+            layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = mapTile(allTiles[parentLayer.grid.tiles[ty][tx]]);
         }
     }
 }

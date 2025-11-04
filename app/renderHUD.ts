@@ -59,20 +59,21 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     // Effects on the HUD layer aren't hidden when the HUD is hidden currently.
     renderHudEffects(context, state);
-    renderARHUD(context, state);
     if (state.hudOpacity <= 0) {
-        return;
-    }
-    if (state.hudOpacity < 1) {
+        // Do not render the regular HUD once opacity is 0 or below.
+    } else if (state.hudOpacity < 1) {
+        // Render the HUD fadingout.
         context.save();
             context.globalAlpha *= state.hudOpacity;
             hudContext.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             renderHUDProper(hudContext, state);
             context.drawImage(hudCanvas, 0, 0);
         context.restore();
-        return;
+    } else {
+        // Render the HUD normally.
+        renderHUDProper(context, state);
     }
-    renderHUDProper(context, state);
+    renderARHUD(context, state);
 }
 function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): void {
     // Draw heart backs, and fillings
