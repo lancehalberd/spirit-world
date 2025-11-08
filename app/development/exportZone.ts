@@ -146,7 +146,7 @@ export function serializeZone(zone: Zone) {
                         if (section.mapY >= 0) {
                             extraFields += `, mapY: ${section.mapY}`;
                         }
-                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}${extraFields}}, `);
+                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}${extraFields}},`);
 
                     }
                     lines.push('    ],');
