@@ -26,6 +26,12 @@ interface VariantData<T = any> extends VariantSeedData, Rect {
     type: VariantType
     styleWeights?: {[key: string]: number}
     fields?: T
+    // Development only fields. These get set during a drag operation to keep track of where the object was
+    // at the start of a drag operation.
+    _dragStartX?: number
+    _dragStartY?: number
+    // Used to disambiguate VariantData from ObjectDefinition.
+    _editorType?: 'variant'
 }
 
 interface VariantField {

@@ -1,8 +1,8 @@
 import { sourcePalettes } from 'app/content/tiles/palettes';
 import { paletteHash } from 'app/content/tiles/paletteHash';
 import { editingState } from 'app/development/editingState';
-import { getObjectTypeProperties, isObjectSelected } from 'app/development/objectEditor';
-import { getVariantTypeSelector, isVariantSelected, unselectVariant } from 'app/development/variantEditor';
+import {getObjectTypeProperties, isObjectSelected, unselectObject} from 'app/development/objectEditor';
+import {getVariantTypeSelector, isVariantSelected} from 'app/development/variantEditor';
 import {
     renderPropertyRows, updateBrushCanvas,
 } from 'app/development/propertyPanel';
@@ -71,7 +71,7 @@ const toolTabContainer = new TabContainer<EditorToolType>('brush', [
             this.render(container);
         },
         onSelect() {
-            unselectVariant(editingState);
+            unselectObject(editingState, editingState.selectedVariantData);
         }
     },
     {

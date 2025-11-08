@@ -2,13 +2,15 @@ import {zones} from 'app/content/zones/zoneHash';
 import {editingState} from 'app/development/editingState';
 import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
-import {updateObjectInstance} from 'app/development/objectEditor';
+import {isObject, isSelectionValid, isVariant, updateObjectInstance} from 'app/development/objectEditor';
+import {addVariantToArea} from 'app/development/variantEditor';
 import {clearScriptEvents} from 'app/scriptEvents';
 import {toggleShowControls} from 'app/scenes/controls/updateControls';
 import {getState} from 'app/state';
 import {isKeyboardKeyDown, KEY} from 'app/userInput'
 import {enterLocation} from 'app/utils/enterLocation';
 import {findAllZoneFlags} from 'app/utils/findAllZoneFlags';
+import {cloneDeep} from 'app/utils/index';
 
 export function addKeyboardShortcuts() {
     document.addEventListener('keydown', function(event: KeyboardEvent) {
@@ -51,8 +53,9 @@ export function addKeyboardShortcuts() {
             return;
         }
         if (keyCode === KEY.C && commandIsDown) {
-            if (getState().areaInstance.definition.objects.includes(editingState.selectedObject)) {
-                editingState.clipboardObject = {...editingState.selectedObject};
+            editingState.clipboardObjects = [];
+            if (isSelectionValid(getState(), editingState)) {
+                editingState.clipboardObjects = [...editingState.selectedObjects];
             } else {
                 exportZoneToClipboard(getState().zone);
                 editingState.hasChanges = false;
@@ -61,9 +64,15 @@ export function addKeyboardShortcuts() {
             return;
         }
         if (keyCode === KEY.V && commandIsDown) {
-            if (editingState.clipboardObject) {
+            if (editingState.clipboardObjects) {
                 const state = getState();
-                updateObjectInstance(state, {...editingState.clipboardObject}, null, state.areaInstance, true);
+                for (const pastedObject of editingState.clipboardObjects) {
+                    if (isObject(pastedObject)) {
+                        updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaInstance, true);
+                    } else if (isVariant(pastedObject)) {
+                        addVariantToArea(state, editingState, cloneDeep(pastedObject));
+                    }
+                }
             }
             event.preventDefault();
             return;

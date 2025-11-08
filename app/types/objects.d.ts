@@ -457,6 +457,10 @@ interface BaseObjectDefinition extends LogicDefinition {
     y: number
     z?: number
     d?: CardinalDirection
+    // Development only. These get set during a drag operation to keep track of where the object was
+    // at the start of a drag operation.
+    _dragStartX?: number
+    _dragStartY?: number
 }
 
 interface BallGoalDefinition extends BaseSwitchDefinition {

@@ -145,6 +145,14 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Fix money maze is using mixed wooden/jade tiles
+
+    - Jade Champion is stuck on save statue outside of war temple.
+        - Add actual pathing algorithm for NPCs+enemies at some point.
+    - Adjust all save statue positions
+    - Fix Guardian dialog after getting teleportation
+        - Make each dreamland exit even more distinct to make it intuive where each one leads.
+
     - For staff animations to render all but the bottom Npx in the foreground.
     - Make Vanara bushes linked between worlds like other bushes.
 

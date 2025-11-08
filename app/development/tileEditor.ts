@@ -10,24 +10,23 @@ import {
     deleteObject,
     fixObjectPosition,
     getObjectFrame,
+    isObject,
+    isVariant,
     onMouseDownSelectObject,
     onMouseDragObject,
-    unselectObject,
+    onMouseUpSelectObject,
+    unselectAll,
     updateObjectInstance,
 } from 'app/development/objectEditor';
 import { updateBrushCanvas } from 'app/development/propertyPanel';
 import { setEditingTool } from 'app/development/toolTab';
-import {
-    createVariantData,
-    onMouseDownSelectVariant,
-    onMouseDragVariant,
-    unselectVariant,
-} from 'app/development/variantEditor';
+import {addVariantToArea, createVariantDataAtScreenCoords} from 'app/development/variantEditor';
 import { getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords } from 'app/render/renderMap';
 import { getState } from 'app/state';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { mainCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
+import {removeElementFromArray} from 'app/utils/index';
 import { initializeAreaLayerTiles } from 'app/utils/layers';
 import { mapTile } from 'app/utils/mapTile';
 import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
@@ -100,18 +99,11 @@ mainCanvas.addEventListener('mousemove', function () {
 });
 function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number) {
     if (onMouseDownSelectObject(state, editingState, x, y)) {
-        unselectVariant(editingState);
-        return;
-    }
-    if (onMouseDownSelectVariant(state, editingState, x, y)) {
         return;
     }
 }
 function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number) {
     if (onMouseDragObject(state, editingState, x, y)) {
-        return;
-    }
-    if (onMouseDragVariant(state, editingState, x, y)) {
         return;
     }
 }
@@ -185,8 +177,8 @@ document.addEventListener('mouseup', (event) => {
         return;
     }
     editingState.tileChunkKey = editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
+    const [x, y] = getAreaMousePosition();
     if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
-        const [x, y] = getAreaMousePosition();
         const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
         editingState.dragOffset = null;
         const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};
@@ -219,6 +211,12 @@ document.addEventListener('mouseup', (event) => {
         }
     }
     editingState.sectionDragData = null;
+    switch(editingState.tool) {
+        case 'select': {
+            onMouseUpSelectObject(state, editingState, x, y);
+            break;
+        }
+    }
 });
 
 function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
@@ -245,9 +243,8 @@ function onMouseDownObject(state: GameState, editingState: EditingState, x: numb
 }
 
 function onMouseDownVariant(state: GameState, editingState: EditingState, x: number, y: number): void {
-    const variant: VariantData = createVariantData(state, editingState, x, y);
-    state.areaInstance.definition.variants = state.areaInstance.definition.variants || [];
-    state.areaInstance.definition.variants.push(variant);
+    const variant: VariantData = createVariantDataAtScreenCoords(state, editingState, x, y);
+    addVariantToArea(state, editingState, variant);
     refreshArea(state);
     if (!isKeyboardKeyDown(KEY.SHIFT)) {
         setEditingTool('select');
@@ -501,7 +498,7 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: R
     return gridDefinition;
 }
 
-export function selectAll() {
+export function selectAllTiles() {
     const state = getState();
     if (state.paused) {
         if (state.showMap) {
@@ -553,8 +550,8 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     const state = getState();
     const commandIsDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
-    if (event.which === KEY.A && commandIsDown) {
-        selectAll();
+    if (editingState.tool === 'brush' && event.which === KEY.A && commandIsDown) {
+        selectAllTiles();
         event.preventDefault();
         return;
     }
@@ -562,22 +559,29 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         if (editingState.tool === 'brush') {
             const [x, y] = getAreaMousePosition();
             deleteTile(x, y);
-        } else if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
-            deleteObject(state, editingState.selectedObject);
-            unselectObject(editingState);
-        }  else if (state.areaInstance.definition.variants?.includes(editingState.selectedVariantData)) {
-            const index = state.areaInstance.definition.variants.indexOf(editingState.selectedVariantData);
-            state.areaInstance.definition.variants.splice(index, 1);
+        }
+        let areaNeedsRefresh = false;
+        for (const selectedObject of editingState.selectedObjects) {
+            if (isObject(selectedObject) && state.areaInstance.definition.objects.includes(selectedObject)) {
+                deleteObject(state, editingState.selectedObject);
+            }  else if (isVariant(selectedObject) && state.areaInstance.definition.variants?.includes(selectedObject)) {
+                removeElementFromArray(state.areaInstance.definition.variants, selectedObject);
+                // Variants update areas in ways that cannot be reversed so we just have to recreate the area when they
+                // are removed.
+                areaNeedsRefresh = true;
+            }
+        }
+        unselectAll(editingState);
+        if (areaNeedsRefresh) {
             refreshArea(state);
         }
     }
     if (event.which === KEY.ESCAPE) {
         editingState.dragOffset = null;
         editingState.selectedSections = [];
-        if (editingState.selectedObject) {
-            unselectObject(editingState);
-        }
-        if (editingState.tool === 'select') {
+        if (editingState.selectedObjects.length) {
+            unselectAll(editingState);
+        } else if (editingState.tool === 'select') {
             setEditingTool(editingState.previousTool);
         }
     }

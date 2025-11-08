@@ -1,8 +1,7 @@
-import { variantHash } from 'app/content/variants/variantHash';
-import { editingState } from 'app/development/editingState';
-import { getState } from 'app/state';
-import { isPointInShortRect } from 'app/utils/index';
-import { enterLocation } from 'app/utils/enterLocation';
+import {variantHash} from 'app/content/variants/variantHash';
+import {editingState} from 'app/development/editingState';
+import {getState} from 'app/state';
+import {enterLocation} from 'app/utils/enterLocation';
 
 const variantTypes = Object.keys(variantHash) as VariantType[];
 
@@ -158,7 +157,12 @@ function uniqueVariantId(state: GameState, prefix: string, location: ZoneLocatio
     return `${prefix}-${i}`;
 }
 
-export function createVariantData(state: GameState, editingState: EditingState, x: number, y: number): VariantData {
+export function addVariantToArea(state: GameState, editingState: EditingState, variantData: VariantData, addToArea = false) {
+    state.areaInstance.definition.variants = state.areaInstance.definition.variants || [];
+    state.areaInstance.definition.variants.push(variantData);
+}
+
+export function createVariantDataAtScreenCoords(state: GameState, editingState: EditingState, x: number, y: number): VariantData {
     const newVariantData = {
         ...editingState.selectedVariantData,
         styleWeights: {...editingState.selectedVariantData.styleWeights},
@@ -169,10 +173,9 @@ export function createVariantData(state: GameState, editingState: EditingState, 
     };
     fixVariantPosition(newVariantData);
     return newVariantData;
-
 }
 
-export function unselectVariant(editingState: EditingState) {
+/*export function unselectVariant(editingState: EditingState) {
     editingState.selectedVariantData = {
         ...editingState.selectedVariantData,
         styleWeights: {
@@ -181,12 +184,12 @@ export function unselectVariant(editingState: EditingState) {
     }
     delete editingState.selectedVariantData.id;
     editingState.needsRefresh = true;
-}
+}*/
 
-function isPointInVariant(state: GameState, x: number, y: number, variantData: VariantData): boolean {
+/*function isPointInVariant(state: GameState, x: number, y: number, variantData: VariantData): boolean {
     return isPointInShortRect(x + state.camera.x, y + state.camera.y, variantData);
 }
-
+*/
 export function fixVariantPosition(variantData: VariantData): void {
     const definition = variantHash[variantData.type];
     const gridSize = definition.gridSize || 4;
@@ -197,7 +200,7 @@ export function fixVariantPosition(variantData: VariantData): void {
 export function isVariantSelected(state: GameState, editingState: EditingState): boolean {
     return !!state.areaInstance.definition.variants?.includes(editingState.selectedVariantData);
 }
-
+/*
 export function onMouseDownSelectVariant(state: GameState, editingState: EditingState, x: number, y: number): boolean {
     let changedSelection = false;
     if (isVariantSelected(state, editingState)) {
@@ -227,7 +230,7 @@ export function onMouseDownSelectVariant(state: GameState, editingState: Editing
         };
     }
     return variantIsSelected;
-}
+}*//*
 
 export function onMouseDragVariant(state: GameState, editingState: EditingState, x: number, y: number): boolean {
     if (!isVariantSelected(state, editingState) || !editingState.dragOffset) {
@@ -247,4 +250,4 @@ export function onMouseDragVariant(state: GameState, editingState: EditingState,
         refreshArea(state);
     }
     return true;
-}
+}*/

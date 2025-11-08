@@ -25,15 +25,21 @@ import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
 import { editingState } from 'app/development/editingState';
 import { getLogicProperties } from 'app/development/zoneEditor';
-import { allLootTypes } from 'app/gameConstants';
+import {allLootTypes, CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
-import { isPointInShortRect } from 'app/utils/index';
+import { enterLocation } from 'app/utils/enterLocation';
+import {isPointInShortRect, removeElementFromArray} from 'app/utils/index';
 import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
 import { getSwitchTargetIds } from 'app/utils/switches';
+import {isKeyboardKeyDown, KEY} from 'app/userInput'
 
 
 type PartialObjectDefinitionWithType = Partial<ObjectDefinition> & {type: ObjectType};
+
+function refreshArea(state: GameState, doNotRefreshEditor = false) {
+    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
+}
 
 function createObjectPaletteItem<T extends string>(type: T, instance: ObjectInstance): ObjectPaletteItem<T> {
     return {
@@ -1654,27 +1660,101 @@ function getVariantSeedProperties(state: GameState, data: ObjectDefinition): Pan
     return rows;
 }
 
-export function unselectObject(editingState: EditingState) {
+export function isVariant(o: SelectableDefinition): o is VariantData {
+    return (o as VariantData)._editorType === 'variant';
+}
+
+export function isObject(o: SelectableDefinition): o is ObjectDefinition {
+    return (o as VariantData)._editorType !== 'variant';
+}
+
+// Currently we don't clear selected elements when switching areas, so for certain actions,
+// we check if the current selection is still valid for the current area.
+export function isSelectionValid(state: GameState, editingState: EditingState): boolean {
+    const firstObject = editingState.selectedObjects[0];
+    return isObject(firstObject) && state.areaInstance.definition.objects.includes(firstObject)
+        || isVariant(firstObject) && state.areaInstance.definition.variants.includes(firstObject);
+}
+
+export function anonymizeSelectedObject(editingState: EditingState) {
     editingState.selectedObject = {...editingState.selectedObject};
     delete editingState.selectedObject.id;
+}
+export function anonymizeSelectedVariantData(editingState: EditingState) {
+    editingState.selectedVariantData = {
+        ...editingState.selectedVariantData,
+        styleWeights: {
+            ...editingState.selectedVariantData.styleWeights,
+        },
+    }
+    delete editingState.selectedVariantData.id;
+}
+
+export function unselectAll(editingState: EditingState) {
+    editingState.selectedObjects = [];
+    anonymizeSelectedObject(editingState);
+    anonymizeSelectedVariantData(editingState);
     editingState.needsRefresh = true;
 }
 
-export function onMouseDownSelectObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
-    let changedSelection = false;
-    if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
-        if (!isPointInObject(x, y, editingState.selectedObject)) {
-            unselectObject(editingState);
-            changedSelection = true;
+export function unselectObject(editingState: EditingState, object: SelectableDefinition) {
+    removeElementFromArray(editingState.selectedObjects, object);
+    if (isObject(object)) {
+        const lastSelectedObject = (editingState.selectedObjects.filter(isObject)[0]);
+        if (lastSelectedObject) {
+            editingState.selectedObject = lastSelectedObject;
+        } else {
+            anonymizeSelectedObject(editingState);
+        }
+    } else if (isVariant(object)) {
+        const lastSelectedVariant = (editingState.selectedObjects.filter(isVariant)[0]);
+        if (lastSelectedVariant) {
+            editingState.selectedVariantData = lastSelectedVariant;
+        } else {
+            anonymizeSelectedVariantData(editingState);
         }
     }
-    if (state.areaInstance.definition.variants?.includes(editingState.selectedVariantData)) {
-        if (!isPointInShortRect(x + state.camera.x, y + state.camera.y, editingState.selectedVariantData)) {
-            unselectObject(editingState);
-            changedSelection = true;
-        }
+    editingState.needsRefresh = true;
+}
+
+
+
+document.addEventListener('keydown', function(event: KeyboardEvent) {
+    if (editingState.tool !== 'select' && editingState.tool !== 'object') {
+        return;
     }
-    let objectDirectlyUnderCursor: ObjectDefinition;
+    if (!editingState.isEditing) {
+        return;
+    }
+    if (event.repeat) {
+        return;
+    }
+    // Don't process keys if an input is targeted, otherwise we prevent typing in
+    // the input.
+    if ((event.target as HTMLElement).closest('input')
+        || (event.target as HTMLElement).closest('textarea')
+        || (event.target as HTMLElement).closest('select')) {
+        return;
+    }
+    const commandIsDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
+    if (event.which === KEY.A && commandIsDown) {
+        editingState.selectedObjects = [...getState().areaInstance.definition.objects];
+        const lastSelectedObject = (editingState.selectedObjects.filter(isObject)[0]);
+        if (lastSelectedObject) {
+            editingState.selectedObject = lastSelectedObject;
+        }
+        event.preventDefault();
+        editingState.tool = 'select';
+        return;
+    }
+});
+
+
+function isPointInVariant(state: GameState, x: number, y: number, variantData: VariantData): boolean {
+    return isPointInShortRect(x + state.camera.x, y + state.camera.y, variantData);
+}
+
+function getObjectDirectlyUnderPoint(state: GameState, editingState: EditingState, x: number, y: number): SelectableDefinition|undefined {
     const backgroundObjects: ObjectDefinition[] = [];
     const spriteObjects: ObjectDefinition[] = [];
     const foregroundObjects: ObjectDefinition[] = [];
@@ -1687,38 +1767,77 @@ export function onMouseDownSelectObject(state: GameState, editingState: EditingS
             spriteObjects.push(object);
         }
     }
+
     for (const layerOfObjects of [foregroundObjects, spriteObjects, backgroundObjects]) {
         for (const object of [...layerOfObjects].reverse()) {
             if (isPointInObject(x, y, object)) {
-                objectDirectlyUnderCursor = object;
-                break;
+                return object;
             }
         }
-        if (objectDirectlyUnderCursor) {
-            break;
+    }
+    // Variants define an area in which objects are created so it is convenient to consider them
+    // "under" other objects, like they are part of the floor.
+    for (const variantData of (state.areaInstance.definition.variants || [])) {
+        if (isPointInVariant(state, x, y, variantData)) {
+            return variantData;
         }
     }
-    if (objectDirectlyUnderCursor) {
-        if (objectDirectlyUnderCursor !== editingState.selectedObject) {
-            editingState.selectedObject = objectDirectlyUnderCursor
-        } else {
-            // TODO: We want to do this if the user clicks and releases but not if they click and drag.
-            // unselectObject(editingState);
-        }
-        changedSelection = true;
-    }
-    if (changedSelection) {
-        editingState.needsRefresh = true;
-    }
-    // If selectedObject is still set, then we are dragging it, so indicate the drag offset.
-    const objectIsSelected = !!state.areaInstance.definition.objects.includes(editingState.selectedObject);
-    if (objectIsSelected) {
+}
+
+export function onMouseDownSelectObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
+    const objectUnderCursor = getObjectDirectlyUnderPoint(state, editingState, x, y);
+    editingState.dragged = false;
+    delete editingState.dragObject;
+    delete editingState.dragOffset;
+    if (editingState.selectedObjects.includes(objectUnderCursor)) {
+        editingState.dragObject = objectUnderCursor;
         editingState.dragOffset = {
-            x: editingState.selectedObject.x - x,
-            y: editingState.selectedObject.y - y,
+            x: editingState.dragObject.x - x,
+            y: editingState.dragObject.y - y,
         };
+        for (const selectedObject of editingState.selectedObjects) {
+            selectedObject._dragStartX = selectedObject.x;
+            selectedObject._dragStartY = selectedObject.y;
+        }
     }
-    return objectIsSelected;
+    return false;
+}
+
+export function selectSingleObject(state: GameState, editingState: EditingState, object: SelectableDefinition, appendToSelection = false) {
+    if (isObject(object)) {
+        editingState.selectedObject = object;
+    } else if (isVariant(object)) {
+        editingState.selectedVariantData = object;
+    }
+    if (appendToSelection) {
+        editingState.selectedObjects.push(object);
+    } else {
+        editingState.selectedObjects = [object];
+    }
+    editingState.needsRefresh = true;
+}
+
+export function onMouseUpSelectObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
+    delete editingState.dragObject;
+    if (editingState.dragged) {
+        delete editingState.dragged;
+        return false;
+    }
+    if (!isPointInShortRect(x, y, {x: 0, y: 0, w: CANVAS_WIDTH / editingState.areaScale, h: CANVAS_HEIGHT / editingState.areaScale})) {
+        return false;
+    }
+    const clickedObject = getObjectDirectlyUnderPoint(state, editingState, x, y);
+    if (!isKeyboardKeyDown(KEY.SHIFT) && editingState.selectedObjects.length) {
+        unselectAll(editingState);
+    }
+    if (clickedObject) {
+        if (!editingState.selectedObjects.includes(clickedObject)) {
+            selectSingleObject(state, editingState, clickedObject, isKeyboardKeyDown(KEY.SHIFT));
+        } else {
+            // This branch should only occur when the user is holding SHIFT to update multiple selections.
+            unselectObject(editingState, clickedObject);
+        }
+    }
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
@@ -1749,23 +1868,39 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
 }
 
 export function onMouseDragObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
-    if (!state.areaInstance.definition.objects.includes(editingState.selectedObject) || !editingState.dragOffset) {
+    if (!editingState.dragObject) {
         return false;
     }
-    const linkedDefinition = editingState.selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
-    const oldX = editingState.selectedObject.x, oldY = editingState.selectedObject.y;
-    editingState.selectedObject.x = Math.round(x + editingState.dragOffset.x);
-    editingState.selectedObject.y = Math.round(y + editingState.dragOffset.y);
-    fixObjectPosition(state, editingState.selectedObject);
-    if (oldX !== editingState.selectedObject.x || oldY !== editingState.selectedObject.y) {
-        if (linkedDefinition) {
-            //console.log("Updating linked definition");
-            linkedDefinition.x = editingState.selectedObject.x;
-            linkedDefinition.y = editingState.selectedObject.y;
-            //console.log(linkedDefinition);
-            updateObjectInstance(state, linkedDefinition, linkedDefinition, state.alternateAreaInstance);
+    const deltaX = Math.round(x + editingState.dragOffset.x) - editingState.dragObject._dragStartX;
+    const deltaY = Math.round(y + editingState.dragOffset.y) - editingState.dragObject._dragStartY;
+    editingState.dragged = true;
+    let areaNeedsRefresh = false;
+    for (const selectedObject of editingState.selectedObjects) {
+        const oldX = selectedObject.x, oldY = selectedObject.y;
+        selectedObject.x = Math.round(selectedObject._dragStartX + deltaX);
+        selectedObject.y = Math.round(selectedObject._dragStartY + deltaY);
+        if (isObject(selectedObject)) {
+            const linkedDefinition = selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, selectedObject);
+            fixObjectPosition(state, selectedObject);
+            if (selectedObject.x !== oldX || selectedObject.y !== oldY) {
+                if (linkedDefinition) {
+                    //console.log("Updating linked definition");
+                    linkedDefinition.x = selectedObject.x;
+                    linkedDefinition.y = selectedObject.y;
+                    //console.log(linkedDefinition);
+                    updateObjectInstance(state, linkedDefinition, linkedDefinition, state.alternateAreaInstance);
+                }
+                updateObjectInstance(state, selectedObject);
+            }
         }
-        updateObjectInstance(state, editingState.selectedObject);
+        if (isVariant(selectedObject)) {
+            editingState.needsRefresh = true;
+            areaNeedsRefresh = true;
+        }
+    }
+    // TODO: debounce this so it doesn't freeze the editor while dragging.
+    if (areaNeedsRefresh) {
+        refreshArea(state);
     }
     return true;
 }
