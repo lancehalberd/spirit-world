@@ -68,6 +68,14 @@ interface SlotGenerator {
     apply?: (context: SlotContext) => void
 }
 
+type ChunkGenerator = {
+    minW?: number
+    minH?: number
+    maxW?: number
+    maxH?: number
+    generate: (random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) => void
+}
+
 interface RoomSlot extends Rect {
     d?: CardinalDirection
     id: string

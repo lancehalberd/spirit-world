@@ -4,9 +4,9 @@ import { getOrAddLayer } from 'app/utils/layers';
 // const floor2Tiles = [793, 796, 797, 799, 800];
 
 export function applyNineSlice(random: SRandom, slice: NineSlice, r: Rect, area: AreaDefinition, alternateArea: AreaDefinition): void {
-    // Height of bottom slice
+    // Height of bottom slice (slice.r is the rectangle of the repeated center) height of top is just slice.r.y).
     const B = slice.h - (slice.r.y + slice.r.h);
-    // Width of right slice
+    // Width of right slice (slice.r is the rectangle of the repeated center) width of left is just slice.r.x).
     const R = slice.w - (slice.r.x + slice.r.w);
     for (const sliceLayer of slice.layers) {
         const areaLayer = getOrAddLayer(sliceLayer.key, area, alternateArea);
@@ -106,7 +106,7 @@ export const caveRoom: NineSlice = {
                 [  0,  0,  0,  0,  0,  0],
             ]
         }
-    ]
+    ],
 };
 
 export const outerStoneWalls: NineSlice = {
@@ -152,7 +152,7 @@ export const outerStoneWalls: NineSlice = {
                 [1168,1163,1163,1163,1163,1167],
             ]
         }
-    ]
+    ],
 };
 
 
@@ -190,7 +190,7 @@ export const innerStoneWalls: NineSlice = {
                 [   0,   0,   0,   0,   0,   0],
             ]
         }
-    ]
+    ],
 };
 
 export const stonePlatform: NineSlice = {
@@ -199,14 +199,6 @@ export const stonePlatform: NineSlice = {
     layers: [
         {
             key: 'floor2',
-            grid: [
-                [0,652,653,654,0],
-                [0,655,  0,656,0],
-                [0,657,658,659,0],
-            ]
-        },
-        {
-            key: 'field',
             grid: [
                 [0,1241,1242,1243,0],
                 [0,1244,   0,1245,0],
@@ -221,7 +213,15 @@ export const stonePlatform: NineSlice = {
                 [700,0,0,0,703],
             ]
         },
-    ]
+        {
+            key: 'behaviors',
+            grid: [
+                [0,368,369,370,0],
+                [0,373,  0,374,0],
+                [0,377,378,379,0],
+            ]
+        },
+    ],
 };
 
 export const slices = {

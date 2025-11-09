@@ -13,7 +13,7 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
     const baseArea = area.parentDefinition ? alternateArea : area;
     const childArea = area.parentDefinition ? area : alternateArea;
 
-    chunkGenerators.stoneRoom(random, baseArea, section, childArea);
+    chunkGenerators.stoneRoom.generate(random, baseArea, section, childArea);
     const innerRect = {
         x: section.x + 1,
         y: section.y + 3,

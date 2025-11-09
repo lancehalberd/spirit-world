@@ -9,7 +9,7 @@ import {
     unselectObject,
 } from 'app/development/objectEditor';
 import {fixVariantPosition} from 'app/development/variantEditor';
-import { getSelectionBounds } from 'app/development/brushSelection';
+import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
 import { renderZoneEditor } from 'app/development/zoneEditor';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { translateContextForAreaAndCamera } from 'app/render/renderField';
@@ -18,6 +18,7 @@ import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { mapTile } from 'app/utils/mapTile';
 import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
+import {chunkGenerators} from 'app/generator/tileChunkGenerators';
 
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -37,7 +38,6 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     }
     renderZoneEditor(context, state, editingState);
 }
-
 
 function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
     if (state.paused) {
@@ -82,13 +82,14 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
         // Tool previews are only drawn for the current area.
         if (area === state.areaInstance) {
             if (editingState.tool === 'tileChunk') {
+                const generator = chunkGenerators[editingState.tileChunkKey];
                 const w = 16, h = 16;
                 let x1 = x, y1 = y;
                 if (isMouseDown() && editingState.dragOffset) {
                     x1 = editingState.dragOffset.x;
                     y1 = editingState.dragOffset.y;
                 }
-                const {L, R, T, B} = getSelectionBounds(state, x1, y1, x, y);
+                const {L, R, T, B} = getChunkGeneratorSelectionBounds(state, generator, x1, y1, x, y);
                 context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);

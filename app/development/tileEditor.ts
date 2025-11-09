@@ -1,10 +1,10 @@
-import { allSections } from 'app/content/sections';
-import { allTiles } from 'app/content/tiles';
-import { zones } from 'app/content/zones';
-import { getSelectionBounds } from 'app/development/brushSelection';
-import { contextMenuState, editingState } from 'app/development/editingState';
-import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
-import { addMissingLayer } from 'app/utils/layers';
+import {allSections} from 'app/content/sections';
+import {allTiles} from 'app/content/tiles';
+import {zones} from 'app/content/zones';
+import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
+import {contextMenuState, editingState} from 'app/development/editingState';
+import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
+import {addMissingLayer} from 'app/utils/layers';
 import {
     createObjectDefinition,
     deleteObject,
@@ -18,21 +18,21 @@ import {
     unselectAll,
     updateObjectInstance,
 } from 'app/development/objectEditor';
-import { updateBrushCanvas } from 'app/development/propertyPanel';
-import { setEditingTool } from 'app/development/toolTab';
+import {updateBrushCanvas} from 'app/development/propertyPanel';
+import {setEditingTool} from 'app/development/toolTab';
 import {addVariantToArea, createVariantDataAtScreenCoords} from 'app/development/variantEditor';
-import { getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords } from 'app/render/renderMap';
-import { getState } from 'app/state';
-import { KEY, isKeyboardKeyDown } from 'app/userInput';
-import { mainCanvas } from 'app/utils/canvas';
-import { enterLocation } from 'app/utils/enterLocation';
+import {getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords} from 'app/render/renderMap';
+import {getState} from 'app/state';
+import {KEY, isKeyboardKeyDown } from 'app/userInput';
+import {mainCanvas} from 'app/utils/canvas';
+import {enterLocation} from 'app/utils/enterLocation';
 import {removeElementFromArray} from 'app/utils/index';
-import { initializeAreaLayerTiles } from 'app/utils/layers';
-import { mapTile } from 'app/utils/mapTile';
-import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
-import { resetTileBehavior } from 'app/utils/tileBehavior';
+import {initializeAreaLayerTiles} from 'app/utils/layers';
+import {mapTile} from 'app/utils/mapTile';
+import {isMouseDown, /*isMouseOverElement*/} from 'app/utils/mouse';
+import {resetTileBehavior} from 'app/utils/tileBehavior';
 import SRandom from 'app/utils/SRandom';
-import { chunkGenerators } from 'app/generator/tileChunkGenerators';
+import {chunkGenerators} from 'app/generator/tileChunkGenerators';
 export * from 'app/development/packSprites';
 
 
@@ -179,10 +179,11 @@ document.addEventListener('mouseup', (event) => {
     editingState.tileChunkKey = editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
     const [x, y] = getAreaMousePosition();
     if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
-        const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
+        const generator = chunkGenerators[editingState.tileChunkKey];
+        const {L, R, T, B} = getChunkGeneratorSelectionBounds(state, generator, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
         editingState.dragOffset = null;
         const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};
-        chunkGenerators[editingState.tileChunkKey](SRandom.seed(Math.random()), state.areaInstance.definition, r, state.alternateAreaInstance.definition);
+        generator.generate(SRandom.seed(Math.random()), state.areaInstance.definition, r, state.alternateAreaInstance.definition);
         refreshArea(state);
         editingState.hasChanges = true;
         return;
@@ -528,7 +529,7 @@ export function selectAllTiles() {
     }
     if (editingState.tool === 'tileChunk') {
         editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
-        chunkGenerators[editingState.tileChunkKey](SRandom.seed(Math.random()), state.areaInstance.definition, state.areaSection, state.alternateAreaInstance.definition);
+        chunkGenerators[editingState.tileChunkKey].generate(SRandom.seed(Math.random()), state.areaInstance.definition, state.areaSection, state.alternateAreaInstance.definition);
         refreshArea(state);
         editingState.hasChanges = true;
     }
