@@ -14,6 +14,7 @@ export const editingState: EditingState = {
     areaScale: 1,
     selectedSections: [],
     recentAreas: [],
+    selectedObjects: [],
     selectedVariantData: {
         id: '',
         seed: 0,

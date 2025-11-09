@@ -6,6 +6,61 @@ dialogueHash.vanaraVillager = {
     options: [
         {
             logicCheck: {
+                requiredFlags: ['beastsDefeated'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    text: `Whatever else may happen, I'm grateful for every day
+                           I have tending the garden with my friends.`,
+                },
+                {
+                    text: `Everyone has a role to play in this world. Enjoy yours if you can.`,
+                },
+                {
+                    text: `It must be hard for humans, born into this world without knowing their purpose.`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['elementalBeastsEscaped'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                /*{
+                    text: `First there was that earthquake and then the fog finally lifted.`,
+                },
+                {
+                    text: `I'm glad the fog is gone, but will we be okay with the village exposed like this?`,
+                },*/
+                {
+                    text: `The Elder says the Spirit Tree is still watching over us, I hope that's true!`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$spiritSight'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                /*{
+                    text: `I love being out in the woods, but I get uncomfortable if I stay out in the fog too long.`,
+                },*/
+                {
+                    text: `They say you don't mind getting wet because your mother is a human.`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
                 requiredFlags: ['$bow'],
                 excludedFlags: [],
             },

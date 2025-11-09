@@ -337,6 +337,9 @@ export function addRecentArea(areaInstance: AreaInstance): void {
 }
 
 export function createAreaInstance(state: GameState, zone: Zone, definition: AreaDefinition, isActiveArea: boolean = false): AreaInstance {
+    for (const variant of (definition.variants ?? [])) {
+        variant._editorType = 'variant';
+    }
     const behaviorGrid: TileBehaviors[][] = [];
     const areaSize = getAreaDimensions(definition, zone);
     const backgroundFrames: AreaFrame[] = [];

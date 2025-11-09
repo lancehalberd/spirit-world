@@ -60,6 +60,8 @@ type PropertyRow = (EditorProperty<any> | HTMLElement | string)[];
 
 type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];
 
+type SelectableDefinition = ObjectDefinition | VariantData;
+
 type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select' | 'tileChunk' | 'variant';
 interface EditingState {
     tool: EditorToolType
@@ -67,7 +69,7 @@ interface EditingState {
     hasChanges: boolean
     isEditing: boolean
     brush?: {[key: string]: TileGridDefinition}
-    clipboardObject?: ObjectDefinition
+    clipboardObjects?: SelectableDefinition[]
     needsRefresh?: boolean
     paletteKey?: string
     tileChunkKey?: string
@@ -76,9 +78,12 @@ interface EditingState {
     refreshMinimap?: boolean
     replacePercentage: number
     selectedObject?: ObjectDefinition
+    selectedObjects: SelectableDefinition[]
     selectedVariantData?: VariantData
     spirit: boolean
+    dragObject?: SelectableDefinition
     dragOffset?: {x: number, y: number}
+    dragged?: boolean
     selectedSections: number[]
     // Can set to 0.5
     areaScale: number

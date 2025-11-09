@@ -3,11 +3,13 @@ import { allTiles } from 'app/content/tiles';
 import { editingState } from 'app/development/editingState';
 import {
     getObjectFrame,
+    isObject,
+    isVariant,
     renderObjectPreview,
     unselectObject,
 } from 'app/development/objectEditor';
-import { fixVariantPosition, unselectVariant } from 'app/development/variantEditor';
-import { getSelectionBounds } from 'app/development/brushSelection';
+import {fixVariantPosition} from 'app/development/variantEditor';
+import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
 import { renderZoneEditor } from 'app/development/zoneEditor';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { translateContextForAreaAndCamera } from 'app/render/renderField';
@@ -16,6 +18,7 @@ import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { mapTile } from 'app/utils/mapTile';
 import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
+import {chunkGenerators} from 'app/generator/tileChunkGenerators';
 
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -24,10 +27,10 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     }
     // Unselect objects that are no longer in the current area.
     if (editingState.selectedObject?.id && !state.areaInstance.definition.objects.find(o => o === editingState.selectedObject)) {
-        unselectObject(editingState);
+        unselectObject(editingState, editingState.selectedObject);
     }
     if (editingState.selectedVariantData?.id && !state.areaInstance.definition.variants?.find(o => o === editingState.selectedVariantData)) {
-        unselectVariant(editingState);
+        unselectObject(editingState, editingState.selectedVariantData);
     }
     renderEditorArea(context, state, state.areaInstance);
     if (state.nextAreaInstance) {
@@ -35,7 +38,6 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     }
     renderZoneEditor(context, state, editingState);
 }
-
 
 function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
     if (state.paused) {
@@ -80,13 +82,14 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
         // Tool previews are only drawn for the current area.
         if (area === state.areaInstance) {
             if (editingState.tool === 'tileChunk') {
+                const generator = chunkGenerators[editingState.tileChunkKey];
                 const w = 16, h = 16;
                 let x1 = x, y1 = y;
                 if (isMouseDown() && editingState.dragOffset) {
                     x1 = editingState.dragOffset.x;
                     y1 = editingState.dragOffset.y;
                 }
-                const {L, R, T, B} = getSelectionBounds(state, x1, y1, x, y);
+                const {L, R, T, B} = getChunkGeneratorSelectionBounds(state, generator, x1, y1, x, y);
                 context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
@@ -191,30 +194,43 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 }
             }
             context.globalAlpha = 0.6;
-            if (editingState.tool === 'select' && state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
-                const instance = createObjectInstance(state, editingState.selectedObject);
-                let target: Rect;
-                if (instance.getEditorHitbox) {
-                    target = instance.getEditorHitbox(state);
-                } else if(instance.getHitbox) {
-                    target = instance.getHitbox(state);
-                } else {
-                    const frame = getObjectFrame(editingState.selectedObject);
-                    target = {
-                        x: editingState.selectedObject.x + (frame.content?.x || 0) - 1,
-                        y: editingState.selectedObject.y + (frame.content?.y || 0) - 1,
-                        w: (frame.content?.w || frame.w) + 2,
-                        h: (frame.content?.h || frame.h) + 2,
-                    };
+            if (editingState.tool === 'select') {
+                for (const selectedObject of editingState.selectedObjects) {
+                    let target: Rect;
+                    if (isObject(selectedObject)) {
+                        if (!state.areaInstance.definition.objects.includes(selectedObject)) {
+                            continue;
+                        }
+                        const instance = createObjectInstance(state, selectedObject);
+
+                        if (instance.getEditorHitbox) {
+                            target = instance.getEditorHitbox(state);
+                        } else if(instance.getHitbox) {
+                            target = instance.getHitbox(state);
+                        } else {
+                            const frame = getObjectFrame(selectedObject);
+                            target = {
+                                x: selectedObject.x + (frame.content?.x || 0) - 1,
+                                y: selectedObject.y + (frame.content?.y || 0) - 1,
+                                w: (frame.content?.w || frame.w) + 2,
+                                h: (frame.content?.h || frame.h) + 2,
+                            };
+                        }
+                    } else if (isVariant(selectedObject)) {
+                        if (!state.areaInstance.definition.variants?.includes(selectedObject)) {
+                            continue;
+                        }
+                        target = selectedObject;
+                    }
+                    if (selectedObject === editingState.selectedObject || selectedObject === editingState.selectedVariantData) {
+                        context.fillStyle = 'white';
+                        context.fillRect(target.x, target.y, target.w, target.h);
+                    } else {
+                        context.lineWidth = 2;
+                        context.strokeStyle = 'white';
+                        context.strokeRect(target.x, target.y, target.w, target.h);
+                    }
                 }
-                context.fillStyle = 'white';
-                context.fillRect(target.x, target.y, target.w, target.h);
-            }
-            const variantData = editingState.selectedVariantData;
-            if (editingState.selectedVariantData && state.areaInstance.definition.variants?.includes(variantData)) {
-                context.lineWidth = 2;
-                context.strokeStyle = 'white';
-                context.strokeRect(variantData.x, variantData.y, variantData.w, variantData.h);
             }
             if (['object', 'enemy', 'boss'].includes(editingState.tool)) {
                 renderObjectPreview(context, state, editingState, x, y);

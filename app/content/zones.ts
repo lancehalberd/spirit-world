@@ -4,6 +4,7 @@ import { zones } from 'app/content/zones/zoneHash';
 export * from 'app/content/zones/zoneHash';
 export * from 'app/content/zones/sky';
 export * from 'app/content/zones/overworld';
+export * from 'app/content/zones/forest';
 export * from 'app/content/zones/underwater';
 export * from 'app/content/zones/caves';
 export * from 'app/content/zones/frozenCave';

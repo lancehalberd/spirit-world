@@ -20,7 +20,7 @@ function addStoneRoomFrame(random: SRandom, node: TreeNode) {
         x: section.x + 1,
         w: section.w - 1,
     };
-    chunkGenerators.stoneRoom(random, node.baseArea, section, node.childArea);
+    chunkGenerators.stoneRoom.generate(random, node.baseArea, section, node.childArea);
     inheritAllLayerTilesFromParent(node.childArea, node.childAreaSection);
 }
 
