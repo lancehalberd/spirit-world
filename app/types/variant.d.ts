@@ -30,6 +30,8 @@ interface VariantData<T = any> extends VariantSeedData, Rect {
     // at the start of a drag operation.
     _dragStartX?: number
     _dragStartY?: number
+    // Set when copying objects to easily refer to the section and calculate their relative section coordinates.
+    _sourceSection?: AreaSection
     // Used to disambiguate VariantData from ObjectDefinition.
     _editorType?: 'variant'
 }

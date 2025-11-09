@@ -28,9 +28,10 @@ import { getLogicProperties } from 'app/development/zoneEditor';
 import {allLootTypes, CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
-import { enterLocation } from 'app/utils/enterLocation';
+import {enterLocation} from 'app/utils/enterLocation';
 import {isPointInShortRect, removeElementFromArray} from 'app/utils/index';
 import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
+import {isDefinitionFromSection} from 'app/utils/sections';
 import { getSwitchTargetIds } from 'app/utils/switches';
 import {isKeyboardKeyDown, KEY} from 'app/userInput'
 
@@ -1661,11 +1662,11 @@ function getVariantSeedProperties(state: GameState, data: ObjectDefinition): Pan
 }
 
 export function isVariant(o: SelectableDefinition): o is VariantData {
-    return (o as VariantData)._editorType === 'variant';
+    return o && (o as VariantData)._editorType === 'variant';
 }
 
 export function isObject(o: SelectableDefinition): o is ObjectDefinition {
-    return (o as VariantData)._editorType !== 'variant';
+    return o && (o as VariantData)._editorType !== 'variant';
 }
 
 // Currently we don't clear selected elements when switching areas, so for certain actions,
@@ -1673,7 +1674,7 @@ export function isObject(o: SelectableDefinition): o is ObjectDefinition {
 export function isSelectionValid(state: GameState, editingState: EditingState): boolean {
     const firstObject = editingState.selectedObjects[0];
     return isObject(firstObject) && state.areaInstance.definition.objects.includes(firstObject)
-        || isVariant(firstObject) && state.areaInstance.definition.variants.includes(firstObject);
+        || isVariant(firstObject) && state.areaInstance.definition.variants?.includes(firstObject);
 }
 
 export function anonymizeSelectedObject(editingState: EditingState) {
@@ -1736,9 +1737,15 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         || (event.target as HTMLElement).closest('select')) {
         return;
     }
-    const commandIsDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
-    if (event.which === KEY.A && commandIsDown) {
-        editingState.selectedObjects = [...getState().areaInstance.definition.objects];
+    const isCommandDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
+    const isShiftDown = isKeyboardKeyDown(KEY.SHIFT);
+    if (event.which === KEY.A && isCommandDown) {
+        const state = getState();
+        editingState.selectedObjects = [...state.areaInstance.definition.objects, ...(state.areaInstance.definition.variants ?? [])];
+        // Unless shift is also held, only select elements from the current section.
+        if (!isShiftDown) {
+            editingState.selectedObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSection))
+        }
         const lastSelectedObject = (editingState.selectedObjects.filter(isObject)[0]);
         if (lastSelectedObject) {
             editingState.selectedObject = lastSelectedObject;

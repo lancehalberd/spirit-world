@@ -11,9 +11,16 @@ import {isKeyboardKeyDown, KEY} from 'app/userInput'
 import {enterLocation} from 'app/utils/enterLocation';
 import {findAllZoneFlags} from 'app/utils/findAllZoneFlags';
 import {cloneDeep} from 'app/utils/index';
+import {isDefinitionFromSection} from 'app/utils/sections';
+
+
+function refreshArea(state: GameState, doNotRefreshEditor = false) {
+    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
+}
 
 export function addKeyboardShortcuts() {
     document.addEventListener('keydown', function(event: KeyboardEvent) {
+        const state = getState();
         if (event.repeat) {
             return;
         }
@@ -25,23 +32,22 @@ export function addKeyboardShortcuts() {
         ) {
             return;
         }
-        const commandIsDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
+        const isCommandDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
         const isShiftDown = isKeyboardKeyDown(KEY.SHIFT);
         const keyCode: number = event.which;
 
-        if (commandIsDown && keyCode === KEY.BACK_SLASH) {
-            const state = getState();
+        if (isCommandDown && keyCode === KEY.BACK_SLASH) {
             state.alwaysHideMenu = !state.alwaysHideMenu;
             event.preventDefault();
             return;
         }
-        if ((commandIsDown || isShiftDown) && keyCode === KEY.E) {
-            toggleEditing(getState());
+        if ((isCommandDown || isShiftDown) && keyCode === KEY.E) {
+            toggleEditing(state);
             event.preventDefault();
             return;
         }
         if (keyCode === KEY.ESCAPE) {
-            toggleShowControls(getState());
+            toggleShowControls(state);
             return;
         }
         if (!editingState.isEditing) {
@@ -49,29 +55,66 @@ export function addKeyboardShortcuts() {
         }
         //console.log(keyCode);
         // Don't override the refresh page command.
-        if (keyCode === KEY.R && commandIsDown) {
+        if (keyCode === KEY.R && isCommandDown) {
             return;
         }
-        if (keyCode === KEY.C && commandIsDown) {
+        if (keyCode === KEY.C && isCommandDown) {
             editingState.clipboardObjects = [];
-            if (isSelectionValid(getState(), editingState)) {
-                editingState.clipboardObjects = [...editingState.selectedObjects];
+            if (isSelectionValid(state, editingState)) {
+                for (const object of editingState.selectedObjects) {
+                    // The source section will be relative to the section the user is looking at when they initiate the copy action.
+                    object._sourceSection = state.areaSection;
+                    // Using the section the objects are actually from turns out to be unintutive.
+                    // object._sourceSection = getAreaSectionForDefinition(state, object);
+                }
+                if (isShiftDown) {
+                    editingState.clipboardObjects = [...editingState.selectedObjects];
+                } else {
+                    editingState.clipboardObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSection))
+                }
             } else {
-                exportZoneToClipboard(getState().zone);
+                exportZoneToClipboard(state.zone);
                 editingState.hasChanges = false;
-                event.preventDefault();
             }
+            event.preventDefault();
             return;
         }
-        if (keyCode === KEY.V && commandIsDown) {
+        if (keyCode === KEY.V && isCommandDown) {
             if (editingState.clipboardObjects) {
-                const state = getState();
-                for (const pastedObject of editingState.clipboardObjects) {
-                    if (isObject(pastedObject)) {
-                        updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaInstance, true);
-                    } else if (isVariant(pastedObject)) {
-                        addVariantToArea(state, editingState, cloneDeep(pastedObject));
+                let areaNeedsRefresh = false;
+                for (let pastedObject of editingState.clipboardObjects) {
+                    if (isShiftDown) {
+                        // If shift is held down, everything is copied relative to the super tile and we ignore any section restrictions
+                        if (isObject(pastedObject)) {
+                            updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaInstance, true);
+                        } else if (isVariant(pastedObject)) {
+                            addVariantToArea(state, editingState, cloneDeep(pastedObject));
+                            areaNeedsRefresh = true;
+                        }
+                    } else {
+                        // Without shift down, we copy everything relative to the source/destination sections, and exclude anything
+                        // that will not be inside the current section, which helps cut down on pasting objects to inaccessible locations
+                        // off the edges of super tiles.
+                        pastedObject = {
+                            ...pastedObject,
+                            x: pastedObject.x - 16 * pastedObject._sourceSection.x + 16 * state.areaSection.x,
+                            y: pastedObject.y - 16 * pastedObject._sourceSection.y + 16 * state.areaSection.y,
+                        };
+                        // Skip this object if it would be pasted outside of the current section.
+                        if (!isDefinitionFromSection(pastedObject, state.areaSection)) {
+                            console.log('not in section:', pastedObject, state.areaSection);
+                            continue;
+                        }
+                        if (isObject(pastedObject)) {
+                            updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaInstance, true);
+                        } else if (isVariant(pastedObject)) {
+                            addVariantToArea(state, editingState, cloneDeep(pastedObject));
+                            areaNeedsRefresh = true;
+                        }
                     }
+                }
+                if (areaNeedsRefresh) {
+                    refreshArea(state);
                 }
             }
             event.preventDefault();
@@ -79,7 +122,6 @@ export function addKeyboardShortcuts() {
         }
         if (keyCode === KEY.R && isShiftDown) {
             // Reset the entire zone if shift is down.
-            const state = getState();
             // Reset all zone flags.
             state.savedState.zoneFlags = {};
             const flagsFromThisZone = findAllZoneFlags(zones[state.location.zoneKey]);
@@ -93,13 +135,14 @@ export function addKeyboardShortcuts() {
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location, {instant: true});
             clearScriptEvents(state);
+            event.preventDefault();
         } else if (keyCode === KEY.R) {
             // Reset the current screen as if you left and returned to it.
-            const state = getState();
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location, {instant: true});
+            event.preventDefault();
         }
     });
 }
