@@ -19,6 +19,7 @@ import { mapTile } from 'app/utils/mapTile';
 import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
 import {chunkGenerators} from 'app/generator/tileChunkGenerators';
+import {createCanvasAndContext} from 'app/utils/canvas';
 
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -239,6 +240,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
     context.restore();
 }
 
+const [maskCanvas, maskContext] = createCanvasAndContext(16, 16);
 function drawBrushLayerPreview(
     context: CanvasRenderingContext2D,
     state: GameState,
@@ -250,6 +252,7 @@ function drawBrushLayerPreview(
     defaultBrush: TileGridDefinition | null,
     rectangle: Rect,
 ): void {
+    const frameIndex = Math.floor(Date.now() * 6 / 1000) % 6;
     const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
     const w = 16, h = 16;
     for (let y = 0; y < rectangle.h; y++) {
@@ -259,29 +262,62 @@ function drawBrushLayerPreview(
             const tx = rectangle.x + x;
             if (tx < 0 || tx >= areaSize.w) continue;
             let tile: FullTile|undefined|null = null;
+            let maskTile: FullTile|undefined|null = null;
             // The brush is used if it is defined.
             if (brush) {
                 tile = allTiles[brush.tiles[y]?.[x]];
+                maskTile = allTiles[brush.mask?.[y]?.[x]];
             } else if (defaultBrush) {
                 // If no brush is defined, check if the default brush applies, otherwise use the existing
                 // layer tile if present.
                 const defaultTile = allTiles[defaultBrush.tiles[y]?.[x]];
                 const defaultLayer = defaultTile ? (defaultTile.behaviors?.defaultLayer ?? 'floor') : 'field';
                 if (defaultLayer === layerKey) {
-                    tile = defaultTile;
+                    // Assign the default tile to the base or mask tile based on its behavior.
+                    if (defaultTile?.behaviors?.maskFrame) {
+                        tile = allTiles[layer.grid.tiles[ty]?.[tx]];
+                        maskTile = defaultTile;
+                    } else {
+                        tile = defaultTile;
+                        maskTile = allTiles[layer.grid.mask?.[ty]?.[tx]];
+                    }
                 } else if (layer) {
                     tile = allTiles[layer.grid.tiles[ty]?.[tx]];
+                    maskTile = allTiles[layer.grid.mask?.[ty]?.[tx]];
                 }
-            }else if (layer) {
+            } else if (layer) {
                 // If there is no brush or default brush just use the existing layer tile if present
                 tile = allTiles[layer.grid.tiles[ty]?.[tx]];
+                maskTile = allTiles[layer.grid.mask?.[ty]?.[tx]];
             }
             if (!tile && parentLayer) {
                 const parentTile = allTiles[parentLayer.grid?.tiles[ty]?.[tx]];
                 tile = mapTile(parentTile);
+                // TODO: map the mask tile from the parent appropriately.
             }
-            if (tile) {
-                context.save();
+
+
+            if (maskTile) {
+                // Create the masked tile to draw underneath the mask frame.
+                if (tile) {
+                    maskContext.clearRect(0, 0, 16, 16);
+                    maskContext.globalCompositeOperation = 'source-over';
+                    if (!maskTile.behaviors.maskFrame) {
+                        console.error('Mask tile was missing maskFrame. This can happen when tile indexes are shifted due to added/removed tiles.');
+                        debugger;
+                    }
+                    // mask frames do not support animation.
+                    drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
+                    maskContext.globalCompositeOperation = 'source-in';
+                    renderTileFrame(tile, frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
+                    // Draw the masked content first, then the mask frame on top.
+                    //window['debugCanvas'](maskCanvas);
+                    context.drawImage(maskCanvas, 0, 0, 16, 16, tx * w, ty * h, w, h);
+                }
+                renderTileFrame(maskTile, frameIndex, context, {x: tx * w, y: ty * h, w, h});
+            } else if (tile) {
+                renderTileFrame(tile, frameIndex, context, {x: tx * w, y: ty * h, w, h});
+                /*context.save();
                 if (tile.behaviors?.editorTransparency) {
                     context.globalAlpha *= tile.behaviors.editorTransparency;
                 }
@@ -290,8 +326,24 @@ function drawBrushLayerPreview(
                 } else {
                     drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
                 }
-                context.restore();
+                context.restore();*/
             }
         }
     }
+}
+
+function renderTileFrame(tile: FullTile, frameIndex: number, context: CanvasRenderingContext2D, target: Rect) {
+    context.save();
+        if (tile.behaviors?.editorTransparency) {
+            context.globalAlpha *= tile.behaviors.editorTransparency;
+        }
+        if (tile.behaviors?.render) {
+            tile.behaviors.render(context, tile, target, frameIndex);
+        } else if (tile.animation) {
+            const frame = tile.animation.frames[frameIndex % tile.animation.frames.length];
+            drawFrame(context, frame, target);
+        } else {
+            drawFrame(context, tile.frame, target);
+        }
+    context.restore();
 }

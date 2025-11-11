@@ -12,9 +12,9 @@ import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, update
 import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
 import { getBackgroundFrame, getBackgroundFrameIndex } from 'app/utils/area';
-import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
+import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
 import {allImagesLoaded} from 'app/utils/images';
-import { getFieldInstanceAndParts } from 'app/utils/objects';
+import {getFieldInstanceAndParts} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
 
 // This is the max size of the spirit sight circle.

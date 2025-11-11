@@ -12,13 +12,16 @@ dialogueHash.vanaraVillager = {
             isExclusive: true,
             text: [
                 {
+                    dialogueIndex: 211,
                     text: `Whatever else may happen, I'm grateful for every day
                            I have tending the garden with my friends.`,
                 },
                 {
+                    dialogueIndex: 212,
                     text: `Everyone has a role to play in this world. Enjoy yours if you can.`,
                 },
                 {
+                    dialogueIndex: 213,
                     text: `It must be hard for humans, born into this world without knowing their purpose.`,
                 },
             ],
@@ -38,6 +41,7 @@ dialogueHash.vanaraVillager = {
                     text: `I'm glad the fog is gone, but will we be okay with the village exposed like this?`,
                 },*/
                 {
+                    dialogueIndex: 214,
                     text: `The Elder says the Spirit Tree is still watching over us, I hope that's true!`,
                 },
             ],
@@ -54,6 +58,7 @@ dialogueHash.vanaraVillager = {
                     text: `I love being out in the woods, but I get uncomfortable if I stay out in the fog too long.`,
                 },*/
                 {
+                    dialogueIndex: 215,
                     text: `They say you don't mind getting wet because your mother is a human.`,
                 },
             ],

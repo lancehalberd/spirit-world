@@ -277,8 +277,8 @@ function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: 
     if (tx < 0 || tx > tiles[0].length - 1 || ty < 0 || ty > tiles.length - 1) {
         return;
     }
-    if (layerDefinition.mask?.tiles?.[ty]?.[tx]) {
-        layerDefinition.mask.tiles[ty][tx] = null;
+    if (layerDefinition.grid.mask?.[ty]?.[tx]) {
+        layerDefinition.grid.mask[ty][tx] = null;
         layer.maskTiles[ty][tx] = null;
     }
     if (!definition.isSpiritWorld) {
@@ -408,6 +408,19 @@ function drawBrush(targetX: number, targetY: number): void {
                 }
                 const tile = brushGrid.tiles[y][x];
                 paintSingleTile(area, layer, parentLayer, column, row, tile);
+                const maskTile = brushGrid.mask?.[y]?.[x];
+                if (maskTile) {
+                    paintSingleTile(area, layer, parentLayer, column, row, maskTile);
+                } else {
+                    // Clear any existing masks that might be defined
+                    if (layer.definition.grid.mask?.[row]?.[column]) {
+                        delete layer.definition.grid.mask[row][column];
+                    }
+                    if (layer.maskTiles?.[row]?.[column]) {
+                        delete layer.maskTiles[row][column]
+                    }
+                }
+                resetTileBehavior(area, {x, y});
             }
         }
     }
@@ -424,15 +437,11 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
         fullTile = mapTile(parentTile);
     }
     if (fullTile?.behaviors?.maskFrame) {
-        if (!layer.definition.mask) {
-            layer.definition.mask = {
-                w: layer.definition.grid.w,
-                h: layer.definition.grid.h,
-                tiles: [],
-            };
+        if (!layer.definition.grid.mask) {
+            layer.definition.grid.mask = [];
         }
-        layer.definition.mask.tiles[y] = layer.definition.mask.tiles[y] || [];
-        layer.definition.mask.tiles[y][x] = tile;
+        layer.definition.grid.mask[y] = layer.definition.grid.mask[y] || [];
+        layer.definition.grid.mask[y][x] = tile;
         layer.maskTiles = layer.maskTiles || [];
         layer.maskTiles[y] = layer.maskTiles[y] || [];
         layer.maskTiles[y][x] = fullTile;
@@ -487,14 +496,21 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, parentDefinition: Area
 function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: Rect): TileGridDefinition {
     const gridDefinition: TileGridDefinition = {
         tiles: [],
+        mask: [],
         w: rectangle.w,
         h: rectangle.h
     }
     for (let y = 0; y < gridDefinition.h; y++) {
         gridDefinition.tiles[y] = [];
+        gridDefinition.mask[y] = [];
         for (let x = 0; x < gridDefinition.w; x++) {
             gridDefinition.tiles[y][x] = layerDefinition.grid.tiles[rectangle.y + y][rectangle.x + x];
+            gridDefinition.mask[y][x] = layerDefinition.grid.mask?.[rectangle.y + y]?.[rectangle.x + x];
         }
+    }
+    // Sometimes we like to export the currently selected brush, and it is nicer if we don't include empty masks on it.
+    if (!gridDefinition.mask.some(row => row.some(v => v))) {
+        delete gridDefinition.mask;
     }
     return gridDefinition;
 }

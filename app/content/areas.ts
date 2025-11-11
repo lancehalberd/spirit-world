@@ -69,12 +69,6 @@ export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefiniti
             // The matrix of tiles
             tiles: [],
         },
-        // Add the mask from the parent layer but only if it is defined.
-        ...(layer.mask ? { mask: {
-            ...layer.mask,
-            // The matrix of tiles
-            tiles: [],
-        }} : {}),
     };
 }
 
@@ -402,7 +396,7 @@ export function createAreaInstance(state: GameState, zone: Zone, definition: Are
             ...layer,
             ...layer.grid,
             tiles: mapTileNumbersToFullTiles(layer.grid.tiles),
-            maskTiles: mapTileNumbersToFullTiles(layer.mask?.tiles),
+            maskTiles: mapTileNumbersToFullTiles(layer.grid.mask),
             originalTiles: mapTileNumbersToFullTiles(layer.grid.tiles),
         })),
         effects: [],
@@ -516,7 +510,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                     ...definition,
                     ...definition.grid,
                     tiles: mapTileNumbersToFullTiles(definition.grid.tiles),
-                    maskTiles: mapTileNumbersToFullTiles(definition.mask?.tiles),
+                    maskTiles: mapTileNumbersToFullTiles(definition.grid.mask),
                     originalTiles: mapTileNumbersToFullTiles(definition.grid.tiles),
                 }
                 instance.layers.splice(lastLayerIndex + 1, 0, newLayer);

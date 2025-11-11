@@ -59,6 +59,7 @@ export * from 'app/content/zones/jadeCityInterior';
 //Comment out below to play game normally
 //export * from 'app/content/zones/overworldBig';
 
+import {exportZoneToClipboard} from 'app/development/exportZone';
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {
@@ -66,3 +67,31 @@ export function getZone(zoneKey: string): Zone {
     }
     return zones[zoneKey];
 }
+
+// Function for migrating zones by exporting the first zone the needs to be migrated
+// each time you load the game.
+function migrateAllZones() {
+    for (const zoneKey of Object.keys(zones)) {
+        const zone = zones[zoneKey];
+        for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
+            const floor = zone.floors[floorIndex];
+            for (const grid of [floor.grid, floor.spiritGrid]) {
+                for (let y = 0; y < grid.length; y++) {
+                    for (let x = 0; x < grid[y].length; x++) {
+                        if (grid[y][x]) {
+                            for (const layer of (grid[y][x].layers ?? [])) {
+                                const migrationCondition = layer.grid.mask;
+                                if (migrationCondition) {
+                                    console.log('Exporting ', zoneKey);
+                                    exportZoneToClipboard(zone);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+migrateAllZones;//();

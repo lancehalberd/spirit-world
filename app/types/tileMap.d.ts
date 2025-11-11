@@ -253,11 +253,13 @@ interface FullTile {
 
 interface TileGridDefinition {
     // The dimensions of the grid.
-    w: number,
-    h: number,
-    drawPriority?: DrawPriority,
+    w: number
+    h: number
+    drawPriority?: DrawPriority
     // The matrix of tiles
-    tiles: number[][],
+    tiles: number[][]
+    // Optional matrix of tile masks
+    mask?: number[][]
 }
 
 interface TileGrid {
@@ -333,7 +335,6 @@ interface AreaLayerDefinition extends LogicDefinition {
     disableBehaviors?: boolean
     drawPriority?: DrawPriority
     grid?: TileGridDefinition
-    mask?: TileGridDefinition
     // This is not saved on and is just used when editing.
     visibilityOverride?: 'show' | 'fade' | 'hide'
     // Coordinates for the layer origin, if not (0, 0).
