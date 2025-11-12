@@ -11,11 +11,14 @@ dialogueHash.refightVanara = {
     key: 'refightVanara',
     mappedOptions: {
         chooseRefight: (state: GameState) => {
-            delete state.savedState.objectFlags['beetleRefight'];
-            delete state.savedState.objectFlags['golemRefight'];
-            delete state.savedState.objectFlags['warTempleRefight'];
-            delete state.savedState.objectFlags['rival2Refight'];
-            delete state.savedState.objectFlags['rushMode'];
+            if (state.savedState.objectFlags['rushMode']) {
+                delete state.savedState.objectFlags['rushMode'];
+                let finishTime = state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTimes[0];
+                if (state.savedState.savedHeroData.bossRushTimes[1] == -1 || finishTime < state.savedState.savedHeroData.bossRushTimes[1]) {
+                    state.savedState.savedHeroData.bossRushTimes[1] = finishTime;
+                    return 'NeW HIGH SCORE' //TESTING
+                }
+            }
             return `{choice:Where to?
                     |Beetle:refightVanara.beetle
                     |Golem:refightVanara.golem
@@ -31,6 +34,7 @@ dialogueHash.refightVanara = {
             rival2: (state: GameState) => travelToLocation(state, 'bossRefights', 'rival2Refight'),
             rush: (state: GameState) => (
                 state.savedState.objectFlags["rushMode"] = true,
+                state.savedState.savedHeroData.bossRushTimes[0] = state.hero.savedData.playTime,
                 travelToLocation(state, 'bossRefights', 'beetleRefight')
             ),
             no: '',

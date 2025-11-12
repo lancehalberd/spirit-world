@@ -182,6 +182,9 @@ interface SavedHeroData {
     playTime: number
     // How long the player had been playing when they "won" the game.
     winTime: number
+    //Array where 1st entry is used to keep track of time current boss rush is started, 
+    //and later entries are to keep the highest score for each type of boss rush.
+    bossRushTimes: number[]
 }
 
 type Computable<T> = T | (() => T);

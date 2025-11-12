@@ -259,6 +259,20 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
             size: 16,
         });
     }
+    if (state.savedState.objectFlags['rushMode']) {
+        let bossSeconds = (state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTimes[0]) / 1000;
+        const bossHours = (bossSeconds / 3600) | 0;
+        const bossMinutes = ((bossSeconds - bossHours * 3600) / 60) | 0;
+        bossSeconds = bossSeconds % 60;
+        const bossMinutesString = `${bossMinutes}`.padStart(2, '0');
+        const bossSecondsString = bossSeconds.toFixed(1).padStart(4, '0');
+        const bossTimeString = `${bossHours}:${bossMinutesString}:${bossSecondsString}`;
+        drawOutlinedText(context, bossTimeString, 2, CANVAS_HEIGHT - 9, {
+            textBaseline: 'middle',
+            textAlign: 'left',
+            size: 16,
+        });
+    }
     if (state.paused && shouldHideMenu(state)) {
         // renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }

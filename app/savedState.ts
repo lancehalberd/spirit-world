@@ -78,5 +78,6 @@ function getDefaultSavedHeroData(): SavedHeroData {
             arDevice: 0,
         },
         spawnLocation: SPAWN_LOCATION_FULL,
+        bossRushTimes: [0, -1],
     };
 }
