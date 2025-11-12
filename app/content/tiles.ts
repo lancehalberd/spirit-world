@@ -2,6 +2,9 @@ import {
     BITMAP_MIDDLE_DOWN_RIGHT, BITMAP_MIDDLE_UP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_2,
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
+    BITMAP_TOP,
+    BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
+    BITMAP_FULL,
     BITMAP_LEFT_2,
     BITMAP_RIGHT_2, BITMAP_TOP_2,
 } from 'app/content/bitMasks';
@@ -537,7 +540,12 @@ const shoreMask: TileSource = {
     source: requireFrame('gfx/tiles/blackmaskground.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor', isGround: false },
-        '3x0': { skipped: true }, '3x1': { skipped: true },
+        '3x0': { skipped: true },
+        '3x1': { skipped: true },
+        '0x3': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
+        '1x3': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
+        '1x4': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '0x4': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
     },
 };
 
@@ -546,6 +554,12 @@ const diagMask: TileSource = {
     source: requireFrame('gfx/tiles/diagMask.png', {x: 0, y: 48, w: 48, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor', isGround: false },
+        '0x0': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
+        '1x0': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
+        '2x0': { isMaskedMap: BITMAP_TOP, isGround: false },
+        '1x1': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '0x1': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
+        '2x1': { isMaskedMap: BITMAP_BOTTOM, isGround: false },
     },
 };
 
@@ -554,8 +568,18 @@ const shoreAnglesMask: TileSource = {
     source: requireFrame('gfx/tiles/blackmaskground.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor', isGround: false },
-        '0x0': { skipped: true }, '3x0': { skipped: true },
-        '0x3': { skipped: true }, '3x3': { skipped: true },
+        '0x0': { skipped: true },
+        '1x0': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
+        '2x0': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
+        '3x0': { skipped: true },
+        '0x1': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
+        '3x1': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
+        '0x2': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '3x2': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
+        '0x3': { skipped: true },
+        '1x3': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
+        '2x3': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
+        '3x3': { skipped: true },
     },
 };
 
@@ -776,11 +800,13 @@ const caveLedges: TileSource = {
         '10x11': { defaultLayer: 'floor2', ledges: { down: true }, solidMap: BITMAP_BOTTOM_2, isGround: false, low: true },
         '11x11': { defaultLayer: 'floor2', ledges: { down: true }, solidMap: BITMAP_BOTTOM_2, isGround: false, low: true },
         '12x11': {
-            defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: true, low: true,
+            defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: false, low: true,
+            isMaskedMap: BITMAP_FULL,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 192, y: 160, w: 16, h: 16}),
         },
         '13x11': {
-            defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: true, low: true,
+            defaultLayer: 'floor2', ledges: { up: true }, solidMap: BITMAP_TOP_2, isGround: false, low: true,
+            isMaskedMap: BITMAP_FULL,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 208, y: 160, w: 16, h: 16}),
         },
         '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright', isGround: false },
@@ -791,19 +817,27 @@ const caveLedges: TileSource = {
         '13x12': { defaultLayer: 'floor2'},
 
         '8x13': {
-            defaultLayer: 'floor2', diagonalLedge: 'upright', isGroundMap: BITMAP_BOTTOM_LEFT,
+            defaultLayer: 'floor2', diagonalLedge: 'upright',
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 208, w: 16, h: 16}),
         },
         '9x13': {
-            defaultLayer: 'floor2', diagonalLedge: 'upleft', isGroundMap: BITMAP_BOTTOM_RIGHT,
+            defaultLayer: 'floor2', diagonalLedge: 'upleft',
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 208, w: 16, h: 16}),
         },
         '10x13': {
-            defaultLayer: 'floor2', diagonalLedge: 'upright', isGroundMap: BITMAP_BOTTOM_RIGHT,
+            defaultLayer: 'floor2', diagonalLedge: 'upright',
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 208, w: 16, h: 16}),
         },
         '11x13': {
-            defaultLayer: 'floor2', diagonalLedge: 'upleft',isGroundMap: BITMAP_BOTTOM_LEFT,
+            defaultLayer: 'floor2', diagonalLedge: 'upleft',
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 208, w: 16, h: 16}),
         },
         '12x13': { defaultLayer: 'floor2', isGround: false},
@@ -818,21 +852,29 @@ const caveLedges: TileSource = {
 
         '8x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upright',
-            solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGroundMap: BITMAP_BOTTOM_LEFT,
+            solidMap: BITMAP_MIDDLE_DOWN_RIGHT,
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 192, w: 16, h: 16}),
         },
         '9x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upleft',
-            solidMap: BITMAP_MIDDLE_UP_RIGHT, isGroundMap: BITMAP_BOTTOM_RIGHT,
+            solidMap: BITMAP_MIDDLE_UP_RIGHT,
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 192, w: 16, h: 16})
         },
         '10x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upright',
-            solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGroundMap: BITMAP_BOTTOM_LEFT,
+            solidMap: BITMAP_MIDDLE_DOWN_RIGHT,
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 192, w: 16, h: 16}), },
         '11x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upleft',
-            solidMap: BITMAP_MIDDLE_UP_RIGHT, isGroundMap: BITMAP_BOTTOM_RIGHT,
+            solidMap: BITMAP_MIDDLE_UP_RIGHT,
+            isGround: false,
+            isMaskedMap: BITMAP_TOP_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 192, w: 16, h: 16}),
         },
         '12x15': { defaultLayer: 'floor2', isGround: false},

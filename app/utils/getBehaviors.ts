@@ -116,6 +116,16 @@ export function getTileBehaviors(
         const sx = (x | 0) % 16;
         tileBehavior.pitWall = !!(tileBehavior.pitWallMap[sy] >> (15 - sx) & 1);
     }
+    if (tileBehavior.water !== true && tileBehavior.water) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        tileBehavior.water = !!(tileBehavior.water[sy] >> (15 - sx) & 1);
+    }
+    if (tileBehavior.shallowWater !== true && tileBehavior.shallowWater) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        tileBehavior.shallowWater = !!(tileBehavior.shallowWater[sy] >> (15 - sx) & 1);
+    }
     return { tileBehavior, tx, ty };
 }
 

@@ -56,6 +56,10 @@ type MapIcon = 'door' | 'chest' | 'down' | 'up'
 
 type DefaultLayer = 'water' | 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
 
+// true = behavior applies to whole tile, false/undefined behavior applies to none of the tile.
+// Array value represents each pixel as a single bit.
+type PixelBehavior = boolean|Uint16Array;
+
 interface TileBehaviors {
     // 0-1
     brightness?: number
@@ -136,6 +140,12 @@ interface TileBehaviors {
     isGround?: boolean
     // The same as isGround but with pixel precision.
     isGroundMap?: Uint16Array
+    // By default, mask tiles are considered to hide most of the masked tile and therefore ignore the behavior
+    // of the masked tile and use the behaviors under that tile plus the behaviors of the mask itself.
+    // If this is set, the true pixels in this map will use the behavior from under the masked tile, and the
+    // false pixels will use the behavior from the masked tile itself. This roughly corresponds to the non
+    // transparent pixels in the mask itself which show the pixels from the masked tile.
+    isMaskedMap?: Uint16Array
     // If this is set on an object, it will override solid behavior behind it, but not ground behavior.
     isNotSolid?: boolean
     // If this is true, this tile is an overlay on top of the ground and should have cover effects applied
@@ -167,13 +177,13 @@ interface TileBehaviors {
     // Boolean flag indicating underTile should be rendered right before rendering this tile.
     // Useful if the tile over the underTile is intended to be transparent like for ice.
     showUnderTile?: boolean
-    shallowWater?: boolean
+    shallowWater?: PixelBehavior
     // Indicates the tile is frozen which causes it to have an ice overlay and slippery behavior.
     isFrozen?: boolean
     slippery?: boolean
     // To be used if we add pixel precision to ice floors for ice attacks.
     slipperyMap?: Uint16Array
-    water?: boolean
+    water?: PixelBehavior
     // How much damage this tile does if thrown.
     throwDamage?: number
     // Sets a standard transparency for this tile type when the editor is open.

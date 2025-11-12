@@ -146,11 +146,9 @@ Graphics to Implement:
 
 Current tasks:
     - Fix behavior masking
-        - Umasked pixels should inherit behavior from lower layer.
-        - Masked pixels should inherit behavior from masked layer.
-        - Behaviors of the mask itself (ledges in particular) should apply even if the masked layer is empty.
-        - verify new mask behavior works for water tiles in the forest river.
         - Spirit world should inherit mask behavior if it inherits the tile from that layer.
+        - Fix masked ledges has 1px line below the ledge where you get the masked behavior.
+            - For example, you can stand on the edge of a cliff when swimming in water below the cliff.
 
     - Fix money maze is using mixed wooden/jade tiles
 

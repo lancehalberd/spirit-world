@@ -74,7 +74,17 @@ function isPointOpen(
         }
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
-        return false;
+        if (tileBehavior.water === true) {
+            return false;
+        }
+        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+        if (movementProperties.needsFullTile) {
+            return false;
+        }
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        if (tileBehavior.water[sy] >> (15 - sx) & 1) {
+            return false;
+        }
     }
     if (tileBehavior?.pit && !movementProperties.canFall) {
         return false;
