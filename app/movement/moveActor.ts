@@ -10,11 +10,17 @@ import { canMoveRight } from 'app/movement/canMoveRight';
 import { canMoveUp } from 'app/movement/canMoveUp';
 
 export function canActorMove(state: GameState, actor: Actor, movementProperties: MovementProperties = {}): boolean {
+    const movementPropertiesWithDefaults = {
+        canFall: true,
+        canSwim: true,
+        canMoveInLava: true,
+        ...movementProperties,
+    };
     const hitbox = actor.getMovementHitbox?.()  || actor.getHitbox();
-    return canMoveUp(state, actor.area, hitbox, movementProperties) === true
-        || canMoveDown(state, actor.area, hitbox, movementProperties) === true
-        || canMoveLeft(state, actor.area, hitbox, movementProperties) === true
-        || canMoveRight(state, actor.area, hitbox, movementProperties) === true;
+    return canMoveUp(state, actor.area, hitbox, movementPropertiesWithDefaults) === true
+        || canMoveDown(state, actor.area, hitbox, movementPropertiesWithDefaults) === true
+        || canMoveLeft(state, actor.area, hitbox, movementPropertiesWithDefaults) === true
+        || canMoveRight(state, actor.area, hitbox, movementPropertiesWithDefaults) === true;
 }
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties = {}): {mx: number, my: number} {

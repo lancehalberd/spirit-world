@@ -162,18 +162,18 @@ export const spiritPlantBehavior: TileBehaviors = {
 export const baseCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, isGround: false};
 
 export const ceilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solid: true};
-export const bottomCeilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM};
-export const bottomLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
-export const bottomLeftShallowCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_24};
-export const bottomRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
-export const bottomRightShallowCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_24};
-export const topLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP};
-export const topRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
+export const bottomCeilingBehavior: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_BOTTOM};
+export const bottomLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_BOTTOM_LEFT_8};
+export const bottomLeftShallowCeiling: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_BOTTOM_LEFT_24};
+export const bottomRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_BOTTOM_RIGHT_8};
+export const bottomRightShallowCeiling: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_BOTTOM_RIGHT_24};
+export const topLeftCeiling: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_TOP_LEFT_8_STRIP};
+export const topRightCeiling: TileBehaviors = { ...baseCeilingBehavior, solid: BITMAP_TOP_RIGHT_8_STRIP};
 
-export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false};
-export const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false};
-export const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, isSouthernWall: true, isGround: false};
-export const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, isSouthernWall: true, isGround: false};
+export const topLeftWall: TileBehaviors = { defaultLayer: 'field', solid: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false};
+export const topRightWall: TileBehaviors = { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false};
+export const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT, isSouthernWall: true, isGround: false};
+export const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT, isSouthernWall: true, isGround: false};
 
 const [emptyCanvas] = createCanvasAndContext(16, 16);
 export const emptyTile: TileSource = {
@@ -275,11 +275,11 @@ export function renderBitmap(context: CanvasRenderingContext2D, tile: FullTile, 
     if (!editingState.isEditing) {
         return;
     }
-    if (tile.behaviors.solid) {
+    if (tile.behaviors.solid === true) {
         context.fillRect(x, y, 16, 16);
-    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM) {
+    } else if (tile.behaviors.solid === BITMAP_BOTTOM) {
         context.fillRect(x, y + 8, 16, 8);
-    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_LEFT_24) {
+    } else if (tile.behaviors.solid === BITMAP_BOTTOM_LEFT_24) {
         context.beginPath();
         context.moveTo(x, y);
         context.lineTo(x + 8, y);
@@ -287,7 +287,7 @@ export function renderBitmap(context: CanvasRenderingContext2D, tile: FullTile, 
         context.lineTo(x + 16, y + 16);
         context.lineTo(x, y + 16);
         context.fill();
-    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_RIGHT_24) {
+    } else if (tile.behaviors.solid === BITMAP_BOTTOM_RIGHT_24) {
         context.beginPath();
         context.moveTo(x, y + 8);
         context.lineTo(x + 8, y);
@@ -295,25 +295,25 @@ export function renderBitmap(context: CanvasRenderingContext2D, tile: FullTile, 
         context.lineTo(x + 16, y + 16);
         context.lineTo(x, y + 16);
         context.fill();
-    } else if (tile.behaviors.solidMap === BITMAP_TOP_LEFT) {
+    } else if (tile.behaviors.solid === BITMAP_TOP_LEFT) {
         context.beginPath();
         context.moveTo(x, y);
         context.lineTo(x + 16, y);
         context.lineTo(x, y + 16);
         context.fill();
-    } else if (tile.behaviors.solidMap === BITMAP_TOP_RIGHT) {
+    } else if (tile.behaviors.solid === BITMAP_TOP_RIGHT) {
         context.beginPath();
         context.moveTo(x, y);
         context.lineTo(x + 16, y);
         context.lineTo(x + 16, y + 16);
         context.fill();
-    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_LEFT) {
+    } else if (tile.behaviors.solid === BITMAP_BOTTOM_LEFT) {
         context.beginPath();
         context.moveTo(x, y);
         context.lineTo(x, y + 16);
         context.lineTo(x + 16, y + 16);
         context.fill();
-    } else if (tile.behaviors.solidMap === BITMAP_BOTTOM_RIGHT) {
+    } else if (tile.behaviors.solid === BITMAP_BOTTOM_RIGHT) {
         context.beginPath();
         context.moveTo(x + 16, y);
         context.lineTo(x + 16, y + 16);
@@ -326,13 +326,13 @@ export const emptyWallBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 32},
     behaviors: {
-        '0x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_TOP_LEFT },
-        '1x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_TOP_RIGHT },
-        '2x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_LEFT },
-        '3x0': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_RIGHT },
-        '0x1': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_LEFT_24 },
-        '1x1': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM },
-        '2x1': {...baseEmptyWallBehaviors, solidMap: BITMAP_BOTTOM_RIGHT_24 },
+        '0x0': {...baseEmptyWallBehaviors, solid: BITMAP_TOP_LEFT },
+        '1x0': {...baseEmptyWallBehaviors, solid: BITMAP_TOP_RIGHT },
+        '2x0': {...baseEmptyWallBehaviors, solid: BITMAP_BOTTOM_LEFT },
+        '3x0': {...baseEmptyWallBehaviors, solid: BITMAP_BOTTOM_RIGHT },
+        '0x1': {...baseEmptyWallBehaviors, solid: BITMAP_BOTTOM_LEFT_24 },
+        '1x1': {...baseEmptyWallBehaviors, solid: BITMAP_BOTTOM },
+        '2x1': {...baseEmptyWallBehaviors, solid: BITMAP_BOTTOM_RIGHT_24 },
         '3x1': {...baseEmptyWallBehaviors, solid: true },
     },
     paletteTargets: [{key: 'behaviors', x: 0, y: 3}],
@@ -342,10 +342,10 @@ export const bouncyWallBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 80, h: 16},
     behaviors: {
-        '0x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_TOP_LEFT },
-        '1x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_TOP_RIGHT },
-        '2x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_BOTTOM_LEFT },
-        '3x0': {...baseBouncyWallBehaviors, solidMap: BITMAP_BOTTOM_RIGHT },
+        '0x0': {...baseBouncyWallBehaviors, solid: BITMAP_TOP_LEFT },
+        '1x0': {...baseBouncyWallBehaviors, solid: BITMAP_TOP_RIGHT },
+        '2x0': {...baseBouncyWallBehaviors, solid: BITMAP_BOTTOM_LEFT },
+        '3x0': {...baseBouncyWallBehaviors, solid: BITMAP_BOTTOM_RIGHT },
         '4x0': {...baseBouncyWallBehaviors, solid: true },
     },
 };

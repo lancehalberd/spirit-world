@@ -88,7 +88,7 @@ export class Teleporter implements ObjectInstance {
         }
         const heroAndClones = new Set([state.hero, ...(state.hero.clones || [])]);
         const {tileBehavior} = getTileBehaviorsAndObstacles(state, this.area, {x: this.x + 8, y: this.y + 8}, heroAndClones);
-        return tileBehavior.solid;
+        return tileBehavior.solid === true;
     }
 
     isHeroInPortal(state: GameState) {

@@ -21,8 +21,8 @@ import {
     BITMAP_RIGHT_6_CUT
 } from 'app/content/bitMasks';
 
-const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false, linkedOffset: 159};
-const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false, linkedOffset: 159};
+const topLeftWall: TileBehaviors = { defaultLayer: 'field', solid: BITMAP_TOP_LEFT, isSouthernWall: true, isGround: false, linkedOffset: 159};
+const topRightWall: TileBehaviors = { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT, isSouthernWall: true, isGround: false, linkedOffset: 159};
 
 import { requireFrame } from 'app/utils/packedImages';
 import { southernWallBehavior } from './constants';
@@ -45,9 +45,9 @@ const jadeCityLightRailings: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 144, y: 160, w: 112, h: 16}),
     behaviors: {
         'all': {...southernWallBehavior, linkedOffset: 159},
-        '0x0':{ defaultLayer: 'field', solidMap: BITMAP_BOTTOM_13, linkedOffset: 159},
-        '1x0':{ defaultLayer: 'field2', solidMap: BITMAP_VERT_MIDDLE_6, linkedOffset: 159},
-        '2x0':{ defaultLayer: 'field', solidMap: BITMAP_VERT_MIDDLE_6, linkedOffset: 159}
+        '0x0':{ defaultLayer: 'field', solid: BITMAP_BOTTOM_13, linkedOffset: 159},
+        '1x0':{ defaultLayer: 'field2', solid: BITMAP_VERT_MIDDLE_6, linkedOffset: 159},
+        '2x0':{ defaultLayer: 'field', solid: BITMAP_VERT_MIDDLE_6, linkedOffset: 159}
 
     }
 }
@@ -91,27 +91,27 @@ const jadeCityLightSlopedWalls: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 112, w: 128, h: 112}),
     behaviors: {
         'all': {...southernWallBehavior, linkedOffset: 159},
-        '0x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
-        '0x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
+        '0x0': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
+        '0x1': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '0x4': topRightWall,
-        '1x1': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
-        '1x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
+        '1x1': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
+        '1x2': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '1x5': topRightWall,
-        '2x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
-        '2x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
+        '2x2': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
+        '2x3': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '2x6': topRightWall,
-        '3x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
-        '3x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
+        '3x2': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
+        '3x3': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '3x6': topLeftWall,
-        '4x1': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
-        '4x2': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
+        '4x1': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
+        '4x2': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '4x5': topLeftWall,
-        '5x0': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
-        '5x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
+        '5x0': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
+        '5x1': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '5x4': topLeftWall,
-        '6x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
+        '6x3': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '6x6': topRightWall,
-        '7x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
+        '7x3': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '7x6': topLeftWall
     }, tileCoordinates: [
         //[0, 0],                                 [5, 0], 
@@ -129,38 +129,38 @@ const jadeCityLightTowers: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 0, w: 128, h: 112}),
     behaviors: {
         'all': {...southernWallBehavior, linkedOffset: 159},
-        '0x1': { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_LEFT_LEDGE, linkedOffset: 159 },
-        '0x2': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159 },
-        '0x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
+        '0x1': { defaultLayer: 'field', solid: BITMAP_DIAGONAL_TOP_LEFT_LEDGE, linkedOffset: 159 },
+        '0x2': { defaultLayer: 'field', solid: BITMAP_LEFT_6, linkedOffset: 159 },
+        '0x3': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '0x6': topRightWall,
-        '1x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_6, linkedOffset: 159 },
-        '1x3': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_10, linkedOffset: 159 },
-        '2x1': { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_RIGHT_LEDGE, linkedOffset: 159 },
-        '2x2': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159 },
-        '2x3': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
+        '1x1': { defaultLayer: 'field', solid: BITMAP_TOP_6, linkedOffset: 159 },
+        '1x3': { defaultLayer: 'field', solid: BITMAP_BOTTOM_10, linkedOffset: 159 },
+        '2x1': { defaultLayer: 'field', solid: BITMAP_DIAGONAL_TOP_RIGHT_LEDGE, linkedOffset: 159 },
+        '2x2': { defaultLayer: 'field', solid: BITMAP_RIGHT_6, linkedOffset: 159 },
+        '2x3': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '2x6': topLeftWall,
         '3x0': { defaultLayer: 'field', solid: false, isSouthernWall: false, linkedOffset: 159 },
-        '3x1': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159 },
-        '3x2': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159 },
-        '3x3': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159 },
-        '3x4': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6, linkedOffset: 159 },
-        '3x5': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6_CUT, linkedOffset: 159 },
-        '4x0': { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_LEFT_LEDGE, linkedOffset: 159 },
-        '4x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT_6, linkedOffset: 159 },
-        '4x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
+        '3x1': { defaultLayer: 'field', solid: BITMAP_RIGHT_6, linkedOffset: 159 },
+        '3x2': { defaultLayer: 'field', solid: BITMAP_RIGHT_6, linkedOffset: 159 },
+        '3x3': { defaultLayer: 'field', solid: BITMAP_RIGHT_6, linkedOffset: 159 },
+        '3x4': { defaultLayer: 'field', solid: BITMAP_RIGHT_6, linkedOffset: 159 },
+        '3x5': { defaultLayer: 'field', solid: BITMAP_LEFT_6_CUT, linkedOffset: 159 },
+        '4x0': { defaultLayer: 'field', solid: BITMAP_DIAGONAL_TOP_LEFT_LEDGE, linkedOffset: 159 },
+        '4x1': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_6, linkedOffset: 159 },
+        '4x2': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
         '4x6': topRightWall,
-        '5x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_6, linkedOffset: 159 },
-        '5x3': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_10, linkedOffset: 159 },
-        '6x0': { defaultLayer: 'field', solidMap: BITMAP_DIAGONAL_TOP_RIGHT_LEDGE, linkedOffset: 159 },
-        '6x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT_CORN_6, linkedOffset: 159 },
-        '6x2': { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
+        '5x0': { defaultLayer: 'field', solid: BITMAP_TOP_6, linkedOffset: 159 },
+        '5x3': { defaultLayer: 'field', solid: BITMAP_BOTTOM_10, linkedOffset: 159 },
+        '6x0': { defaultLayer: 'field', solid: BITMAP_DIAGONAL_TOP_RIGHT_LEDGE, linkedOffset: 159 },
+        '6x1': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_CORN_6, linkedOffset: 159 },
+        '6x2': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
         '6x6': topLeftWall,
         '7x0': { defaultLayer: 'field', solid: false, isSouthernWall: false, linkedOffset: 159 },
-        '7x1': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159 },
-        '7x2': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159 },
-        '7x3': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159 },
-        '7x4': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6, linkedOffset: 159 },
-        '7x5': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6_CUT, linkedOffset: 159 }
+        '7x1': { defaultLayer: 'field', solid: BITMAP_LEFT_6, linkedOffset: 159 },
+        '7x2': { defaultLayer: 'field', solid: BITMAP_LEFT_6, linkedOffset: 159 },
+        '7x3': { defaultLayer: 'field', solid: BITMAP_LEFT_6, linkedOffset: 159 },
+        '7x4': { defaultLayer: 'field', solid: BITMAP_LEFT_6, linkedOffset: 159 },
+        '7x5': { defaultLayer: 'field', solid: BITMAP_RIGHT_6_CUT, linkedOffset: 159 }
     }, tileCoordinates: [
                                 [3, 0], [4, 0],         [6, 0], [7, 0],        // [5, 0], 
         [0, 1], [1, 1], [2, 1], [3, 1], [4, 1],         [6, 1], [7, 1], 
@@ -180,24 +180,24 @@ const jadeCityLightEdges: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 32, w: 80, h: 64}),
     behaviors: {
         'all': { defaultLayer, linkedOffset: 159 },
-        '0x0': { defaultLayer, solidMap: BITMAP_LEFT_6, ledges: {left: true}, linkedOffset: 159},
-        '1x0': { defaultLayer, solidMap: BITMAP_LEFT_6, ledges: {left: true}, linkedOffset: 159},
-        '3x0': { defaultLayer, solidMap: BITMAP_RIGHT_6, ledges: {left: true}, linkedOffset: 159},
-        '4x0': { defaultLayer, solidMap: BITMAP_RIGHT_6, ledges: {left: true}, linkedOffset: 159},
-        '0x1': { defaultLayer, solidMap: orBitMasks(BITMAP_TOP_6, BITMAP_LEFT_6), ledges: { left: true, up: true }, linkedOffset: 159 },
-        '1x1': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
-        '2x1': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
-        '3x1': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
-        '4x1': { defaultLayer, solidMap: orBitMasks(BITMAP_TOP_6, BITMAP_RIGHT_6), ledges: { right: true, up: true }, linkedOffset: 159 },
-        '0x2': { defaultLayer, solidMap: BITMAP_LEFT_6, ledges: { left: true }, linkedOffset: 159 },
-        '1x2': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
-        '3x2': { defaultLayer, solidMap: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
-        '4x2': { defaultLayer, solidMap: BITMAP_RIGHT_6, ledges: { right: true }, linkedOffset: 159 },
-        '0x3': { defaultLayer, solidMap: orBitMasks(BITMAP_BOTTOM_10, BITMAP_LEFT_6), ledges: { left: true, down: true }, linkedOffset: 159 },
-        '1x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 }, //if not approaching from the bottom, consider versions that use foreground2
-        '2x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 }, //so PC can be covered by them.
-        '3x3': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
-        '4x3': { defaultLayer, solidMap: orBitMasks(BITMAP_BOTTOM_10, BITMAP_RIGHT_6), ledges: { right: true, down: true }, linkedOffset: 159 },
+        '0x0': { defaultLayer, solid: BITMAP_LEFT_6, ledges: {left: true}, linkedOffset: 159},
+        '1x0': { defaultLayer, solid: BITMAP_LEFT_6, ledges: {left: true}, linkedOffset: 159},
+        '3x0': { defaultLayer, solid: BITMAP_RIGHT_6, ledges: {left: true}, linkedOffset: 159},
+        '4x0': { defaultLayer, solid: BITMAP_RIGHT_6, ledges: {left: true}, linkedOffset: 159},
+        '0x1': { defaultLayer, solid: orBitMasks(BITMAP_TOP_6, BITMAP_LEFT_6), ledges: { left: true, up: true }, linkedOffset: 159 },
+        '1x1': { defaultLayer, solid: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
+        '2x1': { defaultLayer, solid: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
+        '3x1': { defaultLayer, solid: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
+        '4x1': { defaultLayer, solid: orBitMasks(BITMAP_TOP_6, BITMAP_RIGHT_6), ledges: { right: true, up: true }, linkedOffset: 159 },
+        '0x2': { defaultLayer, solid: BITMAP_LEFT_6, ledges: { left: true }, linkedOffset: 159 },
+        '1x2': { defaultLayer, solid: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
+        '3x2': { defaultLayer, solid: BITMAP_TOP_6, ledges: { up: true }, linkedOffset: 159 },
+        '4x2': { defaultLayer, solid: BITMAP_RIGHT_6, ledges: { right: true }, linkedOffset: 159 },
+        '0x3': { defaultLayer, solid: orBitMasks(BITMAP_BOTTOM_10, BITMAP_LEFT_6), ledges: { left: true, down: true }, linkedOffset: 159 },
+        '1x3': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 }, //if not approaching from the bottom, consider versions that use foreground2
+        '2x3': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 }, //so PC can be covered by them.
+        '3x3': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
+        '4x3': { defaultLayer, solid: orBitMasks(BITMAP_BOTTOM_10, BITMAP_RIGHT_6), ledges: { right: true, down: true }, linkedOffset: 159 },
     }, tileCoordinates: [
         [0, 0], [1, 0],         [3, 0], [4, 0], 
         [0, 1], [1, 1], [2, 1], [3, 1], [4, 1], 
@@ -211,10 +211,10 @@ const jadeCityLightExtraEdges: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 144, w: 48, h: 16}),
     behaviors: {
         'all': {linkedOffset: 159},
-        '0x0': { defaultLayer, solidMap: BITMAP_TOP_3, linkedOffset: 159 },
-        '1x0': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
-        '3x0': { defaultLayer, solidMap: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
-        '4x0': { defaultLayer, solidMap: BITMAP_TOP_3, linkedOffset: 159  },
+        '0x0': { defaultLayer, solid: BITMAP_TOP_3, linkedOffset: 159 },
+        '1x0': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
+        '3x0': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
+        '4x0': { defaultLayer, solid: BITMAP_TOP_3, linkedOffset: 159  },
     }, tileCoordinates: [[0,0], [1,0],     [3,0], [4,0]]
 }
 
@@ -223,14 +223,14 @@ const jadeCityLightStairs: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 192, y: 64, w: 64, h: 96}),
     behaviors: {
         'all' : {defaultLayer, linkedOffset: 159},
-        '0x0':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '0x1':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '0x3':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '0x4':{ defaultLayer, solidMap: BITMAP_RIGHT_6, linkedOffset: 159},
-        '3x0':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
-        '3x1':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
-        '3x3':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
-        '3x4':{ defaultLayer, solidMap: BITMAP_LEFT_6, linkedOffset: 159},
+        '0x0':{ defaultLayer, solid: BITMAP_RIGHT_6, linkedOffset: 159},
+        '0x1':{ defaultLayer, solid: BITMAP_RIGHT_6, linkedOffset: 159},
+        '0x3':{ defaultLayer, solid: BITMAP_RIGHT_6, linkedOffset: 159},
+        '0x4':{ defaultLayer, solid: BITMAP_RIGHT_6, linkedOffset: 159},
+        '3x0':{ defaultLayer, solid: BITMAP_LEFT_6, linkedOffset: 159},
+        '3x1':{ defaultLayer, solid: BITMAP_LEFT_6, linkedOffset: 159},
+        '3x3':{ defaultLayer, solid: BITMAP_LEFT_6, linkedOffset: 159},
+        '3x4':{ defaultLayer, solid: BITMAP_LEFT_6, linkedOffset: 159},
     }, tileCoordinates: [
         [0, 0],                 [3, 0],
         [0, 1],                 [3, 1],

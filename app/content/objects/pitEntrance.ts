@@ -127,7 +127,7 @@ export class PitEntrance implements ObjectInstance {
             return false;
         }
         const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
-        return tileBehavior.solid || tileBehavior.covered || tileBehavior.isBrittleGround;
+        return tileBehavior.solid === true || tileBehavior.covered || tileBehavior.isBrittleGround;
     }
     update(state: GameState) {
         if (this.status !== 'normal') {

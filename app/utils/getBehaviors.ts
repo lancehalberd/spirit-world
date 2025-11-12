@@ -93,11 +93,10 @@ export function getTileBehaviors(
         tileBehavior.outOfBounds = !nextArea && !state.nextAreaSection;
     }
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-    if (!tileBehavior.solid && tileBehavior.solidMap) {
+    if (tileBehavior.solid !== true && tileBehavior.solid) {
         const sy = (y | 0) % 16;
         const sx = (x | 0) % 16;
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
+        tileBehavior.solid = !!(tileBehavior.solid[sy] >> (15 - sx) & 1);
     }
     if (!tileBehavior.isLava && tileBehavior.isLavaMap) {
         const sy = (y | 0) % 16;
@@ -157,9 +156,8 @@ export function getTileBehaviorsAndObstacles(
     const sy = (y | 0) % 16;
     const sx = (x | 0) % 16;
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-    if (!tileBehavior.solid && tileBehavior.solidMap) {
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
+    if (tileBehavior.solid !== true && tileBehavior.solid) {
+        tileBehavior.solid = !!(tileBehavior.solid[sy] >> (15 - sx) & 1);
     }
     for (const object of area.objects) {
         if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch'

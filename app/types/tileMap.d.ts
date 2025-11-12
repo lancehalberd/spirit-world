@@ -164,9 +164,7 @@ interface TileBehaviors {
     // Assign this to skip tiles in source images.
     skipped?: boolean
     // Blocks movement
-    solid?: boolean
-    // The same as solid but with pixel precision.
-    solidMap?: Uint16Array
+    solid?: PixelBehavior
     // Can be picked up with glove
     pickupWeight?: number
     // Tile to display if this tile is removed (picked up, cut, blown up).

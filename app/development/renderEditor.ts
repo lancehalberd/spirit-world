@@ -293,7 +293,7 @@ function drawBrushLayerPreview(
             if (!tile && parentLayer) {
                 const parentTile = allTiles[parentLayer.grid?.tiles[ty]?.[tx]];
                 tile = mapTile(parentTile);
-                maskTile = allTiles[parentLayer.grid?.mask[ty]?.[tx]];
+                maskTile = allTiles[parentLayer.grid?.mask?.[ty]?.[tx]];
             }
 
 

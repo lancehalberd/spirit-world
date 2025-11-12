@@ -257,12 +257,12 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                     paletteContext.save();
                         paletteContext.fillStyle = 'red';
                         paletteContext.globalAlpha *= editingState.showWallsOpacity;
-                        if (tile.behaviors?.solid) {
+                        if (tile.behaviors?.solid === true) {
                             paletteContext.fillRect(target.x, target.y, target.w, target.h);
-                        } else if (tile.behaviors?.solidMap) {
+                        } else if (tile.behaviors?.solid) {
                             for (let sy = 0; sy < 16; sy++) {
                                 for (let sx = 0; sx < 16; sx++) {
-                                    if (tile.behaviors.solidMap[sy] >> (15 - sx) & 1) {
+                                    if (tile.behaviors.solid[sy] >> (15 - sx) & 1) {
                                         paletteContext.fillRect(target.x + sx, target.y +sy, 1, 1);
                                     }
                                 }

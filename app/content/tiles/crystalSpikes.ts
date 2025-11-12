@@ -37,10 +37,10 @@ export const shortWallCrystalSpikes: TileSource = {
     source: requireFrame('gfx/tiles/crystalSpikes.png', {x: 0, y: 0, w: 48, h: 48}),
     behaviors: {
         'all': {...baseShortWallSpikeBehavior, solid: true},
-        '0x0': {...baseShortWallSpikeBehavior, solidMap: BITMAP_BOTTOM_RIGHT},
-        '2x0': {...baseShortWallSpikeBehavior, solidMap: BITMAP_BOTTOM_LEFT},
-        '0x2': {...baseShortWallSpikeBehavior, solidMap: BITMAP_TOP_RIGHT},
-        '2x2': {...baseShortWallSpikeBehavior, solidMap: BITMAP_TOP_LEFT},
+        '0x0': {...baseShortWallSpikeBehavior, solid: BITMAP_BOTTOM_RIGHT},
+        '2x0': {...baseShortWallSpikeBehavior, solid: BITMAP_BOTTOM_LEFT},
+        '0x2': {...baseShortWallSpikeBehavior, solid: BITMAP_TOP_RIGHT},
+        '2x2': {...baseShortWallSpikeBehavior, solid: BITMAP_TOP_LEFT},
     },
     paletteTargets: [{key: 'spirit', x, y}],
 };

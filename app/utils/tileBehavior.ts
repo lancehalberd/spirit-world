@@ -64,13 +64,8 @@ function applyBehaviorMask(baseBehavior: PixelBehavior, mask: Uint16Array): Pixe
 // in the behaviors and are exposed through the isMaskedMap.
 export function getMaskedBehaviors(behaviors: TileBehaviors, isMaskedMap: Uint16Array): TileBehaviors {
     const maskedBehaviors: TileBehaviors = {};
-    if (behaviors.solid || behaviors.solidMap) {
-        const result = applyBehaviorMask(behaviors.solid ?? behaviors.solidMap, isMaskedMap);
-        if (result === true) {
-            maskedBehaviors.solid = true;
-        } else if (result !== false) {
-            maskedBehaviors.solidMap = result;
-        }
+    if (behaviors.solid) {
+        maskedBehaviors.solid = applyBehaviorMask(behaviors.solid, isMaskedMap);
     }
     // isGround defaults behavior is true when undefined so it is important to set it to false to
     // prevent the mask from covering behaviors it shouldn't.
@@ -289,8 +284,8 @@ export function applyTileToBehaviorGrid(
     // Any background tile rendered on top of lava should remove the lava behavior from it.
     // This requires explicitly setting isGround = false on backgrounds tiles like shadows
     const removeLava = (!isForeground && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false && !behaviors.isGroundMap);
-    const removeWater = (!isForeground && !behaviors.water && behaviors.isGround !== false && !behaviors.isGroundMap);
-    const removeShallowWater = (!isForeground && !behaviors.shallowWater && behaviors.isGround !== false && !behaviors.isGroundMap);
+    //const removeWater = (!isForeground && !behaviors.water && behaviors.isGround !== false && !behaviors.isGroundMap);
+    //const removeShallowWater = (!isForeground && !behaviors.shallowWater && behaviors.isGround !== false && !behaviors.isGroundMap);
     // Any background tile rendered on top of a pit/shallow water/water/slipper tile removes that special behavior.
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
@@ -321,7 +316,7 @@ export function applyTileToBehaviorGrid(
     const brightness = Math.max(resultingBehaviors.brightness || 0, behaviors.brightness || 0);
     resultingBehaviors = {...resultingBehaviors, ...behaviors, lightRadius, brightness};
 
-    const newSolidMap = mergeBitmaps(
+    /*const newSolidMap = mergeBitmaps(
         baseBehaviors.solid,
         baseBehaviors.solidMap,
         behaviors.solid,
@@ -338,14 +333,26 @@ export function applyTileToBehaviorGrid(
     } else {
         delete resultingBehaviors.solid;
         resultingBehaviors.solidMap = newSolidMap;
+    }*/
+    const isGround = behaviors.isGround === true || (behaviors.isGround === undefined && !behaviors.isGroundMap);
+    resultingBehaviors.solid = mergePixelBehaviors(baseBehaviors.solid, behaviors.solid, isForeground ? [] : [
+        behaviors.water,
+        behaviors.shallowWater,
+        behaviors.cloudGround,
+        isGround, behaviors.isGroundMap,
+        behaviors.isLava, behaviors.isLavaMap,
+        behaviors.pit, behaviors.pitMap,
+    ]);
+    if (!resultingBehaviors.solid) {
+        delete resultingBehaviors.solid;
     }
     const newIsLavaMap = mergeBitmaps(
         baseBehaviors.isLava,
         baseBehaviors.isLavaMap,
         behaviors.isLava,
         behaviors.isLavaMap,
-        isForeground ? [removeLava] : [removeLava, behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
-        [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
+        isForeground ? [] : [removeLava, isGround, behaviors.pit, behaviors.cloudGround],
+        [behaviors.isGroundMap, behaviors.pitMap],
     );
     if (newIsLavaMap === BITMAP_FULL) {
         resultingBehaviors.isLava = true;
@@ -362,8 +369,8 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.pitMap,
         behaviors.pit,
         behaviors.pitMap,
-        isForeground ? [removePit] : [removePit, behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
-        [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
+        isForeground ? [removePit] : [removePit, isGround, behaviors.isLava, behaviors.cloudGround],
+        [behaviors.isGroundMap, behaviors.isLavaMap],
     );
     if (newPitMap === BITMAP_FULL) {
         resultingBehaviors.pit = true;
@@ -376,20 +383,26 @@ export function applyTileToBehaviorGrid(
         resultingBehaviors.pitMap = newPitMap;
     }
 
-    resultingBehaviors.water = mergePixelBehaviors(baseBehaviors.water, behaviors.water, [
-        removeWater,
+    resultingBehaviors.water = mergePixelBehaviors(baseBehaviors.water, behaviors.water, isForeground ? [] : [
+        behaviors.cloudGround,
         behaviors.shallowWater,
-        behaviors.isGround, behaviors.isGroundMap,
+        isGround, behaviors.isGroundMap,
         behaviors.isLava, behaviors.isLavaMap,
         behaviors.pit, behaviors.pitMap,
     ]);
-    resultingBehaviors.shallowWater = mergePixelBehaviors(baseBehaviors.shallowWater, behaviors.shallowWater, [
-        removeShallowWater,
+    if (!resultingBehaviors.water) {
+        delete resultingBehaviors.water;
+    }
+    resultingBehaviors.shallowWater = mergePixelBehaviors(baseBehaviors.shallowWater, behaviors.shallowWater, isForeground ? [] : [
+        behaviors.cloudGround,
         behaviors.water,
-        behaviors.isGround, behaviors.isGroundMap,
+        isGround, behaviors.isGroundMap,
         behaviors.isLava, behaviors.isLavaMap,
         behaviors.pit, behaviors.pitMap,
     ]);
+    if (!resultingBehaviors.shallowWater) {
+        delete resultingBehaviors.shallowWater;
+    }
 
     behaviorGrid[y][x] = resultingBehaviors;
 
