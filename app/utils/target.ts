@@ -219,7 +219,7 @@ export function getLineOfSightTargetAndDirection(
             for (let y = minY; true; y += 4) {
                 const ty = Math.floor(y / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
-                if ((tileBehavior.solid || tileBehavior.solidMap) && !(tileBehavior.pickupWeight <= movementProperties.crushingPower)) {
+                if (tileBehavior.solid && !(tileBehavior.pickupWeight <= movementProperties.crushingPower)) {
                     if (!canPassOverWall(tileBehavior, movementProperties)) {
                         blocked = true;
                         break;
@@ -270,7 +270,7 @@ export function getLineOfSightTargetAndDirection(
             for (let x = minX; true; x += 4) {
                 const tx = Math.floor(x / 16);
                 const tileBehavior = {...(source.area?.behaviorGrid[ty]?.[tx] || {})};
-                if ((tileBehavior.solid || tileBehavior.solidMap) && !(tileBehavior.pickupWeight <= movementProperties.crushingPower)) {
+                if (tileBehavior.solid && !(tileBehavior.pickupWeight <= movementProperties.crushingPower)) {
                     if (!canPassOverWall(tileBehavior, movementProperties)) {
                         blocked = true;
                         break;

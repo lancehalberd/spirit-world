@@ -54,17 +54,7 @@ export function isMovementBlocked(
                     blockingPitObject = null;
                     continue;
                 }
-            } /*else if (object.getHitbox && behaviors?.solidMap) {
-                // Currently we don't support solidMap on objects. They can just apply this
-                // to the tile map if necessary, otherwise, maybe we should add something like
-                // getPixelBehavior(x: number, y: number): TileBehaviors to objects.
-                const hitbox = object.getHitbox(state);
-                let sx = (x - hitbox.x) | 0;
-                let sy = (y - hitbox.y) | 0;
-                if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
-                    return false;
-                }
-            }*/
+            }
 
             // Low ceiling objects block all movement if the actors z value is too high
             if (behaviors?.lowCeiling && !canMoveUnderLowCeilings) {
@@ -140,8 +130,7 @@ export function isMovementBlocked(
         if (actor
             && (!movementProperties.canPassMediumWalls || !(tileBehaviors?.low || tileBehaviors?.midHeight))
             && (
-                tileBehaviors?.solid
-                || (tileBehaviors?.solidMap && tileBehaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1)
+                tileBehaviors?.solid === true || (tileBehaviors?.solid && tileBehaviors.solid[y % 16] >> (15 - (x % 16)) & 1)
             )
             && (
                 tileBehaviors?.touchHit
@@ -254,7 +243,6 @@ export function isMovementBlocked(
         if (movementProperties.needsFullTile) {
             return {};
         }
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         if (tileBehaviors.pitMap[y % 16] >> (15 - (x % 16)) & 1) {
             return {};
         }
@@ -280,7 +268,6 @@ export function isMovementBlocked(
         if (movementProperties.needsFullTile) {
             return {};
         }
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         if (tileBehaviors.isLavaMap[y % 16] >> (15 - (x % 16)) & 1) {
             return {};
         }
@@ -299,19 +286,18 @@ export function isMovementBlocked(
     if (ignoreSolidPixels) {
         return false;
     }
-    if (tileBehaviors?.solid) {
+    if (tileBehaviors?.solid === true) {
         if (tileBehaviors.pickupWeight <= movementProperties.crushingPower) {
             return false;
         }
         return {};
     }
-    if (tileBehaviors?.solidMap) {
+    if (tileBehaviors?.solid) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return {};
         }
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        if (tileBehaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1) {
+        if (tileBehaviors.solid[y % 16] >> (15 - (x % 16)) & 1) {
             return {};
         }
     }

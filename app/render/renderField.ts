@@ -12,9 +12,9 @@ import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, update
 import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
 import { getBackgroundFrame, getBackgroundFrameIndex } from 'app/utils/area';
-import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
+import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
 import {allImagesLoaded} from 'app/utils/images';
-import { getFieldInstanceAndParts } from 'app/utils/objects';
+import {getFieldInstanceAndParts} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
 
 // This is the max size of the spirit sight circle.
@@ -738,12 +738,12 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
                 }
                 for (let x = 0; x < area.w; x++) {
                     const behaviors = area.behaviorGrid[y][x];
-                    if (behaviors?.solid) {
+                    if (behaviors?.solid === true) {
                         context.fillRect(16 * x, 16 * y, 16, 16);
-                    } else if (behaviors?.solidMap) {
+                    } else if (behaviors?.solid) {
                         for (let sy = 0; sy < 16; sy++) {
                             for (let sx = 0; sx < 16; sx++) {
-                                if (behaviors.solidMap[sy] >> (15 - sx) & 1) {
+                                if (behaviors.solid[sy] >> (15 - sx) & 1) {
                                     context.fillRect(16 * x + sx, 16 * y +sy, 1, 1);
                                 }
                             }

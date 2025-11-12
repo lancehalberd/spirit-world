@@ -59,22 +59,30 @@ function isPointOpen(
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
     const sy = (y | 0) % 16;
     const sx = (x | 0) % 16;
-    if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
+    if (tileBehavior?.solid === true && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
         return false;
     } else if (tileBehavior?.lowCeiling && z >= 3) {
         return false;
-    } else if (tileBehavior?.solidMap && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
+    } else if (tileBehavior?.solid !== true && tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return false;
         }
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
+        if (tileBehavior.solid[sy] >> (15 - sx) & 1) {
             return false;
         }
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
-        return false;
+        if (tileBehavior.water === true) {
+            return false;
+        }
+        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+        if (movementProperties.needsFullTile) {
+            return false;
+        }
+        if (tileBehavior.water[sy] >> (15 - sx) & 1) {
+            return false;
+        }
     }
     if (tileBehavior?.pit && !movementProperties.canFall) {
         return false;
@@ -86,8 +94,7 @@ function isPointOpen(
         if (movementProperties.excludedObjects?.has(object)) {
             continue;
         }
-        // Object behaviors do not support solidMap, they can just return different values
-        // for specific x/y coordinates if necessary.
+        // Object behaviors can return pixel precision behaviors using the x/y parameters.
         const behaviors = getObjectBehaviors(state, object, x, y);
         if (object.getHitbox && behaviors?.solid) {
             return false;
@@ -442,7 +449,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             if (behavior?.cuttable > hit.damage) {
                 combinedResult.blocked = true;
             }
-        } else if (!combinedResult.stopped && hit.hitbox && behavior?.solidMap && (!behavior?.low || hit.cutsGround)) {
+        } else if (!combinedResult.stopped && hit.hitbox && behavior?.solid !== true && behavior?.solid && (!behavior?.low || hit.cutsGround)) {
             const checkPoints = [
                 {x: hit.hitbox.x, y: hit.hitbox.y}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y},
                 {x: hit.hitbox.x, y: hit.hitbox.y + hit.hitbox.h}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y + hit.hitbox.h},
@@ -452,7 +459,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 if (sx < 0 || sx > 15 || sy < 0 || sy >= 15) {
                     continue;
                 }
-                if (behavior.solidMap[sy] >> (15 - sx) & 1) {
+                if (behavior.solid[sy] >> (15 - sx) & 1) {
                     combinedResult.hit = true;
                     combinedResult.pierced = false;
                     combinedResult.stopped = true;
@@ -470,7 +477,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     const tileIndex = layer.tiles[target.y][target.x].index;
                     layer.tiles[target.y][target.x] = allTiles[tileIndex + offset];
                 }
-                if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid || behaviors?.solidMap
+                if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid
                     || behaviors?.pit || behaviors?.pitMap || behaviors?.water || behaviors?.shallowWater
                     || behaviors?.isLava || behaviors?.isLavaMap
                 ) {
@@ -494,7 +501,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     }
                     layer.tiles[target.y][target.x] = allTiles[tileIndex];
                 }
-                if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid || behaviors?.solidMap
+                if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid
                     || behaviors?.pit || behaviors?.pitMap || behaviors?.water || behaviors?.shallowWater
                     || behaviors?.isLava || behaviors?.isLavaMap
                 ) {
@@ -547,7 +554,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
                 foundBlockingLayer = false;
                 if (!behaviors?.isOverlay
-                    && !behaviors?.solid && !behaviors?.solidMap
+                    && !behaviors?.solid
                     && !behaviors?.pit && !behaviors?.pitMap
                     // Experimental: keep ledges drawn over ice for clarity and consistency with tiles
                     // that combine ledges+walls (usually SW/SE ledges).
@@ -778,7 +785,7 @@ export function getLayerToCover(area: AreaInstance, tx: number, ty: number): Are
     // For now solid tiles and pits cannot be covered
     if (behavior?.solid || behavior?.pit || behavior?.pitMap || behavior?.covered
         || behavior?.isLava || behavior?.isLavaMap
-        || behavior?.blocksStaff || behavior?.solidMap
+        || behavior?.blocksStaff
         || behavior?.diagonalLedge
     ) {
         return;

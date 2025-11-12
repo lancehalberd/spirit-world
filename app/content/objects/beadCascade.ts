@@ -172,7 +172,7 @@ export class BeadGrate implements ObjectInstance {
             return false;
         }
         const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
-        return tileBehavior.solid || tileBehavior.covered;
+        return tileBehavior.solid === true || tileBehavior.covered;
     }
     getHitbox(state: GameState) {
         return this;

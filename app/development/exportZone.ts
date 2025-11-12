@@ -1,6 +1,6 @@
-import { zones } from 'app/content/zones';
-import { showToast } from 'app/development/toast';
-import { itemSeed, enemySeed, entranceSeed, worldSeed } from 'app/gameConstants';
+import {zones} from 'app/content/zones/zoneHash';
+import {showToast} from 'app/development/toast';
+import {itemSeed, enemySeed, entranceSeed, worldSeed} from 'app/gameConstants';
 
 
 export function exportZoneToClipboard(zone: Zone): void {
@@ -82,24 +82,23 @@ export function serializeZone(zone: Zone) {
                                 lines.push('            grid: {');
                                 lines.push(`                w: ${layer.grid.w},`);
                                 lines.push(`                h: ${layer.grid.h},`);
+                                // Always include the tiles array.
                                 lines.push('                tiles: [');
                                 for (let y = 0; y < layer.grid.h; y++) {
                                     const row = layer.grid.tiles[y];
                                     lines.push(`                    [${row.slice(0, layer.grid.w).map(v => v || 0).join(',')}],`);
                                 }
                                 lines.push('                ],');
-                                lines.push('            },');
-                            }
-                            if (layer.mask && layer.mask.tiles.some(row => row?.some(element => element))) {
-                                lines.push('            mask: {');
-                                lines.push(`                w: ${layer.mask.w},`);
-                                lines.push(`                h: ${layer.mask.h},`);
-                                lines.push('                tiles: [');
-                                for (let y = 0; y < layer.grid.h; y++) {
-                                    const row = layer.mask.tiles[y];
-                                    lines.push(`                    [${row?.slice(0, layer.grid.w).map(v => v || 0).join(',') || ''}],`);
+                                // Add the mask array if it contains at least one truthy value.
+                                if (layer.grid.mask?.some(row => row?.some(element => element))) {
+                                    lines.push('                mask: [');
+                                    for (let y = 0; y < layer.grid.h; y++) {
+                                        const row = layer.grid.mask[y];
+                                        lines.push(`                    [${row?.slice(0, layer.grid.w).map(v => v || '').join(',') || ''}],`);
+                                    }
+                                    lines.push('                ],');
                                 }
-                                lines.push('                ],');
+
                                 lines.push('            },');
                             }
                             lines.push('        },');
@@ -229,7 +228,7 @@ function getBehaviors(object: AreaBehaviorLogic): string[] {
 }
 // This check is used to prevent exporting empty logic.
 function isLogicValid(logic?: LogicDefinition): boolean {
-    return !!logic && (!!logic.logicKey || !!(logic.hasCustomLogic && logic.customLogic));
+    return !!logic && (!!logic.logicKey || !!logic.isTrue || !!(logic.hasCustomLogic && logic.customLogic));
 }
 window['serializeZone'] = serializeZone;
 

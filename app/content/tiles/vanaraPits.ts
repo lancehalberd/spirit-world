@@ -43,8 +43,8 @@ export const vanaraPitAngledWallsIn: TileSource = {
     w: 16, h: 16,
     source: requireFrame(vanaraPitsImage, {x: 96, y: 128, w: 32, h: 32}),
     behaviors: {
-        '0x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true },
-        '1x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true },
+        '0x0': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT, isSouthernWall: true },
         '0x1': { defaultLayer: 'floor2', pit: true },
         '1x1': { defaultLayer: 'floor2', pit: true },
     },
@@ -53,8 +53,8 @@ export const vanaraPitAngledWallsOut: TileSource = {
     w: 16, h: 16,
     source: requireFrame(vanaraPitsImage, {x: 48, y: 128, w: 32, h: 32}),
     behaviors: {
-        '0x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true },
-        '1x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true },
+        '0x0': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT, isSouthernWall: true },
         '0x1': { defaultLayer: 'floor2', pit: true },
         '1x1': { defaultLayer: 'floor2', pit: true },
     },

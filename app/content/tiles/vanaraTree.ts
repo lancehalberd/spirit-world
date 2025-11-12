@@ -36,8 +36,8 @@ const vanaraCeilingTrim: TileSource = {
     source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
     behaviors: {
         'all': {defaultLayer: 'foreground2'},
-        '1x6': {defaultLayer: 'foreground2', solidMap: BITMAP_BOTTOM_LEFT_8},
-        '3x6': {defaultLayer: 'foreground2', solidMap: BITMAP_BOTTOM_RIGHT_8},
+        '1x6': {defaultLayer: 'foreground2', solid: BITMAP_BOTTOM_LEFT_8},
+        '3x6': {defaultLayer: 'foreground2', solid: BITMAP_BOTTOM_RIGHT_8},
     },
     tileCoordinates: [
                [1,3], [2,3],[3, 3],

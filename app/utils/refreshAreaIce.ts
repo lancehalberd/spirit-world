@@ -61,7 +61,7 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
                 }
                 foundBlockingLayer = false;
                 if (behaviors?.isFrozen || (!behaviors?.isOverlay
-                    && !behaviors?.solid && !behaviors?.solidMap
+                    && !behaviors?.solid
                     && !behaviors?.pit && !behaviors?.pitMap
                     // Experimental: keep ledges drawn over ice for clarity and consistency with tiles
                     // that combine ledges+walls (usually SW/SE ledges).

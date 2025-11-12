@@ -62,8 +62,8 @@ export const crystalCavePitAngledWallsIn: TileSource = {
     behaviors: {
         '0x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
         '1x0': { defaultLayer: 'field', solid: true, isSouthernWall: true },
-        '0x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true },
-        '1x1': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true },
+        '0x1': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT, isSouthernWall: true },
+        '1x1': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT, isSouthernWall: true },
         '0x2': { defaultLayer: 'floor2', pit: true },
         '1x2': { defaultLayer: 'floor2', pit: true },
     },
@@ -72,8 +72,8 @@ export const crystalCavePitAngledWallsOut: TileSource = {
     w: 16, h: 16,
     source: requireFrame(crystalCavePitsImage, {x: 48, y: 128, w: 32, h: 32}),
     behaviors: {
-        '0x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true },
-        '1x0': { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true },
+        '0x0': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT, isSouthernWall: true },
+        '1x0': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT, isSouthernWall: true },
         '0x1': { defaultLayer: 'floor2', pit: true },
         '1x1': { defaultLayer: 'floor2', pit: true },
     },

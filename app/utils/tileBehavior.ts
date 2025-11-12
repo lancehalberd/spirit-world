@@ -11,16 +11,16 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             continue;
         }
         const tile = layer.tiles[y]?.[x];
-        if (!tile) {
-            continue;
-        }
+        const maskTile = layer.maskTiles?.[y]?.[x];
         const isForeground = getDrawPriority(layer.definition) === 'foreground';
-
         // The mask tile behavior is used instead of the behavior masked by it as the mask typically covers
         // most of the tile.
-        const maskTile = layer.maskTiles?.[y]?.[x];
         if (maskTile) {
             if (maskTile?.behaviors) {
+                if (tile?.index !== 1 && tile?.behaviors && maskTile?.behaviors.isMaskedMap) {
+                    const maskedBehavior = getMaskedBehaviors(tile.behaviors, maskTile.behaviors.isMaskedMap);
+                    applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, maskedBehavior, isForeground);
+                }
                 // For drawing frozen tiles correctly, it is important that the isFrozen behavior is kept even when masked.
                 //const behaviors = (tile.index !== 1 ? tile.behaviors : undefined);
                 //applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, {...maskTile.behaviors, isFrozen: behaviors?.isFrozen}, isForeground);
@@ -29,6 +29,10 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             }
             continue;
         }
+        if (!tile) {
+            continue;
+        }
+
         // tile 1 is used a lot but has no meaningful behavior so skip it.
         const behaviors = (tile.index !== 1 ? tile.behaviors : undefined);
         // The behavior grid combines behaviors of all layers, with higher layers
@@ -37,6 +41,75 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, behaviors, isForeground);
         }
     }
+}
+
+
+function applyBehaviorMask(baseBehavior: PixelBehavior, mask: Uint16Array): PixelBehavior {
+    // If the mask is empty, no behaviors come through.
+    if (mask === BITMAP_EMPTY || baseBehavior === BITMAP_EMPTY || !baseBehavior) {
+        return false;
+    }
+    // If the mask is full, we use the exact behaviors from the base tile.
+    if (mask === BITMAP_FULL) {
+        return baseBehavior;
+    }
+    // If the tile is full, we use the map from the mask.
+    if (baseBehavior === true || baseBehavior === BITMAP_FULL) {
+        return mask;
+    }
+    return maskBitmap(baseBehavior, mask);
+}
+
+// For any behaviors that support pixel precision, this will return those behaviors where they exist
+// in the behaviors and are exposed through the isMaskedMap.
+export function getMaskedBehaviors(behaviors: TileBehaviors, isMaskedMap: Uint16Array): TileBehaviors {
+    const maskedBehaviors: TileBehaviors = {};
+    if (behaviors.solid) {
+        maskedBehaviors.solid = applyBehaviorMask(behaviors.solid, isMaskedMap);
+    }
+    // isGround defaults behavior is true when undefined so it is important to set it to false to
+    // prevent the mask from covering behaviors it shouldn't.
+    if (behaviors.isGround !== false || behaviors.isGroundMap) {
+        const result = applyBehaviorMask(behaviors.isGround ?? behaviors.isGroundMap, isMaskedMap);
+        if (result === true || result === false) {
+            maskedBehaviors.isGround = result;
+        } else {
+            maskedBehaviors.isGroundMap = result;
+        }
+    } else {
+        maskedBehaviors.isGround = false;
+    }
+    if (behaviors.isLava || behaviors.isLavaMap) {
+        const result = applyBehaviorMask(behaviors.isLava ?? behaviors.isLavaMap, isMaskedMap);
+        if (result === true) {
+            maskedBehaviors.isLava = true;
+        } else if (result !== false) {
+            maskedBehaviors.isLavaMap = result;
+        }
+    }
+    if (behaviors.pit || behaviors.pitMap) {
+        const result = applyBehaviorMask(behaviors.pit ?? behaviors.pitMap, isMaskedMap);
+        if (result === true) {
+            maskedBehaviors.pit = true;
+        } else if (result !== false) {
+            maskedBehaviors.pitMap = result;
+        }
+    }
+    if (behaviors.pitWall || behaviors.pitWallMap) {
+        const result = applyBehaviorMask(behaviors.pitWall ?? behaviors.pitWallMap, isMaskedMap);
+        if (result === true) {
+            maskedBehaviors.pitWall = true;
+        } else if (result !== false) {
+            maskedBehaviors.pitWallMap = result;
+        }
+    }
+    if (behaviors.water) {
+        maskedBehaviors.water = applyBehaviorMask(behaviors.water, isMaskedMap);
+    }
+    if (behaviors.shallowWater) {
+        maskedBehaviors.shallowWater = applyBehaviorMask(behaviors.shallowWater, isMaskedMap);
+    }
+    return maskedBehaviors;
 }
 
 export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayer): void {
@@ -51,16 +124,20 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
         }
         for (let x = 0; x < tiles.length; x++) {
             const tile = tiles[y]?.[x];
-            if (!tile) {
-                continue;
-            }
             // The mask tile behavior is used instead of the behavior masked by it as the mask typically covers
             // most of the tile.
             const maskTile = layer.maskTiles?.[y]?.[x];
             if (maskTile) {
                 if (maskTile?.behaviors) {
+                    if (tile && tile.index !== 1 && tile.behaviors && maskTile.behaviors.isMaskedMap) {
+                        const maskedBehavior = getMaskedBehaviors(tile.behaviors, maskTile.behaviors.isMaskedMap);
+                        applyTileToBehaviorGrid(behaviorGrid, {x, y}, maskedBehavior, isForeground);
+                    }
                     applyTileToBehaviorGrid(behaviorGrid, {x, y}, maskTile.behaviors, isForeground);
                 }
+                continue;
+            }
+            if (!tile) {
                 continue;
             }
             // tile 1 is used a lot but has no meaningful behavior so skip it.
@@ -139,6 +216,37 @@ function mergeBitmaps(baseFlag: boolean, baseMap: Uint16Array, newFlag: boolean,
     return resultMap;
 }
 
+function mergePixelBehaviors(baseBehavior: PixelBehavior, newBehavior: PixelBehavior|undefined, coveringBehaviors: (PixelBehavior|undefined)[]): PixelBehavior {
+    // Case where the new behavior completely obscures the base behavior, or the base behavior is empty.
+    if (newBehavior === true || newBehavior === false || baseBehavior === false || baseBehavior === undefined) {
+        return newBehavior;
+    }
+    let resultMap = (baseBehavior === true) ? BITMAP_FULL : (baseBehavior || BITMAP_EMPTY);
+    // Apply any behaviors that cover up this behavior, for example, pit tiles would cover up lava or water underneath them.
+    if (resultMap !== BITMAP_EMPTY) {
+        for (const coveringBehavior of coveringBehaviors) {
+            if (coveringBehavior === undefined || coveringBehavior === false || coveringBehavior === BITMAP_EMPTY) {
+                continue;
+            }
+            if (coveringBehavior === true || coveringBehavior === BITMAP_FULL) {
+                resultMap = BITMAP_EMPTY;
+                break;
+            }
+            resultMap = subtractBitmap(resultMap, coveringBehavior);
+        }
+    }
+    if (resultMap === BITMAP_FULL) {
+        return true;
+    }
+    if (resultMap === BITMAP_EMPTY) {
+        return false;
+    }
+    if (newBehavior) {
+        resultMap = addBitmaps(resultMap, newBehavior);
+    }
+    return resultMap;
+}
+
 export function applyTileToBehaviorGrid(
     behaviorGrid: TileBehaviors[][],
     {x, y}: Tile,
@@ -176,6 +284,8 @@ export function applyTileToBehaviorGrid(
     // Any background tile rendered on top of lava should remove the lava behavior from it.
     // This requires explicitly setting isGround = false on backgrounds tiles like shadows
     const removeLava = (!isForeground && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false && !behaviors.isGroundMap);
+    //const removeWater = (!isForeground && !behaviors.water && behaviors.isGround !== false && !behaviors.isGroundMap);
+    //const removeShallowWater = (!isForeground && !behaviors.shallowWater && behaviors.isGround !== false && !behaviors.isGroundMap);
     // Any background tile rendered on top of a pit/shallow water/water/slipper tile removes that special behavior.
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
@@ -206,7 +316,7 @@ export function applyTileToBehaviorGrid(
     const brightness = Math.max(resultingBehaviors.brightness || 0, behaviors.brightness || 0);
     resultingBehaviors = {...resultingBehaviors, ...behaviors, lightRadius, brightness};
 
-    const newSolidMap = mergeBitmaps(
+    /*const newSolidMap = mergeBitmaps(
         baseBehaviors.solid,
         baseBehaviors.solidMap,
         behaviors.solid,
@@ -223,14 +333,26 @@ export function applyTileToBehaviorGrid(
     } else {
         delete resultingBehaviors.solid;
         resultingBehaviors.solidMap = newSolidMap;
+    }*/
+    const isGround = behaviors.isGround === true || (behaviors.isGround === undefined && !behaviors.isGroundMap);
+    resultingBehaviors.solid = mergePixelBehaviors(baseBehaviors.solid, behaviors.solid, isForeground ? [] : [
+        behaviors.water,
+        behaviors.shallowWater,
+        behaviors.cloudGround,
+        isGround, behaviors.isGroundMap,
+        behaviors.isLava, behaviors.isLavaMap,
+        behaviors.pit, behaviors.pitMap,
+    ]);
+    if (!resultingBehaviors.solid) {
+        delete resultingBehaviors.solid;
     }
     const newIsLavaMap = mergeBitmaps(
         baseBehaviors.isLava,
         baseBehaviors.isLavaMap,
         behaviors.isLava,
         behaviors.isLavaMap,
-        isForeground ? [removeLava] : [removeLava, behaviors.isGround, behaviors.solid, behaviors.pit, behaviors.cloudGround],
-        [behaviors.isGroundMap, behaviors.solidMap, behaviors.pitMap],
+        isForeground ? [] : [removeLava, isGround, behaviors.pit, behaviors.cloudGround],
+        [behaviors.isGroundMap, behaviors.pitMap],
     );
     if (newIsLavaMap === BITMAP_FULL) {
         resultingBehaviors.isLava = true;
@@ -247,8 +369,8 @@ export function applyTileToBehaviorGrid(
         baseBehaviors.pitMap,
         behaviors.pit,
         behaviors.pitMap,
-        isForeground ? [removePit] : [removePit, behaviors.isGround, behaviors.solid, behaviors.isLava, behaviors.cloudGround],
-        [behaviors.isGroundMap, behaviors.solidMap, behaviors.isLavaMap],
+        isForeground ? [removePit] : [removePit, isGround, behaviors.isLava, behaviors.cloudGround],
+        [behaviors.isGroundMap, behaviors.isLavaMap],
     );
     if (newPitMap === BITMAP_FULL) {
         resultingBehaviors.pit = true;
@@ -259,6 +381,27 @@ export function applyTileToBehaviorGrid(
     } else {
         delete resultingBehaviors.pit;
         resultingBehaviors.pitMap = newPitMap;
+    }
+
+    resultingBehaviors.water = mergePixelBehaviors(baseBehaviors.water, behaviors.water, isForeground ? [] : [
+        behaviors.cloudGround,
+        behaviors.shallowWater,
+        isGround, behaviors.isGroundMap,
+        behaviors.isLava, behaviors.isLavaMap,
+        behaviors.pit, behaviors.pitMap,
+    ]);
+    if (!resultingBehaviors.water) {
+        delete resultingBehaviors.water;
+    }
+    resultingBehaviors.shallowWater = mergePixelBehaviors(baseBehaviors.shallowWater, behaviors.shallowWater, isForeground ? [] : [
+        behaviors.cloudGround,
+        behaviors.water,
+        isGround, behaviors.isGroundMap,
+        behaviors.isLava, behaviors.isLavaMap,
+        behaviors.pit, behaviors.pitMap,
+    ]);
+    if (!resultingBehaviors.shallowWater) {
+        delete resultingBehaviors.shallowWater;
     }
 
     behaviorGrid[y][x] = resultingBehaviors;
@@ -291,6 +434,13 @@ function subtractBitmap(A: Uint16Array, B: Uint16Array): Uint16Array {
     const result = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
     for (let row = 0; row < 16; row++) {
         result[row] = A[row] & ~B[row];
+    }
+    return result;
+}
+function maskBitmap(A: Uint16Array, mask: Uint16Array): Uint16Array {
+    const result = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
+    for (let row = 0; row < 16; row++) {
+        result[row] = A[row] & mask[row];
     }
     return result;
 }

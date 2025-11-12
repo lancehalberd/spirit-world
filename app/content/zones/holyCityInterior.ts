@@ -371,7 +371,7 @@ const f0_1x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "foodHouse", x: 96, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityFoodHouse", d: "down", linked: true},
         {status: "normal", id: "clothesHouse", x: 352, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityClothesHouse", d: "down", linked: true},
-        {status: "normal", id: "holyCityInterior:0:1x0-npc-1", x: 424, y: 416, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "You're practically dressed in rags! I guess I shouldn't expect any better of a dirty Vanara!", dialogueIndex: 181},
+        {status: "normal", id: "holyCityInterior:0:1x0-npc-1", x: 424, y: 416, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "You're practically dressed in rags! I guess I shouldn't expect any better of a dirty Vanara!", dialogueIndex: 202},
         {status: "normal", id: "holyCityInterior:0:1x0-npc-2", x: 256, y: 128, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "All this sawdust is making me cough! I really should sweep soon.", dialogueIndex: 105},
         {status: "normal", id: "meanPerson", x: 168, y: 412, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!", dialogueKey: "meanPerson"},
         {status: "normal", id: "holyCityInterior:0:1x0-npc-0", x: 60, y: 376, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!", dialogueIndex: 107},

@@ -104,14 +104,14 @@ export const tests: {[key: string]: () => void} = {
     // There have been a few changes that caused the floor behavior in the fire sanctum to not count as safe ground.
     testCloudOnWallBehavior() {
         const state = getState();
-        const fireSanctum = getAreaInstanceFromLocation(state, {
+        const sky = getAreaInstanceFromLocation(state, {
             zoneKey: 'sky',
             floor: 0,
             areaGridCoords: {x: 0, y: 0},
             isSpiritWorld: false,
             x: 0, y: 0, d: 'down',
         });
-        const cloudOnWallBehavior = getCompositeBehaviors(state, fireSanctum, {x: 327, y: 139});
+        const cloudOnWallBehavior = getCompositeBehaviors(state, sky, {x: 327, y: 139});
         if (!cloudOnWallBehavior.cloudGround || cloudOnWallBehavior.solid) {
             console.error('Unexpected behaviors for cloud over wall: ', cloudOnWallBehavior);
         }

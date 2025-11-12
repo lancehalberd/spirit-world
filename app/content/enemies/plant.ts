@@ -71,6 +71,7 @@ const basePlantDefinition: Partial<EnemyDefinition<any>> = {
     alwaysReset: true,
     speed: 0.7,
     aggroRadius: 112,
+    tileBehaviors: {solid: true, touchHit: {damage: 1, source: null}},
     // Before changing this, consider the plant is used in Cocoon as an enemy
     // that will be defeated by rolling over it with a rollingBall twice and we
     // don't want to make this too tedious.
