@@ -32,7 +32,7 @@ import {mapTile} from 'app/utils/mapTile';
 import {isMouseDown, /*isMouseOverElement*/} from 'app/utils/mouse';
 import {resetTileBehavior} from 'app/utils/tileBehavior';
 import SRandom from 'app/utils/SRandom';
-import {chunkGenerators} from 'app/generator/tileChunkGenerators';
+import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
 export * from 'app/development/packSprites';
 
 

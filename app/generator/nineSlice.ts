@@ -16,6 +16,9 @@ export function applyNineSlice(random: SRandom, slice: NineSlice, r: Rect, area:
         // Top
         for (let y = 0; y < r.h; y++) {
             const tY = r.y + y;
+            if (tY < 0) {
+                continue;
+            }
             if (tY >= areaLayer.grid.h) {
                 break;
             }
@@ -29,6 +32,9 @@ export function applyNineSlice(random: SRandom, slice: NineSlice, r: Rect, area:
                     : (y - slice.r.y) % slice.r.h + slice.r.y;
             for (let x = 0; x < r.w; x++) {
                 const tX = r.x + x;
+                if (tX < 0) {
+                    continue;
+                }
                 if (tX >= areaLayer.grid.w) {
                     break;
                 }

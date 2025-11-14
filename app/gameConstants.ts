@@ -106,7 +106,8 @@ export const allLootTypes: LootType[] = [
     'spikeBoots', 'flyingBoots', 'forgeBoots',
 ];
 
-export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'behaviors'];
+// 'foreground3' is rarely required for certain combinations of trees.
+export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];
 
 export const overworldKeys = ['overworld', 'sky', 'underwater'];
 

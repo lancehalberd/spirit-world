@@ -1,10 +1,10 @@
-import { orLogic, hasTeleportation, hasSomersault } from 'app/content/logic';
-import { addDoor } from 'app/generator/doors';
-import { applyNineSlice, slices } from 'app/generator/nineSlice';
-import { fillSlotFromContext } from 'app/generator/slots/basic';
-import { chunkGenerators } from 'app/generator/tileChunkGenerators';
-import { pad } from 'app/utils/index';
-import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
+import {orLogic, hasTeleportation, hasSomersault} from 'app/content/logic';
+import {addDoor} from 'app/generator/doors';
+import {applyNineSlice, slices} from 'app/generator/nineSlice';
+import {fillSlotFromContext} from 'app/generator/slots/basic';
+import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
+import {pad} from 'app/utils/index';
+import {getOrAddLayer, inheritAllLayerTilesFromParent} from 'app/utils/layers';
 
 
 export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, alternateArea: AreaDefinition, section: Rect, rules: RoomGenerationRules): RoomSkeleton {

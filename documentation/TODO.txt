@@ -147,6 +147,13 @@ Graphics to Implement:
 Current tasks:
     - Fix behavior masking
         - Spirit world should inherit mask behavior if it inherits the tile from that layer.
+        - Cannot place a mask when selecting a specific layer. Repro: Select floor 2, try to place cave ledge mask.
+
+    - Check if player can grab mostly empty tiles after changes to how solid pixel behaviors are stored.
+
+    - Add pixel precision to water tiles:
+        - water edges
+        - shallow -> deep water transitions
 
     - Fix money maze is using mixed wooden/jade tiles
 

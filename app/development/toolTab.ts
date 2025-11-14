@@ -1,16 +1,15 @@
-import { sourcePalettes } from 'app/content/tiles/palettes';
-import { paletteHash } from 'app/content/tiles/paletteHash';
-import { editingState } from 'app/development/editingState';
+import {sourcePalettes} from 'app/content/tiles/palettes';
+import {paletteHash} from 'app/content/tiles/paletteHash';
+import {editingState} from 'app/development/editingState';
 import {getObjectTypeProperties, isObjectSelected, unselectObject} from 'app/development/objectEditor';
 import {getVariantTypeSelector, isVariantSelected} from 'app/development/variantEditor';
 import {
     renderPropertyRows, updateBrushCanvas,
 } from 'app/development/propertyPanel';
-import { TabContainer } from 'app/development/tabContainer';
-import { getState } from 'app/state';
-
-import { readImageFromFile } from 'app/utils/index';
-import { chunkGenerators } from 'app/generator/tileChunkGenerators';
+import {TabContainer} from 'app/development/tabContainer';
+import {getState} from 'app/state';
+import {readImageFromFile} from 'app/utils/index';
+import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
 
 
 const toolTabContainer = new TabContainer<EditorToolType>('brush', [
