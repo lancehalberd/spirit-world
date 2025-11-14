@@ -1051,7 +1051,7 @@ function isHeroOnVeryTallWall(this: void, state: GameState, hero: Hero): boolean
     const excludedObjects = new Set([hero]);
     for (const point of points) {
         const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
-        if (tileBehavior.isVeryTall && tileBehavior.solid) {
+        if (tileBehavior.isVeryTall && tileBehavior.solid === true) {
             return true
         }
     }

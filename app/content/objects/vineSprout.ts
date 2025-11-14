@@ -54,7 +54,7 @@ function growVine(this: void, area: AreaInstance, tx: number, ty: number): void 
             break;
         }
         const targetBehavior = area?.behaviorGrid[y]?.[tx];
-        if (!targetBehavior?.solid) {
+        if (targetBehavior?.solid !== true) {
             setTile(area, targetLayer, tx, y, topVineTile);
             break;
         }
@@ -144,7 +144,7 @@ export class VineSprout implements ObjectInstance {
                     return;
                 }
                 const targetBehavior = this.area?.behaviorGrid[y]?.[tx];
-                if (!targetBehavior?.solid) {
+                if (targetBehavior?.solid !== true) {
                     remainingTime = remainingTime - topGrowAnimation.duration;
                     this.growingAnimationA = topGrowAnimation;
                     this.growingAnimationB = null;
