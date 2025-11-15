@@ -68,6 +68,7 @@ export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefiniti
             ...layer.grid,
             // The matrix of tiles
             tiles: [],
+            mask: [],
         },
     };
 }
@@ -439,6 +440,13 @@ export function createAreaInstance(state: GameState, zone: Zone, definition: Are
                         const tile = mapTile(parentTile);
                         layer.tiles[y][x] = tile;
                         layer.originalTiles[y][x] = tile;
+                        const parentMaskTile = allTiles[definition.parentDefinition.layers[definitionIndex].grid.mask?.[y]?.[x]];
+                        const maskTile = mapTile(parentMaskTile);
+                        if (maskTile) {
+                            layer.maskTiles = layer.maskTiles || [];
+                            layer.maskTiles[y] = layer.maskTiles[y] || [];
+                            layer.maskTiles[y][x] = maskTile;
+                        }
                     }
                 }
 

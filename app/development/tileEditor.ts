@@ -278,8 +278,16 @@ function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: 
         return;
     }
     if (layerDefinition.grid.mask?.[ty]?.[tx]) {
-        layerDefinition.grid.mask[ty][tx] = null;
-        layer.maskTiles[ty][tx] = null;
+        delete layerDefinition.grid.mask[ty][tx];
+        delete layer.maskTiles[ty][tx];
+        // Apply deletion to the Spirit World instance mask tile if appropriate, otherwise it will incorrectly keep
+        // showing the mask tile inherited from the material world mask that was just deleted.
+        if (!definition.isSpiritWorld) {
+            const alternateLayer = area.alternateArea?.layers?.find(alternateLayer => alternateLayer.key === layer.key);
+            if (!alternateLayer.definition.grid.mask?.[ty]?.[tx] && alternateLayer.maskTiles?.[ty]?.[tx]) {
+                delete alternateLayer.maskTiles[ty][tx];
+            }
+        }
     }
     if (!definition.isSpiritWorld) {
         // In the physical world we just replace tiles with the empty tile.
@@ -302,12 +310,20 @@ function updateBrushSelection(x: number, y: number): void {
     const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
     const rectangle = {x: L, y: T, w: R - L + 1, h: B - T + 1};
     editingState.brush = {};
+    // If command is held down, we will copy the mapped tiles in the spirit world instead of copying the empty tiles.
+    const isCommandDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
     if (editingState.selectedLayerKey) {
         const layerDefinition = state.areaInstance.definition.layers.find(layer => layer.key === editingState.selectedLayerKey);
-        editingState.brush.none = getTileGridFromLayer(layerDefinition, rectangle);
+        const parentLayerDefinition = (isCommandDown && state.areaInstance.definition.isSpiritWorld)
+            ? state.areaInstance.alternateArea.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)
+            : undefined;
+        editingState.brush.none = getTileGridFromLayer(layerDefinition, rectangle, parentLayerDefinition);
     } else {
         for (const layerDefinition of state.areaInstance.definition.layers) {
-            editingState.brush[layerDefinition.key] = getTileGridFromLayer(layerDefinition, rectangle);
+            const parentLayerDefinition = (isCommandDown && state.areaInstance.definition.isSpiritWorld)
+                ? state.areaInstance.alternateArea.definition.layers.find(layer => layer.key === layerDefinition.key)
+                : undefined;
+            editingState.brush[layerDefinition.key] = getTileGridFromLayer(layerDefinition, rectangle, parentLayerDefinition);
         }
     }
     updateBrushCanvas(editingState.brush);
@@ -411,8 +427,10 @@ function drawBrush(targetX: number, targetY: number): void {
                 const maskTile = brushGrid.mask?.[y]?.[x];
                 if (maskTile) {
                     paintSingleTile(area, layer, parentLayer, column, row, maskTile);
-                } else {
-                    // Clear any existing masks that might be defined
+                } else if (brushGrid !== editingState.brush.none) {
+                    // If this isn't the default grid, that means we are copying multiple layers
+                    // and should apply the exact mask behavior from the brush instead of preserving
+                    // existing masks.
                     if (layer.definition.grid.mask?.[row]?.[column]) {
                         delete layer.definition.grid.mask[row][column];
                     }
@@ -445,7 +463,7 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
         layer.maskTiles = layer.maskTiles || [];
         layer.maskTiles[y] = layer.maskTiles[y] || [];
         layer.maskTiles[y][x] = fullTile;
-        // console.log(layer.key, layer.tiles[y][x], layer.maskTiles[y][x]);
+        //console.log(layer.key, layer.tiles[y][x], layer.maskTiles[y][x]);
     } else {
         layer.definition.grid.tiles[y] = layer.definition.grid.tiles[y] || [];
         layer.definition.grid.tiles[y][x] = tile;
@@ -486,14 +504,21 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, parentDefinition: Area
     if (!area.definition.isSpiritWorld || !layerDefinition) {
         return;
     }
-    if (layerDefinition.grid.tiles[y][x]) {
-        return;
+    if (!layerDefinition.grid.tiles[y][x]) {
+        const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
+        paintSingleTile(area, areaLayer, parentDefinition, x, y, 0);
     }
-    const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
-    paintSingleTile(area, areaLayer, parentDefinition, x, y, 0);
+    if (tile?.behaviors?.maskFrame && !layerDefinition.grid.mask?.[y]?.[x]) {
+        const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
+        const parentTile = allTiles[parentDefinition.grid?.mask?.[y]?.[x]];
+        areaLayer.maskTiles[y] = areaLayer.maskTiles[y] || [];
+        areaLayer.maskTiles[y][x] = mapTile(parentTile);
+        area.checkToRedrawTiles = true;
+        resetTileBehavior(area, {x, y});
+    }
 }
 
-function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: Rect): TileGridDefinition {
+function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: Rect, parentLayerDefinition?: AreaLayerDefinition): TileGridDefinition {
     const gridDefinition: TileGridDefinition = {
         tiles: [],
         mask: [],
@@ -504,8 +529,19 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: R
         gridDefinition.tiles[y] = [];
         gridDefinition.mask[y] = [];
         for (let x = 0; x < gridDefinition.w; x++) {
-            gridDefinition.tiles[y][x] = layerDefinition.grid.tiles[rectangle.y + y][rectangle.x + x];
-            gridDefinition.mask[y][x] = layerDefinition.grid.mask?.[rectangle.y + y]?.[rectangle.x + x];
+            const tile = layerDefinition.grid.tiles[rectangle.y + y][rectangle.x + x];
+            if (tile) {
+                gridDefinition.tiles[y][x] = tile;
+            } else if (parentLayerDefinition) {
+                const parentTile = parentLayerDefinition.grid?.tiles?.[rectangle.y + y]?.[rectangle.x + x];
+                gridDefinition.tiles[y][x] = mapTile(allTiles[parentTile])?.index;
+            }
+            const maskTile = layerDefinition.grid.mask?.[rectangle.y + y]?.[rectangle.x + x];
+            if (maskTile) {
+                gridDefinition.mask[y][x] = maskTile;
+            } else if (parentLayerDefinition) {
+                gridDefinition.mask[y][x] = mapTile(allTiles[parentLayerDefinition.grid?.mask?.[rectangle.y + y]?.[rectangle.x + x]])?.index;
+            }
         }
     }
     // Sometimes we like to export the currently selected brush, and it is nicer if we don't include empty masks on it.
@@ -567,7 +603,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     const state = getState();
     const commandIsDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
-    if (editingState.tool === 'brush' && event.which === KEY.A && commandIsDown) {
+    if ((editingState.tool === 'brush' || editingState.tool === 'tileChunk') && event.which === KEY.A && commandIsDown) {
         selectAllTiles();
         event.preventDefault();
         return;

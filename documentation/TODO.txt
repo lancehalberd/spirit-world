@@ -153,12 +153,9 @@ Current tasks:
         - Adjust all save statue positions
         - Fix Guardian dialog after getting teleportation
             - Make each dreamland exit even more distinct to make it intuive where each one leads.
+        - Update randomizer logic.
     - Minor tasks blocking release:
         - Render fog when transitioning from underwater to foggy area.
-
-    - Fix behavior masking
-        - Spirit world should inherit mask behavior if it inherits the tile from that layer.
-        - Cannot place a mask when selecting a specific layer. Repro: Select floor 2, try to place cave ledge mask.
 
     - Add pixel precision to water tiles:
         - water edges
