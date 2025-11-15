@@ -154,6 +154,7 @@ Current tasks:
         - Fix Guardian dialog after getting teleportation
             - Make each dreamland exit even more distinct to make it intuive where each one leads.
         - Update randomizer logic.
+        - Fix map behavior for forest, forest water, forest temple and for all spirit versions.
     - Minor tasks blocking release:
         - Render fog when transitioning from underwater to foggy area.
 

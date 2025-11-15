@@ -89,6 +89,11 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
         return allTiles[baseTile.index + linkedOffset];
     }
 
+    // Never implicitly map mask tiles to other tiles.
+    if (baseTile.behaviors.maskFrame) {
+        return baseTile;
+    }
+
     if (baseTile.behaviors?.shallowWater || baseTile.behaviors?.water) {
         explicitIndexMapping[baseTile.index] = spiritCrystalGround;
         return allTiles[spiritCrystalGround];
