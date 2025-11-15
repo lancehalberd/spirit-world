@@ -4,7 +4,7 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound} from 'app/musicController';
 import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
 import {getDrawPriority} from 'app/utils/layers';
-import {removeObjectFromArea} from 'app/utils/objects';
+import {removeObjectFromArea, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
 import {saveGame} from 'app/utils/saveGame';
 import {resetTileBehavior} from 'app/utils/tileBehavior';
 
@@ -65,7 +65,7 @@ function growVine(this: void, area: AreaInstance, tx: number, ty: number): void 
 export class VineSprout implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
-    definition: SimpleObjectDefinition = null;
+    definition: DirectionalObjectDefinition = null;
     isObject = <const>true;
     growing = false;
     sprouting = false;
@@ -78,7 +78,7 @@ export class VineSprout implements ObjectInstance {
     growingFrameTime: number;
     growingAnimationA: FrameAnimation;
     growingAnimationB: FrameAnimation;
-    constructor(state: GameState, definition: SimpleObjectDefinition) {
+    constructor(state: GameState, definition: DirectionalObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -86,13 +86,13 @@ export class VineSprout implements ObjectInstance {
     add(state: GameState, area: AreaInstance) {
         this.area = area;
         area.objects.push(this);
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (getObjectStatus(state, this.definition)) {
             growVine(this.area, (this.x / 16) | 0, (this.y / 16) | 0);
             removeObjectFromArea(state, this);
         }
     }
     grow(state: GameState) {
-        state.savedState.objectFlags[this.definition.id] = true;
+        saveObjectStatus(state, this.definition);
         playAreaSound(state, this.area, 'secretChime');
         saveGame(state);
         this.sprouting = true;

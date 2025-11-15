@@ -769,7 +769,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
         for (const target of tiles) {
             const behavior = hero.area.behaviorGrid?.[target.y]?.[target.x];
-            if (behavior?.solid) {
+            if (behavior?.solid === true) {
                 hero.action = 'grabbing';
                 hero.grabTile = target;
             }

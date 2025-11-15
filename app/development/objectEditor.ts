@@ -482,10 +482,16 @@ export function createObjectDefinition(
         case 'shieldingUnit':
         case 'trampoline':
         case 'vineSprout':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+            };
         case 'waterPot':
             return {
                 ...commonProps,
                 saveStatus: definition.saveStatus,
+                d: definition.d || 'left',
                 type: definition.type,
             };
         case 'pushPull':
@@ -1460,6 +1466,17 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 inputClass: 'large',
                 onChange(fireOffset: number) {
                     object.fireOffset = fireOffset;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'waterPot':
+            rows.push({
+                name: 'direction',
+                value: object.d ?? 'left',
+                values: ['left', 'right'],
+                onChange(d: 'left' | 'right') {
+                    object.d = d;
                     updateObjectInstance(state, object);
                 },
             });

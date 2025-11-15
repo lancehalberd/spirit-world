@@ -101,6 +101,8 @@ export function getObjectSaveTreatment(definition: ObjectDefinition, suffix: Sav
         return 'forever';
     } else if (definition.type === 'saveStatue') {
         return 'forever';
+    } else if (definition.type === 'vineSprout') {
+        return 'forever';
     }
     return 'never';
 }

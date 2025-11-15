@@ -1,8 +1,8 @@
-import { PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
-import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { addEffectToArea } from 'app/utils/effects';
+import {PouredWaterEffect} from 'app/content/effects/PouredWaterEffect';
+import {objectHash} from 'app/content/objects/objectHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrame, drawFrameContentReflectedAt, getFrame} from 'app/utils/animations';
+import {addEffectToArea} from 'app/utils/effects';
 
 
 const fullPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 2, y: 0, duration: 24});
@@ -18,9 +18,9 @@ export class WaterPot implements ObjectInstance {
         midHeight: true,
     };
     drawPriority: DrawPriority = 'sprites';
-    definition: SimpleObjectDefinition = null;
-    x: number;
-    y: number;
+    x: number = this.definition.x;
+    y: number = this.definition.y;
+    d: CardinalDirection = this.definition.d ?? 'left';
     fallFrame = 0;
     grabDirection: Direction;
     isNeutralTarget = true;
@@ -31,10 +31,7 @@ export class WaterPot implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     tipped = false;
-    constructor(state: GameState, definition: SimpleObjectDefinition) {
-        this.definition = definition;
-        this.x = definition.x;
-        this.y = definition.y;
+    constructor(state: GameState, public definition: SimpleObjectDefinition) {
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -43,7 +40,7 @@ export class WaterPot implements ObjectInstance {
         this.grabDirection = direction;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (hit.direction === 'left') {
+        if (hit.direction === this.d) {
             if (hit.canPush) {
                 this.pour(state);
             }
@@ -51,12 +48,12 @@ export class WaterPot implements ObjectInstance {
         return { hit: true };
     }
     onPull(state: GameState, direction: Direction): void {
-        if (this.grabDirection === direction && direction === 'left') {
+        if (this.grabDirection === direction && direction === this.d) {
             this.pour(state);
         }
     }
     onPush(state: GameState, direction: Direction): void {
-        if (direction === 'left') {
+        if (direction === this.d) {
             this.pushCounter++;
             this.pushedLastFrame = true;
             if (this.pushCounter >= 15) {
@@ -79,7 +76,7 @@ export class WaterPot implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         if (this.tipped && this.animationTime === FRAME_LENGTH * tippingPodAnimation.frameDuration) {
             addEffectToArea(state, this.area, new PouredWaterEffect({
-                x: this.x - 12,
+                x: this.d === 'left' ? (this.x - 12) : (this.x + 16),
                 y: this.y + 2,
             }));
         }
@@ -98,7 +95,13 @@ export class WaterPot implements ObjectInstance {
         } else {
             frame = getFrame(emptyPodAnimation, this.animationTime);
         }
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+        const target = {...frame, x: this.x, y: this.y};
+        if (this.d === 'left') {
+            drawFrame(context, frame, target);
+        } else {
+            drawFrameContentReflectedAt(context, frame, target);
+
+        }
     }
 }
 objectHash.waterPot = WaterPot;
