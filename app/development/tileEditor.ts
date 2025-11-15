@@ -580,7 +580,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         let areaNeedsRefresh = false;
         for (const selectedObject of editingState.selectedObjects) {
             if (isObject(selectedObject) && state.areaInstance.definition.objects.includes(selectedObject)) {
-                deleteObject(state, editingState.selectedObject);
+                deleteObject(state, selectedObject);
             }  else if (isVariant(selectedObject) && state.areaInstance.definition.variants?.includes(selectedObject)) {
                 removeElementFromArray(state.areaInstance.definition.variants, selectedObject);
                 // Variants update areas in ways that cannot be reversed so we just have to recreate the area when they

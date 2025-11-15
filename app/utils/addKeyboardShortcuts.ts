@@ -68,9 +68,11 @@ export function addKeyboardShortcuts() {
                     // object._sourceSection = getAreaSectionForDefinition(state, object);
                 }
                 if (isShiftDown) {
-                    editingState.clipboardObjects = [...editingState.selectedObjects];
+                    editingState.clipboardObjects = editingState.selectedObjects.map(cloneDeep);
                 } else {
-                    editingState.clipboardObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSection))
+                    editingState.clipboardObjects 
+                        = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSection))
+                                                      .map(cloneDeep);
                 }
             } else {
                 exportZoneToClipboard(state.zone);

@@ -145,41 +145,31 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Prevent movement when ctrl/shift are pressed + editor is open.
-    - Delete all selected objects when pressing delete.
-    - Add underwater forest zone
-    - Update forest zone in spirit world.
+    - Major tasks blocking release:
+        - Fix money maze is using mixed wooden/jade tiles
+        - Update forest zone in spirit world.
+        - Jade Champion is stuck on save statue outside of war temple.
+            - Add actual pathing algorithm for NPCs+enemies at some point.
+        - Adjust all save statue positions
+        - Fix Guardian dialog after getting teleportation
+            - Make each dreamland exit even more distinct to make it intuive where each one leads.
+    - Minor tasks blocking release:
+        - Render fog when transitioning from underwater to foggy area.
 
     - Fix behavior masking
         - Spirit world should inherit mask behavior if it inherits the tile from that layer.
         - Cannot place a mask when selecting a specific layer. Repro: Select floor 2, try to place cave ledge mask.
 
-    - Make deep copies of objects before putting them on clipboard, otherwise edits will apply after copying them.
-
-    - Check if player can grab mostly empty tiles after changes to how solid pixel behaviors are stored.
-
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
-
-    - Fix money maze is using mixed wooden/jade tiles
-
-    - Jade Champion is stuck on save statue outside of war temple.
-        - Add actual pathing algorithm for NPCs+enemies at some point.
-    - Adjust all save statue positions
-    - Fix Guardian dialog after getting teleportation
-        - Make each dreamland exit even more distinct to make it intuive where each one leads.
 
     - For staff animations to render all but the bottom Npx in the foreground.
     - Make Vanara bushes linked between worlds like other bushes.
 
     - Add moss to Peach Cave
-    - Remove glowing grass layer from Peach Cave
 
-    - Add new save statue
-        - Adjust placement of all statues.
-        - Move top floors of peach cave down 1 tile to keep statue from being behind hearts.
-        - Add old save statue graphics as a decoration.
+    - Add old save statue graphics as a decoration.
 
     - Add new graphics
         - Cherry tree
