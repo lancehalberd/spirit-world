@@ -1,6 +1,7 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {FRAME_LENGTH, getElementColor, getElementLightColor} from 'app/gameConstants';
 import {renderLightningCircle} from 'app/render/renderLightning';
+import {drawFrameCenteredAt, getFrame} from 'app/utils/animations';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
 import Random from 'app/utils/Random';
@@ -21,6 +22,7 @@ export interface BlastProps {
     source: Actor
     // Time before this effect becoems active in milliseconds.
     delay?: number
+    animation?: FrameAnimation
     tellDuration?: number
     expansionDuration?: number
     persistDuration?: number
@@ -43,9 +45,10 @@ export class Blast implements EffectInstance {
     source: Actor = this.props.source;
     hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.boundSource, this.source]);
     delay = this.props.delay ?? 0;
+    animation = this.props.animation;
     tellDuration: number = this.props.tellDuration ?? 1000;
     expansionDuration: number = this.props.expansionDuration ?? 140;
-    persistDuration: number = this.props.persistDuration ?? 60;
+    persistDuration: number = this.animation ? this.animation.duration - this.expansionDuration : this.props.persistDuration ?? 60;
     constructor(public props: BlastProps) {}
     update(state: GameState) {
         if (this.delay >= 0) {
@@ -122,7 +125,7 @@ export class Blast implements EffectInstance {
             });
             this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
             // Lightning effects will be rendered as part of the render function.
-            if (this.element !== 'lightning') {
+            if (this.element !== 'lightning' && !this.animation) {
                 if ((this.animationTime - this.tellDuration) % 40 === 20) {
                     const baseTheta = Math.random() * 2 * Math.PI;
                     const count = Random.range(4, 7);
@@ -181,6 +184,21 @@ export class Blast implements EffectInstance {
         const circle = this.getHitCircle();
         if (circle) {
             const persistTime = this.animationTime - this.tellDuration - this.expansionDuration;
+            if (this.animation) {
+                const frame = getFrame(this.animation, this.animationTime - this.tellDuration);
+                const frameSize = Math.max(frame.content?.w ?? frame.w, frame.content?.h ?? frame.h);
+                context.save()
+                    context.translate(circle.x, circle.y);
+                    const scale = circle.r / frameSize;
+                    // Animations will scale up, but not down to match the radius. This should keep
+                    // the effective hit inside the visual indicator.
+                    if (scale > 1) {
+                        context.scale(scale, scale);
+                    }
+                    drawFrameCenteredAt(context, frame, {x: 0, y: 0, w: 0, h: 0});
+                context.restore();
+                // TODO: consider skipping the rest of the rendering here and just using the animation.
+            }
             context.save();
                 context.globalAlpha *= (0.2 - 0.15 * persistTime / this.persistDuration);
                 context.beginPath();

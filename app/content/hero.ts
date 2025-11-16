@@ -228,7 +228,8 @@ export class Hero implements Actor {
 
     getCopy(this: Hero): Hero {
         const copy = new Hero(this.savedData);
-        Object.assign(copy, cloneDeep(this));
+        // TODO: Fix this sharing references between the hero and the copy.
+        Object.assign(copy, this);
         return copy;
     }
 

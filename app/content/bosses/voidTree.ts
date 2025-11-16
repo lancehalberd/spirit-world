@@ -9,7 +9,7 @@ import {addArcOfShockWaves, addRadialShockWaves} from 'app/content/effects/shock
 import {addRadialSparks} from 'app/content/effects/spark';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {Enemy} from 'app/content/enemy';
-import {iceGrenadeAbility} from 'app/content/enemyAbilities/iceGrenade';
+import {iceGrenadeAbility} from 'app/content/enemyAbilities/grenade';
 import {lightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
 import {certainLifeLootTable} from 'app/content/lootTables';
 import {FRAME_LENGTH} from 'app/gameConstants';
