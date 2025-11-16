@@ -78,6 +78,19 @@ function getDefaultSavedHeroData(): SavedHeroData {
             arDevice: 0,
         },
         spawnLocation: SPAWN_LOCATION_FULL,
-        bossRushTimes: [0, -1],
-    };
+        bossRushTimes: {
+            currentBoss: "none",
+            bossStartTime: 0,
+
+            none: 0,
+            beetle: Infinity,
+            golem: Infinity,
+            idols: Infinity,
+            guardian: Infinity,
+            rival2: Infinity,
+            collector: Infinity,
+            stormBeast: Infinity,
+            rush: Infinity,
+        },
+    }
 }

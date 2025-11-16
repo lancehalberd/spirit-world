@@ -142,6 +142,24 @@ interface Hero extends Actor, SavedHeroData {
     spiritRadius: number
 }*/
 
+type BossName =
+  | "none"
+  | "beetle"
+  | "golem"
+  | "idols"
+  | "guardian"
+  | "rival2"
+  | "collector"
+  | "stormBeast"
+  | "rush";
+
+
+type FastestTimes = {
+  currentBoss: BossName;
+  bossStartTime: number;
+} & Record<BossName, number>;
+
+
 interface SavedHeroData {
     maxLife: number
     ironSkinLife: number
@@ -182,9 +200,7 @@ interface SavedHeroData {
     playTime: number
     // How long the player had been playing when they "won" the game.
     winTime: number
-    //Array where 1st entry is used to keep track of time current boss rush is started, 
-    //and later entries are to keep the highest score for each type of boss rush.
-    bossRushTimes: number[]
+    bossRushTimes: FastestTimes
 }
 
 type Computable<T> = T | (() => T);

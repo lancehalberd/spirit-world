@@ -7,39 +7,91 @@ function travelToLocation(state: GameState, zoneKey: string, markerId: string): 
     return '';
 }
 
+function startRefight(state: GameState, boss: BossName, location: string): string {
+    state.savedState.objectFlags["bossRefight"] = true,
+    state.savedState.savedHeroData.bossRushTimes.bossStartTime = state.hero.savedData.playTime;
+    state.savedState.savedHeroData.bossRushTimes.currentBoss = boss;
+    return travelToLocation(state, 'bossRefights', location)
+}
+
 dialogueHash.refightVanara = {
     key: 'refightVanara',
     mappedOptions: {
-        chooseRefight: (state: GameState) => {
+        updateBestTimes: (state: GameState) => {
             if (state.savedState.objectFlags['rushMode']) {
-                delete state.savedState.objectFlags['rushMode'];
-                let finishTime = state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTimes[0];
-                if (state.savedState.savedHeroData.bossRushTimes[1] == -1 || finishTime < state.savedState.savedHeroData.bossRushTimes[1]) {
-                    state.savedState.savedHeroData.bossRushTimes[1] = finishTime;
-                    return 'NeW HIGH SCORE' //TESTING
-                }
+                delete state.savedState.objectFlags['rushMode']; 
             }
-            return `{choice:Where to?
+            if (state.savedState.objectFlags['bossRefight']) {
+                delete state.savedState.objectFlags['bossRefight'];
+            }
+            let currentBoss = state.savedState.savedHeroData.bossRushTimes.currentBoss;
+            if (currentBoss != "none" ) {
+                let finishTime = state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTimes.bossStartTime;
+                console.log(currentBoss);
+                console.log(finishTime);
+                console.log(state.savedState.savedHeroData.bossRushTimes[currentBoss]);
+                if (finishTime < state.savedState.savedHeroData.bossRushTimes[currentBoss]) {
+                    state.savedState.savedHeroData.bossRushTimes[currentBoss] = finishTime;
+                    state.savedState.savedHeroData.bossRushTimes.currentBoss = "none";
+                    return 'Congrats, that is a new high score!'
+                } else {
+                    state.savedState.savedHeroData.bossRushTimes.currentBoss = "none"; 
+                    return 'Well done, but you\'ve been faster before.'
+                }   
+            }
+            return ''
+        },
+        chooseRefight: (state: GameState) => {
+            console.log(state.savedState.savedHeroData.bossRushTimes);
+            return `{choice:Fight who?
                     |Beetle:refightVanara.beetle
                     |Golem:refightVanara.golem
                     |Elemental Idols:refightVanara.idols
+                    |Guardian:refightVanara.guardian
                     |Rival 2:refightVanara.rival2
+                    |Collector:refightVanara.collector
+                    |Storm Beast:refightVanara.stormBeast
                     |Rush:refightVanara.rush
+                    |High Scores:refightVanara.highScores
                     |Nevermind:refightVanara.no
                     }`;
             },
-            beetle: (state: GameState) => travelToLocation(state, 'bossRefights', 'beetleRefight'),
-            golem: (state: GameState) => travelToLocation(state, 'bossRefights', 'golemRefight'),
-            idols: (state: GameState) => travelToLocation(state, 'bossRefights', 'warTempleRefight'),
-            rival2: (state: GameState) => travelToLocation(state, 'bossRefights', 'rival2Refight'),
+            beetle: (state: GameState) => startRefight(state, 'beetle', 'beetleRefight'),
+            golem: (state: GameState) => startRefight(state, 'golem', 'golemRefight'),
+            idols: (state: GameState) => startRefight(state, 'idols', 'warTempleRefight'),
+            rival2: (state: GameState) => startRefight(state, 'rival2', 'rival2Refight'),
+            collector: (state: GameState) => startRefight(state, 'collector', 'crystalCollectorRefight'),
+            stormBeast: (state: GameState) => startRefight(state,  'stormBeast', 'stormBeastRefight'),
+            guardian: (state: GameState) => startRefight(state, 'guardian', 'guardianRefight'),
             rush: (state: GameState) => (
                 state.savedState.objectFlags["rushMode"] = true,
-                state.savedState.savedHeroData.bossRushTimes[0] = state.hero.savedData.playTime,
-                travelToLocation(state, 'bossRefights', 'beetleRefight')
+                startRefight(state, 'rush', 'beetleRefight')
             ),
+            highScores: (state: GameState) => {
+                if (state.savedState.savedHeroData.bossRushTimes['beetle'] == Infinity) {
+                    return `You haven't beaten the beetle yet!`
+                } else {
+                    return `Your fastest time for the beetle fight is 
+                    ${Math.ceil(state.savedState.savedHeroData.bossRushTimes['beetle'] / 1000)} seconds`
+                }
+            },
             no: '',
         },
     options: [
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: ['refightVanara'],
+            },
+            text: [
+                {
+                    dialogueIndex: 195,
+                    text: `I see you have fought many tough battles in your travels.
+                    {|}If you want, I can let you reexperience any of them you want to refight.
+                    {flag:refightVanara}{@refightVanara.chooseRefight}`,
+                },
+            ],
+        },
         {
             logicCheck: {
                 requiredFlags: [],
@@ -47,12 +99,11 @@ dialogueHash.refightVanara = {
             },
             text: [
                 {
-                    dialogueIndex: 195,
-                    text: `I see you have fought many tough battles in your travels.
-                    {|}If you want, I can let you reexperience any of them you want to refight.
+                    dialogueIndex: 197,
+                    text: `{@refightVanara.updateBestTimes}
                     {@refightVanara.chooseRefight}`,
                 },
             ],
-        },
+        }
     ],
 };
