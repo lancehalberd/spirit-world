@@ -145,18 +145,39 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Make plants shoot explosive seeds
+    - Make plants spawn 2x flying beetle when hit with a thrown object that doesn't kill them
+    - Add more enemies to forest
+        - Plants+beetles. Snakes near the water.
+        - 3x plant configuration in a larger open area
+        - plants on raised ground that are difficult to fight and function more like obstacles
+        - elemental plants in Spirit World
+
     - Major tasks blocking release:
-        - Fix money maze is using mixed wooden/jade tiles
+        - BLOCKED: Fix money maze is using mixed wooden/jade tiles
+            - Waiting for E/W Jade doors to convert fully to Jade.
         - Update forest zone in spirit world.
-        - Jade Champion is stuck on save statue outside of war temple.
-            - Add actual pathing algorithm for NPCs+enemies at some point.
+            - Add entrance to spirit world forest/forest temple through the fertility temple
+                - Add ladder/stairs to fertility shrine in spirit world that take you to new entrance area to forest temple.
+                - Add ladder to entrance area the exits in the eastern spirit forest tile.
+                - Add shortcut from entrance to elder's basement that can be unlocked by coming out of the elders basement.
+                    - Add secret that can be obtained by entering this door in the material world after unlocking it in the spirit world.
+            - Test forest pits all land in reasonable places.
+                - Probably need to add content to the southern super tile at a minimum for this.
+                - Also content north of boss arena.
+            - Add paths east of elders basement in the forest temple.
+            - Finish converting river to crystal path.
+            - Update fast travel spot for the forest village.?
         - Adjust all save statue positions
         - Fix Guardian dialog after getting teleportation
             - Make each dreamland exit even more distinct to make it intuive where each one leads.
         - Update randomizer logic.
         - Fix map behavior for forest, forest water, forest temple and for all spirit versions.
+        - Update spawn location for forest temple boss state.
     - Minor tasks blocking release:
+        - Add ability to link map sections to special map marker objects on the overworld.
         - Render fog when transitioning from underwater to foggy area.
+        - Fix knobby tree door is too wide letting player clip the left edge.
 
     - Add pixel precision to water tiles:
         - water edges
@@ -168,6 +189,8 @@ Current tasks:
     - Add moss to Peach Cave
 
     - Add old save statue graphics as a decoration.
+
+    - Add actual pathing algorithm for NPCs+enemies at some point.
 
     - Add new graphics
         - Cherry tree

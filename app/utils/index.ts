@@ -246,6 +246,40 @@ export function cloneDeep<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
 }
 
+function isObject(value: any): value is Object {
+    return (value && typeof value === 'object' && !Array.isArray(value));
+}
+
+// Recursively merges objects together.
+// This mutates the target in place, and may retain original object/array references
+// from either the target or the source, so clone the inputs first.
+// Will not merge any non object values including arrays, these are just overwritten.
+// Fields in the target not found in the source will not be touched.
+// Source values that cannot be merged will overwrite the target values.
+export function mergeDeep<T>(target: T, source: T, seenValues: Set<any> = new Set()) {
+    // Prevent infinite recursion on objects with cycles.
+    if (seenValues.has(source)) {
+        return;
+    }
+    seenValues.add(source);
+    if (!isObject(target) || !isObject(source)) {
+        return;
+    }
+    for (const key in source) {
+        if (!target[key]) {
+            target[key] = source[key];
+            continue;
+        }
+        if (isObject(target[key]) && isObject(source[key])) {
+            mergeDeep(target[key], source[key], seenValues);
+        } else {
+            // This function does not merge non-object types so the source
+            // just overwrites the target in this case entirely.
+            target[key] = source[key];
+        }
+    }
+}
+
 export function sample<T>(collection: Collection<T>): T {
     return Random.element(collection);
 }

@@ -33,7 +33,8 @@ const [
     smallLockFrame, bigLockFrame,
     verticalFrame, horizontalFrame,
     blockedFrame, switchDoorFrame,
-] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 10}).frames;
+    rightFrame, leftFrame,
+] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 12}).frames;
 // window['debugCanvas'](smallLockFrame, 5);
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
@@ -142,6 +143,11 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
             const areaInstance = createAreaInstance(state, zone, grid[row][column]);
             renderActualMapTile(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
+        }
+    }
+    for (let row = 0; row < grid.length; row++) {
+        for (let column = 0; column < grid[row].length; column++) {
+            const areaInstance = createAreaInstance(state, zone, grid[row][column]);
             renderMapObjects(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16},
                 state.hero.savedData.passiveTools.trueSight >= 1);
@@ -510,26 +516,28 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
                     });
                 } else if (isZoneDoor) {
-                    if (object.definition.style === 'wideEntrance' && object.definition.d === 'up') {
-                        drawFrame(context, upFrame, {...upFrame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - upFrame.w / 2,
-                            y: Math.round((hitbox.y) * yScale),
-                        });
-                    } else if (object.definition.style === 'wideEntrance' && object.definition.d === 'down') {
-                        drawFrame(context, downFrame, {...downFrame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - downFrame.w / 2,
-                            y: Math.round((hitbox.y + hitbox.h) * yScale) - downFrame.h,
-                        });
-                    } else if (doorStyle.mapIcon) {
+                    if (doorStyle.mapIcon) {
                         let frame = doorFrame;
                         if (doorStyle.mapIcon === 'up') {
                             frame = upFrame;
                         } else if (doorStyle.mapIcon === 'down') {
                             frame = downFrame;
+                        } else if (doorStyle.mapIcon === 'left') {
+                            frame = downFrame;
+                        } else if (doorStyle.mapIcon === 'right') {
+                            frame = downFrame;
                         }
                         drawFrame(context, frame, {...frame,
                             x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
                             y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
+                                // Render southern doors further up.
+                                + (object.definition.d === 'down' ? -2 : 0),
+                        });
+                    } else if (object.definition.style === 'wideEntrance' || object.definition.style === 'pathEntrance') {
+                        const frame = {up: upFrame, down: downFrame, left: leftFrame, right: rightFrame}[object.definition.d ?? 'up'];
+                        drawFrame(context, frame, {...frame,
+                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
+                            y: Math.round((hitbox.y) * yScale) - frame.h / 2
                                 // Render southern doors further up.
                                 + (object.definition.d === 'down' ? -2 : 0),
                         });

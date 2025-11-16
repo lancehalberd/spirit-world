@@ -65,6 +65,7 @@ type TrackKey
     = 'caveTheme'
     | 'mainTheme'
     | 'waterfallVillageTheme'
+    | 'forestTheme'
     | 'vanaraForestTheme'
     | 'tombTheme'
     | 'cocoonTheme'

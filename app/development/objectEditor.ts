@@ -1901,10 +1901,12 @@ export function onMouseDragObject(state: GameState, editingState: EditingState, 
     let areaNeedsRefresh = false;
     for (const selectedObject of editingState.selectedObjects) {
         const oldX = selectedObject.x, oldY = selectedObject.y;
+        // Object definitions are implicitly linked by type + location which means we must get a reference to the linked object
+        // before we move the base object, otherwise it won't be found at the new location.
+        const linkedDefinition = isObject(selectedObject) && selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, selectedObject);
         selectedObject.x = Math.round(selectedObject._dragStartX + deltaX);
         selectedObject.y = Math.round(selectedObject._dragStartY + deltaY);
         if (isObject(selectedObject)) {
-            const linkedDefinition = selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, selectedObject);
             fixObjectPosition(state, selectedObject);
             if (selectedObject.x !== oldX || selectedObject.y !== oldY) {
                 if (linkedDefinition) {

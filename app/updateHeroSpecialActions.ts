@@ -262,22 +262,30 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             });
             return true;
         }
-        // Special logic for falling from the forst temple overworld area into
+        // Special logic for falling from the forst area into
         // the forest temple dungeon.
+        // This only happens in the Spirit World.
         if (hero === state.hero && hero.action === 'fallen'
-            && state.location.zoneKey === 'overworld'
+            && state.location.zoneKey === 'forest'
             && state.location.isSpiritWorld
-            && state.location.areaGridCoords.x === 0
-            && state.location.areaGridCoords.y === 2
         ) {
             // Map the characters x/y coordinates from this section to
             // the x/y coordinates across the entire dungeon floor.
             // These px/py values are scaled to be 0-1 over the area that you can actually fall through
             // in order to maximally cover possible locations to fall in the dungeon.
-            const px = (hero.x - 48) / (state.areaInstance.w * 16 - 80);
-            const py = (hero.y - 48) / (state.areaInstance.h * 16 - 112);
-            const {w, h} = zones.forestTemple.areaSize ?? {w: 32, h: 32};
-            const templeAreaWidth = w * 16, templeAreaHeight = h * 16;
+            // This was the old logic for calculating px/py when the forest was a single super tile.
+            //const px = (hero.x - 48) / (state.areaInstance.w * 16 - 80);
+            //const py = (hero.y - 48) / (state.areaInstance.h * 16 - 112);
+            const forestAreaSize = zones.forestTemple.areaSize ?? {w: 32, h: 32};
+            const forestAreaWidth = forestAreaSize.w * 16, forestAreaHeight = forestAreaSize.h * 16;
+            const forestWidth = forestAreaWidth * zones.forest.floors[0].grid[0].length;
+            const forestHeight = forestAreaHeight * zones.forest.floors[0].grid.length;
+
+            const px = (state.location.areaGridCoords.x * forestAreaWidth + hero.x) / forestWidth;
+            const py = (state.location.areaGridCoords.y * forestAreaHeight + hero.y) / forestHeight;
+
+            const templeAreaSize = zones.forestTemple.areaSize ?? {w: 32, h: 32};
+            const templeAreaWidth = templeAreaSize.w * 16, templeAreaHeight = templeAreaSize.h * 16;
             const templeWidth = templeAreaWidth * zones.forestTemple.floors[0].grid[0].length;
             const templeHeight = templeAreaHeight * zones.forestTemple.floors[0].grid.length;
             const tx = px * templeWidth;

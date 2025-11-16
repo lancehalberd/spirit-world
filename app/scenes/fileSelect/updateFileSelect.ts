@@ -67,8 +67,7 @@ export function updateFileSelect(state: GameState) {
                 break;
             case 'chooseGameMode':
                 state.savedState = getDefaultSavedState();
-                state.hero = new Hero();
-                state.hero.applySavedHeroData(state.savedState.savedHeroData);
+                state.hero = new Hero(state.savedState.savedHeroData);
                 if (state.menuIndex === 0) {
                     // Full Game
                     state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;

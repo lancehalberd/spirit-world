@@ -90,7 +90,7 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
     }
 
     // Never implicitly map mask tiles to other tiles.
-    if (baseTile.behaviors.maskFrame) {
+    if (baseTile.behaviors?.maskFrame) {
         return baseTile;
     }
 

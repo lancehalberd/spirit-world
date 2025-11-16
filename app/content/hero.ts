@@ -30,6 +30,7 @@ import {
     renderHeroBarrier, renderHeroShadow,
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
+import {getDefaultSavedState} from 'app/savedState'
 import { getCloneMovementDeltas } from 'app/userInput';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { destroyClone } from 'app/utils/destroyClone';
@@ -37,7 +38,7 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import {trackEnemyDealtDamage} from 'app/utils/enemyDamageTracking';
 import { directionMap, getDirection } from 'app/utils/field';
 import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
-import { boxesIntersect } from 'app/utils/index';
+import {boxesIntersect, cloneDeep, mergeDeep} from 'app/utils/index';
 
 const throwSpeed = 6;
 
@@ -104,7 +105,7 @@ export class Hero implements Actor {
     lastTouchedObject?: EffectInstance | ObjectInstance;
     lastPushTime?: number
     invulnerableFrames?: number;
-    life: number;
+    life: number = this.savedData.maxLife;
     // The amount of life to actually display in the HUD.
     // This value may change over many frames to catch up with
     // the actual life value which changes in larger chunks.
@@ -150,7 +151,7 @@ export class Hero implements Actor {
     toolOnCooldown?: ActiveTool;
     // inventory
     astralProjection?: Hero;
-    clones: Hero[];
+    clones: Hero[] = [];
     cloneToolReleased?: boolean
     barrierElement?: MagicElement;
     barrierLevel?: number;
@@ -185,24 +186,22 @@ export class Hero implements Actor {
     // and prevents it from being placed. This is useful for attacking quickly.
     canceledStaffPlacement?: boolean;
 
-    savedData: SavedHeroData;
     renderParent?: BaseFieldInstance;
 
     // Track how many frames the player has been unable to move for in order to
     // reset their position to prevent softlocks.
     stuckFrames: number = 0;
 
-    constructor() {
-        this.clones = [];
+    constructor(public savedData: SavedHeroData = getDefaultSavedState().savedHeroData) {
     }
 
-    applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
-        this.savedData = {...defaultSavedHeroData};
-        if (savedHeroData) {
+    applySavedHeroData(savedHeroData: Partial<SavedHeroData>) {
+        // We need to call `cloneDeep` here so that we won't have
+        // references to the original savedHeroData.
+        mergeDeep(this.savedData, cloneDeep(savedHeroData));
+        this.life = this.savedData.maxLife;
+        /*if (savedHeroData) {
             Object.assign(this.savedData, savedHeroData);
-            /*for (let i in savedHeroData) {
-                this.savedData[i] = savedHeroData[i];
-            }*/
         }
         this.savedData.passiveTools = {
             ...defaultSavedHeroData.passiveTools,
@@ -224,28 +223,12 @@ export class Hero implements Actor {
             ...defaultSavedHeroData.weaponUpgrades,
             ...savedHeroData?.weaponUpgrades,
         };
-        this.life = this.savedData.maxLife;
-    }
-
-    exportSavedHeroData(): SavedHeroData {
-        return {
-            ...this.savedData,
-            weaponUpgrades: {...this.savedData.weaponUpgrades},
-            spawnLocation: this.savedData.spawnLocation,
-            activeTools: {...this.savedData.activeTools},
-            elements: {...this.savedData.elements},
-            equipment: {...this.savedData.equipment},
-            passiveTools: {...this.savedData.passiveTools},
-        };
+        this.life = this.savedData.maxLife;*/
     }
 
     getCopy(this: Hero): Hero {
-        const copy = new Hero();
-        Object.assign(copy, this);
-        /*for (let i in this) {
-            copy[i] = this[i];
-        }*/
-        copy.savedData = this.exportSavedHeroData();
+        const copy = new Hero(this.savedData);
+        Object.assign(copy, cloneDeep(this));
         return copy;
     }
 
