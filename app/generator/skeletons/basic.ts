@@ -1,10 +1,10 @@
-import { applyNineSlice, slices } from 'app/generator/nineSlice';
-import { addCaveRoomFrame, applyCaveWalls, createCaveFloor } from 'app/generator/styles/cave';
-import { applyStoneWalls, createStoneFloor } from 'app/generator/styles/stone';
+import {applyNineSlice, slices} from 'app/generator/nineSlice';
+import {addCaveRoomFrame, applyCaveWalls, createCaveFloor} from 'app/generator/styles/cave';
+import {applyStoneWalls, createStoneFloor} from 'app/generator/styles/stone';
 
-import { chunkGenerators } from 'app/generator/tileChunkGenerators';
-import { directionMap } from 'app/utils/direction';
-import { getOrAddLayer, inheritAllLayerTilesFromParent } from 'app/utils/layers';
+import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
+import {directionMap} from 'app/utils/direction';
+import {getOrAddLayer, inheritAllLayerTilesFromParent} from 'app/utils/layers';
 
 
 // Extract this to generator/styles/stone and refactor chunkGenerators to remove cyclical dependency.

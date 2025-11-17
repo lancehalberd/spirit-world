@@ -245,7 +245,7 @@ const [
     futureLadderTop, futureLadderMiddle, futureLadderBottom, /*futureLadderTop*/, futureLadderDownFrame
 ] = createAnimation('gfx/tiles/futuristic.png', {w: 16, h: 16}, {left: 16, top: 832, rows: 5}).frames;
 
-// This is primarily used for holes in
+// Used for tree doors+transparent door overlay on the helix.
 const wideSquareDoorStyle = {
     getHitbox(door: Door) {
         return {x: door.x, y: door.y, w: 32, h: 32};
@@ -1076,6 +1076,21 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             return (door.definition.d === 'up' || door.definition.d === 'down')
                 ? {x: door.x, y: door.y, w: 64, h: 16}
                 : {x: door.x, y: door.y, w: 16, h: 64};
+        },
+    },
+    pathEntrance: {
+        // We use isNotSolid here since we see the ground type for this entrance.
+        // for example the player should swim through water or wade through shallow water behind this entrance.
+        pathBehaviors: {isNotSolid: true, lowCeiling: true, isEntrance: true},
+        getHitbox(door: Door) {
+            return (door.definition.d === 'up' || door.definition.d === 'down')
+                ? {x: door.x, y: door.y, w: 32, h: 16}
+                : {x: door.x, y: door.y, w: 16, h: 32};
+        },
+        getPathHitbox(door: Door) {
+            return (door.definition.d === 'up' || door.definition.d === 'down')
+                ? {x: door.x, y: door.y, w: 32, h: 16}
+                : {x: door.x, y: door.y, w: 16, h: 32};
         },
     },
 };

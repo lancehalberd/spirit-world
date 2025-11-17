@@ -1,12 +1,13 @@
-import { Hero } from 'app/content/hero';
+import {Hero} from 'app/content/hero';
 import {SPAWN_LOCATION_DEMO, SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
-import { zones } from 'app/content/zones';
-import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
-import { getDefaultSavedState } from 'app/savedState'
+import {zones} from 'app/content/zones';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
+import {randomizerSeed, randomizerGoal } from 'app/gameConstants';
+import {getDefaultSavedState } from 'app/savedState'
 import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
-import { getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import {getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
+import {cloneDeep, mergeDeep} from 'app/utils/index';
+import {returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -68,15 +69,11 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
     applySavedState(state, savedGame);
 }
 
-export function applySavedState(state: GameState, savedState: SavedState): void {
-    const defaultSavedState = getDefaultSavedState();
-    state.hero = new Hero();
-    state.hero.applySavedHeroData(defaultSavedState.savedHeroData, savedState.savedHeroData);
-    state.savedState = {
-        ...defaultSavedState,
-        ...savedState,
-        savedHeroData: state.hero.exportSavedHeroData(),
-    };
+export function applySavedState(state: GameState, savedState: Partial<SavedState>): void {
+    state.savedState = getDefaultSavedState();
+    mergeDeep(state.savedState, cloneDeep(savedState));
+    state.hero = new Hero(state.savedState.savedHeroData);
+    state.hero.applySavedHeroData(savedState.savedHeroData);
     fixProgressFlagsOnLoad(state);
     fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);

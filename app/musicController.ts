@@ -60,10 +60,6 @@ export const updateMusic = (state: GameState): void => {
         }
     } else if (location.zoneKey === 'overworld') {
         if (!location.isSpiritWorld
-            && location.areaGridCoords.x === 0 && location.areaGridCoords.y === 2
-        ) {
-            playTrack('vanaraForestTheme', 0);
-        } else if (!location.isSpiritWorld
             && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 2
         ) {
             playTrack('ruins', 0);
@@ -82,7 +78,15 @@ export const updateMusic = (state: GameState): void => {
         }  else {
             playTrack('mainTheme', 0);
         }
-    }  else if (location.zoneKey === 'treeVillage') {
+    } else if (location.zoneKey === 'forest') {
+        if (location.isSpiritWorld) {
+            playTrack('ruins', 0);
+        } else if (location.areaGridCoords.x === 1 && location.areaGridCoords.y === 1) {
+            playTrack('vanaraForestTheme', 0);
+        } else {
+            playTrack('forestTheme', 0);
+        }
+    } else if (location.zoneKey === 'treeVillage') {
         if (location.isSpiritWorld) {
             playTrack('dungeonTheme', 0);
         } else {
@@ -146,7 +150,11 @@ export const updateMusic = (state: GameState): void => {
     } else if (location.zoneKey === 'helix') {
         playTrack('helixTheme', 0);
     } else if (location.zoneKey === 'forestTemple') {
-        playTrack('dungeonTheme', 0);
+        if (location.isSpiritWorld) {
+            playTrack('dungeonTheme', 0);
+        } else {
+        playTrack('vanaraForestTheme', 0);
+        }
     } else if (location.zoneKey === 'waterfallTower') {
         playTrack('waterfallTowerTheme', 0);
     } else if (location.logicalZoneKey === 'gauntlet') {

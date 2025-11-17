@@ -3,7 +3,7 @@ import {growingThornsAbility} from 'app/content/enemyAbilities/growingThorns';
 import {stationaryChargedLightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
 import {fastVolcanoAbility, volcanoAbility} from 'app/content/enemyAbilities/volcano';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
-import {iceGrenadeAbility} from 'app/content/enemyAbilities/iceGrenade';
+import {iceGrenadeAbility, seedBombAbility} from 'app/content/enemyAbilities/grenade';
 import {addEffectToArea} from 'app/utils/effects';
 import {getVectorToNearbyTarget} from 'app/utils/target';
 import {omniAnimation} from 'app/content/enemyAnimations';
@@ -60,11 +60,6 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
 
 
 
-const plantFrostIceGrenadeAbility = {
-    ...iceGrenadeAbility,
-    prepTime: plantFrostAnimations.prepare.down.duration,
-    recoverTime:plantFrostAnimations.attack.down.duration,
-}
 
 
 const basePlantDefinition: Partial<EnemyDefinition<any>> = {
@@ -87,11 +82,15 @@ const basePlantDefinition: Partial<EnemyDefinition<any>> = {
 };
 
 
+const plantSeedBombAbility = {
+    ...seedBombAbility,
+    prepTime: plantAnimations.prepare.down.duration,
+    recoverTime: plantAnimations.attack.down.duration,
+};
 enemyDefinitions.plant = {
     ...basePlantDefinition,
     naturalDifficultyRating: 1,
-    // Regular plants have no attacks other than contact damage.
-    abilities: [],
+    abilities: [plantSeedBombAbility],
     animations: plantAnimations,
     elementalMultipliers: {'fire': 1.5},
     hybrids: {
@@ -121,6 +120,12 @@ enemyDefinitions.plantFlame = {
     },
 };
 
+
+const plantFrostIceGrenadeAbility = {
+    ...iceGrenadeAbility,
+    prepTime: plantFrostAnimations.prepare.down.duration,
+    recoverTime: plantFrostAnimations.attack.down.duration,
+};
 enemyDefinitions.plantFrost = {
     ...basePlantDefinition,
     naturalDifficultyRating: 2,

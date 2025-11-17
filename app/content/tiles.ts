@@ -483,7 +483,7 @@ const waterWaves: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 144, y: 0, w: 16, h: 64}),
     behaviors: {
-        'all': {defaultLayer: 'field', isGround: false},
+        'all': {defaultLayer: 'field', isGround: false, linkedIndex: 0},
     },
     animationProps: {
         frames: 3,
@@ -495,7 +495,7 @@ const waterRocks: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 144, y: 80, w: 16, h: 48}),
     behaviors: {
-        'all': {defaultLayer: 'field', isGround: false},
+        'all': {defaultLayer: 'field', isGround: false, linkedIndex: 0},
     },
     animationProps: {
         frames: 3,
@@ -819,25 +819,25 @@ const caveLedges: TileSource = {
         '8x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upright',
             isGround: false,
-            isMaskedMap: BITMAP_TOP_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 208, w: 16, h: 16}),
         },
         '9x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upleft',
             isGround: false,
-            isMaskedMap: BITMAP_TOP_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 208, w: 16, h: 16}),
         },
         '10x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upright',
             isGround: false,
-            isMaskedMap: BITMAP_TOP_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 208, w: 16, h: 16}),
         },
         '11x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upleft',
             isGround: false,
-            isMaskedMap: BITMAP_TOP_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 208, w: 16, h: 16}),
         },
         '12x13': { defaultLayer: 'floor2', isGround: false},
@@ -854,27 +854,27 @@ const caveLedges: TileSource = {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upright',
             solid: BITMAP_MIDDLE_DOWN_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_TOP_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 192, w: 16, h: 16}),
         },
         '9x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upleft',
             solid: BITMAP_MIDDLE_UP_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_TOP_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 192, w: 16, h: 16})
         },
         '10x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upright',
             solid: BITMAP_MIDDLE_DOWN_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_TOP_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 192, w: 16, h: 16}), },
         '11x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upleft',
             solid: BITMAP_MIDDLE_UP_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_TOP_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 192, w: 16, h: 16}),
         },
         '12x15': { defaultLayer: 'floor2', isGround: false},

@@ -291,6 +291,7 @@ const musicTracks: {[key in string]: TrackDefinition} = {
     mainTheme: {key: 'mainTheme', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
     waterfallVillageTheme: {key : 'waterfallVillageTheme', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
+    forestTheme: {key: 'forestTheme', source: 'bgm/forestTheme.mp3', volume: 10 },
     vanaraForestTheme: {key: 'vanaraForestTheme', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
     tombTheme: {key: 'tombTheme', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.

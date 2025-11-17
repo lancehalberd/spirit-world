@@ -30,7 +30,7 @@ const warTempleStart = applyItemsToSavedState(tombBossState, {maxLife: 1, spirit
     ['tombBoss', 'tombTeleporter', 'momRuins', 'warTempleEntrance']);
 const warTempleBoss = applyItemsToSavedState(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
 const cocoonStartState = applyItemsToSavedState(warTempleBoss, {maxLife: 1, astralProjection: 1, normalRange: 1},
-    ['warTempleBoss', 'tombExit']);
+    ['warTempleBoss', 'jadeChampionWarTemple', 'tombExit']);
 const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
 const vanaraDreamStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1},

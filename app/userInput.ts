@@ -1,6 +1,7 @@
 /* global navigator */
-import { GAME_KEY } from 'app/gameConstants';
-import { unlockAudio } from 'app/utils/sounds';
+import {GAME_KEY} from 'app/gameConstants';
+import {unlockAudio} from 'app/utils/sounds';
+import {editingState} from 'app/development/editingState';
 
 export const KEY = {
     ESCAPE: 27,
@@ -281,6 +282,10 @@ export function isGameKeyDown(state: GameState, keyCode: number): boolean {
 }
 
 export function getMovementDeltas(state: GameState, force = false): [number, number] {
+    // This prevent accidentally moving left when pressing "CTRL+A" while editing, for example.
+    if (editingState && (isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND))) {
+        return [0, 0];
+    }
     if (!force && state.scriptEvents.blockPlayerInput) {
         return [0, 0];
     }

@@ -257,13 +257,13 @@ export const SPAWN_GRAND_TEMPLE_ENTRANCE: ZoneLocation = {
 
 
 export const SPAWN_FOREST_ENTRANCE: ZoneLocation = {
-    zoneKey: 'overworld',
+    zoneKey: 'caves',
     floor: 0,
-    x: 400,
-    y: 330,
+    x: 376,
+    y: 440,
     z: 0,
-    d: 'down',
-    areaGridCoords: {x: 0, y: 2},
+    d: 'up',
+    areaGridCoords: {x: 1, y: 0},
     isSpiritWorld: true,
 };
 export const SPAWN_FOREST_BOSS: ZoneLocation = {

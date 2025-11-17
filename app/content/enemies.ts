@@ -173,7 +173,7 @@ function isUnderTile(state: GameState, enemy: Enemy): boolean {
     const ty = Math.floor((hitbox.y + hitbox.h / 2) / 16);
     const behavior = enemy.area.behaviorGrid?.[ty]?.[tx];
     // Hide the enemy as long as there is something on top of it.
-    return !!(behavior?.solid || behavior?.cuttable);
+    return !!(behavior?.solid === true || behavior?.cuttable);
 }
 
 enemyDefinitions.floorEye = {

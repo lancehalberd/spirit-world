@@ -482,10 +482,16 @@ export function createObjectDefinition(
         case 'shieldingUnit':
         case 'trampoline':
         case 'vineSprout':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+            };
         case 'waterPot':
             return {
                 ...commonProps,
                 saveStatus: definition.saveStatus,
+                d: definition.d || 'left',
                 type: definition.type,
             };
         case 'pushPull':
@@ -1464,6 +1470,17 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'waterPot':
+            rows.push({
+                name: 'direction',
+                value: object.d ?? 'left',
+                values: ['left', 'right'],
+                onChange(d: 'left' | 'right') {
+                    object.d = d;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
     }
     return rows;
 }
@@ -1884,10 +1901,12 @@ export function onMouseDragObject(state: GameState, editingState: EditingState, 
     let areaNeedsRefresh = false;
     for (const selectedObject of editingState.selectedObjects) {
         const oldX = selectedObject.x, oldY = selectedObject.y;
+        // Object definitions are implicitly linked by type + location which means we must get a reference to the linked object
+        // before we move the base object, otherwise it won't be found at the new location.
+        const linkedDefinition = isObject(selectedObject) && selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, selectedObject);
         selectedObject.x = Math.round(selectedObject._dragStartX + deltaX);
         selectedObject.y = Math.round(selectedObject._dragStartY + deltaY);
         if (isObject(selectedObject)) {
-            const linkedDefinition = selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, selectedObject);
             fixObjectPosition(state, selectedObject);
             if (selectedObject.x !== oldX || selectedObject.y !== oldY) {
                 if (linkedDefinition) {

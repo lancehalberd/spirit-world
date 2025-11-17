@@ -74,6 +74,15 @@ type ChunkGenerator = {
     maxW?: number
     maxH?: number
     generate: (random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) => void
+    renderPreview?: (context: CanvasRenderingContext2D, random: SRandom, area: AreaInstance, r: Rect, alternateArea: AreaInstance) => void
+}
+
+interface Stamp {
+    w: number
+    h: number
+    layers: {
+        [key: string]: (number|undefined)[][]
+    }
 }
 
 interface RoomSlot extends Rect {

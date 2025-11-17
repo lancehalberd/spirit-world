@@ -1,6 +1,6 @@
-import { getLootFrame } from 'app/content/loot';
-import { allTiles } from 'app/content/tiles';
-import { editingState } from 'app/development/editingState';
+import {getLootFrame} from 'app/content/loot';
+import {allTiles} from 'app/content/tiles';
+import {editingState} from 'app/development/editingState';
 import {
     getObjectFrame,
     isObject,
@@ -10,16 +10,17 @@ import {
 } from 'app/development/objectEditor';
 import {fixVariantPosition} from 'app/development/variantEditor';
 import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
-import { renderZoneEditor } from 'app/development/zoneEditor';
-import { KEY, isKeyboardKeyDown } from 'app/userInput';
-import { translateContextForAreaAndCamera } from 'app/render/renderField';
-import { drawFrame } from 'app/utils/animations';
-import { createObjectInstance } from 'app/utils/createObjectInstance';
-import { mapTile } from 'app/utils/mapTile';
-import { isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
-import { getAreaMousePosition } from 'app/development/getAreaMousePosition';
-import {chunkGenerators} from 'app/generator/tileChunkGenerators';
+import {renderZoneEditor} from 'app/development/zoneEditor';
+import {KEY, isKeyboardKeyDown} from 'app/userInput';
+import {translateContextForAreaAndCamera} from 'app/render/renderField';
+import {drawFrame} from 'app/utils/animations';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
+import {mapTile} from 'app/utils/mapTile';
+import {isMouseDown, /*isMouseOverElement*/} from 'app/utils/mouse';
+import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
+import {chunkGenerators} from 'app/generator/chunks/tileChunkGeneratorHash';
 import {createCanvasAndContext} from 'app/utils/canvas';
+import SRandom from 'app/utils/SRandom';
 
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -94,6 +95,9 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 context.lineWidth = 2;
                 context.strokeStyle = 'white';
                 context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
+                if (generator.renderPreview) {
+                    generator.renderPreview(context, SRandom.seed(0), area, {x: L, y: T, w: R - L + 1, h: B - T + 1}, area.alternateArea);
+                }
             }
             if (editingState.tool === 'variant') {
                 context.lineWidth = 2;
@@ -332,7 +336,7 @@ function drawBrushLayerPreview(
     }
 }
 
-function renderTileFrame(tile: FullTile, frameIndex: number, context: CanvasRenderingContext2D, target: Rect) {
+export function renderTileFrame(tile: FullTile, frameIndex: number, context: CanvasRenderingContext2D, target: Rect) {
     context.save();
         if (tile.behaviors?.editorTransparency) {
             context.globalAlpha *= tile.behaviors.editorTransparency;

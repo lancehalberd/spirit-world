@@ -52,7 +52,7 @@ interface NineSlice {
     }[]
 }
 
-type MapIcon = 'door' | 'chest' | 'down' | 'up'
+type MapIcon = 'door' | 'chest' | 'down' | 'up' | 'right' | 'left';
 
 type DefaultLayer = 'water' | 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
 
@@ -94,6 +94,9 @@ interface TileBehaviors {
     linkableTiles?: number[]
     // If this is set, then the default tile in the spirit world will be offset by this number.
     linkedOffset?: number
+    // If this is set, then the default tile in the spirit world be the tile of the given index.
+    // This can be set to 0 to prevent tiles from copying to the spirit world.
+    linkedIndex?: number
     lootTable?: LootTable
     // If this is true projectiles can pass over this tile even if it is solid.
     // Also, the bow won't cut low tiles like thorns.

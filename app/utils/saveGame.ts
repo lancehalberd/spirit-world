@@ -1,9 +1,10 @@
+import {cloneDeep} from 'app/utils/index';
 
 export function saveGame(state: GameState): void {
     if (state.savedGameIndex < 0) {
         return;
     }
-    state.savedState.savedHeroData = state.hero.exportSavedHeroData();
+    state.savedState.savedHeroData = cloneDeep(state.hero.savedData);
     // There is a bug where selecting the delete option in randomizer triggers the `saveGame`
     // function and saves a new file to the delete index which keeps creating more save files.
     // This is a hack to prevent this from happening.

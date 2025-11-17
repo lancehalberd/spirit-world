@@ -579,7 +579,7 @@ interface NPCDefinition extends BaseObjectDefinition {
 type SimpleObjectType = 'airBubbles' | 'arGame' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret' | 'jadeChampion'
     | 'peachTree' | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
-    | 'torch' | 'trampoline' | 'vineSprout' | 'waterPot';
+    | 'torch' | 'trampoline' | 'vineSprout';
 
 interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType
@@ -595,6 +595,12 @@ interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
     // Some decorations can combine with other objects, in particular bed decorations
     // may target NPCs to render NPCs inside of the bed.
     targetObjectId?: string
+}
+
+type DirectionalObjectType = 'waterPot';
+interface DirectionalObjectDefinition extends BaseObjectDefinition {
+    type: DirectionalObjectType
+    d?: CardinalDirection
 }
 
 interface WaterfallDefinition extends BaseObjectDefinition {
@@ -679,6 +685,7 @@ type BossObjectDefinition = BaseObjectDefinition & LootData & {
 }
 
 type ObjectDefinition = SimpleObjectDefinition
+    | DirectionalObjectDefinition
     | AirStreamDefinition
     | AnodeDefinition
     | BallGoalDefinition

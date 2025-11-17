@@ -74,6 +74,10 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
 
 
     // Tiles with linked offsets map to different tiles than the parent definition.
+    const linkedIndex = baseTile?.behaviors?.linkedIndex;
+    if (linkedIndex !== undefined) {
+        return allTiles[linkedIndex];
+    }
     const linkedOffset = baseTile?.behaviors?.linkedOffset;
     if (linkedOffset !== undefined) {
         explicitIndexMapping[baseTile.index] = baseTile.index + linkedOffset;
@@ -83,6 +87,11 @@ export function mapTile(baseTile?: FullTile): FullTile|null {
             logged[baseTile.index] = true;
         }*/
         return allTiles[baseTile.index + linkedOffset];
+    }
+
+    // Never implicitly map mask tiles to other tiles.
+    if (baseTile.behaviors?.maskFrame) {
+        return baseTile;
     }
 
     if (baseTile.behaviors?.shallowWater || baseTile.behaviors?.water) {

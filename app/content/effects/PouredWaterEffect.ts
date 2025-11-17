@@ -36,7 +36,7 @@ export class PouredWaterEffect implements EffectInstance {
                 sprout.grow(state);
                 this.hasHit = true;
                 this.animationTime = 0;
-            } else if (!tileBehavior.solid) {
+            } else if (tileBehavior.solid !== true) {
                 this.hasHit = true;
                 this.animationTime = 0;
             } else if (this.y > 32 * 16) {

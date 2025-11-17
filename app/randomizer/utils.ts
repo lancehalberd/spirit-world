@@ -576,7 +576,7 @@ function debugState(state: GameState) {
 }
 
 function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[], originalState: GameState, assignmentsState: AssignmentState, loot: LootWithLocation): string {
-    let currentState = originalState;
+    let currentState = copyState(originalState);
     let previousState = originalState;
     let counter = 0;
     do {
@@ -767,6 +767,8 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
 }
 
 function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
+    // Make a copy of the state that we can edit and return without mutating the original state.
+    state = copyState(state);
     const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
     // console.log(debugLocations(reachableChecks));
     for (const check of reachableChecks) {
