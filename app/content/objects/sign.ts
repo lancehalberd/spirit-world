@@ -27,7 +27,7 @@ interface SignStyle {
     getFrame?: (state: GameState, sign: Sign) => Frame
     render?: (context: CanvasRenderingContext2D, state: GameState, sign: Sign) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, sign: Sign) => void
-    isSpiritReadable?: boolean
+    spiritMessage?: string
     normal?: Frame
     spirit?: Frame
 }
@@ -46,7 +46,7 @@ export const signStyles: {[key in string]: SignStyle} = {
                 context.fillRect(sign.x + 3, sign.y + 3, 1, 2);
             }
         },
-        isSpiritReadable: false,
+        spiritMessage: `It won't respond to my Astral Body.`
     },
     largeDisplayScreen: {
         w: 32,
@@ -61,7 +61,7 @@ export const signStyles: {[key in string]: SignStyle} = {
                 context.fillRect(sign.x + 3, sign.y + 3, 1, 3);
             }
         },
-        isSpiritReadable: false,
+        spiritMessage: `It won't respond to my Astral Body.`
     },
     stoneTerminal: {
         w: 32,
@@ -87,35 +87,31 @@ export const signStyles: {[key in string]: SignStyle} = {
             const frame = signStyles.stoneTerminal.getFrame(state, sign);
             drawFrameAt(context, {...frame, h: frame.h - 13, y: frame.y + 13}, {x: sign.x - 2, y: sign.y - 10 + 13});
         },
-        isSpiritReadable: false,
+        spiritMessage: `It won't respond to my Astral Body.`
     },
     short: {
         w: 16,
         h: 16,
         normal: shortSign,
         spirit: shortSignSpirit,
-        isSpiritReadable: true,
     },
     tall: {
         w: 16,
         h: 16,
         normal: tallSign,
         spirit: tallSignSpirit,
-        isSpiritReadable: true,
     },
     nicePlaque: {
         w: 16,
         h: 16,
         normal: nicePlaque,
         spirit: nicePlaque,
-        isSpiritReadable: true,
     },
     brokenPlaque: {
         w: 16,
         h: 16,
         normal: brokenPlaque,
         spirit: brokenPlaque,
-        isSpiritReadable: true,
     },
 };
 
@@ -166,7 +162,8 @@ export class Sign implements ObjectInstance {
             return;
         }
         const style = this.getStyle();
-        if (hero.isAstralProjection && !style.isSpiritReadable) {
+        if (hero.isAstralProjection && style.spiritMessage) {
+            showMessage(state, style.spiritMessage);
             return;
         }
         if (this.definition.specialBehaviorKey) {

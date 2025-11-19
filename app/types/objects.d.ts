@@ -506,6 +506,9 @@ interface BaseSwitchDefinition extends BaseObjectDefinition {
 interface FloorSwitchDefinition extends BaseSwitchDefinition {
     type: 'floorSwitch' | 'heavyFloorSw'
     toggleOnRelease?: boolean
+    // If this is set, the switch will turn off the flag tied to
+    // its ID.
+    isInverted?: boolean
 }
 
 interface HeavyFloorSwitchDefinition extends BaseSwitchDefinition {

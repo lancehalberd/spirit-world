@@ -24,9 +24,16 @@ export class HeavyFloorSwitch implements ObjectInstance {
     y = this.definition.y;
     wasDepressed = false;
     constructor(state: GameState, public definition: HeavyFloorSwitchDefinition) {
-        if (getObjectStatus(state, definition)) {
-            this.status = 'active';
+        this.status = this.getLogicalStatus(state);
+    }
+    getLogicalStatus(state: GameState): ObjectStatus {
+        if (!this.definition.id) {
+            return this.status;
         }
+        if (getObjectStatus(state, this.definition) === !this.definition.isInverted) {
+            return 'active';
+        }
+        return 'normal';
     }
     getHitbox(): Rect {
         return {x: this.x + 2, y: this.y + 2, w: 28, h: 28};
@@ -73,6 +80,8 @@ export class HeavyFloorSwitch implements ObjectInstance {
     }
 
     update(state: GameState) {
+        // This does nothing if the switch isn't assigned an ID.
+        this.status = this.getLogicalStatus(state);
         // Switches with save status turned on stay depressed after they are stepped on.
         if (this.status === 'active') {
             return;

@@ -2,6 +2,7 @@ import {
     BITMAP_MIDDLE_DOWN_RIGHT, BITMAP_MIDDLE_UP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_2,
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
+    BITMAP_BOTTOM_LEFT_PLUS, BITMAP_BOTTOM_RIGHT_PLUS,
     BITMAP_TOP,
     BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
     BITMAP_FULL,
@@ -819,25 +820,25 @@ const caveLedges: TileSource = {
         '8x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upright',
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 208, w: 16, h: 16}),
         },
         '9x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upleft',
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 208, w: 16, h: 16}),
         },
         '10x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upright',
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 208, w: 16, h: 16}),
         },
         '11x13': {
             defaultLayer: 'floor2', diagonalLedge: 'upleft',
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 208, w: 16, h: 16}),
         },
         '12x13': { defaultLayer: 'floor2', isGround: false},
@@ -854,27 +855,27 @@ const caveLedges: TileSource = {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upright',
             solid: BITMAP_MIDDLE_DOWN_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 64, y: 192, w: 16, h: 16}),
         },
         '9x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upleft',
             solid: BITMAP_MIDDLE_UP_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 80, y: 192, w: 16, h: 16})
         },
         '10x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upright',
             solid: BITMAP_MIDDLE_DOWN_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_LEFT,
+            isMaskedMap: BITMAP_BOTTOM_LEFT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 96, y: 192, w: 16, h: 16}), },
         '11x15': {
             defaultLayer: 'floor2', low: true, diagonalLedge: 'upleft',
             solid: BITMAP_MIDDLE_UP_RIGHT,
             isGround: false,
-            isMaskedMap: BITMAP_BOTTOM_RIGHT,
+            isMaskedMap: BITMAP_BOTTOM_RIGHT_PLUS,
             maskFrame: requireFrame('gfx/tiles/cavearranged2.png', {x: 112, y: 192, w: 16, h: 16}),
         },
         '12x15': { defaultLayer: 'floor2', isGround: false},
@@ -1013,6 +1014,24 @@ const spiritFloorEdges: TileSource = {
 const solidPitSource: TileSource = solidColorTile('#111111', {pit: true});
 const solidSkySource: TileSource = solidColorTile('#0088FF', {pit: true});
 
+
+const grassTiles: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
+    behaviors: {
+        'all': { linkedOffset: 179, defaultLayer: 'floor2', isGround: false},
+        '0x0': { linkedOffset: 179, defaultLayer: 'floor', isGround: true},
+    },
+};
+const spiritGrassTiles: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/grassspirit.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
+    behaviors: {
+        'all': {defaultLayer: 'floor2', isGround: false},
+        '0x0': {defaultLayer: 'floor', isGround: true},
+    },
+};
+
 addTiles([
     emptyTile,
     singleTileSource('gfx/tiles/bush.png', bushBehavior, 0),
@@ -1033,14 +1052,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocks.png', heavyStoneBehavior, 96),
     singleTileSource('gfx/tiles/rocks.png', {...unliftableStoneBehavior, linkedOffset: 179}, 160),
-    {
-        w: 16, h: 16,
-        source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
-        behaviors: {
-            'all': { linkedOffset: 179, defaultLayer: 'floor2', isGround: false},
-            '0x0': { linkedOffset: 179, defaultLayer: 'floor', isGround: true},
-        }
-    },
+    grassTiles,
     singleTileSource('gfx/tiles/bush.png', null, 16),
     singleTileSource('gfx/tiles/thorns.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', { touchHit: {damage: 1, spiritCloakDamage: 2, isGroundHit: true, source: null }, defaultLayer: 'field' }),
@@ -1080,10 +1092,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 80),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 96),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritUnliftableStoneBehavior, 160),
-    {
-        w: 16, h: 16,
-        source: requireFrame('gfx/tiles/grassspirit.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
-    },
+    spiritGrassTiles,
     singleTileSource('gfx/tiles/bushspirit.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),
     ...smallTreeSources,

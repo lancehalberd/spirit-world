@@ -399,6 +399,7 @@ export function createObjectDefinition(
                 requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
                 toggleOnRelease: definition.toggleOnRelease,
+                isInverted: definition.isInverted,
                 type: definition.type,
             };
         case 'heavyFloorSwitch':
@@ -406,6 +407,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
+                isInverted: definition.isInverted,
                 type: definition.type,
             };
         case 'indicator':
@@ -1261,6 +1263,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
         case 'heavyFloorSwitch':
+            rows.push({
+                name: 'isInverted',
+                value: object.isInverted ?? false,
+                onChange(isInverted: boolean) {
+                    object.isInverted = isInverted;
+                    updateObjectInstance(state, object);
+                },
+            });
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'indicator': {

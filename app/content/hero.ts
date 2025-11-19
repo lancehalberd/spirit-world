@@ -227,9 +227,17 @@ export class Hero implements Actor {
     }
 
     getCopy(this: Hero): Hero {
-        const copy = new Hero(this.savedData);
+        const copy = new Hero();
         // TODO: Fix this sharing references between the hero and the copy.
-        Object.assign(copy, this);
+        // This is not urgent to fix since the current usage doesn't update any
+        // fields outside of savedData, which is handled correctly below.
+        // Note that we cannot just make a deep copy of the hero since it contains references
+        // to external data(primarily the current area) that should not be copied.
+        // Perhaps the simplest solution would be to copy everything except specific fields
+        // like area.
+        const {savedData, ...heroWithoutSavedData} = this;
+        Object.assign(copy, heroWithoutSavedData);
+        copy.applySavedHeroData(this.savedData);
         return copy;
     }
 

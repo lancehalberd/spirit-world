@@ -145,28 +145,16 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Make plants shoot explosive seeds
-    - Make plants spawn 2x flying beetle when hit with a thrown object that doesn't kill them
-    - Add more enemies to forest
-        - Plants+beetles. Snakes near the water.
-        - 3x plant configuration in a larger open area
-        - plants on raised ground that are difficult to fight and function more like obstacles
-        - elemental plants in Spirit World
-
     - Major tasks blocking release:
+        - Some water shore masks are incorrect. Apply them over walls with showWalls = true to identify all of them and fix them.
+
         - BLOCKED: Fix money maze is using mixed wooden/jade tiles
             - Waiting for E/W Jade doors to convert fully to Jade.
         - Update forest zone in spirit world.
-            - Add entrance to spirit world forest/forest temple through the fertility temple
-                - Add ladder/stairs to fertility shrine in spirit world that take you to new entrance area to forest temple.
-                - Add ladder to entrance area the exits in the eastern spirit forest tile.
-                - Add shortcut from entrance to elder's basement that can be unlocked by coming out of the elders basement.
-                    - Add secret that can be obtained by entering this door in the material world after unlocking it in the spirit world.
             - Test forest pits all land in reasonable places.
                 - Probably need to add content to the southern super tile at a minimum for this.
                 - Also content north of boss arena.
             - Add paths east of elders basement in the forest temple.
-            - Finish converting river to crystal path.
             - Update fast travel spot for the forest village.?
         - Adjust all save statue positions
         - Fix Guardian dialog after getting teleportation
@@ -178,10 +166,21 @@ Current tasks:
         - Add ability to link map sections to special map marker objects on the overworld.
         - Render fog when transitioning from underwater to foggy area.
         - Fix knobby tree door is too wide letting player clip the left edge.
+        - Add more enemies to forest
+            - elemental plants in Spirit World
+        - Convert more Forest Temple ladders into knobby tree doors.
+        - Add secret behind sealed door in forest basement in the material world.
+        - Add better dialog and NPCs to forest temple.
 
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
+
+    - Hybrid dungeon map idea:
+        - Show spirit world + material world in different overlapping fragments (maybe like a broken mirror)
+        - Current world is in front by default, but pressing left/right swaps which world is in front.
+        - Or don't have them overlap, but include the mirror effect and have the map just scroll left and right to show both.
+        - Could default the scroll so that the players position in both worlds is centered about the middle of the screen.
 
     - For staff animations to render all but the bottom Npx in the foreground.
     - Make Vanara bushes linked between worlds like other bushes.
@@ -189,6 +188,8 @@ Current tasks:
     - Add moss to Peach Cave
 
     - Add old save statue graphics as a decoration.
+
+    - Make pits in arrow maze game take you out of the area.
 
     - Add actual pathing algorithm for NPCs+enemies at some point.
 

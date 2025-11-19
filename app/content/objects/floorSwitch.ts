@@ -24,13 +24,20 @@ export class FloorSwitch implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        if (getObjectStatus(state, definition)) {
-            this.status = 'active';
-        }
+        this.status = this.getLogicalStatus(state);
         this.stayDepressed = definition.saveStatus === 'zone' || definition.saveStatus === 'forever';
     }
     getHitbox(): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
+    }
+    getLogicalStatus(state: GameState): ObjectStatus {
+        if (!this.definition.id) {
+            return this.status;
+        }
+        if (getObjectStatus(state, this.definition) === !this.definition.isInverted) {
+            return 'active';
+        }
+        return 'normal';
     }
     isDepressed(state: GameState): boolean {
         const hitbox = this.getHitbox();
@@ -54,7 +61,7 @@ export class FloorSwitch implements ObjectInstance {
             this.status = 'normal';
         } else {
             this.status = 'active';
-            saveObjectStatus(state, this.definition, true);
+            saveObjectStatus(state, this.definition, !this.definition.isInverted);
             if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
                 // Refresh the area to update layer logic, for example drainging lava in the crater.
                 state.areaInstance.needsLogicRefresh = true;
@@ -89,6 +96,8 @@ export class FloorSwitch implements ObjectInstance {
         if (this.status === 'hidden') {
             return;
         }
+        // This does nothing if the switch isn't assigned an ID.
+        this.status = this.getLogicalStatus(state);
         // Switches with save status turned on stay depressed after they are stepped on.
         if (this.stayDepressed && this.status === 'active') {
             return;

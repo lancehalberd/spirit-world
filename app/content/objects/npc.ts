@@ -523,6 +523,9 @@ export class NPC implements Actor, ObjectInstance  {
                 if (dialogue.dialogueIndex >= 0) {
                     setDialogueHeard(state, dialogue.dialogueIndex);
                 }
+            } else if (state.hero.isAstralProjection) {
+                // I don't think we need this, but keeping it here in case I want it later.
+                //showMessage(state, `...It seems like they can't sense my presence.`);
             }
             return;
         }

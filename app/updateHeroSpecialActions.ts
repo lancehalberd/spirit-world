@@ -101,8 +101,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
     if (isPrimaryHero && state.nextAreaInstance) {
-        hero.vx = 0;
-        hero.vy = 0;
+        // The player will lose all velocity while entering an area if they release the direction they are moving.
+        const [dx, dy] = getCloneMovementDeltas(state, hero);
+        if (dx * hero.vx <= 0) hero.vx = 0;
+        if (dy * hero.vy <= 0) hero.vy = 0;
         // If we see issues with the screen transition code for super tiles,
         // update this logic to match the section transition code below and stop
         // the player at exactly the threshold.
