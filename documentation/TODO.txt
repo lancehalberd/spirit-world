@@ -146,8 +146,6 @@ Graphics to Implement:
 
 Current tasks:
     - Major tasks blocking release:
-        - Some water shore masks are incorrect. Apply them over walls with showWalls = true to identify all of them and fix them.
-
         - BLOCKED: Fix money maze is using mixed wooden/jade tiles
             - Waiting for E/W Jade doors to convert fully to Jade.
         - Update forest zone in spirit world.

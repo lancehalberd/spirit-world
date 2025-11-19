@@ -545,8 +545,8 @@ const shoreMask: TileSource = {
         '3x1': { skipped: true },
         '0x3': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
         '1x3': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
-        '1x4': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
-        '0x4': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
+        '0x4': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '1x4': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
     },
 };
 
@@ -558,8 +558,8 @@ const diagMask: TileSource = {
         '0x0': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
         '1x0': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
         '2x0': { isMaskedMap: BITMAP_TOP, isGround: false },
-        '1x1': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
-        '0x1': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
+        '0x1': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '1x1': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
         '2x1': { isMaskedMap: BITMAP_BOTTOM, isGround: false },
     },
 };
@@ -578,8 +578,8 @@ const shoreAnglesMask: TileSource = {
         '0x2': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
         '3x2': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
         '0x3': { skipped: true },
-        '1x3': { isMaskedMap: BITMAP_TOP_LEFT, isGround: false },
-        '2x3': { isMaskedMap: BITMAP_TOP_RIGHT, isGround: false },
+        '1x3': { isMaskedMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '2x3': { isMaskedMap: BITMAP_BOTTOM_RIGHT, isGround: false },
         '3x3': { skipped: true },
     },
 };
