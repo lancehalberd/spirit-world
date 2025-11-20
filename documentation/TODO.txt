@@ -150,14 +150,13 @@ Current tasks:
         - So the bug probably still exists, but is difficult to reproduce for some reason.
 
     - Major tasks blocking release:
-        - BLOCKED: Fix money maze is using mixed wooden/jade tiles
-            - Waiting for E/W Jade doors to convert fully to Jade.
         - Adjust all save statue positions
             - Including the title scene.
-        - Fix Guardian dialog after getting teleportation
-            - Make each dreamland exit even more distinct to make it intuive where each one leads.
         - Update randomizer logic.
+        - Test forest
+        - Test forest temple
     - Minor tasks blocking release:
+        - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
         - Render fog when transitioning from underwater to foggy area.
         - Fix knobby tree door is too wide letting player clip the left edge.
         - Add more enemies to forest

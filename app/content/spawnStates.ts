@@ -34,7 +34,7 @@ const cocoonStartState = applyItemsToSavedState(warTempleBoss, {maxLife: 1, astr
 const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
 const vanaraDreamStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1},
-    ['cocoonTeleporter']);
+    ['cocoonBossStarted', 'cocoonBoss']);
 const helixRivalStateStory = applyItemsToSavedState(vanaraDreamStateStory, {teleportation: 1},
     ['teleportationTutorialSwitch']);
 const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
