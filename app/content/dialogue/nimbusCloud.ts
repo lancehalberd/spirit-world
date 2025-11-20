@@ -29,7 +29,7 @@ export const zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     // tombEntrance
     'helix': 'lakeTunnel:helixEntrance',
     // helixSkyEntrance
-    'forestTemple': 'overworld:forestTempleLadder1',
+    'forestTemple': 'forest:forestTempleEastTreeEntrance',
     'waterfallTower': 'overworld:waterfallTowerEntrance',
      // waterfallTowerTopEntrance
     'forge': 'sky:forgeEntrance',
@@ -122,7 +122,7 @@ dialogueHash.nimbusCloud = {
         grandTemple: (state: GameState) => travelToLocation(state, 'grandTemple', 'portalMarker'),
         lake: (state: GameState) => travelToLocation(state, 'overworld', 'lakeMarker'),
         holyCity: (state: GameState) => travelToLocation(state, 'overworld', 'holyCityMarker'),
-        vanaraVillage: (state: GameState) => travelToLocation(state, 'overworld', 'vanaraVillageMarker'),
+        vanaraVillage: (state: GameState) => travelToLocation(state, 'forest', 'vanaraVillageMarker'),
         crater: (state: GameState) => travelToLocation(state, 'sky', 'craterMarker'),
         summonerRuins: (state: GameState) => travelToLocation(state, 'overworld', 'summonerRuinsMarker'),
         // Spirit world destinations

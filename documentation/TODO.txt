@@ -145,6 +145,10 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Fix cannot exit helix top to material sky sometimes.
+        - I cannot reproduce this, but a player reproduced on staging on 2025-11-19 and I couldn't reproduce on the same day
+        - So the bug probably still exists, but is difficult to reproduce for some reason.
+
     - Major tasks blocking release:
         - BLOCKED: Fix money maze is using mixed wooden/jade tiles
             - Waiting for E/W Jade doors to convert fully to Jade.
@@ -152,16 +156,16 @@ Current tasks:
             - Test forest pits all land in reasonable places.
                 - Probably need to add content to the southern super tile at a minimum for this.
                 - Also content north of boss arena.
-            - Add paths east of elders basement in the forest temple.
-            - Update fast travel spot for the forest village.?
         - Adjust all save statue positions
+            - Including the title scene.
         - Fix Guardian dialog after getting teleportation
             - Make each dreamland exit even more distinct to make it intuive where each one leads.
         - Update randomizer logic.
-        - Fix map behavior for forest, forest water, forest temple and for all spirit versions.
+        - Add ability to link map sections to special map marker objects on the overworld.
+            - Add a seperate section for markers and list all spawnMarkers that have ids.
+            - Fix map behavior for forest, forest water, forest temple and for all spirit versions.
         - Update spawn location for forest temple boss state.
     - Minor tasks blocking release:
-        - Add ability to link map sections to special map marker objects on the overworld.
         - Render fog when transitioning from underwater to foggy area.
         - Fix knobby tree door is too wide letting player clip the left edge.
         - Add more enemies to forest
@@ -169,6 +173,8 @@ Current tasks:
         - Convert more Forest Temple ladders into knobby tree doors.
         - Add secret behind sealed door in forest basement in the material world.
         - Add better dialog and NPCs to forest temple.
+        - Add broken glass wall decoration and use it in forest temple south hallway.
+        - Hide target object id editor fields when target zone is "none"
 
     - Add pixel precision to water tiles:
         - water edges
@@ -186,6 +192,7 @@ Current tasks:
     - Add moss to Peach Cave
 
     - Add old save statue graphics as a decoration.
+        - Possibly replace save status with these in the title scene.
 
     - Make pits in arrow maze game take you out of the area.
 
