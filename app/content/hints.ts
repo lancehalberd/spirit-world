@@ -41,7 +41,7 @@ const getLakeTeleporterLocation = (state: GameState) => findMaterialWorldObject(
 const getLakeTunnelLocation = (state: GameState) => findMaterialWorldObject(state, 'lakeTunnelEntrance');
 const getGrandTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'grandTempleEntrance');
 
-const getForestTempleLocation = (state: GameState) => findSpiritWorldObject(state, 'elderSpiritEntrance');
+const getForestTempleLocation = (state: GameState) => findSpiritWorldObject(state, 'fertilityTempleSpiritEntrance');
 const getWaterfallTowerLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallTowerEntrance');
 const getForgeLocation = (state: GameState) => findSpiritSkyObject(state, 'forgeEntrance');
 const getSkyPalaceLocation = (state: GameState) => findSpiritSkyObject(state, 'skyPalaceEntrance');

@@ -1,4 +1,4 @@
-import { createAreaInstance } from 'app/content/areas';
+import {createAreaInstance, getOrCreateAreaInstanceFromDefinition} from 'app/content/areas';
 import { convertLocationToMapCoordinates, getMapTargets } from 'app/content/hints';
 import { doorStyles } from 'app/content/objects/doorStyles';
 import {evaluateLogicDefinition} from 'app/content/logic';
@@ -213,7 +213,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 w: section.w * 16 * 4 / w,
                 h: section.h * 16 * 4 / h,
             },
-            area: createAreaInstance(state, zone, area),
+            area: editingState.isEditing ? getOrCreateAreaInstanceFromDefinition(state, zone, area) : createAreaInstance(state, zone, area),
         });
     }
 
@@ -585,8 +585,8 @@ export function getSectionUnderMouse(state: GameState): AreaSection | undefined 
         if (isPointInShortRect(x, y, {
             x: section.mapX * 32,
             y: section.mapY * 32,
-            w: 2 * section.w,
-            h: 2 * section.h,
+            w: 2 * section.w * 32 / state.zone.areaSize.w,
+            h: 2 * section.h * 32 / state.zone.areaSize.h,
         })) {
             return section;
         }

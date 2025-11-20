@@ -309,7 +309,7 @@ export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][]
     return fullTiles;
 }
 
-export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation): AreaInstance {
+export function getOrCreateAreaInstanceFromLocation(state: GameState, location: ZoneLocation): AreaInstance {
     const definition = getAreaFromLocation(location);
     for (const area of editingState.recentAreas) {
         if (area.definition === definition) {
@@ -317,6 +317,16 @@ export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation
         }
     }
     return createAreaInstance(state, zones[location.zoneKey], definition);
+}
+
+
+export function getOrCreateAreaInstanceFromDefinition(state: GameState, zone: Zone, definition: AreaDefinition): AreaInstance {
+    for (const area of editingState.recentAreas) {
+        if (area.definition === definition) {
+            return area;
+        }
+    }
+    return createAreaInstance(state, zone, definition);
 }
 
 export function addRecentArea(areaInstance: AreaInstance): void {

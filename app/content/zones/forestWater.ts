@@ -172,7 +172,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 661, mapId: 'forestWater', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 32, h: 32, index: 661, mapId: 'overworld', entranceId: 'forestMarkerNW', mapX: 0, mapY: 0},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -364,7 +364,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "forestRiverMoney", x: 144, y: 96, type: "chest", lootType: "money", lootAmount: 20},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 664, mapId: 'forestWater', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 32, h: 32, index: 664, mapId: 'overworld', entranceId: 'forestMarkerW', mapX: 0, mapY: 2},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -555,7 +555,7 @@ const f0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 667, mapId: 'forestWater', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 667, mapId: 'overworld', entranceId: 'forestMarkerSW', mapX: 0, mapY: 4},
     ],
 };
 const f0_1x2: AreaDefinition = {
@@ -730,7 +730,7 @@ const f0_1x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 668, mapId: 'forestWater', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 32, index: 668, mapId: 'overworld', entranceId: 'forestMarkerS', mapX: 2, mapY: 4},
     ],
 };
 const f0_2x2: AreaDefinition = {

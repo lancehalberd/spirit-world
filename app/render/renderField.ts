@@ -1,5 +1,5 @@
 import {renderAR} from 'app/arGames/arGame';
-import { getOrCreateAreaInstance } from 'app/content/areas';
+import {getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
 import { editingState } from 'app/development/editingState';
 import {
@@ -546,7 +546,7 @@ export function renderField(
                     continue;
                 }
                 // This will use cached area instances if available.
-                const area = getOrCreateAreaInstance(state, {
+                const area = getOrCreateAreaInstanceFromLocation(state, {
                     ...state.location,
                     areaGridCoords: {x, y},
                 });

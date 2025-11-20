@@ -511,6 +511,7 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, parentDefinition: Area
     if (tile?.behaviors?.maskFrame && !layerDefinition.grid.mask?.[y]?.[x]) {
         const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
         const parentTile = allTiles[parentDefinition.grid?.mask?.[y]?.[x]];
+        areaLayer.maskTiles = areaLayer.maskTiles || [];
         areaLayer.maskTiles[y] = areaLayer.maskTiles[y] || [];
         areaLayer.maskTiles[y][x] = mapTile(parentTile);
         area.checkToRedrawTiles = true;
