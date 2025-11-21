@@ -491,7 +491,7 @@ const f0_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,11,0,11,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -3632,6 +3632,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "forest:0:2x2-beetleHorned-0", x: 70, y: 300, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
         {status: "normal", id: "forest:0:2x2-beetleWinged-0", x: 202, y: 204, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
         {status: "normal", id: "forest:0:2x2-beetleWinged-1", x: 270, y: 420, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
+        {status: "normal", id: "forestSilver", x: 412, y: 391, type: "loot", lootType: "silverOre", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 648, mapId: 'overworld', entranceId: 'forestMarkerSE', mapX: 4, mapY: 4},
@@ -4404,7 +4405,7 @@ const sf0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "forestTempleLadder4", x: 32, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder4", d: "down"},
+        {status: "normal", id: "forestTempleNorthLadder", x: 32, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleNorthLadder", d: "down"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 653, mapId: 'overworld', entranceId: 'forestMarkerNSpirit', mapX: 2, mapY: 0},
@@ -4797,6 +4798,7 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "forestTowerEntranceSpirit", x: 496, y: 80, type: "door", style: "pathEntrance", targetZone: "overworld", targetObjectId: "forestTowerEntranceSpirit", d: "right"},
         {status: "normal", id: "forestTempleNortheastTreeEntrance", x: 208, y: 320, type: "door", style: "knobbyTree", targetZone: "forestTemple", targetObjectId: "forestTempleNortheastTreeEntance", d: "up"},
         {status: "normal", id: "forestTempleNortheastCaveEntrance", x: 272, y: 112, type: "door", style: "cavernDownstairs", targetZone: "forestTemple", targetObjectId: "forestTempleNortheastCaveEntrance", d: "up"},
+        {status: "normal", id: "spiritForestGold", x: 352, y: 48, type: "chest", lootType: "goldOre", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 654, mapId: 'overworld', entranceId: 'forestMarkerNESpirit', mapX: 4, mapY: 0},
@@ -6295,7 +6297,7 @@ const sf0_0x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "forestTempleBackDoor", x: 192, y: 256, type: "door", style: "knobbyTree", targetZone: "forestTemple", targetObjectId: "forestTempleBackDoor", d: "up"},
-        {status: "normal", id: "forestTempleSouthwestTreeEntrance", x: 424, y: 96, type: "door", style: "cavernDownstairs", targetZone: "forestTemple", targetObjectId: "forestTempleSouthwestTreeEntrance", d: "up"},
+        {status: "normal", id: "forestTempleSouthwestCaveEntrance", x: 424, y: 96, type: "door", style: "cavernDownstairs", targetZone: "forestTemple", targetObjectId: "forestTempleSouthwestCaveEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 658, mapId: 'overworld', entranceId: 'forestMarkerSWSpirit', mapX: 0, mapY: 4},
@@ -6729,7 +6731,7 @@ const sf0_2x2: AreaDefinition = {
     parentDefinition: f0_2x2,
     layers: null,
     objects: [
-        {status: "normal", id: "forestTempleLadder1", x: 200, y: 224, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder1", d: "down"},
+        {status: "normal", id: "forestTempleSoutheastLadder", x: 200, y: 224, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleSoutheastLadder", d: "down"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 660, mapId: 'overworld', entranceId: 'forestMarkerSESpirit', mapX: 4, mapY: 4},

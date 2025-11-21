@@ -10505,10 +10505,10 @@ const sf0_0x2: AreaDefinition = {
     objects: [
         {id: "elderSpiritEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "knobbyTree", targetZone: "treeVillage", targetObjectId: "elderSpiritEntrance", d: "up"},
         {status: "normal", id: "fertilityTempleExit", x: 400, y: 288, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleExit"},
-        {status: "normal", id: "forestTempleLadder1", x: 400, y: 352, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder1", d: "down"},
+        {status: "normal", id: "forestTempleSoutheastLadder", x: 400, y: 352, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleSoutheastLadder", d: "down"},
         {status: "normal", id: "forestTempleLadder2", x: 432, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder2", d: "down"},
         {status: "normal", id: "forestTempleLadder3", x: 368, y: 64, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder3", d: "down"},
-        {status: "normal", id: "forestTempleLadder4", x: 128, y: 96, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder4", d: "down"},
+        {status: "normal", id: "forestTempleNorthLadder", x: 128, y: 96, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleNorthLadder", d: "down"},
         {status: "normal", id: "forestTempleLadder5", x: 48, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder5", d: "down"},
         {status: "normal", id: "", x: 368, y: 384, type: "spawnMarker"},
         {status: "normal", id: "", x: 368, y: 336, type: "spawnMarker"},

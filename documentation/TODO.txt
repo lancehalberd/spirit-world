@@ -150,11 +150,16 @@ Current tasks:
         - So the bug probably still exists, but is difficult to reproduce for some reason.
 
     - Major tasks blocking release:
+        - Make sure falling in the Southwest corner of the sky takes the player to the forest zone.
+            - Use the old logic for falling from the overworld into the forest temple.
+        - Update entrance randomizer logic.
+            - Verify spiritForestGold is in logic in entrance randomizer.
+            - Make sure treeVillage -> forestTemple doors aren't considered entrances for entrance randomizer.
         - Adjust all save statue positions
             - Including the title scene.
-        - Update randomizer logic.
         - Test forest
         - Test forest temple
+        - Test randomizer
     - Minor tasks blocking release:
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
         - Render fog when transitioning from underwater to foggy area.
@@ -165,6 +170,12 @@ Current tasks:
         - Add better dialog and NPCs to forest temple.
         - Add broken glass wall decoration and use it in forest temple south hallway.
         - Hide target object id editor fields when target zone is "none"
+        - Draw fog effect instead of forest map when forest is foggy.
+            - Would be nice to generalize this, but we want to make sure we handle the case of
+                looking at the forest map from underwater (which is not foggy), while the forest is still foggy.
+        - Allow specifying mapIcon on doors to indicate spirit forest trees go down.
+            - Render right arrows 2px left of normal position so they are on screen when near the right edge of the map.
+
 
     - Add pixel precision to water tiles:
         - water edges

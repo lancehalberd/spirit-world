@@ -1,9 +1,13 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {isRandomizer} from 'app/gameConstants';
 
 dialogueHash.spiritTree = {
     key: 'spiritTree',
     mappedOptions: {
         interact(state: GameState) {
+            if (isRandomizer) {
+                return '{@spiritTree.randomizerReward}';
+            }
             if (!state.hero.savedData.passiveTools.teleportation) {
                 return '{@spiritTree.welcome}';
             }
@@ -17,6 +21,7 @@ dialogueHash.spiritTree = {
                 }
             `;
         },
+        randomizerReward: '{item:teleportation}',
         goodbye(state: GameState) {
             return 'The Spirits of the Vanara watch over you.';
         },

@@ -767,8 +767,6 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
 }
 
 function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
-    // Make a copy of the state that we can edit and return without mutating the original state.
-    state = copyState(state);
     const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
     // console.log(debugLocations(reachableChecks));
     for (const check of reachableChecks) {
@@ -836,6 +834,8 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 addCheck(flag, assignment, 'holyCityInterior');
             } else if (dialogueKey === 'forgeSmith') {
                 addCheck(flag, assignment, 'forge');
+            } else if (dialogueKey === 'spiritTree') {
+                addCheck(flag, assignment, 'dream');
             } else {
                 console.error('Unhandled dialogue key', dialogueKey);
             }

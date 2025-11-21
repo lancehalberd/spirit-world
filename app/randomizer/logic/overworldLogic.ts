@@ -20,19 +20,19 @@ export const mainOverworldNode: LogicNode = {
         {dialogueKey: 'streetVendor', optionKey: 'purchase3', logic: beastsDefeated},
     ],
     paths: [
-        { nodeId: 'overworldMountain', logic: canRemoveLightStones },
-        { nodeId: 'forestArea' },
-        { nodeId: 'warTempleArea' },
-        { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
-        { nodeId: 'overworldLakeTunnel', logic: orLogic(canRemoveLightStones, hasTeleportation) },
+        {nodeId: 'overworldMountain', logic: canRemoveLightStones},
+        {nodeId: 'warTempleArea'},
+        {nodeId: 'nimbusCloud', logic: hasNimbusCloud},
+        {nodeId: 'overworldLakeTunnel', logic: orLogic(canRemoveLightStones, hasTeleportation)},
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
-        { nodeId: 'forestTowerSky', logic: andLogic({requiredFlags: ['stormBeast']})},
-        { nodeId: 'underRiver', logic: hasIronBoots},
-        { nodeId: 'underLake', logic: andLogic(hasIronBoots,
+        {nodeId: 'forestTowerSky', logic: andLogic({requiredFlags: ['stormBeast']})},
+        {nodeId: 'underRiver', logic: hasIronBoots},
+        {nodeId: 'underLake', logic: andLogic(hasIronBoots,
             orLogic({requiredFlags: ['frostBeast']}, hasFire)
         )},
-        { nodeId: 'underCity', logic: hasIronBoots},
+        {nodeId: 'underCity', logic: hasIronBoots},
+        {nodeId: 'dreamEntranceInner', logic: hasTeleportation},
     ],
     entranceIds: [
         'sideArea:noToolEntrance', 'tombTeleporter',
@@ -45,10 +45,12 @@ export const mainOverworldNode: LogicNode = {
         'overworld:holyCityGardenHouse', 'overworld:holyCityClothesHouse',
         'fertilityTempleEntrance',
         'frozenCaveEntrance',
+        'forestNorthEntrance',
+        'forestEastEntrance',
+        'lakeDreamTeleporter',
     ],
     exits: [
         {objectId: 'sideArea:noToolEntrance'},
-        {objectId: 'elderEntrance'},
         {objectId: 'peachCaveTopEntrance'},
         // This entrance becomes frozen while the frost beast is active.
         {objectId: 'peachCaveWaterEntrance', logic: orLogic({requiredFlags: ['frostBeast']}, hasFire)},
@@ -70,6 +72,8 @@ export const mainOverworldNode: LogicNode = {
             // You can use fire magic to melt it, or medium range to use a nearby camp fire to melt it.
             logic: orLogic(hasReleasedBeasts, hasFire, hasMediumRange)
         },
+        {objectId: 'forestNorthEntrance'},
+        {objectId: 'forestEastEntrance'},
     ],
 };
 export const overworldNodes: LogicNode[] = [
@@ -119,26 +123,6 @@ export const overworldNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'forestArea',
-        paths: [
-            { nodeId: 'overworldMain' },
-        ],
-        entranceIds: [
-            'elderEntrance',
-            'northwestTreeEntrance',
-            'northeastTreeEntrance',
-            'southeastTreeEntrance',
-        ],
-        exits: [
-            { objectId: 'elderEntrance' },
-            { objectId: 'northwestTreeEntrance' },
-            { objectId: 'northeastTreeEntrance' },
-            { objectId: 'southeastTreeEntrance' },
-            { objectId: 'treeVillageStoragePit' },
-        ],
-    },
-    {
-        zoneId,
         nodeId: 'warTempleArea',
         checks: [
             {objectId: 'desertMoney', logic: canRemoveLightStones},
@@ -164,6 +148,20 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'warTemplePeachEntrance', logic: canRemoveLightStones },
             { objectId: 'warTempleKeyDoor', logic: {requiredFlags: ['warTempleKeyDoor']} },
         ],
+    },
+    {
+        zoneId,
+        nodeId: 'forestTower',
+        // TODO: how to connect this to forestTowerSpirit in a way that supports entrance randomizer?
+        entranceIds: ['forestTowerEntrance'],
+        exits: [{objectId: 'forestTowerEntrance'}],
+    },
+    {
+        zoneId,
+        nodeId: 'forestTowerSpirit',
+        // TODO: how to connect this to forestTowerSpirit in a way that supports entrance randomizer?
+        entranceIds: ['forestTowerEntranceSpirit'],
+        exits: [{objectId: 'forestTowerEntranceSpirit'}],
     },
     {
         zoneId,
@@ -302,50 +300,6 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'warTempleEntranceSpirit' },
             { objectId: 'warPalaceWestDoor' },
         ],
-    },
-    // This node holds paths that work from any node in the forest temple area.
-    {
-        zoneId,
-        nodeId: 'forestTempleNodeAll',
-        paths: [
-            { nodeId: 'forestTempleSEArea', logic: orLogic(hasCloudBoots, hasIce) },
-            { nodeId: 'forestTempleSWArea', logic: orLogic(hasCloudBoots, hasIce) },
-            { nodeId: 'forestTempleNEArea', logic: orLogic(hasCloudBoots, hasIce) },
-            { nodeId: 'forestTempleNWArea', logic: orLogic(hasCloudBoots, hasIce) },
-            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
-        ],
-    },
-    {
-        zoneId,
-        nodeId: 'forestTempleSEArea',
-        paths: [{nodeId: 'forestTempleNodeAll'}],
-        entranceIds: ['forestTempleLadder1', 'fertilityTempleExit'],
-        exits: [{ objectId: 'forestTempleLadder1' }, { objectId: 'fertilityTempleExit' }],
-    },
-    {
-        zoneId,
-        nodeId: 'forestTempleNEArea',
-        paths: [{nodeId: 'forestTempleNodeAll'}],
-        entranceIds: ['forestTempleLadder2', 'forestTempleLadder3'],
-        exits: [{ objectId: 'forestTempleLadder2' }, { objectId: 'forestTempleLadder3' }],
-    },
-    {
-        zoneId,
-        nodeId: 'forestTempleNWArea',
-        paths: [{nodeId: 'forestTempleNodeAll'}],
-        entranceIds: ['forestTempleLadder4', 'forestTempleLadder5'],
-        exits: [
-            { objectId: 'forestTempleLadder4' },
-            { objectId: 'forestTempleLadder5' },
-            { objectId: 'forestTempleBigKeyEntrance' },
-        ],
-    },
-    {
-        zoneId,
-        nodeId: 'forestTempleSWArea',
-        paths: [{nodeId: 'forestTempleNodeAll'}],
-        entranceIds: ['elderSpiritEntrance'],
-        exits: [{ objectId: 'elderSpiritEntrance' }],
     },
 ];
 
@@ -556,8 +510,8 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'desertTowerSkySpirit', logic: orLogic(hasIce, hasCloudBoots, hasSomersault) },
             { nodeId: 'outsideSkyPalacePitEntrance', logic: orLogic(andLogic(hasIce, canCross2Gaps), hasCloudBoots, hasSomersault) },
-            // The player can fall to the NE section of the fertility temple if they can enter the bottom left corner of the sky.
-            { nodeId: 'forestTempleNEArea', logic: orLogic(hasCloudBoots, hasIce, hasStaff) },
+            // The player can fall to the northeast section of the fertility temple if they can enter the bottom left corner of the sky.
+            { nodeId: 'forestTowerEntranceSpirit', logic: orLogic(hasCloudBoots, hasIce, hasStaff) },
         ],
         entranceIds: [],
         exits: [],

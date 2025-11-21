@@ -1,5 +1,5 @@
-import { zoneEntranceMap } from 'app/content/dialogue/nimbusCloud';
-import { overworldKeys } from 'app/gameConstants';
+import {zoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
+import {overworldKeys} from 'app/gameConstants';
 import SRandom from 'app/utils/SRandom';
 
 import {
@@ -17,6 +17,17 @@ const ignoredZones = [
     'void',
 ];
 
+const zoneSets = [
+    new Set(['forestTemple', 'treeVillage', 'caves'])
+];
+
+const equivalentZones: {[key in string]: Set<string>} = {}
+for (const zoneSet of zoneSets) {
+    for (const zoneKey of zoneSet) {
+        equivalentZones[zoneKey] = zoneSet;
+    }
+}
+
 const outsideZones = overworldKeys;
 
 // This stores a list of zone+object ids that should be ignored, (not target zone+object ids).
@@ -26,6 +37,15 @@ const disabledDoors = [
     // Neither this door or its target are reachable in the game.
     // This door just exists as a reason for there to be corresponding cave in the spirit world.
     'sky:hypeCaveEntrance',
+    // Currently we do not randomize entrances between "outside" areas.
+    'overworld:forestNorthEntrance',
+    'forest:forestNorthEntrance',
+    'overworld:forestTowerEntrance',
+    'forest:forestTowerEntrance',
+    'overworld:forestEastEntrance',
+    'forest:forestEastEntrance',
+    'overworld:forestTowerEntranceSpirit',
+    'forest:forestTowerEntranceSpirit',
 ];
 
 interface DoorLocation {
@@ -37,9 +57,10 @@ interface DoorLocation {
 // one needs to be connected to a reachable entrance using a connected exit group.
 const unreachableSpiritExitGroups = [
     // There is currently a ladder leading to this cave in the Spirit World.
-    //['caves:caves-ascentExitSpirit'],
-    ['holyCityInterior:jadeCityMazeExit'],
+    //['caves:caves-ascentExitSpirit'],    ['holyCityInterior:jadeCityMazeExit'],
     ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
+    // When the tower is placed in the forest, this exit is the only way to reach this area in the Spirit World.
+    ['staffTower:staffTowerSpiritEntrance'],
 ];
 
 interface ConnectedExitGroup {
@@ -84,14 +105,16 @@ const connectedExitGroups: ConnectedExitGroup[] = [
         spiritEntranceTargets: ['overworld:staffTowerSpiritEntrance', 'sky:staffTowerSpiritSkyEntrance'],
     },
     {
-        spiritEntranceTargets: ['overworld:fertilityTempleSpiritEntrance', 'overworld:fertilityTempleExit'],
+        spiritEntranceTargets: ['overworld:fertilityTempleSpiritEntrance', 'forestTemple:forestTempleEntranceSpirit'],
     },
     {
-        spiritEntranceTargets: ['overworld:forestTempleLadder1', 'overworld:forestTempleLadder2'],
+        spiritEntranceTargets: ['overworld:forestTempleSoutheastLadder', 'overworld:forestTempleNortheastTreeEntance'],
     },
+    /*
+    // Unsupported one way tunnel from  forestTempleNorthLadder -> forestTempleNortheastCaveEntrance
     {
-        spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
-    },
+        spiritEntranceTargets: ['overworld:forestTempleNortheastCaveEntrance', 'overworld:forestTempleNorthLadder'],
+    },*/
     /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
     {
         spiritEntranceTargets: ['overworld:caves-ascentEntranceSpirit'],
@@ -126,10 +149,10 @@ const normalLoopableEntrancePairs = [
 ];
 const spiritLoopableEntrancePairs = [
     // Elder Spirit -> Forest Temple Back
-    {outerTarget: 'overworld:elderSpiritEntrance', innerTarget: 'forestTemple:forestTempleBackDoor'},
+    // {outerTarget: 'forest:elderSpiritEntrance', innerTarget: 'forestTemple:forestTempleBackDoor'},
     // War Temple Spirit -> Lab
     {outerTarget: 'overworld:warTempleEntranceSpirit', innerTarget: 'lab:labEntrance'},
-    // Lab -> Tre
+    // Lab -> Tree
     {outerTarget: 'warTemple:labEntrance', innerTarget: 'tree:treeEntrance'},
     // Jade Palace -> Holy Sanctum
     {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
@@ -156,7 +179,7 @@ export function randomizeEntrances(random: typeof SRandom) {
             return;
         }
         if (object.type === 'pitEntrance') {
-            if (!object.targetZone || object.targetZone === zone.key) {
+            if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
                 return;
             }
             const targetKey = `${object.targetZone}:${object.targetObjectId}`;
@@ -172,7 +195,7 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (object.type !== 'door' && object.type !== 'staffTower') {
             return;
         }
-        if (!object.targetZone || object.targetZone === zone.key) {
+        if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
             return;
         }
         if (ignoredZones.includes(object.targetZone)) {
@@ -200,7 +223,7 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (outsideZones.includes(zone.key)
             // There are a few special "entrances" inside other zones
             || zone.key === 'tomb' && object.targetZone === 'cocoon'
-            || zone.key === 'treeVillage' && object.targetZone === 'forestTemple'
+            //|| zone.key === 'treeVillage' && object.targetZone === 'forestTemple'
             || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
             || zone.key === 'warTemple' && object.targetZone === 'lab'
             || zone.key === 'lab' && object.targetZone === 'tree'

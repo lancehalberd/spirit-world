@@ -671,6 +671,9 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'void': return 'in the abyss of space';
         case 'gauntlet': return 'in the Gauntlet under the Grand Temple';
         case 'holySanctum': return 'in the Holy Sanctum of the Jade Palace';
+        case 'forest': return 'in the Forest';
+        case 'spiritForest': return 'in the Spirit Forest';
+        case 'dream': return 'in the Dreaming';
     }
     // The type of this should just be `void` if all zones are handled.
     return zone;

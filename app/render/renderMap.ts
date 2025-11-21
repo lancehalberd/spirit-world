@@ -78,6 +78,9 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     if (zone === 'underwater') {
         zone = 'overworld';
     }
+    if (zone === 'forestWater') {
+        zone = 'forest';
+    }
     drawMapFrame(context, fullWorldMapRectangle);
     const r = innerWorldMapRectangle;
     refreshWorldMap(state, zone);

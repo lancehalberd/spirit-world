@@ -1,117 +1,11 @@
 import {
     andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
-    hasRangedPush, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasIronBoots, hasLongSomersault, hasStaff,
-    hasMediumRange, hasWaterBlessing, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
+    hasRangedPush, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasIronBoots, hasLongSomersault, hasStaff,
+    hasWaterBlessing, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
 
 import { variantLogic } from 'app/utils/variants';
-
-
-export const treeVillageNodes: LogicNode[] = [
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'elderEntrance',
-        entranceIds: [
-            'elderEntrance',
-            'elderDownstairs',
-        ],
-        exits: [
-            { objectId: 'elderEntrance' },
-            { objectId: 'elderDownstairs' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'elderDownstairs',
-        checks: [
-            { objectId: 'elderPeachPiece', logic: hasMediumRange },
-            { objectId: 'treeVillageBow', logic: hasCatEyes },
-        ],
-        entranceIds: [
-            'elderUpstairs',
-        ],
-        exits: [
-            { objectId: 'elderUpstairs' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'northwestTree',
-        entranceIds: [
-            'northwestTreeEntrance',
-        ],
-        exits: [
-            { objectId: 'northwestTreeEntrance' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'northeastTreeEntrance',
-        entranceIds: [
-            'northeastTreeEntrance',
-        ],
-        exits: [
-            { objectId: 'northeastTreeEntrance' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'southeastTree',
-        complexNpcs: [{
-            dialogueKey: 'storageVanara',
-            optionKey: 'peachReward',
-            logic: {requiredFlags: ['clearedTreeVillageStorageRoom']},
-        }],
-        entranceIds: [
-            'southeastTreeEntrance',
-            'vanaraStorageStairs',
-        ],
-        exits: [
-            { objectId: 'southeastTreeEntrance' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'treeVillageStorageRoom',
-        checks: [
-            {objectId: 'treeVillageMoneyA'},
-            {objectId: 'treeVillageMoneyB'},
-            {objectId: 'treeVillageEmptyChest'},
-        ],
-        flags: [{flag: 'clearedTreeVillageStorageRoom', logic: hasWeapon }],
-        entranceIds: [
-            'treeVillageStorageMarker',
-        ],
-        exits: [
-            { objectId: 'vanaraStorageStairs' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'elderSpiritEntrance',
-        entranceIds: [
-            'elderSpiritEntrance',
-            'elderSpiritStairs',
-        ],
-        exits: [
-            { objectId: 'elderSpiritEntrance' },
-            { objectId: 'elderSpiritStairs' },
-        ],
-    },
-    {
-        zoneId: 'treeVillage',
-        nodeId: 'elderSpiritDownstairs',
-        entranceIds: [
-            'elderSpiritStairs',
-            'forestTempleBackDoor',
-        ],
-        exits: [
-            { objectId: 'elderSpiritStairs' },
-            { objectId: 'forestTempleBackDoor', logic: andLogic(hasMediumRange, canCross2Gaps) }
-        ],
-    },
-];
 
 export const waterfallCaveNodes: LogicNode[] = [
     {
@@ -272,10 +166,10 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'caves',
         nodeId: 'spiritFertilityTemple',
-        entranceIds: ['fertilityTempleSpiritEntrance', 'fertilityTempleExit'],
+        entranceIds: ['fertilityTempleSpiritEntrance', 'forestTempleEntranceSpirit'],
         exits: [
             { objectId: 'fertilityTempleSpiritEntrance' },
-            { objectId: 'fertilityTempleExit' },
+            { objectId: 'forestTempleEntranceSpirit' },
         ],
     },
 

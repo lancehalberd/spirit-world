@@ -7,6 +7,7 @@ import {
     hasBossWeapon,
     hasGloves,
     hasSpiritBarrier,
+    hasSpiritSight,
     canRemoveLightStones,
     hasSomersault,
     hasTeleportation,
@@ -112,8 +113,11 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoonBoss',
+        paths: [
+            {nodeId: 'dreamMain', logic: hasTeleportation},
+        ],
         checks: [
-            {objectId: 'cocoonBoss', logic: hasAstralProjection},
+            {objectId: 'cocoonBoss', logic: hasSpiritSight},
             {objectId: 'cocoonSilver', logic: orLogic(hasTeleportation, hasSomersault) },
         ],
         npcs: [

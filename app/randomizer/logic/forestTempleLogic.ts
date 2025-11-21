@@ -14,6 +14,15 @@ const zoneId = 'forestTemple';
 export const forestTempleNodes: LogicNode[] = [
     {
         zoneId,
+        nodeId: 'forestTempleEntranceSpirit',
+        entranceIds: ['forestTempleEntranceSpirit', 'forestTempleEastTreeEntrance'],
+        exits: [
+            {objectId: 'forestTempleEntranceSpirit'},
+            {objectId: 'forestTempleEastTreeEntrance'},
+        ],
+    },
+    {
+        zoneId,
         nodeId: 'forestTemple1BeforeLock',
         checks: [
             {objectId: 'forestTempleSmallKey1', logic: hasBow},
@@ -23,9 +32,9 @@ export const forestTempleNodes: LogicNode[] = [
         paths: [
             {nodeId: 'forestTemple1AfterLock', doorId: 'forestTempleLock1', logic: hasBossWeapon},
         ],
-        entranceIds: ['forestTempleLadder1'],
+        entranceIds: ['forestTempleSoutheastLadder'],
         exits: [
-            {objectId: 'forestTempleLadder1'},
+            {objectId: 'forestTempleSoutheastLadder'},
         ],
     },
     {
@@ -35,10 +44,16 @@ export const forestTempleNodes: LogicNode[] = [
         paths: [
             {nodeId: 'forestTemple1BeforeLock', doorId: 'forestTempleLock1', logic: hasBossWeapon},
         ],
-        entranceIds: ['forestTempleLadder2'],
+        entranceIds: ['forestTempleNortheastTreeEntance'],
         exits: [
-            {objectId: 'forestTempleLadder2'}
+            {objectId: 'forestTempleNortheastTreeEntance'}
         ],
+    },
+    {
+        zoneId,
+        nodeId: 'forestTempleDeadEnd',
+        entranceIds: ['forestTempleNortheastCaveEntrance'],
+        exits: [{objectId: 'forestTempleNortheastCaveEntrance'}],
     },
     {
         zoneId,
@@ -50,8 +65,8 @@ export const forestTempleNodes: LogicNode[] = [
         paths: [
             {nodeId: 'forestTemple2AfterLock', doorId: 'forestTempleLock2'},
         ],
-        entranceIds: ['forestTempleLadder3'],
-        exits: [{objectId: 'forestTempleLadder3'}],
+        entranceIds: [],
+        exits: [{objectId: 'forestTempleNortheastCaveEntrance'}],
     },
     {
         zoneId,
@@ -59,8 +74,8 @@ export const forestTempleNodes: LogicNode[] = [
         paths: [
             {nodeId: 'forestTemple2BeforeLock', doorId: 'forestTempleLock2'},
         ],
-        entranceIds: ['forestTempleLadder4'],
-        exits: [{objectId: 'forestTempleLadder4'}],
+        entranceIds: ['forestTempleNorthLadder'],
+        exits: [{objectId: 'forestTempleNorthLadder'}],
     },
     {
         zoneId,
@@ -72,8 +87,8 @@ export const forestTempleNodes: LogicNode[] = [
             // or use the big key to jump down the cliff and bypass the crumble floors.
             {nodeId: 'forestTempleBigChest', doorId: 'forestTempleBigLock'},
         ],
-        entranceIds: ['forestTempleLadder5'],
-        exits: [{objectId: 'forestTempleLadder5'}],
+        entranceIds: ['forestTempleNorthwestTreeEntrance'],
+        exits: [{objectId: 'forestTempleNorthwestTreeEntrance'}],
     },
     {
         zoneId,
@@ -94,6 +109,13 @@ export const forestTempleNodes: LogicNode[] = [
         paths: [{nodeId: 'forestTemple3', logic: canPassLongCrumbleFloors}],
         entranceIds: [],
         exits: [],
+    },
+    {
+        zoneId,
+        nodeId: 'forestTempleSouthwest',
+        paths: [{nodeId: 'forestTempleBigChest', logic: canPassLongCrumbleFloors}],
+        entranceIds: ['forestTempleSouthwestCaveEntrance'],
+        exits: [{objectId: 'forestTempleSouthwestCaveEntrance'}],
     },
 
     {

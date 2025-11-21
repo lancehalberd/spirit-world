@@ -87,7 +87,7 @@ interface DialogueSet {
     options: DialogueOption[],
 }
 
-type DialogueKey = 'streetVendor' | 'storageVanara' | 'forgeSmith' | 'citySmith';
+type DialogueKey = 'streetVendor' | 'storageVanara' | 'forgeSmith' | 'citySmith' | 'spiritTree';
 
 // Node used for building the logical graph of the game used for randomization.
 interface LogicNode {

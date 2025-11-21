@@ -57,6 +57,10 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = false): boolean {
+    if (!logic) {
+        console.error('Missing logic. This can happen if a used logic key was removed from the logicHash');
+        debugger;
+    }
     const trueResult = !isInverted, falseResult = !!isInverted;
     if  (logic === false) {
         return falseResult;
@@ -83,7 +87,11 @@ export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = f
             }
             continue;
         }
-        if (!state.savedState.objectFlags[requiredFlag] && !state.savedState.zoneFlags[requiredFlag]) {
+        if (logicHash[requiredFlag]) {
+            if (!isLogicValid(state, logicHash[requiredFlag])) {
+                return falseResult;
+            }
+        } else if (!state.savedState.objectFlags[requiredFlag] && !state.savedState.zoneFlags[requiredFlag]) {
             return falseResult;
         }
     }
@@ -94,7 +102,11 @@ export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = f
             }
             continue;
         }
-        if (state.savedState.objectFlags[excludedFlag] || state.savedState.zoneFlags[excludedFlag]) {
+        if (logicHash[excludedFlag]) {
+            if (isLogicValid(state, logicHash[excludedFlag])) {
+                return falseResult;
+            }
+        } else if (state.savedState.objectFlags[excludedFlag] || state.savedState.zoneFlags[excludedFlag]) {
             return falseResult;
         }
     }
@@ -328,9 +340,6 @@ export const logicHash: {[key: string]: LogicCheck} = {
             'tombEntered', 'tombRivalRescued', 'tombRivalAvoided',
             'helixRivalIntro',
         ],
-    },
-    cocoonBossStarted: {
-        requiredFlags: ['cocoonBossStarted'],
     },
     // Normally the sleeping beasts disappear when you beat the War Temple boss, but they must also
     // disappear if the beasts escape without defeating that boss.

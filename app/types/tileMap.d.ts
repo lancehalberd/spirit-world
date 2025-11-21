@@ -302,7 +302,7 @@ interface ZoneLocation {
 }
 
 type LogicalZoneKey =
-    'overworld' | 'sky'
+    'overworld' | 'sky' | 'forest'
     // Material world towns
     | 'waterfallCave' | 'treeVillage'
     | 'holyCityInterior' | 'grandTemple'
@@ -310,13 +310,15 @@ type LogicalZoneKey =
     | 'ascentCave' | 'fertilityShrine'
     | 'peachCave' | 'bushCave' | 'frozenCave' | 'lakeTunnel' | 'treeCave'
     // Spirit world
-    | 'spiritWorld' | 'spiritSky'
+    | 'spiritWorld' | 'spiritSky' | 'spiritForest'
     // Spirit world towns
     | 'jadeCityInterior' | 'jadePalace'
     // Spirit world sub areas
     | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
     | 'peachCaveSpirit' | 'hypeCave' | 'bellCave' | 'cloneCave'
     | 'warPalaceWestRoom'
+    // Dream areas
+    | 'dream'
     // Early dungeons
     | 'tomb' | 'warTemple' | 'cocoon' | 'helix'
     // Mid dungeons

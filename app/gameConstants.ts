@@ -75,6 +75,7 @@ export const enemySeed = readGetParameterAsInt('enemySeed');
 // Setting any of these seeds will put the game in randomizer mode.
 // In randomizer mode, story elements are removed and HUD elements are added showing remaining checks/victory points.
 export const isRandomizer = !!entranceSeed || !!itemSeed || !!enemySeed;
+window.isRandomizer = isRandomizer;
 
 export const allLootTypes: LootType[] = [
     'empty',
@@ -109,7 +110,7 @@ export const allLootTypes: LootType[] = [
 // 'foreground3' is rarely required for certain combinations of trees.
 export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];
 
-export const overworldKeys = ['overworld', 'sky', 'underwater'];
+export const overworldKeys = ['overworld', 'underwater', 'sky', 'forest', 'forestWater'];
 
 export function getElementColor(element: MagicElement) {
     switch(element){

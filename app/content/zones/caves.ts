@@ -1335,7 +1335,7 @@ const sf0_1x0: AreaDefinition = {
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 65, mapId: 'cavesSpirit', floorId: '1F', mapX: 2, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 66, mapId: 'overworld', entranceId: 'fertilityTempleExit', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 66, mapId: 'overworld', entranceId: 'fertilityTempleSpiritEntrance', mapX: 2, mapY: 1},
         {x: 16, y: 16, w: 16, h: 16, index: 67, mapId: 'overworld', entranceId: 'fertilityTempleSpiritEntrance', mapX: 3, mapY: 1},
     ],
 };

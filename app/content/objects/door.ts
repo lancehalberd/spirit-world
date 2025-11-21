@@ -496,7 +496,9 @@ export class Door implements ObjectInstance {
         if (this.style.render) {
             this.style.render(context, state, this);
             if (this.definition.d === 'down'
-                && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'sky')
+                // This is similar to the list of overworldKeys, but currently we exclude the `underwater` area because
+                // it feels wrong to show the doorlight for underwater doors.
+                && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'forest' || this.definition.targetZone === 'sky')
                 && this.isOpen()
             ) {
                 // For some reasont his renders when the door is closed while editing, which isn't a problem,
