@@ -26,6 +26,7 @@ export const forestNodes: LogicNode[] = [
             // Technically this path doesn't matter since overworld+forest are forced to be connected currently.
             {nodeId: 'nimbusCloud', logic: hasNimbusCloud},
             {nodeId: 'forestRiver', logic: hasIronBoots},
+            {nodeId: 'forestSecretEntrance', logic: canRemoveLightStones},
         ],
         entranceIds: [
             'forestNorthEntrance',
@@ -36,6 +37,29 @@ export const forestNodes: LogicNode[] = [
             {objectId: 'forestNorthEntrance'},
             {objectId: 'forestTowerEntrance', logic: hasBow},
             {objectId: 'forestEastEntrance'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'forestSecretEntrance',
+        paths: [
+            {nodeId: 'forest', logic: canRemoveLightStones},
+        ],
+        entranceIds: [
+            'forestSecretEntrance',
+        ],
+        exits: [
+            {objectId: 'forestSecretEntrance'},
+        ],
+    },
+    {
+        zoneId: 'treeCave',
+        nodeId: 'forestSecretEntranceCave',
+        entranceIds: [
+            'forestSecretEntrance',
+        ],
+        exits: [
+            {objectId: 'forestSecretEntrance'},
         ],
     },
     {

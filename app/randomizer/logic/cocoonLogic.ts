@@ -20,8 +20,8 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonEntrance',
         paths: [
-            {nodeId: 'cocoon4NW', logic: andLogic(canUseTeleporters, hasBossWeapon)},
-            {nodeId: 'cocoon4NE', logic: andLogic(canUseTeleporters, hasBossWeapon)},
+            {nodeId: 'cocoon4NW', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
+            {nodeId: 'cocoon4NE', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
         ],
         entranceIds: ['cocoonEntrance'],
         exits: [{objectId: 'cocoonEntrance'}],

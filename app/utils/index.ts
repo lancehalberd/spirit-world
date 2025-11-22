@@ -245,6 +245,7 @@ export function readGetParameterAsInt(parameterName: string, defaultValue = 0): 
 export function cloneDeep<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
 }
+window.cloneDeep = cloneDeep;
 
 function isObject(value: any): value is Object {
     return (value && typeof value === 'object' && !Array.isArray(value));
@@ -279,6 +280,7 @@ export function mergeDeep<T>(target: T, source: T, seenValues: Set<any> = new Se
         }
     }
 }
+window.mergeDeep = mergeDeep;
 
 export function sample<T>(collection: Collection<T>): T {
     return Random.element(collection);

@@ -31,7 +31,9 @@ export class FloorSwitch implements ObjectInstance {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
     }
     getLogicalStatus(state: GameState): ObjectStatus {
-        if (!this.definition.id) {
+        // No need to check this if this switch doesn't stay depressed as this behavior is just used to
+        // modify the status of permanent switches when their flag is unset by another source.
+        if (!this.definition.id || !this.stayDepressed) {
             return this.status;
         }
         if (getObjectStatus(state, this.definition) === !this.definition.isInverted) {

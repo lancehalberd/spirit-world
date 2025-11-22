@@ -1,4 +1,5 @@
-import { SPAWN_LOCATION_FULL } from 'app/content/spawnLocations';
+import {SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
+import {cloneDeep} from 'app/utils/index';
 
 export function getDefaultSavedState(): SavedState {
     return {
@@ -77,6 +78,8 @@ function getDefaultSavedHeroData(): SavedHeroData {
             lightningBlessing: 0,
             arDevice: 0,
         },
-        spawnLocation: SPAWN_LOCATION_FULL,
+        // Data from this function is considered mutable, so we need to return a copy of
+        // this spawn location to avoid accidentally modifying it in the future.
+        spawnLocation: cloneDeep(SPAWN_LOCATION_FULL),
     };
 }

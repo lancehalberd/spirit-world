@@ -321,7 +321,7 @@ export function renderBitmap(context: CanvasRenderingContext2D, tile: FullTile, 
         context.fill();
     }
 }
-const baseEmptyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, solid: false};
+const baseEmptyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, isNotSolid: true};
 export const emptyWallBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 32},

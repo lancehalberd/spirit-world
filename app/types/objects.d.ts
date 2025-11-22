@@ -542,6 +542,7 @@ interface EntranceDefinition extends BaseObjectDefinition {
     type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter' | 'helixTop'
     targetZone?: string
     targetObjectId?: string
+    mapIcon?: MapIcon
     // This can be set to force a door to be open if the logic is true.
     openLogic?: LogicDefinition
     // If this logic is present and true, the door is frozen until the unfrozen flag is set.

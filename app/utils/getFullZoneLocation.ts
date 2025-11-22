@@ -32,7 +32,7 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         } else {
             logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
         }
-    } else if (zoneKey === 'treeVillage') {
+    } else if (zoneKey === 'treeVillage' || zoneKey === 'forestTemple') {
         logicalZoneKey = isSpiritWorld ? 'forestTemple' : 'treeVillage';
     } else if (zoneKey === 'holyCityInterior') {
         logicalZoneKey = isSpiritWorld ? 'jadeCityInterior' : 'holyCityInterior';

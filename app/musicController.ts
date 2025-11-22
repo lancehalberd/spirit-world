@@ -78,7 +78,7 @@ export const updateMusic = (state: GameState): void => {
         }  else {
             playTrack('mainTheme', 0);
         }
-    } else if (location.zoneKey === 'forest') {
+    } else if (location.zoneKey === 'forest' || location.zoneKey === 'forestWater') {
         if (location.isSpiritWorld) {
             playTrack('ruins', 0);
         } else if (location.areaGridCoords.x === 1 && location.areaGridCoords.y === 1) {

@@ -246,6 +246,44 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'fallen' || hero.action === 'sankInLava') {
         // Special logic for falling from the sky to the overworld.
         if (hero === state.hero && hero.action === 'fallen' && state.location.zoneKey === 'sky') {
+            // The southwest corner of the sky is over the forest tile in the overwrld, which is
+            // not a valid location and represents the top right portion of the forest area.
+            if (state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
+                const sourceAreaSize = zones.sky.areaSize ?? {w: 32, h: 32};
+                const sourceAreaWidth = sourceAreaSize.w * 16, sourceAreaHeight = sourceAreaSize.h * 16;
+                // We ignore the area grid coords since the source is entirely within a single area tile
+                const px = hero.x / sourceAreaWidth;
+                const py = hero.y / sourceAreaHeight;
+                const targetAreaSize = zones.forest.areaSize ?? {w: 32, h: 32};
+                const targetAreaWidth = targetAreaSize.w * 16, targetAreaHeight = targetAreaSize.h * 16;
+                // The entire forest is 3x3, but we target only the top right 2x2 block.
+                const targetWidth = 2 * targetAreaWidth;
+                const targetHeight = 2 * targetAreaHeight;
+                // This is anywhere in the right two tiles.
+                const tx = targetAreaWidth + px * targetWidth;
+                // This is anywhere in the top two tiles.
+                const ty = py * targetHeight;
+                enterLocation(state, {
+                    zoneKey: 'forest',
+                    floor: 0,
+                    areaGridCoords: {
+                        x: Math.floor(tx / targetAreaWidth),
+                        y: Math.floor(ty / targetAreaHeight),
+                    },
+                    x: tx % targetAreaWidth,
+                    y: ty % targetAreaHeight,
+                    z: CANVAS_HEIGHT,
+                    d: hero.d,
+                    isSpiritWorld: state.location.isSpiritWorld,
+                }, {
+                    callback: () => {
+                        hero.action = 'knocked';
+                        hero.isAirborn = true;
+                        moveToClosestSpawnMarker(state, hero, false);
+                    },
+                });
+                return true;
+            }
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,

@@ -1,7 +1,7 @@
 import {renderAR} from 'app/arGames/arGame';
 import {getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
-import { allTiles } from 'app/content/tiles';
-import { editingState } from 'app/development/editingState';
+import {allTiles} from 'app/content/tiles';
+import {editingState} from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -14,6 +14,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getBackgroundFrame, getBackgroundFrameIndex } from 'app/utils/area';
 import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
 import {allImagesLoaded} from 'app/utils/images';
+import {getDrawPriority} from 'app/utils/layers';
 import {getFieldInstanceAndParts} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
 
@@ -280,7 +281,7 @@ export function renderTiles(
     const layersToDraw: AreaLayer[] = [];
     for (let index = 0; index < area.layers.length; index++) {
         const layer = area.layers[index];
-        const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
+        const isForeground = getDrawPriority(layer.definition) === 'foreground';
         if (isForeground !== areaFrame.isForeground) {
             continue;
         }

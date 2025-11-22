@@ -52,7 +52,7 @@ interface NineSlice {
     }[]
 }
 
-type MapIcon = 'door' | 'chest' | 'down' | 'up' | 'right' | 'left';
+type MapIcon = 'door' | 'chest' | 'down' | 'up' | 'right' | 'left' | 'hidden';
 
 type DefaultLayer = 'water' | 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
 

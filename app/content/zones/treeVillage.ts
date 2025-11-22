@@ -230,10 +230,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 192, y: 96, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 20, h: 20, index: 128, mapId: 'overworld', entranceId: 'northwestTreeEntrance', mapX: 0, mapY: 0},
-        {x: 20, y: 0, w: 20, h: 20, index: 129, mapId: 'overworld', entranceId: 'northeastTreeEntrance', mapX: 1, mapY: 0},
-        {x: 0, y: 20, w: 20, h: 20, index: 130, mapId: 'overworld', entranceId: 'elderEntrance', mapX: 0, mapY: 1},
-        {x: 20, y: 20, w: 20, h: 20, index: 131, mapId: 'overworld', entranceId: 'southeastTreeEntrance', mapX: 1, mapY: 1},
+        {x: 0, y: 0, w: 20, h: 20, index: 128, mapId: 'forest', entranceId: 'southwestTreeEntrance', mapX: 0, mapY: 0},
+        {x: 20, y: 0, w: 20, h: 20, index: 129, mapId: 'forest', entranceId: 'northeastTreeEntrance', mapX: 1, mapY: 0},
+        {x: 0, y: 20, w: 20, h: 20, index: 130, mapId: 'forest', entranceId: 'elderEntrance', mapX: 0, mapY: 1},
+        {x: 20, y: 20, w: 20, h: 20, index: 131, mapId: 'forest', entranceId: 'southeastTreeEntrance', mapX: 1, mapY: 1},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -249,10 +249,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "vanaraStorageStairsSpirit", x: 464, y: 384, type: "door", style: "woodenDownstairs", targetZone: "forestTemple", targetObjectId: "vanaraStorageStairsSpirit", d: "up"},
     ],
     sections: [
-        {x: 0, y: 0, w: 20, h: 20, index: 132, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 0, mapY: 0},
-        {x: 20, y: 0, w: 20, h: 20, index: 133, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 1, mapY: 0},
-        {x: 0, y: 20, w: 20, h: 20, index: 134, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 3},
-        {x: 20, y: 20, w: 20, h: 20, index: 135, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 1, mapY: 1},
+        {x: 0, y: 0, w: 20, h: 20, index: 132, mapId: 'forest', entranceId: 'southwestTreeEntranceSpirit', mapX: 0, mapY: 0},
+        {x: 20, y: 0, w: 20, h: 20, index: 133, mapId: 'forest', entranceId: 'northeastTreeEntranceSpirit', mapX: 2, mapY: 4.5},
+        {x: 0, y: 20, w: 20, h: 20, index: 134, mapId: 'forest', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 3},
+        {x: 20, y: 20, w: 20, h: 20, index: 135, mapId: 'forest', entranceId: 'southeastTreeEntranceSpirit', mapX: 1, mapY: 1},
     ],
 };
 zones.treeVillage = {

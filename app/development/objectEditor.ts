@@ -275,6 +275,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                mapIcon: definition.mapIcon,
                 style: definition.style || 'cave', //Object.keys(doorStyles)[0],
                 frozenLogic: definition.frozenLogic,
                 openLogic: definition.openLogic,
@@ -1083,53 +1084,69 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     editingState.needsRefresh = true;
                 },
             });
-            const zone = zones[zoneKey];
-            // Pit entrances target markers, but other entrances target the same kind of entrnace,
-            // for example teleporter => teleporter, doors => doors.
-            let targetTypes: ObjectType[] = [object.type];
-            if (object.type === 'pitEntrance') {
-                targetTypes = ['marker'];
-            } else if (object.type === 'teleporter') {
-                targetTypes = ['teleporter', 'marker'];
-            } else if (doorTypes.includes(object.type)) {
-                // Staff tower objects also function as doors.
-                targetTypes = doorTypes;
-            }
-            const objectIds = zone ? getTargetObjectIdsByTypes(zone, targetTypes) : [];
-            if (objectIds.length) {
-                if (objectIds.indexOf(object.targetObjectId) < 0) {
-                    object.targetObjectId = objectIds[0];
+            if (zoneKey !== 'none') {
+                const zone = zones[zoneKey];
+                // Pit entrances target markers, but other entrances target the same kind of entrnace,
+                // for example teleporter => teleporter, doors => doors.
+                let targetTypes: ObjectType[] = [object.type];
+                if (object.type === 'pitEntrance') {
+                    targetTypes = ['marker'];
+                } else if (object.type === 'teleporter') {
+                    targetTypes = ['teleporter', 'marker'];
+                } else if (doorTypes.includes(object.type)) {
+                    // Staff tower objects also function as doors.
+                    targetTypes = doorTypes;
                 }
-                rows.push({
-                    name: 'target',
-                    value: object.targetObjectId,
-                    values: objectIds,
-                    onChange(targetObjectId: string) {
-                        object.targetObjectId = targetObjectId;
-                        updateObjectInstance(state, object);
-                    },
-                });
-                if (object.id && object.targetObjectId && object.type !== 'pitEntrance') {
+                const objectIds = zone ? getTargetObjectIdsByTypes(zone, targetTypes) : [];
+                if (objectIds.length) {
+                    if (objectIds.indexOf(object.targetObjectId) < 0) {
+                        object.targetObjectId = objectIds[0];
+                    }
                     rows.push({
-                        name: 'Link Back',
-                        onClick() {
-                            const objectTargets = findZoneTargets(
-                                state,
-                                object.targetZone,
-                                object.targetObjectId,
-                                object,
-                                false
-                            );
-                            for (const objectTarget of objectTargets) {
-                                const targetObject = objectTarget.object as EntranceDefinition;
-                                targetObject.targetZone = state.location.zoneKey;
-                                targetObject.targetObjectId = object.id;
-                            }
+                        name: 'target',
+                        value: object.targetObjectId,
+                        values: objectIds,
+                        onChange(targetObjectId: string) {
+                            object.targetObjectId = targetObjectId;
+                            updateObjectInstance(state, object);
                         },
                     });
+                    if (object.id && object.targetObjectId && object.type !== 'pitEntrance') {
+                        rows.push({
+                            name: 'Link Back',
+                            onClick() {
+                                const objectTargets = findZoneTargets(
+                                    state,
+                                    object.targetZone,
+                                    object.targetObjectId,
+                                    object,
+                                    false
+                                );
+                                for (const objectTarget of objectTargets) {
+                                    const targetObject = objectTarget.object as EntranceDefinition;
+                                    targetObject.targetZone = state.location.zoneKey;
+                                    targetObject.targetObjectId = object.id;
+                                }
+                            },
+                        });
+                    }
+                } else {
+                    rows.push(`No objects of types ${targetTypes}`);
                 }
-            } else {
-                rows.push(`No objects of types ${targetTypes}`);
+                rows.push({
+                    name: 'Map Icon',
+                    value: object.mapIcon ?? 'default',
+                    values: ['default', 'up', 'down', 'left', 'right', 'hidden'],
+                    onChange(mapIcon: MapIcon|'default') {
+                        if (mapIcon === 'default') {
+                            delete object.mapIcon;
+                        } else {
+                            object.mapIcon = mapIcon;
+                        }
+                        // Only effects the display of the map.
+                        state.map.needsRefresh = true;
+                    },
+                });
             }
             // This intentionally continue on to the marker properties.
         case 'marker':

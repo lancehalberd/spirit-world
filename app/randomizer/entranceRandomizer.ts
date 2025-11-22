@@ -15,10 +15,11 @@ const ignoredZones = [
     'fireSanctum', 'iceSanctum', 'lightningSanctum', 'holySanctumBack',
     // The void is part of the 'Tree' zone and should not be randomized.
     'void',
+    'jadeCityInterior',
 ];
 
 const zoneSets = [
-    new Set(['forestTemple', 'treeVillage', 'caves'])
+    new Set(['forestTemple', 'treeVillage', 'caves']),
 ];
 
 const equivalentZones: {[key in string]: Set<string>} = {}
@@ -57,7 +58,8 @@ interface DoorLocation {
 // one needs to be connected to a reachable entrance using a connected exit group.
 const unreachableSpiritExitGroups = [
     // There is currently a ladder leading to this cave in the Spirit World.
-    //['caves:caves-ascentExitSpirit'],    ['holyCityInterior:jadeCityMazeExit'],
+    //['caves:caves-ascentExitSpirit'],   
+    ['holyCityInterior:jadeCityMazeExit'],
     ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
     // When the tower is placed in the forest, this exit is the only way to reach this area in the Spirit World.
     ['staffTower:staffTowerSpiritEntrance'],
@@ -104,11 +106,12 @@ const connectedExitGroups: ConnectedExitGroup[] = [
         normalEntranceTargets: ['overworld:staffTowerEntrance', 'sky:staffTowerSkyEntrance',],
         spiritEntranceTargets: ['overworld:staffTowerSpiritEntrance', 'sky:staffTowerSpiritSkyEntrance'],
     },
-    {
+    // forestTempleEntranceSpirit is no longer considered randomizable because it is considered an intrazone door.
+    /*{
         spiritEntranceTargets: ['overworld:fertilityTempleSpiritEntrance', 'forestTemple:forestTempleEntranceSpirit'],
-    },
+    },*/
     {
-        spiritEntranceTargets: ['overworld:forestTempleSoutheastLadder', 'overworld:forestTempleNortheastTreeEntance'],
+        spiritEntranceTargets: ['forest:forestTempleSoutheastLadder', 'forest:forestTempleNortheastTreeEntrance'],
     },
     /*
     // Unsupported one way tunnel from  forestTempleNorthLadder -> forestTempleNortheastCaveEntrance
@@ -192,7 +195,7 @@ export function randomizeEntrances(random: typeof SRandom) {
             }
             return;
         }
-        if (object.type !== 'door' && object.type !== 'staffTower') {
+        if (object.type !== 'door' && object.type !== 'staffTower' && object.type !== 'helixTop') {
             return;
         }
         if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
@@ -278,6 +281,10 @@ export function randomizeEntrances(random: typeof SRandom) {
         // Choose one entrance in the group to assign as a forced connection through a reachable
         // exit.
         const unreachableExit = random.shuffle(unreachableExits)[0];
+        if (!allTargetedKeys.has(unreachableExit)) {
+            console.error('Exit ID not found, was it moved or removed?', unreachableExit);
+            debugger;
+        }
         for (const exitGroup of random.shuffle(connectedExitGroups)) {
             const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
             const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
@@ -290,6 +297,10 @@ export function randomizeEntrances(random: typeof SRandom) {
                 continue;
             }
             const entrance = random.removeElement(exitGroup.spiritEntranceTargets);
+            if (!allTargetedKeys.has(entrance)) {
+                console.error('Entrance ID not found, was it moved or removed?', entrance);
+                debugger;
+            }
             assignEntranceExitPair(unreachableExit, entrance);
             // If only spirit world exits remain, mark them all as forbidden to match with
             // any other unreachable spirit entrange targets, otherwise this strategy may fail
