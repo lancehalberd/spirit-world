@@ -98,6 +98,10 @@ export function getShortZoneName(location: ZoneLocation): string {
         case 'void': return 'Abyss';
         case 'gauntlet': return 'Gauntlet';
         case 'holySanctum': return 'Holy Sanctum';
+        case 'dream': return 'Dream';
+        case 'forest': return 'Forest';
+        case 'spiritForest': return 'Forest';
+        case 'warPalaceWestRoom': return 'Palace';
     }
     // This should be typed as `never` by the compiler.
     logicalZoneKey;
