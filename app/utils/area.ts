@@ -25,6 +25,15 @@ export function setAreaSection(state: GameState, areaSection: AreaSectionInstanc
     }
 }
 
+export function getAreaSectionInstanceForPoint(state: GameState, zone: Zone, area: AreaDefinition, x: number, y: number): AreaSectionInstance {
+    for (const section of area.sections) {
+        if (isPointInShortRect(x, y, section)) {
+            return  getAreaSectionInstance(state, zone, area, section);
+        }
+    }
+    return getAreaSectionInstance(state, state.zone, area, area.sections[0]);
+}
+
 export function updateAreaSection(state: GameState, newArea: boolean): void {
     //console.log('updateAreaSection', state.hero.x, state.hero.y);
     //const lastAreaSection = state.areaSection;
@@ -54,6 +63,9 @@ export function updateAreaSection(state: GameState, newArea: boolean): void {
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
+    }
+    if (state.alternateAreaInstance) {
+        state.alternateAreaSection = getAreaSectionInstanceForPoint(state, state.zone, state.alternateAreaInstance.definition, x, y);
     }
 }
 

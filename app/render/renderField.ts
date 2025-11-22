@@ -98,7 +98,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
         renderSurfaceLighting(context, state, state.areaInstance);
         renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
         renderWaterOverlay(context, state);
-        renderHeatOverlay(context, state, state.areaInstance);
+        renderHeatOverlay(context, state, state.areaSection);
         renderSpiritOverlay(context, state);
         renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
         context.save();
@@ -615,7 +615,10 @@ async function createFogTile() {
 createFogTile();
 //effects/fog.png 256x128 -> 256x256 then creat pattern.
 const fogV = {x: 10, y: 10};
-export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
+export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState, areaSection?: AreaSectionInstance) {
+    if (!areaSection) {
+        return;
+    }
     if (!editingState.isEditing && state.hotLevel > 0) {
         context.save();
             context.globalAlpha = 0.4 * state.hotLevel;
@@ -623,7 +626,7 @@ export function renderHeatOverlay(context: CanvasRenderingContext2D, state: Game
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
     }
-    if (!editingState.isEditing && state.areaSection?.isFoggy) {
+    if (!editingState.isEditing && areaSection?.isFoggy) {
         context.save();
             const fogPattern = context.createPattern(fogCanvas, 'repeat');
             const dx = state.camera.x - fogV.x * state.fieldTime / 1000;
@@ -1002,6 +1005,8 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                     patternContext.restore();
                     renderAreaLighting(patternContext, state, state.transitionState.nextAreaInstance);
                     renderSurfaceLighting(patternContext, state, state.transitionState.nextAreaInstance);
+                } else {
+                    renderHeatOverlay(patternContext, state, state.transitionState.nextAreaSection);
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
@@ -1109,7 +1114,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             renderAreaObjectsAfterHero(underContext, state, area);
             renderSurfaceLighting(underContext, state, area);
             renderFieldForeground(underContext, state, area);
-            renderHeatOverlay(underContext, state, area);
+            renderHeatOverlay(underContext, state, state.transitionState.nextAreaSection);
             renderAreaLighting(underContext, state, area);
         }
         /*const offsets = [0, 4, 2, 6, 1, 5, 3, 7];
@@ -1145,7 +1150,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
                 renderArea(patternContext, state, state.alternateAreaInstance, true);
-                renderHeatOverlay(patternContext, state, state.alternateAreaInstance);
+                renderHeatOverlay(patternContext, state, state.alternateAreaSection);
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
             context.save();

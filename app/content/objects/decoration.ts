@@ -363,7 +363,7 @@ const glassWall: DecorationType = {
     behaviors: {
         solid: true,
     },
-    onHit(state: GameState, decoration: Decoration, hit: HitProperties): HitResult {
+    onHit(state: GameState, decoration: Decoration, hit: HitProperties): HitResult|undefined {
         if (hit.destroysObjects) {
             const brokenGlassWall = new Decoration(
                 state,
@@ -399,7 +399,7 @@ const glassWall: DecorationType = {
             }
             removeObjectFromArea(state, decoration);
         }
-        return {};
+        return {hit: true, blocked: true};
     },
     getHitbox(decoration: Decoration): Rect {
         return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};

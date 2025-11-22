@@ -157,7 +157,6 @@ Current tasks:
         - Test randomizer
         - Repack images.
     - Minor tasks blocking release:
-        - Render fog when transitioning from underwater to foggy area.
         - Fix knobby tree door is too wide letting player clip the left edge.
         - Add better dialog and NPCs to forest temple.
         - Draw fog effect instead of forest map when forest is foggy.
