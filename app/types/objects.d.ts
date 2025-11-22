@@ -580,13 +580,18 @@ interface NPCDefinition extends BaseObjectDefinition {
     dialogueIndex?: number
 }
 
-type SimpleObjectType = 'airBubbles' | 'arGame' | 'beadGrate' | 'bell' | 'cathode'
+type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret' | 'jadeChampion'
     | 'peachTree' | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'torch' | 'trampoline' | 'vineSprout';
 
 interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType
+}
+
+interface ARGameDefinition extends BaseObjectDefinition {
+    type: 'arGame'
+    gameId?: ARGameID
 }
 
 interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
@@ -692,6 +697,7 @@ type ObjectDefinition = SimpleObjectDefinition
     | DirectionalObjectDefinition
     | AirStreamDefinition
     | AnodeDefinition
+    | ARGameDefinition
     | BallGoalDefinition
     | BeadCascadeDefinition
     | BossObjectDefinition

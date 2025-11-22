@@ -156,7 +156,6 @@ Current tasks:
         - Test forest temple
         - Test randomizer
     - Minor tasks blocking release:
-        - Add secret behind sealed door in forest basement in the material world.
         - Add broken glass wall decoration and use it in forest temple south hallway.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
         - Render fog when transitioning from underwater to foggy area.

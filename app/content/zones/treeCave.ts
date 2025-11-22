@@ -177,9 +177,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "treeCaveMarker", linked: true, x: 120, y: 192, type: "marker"},
         {status: "normal", id: "", linked: true, x: 96, y: 240, type: "door", style: "cavern", d: "down"},
         {status: "hiddenSwitch", id: "treeCaveSilver", linked: true, x: 120, y: 128, type: "chest", lootType: "silverOre", lootAmount: 50},
-        {status: "normal", id: "forestSecretEntrance", linked: true, x: 364, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forest", targetObjectId: "forestSecretEntrance", d: "up"},
-        {status: "normal", id: "", linked: true, x: 376, y: 400, type: "arGame"},
-        {status: "normal", id: "", linked: true, x: 300, y: 300, d: "down", behavior: "face", style: "vanaraRed", type: "npc", dialogue: "Try that device out if you are feeling bored.\n{|}I hear they are really popular in the Spirit World.", dialogueIndex: 218},
+        {status: "normal", id: "forestSecretEntrance", linked: false, x: 364, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forest", targetObjectId: "forestSecretEntrance", d: "up"},
+        {status: "normal", id: "", linked: false, x: 376, y: 400, type: "arGame", gameId: "dodger"},
+        {status: "normal", id: "", linked: false, x: 300, y: 300, d: "down", behavior: "face", style: "vanaraRed", type: "npc", dialogue: "Try that device out if you are feeling bored.\n{|}I hear they are really popular in the Spirit World.", dialogueIndex: 218},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 1063, mapId: 'treeCave', floorId: '1F', mapX: 0, mapY: 0},
@@ -368,9 +368,6 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 96, y: 240, type: "door", style: "cavern", d: "down", spirit: true},
         {status: "hiddenSwitch", id: "treeCaveMoney", linked: true, x: 120, y: 128, type: "chest", lootType: "money", lootAmount: 50, spirit: true},
         {status: "normal", id: "treeCaveSpiritEntrance", x: 120, y: 432, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "treeCaveSpiritEntrance", d: "up", linked: true, spirit: true},
-        {status: "normal", id: "", linked: true, x: 364, y: 272, type: "door", style: "cavernUpstairs", d: "up", spirit: true},
-        {status: "normal", id: "", linked: true, x: 376, y: 400, type: "arGame", spirit: true},
-        {status: "normal", id: "", linked: true, x: 300, y: 300, d: "down", behavior: "none", style: "vanaraRed", type: "npc", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 1067, mapId: 'treeCaveSpirit', floorId: '1F', mapX: 0, mapY: 0},

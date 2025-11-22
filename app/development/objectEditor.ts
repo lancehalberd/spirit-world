@@ -227,6 +227,13 @@ export function createObjectDefinition(
                 offInterval: definition.offInterval,
                 onInterval: definition.onInterval,
             };
+        case 'arGame':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                gameId: definition.gameId,
+            };
         case 'anode':
             return {
                 ...commonProps,
@@ -475,7 +482,6 @@ export function createObjectDefinition(
                 turn: definition.turn || 'bounce',
             };
         case 'airBubbles':
-        case 'arGame':
         case 'beadGrate':
         case 'cathode':
         case 'flameTurret':
@@ -1235,6 +1241,21 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 inputClass: 'large',
                 onChange(offInterval: number) {
                     object.offInterval = offInterval;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'arGame':
+            rows.push({
+                name: 'Game',
+                value: object.gameId || 'none',
+                values: ['none', 'dodger', 'hota', 'target', 'targetFPS'],
+                onChange(gameId: ARGameID|'none') {
+                    if (gameId === 'none') {
+                        delete object.gameId;
+                    } else {
+                        object.gameId = gameId;
+                    }
                     updateObjectInstance(state, object);
                 },
             });
