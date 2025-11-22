@@ -150,20 +150,13 @@ Current tasks:
         - So the bug probably still exists, but is difficult to reproduce for some reason.
 
     - Major tasks blocking release:
-        - Adjust all save statue positions
-            - Including the title scene.
         - Test forest
         - Test forest temple
         - Test randomizer
         - Repack images.
     - Minor tasks blocking release:
-        - Fix knobby tree door is too wide letting player clip the left edge.
         - Add better dialog and NPCs to forest temple.
-        - Draw fog effect instead of forest map when forest is foggy.
-            - Would be nice to generalize this, but we want to make sure we handle the case of
-                looking at the forest map from underwater (which is not foggy), while the forest is still foggy.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
-
 
     - Add pixel precision to water tiles:
         - water edges

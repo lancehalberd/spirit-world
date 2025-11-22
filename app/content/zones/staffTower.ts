@@ -3696,7 +3696,7 @@ const sf2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTowerRoof", x: 432, y: 112, type: "door", style: "futureLadderUpTall", targetZone: "staffTower", targetObjectId: "staffTowerRoof", d: "up", locationCue: "Tower 5F"},
         {status: "normal", id: "staffTower:s2:0x0-sentryBot-0", x: 164, y: 360, type: "enemy", enemyType: "sentryBot", d: "down", saveStatus: "forever", params: {}},
-        {status: "normal", id: "staffTowerBossSave", x: 304, y: 572, type: "saveStatue"},
+        {status: "normal", id: "staffTowerBossSave", x: 308, y: 572, type: "saveStatue"},
         {status: "normal", id: "", x: 264, y: 324, type: "elevator", floor: 5, specialBehaviorKey: "staffTowerElevator"},
         {status: "normal", id: "staffTower:s2:0x0-sentryBot-0", x: 448, y: 352, type: "enemy", enemyType: "largeOrb", d: "down", saveStatus: "forever", params: {}},
         {status: "normal", id: "", x: 304, y: 180, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},

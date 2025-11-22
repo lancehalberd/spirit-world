@@ -1044,7 +1044,9 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     knobbyTree: {
-        ...wideSquareDoorStyle,
+        // The knobby tree entrances are a bit narrower than the normal tree entrances
+        // so it looks better to use a narrower path.
+        ...commonBaseDoorStyle,
         up: {
             doorFrame: knobbyTreeDoorOpen,
             doorClosed: knobbyTreeDoorOpen,

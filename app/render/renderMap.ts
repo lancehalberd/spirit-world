@@ -20,6 +20,7 @@ import {getObjectAndParts, getObjectStatus} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
 import {isSectionExplored } from 'app/utils/sections';
 import {drawText} from 'app/utils/simpleWhiteFont';
+import {fogCanvas} from 'app/render/fog';
 
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
@@ -164,6 +165,16 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16},
                 state.hero.savedData.passiveTools.trueSight >= 1);
         }
+    }
+    // TODO: make this read the fog logic for the forest instead of this specific key.
+    if (zoneKey === 'forest' && !state.savedState.objectFlags.elementalBeastsEscaped) {
+        mapContext.save();
+            mapContext.fillStyle = mapContext.createPattern(fogCanvas, 'repeat');
+            //mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+            const fogScale = 3;
+            mapContext.scale(1 / fogScale, 1 / fogScale);
+            mapContext.fillRect(0, 0, mapCanvas.width * fogScale, mapCanvas.height * fogScale);
+        mapContext.restore();
     }
 }
 

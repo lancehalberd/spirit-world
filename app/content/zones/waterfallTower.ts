@@ -342,7 +342,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:s0:0x0-crystalBat-0", x: 64, y: 336, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x0-crystalBat-1", x: 224, y: 80, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x0-crystalBat-2", x: 432, y: 208, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
-        {status: "normal", id: "waterfallTowerSave", x: 208, y: 400, type: "saveStatue"},
+        {status: "normal", id: "waterfallTowerSave", x: 212, y: 404, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 299, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 1},

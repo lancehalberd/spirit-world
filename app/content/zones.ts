@@ -53,8 +53,6 @@ export * from 'app/content/zones/minimizer/light1';
 export * from 'app/content/zones/title';
 export * from 'app/content/zones/title-noBottomWall';
 // WIP zones
-export * from 'app/content/zones/dream';
-export * from 'app/content/zones/fertility';
 export * from 'app/content/zones/delve';
 export * from 'app/content/zones/jadeCityInterior';
 //Comment out below to play game normally

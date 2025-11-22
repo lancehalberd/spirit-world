@@ -6643,7 +6643,7 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:2:0x0-pitEntrance-1", x: 192, y: 304, targetZone: "warTemple", targetObjectId: "warTempleMoneyMarker", type: "pitEntrance", style: "futuristic"},
         {status: "normal", id: "warTemple:2:0x0-plantFrost-1", x: 404, y: 416, type: "enemy", enemyType: "plant", d: "down", params: {}},
         {status: "normal", id: "warTemple:2:0x0-beetleWingedStorm-0", x: 304, y: 128, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
-        {status: "normal", id: "warTempleSave", x: 48, y: 312, type: "saveStatue"},
+        {status: "normal", id: "warTempleSave", x: 52, y: 312, type: "saveStatue"},
         {status: "normal", id: "warTemple:2:0x0-snakeFlame-0", x: 412, y: 472, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "closedSwitch", id: "warTempleExit", x: 112, y: 16, type: "door", style: "stoneDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true},
         {status: "locked", id: "warTempleLock2", x: 160, y: 440, type: "keyBlock"},

@@ -1640,7 +1640,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeArmor", x: 416, y: 64, type: "chest", lootType: "goldMail", lootAmount: 50, lootLevel: 1},
         {status: "normal", id: "forgeArmorSmith", x: 448, y: 56, d: "down", behavior: "face", style: "flameSpirit", type: "npc", dialogueKey: "forgeArmorSmith"},
         {status: "normal", id: "", spirit: true, x: 176, y: 160, type: "shieldingUnit"},
-        {status: "normal", id: "forgeSaveStatue", linked: true, spirit: true, x: 48, y: 160, type: "saveStatue"},
+        {status: "normal", id: "forgeSaveStatue", linked: false, spirit: true, x: 36, y: 160, type: "saveStatue"},
         {status: "normal", id: "forgeSmith", x: 368, y: 56, d: "down", behavior: "face", style: "flameSpirit", type: "npc", dialogueKey: "forgeSmith"},
     ],
     sections: [

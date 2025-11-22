@@ -255,7 +255,7 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "voidEntrance", x: 416, y: 112, type: "door", style: "woodenUpstairs", targetZone: "void", targetObjectId: "voidEntrance", d: "up"},
-        {status: "normal", id: "finalSaveStatue", x: 392, y: 144, type: "saveStatue"},
+        {status: "normal", id: "finalSaveStatue", x: 380, y: 144, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 574, mapId: 'tree', floorId: '1F', mapX: 1, mapY: 1},

@@ -1093,7 +1093,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-1", x: 224, y: 144, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-2", x: 272, y: 144, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-3", x: 320, y: 112, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
-        {status: "normal", id: "gauntletSave", x: 48, y: 304, type: "saveStatue"},
+        {status: "normal", id: "gauntletSave", x: 52, y: 312, type: "saveStatue"},
         {status: "normal", id: "", linked: true, x: 304, y: 296, style: "short", type: "sign", message: "Some objects are only visible with enhanced sight.", spirit: true},
     ],
     sections: [
