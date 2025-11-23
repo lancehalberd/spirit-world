@@ -778,7 +778,7 @@ const f0_1x2: AreaDefinition = {
     objects: [
         {status: "normal", id: "helixTeleporter", x: 560, y: 412, targetZone: "helix", targetObjectId: "helixBridgeDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation && elementalBeastsEscaped"},
         {status: "normal", id: "tombTeleporter", x: 192, y: 560, targetZone: "tomb", targetObjectId: "tombDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
-        {status: "normal", id: "helixTeleporter", x: 556, y: 408, type: "marker", hasCustomLogic: true, customLogic: "!$teleportation"},
+        {status: "normal", id: "helixTeleporter", x: 556, y: 408, type: "marker", hasCustomLogic: true, customLogic: ""},
         {status: "normal", id: "lakeTeleporter", x: 432, y: 560, targetZone: "overworld", targetObjectId: "lakeDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation"},
         {status: "normal", id: "", x: 400, y: 224, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "My body?\n{|}I don't have a body yet.\n{|}We don't need bodies unless we are training for the Waking.", dialogueIndex: 207, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: "$teleportation"},
         {status: "normal", id: "", x: 336, y: 112, type: "spawnMarker"},
@@ -792,7 +792,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "", x: 272, y: 208, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "The Spirit Tree awaits you just north of here.", dialogueIndex: 181, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: "!$teleportation"},
         {status: "normal", id: "", x: 320, y: 396, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Nothing here is real, but don't worry!{|}If you get something good, the Spirit Tree will give it to you for real when you leave.", dialogueIndex: 194, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: ""},
         {status: "normal", id: "cocoonTeleporter", x: 64, y: 412, targetZone: "cocoon", targetObjectId: "cocoonDreamTeleporter", type: "teleporter", hasCustomLogic: true, customLogic: "$teleportation && cocoonBoss"},
-        {status: "normal", id: "cocoonTeleporter", x: 68, y: 408, type: "marker", hasCustomLogic: true, customLogic: "!$teleportation"},
+        {status: "normal", id: "cocoonTeleporter", x: 68, y: 408, type: "marker", hasCustomLogic: true, customLogic: ""},
         {status: "normal", id: "dreamSmallMoney", linked: true, spirit: true, x: 304, y: 396, type: "chest", lootType: "money", lootAmount: 20},
         {status: "normal", id: "", x: 400, y: 240, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Your body?\n{|}It's just asleep in the world of the Waking.\n{|}Is hasn't been integrated into the Dreaming yet so you appear as a projection.", dialogueIndex: 196, specialBehaviorKey: "ephemeral", hasCustomLogic: true, customLogic: "!$teleportation"},
     ],

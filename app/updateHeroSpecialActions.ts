@@ -414,7 +414,15 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         //const touchingTarget = hero.actionTarget
         //    && (hero.actionTarget.area === state.areaInstance || hero.actionTarget.area === state.nextAreaInstance)
         //    && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getOffsetHitbox());
-        if (door?.area && !door?.isHeroTriggeringDoor?.(state) && isHeroOnOpenTile(state, hero)) {
+        if (door && !door.area) {
+            console.error(`
+                Checking if hero can enter a door that is not yet/no longer assigned an area
+                This can happen if the door is a child object that does not correctly have area set when the parent is added to the area.
+            `);
+            debugger;
+        }
+        if (!door?.isHeroTriggeringDoor?.(state) && isHeroOnOpenTile(state, hero)) {
+            hero.action = null;
             hero.actionTarget = null;
             hero.isUsingDoor = false;
             delete hero.renderParent;

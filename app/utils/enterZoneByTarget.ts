@@ -58,7 +58,7 @@ export function enterZoneByTarget(
                 fixCamera(state);
             }
             // Technically this could also be a MarkerDefinition.
-            const definition = target.definition as EntranceDefinition;
+            const definition = target.definition as EntranceDefinition|MarkerDefinition;
             if (definition.locationCue) {
                 const textCue = new TextCue(state, { text: definition.locationCue});
                 addEffectToArea(state, state.areaInstance, textCue);
@@ -69,6 +69,8 @@ export function enterZoneByTarget(
                 enterZoneByDoorCallback(state, targetObjectId, skipObject);
             } else if (definition.type === 'teleporter') {
                 enterZoneByTeleporterCallback(state, targetObjectId);
+            } else if (definition.type === 'marker') {
+                state.hero.action = null;
             }
             callback?.(state);
         },

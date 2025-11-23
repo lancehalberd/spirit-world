@@ -146,14 +146,12 @@ Graphics to Implement:
 
 Current tasks:
     - Major tasks blocking release:
-        - Test FPS mini game + dodger work with pause changes.
         - Test forest
         - Test forest temple
         - Test randomizer
         - Repack images.
     - Minor tasks blocking release:
         - Fix shore animation in cocoon.
-        - Dreaming portal to cocoon disappears when you pickup the chest in the same area.
         - Add better dialog and NPCs to forest temple.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 

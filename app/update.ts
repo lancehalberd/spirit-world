@@ -79,7 +79,7 @@ export function update() {
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
             //state.hideHUD = false;
             //if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
-            if (state.arState.active) {
+            if (state.arState.active && !state.scriptEvents.blockFieldUpdates) {
                 const isWaiting = state.scriptEvents.activeEvents.length > 0;
                 showMessage(state, '{@arGame.quit}');
                 if (isWaiting) {
@@ -144,12 +144,13 @@ export function update() {
             refreshAreaLogic(state, state.alternateAreaInstance);
         }
         const hideMenu = shouldHideMenu(state);
-        if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT))) {
+        const showNextFrame = hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT);
+        if (state.paused && !showNextFrame) {
             if (!hideMenu) {
                 updateInventory(state);
             }
         } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
-            if (!state.paused) {
+            if (!state.paused || showNextFrame) {
                 updateTransition(state);
             }
         } else if (state.defeatState.defeated) {

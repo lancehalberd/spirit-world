@@ -71,10 +71,8 @@ export class StaffTower implements ObjectInstance {
         this.top = new StaffTowerTop(this);
     }
     // Make sure door area gets set as soon as this object is added to an area.
-    add(state: GameState, area: AreaInstance) {
-        this.area = area;
-        this.door.area = area;
-        area.objects.push(this);
+    onInitialize(state: GameState) {
+        this.door.area = this.area;
     }
     collapse(state: GameState) {
         this.specialStatus = 'collapsing';
