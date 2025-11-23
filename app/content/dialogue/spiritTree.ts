@@ -6,6 +6,9 @@ dialogueHash.spiritTree = {
     mappedOptions: {
         interact(state: GameState) {
             if (isRandomizer) {
+                if (state.savedState.objectFlags.spiritTreeRandomizerReward) {
+                    return `That's all I have for you this time.`;
+                }
                 return '{@spiritTree.randomizerReward}';
             }
             if (!state.hero.savedData.passiveTools.teleportation) {
@@ -21,7 +24,7 @@ dialogueHash.spiritTree = {
                 }
             `;
         },
-        randomizerReward: '{item:teleportation}',
+        randomizerReward: 'Good luck today! {item:teleportation} {flag:spiritTreeRandomizerReward}',
         goodbye(state: GameState) {
             return 'The Spirits of the Vanara watch over you.';
         },
