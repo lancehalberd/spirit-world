@@ -92,7 +92,7 @@ dialogueHash.vanaraVillager = {
                     dialogueIndex: 81,
                     dialogueType: 'hint',
                     text: `The Vanara Elder?
-                    {|}He lives in the tree to the Southwest.`,
+                    {|}He lives in the tree to the Northwest.`,
                 },
                 {
                     dialogueIndex: 82,

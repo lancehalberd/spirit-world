@@ -77,8 +77,9 @@ export function update() {
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-            state.hideHUD = false;
-            if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
+            //state.hideHUD = false;
+            //if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
+            if (state.arState.active) {
                 const isWaiting = state.scriptEvents.activeEvents.length > 0;
                 showMessage(state, '{@arGame.quit}');
                 if (isWaiting) {

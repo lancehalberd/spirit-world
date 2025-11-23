@@ -19,6 +19,9 @@ interface Mission {
 function findMaterialWorldObject(state: GameState, objectIds: string | string[]) {
     return findObjectLocation(state, 'overworld', objectIds, false, null, true);
 }
+function findMaterialForestObject(state: GameState, objectIds: string | string[]) {
+    return findObjectLocation(state, 'forest', objectIds, false, null, true);
+}
 function findSpiritWorldObject(state: GameState, objectIds: string | string[]) {
     return findObjectLocation(state, 'overworld', objectIds, true, null, true);
 }
@@ -31,8 +34,20 @@ function findSpiritSkyObject(state: GameState, objectIds: string | string[]) {
 
 const getPeachCaveLocation = (state: GameState) => findMaterialWorldObject(state, 'peachCaveTopEntrance');
 const getWaterfallVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallCaveEntrance');
-const getVanaraVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'vanaraVillager');
-const getVanaraElderLocation = (state: GameState) => findMaterialWorldObject(state, 'elderEntrance');
+const getVanaraVillageLocation = (state: GameState) => {
+    if (state.location.zoneKey === 'forest') {
+        return findMaterialForestObject(state, 'vanaraVillageMarker');
+    } else {
+        return findMaterialWorldObject(state, 'forestMarkerM')
+    }
+}
+const getVanaraElderLocation = (state: GameState) => {
+    if (state.location.zoneKey === 'forest') {
+        return findMaterialForestObject(state, 'elderEntrance');
+    } else {
+        return findMaterialWorldObject(state, 'forestMarkerM')
+    }
+}
 
 const getTombLocation = (state: GameState) => findMaterialWorldObject(state, 'tombEntrance');
 const getWarTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'warTempleEntrance');

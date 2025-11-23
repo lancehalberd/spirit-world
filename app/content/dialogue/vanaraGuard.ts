@@ -49,7 +49,7 @@ dialogueHash.vanaraGuard = {
                 {
                     dialogueIndex: 78,
                     dialogueType: 'hint',
-                    text: `The Elder lives in the Southwest tree.`,
+                    text: `The Elder lives in the Northwest tree.`,
                 },
             ],
             repeatIndex: 1,

@@ -414,7 +414,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         //const touchingTarget = hero.actionTarget
         //    && (hero.actionTarget.area === state.areaInstance || hero.actionTarget.area === state.nextAreaInstance)
         //    && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getOffsetHitbox());
-        if (!door?.isHeroTriggeringDoor?.(state) && isHeroOnOpenTile(state, hero)) {
+        if (door?.area && !door?.isHeroTriggeringDoor?.(state) && isHeroOnOpenTile(state, hero)) {
             hero.actionTarget = null;
             hero.isUsingDoor = false;
             delete hero.renderParent;

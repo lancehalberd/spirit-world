@@ -209,7 +209,14 @@ export class Door implements ObjectInstance {
         if (this.style.isLadderDown && !this.isOpen()) {
             return false;
         }
-        return (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
+        if (!this.area) {
+            console.error(`
+                Checking if hero can enter a door that is not yet/no longer assigned an area
+                This can happen if the door is a child object that does not correctly have area set when the parent is added to the area.
+            `);
+            debugger;
+        }
+        return this.area && (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     isHeroTriggeringDoor(state: GameState) {
         return boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getOffsetHitbox()) && this.heroCanEnter(state);

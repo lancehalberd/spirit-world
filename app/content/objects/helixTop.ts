@@ -77,6 +77,12 @@ export class HelixTop implements ObjectInstance {
         this.door.area = this.area;
         this.door.update(state);
     }
+    // Make sure door area gets set as soon as this object is added to an area.
+    add(state: GameState, area: AreaInstance) {
+        this.area = area;
+        this.door.area = area;
+        area.objects.push(this);
+    }
     // This draws the top 200px of the top layer of the tower, which includes all of the
     // graphics that need to be drawn in front of objects that might pass behind it.
     render(context: CanvasRenderingContext2D, state: GameState) {

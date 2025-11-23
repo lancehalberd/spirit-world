@@ -145,22 +145,25 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Fix cannot exit helix top to material sky sometimes.
-        - I cannot reproduce this, but a player reproduced on staging on 2025-11-19 and I couldn't reproduce on the same day
-        - So the bug probably still exists, but is difficult to reproduce for some reason.
-
     - Major tasks blocking release:
+        - Test FPS mini game + dodger work with pause changes.
         - Test forest
         - Test forest temple
         - Test randomizer
         - Repack images.
     - Minor tasks blocking release:
+        - Fix shore animation in cocoon.
+        - Dreaming portal to cocoon disappears when you pickup the chest in the same area.
         - Add better dialog and NPCs to forest temple.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
+
+    - Need better enemy for Cocoon B3 rolling ball puzzle.
+
+    - Non ice grenades should splash animate instead of exploding if they hit empty water.
 
     - Hybrid dungeon map idea:
         - Show spirit world + material world in different overlapping fragments (maybe like a broken mirror)

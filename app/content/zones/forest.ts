@@ -1963,7 +1963,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 100, y: 384, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 96, y: 284, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 240, y: 328, type: "spawnMarker"},
-        {status: "normal", id: "", linked: true, x: 244, y: 140, type: "spawnMarker"},
+        {status: "normal", id: "vanaraVillageMarker", linked: false, x: 236, y: 216, type: "spawnMarker"},
         {status: "normal", id: "forestSave", linked: true, spirit: false, x: 416, y: 64, type: "saveStatue"},
         {id: "southeastTreeEntrance", linked: false, spirit: false, status: "normal", x: 304, y: 352, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "southeastTreeEntrance", d: "up"},
         {id: "forestSecretEntrance", linked: false, spirit: false, status: "normal", x: 16, y: 416, type: "door", style: "tree", targetZone: "treeCave", targetObjectId: "forestSecretEntrance", d: "up", mapIcon: "hidden"},
@@ -1974,6 +1974,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 253, y: 62, type: "decoration", w: 40, h: 16, decorationType: "logPile", seed: 1},
         {id: "northeastTreeEntrance", linked: false, spirit: false, status: "normal", x: 352, y: 144, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "northeastTreeEntrance", d: "up"},
         {id: "southwestTreeEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "southwestTreeEntrance", d: "up"},
+        {status: "normal", id: "", linked: true, x: 244, y: 140, type: "spawnMarker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 643, mapId: 'overworld', entranceId: 'forestMarkerM', mapX: 2, mapY: 2},
@@ -5455,7 +5456,6 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 240, y: 328, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 396, y: 344, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 320, y: 272, type: "spawnMarker", spirit: true},
-        {status: "normal", id: "", linked: true, x: 244, y: 140, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 436, y: 120, type: "spawnMarker", spirit: true},
     ],
     sections: [
