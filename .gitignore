@@ -75,6 +75,8 @@ public/sfx/staging
 public/bgm/old
 # Don't include bgm that haven't been processed yet.
 public/bgm/staging
+# Don't include compiled code
+public/client.js
 source_assets
 # Don't include rsync command.
 rsync.txt

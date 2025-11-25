@@ -901,7 +901,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
         } else if (!hero.isAstralProjection
-            && !isActionBlocked && (hero.savedData.passiveTools.catEyes || hero.clones.length)
+            && !isActionBlocked && (hero.savedData.passiveTools.catEyes || hero.savedData.passiveTools.spiritSight || hero.clones.length)
             && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
         ) {
             if (!hero.clones.length) {

@@ -145,21 +145,54 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Unable to enter Staff Tower in spirit Sky?
+        - This has not yet occurred on the most recent version.
+
+    - Objects are unselecting in the editor when zoomed out and clicking on the object properties.
+
+    - Review this suggestion:
+      Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+
+
     - Major tasks blocking release:
-        - Test forest
-        - Test forest temple
-        - Test randomizer
+        - Fix soft lock in Lake temple water section due to mismatched doors.
+        - Same with boss room.
+
         - Repack images.
     - Minor tasks blocking release:
+        - Update Cloud boots, they shouldn't let you cross 3-gaps.
+        - Add a portal to Spirit World dreaming from Jade Palace + Forest Temple to make it easier to leave Forest Temple.
         - Fix shore animation in cocoon.
+        - Allow unsafe screen transitions while in the sky+spirit forest since you can't get softlocked by pits.
         - Add better dialog and NPCs to forest temple.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
+
+    - Keep charging through rolls when wearing iron boots.
+
+    - Switch blessings to two progressive upgrades:
+        - Fire blessing:
+            - take no burning damage as long as you have spirit energy + take 25% less fire damage
+        - Water blessing:
+            - water no longer drains spirit energy (but spirit energy still does not recover) + take 25% less ice damage
+        - Lightning blessing:
+            - lightning traps do not damage you (but they still knock you away) + take 25% lightning damage
+
+
+    - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
 
     - Need better enemy for Cocoon B3 rolling ball puzzle.
+
+    - Flying Ice beetle should have more particles to make it obvious it is ice.
+
+    - Hard mode recommendations:
+        - No free revives/jade from statues.
+            - Change dialogue for first statue to match. "We're rooting for you, but this time you'll have to make it on your own."
+            - Revive price doubled up to 100 Jade.
+            - Bushes/pots no longer drop peaches.
 
     - Non ice grenades should splash animate instead of exploding if they hit empty water.
 

@@ -216,6 +216,11 @@ export function drawLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: nu
         // Set the fill style and draw a rectangle
         context.fillStyle = gradient;
         const mag = Math.sqrt(dx * dx + dy *dy);
-        context.fillRect(0, -ray.r, mag, ray.r * 2);
+        context.beginPath();
+        // Draw a circle at the start of the beam.
+        context.arc(ray.r, 0, ray.r, 0, 2 * Math.PI);
+        // Draw a rectangle starting at the mid point of the circle.
+        context.rect(ray.r, -ray.r, mag - ray.r, ray.r * 2);
+        context.fill();
     context.restore();
 }
