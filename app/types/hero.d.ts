@@ -148,16 +148,19 @@ type BossName =
   | "golem"
   | "idols"
   | "guardian"
+  | "forest"
   | "rival2"
   | "collector"
   | "stormBeast"
-  | "rush";
+  | "rush"
+  | "rush2";
 
 
 type FastestTimes = {
   currentBoss: BossName;
   bossStartTime: number;
-} & Record<BossName, number>;
+  rushPosition: number;
+}
 
 
 interface SavedHeroData {
@@ -200,7 +203,8 @@ interface SavedHeroData {
     playTime: number
     // How long the player had been playing when they "won" the game.
     winTime: number
-    bossRushTimes: FastestTimes
+    bossRushTrackers: FastestTimes
+    bossRushTimes: {[key in BossName]: number}
 }
 
 type Computable<T> = T | (() => T);

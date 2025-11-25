@@ -260,14 +260,14 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         });
     }
     if (state.savedState.objectFlags['bossRefight']) {
-        let bossSeconds = (state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTimes.bossStartTime) / 1000;
+        let bossSeconds = (state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTrackers.bossStartTime) / 1000;
         const bossHours = (bossSeconds / 3600) | 0;
         const bossMinutes = ((bossSeconds - bossHours * 3600) / 60) | 0;
         bossSeconds = bossSeconds % 60;
         const bossMinutesString = `${bossMinutes}`.padStart(2, '0');
         const bossSecondsString = bossSeconds.toFixed(1).padStart(4, '0');
         const bossTimeString = `${bossHours}:${bossMinutesString}:${bossSecondsString}`;
-        const timerPosition = isRandomizer ? CANVAS_HEIGHT - 36 : CANVAS_HEIGHT - 9;
+        const timerPosition = isRandomizer ? CANVAS_HEIGHT - 43 : CANVAS_HEIGHT - 9;
         drawOutlinedText(context, bossTimeString, 2, timerPosition, {
             textBaseline: 'middle',
             textAlign: 'left',

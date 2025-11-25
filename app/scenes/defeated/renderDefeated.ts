@@ -41,7 +41,15 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
             });
         context.restore();
         return;
-    } else {
+    } if (state.savedState.objectFlags['bossRefight']) {
+        drawText(context, 'Leaving the dream...', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 50, {
+            textBaseline: 'middle',
+            textAlign: 'center',
+            size: 16,
+        });
+        return;
+    }
+    else {
         drawText(context, 'TRY AGAIN?', x, y + 2, textOptions);
     }
 

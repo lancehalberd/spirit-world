@@ -161,6 +161,7 @@ interface GameState {
         renderedFloorId?: string
     }
     arState: ARState
+    travel?: (zoneKey: string, markerId: string, options?: any) => void
 }
 
 type ARGameID = 'dodger'|'hota'|'target'|'targetFPS';

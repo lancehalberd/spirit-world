@@ -394,6 +394,8 @@ mainCanvas.addEventListener('click', function (event) {
 
                 } else if (menuItem === 'neutral') {
                     // No handling
+                } else if (menuItem === 'bossRefight') {
+                    // No handling
                 } else if (menuItem === 'fire' || menuItem === 'ice' || menuItem === 'lightning') {
                     state.hero.savedData.elements[menuItem] = ((state.hero.savedData.elements[menuItem] || 0) + 1) % 2;
                 } else {

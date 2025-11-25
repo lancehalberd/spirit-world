@@ -69,6 +69,18 @@ export function updateDefeated(state: GameState) {
         }
         return;
     }
+
+    if (state.savedState.objectFlags['bossRefight'] ) {
+        if (state.defeatState.time > 4000) {
+            delete state.savedState.objectFlags['bossRefight']
+            fixProgressFlagsOnLoad(state);
+            fixSpawnLocationOnLoad(state);
+            returnToSpawnLocation(state);
+            state.paused = false;
+            return;
+        }
+    }
+
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex + 1) % 2;
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {

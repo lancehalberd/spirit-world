@@ -2,6 +2,7 @@ import { setLeftTool, setRightTool } from 'app/content/menu';
 import { playAreaSound } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
+import { travelToLocation } from './dialogue/refightVanara';
 
 const MAX_LEVEL = 2;
 
@@ -94,6 +95,17 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         const inventory = getDungeonInventory(state);
         inventory.bigKey = true;
         updateDungeonInventory(state, inventory, false);
+    },
+    bossRefight: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        if(!state.savedState.objectFlags['rushMode']) {
+            travelToLocation(state, "dream", "bossRefightReturn");
+        }else {
+            if (state.savedState.savedHeroData.bossRushTrackers.rushPosition >= 4) {
+                state.savedState.savedHeroData.bossRushTrackers.rushPosition = 0;
+                travelToLocation(state, "dream", "bossRefightReturn");
+            }
+            state.savedState.savedHeroData.bossRushTrackers.rushPosition += 1
+        }
     },
     map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);

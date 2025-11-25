@@ -3,6 +3,7 @@ import { showMessage } from 'app/scriptEvents';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireFrame } from 'app/utils/packedImages';
+import { updateBestTimes } from 'app/utils/updateBestTimes';
 
 //const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
 //    + '{|}Select a tool and press [B_TOOL] to assign it.';
@@ -177,6 +178,11 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
+        case 'bossRefight': if (state.savedState.savedHeroData.bossRushTrackers.rushPosition >= 4 || 
+            !state.savedState.objectFlags['rushMode']) {
+                return updateBestTimes(state)
+            }
+            else {return '';}
     }
     return `You obtained the ${lootName}!`;
 }
@@ -474,7 +480,7 @@ const [
 const scrollGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 const [map] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 1, cols: 1}).frames;
 const [greyUpgrade, redUpgrade, blueUpgrade, /* goldUpgrade */ ] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 3, cols: 4}).frames;
-
+const emptyFrame = requireFrame('gfx/empty.png', {x: 0, y: 0, w: 16, h: 16 });
 
 export const lootFrames = {
     smallKey: keyOutlineFrame,
@@ -484,6 +490,7 @@ export const lootFrames = {
     fire: fireElement,
     ice: iceElement,
     lightning: lightningElement,
+    emptyFrame,
     // Summoner's Circlet.
     astralProjection: circlet,
     phoenixCrown,
@@ -647,6 +654,11 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return silverMedal;
         }
         return bronzeMedal;
+    }
+
+    //WIP:Change later!
+    if (lootType === 'bossRefight') {
+        return emptyFrame;
     }
     return lootFrames[lootType] || lootFrames.unknown;
 }

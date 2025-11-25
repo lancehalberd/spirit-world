@@ -90,6 +90,8 @@ export const allLootTypes: LootType[] = [
     'secondChance',
     // This is used for the basic goal in randomizer.
     'victoryPoint',
+    // This triggers events in boss refight mode.
+    'bossRefight',
     // This is the special progressive spirit power loot used by the randomizer.
     'spiritPower',
     'bow', 'clone', 'staff', 'cloak',
