@@ -112,15 +112,15 @@ const baseBeetleWingedDefinition: Partial<EnemyDefinition<any>> & { animations: 
         if (!enemy.activeAbility) {
             enemy.changeToAnimation('idle');
             enemy.useRandomAbility(state);
-            if (enemy.params.element && enemy.time % 300 === 0) {
+            if (enemy.params.element && enemy.time % 200 === 0) {
                 const hitbox = enemy.getHitbox(state);
                 const theta = Math.PI / 2 + 2 * Math.PI * enemy.time / 900;
                 addSparkleAnimation(state, enemy.area, {
                     ...hitbox,
-                    x: hitbox.x + 4 * Math.cos(theta),
-                    y: hitbox.y + 4 * Math.sin(theta),
-                    w: hitbox.w / 2,
-                    h: hitbox.h / 2,
+                    x: hitbox.x + hitbox.w / 2 - 4 + 4 * Math.cos(theta) + enemy.vx * 2,
+                    y: hitbox.y + hitbox.h / 2 - 4 + 4 * Math.sin(theta) + enemy.vy * 2,
+                    w: 8,
+                    h: 8,
                 }, { element: enemy.params.element, velocity: {x: enemy.vx, y: enemy.vy}});
             }
         }

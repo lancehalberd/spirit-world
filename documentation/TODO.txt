@@ -148,15 +148,11 @@ Current tasks:
     - Unable to enter Staff Tower in spirit Sky?
         - This has not yet occurred on the most recent version.
 
-    - Review this suggestion:
-      Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
-
-
     - Major tasks blocking release:
         - Repack images.
     - Minor tasks blocking release:
+        - Boots should not effect Astral Projection speed.
         - Add a portal to Spirit World dreaming from Jade Palace + Forest Temple to make it easier to leave Forest Temple.
-        - Fix shore animation in cocoon.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
     - Keep charging through rolls when wearing iron boots.
@@ -169,7 +165,6 @@ Current tasks:
         - Lightning blessing:
             - lightning traps do not damage you (but they still knock you away) + take 25% lightning damage
 
-
     - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 
     - Add pixel precision to water tiles:
@@ -178,7 +173,6 @@ Current tasks:
 
     - Need better enemy for Cocoon B3 rolling ball puzzle.
 
-    - Flying Ice beetle should have more particles to make it obvious it is ice.
 
     - Hard mode recommendations:
         - No free revives/jade from statues.
