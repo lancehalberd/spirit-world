@@ -529,7 +529,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         && hero.actionTarget.definition.targetObjectId
     // Hero can only trigger a screen transition when they are astral projection, otherwise they could
     // get stuck falling into a pit until they die.
-    const canTransitionSafely = !hero.isOverPit || hero.isAstralProjection;
+    const canTransitionSafely = !hero.isOverPit
+        // Astral projection won't fall into pits. This applies to areas where the MC is forced to
+        // be an Astral projection, such as the initial journey to the Dreaming.
+        || hero.isAstralProjection
+        // Falling from the sky transitions you, so you won't softlock here.
+        || state.location.zoneKey === 'sky'
+        // Falling in this location will transition you to the forest temple zone.
+        || (state.location.zoneKey === 'forest' && state.location.isSpiritWorld);
     // Do not trigger the scrolling transition when traveling through a zone door.
     if ((!editingState.isEditing && !canTransitionSafely)
         || state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor

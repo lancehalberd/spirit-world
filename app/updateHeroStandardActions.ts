@@ -77,10 +77,12 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         // Note that there is no movement speed penalty for level 2 iron boots.
         movementSpeed *= 0.6;
     } else if (hero.savedData.equippedBoots === 'cloudBoots') {
-        movementSpeed = 3;
-        // The slipping effect of the cloud boots will cause them to have 2x max speed already.
-        if (hero.slipping) {
-            movementSpeed = 2;
+        // The slipping effect of the cloud boots will cause them to have 2x max speed already, so this is roughly 4 speed.
+        movementSpeed = 2;
+        // The hero won't slip when walking on clouds, so increase movement speed in this case, otherwise it makes
+        // them feel sluggish while walking on clouds.
+        if (!hero.slipping) {
+            movementSpeed = 3;
         }
     } else if (hero.savedData.equippedBoots === 'leatherBoots' && hero.savedData.equipment.leatherBoots >= 2) {
         // Spike boots give the hero a small movement speed boost in addition to preventing slipping.

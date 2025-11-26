@@ -1,7 +1,8 @@
-import { EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH } from 'app/gameConstants';
-import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { carryMap, directionMap, getDirection } from 'app/utils/direction';
+import {EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
+import {isHeroFloating, isHeroSinking} from 'app/utils/actor';
+import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
+import {carryMap, directionMap, getDirection} from 'app/utils/direction';
+import {clamp} from 'app/utils/index';
 
 import {
     heroAnimations,
@@ -283,6 +284,18 @@ export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, 
         || hero.swimming || hero.wading
     )) {
         return;
+    }
+    const z = Math.floor(hero.z - hero.groundHeight);
+    if (!isHeroFloating(state, hero) && hero.action !== 'knocked' && hero.savedData.equippedBoots === 'cloudBoots' && z >= 1 && z <= MAX_FLOAT_HEIGHT) {
+        context.save();
+            context.translate((hero.x | 0) + 8, (hero.y | 0) + 13);
+            context.scale(1, 0.5);
+            context.globalAlpha = clamp(0.2 + 0.15 * z, 0, 1);
+            context.fillStyle = '#FFA';
+            context.beginPath();
+            context.arc(0, 0, 8 + z, 0, Math.PI * 2);
+            context.fill();
+        context.restore();
     }
     const frame = (hero.z >= hero.groundHeight + 4) ? smallShadowFrame : shadowFrame;
     if (frame === smallShadowFrame) {

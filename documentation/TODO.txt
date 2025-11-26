@@ -155,11 +155,8 @@ Current tasks:
     - Major tasks blocking release:
         - Repack images.
     - Minor tasks blocking release:
-        - Update Cloud boots, they shouldn't let you cross 3-gaps.
         - Add a portal to Spirit World dreaming from Jade Palace + Forest Temple to make it easier to leave Forest Temple.
         - Fix shore animation in cocoon.
-        - Allow unsafe screen transitions while in the sky+spirit forest since you can't get softlocked by pits.
-        - Add better dialog and NPCs to forest temple.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
     - Keep charging through rolls when wearing iron boots.
