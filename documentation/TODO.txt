@@ -148,16 +148,11 @@ Current tasks:
     - Unable to enter Staff Tower in spirit Sky?
         - This has not yet occurred on the most recent version.
 
-    - Objects are unselecting in the editor when zoomed out and clicking on the object properties.
-
     - Review this suggestion:
       Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
 
 
     - Major tasks blocking release:
-        - Fix soft lock in Lake temple water section due to mismatched doors.
-        - Same with boss room.
-
         - Repack images.
     - Minor tasks blocking release:
         - Update Cloud boots, they shouldn't let you cross 3-gaps.

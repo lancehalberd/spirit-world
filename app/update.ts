@@ -242,6 +242,7 @@ function updateTransition(state: GameState) {
         if (state.transitionState.time === WATER_TRANSITION_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, {
                 instant: true,
+                isEndOfTransition: true,
                 callback: state.transitionState.callback,
             });
             updateCamera(state);
@@ -261,6 +262,7 @@ function updateTransition(state: GameState) {
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, {
                 instant: true,
+                isEndOfTransition: true,
                 callback: state.transitionState.callback,
             });
             updateCamera(state);

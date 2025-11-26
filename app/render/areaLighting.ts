@@ -1,12 +1,14 @@
-import { Hero } from 'app/content/hero';
-import { editingState } from 'app/development/editingState';
+import {getConnectedSurfaceArea, getConnectedUnderwaterArea} from 'app/content/areas';
+import {Hero} from 'app/content/hero';
+import {editingState} from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
-import { heroCarryAnimations } from 'app/render/heroAnimations';
-import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
-import { carryMap, directionMap } from 'app/utils/direction';
-import { getObjectBehaviors, getObjectAndParts } from 'app/utils/objects';
+import {heroCarryAnimations} from 'app/render/heroAnimations';
+import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
+import {carryMap, directionMap} from 'app/utils/direction';
+import {clamp} from 'app/utils/index';
+import {getObjectBehaviors, getObjectAndParts} from 'app/utils/objects';
 
 
 const lightingGranularity = 1;
@@ -29,8 +31,8 @@ heroLightGradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
 
 const waterSurfaceGranularity = 2;
 
-
-export function updateWaterSurfaceCanvas(state: GameState): void {
+const surfaceLightIntensity = 0.3;
+export function updateWaterSurfaceCanvas(state: GameState, baseArea: AreaInstance): void {
     let underwaterArea: AreaInstance, surfaceArea: AreaInstance;
     if (state.transitionState?.type === 'diving' && state.transitionState?.nextAreaInstance) {
         underwaterArea = state.transitionState.nextAreaInstance;
@@ -38,14 +40,11 @@ export function updateWaterSurfaceCanvas(state: GameState): void {
     } else if (state.transitionState?.type === 'surfacing' && state.transitionState?.nextAreaInstance) {
         underwaterArea = state.areaInstance;
         surfaceArea = state.transitionState.nextAreaInstance;
-    } else if (state.surfaceAreaInstance) {
-        underwaterArea = state.areaInstance;
-        surfaceArea = state.surfaceAreaInstance;
     } else {
-        surfaceArea = state.areaInstance;
-        underwaterArea = state.underwaterAreaInstance;
+        underwaterArea = getConnectedUnderwaterArea(state, baseArea) || baseArea;
+        surfaceArea = getConnectedSurfaceArea(state, baseArea) || baseArea;
     }
-    if (!surfaceArea || !underwaterArea) {
+    if (!surfaceArea || !underwaterArea || underwaterArea === surfaceArea) {
         return;
     }
     if (!underwaterArea.waterSurfaceCanvas) {
@@ -58,19 +57,16 @@ export function updateWaterSurfaceCanvas(state: GameState): void {
     const context = underwaterArea.waterSurfaceContext;
     const gradient = underwaterArea.waterSurfaceContext.createLinearGradient(0, -24, 0, 8);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-    gradient.addColorStop(1, 'rgba(255, 255, 255, 0.1)');
+    gradient.addColorStop(1, `rgba(255, 255, 255, ${surfaceLightIntensity})`);
     context.save();
         context.clearRect(0, 0, underwaterArea.waterSurfaceCanvas.width, underwaterArea.waterSurfaceCanvas.height);
-        //context.globalAlpha = 0.3;
         for (let y = 0; y < surfaceArea.behaviorGrid?.length; y++) {
             for (let x = 0; x < surfaceArea.behaviorGrid[y]?.length; x++) {
                 if (surfaceArea.behaviorGrid[y][x]?.water
                     && !surfaceArea.behaviorGrid[y][x]?.solid
                 ) {
-                    if (surfaceArea.behaviorGrid[y - 1]?.[x]?.water
-                        && !surfaceArea.behaviorGrid[y - 1][x]?.solid
-                    ) {
-                        context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                    if (y <= 0 || (surfaceArea.behaviorGrid[y - 1][x]?.water && !surfaceArea.behaviorGrid[y -1][x]?.solid)) {
+                        context.fillStyle = `rgba(255, 255, 255, ${surfaceLightIntensity})`;
                         context.save();
                             context.translate((x + 0.5) * 16 / waterSurfaceGranularity, (y + 0.5) * 16 / waterSurfaceGranularity);
                             context.scale(1 / waterSurfaceGranularity, 1 / waterSurfaceGranularity);
@@ -160,19 +156,35 @@ export function updateLightingCanvas(area: AreaInstance): void {
     }
 }
 
-export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
+export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextAreaInstance?: AreaInstance) {
     if (state.surfaceAreaInstance && !area.waterSurfaceCanvas) {
-        updateWaterSurfaceCanvas(state);
+        updateWaterSurfaceCanvas(state, area);
     }
     if (!area.waterSurfaceCanvas) {
         return;
     }
-    context.drawImage(area.waterSurfaceCanvas,
-        (state.camera.x - area.cameraOffset.x) / waterSurfaceGranularity,
-        (state.camera.y - area.cameraOffset.y) / waterSurfaceGranularity,
-        CANVAS_WIDTH / waterSurfaceGranularity, CANVAS_HEIGHT / waterSurfaceGranularity,
-        0, 0, CANVAS_WIDTH, CANVAS_HEIGHT,
-    );
+    context.save();
+        context.globalAlpha = clamp(0.8 + 0.2 * Math.cos(state.fieldTime / 500), 0, 1);
+        context.drawImage(area.waterSurfaceCanvas,
+            (state.camera.x - area.cameraOffset.x) / waterSurfaceGranularity,
+            (state.camera.y - area.cameraOffset.y) / waterSurfaceGranularity,
+            CANVAS_WIDTH / waterSurfaceGranularity, CANVAS_HEIGHT / waterSurfaceGranularity,
+            0, 0, CANVAS_WIDTH, CANVAS_HEIGHT,
+        );
+        if (nextAreaInstance) {
+            if (state.surfaceAreaInstance && !nextAreaInstance.waterSurfaceCanvas) {
+                updateWaterSurfaceCanvas(state, nextAreaInstance);
+            }
+            if (nextAreaInstance.waterSurfaceCanvas) {
+                context.drawImage(nextAreaInstance.waterSurfaceCanvas,
+                    (state.camera.x - nextAreaInstance.cameraOffset.x) / waterSurfaceGranularity,
+                    (state.camera.y - nextAreaInstance.cameraOffset.y) / waterSurfaceGranularity,
+                    CANVAS_WIDTH / waterSurfaceGranularity, CANVAS_HEIGHT / waterSurfaceGranularity,
+                    0, 0, CANVAS_WIDTH, CANVAS_HEIGHT,
+                );
+            }
+        }
+    context.restore();
 }
 
 export function renderAreaLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea: AreaInstance = null): void {

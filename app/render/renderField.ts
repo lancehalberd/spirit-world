@@ -94,7 +94,7 @@ function removeScreenShakes(context: CanvasRenderingContext2D, state: GameState)
 export function renderStandardFieldStack(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     applyScreenShakes(context, state);
         renderField(context, state, renderHero);
-        renderSurfaceLighting(context, state, state.areaInstance);
+        renderSurfaceLighting(context, state, state.areaInstance, state.nextAreaInstance);
         renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
         renderWaterOverlay(context, state);
         renderHeatOverlay(context, state, state.areaSection);
@@ -108,7 +108,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
 }
 export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     renderField(context, state, renderHero);
-    renderSurfaceLighting(context, state, state.areaInstance);
+    renderSurfaceLighting(context, state, state.areaInstance, state.nextAreaInstance);
     renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
     renderSpiritOverlay(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
@@ -503,7 +503,7 @@ export function renderField(
         // Update the canvas for displaying lights from the surface in the water area.
         state.areaInstance.checkToRedrawWaterSurface = false;
         if (state.underwaterAreaInstance) {
-            updateWaterSurfaceCanvas(state);
+            updateWaterSurfaceCanvas(state, state.underwaterAreaInstance);
         }
     }
     if (state.alternateAreaInstance.checkToRedrawTiles) {
@@ -1057,10 +1057,6 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             context.restore();
         }
         renderAreaLighting(context, state, state.areaInstance);
-        context.save();
-            context.translate(0, dz + 24);
-            renderSurfaceLighting(context, state, state.areaInstance);
-        context.restore();
         return;
     } else if (state.transitionState.type === 'mutating') {
         if (!state.transitionState.nextAreaInstance) {
@@ -1086,7 +1082,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 updateLightingCanvas(area);
                 drawRemainingFrames(state, area);
                 if (state.underwaterAreaInstance) {
-                    updateWaterSurfaceCanvas(state);
+                    updateWaterSurfaceCanvas(state, area);
                 }
             }
             // Draw the field, enemies, objects and hero.

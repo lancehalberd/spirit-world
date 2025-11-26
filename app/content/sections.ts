@@ -6,10 +6,7 @@ import { overworldKeys } from 'app/gameConstants';
 interface SectionData {
     section: AreaSection
     area: AreaDefinition
-    zoneKey: string
-    floor: number
-    isSpiritWorld: boolean
-    coords: Coords
+    location: ZoneLocation
 }
 
 interface DungeonMap {
@@ -66,19 +63,13 @@ export function populateAllSections() {
                                 allSections[section.index] = {
                                     section,
                                     area,
-                                    zoneKey,
-                                    floor: floorIndex,
-                                    coords: [x, y],
-                                    isSpiritWorld,
+                                    location,
                                 };
                             } else {
                                 newSections.push({
                                     section,
                                     area,
-                                    zoneKey,
-                                    floor: floorIndex,
-                                    coords: [x, y],
-                                    isSpiritWorld,
+                                    location,
                                 });
                             }
                         }
@@ -102,18 +93,18 @@ function populateSectionMapData(): void {
             continue;
         }
         if (!section.mapId) {
-            section.mapId = sectionData.zoneKey;
-            if (sectionData.isSpiritWorld) {
+            section.mapId = sectionData.location.zoneKey;
+            if (sectionData.location.isSpiritWorld) {
                 section.mapId += 'Spirit';
             }
         }
         if (!section.entranceId) {
             if (!section.floorId) {
-                section.floorId = `${sectionData.floor + 1}F`;
+                section.floorId = `${sectionData.location.floor + 1}F`;
             }
             if (!(section.mapX >= 0 && section.mapY >= 0)) {
-                section.mapX = sectionData.coords[0] * 2 + (section.x / 16) | 0;
-                section.mapY = sectionData.coords[1] * 2 + (section.y / 16) | 0;
+                section.mapX = sectionData.location.areaGridCoords.x * 2 + (section.x / 16) | 0;
+                section.mapY = sectionData.location.areaGridCoords.y * 2 + (section.y / 16) | 0;
             }
         }
         // Sections that show overworld areas aren't added to any dungeon maps.

@@ -452,7 +452,12 @@ interface AreaFrame {
 }
 
 interface AreaInstance {
+    location: ZoneLocation
     alternateArea: AreaInstance
+    // Top floor underwater areas will be paired with bottom floor surface areas in the same grid location.
+    // For these pairs, the area instance will have surface/underwaterArea set appropriately.
+    surfaceArea?: AreaInstance
+    underwaterArea?: AreaInstance
     definition: AreaDefinition
     w: number
     h: number

@@ -16,6 +16,7 @@ interface OptionalEnterLocationParams {
     instant?: boolean
     callback?: () => void
     isMutation?: boolean
+    isEndOfTransition?: boolean
     doNotRefreshEditor?: boolean
     preserveZoneFlags?: boolean
 }
@@ -26,6 +27,7 @@ export function enterLocation(
     {
         callback,
         instant = false,
+        isEndOfTransition = false,
         isMutation = false,
         doNotRefreshEditor = false,
         preserveZoneFlags = false,
@@ -125,8 +127,8 @@ export function enterLocation(
         x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y % state.areaGrid.length].length,
     };
     state.location = getFullZoneLocation(state.location);
-    const area = getAreaFromLocation(state.location);
-    const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
+
+    const alternateLocation = {...state.location, isSpiritWorld: !state.location.isSpiritWorld};
 
     // Remove all clones on changing areas.
     if (!isMutation) {
@@ -135,10 +137,10 @@ export function enterLocation(
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
-        || createAreaInstance(state, zones[state.location.zoneKey], area, true);
+        || createAreaInstance(state, state.location, true);
 
     state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
-        || createAreaInstance(state, zones[state.location.zoneKey], alternateArea, true);
+        || createAreaInstance(state, alternateLocation, true);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);
@@ -167,8 +169,10 @@ export function enterLocation(
         }
     }
     updateAreaSection(state, !isMutation);
-    state.hotLevel = state.areaSection.isHot ? 1 : 0;
-    state.fadeLevel = (state.areaSection.dark || 0) / 100;
+    if (!isEndOfTransition) {
+        state.hotLevel = state.areaSection.isHot ? 1 : 0;
+        state.fadeLevel = (state.areaSection.dark || 0) / 100;
+    }
     fixCamera(state);
     setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);

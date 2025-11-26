@@ -11,6 +11,7 @@ import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
 import {findObjectInstanceByDefinition} from 'app/utils/findObjectInstanceById';
 import {getAreaDimensions} from 'app/utils/getAreaSize';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {initializeAreaLayerTiles, initializeAreaTiles} from 'app/utils/layers';
 import {mapTile} from 'app/utils/mapTile';
 import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
@@ -151,45 +152,73 @@ export function populateLayersFromAlternateArea(zone: Zone|null, area: AreaDefin
 }
 
 export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
-    return createAreaInstance(state, zones[location.zoneKey], getAreaFromLocation(location), isActiveArea);
+    return createAreaInstance(state, location, isActiveArea);
 }
 
+// Sets global reference to either underwaterAreaInstance or surfaceAreaInstance if the current area is connected to another
+// area through an underwater/surface location relationship. Also sets the current area as underwater if a surface area is set.
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
-    state.underwaterAreaInstance = null;
-    if (state.zone.underwaterKey && state.location.floor === 0) {
-        const underwaterArea = getAreaFromLocation({
-            ...state.location,
-            floor: zones[state.zone.underwaterKey].floors.length - 1,
-            zoneKey: state.zone.underwaterKey,
-        });
-        if (!underwaterArea) {
-            debugger;
-        }
-        // Keep using the existing instance if one is present.
-        if (lastAreaInstance?.definition === underwaterArea) {
-            state.underwaterAreaInstance = lastAreaInstance;
-        } else {
-            state.underwaterAreaInstance = createAreaInstance(state, zones[state.zone.underwaterKey], underwaterArea);
-        }
+    state.underwaterAreaInstance = getConnectedUnderwaterArea(state, state.areaInstance, lastAreaInstance);
+    state.surfaceAreaInstance = getConnectedSurfaceArea(state, state.areaInstance, lastAreaInstance);
+    // Do we need this? Are should already be set as underwater based on whether the entire zone has a surfaceKey set or not.
+    // state.areaInstance.underwater = !!state.surfaceAreaInstance;
+}
+
+// Get and memoize the connected underwater area for the given area, returning null if there is none.
+export function getConnectedUnderwaterArea(state: GameState, area: AreaInstance, lastAreaInstance?: AreaInstance): AreaInstance|null {
+    if (area.underwaterArea || area.underwaterArea === null) {
+        return area.underwaterArea;
     }
-    state.surfaceAreaInstance = null;
-    if (state.zone.surfaceKey && state.location.floor === state.zone.floors.length - 1) {
-        const surfaceArea = getAreaFromLocation({
-            ...state.location,
-            floor: 0,
-            zoneKey: state.zone.surfaceKey,
-        })
-        if (!surfaceArea) {
-            debugger;
-        }
-        // Keep using the existing instance if one is present.
-        if (lastAreaInstance?.definition === surfaceArea) {
-            state.surfaceAreaInstance = lastAreaInstance;
-        } else {
-            state.surfaceAreaInstance = createAreaInstance(state, zones[state.zone.surfaceKey], surfaceArea);
-        }
+    const underwaterZoneKey = zones[area.location.zoneKey].underwaterKey;
+    if (!underwaterZoneKey || area.location.floor > 0) {
+        area.underwaterArea = null;
+        return null;
     }
-    state.areaInstance.underwater = !!state.surfaceAreaInstance;
+    const underwaterLocation: ZoneLocation = {
+        ...area.location,
+        floor: zones[underwaterZoneKey].floors.length - 1,
+        zoneKey: underwaterZoneKey,
+    };
+    const underwaterAreaDefinition = getAreaFromLocation(underwaterLocation);
+    if (!underwaterAreaDefinition) {
+        debugger;
+    }
+    // Keep using the existing instance if one is present.
+    if (lastAreaInstance?.definition === underwaterAreaDefinition) {
+        area.underwaterArea = lastAreaInstance;
+    } else {
+        area.underwaterArea = createAreaInstance(state, underwaterLocation);
+    }
+    return area.underwaterArea;
+}
+
+// Get and memoize the connected surface area for the given area, returning null if there is none.
+export function getConnectedSurfaceArea(state: GameState, area: AreaInstance, lastAreaInstance?: AreaInstance): AreaInstance|null {
+    if (area.surfaceArea || area.surfaceArea === null) {
+        return area.surfaceArea;
+    }
+    const currentZone = zones[area.location.zoneKey];
+    const surfaceZoneKey = currentZone.surfaceKey;
+    if (!surfaceZoneKey || area.location.floor !== currentZone.floors.length - 1) {
+        area.surfaceArea = null;
+        return null;
+    }
+    const surfaceLocation: ZoneLocation = {
+        ...area.location,
+        floor: 0,
+        zoneKey: surfaceZoneKey,
+    };
+    const surfaceAreaDefinition = getAreaFromLocation(surfaceLocation)
+    if (!surfaceAreaDefinition) {
+        debugger;
+    }
+    // Keep using the existing instance if one is present.
+    if (lastAreaInstance?.definition === surfaceAreaDefinition) {
+        area.surfaceArea = lastAreaInstance;
+    } else {
+        area.surfaceArea = createAreaInstance(state, surfaceLocation);
+    }
+    return area.surfaceArea;
 }
 
 export function linkObjects(state: GameState): void {
@@ -253,11 +282,10 @@ export function findZoneTargets(
     return results;
 }
 
-
-export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
+export function scrollToArea(state: GameState, location: ZoneLocation, direction: Direction): void {
     //console.log('scrollToArea', direction);
     removeAllClones(state);
-    state.nextAreaInstance = createAreaInstance(state, state.zone, area, true);
+    state.nextAreaInstance = createAreaInstance(state, location, true);
     if (direction === 'up') {
         state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.h * 16;
     }
@@ -270,6 +298,7 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
     if (direction === 'right') {
         state.nextAreaInstance.cameraOffset.x = state.areaInstance.w * 16;
     }
+    state.location = getFullZoneLocation(location);
 }
 
 export function switchToNextAreaSection(state: GameState): void {
@@ -316,17 +345,7 @@ export function getOrCreateAreaInstanceFromLocation(state: GameState, location: 
             return area;
         }
     }
-    return createAreaInstance(state, zones[location.zoneKey], definition);
-}
-
-
-export function getOrCreateAreaInstanceFromDefinition(state: GameState, zone: Zone, definition: AreaDefinition): AreaInstance {
-    for (const area of editingState.recentAreas) {
-        if (area.definition === definition) {
-            return area;
-        }
-    }
-    return createAreaInstance(state, zone, definition);
+    return createAreaInstance(state, location);
 }
 
 export function addRecentArea(areaInstance: AreaInstance): void {
@@ -341,11 +360,13 @@ export function addRecentArea(areaInstance: AreaInstance): void {
     }
 }
 
-export function createAreaInstance(state: GameState, zone: Zone, definition: AreaDefinition, isActiveArea: boolean = false): AreaInstance {
+export function createAreaInstance(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
+    const definition = getAreaFromLocation(location);
     for (const variant of (definition.variants ?? [])) {
         variant._editorType = 'variant';
     }
     const behaviorGrid: TileBehaviors[][] = [];
+    const zone = zones[location.zoneKey];
     const areaSize = getAreaDimensions(definition, zone);
     const backgroundFrames: AreaFrame[] = [];
     for (let i = 0; i < 6; i++) {
@@ -376,6 +397,7 @@ export function createAreaInstance(state: GameState, zone: Zone, definition: Are
         });
     }
     const instance: AreaInstance = {
+        location,
         alternateArea: null,
         definition: definition,
         w: areaSize.w,
@@ -549,7 +571,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             state.fadeLevel = (state.areaSection.dark ?? 0) / 100;
             // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
             // state.hero.vx = state.hero.vy = 0;
-            const nextAreaInstance = createAreaInstance(state, state.zone, instance.definition, true);
+            const nextAreaInstance = createAreaInstance(state, instance.location, true);
             nextAreaInstance.alternateArea = instance.alternateArea;
             nextAreaInstance.alternateArea.alternateArea = nextAreaInstance;
             // Refresh tile behaviors+canvases.
