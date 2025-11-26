@@ -382,7 +382,7 @@ export function drawSingleColorLaser(context: CanvasRenderingContext2D, ray: Ray
         //context.fillRect(0, -ray.r, mag, ray.r * 2);
         // Draw a circle at the start of the beam.
 		
-        context.arc(ray.r, 0, ray.r*2, 0, 2 * Math.PI);
+        context.arc(0, 0, ray.r*2, 0, 2 * Math.PI);
         // Draw a rectangle starting at the mid point of the circle.
         context.rect(ray.r, -ray.r, mag - ray.r, ray.r * 2);
         context.fill();
