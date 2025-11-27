@@ -81,6 +81,10 @@ export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = f
         return logic.logicChecks.some(logicCheck => isLogicValid(state, logicCheck)) ? trueResult : falseResult;
     }
     for (const requiredFlag of (logic?.requiredFlags || [])) {
+        if (requiredFlag === '') {
+            console.warn('Found empty required flag in logic.');
+            continue;
+        }
         if (requiredFlag[0] === '$') {
             if (!isItemLogicTrue(state, requiredFlag.substring(1))) {
                 return falseResult;
@@ -316,7 +320,14 @@ export const canUseTeleporters = orLogic(hasSpiritSight, hasTrueSight);
 
 export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);
 
+export const dreamSpiritWorld: LogicCheck = orLogic(
+    {requiredFlags: ['jadePalaceTeleporterUnlocked']},
+    {requiredFlags: ['forestTempleTeleporterUnlocked']},
+    // TODO: Add remaining teleporters here once they are added.
+);
+
 export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEscaped']};
+export const someBeastDefeated = orLogic({requiredFlags: ['flameBeast']}, {requiredFlags: ['frostBeast']}, {requiredFlags: ['stormBeast']});
 export const beastsDefeated: LogicCheck = {requiredFlags: ['flameBeast', 'frostBeast', 'stormBeast']};
 
 // These logic checks should only be used during generation and are not supported during game play.
@@ -365,6 +376,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
         // Storm is gone after the storm beast is gone.
         excludedFlags: ['stormBeast'],
     },
+    dreamSpiritWorld,
     desertTower: (state: GameState) => {
         return !(state.hero.savedData.activeTools.staff & 2) && state.savedState.staffTowerLocation === 'desert';
     },

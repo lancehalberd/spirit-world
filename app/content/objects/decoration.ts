@@ -1,7 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {setSpawnLocation} from 'app/content/spawnLocations';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendScript} from 'app/scriptEvents';
+import {appendScript, showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
@@ -990,7 +990,17 @@ const cocoon: DecorationType = {
     onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
         hero.action = null;
         if (decoration.definition.id === 'dreamPod') {
-            enterZoneByTarget(state, 'dream', 'cocoonTeleporter');
+            if (state.location.zoneKey === 'cocoon') {
+                enterZoneByTarget(state, 'dream', 'cocoonTeleporter');
+            } else if (state.location.zoneKey === 'helix' && state.savedState.objectFlags.helixTeleporterUnlocked) {
+                enterZoneByTarget(state, 'dream', 'helixTeleporter');
+            } else if (state.location.zoneKey === 'forestTemple' && state.savedState.objectFlags.forestTempleTeleporterUnlocked) {
+                enterZoneByTarget(state, 'dream', 'forestTempleTeleporter');
+            } else if (state.location.zoneKey === 'grandTemple' && state.savedState.objectFlags.jadePalaceTeleporterUnlocked) {
+                enterZoneByTarget(state, 'dream', 'jadePalaceTeleporter');
+            } else {
+                showMessage(state, `It won't open for some reason.`);
+            }
         } else if (decoration.child) {
             decoration.child.onGrab?.(state, direction, hero);
         }

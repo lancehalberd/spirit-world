@@ -152,7 +152,6 @@ Current tasks:
         - Repack images.
     - Minor tasks blocking release:
         - Boots should not effect Astral Projection speed.
-        - Add a portal to Spirit World dreaming from Jade Palace + Forest Temple to make it easier to leave Forest Temple.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
     - Keep charging through rolls when wearing iron boots.
@@ -217,7 +216,7 @@ Current tasks:
     - Add Vanara Dreamland
         - Add Vanara Dreamland to logic
             - Add logic for all teleporters
-        - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
+        - Add Spirit world entrances: Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
             - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
             - The dreamland will start small and expand as you save the Daughter Trees.
@@ -243,9 +242,6 @@ Current tasks:
             - Requires moving Staff Tower
         - Expansion(Spirit Sky Tree) 6: library of memories
             - Requires Flying Boots or complicated use of other abilities
-
-    - Add sleeping pod to Helix bridge
-        - Prevent the player from using it before talking to the captain "You can use this pod to visit the Dreaming after you've talked to the captain."
 
     - Add charge behavior to drone
         - line up with hero within 100px
