@@ -8,7 +8,7 @@ import {renderSpiritBar} from 'app/render/spiritBar';
 import {shouldHideMenu} from 'app/state';
 import {createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
-import {drawOutlinedText, drawText} from 'app/utils/simpleWhiteFont';
+import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
 import {createCanvasAndContext} from 'app/utils/canvas';
 import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
@@ -180,13 +180,17 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         drawFrameCenteredAt(context, frame, target);
     }
 
-    drawFrame(context, coin, {...coin, x: CANVAS_WIDTH - 110, y: 4});
+    drawFrame(context, coin, {...coin, x: CANVAS_WIDTH - 110, y: 5});
     let moneyText = `${state.hero.savedData.money}`;
-    while (moneyText.length < 4) moneyText = '0' + moneyText;
-    drawText(context, moneyText, CANVAS_WIDTH - 90, 14, {
+    // Currently the game doesn't cap your Jade quantity, so just make sure the display
+    // doesn't look too bad with huge amounts of Jade.
+    if (moneyText.length > 4) moneyText = moneyText.substring(moneyText.length - 4);
+    //while (moneyText.length < 3) moneyText = '0' + moneyText;
+    drawOutlinedText(context, moneyText, CANVAS_WIDTH - 93, 14, {
         textBaseline: 'middle',
         textAlign: 'left',
         size: 16,
+        spacing: -1,
     });
 
     // Show boss health bars from both realms.

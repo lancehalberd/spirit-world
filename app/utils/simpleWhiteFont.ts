@@ -176,6 +176,8 @@ interface TextOptions {
     textAlign: 'left' | 'center' | 'right'
     textBaseline: 'top' | 'middle' | 'bottom'
     size: number
+    // In some supported contexts this will adjust horizontal spacing between letters.
+    spacing: number
 }
 
 export function drawText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
@@ -211,9 +213,9 @@ export function drawText(context: CanvasRenderingContext2D, text: string, x: num
 }
 
 export function drawOutlinedText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
-    {maxWidth = 100, textAlign = 'left', textBaseline = 'bottom', size = baseHeight}: Partial<TextOptions>
+    {maxWidth = 100, textAlign = 'left', textBaseline = 'bottom', size = baseHeight, spacing = 0}: Partial<TextOptions>
 ) {
-    const letterWidth = baseWidth + 2;
+    const letterWidth = baseWidth + 2 + spacing;
     text = `${text}`;
     x = x | 0;
     y = y | 0;
@@ -235,7 +237,7 @@ export function drawOutlinedText(context: CanvasRenderingContext2D, text: string
                 frame.x, frame.y, frame.w, frame.h,
                 x, y, frame.w * scale, frame.h * scale,
             );
-            x += frame.w * scale;
+            x += (frame.w + spacing) * scale;
         } else {
             x += letterWidth * scale;
         }

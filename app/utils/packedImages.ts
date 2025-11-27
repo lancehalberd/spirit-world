@@ -1,5 +1,4 @@
-import { requireImage } from 'app/utils/images';
-
+import {allImagesLoaded, requireImage} from 'app/utils/images';
 
 /**
  * Example usage:
@@ -313,7 +312,7 @@ export function requireFrame(source: string, r?: FrameRectangle, callback?: (fra
             ? {image: p.image, x: r.x + p.x, y: r.y + p.y, w: r.w, h: r.h, content: r.content, s: r.s}
             : p;
         if (callback) {
-            requireImage(source, () => callback(frame));
+            allImagesLoaded().then(() => callback(frame));
         }
         return frame;
     }
