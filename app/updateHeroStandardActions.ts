@@ -340,7 +340,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (hero.isUncontrollable
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
-            } else if (hero.savedData.passiveTools.catEyes) {
+            } else if (hero.savedData.passiveTools.catEyes || hero.savedData.passiveTools.spiritSight) {
                 // Note that the hero can use spirit sight successfully without spirit sight when they are training to
                 // use spirit sight. Normally maxSpiritRadius will be 0 without spirit sight, but the spirit sight tutorail
                 // will override this value.
