@@ -73,7 +73,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.isRunning && state.hero.magic > 0) {
         movementSpeed *= 1.3;
     }
-    if (hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots < 2) {
+    if (hero.isAstralProjection) {
+        // Boots do not effect astral projection, but it is innately faster than normal speed.
+        movementSpeed *= 1.2;
+    } else if (hero.savedData.equippedBoots === 'ironBoots' && hero.savedData.equipment.ironBoots < 2) {
         // Note that there is no movement speed penalty for level 2 iron boots.
         movementSpeed *= 0.6;
     } else if (hero.savedData.equippedBoots === 'cloudBoots') {

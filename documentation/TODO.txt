@@ -151,7 +151,6 @@ Current tasks:
     - Major tasks blocking release:
         - Repack images.
     - Minor tasks blocking release:
-        - Boots should not effect Astral Projection speed.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
     - Keep charging through rolls when wearing iron boots.
