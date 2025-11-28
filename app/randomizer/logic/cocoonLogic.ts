@@ -120,8 +120,5 @@ export const cocoonNodes: LogicNode[] = [
             {objectId: 'cocoonBoss', logic: hasSpiritSight},
             {objectId: 'cocoonSilver', logic: orLogic(hasTeleportation, hasSomersault) },
         ],
-        npcs: [
-            {loot: {type: 'dialogueLoot', id: 'cocoonGuardianPostBoss', lootType: 'teleportation'}},
-        ],
     },
 ];

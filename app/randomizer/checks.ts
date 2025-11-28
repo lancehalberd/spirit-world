@@ -108,6 +108,7 @@ export function isCheckTrash(state: GameState, check: LootWithLocation): boolean
 
     return false;
 }
+window.isCheckTrash = isCheckTrash;
 
 export function addCheck(checkId: string, assignment: LootAssignment, logicalZoneKey: LogicalZoneKey) {
     allChecks.add(checkId);
