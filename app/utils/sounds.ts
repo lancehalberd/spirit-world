@@ -40,7 +40,7 @@ interface TrackDefinition extends BaseSoundDefinition {
 }
 
 export function requireSoundEffect({
-    key, source, offset, duration, customDelay, volume, instanceLimit = 5, loop = false, repeatFrom, speed,
+    key, source, offset, duration, customDelay, volume = 2, instanceLimit = 5, loop = false, repeatFrom, speed,
 }: SoundEffectDefinition): GameSound {
     const sound = sounds.get(key);
     if (sound) {
@@ -457,6 +457,7 @@ const preloadSounds = () => {
         {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 100, instanceLimit: 4}, 
         {key: 'hitShot', source: 'sfx/enemyDeath.wav', offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 5},
         {key: 'hitBullseye', source: 'sfx/chime 14_1.wav', duration: 1, volume: 4, instanceLimit: 5},
+        {key: 'laser', source: 'sfx/pulseBeam.wav', instanceLimit: 4},
     ].forEach(sound => requireSoundEffect(sound));
 };
 preloadSounds();

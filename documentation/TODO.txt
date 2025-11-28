@@ -156,6 +156,9 @@ Current tasks:
         - Appears to try to guard the terminal to the spirit world.
     - Jade Champion doesn't seem to help during Storm Beast fight in randomizer.
 
+    - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
+        - Delays spirit energy generation for
+
     - Keep charging through rolls when wearing iron boots.
 
     - Switch blessings to two progressive upgrades:
