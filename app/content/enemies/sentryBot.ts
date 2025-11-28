@@ -1,4 +1,4 @@
-import { LaserBeam } from 'app/content/effects/laserBeam';
+import { SentryBotLaser } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     sentryBotAnimations,
@@ -10,6 +10,8 @@ import {
     paceAndCharge,
 } from 'app/utils/enemies';
 import { getEndOfLineOfSight, getVectorToNearbyTarget } from 'app/utils/target';
+import Random from 'app/utils/Random';
+import { invlerp } from 'app/utils/index';
 
 
 const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = false): boolean => {
@@ -31,6 +33,7 @@ const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = fal
 };
 
 const chargeTime = 400;
+const chargeColor = ['dark red', 'red'];
 
 enemyDefinitions.sentryBot = {
     naturalDifficultyRating: 12,
@@ -66,10 +69,11 @@ enemyDefinitions.sentryBot = {
             if (enemy.modeTime === chargeTime - 180) {
                 const cx = hitbox.x + hitbox.w / 2;
                 const cy = hitbox.y + hitbox.h / 2;
-                addEffectToArea(state, enemy.area, new LaserBeam({
+				//playAreaSound(state, 'pulseBeam');  //We'll add this later
+                addEffectToArea(state, enemy.area, new SentryBotLaser({
                     sx: cx, sy: cy,
                     tx: enemy.params.targetX, ty: enemy.params.targetY,
-                    radius: 5, damage: 4, duration: 200,
+                    radius: 3, damage: 4, duration: 200,
                     source: enemy,
                 }));
             }
@@ -95,15 +99,24 @@ enemyDefinitions.sentryBot = {
                 context.stroke();
             context.restore();
         }
-        if (enemy.mode === 'prepareLaser') {
-            const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
-            drawTargetingLine(context, state, enemy, x,  y, 'yellow');
-        } else if (enemy.mode === 'fireLaser') {
-            const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
-            if (enemy.modeTime < chargeTime - 180) {
-                drawTargetingLine(context, state, enemy, x, y, 'red');
-            }
-        }
+		let color = 'dark red';
+		context.strokeStyle = color;
+		if (enemy.mode === 'prepareLaser') {
+				const radius = Math.ceil(invlerp(0, 400, enemy.modeTime)*6) ?? 6;
+				
+				if(radius>3) color = Random.element(chargeColor);
+				drawLaserCharge(context, state, enemy, color, radius);
+				const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
+				drawTargetingLine(context, state, enemy, x,  y, 'dark red');
+		} else if (enemy.mode === 'fireLaser') {
+			const radius = 6;
+			color = Random.element(chargeColor);
+			drawLaserCharge(context, state, enemy, color, radius);
+			const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
+			if (enemy.modeTime < chargeTime - 180) {
+				drawTargetingLine(context, state, enemy, x, y, 'red');
+			}
+		}
     },
 };
 
@@ -123,4 +136,19 @@ function drawTargetingLine(
         context.lineTo(targetX, targetY);
         context.stroke();
     context.restore();
+}
+function drawLaserCharge(
+    context: CanvasRenderingContext2D, state: GameState,
+    enemy: Enemy, color: string, Radius: number
+): void {
+	context.save();
+		const hitbox = enemy.getHitbox(state);
+		const cx = (hitbox.x + hitbox.w / 2) | 0;
+		const cy = (hitbox.y + hitbox.h / 2) | 0;
+		context.globalAlpha *= 0.8;
+		context.fillStyle = color;
+		context.beginPath();
+		context.arc(cx, cy, Radius, 0, 2 * Math.PI);
+		context.fill();
+	context.restore();
 }
