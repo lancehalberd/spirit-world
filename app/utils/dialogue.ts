@@ -27,7 +27,10 @@ export function selectDialogueOption(state: GameState, dialogueKey: string, obje
     return null;
 }
 
-export function isDialogueHeard(state: GameState, dialogueIndex: number): boolean {
+export function isDialogueHeard(state: GameState, dialogueIndex: number|null): boolean {
+    if (dialogueIndex === null) {
+        return true;
+    }
     if (!(dialogueIndex >= 0)) {
         return false;
     }
@@ -36,7 +39,7 @@ export function isDialogueHeard(state: GameState, dialogueIndex: number): boolea
     return !!(state.savedState.heardDialogue[numberIndex] >> bitIndex & 1)
 }
 
-export function setDialogueHeard(state: GameState, dialogueIndex: number) {
+export function setDialogueHeard(state: GameState, dialogueIndex: number|null) {
     if (!(dialogueIndex >= 0)) {
         return;
     }

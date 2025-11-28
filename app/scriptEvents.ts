@@ -305,7 +305,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             const valueNumber = parseInt(value, 10);
             events.push({
                 type: 'setFlag',
-                flag,
+                flag: flag.trim(),
                 value: isNaN(valueNumber) ? (value || true) : valueNumber,
             });
             events.push({
@@ -317,7 +317,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             const flag = actionToken.substring('clearFlag:'.length);
             events.push({
                 type: 'clearFlag',
-                flag,
+                flag: flag.trim(),
             });
             events.push({
                 type: 'refreshAreaLogic',

@@ -22,6 +22,8 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         logicalZoneKey = 'gauntlet';
     } else if (zoneKey === 'overworld' || zoneKey === 'underwater') {
         logicalZoneKey = isSpiritWorld ? 'spiritWorld' : 'overworld';
+    } else if (zoneKey === 'forest' || zoneKey === 'forestWater') {
+        logicalZoneKey = isSpiritWorld ? 'spiritForest' : 'forest';
     } else if (zoneKey === 'peachCave' || zoneKey === 'peachCaveWater') {
         logicalZoneKey = isSpiritWorld ? 'peachCaveSpirit' : 'peachCave';
     } else if (zoneKey === 'riverTemple' || zoneKey === 'riverTempleWater') {
@@ -45,6 +47,8 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         logicalZoneKey = 'holySanctum';
     } else if (zoneKey === 'tree') {
         logicalZoneKey = isSpiritWorld ? 'treeSpirit' : 'tree';
+    } else if (zoneKey === 'waterfallCaveWater') {
+        logicalZoneKey = 'waterfallCave';
     }
     return {
         ...location,

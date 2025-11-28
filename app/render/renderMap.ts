@@ -1,4 +1,4 @@
-import {createAreaInstance, getOrCreateAreaInstanceFromDefinition} from 'app/content/areas';
+import {createAreaInstance, getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
 import {convertLocationToMapCoordinates, getMapTargets} from 'app/content/hints';
 import {doorStyles } from 'app/content/objects/doorStyles';
 import {evaluateLogicDefinition} from 'app/content/logic';
@@ -153,14 +153,28 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
     const grid = state.location.isSpiritWorld ? zone.floors[0].spiritGrid : zone.floors[0].grid;
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, zone, grid[row][column]);
+            const areaInstance = createAreaInstance(state, {
+                zoneKey,
+                floor: 0,
+                areaGridCoords: {x: column, y: row},
+                isSpiritWorld: state.location.isSpiritWorld,
+                // These properties aren't used in this context.
+                x: 0, y: 0, d: 'down',
+            });
             renderActualMapTile(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
         }
     }
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, zone, grid[row][column]);
+            const areaInstance = createAreaInstance(state, {
+                zoneKey,
+                floor: 0,
+                areaGridCoords: {x: column, y: row},
+                isSpiritWorld: state.location.isSpiritWorld,
+                // These properties aren't used in this context.
+                x: 0, y: 0, d: 'down',
+            });
             renderMapObjects(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16},
                 state.hero.savedData.passiveTools.trueSight >= 1);
@@ -218,12 +232,12 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             //mapContext.fillStyle = 'red';
             continue;
         }
-        const {area, section} = sectionData;
-        const zone = zones[sectionData.zoneKey];
+        const {section} = sectionData;
+        const zone = zones[sectionData.location.zoneKey];
         sectionRenderData.push({
             alpha: isHidden ? 0.2 : (!isExplored ? 0.6 : 1),
             isExplored: isActuallyExplored,
-            isUnderwater: !sectionData.isSpiritWorld && !!zone.surfaceKey,
+            isUnderwater: !sectionData.location.isSpiritWorld && !!zone.surfaceKey,
             source: {
                 x: section.x * 16,
                 y: section.y * 16,
@@ -236,7 +250,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 w: section.w * 16 * 4 / w,
                 h: section.h * 16 * 4 / h,
             },
-            area: editingState.isEditing ? getOrCreateAreaInstanceFromDefinition(state, zone, area) : createAreaInstance(state, zone, area),
+            area: editingState.isEditing ? getOrCreateAreaInstanceFromLocation(state, sectionData.location) : createAreaInstance(state, sectionData.location),
         });
     }
 

@@ -145,21 +145,38 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Unable to enter Staff Tower in spirit Sky?
+        - This has not yet occurred on the most recent version.
+
     - Major tasks blocking release:
-        - Test forest
-        - Test forest temple
-        - Test randomizer
         - Repack images.
     - Minor tasks blocking release:
-        - Fix shore animation in cocoon.
-        - Add better dialog and NPCs to forest temple.
         - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
+
+    - Keep charging through rolls when wearing iron boots.
+
+    - Switch blessings to two progressive upgrades:
+        - Fire blessing:
+            - take no burning damage as long as you have spirit energy + take 25% less fire damage
+        - Water blessing:
+            - water no longer drains spirit energy (but spirit energy still does not recover) + take 25% less ice damage
+        - Lightning blessing:
+            - lightning traps do not damage you (but they still knock you away) + take 25% lightning damage
+
+    - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
 
     - Need better enemy for Cocoon B3 rolling ball puzzle.
+
+
+    - Hard mode recommendations:
+        - No free revives/jade from statues.
+            - Change dialogue for first statue to match. "We're rooting for you, but this time you'll have to make it on your own."
+            - Revive price doubled up to 100 Jade.
+            - Bushes/pots no longer drop peaches.
 
     - Non ice grenades should splash animate instead of exploding if they hit empty water.
 
@@ -198,7 +215,7 @@ Current tasks:
     - Add Vanara Dreamland
         - Add Vanara Dreamland to logic
             - Add logic for all teleporters
-        - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
+        - Add Spirit world entrances: Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
             - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
             - The dreamland will start small and expand as you save the Daughter Trees.
@@ -224,9 +241,6 @@ Current tasks:
             - Requires moving Staff Tower
         - Expansion(Spirit Sky Tree) 6: library of memories
             - Requires Flying Boots or complicated use of other abilities
-
-    - Add sleeping pod to Helix bridge
-        - Prevent the player from using it before talking to the captain "You can use this pod to visit the Dreaming after you've talked to the captain."
 
     - Add charge behavior to drone
         - line up with hero within 100px

@@ -25,7 +25,7 @@ import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
 import { editingState } from 'app/development/editingState';
 import { getLogicProperties } from 'app/development/zoneEditor';
-import {allLootTypes, CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
+import {allLootTypes} from 'app/gameConstants';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import {enterLocation} from 'app/utils/enterLocation';
@@ -1889,13 +1889,13 @@ export function selectSingleObject(state: GameState, editingState: EditingState,
     editingState.needsRefresh = true;
 }
 
-export function onMouseUpSelectObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
+export function onMouseUpSelectObject(state: GameState, editingState: EditingState, x: number, y: number, isMouseOverCanvas: boolean): boolean {
     delete editingState.dragObject;
     if (editingState.dragged) {
         delete editingState.dragged;
         return false;
     }
-    if (!isPointInShortRect(x, y, {x: 0, y: 0, w: CANVAS_WIDTH / editingState.areaScale, h: CANVAS_HEIGHT / editingState.areaScale})) {
+    if (!isMouseOverCanvas) {
         return false;
     }
     const clickedObject = getObjectDirectlyUnderPoint(state, editingState, x, y);

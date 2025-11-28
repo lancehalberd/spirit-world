@@ -81,7 +81,8 @@ export class HeavyFloorSwitch implements ObjectInstance {
 
     update(state: GameState) {
         // This does nothing if the switch isn't assigned an ID.
-        this.status = this.getLogicalStatus(state);
+        // This breaks the Flame Beast switches, and isn't used for anything, so I'm disabling this for now.
+        // this.status = this.getLogicalStatus(state);
         // Switches with save status turned on stay depressed after they are stepped on.
         if (this.status === 'active') {
             return;

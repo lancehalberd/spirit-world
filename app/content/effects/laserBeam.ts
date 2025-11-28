@@ -160,31 +160,11 @@ export class LaserBeam implements EffectInstance, Props {
        }
        if (this.tellDuration > 0) {
            const ray = padRay(this.getHitRay(state), visualPadding);
-           renderDamageWarning(context, {
+            renderDamageWarning(context, {
                 ray,
                 duration: this.totalTellDuration,
                 time: this.totalTellDuration - this.tellDuration,
             });
-
-           /* const ray = this.getHitRay(state);
-            context.save();
-                context.translate(ray.x1, ray.y1);
-                const dx = ray.x2 - ray.x1;
-                const dy = ray.y2 - ray.y1;
-                const mag = Math.sqrt(dx * dx + dy *dy);
-                const theta = Math.atan2(dy, dx);
-                context.rotate(theta);
-                context.fillStyle = 'red';
-                context.globalAlpha *= 0.5;
-                context.fillRect(0, -ray.r, mag, 1);
-                context.fillRect(0, ray.r - 1, mag, 1);
-                const r = this.radius - this.tellDuration / 50;
-                if (r > 0) {
-                    context.fillRect(0, -r | 0, mag, 2 * r | 0);
-                }
-            context.restore();
-            //drawLaser(context, this.getHitRay(state), 0.1);
-            return;*/
        }
     }
 }
@@ -226,7 +206,8 @@ export function drawLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: nu
         context.fillStyle = gradient;
 		context.beginPath();
         const mag = Math.sqrt(dx * dx + dy *dy);
-        //context.fillRect(0, -ray.r, mag, ray.r * 2);
+
+		context.beginPath();
         // Draw a circle at the start of the beam.
         context.arc(ray.r, 0, ray.r, 0, 2 * Math.PI);
         // Draw a rectangle starting at the mid point of the circle.
@@ -386,6 +367,5 @@ export function drawSingleColorLaser(context: CanvasRenderingContext2D, ray: Ray
         // Draw a rectangle starting at the mid point of the circle.
         context.rect(ray.r, -ray.r, mag - ray.r, ray.r * 2);
         context.fill();
-		
     context.restore();
 }

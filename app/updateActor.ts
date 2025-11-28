@@ -1,7 +1,4 @@
-import {
-    getAreaFromLocation,
-    scrollToArea,
-} from 'app/content/areas';
+import {scrollToArea} from 'app/content/areas';
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {AirBubbles} from 'app/content/objects/airBubbles';
 import {Enemy} from 'app/content/enemy';
@@ -18,7 +15,6 @@ import {removeAllClones, setNextAreaSection } from 'app/utils/area';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {directionMap} from 'app/utils/field';
 import {getAreaSize} from 'app/utils/getAreaSize';
-import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {boxesIntersect, pad} from 'app/utils/index';
 import {removeObjectFromArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
@@ -533,7 +529,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         && hero.actionTarget.definition.targetObjectId
     // Hero can only trigger a screen transition when they are astral projection, otherwise they could
     // get stuck falling into a pit until they die.
-    const canTransitionSafely = !hero.isOverPit || hero.isAstralProjection;
+    const canTransitionSafely = !hero.isOverPit
+        // Astral projection won't fall into pits. This applies to areas where the MC is forced to
+        // be an Astral projection, such as the initial journey to the Dreaming.
+        || hero.isAstralProjection
+        // Falling from the sky transitions you, so you won't softlock here.
+        || state.location.zoneKey === 'sky'
+        // Falling in this location will transition you to the forest temple zone.
+        || (state.location.zoneKey === 'forest' && state.location.isSpiritWorld);
     // Do not trigger the scrolling transition when traveling through a zone door.
     if ((!editingState.isEditing && !canTransitionSafely)
         || state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor
@@ -550,16 +553,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             x: (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length,
             y: state.location.areaGridCoords.y,
         };
-        scrollToArea(state, getAreaFromLocation(state.location), 'left');
-        state.location = getFullZoneLocation(state.location);
+        scrollToArea(state, state.location, 'left');
         return;
     } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
         state.location.areaGridCoords = {
             x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
             y: state.location.areaGridCoords.y,
         };
-        scrollToArea(state, getAreaFromLocation(state.location), 'right');
-        state.location = getFullZoneLocation(state.location);
+        scrollToArea(state, state.location, 'right');
         return;
     } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
         setNextAreaSection(state, 'left');
@@ -575,15 +576,13 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             x: state.location.areaGridCoords.x,
             y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
         };
-        scrollToArea(state, getAreaFromLocation(state.location), 'up');
-        state.location = getFullZoneLocation(state.location);
+        scrollToArea(state, state.location, 'up');
     } else if (hero.y + hero.h > h && isHeroMovingDown) {
         state.location.areaGridCoords = {
             x: state.location.areaGridCoords.x,
             y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
         };
-        scrollToArea(state, getAreaFromLocation(state.location), 'down');
-        state.location = getFullZoneLocation(state.location);
+        scrollToArea(state, state.location, 'down');
     } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
         setNextAreaSection(state, 'up');
     } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {
