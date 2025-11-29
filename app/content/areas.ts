@@ -565,6 +565,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             specialBehavior?.onRefreshLogic(state, instance);
         }
     }
+    // Objects will be initialized after all objects are added to the area since some object initialization will depend on
+    // other objects, for example beds/cocoons placing target NPC objects inside of them.
+    const objectsToInitialize: ObjectInstance[] = [];
     for (let instance of [area, area.alternateArea]) {
         if (refreshBehavior) {
             state.map.needsRefresh = true;
@@ -627,6 +630,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             nextAreaInstance.objects = [];
             for (const object of [...instance.objects]) {
                 addObjectToArea(state, nextAreaInstance, object);
+                objectsToInitialize.push(object);
             }
             // The objects will be removed from the current instance, so add them back so they will render during the transition.
             //instance.objects = nextAreaInstance.objects.filter(o => instance.removedObjectIds.includes(o.definition.id));
@@ -694,6 +698,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                     objectInstance = createObjectInstance(state, object);
                     // Note that special behavior is applied to objects as part of adding them to the area.
                     addObjectToArea(state, instance, objectInstance);
+                    objectsToInitialize.push(objectInstance);
                 }
             } else {
                 if (objectInstance) {
@@ -711,6 +716,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         //console.log('new instance', instance.objects.map( o => o.definition?.id ));
     }
     delete state.map.restoreOriginalTiles;
+    for (const object of objectsToInitialize) {
+        initializeObject(state, object, true);
+    }
     checkIfAllEnemiesAreDefeated(state, area);
 }
 

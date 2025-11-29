@@ -5,7 +5,11 @@ import {saveGame} from 'app/utils/saveGame';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 
 export function initializeObject(state: GameState, object: ObjectInstance, isActiveArea: boolean): void {
-    // Apply special behavior here, not in addObjectToArea, as addObjecToArea can get called when persisting objects during
+    if (object.isInitialized) {
+        return;
+    }
+    object.isInitialized = true;
+    // Apply special behavior here, not in addObjectToArea, as addObjectToArea can get called when persisting objects during
     // transitions (like lava drain), but apply should only be called once when the object is first created.
     if (object.definition?.specialBehaviorKey) {
         try {

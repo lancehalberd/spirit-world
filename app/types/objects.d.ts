@@ -88,6 +88,9 @@ interface BaseFieldInstance {
     // isActiveArea will be set to false when this object is being initialized in an inactive area,
     // for example areas initialized when drawing maps.
     onInitialize?: (state: GameState, isActiveArea: boolean) => void
+    // Flag used to prevent reinitializing objects when they are moved between area instances
+    // during are logic refreshes.
+    isInitialized?: boolean;
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult

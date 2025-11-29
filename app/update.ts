@@ -47,6 +47,10 @@ export function update() {
     }
     const state = getState();
     state.time += FRAME_LENGTH;
+    // Player input cannot be blocked while the game is paused, otherwise the player will be unable to unpause the game.
+    if (state.paused && state.scriptEvents?.blockPlayerInput) {
+        delete state.scriptEvents?.blockPlayerInput;
+    }
     updateKeyboardState(state);
     try {
         // This has higher priority than anything and basically freezes the game to show the controls.

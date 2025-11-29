@@ -148,6 +148,10 @@ Graphics to Implement:
 Current tasks:
     - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
+    - Lightning switch in waterfall tower keeps playing secret noise on every frame.
+
+    - Disable Nimbus Cloud in the Dreaming.
+
     - Storm beast behavior seems wrong when defeating orbs ahead of the fight
         - Seems to appear and disappear immediately sometime (even when not transitioning to rage phase)
         - Appears to try to guard the terminal to the spirit world.

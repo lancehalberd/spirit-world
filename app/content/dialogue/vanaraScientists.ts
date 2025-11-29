@@ -241,7 +241,7 @@ dialogueHash.vanaraScientist = {
         },
         {
             logicCheck: {
-                requiredFlags: [''],
+                requiredFlags: [],
                 excludedFlags: ['beastsDefeated'],
                 zones: ['forestTemple'],
             },

@@ -156,6 +156,7 @@ export function cleanState(state: GameState) {
     state.screenShakes = defaultState.screenShakes;
     state.defeatState = defaultState.defeatState;
     state.paused = false;
+    delete state.hideHUD;
     delete state.transitionState;
     delete state.messagePage;
 }
