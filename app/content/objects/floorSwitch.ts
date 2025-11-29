@@ -24,8 +24,8 @@ export class FloorSwitch implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        this.status = this.getLogicalStatus(state);
         this.stayDepressed = definition.saveStatus === 'zone' || definition.saveStatus === 'forever';
+        this.status = this.getLogicalStatus(state);
     }
     getHitbox(): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };

@@ -1074,18 +1074,6 @@ const helixBase: DecorationType = {
     },
 };
 
-const [helixTopFrame] = createAnimation('gfx/objects/helixTop.png',
-    {w: 132, h: 292, content: {x: 124, y: 168, w: 124, h: 120}}, {left: 127, top: 2}
-).frames;
-const helixTop: DecorationType = {
-    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, helixTopFrame, decoration);
-    },
-    getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(helixTopFrame, decoration);
-    },
-};
-
 // Walls for the spirit tree, as rectangles relative to the top left corner of the frame.
 const spiritTreeWalls: Rect[] = [
     {x: 57, y: 241, w: 125, h: 27},
@@ -1130,7 +1118,6 @@ const spiritTree: DecorationType = {
 
 export const decorationTypes = {
     helixBase,
-    helixTop,
     anvil,
     basket,
     bearRug,

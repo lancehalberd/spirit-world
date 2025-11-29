@@ -17,67 +17,63 @@ import { requireFrame } from 'app/utils/packedImages';
 
 const vanaraHoleyTile: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
+    source: requireFrame('gfx/tiles/vanara.png', {x: 16, y: 16, w: 240, h: 64}),
     behaviors: {
         // These tiles should transfer to the spirit realm as is.
         'all': { defaultLayer: 'floor', linkedOffset: 0},
     },
     tileCoordinates: [
-       [1,1],        [9,1],[10,1],             [13,1],[14,1],[15,1],
-                [8,2],           [11,2],       [13,2],[14,2],[15,2],
-                [8,3],           [11,3],       [13,3],[14,3],[15,3],
-                     [9,4],[10,4] 
+       [0,0],        [8,0],[9,0],             [12,0],[13,0],[14,0],
+                [7,1],           [10,1],      [12,1],[13,1],[14,1],
+                [7,2],           [10,2],      [12,2],[13,2],[14,2],
+                     [8,3],[9,3]
     ],
 };
 
 
 const vanaraCeilingTrim: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
+    source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 48, w: 80, h: 80}),
     behaviors: {
         'all': {defaultLayer: 'foreground2', isGround: false},
-        '1x6': {defaultLayer: 'foreground2', isGround: false, solid: BITMAP_BOTTOM_LEFT_8},
-        '3x6': {defaultLayer: 'foreground2', isGround: false, solid: BITMAP_BOTTOM_RIGHT_8},
+        '1x3': {defaultLayer: 'foreground2', isGround: false, solid: BITMAP_BOTTOM_LEFT_8},
+        '3x3': {defaultLayer: 'foreground2', isGround: false, solid: BITMAP_BOTTOM_RIGHT_8},
     },
     tileCoordinates: [
-               [1,3], [2,3],[3, 3],
-        [0,4], [1,4],       [3, 4],[4, 4],
-        [0,5],                     [4, 5],
-        [0,6],[1, 6],       [3, 6],[4, 6],
-              [1, 7],[2,7], [3, 7],
+              [1,0],[2,0],[3,0],
+        [0,1],[1,1],      [3,1],[4,1],
+        [0,2],                  [4,2],
+        [0,3],[1,3],      [3,3],[4,3],
+              [1,4],[2,4],[3,4],
     ],
 };
 
 const vanaraWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
+    source: requireFrame('gfx/tiles/vanara.png', {x: 16, y: 128, w: 112, h: 64}),
     behaviors: {
         'all': southernWallBehavior,
-        '3x8': bottomRightWall, '4x8': bottomLeftWall,
-        '3x11': topLeftWall, '4x11': topRightWall,
-        '6x8': bottomRightWall, '7x8': bottomLeftWall,
+        '2x0': bottomRightWall,
+        '3x0': bottomLeftWall,
+        '5x0': bottomRightWall,
+        '6x0': bottomLeftWall,
+        '2x3': topLeftWall,
+        '3x3': topRightWall,
     },
     tileCoordinates: [
-        [1,8],      [3, 8],[4, 8],     [6,8],[7,8],
-        [1,9],      [3, 9],[4, 9],
-        [1,10],     [3,10],[4,10],
-                    [3,11],[4,11]
+        [0,0],      [2,0],[3,0],     [5,0],[6,0],
+        [0,1],      [2,1],[3,1],
+        [0,2],      [2,2],[3,2],
+                    [2,3],[3,3]
     ],
 };
 
 const vanaraStairs: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/vanara.png', {x: 0, y: 0, w: 208, h: 336}),
+    source: requireFrame('gfx/tiles/vanara.png', {x: 16, y: 256, w: 48, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'field' },
     },
-    tileCoordinates: [
-        [1, 16], [2, 16], [3, 16],
-        [1, 17], [2, 17], [3, 17],
-        [1, 18], [2, 18], [3, 18],
-        [1, 19], [2, 19], [3, 19],
-        [1, 20], [2, 20], [3, 20],
-    ],
 };
 
 export const allVanaraTileSources: TileSource[] = [

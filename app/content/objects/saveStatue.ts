@@ -98,7 +98,7 @@ export class SaveStatue implements ObjectInstance {
         }
         const frame = saveStatue;
         //drawFrameContentAt(context, frame, this);
-        drawFrameContentAt(context, {...frame, y: foregroundHeight, h: frame.h - foregroundHeight}, {x: this.x, y: this.y + foregroundHeight});
+        drawFrameContentAt(context, {...frame, y: frame.y + foregroundHeight, h: frame.h - foregroundHeight}, {x: this.x, y: this.y + foregroundHeight});
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         const frame = saveStatue;

@@ -49,6 +49,7 @@ export const lava: TileSource = {
     animationProps: {
         frames: 3,
         frameSequence: [0,0,1,2,2,1],
+        originalRect: {x: 0, y: 0, w: 64, h: 80},
         offset: {x: 9, y: 0}
     },
 };
@@ -63,6 +64,7 @@ export const lavaStone: TileSource = {
     animationProps: {
         frames: 3,
         frameSequence: [0,0,1,2,2,1],
+        originalRect: {x: 0, y: 80, w: 64, h: 80},
         offset: {x: 9, y: 0}
     },
 };
@@ -77,6 +79,7 @@ export const lavaBubbles: TileSource = {
     animationProps: {
         frames: 6,
         frameSequence: [0,1,2,3,4,5],
+        originalRect: {x: 0, y: 240, w: 16, h: 112},
         offset: {x: 1, y: 0}
     },
 };

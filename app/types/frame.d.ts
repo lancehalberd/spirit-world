@@ -49,6 +49,8 @@ interface Frame extends FrameRectangle {
     // Additional property that may be used in some cases to indicate a frame should be flipped
     // horizontally about the center of its content. Only some contexts respect this.
     flipped?: boolean
+    // This will be set on any frames that are loaded using `requireFrame`
+    originalSource?: string
 }
 
 interface FrameWithPattern extends Frame {

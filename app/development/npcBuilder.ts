@@ -1,10 +1,10 @@
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { drawFrame, frameAnimation } from 'app/utils/animations';
-import { allImagesLoaded } from 'app/utils/images';
-import { requireFrame } from 'app/utils/packedImages';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {createAnimation, drawFrame, drawSolidTintedFrame, frameAnimation} from 'app/utils/animations';
+import {allImagesLoaded} from 'app/utils/images';
+import {requireFrame} from 'app/utils/packedImages';
 
 
-const npcImage = requireFrame('gfx/npcs/Humans-Sheet.png', {x: 0, y: 0, w: 384, h: 990 });
+const npcFrame = requireFrame('gfx/npcs/Humans-Sheet.png', {x: 0, y: 0, w: 384, h: 990 });
 
 const columns = [0, 96, 192, 288];
 
@@ -23,7 +23,7 @@ interface HumanNpcOptions {
 }
 
 function drawNpcFrame(context: CanvasRenderingContext2D, x: number, y: number, tx: number, ty: number) {
-    drawFrame(context, {image: npcImage.image, x, y, w: 24, h: 30}, {x: tx, y: ty, w: 24, h: 30});
+    drawFrame(context, {image: npcFrame.image, x: npcFrame.x + x, y: npcFrame.y + y, w: 24, h: 30}, {x: tx, y: ty, w: 24, h: 30});
 }
 
 export function drawHumanNpcFrame(
@@ -69,9 +69,13 @@ export function drawHumanNpcFrame(
         // Shirt
         drawNpcFrame(context, columns[shirt] + xOffset, 660 + childOffset + (isWoman ? 90 : 0), x, y);
         // Pants
-        drawNpcFrame(context, 72 * pants + xOffset, 840 + childOffset, x, y);
+        if (pants >= 0) {
+            drawNpcFrame(context, 72 * pants + xOffset, 840 + childOffset, x, y);
+        }
         // Shoes
-        drawNpcFrame(context, 72 * shoes + xOffset, 930 + childOffset, x, y);
+        if (shoes >= 0) {
+            drawNpcFrame(context, 72 * shoes + xOffset, 930 + childOffset, x, y);
+        }
     }
     drawFrame();
 }
@@ -94,3 +98,37 @@ export function createHumanNpcActorAnimations(options: Partial<HumanNpcOptions>)
     return animations;
 }
 window['createHumanNpcActorAnimations'] = createHumanNpcActorAnimations;
+
+
+const spiritLinesFrame = requireFrame('gfx/npcs/spiritmovesheet-tinted.png', {x: 0, y: 0, w: 160, h: 112});
+const spiritTintFrame = requireFrame('gfx/npcs/spiritmovesheet-tinted.png', {x: 0, y: 112, w: 160, h: 112});
+
+const spiritGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+
+const tintedSpiritActorAnimations: {[key in string]: ActorAnimations} = {};
+export function createTintedSpiritActorAnimations(color: string): ActorAnimations {
+    if (tintedSpiritActorAnimations[color]) {
+        return tintedSpiritActorAnimations[color];
+    }
+    const [canvas, context] = createCanvasAndContext(spiritLinesFrame.w, spiritLinesFrame.h);
+    // This part can only be done after all the images load, but we can return the empty frames immediately.
+    (async () => {
+        await allImagesLoaded();
+        drawSolidTintedFrame(context, {...spiritTintFrame, color}, {x: 0, y: 0, w: 160, h: 112});
+        drawFrame(context, spiritLinesFrame, {x: 0, y: 0, w: 160, h: 112});
+    })();
+    const spiritUpAnimation: FrameAnimation = createAnimation(canvas, spiritGeometry, { cols: 8, y: 2, duration: 10});
+    const spiritDownAnimation: FrameAnimation = createAnimation(canvas, spiritGeometry, { cols: 8, y: 0, duration: 10});
+    const spiritLeftAnimation: FrameAnimation = createAnimation(canvas, spiritGeometry, { cols: 8, y: 3, duration: 10});
+    const spiritRightAnimation: FrameAnimation = createAnimation(canvas, spiritGeometry, { cols: 8, y: 1, duration: 10});
+    const animations: ActorAnimations = {
+        idle: {
+            up: spiritUpAnimation,
+            down: spiritDownAnimation,
+            left: spiritLeftAnimation,
+            right: spiritRightAnimation,
+        },
+    };
+    tintedSpiritActorAnimations[color] = animations;
+    return animations;
+}

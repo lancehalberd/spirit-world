@@ -1,6 +1,6 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createCanvas, createCanvasAndContext, debugCanvas, drawCanvas } from 'app/utils/canvas';
-import { requireFrame } from 'app/utils/packedImages';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createCanvas, createCanvasAndContext, debugCanvas, drawCanvas} from 'app/utils/canvas';
+import {requireFrame} from 'app/utils/packedImages';
 
 export function frame(
     x: number, y: number, w: number, h: number,
@@ -28,20 +28,21 @@ export function createAnimation(
     props: ExtraAnimationProperties = {},
 ): FrameAnimation {
     let frames: Frame[] = [];
-    let frame: Frame;
-    if (typeof source === 'string') {
-        frame = requireFrame(source);
-    } else {
-        frame = {image: source, x: 0, y: 0, w: 0, h: 0};
-    }
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
-            frames[row * cols + col] = {
+            const r: Rect = {
                 ...dimensions,
-                image: frame.image,
-                x: frame.x + left + (dimensions.w + xSpace) * (x + col),
-                y: frame.y + top + (dimensions.h + ySpace) * (y + row),
-            };
+                x: left + (dimensions.w + xSpace) * (x + col),
+                y: top + (dimensions.h + ySpace) * (y + row),
+            }
+            if (typeof source === 'string') {
+                frames[row * cols + col] = requireFrame(source, r);
+            } else {
+                frames[row * cols + col] = {
+                    image: source,
+                    ...r,
+                };
+            }
         }
     }
     // Say an animation has 3 frames, but you want to order them 0, 1, 2, 1, then pass frameMap = [0, 1, 2, 1],

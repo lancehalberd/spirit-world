@@ -1,5 +1,6 @@
 interface PackedImage extends Rect {
     originalSource: string
+    frameStrings: string[]
 }
 
 interface PackedImageData {
@@ -36,6 +37,11 @@ interface TileSource {
         // The sequence to display the source frames in.
         // Should be 2, 3 or 6 long to loop smoothly
         frameSequence: number[]
+        // The rect originally used for loading the first frames from
+        // prior to any changes made for packing. Using this makes sure that
+        // the coordinates requested for animated frames don't change based
+        // on the packed coordinates of the original frames.
+        originalRect: Rect
         // The offset between each frame in tiles.
         offset: Point
     }

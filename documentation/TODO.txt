@@ -146,10 +146,7 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Major tasks blocking release:
-        - Repack images.
-    - Minor tasks blocking release:
-        - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
+    - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
     - Storm beast behavior seems wrong when defeating orbs ahead of the fight
         - Seems to appear and disappear immediately sometime (even when not transitioning to rage phase)
@@ -210,7 +207,6 @@ Current tasks:
         - Cherry tree
         - fireball effect
         - dirt particles
-        - tinted Vanara spirit NPCs
         - test new lab tiles
         - new icons
             - peach basket

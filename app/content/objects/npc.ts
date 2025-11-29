@@ -4,7 +4,7 @@ import {
     rivalAnimations, snakeAnimations,
     omniAnimation,
 } from 'app/content/enemyAnimations';
-import { elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation } from 'app/content/enemies/elemental';
+import {elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation} from 'app/content/enemies/elemental';
 import {
     archeologistAnimations,
     blacksmithOneAnimations,
@@ -25,10 +25,10 @@ import {
     paleLadyPriestAnimations,
     // testAnimations,
 } from 'app/content/npcs/npcAnimations'
+import {createTintedSpiritActorAnimations} from 'app/development/npcBuilder';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { heroAnimations } from 'app/render/heroAnimations';
-import { heroSpiritAnimations } from 'app/render/heroAnimations';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {heroAnimations} from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
     guyAnimations, guy2Animations,
@@ -40,13 +40,13 @@ import {
     vanaraRedAnimations,
     zoroAnimations,
 } from 'app/render/npcAnimations';
-import { shadowFrame, smallShadowFrame } from 'app/renderActor';
-import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { isDialogueHeard, selectDialogueOption, setDialogueHeard } from 'app/utils/dialogue';
-import { directionMap, rotateCardinalDirection } from 'app/utils/direction';
-import { sample } from 'app/utils/index';
-import { moveNPC } from 'app/utils/npc';
+import {shadowFrame, smallShadowFrame} from 'app/renderActor';
+import {showMessage} from 'app/scriptEvents';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {isDialogueHeard, selectDialogueOption, setDialogueHeard} from 'app/utils/dialogue';
+import {directionMap, rotateCardinalDirection} from 'app/utils/direction';
+import {sample} from 'app/utils/index';
+import {moveNPC} from 'app/utils/npc';
 
 const [
     speechBubble,
@@ -67,13 +67,15 @@ interface NPCStyleDefinition {
     z?: number
     // Defaults to the frame height.
     height?: number
+    color?: string
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState, npc: NPC) => void
 }
 
 function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state: GameState, npc: NPC): void {
     const animationStyle = npcStyles[npc.definition.style];
     const scale = animationStyle.scale || 1;
-    const animationSet = heroSpiritAnimations[npc.currentAnimationKey] || heroSpiritAnimations.idle;
+    const allAnimations = createTintedSpiritActorAnimations(animationStyle.color ?? 'brown')
+    const animationSet = allAnimations[npc.currentAnimationKey] || allAnimations.idle;
     const frame = getFrame(animationSet[npc.d], npc.animationTime);
     context.save();
         context.globalAlpha *= 0.2;
@@ -221,13 +223,14 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         shadowOffset: 1,
     },
     vanaraProjection: {
-        animations: heroSpiritAnimations,
+        animations: createTintedSpiritActorAnimations('#DA8'),
         shadowOffset: 1,
     },
     rival: {
         animations: rivalAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#444',
     },
     paleMonk: {
         animations: paleLadyPriestAnimations,
@@ -247,41 +250,49 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: heroAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#A80',
     },
     vanaraBlack: {
         animations: vanaraBlackAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#444',
     },
     vanaraBlue: {
         animations: vanaraBlueAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#4C7BB0',
     },
     vanaraBrown: {
         animations: vanaraBrownAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#A66C42',
     },
     vanaraGold: {
         animations: vanaraGoldAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#D88142',
     },
     vanaraGray: {
         animations: vanaraGrayAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#8E8273',
     },
     vanaraPurple: {
         animations: vanaraPurpleAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#9448B2',
     },
     vanaraRed: {
         animations: vanaraRedAnimations,
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
+        color: '#C55D4D',
     },
     zoro: {
         animations: zoroAnimations,

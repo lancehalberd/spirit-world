@@ -91,10 +91,10 @@ const jadeCityLightSlopedWalls: TileSource = {
     source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 272, y: 112, w: 128, h: 112}),
     behaviors: {
         'all': {...southernWallBehavior, linkedOffset: 159},
-        '0x0': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
-        '0x1': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
+        //'0x0': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
+        //'0x1': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '0x4': topRightWall,
-        '1x1': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
+        //'1x1': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
         '1x2': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
         '1x5': topRightWall,
         '2x2': { defaultLayer: 'field', solid: BITMAP_BOTTOM_LEFT_CORN_10, linkedOffset: 159 },
@@ -103,16 +103,16 @@ const jadeCityLightSlopedWalls: TileSource = {
         '3x2': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
         '3x3': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '3x6': topLeftWall,
-        '4x1': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
+        //'4x1': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
         '4x2': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '4x5': topLeftWall,
-        '5x0': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
-        '5x1': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
+        //'5x0': { defaultLayer: 'field', solid: BITMAP_BOTTOM_RIGHT_CORN_10, linkedOffset: 159 },
+        //'5x1': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
         '5x4': topLeftWall,
         '6x3': { defaultLayer: 'field', solid: BITMAP_TOP_RIGHT_MISS_CORN_6, linkedOffset: 159 },
-        '6x6': topRightWall,
+        //'6x6': topRightWall,
         '7x3': { defaultLayer: 'field', solid: BITMAP_TOP_LEFT_MISS_CORN_6, linkedOffset: 159 },
-        '7x6': topLeftWall
+        //'7x6': topLeftWall
     }, tileCoordinates: [
         //[0, 0],                                 [5, 0], 
         //[0, 1], [1, 1],                 [4, 1], [5, 1], 
@@ -208,14 +208,16 @@ const jadeCityLightEdges: TileSource = {
 
 const jadeCityLightExtraEdges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 144, w: 48, h: 16}),
+    source: requireFrame('gfx/tiles/jadeCityLight.png', {x: 0, y: 144, w: 80, h: 16}),
     behaviors: {
         'all': {linkedOffset: 159},
         '0x0': { defaultLayer, solid: BITMAP_TOP_3, linkedOffset: 159 },
         '1x0': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
         '3x0': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: 159 },
         '4x0': { defaultLayer, solid: BITMAP_TOP_3, linkedOffset: 159  },
-    }, tileCoordinates: [[0,0], [1,0],     [3,0], [4,0]]
+    }, tileCoordinates: [
+        [0,0], [1,0],     [3,0], [4,0]
+    ]
 }
 
 const jadeCityLightStairs: TileSource = {
