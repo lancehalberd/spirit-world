@@ -197,7 +197,6 @@ Current tasks:
     - For staff animations to render all but the bottom Npx in the foreground.
     - Make Vanara bushes linked between worlds like other bushes.
 
-
     - Add old save statue graphics as a decoration.
         - Possibly replace save status with these in the title scene.
 
@@ -216,8 +215,6 @@ Current tasks:
             - medallions
 
     - Add Vanara Dreamland
-        - Add Vanara Dreamland to logic
-            - Add logic for all teleporters
         - Add Spirit world entrances: Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
             - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
@@ -294,9 +291,7 @@ Current tasks:
     - Consider modify rolling balls/pots velocity to match the direction it actually starts moving when hit.
         - If it is hit DR but only moves R the velocity should be R.
 
-    - Add support for placing objects/NPCs inside of beds, stasis pods, and tubes.
-
-    - Apply Cocoon tiles in Cocoon.
+    - Add support for placing objects/NPCs inside of beds and tubes.
 
     - Add test to remove empty tiles masks applied to empty layers.
         - Delete masks when setting tile to 0/1 to prevent this.
@@ -312,8 +307,6 @@ Current tasks:
             - Endless mode with difficulty increasing by 1 every 10 seconds.
 
     - Consider updating eye color when True Sight is unlocked, or drawing a third eye when using Spirit Sight.
-
-    - Add function for generating a full size image of an area or area section.
 
     - Add different SFX for charged bow, maybe even per element.
 
