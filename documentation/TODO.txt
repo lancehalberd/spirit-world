@@ -148,7 +148,7 @@ Graphics to Implement:
 Current tasks:
     - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
-    - Lightning switch in waterfall tower keeps playing secret noise on every frame.
+    - Add new graphics for south facing pod with opening/close animation.
 
     - Disable Nimbus Cloud in the Dreaming.
 
@@ -216,7 +216,6 @@ Current tasks:
             - peach basket
             - consumables
             - medallions
-        - Updated pods
 
     - Add Vanara Dreamland
         - Add Vanara Dreamland to logic
