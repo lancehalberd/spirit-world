@@ -1,21 +1,24 @@
-import { setSpawnLocation } from 'app/content/spawnLocations';
-import { getMapOptions } from 'app/development/contextMenu/map';
-import { getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
-import { contextMenuState, editingState } from 'app/development/editingState';
-import { toggleEditing } from 'app/development/editor';
-import { tagElement } from 'app/dom';
-import { getCanvasScale } from 'app/development/getCanvasScale';
-import { overworldKeys } from 'app/gameConstants';
-import { KEY, isKeyboardKeyDown } from 'app/userInput';
-import { getState } from 'app/state';
-import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
-import { mainCanvas } from 'app/utils/canvas';
-import { getCompositeBehaviors } from 'app/utils/getBehaviors';
-import { getElementRectangle, isPointInShortRect } from 'app/utils/index';
-import { getMousePosition } from 'app/utils/mouse';
-import { setSaveSlot } from 'app/utils/saveGame';
-import { saveSettings } from 'app/utils/saveSettings';
-import { toggleAllSounds, updateSoundSettings } from 'app/utils/soundSettings';
+import {createAreaInstance} from 'app/content/areas';
+import {setSpawnLocation} from 'app/content/spawnLocations';
+import {getMapOptions} from 'app/development/contextMenu/map';
+import {getTestStateContextMenuOption} from 'app/development/contextMenu/setState';
+import {contextMenuState, editingState} from 'app/development/editingState';
+import {toggleEditing} from 'app/development/editor';
+import {tagElement} from 'app/dom';
+import {getCanvasScale} from 'app/development/getCanvasScale';
+import {overworldKeys} from 'app/gameConstants';
+import {checkToRedrawTiles, drawEntireFrame} from 'app/render/renderField';
+import {getState} from 'app/state';
+import {KEY, isKeyboardKeyDown} from 'app/userInput';
+import {defeatAllEnemies} from 'app/utils/addKeyboardShortcuts';
+import {createCanvasAndContext, mainCanvas} from 'app/utils/canvas';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors';
+import {getElementRectangle, isPointInShortRect} from 'app/utils/index';
+import {getMousePosition} from 'app/utils/mouse';
+import {getObjectAndParts} from 'app/utils/objects';
+import {setSaveSlot} from 'app/utils/saveGame';
+import {saveSettings} from 'app/utils/saveSettings';
+import {toggleAllSounds, updateSoundSettings} from 'app/utils/soundSettings';
 
 
 export class ContextMenu {
@@ -175,6 +178,12 @@ export function getContextMenu(): MenuOption[] {
                         console.log(object);
                     }
                 }
+            }
+        });
+        options.push({
+            label: 'Get Floor Image',
+            onSelect() {
+                renderCurrentFloor(state);
             }
         });
     }
@@ -365,4 +374,81 @@ export function addContextMenuListeners(): void {
 class _ContextMenu extends ContextMenu {}
 declare global {
     export interface ContextMenu extends _ContextMenu {}
+}
+
+
+const drawPriorities: DrawPriority[] = ['background', 'sprites', 'foreground'];
+function renderCurrentFloor(state: GameState): void {
+    const isEditing = editingState.isEditing;
+    // Temporarily disable editing to turn off special rendering for editing.
+    editingState.isEditing = false;
+    const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
+    const floor = state.zone.floors[state.location.floor];
+    const grid = state.location.isSpiritWorld ? floor.spiritGrid : floor.grid;
+    const [canvas, context] = createCanvasAndContext(16 * areaSize.w * grid[0].length, 16 * areaSize.h * grid.length);
+
+    const areas: AreaInstance[] = [];
+    for (let row = 0; row < grid.length; row++) {
+        for (let column = 0; column < grid[row].length; column++) {
+            const areaInstance = createAreaInstance(state, {
+                ...state.location,
+                areaGridCoords: {x: column, y: row},
+            });
+            checkToRedrawTiles(areaInstance);
+            drawEntireFrame(state, areaInstance, 0);
+            areas.push(areaInstance);
+        }
+    }
+    for (const drawPriority of drawPriorities) {
+        for (const area of areas) {
+            renderMapLayer(context, state, area,
+                {
+                    x: area.location.areaGridCoords.x * 16 * areaSize.w, w: 16 * areaSize.w,
+                    y: area.location.areaGridCoords.y * 16 * areaSize.h, h: 16 * areaSize.h
+                },  {x: 0, y: 0, w: areaSize.w * 16, h: areaSize.h * 16}, drawPriority
+            );
+        }
+    }
+    window.debugCanvas(canvas, 0.5);
+
+    editingState.isEditing = isEditing;
+}
+export function renderMapLayer(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect, drawPriority: DrawPriority): void {
+    if (drawPriority === 'background') {
+        context.drawImage(area.backgroundFrames[0].canvas,
+            source.x, source.y, source.w, source.h,
+            target.x, target.y, target.w, target.h,
+        );
+    }
+    if (drawPriority === 'foreground' && area.foregroundFrames[0]) {
+        context.drawImage(area.foregroundFrames[0].canvas,
+            source.x, source.y, source.w, source.h,
+            target.x, target.y, target.w, target.h,
+        );
+    }
+    renderMapObjects(context, state, area, target, source, drawPriority);
+}
+
+export function renderMapObjects(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect, drawPriority: DrawPriority) {
+    // Draw additional objects that we want to show on the map.
+    context.save();
+        context.translate(target.x, target.y);
+        for (const object of area.objects) {
+            context.save();
+                context.translate(-source.x, -source.y);
+                const objectAndParts = getObjectAndParts(state, object)
+                for(const part of objectAndParts) {
+                    if (drawPriority === 'background') {
+                        part.renderShadow?.(context, state);
+                    }
+                    if ((part.getDrawPriority?.(state) || part.drawPriority) === drawPriority) {
+                        part.render(context, state);
+                    }
+                    if (drawPriority === 'foreground') {
+                        part.renderForeground?.(context, state);
+                    }
+                }
+            context.restore();
+        }
+    context.restore();
 }
