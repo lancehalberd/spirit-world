@@ -150,8 +150,6 @@ Current tasks:
 
     - Add new graphics for south facing pod with opening/close animation.
 
-    - Disable Nimbus Cloud in the Dreaming.
-
     - Storm beast behavior seems wrong when defeating orbs ahead of the fight
         - Seems to appear and disappear immediately sometime (even when not transitioning to rage phase)
         - Appears to try to guard the terminal to the spirit world.

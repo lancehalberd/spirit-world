@@ -83,6 +83,9 @@ dialogueHash.nimbusCloud = {
             return '';
         },
         chooseDestination: (state: GameState) => {
+            if (state.location.zoneKey === 'dream') {
+                return `The Nimbus Cloud won't appear in the Dreaming.`;
+            }
             // There is a section of the sky that is part of the Sky Palace logical zone, but since it is outside,
             // it should *not* show the return to entrance option.
             if (state.location.zoneKey !== 'sky' && zoneEntranceMap[state.location.logicalZoneKey]) {
