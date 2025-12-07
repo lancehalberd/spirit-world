@@ -9,7 +9,7 @@ import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {requireFrame} from 'app/utils/packedImages'
 
 
-const podSouthGeometry = {w: 64, h: 48, content: {x: 20, y: 20, w: 24, h: 26}};
+const podSouthGeometry = {w: 64, h: 48, content: {x: 20, y: 20, w: 24, h: 24}};
 const podSouthFrame = requireFrame('gfx/objects/podSouth.png', {x: 0, y: 0, ...podSouthGeometry});
 //const podSouthDoorClosedFrame = requireFrame('gfx/objects/podSouth.png', {x: 0, y: 48, ...podSouthGeometry});
 const podSouthDoorOpenAnimation = createAnimation('gfx/objects/podSouth.png', podSouthGeometry, {y: 1, cols: 6}, {loop: false});
@@ -18,6 +18,7 @@ const podSouthDoorCloseAnimation = reverseAnimation(podSouthDoorOpenAnimation);
 export class DreamPod implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
+    behaviors: TileBehaviors = {solid: true};
     x: number = this.definition.x;
     y: number = this.definition.y;
     active: boolean = false;
@@ -112,7 +113,7 @@ export class DreamPod implements ObjectInstance {
         }
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
-        if (this.definition.d !== 'down') {
+        if (this.definition.d !== 'down' || hero.d !== 'up') {
             return;
         }
         if (hero.isAstralProjection || state.hero !== hero) {

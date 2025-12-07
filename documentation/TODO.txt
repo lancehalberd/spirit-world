@@ -150,8 +150,6 @@ Current tasks:
 
     - Preload music.
 
-    - Add new pod graphics to Helix, Forest Temple and Jade Palace.
-
     - Storm beast behavior seems wrong when defeating orbs ahead of the fight
         - Seems to appear and disappear immediately sometime (even when not transitioning to rage phase)
         - Appears to try to guard the terminal to the spirit world.

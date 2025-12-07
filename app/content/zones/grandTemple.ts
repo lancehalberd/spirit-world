@@ -2932,9 +2932,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "closed", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},
         {status: "normal", id: "holySanctumEntrance", x: 240, y: 32, type: "door", style: "wooden", targetZone: "holySanctum", targetObjectId: "holySanctumEntrance", d: "up", locationCue: "Jade Palace"},
         {status: "normal", id: "spiritKing", x: 232, y: 224, d: "down", behavior: "idle", style: "giantSnake", type: "npc", dialogueKey: "spiritKing"},
-        {status: "normal", id: "dreamPod", x: 392, y: 409, type: "decoration", z: 0, d: "down", w: 16, h: 16, decorationType: "cocoon", logicKey: "hasReleasedBeasts"},
-        {status: "normal", id: "dreamPod", x: 419, y: 409, type: "decoration", z: 0, d: "right", w: 16, h: 16, decorationType: "cocoon", logicKey: "hasReleasedBeasts"},
-        {status: "normal", id: "jadePalaceDreamTeleporter", x: 372, y: 428, type: "marker"},
+        {status: "normal", id: "jadePalaceDreamTeleporter", x: 404, y: 408, targetZone: "dream", targetObjectId: "jadePalaceTeleporter", type: "dreamPod", openLogic: {"hasCustomLogic":true,"customLogic":"jadePalaceTeleporterUnlocked"}, d: "down"},
         {status: "normal", id: "", x: 368, y: 396, d: "down", behavior: "face", style: "vanaraPurple", type: "npc", dialogueKey: "vanaraScientist", logicKey: "hasReleasedBeasts"},
     ],
     sections: [

@@ -3014,7 +3014,7 @@ const sf3_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixBridgeDreamTeleporter", x: 388, y: 192, locationCue: "Helix Bridge", type: "marker"},
+        {status: "normal", id: "helixBridgeDreamTeleporter", x: 420, y: 168, targetZone: "dream", targetObjectId: "helixTeleporter", type: "dreamPod", openLogic: {"hasCustomLogic":true,"customLogic":"helixTeleporterUnlocked"}, d: "down", locationCue: "Helix Bridge"},
         {status: "normal", id: "helixVanaraCommander", x: 312, y: 148, d: "down", behavior: "none", style: "vanaraGold", type: "npc", dialogueKey: "vanaraCommander"},
         {status: "normal", id: "helixBridgePortal", x: 80, y: 344, type: "teleporter", linked: true},
         {status: "cracked", id: "helixSkySpiritEntrance", x: 288, y: 560, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "helixSkySpiritEntrance", d: "down", locationCue: "Helix Bridge"},
@@ -3022,8 +3022,6 @@ const sf3_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 160, d: "right", behavior: "none", style: "vanaraRed", type: "npc", dialogue: "Most of the crew is assigned elsewhere.", dialogueIndex: 126},
         {status: "normal", id: "", x: 296, y: 280, d: "down", behavior: "none", style: "vanaraBlue", type: "npc", dialogue: "Guardian?\n{|}No I'm the chief of security.", dialogueIndex: 127},
         {status: "normal", id: "helixBridgeTeleporter", x: 544, y: 344, targetZone: "helix", targetObjectId: "helixBridgeTeleporter", type: "teleporter", locationCue: "Helix Bridge"},
-        {status: "normal", id: "dreamPod", x: 408, y: 168, type: "decoration", z: 0, d: "down", w: 16, h: 16, decorationType: "cocoon"},
-        {status: "normal", id: "dreamPod", x: 435, y: 168, type: "decoration", z: 0, d: "right", w: 16, h: 16, decorationType: "cocoon"},
         {status: "normal", id: "", x: 388, y: 144, d: "down", behavior: "face", style: "vanaraPurple", type: "npc", dialogueKey: "vanaraScientist"},
     ],
     sections: [
