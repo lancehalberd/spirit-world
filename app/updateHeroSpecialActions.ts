@@ -124,7 +124,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.isControlledByObject) {
-        hero.animationTime += FRAME_LENGTH;
+        // This should already be getting updated in updateGenericHeroState as long
+        // as the hero is not frozen.
+        // hero.animationTime += FRAME_LENGTH;
         // Objects must set this flag every frame to keep it set.
         hero.isControlledByObject = false;
         return true;

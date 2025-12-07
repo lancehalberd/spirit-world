@@ -542,7 +542,7 @@ interface CrystalSwitchDefinition extends BaseSwitchDefinition {
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
-    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter' | 'helixTop'
+    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter' | 'helixTop' | 'dreamPod'
     targetZone?: string
     targetObjectId?: string
     mapIcon?: MapIcon

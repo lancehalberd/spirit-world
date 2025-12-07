@@ -174,8 +174,10 @@ export function getObjectTypeProperties(): PanelRows {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'airStream', 'anode', 'cathode', 'airBubbles', 'arGame', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch', 'helixTop', 'indicator', 'keyBlock', 'lavafall', 'loot',
+    'airStream', 'anode', 'cathode', 'airBubbles', 'arGame',
+    'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'door', 'dreamPod', 'elevator', 'escalator', 'flameTurret', 'floorSwitch',
+    'heavyFloorSwitch', 'helixTop', 'indicator', 'keyBlock', 'lavafall', 'loot',
     'marker', 'movingPlatform', 'narration', 'npc', 'peachTree', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
@@ -439,6 +441,16 @@ export function createObjectDefinition(
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 type: definition.type,
+            };
+        case 'dreamPod':
+            return {
+                ...commonProps,
+                targetZone: definition.targetZone,
+                targetObjectId: definition.targetObjectId,
+                type: definition.type,
+                openLogic: definition.openLogic,
+                d: definition.d || 'down',
+                locationCue: definition.locationCue,
             };
         case 'teleporter':
             return {
@@ -1074,6 +1086,17 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'pitEntrance':
         case 'staffTower':
         case 'teleporter':
+        case 'dreamPod':
+            if (object.type === 'dreamPod') {
+                rows = [
+                    ...rows,
+                    ...getLogicProperties(state, 'Is Open?', object.openLogic, updatedLogic => {
+                        object.openLogic = updatedLogic;
+                        updateObjectInstance(state, object);
+                        editingState.needsRefresh = true;
+                    }),
+                ];
+            }
             const zoneKeys = Object.keys(zones);
             const zoneKey = object.targetZone || 'none';
             rows.push({
@@ -1097,8 +1120,8 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 let targetTypes: ObjectType[] = [object.type];
                 if (object.type === 'pitEntrance') {
                     targetTypes = ['marker'];
-                } else if (object.type === 'teleporter') {
-                    targetTypes = ['teleporter', 'marker'];
+                } else if (object.type === 'teleporter' || object.type === 'dreamPod') {
+                    targetTypes = ['teleporter', 'marker', 'dreamPod'];
                 } else if (doorTypes.includes(object.type)) {
                     // Staff tower objects also function as doors.
                     targetTypes = doorTypes;

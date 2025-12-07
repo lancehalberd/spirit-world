@@ -148,7 +148,9 @@ Graphics to Implement:
 Current tasks:
     - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
-    - Add new graphics for south facing pod with opening/close animation.
+    - Preload music.
+
+    - Add new pod graphics to Helix, Forest Temple and Jade Palace.
 
     - Storm beast behavior seems wrong when defeating orbs ahead of the fight
         - Seems to appear and disappear immediately sometime (even when not transitioning to rage phase)
@@ -370,7 +372,6 @@ Current tasks:
         - flame wall should be red
         - lightningDischarge should be yellow
 
-    - Preload music.
 
     - Design and add enemy scaling
         - Add variant seed to enemy instance props in editor (default to 0)
@@ -1044,13 +1045,18 @@ Current tasks:
             - Tools can make it easier to avoid attacks
 
     Lab + World Tree Notes:
+        - See enemies in tubes while first exploring dungeon
+            - Layer tubes are broken and empty, then assassin type enemies start ambushing the player.
+            - Large tubes growing new elemental hearts for beasts are also present.
+        - Possible sneaking vs fighting routes through lab
+        - Terminal to unlock all doors?
+            - Terminals to unlock certain security level doors, or grant increased security access?
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
         - Possible flow:
             Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance.
                 - This step is only completable after fighting the rival during the 3rd spirit beast battle.
             Tunnel takes you to the lab where the War God's Scientists have been creating Hybrdid creatures and have made a modified World Tree Seed from the Helix.
-            Can(must?) find clone upgrade to complete the lab.
             The seed is activated(possibly by combined proximity of champion+MC) and grows a giant tree that MC must climb to rescue the Champion and stop the War God.
             The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
 

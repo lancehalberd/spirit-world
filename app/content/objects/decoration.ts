@@ -948,10 +948,6 @@ const windowOctogonal: DecorationType = {
     },
 };
 
-/*const podSouthGeometry = {w: 64, h: 48, content: {x: 20, y: 20, w: 24, h: 26}};
-const podSouthFrame = requireFrame('gfx/objects/podSouth.png', {x: 0, y: 0, ...podSouthGeometry});
-const podSouthDoorClosedFrame = requireFrame('gfx/objects/podSouth.png', {x: 0, y: 48, ...podSouthGeometry});
-const podSouthDoorOpenAnimation = createAnimation('gfx/objects/podSouth.png', podSouthGeometry, {y: 1, cols: 6});*/
 
 const cocoonFrame = requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
 const cocoonBackFrame = requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});

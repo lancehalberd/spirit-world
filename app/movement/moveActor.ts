@@ -270,17 +270,18 @@ export function moveActorTowardsLocation(
     state: GameState,
     actor: Actor,
     {x, y}: Point,
-    speed = 1
+    speed = 1,
+    movementProperties: MovementProperties = {}
 ): number {
     const anchor = getMovementAnchor(actor);
     const dx = x - anchor.x, dy = y - anchor.y;
     actor.d = getCardinalDirection(dx, dy, actor.d);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > speed) {
-        moveActor(state, actor, speed * dx / mag, speed * dy / mag, {boundingBox: false});
+        moveActor(state, actor, speed * dx / mag, speed * dy / mag, {boundingBox: false, ...movementProperties});
         return mag - speed;
     }
-    moveActor(state, actor, dx, dy, {boundingBox: false});
+    moveActor(state, actor, dx, dy, {boundingBox: false, ...movementProperties});
     return 0;
 }
 
