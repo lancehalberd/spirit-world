@@ -150,11 +150,6 @@ Current tasks:
 
     - Preload music.
 
-    - Storm beast behavior seems wrong when defeating orbs ahead of the fight
-        - Seems to appear and disappear immediately sometime (even when not transitioning to rage phase)
-        - Appears to try to guard the terminal to the spirit world.
-    - Jade Champion doesn't seem to help during Storm Beast fight in randomizer.
-
     - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
         - Delays spirit energy generation for
 
@@ -200,7 +195,14 @@ Current tasks:
     - Add old save statue graphics as a decoration.
         - Possibly replace save status with these in the title scene.
 
-    - Make pits in arrow maze game take you out of the area.
+    - Update money maze mini game
+        - Gain a 25 Jade total that functions as a "score" while in the maze
+            - This score is shown in outlined white text at the bottom of the screen with a Jade symbol next to it.
+        - Jade goes to score instead of Jade Total
+        - Arrows subtract 5 Jade per hit, pits subtract 10 Jade per fall
+        - Doors must be paid for out of the current score.
+        - Player gains current score as Jade when they exit the maze.
+        - Possibly kick the player out if their score reaches 0.
 
     - Add actual pathing algorithm for NPCs+enemies at some point.
 
