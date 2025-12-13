@@ -152,8 +152,11 @@ type BossName =
   | "rival2"
   | "collector"
   | "stormBeast"
+  | "flameBeast"
+  | "frostBeast"
   | "rush"
-  | "rush2";
+  | "rush2"
+  | "rush3";
 
 
 type FastestTimes = {

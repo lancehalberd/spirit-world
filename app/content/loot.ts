@@ -178,7 +178,8 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
-        case 'bossRefight': if (state.savedState.savedHeroData.bossRushTrackers.rushPosition >= 4 || 
+        case 'bossRefight': if (state.savedState.savedHeroData.bossRushTrackers.rushPosition >= 5 || 
+            //set rush position to 1 above what triggers travelToLocation for correct behavior
             !state.savedState.objectFlags['rushMode']) {
                 return updateBestTimes(state)
             }
