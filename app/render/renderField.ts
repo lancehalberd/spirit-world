@@ -304,6 +304,9 @@ export function renderTiles(
             for (const layer of layersToDraw) {
                 let tile = layer.tiles[y]?.[x];
                 const maskTile = layer.maskTiles?.[y]?.[x];
+                // This is a bit of a hack to keep water from animating under frozen tiles, but this might be okay
+                // in the long run since we don't have that many animated tiles.
+                const frameIndex = area.behaviorGrid[y]?.[x]?.isFrozen ? 0 : areaFrame.frameIndex;
                 context.save();
                 if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
                     if (layer.definition.visibilityOverride === 'fade') {
@@ -336,14 +339,14 @@ export function renderTiles(
                         // mask frames do not support animation.
                         drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
                         maskContext.globalCompositeOperation = 'source-in';
-                        renderTileFrame(tile, areaFrame.frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
+                        renderTileFrame(tile, frameIndex, maskContext, {x: 0, y: 0, w: 16, h: 16});
                         // Draw the masked content first, then the mask frame on top.
                         //window['debugCanvas'](maskCanvas);
                         context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
                     }
-                    renderTileFrame(maskTile, areaFrame.frameIndex, context, {x: x * w, y: y * h, w, h});
+                    renderTileFrame(maskTile, frameIndex, context, {x: x * w, y: y * h, w, h});
                 } else if (tile) {
-                    renderTileFrame(tile, areaFrame.frameIndex, context, {x: x * w, y: y * h, w, h});
+                    renderTileFrame(tile, frameIndex, context, {x: x * w, y: y * h, w, h});
                 }
                 context.restore();
             }

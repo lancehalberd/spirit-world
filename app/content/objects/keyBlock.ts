@@ -115,7 +115,10 @@ export class KeyBlock implements ObjectInstance {
             return false;
         }
     }
-    onGrab(state: GameState) {
+    onGrab(state: GameState, d: Direction, hero: Hero) {
+        if (hero.isAstralProjection) {
+            return;
+        }
         if (this.isOpen) {
             state.hero.action = null;
             return;
@@ -132,7 +135,10 @@ export class KeyBlock implements ObjectInstance {
             state.hero.action = null;
         }
     }
-    onPush(state: GameState) {
+    onPush(state: GameState, d: Direction, hero: Hero) {
+        if (hero.isAstralProjection) {
+            return;
+        }
         if (this.isOpen) {
             return;
         }

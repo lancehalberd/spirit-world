@@ -41,6 +41,9 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, behaviors, isForeground);
         }
     }
+    if (area.behaviorGrid?.[y]?.[x]?.isFrozen) {
+        area.needsIceRefresh = true;
+    }
 }
 
 

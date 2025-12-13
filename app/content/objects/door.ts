@@ -284,7 +284,11 @@ export class Door implements ObjectInstance {
         hitbox.y += this.area?.cameraOffset?.y ?? 0;
         return hitbox;
     }
-    onPush(state: GameState, direction: Direction): void {
+    onPush(state: GameState, direction: Direction, hero: Hero): void {
+        // Astral projections cannot interact with doors in general.
+        if (hero.isAstralProjection) {
+            return;
+        }
         if (direction === this.definition.d) {
             this.tryToUnlock(state);
         }
@@ -301,6 +305,10 @@ export class Door implements ObjectInstance {
         return true;
     }
     onGrab(state: GameState, d: Direction, hero: Hero) {
+        // Astral projections cannot interact with doors in general.
+        if (hero.isAstralProjection) {
+            return;
+        }
         if (hero.d === 'up' && hero === state.hero &&
             this.definition.d === 'up' && this.status === 'closed' && this.definition.price
         ) {

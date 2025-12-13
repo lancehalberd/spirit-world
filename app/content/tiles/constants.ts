@@ -351,6 +351,21 @@ export const bouncyWallBehaviors: TileSource = {
 };
 
 
+export const frozenTile: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
+    behaviors: {'all': {
+        isGround: true, isFrozen: true, slippery: true,
+        elementTiles: {fire: 0},
+        render(context: CanvasRenderingContext2D) {
+            if (!editingState.isEditing) {
+                return;
+            }
+        },
+    }},
+};
+
+
 export function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TileSource {
     const [canvas, context] = createCanvasAndContext(16, 16);
     draw(context);

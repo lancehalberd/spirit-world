@@ -100,8 +100,8 @@ dialogueHash.tombGuardian = {
                     dialogueType: 'quest',
                     text:`You have proven you are ready to meet the Spirit Tree, but you will not find her even here in the Spirit World.{|}
                     She presides over the Realm of the Dreaming where the Vanara rest and prepare to join our waking world.{|}
-                    You may now use one of these empty pods to visit the Dreaming yourself.
-                    {addCue: Face a pod and press [B_PASSIVE] to get in}`,
+                    You may now use this pod to visit the Dreaming yourself.
+                    {addCue: Face the pod and press [B_PASSIVE] to get in}`,
                 },
             ],
         },

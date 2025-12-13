@@ -1,3 +1,4 @@
+import {getAreaFromLocation} from 'app/content/areas';
 import {TextCue} from 'app/content/effects/textCue';
 import {evaluateLogicDefinition} from 'app/content/logic';
 import {Door} from 'app/content/objects/door';
@@ -18,6 +19,7 @@ interface OptionalEnterZoneByTargetParams {
     instant?: boolean
     callback?: (state: GameState) => void
     skipObject?: ObjectDefinition
+    doNotFixCamera?: boolean
 }
 
 export function enterZoneByTarget(
@@ -39,6 +41,11 @@ export function enterZoneByTarget(
     if (!objectLocation) {
         return false;
     }
+    const targetAreaDefinition = getAreaFromLocation(objectLocation);
+    if (state.areaInstance.definition === targetAreaDefinition) {
+        onEnterLocation(state, targetObjectId, {doNotFixCamera: true, skipObject, callback});
+        return true;
+    }
     if (state.location.zoneKey !== objectLocation.zoneKey) {
         // When leaving a zone through a door, we check to update the spawn location for both the location you are leaving from or the
         // location you are arriving to. This will cause you to update your spawn location when entering or exiting most dungeons
@@ -48,37 +55,49 @@ export function enterZoneByTarget(
     }
     enterLocation(state, objectLocation, {
         instant,
-        callback: () => {
-            const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]);
-            if (target?.getHitbox) {
-                const hitbox = target.getHitbox(state);
-                state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-                state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                updateAreaSection(state, true);
-                checkForFloorEffects(state, state.hero);
-                fixCamera(state);
-            }
-            // Technically this could also be a MarkerDefinition.
-            const definition = target.definition as EntranceDefinition|MarkerDefinition;
-            if (definition.locationCue) {
-                const textCue = new TextCue(state, { text: definition.locationCue});
-                addEffectToArea(state, state.areaInstance, textCue);
-            }
-            // Entering via a door requires some special logic to orient the
-            // character to the door properly.
-            if (definition.type === 'door') {
-                enterZoneByDoorCallback(state, targetObjectId, skipObject);
-            } else if (definition.type === 'teleporter') {
-                enterZoneByTeleporterCallback(state, targetObjectId);
-            } else if (definition.type === 'marker') {
-                state.hero.action = null;
-            } else if (definition.type === 'dreamPod') {
-                enterZoneByDreamPodCallback(state, targetObjectId);
-            }
-            callback?.(state);
-        },
+        callback: () => onEnterLocation(state, targetObjectId, {skipObject, callback}),
     });
     return true;
+}
+
+function onEnterLocation(
+    state: GameState,
+    targetObjectId: string,
+    {
+        skipObject,
+        callback,
+        doNotFixCamera,
+    }: OptionalEnterZoneByTargetParams = {}
+) {
+    const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]);
+    if (target?.getHitbox) {
+        const hitbox = target.getHitbox(state);
+        state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+        state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+        updateAreaSection(state, true);
+        checkForFloorEffects(state, state.hero);
+        if (!doNotFixCamera) {
+            fixCamera(state);
+        }
+    }
+    // Technically this could also be a MarkerDefinition.
+    const definition = target.definition as EntranceDefinition|MarkerDefinition;
+    if (definition.locationCue) {
+        const textCue = new TextCue(state, { text: definition.locationCue});
+        addEffectToArea(state, state.areaInstance, textCue);
+    }
+    // Entering via a door requires some special logic to orient the
+    // character to the door properly.
+    if (definition.type === 'door') {
+        enterZoneByDoorCallback(state, targetObjectId, skipObject);
+    } else if (definition.type === 'teleporter') {
+        enterZoneByTeleporterCallback(state, targetObjectId);
+    } else if (definition.type === 'marker') {
+        state.hero.action = null;
+    } else if (definition.type === 'dreamPod') {
+        enterZoneByDreamPodCallback(state, targetObjectId);
+    }
+    callback?.(state);
 }
 
 export function findObjectLocation(

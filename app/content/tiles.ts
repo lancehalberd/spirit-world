@@ -26,6 +26,7 @@ import {
     dirtParticles,
     emptyWallBehaviors,
     emptyLedgeBehaviors,
+    frozenTile,
     heavyStoneBehavior,
     lightStoneBehavior,
     pitBehavior,
@@ -401,13 +402,6 @@ const brightGrass: TileSource = {
     /*behaviors: {
         '0x0': {brightness: 1, lightRadius: 16},
     },*/
-};
-
-
-const iceTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
-    behaviors: {'all': {isGround: true, isFrozen: true, slippery: true, elementTiles: {fire: 0}}},
 };
 
 const railsTiles: TileSource = {
@@ -1108,7 +1102,7 @@ addTiles([
     ...allGardenTiles,
     waterWaves,
     deletedTiles(1),
-    iceTiles,
+    frozenTile,
     lavaBubbles,
     waterRocks,
     // Save these slots for additional empty wall behaviors we might want.

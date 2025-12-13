@@ -45,7 +45,11 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
                 if (getDrawPriority(layer.definition) === 'foreground') {
                     break;
                 }
-                if (layer.tiles[ty][tx] === allTiles[294]) {
+                if (layer.tiles[ty][tx]?.behaviors?.isFrozen) {
+                    // If the specific frozen tile is found, stop at this layer, only tiles at and beneath this tile
+                    // should be frozen.
+                    topLayer = layer;
+                    break;
                     //foundFrozenTile = true;
                 }
                 // TODO: treat the mask as another layer and apply the ice rendering to the mask layer when selected.
@@ -86,7 +90,7 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
                 continue;
             }*/
             // If this is literally the square frozen tile, don't replace it.
-            if (!topLayer || topLayer.tiles[ty][tx] === allTiles[294]) {
+            if (!topLayer) {
                 continue;
             }
             // Fabricate a frozen tile that has the original tile "underneath it", so it will
