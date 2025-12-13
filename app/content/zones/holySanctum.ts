@@ -1072,7 +1072,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 304, style: "short", type: "sign", message: "Erupting flames will never fail\n[-]For those intent on blazing trails."},
         {status: "normal", id: "", x: 432, y: 304, style: "short", type: "sign", message: "Twins of flesh with cold affinity\n[-]Their crystal might in perfect symmetry."},
         {status: "normal", id: "", x: 128, y: 48, style: "short", type: "sign", message: "Blinding crack of lightning make\n[-]And passage forth is yours to take."},
-        {status: "normal", id: "holySanctumSave", x: 208, y: 72, type: "saveStatue"},
+        {status: "normal", id: "holySanctumSave", x: 244, y: 328, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 376, mapId: 'holySanctumSpirit', floorId: '1F', mapX: 2, mapY: 3},

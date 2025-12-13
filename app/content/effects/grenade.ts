@@ -7,8 +7,10 @@ import {requireFrame} from 'app/utils/packedImages';
 
 const seedFrame = requireFrame('gfx/tiles/crops.png', {x: 147, y: 28, w: 12, h: 20, content:{x: 1, y: 10, w: 9, h: 9}});
 
-const explosionGeometry: FrameDimensions = {w: 32, h: 32};
-const explosionAnimation = createAnimation('gfx/effects/explosion.png', explosionGeometry, { cols: 6, duration: 4}, { loop: false });
+const explosionGeometry: FrameDimensions = {w: 32, h: 32, content: {x: 4, y: 4, w: 24, h: 24}};
+const explosionAnimation = createAnimation('gfx/effects/explosion.png', explosionGeometry, {cols: 6, duration: 2,
+    frameMap: [0, 1, 2, 2, 3, 3, 3, 4, 4, 5, 5]
+}, { loop: false });
 
 interface Props {
     x: number
@@ -80,6 +82,7 @@ export class Grenade implements EffectInstance, Props {
             // The trajectory of the grenade gives enough warning.
             tellDuration: 0,
             animation: explosionAnimation,
+            expansionDuration: 140,
             source: this.source,
         });
         addEffectToArea(state, this.area, blast);

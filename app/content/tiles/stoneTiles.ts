@@ -20,7 +20,7 @@ import { requireFrame } from 'app/utils/packedImages';
 
 const stoneCeiling: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 96, h: 208}),
     behaviors: {
         'all': ceilingBehavior,
         '3x0': bottomCeilingBehavior,
@@ -41,6 +41,7 @@ const stoneCeiling: TileSource = {
         [0,3],[1,3],[2,3],[3,3],
         [0,4],[1,4],[2,4],
         [0,5],[1,5],
+
                         [ 2, 7],[ 3, 7],[ 4, 7],[ 5, 7],
                         [ 2, 8],[ 3, 8],[ 4, 8],[ 5, 8],
                         [ 2, 9],[ 3, 9],
@@ -52,142 +53,127 @@ const stoneCeiling: TileSource = {
 
 const stoneCeilingTopAngles: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 80}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 144, y: 32, w: 32, h: 16}),
     behaviors: {
-        '9x2': {defaultLayer: 'foreground2', solid: BITMAP_BOTTOM_LEFT},
-        '10x2': {defaultLayer: 'foreground2', solid: BITMAP_BOTTOM_RIGHT},
+        '0x0': {defaultLayer: 'foreground2', solid: BITMAP_BOTTOM_LEFT},
+        '1x0': {defaultLayer: 'foreground2', solid: BITMAP_BOTTOM_RIGHT},
     },
-    tileCoordinates: [
-        [ 9, 2],[10, 2],
-    ],
 };
 
 const stoneWalls: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 80}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 112, y: 0, w: 128, h: 64}),
     behaviors: {
         'all': southernWallBehavior,
-        '13x3': topRightWall,
-        '14x3': topLeftWall,
+        '6x3': topRightWall,
+        '7x3': topLeftWall,
     },
     tileCoordinates: [
-    [ 7, 0],[ 8, 0],[ 9, 0],[10, 0],[11, 0],
-    [ 7, 1],[ 8, 1],[ 9, 1],[10, 1],[11, 1],
-                                             [13, 2],[14, 2],
-                                             [13, 3],[14, 3],
+        [0, 0],[1, 0],[2, 0],[3, 0],[4, 0],
+        [0, 1],[1, 1],[2, 1],[3, 1],[4, 1],
+                                               [6, 2],[7, 2],
+                                               [6, 3],[7, 3],
     ],
 };
 
 const stoneStairs: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 256, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'field' },
     },
-    tileCoordinates: [
-        [16, 0],[17, 0],[18, 0],
-        [16, 1],[17, 1],[18, 1],
-        [16, 2],[17, 2],[18, 2],
-        [16, 3],[17, 3],[18, 3],
-        [16, 4],[17, 4],[18, 4],
-    ],
 };
 
 const stoneLedges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 128, y: 96, w: 96, h: 128}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
-        '8x8': { defaultLayer: 'floor2', ledges: { right: true } },
-        '9x8': { defaultLayer: 'floor2', ledges: { right: true } },
+        '0x2': { defaultLayer: 'floor2', ledges: { right: true } },
+        '1x2': { defaultLayer: 'floor2', ledges: { right: true } },
 
-        '8x9': { defaultLayer: 'floor2', ledges: { left: true } },
-        '9x9': { defaultLayer: 'floor2', ledges: { left: true } },
-        '10x9': { defaultLayer: 'floor2', ledges: { down: true } },
-        '11x9': { defaultLayer: 'floor2', ledges: { down: true } },
-        '12x9': { defaultLayer: 'floor2', ledges: {down: false}, solid: BITMAP_BOTTOM_6, low: true, },
-        '13x9': { defaultLayer: 'floor2', ledges: {down: false}, solid: BITMAP_BOTTOM_6, low: true, },
+        '0x3': { defaultLayer: 'floor2', ledges: { left: true } },
+        '1x3': { defaultLayer: 'floor2', ledges: { left: true } },
+        '2x3': { defaultLayer: 'floor2', ledges: { down: true } },
+        '3s3': { defaultLayer: 'floor2', ledges: { down: true } },
+        '4x3': { defaultLayer: 'floor2', ledges: {down: false}, solid: BITMAP_BOTTOM_6, low: true, },
+        '5x3': { defaultLayer: 'floor2', ledges: {down: false}, solid: BITMAP_BOTTOM_6, low: true, },
 
-        '8x10': { defaultLayer: 'floor2', solid: BITMAP_RIGHT_6 },
-        '9x10': { defaultLayer: 'floor2', solid: BITMAP_RIGHT_6 },
+        '0x4': { defaultLayer: 'floor2', solid: BITMAP_RIGHT_6 },
+        '1x4': { defaultLayer: 'floor2', solid: BITMAP_RIGHT_6 },
 
-        '8x11': { defaultLayer: 'floor2', solid: BITMAP_LEFT_6 },
-        '9x11': { defaultLayer: 'floor2', solid: BITMAP_LEFT_6 },
-        '10x11': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
-        '11x11': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
-        '12x11': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
-        '13x11': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
+        '0x5': { defaultLayer: 'floor2', solid: BITMAP_LEFT_6 },
+        '1x5': { defaultLayer: 'floor2', solid: BITMAP_LEFT_6 },
+        '2x5': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
+        '3s5': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
+        '4x5': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
+        '5x5': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_6 },
 
-        '8x12': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright' },
-        '9x12': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft' },
-        '10x12': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright' },
-        '11x12': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft' },
+        '0x6': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright' },
+        '1x6': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft' },
+        '2x6': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright' },
+        '3s6': { defaultLayer: 'floor2', solid: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft' },
 
-        '8x13': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
-        '9x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
-        '10x13': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
-        '11x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
+        '0x7': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
+        '1x7': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
+        '2x7': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
+        '3s7': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
     },
     tileCoordinates: [
-        [ 8, 6],[ 9, 6],
-        [ 8, 7],[ 9, 7],
-        [ 8, 8],[ 9, 8],
-        [ 8, 9],[ 9, 9],[10, 9],[11, 9],[12, 9],[13, 9],
-        [ 8,10],[ 9,10],
-        [ 8,11],[ 9,11],[10,11],[11,11],[12,11],[13,11],
-        [ 8,12],[ 9,12],[10,12],[11,12],[12,12],[13,12],
-        [ 8,13],[ 9,13],[10,13],[11,13],[12,13],[13,13],
+        [0,0],[1,0],
+        [0,1],[1,1],
+        [0,2],[1,2],
+        [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],
+        [0,4],[1,4],
+        [0,5],[1,5],[2,5],[3,5],[4,5],[5,5],
+        [0,6],[1,6],[2,6],[3,6],[4,6],[5,6],
+        [0,7],[1,7],[2,7],[3,7],[4,7],[5,7],
     ],
 };
 
 const stoneFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 240, y: 80, w: 64, h: 176}),
     behaviors: {
-        'all': { defaultLayer: 'floor2' },
-        '17x7': { defaultLayer: 'floor' },
-        '18x7': { defaultLayer: 'floor' },
-        '17x8': { defaultLayer: 'floor' },
-        '18x8': { defaultLayer: 'floor' },
-
+        'all': {defaultLayer: 'floor2'},
+        '2x2': {defaultLayer: 'floor'},
+        '3x2': {defaultLayer: 'floor'},
+        '2x3': {defaultLayer: 'floor'},
+        '3x3': {defaultLayer: 'floor'},
     },
     tileCoordinates: [
-        [15, 5],[16, 5],[17, 5],[18, 5],
-        [15, 6],[16, 6],[17, 6],[18, 6],
-        [15, 7],[16, 7],[17, 7],[18, 7],
-                        [17, 8],[18, 8],
-                [16, 9],[17, 9],[18, 9],
-                [16,10],        [18,10],
-                [16,11],[17,11],[18,11],
-                [16,12],[17,12],
-        [15,13],[16,13],[17,13],[18,13],
-        [15,14],[16,14],[17,14],[18,14],
-                [16,15],[17,15],
+        [0,0],[1,0],[2,0],[3,0],
+        [0,1],[1,1],[2,1],[3,1],
+        [0,2],[1,2],[2,2],[3,2],
+                    [2,3],[3,3],
+              [1,4],[2,4],[3,4],
+              [1,5],       [3,5],
+              [1,6],[2,6],[3,6],
+              [1,7],[2,7],
+        [0,8],[1,8],[2,8],[3,8],
+        [0,9],[1,9],[2,9],[3,9],
+              [1,10],[2,10],
     ],
 };
 
 const stoneFloor: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 192, y: 64, w: 48, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
-        '13x5': { defaultLayer: 'field', underTile: 4, isBrittleGround: true, particles: lightStoneParticles, breakSound: 'rockShatter'},
+        '1x1': { defaultLayer: 'field', underTile: 4, isBrittleGround: true, particles: lightStoneParticles, breakSound: 'rockShatter'},
     },
     tileCoordinates: [
-        [12, 4],[13, 4],[14, 4],
-        [12, 5],[13, 5],
+        [0,0],[1,0],[2,0],
+        [0,1],[1,1],
     ],
 };
 const stoneFloorEdges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 128, y: 64, w: 64, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
-    tileCoordinates: [
-        [ 8, 4],[ 9, 4],[10, 4],[11, 4],
-        [ 8, 5],[ 9, 5],[10, 5],[11, 5],
-    ],
 };
 
 export const allStoneTileSources: TileSource[] = [

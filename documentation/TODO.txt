@@ -24,6 +24,7 @@ Bugs:
         - Robot stopped moving in ST basement. Maybe ice damage against shield is broken?
         - If controlled clones despawns during quick clone toss, sometimes you'll take control of the original clone in an invalid position, such as inside a solid object or cliff face.
             - Possibly fixed by other changes.
+        - Cannot enter Staff Tower from the spirit sky, though it appears open.
 
 Graphics Work:
     Categories of types of graphics work:
@@ -145,50 +146,63 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Make plants shoot explosive seeds
-    - Make plants spawn 2x flying beetle when hit with a thrown object that doesn't kill them
-    - Add more enemies to forest
-        - Plants+beetles. Snakes near the water.
-        - 3x plant configuration in a larger open area
-        - plants on raised ground that are difficult to fight and function more like obstacles
-        - elemental plants in Spirit World
+    - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
 
-    - Major tasks blocking release:
-        - BLOCKED: Fix money maze is using mixed wooden/jade tiles
-            - Waiting for E/W Jade doors to convert fully to Jade.
-        - Update forest zone in spirit world.
-            - Add entrance to spirit world forest/forest temple through the fertility temple
-                - Add ladder/stairs to fertility shrine in spirit world that take you to new entrance area to forest temple.
-                - Add ladder to entrance area the exits in the eastern spirit forest tile.
-                - Add shortcut from entrance to elder's basement that can be unlocked by coming out of the elders basement.
-                    - Add secret that can be obtained by entering this door in the material world after unlocking it in the spirit world.
-            - Test forest pits all land in reasonable places.
-                - Probably need to add content to the southern super tile at a minimum for this.
-                - Also content north of boss arena.
-            - Add paths east of elders basement in the forest temple.
-            - Finish converting river to crystal path.
-            - Update fast travel spot for the forest village.?
-        - Adjust all save statue positions
-        - Fix Guardian dialog after getting teleportation
-            - Make each dreamland exit even more distinct to make it intuive where each one leads.
-        - Update randomizer logic.
-        - Fix map behavior for forest, forest water, forest temple and for all spirit versions.
-        - Update spawn location for forest temple boss state.
-    - Minor tasks blocking release:
-        - Add ability to link map sections to special map marker objects on the overworld.
-        - Render fog when transitioning from underwater to foggy area.
-        - Fix knobby tree door is too wide letting player clip the left edge.
+    - Preload music.
+
+    - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
+        - Delays spirit energy generation for
+
+    - Keep charging through rolls when wearing iron boots.
+
+    - Switch blessings to two progressive upgrades:
+        - Fire blessing:
+            - take no burning damage as long as you have spirit energy + take 25% less fire damage
+        - Water blessing:
+            - water no longer drains spirit energy (but spirit energy still does not recover) + take 25% less ice damage
+        - Lightning blessing:
+            - lightning traps do not damage you (but they still knock you away) + take 25% lightning damage
+
+    - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
 
+    - Need better enemy for Cocoon B3 rolling ball puzzle.
+
+
+    - Hard mode recommendations:
+        - No free revives/jade from statues.
+            - Change dialogue for first statue to match. "We're rooting for you, but this time you'll have to make it on your own."
+            - Revive price doubled up to 100 Jade.
+            - Bushes/pots no longer drop peaches.
+
+    - Non ice grenades should splash animate instead of exploding if they hit empty water.
+
+    - Hybrid dungeon map idea:
+        - Show spirit world + material world in different overlapping fragments (maybe like a broken mirror)
+        - Current world is in front by default, but pressing left/right swaps which world is in front.
+        - Or don't have them overlap, but include the mirror effect and have the map just scroll left and right to show both.
+        - Could default the scroll so that the players position in both worlds is centered about the middle of the screen.
+
+    - Fix error when save game is loaded with player over a pit.
+        - Not high priority since this doesn't happen outside of debug situations and the error doesn't crash the game.
+
     - For staff animations to render all but the bottom Npx in the foreground.
     - Make Vanara bushes linked between worlds like other bushes.
 
-    - Add moss to Peach Cave
-
     - Add old save statue graphics as a decoration.
+        - Possibly replace save status with these in the title scene.
+
+    - Update money maze mini game
+        - Gain a 25 Jade total that functions as a "score" while in the maze
+            - This score is shown in outlined white text at the bottom of the screen with a Jade symbol next to it.
+        - Jade goes to score instead of Jade Total
+        - Arrows subtract 5 Jade per hit, pits subtract 10 Jade per fall
+        - Doors must be paid for out of the current score.
+        - Player gains current score as Jade when they exit the maze.
+        - Possibly kick the player out if their score reaches 0.
 
     - Add actual pathing algorithm for NPCs+enemies at some point.
 
@@ -196,18 +210,14 @@ Current tasks:
         - Cherry tree
         - fireball effect
         - dirt particles
-        - tinted Vanara spirit NPCs
         - test new lab tiles
         - new icons
             - peach basket
             - consumables
             - medallions
-        - Updated pods
 
     - Add Vanara Dreamland
-        - Add Vanara Dreamland to logic
-            - Add logic for all teleporters
-        - Add Spirit world entrances: Fertility Temple, Helix Bridge, Sky City Arcade, Jade City Arcade
+        - Add Spirit world entrances: Sky City Arcade, Jade City Arcade
         - Design + Create the Vanara Dreamland
             - Eventually we will want more Vanara ship/plant tiles here and the Village and for the Helix exterior.
             - The dreamland will start small and expand as you save the Daughter Trees.
@@ -233,9 +243,6 @@ Current tasks:
             - Requires moving Staff Tower
         - Expansion(Spirit Sky Tree) 6: library of memories
             - Requires Flying Boots or complicated use of other abilities
-
-    - Add sleeping pod to Helix bridge
-        - Prevent the player from using it before talking to the captain "You can use this pod to visit the Dreaming after you've talked to the captain."
 
     - Add charge behavior to drone
         - line up with hero within 100px
@@ -286,9 +293,7 @@ Current tasks:
     - Consider modify rolling balls/pots velocity to match the direction it actually starts moving when hit.
         - If it is hit DR but only moves R the velocity should be R.
 
-    - Add support for placing objects/NPCs inside of beds, stasis pods, and tubes.
-
-    - Apply Cocoon tiles in Cocoon.
+    - Add support for placing objects/NPCs inside of beds and tubes.
 
     - Add test to remove empty tiles masks applied to empty layers.
         - Delete masks when setting tile to 0/1 to prevent this.
@@ -304,8 +309,6 @@ Current tasks:
             - Endless mode with difficulty increasing by 1 every 10 seconds.
 
     - Consider updating eye color when True Sight is unlocked, or drawing a third eye when using Spirit Sight.
-
-    - Add function for generating a full size image of an area or area section.
 
     - Add different SFX for charged bow, maybe even per element.
 
@@ -369,7 +372,6 @@ Current tasks:
         - flame wall should be red
         - lightningDischarge should be yellow
 
-    - Preload music.
 
     - Design and add enemy scaling
         - Add variant seed to enemy instance props in editor (default to 0)
@@ -1043,13 +1045,18 @@ Current tasks:
             - Tools can make it easier to avoid attacks
 
     Lab + World Tree Notes:
+        - See enemies in tubes while first exploring dungeon
+            - Layer tubes are broken and empty, then assassin type enemies start ambushing the player.
+            - Large tubes growing new elemental hearts for beasts are also present.
+        - Possible sneaking vs fighting routes through lab
+        - Terminal to unlock all doors?
+            - Terminals to unlock certain security level doors, or grant increased security access?
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
         - Possible flow:
             Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance.
                 - This step is only completable after fighting the rival during the 3rd spirit beast battle.
             Tunnel takes you to the lab where the War God's Scientists have been creating Hybrdid creatures and have made a modified World Tree Seed from the Helix.
-            Can(must?) find clone upgrade to complete the lab.
             The seed is activated(possibly by combined proximity of champion+MC) and grows a giant tree that MC must climb to rescue the Champion and stop the War God.
             The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
 

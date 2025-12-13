@@ -29,7 +29,7 @@ export const zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     // tombEntrance
     'helix': 'lakeTunnel:helixEntrance',
     // helixSkyEntrance
-    'forestTemple': 'overworld:forestTempleLadder1',
+    'forestTemple': 'forest:forestTempleEastTreeEntrance',
     'waterfallTower': 'overworld:waterfallTowerEntrance',
      // waterfallTowerTopEntrance
     'forge': 'sky:forgeEntrance',
@@ -83,6 +83,9 @@ dialogueHash.nimbusCloud = {
             return '';
         },
         chooseDestination: (state: GameState) => {
+            if (state.location.zoneKey === 'dream') {
+                return `The Nimbus Cloud won't appear in the Dreaming.`;
+            }
             // There is a section of the sky that is part of the Sky Palace logical zone, but since it is outside,
             // it should *not* show the return to entrance option.
             if (state.location.zoneKey !== 'sky' && zoneEntranceMap[state.location.logicalZoneKey]) {
@@ -122,7 +125,7 @@ dialogueHash.nimbusCloud = {
         grandTemple: (state: GameState) => travelToLocation(state, 'grandTemple', 'portalMarker'),
         lake: (state: GameState) => travelToLocation(state, 'overworld', 'lakeMarker'),
         holyCity: (state: GameState) => travelToLocation(state, 'overworld', 'holyCityMarker'),
-        vanaraVillage: (state: GameState) => travelToLocation(state, 'overworld', 'vanaraVillageMarker'),
+        vanaraVillage: (state: GameState) => travelToLocation(state, 'forest', 'vanaraVillageMarker'),
         crater: (state: GameState) => travelToLocation(state, 'sky', 'craterMarker'),
         summonerRuins: (state: GameState) => travelToLocation(state, 'overworld', 'summonerRuinsMarker'),
         // Spirit world destinations

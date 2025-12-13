@@ -1,7 +1,7 @@
-import { LaserBeam } from 'app/content/effects/laserBeam';
+import {LaserBeam} from 'app/content/effects/laserBeam';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import { addEffectToArea } from 'app/utils/effects';
-import { getEndOfLineOfSight, getVectorToNearbyTarget } from 'app/utils/target';
+import {addEffectToArea} from 'app/utils/effects';
+import {getEndOfLineOfSight, getVectorToNearbyTarget} from 'app/utils/target';
 
 
 export const laserBeamAbility: EnemyAbility<Point> = {

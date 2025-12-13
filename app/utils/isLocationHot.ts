@@ -7,8 +7,7 @@ export function isLocationHot(state: GameState, location: ZoneLocation): boolean
     const grid = location.isSpiritWorld ? floor?.spiritGrid : floor?.grid;
     const areaDefinition = grid?.[location.areaGridCoords.y]?.[location.areaGridCoords.x];
     if (!areaDefinition) {
-        console.error('Could not find area definition for location: ', location);
-        debugger;
+        console.warn('Could not find area definition for location: ', location);
         return false;
     }
     const x = Math.min(31, Math.max(0, (location.x + 8) / 16));

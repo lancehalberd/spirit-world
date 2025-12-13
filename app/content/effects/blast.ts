@@ -48,7 +48,7 @@ export class Blast implements EffectInstance {
     animation = this.props.animation;
     tellDuration: number = this.props.tellDuration ?? 1000;
     expansionDuration: number = this.props.expansionDuration ?? 140;
-    persistDuration: number = this.animation ? this.animation.duration - this.expansionDuration : this.props.persistDuration ?? 60;
+    persistDuration: number = this.props.persistDuration ?? 60;
     constructor(public props: BlastProps) {}
     update(state: GameState) {
         if (this.delay >= 0) {
@@ -110,7 +110,7 @@ export class Blast implements EffectInstance {
             this.y += this.vy;
         }
         const circle = this.getHitCircle();
-        if (circle) {
+        if (circle?.r > 0) {
             const hitResult = hitTargets(state, this.area, {
                 damage: this.damage,
                 element: this.element,
@@ -136,7 +136,9 @@ export class Blast implements EffectInstance {
                 }
             }
         }
-        if (this.animationTime >=  this.tellDuration + this.expansionDuration + this.persistDuration) {
+        if (this.animationTime >= this.tellDuration + this.expansionDuration + this.persistDuration
+            && (!this.animation || this.animationTime >= this.animation.duration)
+        ) {
             removeEffectFromArea(state, this);
         }
     }
@@ -154,6 +156,9 @@ export class Blast implements EffectInstance {
     getHitCircle(): Circle | null {
         if (this.animationTime < this.tellDuration) {
             return null;
+        }
+        if (this.animationTime >= this.tellDuration + this.expansionDuration + this.persistDuration) {
+            return {x: this.x, y: this.y, r: 0};
         }
         const time = this.animationTime - this.tellDuration;
         const p = Math.min(1, time / this.expansionDuration);
@@ -188,8 +193,8 @@ export class Blast implements EffectInstance {
                 const frame = getFrame(this.animation, this.animationTime - this.tellDuration);
                 const frameSize = Math.max(frame.content?.w ?? frame.w, frame.content?.h ?? frame.h);
                 context.save()
-                    context.translate(circle.x, circle.y);
-                    const scale = circle.r / frameSize;
+                    context.translate(this.x, this.y);
+                    const scale = 2 * this.radius / frameSize;
                     // Animations will scale up, but not down to match the radius. This should keep
                     // the effective hit inside the visual indicator.
                     if (scale > 1) {
@@ -197,7 +202,7 @@ export class Blast implements EffectInstance {
                     }
                     drawFrameCenteredAt(context, frame, {x: 0, y: 0, w: 0, h: 0});
                 context.restore();
-                // TODO: consider skipping the rest of the rendering here and just using the animation.
+                return;
             }
             context.save();
                 context.globalAlpha *= (0.2 - 0.15 * persistTime / this.persistDuration);

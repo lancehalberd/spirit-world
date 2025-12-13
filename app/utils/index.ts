@@ -245,6 +245,7 @@ export function readGetParameterAsInt(parameterName: string, defaultValue = 0): 
 export function cloneDeep<T>(value: T): T {
     return JSON.parse(JSON.stringify(value)) as T;
 }
+window.cloneDeep = cloneDeep;
 
 function isObject(value: any): value is Object {
     return (value && typeof value === 'object' && !Array.isArray(value));
@@ -279,6 +280,7 @@ export function mergeDeep<T>(target: T, source: T, seenValues: Set<any> = new Se
         }
     }
 }
+window.mergeDeep = mergeDeep;
 
 export function sample<T>(collection: Collection<T>): T {
     return Random.element(collection);
@@ -317,6 +319,16 @@ export function clamp(value: number, min: number, max: number) {
         return max;
     }
     return value;
+}
+
+export function lerp(x: number, y: number, a: number){
+	return x * (1 - a) + y * a;
+}
+export function invlerp(x: number, y: number, a: number){
+	return clamp((a - x) / (y - x), 0, 1);
+}
+export function range(x1: number, y1: number, x2: number, y2: number, a: number){
+	return lerp(x2, y2, invlerp(x1, y1, a));
 }
 
 export function removeItemFromArray<T>(array: T[], item: T): number {

@@ -1,13 +1,27 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 
 dialogueHash.vanaraCommander = {
     key: 'vanaraCommander',
     options: [
         {
             logicCheck: {
-                requiredFlags: ['vanaraCommanderBeasts'],
+                requiredFlags: ['spiritKingForestTemple'],
                 excludedFlags: [],
-                zones: [],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueIndex: 228,
+                    text: `
+                        One day I'll have a lot to talk to you about, but for now just go out and enjoy your adventure.
+                    `,
+                },
+            ],
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['vanaraCommanderBeasts'],
+                excludedFlags: ['spiritKingForestTemple'],
             },
             isExclusive: true,
             text: [
@@ -41,14 +55,16 @@ dialogueHash.vanaraCommander = {
             logicCheck: {
                 requiredFlags: [],
                 excludedFlags: ['vanaraCommanderBeasts'],
-                zones: [],
             },
             isExclusive: true,
             text: [
                 {
                     dialogueIndex: 73,
                     dialogueType: 'quest',
-                    text: `I'm impressed that you've made it here already!
+                    text: `
+                    Congratulations on scaling the Helix!
+                    {|}With this you have accepted your powers and responsibilities as a true Vanara and will be granted
+                    knowledge that very few are trusted with.
                     {|}You might have already realized this, but we Vanara aren't from this world.
                     {|}We traveled the stars on this ship, but there was an accident and we crashed here.
                     {|}I'm sure you have many questions, but we detected a big problem while you were climbing the Helix.
@@ -60,6 +76,7 @@ dialogueHash.vanaraCommander = {
                     {|}Go there and speak with the Spirit King, I'm sure you will be expected.
                     {|}And here, take this with you before you go.
                     {flag:elementalBeastsEscaped}
+                    {flag:helixTeleporterUnlocked}
                     {flag:vanaraCommanderBeasts}
                     {item:weapon=2}`,
                 },

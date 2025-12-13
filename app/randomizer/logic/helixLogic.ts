@@ -117,10 +117,13 @@ export const helixNodes: LogicNode[] = [
         npcs: [
             {
                 loot: {type: 'dialogueLoot', id: 'helixVanaraCommander', lootType: 'weapon'},
-                progressFlags: ['elementalBeastsEscaped']
+                progressFlags: ['elementalBeastsEscaped', 'helixTeleporterUnlocked']
             },
         ],
-        paths: [{nodeId: 'helixBridge', logic: canUseTeleporters}],
+        paths: [
+            {nodeId: 'helixBridge', logic: canUseTeleporters},
+            {nodeId: 'dreamMain'},
+        ],
         entranceIds: ['helixBridgeTeleporter', 'helixSkySpiritEntrance'],
         exits: [
             {objectId: 'helixBridgeTeleporter'},

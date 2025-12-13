@@ -101,8 +101,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
     if (isPrimaryHero && state.nextAreaInstance) {
-        hero.vx = 0;
-        hero.vy = 0;
+        // The player will lose all velocity while entering an area if they release the direction they are moving.
+        const [dx, dy] = getCloneMovementDeltas(state, hero);
+        if (dx * hero.vx <= 0) hero.vx = 0;
+        if (dy * hero.vy <= 0) hero.vy = 0;
         // If we see issues with the screen transition code for super tiles,
         // update this logic to match the section transition code below and stop
         // the player at exactly the threshold.
@@ -122,7 +124,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.isControlledByObject) {
-        hero.animationTime += FRAME_LENGTH;
+        // This should already be getting updated in updateGenericHeroState as long
+        // as the hero is not frozen.
+        // hero.animationTime += FRAME_LENGTH;
         // Objects must set this flag every frame to keep it set.
         hero.isControlledByObject = false;
         return true;
@@ -244,6 +248,44 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'fallen' || hero.action === 'sankInLava') {
         // Special logic for falling from the sky to the overworld.
         if (hero === state.hero && hero.action === 'fallen' && state.location.zoneKey === 'sky') {
+            // The southwest corner of the sky is over the forest tile in the overwrld, which is
+            // not a valid location and represents the top right portion of the forest area.
+            if (state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
+                const sourceAreaSize = zones.sky.areaSize ?? {w: 32, h: 32};
+                const sourceAreaWidth = sourceAreaSize.w * 16, sourceAreaHeight = sourceAreaSize.h * 16;
+                // We ignore the area grid coords since the source is entirely within a single area tile
+                const px = hero.x / sourceAreaWidth;
+                const py = hero.y / sourceAreaHeight;
+                const targetAreaSize = zones.forest.areaSize ?? {w: 32, h: 32};
+                const targetAreaWidth = targetAreaSize.w * 16, targetAreaHeight = targetAreaSize.h * 16;
+                // The entire forest is 3x3, but we target only the top right 2x2 block.
+                const targetWidth = 2 * targetAreaWidth;
+                const targetHeight = 2 * targetAreaHeight;
+                // This is anywhere in the right two tiles.
+                const tx = targetAreaWidth + px * targetWidth;
+                // This is anywhere in the top two tiles.
+                const ty = py * targetHeight;
+                enterLocation(state, {
+                    zoneKey: 'forest',
+                    floor: 0,
+                    areaGridCoords: {
+                        x: Math.floor(tx / targetAreaWidth),
+                        y: Math.floor(ty / targetAreaHeight),
+                    },
+                    x: tx % targetAreaWidth,
+                    y: ty % targetAreaHeight,
+                    z: CANVAS_HEIGHT,
+                    d: hero.d,
+                    isSpiritWorld: state.location.isSpiritWorld,
+                }, {
+                    callback: () => {
+                        hero.action = 'knocked';
+                        hero.isAirborn = true;
+                        moveToClosestSpawnMarker(state, hero, false);
+                    },
+                });
+                return true;
+            }
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,
@@ -374,7 +416,15 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         //const touchingTarget = hero.actionTarget
         //    && (hero.actionTarget.area === state.areaInstance || hero.actionTarget.area === state.nextAreaInstance)
         //    && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getOffsetHitbox());
+        if (door && !door.area) {
+            console.error(`
+                Checking if hero can enter a door that is not yet/no longer assigned an area
+                This can happen if the door is a child object that does not correctly have area set when the parent is added to the area.
+            `);
+            debugger;
+        }
         if (!door?.isHeroTriggeringDoor?.(state) && isHeroOnOpenTile(state, hero)) {
+            hero.action = null;
             hero.actionTarget = null;
             hero.isUsingDoor = false;
             delete hero.renderParent;

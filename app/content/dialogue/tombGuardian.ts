@@ -66,7 +66,7 @@ dialogueHash.tombGuardian = {
                     dialogueIndex: 61,
                     dialogueType: 'hint',
                     text:`Now that you can teleport you can travel through the Dreaming to reach
-                    different places.{|}Look for a portal that will take you back to the lake.
+                    different places.{|}Look for a portal in the Dreaming that will take you back to the lake.
                     `,
                 },
             ],

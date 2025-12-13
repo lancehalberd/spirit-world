@@ -209,7 +209,14 @@ export class Door implements ObjectInstance {
         if (this.style.isLadderDown && !this.isOpen()) {
             return false;
         }
-        return (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
+        if (!this.area) {
+            console.error(`
+                Checking if hero can enter a door that is not yet/no longer assigned an area
+                This can happen if the door is a child object that does not correctly have area set when the parent is added to the area.
+            `);
+            debugger;
+        }
+        return this.area && (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     isHeroTriggeringDoor(state: GameState) {
         return boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getOffsetHitbox()) && this.heroCanEnter(state);
@@ -496,7 +503,9 @@ export class Door implements ObjectInstance {
         if (this.style.render) {
             this.style.render(context, state, this);
             if (this.definition.d === 'down'
-                && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'sky')
+                // This is similar to the list of overworldKeys, but currently we exclude the `underwater` area because
+                // it feels wrong to show the doorlight for underwater doors.
+                && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'forest' || this.definition.targetZone === 'sky')
                 && this.isOpen()
             ) {
                 // For some reasont his renders when the door is closed while editing, which isn't a problem,

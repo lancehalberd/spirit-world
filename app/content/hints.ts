@@ -19,6 +19,9 @@ interface Mission {
 function findMaterialWorldObject(state: GameState, objectIds: string | string[]) {
     return findObjectLocation(state, 'overworld', objectIds, false, null, true);
 }
+function findMaterialForestObject(state: GameState, objectIds: string | string[]) {
+    return findObjectLocation(state, 'forest', objectIds, false, null, true);
+}
 function findSpiritWorldObject(state: GameState, objectIds: string | string[]) {
     return findObjectLocation(state, 'overworld', objectIds, true, null, true);
 }
@@ -31,8 +34,20 @@ function findSpiritSkyObject(state: GameState, objectIds: string | string[]) {
 
 const getPeachCaveLocation = (state: GameState) => findMaterialWorldObject(state, 'peachCaveTopEntrance');
 const getWaterfallVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallCaveEntrance');
-const getVanaraVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'vanaraVillager');
-const getVanaraElderLocation = (state: GameState) => findMaterialWorldObject(state, 'elderEntrance');
+const getVanaraVillageLocation = (state: GameState) => {
+    if (state.location.zoneKey === 'forest') {
+        return findMaterialForestObject(state, 'vanaraVillageMarker');
+    } else {
+        return findMaterialWorldObject(state, 'forestMarkerM')
+    }
+}
+const getVanaraElderLocation = (state: GameState) => {
+    if (state.location.zoneKey === 'forest') {
+        return findMaterialForestObject(state, 'elderEntrance');
+    } else {
+        return findMaterialWorldObject(state, 'forestMarkerM')
+    }
+}
 
 const getTombLocation = (state: GameState) => findMaterialWorldObject(state, 'tombEntrance');
 const getWarTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'warTempleEntrance');
@@ -41,7 +56,7 @@ const getLakeTeleporterLocation = (state: GameState) => findMaterialWorldObject(
 const getLakeTunnelLocation = (state: GameState) => findMaterialWorldObject(state, 'lakeTunnelEntrance');
 const getGrandTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'grandTempleEntrance');
 
-const getForestTempleLocation = (state: GameState) => findSpiritWorldObject(state, 'elderSpiritEntrance');
+const getForestTempleLocation = (state: GameState) => findSpiritWorldObject(state, 'fertilityTempleSpiritEntrance');
 const getWaterfallTowerLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallTowerEntrance');
 const getForgeLocation = (state: GameState) => findSpiritSkyObject(state, 'forgeEntrance');
 const getSkyPalaceLocation = (state: GameState) => findSpiritSkyObject(state, 'skyPalaceEntrance');
@@ -671,6 +686,9 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
         case 'void': return 'in the abyss of space';
         case 'gauntlet': return 'in the Gauntlet under the Grand Temple';
         case 'holySanctum': return 'in the Holy Sanctum of the Jade Palace';
+        case 'forest': return 'in the Forest';
+        case 'spiritForest': return 'in the Spirit Forest';
+        case 'dream': return 'in the Dreaming';
     }
     // The type of this should just be `void` if all zones are handled.
     return zone;

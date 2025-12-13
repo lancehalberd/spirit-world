@@ -1,25 +1,26 @@
-import { createAreaInstance } from 'app/content/areas';
-import { convertLocationToMapCoordinates, getMapTargets } from 'app/content/hints';
-import { doorStyles } from 'app/content/objects/doorStyles';
+import {createAreaInstance, getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
+import {convertLocationToMapCoordinates, getMapTargets} from 'app/content/hints';
+import {doorStyles } from 'app/content/objects/doorStyles';
 import {evaluateLogicDefinition} from 'app/content/logic';
-import { allSections, dungeonMaps } from 'app/content/sections';
-import { zones } from 'app/content/zones/zoneHash';
-import { editingState } from 'app/development/editingState';
-import { getCanvasScale } from 'app/development/getCanvasScale';
-import { initializeSection } from 'app/development/sections';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, overworldKeys } from 'app/gameConstants';
-import { heroIcon } from 'app/render/heroAnimations';
-import { checkToRedrawTiles, drawEntireFrame } from 'app/render/renderField';
-import { createAnimation, drawFrame } from 'app/utils/animations';
-import { mainCanvas } from 'app/utils/canvas';
-import { findObjectLocation } from 'app/utils/enterZoneByTarget';
-import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
-import { isPointInShortRect, boxesIntersect, pad } from 'app/utils/index';
-import { getMousePosition, isMouseDown } from 'app/utils/mouse';
-import { getObjectAndParts, getObjectStatus} from 'app/utils/objects';
-import { requireFrame } from 'app/utils/packedImages';
-import { isSectionExplored } from 'app/utils/sections';
-import { drawText } from 'app/utils/simpleWhiteFont';
+import {allSections, dungeonMaps} from 'app/content/sections';
+import {zones} from 'app/content/zones/zoneHash';
+import {editingState} from 'app/development/editingState';
+import {getCanvasScale} from 'app/development/getCanvasScale';
+import {initializeSection} from 'app/development/sections';
+import {CANVAS_WIDTH, CANVAS_HEIGHT, overworldKeys} from 'app/gameConstants';
+import {heroIcon} from 'app/render/heroAnimations';
+import {checkToRedrawTiles, drawEntireFrame} from 'app/render/renderField';
+import {createAnimation, drawFrame} from 'app/utils/animations';
+import {mainCanvas} from 'app/utils/canvas';
+import {findObjectLocation} from 'app/utils/enterZoneByTarget';
+import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
+import {clamp, isPointInShortRect, boxesIntersect, pad} from 'app/utils/index';
+import {getMousePosition, isMouseDown} from 'app/utils/mouse';
+import {getObjectAndParts, getObjectStatus} from 'app/utils/objects';
+import {requireFrame} from 'app/utils/packedImages';
+import {isSectionExplored } from 'app/utils/sections';
+import {drawText} from 'app/utils/simpleWhiteFont';
+import {fogCanvas} from 'app/render/fog';
 
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
@@ -36,6 +37,15 @@ const [
     rightFrame, leftFrame,
 ] = createAnimation('gfx/hud/mapIcons.png', {w: 6, h: 6}, {cols: 12}).frames;
 // window['debugCanvas'](smallLockFrame, 5);
+
+const mapIconMap = {
+    door: doorFrame,
+    up: upFrame,
+    down: downFrame,
+    left: leftFrame,
+    right: rightFrame,
+    chest: chestFrame,
+}
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (overworldKeys.includes(state.location.zoneKey)) {
@@ -77,6 +87,9 @@ const innerWorldMapRectangle = {
 export function renderOverworldMap(context: CanvasRenderingContext2D, state: GameState, zone: string): void {
     if (zone === 'underwater') {
         zone = 'overworld';
+    }
+    if (zone === 'forestWater') {
+        zone = 'forest';
     }
     drawMapFrame(context, fullWorldMapRectangle);
     const r = innerWorldMapRectangle;
@@ -140,18 +153,42 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
     const grid = state.location.isSpiritWorld ? zone.floors[0].spiritGrid : zone.floors[0].grid;
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, zone, grid[row][column]);
+            const areaInstance = createAreaInstance(state, {
+                zoneKey,
+                floor: 0,
+                areaGridCoords: {x: column, y: row},
+                isSpiritWorld: state.location.isSpiritWorld,
+                // These properties aren't used in this context.
+                x: 0, y: 0, d: 'down',
+            });
             renderActualMapTile(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
         }
     }
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, zone, grid[row][column]);
+            const areaInstance = createAreaInstance(state, {
+                zoneKey,
+                floor: 0,
+                areaGridCoords: {x: column, y: row},
+                isSpiritWorld: state.location.isSpiritWorld,
+                // These properties aren't used in this context.
+                x: 0, y: 0, d: 'down',
+            });
             renderMapObjects(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16},
                 state.hero.savedData.passiveTools.trueSight >= 1);
         }
+    }
+    // TODO: make this read the fog logic for the forest instead of this specific key.
+    if (zoneKey === 'forest' && !state.savedState.objectFlags.elementalBeastsEscaped) {
+        mapContext.save();
+            mapContext.fillStyle = mapContext.createPattern(fogCanvas, 'repeat');
+            //mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+            const fogScale = 3;
+            mapContext.scale(1 / fogScale, 1 / fogScale);
+            mapContext.fillRect(0, 0, mapCanvas.width * fogScale, mapCanvas.height * fogScale);
+        mapContext.restore();
     }
 }
 
@@ -195,12 +232,12 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             //mapContext.fillStyle = 'red';
             continue;
         }
-        const {area, section} = sectionData;
-        const zone = zones[sectionData.zoneKey];
+        const {section} = sectionData;
+        const zone = zones[sectionData.location.zoneKey];
         sectionRenderData.push({
             alpha: isHidden ? 0.2 : (!isExplored ? 0.6 : 1),
             isExplored: isActuallyExplored,
-            isUnderwater: !sectionData.isSpiritWorld && !!zone.surfaceKey,
+            isUnderwater: !sectionData.location.isSpiritWorld && !!zone.surfaceKey,
             source: {
                 x: section.x * 16,
                 y: section.y * 16,
@@ -213,7 +250,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 w: section.w * 16 * 4 / w,
                 h: section.h * 16 * 4 / h,
             },
-            area: createAreaInstance(state, zone, area),
+            area: editingState.isEditing ? getOrCreateAreaInstanceFromLocation(state, sectionData.location) : createAreaInstance(state, sectionData.location),
         });
     }
 
@@ -489,11 +526,20 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                     || object.definition.status === 'closedSwitch'
                     || object.definition.status === 'closedEnemy';
                 const doorStyle = doorStyles[object.definition.style] || doorStyles.cavern;
+                // Draws the door icon with some extra clamping logic to force it to be fully in view on the map
+                // for doors that are on the extrem edges, common for southern entrances or paths going off the edge of the area.
+                function drawDoorFrame(frame: Frame) {
+                    drawFrame(context, frame, {...frame,
+                        x: clamp(target.x + Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2, 0, 192 - frame.w) - target.x,
+                        y: clamp(target.y + Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2, 0, 192 - frame.h) - target.y,
+                    });
+                }
                 if (isFrozen && !getObjectStatus(state, object.definition, 'melted')) {
-                    drawFrame(context, switchDoorFrame, {...switchDoorFrame,
+                    /*drawFrame(context, switchDoorFrame, {...switchDoorFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - switchDoorFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - switchDoorFrame.h / 2,
-                    });
+                    });*/
+                    drawDoorFrame(switchDoorFrame);
                 } else if (wasClosed && !isOpened) {
                     // Ladders are hidden when closed, so do not draw them to the map.
                     if (doorStyle.isLadderUp || doorStyle.isLadderDown) {
@@ -501,43 +547,48 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                     }
                     //const canOpenDoor = object.definition.price > 0 || object.definition.status !== 'closed';
                     const frame = (isZoneDoor ? switchDoorFrame : blockedFrame);
-                    drawFrame(context, frame, {...frame,
+                    /*drawFrame(context, frame, {...frame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2,
-                    });
+                    });*/
+                    drawDoorFrame(frame);
                 } else if (object.definition.status === 'locked' && !isOpened) {
-                    drawFrame(context, smallLockFrame, {...smallLockFrame,
+                    /*drawFrame(context, smallLockFrame, {...smallLockFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
-                    });
+                    });*/
+                    drawDoorFrame(smallLockFrame);
                 } else if (object.definition.status === 'bigKeyLocked' && !isOpened) {
-                    drawFrame(context, bigLockFrame, {...bigLockFrame,
+                    /*drawFrame(context, bigLockFrame, {...bigLockFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
-                    });
+                    });*/
+                    drawDoorFrame(bigLockFrame);
                 } else if (isZoneDoor) {
-                    if (doorStyle.mapIcon) {
-                        let frame = doorFrame;
-                        if (doorStyle.mapIcon === 'up') {
-                            frame = upFrame;
-                        } else if (doorStyle.mapIcon === 'down') {
-                            frame = downFrame;
-                        } else if (doorStyle.mapIcon === 'left') {
-                            frame = downFrame;
-                        } else if (doorStyle.mapIcon === 'right') {
-                            frame = downFrame;
-                        }
-                        drawFrame(context, frame, {...frame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
-                            y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
-                                // Render southern doors further up.
-                                + (object.definition.d === 'down' ? -2 : 0),
-                        });
+                    let mapIcon: MapIcon = object.definition.mapIcon ?? doorStyle.mapIcon;
+                    if (!mapIcon && (object.definition.style === 'wideEntrance' || object.definition.style === 'pathEntrance')) {
+                        mapIcon = object.definition.d;
+                    }
+                    if (mapIcon === 'hidden') {
+                        continue;
+                    }
+                    const frame = mapIconMap[mapIcon] ?? doorFrame;
+                    drawDoorFrame(frame);
+                    /*drawFrame(context, frame, {...frame,
+                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2
+                            + (mapIcon === 'right' ? -2 : (mapIcon === 'left' ? 2 : 0)),
+                           // + (object.definition.d === 'right' ? -2 : 0),
+                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
+                            // Render southern doors further up.
+                            + (mapIcon === 'down' ? -2 : (mapIcon === 'up' ? 2 : 0)),
+                            //+ (object.definition.d === 'down' ? -2 : 0),
+                    });*/
+                    /*if (!mapIcon && ) {
                     } else if (object.definition.style === 'wideEntrance' || object.definition.style === 'pathEntrance') {
                         const frame = {up: upFrame, down: downFrame, left: leftFrame, right: rightFrame}[object.definition.d ?? 'up'];
                         drawFrame(context, frame, {...frame,
                             x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
-                            y: Math.round((hitbox.y) * yScale) - frame.h / 2
+                            y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
                                 // Render southern doors further up.
                                 + (object.definition.d === 'down' ? -2 : 0),
                         });
@@ -548,17 +599,19 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                                 // Render southern doors further up.
                                 + (object.definition.d === 'down' ? -2 : 0),
                         });
-                    }
+                    }*/
                 } else if (object.definition?.d === 'up' || object.definition?.d === 'down') {
-                    drawFrame(context, verticalFrame, {...verticalFrame,
+                    /*drawFrame(context, verticalFrame, {...verticalFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - verticalFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - verticalFrame.h / 2,
-                    });
+                    });*/
+                    drawDoorFrame(verticalFrame);
                 } else {
-                    drawFrame(context, horizontalFrame, {...horizontalFrame,
+                    /*drawFrame(context, horizontalFrame, {...horizontalFrame,
                         x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - horizontalFrame.w / 2,
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - horizontalFrame.h / 2,
-                    });
+                    });*/
+                    drawDoorFrame(horizontalFrame);
                 }
             }
         }
@@ -585,8 +638,8 @@ export function getSectionUnderMouse(state: GameState): AreaSection | undefined 
         if (isPointInShortRect(x, y, {
             x: section.mapX * 32,
             y: section.mapY * 32,
-            w: 2 * section.w,
-            h: 2 * section.h,
+            w: 2 * section.w * 32 / state.zone.areaSize.w,
+            h: 2 * section.h * 32 / state.zone.areaSize.h,
         })) {
             return section;
         }

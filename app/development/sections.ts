@@ -10,10 +10,7 @@ export function initializeSection(section: AreaSection, location: ZoneLocation) 
         allSections[section.index] = {
             section,
             area: getAreaFromLocation(location),
-            zoneKey: location.zoneKey,
-            floor: location.floor,
-            coords: [location.areaGridCoords.x, location.areaGridCoords.y],
-            isSpiritWorld: location.isSpiritWorld,
+            location,
         };
     }
     if (!section.mapId) {

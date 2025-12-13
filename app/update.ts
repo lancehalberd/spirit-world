@@ -47,6 +47,10 @@ export function update() {
     }
     const state = getState();
     state.time += FRAME_LENGTH;
+    // Player input cannot be blocked while the game is paused, otherwise the player will be unable to unpause the game.
+    if (state.paused && state.scriptEvents?.blockPlayerInput) {
+        delete state.scriptEvents?.blockPlayerInput;
+    }
     updateKeyboardState(state);
     try {
         // This has higher priority than anything and basically freezes the game to show the controls.
@@ -77,8 +81,9 @@ export function update() {
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-            state.hideHUD = false;
-            if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
+            //state.hideHUD = false;
+            //if (!state.alwaysHideMenu && state.arState.active && canPauseGame(state)) {
+            if (state.arState.active && !state.scriptEvents.blockFieldUpdates) {
                 const isWaiting = state.scriptEvents.activeEvents.length > 0;
                 showMessage(state, '{@arGame.quit}');
                 if (isWaiting) {
@@ -143,12 +148,13 @@ export function update() {
             refreshAreaLogic(state, state.alternateAreaInstance);
         }
         const hideMenu = shouldHideMenu(state);
-        if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT))) {
+        const showNextFrame = hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT);
+        if (state.paused && !showNextFrame) {
             if (!hideMenu) {
                 updateInventory(state);
             }
         } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
-            if (!state.paused) {
+            if (!state.paused || showNextFrame) {
                 updateTransition(state);
             }
         } else if (state.defeatState.defeated) {
@@ -240,6 +246,7 @@ function updateTransition(state: GameState) {
         if (state.transitionState.time === WATER_TRANSITION_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, {
                 instant: true,
+                isEndOfTransition: true,
                 callback: state.transitionState.callback,
             });
             updateCamera(state);
@@ -259,6 +266,7 @@ function updateTransition(state: GameState) {
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, {
                 instant: true,
+                isEndOfTransition: true,
                 callback: state.transitionState.callback,
             });
             updateCamera(state);

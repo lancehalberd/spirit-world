@@ -4,8 +4,8 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {appendScript} from 'app/scriptEvents';
 import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
-import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {isPointInShortRect} from 'app/utils/index';
+import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
 import {getVariantRandom} from 'app/utils/variants';
 
@@ -18,6 +18,7 @@ export class Decoration implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     child: ObjectInstance;
+    linkedObject?: Decoration;
 
     drawPriority: DrawPriority = this.definition.drawPriority || 'sprites';
     x = this.definition.x;
@@ -26,35 +27,35 @@ export class Decoration implements ObjectInstance {
     w = this.definition.w;
     h = this.definition.h;
     d = this.definition.d || 'up';
+    decorationType = decorationTypes[this.definition.decorationType];
+    // Don't set this function unless the behavior is actually defined.
+    onHit = this.decorationType.onHit
+        ? (state: GameState, hit: HitProperties) => this.decorationType.onHit(state, this, hit)
+        : undefined;
     constructor(state: GameState, public definition: DecorationDefinition) {}
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
-        const decorationType = decorationTypes[this.definition.decorationType];
-        return decorationType.getBehaviors?.(state, this, x, y) || decorationType.behaviors;
+        return this.decorationType.getBehaviors?.(state, this, x, y) || this.decorationType.behaviors;
     }
     getLightSources(state: GameState): LightSource[] {
-        const decorationType = decorationTypes[this.definition.decorationType];
-        return decorationType.getLightSources?.(state, this) || [];
+        return this.decorationType.getLightSources?.(state, this) || [];
     }
     getYDepth(): number {
-        const decorationType = decorationTypes[this.definition.decorationType];
-        if (decorationType.getYDepth) {
-            return decorationType.getYDepth(this)
+        if (this.decorationType.getYDepth) {
+            return this.decorationType.getYDepth(this)
         }
         const hitbox = this.getHitbox();
         return hitbox.y + hitbox.h;
     }
     getHitbox(): Rect {
-        const decorationType = decorationTypes[this.definition.decorationType];
-        return decorationType.getHitbox?.(this) || this;
+        return this.decorationType.getHitbox?.(this) || this;
     }
     canGrab(state: GameState): boolean {
-        const decorationType = decorationTypes[this.definition.decorationType];
-        return !!decorationType.onGrab || !!this.getBehaviors(state)?.solid;
+        return !!this.decorationType.onGrab || !!this.getBehaviors(state)?.solid;
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
-        const decorationType = decorationTypes[this.definition.decorationType];
-        decorationType.onGrab?.(state, this, direction, hero);
+        this.decorationType.onGrab?.(state, this, direction, hero);
     }
+
     onInitialize(state: GameState) {
         const targetId = this.definition.targetObjectId;
         if (targetId && targetId !== this.child?.definition?.id) {
@@ -118,6 +119,7 @@ interface DecorationType {
     getLightSources?: (state: GameState, decoration: Decoration) => LightSource[]
     getYDepth?: (decoration: Decoration) => number
     onGrab?:(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) => void
+    onHit?: (state: GameState, decoration: Decoration, hit: HitProperties) => HitResult
 }
 
 const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
@@ -360,8 +362,76 @@ const glassWall: DecorationType = {
     behaviors: {
         solid: true,
     },
+    onHit(state: GameState, decoration: Decoration, hit: HitProperties): HitResult|undefined {
+        if (hit.destroysObjects) {
+            const brokenGlassWall = new Decoration(
+                state,
+                {
+                    id: decoration.definition.id,
+                    type: 'decoration',
+                    decorationType: 'brokenGlassWall',
+                    status: 'normal',
+                    x: decoration.x,
+                    y: decoration.y,
+                    w: decoration.w,
+                    h: decoration.h,
+                },
+            );
+            const brokenGlass = new Decoration(
+                state,
+                {
+                    id: decoration.definition.id,
+                    type: 'decoration',
+                    decorationType: 'brokenGlass',
+                    drawPriority: 'background',
+                    status: 'normal',
+                    x: decoration.x,
+                    y: decoration.y + 36,
+                    w: decoration.w,
+                    h: decoration.h,
+                },
+            );
+            addObjectToArea(state, decoration.area, brokenGlass);
+            addObjectToArea(state, decoration.area, brokenGlassWall);
+            if (decoration.linkedObject && !decoration.area.definition.isSpiritWorld) {
+                decoration.linkedObject.onHit(state, {destroysObjects: true, source: null});
+            }
+            removeObjectFromArea(state, decoration);
+        }
+        return {hit: true, blocked: true};
+    },
     getHitbox(decoration: Decoration): Rect {
         return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
+    },
+};
+
+
+const brokenGlassWallFrame = requireFrame('gfx/objects/labObjects.png', {x: 208, y: 0, w: 64, h: 48});
+const brokenGlassWall: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, brokenGlassWallFrame, decoration);
+    },
+    getBehaviors(state: GameState, decoration: Decoration, x?: number, y?: number) {
+        if (x === undefined || y === undefined) {
+            return {solid: true};
+        }
+        if (x < decoration.x + 20 || x > decoration.x + brokenGlassWallFrame.w - 20) {
+            return {solid: true};
+        }
+        return {};
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return {x: decoration.x, y: decoration.y + 42, w: 64, h: 6};
+    },
+};
+
+const brokenGlassFrame = requireFrame('gfx/objects/labObjects.png', {x: 208, y:48, w: 64, h: 25});
+const brokenGlass: DecorationType = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+        drawFrameContentAt(context, brokenGlassFrame, decoration);
+    },
+    getHitbox(decoration: Decoration): Rect {
+        return getFrameHitbox(brokenGlassFrame, decoration);
     },
 };
 
@@ -877,8 +947,9 @@ const windowOctogonal: DecorationType = {
     },
 };
 
-const cocoonFrame= requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
-const cocoonBackFrame= requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
+
+const cocoonFrame = requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
+const cocoonBackFrame = requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
 const cocoon: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         if (decoration.d === 'right') {
@@ -918,9 +989,7 @@ const cocoon: DecorationType = {
     },
     onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
         hero.action = null;
-        if (decoration.definition.id === 'dreamPod') {
-            enterZoneByTarget(state, 'dream', 'cocoonTeleporter');
-        } else if (decoration.child) {
+        if (decoration.child) {
             decoration.child.onGrab?.(state, direction, hero);
         }
     }
@@ -993,18 +1062,6 @@ const helixBase: DecorationType = {
     },
 };
 
-const [helixTopFrame] = createAnimation('gfx/objects/helixTop.png',
-    {w: 132, h: 292, content: {x: 124, y: 168, w: 124, h: 120}}, {left: 127, top: 2}
-).frames;
-const helixTop: DecorationType = {
-    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        drawFrameContentAt(context, helixTopFrame, decoration);
-    },
-    getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(helixTopFrame, decoration);
-    },
-};
-
 // Walls for the spirit tree, as rectangles relative to the top left corner of the frame.
 const spiritTreeWalls: Rect[] = [
     {x: 57, y: 241, w: 125, h: 27},
@@ -1049,7 +1106,6 @@ const spiritTree: DecorationType = {
 
 export const decorationTypes = {
     helixBase,
-    helixTop,
     anvil,
     basket,
     bearRug,
@@ -1062,6 +1118,8 @@ export const decorationTypes = {
     logPile,
     fireplace,
     glassWall,
+    brokenGlassWall,
+    brokenGlass,
     placeSettingFancy,
     placeSettingNormal,
     pottedPlant,

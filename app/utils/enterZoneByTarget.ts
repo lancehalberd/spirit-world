@@ -1,6 +1,7 @@
 import {TextCue} from 'app/content/effects/textCue';
 import {evaluateLogicDefinition} from 'app/content/logic';
 import {Door} from 'app/content/objects/door';
+import {DreamPod} from 'app/content/objects/dreamPod';
 import {Teleporter} from 'app/content/objects/teleporter';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {zones} from 'app/content/zones';
@@ -58,7 +59,7 @@ export function enterZoneByTarget(
                 fixCamera(state);
             }
             // Technically this could also be a MarkerDefinition.
-            const definition = target.definition as EntranceDefinition;
+            const definition = target.definition as EntranceDefinition|MarkerDefinition;
             if (definition.locationCue) {
                 const textCue = new TextCue(state, { text: definition.locationCue});
                 addEffectToArea(state, state.areaInstance, textCue);
@@ -69,6 +70,10 @@ export function enterZoneByTarget(
                 enterZoneByDoorCallback(state, targetObjectId, skipObject);
             } else if (definition.type === 'teleporter') {
                 enterZoneByTeleporterCallback(state, targetObjectId);
+            } else if (definition.type === 'marker') {
+                state.hero.action = null;
+            } else if (definition.type === 'dreamPod') {
+                enterZoneByDreamPodCallback(state, targetObjectId);
             }
             callback?.(state);
         },
@@ -186,6 +191,26 @@ function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjec
     }
     // Make sure the hero appears to be behind the teleporter glow.
     hero.y--;
+}
+
+function enterZoneByDreamPodCallback(this: void, state: GameState, targetObjectId: string) {
+    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as DreamPod;
+    if (!target){
+        console.error(state.areaInstance.objects);
+        console.error(targetObjectId);
+        debugger;
+    } else {
+        state.hero.d = 'down';
+        delete state.hero.action;
+        // Pods are always closed when we enter them from another location.
+        target.isOpen = false;
+        target.animationTime = target.getAnimation().duration;
+        // This flag lets the pod track that the player is performing the "getting out" action.
+        target.heroIsLeaving = true;
+        // Pod will control and render the hero until this is unset.
+        state.hero.renderParent = target;
+        state.hero.isControlledByObject = true;
+    }
 }
 
 function findEntranceById(state: GameState, areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {

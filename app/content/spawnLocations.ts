@@ -273,7 +273,7 @@ export const SPAWN_FOREST_BOSS: ZoneLocation = {
     y: 488,
     z: 0,
     d: 'right',
-    areaGridCoords: {x: 0, y: 1},
+    areaGridCoords: {x: 0, y: 2},
     isSpiritWorld: true,
 };
 

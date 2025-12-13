@@ -22,6 +22,8 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         logicalZoneKey = 'gauntlet';
     } else if (zoneKey === 'overworld' || zoneKey === 'underwater') {
         logicalZoneKey = isSpiritWorld ? 'spiritWorld' : 'overworld';
+    } else if (zoneKey === 'forest' || zoneKey === 'forestWater') {
+        logicalZoneKey = isSpiritWorld ? 'spiritForest' : 'forest';
     } else if (zoneKey === 'peachCave' || zoneKey === 'peachCaveWater') {
         logicalZoneKey = isSpiritWorld ? 'peachCaveSpirit' : 'peachCave';
     } else if (zoneKey === 'riverTemple' || zoneKey === 'riverTempleWater') {
@@ -32,7 +34,7 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         } else {
             logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
         }
-    } else if (zoneKey === 'treeVillage') {
+    } else if (zoneKey === 'treeVillage' || zoneKey === 'forestTemple') {
         logicalZoneKey = isSpiritWorld ? 'forestTemple' : 'treeVillage';
     } else if (zoneKey === 'holyCityInterior') {
         logicalZoneKey = isSpiritWorld ? 'jadeCityInterior' : 'holyCityInterior';
@@ -45,6 +47,8 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         logicalZoneKey = 'holySanctum';
     } else if (zoneKey === 'tree') {
         logicalZoneKey = isSpiritWorld ? 'treeSpirit' : 'tree';
+    } else if (zoneKey === 'waterfallCaveWater') {
+        logicalZoneKey = 'waterfallCave';
     }
     return {
         ...location,
@@ -98,6 +102,10 @@ export function getShortZoneName(location: ZoneLocation): string {
         case 'void': return 'Abyss';
         case 'gauntlet': return 'Gauntlet';
         case 'holySanctum': return 'Holy Sanctum';
+        case 'dream': return 'Dream';
+        case 'forest': return 'Forest';
+        case 'spiritForest': return 'Forest';
+        case 'warPalaceWestRoom': return 'Palace';
     }
     // This should be typed as `never` by the compiler.
     logicalZoneKey;

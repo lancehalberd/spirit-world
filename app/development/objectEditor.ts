@@ -25,7 +25,7 @@ import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
 import { editingState } from 'app/development/editingState';
 import { getLogicProperties } from 'app/development/zoneEditor';
-import {allLootTypes, CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
+import {allLootTypes} from 'app/gameConstants';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import {enterLocation} from 'app/utils/enterLocation';
@@ -174,8 +174,10 @@ export function getObjectTypeProperties(): PanelRows {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'airStream', 'anode', 'cathode', 'airBubbles', 'arGame', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'elevator', 'escalator', 'flameTurret', 'floorSwitch', 'heavyFloorSwitch', 'helixTop', 'indicator', 'keyBlock', 'lavafall', 'loot',
+    'airStream', 'anode', 'cathode', 'airBubbles', 'arGame',
+    'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'door', 'dreamPod', 'elevator', 'escalator', 'flameTurret', 'floorSwitch',
+    'heavyFloorSwitch', 'helixTop', 'indicator', 'keyBlock', 'lavafall', 'loot',
     'marker', 'movingPlatform', 'narration', 'npc', 'peachTree', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'staffTower',
     'stairs', 'teleporter', 'tippable', 'torch', 'trampoline', 'turret',
@@ -227,6 +229,13 @@ export function createObjectDefinition(
                 offInterval: definition.offInterval,
                 onInterval: definition.onInterval,
             };
+        case 'arGame':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                gameId: definition.gameId,
+            };
         case 'anode':
             return {
                 ...commonProps,
@@ -275,6 +284,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                mapIcon: definition.mapIcon,
                 style: definition.style || 'cave', //Object.keys(doorStyles)[0],
                 frozenLogic: definition.frozenLogic,
                 openLogic: definition.openLogic,
@@ -399,6 +409,7 @@ export function createObjectDefinition(
                 requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
                 toggleOnRelease: definition.toggleOnRelease,
+                isInverted: definition.isInverted,
                 type: definition.type,
             };
         case 'heavyFloorSwitch':
@@ -406,6 +417,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 requireAll: definition.requireAll ?? true,
                 targetObjectId: definition.targetObjectId,
+                isInverted: definition.isInverted,
                 type: definition.type,
             };
         case 'indicator':
@@ -429,6 +441,16 @@ export function createObjectDefinition(
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 type: definition.type,
+            };
+        case 'dreamPod':
+            return {
+                ...commonProps,
+                targetZone: definition.targetZone,
+                targetObjectId: definition.targetObjectId,
+                type: definition.type,
+                openLogic: definition.openLogic,
+                d: definition.d || 'down',
+                locationCue: definition.locationCue,
             };
         case 'teleporter':
             return {
@@ -472,7 +494,6 @@ export function createObjectDefinition(
                 turn: definition.turn || 'bounce',
             };
         case 'airBubbles':
-        case 'arGame':
         case 'beadGrate':
         case 'cathode':
         case 'flameTurret':
@@ -1065,6 +1086,17 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'pitEntrance':
         case 'staffTower':
         case 'teleporter':
+        case 'dreamPod':
+            if (object.type === 'dreamPod') {
+                rows = [
+                    ...rows,
+                    ...getLogicProperties(state, 'Is Open?', object.openLogic, updatedLogic => {
+                        object.openLogic = updatedLogic;
+                        updateObjectInstance(state, object);
+                        editingState.needsRefresh = true;
+                    }),
+                ];
+            }
             const zoneKeys = Object.keys(zones);
             const zoneKey = object.targetZone || 'none';
             rows.push({
@@ -1081,53 +1113,69 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     editingState.needsRefresh = true;
                 },
             });
-            const zone = zones[zoneKey];
-            // Pit entrances target markers, but other entrances target the same kind of entrnace,
-            // for example teleporter => teleporter, doors => doors.
-            let targetTypes: ObjectType[] = [object.type];
-            if (object.type === 'pitEntrance') {
-                targetTypes = ['marker'];
-            } else if (object.type === 'teleporter') {
-                targetTypes = ['teleporter', 'marker'];
-            } else if (doorTypes.includes(object.type)) {
-                // Staff tower objects also function as doors.
-                targetTypes = doorTypes;
-            }
-            const objectIds = zone ? getTargetObjectIdsByTypes(zone, targetTypes) : [];
-            if (objectIds.length) {
-                if (objectIds.indexOf(object.targetObjectId) < 0) {
-                    object.targetObjectId = objectIds[0];
+            if (zoneKey !== 'none') {
+                const zone = zones[zoneKey];
+                // Pit entrances target markers, but other entrances target the same kind of entrnace,
+                // for example teleporter => teleporter, doors => doors.
+                let targetTypes: ObjectType[] = [object.type];
+                if (object.type === 'pitEntrance') {
+                    targetTypes = ['marker'];
+                } else if (object.type === 'teleporter' || object.type === 'dreamPod') {
+                    targetTypes = ['teleporter', 'marker', 'dreamPod'];
+                } else if (doorTypes.includes(object.type)) {
+                    // Staff tower objects also function as doors.
+                    targetTypes = doorTypes;
                 }
-                rows.push({
-                    name: 'target',
-                    value: object.targetObjectId,
-                    values: objectIds,
-                    onChange(targetObjectId: string) {
-                        object.targetObjectId = targetObjectId;
-                        updateObjectInstance(state, object);
-                    },
-                });
-                if (object.id && object.targetObjectId && object.type !== 'pitEntrance') {
+                const objectIds = zone ? getTargetObjectIdsByTypes(zone, targetTypes) : [];
+                if (objectIds.length) {
+                    if (objectIds.indexOf(object.targetObjectId) < 0) {
+                        object.targetObjectId = objectIds[0];
+                    }
                     rows.push({
-                        name: 'Link Back',
-                        onClick() {
-                            const objectTargets = findZoneTargets(
-                                state,
-                                object.targetZone,
-                                object.targetObjectId,
-                                object,
-                                false
-                            );
-                            for (const objectTarget of objectTargets) {
-                                const targetObject = objectTarget.object as EntranceDefinition;
-                                targetObject.targetZone = state.location.zoneKey;
-                                targetObject.targetObjectId = object.id;
-                            }
+                        name: 'target',
+                        value: object.targetObjectId,
+                        values: objectIds,
+                        onChange(targetObjectId: string) {
+                            object.targetObjectId = targetObjectId;
+                            updateObjectInstance(state, object);
                         },
                     });
+                    if (object.id && object.targetObjectId && object.type !== 'pitEntrance') {
+                        rows.push({
+                            name: 'Link Back',
+                            onClick() {
+                                const objectTargets = findZoneTargets(
+                                    state,
+                                    object.targetZone,
+                                    object.targetObjectId,
+                                    object,
+                                    false
+                                );
+                                for (const objectTarget of objectTargets) {
+                                    const targetObject = objectTarget.object as EntranceDefinition;
+                                    targetObject.targetZone = state.location.zoneKey;
+                                    targetObject.targetObjectId = object.id;
+                                }
+                            },
+                        });
+                    }
+                } else {
+                    rows.push(`No objects of types ${targetTypes}`);
                 }
-            } else {
-                rows.push(`No objects of types ${targetTypes}`);
+                rows.push({
+                    name: 'Map Icon',
+                    value: object.mapIcon ?? 'default',
+                    values: ['default', 'up', 'down', 'left', 'right', 'hidden'],
+                    onChange(mapIcon: MapIcon|'default') {
+                        if (mapIcon === 'default') {
+                            delete object.mapIcon;
+                        } else {
+                            object.mapIcon = mapIcon;
+                        }
+                        // Only effects the display of the map.
+                        state.map.needsRefresh = true;
+                    },
+                });
             }
             // This intentionally continue on to the marker properties.
         case 'marker':
@@ -1220,6 +1268,21 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'arGame':
+            rows.push({
+                name: 'Game',
+                value: object.gameId || 'none',
+                values: ['none', 'dodger', 'hota', 'target', 'targetFPS'],
+                onChange(gameId: ARGameID|'none') {
+                    if (gameId === 'none') {
+                        delete object.gameId;
+                    } else {
+                        object.gameId = gameId;
+                    }
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'crystalSwitch':
             rows.push({
                 name: 'element',
@@ -1261,6 +1324,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
         case 'heavyFloorSwitch':
+            rows.push({
+                name: 'isInverted',
+                value: object.isInverted ?? false,
+                onChange(isInverted: boolean) {
+                    object.isInverted = isInverted;
+                    updateObjectInstance(state, object);
+                },
+            });
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'indicator': {
@@ -1841,13 +1912,13 @@ export function selectSingleObject(state: GameState, editingState: EditingState,
     editingState.needsRefresh = true;
 }
 
-export function onMouseUpSelectObject(state: GameState, editingState: EditingState, x: number, y: number): boolean {
+export function onMouseUpSelectObject(state: GameState, editingState: EditingState, x: number, y: number, isMouseOverCanvas: boolean): boolean {
     delete editingState.dragObject;
     if (editingState.dragged) {
         delete editingState.dragged;
         return false;
     }
-    if (!isPointInShortRect(x, y, {x: 0, y: 0, w: CANVAS_WIDTH / editingState.areaScale, h: CANVAS_HEIGHT / editingState.areaScale})) {
+    if (!isMouseOverCanvas) {
         return false;
     }
     const clickedObject = getObjectDirectlyUnderPoint(state, editingState, x, y);

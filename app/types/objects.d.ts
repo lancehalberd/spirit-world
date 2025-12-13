@@ -88,6 +88,9 @@ interface BaseFieldInstance {
     // isActiveArea will be set to false when this object is being initialized in an inactive area,
     // for example areas initialized when drawing maps.
     onInitialize?: (state: GameState, isActiveArea: boolean) => void
+    // Flag used to prevent reinitializing objects when they are moved between area instances
+    // during are logic refreshes.
+    isInitialized?: boolean;
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
@@ -506,6 +509,9 @@ interface BaseSwitchDefinition extends BaseObjectDefinition {
 interface FloorSwitchDefinition extends BaseSwitchDefinition {
     type: 'floorSwitch' | 'heavyFloorSw'
     toggleOnRelease?: boolean
+    // If this is set, the switch will turn off the flag tied to
+    // its ID.
+    isInverted?: boolean
 }
 
 interface HeavyFloorSwitchDefinition extends BaseSwitchDefinition {
@@ -536,9 +542,10 @@ interface CrystalSwitchDefinition extends BaseSwitchDefinition {
 }
 
 interface EntranceDefinition extends BaseObjectDefinition {
-    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter' | 'helixTop'
+    type:  'door' | 'ladder' | 'pitEntrance' | 'staffTower' | 'teleporter' | 'helixTop' | 'dreamPod'
     targetZone?: string
     targetObjectId?: string
+    mapIcon?: MapIcon
     // This can be set to force a door to be open if the logic is true.
     openLogic?: LogicDefinition
     // If this logic is present and true, the door is frozen until the unfrozen flag is set.
@@ -573,16 +580,23 @@ interface NPCDefinition extends BaseObjectDefinition {
     // If this NPC stores dialogue directly on it, then this dialogueIndex
     // should be set to a unique identifier that can be used to look it up
     // and is used when tracking whether the player has read this dialogue.
-    dialogueIndex?: number
+    // -1 can be used for dialogue that isn't stored and should always appear fresh.
+    // null can be used for dialoge that isn't stored and should always appear stale.
+    dialogueIndex?: number|null
 }
 
-type SimpleObjectType = 'airBubbles' | 'arGame' | 'beadGrate' | 'bell' | 'cathode'
+type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret' | 'jadeChampion'
     | 'peachTree' | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'torch' | 'trampoline' | 'vineSprout';
 
 interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType
+}
+
+interface ARGameDefinition extends BaseObjectDefinition {
+    type: 'arGame'
+    gameId?: ARGameID
 }
 
 interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
@@ -688,6 +702,7 @@ type ObjectDefinition = SimpleObjectDefinition
     | DirectionalObjectDefinition
     | AirStreamDefinition
     | AnodeDefinition
+    | ARGameDefinition
     | BallGoalDefinition
     | BeadCascadeDefinition
     | BossObjectDefinition

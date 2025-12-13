@@ -1,21 +1,22 @@
 import {
     createAreaInstance, getAreaFromLocation, linkObjects, setConnectedAreas,
 } from 'app/content/areas';
-import { zones } from 'app/content/zones';
-import { editingState } from 'app/development/editingState';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { removeTextCue } from 'app/content/effects/textCue';
-import { cleanupHeroFromArea, updateAreaSection } from 'app/utils/area'
-import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { fixCamera } from 'app/utils/fixCamera';
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
-import { removeObjectFromArea } from 'app/utils/objects';
+import {zones} from 'app/content/zones';
+import {editingState} from 'app/development/editingState';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {removeTextCue} from 'app/content/effects/textCue';
+import {cleanupHeroFromArea, getAreaSectionInstanceForPoint, updateAreaSection} from 'app/utils/area'
+import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {fixCamera} from 'app/utils/fixCamera';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
+import {removeObjectFromArea} from 'app/utils/objects';
 
 interface OptionalEnterLocationParams {
     instant?: boolean
     callback?: () => void
     isMutation?: boolean
+    isEndOfTransition?: boolean
     doNotRefreshEditor?: boolean
     preserveZoneFlags?: boolean
 }
@@ -26,6 +27,7 @@ export function enterLocation(
     {
         callback,
         instant = false,
+        isEndOfTransition = false,
         isMutation = false,
         doNotRefreshEditor = false,
         preserveZoneFlags = false,
@@ -50,14 +52,24 @@ export function enterLocation(
             time: 0,
             type: 'fade',
         };
+        const newZone = zones[location.zoneKey];
+        const {w, h} = newZone.areaSize ?? {w: 32, h: 32};
+        // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
+        // returns false for points on the edge of the rectangle.
+        const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
+        const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
         if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
             state.transitionState.type = 'diving';
             state.transitionState.nextAreaInstance = state.underwaterAreaInstance;
+            state.transitionState.nextAreaSection = getAreaSectionInstanceForPoint(state, newZone, state.underwaterAreaInstance.definition, x, y);
             state.hero.vx = state.hero.vy = 0;
         } else if (state.zone.surfaceKey === location.zoneKey) {
             state.transitionState.type = 'surfacing';
             state.transitionState.nextAreaInstance = state.surfaceAreaInstance;
+            state.transitionState.nextAreaSection = getAreaSectionInstanceForPoint(state, newZone, state.surfaceAreaInstance.definition, x, y);
             state.hero.vx = state.hero.vy = 0;
+            //console.log(state.transitionState.nextAreaSection);
+            //console.log(state.transitionState.nextAreaSection.isFoggy);
         } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
         } else if (state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
@@ -115,8 +127,8 @@ export function enterLocation(
         x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y % state.areaGrid.length].length,
     };
     state.location = getFullZoneLocation(state.location);
-    const area = getAreaFromLocation(state.location);
-    const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
+
+    const alternateLocation = {...state.location, isSpiritWorld: !state.location.isSpiritWorld};
 
     // Remove all clones on changing areas.
     if (!isMutation) {
@@ -125,10 +137,10 @@ export function enterLocation(
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
-        || createAreaInstance(state, zones[state.location.zoneKey], area, true);
+        || createAreaInstance(state, state.location, true);
 
     state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
-        || createAreaInstance(state, zones[state.location.zoneKey], alternateArea, true);
+        || createAreaInstance(state, alternateLocation, true);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);
@@ -157,8 +169,10 @@ export function enterLocation(
         }
     }
     updateAreaSection(state, !isMutation);
-    state.hotLevel = state.areaSection.isHot ? 1 : 0;
-    state.fadeLevel = (state.areaSection.dark || 0) / 100;
+    if (!isEndOfTransition) {
+        state.hotLevel = state.areaSection.isHot ? 1 : 0;
+        state.fadeLevel = (state.areaSection.dark || 0) / 100;
+    }
     fixCamera(state);
     setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);

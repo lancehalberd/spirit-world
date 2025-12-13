@@ -226,14 +226,16 @@ const jadeCityDarkEdges: TileSource = {
 
 const jadeCityDarkExtraEdges: TileSource = {
     w: 16, h: 16,
-    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 144, w: 48, h: 16}),
+    source: requireFrame('gfx/tiles/jadeCityDark.png', {x: 0, y: 144, w: 80, h: 16}),
     behaviors: {
         'all': {linkedOffset: -159},
         '0x0': { defaultLayer, solid: BITMAP_TOP_3, linkedOffset: -159 },
         '1x0': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: -159 },
         '3x0': { defaultLayer, solid: BITMAP_BOTTOM_10, ledges: { down: true }, linkedOffset: -159 },
         '4x0': { defaultLayer, solid: BITMAP_TOP_3, linkedOffset: -159  },
-    }, tileCoordinates: [[0,0], [1,0],     [3,0], [4,0]]
+    }, tileCoordinates: [
+        [0,0], [1,0],     [3,0], [4,0]
+    ],
 }
 
 

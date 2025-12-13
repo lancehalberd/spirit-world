@@ -1,15 +1,18 @@
-import { LaserBeam } from 'app/content/effects/laserBeam';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import {drawJitteryLaser, LaserBeam} from 'app/content/effects/laserBeam';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {
     sentryBotAnimations,
 } from 'app/content/enemyAnimations';
-import { lifeLootTable } from 'app/content/lootTables';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { addEffectToArea } from 'app/utils/effects';
+import {lifeLootTable} from 'app/content/lootTables';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {addEffectToArea} from 'app/utils/effects';
 import {
     paceAndCharge,
 } from 'app/utils/enemies';
-import { getEndOfLineOfSight, getVectorToNearbyTarget } from 'app/utils/target';
+import {invlerp} from 'app/utils/index'
+import {getEndOfLineOfSight, getVectorToNearbyTarget} from 'app/utils/target';
+import Random from 'app/utils/Random';
+import {playAreaSound} from 'app/musicController';;
 
 
 const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = false): boolean => {
@@ -31,6 +34,8 @@ const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = fal
 };
 
 const chargeTime = 400;
+const darkRed = '#800', red = '#F00';
+const chargeColor = [darkRed, red];
 
 enemyDefinitions.sentryBot = {
     naturalDifficultyRating: 12,
@@ -66,11 +71,14 @@ enemyDefinitions.sentryBot = {
             if (enemy.modeTime === chargeTime - 180) {
                 const cx = hitbox.x + hitbox.w / 2;
                 const cy = hitbox.y + hitbox.h / 2;
+                playAreaSound(state, enemy.area, 'laser');
                 addEffectToArea(state, enemy.area, new LaserBeam({
                     sx: cx, sy: cy,
                     tx: enemy.params.targetX, ty: enemy.params.targetY,
-                    radius: 5, damage: 4, duration: 200,
+                    radius: 3, damage: 4, duration: 200,
                     source: enemy,
+                    visualPadding: 1,
+                    drawLaser: drawJitteryLaser
                 }));
             }
             if (enemy.modeTime === chargeTime) {
@@ -87,23 +95,28 @@ enemyDefinitions.sentryBot = {
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         const hitbox = enemy.getHitbox(state);
         if (enemy.shielded) {
-            context.strokeStyle = 'yellow';
             context.save();
+                context.strokeStyle = '#FF0';
                 context.globalAlpha *= (0.7 + 0.3 * Math.random());
                 context.beginPath();
                 context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, 16, 0, 2 * Math.PI);
                 context.stroke();
             context.restore();
         }
-        if (enemy.mode === 'prepareLaser') {
-            const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
-            drawTargetingLine(context, state, enemy, x,  y, 'yellow');
-        } else if (enemy.mode === 'fireLaser') {
-            const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
-            if (enemy.modeTime < chargeTime - 180) {
-                drawTargetingLine(context, state, enemy, x, y, 'red');
-            }
-        }
+		if (enemy.mode === 'prepareLaser') {
+			const radius = Math.ceil(invlerp(0, 400, enemy.modeTime)*6) ?? 6;
+            const color = (radius > 3) ? Random.element(chargeColor) : darkRed;
+			drawLaserCharge(context, state, enemy, color, radius);
+			const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
+			drawTargetingLine(context, state, enemy, x,  y, darkRed);
+		} else if (enemy.mode === 'fireLaser') {
+			const radius = 6;
+			drawLaserCharge(context, state, enemy, Random.element(chargeColor), radius);
+			const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
+			if (enemy.modeTime < chargeTime - 180) {
+				drawTargetingLine(context, state, enemy, x, y, red);
+			}
+		}
     },
 };
 
@@ -123,4 +136,19 @@ function drawTargetingLine(
         context.lineTo(targetX, targetY);
         context.stroke();
     context.restore();
+}
+function drawLaserCharge(
+    context: CanvasRenderingContext2D, state: GameState,
+    enemy: Enemy, color: string, Radius: number
+): void {
+	context.save();
+		const hitbox = enemy.getHitbox(state);
+		const cx = (hitbox.x + hitbox.w / 2) | 0;
+		const cy = (hitbox.y + hitbox.h / 2) | 0;
+		context.globalAlpha *= 0.8;
+		context.fillStyle = color;
+		context.beginPath();
+		context.arc(cx, cy, Radius, 0, 2 * Math.PI);
+		context.fill();
+	context.restore();
 }

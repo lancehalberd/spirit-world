@@ -113,10 +113,12 @@ export class JadeChampion implements Actor, ObjectInstance  {
                 return;
             }
         }
-        if (isFlameBeastEncounter(state, this.area.alternateArea)) {
+        if (isFlameBeastEncounter(state, this.area)) {
             updateJadeChampionFlameBeast(state, this);
-        } else if (isStormBeastEncounter(state, this.area.alternateArea)) {
+        } else if (isStormBeastEncounter(state, this.area)) {
             updateJadeChampionStormBeast(state, this);
+        } else {
+            console.warn('Unrecognized encounter for Jade Champion.');
         }
         if (this.mode === 'usePotion') {
             if (this.modeTime === 1000) {

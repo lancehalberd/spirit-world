@@ -57,6 +57,10 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = false): boolean {
+    if (!logic) {
+        console.error('Missing logic. This can happen if a used logic key was removed from the logicHash');
+        debugger;
+    }
     const trueResult = !isInverted, falseResult = !!isInverted;
     if  (logic === false) {
         return falseResult;
@@ -77,13 +81,21 @@ export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = f
         return logic.logicChecks.some(logicCheck => isLogicValid(state, logicCheck)) ? trueResult : falseResult;
     }
     for (const requiredFlag of (logic?.requiredFlags || [])) {
+        if (requiredFlag === '') {
+            console.warn('Found empty required flag in logic.');
+            continue;
+        }
         if (requiredFlag[0] === '$') {
             if (!isItemLogicTrue(state, requiredFlag.substring(1))) {
                 return falseResult;
             }
             continue;
         }
-        if (!state.savedState.objectFlags[requiredFlag] && !state.savedState.zoneFlags[requiredFlag]) {
+        if (logicHash[requiredFlag]) {
+            if (!isLogicValid(state, logicHash[requiredFlag])) {
+                return falseResult;
+            }
+        } else if (!state.savedState.objectFlags[requiredFlag] && !state.savedState.zoneFlags[requiredFlag]) {
             return falseResult;
         }
     }
@@ -94,7 +106,11 @@ export function isLogicValid(state: GameState, logic: LogicCheck, isInverted = f
             }
             continue;
         }
-        if (state.savedState.objectFlags[excludedFlag] || state.savedState.zoneFlags[excludedFlag]) {
+        if (logicHash[excludedFlag]) {
+            if (isLogicValid(state, logicHash[excludedFlag])) {
+                return falseResult;
+            }
+        } else if (state.savedState.objectFlags[excludedFlag] || state.savedState.zoneFlags[excludedFlag]) {
             return falseResult;
         }
     }
@@ -304,7 +320,14 @@ export const canUseTeleporters = orLogic(hasSpiritSight, hasTrueSight);
 
 export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);
 
+export const dreamSpiritWorld: LogicCheck = orLogic(
+    {requiredFlags: ['jadePalaceTeleporterUnlocked']},
+    {requiredFlags: ['forestTempleTeleporterUnlocked']},
+    // TODO: Add remaining teleporters here once they are added.
+);
+
 export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEscaped']};
+export const someBeastDefeated = orLogic({requiredFlags: ['flameBeast']}, {requiredFlags: ['frostBeast']}, {requiredFlags: ['stormBeast']});
 export const beastsDefeated: LogicCheck = {requiredFlags: ['flameBeast', 'frostBeast', 'stormBeast']};
 
 // These logic checks should only be used during generation and are not supported during game play.
@@ -328,12 +351,6 @@ export const logicHash: {[key: string]: LogicCheck} = {
             'tombEntered', 'tombRivalRescued', 'tombRivalAvoided',
             'helixRivalIntro',
         ],
-    },
-    cocoonBossStarted: {
-        requiredFlags: ['cocoonBossStarted'],
-    },
-    cocoonBossDefeated: {
-        requiredFlags: ['cocoonBoss'],
     },
     // Normally the sleeping beasts disappear when you beat the War Temple boss, but they must also
     // disappear if the beasts escape without defeating that boss.
@@ -359,6 +376,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
         // Storm is gone after the storm beast is gone.
         excludedFlags: ['stormBeast'],
     },
+    dreamSpiritWorld,
     desertTower: (state: GameState) => {
         return !(state.hero.savedData.activeTools.staff & 2) && state.savedState.staffTowerLocation === 'desert';
     },

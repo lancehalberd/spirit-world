@@ -238,11 +238,11 @@ function mergePixelBehaviors(baseBehavior: PixelBehavior, newBehavior: PixelBeha
     if (resultMap === BITMAP_FULL) {
         return true;
     }
-    if (resultMap === BITMAP_EMPTY) {
-        return false;
-    }
     if (newBehavior) {
         resultMap = addBitmaps(resultMap, newBehavior);
+    }
+    if (resultMap === BITMAP_EMPTY) {
+        return false;
     }
     return resultMap;
 }
@@ -335,7 +335,12 @@ export function applyTileToBehaviorGrid(
         resultingBehaviors.solidMap = newSolidMap;
     }*/
     const isGround = behaviors.isGround === true || (behaviors.isGround === undefined && !behaviors.isGroundMap);
-    resultingBehaviors.solid = mergePixelBehaviors(baseBehaviors.solid, behaviors.solid, isForeground ? [] : [
+    resultingBehaviors.solid = mergePixelBehaviors(baseBehaviors.solid, behaviors.solid,
+        // Behavior layers are considered in the foreground because I like to draw them on top for clarity
+        // during editing, but `isNotSolid` still needs to apply for them to override walls.
+        isForeground
+            ? [behaviors.isNotSolid] : [
+        behaviors.isNotSolid,
         behaviors.water,
         behaviors.shallowWater,
         behaviors.cloudGround,

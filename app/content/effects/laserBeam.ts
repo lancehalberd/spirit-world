@@ -5,6 +5,7 @@ import { removeEffectFromArea } from 'app/utils/effects';
 import {isEnemyDefeated} from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
 import { getTileBehaviors} from 'app/utils/getBehaviors';
+import Random from 'app/utils/Random';
 
 
 function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {
@@ -47,17 +48,18 @@ interface Props {
     duration?: number
     tellDuration?: number
     ignoreWalls?: boolean
+	monocolor?: boolean
     damage?: number
     delay?: number
     source: Enemy
+    // How much to pad the laser's tell+appearance by which can make it easier to dodge.
+    visualPadding?: number
     beforeUpdate?: (state: GameState, laserBeam: LaserBeam) => void
+    drawLaser?: (context: CanvasRenderingContext2D, ray: Ray, alpha: number) => void
 }
 
 const FADE_DURATION = 100;
 
-// This many pixels is added to the appearance + warning box for the laser.
-// This makes it more intuitive to dodge.
-const visualPadding = 4;
 function padRay(ray: Ray, padding: number) {
     return {...ray, r: ray.r + padding};
 }
@@ -80,6 +82,8 @@ export class LaserBeam implements EffectInstance, Props {
     tellDuration = this.props.tellDuration ?? 0;
     source = this.props.source;
     beforeUpdate = this.props.beforeUpdate;
+    visualPadding = this.props.visualPadding ?? 4;
+    drawLaser = this.props.drawLaser ?? drawLaser;
     z: number = 0;
     animationTime = 0;
     done = false;
@@ -145,39 +149,19 @@ export class LaserBeam implements EffectInstance, Props {
         }
         const p = (this.animationTime - this.duration) / FADE_DURATION;
         const alpha = 1 - Math.max(0, Math.min(1, p));
-        drawLaser(context, padRay(this.getHitRay(state), visualPadding), alpha);
+        this.drawLaser(context, padRay(this.getHitRay(state), this.visualPadding), alpha);
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
        if (this.delay > 0) {
            return;
        }
        if (this.tellDuration > 0) {
-           const ray = padRay(this.getHitRay(state), visualPadding);
-           renderDamageWarning(context, {
+           const ray = padRay(this.getHitRay(state), this.visualPadding);
+            renderDamageWarning(context, {
                 ray,
                 duration: this.totalTellDuration,
                 time: this.totalTellDuration - this.tellDuration,
             });
-
-           /* const ray = this.getHitRay(state);
-            context.save();
-                context.translate(ray.x1, ray.y1);
-                const dx = ray.x2 - ray.x1;
-                const dy = ray.y2 - ray.y1;
-                const mag = Math.sqrt(dx * dx + dy *dy);
-                const theta = Math.atan2(dy, dx);
-                context.rotate(theta);
-                context.fillStyle = 'red';
-                context.globalAlpha *= 0.5;
-                context.fillRect(0, -ray.r, mag, 1);
-                context.fillRect(0, ray.r - 1, mag, 1);
-                const r = this.radius - this.tellDuration / 50;
-                if (r > 0) {
-                    context.fillRect(0, -r | 0, mag, 2 * r | 0);
-                }
-            context.restore();
-            //drawLaser(context, this.getHitRay(state), 0.1);
-            return;*/
        }
     }
 }
@@ -197,7 +181,6 @@ export function drawLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: nu
             0,
             ray.r,
         );
-
         // Add color stops
         // pink #f9c8c8 rgba(249,200,200,255)
         // red #ef3b3b rgba(239,59,59,255)
@@ -212,10 +195,37 @@ export function drawLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: nu
         gradient.addColorStop(0.8, "rgba(207,35,64,0.8)");
         gradient.addColorStop(0.98, "rgba(207,35,64,0.2)");
         gradient.addColorStop(1, "rgba(207,35,64,0)");
-
         // Set the fill style and draw a rectangle
-        context.fillStyle = gradient;
         const mag = Math.sqrt(dx * dx + dy *dy);
-        context.fillRect(0, -ray.r, mag, ray.r * 2);
+        context.fillStyle = gradient;
+		context.beginPath();
+        // Draw a circle at the start of the beam.
+        context.arc(ray.r, 0, ray.r, 0, 2 * Math.PI);
+        // Draw a rectangle starting at the mid point of the circle.
+        context.rect(ray.r, -ray.r, mag - ray.r, ray.r * 2);
+        context.fill();
+    context.restore();
+}
+
+const colorArray = ["rgba(207,35,64,0)", "rgba(207,35,64,0.2)", "rgba(207,35,64,0.8)", "rgba(239,59,59,1)", "rgba(249,200,200,1)", "rgba(249,200,200,1)", "rgba(239,59,59,1)", "rgba(207,35,64,0.8)", "rgba(207,35,64,0.2)", "rgba(207,35,64,0)"];
+const laserJitter = [0.03490, -0.03490 , 0.01745, -0.01745, 0, 0, 0];
+
+export function drawJitteryLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: number) {
+    context.save();
+        context.globalAlpha = alpha;
+        context.translate(ray.x1, ray.y1);
+        const dx = ray.x2 - ray.x1;
+        const dy = ray.y2 - ray.y1;
+        const theta = Math.atan2(dy, dx);
+		//Add some laser jitter
+        context.rotate(theta + Random.element(laserJitter));
+        const mag = Math.sqrt(dx * dx + dy *dy);
+        context.fillStyle = Random.element(colorArray);
+		context.beginPath();
+        // Draw a circle at the start of the beam.
+        context.arc(0, 0, ray.r*2, 0, 2 * Math.PI);
+        // Draw a rectangle starting at the mid point of the circle.
+        context.rect(ray.r, -ray.r, mag - ray.r, ray.r * 2);
+        context.fill();
     context.restore();
 }

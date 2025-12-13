@@ -110,7 +110,7 @@ const obsidianLedgeBits: TileSource = {
 
 const obsidianFloor: TileSource = {
     w: 16, h: 16,
-    source: requireFrame(obsidianImage, {x: 0, y: 0, w: 48, h: 64}),
+    source: requireFrame(obsidianImage, {x: 0, y: 0, w: 96, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '1x1': { defaultLayer: 'floor' },

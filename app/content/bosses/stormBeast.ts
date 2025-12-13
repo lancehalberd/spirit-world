@@ -427,7 +427,8 @@ function updateStormBeast(state: GameState, enemy: Enemy): void {
     }
     // The storm beast uses random abilities until it reaches a certain life threshold.
     if (enemy.mode === 'attackUntilDamaged') {
-        if (!enemy.activeAbility) {
+        // Don't stop attacking until at least 2 abilities have been used.
+        if (!enemy.activeAbility && enemy.modeTime > 2600) {
             enemy.changeToAnimation('idle');
             if (enemy.life <= enemy.params.attackLifeThreshold) {
                 leaveScreen(enemy);

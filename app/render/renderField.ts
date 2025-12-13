@@ -1,21 +1,21 @@
 import {renderAR} from 'app/arGames/arGame';
-import { getOrCreateAreaInstance } from 'app/content/areas';
-import { allTiles } from 'app/content/tiles';
-import { editingState } from 'app/development/editingState';
+import {getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
+import {allTiles} from 'app/content/tiles';
+import {editingState} from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
     WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
-import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
-import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
-import { drawFrame } from 'app/utils/animations';
-import { getBackgroundFrame, getBackgroundFrameIndex } from 'app/utils/area';
+import {renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas} from 'app/render/areaLighting';
+import {fogCanvas} from 'app/render/fog';
+import {renderHeroEyes, renderHeroShadow} from 'app/renderActor';
+import {drawFrame } from 'app/utils/animations';
+import {getBackgroundFrame, getBackgroundFrameIndex} from 'app/utils/area';
 import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
-import {allImagesLoaded} from 'app/utils/images';
+import {getDrawPriority} from 'app/utils/layers';
 import {getFieldInstanceAndParts} from 'app/utils/objects';
-import {requireFrame} from 'app/utils/packedImages';
 
 // This is the max size of the spirit sight circle.
 // The canvas is slightly wider to account for the circles being centered on each eye, which are 4 pixels from the center of the face.
@@ -94,10 +94,10 @@ function removeScreenShakes(context: CanvasRenderingContext2D, state: GameState)
 export function renderStandardFieldStack(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     applyScreenShakes(context, state);
         renderField(context, state, renderHero);
-        renderSurfaceLighting(context, state, state.areaInstance);
+        renderSurfaceLighting(context, state, state.areaInstance, state.nextAreaInstance);
         renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
         renderWaterOverlay(context, state);
-        renderHeatOverlay(context, state, state.areaInstance);
+        renderHeatOverlay(context, state, state.areaSection);
         renderSpiritOverlay(context, state);
         renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
         context.save();
@@ -108,7 +108,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
 }
 export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     renderField(context, state, renderHero);
-    renderSurfaceLighting(context, state, state.areaInstance);
+    renderSurfaceLighting(context, state, state.areaInstance, state.nextAreaInstance);
     renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
     renderSpiritOverlay(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
@@ -280,7 +280,7 @@ export function renderTiles(
     const layersToDraw: AreaLayer[] = [];
     for (let index = 0; index < area.layers.length; index++) {
         const layer = area.layers[index];
-        const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
+        const isForeground = getDrawPriority(layer.definition) === 'foreground';
         if (isForeground !== areaFrame.isForeground) {
             continue;
         }
@@ -503,7 +503,7 @@ export function renderField(
         // Update the canvas for displaying lights from the surface in the water area.
         state.areaInstance.checkToRedrawWaterSurface = false;
         if (state.underwaterAreaInstance) {
-            updateWaterSurfaceCanvas(state);
+            updateWaterSurfaceCanvas(state, state.underwaterAreaInstance);
         }
     }
     if (state.alternateAreaInstance.checkToRedrawTiles) {
@@ -546,7 +546,7 @@ export function renderField(
                     continue;
                 }
                 // This will use cached area instances if available.
-                const area = getOrCreateAreaInstance(state, {
+                const area = getOrCreateAreaInstanceFromLocation(state, {
                     ...state.location,
                     areaGridCoords: {x, y},
                 });
@@ -598,23 +598,12 @@ export function renderWaterOverlay(context: CanvasRenderingContext2D, state: Gam
     }
 }
 
-const fogFrame = requireFrame('gfx/effects/fog.png', {x: 0, y: 0, w: 256, h: 128});
-const [fogCanvas, fogContext] = createCanvasAndContext(256, 256);
-async function createFogTile() {
-    await allImagesLoaded();
-    const [tempCanvas, tempContext] = createCanvasAndContext(256, 256);
-    tempContext.fillStyle='rgba(255,255,255,0.5)';
-    tempContext.fillRect(0, 0, 256, 256);
-    drawFrame(tempContext, fogFrame, fogFrame);
-    drawFrame(tempContext, {...fogFrame, x: 128, w: 128}, {...fogFrame, y: 128, w: 128});
-    drawFrame(tempContext, {...fogFrame, w: 128}, {...fogFrame, x: 128, y: 128, w: 128});
-    fogContext.globalAlpha = 0.75;
-    fogContext.drawImage(tempCanvas, 0, 0, 256, 256, 0, 0, 256, 256);
-}
-createFogTile();
 //effects/fog.png 256x128 -> 256x256 then creat pattern.
 const fogV = {x: 10, y: 10};
-export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
+export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState, areaSection?: AreaSectionInstance) {
+    if (!areaSection) {
+        return;
+    }
     if (!editingState.isEditing && state.hotLevel > 0) {
         context.save();
             context.globalAlpha = 0.4 * state.hotLevel;
@@ -622,7 +611,7 @@ export function renderHeatOverlay(context: CanvasRenderingContext2D, state: Game
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
     }
-    if (!editingState.isEditing && state.areaSection?.isFoggy) {
+    if (!editingState.isEditing && areaSection?.isFoggy) {
         context.save();
             const fogPattern = context.createPattern(fogCanvas, 'repeat');
             const dx = state.camera.x - fogV.x * state.fieldTime / 1000;
@@ -1001,6 +990,8 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                     patternContext.restore();
                     renderAreaLighting(patternContext, state, state.transitionState.nextAreaInstance);
                     renderSurfaceLighting(patternContext, state, state.transitionState.nextAreaInstance);
+                } else {
+                    renderHeatOverlay(patternContext, state, state.transitionState.nextAreaSection);
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
@@ -1066,10 +1057,6 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             context.restore();
         }
         renderAreaLighting(context, state, state.areaInstance);
-        context.save();
-            context.translate(0, dz + 24);
-            renderSurfaceLighting(context, state, state.areaInstance);
-        context.restore();
         return;
     } else if (state.transitionState.type === 'mutating') {
         if (!state.transitionState.nextAreaInstance) {
@@ -1095,7 +1082,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 updateLightingCanvas(area);
                 drawRemainingFrames(state, area);
                 if (state.underwaterAreaInstance) {
-                    updateWaterSurfaceCanvas(state);
+                    updateWaterSurfaceCanvas(state, area);
                 }
             }
             // Draw the field, enemies, objects and hero.
@@ -1108,7 +1095,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             renderAreaObjectsAfterHero(underContext, state, area);
             renderSurfaceLighting(underContext, state, area);
             renderFieldForeground(underContext, state, area);
-            renderHeatOverlay(underContext, state, area);
+            renderHeatOverlay(underContext, state, state.transitionState.nextAreaSection);
             renderAreaLighting(underContext, state, area);
         }
         /*const offsets = [0, 4, 2, 6, 1, 5, 3, 7];
@@ -1144,7 +1131,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
                 renderArea(patternContext, state, state.alternateAreaInstance, true);
-                renderHeatOverlay(patternContext, state, state.alternateAreaInstance);
+                renderHeatOverlay(patternContext, state, state.alternateAreaSection);
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
             context.save();

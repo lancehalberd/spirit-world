@@ -123,9 +123,11 @@ export class CrystalSwitch implements ObjectInstance {
         return { pierced: true, hit: true };
     }
     activate(state: GameState): void {
-        if (this.status !== 'active' || (this.timeLimit && this.timeLeft < this.timeLimit - 200)) {
-            playAreaSound(state, this.area, 'activateCrystalSwitch');
+        // Do nothing if this switch is already active and cannot be re-activated.
+        if (this.status === 'active' && !(this.timeLimit && this.timeLeft < this.timeLimit - 200)) {
+            return;
         }
+        playAreaSound(state, this.area, 'activateCrystalSwitch');
         this.status = 'active';
         saveObjectStatus(state, this.definition);
         this.animationTime = 0;

@@ -7,6 +7,7 @@ import {
     hasBossWeapon,
     hasGloves,
     hasSpiritBarrier,
+    hasSpiritSight,
     canRemoveLightStones,
     hasSomersault,
     hasTeleportation,
@@ -19,8 +20,8 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonEntrance',
         paths: [
-            {nodeId: 'cocoon4NW', logic: andLogic(canUseTeleporters, hasBossWeapon)},
-            {nodeId: 'cocoon4NE', logic: andLogic(canUseTeleporters, hasBossWeapon)},
+            {nodeId: 'cocoon4NW', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
+            {nodeId: 'cocoon4NE', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
         ],
         entranceIds: ['cocoonEntrance'],
         exits: [{objectId: 'cocoonEntrance'}],
@@ -112,12 +113,12 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoonBoss',
-        checks: [
-            {objectId: 'cocoonBoss', logic: hasAstralProjection},
-            {objectId: 'cocoonSilver', logic: orLogic(hasTeleportation, hasSomersault) },
+        paths: [
+            {nodeId: 'dreamMain', logic: hasTeleportation},
         ],
-        npcs: [
-            {loot: {type: 'dialogueLoot', id: 'cocoonGuardianPostBoss', lootType: 'teleportation'}},
+        checks: [
+            {objectId: 'cocoonBoss', logic: hasSpiritSight},
+            {objectId: 'cocoonSilver', logic: orLogic(hasTeleportation, hasSomersault) },
         ],
     },
 ];

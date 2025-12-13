@@ -1,5 +1,6 @@
 import {Blast} from 'app/content/effects/blast';
 import {growingThornsAbility} from 'app/content/enemyAbilities/growingThorns';
+import {Enemy} from 'app/content/enemy';
 import {stationaryChargedLightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
 import {fastVolcanoAbility, volcanoAbility} from 'app/content/enemyAbilities/volcano';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
@@ -8,6 +9,7 @@ import {addEffectToArea} from 'app/utils/effects';
 import {getVectorToNearbyTarget} from 'app/utils/target';
 import {omniAnimation} from 'app/content/enemyAnimations';
 import {createAnimation} from 'app/utils/animations';
+import {addObjectToArea} from 'app/utils/objects';
 
 const plantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 12} };
 
@@ -58,8 +60,43 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
     recoverTime: 200,
 };
 
-
-
+export const spawnBeetleAbility: EnemyAbility<boolean> = {
+    // This skill will only be used when there is no nearby target.
+    getTarget(this: void, state: GameState, enemy: Enemy): boolean {
+        return !getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
+        enemy.changeToAnimation('prepare');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: boolean): void {
+        enemy.changeToAnimation('attack');
+        const hitbox = enemy.getHitbox();
+        const flyingBeetle = new Enemy(state, {
+            status: 'normal',
+            type: 'enemy',
+            enemyType: 'beetleWinged',
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+        });
+        const beetleHitbox = flyingBeetle.getHitbox();
+        flyingBeetle.x -= beetleHitbox.w / 2;
+        flyingBeetle.y -= beetleHitbox.h;
+        flyingBeetle.z = enemy.z + 8;
+        flyingBeetle.vz = 4;
+        addObjectToArea(state, enemy.area, flyingBeetle);
+    },
+    // This skill has a very long cooldown
+    cooldown: 30000,
+    initialCooldown: 10000,
+    charges: 1,
+    initialCharges: 0,
+    prepTime: 400,
+    recoverTime: 200,
+    // When multiple plants are on screen, they will not use the summon ability
+    // collectively more than once every 10 seconds. This can be reduce on
+    // harder difficulties.
+    globalCooldown: 10000,
+};
 
 
 const basePlantDefinition: Partial<EnemyDefinition<any>> = {
@@ -90,13 +127,19 @@ const plantSeedBombAbility = {
 enemyDefinitions.plant = {
     ...basePlantDefinition,
     naturalDifficultyRating: 1,
-    abilities: [plantSeedBombAbility],
+    abilities: [plantSeedBombAbility, spawnBeetleAbility],
     animations: plantAnimations,
     elementalMultipliers: {'fire': 1.5},
     hybrids: {
         'elementalFlame': 'plantFlame',
         'elementalFrost': 'plantFrost',
         'elementalStorm': 'plantStorm',
+    },
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        if (hit.isThrownObject && hit.damage < enemy.life) {
+            enemy.useAbiltyFromDefinition(state, spawnBeetleAbility, true);
+        }
+        return enemy.defaultOnHit(state, hit);
     },
     initialize(state: GameState, enemy: Enemy) {
         if (enemy.difficulty > this.naturalDifficultyRating) {

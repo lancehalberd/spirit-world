@@ -1,5 +1,6 @@
 interface PackedImage extends Rect {
     originalSource: string
+    frameStrings: string[]
 }
 
 interface PackedImageData {
@@ -36,6 +37,11 @@ interface TileSource {
         // The sequence to display the source frames in.
         // Should be 2, 3 or 6 long to loop smoothly
         frameSequence: number[]
+        // The rect originally used for loading the first frames from
+        // prior to any changes made for packing. Using this makes sure that
+        // the coordinates requested for animated frames don't change based
+        // on the packed coordinates of the original frames.
+        originalRect: Rect
         // The offset between each frame in tiles.
         offset: Point
     }
@@ -52,7 +58,7 @@ interface NineSlice {
     }[]
 }
 
-type MapIcon = 'door' | 'chest' | 'down' | 'up' | 'right' | 'left';
+type MapIcon = 'door' | 'chest' | 'down' | 'up' | 'right' | 'left' | 'hidden';
 
 type DefaultLayer = 'water' | 'floor' | 'floor2' | 'field' | 'field2' | 'behaviors' | 'foreground' | 'foreground2';
 
@@ -302,7 +308,7 @@ interface ZoneLocation {
 }
 
 type LogicalZoneKey =
-    'overworld' | 'sky'
+    'overworld' | 'sky' | 'forest'
     // Material world towns
     | 'waterfallCave' | 'treeVillage'
     | 'holyCityInterior' | 'grandTemple'
@@ -310,13 +316,15 @@ type LogicalZoneKey =
     | 'ascentCave' | 'fertilityShrine'
     | 'peachCave' | 'bushCave' | 'frozenCave' | 'lakeTunnel' | 'treeCave'
     // Spirit world
-    | 'spiritWorld' | 'spiritSky'
+    | 'spiritWorld' | 'spiritSky' | 'spiritForest'
     // Spirit world towns
     | 'jadeCityInterior' | 'jadePalace'
     // Spirit world sub areas
     | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
     | 'peachCaveSpirit' | 'hypeCave' | 'bellCave' | 'cloneCave'
     | 'warPalaceWestRoom'
+    // Dream areas
+    | 'dream'
     // Early dungeons
     | 'tomb' | 'warTemple' | 'cocoon' | 'helix'
     // Mid dungeons
@@ -450,7 +458,12 @@ interface AreaFrame {
 }
 
 interface AreaInstance {
+    location: ZoneLocation
     alternateArea: AreaInstance
+    // Top floor underwater areas will be paired with bottom floor surface areas in the same grid location.
+    // For these pairs, the area instance will have surface/underwaterArea set appropriately.
+    surfaceArea?: AreaInstance
+    underwaterArea?: AreaInstance
     definition: AreaDefinition
     w: number
     h: number

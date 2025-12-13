@@ -29,7 +29,7 @@ import {enterLocation} from 'app/utils/enterLocation';
 import {removeElementFromArray} from 'app/utils/index';
 import {initializeAreaLayerTiles} from 'app/utils/layers';
 import {mapTile} from 'app/utils/mapTile';
-import {isMouseDown, /*isMouseOverElement*/} from 'app/utils/mouse';
+import {isMouseDown, isMouseOverElement} from 'app/utils/mouse';
 import {resetTileBehavior} from 'app/utils/tileBehavior';
 import SRandom from 'app/utils/SRandom';
 import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
@@ -178,6 +178,7 @@ document.addEventListener('mouseup', (event) => {
     }
     editingState.tileChunkKey = editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
     const [x, y] = getAreaMousePosition();
+    const isMouseOverCanvas = isMouseOverElement(mainCanvas);
     if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
         const generator = chunkGenerators[editingState.tileChunkKey];
         const {L, R, T, B} = getChunkGeneratorSelectionBounds(state, generator, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
@@ -214,7 +215,7 @@ document.addEventListener('mouseup', (event) => {
     editingState.sectionDragData = null;
     switch(editingState.tool) {
         case 'select': {
-            onMouseUpSelectObject(state, editingState, x, y);
+            onMouseUpSelectObject(state, editingState, x, y, isMouseOverCanvas);
             break;
         }
     }
@@ -511,6 +512,7 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, parentDefinition: Area
     if (tile?.behaviors?.maskFrame && !layerDefinition.grid.mask?.[y]?.[x]) {
         const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
         const parentTile = allTiles[parentDefinition.grid?.mask?.[y]?.[x]];
+        areaLayer.maskTiles = areaLayer.maskTiles || [];
         areaLayer.maskTiles[y] = areaLayer.maskTiles[y] || [];
         areaLayer.maskTiles[y][x] = mapTile(parentTile);
         area.checkToRedrawTiles = true;

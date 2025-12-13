@@ -409,11 +409,13 @@ export class ChestObject implements ObjectInstance {
     isOpen(state: GameState): boolean {
         return (!!state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
     }
-    onGrab(state: GameState) {
+    onGrab(state: GameState, direction: Direction, hero: Hero) {
+        if (hero.isAstralProjection) {
+            showMessage(state, `I can't open it with my Astral Body for some reason...`);
+            return;
+        }
         // You can only open a chest from the bottom.
-        // Surpisingly, this prevents the Astral Projection from opening chests,
-        // because the hero always faces south when meditating.
-        if (!this.definition.id || state.hero.d !== 'up') {
+        if (!this.definition.id || direction !== 'up') {
             return;
         }
         // The hero cannot open chests that they cannot see.

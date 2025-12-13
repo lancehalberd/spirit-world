@@ -72,6 +72,7 @@ interface GameState {
     surfaceAreaInstance?: AreaInstance
     underwaterAreaInstance?: AreaInstance
     areaSection?: AreaSectionInstance
+    alternateAreaSection?: AreaSectionInstance
     nextAreaInstance?: AreaInstance
     nextAreaSection?: AreaSectionInstance
     zone: Zone
@@ -84,6 +85,7 @@ interface GameState {
         // This is used for rendering the next area when diving/surfacing.
         // It is also used to avoid recreating areas when teleporting between spirit+material worlds.
         nextAreaInstance?: AreaInstance
+        nextAreaSection?: AreaSectionInstance
         // This is used to avoid recreating areas then teleporting between spirit+material worlds.
         nextAlternateAreaInstance?: AreaInstance
         time: number

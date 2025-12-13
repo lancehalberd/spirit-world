@@ -667,7 +667,7 @@ const vanaraImage = 'gfx/tiles/vanara.png';
 const vanaraStairsUp = requireFrame(vanaraImage, {x: 16, y: 208, w: 32, h: 36})
 const vanaraStairsDown = requireFrame(vanaraImage, {x: 64, y: 208, w: 32, h: 36})
 const vanaraDoorOpen = requireFrame(vanaraImage, {x: 112, y: 208, w: 32, h: 36})
-const vanaraSouthOpen = requireFrame(vanaraImage, {x: 158, y: 208, w: 32, h: 36});
+const vanaraSouthOpen = requireFrame(vanaraImage, {x: 160, y: 208, w: 32, h: 32});
 
 
 //Using cavern doors to fill in for non-existant vanara doors
@@ -1044,7 +1044,9 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
     },
     knobbyTree: {
-        ...wideSquareDoorStyle,
+        // The knobby tree entrances are a bit narrower than the normal tree entrances
+        // so it looks better to use a narrower path.
+        ...commonBaseDoorStyle,
         up: {
             doorFrame: knobbyTreeDoorOpen,
             doorClosed: knobbyTreeDoorOpen,

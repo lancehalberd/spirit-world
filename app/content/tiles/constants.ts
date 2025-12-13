@@ -321,7 +321,7 @@ export function renderBitmap(context: CanvasRenderingContext2D, tile: FullTile, 
         context.fill();
     }
 }
-const baseEmptyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, solid: false};
+const baseEmptyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderEmptyWall, isNotSolid: true};
 export const emptyWallBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 64, h: 32},
@@ -337,7 +337,7 @@ export const emptyWallBehaviors: TileSource = {
     },
     paletteTargets: [{key: 'behaviors', x: 0, y: 3}],
 };
-const baseBouncyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderBouncyWall, solid: false, touchHit: {damage: 0, source: null, knockbackForce: 0.5}};
+const baseBouncyWallBehaviors: TileBehaviors = {defaultLayer: 'behaviors', render: renderBouncyWall, solid: false, touchHit: {damage: 0, source: null, knockbackForce: 0.5, canAlwaysKnockback: true}};
 export const bouncyWallBehaviors: TileSource = {
     ...emptyTile,
     source: {image: emptyTile.source.image, x: 0, y: 0, w: 80, h: 16},

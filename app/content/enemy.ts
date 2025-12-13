@@ -664,6 +664,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }
         }
         const ability = this.abilities.find(a => a.definition === definition);
+        if (definition.globalCooldownSection === state.areaSection && definition.globalCooldownExpiration > state.fieldTime) {
+            return false;
+        }
         if (!ability || !(ability.charges > 0)) {
             return false;
         }
@@ -677,7 +680,24 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.useAbility(state, ability, target);
         return true;
     }
+    // This allows an enemy to use an ability that is not currently instantiated. This won't respect
+    // any cooldown or charge restrictions as the instance information is not stored beyond a single
+    // use. This is useful for enemy counter attacks and other circumstances where an enemy uses an
+    // ability that doesn't need any long term tracking.
+    useAbiltyFromDefinition<T>(state: GameState, ability: EnemyAbility<T>, target: T) {
+        const abilityInstance = {
+            definition: ability,
+            charges: 1,
+            cooldown: 0,
+        };
+        this.useAbility(state, abilityInstance, target);
+    }
     useAbility(state: GameState, ability: EnemyAbilityWithCharges, target: any) {
+        const definition = ability.definition;
+        if (definition.globalCooldown) {
+            definition.globalCooldownSection = state.areaSection;
+            definition.globalCooldownExpiration = state.fieldTime + definition.globalCooldown;
+        }
         ability.charges--;
         this.activeAbility = {
             definition: ability.definition,
@@ -907,11 +927,15 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.flying) {
             if (this.enemyDefinition.updateFlyingZ) {
                 this.enemyDefinition.updateFlyingZ(state, this);
-            } else if (this.z < 12) {
-                this.z = Math.min(12, this.z + 2);
-                return;
-            } else if (this.z > 12) {
-                this.z = Math.max(12, this.z - 2);
+            } else {
+                // Adjust target vz value to reach goal.
+                const targetVz =  Math.max(-1, Math.min(1, 12 - this.z));
+                if (this.vz > targetVz) {
+                    this.vz = Math.max(targetVz, this.vz - 0.3);
+                } else if (this.vz < targetVz) {
+                    this.vz = Math.min(targetVz, this.vz + 0.5);
+                }
+                this.z += this.vz;
             }
         }
         this.healthBarTime += FRAME_LENGTH;

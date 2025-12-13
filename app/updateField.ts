@@ -31,9 +31,9 @@ export function updateField(this: void, state: GameState) {
     }
     const targetFadeLevel = Math.max(state.areaSection?.dark ?? 0, state.nextAreaSection?.dark ?? 0) / 100;
     if (state.fadeLevel < targetFadeLevel) {
-        state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
+        state.fadeLevel = Math.min(state.fadeLevel + 0.01, targetFadeLevel);
     } else if (state.fadeLevel > targetFadeLevel){
-        state.fadeLevel = Math.max(state.fadeLevel - 0.05, targetFadeLevel);
+        state.fadeLevel = Math.max(state.fadeLevel - 0.01, targetFadeLevel);
     }
     const targetHotLevel = ((!state.nextAreaSection && state.areaSection?.isHot) || state.nextAreaSection?.isHot) ? 1 : 0;
     if (state.hotLevel < targetHotLevel) {

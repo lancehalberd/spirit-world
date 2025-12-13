@@ -13,7 +13,7 @@ export class ARGame implements ObjectInstance {
     charge = 1;
     chargeStage = 0;
     status: ObjectStatus = 'normal';
-    constructor(state: GameState, public definition: SimpleObjectDefinition) {}
+    constructor(state: GameState, public definition: ARGameDefinition) {}
     getBehaviors(state: GameState): TileBehaviors {
         if (!this.isVisible(state)) {
             return {}
@@ -33,8 +33,8 @@ export class ARGame implements ObjectInstance {
             return;
         }
         state.arState.scene = 'choose';
-        if (this.definition.id === 'heroesAR') {
-            state.arState.scene = 'hota';
+        if (this.definition.gameId) {
+            state.arState.scene = this.definition.gameId;
         }
         showMessage(state, '{@arGame.start}');
     }

@@ -70,6 +70,10 @@ export class StaffTower implements ObjectInstance {
         this.balcony = new Balcony(this);
         this.top = new StaffTowerTop(this);
     }
+    // Make sure door area gets set as soon as this object is added to an area.
+    onInitialize(state: GameState) {
+        this.door.area = this.area;
+    }
     collapse(state: GameState) {
         this.specialStatus = 'collapsing';
         this.animationTime = 0;
@@ -184,7 +188,6 @@ export class StaffTower implements ObjectInstance {
         } else {
             // Do not update the door during the animations, it might overlap the character
             // and trigger entering the door.
-            this.door.area = this.area;
             this.door.update(state);
         }
         // Need to udpate the door during animations that move the tower.
@@ -426,7 +429,6 @@ export class StaffTowerTop implements ObjectInstance {
                     drawFrameContentAt(context, {...staffTowerFrame, h: 200}, this.staffTower);
                 }
             }
-            this.staffTower.door.area = this.staffTower.area;
             this.staffTower.door.render(context, state);
         context.restore();
     }

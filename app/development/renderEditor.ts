@@ -276,7 +276,7 @@ function drawBrushLayerPreview(
                 // layer tile if present.
                 const defaultTile = allTiles[defaultBrush.tiles[y]?.[x]];
                 const defaultLayer = defaultTile ? (defaultTile.behaviors?.defaultLayer ?? 'floor') : 'field';
-                if (defaultLayer === layerKey) {
+                if (layer && defaultLayer === layerKey) {
                     // Assign the default tile to the base or mask tile based on its behavior.
                     if (defaultTile?.behaviors?.maskFrame) {
                         tile = allTiles[layer.grid.tiles[ty]?.[tx]];

@@ -32,6 +32,13 @@ interface EnemyAbility<T> {
     cancelsOtherAbilities?: boolean
     // If true thisa bility cannot be canceled by other abilities.
     cannotBeCanceled?: boolean
+    // How often this ability can be used globally across all enemies in the current area section.
+    globalCooldown?: number
+    // Track which area section the global cooldown was set in, if this doesn't match the
+    // current area section, the cooldown is ignored.
+    globalCooldownSection?: AreaSectionInstance
+    // When set, this skill cannot be used normally again until this time.
+    globalCooldownExpiration?: number
 }
 
 // A particular instance of an enemy using an ability. This is stored

@@ -8,6 +8,7 @@ export * from 'app/content/objects/bell';
 export * from 'app/content/objects/crystalSwitch';
 export * from 'app/content/objects/decoration';
 export * from 'app/content/objects/door';
+export * from 'app/content/objects/dreamPod';
 export * from 'app/content/objects/elevator';
 export * from 'app/content/objects/escalator';
 export * from 'app/content/objects/flameTurret';
