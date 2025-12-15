@@ -5,12 +5,12 @@ import {
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
     BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
 } from 'app/content/bitMasks';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { createAnimation } from 'app/utils/animations';
-import { requireFrame } from 'app/utils/packedImages';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {createAnimation, drawFrameAt} from 'app/utils/animations';
+import {requireFrame} from 'app/utils/packedImages';
 
-import { rareLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { editingState } from 'app/development/editingState';
+import {rareLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable} from 'app/content/lootTables';
+import {editingState} from 'app/development/editingState';
 
 
 export function singleTileSource(
@@ -350,17 +350,18 @@ export const bouncyWallBehaviors: TileSource = {
     },
 };
 
-
+const [iceGrenade] = createAnimation('gfx/effects/iceGrenade.png', {w: 16, h: 16}, {x: 1}).frames;
 export const frozenTile: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
     behaviors: {'all': {
         isGround: true, isFrozen: true, slippery: true,
         elementTiles: {fire: 0},
-        render(context: CanvasRenderingContext2D) {
+        render(context: CanvasRenderingContext2D, tile: FullTile, {x, y}: Point) {
             if (!editingState.isEditing) {
                 return;
             }
+            drawFrameAt(context, iceGrenade, {x, y});
         },
     }},
 };

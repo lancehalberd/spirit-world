@@ -1,6 +1,7 @@
-import { getLootHelpMessage, getLootName } from 'app/content/loot';
-import { isRandomizer } from 'app/gameConstants';
-import { editingState } from 'app/development/editingState';
+import {getLootHelpMessage, getLootName} from 'app/content/loot';
+import {isRandomizer, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
+import {editingState} from 'app/development/editingState';
+import {playAreaSound} from 'app/musicController';
 
 
 
@@ -158,12 +159,22 @@ export function setRightTool(state: GameState, tool: ActiveTool): void {
 
 // Function to set the equipped boots on all copies of the hero.
 export function setEquippedBoots(state: GameState, boots: Equipment): void {
-    // If this is actually changing boots, asign the current boots to the
-    // previously equipped boots slot. This is used for swapping back to cloud boots
-    // while underwater.
-    if (state.hero.savedData.equippedBoots !== boots) {
-        state.hero.savedData.previousBoots = state.hero.savedData.equippedBoots;
+    // Do nothing if these boots are already equipped.
+    if (state.hero.savedData.equippedBoots === boots) {
+        return;
     }
+    const delta = state.hero.savedData.equippedBoots === 'cloudBoots' ? MAX_FLOAT_HEIGHT : 0;
+    // Player cannot change boots unless they are "on the ground".
+    // This makes it so they can't toggle boots off/on repeatedly
+    // to swim over pits without surfacing.
+    // You can always put on iron boots in order to start sinking when floating under water.
+    if (boots !== 'ironBoots' && state.hero.z > state.hero.groundHeight + delta) {
+        playAreaSound(state, state.hero.area, 'error');
+        return;
+    }
+    // Assign the current boots to the previously equipped boots slot.
+    // This is used for swapping back to cloud boots while underwater.
+    state.hero.savedData.previousBoots = state.hero.savedData.equippedBoots;
     for (const hero of [state.hero, ...state.hero.clones]) {
         hero.savedData.equippedBoots = boots;
     }

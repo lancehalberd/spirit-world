@@ -452,6 +452,7 @@ export function createAreaInstance(state: GameState, location: ZoneLocation, isA
         neutralTargets: [],
         enemies: [],
         objectsToRender: [],
+        needsIceRefresh: true,
     };
     // Don't attempt to inherit layers if they are not defined in the parent. This can
     // happen in spirit areas that are not connected to the material world.

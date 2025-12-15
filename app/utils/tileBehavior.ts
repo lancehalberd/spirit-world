@@ -5,6 +5,7 @@ import {getDrawPriority} from 'app/utils/layers';
 // This is useful when an object in a tile was overriding the tile behavior beneath it and we need to
 // reconstruct the original behavior after the object is removed.
 export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
+    const wasFrozen = !!area.behaviorGrid[y]?.[x]?.isFrozen;
     delete area.behaviorGrid?.[y]?.[x];
     for (const layer of area.layers) {
         if (layer.definition.disableBehaviors) {
@@ -41,8 +42,30 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, behaviors, isForeground);
         }
     }
-    if (area.behaviorGrid?.[y]?.[x]?.isFrozen) {
-        area.needsIceRefresh = true;
+    // Additional logic to make sure ice tiles are visually updated when necessary.
+    // Ice graphics depend on adjacent tiles so we need to update all surrounding
+    // tiles when `isFrozen` status changes for this tile.
+    if ((!!area.behaviorGrid[y]?.[x]?.isFrozen) !== wasFrozen) {
+        markTilesForIceRefresh(area, x, y);
+    }
+}
+
+// Mark any frozen tiles in a 3x3 square around the given tile as needing a graphical
+// refresh.
+export function markTilesForIceRefresh(area: AreaInstance, x: number, y: number) {
+    if (area.needsIceRefresh === true) {
+        return;
+    }
+    area.needsIceRefresh = area.needsIceRefresh ?? [];
+    for (const dy of [-1, 0, 1]) {
+        const ty = y + dy;
+        area.needsIceRefresh[ty] = area.needsIceRefresh[ty] ?? [];
+        for (const dx of [-1, 0, 1]) {
+            const tx = x + dx;
+            if (area.behaviorGrid[ty]?.[tx]?.isFrozen) {
+                area.needsIceRefresh[ty][tx] = true;
+            }
+        }
     }
 }
 

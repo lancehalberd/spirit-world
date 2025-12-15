@@ -507,7 +507,7 @@ interface AreaInstance {
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
     needsLogicRefresh?: boolean
-    needsIceRefresh?: boolean
+    needsIceRefresh?: boolean[][]|true
 }
 
 

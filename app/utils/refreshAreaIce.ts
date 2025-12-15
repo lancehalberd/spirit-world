@@ -10,11 +10,13 @@ import {requireFrame} from 'app/utils/packedImages';
 const tinyIceTiles = requireFrame('gfx/tiles/tinyIceTiles.png', {x: 0, y: 0, w: 128, h: 32});
 
 export function refreshAreaIce(state: GameState, area: AreaInstance) {
-    delete area.needsIceRefresh;
+    if (!area.needsIceRefresh) {
+        return;
+    }
     for (let ty = 0; ty < area.h; ty++) {
         for (let tx = 0; tx < area.w; tx++) {
             // Only process tiles that have been marked as dirty to prevent checking lots of unnecessary tiles.
-            if (area.tilesDrawn[ty]?.[tx]) {
+            if (area.needsIceRefresh !== true && !area.needsIceRefresh[ty]?.[tx]) {
                 continue;
             }
             const behavior = area.behaviorGrid?.[ty]?.[tx];
@@ -89,7 +91,6 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
             /*if (foundFrozenTile) {
                 continue;
             }*/
-            // If this is literally the square frozen tile, don't replace it.
             if (!topLayer) {
                 continue;
             }
@@ -144,4 +145,5 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
             resetTileBehavior(area, {x: tx, y: ty});
         }
     }
+    delete area.needsIceRefresh;
 }
