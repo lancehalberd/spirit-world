@@ -13,6 +13,7 @@ import { playAreaSound } from 'app/musicController';
 import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
 import { updateAreaSection } from 'app/utils/area';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {
     directionMap,
     getCardinalDirection,
@@ -245,9 +246,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
-    if (hero.action === 'fallen' || hero.action === 'sankInLava') {
+    // sankInLava action is no longer supported, but used to be handled here similar to 'fallen'.
+    // if (hero.action === 'sankInLava') {
+    if (hero.action === 'fallen') {
         // Special logic for falling from the sky to the overworld.
-        if (hero === state.hero && hero.action === 'fallen' && state.location.zoneKey === 'sky') {
+        if (hero === state.hero && state.location.zoneKey === 'sky') {
             // The southwest corner of the sky is over the forest tile in the overwrld, which is
             // not a valid location and represents the top right portion of the forest area.
             if (state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
@@ -304,13 +307,23 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             });
             return true;
         }
+        if (hero === state.hero && state.location.zoneKey === 'treeWater' && !state.location.isSpiritWorld) {
+            enterZoneByTarget(state, 'tree', 'treeWaterDrain', {
+                transitionType: 'fade',
+                callback: () => {
+                    hero.action = 'knocked';
+                    hero.isAirborn = true;
+                    hero.y += 48;
+                    hero.z = 40;
+                    hero.d = 'down';
+                },
+            });
+            return true;
+        }
         // Special logic for falling from the forst area into
         // the forest temple dungeon.
         // This only happens in the Spirit World.
-        if (hero === state.hero && hero.action === 'fallen'
-            && state.location.zoneKey === 'forest'
-            && state.location.isSpiritWorld
-        ) {
+        if (hero === state.hero && state.location.zoneKey === 'forest' && state.location.isSpiritWorld) {
             // Map the characters x/y coordinates from this section to
             // the x/y coordinates across the entire dungeon floor.
             // These px/py values are scaled to be 0-1 over the area that you can actually fall through
@@ -362,12 +375,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.y = hero.safeY;
             hero.justRespawned = true;
             let damage = 1;
-            if (hero.action === 'sankInLava') {
+            /*if (hero.action === 'sankInLava') {
                 damage = 8;
                 if (hero.savedData.passiveTools.fireBlessing) {
                     damage /= 2;
                 }
-            }
+            }*/
             hero.takeDamage(state, damage);
             destroyClone(state, hero);
             hero.action = null;

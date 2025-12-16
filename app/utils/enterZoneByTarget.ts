@@ -20,6 +20,7 @@ interface OptionalEnterZoneByTargetParams {
     callback?: (state: GameState) => void
     skipObject?: ObjectDefinition
     doNotFixCamera?: boolean
+    transitionType?: 'circle'|'fade'
 }
 
 export function enterZoneByTarget(
@@ -30,6 +31,7 @@ export function enterZoneByTarget(
         skipObject,
         instant = false,
         callback,
+        transitionType
     }: OptionalEnterZoneByTargetParams = {}
 ): boolean {
     const zone = zones[zoneKey];
@@ -56,6 +58,7 @@ export function enterZoneByTarget(
     enterLocation(state, objectLocation, {
         instant,
         callback: () => onEnterLocation(state, targetObjectId, {skipObject, callback}),
+        transitionType,
     });
     return true;
 }

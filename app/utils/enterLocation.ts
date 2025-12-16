@@ -19,6 +19,7 @@ interface OptionalEnterLocationParams {
     isEndOfTransition?: boolean
     doNotRefreshEditor?: boolean
     preserveZoneFlags?: boolean
+    transitionType?: 'circle'|'fade'
 }
 
 export function enterLocation(
@@ -31,6 +32,7 @@ export function enterLocation(
         isMutation = false,
         doNotRefreshEditor = false,
         preserveZoneFlags = false,
+        transitionType,
     }: OptionalEnterLocationParams = {}
 ): void {
     // Remve astral projection when switching areas.
@@ -58,7 +60,11 @@ export function enterLocation(
         // returns false for points on the edge of the rectangle.
         const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
         const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
-        if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
+        if (transitionType === 'circle') {
+            state.transitionState.type = 'circle';
+        } else if (transitionType === 'fade') {
+            state.transitionState.type = 'fade';
+        } else if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
             state.transitionState.type = 'diving';
             state.transitionState.nextAreaInstance = state.underwaterAreaInstance;
             state.transitionState.nextAreaSection = getAreaSectionInstanceForPoint(state, newZone, state.underwaterAreaInstance.definition, x, y);
