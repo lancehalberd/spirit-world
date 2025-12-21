@@ -4,10 +4,17 @@ import {
     iceRightAnimation,
     iceTopAnimation,
 } from 'app/content/animations/iceOverlay';
-import type { Door } from 'app/content/objects/door';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { debugCanvas } from 'app/utils/canvas';
-import { requireFrame } from 'app/utils/packedImages';
+import type {Door} from 'app/content/objects/door';
+import {
+    createAnimation,
+    drawFrame,
+    drawFrameAt,
+    drawFrameContentAt,
+    drawFrameContentReflectedAt,
+    getFrame,
+} from 'app/utils/animations';
+import {debugCanvas} from 'app/utils/canvas';
+import {requireFrame} from 'app/utils/packedImages';
 
 
 interface DoorStyleFrames {
@@ -29,12 +36,14 @@ export interface DoorStyleDefinition {
     isLadderUp?: boolean
     isLadderDown?: boolean
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
+    renderAfterHero?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames
     right?: DoorStyleFrames
     up?: DoorStyleFrames
     left?: DoorStyleFrames
     mapIcon?: MapIcon
+    getDrawPriority?: (state: GameState, door: Door) => DrawPriority|undefined
     // Possible options for dynamic map icons:
     // getMapIcon?: (state: GameState, door: Door) => void
     // renderMapIcon?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
@@ -61,11 +70,13 @@ interface V1DoorFrames {
     westDoorOpenForeground: Frame
     westDoorClosed: Frame
     westCrackedWall: Frame
+    westDoorTrim?: Frame
     eastDoorEmpty: Frame
     eastDoorEmptyForeground: Frame
     eastDoorOpen: Frame
     eastDoorOpenForeground: Frame
     eastDoorClosed: Frame
+    eastDoorTrim?: Frame
     eastCrackedWall: Frame
     southDoorEmpty: Frame
     southDoorOpen: Frame
@@ -123,6 +134,24 @@ function renderV1DoorBackground(this: void, context: CanvasRenderingContext2D, s
     }
     // There is no background frame for southern doors.
     checkToRenderFrozenDoor(context, state, door);
+}
+
+// When the hero is a render child of the door, we need to make sure the east/west trim is drawn in front of the hero, but we
+// cannot draw it in the foreground in general as it should be behind the hero when the hero stands to the south of the door trim.
+function renderV1DoorAfterHero(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames) {
+    if (door.definition.d === 'left') {
+        if (v1DoorFrames.westDoorTrim) {
+            drawFrameContentAt(context, v1DoorFrames.westDoorTrim, {x: door.x + 16, y: door.y - 2});
+        } else if (v1DoorFrames.eastDoorTrim) {
+            drawFrameContentReflectedAt(context, v1DoorFrames.eastDoorTrim, {x: door.x + 16, y: door.y - 2});
+        }
+    } else if (door.definition.d === 'right') {
+        if (v1DoorFrames.eastDoorTrim) {
+            drawFrameContentAt(context, v1DoorFrames.eastDoorTrim, {x: door.x - 16, y: door.y - 2});
+        } else if (v1DoorFrames.eastDoorTrim) {
+            drawFrameContentReflectedAt(context, v1DoorFrames.eastDoorTrim, {x: door.x - 16, y: door.y - 2});
+        }
+    }
 }
 
 function renderV1DoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames, h = 12) {
@@ -706,9 +735,9 @@ const jadeLightDoorStyle: DoorStyleDefinition = {
 
 //DARK JADE DOOR STYLE
 const jadeDarkImage = 'gfx/tiles/jadeCityDark.png';
-const jadeDarkDoorOpen = requireFrame(jadeDarkImage, {x: 96, y: 110, w: 32, h: 36})
-const jadeDarkStairsDown = requireFrame(jadeDarkImage, {x: 128, y: 110, w: 32, h: 36})
-const jadeDarkStairsUp = requireFrame(jadeDarkImage, {x: 160, y: 110, w: 32, h: 36})
+const jadeDarkDoorOpen = requireFrame(jadeDarkImage, {x: 96, y: 110, w: 32, h: 36});
+const jadeDarkStairsDown = requireFrame(jadeDarkImage, {x: 128, y: 110, w: 32, h: 36});
+const jadeDarkStairsUp = requireFrame(jadeDarkImage, {x: 160, y: 110, w: 32, h: 36});
 
 //Using cavern doors to fill in for non-existant jade doors
 const jadeDarkDoorFrames: V1DoorFrames = {
@@ -727,7 +756,10 @@ const jadeLightIntImage = 'gfx/tiles/jadeInteriorLight.png';
 const jadeLight1IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 0, w: 32, h: 32})
 const jadeLight1IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 0, w: 32, h: 32})
 const jadeLight1IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 0, w: 32, h: 32})
-const jadeLight1IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorLight.png', {x: 304, y: 0, w: 32, h: 32})
+const jadeLight1IntSouthDoor = requireFrame(jadeLightIntImage, {x: 304, y: 0, w: 32, h: 32})
+const jadeLight1IntEastTrim = requireFrame(jadeLightIntImage, {x: 336, y: 96, w: 16, h: 64});
+const jadeLight1IntEastOpen = requireFrame(jadeLightIntImage, {x: 352, y: 96, w: 16, h: 48});
+const jadeLight1IntEastClosed = requireFrame(jadeLightIntImage, {x: 368, y: 96, w: 16, h: 48});
 /*
 const jadeLight2IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 32, w: 32, h: 32})
 const jadeLight2IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 32, w: 32, h: 32})
@@ -736,6 +768,17 @@ const jadeLight2IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorLight.png', {
 */
 const jadeLight1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames, 
+    eastDoorEmpty: jadeLight1IntEastOpen,
+    eastDoorEmptyForeground: jadeLight1IntEastOpen,
+    eastDoorOpen: jadeLight1IntEastOpen,
+    eastDoorOpenForeground: jadeLight1IntEastOpen,
+    eastDoorClosed: jadeLight1IntEastClosed,
+    eastDoorTrim: jadeLight1IntEastTrim,
+    westDoorEmpty: jadeLight1IntEastOpen,
+    westDoorEmptyForeground: jadeLight1IntEastOpen,
+    westDoorOpen: jadeLight1IntEastOpen,
+    westDoorOpenForeground: jadeLight1IntEastOpen,
+    westDoorClosed: jadeLight1IntEastClosed,
     northDoorway: jadeLight1IntDoorOpen,
     southDoorEmpty: jadeLight1IntSouthDoor,
     southDoorOpen: jadeLight1IntSouthDoor,
@@ -751,8 +794,43 @@ const jadeLight2DoorFrames:  V1DoorFrames = {
 */
 
 const jadeLight1DoorStyle: DoorStyleDefinition = {
-    ...commonBaseDoorStyle,
+    getHitbox(door: Door) {
+        if (door.definition.d === 'up') {
+            return {x: door.x, y: door.y, w: 32, h: 32};
+        }
+        if (door.definition.d === 'down') {
+            return {x: door.x, y: door.y + 8, w: 64, h: 8};
+        }
+        if (door.definition.d === 'left') {
+            return {x: door.x, y: door.y + 4, w: 20, h: 56};
+        }
+        if (door.definition.d === 'right') {
+            return {x: door.x - 4, y: door.y + 4, w: 20, h: 56};
+        }
+    },
+    getPathHitbox(door: Door) {
+        if (door.definition.d === 'up') {
+            return {x: door.x + 8, y: door.y, w: 16, h: 32};
+        }
+        if (door.definition.d === 'down') {
+            return {x: door.x + 16, y: door.y + 8, w: 32, h: 8};
+        }
+        if (door.definition.d === 'left') {
+            return {x: door.x, y: door.y + 32, w: 20, h: 16};
+        }
+        if (door.definition.d === 'right') {
+            return {x: door.x - 4, y: door.y + 32, w: 20, h: 16};
+        }
+    },
+    getDrawPriority: (state, door) => {
+        if (door.definition.d === 'left' || door.definition.d === 'right') {
+            return 'sprites';
+        }
+        // Use default draw priority for doors otherwise.
+        return undefined;
+    },
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight1DoorFrames),
+    renderAfterHero: (context, state, door) => renderV1DoorAfterHero(context, state, door, jadeLight1DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight1DoorFrames),
 };
 
@@ -769,17 +847,31 @@ const jadeDarkIntImage = 'gfx/tiles/jadeInteriorDark.png';
 const jadeDark1IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 0, w: 32, h: 32})
 const jadeDark1IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 0, w: 32, h: 32})
 const jadeDark1IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 0, w: 32, h: 32})
-const jadeDark1IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 304, y: 0, w: 32, h: 32})
+const jadeDark1IntSouthDoor = requireFrame(jadeDarkIntImage, {x: 304, y: 0, w: 32, h: 32})
+const jadeDark1IntEastTrim = requireFrame(jadeDarkIntImage, {x: 336, y: 96, w: 16, h: 64});
+const jadeDark1IntEastOpen = requireFrame(jadeDarkIntImage, {x: 352, y: 96, w: 16, h: 48});
+const jadeDark1IntEastClosed = requireFrame(jadeDarkIntImage, {x: 368, y: 96, w: 16, h: 48});
 
 /*
 const jadeDark2IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 32, w: 32, h: 32})
 const jadeDark2IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 32, w: 32, h: 32})
 const jadeDark2IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 32, w: 32, h: 32})
-const jadeDark2IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorDark.png', {x: 256, y: 96, w: 64, h: 32})
+const jadeDark2IntSouthDoor = requireFrame(jadeDarkIntImage, {x: 256, y: 96, w: 64, h: 32})
 */
 
 const jadeDark1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames,
+    eastDoorEmpty: jadeDark1IntEastOpen,
+    eastDoorEmptyForeground: jadeDark1IntEastOpen,
+    eastDoorOpen: jadeDark1IntEastOpen,
+    eastDoorOpenForeground: jadeDark1IntEastOpen,
+    eastDoorClosed: jadeDark1IntEastClosed,
+    eastDoorTrim: jadeDark1IntEastTrim,
+    westDoorEmpty: jadeDark1IntEastOpen,
+    westDoorEmptyForeground: jadeDark1IntEastOpen,
+    westDoorOpen: jadeDark1IntEastOpen,
+    westDoorOpenForeground: jadeDark1IntEastOpen,
+    westDoorClosed: jadeDark1IntEastClosed,
     northDoorway: jadeDark1IntDoorOpen,
     southDoorEmpty: jadeDark1IntSouthDoor,
     southDoorOpen: jadeDark1IntSouthDoor,
@@ -795,8 +887,9 @@ const jadeDark2DoorFrames:  V1DoorFrames = {
 */
 
 const jadeDark1DoorStyle: DoorStyleDefinition = {
-    ...commonBaseDoorStyle,
+    ...jadeLight1DoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark1DoorFrames),
+    renderAfterHero: (context, state, door) => renderV1DoorAfterHero(context, state, door, jadeDark1DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark1DoorFrames),
 };
 

@@ -261,12 +261,14 @@ export function generateTileHash({ frame }: {frame: Frame}): string {
     const imageData = context.getImageData(0, 0, 16, 16).data;
     return imageData.join(',');
 }
+window.generateTileHash = generateTileHash;
 let imageMap: TileHashMap;
 export function generateTileHashMap(): TileHashMap {
     if (imageMap) {
         return imageMap;
     }
     imageMap = {};
+    window.imageMap = imageMap;
     imageMap[emptyKey] = allTiles[1];
     // don't add the null+empty tiles.
     addTilesToTileHashMap(allTiles.slice(2));
@@ -291,7 +293,9 @@ export function addTilesToTileHashMap(tiles: FullTile[]) {
             }
             continue;
         }
-        imageMap[hashKey] = tile;
+        if (!imageMap[hashKey]) {
+            imageMap[hashKey] = tile;
+        }
     }
 }
 

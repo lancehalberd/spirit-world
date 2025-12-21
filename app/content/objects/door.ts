@@ -79,6 +79,12 @@ export class Door implements ObjectInstance {
     area: AreaInstance;
     //drawPriority: DrawPriority = 'background';
     getDrawPriority(state: GameState): DrawPriority {
+        if (this.style.getDrawPriority) {
+            const drawPriority = this.style.getDrawPriority(state, this);
+            if (drawPriority) {
+                return drawPriority;
+            }
+        }
         // Upgrade the draw priority to 'sprites' when the hero is rendered by the door.
         // Otherwise the hero might be drawn behind objects on the ground, like the key block
         // in the Tomb that is right next to a door.
@@ -552,7 +558,6 @@ export class Door implements ObjectInstance {
             }
         }
         if (state.hero.renderParent == this) {
-
             if (this.area === state.nextAreaInstance) {
                 // The hero's coordinates are always relative to `this.area`, so we need to
                 // adjust by the door's camera offset if it is part of the next area during a transition.
@@ -581,6 +586,9 @@ export class Door implements ObjectInstance {
                     }
                 }
             }
+        }
+        if (this.style.renderAfterHero) {
+            this.style.renderAfterHero(context, state, this);
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
