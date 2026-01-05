@@ -1,7 +1,7 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {getLedgeDelta, updateProjectileHeight} from 'app/movement/getLedgeDelta';
-import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
+import {createAnimation, drawFrameCenteredAt, drawFrameAt, getFrame} from 'app/utils/animations';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {getDirection, hitTargets} from 'app/utils/field';
 import {getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
@@ -11,6 +11,7 @@ import {clamp} from 'app/utils/index';
 
 const flameAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3});
 const flameBrokenAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3, y: 1, loop: false});
+
 
 interface Props {
     delay?: number
@@ -160,6 +161,7 @@ export class Flame implements EffectInstance, Props {
         }
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
+            this.animationTime += FRAME_LENGTH;
             return;
         }
         this.beforeUpdate?.(state, this);
@@ -313,5 +315,64 @@ export class Flame implements EffectInstance, Props {
         context.arc(0, 0, shadowRadius, 0, 2 * Math.PI);
         context.fill();
         context.restore();
+    }
+}
+
+const fireballNorthAnimation = createAnimation('gfx/effects/fireball.png', {w: 16, h: 16, content: {x: 4, y: 0, w: 8, h: 8}}, {cols: 4});
+const fireballNortheastAnimation = createAnimation('gfx/effects/fireball.png', {w: 16, h: 16, content: {x: 7, y: 1, w: 8, h: 8}}, {y: 1, cols: 4});
+
+const fireballSize = {w: 8, h: 8};
+export class Fireball extends Flame {
+    w: number = fireballSize.w;
+    h: number = fireballSize.h;
+    update(state: GameState) {
+        if (this.destroyed) {
+            this.scale *= 0.9;
+            this.updateSize();
+        }
+        super.update(state);
+    }
+    updateSize() {
+        const w = fireballSize.w;
+        const h = fireballSize.h;
+        this.w = w * this.scale;
+        this.h = h * this.scale;
+    }
+    // Fireball hits where the flame appears, it doesn't visually appear in a different place than the hit box.
+    getHitbox() {
+        return {
+            x: (this.x - this.w / 2) | 0,
+            y: (this.y - this.z - this.h / 2) | 0,
+            w: this.w | 0,
+            h: this.h | 0,
+        };
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const direction = getDirection(this.vx, this.vy, true, 'up', 0.0001);
+        const animation = ['up', 'down', 'left', 'right'].includes(direction)
+            ? fireballNorthAnimation : fireballNortheastAnimation;
+        const frame = getFrame(animation, this.animationTime);
+        context.save();
+            context.translate(this.x, this.y - this.z);
+            context.scale(this.scale, this.scale);
+            const defaultTheta = (animation === fireballNorthAnimation) ? -Math.PI / 2 : -Math.PI / 4;
+            const targetTheta = Math.atan2(this.vy, this.vx);
+            context.rotate(targetTheta - defaultTheta);
+            drawFrameCenteredAt(context, frame, {
+                x: 0,
+                y: 0,
+                w: 0,
+                h: 0,
+            });
+        context.restore();
+        if (editingState.showHitboxes) {
+            context.strokeStyle = 'red';
+            const {x, y, w, h} = this.getHitbox();
+            context.strokeRect(x + 0.5, y + 0.5, w, h);
+        }
+    }
+
+    renderShadow(context: CanvasRenderingContext2D) {
+        // Fireball doesn't need a shadow since we don't use the z component.
     }
 }

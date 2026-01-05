@@ -1,7 +1,7 @@
 import {addBurstEffect, addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {CrystalSpike} from 'app/content/effects/arrow';
 import {Blast} from 'app/content/effects/blast';
-import {Flame} from 'app/content/effects/flame';
+import {Fireball, Flame} from 'app/content/effects/flame';
 import {Frost} from 'app/content/effects/frost';
 import {throwMineAtLocation} from 'app/content/effects/landMine';
 import {GrowingThorn} from 'app/content/effects/growingThorn';
@@ -46,6 +46,9 @@ const guardianSpiritAnimations: ActorAnimations = {
     attack: omniAnimation(guardianSpiritAttackAnimation),
     cast: omniAnimation(guardianSpiritCastAnimation),
 };
+
+// Setting this will force the boss to always use this element.
+const testElement: MagicElement = null;//'fire'
 
 interface ProjectionParams {
     element: MagicElement
@@ -166,6 +169,7 @@ enemyDefinitions.guardianProjection = {
     healthBarColor: '#6BD657', showHealthBar: true,
     floating: true,
     params: {
+        element: testElement,
     },
     onHit(this: void, state: GameState, enemy: Enemy<ProjectionParams>, hit: HitProperties): HitResult {
         if (enemy.mode === 'teleport') {
@@ -322,7 +326,7 @@ function switchElements(state: GameState, enemy: Enemy<ProjectionParams>) {
     }
     // Find the index of the current element, then cycle to the next available element.
     const index = availableElements.indexOf(enemy.params.element);
-    enemy.params.element = availableElements[(index + 1) % availableElements.length];
+    enemy.params.element = testElement || availableElements[(index + 1) % availableElements.length];
     if (enemy.params.element === elements[1]) {
         guardian.useTaunt(state, 'elements');
     } else if (enemy.params.element === elements[2]) {
@@ -368,11 +372,11 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
         });
         addEffectToArea(state, enemy.area, frost);
     } else if (enemy.params.element === 'fire') {
-        const flame = new Flame({
+        const flame = new Fireball({
             x, y,
             vx: 3 * dx,
             vy: 3 * dy,
-            damage: 1,
+            scale: 1.5,
             source: enemy,
         });
         addEffectToArea(state, enemy.area, flame);
