@@ -1,7 +1,8 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { altGolemState } from '../heroSavedStates';
+import { alterHeroData } from 'app/utils/alterHeroData';
 
-
-const aBosses: BossName[] = ["beetle", "golem", "idols", "guardian", "rush"];
+const aBosses: BossName[] = ["beetle", "golem", "idols", "guardian", "rush", "altGolem"];
 const bBosses: BossName[] = aBosses.concat(["guardian", "rival2", "forest", "rush2"])
 const cBosses: BossName[] = bBosses.concat(["flameBeast", "frostBeast", "stormBeast", "rush3"])
 const bossRushNames: {[key in BossName]: string} = {
@@ -19,6 +20,7 @@ const bossRushNames: {[key in BossName]: string} = {
     rush: "Boss Rush 1",
     rush2: "Boss Rush 2",
     rush3: "Boss Rush 3",
+    altGolem: "Challenge - Golem"
 }
 
 
@@ -33,11 +35,9 @@ export function travelToLocation(state: GameState, zoneKey: string, markerId: st
 }
 
 function startRefight(state: GameState, boss: BossName, location: string): string {
-    //console.log(state.savedState.savedHeroData.bossRushTrackers);
     state.savedState.objectFlags["bossRefight"] = true,
-    state.savedState.savedHeroData.bossRushTrackers.bossStartTime = state.hero.savedData.playTime;
-    state.savedState.savedHeroData.bossRushTrackers.currentBoss = boss;
-    //console.log(state.savedState.savedHeroData.bossRushTrackers);
+    state.bossRushTrackers.bossStartTime = state.hero.savedData.playTime;
+    state.bossRushTrackers.currentBoss = boss;
     return travelToLocation(state, 'bossRefights', location);
 }
 
@@ -45,7 +45,7 @@ function getHighScores(state: GameState, bosses: BossName[]): string {
     let highScoreReturn: string = '';
     for (const boss of bosses) {
         let time = state.savedState.savedHeroData.bossRushTimes[boss]
-        if (time >= 10000000) {
+        if (typeof time !== 'number' || !Number.isFinite(time)) {
             highScoreReturn = highScoreReturn.concat(bossRushNames[boss] + `: N/A[-]`);
         } else {
             highScoreReturn = highScoreReturn.concat(bossRushNames[boss] + `: ${Math.ceil(time / 1000)} seconds[-]`);
@@ -74,6 +74,7 @@ dialogueHash.refightVanara = {
                     |Golem:refightVanara.golem
                     |Idols:refightVanara.idols
                     |Guardian:refightVanara.guardian
+                    |Alt Golem:refightVanara.altGolem
                     |Rush:refightVanara.rush
                     |Next:refightVanara.chooseRefight2B
                     |Nevermind:refightVanara.no
@@ -96,6 +97,7 @@ dialogueHash.refightVanara = {
                     |Golem:refightVanara.golem
                     |Idols:refightVanara.idols
                     |Guardian:refightVanara.guardian
+                    |Alt Golem:refightVanara.altGolem
                     |Rush:refightVanara.rush
                     |Next:refightVanara.chooseRefight2C
                     |Nevermind:refightVanara.no
@@ -131,19 +133,24 @@ dialogueHash.refightVanara = {
         frostBeast: (state: GameState) => startRefight(state, 'frostBeast', 'frostBeastRefight'),
         stormBeast: (state: GameState) => startRefight(state,  'stormBeast', 'stormBeastRefight'),
         guardian: (state: GameState) => startRefight(state, 'guardian', 'guardianRefight'),
+        altGolem: (state:GameState) => (
+            alterHeroData(state, altGolemState),
+            state.savedState.usingBackup = true,
+            startRefight(state, 'altGolem', 'golemRefight') //WIP: make AltGolem be stored seperately from guardian in time attack
+        ),
         rush: (state: GameState) => (
             state.savedState.objectFlags["rushMode"] = true,
-            state.savedState.savedHeroData.bossRushTrackers.rushPosition = 1,
+            state.bossRushTrackers.rushPosition = 0,
             startRefight(state, 'rush', 'beetleRefight')
         ),
         rush2: (state: GameState) => (
             state.savedState.objectFlags["rushMode"] = true,
-            state.savedState.savedHeroData.bossRushTrackers.rushPosition = 2,
+            state.bossRushTrackers.rushPosition = 4,
             startRefight(state, 'rush2', 'forestTempleRefight')
         ),
         rush3: (state: GameState) => (
             state.savedState.objectFlags["rushMode"] = true,
-            state.savedState.savedHeroData.bossRushTrackers.rushPosition = 2,
+            state.bossRushTrackers.rushPosition = 7,
             startRefight(state, 'rush3', 'frostBeastRefight')
         ),
         highScoresA: (state: GameState) => {

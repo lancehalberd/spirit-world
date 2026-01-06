@@ -75,6 +75,19 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     renderARHUD(context, state);
 }
+
+function formatTime(state: GameState, isRando: boolean, seconds: number): string {
+    const hours = (seconds / 3600) | 0;
+    const minutes = ((seconds - hours * 3600) / 60) | 0;
+    seconds = seconds % 60;
+    const minutesString = `${minutes}`.padStart(2, '0');
+    const secondsString = seconds.toFixed(1).padStart(4, '0');
+    if (isRando) {
+        return `${hours}:${minutesString}:${secondsString}`;
+    }
+    else {return `${minutesString}:${secondsString}`;}
+}
+
 function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): void {
     // Draw heart backs, and fillings
     let x = 26;
@@ -233,12 +246,7 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
     if (isRandomizer) {
         // Freeze on the display of the win time once the game is completed.
         let seconds = (state.hero.savedData.winTime || state.hero.savedData.playTime) / 1000;
-        const hours = (seconds / 3600) | 0;
-        const minutes = ((seconds - hours * 3600) / 60) | 0;
-        seconds = seconds % 60;
-        const minutesString = `${minutes}`.padStart(2, '0');
-        const secondsString = seconds.toFixed(1).padStart(4, '0');
-        const timeString = `${hours}:${minutesString}:${secondsString}`;
+        const timeString = formatTime(state, true, seconds);
         const info = getCheckInfo(state);
         if (randomizerGoalType === 'victoryPoints') {
             drawOutlinedText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.victoryPoints)}`, 2, CANVAS_HEIGHT - 9 - 17, {
@@ -264,13 +272,8 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         });
     }
     if (state.savedState.objectFlags['bossRefight']) {
-        let bossSeconds = (state.hero.savedData.playTime - state.savedState.savedHeroData.bossRushTrackers.bossStartTime) / 1000;
-        const bossHours = (bossSeconds / 3600) | 0;
-        const bossMinutes = ((bossSeconds - bossHours * 3600) / 60) | 0;
-        bossSeconds = bossSeconds % 60;
-        const bossMinutesString = `${bossMinutes}`.padStart(2, '0');
-        const bossSecondsString = bossSeconds.toFixed(1).padStart(4, '0');
-        const bossTimeString = `${bossHours}:${bossMinutesString}:${bossSecondsString}`;
+        let bossSeconds = (state.hero.savedData.playTime - state.bossRushTrackers.bossStartTime) / 1000;
+        const bossTimeString = formatTime(state, false, bossSeconds)
         const timerPosition = isRandomizer ? CANVAS_HEIGHT - 43 : CANVAS_HEIGHT - 9;
         drawOutlinedText(context, bossTimeString, 2, timerPosition, {
             textBaseline: 'middle',

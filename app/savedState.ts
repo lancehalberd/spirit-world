@@ -12,6 +12,8 @@ export function getDefaultSavedState(): SavedState {
         zoneFlags: {},
         luckyBeetles: [],
         savedHeroData: getDefaultSavedHeroData(),
+        backupHeroData: getDefaultSavedHeroData(),
+        usingBackup: false,
         savedArData: {gameData: {}},
         staffTowerLocation: 'desert',
     };
@@ -81,26 +83,6 @@ function getDefaultSavedHeroData(): SavedHeroData {
         // Data from this function is considered mutable, so we need to return a copy of
         // this spawn location to avoid accidentally modifying it in the future.
         spawnLocation: cloneDeep(SPAWN_LOCATION_FULL),
-        bossRushTrackers: {
-            currentBoss: "none",
-            bossStartTime: 0,
-            rushPosition: 0,
-        },
-        bossRushTimes: {
-            none: 10000000,
-            beetle: 10000000,
-            golem: 10000000,
-            idols: 10000000,
-            guardian: 10000000,
-            rival2: 10000000,
-            forest: 10000000,
-            collector: 10000000,
-            stormBeast: 10000000,
-            flameBeast: 10000000,
-            frostBeast: 10000000,
-            rush: 10000000,
-            rush2: 10000000,
-            rush3: 10000000,
-        }
+        bossRushTimes: {},
     };
 }

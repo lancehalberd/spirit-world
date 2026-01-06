@@ -15,6 +15,7 @@ import {
 } from 'app/userInput';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame } from 'app/utils/saveGame';
+import { restoreHeroData } from 'app/utils/alterHeroData';
 
 export function updateDefeated(state: GameState) {
     if (!isGameKeyDown(state, GAME_KEY.WEAPON)) {
@@ -72,6 +73,10 @@ export function updateDefeated(state: GameState) {
 
     if (state.savedState.objectFlags['bossRefight'] ) {
         if (state.defeatState.time > 4000) {
+            if (state.savedState.usingBackup) {
+                state.savedState.usingBackup = false;
+                restoreHeroData(state);
+            }
             delete state.savedState.objectFlags['bossRefight']
             fixProgressFlagsOnLoad(state);
             fixSpawnLocationOnLoad(state);

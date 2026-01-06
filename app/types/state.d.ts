@@ -10,6 +10,8 @@ interface SavedState {
     // Flags that remain set as long as the character does not leave the current zone.
     zoneFlags: {[key: string]: boolean | number | number[] | string}
     savedHeroData: SavedHeroData
+    backupHeroData: SavedHeroData
+    usingBackup: boolean
     savedArData: SavedARState
     dungeonInventories: {
         [key: string]: DungeonInventory
@@ -163,6 +165,7 @@ interface GameState {
         renderedFloorId?: string
     }
     arState: ARState
+    bossRushTrackers: bossRushState
     travel?: (zoneKey: string, markerId: string, options?: any) => void
 }
 

@@ -3,10 +3,16 @@ import { playAreaSound } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 import { travelToLocation } from './dialogue/refightVanara';
+import { restoreHeroData } from 'app/utils/alterHeroData';
 
 const MAX_LEVEL = 2;
 
 type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
+
+let bossRushOrder: Array<string> = ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight',
+    'forestTempleRefight', 'rival2Refight', 'crystalCollectorRefight', 
+    'flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight',
+]
 
 function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
     // Non-progressive upgrades specify the exact level of the item.
@@ -97,14 +103,22 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         updateDungeonInventory(state, inventory, false);
     },
     bossRefight: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        //WIP: Will change implementation to allow for full boss rush and not force stop on certain fights
+        //Also change loot.ts
+        if (state.savedState.usingBackup) {
+            state.savedState.usingBackup = false;
+            restoreHeroData(state)
+        }
         if(!state.savedState.objectFlags['rushMode']) {
             travelToLocation(state, "dream", "bossRefightReturn");
         } else {
-            if (state.savedState.savedHeroData.bossRushTrackers.rushPosition >= 4) {
-                //state.savedState.savedHeroData.bossRushTrackers.rushPosition = 0;
+            if ([3, 6, 9].includes(state.bossRushTrackers.rushPosition)) {
                 travelToLocation(state, "dream", "bossRefightReturn");
+                state.bossRushTrackers.rushPosition += 1
+            } else {
+                state.bossRushTrackers.rushPosition += 1
+                travelToLocation(state, "bossRefights", bossRushOrder[state.bossRushTrackers.rushPosition])
             }
-            state.savedState.savedHeroData.bossRushTrackers.rushPosition += 1
         }
     },
     map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {

@@ -82,6 +82,7 @@ export function applySavedState(state: GameState, savedState: Partial<SavedState
     returnToSpawnLocation(state, true);
 }
 
+
 export function getDefaultState(): GameState {
     const state: GameState = {
         savedState: getDefaultSavedState(),
@@ -149,6 +150,11 @@ export function getDefaultState(): GameState {
         },
         travel: (zoneKey: string, markerId: string, options?: any) => {
             enterZoneByTarget(state, zoneKey, markerId, options);
+        },
+        bossRushTrackers: {
+            currentBoss: "none",
+            bossStartTime: 0,
+            rushPosition: 0,
         },
     };
     return state;
