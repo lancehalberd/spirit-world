@@ -1,4 +1,5 @@
 import { cloneDeep } from "./index";
+import { updateHeroMagicStats } from "app/render/spiritBar";
 
 export function alterHeroData(state: GameState, newHero: SavedHeroData): void {
     state.savedState.backupHeroData = cloneDeep(state.savedState.savedHeroData);
@@ -12,4 +13,6 @@ export function restoreHeroData(state: GameState): void {
     state.savedState.savedHeroData = cloneDeep(state.savedState.backupHeroData);
     state.savedState.savedHeroData.playTime = newPlayTime;
     state.hero.applySavedHeroData(state.savedState.savedHeroData);
+    updateHeroMagicStats(state);
+    delete state.savedState.backupHeroData;
 }

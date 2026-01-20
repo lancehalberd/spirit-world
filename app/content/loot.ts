@@ -481,7 +481,7 @@ const [
 const scrollGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 const [map] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 1, cols: 1}).frames;
 const [greyUpgrade, redUpgrade, blueUpgrade, /* goldUpgrade */ ] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 3, cols: 4}).frames;
-const emptyFrame = requireFrame('gfx/empty.png', {x: 0, y: 0, w: 16, h: 16 });
+const emptyFrame = requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 16, h: 16 });
 
 export const lootFrames = {
     smallKey: keyOutlineFrame,

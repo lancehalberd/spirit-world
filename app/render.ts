@@ -16,6 +16,7 @@ import { renderSettings } from 'app/scenes/settings/renderSettings';
 import { getState, shouldHideMenu } from 'app/state';
 import { mainContext } from 'app/utils/canvas';
 import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
+import { renderBossRushMenu } from './scenes/bossRush/renderBossRush';
 
 let frameDurations: number[] = [];
 export function render() {
@@ -110,6 +111,10 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
     }
     if (state.scene === 'options') {
         renderSettings(context, state);
+        return;
+    }
+    if (state.scene === 'bossRush') {
+        renderBossRushMenu(context, state);
         return;
     }
     state.lastTimeRendered = state.time;

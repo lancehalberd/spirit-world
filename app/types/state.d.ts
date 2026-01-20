@@ -46,7 +46,7 @@ interface DungeonInventory {
 
 type Scene = 'intro' | 'prologue' | 'title' | 'fileSelect'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
-    | 'game' | 'credits' | 'options';
+    | 'game' | 'credits' | 'options' | 'bossRush';
 
 
 interface GameState {

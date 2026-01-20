@@ -33,6 +33,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
 import {refreshAreaIce} from 'app/utils/refreshAreaIce';
 import { updateSoundSettings } from 'app/utils/soundSettings';
+import { updateBossRushMenu } from './scenes/bossRush/updateBossRush';
 
 let isGameInitialized = false;
 export function update() {
@@ -49,6 +50,9 @@ export function update() {
     state.time += FRAME_LENGTH;
     // Player input cannot be blocked while the game is paused, otherwise the player will be unable to unpause the game.
     if (state.paused && state.scriptEvents?.blockPlayerInput) {
+        delete state.scriptEvents?.blockPlayerInput;
+    }
+    if (state.scene === 'bossRush') {
         delete state.scriptEvents?.blockPlayerInput;
     }
     updateKeyboardState(state);
@@ -78,6 +82,10 @@ export function update() {
         }
         if (state.scene === 'options') {
             updateSettings(state);
+            return;
+        }
+        if (state.scene === 'bossRush') {
+            updateBossRushMenu(state);
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {

@@ -23,9 +23,6 @@ const bossRushNames: {[key in BossName]: string} = {
     altGolem: "Challenge - Golem"
 }
 
-
-
-
 export function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
   if (state.travel) {
     state.travel(zoneKey, markerId, {instant: false});
@@ -57,6 +54,12 @@ function getHighScores(state: GameState, bosses: BossName[]): string {
 dialogueHash.refightVanara = {
     key: 'refightVanara',
     mappedOptions: { //A is for initial set of bosses, B is for bosses unlocked after freeing the beasts, C will be for beasts
+        chooseRefight : (state: GameState) => {
+            return `{choice:Here for a fight?
+                    |Yes:refightVanara.openMenu
+                    |No:refightVanara.no
+                    }`;
+        },
         chooseRefight1A : (state: GameState) => {
             return `{choice:Fight who?
                     |Beetle:refightVanara.beetle
@@ -128,7 +131,7 @@ dialogueHash.refightVanara = {
         idols: (state: GameState) => startRefight(state, 'idols', 'warTempleRefight'),
         rival2: (state: GameState) => startRefight(state, 'rival2', 'rival2Refight'),
         forest: (state: GameState) => startRefight(state, 'forest', 'forestTempleRefight'),
-        collector: (state: GameState) => startRefight(state, 'collector', 'crystalCollectorRefight'),
+        collector: (state: GameState) => startRefight(state, 'collector', 'collectorRefight'),
         flameBeast: (state: GameState) => startRefight(state, 'flameBeast', 'flameBeastRefight'),
         frostBeast: (state: GameState) => startRefight(state, 'frostBeast', 'frostBeastRefight'),
         stormBeast: (state: GameState) => startRefight(state,  'stormBeast', 'stormBeastRefight'),
@@ -136,7 +139,7 @@ dialogueHash.refightVanara = {
         altGolem: (state:GameState) => (
             alterHeroData(state, altGolemState),
             state.savedState.usingBackup = true,
-            startRefight(state, 'altGolem', 'golemRefight') //WIP: make AltGolem be stored seperately from guardian in time attack
+            startRefight(state, 'altGolem', 'golemRefight')
         ),
         rush: (state: GameState) => (
             state.savedState.objectFlags["rushMode"] = true,
@@ -162,6 +165,10 @@ dialogueHash.refightVanara = {
         highScoresC: (state: GameState) => {
             return getHighScores(state, cBosses)
         },
+        openMenu: (state: GameState) => {
+            state.scene = 'bossRush';
+            return ''
+        },
         no: '',
     },
     options: [
@@ -175,19 +182,20 @@ dialogueHash.refightVanara = {
                     dialogueIndex: 195,
                     text: `I see you have fought many tough battles in your travels.
                     {|}If you want, I can let you reexperience any of them you want to refight.
+                    {|}See how fast you can vanquish your old foes and set a new record!
                     {flag:refightVanara}`,
                 },
             ],
         },
         {
             logicCheck: {
-                requiredFlags: ['frostBeast', 'flameBeast', 'stormBeast'],
+                requiredFlags: [],
                 excludedFlags: [],
             },
             text: [
                 {
                     dialogueIndex: 200,
-                    text:'{@refightVanara.chooseRefight1C}'
+                    text:'{@refightVanara.chooseRefight}'
                 },
             ],
         },

@@ -2054,7 +2054,7 @@ const f0_2x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "bossRefights:0:2x1-crystalCollector-0", x: 260, y: 54, type: "boss", enemyType: "crystalCollector", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", saveStatus: "zone", params: {}},
-        {status: "normal", id: "crystalCollectorRefight", x: 248, y: 168, type: "marker"},
+        {status: "normal", id: "collectorRefight", x: 248, y: 168, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 1083, mapId: 'bossRefights', floorId: '1F', mapX: 4, mapY: 2},
@@ -2318,7 +2318,7 @@ const f0_3x1: AreaDefinition = {
                     [,,,,,,,,,,849],
                     [,,,,,,,,,,,,,,,,,,,,,,,850],
                     [],
-                    [,,,,,,,,,,,,849,],
+                    [,,,,,,,,,,,,849],
                     [],
                     [],
                     [],
