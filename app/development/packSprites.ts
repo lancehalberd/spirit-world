@@ -1,7 +1,7 @@
-import {createCanvasAndContext} from 'app/utils/canvas';
-import {images} from 'app/utils/images';
+import {createCanvasAndContext, debugCanvas} from 'app/utils/canvas';
+import {awaitImage, images} from 'app/utils/images';
 import {isObjectInsideTarget, removeElementFromArray} from 'app/utils/index';
-import {framesBySource} from 'app/utils/packedImages';
+import {framesBySource, getPackedImage} from 'app/utils/packedImages';
 
 function booleanGrid(columns: number, rows: number): boolean[][] {
     const grid: boolean[][] = [];
@@ -14,7 +14,7 @@ function booleanGrid(columns: number, rows: number): boolean[][] {
     return grid;
 }
 
-export function packSprites(prefixes: string[], gridSize: number = 16, columns: number = 64, rows: number = 160, padding: number = 0): PackedImageData[] {
+export function packSprites(prefixes: string[], gridSize: number = 16, columns: number = 64, rows: number = 160, padding: number = 0): PackingImageData[] {
     const packedImages: PackingImageData[] = [];
     for (const key of Object.keys(images)) {
         // Ignore already packed images.
@@ -63,6 +63,23 @@ export function packSprites(prefixes: string[], gridSize: number = 16, columns: 
     return packedImages;
 }
 window['packSprites'] = packSprites;
+export async function refreshPackedSprite(name: string) {
+    const data = getPackedImage(name);
+    const [canvas, context] = createCanvasAndContext(data.image.width, data.image.height);
+    for (const packedImage of data.packedImages) {
+        console.log('awaiting ', packedImage.originalSource);
+        const image = await awaitImage(packedImage.originalSource);
+        const [x,y,w,h] = packedImage.frameStrings[0].split(',').map(s => Number(s));
+        context.drawImage(image,
+            x, y, w, h,
+            packedImage.x, packedImage.y, packedImage.w, packedImage.h,
+        );
+    }
+    console.log('debug canvas');
+    debugCanvas(canvas, 1);
+    return canvas;
+}
+window['refreshPackedSprite'] = refreshPackedSprite;
 
 export function serializePackedImage(packedImage: PackingImageData, name: string): string {
     return `

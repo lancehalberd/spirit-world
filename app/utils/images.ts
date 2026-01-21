@@ -1,4 +1,5 @@
 export const images: {[key: string]: HTMLImageElement} = {};
+export const imagePromises: {[key: string]: Promise<HTMLImageElement>} = {};
 
 const version = window.version;
 
@@ -11,14 +12,35 @@ function loadImage(source: string, callback: () => void): HTMLImageElement {
 
 let startedLoading = false;
 let numberOfImagesLeftToLoad = 0;
-export function requireImage(imageFile: string, callback?: () => void): HTMLImageElement {
-    if (images[imageFile]) return images[imageFile];
-    startedLoading = true;
-    numberOfImagesLeftToLoad++;
-    return loadImage(imageFile, () => {
-        callback?.();
-        numberOfImagesLeftToLoad--;
-    });
+export function requireImage(imageFile: string, callback?: (image: HTMLImageElement) => void): HTMLImageElement {
+    if (images[imageFile]) {
+        // images[imageFile] will be populated as soon as the image starts loading, so we still need
+        // to wait on the promise before calling the callback in this case to make sure we
+        // only make the callback when the image has finished loading.
+        if (callback) {
+            awaitImage(imageFile).then(callback);
+        }
+        return images[imageFile];
+    }
+    const promise = awaitImage(imageFile);
+    if (callback) {
+        promise.then(callback);
+    }
+    return images[imageFile];
+}
+
+export async function awaitImage(imageFile: string): Promise<HTMLImageElement> {
+    if (!imagePromises[imageFile]) {
+        imagePromises[imageFile] = new Promise<HTMLImageElement>((resolve, reject) => {
+            startedLoading = true;
+            numberOfImagesLeftToLoad++;
+            loadImage(imageFile, () => {
+                resolve?.(images[imageFile]);
+                numberOfImagesLeftToLoad--;
+            });
+        });
+    }
+    return imagePromises[imageFile];
 }
 
 let allImagesAreLoaded = false;

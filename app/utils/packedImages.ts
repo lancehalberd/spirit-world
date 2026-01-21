@@ -5127,3 +5127,12 @@ export function requireFrame(source: string, r: FrameRectangle, callback?: (fram
     }
     return frame;
 }
+
+export function getPackedImage(name: string): PackedImageData {
+    // Use includes here since the source also has the `?v=...` version string appended to it.
+    const data = imagePacks.find(pack => pack.image.src.includes(name + ".png"));
+    if (!data) {
+        throw new Error('Unable to find packaged image: ' + name);
+    }
+    return data;
+}
