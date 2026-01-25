@@ -148,12 +148,6 @@ Graphics to Implement:
 Current tasks:
     - Preload music.
 
-    - Update door graphics
-        - Fix closed doors render without arrows in some cases:
-            - some doors draw the entire closed door instead of the closed cover over the stairs.
-                - wooden, cavern, crystal, stone, obsidian, future
-        - Jade interiors use the wrong closed door cover graphics.
-
     - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
         - Delays spirit energy generation for
 

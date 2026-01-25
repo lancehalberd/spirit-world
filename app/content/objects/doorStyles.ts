@@ -36,6 +36,7 @@ export interface DoorStyleDefinition {
     isLadderUp?: boolean
     isLadderDown?: boolean
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
+    renderCover?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderAfterHero?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames
@@ -84,29 +85,40 @@ interface V1DoorFrames {
     southCrackedWall: Frame
 }
 
+function renderV1DoorCover(context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames) {
+    if (door.definition.d !== 'up') {
+        return;
+    }
+    if (door.renderOpen(state)) {
+        return;
+    }
+    if (door.status === 'cracked' || door.status === 'blownOpen') {
+        return;
+    }
+    // This value should be used for all closed* statuses.
+    let frame: Frame = v1DoorFrames?.northClosed || blockedDoorCover;
+    if (door.status === 'locked') {
+        frame = lockedDoorCover;
+    } else if (door.status === 'bigKeyLocked' ) {
+        frame = bigLockedDoorCover;
+    }
+    drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+}
+
 function renderV1DoorBackground(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames) {
     if (door.definition.d === 'up') {
-        let frame = v1DoorFrames.northDoorway, overFrame: Frame = null;
+        let frame = v1DoorFrames.northDoorway;
         if (door.renderOpen(state)) {
             if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
                 context.fillStyle = 'black';
                 context.fillRect(door.x, door.y, 32, 32);
                 frame = v1DoorFrames.northBlownup;
             }
-        } else if (door.status === 'locked') {
-            overFrame = lockedDoorCover;
-        } else if (door.status === 'bigKeyLocked' ) {
-            overFrame = bigLockedDoorCover;
         } else if (door.status === 'cracked') {
             frame = v1DoorFrames.northCrack;
-        } else {
-            // This covers closed, closedEnemy + closedSwitch
-            overFrame = v1DoorFrames?.northClosed || blockedDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
-        if (overFrame) {
-            drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
-        }
+        renderV1DoorCover(context, state, door, v1DoorFrames);
     } else if (door.definition.d === 'left') {
         if (door.status === 'cracked') {
             return;
@@ -308,6 +320,7 @@ const commonBaseDoorStyle = {
         }
         return {x: door.x, y: door.y + 32, w: 16, h: 16};
     },
+    renderCover: renderDefaultDoorCover,
 };
 
 // WOODEN DOOR STYLE
@@ -345,29 +358,38 @@ const [
 const [
     woodenStairsDown,
 ] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32}, {left: 304, top: 96}).frames;
+function renderDefaultDoorCover(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d !== 'up') {
+        return;
+    }
+    if (door.renderOpen(state)) {
+        return;
+    }
+    if (door.status === 'cracked' || door.status === 'blownOpen') {
+        return;
+    }
+    let frame: Frame = blockedDoorCover;
+    if (door.status === 'locked') {
+        frame = lockedDoorCover;
+    } else if (door.status === 'bigKeyLocked' ) {
+        frame = bigLockedDoorCover;
+    }
+    drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+}
 function renderWoodenDoor(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'up') {
-        let frame = woodenNorthDoorway, overFrame: Frame = null;
+        let frame = woodenNorthDoorway;
         if (door.renderOpen(state)) {
             if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
                 context.fillStyle = 'black';
                 context.fillRect(door.x, door.y, 32, 32);
                 frame = woodenNorthBlownup;
             }
-        } else if (door.status === 'locked') {
-            overFrame = lockedDoorCover;
-        } else if (door.status === 'bigKeyLocked' ) {
-            overFrame = bigLockedDoorCover;
         } else if (door.status === 'cracked') {
             frame = woodenNorthCrack;
-        } else {
-            // This covers closed, closedEnemy + closedSwitch
-            overFrame = blockedDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
-        if (overFrame) {
-            drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
-        }
+        renderDefaultDoorCover(context, state, door);
     } else if (door.definition.d === 'left') {
         if (door.status === 'cracked') {
             return;
@@ -543,6 +565,7 @@ const cavernDoorFrames: V1DoorFrames = {
 const cavernDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, cavernDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, cavernDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, cavernDoorFrames),
 };
 
@@ -598,6 +621,7 @@ const crystalDoorFrames: V1DoorFrames = {
 const crystalDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, crystalDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, crystalDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, crystalDoorFrames),
 };
 
@@ -652,6 +676,7 @@ const stoneDoorFrames: V1DoorFrames = {
 const stoneDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, stoneDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, stoneDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, stoneDoorFrames),
 };
 
@@ -688,6 +713,7 @@ const obsidianDoorFrames: V1DoorFrames = {
 const obsidianDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, obsidianDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, obsidianDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, obsidianDoorFrames),
 };
 
@@ -712,6 +738,7 @@ const vanaraDoorFrames: V1DoorFrames = {
 const vanaraDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, vanaraDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, vanaraDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, vanaraDoorFrames),
 };
 
@@ -730,6 +757,7 @@ const jadeLightDoorFrames: V1DoorFrames = {
 const jadeLightDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLightDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeLightDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLightDoorFrames),
 };
 
@@ -748,15 +776,17 @@ const jadeDarkDoorFrames: V1DoorFrames = {
 const jadeDarkDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDarkDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeDarkDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDarkDoorFrames),
 };
 
 //JADE LIGHT INTERIOR DOOR STYLE
 const jadeLightIntImage = 'gfx/tiles/jadeInteriorLight.png';
-const jadeLight1IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 0, w: 32, h: 32})
-const jadeLight1IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 0, w: 32, h: 32})
-const jadeLight1IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 0, w: 32, h: 32})
-const jadeLight1IntSouthDoor = requireFrame(jadeLightIntImage, {x: 304, y: 0, w: 32, h: 32})
+const jadeLight1IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 0, w: 32, h: 32});
+const jadeLight1IntDoorClosed = requireFrame(jadeLightIntImage, {x: 272, y: 64, w: 32, h: 32});
+const jadeLight1IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 0, w: 32, h: 32});
+const jadeLight1IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 0, w: 32, h: 32});
+const jadeLight1IntSouthDoor = requireFrame(jadeLightIntImage, {x: 304, y: 0, w: 32, h: 32});
 const jadeLight1IntEastTrim = requireFrame(jadeLightIntImage, {x: 336, y: 96, w: 16, h: 64});
 const jadeLight1IntEastOpen = requireFrame(jadeLightIntImage, {x: 352, y: 96, w: 16, h: 48});
 const jadeLight1IntEastClosed = requireFrame(jadeLightIntImage, {x: 368, y: 96, w: 16, h: 48});
@@ -768,6 +798,7 @@ const jadeLight2IntSouthDoor = requireFrame('gfx/tiles/jadeInteriorLight.png', {
 */
 const jadeLight1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames, 
+    northClosed: jadeLight1IntDoorClosed,
     eastDoorEmpty: jadeLight1IntEastOpen,
     eastDoorEmptyForeground: jadeLight1IntEastOpen,
     eastDoorOpen: jadeLight1IntEastOpen,
@@ -830,6 +861,7 @@ const jadeLight1DoorStyle: DoorStyleDefinition = {
         return undefined;
     },
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight1DoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeLight1DoorFrames),
     renderAfterHero: (context, state, door) => renderV1DoorAfterHero(context, state, door, jadeLight1DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight1DoorFrames),
 };
@@ -838,6 +870,7 @@ const jadeLight1DoorStyle: DoorStyleDefinition = {
 const jadeLight2DoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight2DoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeLight2DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight2DoorFrames),
 };
 */
@@ -845,6 +878,7 @@ const jadeLight2DoorStyle: DoorStyleDefinition = {
 const jadeDarkIntImage = 'gfx/tiles/jadeInteriorDark.png';
 
 const jadeDark1IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 0, w: 32, h: 32})
+const jadeDark1IntDoorClosed = requireFrame(jadeDarkIntImage, {x: 272, y: 64, w: 32, h: 32});
 const jadeDark1IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 0, w: 32, h: 32})
 const jadeDark1IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 0, w: 32, h: 32})
 const jadeDark1IntSouthDoor = requireFrame(jadeDarkIntImage, {x: 304, y: 0, w: 32, h: 32})
@@ -861,6 +895,7 @@ const jadeDark2IntSouthDoor = requireFrame(jadeDarkIntImage, {x: 256, y: 96, w: 
 
 const jadeDark1DoorFrames: V1DoorFrames = {
     ...cavernDoorFrames,
+    northClosed: jadeDark1IntDoorClosed,
     eastDoorEmpty: jadeDark1IntEastOpen,
     eastDoorEmptyForeground: jadeDark1IntEastOpen,
     eastDoorOpen: jadeDark1IntEastOpen,
@@ -889,6 +924,7 @@ const jadeDark2DoorFrames:  V1DoorFrames = {
 const jadeDark1DoorStyle: DoorStyleDefinition = {
     ...jadeLight1DoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark1DoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeDark1DoorFrames),
     renderAfterHero: (context, state, door) => renderV1DoorAfterHero(context, state, door, jadeDark1DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark1DoorFrames),
 };
@@ -899,6 +935,7 @@ const jadeDark1DoorStyle: DoorStyleDefinition = {
 const jadeDark2DoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark2DoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeDark2DoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark2DoorFrames),
 };
 */
@@ -948,6 +985,7 @@ const futureDoorFrames: V1DoorFrames = {
 const futureDoorStyle: DoorStyleDefinition = {
     ...commonBaseDoorStyle,
     render: (context, state, door) => renderV1DoorBackground(context, state, door, futureDoorFrames),
+    renderCover: (context, state, door) => renderV1DoorCover(context, state, door, futureDoorFrames),
     renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, futureDoorFrames, 6),
 };
 
@@ -966,14 +1004,24 @@ function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, mapIcon: 
         },
         isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-            if (door.status !== 'normal') {
+            // We typically don't have frames for drawing stairs for cracked/blown open doors,
+            // so we fall back to the base style for these by default.
+            if (door.status === 'cracked' || door.status === 'blownOpen') {
                 baseStyle.render(context, state, door);
                 return;
             }
             drawFrameAt(context, frame, {x: door.x, y: door.y});
+            baseStyle.renderCover?.(context, state, door);
+            drawFrame(context, {...frame, h}, {...frame, x: door.x, y: door.y, h});
             checkToRenderFrozenDoor(context, state, door);
         },
         renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            // We typically don't have frames for drawing stairs for cracked/blown open doors,
+            // so we fall back to the base style for these by default.
+            if (door.status === 'cracked' || door.status === 'blownOpen') {
+                baseStyle.renderForeground(context, state, door);
+                return;
+            }
             if (door.isFrozen) {
                 return;
             }
@@ -985,6 +1033,7 @@ function stairsDoorStyle(baseStyle: DoorStyleDefinition, frame: Frame, mapIcon: 
 
 const woodenDoorStyle: DoorStyleDefinition = {
     render: renderWoodenDoor,
+    renderCover: renderDefaultDoorCover,
     renderForeground: renderWoodenDoorForeground,
     // Woodon door graphics look a bit different than others for the left/right orientations.
     getHitbox(door: Door) {
