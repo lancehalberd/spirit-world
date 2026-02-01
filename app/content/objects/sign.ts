@@ -14,6 +14,8 @@ const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeo
 const plaqueGeometry = {w: 16, h: 16, content: {x: 0, y: -2, w: 16, h: 16}};
 const [nicePlaque] = createAnimation('gfx/objects/plaque.png', plaqueGeometry).frames;
 const [brokenPlaque] = createAnimation('gfx/objects/plaque_broken.png', plaqueGeometry).frames;
+const smallVanaraSign = requireFrame('gfx/tiles/vanara.png', {x: 120, y: 380, w: 16, h: 16});
+const largeVanaraSign = requireFrame('gfx/tiles/vanara.png', {x: 64, y: 372, w: 32, h: 24, content: {x: 1, w: 30, y: 8, h: 16}});
 
 const tabletOn1 = requireFrame('gfx/tiles/futuristic.png', {x: 6, y: 1155, w: 36, h: 26});
 const tabletOn2 = requireFrame('gfx/tiles/futuristic.png', {x: 54, y: 1155, w: 36, h: 26});
@@ -112,6 +114,18 @@ export const signStyles: {[key in string]: SignStyle} = {
         h: 16,
         normal: brokenPlaque,
         spirit: brokenPlaque,
+    },
+    vanaraSmall: {
+        w: smallVanaraSign.w,
+        h: smallVanaraSign.h,
+        normal: smallVanaraSign,
+        spirit: smallVanaraSign,
+    },
+    vanaraLarge: {
+        w: largeVanaraSign.content.w,
+        h: largeVanaraSign.content.h,
+        normal: largeVanaraSign,
+        spirit: largeVanaraSign,
     },
 };
 

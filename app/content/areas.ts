@@ -167,8 +167,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
     if (state.surfaceAreaInstance) {
         state.surfaceAreaInstance.underwaterArea = state.areaInstance;
     }
-    // Do we need this? Are should already be set as underwater based on whether the entire zone has a surfaceKey set or not.
-    // state.areaInstance.underwater = !!state.surfaceAreaInstance;
+    state.areaInstance.underwater = !!state.zone.surfaceKey && !state.location.isSpiritWorld;
 }
 
 // Get and memoize the connected underwater area for the given area, returning null if there is none.

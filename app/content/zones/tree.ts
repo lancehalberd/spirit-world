@@ -1276,6 +1276,9 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "treeFrostBeast", linked: false, x: 230, y: 260, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "treeFrostBeast", linked: false, x: 242, y: 302, type: "boss", enemyType: "frostBeast", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "emotionalSupportStormBeast", x: 240, y: 108, type: "boss", enemyType: "stormBeast", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {"isSupporting":true}, saveStatus: "never"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 579, mapId: 'tree', floorId: '1F', mapX: 3, mapY: 3},

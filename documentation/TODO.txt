@@ -149,7 +149,14 @@ Current tasks:
     - Preload music.
 
     - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
-        - Delays spirit energy generation for
+        - Delays spirit energy generation for 1s
+
+    - Cocoon improvements
+        - Add additional gauntlet gauntlet floor before the boss
+            - Removing rolling stone puzzle from first gauntlet floor.
+            - Add single rolling stone puzzle to new gauntlet floor
+            - Add additional rolling stones that can be used to make gauntlet easier
+        - Make Cocoon pits drop you to lower levels.
 
     - Keep charging through rolls when wearing iron boots.
 

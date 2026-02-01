@@ -26,6 +26,7 @@ export interface BlastProps {
     tellDuration?: number
     expansionDuration?: number
     persistDuration?: number
+    hitProperties?: Partial<HitProperties>
 }
 
 export class Blast implements EffectInstance {
@@ -43,6 +44,7 @@ export class Blast implements EffectInstance {
     minRadius: number = this.props.minRadius ?? 4;
     boundSource: Enemy = this.props.boundSource;
     source: Actor = this.props.source;
+    hitProperties: Partial<HitProperties> = this.props.hitProperties ?? {};
     hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.boundSource, this.source]);
     delay = this.props.delay ?? 0;
     animation = this.props.animation;
@@ -66,39 +68,29 @@ export class Blast implements EffectInstance {
                 removeEffectFromArea(state, this);
                 return;
             }
-            if (this.animationTime % 40 === 0 && this.animationTime < this.tellDuration - Math.min(200, this.tellDuration / 3)) {
-                const count = Random.range(1, 2);
-                const baseTheta = Math.random() * 2 * Math.PI;
-                for (let i = 0; i < count; i++) {
-                    const theta = baseTheta + 2 * Math.PI * i / count;
-                    const dx = Math.cos(theta), dy = Math.sin(theta);
-                    const sparkle = this.addParticleEffect(state,  0.8 * this.radius * dx, 0.8 * this.radius * dy);
-                    /*const hitbox = this.boundSource ? {...this.boundSource.getHitbox(), x: 0, y: 0} : {x: this.x, y: this.y, w: 0, h: 0};
-                    const sparkle = addSparkleAnimation(state, this.area, {
-                        x: hitbox.x + hitbox.w / 2 + 0.8 * this.radius * dx,
-                        y: hitbox.y + hitbox.h / 2 + 0.8 * this.radius * dy, w: 0, h: 0},
-                        {
-                            velocity: { x: -dx, y: -dy, z: 1},
-                            element: this.element,
-                            target: this.boundSource,
-                        }
-                    );*/
-                    let speed = Random.range(3, 12);
-                    if (this.element === 'lightning') {
-                        // Special treatment to make lightning particle movement
-                        // more discrete.
-                        sparkle.vstep = 3 * FRAME_LENGTH;
-                    } else {
-                        sparkle.vstep = FRAME_LENGTH;
-                        speed /= 3;
-                    }
-                    // override the default velocity so that the particle
-                    // always moves in towards the center of the blast.
-                    sparkle.vx = -speed * dx;
-                    sparkle.vy = -speed * dy;
-                    sparkle.vz = 0;
-                    sparkle.z = 1;
+        }
+        if (this.animationTime % 40 === 0 && this.animationTime < this.tellDuration - Math.min(200, this.tellDuration / 3)) {
+            const count = Random.range(1, 2);
+            const baseTheta = Math.random() * 2 * Math.PI;
+            for (let i = 0; i < count; i++) {
+                const theta = baseTheta + 2 * Math.PI * i / count;
+                const dx = Math.cos(theta), dy = Math.sin(theta);
+                const sparkle = this.addParticleEffect(state,  0.8 * this.radius * dx, 0.8 * this.radius * dy);
+                let speed = Random.range(3, 12);
+                if (this.element === 'lightning') {
+                    // Special treatment to make lightning particle movement
+                    // more discrete.
+                    sparkle.vstep = 3 * FRAME_LENGTH;
+                } else {
+                    sparkle.vstep = FRAME_LENGTH;
+                    speed /= 3;
                 }
+                // override the default velocity so that the particle
+                // always moves in towards the center of the blast.
+                sparkle.vx = -speed * dx;
+                sparkle.vy = -speed * dy;
+                sparkle.vz = 0;
+                sparkle.z = 1;
             }
         }
         if (this.boundSource) {
@@ -122,6 +114,7 @@ export class Blast implements EffectInstance {
                 ignoreTargets: this.hitTargets,
                 knockAwayFromHit: true,
                 source: this.source,
+                ...this.hitProperties,
             });
             this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
             // Lightning effects will be rendered as part of the render function.

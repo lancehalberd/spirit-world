@@ -80,13 +80,23 @@ const stormBeastGlowAnimations = {
     ball: omniAnimation(stormBeastBallGlowAnimation),
 }
 
-function getStormHeart(this: void, state: GameState, area: AreaInstance): Enemy {
-    return area.enemies.find(target => target.definition.enemyType === 'stormHeart') as Enemy;
-}
-
 interface Path {
     start: number[]
     end: number[]
+}
+
+interface StormBeastParams {
+    enrageLevel: number
+    isSupporting: boolean
+    targetVector?: Point
+    enrageTime?: number
+    targetLocation?: number[]
+    attackLifeThreshold?: number
+    paths?: Path[]
+}
+
+function getStormHeart(this: void, state: GameState, area: AreaInstance): Enemy {
+    return area.enemies.find(target => target.definition.enemyType === 'stormHeart') as Enemy;
 }
 
 const stormBeastPaths = [
@@ -94,7 +104,6 @@ const stormBeastPaths = [
     { start: [-80, 320], end: [320, 424]},
     { start: [320, 720], end: [424, 320]},
 ];
-
 
 type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 
@@ -185,7 +194,8 @@ const stormBeastChargedLightningAbility = {
     recoverTime: 400,
 }
 
-enemyDefinitions.stormBeast = {
+
+const stormBeast: EnemyDefinition<StormBeastParams> = {
     naturalDifficultyRating: 100,
     animations: stormBeastAnimations, life: 90, scale: 1, flying: true,
     aggroRadius: 2000,
@@ -197,6 +207,9 @@ enemyDefinitions.stormBeast = {
     initialMode: 'hidden',
     params: {
         enrageLevel: 0,
+        // This is set to true when supporting other beasts in the final dungeon.
+        // It makes the Storm Beast unkillable, but it will retreat when the main boss is defeated.
+        isSupporting: false,
     },
     update: updateStormBeast,
     afterUpdate(state: GameState, enemy: Enemy) {
@@ -246,8 +259,9 @@ enemyDefinitions.stormBeast = {
         }*/
     },
 };
+enemyDefinitions.stormBeast = stormBeast;
 
-function faceCenter(state: GameState, enemy: Enemy): void {
+function faceCenter(state: GameState, enemy: Enemy<StormBeastParams>): void {
     const { section } = getAreaSize(state);
     const hitbox = enemy.getHitbox(state);
     const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
@@ -255,8 +269,8 @@ function faceCenter(state: GameState, enemy: Enemy): void {
     enemy.rotation = baseTheta - Math.PI / 2;
 }
 
-function getBallLightningCircle(enemy: Enemy): Circle {
-    const r = Math.min(32, enemy.animationTime / 20);
+function getBallLightningCircle(enemy: Enemy<StormBeastParams>): Circle {
+    const r = Math.min(32, Math.max(24 - enemy.animationTime / 20, enemy.animationTime / 20));
     const hitbox = enemy.getHitbox();
     return {
         x: hitbox.x + hitbox.w / 2,
@@ -265,20 +279,118 @@ function getBallLightningCircle(enemy: Enemy): Circle {
     };
 }
 
-function leaveScreen(enemy: Enemy): void {
-    enemy.setMode('leave');
-    if (!(enemy.params.enrageTime > 0)) {
-        enemy.changeToAnimation('flying');
-    }
-    const theta = Math.random() * 2 * Math.PI;
+function setHeading(enemy: Enemy<StormBeastParams>, theta: number) {
     enemy.rotation = theta - Math.PI / 2;
     enemy.params.targetVector = {x: Math.cos(theta), y: Math.sin(theta)};
     enemy.vx = 0;
     enemy.vy = 0;
 }
 
+function leaveScreen(enemy: Enemy<StormBeastParams>): void {
+    enemy.setMode('leave');
+    if (!(enemy.params.enrageTime > 0) && !enemy.params.isSupporting) {
+        enemy.changeToAnimation('flying');
+    }
+    setHeading(enemy, Math.random() * 2 * Math.PI);
+}
+function updateSupportStormBeast(state: GameState, enemy: Enemy<StormBeastParams>): void {
+    // Don't show the health bar of the Storm Beast.
+    // The theory is this will encourage the player to focus on the defeatable targets instead.
+    enemy.healthBarTime = 0;
+    if (enemy.mode === 'leave') {
+        if (enemy.currentAnimationKey !== 'ball') {
+            if (enemy.modeTime <= 100) {
+                enemy.changeToAnimation('prepareCast');
+            } else {
+                enemy.changeToAnimation('cast');
+            }
+            if (enemy.modeTime >= 200) {
+                enemy.changeToAnimation('ball');
+                setHeading(enemy, Math.random() * 2 * Math.PI);
+            }
+            return;
+        }
+        if (enemy.modeTime > 400) {
+            accelerateInDirection(state, enemy, enemy.params.targetVector);
+            enemy.x += enemy.vx;
+            enemy.y += enemy.vy;
+        }
+        if (hasEnemyLeftSection(state, enemy, 48) && enemy.modeTime > 2000) {
+            enemy.setMode('hidden');
+        }
+        return;
+    }
+    const nonSupportBosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+        e => e.status !== 'gone' && e.definition.type === 'boss' && !e.params.isSupporting
+        && e.isFromCurrentSection(state)
+    ) as Enemy[];
+    if (enemy.mode === 'hidden') {
+        // Despawn this boss once it is hidden offscreen and has no other boss left to support.
+        if (!nonSupportBosses.length) {
+            enemy.status = 'gone';
+            return;
+        }
+        enemy.life = Math.min(enemy.maxLife, enemy.life + 5 * FRAME_LENGTH / 1000);
+        // Do not return until regenerated to full life.
+        if (enemy.life < enemy.maxLife) {
+            return;
+        }
+        for (const boss of nonSupportBosses) {
+            if (boss.params.declineSupport) {
+                return;
+            }
+        }
+        const { section } = getAreaSize(state);
+        enemy.status = 'normal';
+        enemy.changeToAnimation('ball');
+        let theta = 2 * Math.PI * Math.random();
+        enemy.x = section.x + section.w / 2 + (section.w * 1.5 + 50) * Math.cos(theta);
+        enemy.y = section.y + section.h / 2 + (section.h * 1.5 + 50) * Math.sin(theta);
 
-function updateStormBeast(state: GameState, enemy: Enemy): void {
+        theta = Random.range(0, 3) * Math.PI / 2;
+        enemy.params.targetLocation = [
+            section.x + section.w / 2 + 64 * Math.cos(theta),
+            section.y + section.h / 2 + 64 * Math.sin(theta),
+        ];
+        enemy.setMode('approach');
+        return;
+    }
+    // Automatically retreat when life drops below a threshold or there are no more bosses to support.
+    if (!enemy.activeAbility && (!nonSupportBosses.length || enemy.life < enemy.maxLife * 2 / 3)) {
+        enemy.setMode('leave');
+        return;
+    }
+    if (enemy.mode === 'approach') {
+        const [x, y] = enemy.params.targetLocation;
+        if (moveEnemyToTargetLocation(state, enemy, x, y) < 5) {
+            faceCenter(state, enemy);
+            enemy.setMode('attackUntilDamaged');
+            enemy.params.attackLifeThreshold = enemy.life - 10;
+        }
+        return;
+    }
+    // The storm beast uses random abilities until it reaches a certain life threshold.
+    if (enemy.mode === 'attackUntilDamaged') {
+        // Don't stop attacking until at least 2 abilities have been used.
+        if (!enemy.activeAbility && enemy.modeTime > 2600) {
+            enemy.changeToAnimation('idle');
+            if (enemy.life <= enemy.params.attackLifeThreshold) {
+                enemy.setMode('leave');
+                return;
+            }
+        }
+        if (enemy.modeTime % 2000 === 600) {
+            enemy.useRandomAbility(state);
+        }
+        return;
+    }
+}
+
+function updateStormBeast(state: GameState, enemy: Enemy<StormBeastParams>): void {
+    if (enemy.params.isSupporting) {
+        updateSupportStormBeast(state, enemy);
+        return;
+    }
     const stormHeart = getStormHeart(state, enemy.area);
     if (enemy.mode === 'hidden') {
         // Stay hidden until the player enters the same area and damages the storm heart(or no heart is present).
@@ -293,10 +405,12 @@ function updateStormBeast(state: GameState, enemy: Enemy): void {
         enemy.healthBarTime = 0;
         return;
     }
-    // If the hero
+    // When the hero is in the other world, the boss moves to the center of the area and casts spells
+    // targeting the hero in the other world.
     if (enemy.mode !== 'regenerate' && enemy.mode !== 'transform' && enemy.area !== state.areaInstance) {
         enemy.setMode('attackOtherWorld');
-        const t = {x: 320, y: 320};
+        const { section } = getAreaSize(state);
+        const t = {x: section.x + section.w / 2, y: section.y + section.h / 2};
         if (moveEnemyToTargetLocation(state, enemy, t.x, t.y) < 10) {
             faceCenter(state, enemy);
             enemy.useRandomAbility(state);

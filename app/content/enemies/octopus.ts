@@ -1,6 +1,11 @@
-import { omniAnimation } from 'app/content/enemyAnimations';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { createAnimation } from 'app/utils/animations';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {Blast} from 'app/content/effects/blast';
+import {omniAnimation} from 'app/content/enemyAnimations';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation} from 'app/utils/animations';
+import {addEffectToArea} from 'app/utils/effects';
+import {getNearbyTarget, getTargetingAnchor} from 'app/utils/target';
 
 const duration  = 6;
 const octopusGeometry: FrameDimensions = { w: 100, h: 100, content: {x: 31, y: 50, w: 38, h: 25} };
@@ -19,16 +24,60 @@ export const octopusAnimations: ActorAnimations = {
     spinAttackEnd: omniAnimation(octopusSpinAttackEndAnimation),
 };
 
+const targetedDischargeAbility = {
+    getTarget(state: GameState, enemy: Enemy): Target {
+        return getNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(state: GameState, enemy: Enemy, target: Target): void {
+        enemy.changeToAnimation('spinAttack');
+        const anchor = getTargetingAnchor(target);
+        const discharge = new Blast({
+            x: anchor.x,
+            y: anchor.y,
+            damage: 4,
+            element: 'lightning',
+            radius: 40,
+            source: enemy,
+            hitProperties: {
+                hitEnemies: false,
+            },
+        });
+        addEffectToArea(state, enemy.area, discharge);
+    },
+    updateAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
+        const hitbox = enemy.getHitbox(state);
+        if (enemy.activeAbility.time % (2 * FRAME_LENGTH) === 0) {
+            const theta = -Math.PI - enemy.activeAbility.time / FRAME_LENGTH / 2 * Math.PI / 8;
+            addSparkleAnimation(state, enemy.area, {
+                x: hitbox.x + hitbox.w / 2 + 60 * Math.cos(theta) - 1,
+                y: hitbox.y + hitbox.h / 2 + 30 * Math.sin(theta) - 1,
+                w: 2,
+                h: 2,
+            }, { element: 'lightning', velocity: {x: 0, y: 0, z: 6}});
+        }
+    },
+    useAbility(state: GameState, enemy: Enemy, target: Target): void {
+        enemy.changeToAnimation('spinAttackEnd', 'idle');
+    },
+    globalCooldown: 500,
+    cooldown: 5000,
+    prepTime: 1000,
+    recoverTime: 400,
+    initialCharges: 3,
+    charges: 3,
+    chargesRecovered: 3,
+}
+
 
 // TODO: keep the octopus hitbox from changing with its z position since we fight in underwater where the hero
 // can easily change z position.
 enemyDefinitions.octopus = {
-    naturalDifficultyRating: 8,
+    naturalDifficultyRating: 10,
     floating: true,
-    abilities: [],
+    abilities: [targetedDischargeAbility],
     alwaysReset: true,
-    animations: octopusAnimations, aggroRadius: 160,
-    life: 10, touchDamage: 2, update: updateOctopus,
+    animations: octopusAnimations, aggroRadius: 192,
+    life: 16, touchDamage: 2, update: updateOctopus,
     ignorePits: true,
     elementalMultipliers: {'lightning': 2},
     touchHit: {damage: 3, source: null},
@@ -39,6 +88,9 @@ enemyDefinitions.octopus = {
 
 function updateOctopus(state: GameState, enemy: Enemy): void {
     enemy.useRandomAbility(state);
+    if (enemy.activeAbility) {
+        return;
+    }
     if (enemy.mode === 'spinAttack') {
         if (enemy.currentAnimationKey !== 'spinAttack' && enemy.modeTime < 100) {
             enemy.changeToAnimation('spinAttack');
