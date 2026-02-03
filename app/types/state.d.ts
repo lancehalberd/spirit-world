@@ -48,6 +48,7 @@ type Scene = 'intro' | 'prologue' | 'title' | 'fileSelect'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options' | 'bossRush';
 
+type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
 interface GameState {
     savedState: SavedState
@@ -96,7 +97,7 @@ interface GameState {
         patternContext?: CanvasRenderingContext2D
         pattern?: CanvasPattern
         underCanvas?: HTMLCanvasElement
-        type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating'
+        type: TransitionType
         // Color to fade to, defaults to black.
         fadeColor?: string
         // The targetZ value for the hero after the transition.

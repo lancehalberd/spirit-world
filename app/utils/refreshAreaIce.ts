@@ -10,11 +10,13 @@ import {requireFrame} from 'app/utils/packedImages';
 const tinyIceTiles = requireFrame('gfx/tiles/tinyIceTiles.png', {x: 0, y: 0, w: 128, h: 32});
 
 export function refreshAreaIce(state: GameState, area: AreaInstance) {
-    delete area.needsIceRefresh;
+    if (!area.needsIceRefresh) {
+        return;
+    }
     for (let ty = 0; ty < area.h; ty++) {
         for (let tx = 0; tx < area.w; tx++) {
             // Only process tiles that have been marked as dirty to prevent checking lots of unnecessary tiles.
-            if (area.tilesDrawn[ty]?.[tx]) {
+            if (area.needsIceRefresh !== true && !area.needsIceRefresh[ty]?.[tx]) {
                 continue;
             }
             const behavior = area.behaviorGrid?.[ty]?.[tx];
@@ -45,7 +47,11 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
                 if (getDrawPriority(layer.definition) === 'foreground') {
                     break;
                 }
-                if (layer.tiles[ty][tx] === allTiles[294]) {
+                if (layer.tiles[ty][tx]?.behaviors?.isFrozen) {
+                    // If the specific frozen tile is found, stop at this layer, only tiles at and beneath this tile
+                    // should be frozen.
+                    topLayer = layer;
+                    break;
                     //foundFrozenTile = true;
                 }
                 // TODO: treat the mask as another layer and apply the ice rendering to the mask layer when selected.
@@ -85,8 +91,7 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
             /*if (foundFrozenTile) {
                 continue;
             }*/
-            // If this is literally the square frozen tile, don't replace it.
-            if (!topLayer || topLayer.tiles[ty][tx] === allTiles[294]) {
+            if (!topLayer) {
                 continue;
             }
             // Fabricate a frozen tile that has the original tile "underneath it", so it will
@@ -140,4 +145,5 @@ export function refreshAreaIce(state: GameState, area: AreaInstance) {
             resetTileBehavior(area, {x: tx, y: ty});
         }
     }
+    delete area.needsIceRefresh;
 }

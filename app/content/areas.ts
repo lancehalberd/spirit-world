@@ -15,6 +15,7 @@ import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {initializeAreaLayerTiles, initializeAreaTiles} from 'app/utils/layers';
 import {mapTile} from 'app/utils/mapTile';
 import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
+import {refreshAreaIce} from 'app/utils/refreshAreaIce';
 import {applyLayerToBehaviorGrid, resetTileBehavior} from 'app/utils/tileBehavior';
 import {applyVariantsToArea} from 'app/utils/variants';
 
@@ -159,9 +160,14 @@ export function getAreaInstanceFromLocation(state: GameState, location: ZoneLoca
 // area through an underwater/surface location relationship. Also sets the current area as underwater if a surface area is set.
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
     state.underwaterAreaInstance = getConnectedUnderwaterArea(state, state.areaInstance, lastAreaInstance);
+    if (state.underwaterAreaInstance) {
+        state.underwaterAreaInstance.surfaceArea = state.areaInstance;
+    }
     state.surfaceAreaInstance = getConnectedSurfaceArea(state, state.areaInstance, lastAreaInstance);
-    // Do we need this? Are should already be set as underwater based on whether the entire zone has a surfaceKey set or not.
-    // state.areaInstance.underwater = !!state.surfaceAreaInstance;
+    if (state.surfaceAreaInstance) {
+        state.surfaceAreaInstance.underwaterArea = state.areaInstance;
+    }
+    state.areaInstance.underwater = !!state.zone.surfaceKey && !state.location.isSpiritWorld;
 }
 
 // Get and memoize the connected underwater area for the given area, returning null if there is none.
@@ -445,6 +451,7 @@ export function createAreaInstance(state: GameState, location: ZoneLocation, isA
         neutralTargets: [],
         enemies: [],
         objectsToRender: [],
+        needsIceRefresh: true,
     };
     // Don't attempt to inherit layers if they are not defined in the parent. This can
     // happen in spirit areas that are not connected to the material world.
@@ -504,6 +511,7 @@ export function createAreaInstance(state: GameState, location: ZoneLocation, isA
         specialBehavior?.apply(state, instance);
     }
     addRecentArea(instance);
+    refreshAreaIce(state, instance);
     return instance;
 }
 

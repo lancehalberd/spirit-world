@@ -45,7 +45,7 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         || zoneKey === 'fireSanctum' || zoneKey === 'lightningSanctum' || zoneKey === 'iceSanctum'
     ) {
         logicalZoneKey = 'holySanctum';
-    } else if (zoneKey === 'tree') {
+    } else if (zoneKey === 'tree' || zoneKey === 'treeWater') {
         logicalZoneKey = isSpiritWorld ? 'treeSpirit' : 'tree';
     } else if (zoneKey === 'waterfallCaveWater') {
         logicalZoneKey = 'waterfallCave';

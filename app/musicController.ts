@@ -115,7 +115,7 @@ export const updateMusic = (state: GameState): void => {
         playTrack('tombTheme', 0);
     } else if (location.zoneKey === 'holyCityInterior') {
         playTrack('village', 0);
-    } else if (location.zoneKey === 'waterfallCave' || location.zoneKey === 'waterfallCaveWater') {
+    } else if (location.logicalZoneKey === 'waterfallCave') {
         playTrack('waterfallVillageTheme', 0);
     } else if (location.zoneKey === 'warTemple') {
         // Don't change music during transitions since the logic below that depends on x/y locations
@@ -184,7 +184,7 @@ export const updateMusic = (state: GameState): void => {
         }
     } else if (location.zoneKey === 'lab') {
         playTrack('labTheme', 0);
-    } else if (location.zoneKey === 'tree') {
+    } else if (location.logicalZoneKey === 'tree' || location.logicalZoneKey === 'treeSpirit') {
         playTrack('helixTheme', 0);
     } else if (location.zoneKey === 'void') {
         playTrack('vanaraDreamTheme', 0);

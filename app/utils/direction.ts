@@ -89,11 +89,11 @@ export function getCardinalDirection(dx: number, dy: number, defaultDirection: C
     return dy < 0 ? 'up' : 'down';
 }
 
-export function getDirection(dx: number, dy: number, includeDiagonals = false, defaultDirection: Direction = null): Direction {
-    if (Math.abs(dy) < 0.2) {
+export function getDirection(dx: number, dy: number, includeDiagonals = false, defaultDirection: Direction = null, threshold = 0.2): Direction {
+    if (Math.abs(dy) < threshold) {
         dy = 0;
     }
-    if (Math.abs(dx) < 0.2) {
+    if (Math.abs(dx) < threshold) {
         dx = 0;
     }
     if (defaultDirection && !dy && !dx) {

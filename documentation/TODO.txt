@@ -146,12 +146,17 @@ Graphics to Implement:
 
 
 Current tasks:
-    - BLOCKED: Add jade door styles to fix the look of the money maze area in the holy city interior.
-
     - Preload music.
 
     - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
-        - Delays spirit energy generation for
+        - Delays spirit energy generation for 1s
+
+    - Cocoon improvements
+        - Add additional gauntlet gauntlet floor before the boss
+            - Removing rolling stone puzzle from first gauntlet floor.
+            - Add single rolling stone puzzle to new gauntlet floor
+            - Add additional rolling stones that can be used to make gauntlet easier
+        - Make Cocoon pits drop you to lower levels.
 
     - Keep charging through rolls when wearing iron boots.
 
@@ -208,13 +213,17 @@ Current tasks:
 
     - Add new graphics
         - Cherry tree
-        - fireball effect
         - dirt particles
         - test new lab tiles
         - new icons
             - peach basket
             - consumables
             - medallions
+
+    - Fix Vanara Guardian boss looks bad when moving behind foreground tiles
+        - Move more tiles to the background.
+        - Prevent the Guardian from going over as many wall tiles
+        - Draw the top 32-48px of the guardian in the foreground, similar to staff.
 
     - Add Vanara Dreamland
         - Add Spirit world entrances: Sky City Arcade, Jade City Arcade

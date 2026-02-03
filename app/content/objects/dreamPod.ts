@@ -100,6 +100,11 @@ export class DreamPod implements ObjectInstance {
             if (this.animationTime >= this.getAnimation().duration) {
                 enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
                     skipObject: this.definition,
+                    callback: () => {
+                        if (state.hero.renderParent === this) {
+                            delete state.hero.renderParent;
+                        }
+                    }
                 });
             }
             return;

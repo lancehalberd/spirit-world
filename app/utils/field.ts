@@ -496,9 +496,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 const behaviors = layer.tiles?.[target.y]?.[target.x]?.behaviors;
                 const tileIndex = behaviors?.elementTiles?.[hit.element];
                 if (tileIndex !== undefined) {
-                    if (behaviors?.isFrozen) {
-                        area.needsIceRefresh = true;
-                    }
+                    //if (behaviors?.isFrozen) {
+                    //    markTilesForIceRefresh(area, target.x, target.y);
+                    //}
                     layer.tiles[target.y][target.x] = allTiles[tileIndex];
                 }
                 if (behaviors?.isGround || behaviors?.isGroundMap || behaviors?.solid
@@ -511,16 +511,16 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             if (area.tilesDrawn[target.y]?.[target.x]) {
                 area.tilesDrawn[target.y][target.x] = false;
             }
-            for (const [x, y] of [
+            /*for (const [x, y] of [
                 [target.x - 1, target.y - 1], [target.x, target.y - 1], [target.x + 1, target.y - 1],
                 [target.x - 1, target.y], [target.x + 1, target.y],
                 [target.x - 1, target.y + 1], [target.x, target.y + 1], [target.x + 1, target.y + 1],
             ]) {
                 // Any nearby tiles that are also frozen may also need to be redrawn with new ice graphics.
-                if (area.behaviorGrid?.[y]?.[x]?.isFrozen && area.tilesDrawn[y]?.[x]) {
-                    area.tilesDrawn[y][x] = false;
+                if (area.behaviorGrid?.[y]?.[x]?.isFrozen) {
+                    markTileNeedsIceRefresh(area, x, y);
                 }
-            }
+            }*/
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
         } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
@@ -591,7 +591,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                         },
                     },
                 };
-                if (area.tilesDrawn[target.y]?.[target.x]) {
+                // markTilesForIceRefresh(area, target.x, target.y);
+                /*if (area.tilesDrawn[target.y]?.[target.x]) {
                     area.tilesDrawn[target.y][target.x] = false;
                 }
                 for (const [x, y] of [
@@ -603,10 +604,12 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     if (area.behaviorGrid?.[y]?.[x]?.isFrozen && area.tilesDrawn[y]?.[x]) {
                         area.tilesDrawn[y][x] = false;
                     }
+
                 }
                 // Indicate that ice edging needs to be added around newly frozen tiles.
                 area.needsIceRefresh = true;
-                area.checkToRedrawTiles = true;
+                area.checkToRedrawTiles = true;*/
+                // This will handle updating the ice graphics as well.
                 resetTileBehavior(area, target);
                 // console.log('updated behavior', area.behaviorGrid?.[target.y]?.[target.x]);
             }

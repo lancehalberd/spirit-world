@@ -1,6 +1,6 @@
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { DelayedEffect } from 'app/content/effects/delayedEffect';
-import { Flame } from 'app/content/effects/flame';
+import {Fireball} from 'app/content/effects/flame';
 import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -194,20 +194,18 @@ const flameRingAbility: EnemyAbility<true> = {
         for (let i = 0; i < count; i++) {
             const theta = 2 * Math.PI * i / count;
             const dx = Math.cos(theta), dy = Math.sin(theta);
-            const flame = new Flame({
+            const flame = new Fireball({
                 delay: 400 + 200 * i,
                 x: center.x + center.w / 3 * dx,
                 y: center.y + center.h / 3 * dy,
                 damage: 1,
-                ax: -dx / 5,
-                ay: -dy / 5,
-                vx: 0,
-                vy: 0,
+                vx: -4 * dx,
+                vy: -4 * dy,
                 hybridWorlds: true,
                 source: enemy,
             });
             const delayedFlame = new DelayedEffect({
-                delay: 60 * i,
+                delay: 40 * i,
                 effect: flame,
             });
             addEffectToArea(state, state.hero.area, delayedFlame);

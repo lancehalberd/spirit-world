@@ -30,6 +30,7 @@ import {
 } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
+import {showMessage} from 'app/scriptEvents';
 
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
     hero.thrownChakrams = hero.thrownChakrams.filter(
@@ -772,13 +773,17 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 glovesLevel = 1;
             }
         }
+        // In some situations this can be set when the player tries to grab something and fails.
+        // This was introduced to prevent players from getting confused when they fail to pick something
+        // up as an Astral Projection that they could pick up in their normal bodies.
+        let failedToLiftMessage = '';
         for (const target of tiles) {
             const behavior = hero.area.behaviorGrid?.[target.y]?.[target.x];
             if (behavior?.solid === true) {
                 hero.action = 'grabbing';
                 hero.grabTile = target;
             }
-            if (glovesLevel >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
+            if (glovesLevel >= behavior?.pickupWeight) {
                 // This is an unusual distance, but should do what we want still.
                 const distance = (
                     Math.abs(target.x * 16 - hero.x) +
@@ -788,6 +793,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     closestDistance = distance;
                     closestLiftableTileCoords = target;
                 }
+            } else if (hero.isAstralProjection && (behavior?.pickupWeight > 0 && behavior?.pickupWeight <= 2)) {
+                failedToLiftMessage = 'This is too heavy for my Astral Body to lift.';
             }
         }
         for (const object of objects) {
@@ -856,6 +863,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             /*const {mx, my} = */moveActor(state, hero, dx, dy);
             // console.log('moving towards grabbed object', {mx, my});
             return;
+        } else if (hero.action === 'grabbing' && failedToLiftMessage) {
+            showMessage(state, failedToLiftMessage);
+            delete hero.action;
         }
     }
     if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)

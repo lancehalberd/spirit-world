@@ -32,6 +32,7 @@ export function addKeyboardShortcuts() {
         ) {
             return;
         }
+        const isAltDown = event.altKey;
         const isCommandDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
         const isShiftDown = isKeyboardKeyDown(KEY.SHIFT);
         const keyCode: number = event.which;
@@ -52,6 +53,24 @@ export function addKeyboardShortcuts() {
         }
         if (!editingState.isEditing) {
             return;
+        }
+        if (keyCode === KEY.TAB) {
+            // Don't interfere with alt/command/control + tab commands.
+            if (isAltDown || isCommandDown) {
+                return;
+            }
+            const nextArea: AreaInstance = isShiftDown
+                ? (state.surfaceAreaInstance || state.underwaterAreaInstance)
+                : state.alternateAreaInstance;
+            if (nextArea) {
+                enterLocation(state, {
+                    ...nextArea.location,
+                    x: state.hero.x,
+                    y: state.hero.y,
+                    z: 0,
+                }, {instant: true});
+            }
+            event.preventDefault();
         }
         //console.log(keyCode);
         // Don't override the refresh page command.

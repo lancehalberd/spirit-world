@@ -19,7 +19,9 @@ export function toggleEditing(state: GameState) {
         setSaveFileToState(0, 0);
     }
     state.scene = 'game';
-    state.hero.z = 0;
+    // Set this to 1 so the player doesn't immediately fall into pits when the editor is
+    // rendered off underwater.
+    state.hero.z = 1;
     state.hero.actionTarget = null;
     editingState.isEditing = !editingState.isEditing;
     editingState.recentAreas = [];

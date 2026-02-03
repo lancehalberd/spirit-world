@@ -98,6 +98,7 @@ interface FrostHeartParams {
     shieldLevel: number
     targetShieldLevel: number
     active?: boolean
+    declineSupport: boolean
 }
 
 
@@ -106,11 +107,12 @@ enemyDefinitions.frostHeart = {
     naturalDifficultyRating: 20,
     floating: true,
     flipRight: true,
-    animations: frostHeartSurfaceAnimations, life: 50, scale: 2, touchDamage: 1, params: {
+    animations: frostHeartSurfaceAnimations, life: 50, scale: 2, touchHit: {damage: 2, source: null}, params: {
         chargeLevel: 0,
         enrageLevel: 0,
         shieldLevel: maxShieldLevel,
         targetShieldLevel: maxShieldLevel,
+        declineSupport: true,
     },
     immunities: ['ice'],
     elementalMultipliers: {'fire': 1.5, 'lightning': 1.2},
@@ -240,7 +242,7 @@ function isUnderwaterHeart(state: GameState, enemy: Enemy): boolean {
 
 enemyDefinitions.frostBeast = {
     naturalDifficultyRating: 100,
-    animations: snakeAnimations, life: 80, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
+    animations: snakeAnimations, life: 80, scale: 3, touchHit: {damage: 2, source: null}, update: updateFrostSerpent, flipRight: true,
     canSwim: true,
     acceleration: 0.3, speed: 2,
     immunities: ['ice'],
@@ -312,8 +314,9 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
     if (underwaterHeart && underwaterHeart.animations !== frostHeartWaterAnimations) {
         underwaterHeart.animations = frostHeartWaterAnimations;
         underwaterHeart.changeToAnimation(underwaterHeart.currentAnimationKey, underwaterHeart.nextAnimationKey);
-        underwaterHeart.z = 8;
     }
+    surfaceHeart.z = 0;
+    underwaterHeart.z = 8;
     // If either form is defeated, both are defeated.
     if (isEnemyDefeated(surfaceHeart) || isEnemyDefeated(underwaterHeart)) {
         enemy.status = 'gone';
@@ -335,6 +338,10 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         enemy.shielded = false;
         return;
     }
+    // The Frost Heart will decline support as long as the Frost Beast is active until it reaches enrage level 2.
+    const frostBeast = getFrostSerpent(state, enemy.area);
+    const isSurfaceSerpentActive = frostBeast && frostBeast.mode !== 'regenerate';
+    enemy.params.declineSupport = enemy.params.enrageLevel < 2 && isSurfaceSerpentActive;
     enemy.shielded = enemy.params.shieldLevel > 0;
     if (enemy.mode === 'ragePhaseOne') {
         enemy.changeToAnimation('attack');
@@ -549,6 +556,11 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         underwaterSerpent.params.active = false;
         underwaterSerpent.params.submerged = true;
         enemy.params.submerged = true;
+    }
+    if (enemy.params.submerged !== enemy.area.underwater) {
+        delete enemy.touchHit;
+    } else {
+        enemy.touchHit = enemy.enemyDefinition.touchHit;
     }
     enemy.params.active = true;
     const heart = getFrostHeart(state, enemy.area);

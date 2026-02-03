@@ -1,15 +1,15 @@
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { shootFrostInCone } from 'app/content/bosses/frostBeast';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {shootFrostInCone} from 'app/content/bosses/frostBeast';
 import {Blast} from 'app/content/effects/blast';
-import { Flame } from 'app/content/effects/flame';
-import { simpleLootTable } from 'app/content/lootTables';
-import { snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations } from 'app/content/enemyAnimations';
-import { renderLightningCircle, renderLightningRay } from 'app/render/renderLightning'
-import { directionMap, directionToRadiansMap } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
-import { canMoveEnemy, moveEnemy, paceRandomly } from 'app/utils/enemies';
-import { hitTargets } from 'app/utils/field';;
-import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget } from 'app/utils/target';
+import {Fireball, Flame} from 'app/content/effects/flame';
+import {simpleLootTable} from 'app/content/lootTables';
+import {snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations} from 'app/content/enemyAnimations';
+import {renderLightningCircle, renderLightningRay} from 'app/render/renderLightning'
+import {directionMap, directionToRadiansMap} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
+import {canMoveEnemy, moveEnemy, paceRandomly} from 'app/utils/enemies';
+import {hitTargets} from 'app/utils/field';
+import {getLineOfSightTargetAndDirection, getVectorToNearbyTarget} from 'app/utils/target';
 import Random from 'app/utils/Random';
 
 
@@ -26,12 +26,12 @@ const fireBallAbility: EnemyAbility<boolean> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
         const hitbox = enemy.getHitbox(state);
         const [dx, dy] = directionMap[enemy.d];
-        const flame = new Flame({
+        const flame = new Fireball({
             x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
             isPreparing: true,
-            vx: 0,
-            vy: 0,
+            vx: dx,
+            vy: dy,
             z: 4,
             az: 0,
             scale: 0.1,
@@ -44,7 +44,7 @@ const fireBallAbility: EnemyAbility<boolean> = {
     updateAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
         const fireball = enemy.params.fireball;
         const [dx, dy] = directionMap[enemy.d];
-        fireball.scale = Math.min(0.6, fireball.scale + 0.05);
+        fireball.scale = Math.min(1, fireball.scale + 0.05);
         fireball.updateSize();
         const hitbox = enemy.getHitbox(state);
         fireball.x = hitbox.x + hitbox.w / 2 + dx * 3 * hitbox.w / 4;
@@ -71,7 +71,7 @@ const chasingFireBallAbility: EnemyAbility<boolean> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
         const hitbox = enemy.getHitbox(state);
         const [dx, dy] = directionMap[enemy.d];
-        const flame = new Flame({
+        const flame = new Fireball({
             x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
             isPreparing: true,

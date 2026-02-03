@@ -5,11 +5,13 @@ interface PackedImage extends Rect {
 
 interface PackedImageData {
     packedImages: PackedImage[]
-    image: HTMLImageElement | HTMLCanvasElement
+    image: HTMLImageElement
 }
 
 // PackedImageData with additional fields used while packing.
-interface PackingImageData extends PackedImageData {
+interface PackingImageData {
+    packedImages: PackedImage[]
+    image: HTMLCanvasElement
     grid: boolean[][]
     context: CanvasRenderingContext2D
 }
@@ -507,7 +509,7 @@ interface AreaInstance {
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
     needsLogicRefresh?: boolean
-    needsIceRefresh?: boolean
+    needsIceRefresh?: boolean[][]|true
 }
 
 

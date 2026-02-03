@@ -535,6 +535,8 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         || hero.isAstralProjection
         // Falling from the sky transitions you, so you won't softlock here.
         || state.location.zoneKey === 'sky'
+        // Falling in this location will transition you to the water drain.
+        || (state.location.zoneKey === 'treeWater' && !state.location.isSpiritWorld)
         // Falling in this location will transition you to the forest temple zone.
         || (state.location.zoneKey === 'forest' && state.location.isSpiritWorld);
     // Do not trigger the scrolling transition when traveling through a zone door.

@@ -26,6 +26,7 @@ import {
     dirtParticles,
     emptyWallBehaviors,
     emptyLedgeBehaviors,
+    frozenTile,
     heavyStoneBehavior,
     lightStoneBehavior,
     pitBehavior,
@@ -260,12 +261,14 @@ export function generateTileHash({ frame }: {frame: Frame}): string {
     const imageData = context.getImageData(0, 0, 16, 16).data;
     return imageData.join(',');
 }
+window.generateTileHash = generateTileHash;
 let imageMap: TileHashMap;
 export function generateTileHashMap(): TileHashMap {
     if (imageMap) {
         return imageMap;
     }
     imageMap = {};
+    window.imageMap = imageMap;
     imageMap[emptyKey] = allTiles[1];
     // don't add the null+empty tiles.
     addTilesToTileHashMap(allTiles.slice(2));
@@ -290,7 +293,9 @@ export function addTilesToTileHashMap(tiles: FullTile[]) {
             }
             continue;
         }
-        imageMap[hashKey] = tile;
+        if (!imageMap[hashKey]) {
+            imageMap[hashKey] = tile;
+        }
     }
 }
 
@@ -401,13 +406,6 @@ const brightGrass: TileSource = {
     /*behaviors: {
         '0x0': {brightness: 1, lightRadius: 16},
     },*/
-};
-
-
-const iceTiles: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
-    behaviors: {'all': {isGround: true, isFrozen: true, slippery: true, elementTiles: {fire: 0}}},
 };
 
 const railsTiles: TileSource = {
@@ -1108,7 +1106,7 @@ addTiles([
     ...allGardenTiles,
     waterWaves,
     deletedTiles(1),
-    iceTiles,
+    frozenTile,
     lavaBubbles,
     waterRocks,
     // Save these slots for additional empty wall behaviors we might want.
