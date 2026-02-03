@@ -4,9 +4,7 @@ import {
     wasConfirmKeyPressed,
 } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
-//import { getBossRushOptions } from './renderBossRush';
 import { getBossRushOptions, BossRushOption } from './bossRushOptions';
-//import { altGolemState } from 'app/content/heroSavedStates';
 import { alterHeroData } from 'app/utils/alterHeroData';
 
 export function updateBossRushMenu(state: GameState) {

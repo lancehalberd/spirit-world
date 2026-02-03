@@ -1,6 +1,5 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { renderStandardFieldStack } from 'app/render/renderField';
-import { renderHUD } from 'app/renderHUD';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 import { getBossRushOptions } from './bossRushOptions';
@@ -34,7 +33,7 @@ function getHighScore(state: GameState, boss: BossName): string {
 }
 export function renderBossRushMenu(context: CanvasRenderingContext2D, state: GameState): void {
     renderStandardFieldStack(context, state);
-    renderHUD(context, state);
+    //renderHUD(context, state);
     const options = getBossRushOptions(state);
     
     // Calculate visible window

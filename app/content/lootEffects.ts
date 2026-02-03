@@ -2,9 +2,8 @@ import { setLeftTool, setRightTool } from 'app/content/menu';
 import { playAreaSound } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
-import { travelToLocation } from './dialogue/refightVanara';
 import { restoreHeroData } from 'app/utils/alterHeroData';
-import { endBossRush, startNextBoss } from 'app/scenes/bossRush/bossRushOptions';
+import { endBossRush, startNextBoss, travelToLocation } from 'app/scenes/bossRush/bossRushOptions';
 import { updateBestTimes } from 'app/utils/updateBestTimes';
 import { showMessage } from 'app/scriptEvents';
 

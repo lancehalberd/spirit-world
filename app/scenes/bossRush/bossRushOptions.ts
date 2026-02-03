@@ -137,7 +137,7 @@ const allBossRushOptions: BossRushOption[] = [
         bosses: ['forest', 'rival2', 'collector'],
         location: ['forestTempleRefight', 'rival2Refight', 'collectorRefight'],
         isVisible(state: GameState) {
-            return true;
+            return !!(state.savedState.objectFlags.elementalBeastsEscaped);
         }
     },
     {
@@ -172,13 +172,13 @@ export function endBossRush(state: GameState): boolean {
     } return false;
 }
 
-function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
+export function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
   if (state.travel) {
     state.travel(zoneKey, markerId, {instant: false});
     return '';
   }
   console.log("Can't find travel function!")
-} //WIP: reduce travelToLocation redefinitions
+}
 
 export function startNextBoss(state: GameState): string {
     return travelToLocation(state, 'bossRefights', fightLocations[state.bossRushTrackers.currentBoss]
