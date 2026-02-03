@@ -3,7 +3,6 @@ import { showMessage } from 'app/scriptEvents';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireFrame } from 'app/utils/packedImages';
-import { updateBestTimes } from 'app/utils/updateBestTimes';
 
 //const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
 //    + '{|}Select a tool and press [B_TOOL] to assign it.';
@@ -178,12 +177,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
-        case 'bossRefight': if (([4, 7, 10].includes(state.bossRushTrackers.rushPosition))
-            //set rush position to 1 above what triggers travelToLocation for correct behavior
-            || !state.savedState.objectFlags['rushMode']) {
-                return updateBestTimes(state)
-            }
-            else {return '';}
+        case 'bossRefight': return '';
     }
     return `You obtained the ${lootName}!`;
 }
@@ -481,7 +475,7 @@ const [
 const scrollGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 const [map] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 1, cols: 1}).frames;
 const [greyUpgrade, redUpgrade, blueUpgrade, /* goldUpgrade */ ] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 3, cols: 4}).frames;
-const emptyFrame = requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 16, h: 16 });
+const emptyFrame = requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 16, h: 16 }); //WIP: Make sure still works
 
 export const lootFrames = {
     smallKey: keyOutlineFrame,

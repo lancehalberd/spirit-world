@@ -3,6 +3,7 @@ import { renderStandardFieldStack } from 'app/render/renderField';
 import { renderHUD } from 'app/renderHUD';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
+import { getBossRushOptions } from './bossRushOptions';
 
 
 const WIDTH = 144;
@@ -14,22 +15,6 @@ const textOptions = <const>{
     textAlign: 'left',
     size: 16,
 };
-
-const aBosses: BossName[] = ["beetle", "golem", "idols", "guardian", "rush", "altGolem"];
-const bBosses: BossName[] = aBosses.concat(["rival2", "forest", "collector", "rush2"])
-const cBosses: BossName[] = bBosses.concat(["flameBeast", "frostBeast", "stormBeast", "rush3"])
-
-export function getBossRushOptions(state: GameState): string[] {
-    if (state.savedState.objectFlags.frostBeast && 
-        state.savedState.objectFlags.flameBeast &&
-        state.savedState.objectFlags.stormBeast) {
-            return cBosses
-        }
-    if (state.savedState.objectFlags.elementalBeastsEscaped) {
-        return bBosses
-    }
-    return aBosses
-}
 
 function formatTime(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -77,7 +62,7 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
     
     for (let i = 0; i < visibleOptions.length; i++) {
         const actualIndex = startIndex + i;
-        let text = visibleOptions[i].slice(0, 13).toUpperCase();
+        let text = visibleOptions[i].label.slice(0, 13).toUpperCase();
         drawText(context, text, x, y, textOptions);
         
         if (state.menuIndex === actualIndex) {
@@ -111,7 +96,7 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
     }
 
     // High Score Display
-    const selectedBoss = cBosses[state.menuIndex];
+    const selectedBoss = options[state.menuIndex].key;
     const highScoreTime = getHighScore(state, selectedBoss); 
 
     if (highScoreTime) {

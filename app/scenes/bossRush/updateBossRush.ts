@@ -4,78 +4,48 @@ import {
     wasConfirmKeyPressed,
 } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
-import { getBossRushOptions } from './renderBossRush';
-import { altGolemState } from 'app/content/heroSavedStates';
+//import { getBossRushOptions } from './renderBossRush';
+import { getBossRushOptions, BossRushOption } from './bossRushOptions';
+//import { altGolemState } from 'app/content/heroSavedStates';
 import { alterHeroData } from 'app/utils/alterHeroData';
-
-
-const aBosses: BossName[] = ["beetle", "golem", "idols", "guardian", "rush", "altGolem"];
-const bBosses: BossName[] = aBosses.concat(["rival2", "forest", "collector", "rush2"])
-const cBosses: BossName[] = bBosses.concat(["flameBeast", "frostBeast", "stormBeast", "rush3"])
-
-
-
-const bossLocations: string[] = [
-    'beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight', 'beetleRefight', 'golemRefight',
-    'rival2Refight', 'forestTempleRefight', 'collectorRefight', 'forestTempleRefight',
-    'flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight', 'frostBeastRefight'
-]
 
 export function updateBossRushMenu(state: GameState) {
     const options = getBossRushOptions(state);
-    if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
+    if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+        state.travel("dream", "bossRefightReturn", {instant: true});
         state.scene = 'game';
         return
     }
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         playSound('menuTick');
+        changeBackground(state, options);
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % options.length;
         playSound('menuTick');
+        changeBackground(state, options);
     }
     if (wasConfirmKeyPressed(state)) {
         playSound('menuTick');
         state.scene = 'game';
-        let selectedBoss = cBosses[state.menuIndex];
-        if (selectedBoss === "altGolem") {
-            alterHeroData(state, altGolemState);
+        let selectedBoss = options[state.menuIndex].key
+        if (options[state.menuIndex].playerState) {
+            alterHeroData(state, options[state.menuIndex].playerState)
             state.savedState.usingBackup = true;
-            startRefight(state, selectedBoss, "golemRefight")
-            return;
-        } if (selectedBoss === "rush") {
-            state.savedState.objectFlags["rushMode"] = true,
-            state.bossRushTrackers.rushPosition = 0,
-            startRefight(state, 'rush', 'beetleRefight')
-            return;
-        } if (selectedBoss === "rush2") {
-            state.savedState.objectFlags["rushMode"] = true,
-            state.bossRushTrackers.rushPosition = 4,
-            startRefight(state, 'rush', 'beetleRefight')
-            return;
-        } if (selectedBoss === "rush3") {
-            state.savedState.objectFlags["rushMode"] = true,
-            state.bossRushTrackers.rushPosition = 7,
-            startRefight(state, 'rush', 'beetleRefight')
-            return;
         }
-        let selectedLocation = bossLocations[state.menuIndex];
+        let selectedLocation = options[state.menuIndex].location[0]
         startRefight(state, selectedBoss, selectedLocation);
     }
 }
 
-
-function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
-  if (state.travel) {
-    state.travel(zoneKey, markerId, {instant: false});
-    return '';
-  }
-  console.log("Can't find travel function!")
+function changeBackground(state: GameState, options: BossRushOption[]) {
+    let selectedLocation = options[state.menuIndex].location[0];
+    state.travel("bossRefights", selectedLocation, {instant: true});
 }
 
-function startRefight(state: GameState, boss: BossName, location: string): string {
+function startRefight(state: GameState, boss: BossName, location: string): void {
     state.savedState.objectFlags["bossRefight"] = true,
     state.bossRushTrackers.bossStartTime = state.hero.savedData.playTime;
     state.bossRushTrackers.currentBoss = boss;
-    return travelToLocation(state, 'bossRefights', location);
+    return;
 }

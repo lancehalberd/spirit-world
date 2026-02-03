@@ -4,15 +4,18 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 import { travelToLocation } from './dialogue/refightVanara';
 import { restoreHeroData } from 'app/utils/alterHeroData';
+import { endBossRush, startNextBoss } from 'app/scenes/bossRush/bossRushOptions';
+import { updateBestTimes } from 'app/utils/updateBestTimes';
+import { showMessage } from 'app/scriptEvents';
 
 const MAX_LEVEL = 2;
 
 type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
 
-let bossRushOrder: Array<string> = ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight',
+/*let bossRushOrder: Array<string> = ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight',
     'forestTempleRefight', 'rival2Refight', 'crystalCollectorRefight', 
     'flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight',
-]
+]*/
 
 function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
     // Non-progressive upgrades specify the exact level of the item.
@@ -103,21 +106,23 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         updateDungeonInventory(state, inventory, false);
     },
     bossRefight: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        //WIP: Will change implementation to allow for full boss rush and not force stop on certain fights
-        //Also change loot.ts
         if (state.savedState.usingBackup) {
             state.savedState.usingBackup = false;
             restoreHeroData(state)
         }
-        if(!state.savedState.objectFlags['rushMode']) {
+        if(!['rush', 'rush2', 'rush3'].includes(state.bossRushTrackers.currentBoss)) {
+            let timeMessage = updateBestTimes(state);
+            showMessage(state, timeMessage)
             travelToLocation(state, "dream", "bossRefightReturn");
         } else {
-            if ([3, 6, 9].includes(state.bossRushTrackers.rushPosition)) {
+            if (endBossRush(state)) {
+                let timeMessage = updateBestTimes(state);
+                showMessage(state, timeMessage)
+                state.bossRushTrackers.rushPosition = 0;
                 travelToLocation(state, "dream", "bossRefightReturn");
-                state.bossRushTrackers.rushPosition += 1
             } else {
                 state.bossRushTrackers.rushPosition += 1
-                travelToLocation(state, "bossRefights", bossRushOrder[state.bossRushTrackers.rushPosition])
+                startNextBoss(state);
             }
         }
     },

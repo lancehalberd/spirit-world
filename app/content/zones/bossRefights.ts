@@ -468,14 +468,14 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "golemRefight", x: 356, y: 64, type: "boss", enemyType: "golem", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "left", params: {}, saveStatus: "zone"},
         {status: "normal", id: "golemRefightRight", x: 344, y: 114, type: "enemy", enemyType: "golemHand", d: "right", params: {}, saveStatus: "zone"},
         {status: "normal", id: "golemRefightdLeft", x: 392, y: 114, type: "enemy", enemyType: "golemHand", d: "left", params: {}, saveStatus: "zone"},
-        {status: "normal", id: "beetleRefight", x: 120, y: 184, type: "marker"},
-        {status: "normal", id: "golemRefight", x: 376, y: 184, type: "marker"},
+        {status: "normal", id: "beetleRefight", x: 120, y: 132, type: "marker"},
+        {status: "normal", id: "golemRefight", x: 376, y: 156, type: "marker"},
         {status: "normal", id: "rival2Refight", x: 376, y: 308, type: "boss", enemyType: "rival2", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, saveStatus: "zone"},
         {status: "normal", id: "warTempleRefight", spirit: false, x: 50, y: 424, type: "boss", enemyType: "flameIdol", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, saveStatus: "zone"},
         {status: "normal", id: "warTempleRefight", spirit: true, x: 120, y: 350, type: "boss", enemyType: "stormIdol", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, saveStatus: "zone"},
         {status: "normal", id: "warTempleRefight", spirit: true, x: 184, y: 426, type: "boss", enemyType: "frostIdol", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, saveStatus: "zone"},
-        {status: "normal", id: "warTempleRefight", x: 120, y: 432, type: "marker"},
-        {status: "normal", id: "rival2Refight", x: 376, y: 432, type: "marker"},
+        {status: "normal", id: "warTempleRefight", x: 120, y: 376, type: "marker"},
+        {status: "normal", id: "rival2Refight", x: 376, y: 352, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 1029, mapId: 'dreamBoss', floorId: '1F', mapX: 0, mapY: 0},
@@ -785,7 +785,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 376, y: 376, type: "rollingBall", spirit: true},
         {status: "normal", id: "", linked: true, spirit: false, x: 120, y: 360, type: "rollingBall"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 376, y: 380, type: "marker"},
-        {status: "normal", id: "guardianRefight", linked: true, spirit: true, x: 272, y: 300, type: "marker"},
+        {status: "normal", id: "guardianRefight", linked: true, spirit: true, x: 248, y: 272, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 116, y: 128, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 132, y: 384, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 384, y: 132, type: "marker"},
@@ -793,7 +793,6 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 200, y: 328, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 200, y: 220, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 308, y: 220, type: "marker"},
-        {status: "normal", id: "guardianRefight", linked: true, spirit: true, x: 248, y: 300, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: true, x: 184, y: 280, type: "marker"},
     ],
     sections: [
@@ -1474,12 +1473,12 @@ const f0_3x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "frostBeastRematch", x: 238, y: 242, type: "boss", enemyType: "frostHeart", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, saveStatus: "zone", customLogic: "refightVanara"},
-        {status: "normal", id: "frostBeastRematch", x: 248, y: 288, type: "boss", enemyType: "frostBeast", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, spirit: false, saveStatus: "zone", customLogic: "refightVanara"},
+        {status: "normal", id: "frostBeastRematch", x: 166, y: 220, type: "boss", enemyType: "frostBeast", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", params: {}, spirit: false, saveStatus: "zone", customLogic: "refightVanara"},
         {status: "normal", id: "bossRTorchSW", x: 144, y: 352, style: "torch", type: "torch"},
         {status: "normal", id: "bossRTorchNW", x: 144, y: 144, style: "torch", type: "torch"},
         {status: "normal", id: "bossRTorchNE", x: 352, y: 144, style: "torch", type: "torch"},
         {status: "normal", id: "bossRTorchSE", x: 352, y: 352, style: "torch", type: "torch"},
-        {status: "normal", id: "frostBeastRefight", x: 248, y: 396, type: "marker"},
+        {status: "normal", id: "frostBeastRefight", x: 256, y: 292, type: "marker"},
         {status: "normal", id: "", x: 372, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, requireAll: true, targetObjectId: "bossRTorchSE"},
         {status: "normal", id: "", x: 128, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, requireAll: true, targetObjectId: "bossRTorchSW"},
     ],
@@ -1751,7 +1750,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "stormHeartRefight", x: 220, y: 94, type: "boss", enemyType: "stormHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "stormBeastRefight", x: 240, y: 62, type: "boss", enemyType: "stormBeast", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", saveStatus: "zone", params: {}},
-        {status: "normal", id: "stormBeastRefight", linked: true, spirit: true, x: 248, y: 200, type: "marker"},
+        {status: "normal", id: "stormBeastRefight", linked: true, spirit: true, x: 248, y: 180, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 662, mapId: 'bossRefights', floorId: '1F', mapX: 2, mapY: 2},
@@ -2054,7 +2053,7 @@ const f0_2x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "bossRefights:0:2x1-crystalCollector-0", x: 260, y: 54, type: "boss", enemyType: "crystalCollector", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "down", saveStatus: "zone", params: {}},
-        {status: "normal", id: "collectorRefight", x: 248, y: 168, type: "marker"},
+        {status: "normal", id: "collectorRefight", x: 248, y: 132, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 1083, mapId: 'bossRefights', floorId: '1F', mapX: 4, mapY: 2},
@@ -2611,7 +2610,7 @@ const f0_3x1: AreaDefinition = {
         {status: "normal", id: "craterBossSwitch", specialBehaviorKey: "craterBossSwitch", x: 316, y: 88, requireAll: true, type: "heavyFloorSwitch", customLogic: "craterLava3"},
         {status: "normal", id: "craterBossSwitch", specialBehaviorKey: "craterBossSwitch", x: 400, y: 236, requireAll: true, type: "heavyFloorSwitch", customLogic: "craterLava3"},
         {status: "normal", id: "craterBossSwitch", specialBehaviorKey: "craterBossSwitch", x: 372, y: 424, requireAll: true, type: "heavyFloorSwitch", customLogic: "craterLava3"},
-        {status: "normal", id: "flameBeastRefight", x: 256, y: 412, type: "marker"},
+        {status: "normal", id: "flameBeastRefight", x: 256, y: 368, type: "marker"},
         {status: "normal", id: "craterBossPoint", x: 120, y: 360, type: "marker"},
         {status: "normal", id: "craterBossPoint", x: 180, y: 208, type: "marker"},
         {status: "normal", id: "craterBossPoint", x: 316, y: 208, type: "marker"},
@@ -2955,6 +2954,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "teleportTarget", linked: true, spirit: false, x: 184, y: 280, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: false, x: 248, y: 216, type: "marker"},
         {status: "normal", id: "teleportTarget", linked: true, spirit: false, x: 312, y: 276, type: "marker"},
+        {status: "normal", id: "guardianRefight", linked: true, spirit: false, x: 248, y: 272, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 663, mapId: 'bossRefightsSpirit', floorId: '1F', mapX: 2, mapY: 0},
@@ -3432,7 +3432,7 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "forestTempleRefight", x: 330, y: 214, type: "boss", enemyType: "flameIdol", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "left", params: {}, saveStatus: "zone"},
         {status: "normal", id: "forestTempleRefight", x: 338, y: 344, type: "boss", enemyType: "stormIdol", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "right", saveStatus: "zone", params: {}},
         {status: "normal", id: "forestTempleRefight", x: 164, y: 216, type: "boss", enemyType: "stormIdol", lootType: "bossRefight", lootAmount: 1, lootLevel: 1, d: "right", params: {}, saveStatus: "zone"},
-        {status: "normal", id: "forestTempleRefight", x: 252, y: 376, type: "spawnMarker"},
+        {status: "normal", id: "forestTempleRefight", x: 248, y: 256, type: "spawnMarker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 684, mapId: 'bossRefightsSpirit', floorId: '1F', mapX: 4, mapY: 0},
@@ -3843,7 +3843,7 @@ const sf0_1x1: AreaDefinition = {
     parentDefinition: f0_1x1,
     layers: null,
     objects: [
-        {status: "normal", id: "", linked: true, spirit: false, x: 248, y: 200, type: "marker"},
+        {status: "normal", id: "", linked: true, spirit: false, x: 248, y: 180, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 664, mapId: 'bossRefightsSpirit', floorId: '1F', mapX: 2, mapY: 2},

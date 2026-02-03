@@ -1,9 +1,8 @@
 export function updateBestTimes(state: GameState): string {
-    if (state.savedState.objectFlags['rushMode']) {
-        delete state.savedState.objectFlags['rushMode']; 
-    }
+    console.log(state.bossRushTrackers)
     if (state.savedState.objectFlags['bossRefight']) {
         delete state.savedState.objectFlags['bossRefight'];
+        //Note: currently all bossRefight flag does is make it so you don't get a true 'game over' dying in boss rush
     }
     let currentBoss = state.bossRushTrackers.currentBoss;
     if (currentBoss != "none" ) {
