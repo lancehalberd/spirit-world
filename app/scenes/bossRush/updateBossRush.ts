@@ -6,6 +6,7 @@ import {
 import { playSound } from 'app/utils/sounds';
 import { getBossRushOptions, BossRushOption } from './bossRushOptions';
 import { alterHeroData } from 'app/utils/alterHeroData';
+import { fixCamera } from 'app/utils/fixCamera';
 
 export function updateBossRushMenu(state: GameState) {
     const options = getBossRushOptions(state);
@@ -38,7 +39,9 @@ export function updateBossRushMenu(state: GameState) {
 
 function changeBackground(state: GameState, options: BossRushOption[]) {
     let selectedLocation = options[state.menuIndex].location[0];
+    console.log(selectedLocation)
     state.travel("bossRefights", selectedLocation, {instant: true});
+    fixCamera(state);
 }
 
 function startRefight(state: GameState, boss: BossName, location: string): void {

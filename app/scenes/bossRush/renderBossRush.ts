@@ -33,7 +33,6 @@ function getHighScore(state: GameState, boss: BossName): string {
 }
 export function renderBossRushMenu(context: CanvasRenderingContext2D, state: GameState): void {
     renderStandardFieldStack(context, state);
-    //renderHUD(context, state);
     const options = getBossRushOptions(state);
     
     // Calculate visible window
