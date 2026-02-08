@@ -14,11 +14,13 @@ const Random = {
      */
     element<T>(collection: Collection<T>): T {
         if (Array.isArray(collection)) {
-            const array = collection as Array<any>;
+            const array = collection as Array<T>;
             return array[Math.floor(Math.random() * array.length)];
         }
-        const keys = Object.keys(collection);
-        return collection[this.element(keys)];
+        if (collection instanceof Set) {
+            return this.element([...collection]);
+        }
+        return this.element(Object.values(collection));
     },
 
     /**
@@ -29,10 +31,15 @@ const Random = {
             const array = collection as Array<any>;
             return array.splice(Math.floor(Math.random() * array.length), 1)[0];
         }
+        if (collection instanceof Set) {
+            const value = this.element([...collection]);
+            collection.delete(value);
+            return value;
+        }
         const keys = Object.keys(collection);
         const key = this.element(keys);
         const value = collection[key];
-        collection[key] = null;
+        delete collection[key];
         return value;
     },
 

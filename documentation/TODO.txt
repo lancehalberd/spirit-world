@@ -164,8 +164,6 @@ Current tasks:
             When teleporting: "There is no escaping me!"
             - Player will want to lure the projection away from the boss and complete the puzzle during its attacks.
             - This occurs when the boss reaches 2 health and cancels any burning damage.
-        - Once the boss reaches 80% health, have the spirit intentionally move on top of the ball any time it is close by.
-            - Update hit mechanics so that the spirit mostly prevents interacting with the ball while it is on top of it.
 
     - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
         - Delays spirit energy generation for 1s

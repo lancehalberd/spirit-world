@@ -62,7 +62,10 @@ export class TextCue implements EffectInstance {
             } else if (this.duration > 0 && this.time > this.duration - fadeDuration) {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }
-            let x = padding, y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * rowHeight;
+            let x = padding;
+            // Trying with extar -8 to avoid rendering behind secondary boss health bars.
+            // TODO: just move these up when health bars are on the screen?
+            let y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * rowHeight - 8;
             let maxWidth = 0;
             for (const frameRow of this.textFrames) {
                 let rowWidth = 0;

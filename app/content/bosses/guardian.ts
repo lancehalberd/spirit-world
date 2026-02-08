@@ -26,6 +26,7 @@ import {
     getClosestTarget,
     getNearbyTarget,
     getTargetingAnchor,
+    getTargetDistance,
     getVectorToNearbyTarget,
     getVectorToMovementTarget,
     getVectorToTarget,
@@ -333,6 +334,10 @@ const projectileRingAbility: EnemyAbility<Target> = {
 };
 
 function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
+    const projection = getProjection(state);
+    if (!projection || projection.params.isEnraged) {
+        return;
+    }
     // Increased the time since last hit by 0.5s every time we check. This will cause the hints
     // to be given slightly faster the more often the player hits the projection, which may
     // indicate that they haven't figured out how to complete the battle yet.
@@ -389,7 +394,7 @@ interface ProjectionParams {
     bodyAlpha: number
     // This will only be set on copies of the projection.
     parent?: Enemy<ProjectionParams>
-    usedEnrageAbilities?: Set<EnemyAbility<any>>,
+    usedEnrageModes?: Set<string>,
 }
 const guardianProjection: EnemyDefinition<ProjectionParams> = {
     naturalDifficultyRating: 1,
@@ -416,7 +421,7 @@ const guardianProjection: EnemyDefinition<ProjectionParams> = {
         }
         const result = enemy.defaultOnHit(state, hit);
         if (result.hit) {
-            checkToGiveHint(state, getGuardian(enemy));
+            checkToGiveHint(state, getGuardian(state));
         }
         // Projection blocks all attacks so that it can interfere with pushing rolling balls.
         return {
@@ -528,10 +533,10 @@ const guardian: EnemyDefinition<GuardianParams> = {
 };
 enemyDefinitions.guardian = guardian;
 
-function getGuardian(projection: Enemy<ProjectionParams>): Enemy<GuardianParams> {
-    return projection.area.alternateArea.enemies.find(o =>
+function getGuardian(state: GameState): Enemy<GuardianParams> {
+    return state.areaInstance.enemies.find(o =>
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
-    ) || projection.area.enemies.find(o =>
+    ) || state.areaInstance.alternateArea.enemies.find(o =>
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
     );
 }
@@ -587,21 +592,27 @@ function moveGuardianToArea(state: GameState, area: AreaInstance, enemy: Enemy<G
     }
 }
 
+function getAvailableElements(state: GameState): MagicElement[] {
+    const guardian = getGuardian(state);
+    if (!guardian) {
+        return [];
+    }
+    if (guardian.life >= guardian.maxLife) {
+        return [elements[0]];
+    } else if (guardian.life >= guardian.maxLife / 2) {
+        return [elements[0], elements[1]];
+    }
+    return elements;
+}
+
 const elements: MagicElement[] = [null, 'lightning', 'ice', 'fire'];
 //const elements: MagicElement[] = ['ice', 'ice', 'ice', 'ice'];
 function switchElements(state: GameState, enemy: Enemy<ProjectionParams>) {
-    const guardian = getGuardian(enemy);
+    const guardian = getGuardian(state);
     if (!guardian) {
         return;
     }
-    const maxLife = guardian.maxLife;
-    // Determine which elements are currently available
-    let availableElements = elements;
-    if (guardian.life >= maxLife) {
-        availableElements = [elements[0]];
-    } else if (guardian.life >= maxLife / 2) {
-        availableElements = [elements[0], elements[1]];
-    }
+    const availableElements = getAvailableElements(state);
     // Find the index of the current element, then cycle to the next available element.
     const index = availableElements.indexOf(enemy.params.element);
     enemy.params.element = testElement || availableElements[(index + 1) % availableElements.length];
@@ -627,8 +638,8 @@ function switchToNextMode(state: GameState, enemy: Enemy<ProjectionParams>) {
 
 function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta: number) {
     const hitbox = enemy.getHitbox();
-    const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h;
     const dx = Math.cos(theta), dy = Math.sin(theta);
+    const x = hitbox.x + hitbox.w / 2 + 12 * dx, y = hitbox.y + hitbox.h + 12 * dy;
     if (enemy.params.element === 'lightning') {
         const spark = new Spark({
             x, y,
@@ -699,7 +710,7 @@ function seekProjection(state: GameState, effect: FieldAnimationEffect) {
 
 function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
     enemy.z = 6;
-    const guardian = getGuardian(enemy);
+    const guardian = getGuardian(state);
     // The projection is defeated when the guardian is defeated.
     if (!guardian || guardian.status === 'gone' || guardian.isDefeated) {
         enemy.life = 0;
@@ -752,6 +763,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             // The projection enrage phase ends as soon as it needs to regenerate once.
             if (enemy.params.isEnraged) {
                 enemy.params.isEnraged = false;
+                guardian.params.lastDamaged = state.fieldTime
                 // Projection regenerates quickly after enraging.
                 enemy.params.regenerationRate = staggerRegenerationRate;
             }
@@ -813,10 +825,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         if (moveEnemyToTargetLocation(state, enemy, centralPosition.x, centralPosition.y)) {
             return;
         }
-        const targets = enemy.area.objects.filter(o => o.definition.type === 'rollingBall').map(o => {
-            const hitbox = o.getHitbox();
-            return {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
-        });
+        const targets = enemy.area.objects.filter(o => o.definition.type === 'rollingBall');
         while (enemy.params.copies.length < targets.length) {
             const copy = new Enemy(state, {
                 type: 'enemy',
@@ -839,8 +848,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             const copy = enemy.params.copies[i];
             copy.params.bodyAlpha = Math.min(1, copy.params.bodyAlpha + 0.03);
             copy.params.element = enemy.params.element;
-            const distance = moveEnemyToTargetLocation(state, copy, target.x, target.y)
-            if (distance) {
+            if (moveTowardsTarget(state, copy, target)) {
                 copy.invulnerableFrames = copy.enemyInvulnerableFrames = 10;
                 enemy.modeTime = -20;
             } else {
@@ -849,19 +857,39 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 copy.enemyInvulnerableFrames = enemy.enemyInvulnerableFrames;
             }
         }
-        if (enemy.mode === 'choose' && enemy.modeTime === 0) {
-            if (Math.random() < 0.2) {
-                enemy.setMode('projectileRings');
-            } else if (enemy.params.element === 'lightning') {
-                enemy.setMode('storm');
-            } else if (enemy.params.element === 'fire') {
-                enemy.setMode('flameWalls');
-            } else if (enemy.params.element === 'ice') {
-                enemy.setMode('blizzard');
-            } else {
-                enemy.setMode('lasers');
+        if (enemy.mode === 'choose') {
+            // Attempt to choose an enrage mode that is available and new.
+            // If no new choices are available,
+            const availableElements = getAvailableElements(state);
+            let availableModes: Set<string> = new Set(['projectileRings']);
+            if (availableElements.includes(null)) {
+                availableModes.add('lasers');
             }
-            // enemy.setMode('projectileRings');
+            if (availableElements.includes('lightning')) {
+                availableModes.add('storm');
+            }
+            if (availableElements.includes('fire')) {
+                availableModes.add('flameWalls');
+            }
+            if (availableElements.includes('ice')) {
+                availableModes.add('blizzard');
+            }
+            // Make sure usedEnragedModes is initialized before we try to read it.
+            if (!enemy.params.usedEnrageModes) {
+                enemy.params.usedEnrageModes = new Set();
+            }
+            // If all modes are already used, just choose one at random.
+            if (enemy.params.usedEnrageModes.size >= availableModes.size) {
+                enemy.setMode(Random.element(availableModes));
+            }
+            // Otherwise, randomly choose an unused mode.
+            for (const mode of Random.shuffle([...availableModes])) {
+                if (!enemy.params.usedEnrageModes.has(mode)) {
+                    enemy.params.usedEnrageModes.add(mode);
+                    enemy.setMode(mode);
+                    break;
+                }
+            }
         }
     } else if (!enemy.params.isEnraged) {
         cleanupCopies(state, enemy);
@@ -869,18 +897,21 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
 
     enemy.life = Math.max(0, enemy.life - 0.5 * FRAME_LENGTH / 1000);
     if (enemy.mode === 'lasers') {
+        enemy.params.element = null;
         if (enemy.modeTime === 1500 || enemy.modeTime === 2500 || (enemy.modeTime >= 3000 && (enemy.modeTime % 500) === 0)) {
             // Randomly choose any copy that isn't currently using an ability.
             const user = Random.element([enemy, ...enemy.params.copies].filter(e => !e.activeAbility));
             user?.useAbiltyFromDefinition(state, laserAbility, state.hero.getAnchorPoint());
         }
     } else if (enemy.mode === 'flameWalls') {
+        enemy.params.element = 'fire';
         if (enemy.modeTime === 600 || (enemy.modeTime >= 2400 && (enemy.modeTime % 1200) === 0)) {
             // Choose closest copy not using an ability.
             const user = getClosestTarget(state.hero, [enemy, ...enemy.params.copies].filter(e => !e.activeAbility));
             user?.useAbiltyFromDefinition(state, flameWallAbility, true);
         }
     } else if (enemy.mode === 'storm') {
+        enemy.params.element = 'lightning';
         if (enemy.modeTime % 400 === 0) {
             for (const user of [enemy, ...enemy.params.copies]) {
                 user.params.sparkTheta = (user.params.sparkTheta || 0) + Math.PI / 24;
@@ -902,6 +933,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             user?.useAbiltyFromDefinition(state, lightningBoltAbility);
         }
     } else if (enemy.mode === 'blizzard') {
+        enemy.params.element = 'ice';
         if (enemy.modeTime > 1000 && !enemy.params.copies.filter(e => e.activeAbility?.time < 1500).length) {
             const copy = getClosestTarget(state.hero, enemy.params.copies.filter(e => !e.activeAbility));
             if (copy) {
@@ -1087,47 +1119,50 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             enemy.setMode('choose');
         }
     } else {
+        if (enemy.vx > 1 || enemy.vy > 1) {
         // Slow to a stop if moving.
-        if (enemy.modeTime < 500) {
             enemy.vx *= 0.8;
             enemy.vy *= 0.8;
             enemy.x += enemy.vx;
             enemy.y += enemy.vy;
             return;
         }
-        // Face the nearest target
-        enemy.vx = enemy.vy = 0;
-        const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
-        if (v) {
-            enemy.d = getCardinalDirection(v.x, v.y);
+        // Projection will approach either the center or nearest rolling block depending on what is closest to the hero.
+        const target = getClosestTarget(state.hero, enemy.area.objects.filter(o => o.definition.type === 'rollingBall' || o.definition.id === 'centerTarget'));
+        const distance = getTargetDistance(state, target, enemy);
+        if (distance > 64) {
+            enemy.setMode('teleport');
+            return;
         }
-        if (v && enemy.modeTime >= 1000) {
-            if (v.mag >= 128) {
-                enemy.setMode('teleport');
-            } else {
-                switchToNextMode(state, enemy);
+        if (!moveTowardsTarget(state, enemy, target) && enemy.modeTime >= 500) {
+            enemy.vx = enemy.vy = 0;
+            // Face the nearest target
+            const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
+            if (v) {
+                enemy.d = getCardinalDirection(v.x, v.y);
             }
+            switchToNextMode(state, enemy);
         }
     }
 }
 
 function teleportToClosestMarker(this: void, state: GameState, projection: Enemy<ProjectionParams>): void {
-    const markers = projection.area.objects.filter(o => o.definition?.id === 'teleportTarget');
-    let bestDistance: number, bestMarker: ObjectInstance;
-    for (const marker of markers) {
-        const v = getVectorToNearbyTarget(state, marker, 1000, projection.area.allyTargets);
-        if (bestDistance === undefined || v?.mag < bestDistance) {
-            bestDistance = v?.mag;
-            bestMarker = marker;
-        }
-    }
-    if (!bestMarker) {
+    const marker = getClosestTarget(state.hero, projection.area.objects.filter(o => o.definition?.id === 'centerTarget' || o.definition.type === 'rollingBall'));
+    if (!marker) {
         debugger;
     }
-    const hitbox = projection.getHitbox();
-    const markerBox = bestMarker.getHitbox();
+    const hitbox = projection.getMovementHitbox();
+    const markerBox = marker.getHitbox();
     projection.x += markerBox.x + markerBox.w / 2 - (hitbox.x + hitbox.w / 2);
-    projection.y += markerBox.y + markerBox.h - (hitbox.y + hitbox.h);
+    projection.y += markerBox.y + markerBox.h / 2 - (hitbox.y + hitbox.h / 2);
+}
+
+function moveTowardsTarget(state: GameState, projection: Enemy<ProjectionParams>, target: Target): number {
+    if (!target) {
+        return;
+    }
+    const hitbox = target.getHitbox();
+    return moveEnemyToTargetLocation(state, projection, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2);
 }
 
 function teleportToNextMarker(this: void, state: GameState, guardian: Enemy<GuardianParams>): void {

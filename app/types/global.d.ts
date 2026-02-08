@@ -9,7 +9,7 @@ interface Window {
   [key: string]: any;
 }
 
-type Collection<T> = {[key:string]: T} | Array<T>;
+type Collection<T> = {[key:string]: T} | Array<T> | Set<T>;
 
 type Color = string;
 // type Range = [number, number];
