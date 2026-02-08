@@ -144,24 +144,18 @@ export function drawRunningAnts(context: CanvasRenderingContext2D, rectangle: Fu
 }
 
 
-export function arrMod<T>(array: T[], index: number): T {
-    return array[(index % array.length + array.length) % array.length];
-}
-
-export function removeElementFromArray<T>(array: T[], element: T, throwErrorIfMissing = false): T {
-    const index = array.indexOf(element);
-    if (index < 0) {
-        if (throwErrorIfMissing) throw new Error("Element was not found to remove from array.");
-        return;
-    }
-    return array.splice(index, 1)[0];
-}
 
 
 // Return the minimum angle between two angles, specified in degrees.
 export function getThetaDistance(angle1: number, angle2: number): number {
     const diff = Math.abs(angle1 - angle2) % 360;
     return Math.min(diff, 360 - diff);
+}
+export function getDistanceSquared(a: Point, b: Point) {
+    return (b.x - a.x) ** 2 + (b.y - a.y) ** 2;
+}
+export function getDistance(a: Point, b: Point) {
+    return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 }
 
 export function saveToFile(content: string, fileName: string, contentType: string) {
@@ -331,10 +325,16 @@ export function range(x1: number, y1: number, x2: number, y2: number, a: number)
 	return lerp(x2, y2, invlerp(x1, y1, a));
 }
 
-export function removeItemFromArray<T>(array: T[], item: T): number {
-    const index = array.indexOf(item);
-        if (index >= 0) {
-            array.splice(index, 1);
-        }
-    return index;
+
+export function arrMod<T>(array: T[], index: number): T {
+    return array[(index % array.length + array.length) % array.length];
+}
+// removeItemFromArray
+export function removeElementFromArray<T>(array: T[], element: T, throwErrorIfMissing = false): T {
+    const index = array.indexOf(element);
+    if (index < 0) {
+        if (throwErrorIfMissing) throw new Error("Element was not found to remove from array.");
+        return;
+    }
+    return array.splice(index, 1)[0];
 }

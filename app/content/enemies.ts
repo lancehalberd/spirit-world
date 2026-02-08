@@ -58,6 +58,7 @@ export const enemyTypes = <const>[
     // This is for the Golem Boss, use "Crusher" for a standalone enemy.
     'golemHand',
     'guardianProjection',
+    'guardianProjectionCopy',
 ];
 declare global {
     export type EnemyType = typeof enemyTypes[number];

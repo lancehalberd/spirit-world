@@ -169,6 +169,8 @@ interface Props {
     spiritCloakDamage?: number
     // Don't update for this many milliseconds.
     delay?: number
+    // time to live in milliseconds.
+    ttl?: number
     // Don't collide with walls for this many milliseconds.
     ignoreWallsDuration?: number
     element?: MagicElement
@@ -185,6 +187,7 @@ export class Arrow implements EffectInstance, Projectile {
     damage: number;
     spiritCloakDamage: number;
     delay: number;
+    ttl: number;
     ignoreWallsDuration: number;
     isEffect = <const>true;
     chargeLevel: number = 0;
@@ -219,7 +222,7 @@ export class Arrow implements EffectInstance, Projectile {
     constructor({
         x = 0, y = 0, z = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
-        ignoreWallsDuration = 0, source
+        ignoreWallsDuration = 0, source, ttl = 0
     }: Props) {
         this.x = x | 0;
         this.y = y | 0;
@@ -243,6 +246,7 @@ export class Arrow implements EffectInstance, Projectile {
         this.reflected = reflected;
         this.hybridWorlds = hybridWorlds;
         this.source = source;
+        this.ttl = ttl
     }
     getAnchorPoint() {
         const direction = getDirection(this.vx, this.vy, true);
@@ -322,6 +326,10 @@ export class Arrow implements EffectInstance, Projectile {
             this.y = this.stuckTo.object.y + this.stuckTo.dy;
         }
         this.animationTime += FRAME_LENGTH;
+        if (this.ttl && this.animationTime >= this.ttl) {
+            removeEffectFromArea(state, this);
+            return;
+        }
         if (this.stuckFrames > 0) {
             this.stuckFrames++;
             if (this.blocked) {

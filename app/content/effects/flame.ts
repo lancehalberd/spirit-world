@@ -15,6 +15,7 @@ const flameBrokenAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h:
 
 interface Props {
     delay?: number
+    ignoreWallsDuration?: number
     x: number
     y: number
     z?: number
@@ -66,6 +67,7 @@ export class Flame implements EffectInstance, Props {
     damage: number;
     scale: number;
     delay = 0;
+    ignoreWallsDuration = 0;
     x: number;
     y: number;
     z: number = 0;
@@ -95,11 +97,12 @@ export class Flame implements EffectInstance, Props {
     source: Actor;
     beforeUpdate?: (state: GameState, flame: Flame) => void;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3,
-        delay = 0, damage = 1, scale = 1, ttl = 2000, hybridWorlds = false, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
+        delay = 0, ignoreWallsDuration = 0, damage = 1, scale = 1, ttl = 2000, hybridWorlds = false, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
         source, persist
     }: Props) {
         this.damage = damage;
         this.delay = delay;
+        this.ignoreWallsDuration = ignoreWallsDuration;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -159,8 +162,7 @@ export class Flame implements EffectInstance, Props {
             }
             return;
         }
-        if (this.delay > 0) {
-            this.delay -= FRAME_LENGTH;
+        if (this.animationTime < this.delay) {
             this.animationTime += FRAME_LENGTH;
             return;
         }
@@ -234,7 +236,7 @@ export class Flame implements EffectInstance, Props {
                     hitAllies: !this.reflected,
                     hitEnemies: this.reflected,
                     hitObjects: true,
-                    hitTiles: true,
+                    hitTiles: this.animationTime >= (this.delay ?? 0) + (this.ignoreWallsDuration ?? 0),
                     vx: this.vx,
                     vy: this.vy,
                     anchorPoint,

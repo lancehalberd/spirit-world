@@ -365,7 +365,7 @@ interface HitProperties {
     // Alternate hitbox to use when checking for tile hits.
     tileHitbox?: Rect
     // Targets to ignore.
-    ignoreTargets?: Set<EffectInstance | ObjectInstance>
+    ignoreTargets?: Set<Target>
     // If true this hit will only apply to objects touching the ground.
     isGroundHit?: boolean
     // True if this is an arrow attack, targets may be strong/weak against arrows.
@@ -423,7 +423,7 @@ interface HitResult {
     // For example an arrow hitting a lit torch will gain the 'fire' element.
     setElement?: MagicElement
     // Returns the set of targets hit.
-    hitTargets?: Set<EffectInstance | ObjectInstance>
+    hitTargets?: Set<Target>
     // Additional data can be returned with a HitResult that might be helpful when debugging.
     debug?: any
 }

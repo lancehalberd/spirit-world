@@ -29,7 +29,7 @@ interface AnimationProps {
     scale?: number
     ttl?: number
     delay?: number
-    target?: ObjectInstance | EffectInstance
+    target?: Target
     // If set to true it will adjust the coords to center the first frame of the animation.
     centerOnPoint?: boolean
     update?: (state: GameState, effect: FieldAnimationEffect) => void
@@ -60,7 +60,8 @@ export class FieldAnimationEffect implements EffectInstance {
     az: number;
     rotation: number;
     scale: number;
-    target?: ObjectInstance | EffectInstance;
+    // If this is set, the coords are relative to this target.
+    target?: Target;
     ttl: number;
     checkToCull?: (state: GameState) => boolean;
     onUpdate: (state: GameState, effect: FieldAnimationEffect) => void
@@ -143,12 +144,13 @@ export class FieldAnimationEffect implements EffectInstance {
         if (this.behaviors.brightness > 0) {
             this.behaviors.brightness *= 0.9;
         }
-        if (this.animationTime > this.ttl || this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
+        if (this.animationTime > this.ttl || this.z < 0 || ((this.animation.loop === false || !this.ttl) && this.animationTime >= this.animation.duration)) {
             this.done = true;
-            removeEffectFromArea(state, this);
         }
         if (this.boundingBox && !rectanglesOverlap(this.boundingBox, this.getGroundHitbox())) {
             this.done = true;
+        }
+        if (this.done) {
             removeEffectFromArea(state, this);
         }
     }
@@ -235,7 +237,7 @@ export function addParticleAnimations(
 }
 
 
-const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: false});
+const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: true});
 //const whiteSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 0, duration: 6, frameMap: [0,1,0]}, {loop: false});
 export const iceSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 2, duration: 6, frameMap: [0, 1, 0]}, {loop: false});
 const fireSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 4, duration: 6,  frameMap: [0,1,0,0]}, {loop: false});

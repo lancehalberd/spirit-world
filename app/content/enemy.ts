@@ -238,11 +238,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 (this.enemyDefinition.flipRight && this.d === 'right')
                 || (this.enemyDefinition.flipLeft && this.d === 'left')
             ) {
-                hitbox.x -= ((frame.content?.x || 0) + (frame.content?.w || frame.w) - frame.anchor.x);
+                hitbox.x -= ((frame.content?.x || 0) + (frame.content?.w || frame.w) - frame.anchor.x) * this.scale;
             } else {
-                hitbox.x -= (frame.anchor.x - (frame.content?.x || 0));
+                hitbox.x -= (frame.anchor.x - (frame.content?.x || 0)) * this.scale;
             }
-            hitbox.y -= (frame.anchor.y - (frame.content.y || 0));
+            hitbox.y -= (frame.anchor.y - (frame.content.y || 0)) * this.scale;
         }
         return hitbox;
     }
@@ -259,11 +259,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 (this.enemyDefinition.flipRight && this.d === 'right')
                 || (this.enemyDefinition.flipLeft && this.d === 'left')
             ) {
-                hitbox.x -= ((frame.content?.x || 0) + (frame.content?.w || frame.w) - frame.anchor.x);
+                hitbox.x -= ((frame.content?.x || 0) + (frame.content?.w || frame.w) - frame.anchor.x) * this.scale;
             } else {
-                hitbox.x -= (frame.anchor.x - (frame.content?.x || 0));
+                hitbox.x -= (frame.anchor.x - (frame.content?.x || 0)) * this.scale;
             }
-            hitbox.y -= (frame.anchor.y - (frame.content?.y || 0));
+            hitbox.y -= (frame.anchor.y - (frame.content?.y || 0)) * this.scale;
         }
         return hitbox;
     }
@@ -684,7 +684,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // any cooldown or charge restrictions as the instance information is not stored beyond a single
     // use. This is useful for enemy counter attacks and other circumstances where an enemy uses an
     // ability that doesn't need any long term tracking.
-    useAbiltyFromDefinition<T>(state: GameState, ability: EnemyAbility<T>, target: T) {
+    useAbiltyFromDefinition<T>(state: GameState, ability: EnemyAbility<T>, target: T = ability.getTarget(state, this)) {
+        if (!target){
+            return;
+        }
         const abilityInstance = {
             definition: ability,
             charges: 1,
@@ -1174,6 +1177,17 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 removeEffectFromArea(state, effect);
             }
         }
+    }
+    // Move the center of the enemies hitbox to its current coordinates.
+    // By default x/y represent the top left corner of the hitbox.
+    // When creating an enemy it is often convenient to use the center of
+    // their hitbox instead.
+    // Call this function after creating an enemy with coords x,y so that
+    // the center of its hitbox will be at x,y instead
+    center(hitbox = this.getMovementHitbox()): this {
+        this.x -= hitbox.w / 2;
+        this.y -= hitbox.h / 2;
+        return this;
     }
 }
 objectHash.enemy = Enemy;

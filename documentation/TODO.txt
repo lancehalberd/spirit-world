@@ -148,6 +148,25 @@ Graphics to Implement:
 Current tasks:
     - Preload music.
 
+    - Cocoon boss improvements
+        - Allow boss to hit and move rolling balls with some attacks.
+            - Track source of ball hit on the ball, and apply it to damge from the ball.
+            - If the boss hits the ball into itself(check source is projection), add special dialog
+                "How embarrassing!"
+                "You got lucky!"
+                "I hit myself?!"
+        - Add large blast to start of enrage phase (when sending clones out)?
+        - Add a final pinch phase where the astral projection becomes undamagable and uses slow targeted attacks that impede
+          the player's ability to interact with the puzzle elements.
+            "I won't lose this easily!"
+            Taunts change
+            "My Spirit Energy is limitless"
+            When teleporting: "There is no escaping me!"
+            - Player will want to lure the projection away from the boss and complete the puzzle during its attacks.
+            - This occurs when the boss reaches 2 health and cancels any burning damage.
+        - Once the boss reaches 80% health, have the spirit intentionally move on top of the ball any time it is close by.
+            - Update hit mechanics so that the spirit mostly prevents interacting with the ball while it is on top of it.
+
     - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
         - Delays spirit energy generation for 1s
 

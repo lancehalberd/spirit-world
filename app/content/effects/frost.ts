@@ -19,6 +19,8 @@ interface Props {
     vz?: number
     az?: number
     ttl?: number
+    delay?: number
+    ignoreWallsDuration?: number
     hitEnemies?: boolean
     source: Actor
 }
@@ -43,11 +45,13 @@ export class Frost implements EffectInstance, Props {
     radius: number;
     animationTime = 0;
     speed = 0;
+    delay?: number;
+    ignoreWallsDuration?: number;
     ttl: number;
     animationOffset: number;
     hitEnemies: boolean;
     source: Actor;
-    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, hitEnemies = false, ignoreTargets, source}: Props) {
+    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, hitEnemies = false, delay, ignoreWallsDuration, ignoreTargets, source}: Props) {
         this.damage = damage;
         this.x = x - 6;
         this.y = y - 6;
@@ -57,6 +61,8 @@ export class Frost implements EffectInstance, Props {
         this.vz = vz;
         this.az = az;
         this.ttl = ttl;
+        this.delay = delay;
+        this.ignoreWallsDuration = ignoreWallsDuration;
         this.ignoreTargets = ignoreTargets || new Set();
         this.hitEnemies = hitEnemies;
         this.animationOffset = ((Math.random() * 10) | 0) * 20;
@@ -66,13 +72,17 @@ export class Frost implements EffectInstance, Props {
         return this;
     }
     update(state: GameState) {
+        if (this.animationTime < this.delay) {
+            this.animationTime += FRAME_LENGTH;
+            return;
+        }
         this.x += this.vx;
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
         this.vz = Math.max(-8, this.vz + this.az);
         this.animationTime += FRAME_LENGTH;
 
-        if (this.animationTime >= this.ttl) {
+        if (this.animationTime >= this.ttl + this.delay) {
             removeEffectFromArea(state, this);
         } else {
             hitTargets(state, this.area, {
@@ -83,7 +93,7 @@ export class Frost implements EffectInstance, Props {
                 hitAllies: true,
                 hitEnemies: this.hitEnemies,
                 hitObjects: true,
-                hitTiles: true,
+                hitTiles: this.animationTime >= (this.delay ?? 0) + (this.ignoreWallsDuration ?? 0),
                 ignoreTargets: this.ignoreTargets,
                 source: this.source,
             });

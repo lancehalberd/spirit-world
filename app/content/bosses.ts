@@ -35,6 +35,7 @@ const minionTypes = <const>[
     'beetleBossWingedMinionDefinition',
     'golemHand',
     'guardianProjection',
+    'guardianProjectionCopy',
     'voidStone', 'voidFlame', 'voidFrost', 'voidStorm', 'voidHand',
 ];
 

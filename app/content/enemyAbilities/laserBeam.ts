@@ -1,5 +1,4 @@
-import {LaserBeam} from 'app/content/effects/laserBeam';
-import {FRAME_LENGTH} from 'app/gameConstants';
+import {LaserBeam, rotateLaserBeamAroundTarget, setLaserBeamBySourceAndAngle, stickLaserBeamToTarget} from 'app/content/effects/laserBeam';
 import {addEffectToArea} from 'app/utils/effects';
 import {getEndOfLineOfSight, getVectorToNearbyTarget} from 'app/utils/target';
 
@@ -51,38 +50,13 @@ export const bossLaserBeamAbility: EnemyAbility<number> = {
             source: enemy,
             ignoreWalls: true,
         });
-        setLaserBeamByTargetAndAngle(laserBeam, enemy, angle);
+        setLaserBeamBySourceAndAngle(laserBeam, enemy, angle);
         addEffectToArea(state, enemy.area, laserBeam);
     },
     cooldown: 4000,
     prepTime: 0,
     recoverTime: 1000,
 };
-
-function setLaserBeamByTargetAndAngle(laserBeam: LaserBeam, target: ObjectInstance, theta: number) {
-    const hitbox = target.getHitbox();
-    const cx = hitbox.x + hitbox.w / 2;
-    const cy = hitbox.y + hitbox.h / 2;
-    const dx = Math.cos(theta), dy = Math.sin(theta);
-    laserBeam.sx = cx + dx * hitbox.w / 2;
-    laserBeam.sy = cy + dy * hitbox.h / 2;
-    laserBeam.tx = laserBeam.sx + 1000 * dx;
-    laserBeam.ty = laserBeam.sy + 1000 * dy;
-}
-
-function stickLaserBeamToTarget(laserBeam: LaserBeam, target: ObjectInstance, theta: number) {
-    setLaserBeamByTargetAndAngle(laserBeam, target, theta);
-    laserBeam.beforeUpdate = (state: GameState, laserBeam: LaserBeam) => {
-        setLaserBeamByTargetAndAngle(laserBeam, target, theta);
-    };
-}
-function rotateLaserBeamAroundTarget(laserBeam: LaserBeam, target: ObjectInstance, theta: number, thetaV: number) {
-    setLaserBeamByTargetAndAngle(laserBeam, target, theta);
-    laserBeam.beforeUpdate = (state: GameState, laserBeam: LaserBeam) => {
-        theta += thetaV * FRAME_LENGTH / 1000;
-        setLaserBeamByTargetAndAngle(laserBeam, target, theta);
-    };
-}
 
 export const bossQuadStepLaserBeamAbility: EnemyAbility<number> = {
     getTarget(this: void, state: GameState, enemy: Enemy): number {

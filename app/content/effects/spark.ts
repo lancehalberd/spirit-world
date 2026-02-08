@@ -24,6 +24,7 @@ interface Props {
     extraHitProps?: Partial<HitProperties>
     finalRadius?: number
     delay?: number
+    ignoreWallsDuration?: number
     target?: ObjectInstance | EffectInstance
     hybridWorlds?: boolean
     onHit?: (state: GameState, spark: Spark) => void
@@ -79,6 +80,7 @@ export class Spark implements EffectInstance, Props {
     hitRay: Ray;
     animationTime = 0;
     ttl: number = this.props.ttl ?? 2000;
+    ignoreWallsDuration = this.props.ignoreWallsDuration;
     delay = this.props.delay;
     source = this.props.source;
     constructor(readonly props: Props) {
@@ -109,7 +111,7 @@ export class Spark implements EffectInstance, Props {
             element: 'lightning',
             hitAllies: true,
             // This is needed to prevent the spark from traveling across ledges.
-            hitTiles: true,
+            hitTiles: this.animationTime >= (this.ignoreWallsDuration ?? 0),
             knockAwayFrom: {x: this.x, y: this.y},
             vx: this.vx,
             vy: this.vy,
