@@ -699,6 +699,10 @@ function cleanupCopies(state: GameState, enemy: Enemy<ProjectionParams>, instant
 
 function seekProjection(state: GameState, effect: FieldAnimationEffect) {
     const projection = getProjection(state);
+    if (!projection || projection.area !== effect.area) {
+        effect.done = true;
+        return;
+    }
     const v = getVectorToMovementTarget(state, effect, projection);
     const speed = 2 + Math.random();
     effect.vx = v.x * speed;
