@@ -172,6 +172,10 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (!editingState.isEditing && state.areaSection?.isHot && !state.hero.savedData.passiveTools.fireBlessing) {
         hero.applyBurn(1, 500);
     }
+    // Life is restored as soon as it is visibly lost in the Dream world.
+    if (state.location.zoneKey === 'dream' && hero.displayLife < hero.savedData.maxLife) {
+        hero.life = hero.savedData.maxLife;
+    }
     if (hero.rollCooldown > 0) {
         hero.rollCooldown -= FRAME_LENGTH;
     }

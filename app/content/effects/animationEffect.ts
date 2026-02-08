@@ -32,6 +32,7 @@ interface AnimationProps {
     target?: Target
     // If set to true it will adjust the coords to center the first frame of the animation.
     centerOnPoint?: boolean
+    doNotLoop?: boolean
     update?: (state: GameState, effect: FieldAnimationEffect) => void
 }
 
@@ -60,6 +61,7 @@ export class FieldAnimationEffect implements EffectInstance {
     az: number;
     rotation: number;
     scale: number;
+    doNotLoop?: boolean;
     // If this is set, the coords are relative to this target.
     target?: Target;
     ttl: number;
@@ -70,7 +72,7 @@ export class FieldAnimationEffect implements EffectInstance {
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
         ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
-        friction = 0,
+        friction = 0, doNotLoop,
         target, ttl, delay = 0, centerOnPoint = false, update
      }: AnimationProps) {
         this.animation = animation;
@@ -97,6 +99,7 @@ export class FieldAnimationEffect implements EffectInstance {
         this.behaviors = {};
         this.target = target;
         this.onUpdate = update;
+        this.doNotLoop = doNotLoop;
         if (centerOnPoint) {
             const hitbox = this.getHitbox();
             this.x -= hitbox.w / 2;
@@ -144,7 +147,7 @@ export class FieldAnimationEffect implements EffectInstance {
         if (this.behaviors.brightness > 0) {
             this.behaviors.brightness *= 0.9;
         }
-        if (this.animationTime > this.ttl || this.z < 0 || ((this.animation.loop === false || !this.ttl) && this.animationTime >= this.animation.duration)) {
+        if (this.animationTime > this.ttl || this.z < 0 || ((this.animation.loop === false || this.doNotLoop) && this.animationTime >= this.animation.duration)) {
             this.done = true;
         }
         if (this.boundingBox && !rectanglesOverlap(this.boundingBox, this.getGroundHitbox())) {
@@ -288,7 +291,8 @@ export function makeSparkleAnimation(
         target,
         x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
         y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
-        z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0)
+        z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0),
+        doNotLoop: true,
     }
     if (velocity?.z) {
         animationProps.vz = velocity.z;

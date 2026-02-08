@@ -803,7 +803,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             if (!enemy.params.isEnraged && enemy.modeTime % 60 === 0 && enemy.life <= enemy.maxLife - 3) {
                 addSparkleAnimation(state, enemy.area, pad(guardian.getHitbox(), -4),
                     {element: null},
-                    {ttl: 2000, vx: Random.range(-1, 1), vy: Random.range(-1, 1), update: seekProjection}
+                    {ttl: 2000, vx: Random.range(-1, 1), vy: Random.range(-1, 1), update: seekProjection, doNotLoop: false}
                 );
             }
             // The projection regenerates quickly after the Guardian recovers from being staggered.
@@ -1134,7 +1134,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         // Projection will approach either the center or nearest rolling block depending on what is closest to the hero.
         const target = getClosestTarget(state.hero, enemy.area.objects.filter(o => o.definition.type === 'rollingBall' || o.definition.id === 'centerTarget'));
         const distance = getTargetDistance(state, target, enemy);
-        if (distance > 64) {
+        if (distance > 8 * 16) {
             enemy.setMode('teleport');
             return;
         }

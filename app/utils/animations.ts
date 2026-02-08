@@ -11,7 +11,7 @@ export function frame(
 
 // Make a single frame into an FrameAnimation.
 export function frameAnimation(frame: Frame): FrameAnimation {
-    return {frames: [frame], frameDuration: 1, duration: 1};
+    return {frames: [frame], frameDuration: 1, duration: 1, loop: true};
 }
 
 export function framesAnimation(frames: Frame[], duration = 8, props: ExtraAnimationProperties = {}): FrameAnimation {

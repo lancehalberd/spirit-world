@@ -149,6 +149,9 @@ Current tasks:
     - Preload music.
 
     - Cocoon boss improvements
+        - Improve basic attack set
+            - Make attacks ignore walls, but hit player, apply ground effects and knock balls around
+        - Fix projectile ring should add/remove ice as expected.
         - Allow boss to hit and move rolling balls with some attacks.
             - Track source of ball hit on the ball, and apply it to damge from the ball.
             - If the boss hits the ball into itself(check source is projection), add special dialog
