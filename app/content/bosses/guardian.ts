@@ -18,6 +18,7 @@ import {createAnimation} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
 import {accelerateInDirection, hasEnemyLeftSection, moveEnemyToTargetLocation} from 'app/utils/enemies';
+import {getTilesInCircle} from 'app/utils/field';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {pad, removeElementFromArray} from 'app/utils/index';
 import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
@@ -82,6 +83,7 @@ const guardianSpiritAnimations: ActorAnimations = {
 
 // Setting this will force the boss to always use this element.
 const testElement: MagicElement = undefined;//'lightning'
+const testMode: string = undefined;//'denial';
 
 //type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 const blastAbility: EnemyAbility<true> = {
@@ -332,6 +334,46 @@ const projectileRingAbility: EnemyAbility<Target> = {
     prepTime: 500,
     recoverTime: guardianSpiritFinishAttackAnimation.duration,
 };
+
+const growingThornsAbility: EnemyAbility<Target> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): Target {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets).target;
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: Target) {
+        const guardian = getGuardian(state);
+        if (!guardian) {
+            return;
+        }
+        enemy.changeToAnimation('startCast', 'holdCast');
+        const count = 6 + 8 * (1 - guardian.life / guardian.maxLife);
+        const anchor = getTargetingAnchor(target);
+        let coords = getTilesInCircle(enemy.area, {x: anchor.x, y: anchor.y, r: 56}).map(p => ({x: p.x * 16 + 8, y: p.y * 16 + 8}));
+        coords = coords.filter(p => GrowingThorn.canGrowAtPoint(enemy.area, p));
+        for (const point of Random.elements(coords, count)) {
+            const thorns = new GrowingThorn({
+                x: point.x,
+                y: point.y,
+                animationSpeed: 3,
+                delay: growingThornsAbility.prepTime,
+                damage: 1,
+                source: enemy,
+            });
+            addEffectToArea(state, enemy.area, thorns);
+        }
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
+        const count = 6 + 8 * (1 - enemy.life / enemy.maxLife);
+        enemy.life -= count / 2;
+        enemy.changeToAnimation('finishCast', 'idle');
+    },
+    cooldown: 1000,
+    initialCharges: 0,
+    charges: 1,
+    chargesRecovered: 1,
+    prepTime: 500,
+    recoverTime: guardianSpiritFinishAttackAnimation.duration,
+};
+
 
 function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
     const projection = getProjection(state);
@@ -787,6 +829,10 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.enemyInvulnerableFrames = 10;
         enemy.acceleration = isGuardianStaggered ? 2 : 1;
         enemy.speed = enemy.params.isEnraged ? 3 : 1;
+        if (testMode) {
+            enemy.speed = 5;
+            enemy.params.regenerationRate = 10;
+        }
         //const hitbox = guardian.getMovementHitbox();
         // Move slightly behind the guardian so the projection renders behind him.
         //const amount = moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 2, undefined, {
@@ -824,6 +870,9 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     if (enemy.params.element && enemy.time % 100 === 0) {
         addSparkleAnimation(state, enemy.area, enemy.getHitbox(), {element: enemy.params.element});
     }
+
+
+    if (testMode && enemy.mode !== testMode) enemy.setMode(testMode);
 
     if (enemy.params.isEnraged) {
         if (moveEnemyToTargetLocation(state, enemy, centralPosition.x, centralPosition.y)) {
@@ -1087,17 +1136,8 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 enemy.setMode('choose');
             }
         } else {
-            if (enemy.modeTime > 0 && enemy.modeTime % 500 === 100) {
-                enemy.life -= 0.5;
-                const mag = (v?.mag || 64) - 8 + Math.random() * 16;
-                const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
-                const thorns = new GrowingThorn({
-                    x: tx,
-                    y: ty,
-                    damage: 1,
-                    source: enemy,
-                });
-                addEffectToArea(state, enemy.area, thorns);
+            if (enemy.modeTime === 600) {
+                enemy?.useAbiltyFromDefinition(state, growingThornsAbility);
             }
             if (enemy.modeTime >= 3000) {
                 enemy.setMode('choose');

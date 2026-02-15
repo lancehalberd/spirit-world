@@ -314,6 +314,16 @@ export function clamp(value: number, min: number, max: number) {
     }
     return value;
 }
+export function clampRect({x,y,w,h}: Rect, bounds: Rect): Rect {
+    w = Math.min(w, bounds.w);
+    h = Math.min(h, bounds.h);
+    return {
+        x: Math.max(bounds.x, Math.min(x, bounds.x + bounds.w - w)),
+        y: Math.max(bounds.y, Math.min(y, bounds.y + bounds.h - h)),
+        w,
+        h,
+    };
+}
 
 export function lerp(x: number, y: number, a: number){
 	return x * (1 - a) + y * a;
