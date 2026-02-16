@@ -16,6 +16,7 @@ import {
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame } from 'app/utils/saveGame';
 import { restoreHeroData } from 'app/utils/alterHeroData';
+import { removeConditions } from 'app/utils/updateBestTimes';
 
 export function updateDefeated(state: GameState) {
     if (!isGameKeyDown(state, GAME_KEY.WEAPON)) {
@@ -77,7 +78,7 @@ export function updateDefeated(state: GameState) {
                 state.savedState.usingBackup = false;
                 restoreHeroData(state);
             }
-            delete state.savedState.objectFlags['bossRefight']
+            removeConditions(state);
             fixProgressFlagsOnLoad(state);
             fixSpawnLocationOnLoad(state);
             returnToSpawnLocation(state);
@@ -92,6 +93,10 @@ export function updateDefeated(state: GameState) {
         state.menuIndex = (state.menuIndex + 1) % 2;
     } else if (wasConfirmKeyPressed(state)) {
         if (state.menuIndex === 0) {
+            if (state.savedState.usingBackup) {
+                state.savedState.usingBackup = false;
+                restoreHeroData(state);
+            }
             fixProgressFlagsOnLoad(state);
             fixSpawnLocationOnLoad(state);
             returnToSpawnLocation(state);

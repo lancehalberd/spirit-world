@@ -13,6 +13,10 @@ export interface BossRushOption {
     location: string[]
     // Special logic for unlocking this boss rush
     isVisible?: (state: GameState) => boolean
+    daredevilKarma?: number
+    normalKarma?: number
+    //WIP: Give differing amounts of karma for beating time threshold.
+    targetTime: number
 }
 
 const bossFlags: {[key in BossName]: string} = {
@@ -50,68 +54,98 @@ const fightLocations: {[key in BossName]: string[]} = {
     rush2: ['forestTempleRefight', 'rival2Refight', 'collectorRefight'],
     rush3: ['flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight'],
     altGolem: ['golem'],
-};
+}
 
-const allBossRushOptions: BossRushOption[] = [
+export const allBossRushOptions: BossRushOption[] = [
     {
         label: 'Beetle',
         key: 'beetle',
         bosses: ['beetle'],
-        location: ['beetleRefight']
+        location: ['beetleRefight'],
+        daredevilKarma: 2,
+        normalKarma: 0,
+        targetTime: 30000,
     },
     {
         label: 'Golem',
         key: 'golem',
         bosses: ['golem'],
-        location: ['golemRefight']
+        location: ['golemRefight'],
+        daredevilKarma: 1,
+        normalKarma: 0,
+        targetTime: 60000,
     },
     {
         label: 'War Idols',
         key: 'idols',
         bosses: ['idols'],
-        location: ['warTempleRefight']
+        location: ['warTempleRefight'],
+        daredevilKarma: 1,
+        normalKarma: 0,
+        targetTime: 50000,
     },
     {
         label: 'Guardian',
         key: 'guardian',
         bosses: ['guardian'],
-        location: ['guardianRefight']
+        location: ['guardianRefight'],
+        daredevilKarma: 1,
+        normalKarma: 0,
+        targetTime: 90000,
     },
     {
         label: 'Forest Idols',
         key: 'forest',
         bosses: ['forest'],
-        location: ['forestTempleRefight']
+        location: ['forestTempleRefight'],
+        daredevilKarma: 1,
+        normalKarma: 0,
+        targetTime: 50000,
     },
     {
         label: 'Rival 2',
         key: 'rival2',
         bosses: ['rival2'],
-        location: ['rival2Refight']
+        location: ['rival2Refight'],
+        daredevilKarma: 1,
+        normalKarma: 0,
+        targetTime: 75000,
     },
     {
         label: 'Collector',
         key: 'collector',
         bosses: ['collector'],
-        location: ['collectorRefight']
+        location: ['collectorRefight'],
+        daredevilKarma: 2,
+        normalKarma: 0,
+        targetTime: 60000,
     },
     {
         label: 'Flame Beast',
         key: 'flameBeast',
         bosses: ['flameBeast'],
-        location: ['flameBeastRefight']
+        location: ['flameBeastRefight'],
+        daredevilKarma: 2,
+        normalKarma: 0,
+        targetTime: 120000,
     },
     {
         label: 'Frost Beast',
         key: 'frostBeast',
         bosses: ['frostBeast'],
-        location: ['frostBeastRefight']
+        location: ['frostBeastRefight'],
+        daredevilKarma: 2,
+        normalKarma: 0,
+        targetTime: 90000,
     },
     {
         label: 'Storm Beast',
         key: 'stormBeast',
         bosses: ['stormBeast'],
-        location: ['stormBeastRefight']
+        location: ['stormBeastRefight'],
+        daredevilKarma: 2,
+        normalKarma: 0,
+        targetTime: 90000,
     },
     {
         label: 'Odd Golem',
@@ -119,6 +153,9 @@ const allBossRushOptions: BossRushOption[] = [
         bosses: ['golem'],
         location: ['golemRefight'],
         playerState: altGolemState,
+        daredevilKarma: 1,
+        normalKarma: 1,
+        targetTime: 120000,
         // Also requires gloves to unlock.
         isVisible(state: GameState) {
             return !!(state.savedState.objectFlags.tombBoss
@@ -129,13 +166,19 @@ const allBossRushOptions: BossRushOption[] = [
         label: 'Rush 1',
         key: 'rush',
         bosses: ['beetle', 'golem', 'idols', 'guardian'],
-        location: ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight']
+        location: ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight'],
+        daredevilKarma: 5,
+        normalKarma: 2,
+        targetTime: 180000,
     },
     {
         label: 'Rush 2',
         key: 'rush2',
         bosses: ['forest', 'rival2', 'collector'],
         location: ['forestTempleRefight', 'rival2Refight', 'collectorRefight'],
+        daredevilKarma: 7,
+        normalKarma: 2,
+        targetTime: 150000,
         isVisible(state: GameState) {
             return !!(state.savedState.objectFlags.elementalBeastsEscaped);
         }
@@ -145,6 +188,9 @@ const allBossRushOptions: BossRushOption[] = [
         key: 'rush3',
         location: ['flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight'],
         bosses: ['flameBeast', 'frostBeast', 'stormBeast'],
+        daredevilKarma: 10,
+        normalKarma: 2,
+        targetTime: 400000,
         isVisible(state: GameState) {
             return !!(state.savedState.objectFlags.flameBeast && 
                       state.savedState.objectFlags.frostBeast &&
@@ -152,6 +198,37 @@ const allBossRushOptions: BossRushOption[] = [
         }
     },
 ];
+
+const normalKarmaByKey: Record<BossName, number> =
+    allBossRushOptions.reduce((acc, option) => {
+        acc[option.key] = option.normalKarma;
+        return acc;
+    }, {} as Record<BossName, number>);
+
+const daredevilKarmaByKey: Record<BossName, number> =
+    allBossRushOptions.reduce((acc, option) => {
+        acc[option.key] = option.daredevilKarma;
+        return acc;
+    }, {} as Record<BossName, number>);
+
+const karmaTimeByKey: Record<BossName, number> =
+    allBossRushOptions.reduce((acc, option) => {
+        acc[option.key] = option.targetTime;
+        return acc;
+    }, {} as Record<BossName, number>);
+
+export function getKarmaTimeByKey(key: BossName): number {
+    return karmaTimeByKey[key] ?? 0;
+}
+
+export function getNormalKarmaForKey(key: BossName): number {
+    return normalKarmaByKey[key] ?? 0;
+}
+
+export function getDaredevilKarmaForKey(key: BossName): number {
+    return daredevilKarmaByKey[key] ?? 0;
+}
+
 export function isBossRushOptionVisible(state: GameState, bossRushOption: BossRushOption): boolean {
     if (bossRushOption.isVisible) {
         return bossRushOption.isVisible(state);

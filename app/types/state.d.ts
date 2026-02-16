@@ -21,6 +21,7 @@ interface SavedState {
     luckyBeetles: string[]
     exploredSections: number[]
     heardDialogue: number[]
+    bossRushTimes: Record<BossCondition, Partial<Record<BossName, number>>>;
 }
 
 // These settings are global and can be saved independent of saved state

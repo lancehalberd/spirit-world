@@ -1,21 +1,63 @@
-export function updateBestTimes(state: GameState): string {
-    console.log(state.bossRushTrackers)
+import { getNormalKarmaForKey, getDaredevilKarmaForKey, getKarmaTimeByKey } from "app/scenes/bossRush/bossRushOptions";
+
+export function returnFromBoss(state: GameState): string {
+    removeConditions(state);
+    let returnString = updateBestTimes(state);
+    state.bossRushTrackers.currentCondition = "none";
+    return returnString;
+}
+
+export function removeConditions(state: GameState) {
     if (state.savedState.objectFlags['bossRefight']) {
         delete state.savedState.objectFlags['bossRefight'];
         //Note: currently all bossRefight flag does is make it so you don't get a true 'game over' dying in boss rush
     }
+    if (state.bossRushTrackers.currentCondition == 'daredevil') {
+        state.savedState.savedHeroData.maxLife = state.bossRushTrackers.storedLife
+        if (state.bossRushTrackers.hasIronSkin) 
+            {state.savedState.savedHeroData.passiveTools.ironSkin = 1}
+    }
+}
+
+
+function updateBestTimes(state: GameState): string {
+    console.log(state.hero.savedData.playTime)
+    console.log(state.bossRushTrackers.bossStartTime)
     let currentBoss = state.bossRushTrackers.currentBoss;
     if (currentBoss != "none" ) {
+        let condition = state.bossRushTrackers.currentCondition
         let finishTime = state.hero.savedData.playTime - state.bossRushTrackers.bossStartTime;
-        const bestTime = state.savedState.savedHeroData.bossRushTimes[currentBoss] ?? Number.MAX_SAFE_INTEGER;
+        const bestTime = state.savedState.bossRushTimes[condition][currentBoss] ?? Number.MAX_SAFE_INTEGER;
+        if (bestTime == Number.MAX_SAFE_INTEGER) {
+            rewardKarma(state) //WIP: Add message?
+        }
         if (bestTime > finishTime) {
-            state.savedState.savedHeroData.bossRushTimes[currentBoss] = finishTime;
+            console.log(finishTime)
+            let returnString = "";
+            let karmaTime = getKarmaTimeByKey(currentBoss);
             state.bossRushTrackers.currentBoss = "none";
-            return 'Congrats, that is a new high score!'
+            returnString = returnString.concat('Congrats, that is a new high score!')
+            if (bestTime > karmaTime && karmaTime > finishTime && condition == 'none') {
+                returnString = returnString.concat('{|}You earned Karma for beating my best time!')
+                state.savedState.savedHeroData.karma += 1;
+                console.log(state.savedState.savedHeroData)
+            }
+            state.savedState.bossRushTimes[condition][currentBoss] = finishTime;
+            return returnString;
         } else {
             state.bossRushTrackers.currentBoss = "none"; 
             return 'Well done, but you\'ve been faster before.'
         }   
     }
-    return ''
+}
+
+function rewardKarma(state: GameState) {
+    let boss = state.bossRushTrackers.currentBoss
+    if (state.bossRushTrackers.currentCondition == 'none') {
+        state.savedState.savedHeroData.karma += getNormalKarmaForKey(boss)
+        return;
+    } else if (state.bossRushTrackers.currentCondition == 'daredevil') {
+        state.savedState.savedHeroData.karma += getDaredevilKarmaForKey(boss)
+        return;
+    }
 }

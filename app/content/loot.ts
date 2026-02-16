@@ -93,7 +93,8 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'lightning': return 'Lightning Element';
         case 'phoenixCrown': return 'Phoenix Crown';
         case 'goldMail': return 'Golden Mail';
-        case 'ironSkin': return 'Iron Skin';
+        case 'ironSkin':
+            return 'Iron Skin';
         case 'catEyes': return 'Cat Eyes';
         case 'nimbusCloud': return 'Nimbus Cloud';
         case 'trueSight': return 'True Sight';

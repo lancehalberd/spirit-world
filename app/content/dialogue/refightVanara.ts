@@ -1,12 +1,5 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 
-export function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
-  if (state.travel) {
-    state.travel(zoneKey, markerId, {instant: false});
-    return '';
-  }
-  console.log("Can't find travel function!")
-}
 
 dialogueHash.refightVanara = {
     key: 'refightVanara',
@@ -18,7 +11,6 @@ dialogueHash.refightVanara = {
                     }`;
         },
         openMenu: (state: GameState) => {
-            console.log(state.savedState.savedHeroData.bossRushTimes)
             state.menuIndex = 0;
             state.travel("bossRefights", "beetleRefight", {instant: true});
             state.scene = 'bossRush';

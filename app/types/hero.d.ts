@@ -160,10 +160,15 @@ type BossName =
   | "altGolem";
 
 
+type BossCondition = "none" | "daredevil"
+
 type bossRushState = {
   currentBoss: BossName;
   bossStartTime: number;
   rushPosition: number;
+  currentCondition: BossCondition;
+  storedLife: number;
+  hasIronSkin: boolean;
 }
 
 
@@ -207,7 +212,7 @@ interface SavedHeroData {
     playTime: number
     // How long the player had been playing when they "won" the game.
     winTime: number
-    bossRushTimes: Partial<Record<BossName, number>>;
+    //bossRushTimes: Record<BossCondition, Partial<Record<BossName, number>>>;
 }
 
 type Computable<T> = T | (() => T);

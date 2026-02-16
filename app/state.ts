@@ -155,6 +155,9 @@ export function getDefaultState(): GameState {
             currentBoss: "none",
             bossStartTime: 0,
             rushPosition: 0,
+            currentCondition: 'none',
+            storedLife: 3,
+            hasIronSkin: false,
         },
     };
     return state;

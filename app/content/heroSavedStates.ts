@@ -63,5 +63,5 @@ export const altGolemState: SavedHeroData = {
     },
     
     spawnLocation: cloneDeep(SPAWN_DREAM_ENTRANCE),
-    bossRushTimes: {},
+
 }

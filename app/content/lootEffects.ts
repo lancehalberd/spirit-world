@@ -4,7 +4,7 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 import { restoreHeroData } from 'app/utils/alterHeroData';
 import { endBossRush, startNextBoss, travelToLocation } from 'app/scenes/bossRush/bossRushOptions';
-import { updateBestTimes } from 'app/utils/updateBestTimes';
+import { returnFromBoss } from 'app/utils/updateBestTimes';
 import { showMessage } from 'app/scriptEvents';
 
 const MAX_LEVEL = 2;
@@ -105,19 +105,23 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         updateDungeonInventory(state, inventory, false);
     },
     bossRefight: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        if (state.savedState.usingBackup) {
-            state.savedState.usingBackup = false;
-            restoreHeroData(state)
-        }
         if(!['rush', 'rush2', 'rush3'].includes(state.bossRushTrackers.currentBoss)) {
-            let timeMessage = updateBestTimes(state);
+            let timeMessage = returnFromBoss(state);
             showMessage(state, timeMessage)
+            if (state.savedState.usingBackup) {
+                state.savedState.usingBackup = false;
+                restoreHeroData(state)
+            }
             travelToLocation(state, "dream", "bossRefightReturn");
         } else {
             if (endBossRush(state)) {
-                let timeMessage = updateBestTimes(state);
+                let timeMessage = returnFromBoss(state);
                 showMessage(state, timeMessage)
                 state.bossRushTrackers.rushPosition = 0;
+                if (state.savedState.usingBackup) {
+                    state.savedState.usingBackup = false;
+                    restoreHeroData(state)
+                }
                 travelToLocation(state, "dream", "bossRefightReturn");
             } else {
                 state.bossRushTrackers.rushPosition += 1

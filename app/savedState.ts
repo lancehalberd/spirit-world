@@ -16,6 +16,10 @@ export function getDefaultSavedState(): SavedState {
         usingBackup: false,
         savedArData: {gameData: {}},
         staffTowerLocation: 'desert',
+        bossRushTimes: {
+            none: {},
+            daredevil: {}
+        },
     };
 }
 
@@ -83,6 +87,5 @@ function getDefaultSavedHeroData(): SavedHeroData {
         // Data from this function is considered mutable, so we need to return a copy of
         // this spawn location to avoid accidentally modifying it in the future.
         spawnLocation: cloneDeep(SPAWN_LOCATION_FULL),
-        bossRushTimes: {},
     };
 }
