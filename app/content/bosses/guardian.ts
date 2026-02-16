@@ -238,7 +238,7 @@ const flameWallAbility: EnemyAbility<true> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
         enemy.changeToAnimation('finishCast', 'idle');
-        (enemy.params.parent || enemy).life -= 2;
+        (enemy.params.parent || enemy).life -= 1;
     },
     cooldown: 1000,
     initialCharges: 0,
@@ -706,7 +706,7 @@ function switchToNextMode(state: GameState, enemy: Enemy<ProjectionParams>) {
 }
 
 function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta: number) {
-    const hitbox = enemy.getHitbox();
+    const hitbox = enemy.getMovementHitbox();
     const dx = Math.cos(theta), dy = Math.sin(theta);
     const x = hitbox.x + hitbox.w / 2 + 12 * dx, y = hitbox.y + hitbox.h + 12 * dy;
     const delay = 400;
