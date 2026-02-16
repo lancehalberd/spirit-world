@@ -82,8 +82,9 @@ const guardianSpiritAnimations: ActorAnimations = {
 };
 
 // Setting this will force the boss to always use this element.
-const testElement: MagicElement = undefined;//'lightning'
-const testMode: string = undefined;//'denial';
+const testElement: MagicElement = undefined; //'lightning';//'lightning'
+const testMode: string = undefined; // 'projectileRings';//'denial';
+const testEnrage = false;
 
 //type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 const blastAbility: EnemyAbility<true> = {
@@ -519,6 +520,10 @@ const guardian: EnemyDefinition<GuardianParams> = {
     animations: vanaraBlueAnimations,
     life: 30, touchDamage: 0, update: updateGuardian,
     onHit(this: void, state: GameState, enemy: Enemy<GuardianParams>, hit: HitProperties): HitResult {
+        // Guardian is invulnerable while recovering from stagger.
+        if (enemy.mode === 'recoverFromStaggered') {
+            return {};
+        }
         const result = enemy.defaultOnHit(state, hit);
         if (!result.damageDealt) {
             return result;
@@ -532,7 +537,7 @@ const guardian: EnemyDefinition<GuardianParams> = {
             enemy.modeTime = 2000;
             enemy.params.staggerHits++;
             enemy.params.staggerDamage = (enemy.params.staggerDamage || 0) + result.damageDealt;
-            if (enemy.params.staggerHits >= 3 || enemy.params.staggerDamage >= 6) {
+            if (enemy.params.staggerHits >= 4 || enemy.params.staggerDamage >= 6) {
                 enemy.setMode('recoverFromStaggered');
             }
         } else if (enemy.area !== state.areaInstance) {
@@ -779,15 +784,15 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     if (isGuardianStaggered) {
         targetScale = 1;
     } else if (enemy.mode === 'regenerate') {
-        targetScale = 1 + 2 * enemy.life / maxLife;
+        targetScale = 1 + 1 * enemy.life / maxLife;
     } else if (enemy.params.isEnraged) {
         // Projection stays at max scale while enraged regardless of life.
-        targetScale = 3;
+        targetScale = 2;
     } else {
         if (enemy.life > maxLife / 2) {
-            targetScale = 3;
-        } else if (enemy.life > 0) {
             targetScale = 2;
+        } else if (enemy.life > 0) {
+            targetScale = 1;
         }
     }
     if (enemy.scale < targetScale) {
@@ -800,8 +805,10 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     const centralPosition = {x: section.x + section.w / 2, y: section.y + section.h / 2 + 16};
 
     // Uncomment this to force testing enraged behavior.
-    //enemy.params.isEnraged = true;
-    //enemy.params.regenerationRate = staggerRegenerationRate;
+    if (testEnrage) {
+        enemy.params.isEnraged = true;
+        enemy.params.regenerationRate = staggerRegenerationRate;
+    }
     if (enemy.life <= 0 || enemy.mode === 'regenerate' || isGuardianStaggered) {
         enemy.life = Math.max(enemy.life, 0);
         if (enemy.mode !== 'regenerate' && !isGuardianStaggered) {
@@ -889,7 +896,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 y: enemy.y,
             });
             copy.speed = 5;
-            copy.scale = 3;
+            copy.scale = 2;
             addObjectToArea(state, enemy.area, copy);
             // Copy is invisible except for its shadow at first.
             copy.params.parent = enemy;
@@ -1261,7 +1268,7 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
             teleportToNextMarker(state, enemy);
             // Once the Guardian is below 80% health it will enrage any time it takes a certain
             // amount of damage when staggered.
-            if (enemy.params.staggerDamage >= 3 && enemy.life <= 0.8 * enemy.maxLife) {
+            if (enemy.params.staggerDamage >= 3 && enemy.life <= 0.75 * enemy.maxLife) {
                 const projection = getOrCreateProjection(state, enemy);
                 projection.params.isEnraged = true;
             }

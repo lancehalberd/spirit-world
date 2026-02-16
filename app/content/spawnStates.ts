@@ -41,7 +41,8 @@ const helixRivalStateStory = applyItemsToSavedState(vanaraDreamStateStory, {tele
 const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
 const helixStartState = applyItemsToSavedState(helixRivalStateStory, {},
     ['helixRivalBoss']);
-const helixEndState = applyItemsToSavedState(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
+// Seting weapon to 3 correctly gives both the regular and golden chakrams (1 | 2 = 3).
+const helixEndState = applyItemsToSavedState(helixStartState, {staff: 1, normalDamage: 1, weapon: 3},
     ['elementalBeastsEscaped', 'vanaraCommanderBeasts']);
 const forestStartState = applyItemsToSavedState(helixEndState, {}, ['spiritKingForestTemple']);
 const forestBossState = applyItemsToSavedState(forestStartState, {cloudBoots: 1, 'forestTemple:bigKey': 1},
@@ -49,24 +50,24 @@ const forestBossState = applyItemsToSavedState(forestStartState, {cloudBoots: 1,
 const waterfallBossState = applyItemsToSavedState(helixEndState, {ironBoots: 1});
 
 const gauntletStartState = applyItemsToSavedState(helixEndState, {
-    clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2
+    clone: 1, cloudBoots: 1, gloves: 3, cloak: 3, nimbusCloud: 1, roll: 3
 }, []);
 
 const skyPalaceStartState = applyItemsToSavedState(helixEndState, {
     maxLife: 3,
     clone: 1, cloudBoots: 1,
-    ironBoots: 1, cloak: 2,
-    gloves: 2, goldMail: 1,
+    ironBoots: 1, cloak: 3,
+    gloves: 3, goldMail: 1,
 }, []);
 
 const holySanctumStartState = applyItemsToSavedState(helixEndState, {
     maxLife: 5,
-    gloves: 2, goldMail: 1,
+    gloves: 3, goldMail: 1,
     cloudBoots: 1, clone: 1,
     trueSight: 1, ironSkin: 1,
-    ironBoots:1, cloak: 2,
-    nimbusCloud: 1, roll: 2,
-    staff: 2, lightning: 1,
+    ironBoots:1, cloak: 3,
+    nimbusCloud: 1, roll: 3,
+    staff: 3, lightning: 1,
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
 }, []);
@@ -75,16 +76,16 @@ const beastState = applyItemsToSavedState(helixEndState, {
     maxLife: 7,
     lightningBlessing: 1, goldOre: 2,
     cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2,
+    ironBoots: 1, cloak: 3,
     trueSight: 1, ironSkin: 1,
-    gloves: 2, goldMail: 1,
-    roll: 2, nimbusCloud: 1,
-    bow: 2,
+    gloves: 3, goldMail: 1,
+    roll: 3, nimbusCloud: 1,
+    bow: 3,
     spiritDamage: 1, spiritRange: 1,
 });
 
 const riverTempleStartState = applyItemsToSavedState(beastState, {
-    staff: 2, lightning: 1,
+    staff: 3, lightning: 1,
     fireBlessing: 1, fire: 1,
 }, ['flameBeast', 'stormBeast']);
 const riverTempleBossState = applyItemsToSavedState(riverTempleStartState,
@@ -93,7 +94,7 @@ const riverTempleBossState = applyItemsToSavedState(riverTempleStartState,
 );
 
 const craterStartState = applyItemsToSavedState(beastState, {
-    staff: 2, lightning: 1,
+    staff: 3, lightning: 1,
     waterBlessing: 1, ice: 1
 }, ['frostBeast', 'stormBeast']);
 const craterBossState = applyItemsToSavedState(craterStartState, {fireBlessing: 1},
@@ -114,9 +115,9 @@ const staffAquiredState = applyItemsToSavedState(staffBossState, {lightning: 1},
     'staffTowerActivated'
 ]);
 
-const warshipStartState = applyItemsToSavedState(staffAquiredState, {staff: 2, phoenixCrown: 1});
+const warshipStartState = applyItemsToSavedState(staffAquiredState, {staff: 3, phoenixCrown: 1});
 
-const finalBoss1State = applyItemsToSavedState(warshipStartState, {clone: 2, maxLife: 5});
+const finalBoss1State = applyItemsToSavedState(warshipStartState, {clone: 3, maxLife: 5});
 
 
 export interface SpawnLocationOptions {

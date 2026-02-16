@@ -2,18 +2,18 @@ import { addTextCue, removeTextCue } from 'app/content/effects/textCue';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { getLoot } from 'app/content/objects/lootObject';
 import { GAME_KEY } from 'app/gameConstants';
-import {clearScriptEvents, prependScript} from 'app/scriptEvents';
-
+import {prependScript} from 'app/scriptEvents';
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
 import { enterLocation } from 'app/utils/enterLocation';
 import { clearObjectFlag, setObjectFlag } from 'app/utils/objectFlags';
 import { saveGame } from 'app/utils/saveGame';
+import {cleanState} from 'app/utils/state';
 
 
 export function skipCutscene(state: GameState) {
     const onSkipCutscene = state.scriptEvents.onSkipCutscene;
-    clearScriptEvents(state);
+    cleanState(state);
     onSkipCutscene?.(state);
 }
 

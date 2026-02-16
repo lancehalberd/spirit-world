@@ -93,7 +93,7 @@ export class Frost implements EffectInstance, Props {
                 hitAllies: true,
                 hitEnemies: this.hitEnemies,
                 hitObjects: true,
-                hitTiles: this.animationTime >= (this.delay ?? 0) + (this.ignoreWallsDuration ?? 0),
+                hitTiles: this.animationTime >= (this.delay ?? 0),
                 ignoreTargets: this.ignoreTargets,
                 source: this.source,
             });

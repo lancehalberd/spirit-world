@@ -111,7 +111,7 @@ export class Spark implements EffectInstance, Props {
             element: 'lightning',
             hitAllies: true,
             // This is needed to prevent the spark from traveling across ledges.
-            hitTiles: this.animationTime >= (this.ignoreWallsDuration ?? 0),
+            hitTiles: true,
             knockAwayFrom: {x: this.x, y: this.y},
             vx: this.vx,
             vy: this.vy,
@@ -185,7 +185,8 @@ export class Spark implements EffectInstance, Props {
             if (hit) {
                 this.props.onHit?.(state, this);
             }
-            if (stopped) {
+            const persist = !(this.animationTime >= (this.ignoreWallsDuration ?? 0));
+            if (!persist && stopped) {
                 removeEffectFromArea(state, this);
             }
         }

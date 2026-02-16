@@ -287,7 +287,7 @@ export class Arrow implements EffectInstance, Projectile {
             hitAllies: this.reflected,
             hitEnemies: !this.reflected,
             hitObjects: true,
-            hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            hitTiles: true,
             isArrow: true,
             anchorPoint: this.getAnchorPoint(),
             isHigh: this.isHigh,
@@ -416,14 +416,15 @@ export class Arrow implements EffectInstance, Projectile {
                 this.direction = getDirection(this.vx, this.vy, true);
                 return;
             }
-            if (hitResult.blocked || hitResult.stopped) {
+            const persist = !(this.animationTime >= this.ignoreWallsDuration);
+            if (!persist && (hitResult.blocked || hitResult.stopped)) {
                 this.stuckFrames = 1;
                 this.blocked = true;
                 this.vz = 1;
                 this.animationTime = 0;
                 return;
             }
-            if (hitResult.hit && !hitResult.pierced) {
+            if (!persist && hitResult.hit && !hitResult.pierced) {
                 this.stuckFrames = 1;
                 this.animationTime = 0;
                 if (hitResult.hitTargets.size) {
@@ -549,7 +550,7 @@ export class EnemyArrow extends Arrow {
             hitAllies: !this.reflected,
             hitEnemies: this.reflected,
             hitObjects: true,
-            hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            hitTiles: true,
             isArrow: true,
             anchorPoint: this.getAnchorPoint(),
             isHigh: this.isHigh,
@@ -597,7 +598,7 @@ export class CrystalSpike extends Arrow {
             hitAllies: !this.reflected,
             hitEnemies: this.reflected,
             hitObjects: true,
-            hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            hitTiles: true,
             anchorPoint: this.getAnchorPoint(),
             isHigh: this.isHigh,
             source: this.source,

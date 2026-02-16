@@ -25,7 +25,7 @@ import {
     canTeleportToCoords,
     directionMap,
     getDirection,
-    // isPointOpen,
+    areNPointsOpen,
     isTileOpen,
 } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
@@ -343,7 +343,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             ) {
             } else if (hero.savedData.passiveTools.catEyes || hero.savedData.passiveTools.spiritSight) {
                 // Note that the hero can use spirit sight successfully without spirit sight when they are training to
-                // use spirit sight. Normally maxSpiritRadius will be 0 without spirit sight, but the spirit sight tutorail
+                // use spirit sight. Normally maxSpiritRadius will be 0 without spirit sight, but the spirit sight tutorial
                 // will override this value.
                 if (hero.spiritRadius <= hero.maxSpiritRadius) {
                     hero.spiritRadius = Math.min(hero.spiritRadius + hero.maxSpiritRadius / 20, hero.maxSpiritRadius);
@@ -924,7 +924,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = 'meditating';
                 hero.spiritRadius = 0;
                 hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
-                if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
+                //if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
+                // Astral Projection will be valid as long as at least 2 corners are open. This mostly prevents spawning the projection
+                // completely stuck inside walls.
+                if (state.areaSection?.isFoggy || !areNPointsOpen(state, state.hero.area.alternateArea, [
+                    {x: hero.x + 2, y: hero.y + 2},
+                    {x: hero.x + 13, y: hero.y + 2},
+                    {x: hero.x + 2, y: hero.y + 13},
+                    {x: hero.x + 13, y: hero.y + 13},
+                ], 2)) {
                     hero.maxSpiritRadius = 24;
                 }
                 if (!hero.savedData.passiveTools.spiritSight) {

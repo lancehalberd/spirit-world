@@ -227,6 +227,7 @@ export class Flame implements EffectInstance, Props {
                 this.updateSize();
             }
             if (!this.isPreparing && this.z <= 16) {
+                const persist = this.persist || !(this.animationTime >= (this.delay ?? 0) + (this.ignoreWallsDuration ?? 0));
                 const hitProperties: HitProperties = {
                     canPush: false,
                     damage: this.damage,
@@ -236,7 +237,7 @@ export class Flame implements EffectInstance, Props {
                     hitAllies: !this.reflected,
                     hitEnemies: this.reflected,
                     hitObjects: true,
-                    hitTiles: this.animationTime >= (this.delay ?? 0) + (this.ignoreWallsDuration ?? 0),
+                    hitTiles: true,
                     vx: this.vx,
                     vy: this.vy,
                     anchorPoint,
@@ -259,7 +260,7 @@ export class Flame implements EffectInstance, Props {
                     this.vx = -this.vx;
                     this.vy = -this.vy;
                     this.time = 0;
-                } else  if (!this.persist && (hitResult.blocked || stopped || (hit && !hitResult.pierced))) {
+                } else  if (!persist && (hitResult.blocked || stopped || (hit && !hitResult.pierced))) {
                     const hitbox = this.getHitbox();
                     const count = 4;
                     for (let i = 0; i < count; i++) {

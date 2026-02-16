@@ -1,5 +1,5 @@
-import { applySavedState, cleanState, getState } from 'app/state';
-import { setSpawnLocation } from 'app/content/spawnLocations';
+import {applySavedState, getState} from 'app/state';
+import {setSpawnLocation} from 'app/content/spawnLocations';
 import {
     earlyDungeonSpawnLocations,
     middleDungeonSpawnLocations,
@@ -9,9 +9,10 @@ import {
     devSpawnLocations,
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
-import { cloneDeep } from 'app/utils/index';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
-import { setSaveSlot } from 'app/utils/saveGame';
+import {cloneDeep} from 'app/utils/index';
+import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation';
+import {setSaveSlot} from 'app/utils/saveGame';
+import {cleanState} from 'app/utils/state';
 
 
 function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedState = false) {
