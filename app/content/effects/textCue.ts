@@ -123,7 +123,7 @@ export function removeTextCue(state: GameState, priority: number = 10000): boole
 
 export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): boolean {
     // Only add the new cue if it can override the previous one.
-    if (removeTextCue(state)) {
+    if (removeTextCue(state, priority)) {
         addEffectToArea(state, state.areaInstance, new TextCue(state, {
             duration,
             priority,

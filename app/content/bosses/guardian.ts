@@ -183,6 +183,7 @@ const laserAbility: EnemyAbility<Point> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
         enemy.changeToAnimation('finishAttack', 'idle');
+        (enemy.params.parent || enemy).life -= 1;
     },
     cooldown: 1000,
     initialCharges: 0,
@@ -237,6 +238,7 @@ const flameWallAbility: EnemyAbility<true> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
         enemy.changeToAnimation('finishCast', 'idle');
+        (enemy.params.parent || enemy).life -= 2;
     },
     cooldown: 1000,
     initialCharges: 0,
@@ -255,6 +257,7 @@ const blizzardAbility: EnemyAbility<true> = {
         enemy.changeToAnimation('startCast', 'holdCast');
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
+        (enemy.params.parent || enemy).life -= 4;
         enemy.changeToAnimation('finishCast', 'idle');
         const theta = Random.range(0, 12) * Math.PI / 6;
         const cx = state.camera.x + CANVAS_WIDTH / 2;
@@ -313,6 +316,7 @@ const projectileRingAbility: EnemyAbility<Target> = {
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: Target) {
         enemy.changeToAnimation('startAttack', 'holdAttack');
+        (enemy.params.parent || enemy).life -= 2;
         const count = 12, radius = 48;
         const p = getTargetingAnchor(target)
         for (let i = 0; i < count; i++) {
@@ -332,7 +336,7 @@ const projectileRingAbility: EnemyAbility<Target> = {
     initialCharges: 0,
     charges: 1,
     chargesRecovered: 1,
-    prepTime: 500,
+    prepTime: 600,
     recoverTime: guardianSpiritFinishAttackAnimation.duration,
 };
 
@@ -363,8 +367,9 @@ const growingThornsAbility: EnemyAbility<Target> = {
         }
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
-        const count = 6 + 8 * (1 - enemy.life / enemy.maxLife);
-        enemy.life -= count / 2;
+        const guardian = getGuardian(state);
+        const count = 6 + 8 * (1 - guardian.life / guardian.maxLife);
+        (enemy.params.parent || enemy).life -= count / 2;
         enemy.changeToAnimation('finishCast', 'idle');
     },
     cooldown: 1000,
@@ -404,16 +409,20 @@ function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
     }
 }
 
+const teleportationFadeTime = 500;
+const teleportationTime = 600;
+const fadeInTime = 2 * teleportationTime - teleportationFadeTime;
+
 function getProjectionAlpha(enemy: Enemy<ProjectionParams>) {
     if (enemy.params.parent) {
         enemy = enemy.params.parent;
     }
     let alpha = enemy.params.isEnraged ? 1 : Math.min(1, 0.2 + 2 * enemy.life / enemy.maxLife);
     if (enemy.mode === 'teleport') {
-        if (enemy.modeTime < 600) {
-            alpha *= (600 - enemy.modeTime) / 600;
-        } else if (enemy.modeTime >= 1400) {
-            alpha *= Math.min(1, (enemy.modeTime - 1400) / 600);
+        if (enemy.modeTime < teleportationFadeTime) {
+            alpha *= (teleportationFadeTime - enemy.modeTime) / teleportationFadeTime;
+        } else if (enemy.modeTime >= fadeInTime) {
+            alpha *= Math.min(1, (enemy.modeTime - fadeInTime) / teleportationFadeTime);
         } else {
             alpha = 0;
         }
@@ -518,7 +527,7 @@ const guardian: EnemyDefinition<GuardianParams> = {
     naturalDifficultyRating: 20,
     // This should match the NPC style of the Tomb Guardian.
     animations: vanaraBlueAnimations,
-    life: 30, touchDamage: 0, update: updateGuardian,
+    life: 32, touchDamage: 0, update: updateGuardian,
     onHit(this: void, state: GameState, enemy: Enemy<GuardianParams>, hit: HitProperties): HitResult {
         // Guardian is invulnerable while recovering from stagger.
         if (enemy.mode === 'recoverFromStaggered') {
@@ -570,6 +579,17 @@ const guardian: EnemyDefinition<GuardianParams> = {
         // Triggered when the player staggers them.
         staggered: { text: 'Ugh!', priority: 4},
         staggered2: { text: `Not bad!`, priority: 4},
+        // Include enough enraged taunts that they won't need to repeat in a single fight.
+        enraged1: { text: `This is going to hurt!`, priority: 5, limit: 1},
+        enraged2: { text: `Prepare for my counter attack!`, priority: 5, limit: 1},
+        enraged3: { text: `Time to blow off some steam!`, priority: 5, limit: 1},
+        enraged4: { text: `I've been too easy on you!`, priority: 5, limit: 1},
+        enraged5: { text: `You asked for this!`, priority: 5, limit: 1},
+        projectileRings: { text: `Inescapable Doom!`, priority: 6, limit: 1},
+        lasers: { text: `Dodge this!`, priority: 6, limit: 1},
+        blizzard: { text: `A blizzard approaches!`, priority: 6, limit: 1},
+        flameWalls: { text: `Dance among the flames!`, priority: 6, limit: 1},
+        storm: { text: `I am the storm!`, priority: 6, limit: 1},
     },
     acceleration: 0.3, speed: 2,
     params: {
@@ -663,10 +683,12 @@ function switchElements(state: GameState, enemy: Enemy<ProjectionParams>) {
     // Find the index of the current element, then cycle to the next available element.
     const index = availableElements.indexOf(enemy.params.element);
     enemy.params.element = testElement || availableElements[(index + 1) % availableElements.length];
-    if (enemy.params.element === elements[1]) {
-        guardian.useTaunt(state, 'elements');
-    } else if (enemy.params.element === elements[2]) {
-        guardian.useTaunt(state, 'allElements');
+    if (!enemy.params.isEnraged) {
+        if (enemy.params.element === elements[1]) {
+            guardian.useTaunt(state, 'elements');
+        } else if (enemy.params.element === elements[2]) {
+            guardian.useTaunt(state, 'allElements');
+        }
     }
     // Reset mode order on every element switch so that denial is reliably the second attack pattern.
     enemy.params.modeOrder = [];
@@ -687,9 +709,11 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
     const hitbox = enemy.getHitbox();
     const dx = Math.cos(theta), dy = Math.sin(theta);
     const x = hitbox.x + hitbox.w / 2 + 12 * dx, y = hitbox.y + hitbox.h + 12 * dy;
+    const delay = 400;
     if (enemy.params.element === 'lightning') {
         const spark = new Spark({
             x, y,
+            delay,
             vx: 4 * dx,
             vy: 4 * dy,
             damage: 1,
@@ -702,6 +726,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
     if (enemy.params.element === 'ice') {
         const frost = new Frost({
             x, y,
+            delay,
             vx: 2 * dx,
             vy: 2 * dy,
             damage: 1,
@@ -714,6 +739,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
     if (enemy.params.element === 'fire') {
         const fireball = new Fireball({
             x, y,
+            delay,
             vx: 3 * dx,
             vy: 3 * dy,
             scale: 1.5,
@@ -724,6 +750,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
     }
     const crystalSpike = new CrystalSpike({
         x, y,
+        delay,
         vx: 3 * dx,
         vy: 3 * dy,
         damage: 1,
@@ -836,7 +863,8 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.enemyInvulnerableFrames = 10;
         enemy.acceleration = isGuardianStaggered ? 2 : 1;
         enemy.speed = enemy.params.isEnraged ? 3 : 1;
-        if (testMode) {
+        // If we are testing abilities, make the projection regenerate quickly to waste less time.
+        if (testMode || testElement) {
             enemy.speed = 5;
             enemy.params.regenerationRate = 10;
         }
@@ -947,6 +975,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 if (!enemy.params.usedEnrageModes.has(mode)) {
                     enemy.params.usedEnrageModes.add(mode);
                     enemy.setMode(mode);
+                    guardian.useTaunt(state, enemy.mode);
                     break;
                 }
             }
@@ -991,6 +1020,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             // Choose closest copy not using an ability.
             const user = getClosestTarget(state.hero, [enemy, ...enemy.params.copies].filter(e => !e.activeAbility));
             user?.useAbiltyFromDefinition(state, lightningBoltAbility);
+            enemy.life -= 2;
         }
     } else if (enemy.mode === 'blizzard') {
         enemy.params.element = 'ice';
@@ -1019,28 +1049,34 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     }  else if (enemy.mode === 'projectiles') {
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
         enemy.d = 'down';
-        enemy.changeToAnimation('attack', 'idle');
+        // enemy.changeToAnimation('attack', 'idle');
         if (v?.mag >= 80) {
             enemy.setMode('aimedProjectiles');
         } else {
             enemy.setMode('projectileArcs');
         }
     } else if (enemy.mode === 'aimedProjectiles') {
-        const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
-        if (enemy.modeTime >= 3000) {
+        if (enemy.currentAnimationKey === 'idle' && enemy.modeTime >= 3000) {
             enemy.setMode('choose');
-        } else if (v.target && enemy.modeTime > 0 && enemy.modeTime % 600 === 0) {
+        } else if (enemy.currentAnimationKey !== 'finishAttack' &&
+            enemy.runAnimationSequence(['startAttack', 'holdAttack']) && enemy.animationTime >= 100
+        ) {
+            enemy.changeToAnimation('finishAttack', 'idle');
             enemy.life--;
+            const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
             shootProjectile(state, enemy, Math.atan2(v.y, v.x));
         }
     } else if (enemy.mode === 'projectileArcs') {
-        const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
-        if (enemy.modeTime >= 3000) {
+        if (enemy.currentAnimationKey === 'idle' && enemy.modeTime >= 3000) {
             enemy.setMode('choose');
-        } else if (enemy.modeTime > 0 && enemy.modeTime % 800 === 0) {
+        } else if (enemy.currentAnimationKey !== 'finishAttack' &&
+            enemy.runAnimationSequence(['startAttack', 'holdAttack']) && enemy.animationTime >= 600
+        ) {
+            enemy.changeToAnimation('finishAttack', 'idle');
             enemy.life--;
+            const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
             if (v) {
-                const count = 2 + enemy.modeTime / 800; // 3, 4, 5
+                const count = 2 + enemy.modeTime / 1000; // 3, 4, 5
                 const theta = Math.atan2(v.y, v.x) - Math.PI / 4;
                 for (let i = 0; i < count; i++) {
                     shootProjectile(state, enemy, theta + i * Math.PI / 2 / (count - 1));
@@ -1083,22 +1119,28 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             enemy.changeToAnimation('cast', 'idle');
         }
         if (enemy.params.element === 'lightning') {
-            if (enemy.modeTime % 1500 === 0) {
-                enemy.life--;
+            if (enemy.currentAnimationKey === 'idle' && enemy.modeTime >= 5000) {
+                enemy.setMode('choose');
+            } else if (enemy.currentAnimationKey !== 'finishAttack' &&
+                enemy.runAnimationSequence(['startAttack', 'holdAttack']) && enemy.animationTime >= 1000
+            ) {
+                enemy.changeToAnimation('finishAttack', 'idle');
+                enemy.life -= 2;
                 const spark = new Spark({
                     x, y,
-                    friction: 0.05 - 0.01 * enemy.modeTime / 1500,
+                    friction: Math.max(0.03, 0.05 - 0.01 * enemy.modeTime / 3000),
+                    delay: 400,
                     vx: 3 * dx,
                     vy: 3 * dy,
                     damage: 1,
+                    ignoreWallsDuration: 8000,
                     ttl: 8000,
-                    hitCircle: {x: 0, y: 0, r: 24},
+                    hitCircle: {x: 0, y: 0, r: 20},
                     source: enemy,
+                    strength: 3,
+                    treeSize: 30,
                 })
                 addEffectToArea(state, enemy.area, spark);
-            }
-            if (enemy.modeTime >= 5000) {
-                enemy.setMode('choose');
             }
         } else if (enemy.params.element === 'ice') {
             if (enemy.modeTime === 400) {
@@ -1126,8 +1168,13 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 enemy.setMode('choose');
             }
         } else if (enemy.params.element === 'fire') {
-            if (enemy.modeTime % 1000 === 100) {
-                enemy.life--;
+            if (enemy.currentAnimationKey === 'idle' && enemy.modeTime >= 3500) {
+                enemy.setMode('choose');
+            } else if (enemy.currentAnimationKey !== 'finishCast' &&
+                enemy.runAnimationSequence(['startCast', 'holdCast']) && enemy.animationTime >= 600
+            ) {
+                enemy.changeToAnimation('finishCast', 'idle');
+                enemy.life -= 2;
                 const mag = (v?.mag || 64) - 8 + Math.random() * 16;
                 const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
                 const flame = new Flame({
@@ -1139,14 +1186,11 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 })
                 addEffectToArea(state, enemy.area, flame);
             }
-            if (enemy.modeTime >= 3500) {
-                enemy.setMode('choose');
-            }
         } else {
             if (enemy.modeTime === 600) {
                 enemy?.useAbiltyFromDefinition(state, growingThornsAbility);
             }
-            if (enemy.modeTime >= 3000) {
+            if (enemy.modeTime >= 2000) {
                 enemy.setMode('choose');
             }
         }
@@ -1162,12 +1206,30 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
             enemy.y += enemy.vy;
         }
     } else if (enemy.mode === 'teleport') {
-        // 0-600, fade out, 600-1000 invisible, 1000-1400 invisible, 1400-2000 fade in, 2000, change mode.
-        if (enemy.modeTime === 1000) {
+        // Before teleporting, if the player returns to the current area, rapidly cancel the teleport.
+        if (enemy.modeTime < teleportationTime) {
+            const target = getClosestTarget(state.hero, enemy.area.objects.filter(o => o.definition.type === 'rollingBall' || o.definition.id === 'centerTarget'));
+            const distance = getTargetDistance(state, target, enemy);
+            if (distance <= 8 * 16) {
+                enemy.modeTime -= 80;
+                if (enemy.modeTime <= 0) {
+                    enemy.setMode('choose');
+                    enemy.modeTime = 500;
+                }
+                return;
+            }
+        }
+        // 0 to teleportationFadeTime, fade out
+        // teleportationFadeTime to teleportationTime invisible
+        // teleportationTime to 2 * teleportationTime - teleportationFadeTime invisible
+        // 2 * teleportationTime - teleportationFadeTime to 2 * teleportationTime fade in
+        // 2 * teleportationTime: change mode.
+        if (enemy.modeTime === teleportationTime) {
             teleportToClosestMarker(state, enemy);
         }
-        if (enemy.modeTime >= 2000) {
+        if (enemy.modeTime >= 2 * teleportationTime) {
             enemy.setMode('choose');
+            enemy.modeTime = 500;
         }
     } else {
         if (enemy.vx > 1 || enemy.vy > 1) {
@@ -1271,6 +1333,7 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
             if (enemy.params.staggerDamage >= 3 && enemy.life <= 0.75 * enemy.maxLife) {
                 const projection = getOrCreateProjection(state, enemy);
                 projection.params.isEnraged = true;
+                enemy.useTauntFromList(state, ['enraged1', 'enraged2', 'enraged3', 'enraged4', 'enraged5']);
             }
         }
         return;

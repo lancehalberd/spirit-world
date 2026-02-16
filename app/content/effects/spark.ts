@@ -29,6 +29,8 @@ interface Props {
     hybridWorlds?: boolean
     onHit?: (state: GameState, spark: Spark) => void
     source: Actor
+    strength?: number
+    treeSize?: number
 }
 
 export class Spark implements EffectInstance, Props {
@@ -83,6 +85,8 @@ export class Spark implements EffectInstance, Props {
     ignoreWallsDuration = this.props.ignoreWallsDuration;
     delay = this.props.delay;
     source = this.props.source;
+    strength = this.props.strength;
+    treeSize = this.props.treeSize;
     constructor(readonly props: Props) {
         this.hitCircle = this.props.hitCircle;
         this.hitRay = this.props.hitRay;
@@ -221,7 +225,7 @@ export class Spark implements EffectInstance, Props {
                 x2: this.x + this.hitRay.x2 + px,
                 y2: this.y + this.hitRay.y2 + py,
                 r: this.hitRay.r + 2
-            },  {strength: 1, treeSize: 20});
+            },  {strength: this.strength ?? 1, treeSize: this.treeSize ?? 20});
         } else {
             //const strength = this.hitCircle.r < 8 ? 1 : 2;
             //const count = this.hitCircle.r < 8 ? 20 : 30;
@@ -229,7 +233,7 @@ export class Spark implements EffectInstance, Props {
                 x: this.x + this.hitCircle.x,
                 y: this.y + this.hitCircle.y,
                 r: this.hitCircle.r + 2
-            }, 2, 20);
+            }, this.strength ?? 2, this.treeSize ?? 20);
         }
     }
     alternateRender(context: CanvasRenderingContext2D, state: GameState) {
