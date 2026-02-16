@@ -1,27 +1,9 @@
-import { setLeftTool, setRightTool } from 'app/content/menu';
-import { playAreaSound } from 'app/musicController';
-import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { saveGame } from 'app/utils/saveGame';
+import {setLeftTool, setRightTool} from 'app/content/menu';
+import {playAreaSound} from 'app/musicController';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
+import {applyUpgrade} from 'app/utils/loot';
+import {saveGame} from 'app/utils/saveGame';
 
-const MAX_LEVEL = 2;
-
-type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
-
-function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
-    // Non-progressive upgrades specify the exact level of the item.
-    if (loot.lootLevel) {
-        //console.log(loot.lootType, 'max', currentLevel, loot.lootLevel);
-        return currentLevel | (1 << (loot.lootLevel - 1));
-    }
-    //console.log(loot.lootType, 'increment', currentLevel);
-    for (let i = 0; i < MAX_LEVEL; i++) {
-        const bit = 1 << i;
-        if (!(currentLevel & bit)) {
-            return currentLevel | bit;
-        }
-    }
-    return currentLevel;
-}
 
 function getDungeonInventory(state: GameState): DungeonInventory {
     return state.savedState.dungeonInventories[state.location.logicalZoneKey] || {
@@ -43,7 +25,7 @@ function isBlueprints(lootType: LootType): lootType is Blueprints {
     return blueprints.includes(lootType as Blueprints);
 }
 
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: AnyLootDefinition, simulate?: boolean) => void}> = {
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootData, simulate?: boolean) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'weapon') {
             state.hero.savedData.weapon = applyUpgrade(state.hero.savedData.weapon, loot);

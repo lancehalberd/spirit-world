@@ -1,15 +1,15 @@
 import {
     iceFrontAnimation,
 } from 'app/content/animations/iceOverlay';
-import { addParticleAnimations, FieldAnimationEffect } from 'app/content/effects/animationEffect';
-import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
-import { lightStoneParticles, heavyStoneParticles } from 'app/content/tiles/constants';
-import { Staff } from 'app/content/objects/staff';
-import { getChargedArrowAnimation } from 'app/content/effects/arrow';
-import { ThrownObject } from 'app/content/effects/thrownObject';
-import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
+import {addParticleAnimations, FieldAnimationEffect} from 'app/content/effects/animationEffect';
+import {BarrierBurstEffect} from 'app/content/effects/barrierBurstEffect';
+import {lightStoneParticles, heavyStoneParticles} from 'app/content/tiles/constants';
+import {Staff} from 'app/content/objects/staff';
+import {getChargedArrowAnimation} from 'app/content/effects/arrow';
+import {ThrownObject} from 'app/content/effects/thrownObject';
+import {editingState} from 'app/development/editingState';
+import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
 
 import {getSpiritFrame} from 'app/render/astralProjectionAnimations';
 import {
@@ -31,14 +31,14 @@ import {
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
 import {getDefaultSavedState} from 'app/savedState'
-import { getCloneMovementDeltas } from 'app/userInput';
-import { drawFrameAt, getFrame } from 'app/utils/animations';
-import { destroyClone } from 'app/utils/destroyClone';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {getCloneMovementDeltas} from 'app/userInput';
+import {drawFrameAt, getFrame} from 'app/utils/animations';
+import {destroyClone} from 'app/utils/destroyClone';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {trackEnemyDealtDamage} from 'app/utils/enemyDamageTracking';
-import { directionMap, getDirection } from 'app/utils/field';
-import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
-import {boxesIntersect, cloneDeep, mergeDeep} from 'app/utils/index';
+import {directionMap, getDirection} from 'app/utils/field';
+import {getChargeLevelAndElement, getElement} from 'app/utils/getChargeLevelAndElement';
+import {boxesIntersect, clamp, cloneDeep, mergeDeep} from 'app/utils/index';
 
 const throwSpeed = 6;
 
@@ -166,6 +166,7 @@ export class Hero implements Actor {
     chargingHeldObject?: boolean;
     chargeTime?: number = 0;
     maxSpiritRadius: number = 0;
+    shockDuration: number = 0;
     spiritRadius: number = 0;
     status: ObjectStatus = 'normal';
 
@@ -343,17 +344,13 @@ export class Hero implements Actor {
             if (hit.element === 'fire') {
                 // The barrier prevents burning damage entirely (normally a 2x multiplier)
                 // so to balance this out the barrier takes a flat 50% more damage from fire elements.
-                spiritDamage *= 1.5;
-                if (state.hero.savedData.passiveTools.fireBlessing) {
-                    spiritDamage /= 2;
-                }
+                spiritDamage *= 1.5 * this.getFireBlessingDamageMultiplier();
             }
-            if (hit.element === 'ice' && state.hero.savedData.passiveTools.waterBlessing) {
-                spiritDamage /= 2;
+            if (hit.element === 'ice') {
+                spiritDamage *= this.getWaterBlessingDamageMultiplier();
             }
-            if (hit.element === 'lightning' && state.hero.savedData.passiveTools.lightningBlessing) {
-                spiritDamage /= 2;
-                iframeMultiplier *= 0.5;
+            if (hit.element === 'lightning') {
+                spiritDamage *= this.getLightningBlessingDamageMultiplier();
             }
             // The cloak does increased extra damage and prevents all spirit damage while the cloak is being activated.
             // This rewards players for using the cloak just in time to block attacks, but may be too generous.
@@ -396,20 +393,17 @@ export class Hero implements Actor {
             let burnDamage = 0;
             let iframeMultiplier = 1;
             if (hit.element === 'fire') {
-                let burnDuration = 2000;
+                const burnDuration = 2000;
+                damage *= this.getFireBlessingDamageMultiplier();
                 burnDamage = damage / 2;
-                if (state.hero.savedData.passiveTools.fireBlessing) {
-                    damage /= 2;
-                    burnDuration /= 2;
-                }
                 this.applyBurn(burnDamage, burnDuration);
             }
-            if (hit.element === 'ice' && state.hero.savedData.passiveTools.waterBlessing) {
-                damage /= 2;
+            if (hit.element === 'ice') {
+                damage *= this.getWaterBlessingDamageMultiplier();
             }
-            if (hit.element === 'lightning' && state.hero.savedData.passiveTools.lightningBlessing) {
-                damage /= 2;
-                iframeMultiplier *= 0.5;
+            if (hit.element === 'lightning') {
+                damage *= this.getLightningBlessingDamageMultiplier();
+                this.applyShock(2000 * damage);
             }
             if (state.hero.savedData.passiveTools.goldMail) {
                 if (gameModifiers.nerfGoldenMail) {
@@ -443,7 +437,7 @@ export class Hero implements Actor {
         } else if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && this.frozenDuration <= -500) {
-            const duration = this.savedData.passiveTools.waterBlessing ? 1000 : 1500;
+            const duration = this.savedData.passiveTools.waterBlessing ? 800 : 1600;
             if (hadIronSkin) {
                 this.frozenHeartDuration = 2 * duration;
             } else {
@@ -458,6 +452,36 @@ export class Hero implements Actor {
         return { hit: true };
     }
 
+    getFireBlessingDamageMultiplier() {
+        if (this.savedData.passiveTools.fireBlessing >= 2) {
+            return 0.5;
+        }
+        if (this.savedData.passiveTools.fireBlessing >= 1) {
+            return 0.75;
+        }
+        return 1;
+    }
+
+    getWaterBlessingDamageMultiplier() {
+        if (this.savedData.passiveTools.waterBlessing >= 2) {
+            return 0.5;
+        }
+        if (this.savedData.passiveTools.waterBlessing >= 1) {
+            return 0.75;
+        }
+        return 1;
+    }
+
+    getLightningBlessingDamageMultiplier() {
+        if (this.savedData.passiveTools.lightningBlessing >= 2) {
+            return 0.5;
+        }
+        if (this.savedData.passiveTools.lightningBlessing >= 1) {
+            return 0.75;
+        }
+        return 1;
+    }
+
     applyBounce(vx: number, vy: number, frames = 10) {
         this.vx = vx;
         this.vy = vy;
@@ -465,6 +489,9 @@ export class Hero implements Actor {
     }
 
     applyBurn(burnDamage: number, burnDuration: number) {
+        // This damage does not go through the apply damage function, so we need
+        // to apply the global damage multiplier to it separately.
+        burnDamage *= gameModifiers.globalDamageTaken;
         if (burnDuration * burnDamage >= this.burnDuration * this.burnDamage) {
             this.burnDuration = burnDuration;
             this.burnDamage = burnDamage;
@@ -472,6 +499,17 @@ export class Hero implements Actor {
         // Burns unfreeze the player.
         this.frozenDuration = 0;
         this.frozenHeartDuration = 0;
+    }
+
+    applyShock(shockDuration: number) {
+        let maxShockEffect = 1000 * this.maxMagic / 10;
+        if (this.savedData.passiveTools.lightningBlessing >= 2) {
+            maxShockEffect /= 2;
+        }
+        // Max shock duration is 1s per 10 max magic.
+        this.shockDuration = clamp(shockDuration, this.shockDuration, maxShockEffect);
+        // Current magic is reduced so that magic + shock effect <= max Magic.
+        this.magic = clamp(this.magic, this.maxMagic - this.shockDuration * 10 / 1000, this.magic);
     }
 
     burstBarrier(state: GameState) {
@@ -571,8 +609,8 @@ export class Hero implements Actor {
                 [...lightStoneParticles, ...heavyStoneParticles],
                 {numberParticles}, 4
             );
-            if (state.hero.savedData.ironSkinLife >= damage / 2) {
-                state.hero.savedData.ironSkinLife -= damage / 2;
+            if (state.hero.savedData.ironSkinLife >= damage) {
+                state.hero.savedData.ironSkinLife -= damage;
                 if (damage >= 1) {
                     playAreaSound(state, state.areaInstance, 'rockShatter');
                 } else {
@@ -603,12 +641,12 @@ export class Hero implements Actor {
         ) {
             if (this !== state.hero) {
                 // Clones that are not currently controlled take minimal damage.
-                state.hero.life -= Math.min(damage / 2, 0.5);
+                state.hero.life -= Math.min(damage, 0.5);
                 // Set iframes because a clone can take multiple tile hits in
                 // a single frame otherwise.
                 this.invulnerableFrames = 1;
             } else {
-                state.hero.life -= damage / 2;
+                state.hero.life -= damage;
                 state.hero.invulnerableFrames = 50 * iframeMultiplier;
                 // Taking damage resets radius for spirit sight meditation.
                 state.hero.spiritRadius = 0;
@@ -616,7 +654,7 @@ export class Hero implements Actor {
             destroyClone(state, this);
         } else {
             // Damage applies to the hero, not the clone.
-            state.hero.life -= damage / 2;
+            state.hero.life -= damage;
             state.hero.invulnerableFrames = 50 * iframeMultiplier;
             // Taking damage resets radius for spirit sight meditation.
             state.hero.spiritRadius = 0;

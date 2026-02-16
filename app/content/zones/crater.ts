@@ -5197,7 +5197,7 @@ const f1_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "locked", id: "craterLockedDoor", x: 96, y: 368, type: "door", style: "cavern", d: "down", targetZone: "crater", targetObjectId: "craterLockedDoor"},
-        {status: "normal", id: "craterMiniBoss", x: 400, y: 160, type: "boss", enemyType: "frostIdol", lootType: "fireBlessing", lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "craterMiniBoss", x: 400, y: 160, type: "boss", enemyType: "frostIdol", lootType: "fireBlessing", lootLevel: 0, d: "down", params: {}},
         {status: "normal", id: "craterInnerLeftDoor", x: 352, y: 336, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterInnerLeftDoor", d: "down"},
         {status: "normal", id: "craterMidDoor", x: 272, y: 496, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterMidDoor", d: "down"},
         {status: "normal", id: "crater:1:0x0-snakeFlame-0", x: 448, y: 316, type: "enemy", enemyType: "snakeFlame", d: "left", params: {}},

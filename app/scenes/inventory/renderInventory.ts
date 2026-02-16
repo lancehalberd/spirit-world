@@ -126,6 +126,15 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
 
         renderFaded(context, !state.hero.savedData.equipment[equipment], () => drawFrameCenteredAt(context, frame, target));
     }
+    function renderBlessing(blessing: 'fireBlessing' | 'lightningBlessing' | 'waterBlessing', lootLevel = state.hero.savedData.passiveTools[blessing]): void {
+        const frame = getLootFrame(state, { lootType: blessing, lootLevel });
+        const target = {w: frameSize, h: frameSize, x, y};
+
+        if (lootLevel >= 2) {
+            renderFaded(context, false, () => drawFrameCenteredAt(context, lootFrames.spiritSight, target));
+        }
+        renderFaded(context, !lootLevel, () => drawFrameCenteredAt(context, frame, target));
+    }
     function renderElement(element: MagicElement): void {
         const frame = getLootFrame(state, { lootType: element, lootLevel: state.hero.savedData.elements[element] || 1 });
         const target = {w: frameSize, h: frameSize, x, y};
@@ -156,6 +165,8 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
                 drawFrameCenteredAt(context, neutralElement, {x, y, w: frameSize, h: frameSize});
             } else if (menuItem === 'fire' || menuItem === 'ice' || menuItem === 'lightning') {
                 renderElement(menuItem as MagicElement);
+            } else if (menuItem === 'fireBlessing' || menuItem === 'lightningBlessing' || menuItem === 'waterBlessing') {
+                renderBlessing(menuItem);
             } else if (state.hero.savedData.passiveTools[menuItem as PassiveTool] || editingState.isEditing) {
                 renderLoot(menuItem as LootType, state.hero.savedData.passiveTools[menuItem as PassiveTool]);
             }
@@ -397,7 +408,7 @@ mainCanvas.addEventListener('click', function (event) {
                 } else if (menuItem === 'fire' || menuItem === 'ice' || menuItem === 'lightning') {
                     state.hero.savedData.elements[menuItem] = ((state.hero.savedData.elements[menuItem] || 0) + 1) % 2;
                 } else {
-                    if (menuItem === 'gloves' || menuItem === 'roll') {
+                    if (['gloves', 'roll', 'fireBlessing', 'lightningBlessing', 'waterBlessing'].includes(menuItem)) {
                         // These passive tools have 2 levels.
                         state.hero.savedData.passiveTools[menuItem] = ((state.hero.savedData.passiveTools[menuItem] || 0) + 1) % 4;
                     } else {

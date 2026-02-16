@@ -1,17 +1,18 @@
-import { renderIndicator } from 'app/content/objects/indicator';
-import { objectHash } from 'app/content/objects/objectHash';
-import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
-import { lootEffects } from 'app/content/lootEffects';
-import { editingState } from 'app/development/editingState';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, MAX_FLOAT_HEIGHT } from 'app/gameConstants';
-import { playSound } from 'app/utils/sounds';
-import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame, drawFrameAt, getFrameHitbox } from 'app/utils/animations';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { pad, boxesIntersect } from 'app/utils/index';
-import { setObjectFlag } from 'app/utils/objectFlags';
-import { addObjectToArea, getObjectStatus, removeObjectFromArea } from 'app/utils/objects';
-import { saveGame } from 'app/utils/saveGame';
+import {renderIndicator} from 'app/content/objects/indicator';
+import {objectHash} from 'app/content/objects/objectHash';
+import {getLootFrame, getLootShadowFrame, showLootMessage} from 'app/content/loot';
+import {lootEffects} from 'app/content/lootEffects';
+import {editingState} from 'app/development/editingState';
+import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
+import {playSound} from 'app/utils/sounds';
+import {showMessage} from 'app/scriptEvents';
+import {createAnimation, drawFrame, drawFrameAt, getFrameHitbox} from 'app/utils/animations';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {pad, boxesIntersect} from 'app/utils/index';
+import {getLootLevel} from 'app/utils/loot';
+import {setObjectFlag} from 'app/utils/objectFlags';
+import {addObjectToArea, getObjectStatus, removeObjectFromArea} from 'app/utils/objects';
+import {saveGame} from 'app/utils/saveGame';
 import {drawARFont} from 'app/arGames/arFont';
 
 
@@ -64,6 +65,7 @@ export class LootGetAnimation implements EffectInstance {
     };
     frame: Frame;
     loot: AnyLootDefinition;
+    lootLevel: number;
     animationTime: number = 0;
     isEffect = <const>true;
     x: number;
@@ -72,7 +74,10 @@ export class LootGetAnimation implements EffectInstance {
     status: ObjectStatus = 'normal';
     constructor(state: GameState, loot: AnyLootDefinition) {
         this.loot = loot;
+        // The frame and loot level need to be calculated in the constructor before the loot effect is
+        // applied, which would cause progressive loot to show the wrong frame/message.
         this.frame = getLootFrame(state, loot);
+        this.lootLevel = getLootLevel(state, this.loot);
         if (loot.type === 'bigChest') {
             this.x = loot.x + chestOpenedFrame.w - this.frame.w / 2;
             this.y = loot.y + 16;
@@ -105,7 +110,8 @@ export class LootGetAnimation implements EffectInstance {
             }
         }
         if (this.animationTime === 1000) {
-            showLootMessage(state, this.loot.lootType, this.loot.lootLevel, this.loot.lootAmount);
+            // Calculate the loot level immediately so that the
+            showLootMessage(state, this.loot.lootType, this.lootLevel, this.loot.lootAmount);
         } else if (this.animationTime > 1000) {
             removeEffectFromArea(state, this);
         }

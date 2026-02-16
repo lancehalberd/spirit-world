@@ -1698,7 +1698,7 @@ const f1_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "frozen", id: "riverTempleBigChest", x: 112, y: 144, type: "bigChest", lootType: "waterBlessing", lootLevel: 1},
+        {status: "frozen", id: "riverTempleBigChest", x: 112, y: 144, type: "bigChest", lootType: "waterBlessing", lootLevel: 0},
         {status: "normal", id: "", x: 368, y: 16, type: "door", style: "stone", d: "up"},
         {status: "normal", id: "", x: 240, y: 144, type: "door", style: "stone", d: "right"},
         {status: "normal", id: "", x: 256, y: 144, type: "door", style: "stone", d: "left"},

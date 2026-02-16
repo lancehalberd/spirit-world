@@ -320,8 +320,8 @@ export function createObjectDefinition(
                 id: definition.id || uniqueId(state, bossType),
                 enemyType: bossType,
                 lootType,
-                lootAmount: definition.lootAmount || 1,
-                lootLevel: definition.lootLevel || 1,
+                lootAmount: definition.lootAmount,
+                lootLevel: definition.lootLevel ?? 1,
                 d: definition.d || 'down',
                 saveStatus: definition.saveStatus,
                 params,
@@ -478,7 +478,7 @@ export function createObjectDefinition(
             if (lootType === 'money') {
                 lootDefinition.lootAmount = definition.lootAmount || 1;
             } else {
-                lootDefinition.lootLevel = definition.lootLevel || 1;
+                lootDefinition.lootLevel = definition.lootLevel ?? 1;
                 delete lootDefinition.lootAmount;
             }
             return lootDefinition;

@@ -1,8 +1,9 @@
-import { CHAKRAM_2_NAME } from 'app/gameConstants';
-import { showMessage } from 'app/scriptEvents';
-import { createAnimation } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { requireFrame } from 'app/utils/packedImages';
+import {CHAKRAM_2_NAME} from 'app/gameConstants';
+import {showMessage} from 'app/scriptEvents';
+import {createAnimation} from 'app/utils/animations';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {getLootLevel} from 'app/utils/loot';
+import {requireFrame} from 'app/utils/packedImages';
 
 //const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
 //    + '{|}Select a tool and press [B_TOOL] to assign it.';
@@ -34,40 +35,34 @@ function getChargeMessage(state: GameState) {
 }
 
 export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
-    if (!lootLevel) {
-        lootLevel = state.hero.savedData.activeTools[lootType as ActiveTool]
-            || state.hero.savedData.passiveTools[lootType as PassiveTool]
-            || state.hero.savedData.equipment[lootType as Equipment]
-            || 1;
-    }
     switch (lootType) {
         case 'bow':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Spirit Bow';
             }
             return 'Golden Bow';
         case 'cloak':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Spirit Cloak';
             }
             return 'Invisibility Cloak';
         case 'staff':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Tree Staff';
             }
             return 'Tower Staff';
         case 'clone':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Shadow Clone';
             }
             return 'Double Clone';
         case 'roll':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Mist Roll';
             }
             return 'Cloud Somersault';
         case 'gloves':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Spirit Bracers';
             }
             return 'Magical Bracers';
@@ -80,7 +75,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             }
             return 'Teleportation';
         case 'weapon':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Chakram';
             }
             return CHAKRAM_2_NAME;
@@ -98,17 +93,17 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'nimbusCloud': return 'Nimbus Cloud';
         case 'trueSight': return 'True Sight';
         case 'leatherBoots':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Leather Boots';
             }
             return 'Spike Boots';
         case 'ironBoots':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Iron Boots';
             }
             return 'Forge Boots';
         case 'cloudBoots':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Cloud Boots';
             }
             return 'Flying Boots';
@@ -118,22 +113,34 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             return 'Flying Boots Schematics';
         case 'forgeBoots':
             return 'Forge Boots Schematics';
-        case 'fireBlessing': return 'Fire Blessing';
-        case 'waterBlessing': return 'Water Blessing';
-        case 'lightningBlessing': return 'Ancient Badge';
+        case 'fireBlessing':
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return 'Fire Charm';
+            }
+            return 'Fire Blessing';
+        case 'waterBlessing':
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return 'Water Charm';
+            }
+            return 'Water Blessing';
+        case 'lightningBlessing':
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return 'Ancient Charm';
+            }
+            return 'Ancient Badge';
         case 'silverOre': return 'Silver Ore';
         case 'goldOre': return 'Gold Ore';
     }
     return '?'+lootType;
 }
 
-export function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
+function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
     const lootName = getLootName(state, lootType, lootLevel);
     switch (lootType) {
         case 'leatherBoots':
         case 'cloudBoots':
         case 'ironBoots':
-            if (lootLevel > 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) > 1) {
                 const oldLootName = getLootName(state, lootType, 1);
                 return `Your ${oldLootName} have been upgraded into ${lootName}!`;
             }
@@ -171,9 +178,14 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'ice':
         case 'lightning':
             return `You have received the ${lootName}!` + getEquipElementMessage(state) + getChargeMessage(state);
-        case 'fireBlessing': return 'You have received the Blessing of Fire!';
-        case 'waterBlessing': return 'You have received the Blessing of Water!';
-        case 'lightningBlessing': return `You have obtained the ${lootName}!`;
+        case 'fireBlessing':
+        case 'waterBlessing':
+        case 'lightningBlessing':
+            if (getLootLevel(state, {lootType, lootLevel}) > 1) {
+                const oldLootName = getLootName(state, lootType, 1);
+                return `Your ${oldLootName} has been upgraded into the ${lootName}!`;
+            }
+            return `You found the ${lootName}!`;
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
@@ -184,24 +196,24 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
 export function getLootHelpMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
     switch (lootType) {
         case 'leatherBoots':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'These are just regular boots. You can wear them when you don\'t want to wear other boots.';
             }
             return 'Spike Boots let you walk on ice without slipping and even make you a bit faster!';
         case 'cloudBoots':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Use the Cloud Boots to glide over dangerous ground and even walk in the clouds!'
                     + '{|}Cloud Boots allow you to move faster but with less control.';
             }
             return 'You can even walk over pits with Flying Boots as long as you keep moving!';
         case 'ironBoots':
-            if (lootLevel === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Use the Iron Boots to explore under water but watch your breath!'
                     + '{|}Iron boots slow you down but keep you from slipping and being knocked back.';
             }
             return 'Forge Boots are lighter and can withstand walking through lava!'
         case 'weapon':
-            if (state.hero.savedData.weapon === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return `Press [B_WEAPON] to throw the Chakram.
                     {|}Use it to defeat enemies or destroy some obstacles.`;
             }
@@ -210,7 +222,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 {|}After throwing the ${CHAKRAM_2_NAME}, quickly press [B_WEAPON] again
                 to throw your normal Chakram at the same time!`;
         case 'bow':
-            if (state.hero.savedData.activeTools.bow === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Press [B_TOOL] to shoot a magic arrow.'
                     + '{|}Use the bow to hit distant enemies and objects.';
             }
@@ -218,14 +230,14 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                     {|}This magical bow applies your equipped element to every shot.
                     {|}Charge the bow to shoot multiple arrows at once.`;
         case 'clone':
-            if (state.hero.savedData.activeTools.clone === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Press [B_TOOL] to create a clone or switch between clones.'
                     + '{|}Hold [B_TOOL] to control all clones at once!'
                     + '{|}Hold [B_MEDITATE] to make a clone explode!';
             }
             return `Your clone technique now creates two clones!`;
         case 'cloak':
-            if (state.hero.savedData.activeTools.cloak === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Press [B_TOOL] to create a Spirit Barrier around you.'
                     + '{|}The barrier will damage enemies and reflect projectiles at the cost of your Spirit Energy!'
                     + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
@@ -240,7 +252,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Invisibility makes you undetectable and invulnerable to most damage.'
                 + '{|}Your Spirit Energy will drain faster the longer you remain invisible.';
         case 'staff':
-            if (state.hero.savedData.activeTools.staff === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Press [B_TOOL] to summon the staff and slam it to the ground.'
                     + '{|}You can use the staff as a weapon and a bridge!'
                     + '{|}Press [B_TOOL] again to summon the staff back to you.';
@@ -252,14 +264,14 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
             state.savedState.objectFlags.readTowerStaffMessage = true;
             return 'This Staff is unbelievably large and powerful!';
         case 'gloves':
-            if (state.hero.savedData.passiveTools.gloves === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Now you can lift heavier objects.'
                     + '{|}Face an object and use [B_PASSIVE] to try to lift it.';
             }
             return 'Now you can lift even heavier objects.'
                 + '{|}Face an object and use [B_PASSIVE] to try to lift it.';
         case 'roll':
-            if (state.hero.savedData.passiveTools.roll === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Press [B_ROLL] to do a quick roll forward.'
                     + '{|}You can avoid most damage while rolling and cross small gaps.'
             }
@@ -293,13 +305,26 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'ice': return 'Ice can be used to freeze objects and enemies.';
         case 'lightning': return 'Lightning stuns enemies and activates some objects.';
         case 'fireBlessing':
-            return 'Burning hot rooms will no longer damage you.'
-                + '{|}You will also take half damage from fire.';
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return `Burning reduces your spirit energy before damaging you.
+                    {|} You also take 25% less damage from fire.`;
+            }
+            return `Burning will reduces your spirit energy before damaging you.
+                {|} Burning and fire damage is reduced by half.`;
         case 'waterBlessing':
-            return 'Being underwater will no longer drain your spirit energy or damage you.'
-                + '{|}You will also take half damage from ice.';
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return `Being underwater drains you spirit energy half as quickly.
+                    {|} You also take 25% less damage from ice.`;
+            }
+            return `Being underwater no longer drains your spirit energy.
+                {|}Freeze duration and ice damage is reduced by half.`;
         case 'lightningBlessing':
-            return 'This ancient artifact halves the damage from lightning effects.';
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return `You can pass through lightning barrier.
+                    {|} You also take 25% less damage from lightning.`;
+            }
+            return `Damage from lightning barriers is prevented.
+                {|}Maximum shock effect and lightning damage is reduced by half.`;
         case 'goldMail': return 'This amazing armor reduces all damage you receive.';
         case 'phoenixCrown': return `The feather in this crown absorbs almost limitless energy from the spirit world.`;
         case 'ironSkin': return `The Iron Skin technique allows you to coat your skin
@@ -529,19 +554,6 @@ export const lootFrames = {
     aetherCrystal: createLootFrame('black', 'C'),
 } as const;
 
-
-function determineLevel(lootLevel: number, currentValue: number): number {
-    if (lootLevel) {
-        return lootLevel;
-    }
-    for (let i = 0; i < 2; i++) {
-        if ((currentValue & (1 << i)) === 0) {
-            return i + 1;
-        }
-    }
-    return 1;
-}
-
 const [
     lightHalf, darkHalf, wholeCoin
 ] = createAnimation('gfx/hud/money.png', largeMoneyGeometry, {x: 7, cols: 3}).frames;
@@ -582,50 +594,43 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         return wholeCoin;
     }
     if (lootType === 'weapon') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.weapon);
-        if (lootLevel === 1){
+        if (getLootLevel(state, {lootType, lootLevel}) === 1){
             return silverChakram;
         }
         return goldChakram;
     }
     if (lootType === 'bow') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.bow);
-        if (lootLevel === 1) {
+        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
             return bow;
         }
         return goldBow;
     }
     if (lootType === 'cloak') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.cloak);
-        if (lootLevel === 1) {
+        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
             return lootFrames.spiritCloak;
         }
         return lootFrames.invisibilityCloak;
     }
     if (lootType === 'staff') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.staff);
-        if (lootLevel === 1) {
+        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
             return lootFrames.staff;
         }
         return lootFrames.towerStaff;
     }
     if (lootType === 'clone') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.activeTools.clone);
-        if (lootLevel === 1) {
+        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
             return lootFrames.clone;
         }
         return lootFrames.clone2;
     }
     if (lootType === 'roll') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.passiveTools.roll);
-        if (lootLevel === 1) {
+        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
             return lootFrames.roll;
         }
         return lootFrames.somersault;
     }
     if (lootType === 'gloves') {
-        lootLevel = determineLevel(lootLevel, state.hero.savedData.passiveTools.gloves);
-        if (lootLevel === 1) {
+        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
             return lootFrames.gloves;
         }
         return lootFrames.bracelet;

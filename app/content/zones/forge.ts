@@ -1637,7 +1637,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "closedEnemy", id: "forgeBossEntrance", x: 448, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up", locationCue: "Forge B1"},
         {status: "normal", id: "forgeBoss", x: 344, y: 428, type: "boss", enemyType: "balloonMegapede", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "up", params: {"length":7}},
         {status: "normal", id: "", x: 288, y: 240, type: "door", style: "cavern", d: "down"},
-        {status: "normal", id: "forgeArmor", x: 416, y: 64, type: "chest", lootType: "goldMail", lootAmount: 50, lootLevel: 1},
+        {status: "normal", id: "forgeBlessing", x: 416, y: 64, type: "chest", lootType: "fireBlessing", lootLevel: 0},
         {status: "normal", id: "forgeArmorSmith", x: 448, y: 56, d: "down", behavior: "face", style: "flameSpirit", type: "npc", dialogueKey: "forgeArmorSmith"},
         {status: "normal", id: "", spirit: true, x: 176, y: 160, type: "shieldingUnit"},
         {status: "normal", id: "forgeSaveStatue", linked: false, spirit: true, x: 36, y: 160, type: "saveStatue"},

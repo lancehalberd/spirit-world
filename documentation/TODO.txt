@@ -148,8 +148,8 @@ Graphics to Implement:
 Current tasks:
     - Preload music.
 
-    - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
-        - Delays spirit energy generation for 1s
+    - Mechanic idea:
+        - Survive with no life as long as you have spirit energy,
 
     - Add a dissipating spark effect when a circular spark is removed.
         - This will make large sparks disappearing on hit/TTL/cleanup be less jarring with no mechanical impact (the effect isn't interactive).
@@ -164,13 +164,13 @@ Current tasks:
 
     - Keep charging through rolls when wearing iron boots.
 
-    - Switch blessings to two progressive upgrades:
-        - Fire blessing:
-            - take no burning damage as long as you have spirit energy + take 25% less fire damage
-        - Water blessing:
-            - water no longer drains spirit energy (but spirit energy still does not recover) + take 25% less ice damage
-        - Lightning blessing:
-            - lightning traps do not damage you (but they still knock you away) + take 25% lightning damage
+    - Update item locations:
+        - Silver armor recipe
+        - Silver armor behind normal armor smith 3 silver + recipe
+        - Golden armor recipe
+        - Golden armor behind spirit armor smith in Forge + 3 gold + 2 silver + recipe + Silver Armor
+        - Water Blessing
+        - Lightning Blessing -> Upgraded by an enthusiastic NPC if you have the level 1 blessing.
 
     - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 

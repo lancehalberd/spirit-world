@@ -233,9 +233,11 @@ export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak'] };
 export const hasInvisibility: LogicCheck = { requiredFlags: ['$cloak:2'] };
 export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
 export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
+// Level 1 blessings are sufficient to put hot/water/corrosive rooms in logic.
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
-export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing']};
+// Only the second level of lightning blessing allows you to pass through lightning barriers.
+export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing:2']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon:3']};
 export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 export const hasPhoenixCrown: LogicCheck = {requiredFlags: ['$phoenixCrown']};

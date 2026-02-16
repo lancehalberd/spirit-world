@@ -1,4 +1,4 @@
-import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
+import {addDustBurst, addReviveBurst} from 'app/content/effects/animationEffect';
 import {
     fixProgressFlagsOnLoad,
     fixSpawnLocationOnLoad,
@@ -6,15 +6,16 @@ import {
 import {
     FRAME_LENGTH, GAME_KEY,
 } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
+import {playAreaSound} from 'app/musicController';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
+import {clamp} from 'app/utils/index';
 import {
     isGameKeyDown,
     wasGameKeyPressed,
     wasConfirmKeyPressed,
 } from 'app/userInput';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
-import { saveGame } from 'app/utils/saveGame';
+import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation'
+import {saveGame} from 'app/utils/saveGame';
 
 export function updateDefeated(state: GameState) {
     if (!isGameKeyDown(state, GAME_KEY.WEAPON)) {
@@ -67,6 +68,11 @@ export function updateDefeated(state: GameState) {
             state.hero.displayLife = state.hero.life;
             playAreaSound(state, state.areaInstance, 'heart');
         }
+        // This value is designed to make the magic increase smoothly in lock step with the life.
+        // It matches the life exactly when defeatTime % 200 === 0, and then interpolates linearly over the 200ms, matching the
+        // same 0.5 life per 200ms that the life increases discretely.
+        const smoothMagicValue = state.hero.maxMagic * (state.hero.life + 0.5 * (state.defeatState.time % 200) / 200) / state.hero.savedData.maxLife;
+        state.hero.magic = clamp(smoothMagicValue, state.hero.magic, state.hero.maxMagic);
         return;
     }
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
