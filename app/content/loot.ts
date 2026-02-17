@@ -115,23 +115,23 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             return 'Forge Boots Schematics';
         case 'fireBlessing':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
-                return 'Fire Charm';
+                return 'Ruby Stud';
             }
-            return 'Fire Blessing';
+            return 'Ruby Earrings';
         case 'waterBlessing':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
-                return 'Water Charm';
+                return 'Sapphire Bangle';
             }
-            return 'Water Blessing';
+            return 'Sapphire Bracelet';
         case 'lightningBlessing':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
-                return 'Ancient Charm';
+                return 'Topaz Pin';
             }
             return 'Ancient Badge';
         case 'silverOre': return 'Silver Ore';
         case 'goldOre': return 'Gold Ore';
     }
-    return '?'+lootType;
+    return '?' + lootType;
 }
 
 function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {

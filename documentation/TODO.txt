@@ -156,6 +156,7 @@ Current tasks:
         - Just a shrinking spark effect.
 
     - Cocoon improvements
+        - Move turrets closer in and add more of them for the cloak tutorial
         - Add additional gauntlet gauntlet floor before the boss
             - Removing rolling stone puzzle from first gauntlet floor.
             - Add single rolling stone puzzle to new gauntlet floor
@@ -164,13 +165,23 @@ Current tasks:
 
     - Keep charging through rolls when wearing iron boots.
 
-    - Update item locations:
-        - Silver armor recipe
-        - Silver armor behind normal armor smith 3 silver + recipe
-        - Golden armor recipe
-        - Golden armor behind spirit armor smith in Forge + 3 gold + 2 silver + recipe + Silver Armor
+    - Add Silver Armor:
+        - Choose location and add Silver Armor Schematics
+            - Karma reward in the Vanara Dream.
+        - Add Silver Armor to armor smith for Schematics + 3 silver
+        - Update randomizer logic
+
+    - Add Golden Armor:
+        - Choose location and add Golden Armor Schematics
+            - Possibly place this behind fully upgrading Golden Chakram, move Forge boots Schematics elsewhere.
+        - Add Golden Armor to spirit armor smith for Schematics + 3 gold + 2 silver + Silver Armor
+        - Update randomizer logic
+
+    - Add missing progressive upgrades:
         - Water Blessing
+            - Karma reward in the Vanara Dream
         - Lightning Blessing -> Upgraded by an enthusiastic NPC if you have the level 1 blessing.
+        - Update randomizer logic
 
     - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 
