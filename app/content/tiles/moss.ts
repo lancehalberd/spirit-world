@@ -18,7 +18,7 @@ const greenConvexTiles: TileSource = {
         '3x2': greenFloor,
         '1x3': greenFloor,
         '2x3': greenFloor,
-        '3x4': greenFloor,
+        '3x3': greenFloor,
     },
 };
 

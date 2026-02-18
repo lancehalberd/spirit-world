@@ -2259,7 +2259,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "jadeCityInterior:s0:0x2-money-0", x: 20, y: 436, type: "loot", lootType: "money", lootAmount: 1},
         {status: "normal", id: "jadeCityInterior:s0:0x2-money-1", x: 20, y: 451, type: "loot", lootType: "money", lootAmount: 5},
         {status: "normal", id: "jadeCityInterior:s0:0x2-money-0", x: 20, y: 468, type: "loot", lootType: "money", lootAmount: 1},
-        {status: "normal", id: "NEWmoneyMazePeachPiece", x: 174, y: 78, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 10},
+        {status: "normal", id: "NEWmoneyMazePeachPiece", x: 174, y: 78, type: "loot", lootType: "peachOfImmortalityPiece"},
         {status: "normal", id: "jadeCityInterior:0:0x2-money-0", x: 482, y: 178, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "jadeCityInterior:0:0x2-money-0", x: 466, y: 66, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "jadeCityInterior:0:0x2-money-0", x: 290, y: 179, type: "loot", lootType: "money", lootAmount: 10},

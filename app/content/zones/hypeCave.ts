@@ -440,7 +440,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "hypeCaveMoney2", x: 40, y: 400, type: "chest", lootType: "money", lootAmount: 50},
         {status: "normal", id: "hypeCaveMoney3", x: 184, y: 368, type: "chest", lootType: "money", lootAmount: 20},
         {status: "normal", id: "hypeCaveMoney4", x: 208, y: 384, type: "chest", lootType: "money", lootAmount: 50},
-        {status: "normal", id: "hypeCavePeachPiece", x: 120, y: 48, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1},
+        {status: "normal", id: "hypeCavePeachPiece", x: 120, y: 48, type: "chest", lootType: "peachOfImmortalityPiece"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 70, mapId: 'sky', entranceId: 'hypeCaveEntranceSpirit', mapX: 0, mapY: 0},

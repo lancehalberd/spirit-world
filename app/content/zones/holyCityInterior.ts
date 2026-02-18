@@ -621,7 +621,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 35, y: 227, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 49, y: 123, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 114, y: 108, type: "loot", lootType: "money", lootAmount: 10},
-        {status: "normal", id: "moneyMazePeachPiece", x: 176, y: 78, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 50},
+        {status: "normal", id: "moneyMazePeachPiece", x: 176, y: 78, type: "loot", lootType: "peachOfImmortalityPiece"},
         {status: "normal", id: "", x: 452, y: 148, type: "loot", lootType: "money", lootAmount: 5},
         {status: "normal", id: "", x: 18, y: 210, type: "loot", lootType: "money", lootAmount: 10},
         {status: "normal", id: "", x: 65, y: 142, type: "loot", lootType: "money", lootAmount: 10},
@@ -834,7 +834,7 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "jadeCitySoutheastDoor", x: 352, y: 240, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "jadeCitySoutheastDoor", d: "down", linked: true},
-        {status: "normal", id: "jadeCityPeachPiece", x: 472, y: 56, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1, isInvisible: true},
+        {status: "normal", id: "jadeCityPeachPiece", x: 472, y: 56, type: "chest", lootType: "peachOfImmortalityPiece", isInvisible: true},
         {status: "normal", id: "", x: 472, y: 56, type: "indicator"},
         {status: "normal", id: "jadeCityNortheastDoor", x: 96, y: 240, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "jadeCityNortheastDoor", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", x: 376, y: 148, d: "down", behavior: "face", style: "smallSpirit", type: "npc", dialogue: "Someone's hidden something here in between worlds. \n{|}Feel free to take it if you can see it.", dialogueIndex: 138},

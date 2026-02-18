@@ -176,7 +176,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 176, type: "rollingBall", linked: true},
         {status: "normal", id: "treeCaveMarker", linked: true, x: 120, y: 192, type: "marker"},
         {status: "normal", id: "", linked: true, x: 96, y: 240, type: "door", style: "cavern", d: "down"},
-        {status: "hiddenSwitch", id: "treeCaveSilver", linked: true, x: 120, y: 128, type: "chest", lootType: "silverOre", lootAmount: 50},
+        {status: "hiddenSwitch", id: "treeCaveSilver", linked: true, x: 120, y: 128, type: "chest", lootType: "silverOre"},
         {status: "normal", id: "forestSecretEntrance", linked: false, x: 364, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forest", targetObjectId: "forestSecretEntrance", d: "up"},
         {status: "normal", id: "", linked: false, x: 376, y: 400, type: "arGame", gameId: "dodger"},
         {status: "normal", id: "", linked: false, x: 300, y: 300, d: "down", behavior: "face", style: "vanaraRed", type: "npc", dialogue: "Try that device out if you are feeling bored.\n{|}I hear they are really popular in the Spirit World.", dialogueIndex: 218},

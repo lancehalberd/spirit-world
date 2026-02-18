@@ -779,7 +779,7 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "locked", id: "holySanctumBackDoor", x: 224, y: 496, type: "door", style: "crystal", d: "down", targetZone: "holySanctum", targetObjectId: "holySanctumBackDoor"},
-        {status: "normal", id: "holySanctumBigKey", x: 248, y: 408, type: "chest", lootType: "bigKey", lootLevel: 1},
+        {status: "normal", id: "holySanctumBigKey", x: 248, y: 408, type: "chest", lootType: "bigKey"},
         {status: "locked", id: "holySanctumKeyBlock", x: 240, y: 352, type: "keyBlock", spirit: false},
         {status: "locked", id: "holySanctumBackEntrance", x: 240, y: 304, type: "door", style: "crystal", targetZone: "holySanctumBack", targetObjectId: "holySanctumBackEntrance", d: "up", locationCue: "Holy Sanctum 1F"},
         {status: "normal", id: "holySanctumBow", x: 112, y: 76, type: "bigChest", lootType: "bow", lootLevel: 2},

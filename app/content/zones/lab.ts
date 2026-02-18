@@ -1770,7 +1770,7 @@ const f1_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "labStairs", linked: true, spirit: true, x: 416, y: 0, type: "door", style: "cavernDownstairs", targetZone: "lab", targetObjectId: "labStairs", d: "up", locationCue: "Lab 1F"},
-        {status: "normal", id: "lab:s1:0x0-smallKey-0", linked: true, x: 72, y: 56, type: "chest", lootType: "smallKey", lootLevel: 1, spirit: true},
+        {status: "normal", id: "lab:s1:0x0-smallKey-0", linked: true, x: 72, y: 56, type: "chest", lootType: "smallKey", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 486, mapId: 'lab', floorId: '2F', mapX: 2, mapY: 1},
@@ -1800,7 +1800,7 @@ const sf1_0x0: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "labStairs", linked: true, spirit: false, x: 416, y: 0, type: "door", style: "cavernDownstairs", targetZone: "lab", targetObjectId: "labStairs", d: "up", locationCue: "Lab 1F"},
-        {status: "normal", id: "labKey", linked: true, x: 72, y: 56, type: "chest", lootType: "smallKey", lootLevel: 1},
+        {status: "normal", id: "labKey", linked: true, x: 72, y: 56, type: "chest", lootType: "smallKey"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 489, mapId: 'labSpirit', floorId: '2F', mapX: 2, mapY: 1},

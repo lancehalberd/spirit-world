@@ -213,7 +213,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "voidTree", x: 208, y: 24, type: "boss", enemyType: "voidTree", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "voidTree", x: 208, y: 24, type: "boss", enemyType: "voidTree", lootType: "empty", d: "down", params: {}},
         {status: "normal", id: "voidEntrance", x: 224, y: 496, type: "door", style: "wideEntrance", targetZone: "tree", targetObjectId: "voidEntrance", d: "down"},
         {status: "normal", id: "", x: 272, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "!voidFlame"},
         {status: "normal", id: "", x: 208, y: 173, type: "lavafall", w: 32, h: 40, hasCustomLogic: true, customLogic: "!voidFlame"},

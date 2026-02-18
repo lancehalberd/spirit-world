@@ -533,7 +533,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", linked: false, spirit: false, x: 160, y: 172, type: "tippable"},
         {status: "normal", id: "", linked: false, spirit: false, x: 176, y: 172, type: "tippable"},
         {status: "normal", id: "waterfallCaveWaterMoney", linked: false, spirit: true, x: 384, y: 72, type: "chest", lootType: "money", lootAmount: 300},
-        {status: "normal", id: "waterfallCaveWaterPeach", linked: false, spirit: true, x: 64, y: 40, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 300},
+        {status: "normal", id: "waterfallCaveWaterPeach", linked: false, spirit: true, x: 64, y: 40, type: "chest", lootType: "peachOfImmortalityPiece"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 866, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},

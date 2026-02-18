@@ -284,12 +284,17 @@ export class Hero implements Actor {
             this.invulnerableFrames = 20;
         }
         if (hit.knockback) {
-            this.throwHeldObject(state);
-            this.action = 'knocked';
-            this.animationTime = 0;
-            this.vx = hit.knockback.vx;
-            this.vy = hit.knockback.vy;
-            this.vz = hit.knockback.vz;
+            this.knockBack(state, hit.knockback);
+            /*this.throwHeldObject(state);
+            if (this.action !== 'knocked') {
+                this.action = 'knocked';
+                this.animationTime = 0;
+                this.vx = hit.knockback.vx;
+                this.vy = hit.knockback.vy;
+                this.vz = hit.knockback.vz;
+            } else {
+                console.log('knock locked');
+            }*/
         }
         return {
             hit: true,
@@ -483,9 +488,12 @@ export class Hero implements Actor {
     }
 
     applyBounce(vx: number, vy: number, frames = 10) {
-        this.vx = vx;
-        this.vy = vy;
-        this.bounce = {vx, vy, frames};
+        // Hero can get stuck against bouncy clouds if we don't prevent chaining bounces.
+        if (!this.bounce) {
+            this.vx = vx;
+            this.vy = vy;
+            this.bounce = {vx, vy, frames};
+        }
     }
 
     applyBurn(burnDamage: number, burnDuration: number) {

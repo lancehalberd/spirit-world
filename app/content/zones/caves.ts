@@ -383,7 +383,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "caves-ascentEntrance", x: 64, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "caves-ascentEntrance", d: "down"},
         {status: "normal", id: "caves-ascentExit", x: 96, y: 240, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "caves-ascentExit", d: "down"},
-        {status: "normal", id: "caves-ascentPeachPiece", x: 144, y: 112, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
+        {status: "normal", id: "caves-ascentPeachPiece", x: 144, y: 112, type: "chest", lootType: "peachOfImmortalityPiece"},
         {status: "normal", id: "", x: 20, y: 416, style: "smallStatue", type: "pushPull", linked: true},
         {status: "normal", id: "", x: 40, y: 404, style: "smallStatue", type: "pushPull", linked: true},
         {status: "normal", id: "", x: 60, y: 164, style: "smallStatue", type: "pushPull", linked: true},
@@ -1062,7 +1062,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 184, style: "smallStatue", type: "pushPull", linked: true, spirit: true},
         {status: "normal", id: "", x: 60, y: 164, style: "smallStatue", type: "pushPull", linked: true, spirit: true},
         {status: "normal", id: "caves:s0:0x0-plantFlame-0", spirit: true, x: 124, y: 134, type: "enemy", enemyType: "plantFlame", d: "down", params: {}},
-        {status: "normal", id: "caves-ascentSpiritPeachPiece", spirit: true, x: 404, y: 267, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
+        {status: "normal", id: "caves-ascentSpiritPeachPiece", spirit: true, x: 404, y: 267, type: "loot", lootType: "peachOfImmortalityPiece"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 62, hotLogic: {"logicKey":"mountainLava"}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 0},

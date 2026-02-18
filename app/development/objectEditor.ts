@@ -30,6 +30,7 @@ import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import {enterLocation} from 'app/utils/enterLocation';
 import {isPointInShortRect, removeElementFromArray} from 'app/utils/index';
+import {doesLootRequireAmount, doesLootRequireLevel} from 'app/utils/loot';
 import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
 import {isDefinitionFromSection} from 'app/utils/sections';
 import { getSwitchTargetIds } from 'app/utils/switches';
@@ -185,6 +186,19 @@ export const combinedObjectTypes: ObjectType[] = [
 ];
 export const doorTypes: ObjectType[] = ['door', 'helixTop', 'staffTower'];
 
+function setLootData(definition: LootData) {
+    if (doesLootRequireAmount(definition.lootType)) {
+        definition.lootAmount = definition.lootAmount || 1;
+    } else {
+        delete definition.lootAmount;
+    }
+    if (doesLootRequireLevel(definition.lootType)) {
+        definition.lootLevel = definition.lootLevel ?? 1;
+    } else {
+        delete definition.lootLevel;
+    }
+}
+
 export function createObjectDefinition(
     state: GameState,
     definition: PartialObjectDefinitionWithType
@@ -312,7 +326,7 @@ export function createObjectDefinition(
                     params[key] = definition.params[key];
                 }
             }
-            return {
+            const bossDefinition: BossObjectDefinition = {
                 ...commonProps,
                 type: definition.type,
                 // Only store difficulty when it is not the default value.
@@ -320,12 +334,13 @@ export function createObjectDefinition(
                 id: definition.id || uniqueId(state, bossType),
                 enemyType: bossType,
                 lootType,
-                lootAmount: definition.lootAmount,
-                lootLevel: definition.lootLevel ?? 1,
                 d: definition.d || 'down',
                 saveStatus: definition.saveStatus,
                 params,
             };
+            setLootData(bossDefinition);
+
+            return bossDefinition;
         }
         case 'decoration':
             const decorationDefinition: DecorationDefinition = {
@@ -475,12 +490,7 @@ export function createObjectDefinition(
             if (definition.type === 'shopItem') {
                 lootDefinition.price = definition.price || 100;
             }
-            if (lootType === 'money') {
-                lootDefinition.lootAmount = definition.lootAmount || 1;
-            } else {
-                lootDefinition.lootLevel = definition.lootLevel ?? 1;
-                delete lootDefinition.lootAmount;
-            }
+            setLootData(lootDefinition);
             return lootDefinition;
         }
         case 'movingPlatform':
@@ -1687,7 +1697,7 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
             editingState.needsRefresh = true;
         },
     });
-    if (lootType === 'money') {
+    if (doesLootRequireAmount(lootType)) {
         rows.push({
             name: 'amount',
             value: '' + (object.lootAmount ?? 1),
@@ -1698,9 +1708,8 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
                 updateObjectInstance(state, object);
             },
         });
-    } else if (lootType === 'peachOfImmortality' || lootType === 'peachOfImmortalityPiece') {
-    } else if (lootType === 'fire' || lootType === 'ice' || lootType === 'lightning') {
-    } else {
+    }
+    if (doesLootRequireLevel(lootType)) {
         const level = object.lootLevel ?? 0;
         rows.push({
             name: 'level',

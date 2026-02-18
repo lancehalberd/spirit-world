@@ -4,6 +4,7 @@ import {everyArea, everyObject} from 'app/utils/every';
 import {hitTargets} from 'app/utils/field';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import {getDrawPriority} from 'app/utils/layers';
+import {doesLootRequireAmount, doesLootRequireLevel, getLootLevel} from 'app/utils/loot';
 import {getObjectSaveTreatment} from 'app/utils/objects';
 import {applyTileToBehaviorGrid} from 'app/utils/tileBehavior';
 import {getAreaInstanceFromLocation} from 'app/content/areas';
@@ -22,6 +23,38 @@ export const tests: {[key: string]: () => void} = {
             if (!objectDefinition.id) {
                 console.error(`Missing object id`, location, objectDefinition);
             }
+        });
+    },
+    checkForInvalidLoot() {
+        everyObject((location, zone, area, objectDefinition) => {
+            if (objectDefinition.type === 'boss'
+                || objectDefinition.type === 'loot'
+                || objectDefinition.type === 'chest'
+                || objectDefinition.type === 'bigChest'
+                || objectDefinition.type === 'shopItem'
+            ) {
+                if (doesLootRequireAmount(objectDefinition.lootType)) {
+                    if (!objectDefinition.lootAmount) {
+                        console.error(`Loot requires a non-zero amount`, location, objectDefinition);
+                    }
+                } else {
+                    if (objectDefinition.lootAmount !== undefined) {
+                        console.error(`Loot should not have an amount`, location, objectDefinition);
+                    }
+                }
+                if (doesLootRequireLevel(objectDefinition.lootType)) {
+                    if (objectDefinition.lootLevel === undefined) {
+                        console.error(`Loot requires a level`, location, objectDefinition);
+                    }
+                } else {
+                    if (objectDefinition.lootLevel !== undefined) {
+                        console.error(`Loot should not have a level`, location, objectDefinition);
+                    }
+                }
+                // This will throw an error if lootLevel is set to progressive on invalid items.
+                getLootLevel(getState(), objectDefinition);
+            }
+
         });
     },
     checkLayersAreOrdered() {

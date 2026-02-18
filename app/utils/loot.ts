@@ -37,8 +37,18 @@ export function isEquipment(lootType: LootType): lootType is Equipment {
     return equipment.includes(lootType as Equipment);
 }
 
+export function doesLootRequireLevel(lootType: LootType) {
+    return lootType === 'weapon' || isActiveTool(lootType) || isPassiveTool(lootType) || isEquipment(lootType);
+}
+
+export function doesLootRequireAmount(lootType: LootType) {
+    return lootType === 'money';
+}
+
 export function getLootLevel(state: GameState, loot: LootData): number {
-    if (loot.lootLevel > 0) {
+    // 0 represents progressive loot. If the loot is not progressive, it has
+    // the exact level given (or not given for many items that have no concept of level).
+    if (loot.lootLevel !== 0 || !doesLootRequireLevel(loot.lootType)) {
         return loot.lootLevel;
     }
     const currentLevel = getCurrentLootValue(state, loot.lootType);

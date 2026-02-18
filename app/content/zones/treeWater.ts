@@ -982,8 +982,8 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "treeFrostBeast", linked: false, x: 230, y: 260, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
-        {status: "normal", id: "treeFrostBeast", linked: false, x: 242, y: 302, type: "boss", enemyType: "frostBeast", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "treeFrostBeast", linked: false, x: 230, y: 260, type: "boss", enemyType: "frostHeart", lootType: "empty", d: "down", params: {}},
+        {status: "normal", id: "treeFrostBeast", linked: false, x: 242, y: 302, type: "boss", enemyType: "frostBeast", lootType: "empty", d: "down", params: {}},
         {status: "normal", id: "treeOctopusNorthwest", x: 112, y: 170, type: "enemy", enemyType: "octopus", d: "down", saveStatus: "never", params: {}, hasCustomLogic: true, customLogic: "!treeFrostBeast"},
         {status: "normal", id: "treeOctopusNortheast", x: 324, y: 72, type: "enemy", enemyType: "octopus", d: "down", params: {}, saveStatus: "forever", hasCustomLogic: true, customLogic: "!treeFrostBeast"},
         {status: "normal", id: "treeOctopusSouthwest", x: 122, y: 412, type: "enemy", enemyType: "octopus", d: "down", saveStatus: "forever", params: {}, hasCustomLogic: true, customLogic: "!treeFrostBeast"},
