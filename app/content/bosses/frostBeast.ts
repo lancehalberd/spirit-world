@@ -315,13 +315,13 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         underwaterHeart.animations = frostHeartWaterAnimations;
         underwaterHeart.changeToAnimation(underwaterHeart.currentAnimationKey, underwaterHeart.nextAnimationKey);
     }
-    surfaceHeart.z = 0;
-    underwaterHeart.z = 8;
     // If either form is defeated, both are defeated.
     if (isEnemyDefeated(surfaceHeart) || isEnemyDefeated(underwaterHeart)) {
         enemy.status = 'gone';
         return;
     }
+    surfaceHeart.z = 0;
+    underwaterHeart.z = 8;
     if (enemy === underwaterHeart && surfaceHeart?.params?.active) {
         enemy.life = surfaceHeart.life;
         surfaceHeart.params.active = false;

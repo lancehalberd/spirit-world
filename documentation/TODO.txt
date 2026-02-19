@@ -162,8 +162,6 @@ Current tasks:
         - Ideally, we would return a list of all hits+pixels and decide what the aggregate effect is.
             - Some hits might take priority over others or prevent others.
 
-    - Check killing frost beast underwater grants ice element.
-
     - Add first daughter tree area
         - Large beetle with hard shell immune to regular damage (except staff bonks+clone explosion)
             - Higher resolution art requested.
