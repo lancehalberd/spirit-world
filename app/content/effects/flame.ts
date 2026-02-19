@@ -82,6 +82,7 @@ export class Flame implements EffectInstance, Props {
     h: number = 12;
     radius: number;
     animationTime = 0;
+    animationTimeOffset = Math.floor(Math.random() * 10) * FRAME_LENGTH;
     time: number = 0;
     speed = 0;
     ttl: number;
@@ -117,7 +118,6 @@ export class Flame implements EffectInstance, Props {
         this.scale = scale;
         this.updateSize();
         this.isPreparing = isPreparing
-        this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
         this.groundFriction = groundFriction;
         this.beforeUpdate = beforeUpdate;
         this.source = source;
@@ -285,7 +285,7 @@ export class Flame implements EffectInstance, Props {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = getFrame(this.destroyed ? flameBrokenAnimation : flameAnimation, this.animationTime);
+        const frame = getFrame(this.destroyed ? flameBrokenAnimation : flameAnimation, this.animationTime + this.animationTimeOffset);
         drawFrameAt(context, frame, {
             x: this.x - this.w / 2,
             y: this.y - this.z - this.h / 2,
@@ -305,18 +305,43 @@ export class Flame implements EffectInstance, Props {
         }
     }
 
-    renderShadow(context: CanvasRenderingContext2D) {
-        const p = clamp(this.destroyed ? (1 - this.animationTime / flameBrokenAnimation.duration) : this.animationTime / 400, 0.1, 1);
+    renderWarning(context: CanvasRenderingContext2D) {
+        const p = clamp(this.destroyed ? (1 - this.animationTime / flameBrokenAnimation.duration) : this.animationTime / 400, .1, 1);
         const actualZ = this.z + 4 - 2 * Math.sin(this.animationTime / 150);
-        const shadowRadius = Math.max(3, 6 - actualZ / 2);
+        const hitbox = this.getHitbox();
         context.save();
-        context.globalAlpha = 0.5 * p;
-        context.fillStyle = 'red';
-        context.translate(this.x, this.y);
-        context.scale(this.w / 12, this.h / 18);
-        context.beginPath();
-        context.arc(0, 0, shadowRadius, 0, 2 * Math.PI);
-        context.fill();
+            context.fillStyle = 'red';
+            const cx = this.x;
+            //const cy = hitbox.y + hitbox.h - hitbox.w / 4;
+            const cy = this.y;
+            const shadowRadius = 1.1 * hitbox.w / 2;
+            const fullScale = 1;
+            context.translate(cx, cy + hitbox.h / 4);
+            context.scale(1, 0.5);
+            if (actualZ <= 4) {
+                context.globalAlpha *= 0.6 * p;
+                context.scale(fullScale, fullScale);
+                context.beginPath();
+                context.arc(0, 0, shadowRadius, 0, Math.PI * 2);
+                context.fill();
+            } else {
+                context.globalAlpha *= Math.min(0.35, p);
+                const dw = Math.min(shadowRadius, actualZ / 6);
+                if (shadowRadius - dw > 0) {
+                    context.save();
+                        const zAlpha = Math.max(0.5, 0.96 ** (actualZ / 2));
+                        context.globalAlpha *= zAlpha;
+                        context.beginPath();
+                        context.arc(0, 0, shadowRadius - dw, 0, Math.PI * 2);
+                        context.fill();
+                    context.restore();
+                }
+                const zAlpha = Math.max(0.5, 0.98 ** (actualZ / 2));
+                context.globalAlpha *= zAlpha;
+                context.beginPath();
+                context.arc(0, 0, shadowRadius + dw, 0, Math.PI * 2);
+                context.fill();
+            }
         context.restore();
     }
 }
@@ -354,7 +379,7 @@ export class Fireball extends Flame {
         const direction = getDirection(this.vx, this.vy, true, 'up', 0.0001);
         const animation = ['up', 'down', 'left', 'right'].includes(direction)
             ? fireballNorthAnimation : fireballNortheastAnimation;
-        const frame = getFrame(animation, this.animationTime);
+        const frame = getFrame(animation, this.animationTime + this.animationTimeOffset);
         context.save();
             context.translate(this.x, this.y - this.z);
             context.scale(this.scale, this.scale);

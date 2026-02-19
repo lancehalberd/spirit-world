@@ -34,6 +34,10 @@ import {
 } from 'app/utils/target';
 
 
+// Setting this will force the boss to always use this element.
+const testElement: MagicElement = undefined; //'lightning';//'lightning'
+const testMode: string = undefined; // 'projectileRings';//'denial';
+const testEnrage = false;
 
 
 // Taken from heroAnimations.ts
@@ -80,11 +84,6 @@ const guardianSpiritAnimations: ActorAnimations = {
     finishCast: omniAnimation(guardianSpiritFinishCastAnimation),
     cast: omniAnimation(guardianSpiritCastAnimation),
 };
-
-// Setting this will force the boss to always use this element.
-const testElement: MagicElement = undefined; //'lightning';//'lightning'
-const testMode: string = undefined; // 'projectileRings';//'denial';
-const testEnrage = false;
 
 //type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 const blastAbility: EnemyAbility<true> = {
@@ -377,9 +376,45 @@ const growingThornsAbility: EnemyAbility<Target> = {
     charges: 1,
     chargesRecovered: 1,
     prepTime: 500,
-    recoverTime: guardianSpiritFinishAttackAnimation.duration,
+    recoverTime: guardianSpiritFinishCastAnimation.duration,
 };
 
+type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+const fallingFlameAbility: EnemyAbility<NearbyTargetType|true> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType|true {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets) ?? true;
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType|true) {
+        const guardian = getGuardian(state);
+        if (!guardian) {
+            return;
+        }
+        const {x, y} = getTargetingAnchor(enemy);
+        enemy.changeToAnimation('startCast', 'holdCast');
+        const theta = target === true ? Math.random() * 2 * Math.PI : Math.atan2(target.y, target.x);
+        const mag = (target === true ? 64 : target?.mag) - 8 + Math.random() * 16;
+        const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
+        const flame = new Flame({
+            x: tx, y: ty, z: 200,
+            damage: 1,
+            scale: 2,
+            delay: fallingFlameAbility.prepTime,
+            ttl: 7000,
+            source: enemy,
+        });
+        addEffectToArea(state, enemy.area, flame);
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
+        (enemy.params.parent || enemy).life -= 2
+        enemy.changeToAnimation('finishCast', 'idle');
+    },
+    cooldown: 1000,
+    initialCharges: 0,
+    charges: 1,
+    chargesRecovered: 1,
+    prepTime: 300,
+    recoverTime: guardianSpiritFinishCastAnimation.duration + 200,
+};
 
 function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
     const projection = getProjection(state);
@@ -1168,23 +1203,12 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 enemy.setMode('choose');
             }
         } else if (enemy.params.element === 'fire') {
-            if (enemy.currentAnimationKey === 'idle' && enemy.modeTime >= 3500) {
-                enemy.setMode('choose');
-            } else if (enemy.currentAnimationKey !== 'finishCast' &&
-                enemy.runAnimationSequence(['startCast', 'holdCast']) && enemy.animationTime >= 600
-            ) {
-                enemy.changeToAnimation('finishCast', 'idle');
-                enemy.life -= 2;
-                const mag = (v?.mag || 64) - 8 + Math.random() * 16;
-                const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
-                const flame = new Flame({
-                    x: tx, y: ty, z: 160,
-                    damage: 1,
-                    scale: 2,
-                    ttl: 7000,
-                    source: enemy,
-                })
-                addEffectToArea(state, enemy.area, flame);
+            if (!enemy.activeAbility) {
+                if (enemy.modeTime >= 3500) {
+                    enemy.setMode('choose');
+                } else {
+                    enemy?.useAbiltyFromDefinition(state, fallingFlameAbility);
+                }
             }
         } else {
             if (enemy.modeTime === 600) {

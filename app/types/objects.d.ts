@@ -78,11 +78,15 @@ interface BaseFieldInstance {
     neverSkipFrames?: boolean
     getDrawPriority?: (state: GameState) => DrawPriority
     render: (context: CanvasRenderingContext2D, state: GameState) => void
+    // This has reduced opacity when objects have high z value.
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    // Warning is rendered over shadows and has no opacity reduction for high z values
+    renderWarning?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground2?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRenderWarning?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     // Called after the object is added to an area and initialized.
     // isActiveArea will be set to false when this object is being initialized in an inactive area,

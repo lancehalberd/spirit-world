@@ -751,9 +751,8 @@ function renderObjectWithEffects(
     context: CanvasRenderingContext2D,
     state: GameState,
     object: ObjectInstance | EffectInstance,
-    callback: () => void
+    callback: () => void,
 ): void {
-
         if (object.z > 100) {
             context.save();
             context.globalAlpha *= Math.max(0, 1 - (object.z - 100) / 28);
@@ -823,6 +822,13 @@ export function renderAreaObjectsBeforeHero(
                 renderObjectWithEffects(context, state, object, () => object.renderShadow?.(context, state));
             } else {
                 renderObjectWithEffects(context, state, object, () => object.alternateRenderShadow?.(context, state));
+            }
+        }
+        for (const object of area.objectsToRender) {
+            if (object.area?.definition === area.definition) {
+                object.renderWarning?.(context, state);
+            } else {
+                object.alternateRenderWarning?.(context, state);
             }
         }
         if (!state.hero.renderParent) {
