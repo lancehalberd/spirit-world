@@ -1050,9 +1050,9 @@ const bigDarkDome: DecorationType = {
 };
 
 
-const [helixBaseFrame] = createAnimation('gfx/objects/helixBaseCombined.png',
-    {w: 356, h: 325, content: {x: 120, y: 273, w: 114, h: 46}}, {}
-).frames;
+const helixBaseFrame = requireFrame('gfx/objects/helixBaseCombined.png',
+    {x: 115, y: 71, w: 141, h: 261, content: {x: 5, y: 205, w: 125, h: 46}}
+);
 const helixBase: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, helixBaseFrame, decoration);
