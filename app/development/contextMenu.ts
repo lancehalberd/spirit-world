@@ -6,7 +6,7 @@ import {contextMenuState, editingState} from 'app/development/editingState';
 import {toggleEditing} from 'app/development/editor';
 import {tagElement} from 'app/dom';
 import {getCanvasScale} from 'app/development/getCanvasScale';
-import {overworldKeys} from 'app/gameConstants';
+import {isDebugMode, overworldKeys} from 'app/gameConstants';
 import {checkToRedrawTiles, drawEntireFrame} from 'app/render/renderField';
 import {getState} from 'app/state';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
@@ -350,6 +350,9 @@ export function hideContextMenu(): void {
 let lastContextClick: number[];
 
 export function addContextMenuListeners(): void {
+    if (!isDebugMode) {
+        return;
+    }
     document.addEventListener('mouseup', function (event) {
         if (event.which !== 1) {
             return;

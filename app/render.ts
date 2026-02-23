@@ -1,20 +1,20 @@
-import { editingState } from 'app/development/editingState';
-import { renderEditor } from 'app/development/renderEditor';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { renderControls } from 'app/scenes/controls/renderControls';
-import { renderDefeatedMenu } from 'app/scenes/defeated/renderDefeated';
-import { renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera } from 'app/render/renderField';
-import { renderHUD } from 'app/renderHUD';
-import { renderIntro } from 'app/scenes/intro/renderIntro';
-import { renderInventory } from 'app/scenes/inventory/renderInventory';
-import { renderPrologue } from 'app/scenes/prologue/renderPrologue';
-import { renderMap } from 'app/render/renderMap';
-import { renderMessage } from 'app/render/renderMessage';
-import { renderFileSelect } from 'app/scenes/fileSelect/renderFileSelect';
-import { renderTitle } from 'app/scenes/title/renderTitle';
-import { renderSettings } from 'app/scenes/settings/renderSettings';
-import { getState, shouldHideMenu } from 'app/state';
-import { mainContext } from 'app/utils/canvas';
+import {editingState} from 'app/development/editingState';
+import {renderEditor} from 'app/development/renderEditor';
+import {CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
+import {renderControls} from 'app/scenes/controls/renderControls';
+import {renderDefeatedMenu} from 'app/scenes/defeated/renderDefeated';
+import {renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera} from 'app/render/renderField';
+import {renderHUD} from 'app/renderHUD';
+import {renderFieldMenu} from 'app/scenes/fieldMenu/renderFieldMenu';
+import {renderIntro} from 'app/scenes/intro/renderIntro';
+import {renderPrologue} from 'app/scenes/prologue/renderPrologue';
+import {renderMap} from 'app/render/renderMap';
+import {renderMessage} from 'app/render/renderMessage';
+import {renderFileSelect} from 'app/scenes/fileSelect/renderFileSelect';
+import {renderTitle} from 'app/scenes/title/renderTitle';
+import {renderSettings} from 'app/scenes/settings/renderSettings';
+import {getState, shouldHideMenu} from 'app/state';
+import {mainContext} from 'app/utils/canvas';
 import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
 
 let frameDurations: number[] = [];
@@ -87,13 +87,16 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         return;
     }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
-        renderTransition(context, state);
-        renderHUD(context, state);
         if (state.paused && !shouldHideMenu(state)) {
             if (state.showMap) {
+                renderTransition(context, state);
+                renderHUD(context, state);
                 renderMap(context, state);
             } else {
-                renderInventory(context, state);
+                renderFieldMenu(context, state, (context: CanvasRenderingContext2D, state: GameState) => {
+                    renderTransition(context, state);
+                    renderHUD(context, state);
+                });
             }
         }
         return;
@@ -112,12 +115,8 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         renderSettings(context, state);
         return;
     }
-    state.lastTimeRendered = state.time;
-    renderStandardFieldStack(context, state);
-
-    // Render any editor specific graphics if appropriate.
-    renderEditor(context, state);
     if (state.defeatState.defeated) {
+        renderFieldAndEditor(context, state);
         context.save();
             if (state.defeatState.reviving) {
                 context.globalAlpha *= 0.7 * (1 - state.hero.life / state.hero.savedData.maxLife);
@@ -148,15 +147,33 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         if (state.defeatState.time >= 2000) {
             renderDefeatedMenu(context, state);
         }
-        return;
-    }
-    renderHUD(context, state);
-    renderMessage(context, state);
-    if (state.paused && !shouldHideMenu(state)) {
+        renderHUD(context, state);
+        renderMessage(context, state);
+    } else if (state.paused && !shouldHideMenu(state)) {
         if (state.showMap) {
+            renderFieldMenuBackground(context, state);
             renderMap(context, state);
         } else {
-            renderInventory(context, state);
+            renderFieldMenu(context, state, renderFieldMenuBackground);
         }
+        renderMessage(context, state);
+    } else {
+        // Normal rendering during game play.
+        renderFieldAndEditor(context, state);
+        renderHUD(context, state);
+        renderMessage(context, state);
     }
+}
+
+function renderFieldMenuBackground(context: CanvasRenderingContext2D, state: GameState) {
+    renderFieldAndEditor(context, state);
+    renderHUD(context, state);
+}
+
+function renderFieldAndEditor(context: CanvasRenderingContext2D, state: GameState) {
+    state.lastTimeRendered = state.time;
+    renderStandardFieldStack(context, state);
+
+    // Render any editor specific graphics if appropriate.
+    renderEditor(context, state);
 }

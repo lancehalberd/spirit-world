@@ -71,6 +71,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             astralProjection: 0,
             teleportation: 0,
             ironSkin: 0,
+            silverMail: 0,
             goldMail: 0,
             phoenixCrown: 0,
             waterBlessing: 0,

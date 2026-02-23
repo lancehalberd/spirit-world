@@ -146,10 +146,30 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Preload music.
+    - Demo blockers
+        - Preload music.
+        - New inventory+contorls+options
+        - Demo flag
+            - Disable access to waterfall tower.
+            - Replace Helix rival fight with demo ending, possibly unlock randomizer.
+        - Cleanup overworld
+            - Finish adding grass
+            - [Optional] add ash to spirit world
+        - Finish cocoon update
+            - New pod graphics
+            - Falling between floors
+            - Missing floor
+        - Add new peach tree graphics
+        - Cocoon boss projectiles still getting blocked by boulders
+        - High priority SFX
 
     - Mechanic idea:
         - Survive with no life as long as you have spirit energy,
+
+    - Add crystal switch puzzles before bow:
+        - two switches you have to hit with chakram to open basement door, Elder gives a hint.
+            - Add some bushes for randomizer.
+        - one switch out of range in the basement, sign explains you can hold the attack button to throw further.
 
     - Enemy with hard shell that can only be broken by Staff bonk or clone explosion
         - Make clone immune to damage once detonation sequence cannot be aborted.

@@ -1,5 +1,5 @@
-import { showHint } from 'app/content/hints';
-import { getLootHelpMessage } from 'app/content/loot';
+import {showHint} from 'app/content/hints';
+import {getLootHelpMessage} from 'app/content/loot';
 import {
     getMenuRows,
     setEquippedBoots,
@@ -7,16 +7,16 @@ import {
     setLeftTool,
     setRightTool,
 } from 'app/content/menu';
-import { dungeonMaps } from 'app/content/sections';
-import { editingState } from 'app/development/editingState';
-import { GAME_KEY } from 'app/gameConstants';
+import {dungeonMaps} from 'app/content/sections';
+import {editingState} from 'app/development/editingState';
+import {GAME_KEY} from 'app/gameConstants';
 import {
     wasGameKeyPressed,
     wasMenuConfirmKeyPressed,
 } from 'app/userInput';
-import { showMessage } from 'app/scriptEvents';
-import { isSectionExplored } from 'app/utils/sections';
-import { updateSoundSettings } from 'app/utils/soundSettings';
+import {showMessage} from 'app/scriptEvents';
+import {isSectionExplored} from 'app/utils/sections';
+import {updateSoundSettings} from 'app/utils/soundSettings';
 
 export function updateInventory(state: GameState) {
     if (state.showMap) {
@@ -116,6 +116,14 @@ export function updateInventory(state: GameState) {
             return;
         } else if (state.hero.savedData.elements[menuItem as MagicElement]) {
             setEquippedElement(state, menuItem as MagicElement);
+            return;
+        }
+        if (menuItem === 'weapon') {
+            showMessage(state, getLootHelpMessage(state, 'weapon', 1));
+            return;
+        }
+        if (menuItem === 'weapon2') {
+            showMessage(state, getLootHelpMessage(state, 'weapon', 2));
             return;
         }
         if (menuItem === 'nimbusCloud') {

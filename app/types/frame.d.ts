@@ -73,3 +73,5 @@ interface CreateAnimationOptions {
     duration?: number
     frameMap?: number[]
 }
+
+type RenderFunction = (context: CanvasRenderingContext2D, state: GameState) => void

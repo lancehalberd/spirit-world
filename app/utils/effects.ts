@@ -1,4 +1,7 @@
 
+export function isEffect(effect: BaseFieldInstance): effect is EffectInstance {
+    return !!(effect as EffectInstance).isEffect;
+}
 export function addEffectToArea(state: GameState, area: AreaInstance, effect: EffectInstance): void {
     if (!area) {
         console.trace("Missing area instance in addEffectToArea")

@@ -1,38 +1,38 @@
-import { refreshAreaLogic } from 'app/content/areas';
-import { dungeonMaps } from 'app/content/sections';
+import {refreshAreaLogic} from 'app/content/areas';
+import {dungeonMaps} from 'app/content/sections';
 import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     MUTATE_DURATION, WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
-import { initializeGame } from 'app/initialize';
+import {initializeGame} from 'app/initialize';
 import {
     updateKeyboardState,
     wasGameKeyPressed,
     wasConfirmKeyPressed,
 } from 'app/userInput';
-import { updateControls } from 'app/scenes/controls/updateControls';
-import { updateDefeated } from 'app/scenes/defeated/updateDefeated';
-import { updateIntro } from 'app/scenes/intro/updateIntro';
-import { updateInventory } from 'app/scenes/inventory/updateInventory';
-import { updatePrologue } from 'app/scenes/prologue/updatePrologue';
-import { updateFileSelect } from 'app/scenes/fileSelect/updateFileSelect';
-import { updateTitle } from 'app/scenes/title/updateTitle';
-import { updateSettings } from 'app/scenes/settings/updateSettings';
+import {updateControls} from 'app/scenes/controls/updateControls';
+import {updateDefeated} from 'app/scenes/defeated/updateDefeated';
+import {updateFieldMenu} from 'app/scenes/fieldMenu/updateFieldMenu';
+import {updateIntro} from 'app/scenes/intro/updateIntro';
+import {updatePrologue} from 'app/scenes/prologue/updatePrologue';
+import {updateFileSelect} from 'app/scenes/fileSelect/updateFileSelect';
+import {updateTitle} from 'app/scenes/title/updateTitle';
+import {updateSettings} from 'app/scenes/settings/updateSettings';
 import {appendCallback, showMessage, waitForARGameToFinish} from 'app/scriptEvents';
 import {
     canPauseGame,
     getState,
     shouldHideMenu,
 } from 'app/state';
-import { updateCamera } from 'app/updateCamera';
-import { updateField } from 'app/updateField';
-import { updateScriptEvents } from 'app/updateScriptEvents';
-import { enterLocation } from 'app/utils/enterLocation';
-import { areAllImagesLoaded } from 'app/utils/images';
+import {updateCamera} from 'app/updateCamera';
+import {updateField} from 'app/updateField';
+import {updateScriptEvents} from 'app/updateScriptEvents';
+import {enterLocation} from 'app/utils/enterLocation';
+import {areAllImagesLoaded} from 'app/utils/images';
 import {refreshAreaIce} from 'app/utils/refreshAreaIce';
-import { updateSoundSettings } from 'app/utils/soundSettings';
+import {updateSoundSettings} from 'app/utils/soundSettings';
 
 let isGameInitialized = false;
 export function update() {
@@ -112,6 +112,9 @@ export function update() {
                     state.menuIndex = 0;
                 } else {
                     state.paused = !state.paused;
+                    state.fieldMenuState.needsRefresh = true;
+                    state.fieldMenuState.backgroundBuffer.needsRefresh = true;
+                    state.fieldMenuState.panelsBuffer.needsRefresh = true;
                     state.showMap = false;
                     state.menuIndex = 0;
                 }
@@ -151,7 +154,7 @@ export function update() {
         const showNextFrame = hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT);
         if (state.paused && !showNextFrame) {
             if (!hideMenu) {
-                updateInventory(state);
+                updateFieldMenu(state);
             }
         } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
             if (!state.paused || showNextFrame) {

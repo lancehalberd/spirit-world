@@ -1,23 +1,25 @@
-import { getMenuName, getMenuRows, getMenuTip } from 'app/content/menu';
-import { getLootFrame, lootFrames, neutralElement } from 'app/content/loot';
-import { getCanvasScale } from 'app/development/getCanvasScale';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { mainCanvas } from 'app/utils/canvas';
-import { characterMap } from 'app/utils/simpleWhiteFont';
-import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';
-import { fillRect, isPointInShortRect, pad } from 'app/utils/index';
-import { getMousePosition } from 'app/utils/mouse';
-import { drawText } from 'app/utils/simpleWhiteFont';
-import { contextMenuState, editingState } from 'app/development/editingState';
-import { getState, shouldHideMenu } from 'app/state';
-import { parseMessage } from 'app/render/renderMessage';
-import { updateHeroMagicStats } from 'app/render/spiritBar';
+import {getMenuName, getMenuRows, getMenuTip} from 'app/content/menu';
+import {getLootFrame, lootFrames, neutralElement} from 'app/content/loot';
+import {contextMenuState, editingState} from 'app/development/editingState';
+import {getCanvasScale} from 'app/development/getCanvasScale';
+import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
+import {mainCanvas} from 'app/utils/canvas';
+import {characterMap} from 'app/utils/simpleWhiteFont';
+import {createAnimation, drawFrame, drawFrameCenteredAt} from 'app/utils/animations';
+import {fillRect, isPointInShortRect, pad} from 'app/utils/index';
+import {getMousePosition} from 'app/utils/mouse';
+import {drawText} from 'app/utils/simpleWhiteFont';
+import {getState, shouldHideMenu} from 'app/state';
+import {parseMessage} from 'app/render/renderMessage';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
+import {requireFrame} from 'app/utils/packedImages';
 
 const MARGIN = 20;
 
 
 const [, fullPeach, threeQuartersPeach, halfPeach, quarterPeach] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
+const fullPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 54, y: 0, w: 20, h: 20});
 
 const frameSize = 24;
 const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, h: frameSize}).frames[0];
@@ -217,10 +219,7 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
         });
     }
 
-    context.save();
-        context.globalAlpha = 0.3;
-        drawFrame(context, fullPeach, peachRect);
-    context.restore();
+    drawFrame(context, fullPeachFrame, pad(peachRect, 1));
     if (state.hero.savedData.peachQuarters === 3) {
         drawFrame(context, threeQuartersPeach, peachRect);
     } else if (state.hero.savedData.peachQuarters === 2) {
@@ -357,7 +356,7 @@ mainCanvas.addEventListener('click', function (event) {
         for (const menuItem of menuRow) {
             const r = {x, y, w: frameSize, h: frameSize};
             if (isPointInShortRect(mouseX, mouseY, r)) {
-                if (menuItem === 'help' || menuItem === 'empty' || menuItem === 'weapon'
+                if (menuItem === 'help' || menuItem === 'empty'
                     || menuItem === 'spiritPower' || menuItem === 'secondChance'
                     || menuItem === 'spikeBoots' || menuItem === 'forgeBoots' || menuItem === 'flyingBoots'
                     || menuItem === 'peachOfImmortality' || menuItem === 'peachOfImmortalityPiece'
@@ -368,7 +367,30 @@ mainCanvas.addEventListener('click', function (event) {
                 ) {
                     // No handling
                 } else if (menuItem === 'return') {
-                    // No handling
+                } else if (menuItem === 'weapon') {
+                    if ((state.hero.savedData.weapon & 1) === 0) {
+                        state.hero.savedData.weapon += 1;
+                    } else if (!state.hero.savedData.weaponUpgrades.normalDamage) {
+                        state.hero.savedData.weaponUpgrades.normalDamage = true;
+                    } else if (!state.hero.savedData.weaponUpgrades.normalRange) {
+                        state.hero.savedData.weaponUpgrades.normalRange = true;
+                    } else {
+                        state.hero.savedData.weapon -= 1;
+                        state.hero.savedData.weaponUpgrades.normalDamage = false;
+                        state.hero.savedData.weaponUpgrades.normalRange = false;
+                    }
+                } else if (menuItem === 'weapon2') {
+                    if ((state.hero.savedData.weapon & 2) === 0) {
+                        state.hero.savedData.weapon += 2;
+                    } else if (!state.hero.savedData.weaponUpgrades.spiritDamage) {
+                        state.hero.savedData.weaponUpgrades.spiritDamage = true;
+                    } else if (!state.hero.savedData.weaponUpgrades.spiritRange) {
+                        state.hero.savedData.weaponUpgrades.spiritRange = true;
+                    } else {
+                        state.hero.savedData.weapon -= 2;
+                        state.hero.savedData.weaponUpgrades.spiritDamage = false;
+                        state.hero.savedData.weaponUpgrades.spiritRange = false;
+                    }
                 } else if (menuItem === 'bow' || menuItem === 'cloak' || menuItem === 'staff' || menuItem === 'clone') {
                     state.hero.savedData.activeTools[menuItem] = ((state.hero.savedData.activeTools[menuItem] || 0) + 1) % 4;
                 } else if (menuItem === 'leatherBoots') {

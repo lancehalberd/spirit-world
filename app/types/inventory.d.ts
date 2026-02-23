@@ -1,11 +1,20 @@
 type ActiveTool = 'bow' | 'staff' | 'clone' | 'cloak';
 type Equipment = 'leatherBoots' | 'cloudBoots' | 'ironBoots';
-type PassiveTool = 'gloves'
+type PassiveTool =
+    // Techniques
     | 'roll'
     | 'nimbusCloud'
+    | 'teleportation'
+    | 'ironSkin'
+    // Eyes
     | 'catEyes' | 'spiritSight' | 'trueSight'
-    | 'astralProjection' | 'teleportation'
-    | 'ironSkin' | 'goldMail' | 'phoenixCrown'
+    // Head
+    | 'astralProjection' | 'phoenixCrown'
+    // Hands
+    | 'gloves'
+    // Body
+    | 'silverMail' | 'goldMail'
+    // Accessories
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing'
     | 'arDevice';
 type MagicElement = 'fire' | 'ice' | 'lightning';
@@ -30,7 +39,7 @@ type LootType = 'empty' | 'weapon'
     | Blueprints
     | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
-type MenuOptionType = LootType | 'help' | 'return';
+type MenuOptionType = null | LootType | 'weapon2' | 'help' | 'return';
 
 type WeaponUpgrades = 'normalDamage' | 'normalRange' | 'spiritDamage' | 'spiritRange';
 

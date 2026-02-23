@@ -17,7 +17,7 @@ export function applyUpgrade(currentLevel: number, loot: LootData): number {
 }
 
 const activeTools: ActiveTool[] = ['bow', 'staff', 'clone', 'cloak'];
-export function isActiveTool(lootType: LootType): lootType is ActiveTool {
+export function isActiveTool(lootType: string): lootType is ActiveTool {
     return activeTools.includes(lootType as ActiveTool);
 }
 const passiveTools: PassiveTool[] = [
@@ -25,23 +25,23 @@ const passiveTools: PassiveTool[] = [
     'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
     'waterBlessing', 'fireBlessing', 'lightningBlessing',
 ];
-export function isPassiveTool(lootType: LootType): lootType is PassiveTool {
+export function isPassiveTool(lootType: string): lootType is PassiveTool {
     return passiveTools.includes(lootType as PassiveTool);
 }
 const elementLoot: MagicElement[] = ['fire', 'lightning', 'ice'];
-export function isMagicElement(lootType: LootType): lootType is MagicElement {
+export function isMagicElement(lootType: string): lootType is MagicElement {
     return elementLoot.includes(lootType as MagicElement);
 }
 const equipment: Equipment[] = ['leatherBoots', 'cloudBoots', 'ironBoots'];
-export function isEquipment(lootType: LootType): lootType is Equipment {
+export function isEquipment(lootType: string): lootType is Equipment {
     return equipment.includes(lootType as Equipment);
 }
 
-export function doesLootRequireLevel(lootType: LootType) {
+export function doesLootRequireLevel(lootType: string) {
     return lootType === 'weapon' || isActiveTool(lootType) || isPassiveTool(lootType) || isEquipment(lootType);
 }
 
-export function doesLootRequireAmount(lootType: LootType) {
+export function doesLootRequireAmount(lootType: string) {
     return lootType === 'money';
 }
 

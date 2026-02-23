@@ -512,6 +512,8 @@ export const lootFrames = {
     // Summoner's Circlet.
     astralProjection: circlet,
     phoenixCrown,
+    // TODO: Add real graphics.
+    silverMail: goldMail,
     goldMail,
     ironSkin,
     bigKey: bigKeyOutlineFrame,

@@ -2,8 +2,9 @@ import {Hero} from 'app/content/hero';
 import {SPAWN_LOCATION_DEMO, SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
 import {zones} from 'app/content/zones';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
-import {randomizerSeed, randomizerGoal } from 'app/gameConstants';
+import {CANVAS_HEIGHT, CANVAS_WIDTH, randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import {getDefaultSavedState } from 'app/savedState'
+import {createCanvasAndContext} from 'app/utils/canvas';
 import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
 import {getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
 import {cloneDeep, mergeDeep} from 'app/utils/index';
@@ -81,6 +82,9 @@ export function applySavedState(state: GameState, savedState: Partial<SavedState
     returnToSpawnLocation(state, true);
 }
 
+const [backgroundCanvas, backgroundContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+const [panelsCanvas, panelsContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+
 export function getDefaultState(): GameState {
     const state: GameState = {
         savedState: getDefaultSavedState(),
@@ -109,6 +113,24 @@ export function getDefaultState(): GameState {
         paused: false,
         showControls: false,
         showMap: false,
+        fieldMenuState:{
+            needsRefresh: true,
+            backgroundBuffer: {
+                needsRefresh: true,
+                canvas: backgroundCanvas,
+                context: backgroundContext,
+            },
+            panelsBuffer: {
+                needsRefresh: true,
+                canvas: panelsCanvas,
+                context: panelsContext,
+            },
+            panels: [],
+            grid: [[]],
+            // This will update to the first selectable menu item
+            // found in reading order from this point when the menu opens.
+            cursor: {x: 0, y: 0},
+        },
         menuIndex: 0,
         menuRow: 0,
         defeatState: {

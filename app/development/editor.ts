@@ -1,20 +1,24 @@
-import { bossTypes } from 'app/content/bosses';
-import { enemyTypes } from 'app/content/enemies';
-import { editingState } from 'app/development/editingState';
-import { getBrushContextProperties } from 'app/development/getBrushContextProperties';
-import { getObjectProperties } from 'app/development/objectEditor';
-import { renderProgressTabContainer } from 'app/development/progressEditor';
-import { displayPanel } from 'app/development/propertyPanel';
-import { renderToolTabContainer } from 'app/development/toolTab';
-import { checkToRefreshMinimap, renderZoneTabContainer } from 'app/development/zoneEditor';
-import { displayPropertyPanel, hideAllPropertyPanels } from 'app/development/propertyPanel';
-import { createObjectDefinition, combinedObjectTypes } from 'app/development/objectEditor';
-import { getVariantProperties, isVariantSelected } from 'app/development/variantEditor';
-import { enterLocation } from 'app/utils/enterLocation';
+import {bossTypes} from 'app/content/bosses';
+import {enemyTypes} from 'app/content/enemies';
+import {editingState} from 'app/development/editingState';
+import {getBrushContextProperties} from 'app/development/getBrushContextProperties';
+import {getObjectProperties} from 'app/development/objectEditor';
+import {renderProgressTabContainer} from 'app/development/progressEditor';
+import {displayPanel} from 'app/development/propertyPanel';
+import {renderToolTabContainer} from 'app/development/toolTab';
+import {checkToRefreshMinimap, renderZoneTabContainer} from 'app/development/zoneEditor';
+import {displayPropertyPanel, hideAllPropertyPanels} from 'app/development/propertyPanel';
+import {createObjectDefinition, combinedObjectTypes} from 'app/development/objectEditor';
+import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
+import {isDebugMode} from 'app/gameConstants';
+import {enterLocation} from 'app/utils/enterLocation';
 import {setSaveFileToState} from 'app/state';
 
 
 export function toggleEditing(state: GameState) {
+    if (!isDebugMode) {
+        return;
+    }
     if (state.scene === 'title' || state.scene === 'prologue' || state.scene === 'intro') {
         setSaveFileToState(0, 0);
     }
@@ -26,6 +30,7 @@ export function toggleEditing(state: GameState) {
     editingState.isEditing = !editingState.isEditing;
     editingState.recentAreas = [];
     state.map.needsRefresh = true;
+    state.fieldMenuState.needsRefresh = true;
     if (editingState.isEditing) {
         startEditing(state);
     } else {

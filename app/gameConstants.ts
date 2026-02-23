@@ -51,6 +51,10 @@ export const RIVAL_NAME = 'Saru';
 
 export const CHAKRAM_2_NAME = 'Golden Chakram';
 
+export const isDemoMode = false;
+
+export const isDebugMode = !isDemoMode;
+
 export const entranceSeed = readGetParameterAsInt('entranceSeed');
 // Entrance randomizer may not be completable with randomized items, so item randomizer
 // defaults to the entrance seed if one is not set.

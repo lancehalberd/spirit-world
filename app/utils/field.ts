@@ -6,7 +6,7 @@ import {directionMap, getDirection} from 'app/utils/direction';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {rectanglesOverlap} from 'app/utils/index';
 import {getDrawPriority} from 'app/utils/layers';
-import {getObjectBehaviors, removeObjectFromArea} from 'app/utils/objects';
+import {getObjectBehaviors, isObject, removeObjectFromArea} from 'app/utils/objects';
 import {resetTileBehavior} from 'app/utils/tileBehavior';
 
 
@@ -722,10 +722,6 @@ export function isTargetHit(hitbox: Rect, hit: HitProperties): boolean {
         return distance <= (hit.hitRay.r + fakeRadius);
     }
     return hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox);
-}
-
-function isObject(object: ObjectInstance | EffectInstance): object is ObjectInstance {
-    return !!(object as ObjectInstance).isObject;
 }
 
 function getHitTestPoints(hit: HitProperties): Point[] {
