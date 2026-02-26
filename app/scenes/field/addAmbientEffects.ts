@@ -1,5 +1,4 @@
 import {addSparkleAnimation, FieldAnimationEffect, spawnAnimation} from 'app/content/effects/animationEffect';
-import {FRAME_LENGTH} from 'app/gameConstants';
 // import { editingState } from 'app/development/editingState';
 import {createAnimation} from 'app/utils/animations';
 import {addEffectToArea} from 'app/utils/effects';
@@ -35,11 +34,15 @@ export function addAmbientEffects(this: void, state: GameState) {
     );*/
 }
 
-const spawnSmallBubbleAnimation = createAnimation('gfx/effects/smallBubble.png', {w: 8, h: 8}, {y: 1, cols: 11, duration: 3, loop: false});
+const smallBubbleSpawnAnimation = createAnimation('gfx/effects/smallBubble.png', {w: 8, h: 8}, {y: 1, cols: 11, duration: 3, loop: false});
 const smallBubbleAnimation = createAnimation('gfx/effects/smallBubble.png', {w: 8, h: 8}, {cols: 12, duration: 6});
+const smallBubblePopAnimation = createAnimation('gfx/effects/smallBubble.png',
+    {w: 24, h: 24, content: {x: 8, y: 8, w: 8, h: 8}}, {top: 16, cols: 3, duration: 3, loop: false}
+);
 
-const spawnLargeBubbleAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {y: 1, cols: 22, duration: 3, loop: false});
+const largeBubbleSpawnAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {y: 1, cols: 22, duration: 3, loop: false});
 const largeBubbleAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {cols: 12, duration: 6});
+const largeBubblePopAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {y: 2, cols: 3, duration: 3, loop: false});
 
 
 const lavaBubbleGeometry: FrameDimensions = {w: 16, h: 16, content: {x: 3, w: 10, y: 6, h: 4}};
@@ -79,28 +82,36 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
     if (state.location.zoneKey === 'dream' && !behavior.pit && !behavior.pitWall && !behavior.solid && Math.random() < 0.05) {
         if (Math.random() < 0.9) {
             addEffectToArea(state, area, spawnAnimation({
-                animation: spawnSmallBubbleAnimation,
+                animation: smallBubbleSpawnAnimation,
                 drawPriority: 'sprites',
                 x, y,
                 centerOnPoint: true,
-            }, new FieldAnimationEffect({
+            }, spawnAnimation({
                 animation: smallBubbleAnimation,
                 drawPriority: 'sprites',
-                ttl: Math.max(128 / 0.5) * FRAME_LENGTH,
+                ttl: 3000,
                 vz: 0.5,
-            })));
+            }, new FieldAnimationEffect({
+                animation: smallBubblePopAnimation,
+                drawPriority: 'sprites',
+                vz: 0,
+            }))));
         } else {
             addEffectToArea(state, area, spawnAnimation({
-                animation: spawnLargeBubbleAnimation,
+                animation: largeBubbleSpawnAnimation,
                 drawPriority: 'sprites',
                 x, y,
                 centerOnPoint: true,
-            }, new FieldAnimationEffect({
+            }, spawnAnimation({
                 animation: largeBubbleAnimation,
                 drawPriority: 'sprites',
-                ttl: Math.max(128 / 0.5) * FRAME_LENGTH,
+                ttl: 4000,
                 vz: 0.5,
-            })));
+            }, new FieldAnimationEffect({
+                animation: largeBubblePopAnimation,
+                drawPriority: 'sprites',
+                vz: 0,
+            }))));
         }
     }
     if (state.areaInstance === area && state.areaSection?.isHot) {
