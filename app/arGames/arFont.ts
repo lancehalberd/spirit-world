@@ -35,7 +35,7 @@ interface TextOptions {
     textBaseline: 'top' | 'middle' | 'bottom'
 }
 
-export function drawARFont(context: CanvasRenderingContext2D, text: string, x: number, y: number,
+export function drawARFont(context: CanvasRenderingContext2D, text: string|number, x: number, y: number,
     {textAlign = 'left', textBaseline = 'bottom'}: Partial<TextOptions>
 ) {
     text = `${text}`;

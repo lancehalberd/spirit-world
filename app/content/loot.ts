@@ -34,7 +34,7 @@ function getChargeMessage(state: GameState) {
     // {|}You can even hold [B_PASSIVE] when picking up an object to channel Spirit Energy into them!
 }
 
-export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
+export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}: LootData): string {
     switch (lootType) {
         case 'bow':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
@@ -79,6 +79,16 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
                 return 'Chakram';
             }
             return CHAKRAM_2_NAME;
+        case 'spiritPower':
+            if (state.hero.savedData.passiveTools.astralProjection) {
+                return 'Teleportation';
+            }
+            if (state.hero.savedData.passiveTools.spiritSight) {
+                return 'Summoner\'s Circlet';
+            }
+            return 'Spirit Sight';
+        case 'victoryPoint':
+            return `${lootAmount}x VP(${state.hero.savedData.victoryPoints + lootAmount})`;
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
@@ -87,10 +97,15 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'ice': return 'Ice Element';
         case 'lightning': return 'Lightning Element';
         case 'phoenixCrown': return 'Phoenix Crown';
-        case 'goldMail': return 'Golden Mail';
+        case 'armor':
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return 'Silver Mail';
+            }
+            return 'Golden Mail';
         case 'ironSkin': return 'Iron Skin';
         case 'catEyes': return 'Cat Eyes';
         case 'nimbusCloud': return 'Nimbus Cloud';
+        case 'arDevice': return 'AR Device';
         case 'trueSight': return 'True Sight';
         case 'leatherBoots':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
@@ -113,6 +128,10 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             return 'Flying Boots Schematics';
         case 'forgeBoots':
             return 'Forge Boots Schematics';
+        case 'silverMailSchematics':
+            return 'Silver Mail Schematics';
+        case 'goldMailSchematics':
+            return 'Gold Mail Schematics';
         case 'fireBlessing':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Ruby Stud';
@@ -134,14 +153,14 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
     return '?' + lootType;
 }
 
-function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
-    const lootName = getLootName(state, lootType, lootLevel);
+function getLootGetMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): string {
+    const lootName = getLootName(state, {lootType, lootLevel});
     switch (lootType) {
         case 'leatherBoots':
         case 'cloudBoots':
         case 'ironBoots':
             if (getLootLevel(state, {lootType, lootLevel}) > 1) {
-                const oldLootName = getLootName(state, lootType, 1);
+                const oldLootName = getLootName(state, {lootType, lootLevel: 1});
                 return `Your ${oldLootName} have been upgraded into ${lootName}!`;
             }
             return `You found the ${lootName}!` + equipBootsMessage;
@@ -182,7 +201,7 @@ function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: num
         case 'waterBlessing':
         case 'lightningBlessing':
             if (getLootLevel(state, {lootType, lootLevel}) > 1) {
-                const oldLootName = getLootName(state, lootType, 1);
+                const oldLootName = getLootName(state, {lootType, lootLevel: 1});
                 return `Your ${oldLootName} has been upgraded into the ${lootName}!`;
             }
             return `You found the ${lootName}!`;
@@ -193,7 +212,7 @@ function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: num
     return `You obtained the ${lootName}!`;
 }
 
-export function getLootHelpMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
+export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): string {
     switch (lootType) {
         case 'leatherBoots':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
@@ -240,10 +259,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
                 return 'Press [B_TOOL] to create a Spirit Barrier around you.'
                     + '{|}The barrier will damage enemies and reflect projectiles at the cost of your Spirit Energy!'
-                    + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
-                    + '{|}and the barrier will fail if you run out of Spirit Energy.'
-                    + '{|}Press [B_TOOL] again to deactivate the barrier.'
-                    + '{|}Barrier Burst: Press and hold [B_TOOL] to detonate the barrier.';
+                    // + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
+                    // + '{|}and the barrier will fail if you run out of Spirit Energy.'
+                    // + '{|}Press [B_TOOL] again to deactivate the barrier.';
+                    // + '{|}Barrier Burst: Press and hold [B_TOOL] to detonate the barrier.';
             }
             return 'Use your Barrier Burst to become invisible.'
                 + '{|}Press [B_TOOL] to create a Spirit Barrier.'
@@ -320,12 +339,16 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 {|}Freeze duration and ice damage is reduced by half.`;
         case 'lightningBlessing':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
-                return `You can pass through lightning barrier.
+                return `Damage from lightning barriers is prevented.
                     {|} You also take 25% less damage from lightning.`;
             }
-            return `Damage from lightning barriers is prevented.
+            return `You can pass through lightning barriers.
                 {|}Maximum shock effect and lightning damage is reduced by half.`;
-        case 'goldMail': return 'This amazing armor reduces all damage you receive.';
+        case 'armor':
+            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+                return `This armor reduces non-elemental damage by half.`;
+            }
+            return 'This amazing armor reduces all damage you receive.';
         case 'phoenixCrown': return `The feather in this crown absorbs almost limitless energy from the spirit world.`;
         case 'ironSkin': return `The Iron Skin technique allows you to coat your skin
             with layers of Spirit Energy until it is as hard as iron!
@@ -343,6 +366,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
             return 'Bring these schematics to a certain armor smith to upgrade your Cloud Boots';
         case 'forgeBoots':
             return 'Bring these schematics to a certain armor smith to upgrade your Iron Boots';
+        case 'silverMailSchematics':
+            return 'Bring these schematics to a certain armor smith to obtain some armor';
+        case 'goldMailSchematics':
+            return 'Bring these schematics to a certain armor smith to upgrade your Silver Mail';
         case 'silverOre':
             return 'Maybe someone in the city can use this to make something.';
         case 'goldOre':
@@ -351,7 +378,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
     return '';
 }
 
-export function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
+export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): void {
     // Skip instructions during the randomizer.
     if (state.randomizer?.seed) {
         if (lootType === 'peachOfImmortalityPiece' && state.hero.savedData.peachQuarters === 0) {
@@ -364,7 +391,7 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
         }
         return;
     }
-    const getMessage = getLootGetMessage(state, lootType, lootLevel, lootAmount);
+    const getMessage = getLootGetMessage(state, {lootType, lootLevel, lootAmount});
     switch (lootType) {
         case 'bigKey':
             return showMessage(state, getMessage
@@ -415,7 +442,7 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
             }
             return;
     }
-    const helpMessage = getLootHelpMessage(state, lootType, lootLevel, lootAmount);
+    const helpMessage = getLootHelpMessage(state, {lootType, lootLevel, lootAmount});
     if (getMessage) {
         if (helpMessage) {
             return showMessage(state, getMessage + '{|}' + helpMessage);
@@ -464,9 +491,13 @@ export const [
     frostBoots, flameBoots, stormBoots,
     arDevice,
     flippers,
-    emptyPeachBasket, fullPeachBasket
+    emptyPeachBasket, fullPeachBasket,
+    goldMailSchematics, silverMailSchematics, silverMail,
+    rubyStud, rubyEarrings,
+    sapphireBangle, sapphireBracelet,
+    topazPin, topazBadge,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 59}
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 68}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -513,7 +544,7 @@ export const lootFrames = {
     astralProjection: circlet,
     phoenixCrown,
     // TODO: Add real graphics.
-    silverMail: goldMail,
+    silverMail,
     goldMail,
     ironSkin,
     bigKey: bigKeyOutlineFrame,
@@ -547,21 +578,25 @@ export const lootFrames = {
     spikeBoots: greyUpgrade,
     flyingBoots: blueUpgrade,
     forgeBoots: redUpgrade,
-    fireBlessing,
-    waterBlessing,
-    lightningBlessing,
+    // TODO: Add new graphics for these.
+    silverMailSchematics,
+    goldMailSchematics,
+    fireBlessing, rubyStud, rubyEarrings,
+    waterBlessing, sapphireBangle, sapphireBracelet,
+    lightningBlessing, topazPin, topazBadge,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
-    arDevice: createLootFrame('black', 'AR'),
+    arDevice,
     aetherCrystal: createLootFrame('black', 'C'),
 } as const;
 
 const [
     lightHalf, darkHalf, wholeCoin
 ] = createAnimation('gfx/hud/money.png', largeMoneyGeometry, {x: 7, cols: 3}).frames;
-export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}:
-    {lootType: LootType, lootLevel?: number, lootAmount?: number}
+export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}: LootData
 ): Frame {
+    // Calculate the actual loot level, for undefined or progressive loot levels(lootLevel = 0).
+    lootLevel = getLootLevel(state, {lootType, lootLevel});
     if (lootType === 'leatherBoots') {
         if (lootLevel > 1) {
             return spikeBoots;
@@ -596,43 +631,67 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         return wholeCoin;
     }
     if (lootType === 'weapon') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1){
+        if (lootLevel === 1){
             return silverChakram;
         }
         return goldChakram;
     }
     if (lootType === 'bow') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+        if (lootLevel === 1) {
             return bow;
         }
         return goldBow;
     }
     if (lootType === 'cloak') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+        if (lootLevel === 1) {
             return lootFrames.spiritCloak;
         }
         return lootFrames.invisibilityCloak;
     }
     if (lootType === 'staff') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+        if (lootLevel === 1) {
             return lootFrames.staff;
         }
         return lootFrames.towerStaff;
     }
     if (lootType === 'clone') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+        if (lootLevel === 1) {
             return lootFrames.clone;
         }
         return lootFrames.clone2;
     }
     if (lootType === 'roll') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+        if (lootLevel === 1) {
             return lootFrames.roll;
         }
         return lootFrames.somersault;
     }
+    if (lootType === 'armor') {
+        if (lootLevel === 1) {
+            return lootFrames.silverMail;
+        }
+        return lootFrames.goldMail;
+    }
+    if (lootType === 'fireBlessing') {
+        if (lootLevel > 1) {
+            return rubyEarrings;
+        }
+        return rubyStud;
+    }
+    if (lootType === 'waterBlessing') {
+        if (lootLevel > 1) {
+            return sapphireBracelet;
+        }
+        return sapphireBangle;
+    }
+    if (lootType === 'lightningBlessing') {
+        if (lootLevel > 1) {
+            return topazBadge;
+        }
+        return topazPin;
+    }
     if (lootType === 'gloves') {
-        if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+        if (lootLevel === 1) {
             return lootFrames.gloves;
         }
         return lootFrames.bracelet;

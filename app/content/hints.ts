@@ -425,7 +425,7 @@ const missions: Mission[] = [
             );
         },
         isResolved(state: GameState) {
-            return !!state.hero.savedData.passiveTools.goldMail;
+            return state.hero.savedData.passiveTools.armor >= 2;
         },
     },
     {

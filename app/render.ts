@@ -92,13 +92,16 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
                 renderTransition(context, state);
                 renderHUD(context, state);
                 renderMap(context, state);
+                return;
             } else {
                 renderFieldMenu(context, state, (context: CanvasRenderingContext2D, state: GameState) => {
                     renderTransition(context, state);
                     renderHUD(context, state);
                 });
+                return;
             }
         }
+        renderTransition(context, state);
         return;
     }
     if (state.scene === 'fileSelect' || state.scene === 'chooseGameMode' ||

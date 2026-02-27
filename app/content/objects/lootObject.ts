@@ -111,7 +111,7 @@ export class LootGetAnimation implements EffectInstance {
         }
         if (this.animationTime === 1000) {
             // Calculate the loot level immediately so that the
-            showLootMessage(state, this.loot.lootType, this.lootLevel, this.loot.lootAmount);
+            showLootMessage(state, this.loot);
         } else if (this.animationTime > 1000) {
             removeEffectFromArea(state, this);
         }

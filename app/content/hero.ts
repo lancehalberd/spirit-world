@@ -410,15 +410,19 @@ export class Hero implements Actor {
                 damage *= this.getLightningBlessingDamageMultiplier();
                 this.applyShock(2000 * damage);
             }
-            if (state.hero.savedData.passiveTools.goldMail) {
+            if (state.hero.savedData.passiveTools.armor >= 2) {
                 if (gameModifiers.nerfGoldenMail) {
                     // The nerfed golden mail only reduces physical damage.
                     if (hit.element === null) {
-                        damage /= 2;
+                        damage /= 4;
                     }
                 } else {
-                    damage /= 2;
+                    damage /= 4;
                     iframeMultiplier *= 1.2;
+                }
+            } else if (state.hero.savedData.passiveTools.armor) {
+                if (hit.element === null) {
+                    damage /= 2;
                 }
             }
             if ((hit.source as Enemy)?.type === 'enemy') {

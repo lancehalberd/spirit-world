@@ -44,8 +44,10 @@ interface FrameRectangle extends Rect {
     s?: number
 }
 
+type FrameImage = HTMLCanvasElement | HTMLImageElement;
+
 interface Frame extends FrameRectangle {
-    image: HTMLCanvasElement | HTMLImageElement
+    image: FrameImage
     // Additional property that may be used in some cases to indicate a frame should be flipped
     // horizontally about the center of its content. Only some contexts respect this.
     flipped?: boolean

@@ -1,11 +1,13 @@
-import { updateMenuState} from 'app/content/menu';
+import {frameSize, getActivePanelAndOption, updateMenuState} from 'app/content/menu';
 import {dungeonMaps} from 'app/content/sections';
 import {editingState} from 'app/development/editingState';
 import {GAME_KEY} from 'app/gameConstants';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {
     wasGameKeyPressed,
     wasMenuConfirmKeyPressed,
 } from 'app/userInput';
+import {clamp, isPointInShortRect, pad} from 'app/utils/index';
 import {isSectionExplored} from 'app/utils/sections';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 
@@ -38,6 +40,19 @@ function updateMap(state: GameState) {
     }
 }
 
+function selectClosestElement(state: GameState, x: number, y: number) {
+    for (const panel of state.fieldMenuState.panels) {
+        // This padding should be adjusted to account for any gaps that appear between menus.
+        if (isPointInShortRect(x, y, pad(panel, 5))) {
+            state.fieldMenuState.cursor.panelId = panel.id;
+            const column = ((x - panel.x) / frameSize) | 0;
+            const row = ((y - panel.y) / frameSize) | 0;
+            state.fieldMenuState.cursor.optionIndex = clamp(column + row * panel.columns, 0, panel.options.length - 1);
+            return;
+        }
+    }
+}
+
 export function updateFieldMenu(state: GameState) {
     if (state.showMap) {
         updateMap(state);
@@ -47,57 +62,38 @@ export function updateFieldMenu(state: GameState) {
         delete state.fieldMenuState.needsRefresh;
         updateMenuState(state);
     }
-    const grid = state.fieldMenuState.grid;
-    const cursor = state.fieldMenuState.cursor;
-    if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        cursor.y = (cursor.y + grid.length - 1) % grid.length;
-    } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        cursor.y = (cursor.y + 1) % grid.length;
-    }
-    const menuRow = grid[cursor.y];
-    cursor.x = Math.min(menuRow.length - 1, cursor.x);
-    if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
-        cursor.x = (cursor.x + menuRow.length - 1) % menuRow.length;
-    } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
-        cursor.x = (cursor.x + 1) % menuRow.length;
-    }
-    // Cycle to the next row that isn't empty.
-    // There is always at least one row since the help tool is always there.
-    /*if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        do {
-            cursor.y = (cursor.y + grid.length - 1) % grid.length;
-        } while (cursor.y > 0 && !grid[cursor.y]?.length)
-    } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        do {
-            cursor.y = (cursor.y + 1) % grid.length;
-        } while (cursor.y < grid.length - 1 && !grid[cursor.y]?.length)
-    }
-    // Make sure menuRow always pointed to a populated row in bounds.
-    // This value might be in a bad place when toggling the editor off while viewing the inventory,
-    // for example when selecting an element and turning the editor off when no elements are owned.
-    while (cursor.y !== 0 && grid.length && !grid[cursor.y]?.length) {
-        cursor.y = (cursor.y + 1) % grid.length;
-    }
-    const menuRow = grid[cursor.y];
-    cursor.x = Math.min(menuRow.length - 1, cursor.x);
-    if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
-        cursor.x = (cursor.x + menuRow.length - 1) % menuRow.length;
-    } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
-        cursor.x = (cursor.x + 1) % menuRow.length;
-    }*/
+    const {activePanel, activeOption} = getActivePanelAndOption(state);
+    const x = activePanel.x + activeOption.x + frameSize / 2;
+    const y = activePanel.y + activeOption.y + frameSize / 2;
 
-    if (wasMenuConfirmKeyPressed(state)) {
-        const menuElement = grid[cursor.y][cursor.x];
+    // Moving the cursor is accomplished by just moving to the closest element when
+    // moving the cursor by a set amount in any direction.
+    const movementDelta = frameSize + 3;
+    if (wasGameKeyPressed(state, GAME_KEY.UP)) {
+        selectClosestElement(state, x, y - movementDelta);
+    } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+        selectClosestElement(state, x, y + movementDelta);
+    }
+    if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
+        selectClosestElement(state, x - movementDelta, y);
+    } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
+        selectClosestElement(state, x + movementDelta, y);
+    }
+    if (activeOption && wasMenuConfirmKeyPressed(state)) {
         if (editingState.isEditing) {
-            menuElement?.onUpgrade(state);
-        } else if (menuElement?.isVisible?.(state)) {
+            activeOption.onUpgrade?.(state);
+            updateHeroMagicStats(state);
+        } else if (activeOption.isVisible?.(state)) {
             let toolIndex: number;
             if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
                 toolIndex = 0;
             } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
                 toolIndex = 1;
             }
-            menuElement?.onSelect(state, toolIndex);
+            if (activeOption.onSelect?.(state, toolIndex)) {
+                state.paused = false;
+                updateSoundSettings(state);
+            }
         }
     }
 }

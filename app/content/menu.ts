@@ -1,13 +1,16 @@
+import {showHint} from 'app/content/hints';
 import {getLootFrame, getLootHelpMessage, getLootName, lootFrames, neutralElement} from 'app/content/loot';
-import {isRandomizer, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
-import {editingState} from 'app/development/editingState';
-import {playAreaSound} from 'app/musicController';
+import {isRandomizer} from 'app/gameConstants';
 import {showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {fillRect, pad} from 'app/utils/index';
-import {isActiveTool, isMagicElement} from 'app/utils/loot';
+import {isActiveTool, isEquipment, isMagicElement, isPassiveTool} from 'app/utils/loot';
+import {setEquippedBoots, setEquippedElement, setLeftTool, setRightTool} from 'app/utils/menu';
+import {characterMap} from 'app/utils/simpleWhiteFont';
+import {drawARFont} from 'app/arGames/arFont';
+import {requireFrame} from 'app/utils/packedImages';
 
-type ExtendedMenuOptionType = MenuOptionType | 'armor' | 'crown';
+
 
 export const frameSize = 24;
 const elementGeometry: Rect = {
@@ -17,7 +20,7 @@ const elementGeometry: Rect = {
 
 const emptyMenuElement: MenuElement = {
     ...elementGeometry,
-    label: '',
+    getLabel: () => '',
     isVisible: () => false,
     render() {
 
@@ -27,6 +30,7 @@ const emptyMenuElement: MenuElement = {
     },
 };
 
+export const [optionFrame, speakerFrame, speakerSoundFrame] = createAnimation('gfx/hud/options.png', {w: 24, h: 24}).frames;
 export const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: 24, h: 24}).frames[0];
 export const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: 24, h: 24}).frames[0];
 export const cursorFrame = createAnimation('gfx/hud/cursortemp.png', {w: 24, h: 24}).frames[0];
@@ -35,9 +39,40 @@ export const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
     {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {x: 2, cols: 2}
 ).frames;
 
+const [/*small peach*/, /* full peach */, threeQuartersPeach, halfPeach, quarterPeach] =
+    createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
+const fullPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 54, y: 0, w: 20, h: 20});
+const peachMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: (state: GameState) => 'Peach Pieces',
+    isVisible: (state: GameState) => state.hero.savedData.peachQuarters > 0 || state.hero.savedData.maxLife > 4,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, fullPeachFrame, this);
+        if (state.hero.savedData.peachQuarters === 3) {
+            drawFrameCenteredAt(context, threeQuartersPeach, this);
+        } else if (state.hero.savedData.peachQuarters === 2) {
+            drawFrameCenteredAt(context, halfPeach, this);
+        } else if (state.hero.savedData.peachQuarters === 1) {
+            drawFrameCenteredAt(context, quarterPeach, this);
+        }
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, 'Collect 4 Peach Pieces to increase your life total.');
+        return true;
+    },
+    onUpgrade(state: GameState, toolIndex?: number) {
+        state.hero.savedData.peachQuarters++;
+        if (state.hero.savedData.peachQuarters >= 4) {
+            state.hero.savedData.peachQuarters = 0;
+            state.hero.savedData.maxLife++;
+        }
+        return true;
+    },
+};
+
 const neutralElementMenuOption: MenuElement = {
     ...elementGeometry,
-    label: 'Neutral',
+    getLabel: () => 'Neutral',
     isVisible: (state: GameState) => !!(
         state.hero.savedData.elements.fire ||
         state.hero.savedData.elements.ice ||
@@ -49,20 +84,367 @@ const neutralElementMenuOption: MenuElement = {
     onSelect(state: GameState, toolIndex?: number) {
         setEquippedElement(state, null);
         return false;
+    },
+};
+
+const nimbusCloudMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: (state: GameState) => getLootName(state, {lootType: 'nimbusCloud'}),
+    isVisible: (state: GameState) => !!(state.hero.savedData.passiveTools.nimbusCloud),
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'nimbusCloud'}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, '{@nimbusCloud.chooseDestination}');
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        state.hero.savedData.passiveTools.nimbusCloud = (state.hero.savedData.passiveTools.nimbusCloud + 1) % 2;
     }
 };
 
+const arDeviceMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: (state: GameState) => getLootName(state, {lootType: 'arDevice'}),
+    isVisible: (state: GameState) => !!(state.hero.savedData.passiveTools.arDevice),
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'arDevice', lootLevel: state.hero.savedData.passiveTools.arDevice}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        // TODO
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        state.hero.savedData.passiveTools.arDevice = (state.hero.savedData.passiveTools.arDevice + 1) % 4;
+    }
+};
+
+const chakramMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Chakram',
+    isVisible: (state: GameState) => !!(state.hero.savedData.weapon & 1),
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'weapon', lootLevel: 1}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, getLootHelpMessage(state, {lootType: 'weapon', lootLevel: 1}));
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        if ((state.hero.savedData.weapon & 1) === 0) {
+            state.hero.savedData.weapon += 1;
+        } else if (!state.hero.savedData.weaponUpgrades.normalDamage) {
+            state.hero.savedData.weaponUpgrades.normalDamage = true;
+        } else if (!state.hero.savedData.weaponUpgrades.normalRange) {
+            state.hero.savedData.weaponUpgrades.normalRange = true;
+        } else {
+            state.hero.savedData.weapon -= 1;
+            state.hero.savedData.weaponUpgrades.normalDamage = false;
+            state.hero.savedData.weaponUpgrades.normalRange = false;
+        }
+    },
+};
+
+const goldChakramMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Gold Chakram',
+    isVisible: (state: GameState) => !!(state.hero.savedData.weapon & 2),
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'weapon', lootLevel: 2}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, getLootHelpMessage(state, {lootType: 'weapon', lootLevel: 2}));
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        if ((state.hero.savedData.weapon & 2) === 0) {
+            state.hero.savedData.weapon += 2;
+        } else if (!state.hero.savedData.weaponUpgrades.spiritDamage) {
+            state.hero.savedData.weaponUpgrades.spiritDamage = true;
+        } else if (!state.hero.savedData.weaponUpgrades.spiritRange) {
+            state.hero.savedData.weaponUpgrades.spiritRange = true;
+        } else {
+            state.hero.savedData.weapon -= 2;
+            state.hero.savedData.weaponUpgrades.spiritDamage = false;
+            state.hero.savedData.weaponUpgrades.spiritRange = false;
+        }
+    },
+};
+
+const returnMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Return',
+    isVisible: (state: GameState) => isRandomizer,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'nimbusCloud'}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, '{@nimbusCloud.returnMenu}');
+        return true;
+    },
+};
+
+const helpMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Hint',
+    isVisible: () => true,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, characterMap['?'], this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showHint(state);
+        return true;
+    },
+};
+
+const mapMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Map',
+    isVisible: () => true,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, mapFrame, this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        state.showMap = true;
+        return false;
+    },
+};
+
+const optionMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Options',
+    isVisible: () => true,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, optionFrame, this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        // TODO:
+        // add options scene to scene stack.
+        return false;
+    },
+};
+
+
+const armorMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: (state: GameState) => {
+        // The silver mail schematics are displayed in isolation until you have armor.
+        if (!state.hero.savedData.passiveTools.armor) {
+            return getLootName(state, {lootType: 'silverMailSchematics'});
+        }
+        return getLootName(state, {lootType:'armor'});
+    },
+    // All armors are blocked behind the silver mail schematics.
+    isVisible: (state: GameState) => !!state.hero.savedData.blueprints.silverMailSchematics,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        if (!state.hero.savedData.blueprints.silverMailSchematics) {
+            // This will only render during debug mode, displaying as the placeholder.
+            return drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'silverMailSchematics'}), this);
+        }
+        if (state.hero.savedData.passiveTools.armor >= 2) {
+            return drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'armor', lootLevel: 2}), this);
+        }
+        if (state.hero.savedData.blueprints.goldMailSchematics) {
+            // Offset these schematics so you can see them behind the silver mail
+            drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'goldMailSchematics'}),
+                {x: this.x + 3, y: this.y - 2, w: this.w, h: this.h}
+            );
+        }
+        if (state.hero.savedData.passiveTools.armor >= 1) {
+            return drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'armor'}), this);
+        }
+        return drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'silverMailSchematics'}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        if (!state.hero.savedData.passiveTools.armor) {
+            showMessage(state, getLootHelpMessage(state, {lootType: 'silverMailSchematics'}));
+            return true;
+        }
+        showMessage(state, getLootHelpMessage(state, {lootType: 'armor'}));
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        if (!state.hero.savedData.blueprints.silverMailSchematics) {
+            state.hero.savedData.blueprints.silverMailSchematics = 1;
+        } else if (state.hero.savedData.passiveTools.armor < 1) {
+            state.hero.savedData.passiveTools.armor = 1;
+        } else if (!state.hero.savedData.blueprints.goldMailSchematics) {
+            state.hero.savedData.blueprints.goldMailSchematics = 1;
+        } else if (state.hero.savedData.passiveTools.armor < 2) {
+            state.hero.savedData.passiveTools.armor = 3;
+        } else{
+            state.hero.savedData.blueprints.silverMailSchematics = 0;
+            state.hero.savedData.blueprints.goldMailSchematics = 0;
+            state.hero.savedData.passiveTools.armor = 0;
+        }
+    },
+};
+
+const crownMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: (state: GameState) => {
+        if (state.hero.savedData.passiveTools.phoenixCrown) {
+            return getLootName(state, {lootType: 'phoenixCrown'});
+        }
+        return getLootName(state, {lootType: 'astralProjection'});
+    },
+    isVisible: (state: GameState) => !!state.hero.savedData.passiveTools.astralProjection || !!state.hero.savedData.passiveTools.phoenixCrown,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        if (state.hero.savedData.passiveTools.phoenixCrown) {
+            return drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'phoenixCrown'}), this);
+        }
+        return drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'astralProjection'}), this);
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        if (state.hero.savedData.passiveTools.phoenixCrown) {
+            showMessage(state, getLootHelpMessage(state, {lootType: 'phoenixCrown'}));
+            return true;
+        }
+        showMessage(state, getLootHelpMessage(state, {lootType: 'astralProjection'}));
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        if (!state.hero.savedData.passiveTools.astralProjection) {
+            state.hero.savedData.passiveTools.astralProjection = 1;
+        } else if (!state.hero.savedData.passiveTools.phoenixCrown) {
+            state.hero.savedData.passiveTools.phoenixCrown = 1;
+        } else {
+            state.hero.savedData.passiveTools.astralProjection = 0;
+            state.hero.savedData.passiveTools.phoenixCrown = 0;
+        }
+    },
+};
+
+function getPassiveToolElement(state: GameState, passiveTool: PassiveTool, maxLevel: number = 2) {
+    return {
+        ...elementGeometry,
+        getLabel: () => getLootName(state, {lootType: passiveTool}),
+        isVisible: (state: GameState) => state.hero.savedData.passiveTools[passiveTool] > 0,
+        render(context: CanvasRenderingContext2D, state: GameState) {
+            drawFrameCenteredAt(context, getLootFrame(state, {lootType: passiveTool}), this);
+        },
+        onSelect(state: GameState, toolIndex?: number) {
+            showMessage(state, getLootHelpMessage(state, {lootType: passiveTool}));
+            return true;
+        },
+        onUpgrade(state: GameState) {
+            state.hero.savedData.passiveTools[passiveTool] = (state.hero.savedData.passiveTools[passiveTool] + 1) % (1 << maxLevel);
+        }
+    };
+}
+
+function getEquipmentElement(state: GameState, equipment: Equipment) {
+    return {
+        ...elementGeometry,
+        getLabel: () => {
+            // In randomizer, it is possible to obtain boots recipes without the boots, so update the label accordingly.
+            if (equipment === 'cloudBoots' && !state.hero.savedData.equipment.cloudBoots) {
+                return getLootName(state, {lootType: 'flyingBoots'});
+            }
+            if (equipment === 'ironBoots' && !state.hero.savedData.equipment.ironBoots) {
+                return getLootName(state, {lootType: 'forgeBoots'});
+            }
+            return getLootName(state, {lootType: equipment});
+        },
+        isVisible: (state: GameState) => {
+            if (equipment === 'leatherBoots') {
+                return true;
+            }
+            if (equipment === 'cloudBoots') {
+                return state.hero.savedData.equipment.cloudBoots > 0 || state.hero.savedData.blueprints.flyingBoots > 0;
+            }
+            if (equipment === 'ironBoots') {
+                return state.hero.savedData.equipment.ironBoots > 0 || state.hero.savedData.blueprints.forgeBoots > 0;
+            }
+            return false;
+        },
+        renderSelection(context: CanvasRenderingContext2D, state: GameState) {
+            fillRect(context, this, 'white');
+            fillRect(context, pad(this, -2), 'black');
+        },
+        render(context: CanvasRenderingContext2D, state: GameState) {
+            const level = state.hero.savedData.equipment[equipment];
+            const scrollTarget = {x: this.x + 3, y: this.y - 2, w: this.w, h: this.h};
+            const hideSpikeBootsRecipe = !state.hero.savedData.blueprints.spikeBoots || state.hero.savedData.equipment.leatherBoots > 1;
+            if (equipment === 'leatherBoots' && !hideSpikeBootsRecipe) {
+                drawFrameCenteredAt(context, lootFrames.spikeBoots, scrollTarget);
+            }
+            const hideFlyingBootsRecipe = !state.hero.savedData.blueprints.flyingBoots || state.hero.savedData.equipment.cloudBoots > 1;
+            if (equipment === 'cloudBoots' && !hideFlyingBootsRecipe) {
+                drawFrameCenteredAt(context, lootFrames.flyingBoots, scrollTarget);
+            }
+            const hideForgeBootsRecipe = !state.hero.savedData.blueprints.forgeBoots || state.hero.savedData.equipment.ironBoots > 1;
+            if (equipment === 'ironBoots' && !hideForgeBootsRecipe) {
+                drawFrameCenteredAt(context, lootFrames.forgeBoots, scrollTarget);
+            }
+            drawFrameCenteredAt(context, getLootFrame(state, {lootType: equipment, lootLevel: level}), this);
+        },
+        onSelect(state: GameState) {
+            setEquippedBoots(state, equipment);
+            return true;
+        },
+        onUpgrade(state: GameState) {
+            if (equipment === 'leatherBoots') {
+                if (!state.hero.savedData.blueprints.spikeBoots) {
+                    state.hero.savedData.blueprints.spikeBoots = 1;
+                } else if (state.hero.savedData.equipment.leatherBoots < 2) {
+                    state.hero.savedData.equipment.leatherBoots = 2;
+                } else {
+                    state.hero.savedData.equipment.leatherBoots = 0;
+                    state.hero.savedData.blueprints.spikeBoots = 0;
+                }
+            }
+            if (equipment === 'cloudBoots') {
+                if (!state.hero.savedData.equipment.cloudBoots) {
+                    state.hero.savedData.equipment.cloudBoots = 1;
+                } else if (!state.hero.savedData.blueprints.flyingBoots) {
+                    state.hero.savedData.blueprints.flyingBoots = 1;
+                } else if (state.hero.savedData.equipment.cloudBoots < 2) {
+                    state.hero.savedData.equipment.cloudBoots = 2;
+                } else {
+                    state.hero.savedData.equipment.cloudBoots = 0;
+                    state.hero.savedData.blueprints.flyingBoots = 0;
+                }
+            }
+            if (equipment === 'ironBoots') {
+                if (!state.hero.savedData.equipment.ironBoots) {
+                    state.hero.savedData.equipment.ironBoots = 1;
+                } else if (!state.hero.savedData.blueprints.forgeBoots) {
+                    state.hero.savedData.blueprints.forgeBoots = 1;
+                } else if (state.hero.savedData.equipment.ironBoots < 2) {
+                    state.hero.savedData.equipment.ironBoots = 2;
+                } else {
+                    state.hero.savedData.equipment.ironBoots = 0;
+                    state.hero.savedData.blueprints.forgeBoots = 0;
+                }
+            }
+        }
+    };
+}
+
+type ExtendedMenuOptionType = MenuOptionType | 'armor' | 'crown';
 function getMenuElement(state: GameState, option: ExtendedMenuOptionType): MenuElement {
     switch (option) {
         case 'map': return dungeonMapMenuOption;
         case 'bigKey': return bigKeyMenuOption;
         case 'smallKey': return smallKeyMenuOption;
         case 'neutral': return neutralElementMenuOption;
+        case 'weapon': return chakramMenuOption;
+        case 'weapon2': return goldChakramMenuOption;
+        case 'armor': return armorMenuOption;
+        case 'crown': return crownMenuOption;
+        case 'nimbusCloud': return nimbusCloudMenuOption;
+    }
+    if (isPassiveTool(option)) {
+        return getPassiveToolElement(state, option);
+    }
+    if (isEquipment(option)) {
+        return getEquipmentElement(state, option);
     }
     if (isMagicElement(option)) {
         return {
             ...elementGeometry,
-            label: getLootName(state, option),
+            getLabel: () => getLootName(state, {lootType: option}),
             isVisible: (state: GameState) => !!state.hero.savedData.elements[option],
             isSelected: (state: GameState) => state.hero.savedData.element === option,
             render(context: CanvasRenderingContext2D, state: GameState) {
@@ -75,7 +457,7 @@ function getMenuElement(state: GameState, option: ExtendedMenuOptionType): MenuE
             },
             onSelect(state: GameState, toolIndex?: number) {
                 setEquippedElement(state, option);
-                return false;
+                return true;
             },
             onUpgrade(state: GameState) {
                 state.hero.savedData.elements[option] = state.hero.savedData.elements[option] ? 0 : 1;
@@ -85,7 +467,7 @@ function getMenuElement(state: GameState, option: ExtendedMenuOptionType): MenuE
     if (isActiveTool(option)) {
         return {
             ...elementGeometry,
-            label: getLootName(state, option),
+            getLabel: () => getLootName(state, {lootType: option}),
             isVisible: (state: GameState) => !!state.hero.savedData.activeTools[option],
             isSelected: (state: GameState) => state.hero.savedData.leftTool === option ||state.hero.savedData.rightTool === option,
             render(context: CanvasRenderingContext2D, state: GameState) {
@@ -126,52 +508,66 @@ function getMenuElement(state: GameState, option: ExtendedMenuOptionType): MenuE
         };
     }
 
-    return emptyMenuElement;
+    return {...emptyMenuElement};
 }
 
-function createMenuPanel(options: MenuElement[], rows: number, columns: number, {x, y, w, h}: Rect): MenuPanel {
+function createMenuPanel(id: string, options: MenuElement[], rows: number, columns: number, {x, y, w, h}: Rect): MenuPanel {
     return {
+        id,
         x, y, w, h,
         rows,
         columns,
         options,
+        optionsOffset: {
+            x: ((w - columns * frameSize) / 2) | 0,
+            y: ((h - rows * frameSize) / 2) | 0,
+        },
+    };
+}
+
+export function getActivePanelAndOption(state: GameState): {activePanel: MenuPanel, activeOption: MenuElement} {
+    const cursor = state.fieldMenuState.cursor;
+    let activePanel = state.fieldMenuState.panels.find(panel => panel.id === cursor.panelId);
+    // If the active panel is invalid, default to the first panel.
+    if (!activePanel)  {
+        activePanel = state.fieldMenuState.panels[0];
+        cursor.panelId = activePanel.id;
+        cursor.optionIndex = 0;
+    }
+    if (!activePanel.options[cursor.optionIndex]) {
+        cursor.optionIndex = 0;
+    }
+    return {
+        activePanel,
+        activeOption: activePanel.options[cursor.optionIndex],
     };
 }
 
 export function getMenuPanels(state: GameState): MenuPanel[] {
+
     const panels: MenuPanel[] = [
-        createMenuPanel(getEquipmentOptions(state), 4, 2, {x: 0, y: 0, w: 48, h: 96}),
-        createMenuPanel(getElementOptions(state), 4, 1, {x: 56, y: 0, w: 24, h: 96}),
-        createMenuPanel(getToolOptions(state), 1, 4, {x: 88, y: 0, w: 96, h: 24}),
-        createMenuPanel(getBootOptions(state), 1, 3, {x: 88, y: 32, w: 72, h: 24}),
-        createMenuPanel(getEyesOptions(state), 1, 3, {x: 88, y: 64, w: 72, h: 24}),
-        createMenuPanel(getTechniqueOptions(state), 1, 3, {x: 88, y: 96, w: 72, h: 24}),
-        /*{
-            x: 0, y: 0, w: 2, h: 4,
-            rows: 4,
-            columns: 2,
-            options: getEquipmentOptions(state),
-        },
-        {
-            x: 2, y: 0, w: 1, h: 4,
-            options: getElementOptions(state),
-        },
-        {
-            x: 3, y: 0, w: 4, h: 1,
-            options: getToolOptions(state),
-        },
-        {
-            x: 3, y: 1, w: 3, h: 1,
-            options: getBootOptions(state),
-        },
-        {
-            x: 3, y: 2, w: 4, h: 1,
-            options: getEyesOptions(state),
-        },
-        {
-            x: 3, y: 3, w: 4, h: 1,
-            options: getTechniqueOptions(state),
-        }*/
+        // two left most columns
+        createMenuPanel('equipment', getEquipmentOptions(state), 4, 2, {x: 0, y: 0, w: 48, h: 96}),
+        createMenuPanel('elements', getElementOptions(state), 4, 1, {x: 57, y: 0, w: 24, h: 96}),
+
+        // row on bottom left
+        createMenuPanel('dungeon', getDungeonOptions(state), 1, 3, {x: 9, y: 105, w: 72, h: 28}),
+
+        // top row in the middle.
+        createMenuPanel('tools', getToolOptions(state), 2, 2, {x: 90, y: 0, w: 48, h: 48}),
+
+        // Column under left side of tools
+        createMenuPanel('special', [nimbusCloudMenuOption, arDeviceMenuOption], 2, 1, {x: 147, y: 0, w: 24, h: 48}),
+
+        // Various rows shown under the active tools
+        createMenuPanel('boots', getBootOptions(state), 1, 3, {x: 90, y: 57, w: 81, h: 24}),
+        createMenuPanel('eyes', getEyesOptions(state), 1, 3, {x: 90, y: 90, w: 81, h: 24}),
+        createMenuPanel('techniques', getTechniqueOptions(state), 1, 3, {x: 90, y: 123, w: 81, h: 24}),
+
+        // system options on the far right
+        createMenuPanel('menu', getSystemOptions(state), 4, 1, {x: 180, y: 0, w: 24, h: 96}),
+
+        createMenuPanel('peach', [peachMenuOption], 1, 1, {x: 180, y: 106, w: 24, h: 24})
     ];
 
     return panels;
@@ -182,8 +578,8 @@ export function updateMenuState(state: GameState) {
     for (const panel of state.fieldMenuState.panels) {
         let row = 0, column = 0;
         for (const element of panel.options) {
-            element.x = column * frameSize;
-            element.y = row * frameSize;
+            element.x = column * frameSize + (panel.optionsOffset?.x ?? 0);
+            element.y = row * frameSize + (panel.optionsOffset?.y ?? 0);
             column++;
             if (column >= panel.columns) {
                 row++;
@@ -191,16 +587,17 @@ export function updateMenuState(state: GameState) {
             }
         }
     }
-    const grid: MenuElement[][] = [];
-    for (const panel of state.fieldMenuState.panels) {
-        for (let y = 0; y < panel.h; y++) {
-            grid[panel.y + y] = grid[panel.y + y] || [];
-            for (let x = 0; x < panel.w; x++) {
-                grid[panel.y + y][panel.x + x] = panel.options[y * panel.w + x];
-            }
-        }
+}
+
+export function getSystemOptions(state: GameState): MenuElement[] {
+    const systemOptions: MenuElement[] = [];
+    if (isRandomizer) {
+        systemOptions.push(returnMenuOption);
     }
-    state.fieldMenuState.grid = grid;
+    systemOptions.push(helpMenuOption);
+    systemOptions.push(mapMenuOption);
+    systemOptions.push(optionMenuOption);
+    return systemOptions;
 }
 
 
@@ -241,14 +638,14 @@ function getDungeonItems(state: GameState) {
 }
 const dungeonMapMenuOption: MenuElement = {
     ...elementGeometry,
-    label: 'Map',
+    getLabel: () => 'Dungeon Map',
     isVisible: (state: GameState) => getDungeonItems(state).map,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, mapFrame, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showMessage(state, getLootHelpMessage(state, 'map'));
-        return false;
+        showMessage(state, getLootHelpMessage(state, {lootType: 'map'}));
+        return true;
     },
     onUpgrade(state: GameState) {
         const dungeonItems = getDungeonItems(state);
@@ -257,14 +654,14 @@ const dungeonMapMenuOption: MenuElement = {
 };
 const bigKeyMenuOption: MenuElement = {
     ...elementGeometry,
-    label: 'Big Key',
+    getLabel: () => 'Big Key',
     isVisible: (state: GameState) => getDungeonItems(state).bigKey,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, bigKeyFrame, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showMessage(state, getLootHelpMessage(state, 'bigKey'));
-        return false;
+        showMessage(state, getLootHelpMessage(state, {lootType: 'bigKey'}));
+        return true;
     },
     onUpgrade(state: GameState) {
         const dungeonItems = getDungeonItems(state);
@@ -273,14 +670,17 @@ const bigKeyMenuOption: MenuElement = {
 };
 const smallKeyMenuOption: MenuElement = {
     ...elementGeometry,
-    label: 'Small Key',
+    getLabel: () => 'Small Key',
     isVisible: (state: GameState) => getDungeonItems(state).totalSmallKeys > 0,
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameCenteredAt(context, keyFrame, this);
+        drawFrameCenteredAt(context, keyFrame, {x: this.x, y: this.y, w: this.w, h: this.h});
+        drawARFont(context, getDungeonItems(state).smallKeys, this.x + this.w / 2, this.y + this.h, {
+            textBaseline: 'middle', textAlign: 'center',
+        });
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showMessage(state, getLootHelpMessage(state, 'smallKey'));
-        return false;
+        showMessage(state, getLootHelpMessage(state, {lootType: 'smallKey'}));
+        return true;
     },
     onUpgrade(state: GameState) {
         const dungeonItems = getDungeonItems(state);
@@ -290,161 +690,6 @@ const smallKeyMenuOption: MenuElement = {
 };
 export function getDungeonOptions(state: GameState): MenuElement[] {
     return [dungeonMapMenuOption, bigKeyMenuOption, smallKeyMenuOption];
-}
-
-/*
-export function getEquipmentOptions(state: GameState): MenuOptionType[] {
-    const isEditing = editingState.isEditing;
-    return [
-        (state.hero.savedData.weapon & 1 || isEditing) ? 'weapon' : null,
-        (state.hero.savedData.weapon & 2 || isEditing) ? 'weapon2' : null,
-        state.hero.savedData.passiveTools.goldMail
-            ? 'goldMail'
-            : (state.hero.savedData.passiveTools.silverMail || isEditing ? 'silverMail' : null),
-        state.hero.savedData.passiveTools.phoenixCrown
-            ? 'phoenixCrown'
-            : (state.hero.savedData.passiveTools.astralProjection || isEditing ? 'astralProjection' : null),
-        state.hero.savedData.passiveTools.gloves || isEditing ? 'gloves' : null,
-        state.hero.savedData.passiveTools.fireBlessing || isEditing ? 'fireBlessing' : null,
-        state.hero.savedData.passiveTools.waterBlessing || isEditing ? 'waterBlessing' : null,
-        state.hero.savedData.passiveTools.lightningBlessing || isEditing ? 'lightningBlessing' : null,
-    ];
-}
-
-export function getElementOptions(state: GameState): MenuOptionType[] {
-    const hasElements = state.hero.savedData.elements.fire || state.hero.savedData.elements.ice || state.hero.savedData.elements.lightning;
-    return [
-        (hasElements || editingState.isEditing) ? 'neutral' : null,
-        (state.hero.savedData.elements.fire || editingState.isEditing) ? 'fire' : null,
-        (state.hero.savedData.elements.ice || editingState.isEditing) ? 'ice' : null,
-        (state.hero.savedData.elements.lightning || editingState.isEditing) ? 'lightning' : null,
-    ];
-}
-
-export function getToolOptions(state: GameState): MenuOptionType[] {
-    return [
-        state.hero.savedData.activeTools.bow || editingState.isEditing ? 'bow' : null,
-        state.hero.savedData.activeTools.staff || editingState.isEditing ? 'bow' : null,
-        state.hero.savedData.activeTools.cloak || editingState.isEditing ? 'cloak' : null,
-        state.hero.savedData.activeTools.clone || editingState.isEditing ? 'clone' : null,
-    ];
-}
-
-export function getBootOptions(state: GameState): MenuOptionType[] {
-    return [
-        'leatherBoots',
-        state.hero.savedData.equipment.ironBoots || editingState.isEditing ? 'ironBoots' : null,
-        state.hero.savedData.equipment.cloudBoots || editingState.isEditing ? 'cloudBoots' : null,
-    ];
-}
-
-export function getEyesOptions(state: GameState): MenuOptionType[] {
-    const isEditing = editingState.isEditing;
-    return [
-        state.hero.savedData.passiveTools.catEyes || isEditing ? 'catEyes' : null,
-        state.hero.savedData.passiveTools.spiritSight || isEditing ? 'spiritSight' : null,
-        state.hero.savedData.passiveTools.trueSight || isEditing ? 'trueSight' : null,
-    ];
-}
-
-export function getTechniqueOptions(state: GameState): MenuOptionType[] {
-    const isEditing = editingState.isEditing;
-    return [
-        state.hero.savedData.passiveTools.roll || isEditing ? 'roll' : null,
-        state.hero.savedData.passiveTools.teleportation || isEditing ? 'teleportation' : null,
-        state.hero.savedData.passiveTools.ironSkin || isEditing ? 'ironSkin' : null,
-    ];
-}
-
-export function getDungeonOptions(state: GameState): MenuOptionType[] {
-    state.savedState.dungeonInventories[state.location.logicalZoneKey]
-        = state.savedState.dungeonInventories[state.location.logicalZoneKey] || {bigKey: false, map: false, smallKeys: 0, totalSmallKeys: 0};
-    return [
-
-    ]
-}
-*/
-
-export function getMenuRows(state: GameState): MenuOptionType[][] {
-    const menuRows: MenuOptionType[][] = [];
-    const activeTools: MenuOptionType[] = ['help'];
-    if (isRandomizer) {
-        activeTools.push('return');
-    }
-    // Active tools
-    if (state.hero.savedData.activeTools.bow || editingState.isEditing) {
-        activeTools.push('bow');
-    }
-    if (state.hero.savedData.activeTools.staff || editingState.isEditing) {
-        activeTools.push('staff');
-    }
-    if (state.hero.savedData.activeTools.cloak || editingState.isEditing) {
-        activeTools.push('cloak');
-    }
-    if (state.hero.savedData.activeTools.clone || editingState.isEditing) {
-        activeTools.push('clone');
-    }
-    menuRows.push(activeTools);
-
-    const equipment: MenuOptionType[] = ['leatherBoots'];
-    if (state.hero.savedData.equipment.ironBoots || editingState.isEditing) {
-        equipment.push('ironBoots');
-    }
-    if (state.hero.savedData.equipment.cloudBoots || editingState.isEditing) {
-        equipment.push('cloudBoots');
-    }
-    menuRows.push(equipment);
-
-    const elements: MenuOptionType[] = [];
-    if (state.hero.savedData.elements.fire || state.hero.savedData.elements.ice || state.hero.savedData.elements.lightning || editingState.isEditing) {
-        elements.push('neutral');
-    }
-    if (state.hero.savedData.elements.fire || editingState.isEditing) {
-        elements.push('fire');
-    }
-    if (state.hero.savedData.elements.ice || editingState.isEditing) {
-        elements.push('ice');
-    }
-    if (state.hero.savedData.elements.lightning || editingState.isEditing) {
-        elements.push('lightning');
-    }
-    menuRows.push(elements);
-
-    let passiveToolRow: MenuOptionType[] = [];
-    for (let key in state.hero.savedData.passiveTools) {
-        if (!state.hero.savedData.passiveTools[key as PassiveTool] && !editingState.isEditing) continue;
-        // Don't show cat eyes once true sight is obtained.
-        if (key === 'catEyes' && state.hero.savedData.passiveTools.trueSight && !editingState.isEditing) continue;
-        passiveToolRow.push(key as MenuOptionType);
-        if (passiveToolRow.length >= 7) {
-            menuRows.push(passiveToolRow);
-            passiveToolRow = [];
-        }
-    }
-    if (passiveToolRow.length) {
-        menuRows.push(passiveToolRow);
-    }
-
-    return menuRows;
-}
-
-export function getMenuName(state: GameState, type: MenuOptionType): string {
-    if (!type) {
-        return '';
-    }
-    if (type === 'help') {
-        return 'Hint';
-    }
-    if (type === 'return') {
-        return 'Return Home';
-    }
-    if (type === 'weapon') {
-        return 'Chakram';
-    }
-    if (type === 'weapon2') {
-        return 'Gold Chakram';
-    }
-    return getLootName(state, type);
 }
 
 export function getMenuTip(state: GameState, type: MenuOptionType): {buttons: string, action: string} | null {
@@ -500,64 +745,4 @@ export function getMenuTip(state: GameState, type: MenuOptionType): {buttons: st
         buttons: '[B_WEAPON]',
         action: 'Help',
     };
-}
-
-export function getMenuHelpMessage(state: GameState, type: MenuOptionType): string {
-    if (type === 'help') {
-        return 'Hint';
-    }
-    if (type === 'return') {
-        return 'Return Home';
-    }
-    if (type === 'weapon') {
-        return getLootHelpMessage(state, 'weapon', 1);
-    }
-    if (type === 'weapon2') {
-        return getLootHelpMessage(state, 'weapon', 2);
-    }
-    return getLootHelpMessage(state, type);
-}
-
-// Function to set the left tool on all copies of the hero.
-export function setLeftTool(state: GameState, tool: ActiveTool): void {
-    for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.savedData.leftTool = tool;
-    }
-}
-
-// Function to set the right tool on all copies of the hero.
-export function setRightTool(state: GameState, tool: ActiveTool): void {
-    for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.savedData.rightTool = tool;
-    }
-}
-
-// Function to set the equipped boots on all copies of the hero.
-export function setEquippedBoots(state: GameState, boots: Equipment): void {
-    // Do nothing if these boots are already equipped.
-    if (state.hero.savedData.equippedBoots === boots) {
-        return;
-    }
-    const delta = state.hero.savedData.equippedBoots === 'cloudBoots' ? MAX_FLOAT_HEIGHT : 0;
-    // Player cannot change boots unless they are "on the ground".
-    // This makes it so they can't toggle boots off/on repeatedly
-    // to swim over pits without surfacing.
-    // You can always put on iron boots in order to start sinking when floating under water.
-    if (boots !== 'ironBoots' && state.hero.z > state.hero.groundHeight + delta) {
-        playAreaSound(state, state.hero.area, 'error');
-        return;
-    }
-    // Assign the current boots to the previously equipped boots slot.
-    // This is used for swapping back to cloud boots while underwater.
-    state.hero.savedData.previousBoots = state.hero.savedData.equippedBoots;
-    for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.savedData.equippedBoots = boots;
-    }
-}
-
-// Function to set the equipped element on all copies of the hero.
-export function setEquippedElement(state: GameState, element: MagicElement): void {
-    for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.setElement(element);
-    }
 }

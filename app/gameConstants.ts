@@ -103,12 +103,13 @@ export const allLootTypes: LootType[] = [
     'nimbusCloud',
     'catEyes', 'spiritSight', 'trueSight',
     'astralProjection', 'teleportation',
-    'ironSkin', 'goldMail', 'phoenixCrown',
+    'ironSkin', 'armor', 'phoenixCrown',
     'waterBlessing', 'fireBlessing', 'lightningBlessing',
     'leatherBoots', 'ironBoots', 'cloudBoots',
     'fire', 'ice', 'lightning',
     // Blueprints
     'spikeBoots', 'flyingBoots', 'forgeBoots',
+    'silverMailSchematics', 'goldMailSchematics',
 ];
 
 // 'foreground3' is rarely required for certain combinations of trees.

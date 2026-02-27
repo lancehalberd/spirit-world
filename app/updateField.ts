@@ -1,7 +1,7 @@
 import {updateAR} from 'app/arGames/arGame';
 import {addObjectFallAnimation, addEnemyFallAnimation, addSplashAnimation} from 'app/content/effects/animationEffect';
 import {Enemy} from 'app/content/enemy';
-import {setEquippedElement} from 'app/content/menu';
+import {setEquippedElement} from 'app/utils/menu';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';

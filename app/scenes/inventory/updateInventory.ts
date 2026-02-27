@@ -1,4 +1,4 @@
-import {showHint} from 'app/content/hints';
+/*import {showHint} from 'app/content/hints';
 import {getLootHelpMessage} from 'app/content/loot';
 import {
     getMenuRows,
@@ -6,7 +6,7 @@ import {
     setEquippedElement,
     setLeftTool,
     setRightTool,
-} from 'app/content/menu';
+} from 'app/utils/menu';
 import {dungeonMaps} from 'app/content/sections';
 import {editingState} from 'app/development/editingState';
 import {GAME_KEY} from 'app/gameConstants';
@@ -140,3 +140,4 @@ export function updateInventory(state: GameState) {
         }
     }
 }
+*/

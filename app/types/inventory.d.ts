@@ -13,7 +13,7 @@ type PassiveTool =
     // Hands
     | 'gloves'
     // Body
-    | 'silverMail' | 'goldMail'
+    | 'armor'
     // Accessories
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing'
     | 'arDevice';
@@ -24,7 +24,7 @@ type Collectible = 'peachOfImmortality'
     | 'goldOre'
     | 'aetherCrystal'
     | 'victoryPoint';
-type Blueprints = 'spikeBoots' | 'flyingBoots' | 'forgeBoots';
+type Blueprints = 'spikeBoots' | 'flyingBoots' | 'forgeBoots' | 'silverMailSchematics' | 'goldMailSchematics';
 type CommonLoot = 'money' | 'peach';
 type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 

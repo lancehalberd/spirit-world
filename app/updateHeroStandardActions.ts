@@ -1,6 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { HeldChakram } from 'app/content/effects/thrownChakram';
-import { setEquippedBoots } from 'app/content/menu';
+import { setEquippedBoots } from 'app/utils/menu';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import {allTiles} from 'app/content/tiles';

@@ -1,6 +1,7 @@
 import {
-    frameSize,
     cursorFrame,
+    frameSize,
+    getActivePanelAndOption,
 } from 'app/content/menu';
 import {contextMenuState, editingState} from 'app/development/editingState';
 import {getCanvasScale} from 'app/development/getCanvasScale';
@@ -8,24 +9,19 @@ import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
 import {drawCanvas, mainCanvas} from 'app/utils/canvas';
 // import {characterMap} from 'app/utils/simpleWhiteFont';
 import {createAnimation, drawFrame, drawFrameCenteredAt} from 'app/utils/animations';
-import {pad} from 'app/utils/index';
+import {isPointInShortRect, pad} from 'app/utils/index';
 import {getMousePosition} from 'app/utils/mouse';
-// import {drawText} from 'app/utils/simpleWhiteFont';
+import {drawText} from 'app/utils/simpleWhiteFont';
 import {getState, shouldHideMenu} from 'app/state';
-import {requireFrame} from 'app/utils/packedImages';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
 
 // const MARGIN = 20;
 
-
-const [, fullPeach, threeQuartersPeach, halfPeach, quarterPeach] =
-    createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
-const fullPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 54, y: 0, w: 20, h: 20});
-
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
 
-function subRect(container: Rect, target: Rect) {
+/*function subRect(container: Rect, target: Rect) {
     return {x: container.x + target.x, y: container.y + target.y, w: target.w, h: target.h};
-}
+}*/
 
 export function renderMenuFrame(context: CanvasRenderingContext2D, r: Rect): void {
     drawFrame(context, menuSlices[0], {x: r.x, y: r.y, w: 8, h: 8});
@@ -49,14 +45,13 @@ const screenRect: Rect = {
 };
 const menuRect: Rect = {
     x: 25,
-    y: 30,
+    y: 35,
     w: CANVAS_WIDTH - 2 * 25,
-    h: CANVAS_HEIGHT - 2 * 25,
+    h: CANVAS_HEIGHT - 40,
 }
-const peachRect = subRect(menuRect, { x: -8, y: menuRect.h + 8 - fullPeach.h, w: fullPeach.w, h: fullPeach.h});
 export function renderFieldMenu(context: CanvasRenderingContext2D, state: GameState, renderBackground: RenderFunction): void {
-    if (state.fieldMenuState.backgroundBuffer.needsRefresh) {
-        delete state.fieldMenuState.backgroundBuffer.needsRefresh;
+    if (state.fieldMenuState.backgroundBuffer.needsRefresh || editingState.isEditing) {
+        state.fieldMenuState.backgroundBuffer.needsRefresh = editingState.isEditing;
         renderBackground(state.fieldMenuState.backgroundBuffer.context, state);
     }
     if (state.fieldMenuState.panelsBuffer.needsRefresh) {
@@ -92,49 +87,78 @@ export function renderFieldMenu(context: CanvasRenderingContext2D, state: GameSt
                 }
             context.restore();
         }
-        /*for (let rowIndex = 0; rowIndex < state.fieldMenuState.grid.length; rowIndex++) {
-            const row = state.fieldMenuState.grid[rowIndex];
-            for (let columnIndex = 0; columnIndex < state.fieldMenuState.grid[rowIndex].length; columnIndex++) {
-                const menuElement = row[columnIndex];
-                if (!menuElement) {
-                    continue;
-                }
-                const x = menuRect.x + columnIndex * frameSize, y = menuRect.y + rowIndex * frameSize;
-                const isVisible = menuElement?.isVisible?.(state);
-                if (!editingState.isEditing && !isVisible) {
-                    continue;
-                }
-                if (menuElement.isSelected?.(state)) {
-                    menuElement.renderSelection?.(context, state, x, y);
-                }
-                if (!isVisible) {
-                    context.save();
-                        context.globalAlpha *= 0.3;
-                        menuElement.render(context, state, x, y);
-                    context.restore();
-                } else {
-                    menuElement.render(context, state, x, y);
-                }
-            }
-        }*/
 
-        // Render the peach piece indicator
-        drawFrame(context, fullPeachFrame, pad(peachRect, 1));
-        if (state.hero.savedData.peachQuarters === 3) {
-            drawFrame(context, threeQuartersPeach, peachRect);
-        } else if (state.hero.savedData.peachQuarters === 2) {
-            drawFrame(context, halfPeach, peachRect);
-        } else if (state.hero.savedData.peachQuarters === 1) {
-            drawFrame(context, quarterPeach, peachRect);
-        }
-
+        const {activePanel, activeOption} = getActivePanelAndOption(state);
+        const x = activePanel.x + activeOption.x;
+        const y = activePanel.y + activeOption.y;
         // Render the cursor last, on top of everything.
+        // get active element and draw based on that (refactor active element code into menu code from updateFieldMenu)
         drawFrameCenteredAt(context, cursorFrame, {
-            x: state.fieldMenuState.cursor.x * frameSize,
-            y: state.fieldMenuState.cursor.y * frameSize,
+            x,
+            y,
             w: frameSize, h: frameSize,
         });
+
+        const label = activeOption.isVisible(state) && activeOption.getLabel(state);
+        if (label) {
+            const nameBoxWidth = label.length * 8 + 12, h = 18 + 8;
+            const nameBoxRect = {
+                x: menuRect.w + 8 - nameBoxWidth,
+                y: menuRect.h - h,
+                w: nameBoxWidth, h};
+            renderMenuFrame(context, nameBoxRect);
+            drawText(context, label, nameBoxRect.x + nameBoxRect.w - 6, nameBoxRect.y + nameBoxRect.h - 4, {
+                textBaseline: 'bottom',
+                textAlign: 'right',
+                size: 16,
+            });
+            /*const menuTip = getMenuTip(state, selectedItem);
+            if (menuTip) {
+                const textFrames = parseMessage(state, menuTip.buttons)[0].frames[0].filter(v => v);
+                let buttonW = 0;
+                for (const frame of textFrames) {
+                    buttonW += frame ? frame.w : 8;
+                }
+                const padding = 2;
+
+                const w = buttonW + padding + menuTip.action.length * 8 + 12, h = 18 + 8;
+                const textRect = {
+                    x: nameBoxRect.x + nameBoxRect.w - w,//nameBoxRect.x + nameBoxRect.w / 2 - w / 2,//outerMenuFrame.x + outerMenuFrame.w + 12 - w,
+                    y: outerMenuFrame.y + outerMenuFrame.h + 10 - h,
+                    w, h
+                };
+                renderMenuFrame(context, state, textRect);
+                const characterWidth = 8;
+                let x = textRect.x + 4;
+                for (const frame of textFrames) {
+                    if (!frame) {
+                        x += characterWidth;
+                        continue;
+                    }
+                    drawFrame(context, frame, {
+                        x: x - (frame.content?.x || 0),
+                        y: textRect.y + 6 - (frame.content?.y || 0), w: frame.w, h: frame.h
+                    });
+                    x += frame.w;
+                }
+                drawText(context, menuTip.action, textRect.x + 4 + buttonW + padding, textRect.y + textRect.h - 4, {
+                    textBaseline: 'bottom',
+                    textAlign: 'left',
+                    size: 16,
+                });
+            }*/
+        }
     context.restore();
+}
+
+function elementUnderPoint(state: GameState, x: number, y: number): MenuElement {
+    for (const panel of state.fieldMenuState.panels) {
+        if (isPointInShortRect(x, y, panel)) {
+            const column = ((x - panel.x) / frameSize) | 0;
+            const row = ((y - panel.y) / frameSize) | 0;
+            return panel.options[column + row * panel.columns];
+        }
+    }
 }
 
 // While the editor is open, all possible items are displayed, and you can
@@ -152,10 +176,9 @@ mainCanvas.addEventListener('click', function (event) {
         return;
     }
     const [mouseX, mouseY] = getMousePosition(mainCanvas, getCanvasScale());
-    const rowIndex = Math.floor((mouseY - menuRect.y) / frameSize);
-    const columnIndex = Math.floor((mouseX - menuRect.x) / frameSize);
-    const menuElement = state.fieldMenuState.grid[rowIndex][columnIndex];
+    const menuElement = elementUnderPoint(state, mouseX - menuRect.x, mouseY - menuRect.y);
     menuElement?.onUpgrade?.(state);
+    updateHeroMagicStats(state);
 });
 
 export function renderPanels(context: CanvasRenderingContext2D, state: GameState): void {

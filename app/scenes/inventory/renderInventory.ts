@@ -1,4 +1,4 @@
-import {getMenuName, getMenuRows, getMenuTip} from 'app/content/menu';
+/*import {getMenuName, getMenuRows, getMenuTip} from 'app/content/menu';
 import {getLootFrame, lootFrames, neutralElement} from 'app/content/loot';
 import {contextMenuState, editingState} from 'app/development/editingState';
 import {getCanvasScale} from 'app/development/getCanvasScale';
@@ -300,25 +300,8 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
 // While the editor is open, all possible items are displayed, and you can
 // click them to enabled/upgrade/disable them.
 mainCanvas.addEventListener('click', function (event) {
-    if (event.which !== 1 || contextMenuState.contextMenu) {
-        return;
-    }
-    if (!editingState.isEditing) {
-        return;
-    }
-    const state = getState();
-    // Only process inventory editing when the inventory is actually being displayed.
-    if (!state.paused || state.showMap || shouldHideMenu(state)) {
-        return;
-    }
-    const rowHeight = 25, rowWidth = 26;
-    const [mouseX, mouseY] = getMousePosition(mainCanvas, getCanvasScale());
-    let {x, y} = innerMenuFrame;
 
-    if (isPointInShortRect(mouseX, mouseY, weapon1Rect) || isPointInShortRect(mouseX, mouseY, weapon2Rect)) {
-        state.hero.savedData.weapon = ((state.hero.savedData.weapon || 0) + 1) % 4;
-        return;
-    }
+
     if (isPointInShortRect(mouseX, mouseY, peachRect)) {
         state.hero.savedData.peachQuarters = ((state.hero.savedData.peachQuarters || 0) + 1) % 4;
         if (state.hero.savedData.peachQuarters === 0) {
@@ -359,6 +342,7 @@ mainCanvas.addEventListener('click', function (event) {
                 if (menuItem === 'help' || menuItem === 'empty'
                     || menuItem === 'spiritPower' || menuItem === 'secondChance'
                     || menuItem === 'spikeBoots' || menuItem === 'forgeBoots' || menuItem === 'flyingBoots'
+                    || menuItem === 'silverMailSchematics' || menuItem === 'goldMailSchematics'
                     || menuItem === 'peachOfImmortality' || menuItem === 'peachOfImmortalityPiece'
                     || menuItem === 'money' || menuItem === 'peach' || menuItem === 'victoryPoint'
                     || menuItem === 'goldOre' || menuItem === 'silverOre' || menuItem === 'unknown'
@@ -448,3 +432,4 @@ mainCanvas.addEventListener('click', function (event) {
 
 
 });
+*/

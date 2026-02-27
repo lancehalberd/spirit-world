@@ -22,7 +22,7 @@ export function isActiveTool(lootType: string): lootType is ActiveTool {
 }
 const passiveTools: PassiveTool[] = [
     'gloves', 'roll', 'nimbusCloud', 'catEyes', 'spiritSight',
-    'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
+    'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'armor', 'phoenixCrown',
     'waterBlessing', 'fireBlessing', 'lightningBlessing',
 ];
 export function isPassiveTool(lootType: string): lootType is PassiveTool {
@@ -46,6 +46,10 @@ export function doesLootRequireAmount(lootType: string) {
 }
 
 export function getLootLevel(state: GameState, loot: LootData): number {
+    // Default to the current loot level for loot that requires a level and has non defined.
+    if (loot.lootLevel === undefined && doesLootRequireLevel(loot.lootType)) {
+        return getCurrentLootValue(state, loot.lootType);
+    }
     // 0 represents progressive loot. If the loot is not progressive, it has
     // the exact level given (or not given for many items that have no concept of level).
     if (loot.lootLevel !== 0 || !doesLootRequireLevel(loot.lootType)) {

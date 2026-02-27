@@ -48,36 +48,6 @@ type Scene = 'intro' | 'prologue' | 'title' | 'fileSelect'
 
 type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
-interface MenuPanel extends Rect {
-    rows: number
-    columns: number
-    options: MenuElement[]
-}
-interface CanvasBuffer {
-    needsRefresh?: boolean
-    canvas: HTMLCanvasElement
-    context: CanvasRenderingContext2D
-}
-interface MenuState {
-    needsRefresh?: boolean
-    backgroundBuffer: CanvasBuffer
-    panelsBuffer: CanvasBuffer
-    panels: MenuPanel[]
-    grid: MenuElement[][]
-    cursor: Point
-}
-
-interface MenuElement extends Rect {
-    label: string
-    isVisible: (state: GameState) => boolean
-    isSelected?: (state: GameState) => boolean
-    render: (context: CanvasRenderingContext2D, state: GameState) => void
-    renderSelection?: (context: CanvasRenderingContext2D, state: GameState) => void
-    // Tool index will be set to 0/1 if the LEFT_TOOL or RIGHT_TOOL button is used to select.
-    onSelect: (state: GameState, toolIndex?: number) => boolean
-    onUpgrade?: (state: GameState) => void
-}
-
 interface GameState {
     savedState: SavedState
     settings: Settings

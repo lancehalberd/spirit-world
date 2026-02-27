@@ -126,10 +126,7 @@ export function getDefaultState(): GameState {
                 context: panelsContext,
             },
             panels: [],
-            grid: [[]],
-            // This will update to the first selectable menu item
-            // found in reading order from this point when the menu opens.
-            cursor: {x: 0, y: 0},
+            cursor: {panelId: 'tools', optionIndex: 0},
         },
         menuIndex: 0,
         menuRow: 0,

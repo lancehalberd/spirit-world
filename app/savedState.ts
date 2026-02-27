@@ -49,6 +49,8 @@ function getDefaultSavedHeroData(): SavedHeroData {
             spikeBoots: 0,
             flyingBoots: 0,
             forgeBoots: 0,
+            silverMailSchematics: 0,
+            goldMailSchematics: 0,
         },
         element: null,
         elements: {
@@ -71,8 +73,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             astralProjection: 0,
             teleportation: 0,
             ironSkin: 0,
-            silverMail: 0,
-            goldMail: 0,
+            armor: 0,
             phoenixCrown: 0,
             waterBlessing: 0,
             fireBlessing: 0,

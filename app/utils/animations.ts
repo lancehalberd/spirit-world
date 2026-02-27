@@ -217,8 +217,7 @@ export function drawFrameCenteredAt(
     if (image instanceof HTMLCanvasElement) {
         drawCanvas(context, image,
             {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
-            // TODO: check if this is wrong, it seems like this should use w/h not tw/th.
-            {x: tx | 0, y: ty | 0, w: tw | 0, h: th | 0}
+            {x: tx | 0, y: ty | 0, w: w | 0, h: h | 0}
         );
         return;
     }
