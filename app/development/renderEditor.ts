@@ -12,7 +12,7 @@ import {fixVariantPosition} from 'app/development/variantEditor';
 import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
 import {renderZoneEditor} from 'app/development/zoneEditor';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
-import {translateContextForAreaAndCamera} from 'app/render/renderField';
+import {translateContextForAreaAndCamera} from 'app/scenes/field/renderField';
 import {drawFrame} from 'app/utils/animations';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {mapTile} from 'app/utils/mapTile';

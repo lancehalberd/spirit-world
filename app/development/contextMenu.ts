@@ -7,7 +7,7 @@ import {toggleEditing} from 'app/development/editor';
 import {tagElement} from 'app/dom';
 import {getCanvasScale} from 'app/development/getCanvasScale';
 import {isDebugMode, overworldKeys} from 'app/gameConstants';
-import {checkToRedrawTiles, drawEntireFrame} from 'app/render/renderField';
+import {checkToRedrawTiles, drawEntireFrame} from 'app/scenes/field/renderField';
 import {getState} from 'app/state';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {defeatAllEnemies} from 'app/utils/addKeyboardShortcuts';

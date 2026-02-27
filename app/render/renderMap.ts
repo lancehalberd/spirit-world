@@ -9,7 +9,7 @@ import {getCanvasScale} from 'app/development/getCanvasScale';
 import {initializeSection} from 'app/development/sections';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, overworldKeys} from 'app/gameConstants';
 import {heroIcon} from 'app/render/heroAnimations';
-import {checkToRedrawTiles, drawEntireFrame} from 'app/render/renderField';
+import {checkToRedrawTiles, drawEntireFrame} from 'app/scenes/field/renderField';
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import {mainCanvas} from 'app/utils/canvas';
 import {findObjectLocation} from 'app/utils/enterZoneByTarget';

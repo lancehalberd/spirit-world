@@ -1,14 +1,12 @@
-import {Hero} from 'app/content/hero';
-import {SPAWN_LOCATION_DEMO, SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
+import {SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
 import {zones} from 'app/content/zones';
-import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {CANVAS_HEIGHT, CANVAS_WIDTH, randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import {getDefaultSavedState } from 'app/savedState'
+import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {createCanvasAndContext} from 'app/utils/canvas';
-import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
+
 import {getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
-import {cloneDeep, mergeDeep} from 'app/utils/index';
-import {returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -60,36 +58,17 @@ export function eraseAllSaves(): void {
     window.localStorage.clear()
 }
 
-export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0): void {
-    state.savedGameIndex = savedGameIndex;
-    let savedGame = state.savedGames[state.savedGameIndex];
-    if (!savedGame) {
-        savedGame = getDefaultSavedState();
-        savedGame.savedHeroData.spawnLocation = gameMode === 0 ? SPAWN_LOCATION_FULL : SPAWN_LOCATION_DEMO;
-    }
-    applySavedState(state, savedGame);
-}
 
-export function applySavedState(state: GameState, savedState: Partial<SavedState>): void {
-    state.savedState = getDefaultSavedState();
-    mergeDeep(state.savedState, cloneDeep(savedState));
-    state.hero = new Hero(state.savedState.savedHeroData);
-    state.hero.applySavedHeroData(savedState.savedHeroData);
-    fixProgressFlagsOnLoad(state);
-    fixSpawnLocationOnLoad(state);
-    updateHeroMagicStats(state);
-    // Preserve zone flags when entering zone initially.
-    returnToSpawnLocation(state, true);
-}
 
 const [backgroundCanvas, backgroundContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
 const [panelsCanvas, panelsContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 export function getDefaultState(): GameState {
     const state: GameState = {
+        sceneStack: [],
         savedState: getDefaultSavedState(),
         savedGames: [null, null, null],
-        savedGameIndex: 0,
+        savedGameIndex: -1,
         settings: {
             muteAllSounds: false,
         },
@@ -103,7 +82,6 @@ export function getDefaultState(): GameState {
         fieldTime: 10000,
         reviveTime: 0,
         prologueTime: 0,
-        idleTime: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
         location: getFullZoneLocation(SPAWN_LOCATION_FULL),
@@ -173,8 +151,13 @@ let state: GameState;
 export function initializeState() {
     state = getDefaultState();
     loadSavedData();
-    setSaveFileToState(0);
-    state.scene = Math.random() < 0.5 ? 'intro' : 'prologue';
+    setSaveFileToState(state, 0);
+    if (Math.random() < 0.5) {
+        showIntroScene(state);
+    } else {
+        // TODO: Change to prologue.
+        showIntroScene(state);
+    }
 }
 
 export function getState(): GameState {
@@ -183,9 +166,6 @@ export function getState(): GameState {
 window['getState'] = getState;
 
 export function getFileSelectOptions(state: GameState): string[] {
-    if (state.scene === 'chooseGameMode') {
-        return ['Full Game', 'Quick Demo', 'Cancel'];
-    }
     if (state.scene === 'deleteSavedGameConfirmation') {
         return ['CANCEL', 'DELETE'];
     }
@@ -199,15 +179,6 @@ export function getFileSelectOptions(state: GameState): string[] {
         return [...gameFiles, 'CANCEL'];
     }
     return [...gameFiles, 'DELETE', 'TITLE'];
-}
-
-export function getTitleOptions(state: GameState): string[] {
-    const titleMenu = ['START', 'SETTINGS'];
-    // only display 'QUIT' if game is being played inside of Electron as a desktop app
-    if (window.electronAPI && state.gameHasBeenInitialized) {
-        return [...titleMenu, 'QUIT'];
-    }
-    return titleMenu;
 }
 
 export function getSettingsOptions(state: GameState): string[] {

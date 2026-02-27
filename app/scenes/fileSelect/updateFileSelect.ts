@@ -1,25 +1,20 @@
-import {
-    SPAWN_LOCATION_DEMO,
-    SPAWN_LOCATION_FULL,
-} from 'app/content/spawnLocations';
-import { Hero } from 'app/content/hero';
-import { showHint } from 'app/content/hints';
-import { isRandomizer, GAME_KEY, randomizerGoal, randomizerGoalType, randomizerTotal } from 'app/gameConstants';
+import {SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
+import {showHint} from 'app/content/hints';
+import {isRandomizer, GAME_KEY, randomizerGoal, randomizerGoalType, randomizerTotal} from 'app/gameConstants';
 import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
 } from 'app/userInput';
-import { playSound } from 'app/utils/sounds';
-import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { getDefaultSavedState } from 'app/savedState'
+import {playSound} from 'app/utils/sounds';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
+import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {
     getFileSelectOptions,
-    setSaveFileToState,
 } from 'app/state';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
-import { saveGamesToLocalStorage, } from 'app/utils/saveGame';
-import { parseScriptText, setScript } from 'app/scriptEvents';
-import { showTitleScene } from 'app/scenes/title/showTitleScene';
+import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation'
+import {saveGamesToLocalStorage,} from 'app/utils/saveGame';
+import {parseScriptText, setScript} from 'app/scriptEvents';
+import {showTitleScene} from 'app/scenes/title/showTitleScene';
 
 export function updateFileSelect(state: GameState) {
     const options = getFileSelectOptions(state);
@@ -36,10 +31,8 @@ export function updateFileSelect(state: GameState) {
     if (changedOption) {
         if (state.scene === 'fileSelect' || state.scene === 'deleteSavedGame') {
             if (state.menuIndex < state.savedGames.length) {
-                setSaveFileToState(state.menuIndex, 0);
+                setSaveFileToState(state, state.menuIndex, 0);
             }
-        } else if (state.scene === 'chooseGameMode') {
-            setSaveFileToState(state.savedGameIndex, state.menuIndex);
         }
     }
     if (wasConfirmKeyPressed(state)) {
@@ -52,38 +45,17 @@ export function updateFileSelect(state: GameState) {
                 }
                 state.scene = 'fileSelect';
                 state.menuIndex = state.savedGameIndex;
-                setSaveFileToState(state.savedGameIndex, 0);
+                setSaveFileToState(state, state.savedGameIndex, 0);
                 break;
             case 'deleteSavedGame':
                 if (state.menuIndex >= state.savedGames.length) {
                     state.scene = 'fileSelect';
                     state.menuIndex = 0;
-                    setSaveFileToState(state.menuIndex, 0);
+                    setSaveFileToState(state, state.menuIndex, 0);
                 } else {
                     state.savedGameIndex = state.menuIndex;
                     state.scene = 'deleteSavedGameConfirmation';
                     state.menuIndex = 0;
-                }
-                break;
-            case 'chooseGameMode':
-                state.savedState = getDefaultSavedState();
-                state.hero = new Hero(state.savedState.savedHeroData);
-                if (state.menuIndex === 0) {
-                    // Full Game
-                    state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;
-                    state.scene = 'game';
-                    updateHeroMagicStats(state);
-                    returnToSpawnLocation(state);
-                } else if (state.menuIndex === 1) {
-                    // Demo
-                    state.hero.savedData.spawnLocation = SPAWN_LOCATION_DEMO;
-                    state.scene = 'game';
-                    updateHeroMagicStats(state);
-                    returnToSpawnLocation(state);
-                } else {
-                    state.scene = 'fileSelect';
-                    state.menuIndex = state.savedGameIndex;
-                    setSaveFileToState(state.savedGameIndex, 0);
                 }
                 break;
             case 'fileSelect':
@@ -91,7 +63,7 @@ export function updateFileSelect(state: GameState) {
                         && options[state.menuIndex] === 'DELETE') {
                     state.scene = 'deleteSavedGame';
                     state.menuIndex = 0;
-                    setSaveFileToState(state.menuIndex, 0);
+                    setSaveFileToState(state, state.menuIndex, 0);
                 } else if (state.menuIndex > state.savedGames.length
                         && options[state.menuIndex] === 'TITLE') {
                     showTitleScene(state);
@@ -125,7 +97,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
         }
         return;
     }
-    setSaveFileToState(savedGameIndex);
+    setSaveFileToState(state, savedGameIndex);
     state.scene = 'game';
     // Hack to prevent showing the falling animation a second time on loading a game in the peach cave.
     if (state.location.zoneKey === 'peachCave' && state.hero.z > 100) {

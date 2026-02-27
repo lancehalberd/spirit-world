@@ -7,7 +7,7 @@ import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,
     renderForegroundObjects,
-} from 'app/render/renderField';
+} from 'app/scenes/field/renderField';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { getBackgroundFrame } from 'app/utils/area';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';

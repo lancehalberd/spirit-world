@@ -12,7 +12,7 @@ interface GameScene {
     paused?: boolean
     // Optional buffer for this scene which can be used to skip rendering in the background.
     buffer?: CanvasBuffer
-    update?: (state: GameState) => void
+    update?: (state: GameState, interactive: boolean) => void
     render?: (context: CanvasRenderingContext2D, state: GameState) => void
     // If true, other scenes below this scene in the stack should not process input.
     // Should be true in most cases.

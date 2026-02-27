@@ -12,15 +12,15 @@ import {createObjectDefinition, combinedObjectTypes} from 'app/development/objec
 import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
 import {isDebugMode} from 'app/gameConstants';
 import {enterLocation} from 'app/utils/enterLocation';
-import {setSaveFileToState} from 'app/state';
+import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 
 
 export function toggleEditing(state: GameState) {
     if (!isDebugMode) {
         return;
     }
-    if (state.scene === 'title' || state.scene === 'prologue' || state.scene === 'intro') {
-        setSaveFileToState(0, 0);
+    if (state.savedGameIndex < 0) {
+        setSaveFileToState(state, 0, 0);
     }
     state.scene = 'game';
     // Set this to 1 so the player doesn't immediately fall into pits when the editor is

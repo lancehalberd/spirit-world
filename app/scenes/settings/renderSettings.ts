@@ -1,6 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { renderStandardFieldStack } from 'app/render/renderField';
+import { renderStandardFieldStack } from 'app/scenes/field/renderField';
 import { fillRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { getSettingsOptions } from 'app/state';

@@ -62,8 +62,8 @@ window['debugCanvas'] = debugCanvas;
 export function drawCanvas(
     context: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
-    {x, y, w, h}: Rect,
-    {x: tx, y: ty, w: tw, h: th}:Rect
+    {x, y, w, h}: Rect = {x: 0, y: 0, w: canvas.width, h: canvas.height},
+    {x: tx, y: ty, w: tw, h: th}: Rect  = {x: 0, y: 0, w: canvas.width, h: canvas.height},
 ): void {
     // Render nothing if the source is entirely
     // outside of the canvas rect.

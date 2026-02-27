@@ -20,7 +20,8 @@ import {
 import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
 
 import {cloneDeep} from 'app/utils/index';
-import {applySavedState, getDefaultState} from 'app/state';
+import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {getDefaultState} from 'app/state';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import SRandom from 'app/utils/SRandom';
 

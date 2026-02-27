@@ -42,13 +42,14 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type Scene = 'intro' | 'prologue' | 'title' | 'fileSelect'
-    | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
+type Scene = 'prologue' | 'fileSelect'
+    | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options';
 
 type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
 interface GameState {
+    sceneStack: GameScene[]
     savedState: SavedState
     settings: Settings
     savedGames: SavedState[]
@@ -56,10 +57,6 @@ interface GameState {
     hero: Hero
     camera: { x: number, y: number, speed?: number }
     fieldTime: number
-    // This can be used any time we want to track player idlesness,
-    // for example to show the prologue again when the player is idle
-    // on the title screen.
-    idleTime: number
     prologueTime: number
     // Time that advances forward regardles of scene or whether the game is paused.
     time: number

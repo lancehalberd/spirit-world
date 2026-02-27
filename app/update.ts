@@ -15,10 +15,8 @@ import {
 import {updateControls} from 'app/scenes/controls/updateControls';
 import {updateDefeated} from 'app/scenes/defeated/updateDefeated';
 import {updateFieldMenu} from 'app/scenes/fieldMenu/updateFieldMenu';
-import {updateIntro} from 'app/scenes/intro/updateIntro';
 import {updatePrologue} from 'app/scenes/prologue/updatePrologue';
 import {updateFileSelect} from 'app/scenes/fileSelect/updateFileSelect';
-import {updateTitle} from 'app/scenes/title/updateTitle';
 import {updateSettings} from 'app/scenes/settings/updateSettings';
 import {appendCallback, showMessage, waitForARGameToFinish} from 'app/scriptEvents';
 import {
@@ -27,7 +25,6 @@ import {
     shouldHideMenu,
 } from 'app/state';
 import {updateCamera} from 'app/updateCamera';
-import {updateField} from 'app/updateField';
 import {updateScriptEvents} from 'app/updateScriptEvents';
 import {enterLocation} from 'app/utils/enterLocation';
 import {areAllImagesLoaded} from 'app/utils/images';
@@ -52,6 +49,20 @@ export function update() {
         delete state.scriptEvents?.blockPlayerInput;
     }
     updateKeyboardState(state);
+    if (state.sceneStack.length) {
+        let blockInput = false;
+        for (let i = state.sceneStack.length - 1; i >= 0; i++) {
+            const scene = state.sceneStack[i];
+            if (scene.paused) {
+                continue;
+            }
+            scene.update(state, blockInput);
+            if (!blockInput) {
+                blockInput = scene.capturesInput;
+            }
+        }
+        return;
+    }
     try {
         // This has higher priority than anything and basically freezes the game to show the controls.
         if (state.showControls) {
@@ -62,18 +73,10 @@ export function update() {
             updatePrologue(state);
             return;
         }
-        if (state.scene === 'intro') {
-            updateIntro(state);
-            return;
-        }
-        if (state.scene === 'fileSelect' || state.scene === 'chooseGameMode' ||
+        if (state.scene === 'fileSelect' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
             updateFileSelect(state);
-            return;
-        }
-        if (state.scene === 'title') {
-            updateTitle(state);
             return;
         }
         if (state.scene === 'options') {
@@ -223,7 +226,7 @@ export function update() {
                 // Make sure we don't handle script event input twice in one frame.
                 // We could also manage this by unsetting game keys on the state.
                 if (!state.scriptEvents.blockFieldUpdates && !state.scriptEvents.handledInput) {
-                    updateField(state);
+                    // updateField(state);
                 }
             }
         }

@@ -422,6 +422,7 @@ export class NPC implements Actor, ObjectInstance  {
     dialogueIndex = 0;
     lastDialogueOption: DialogueOption;
     hasFinishedDialog = false;
+    hideDialogueMarker = false;
     constructor(state: GameState, definition: NPCDefinition) {
         this.definition = definition;
         this.d = definition.d || 'down';
@@ -581,7 +582,7 @@ export class NPC implements Actor, ObjectInstance  {
         // distracting during cut scenes, and you cannot usually interract with NPCs while events are running.
         // Also hide dialogue bubbles on the title screen
         if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length
-            && state.scene !== 'title') {
+            && !this.hideDialogueMarker) {
             const dialogue = this.getNextDialogue(state);
             if (dialogue) {
                 context.save();

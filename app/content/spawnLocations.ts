@@ -32,15 +32,6 @@ export const SPAWN_LOCATION_FULL: ZoneLocation = {
     areaGridCoords: {x: 0, y: 1},
     isSpiritWorld: false,
 };
-export const SPAWN_LOCATION_DEMO: ZoneLocation = {
-    zoneKey: 'demo_entrance',
-    floor: 0,
-    x: 150,
-    y: 100,
-    d: 'up',
-    areaGridCoords: {x: 0, y: 0},
-    isSpiritWorld: false,
-};
 
 export const SPAWN_LOCATION_WATERFALL_VILLAGE: ZoneLocation = {
     zoneKey: 'overworld',

@@ -14,7 +14,7 @@ export const updateMusic = (state: GameState): void => {
         return;
     }
     updateAudio(state);
-    if (state.scene === 'prologue' || state.scene === 'intro') {
+    if (state.scene === 'prologue') {
         playTrack('dungeonTheme', state.prologueTime / 1000);
         return;
     }

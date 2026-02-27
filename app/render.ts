@@ -3,18 +3,16 @@ import {renderEditor} from 'app/development/renderEditor';
 import {CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
 import {renderControls} from 'app/scenes/controls/renderControls';
 import {renderDefeatedMenu} from 'app/scenes/defeated/renderDefeated';
-import {renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera} from 'app/render/renderField';
+import {renderStandardFieldStack, renderTransition, translateContextForAreaAndCamera} from 'app/scenes/field/renderField';
 import {renderHUD} from 'app/renderHUD';
 import {renderFieldMenu} from 'app/scenes/fieldMenu/renderFieldMenu';
-import {renderIntro} from 'app/scenes/intro/renderIntro';
 import {renderPrologue} from 'app/scenes/prologue/renderPrologue';
 import {renderMap} from 'app/render/renderMap';
 import {renderMessage} from 'app/render/renderMessage';
 import {renderFileSelect} from 'app/scenes/fileSelect/renderFileSelect';
-import {renderTitle} from 'app/scenes/title/renderTitle';
 import {renderSettings} from 'app/scenes/settings/renderSettings';
 import {getState, shouldHideMenu} from 'app/state';
-import {mainContext} from 'app/utils/canvas';
+import {drawCanvas, mainContext} from 'app/utils/canvas';
 import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
 
 let frameDurations: number[] = [];
@@ -78,12 +76,23 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         renderControls(context, state);
         return;
     }
-    if (state.scene === 'prologue') {
-        renderPrologue(context, state);
+    if (state.sceneStack.length) {
+        for (let i = 0; i < state.sceneStack.length; i++) {
+            const scene = state.sceneStack[i];
+            if (scene.paused && scene.buffer) {
+                if (scene.buffer.needsRefresh) {
+                    delete scene.buffer.needsRefresh;
+                    scene.render(scene.buffer.context, state);
+                }
+                drawCanvas(context, scene.buffer.canvas);
+            } else {
+                scene.render(context, state);
+            }
+        }
         return;
     }
-    if (state.scene === 'intro') {
-        renderIntro(context, state);
+    if (state.scene === 'prologue') {
+        renderPrologue(context, state);
         return;
     }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
@@ -104,14 +113,9 @@ export function renderInternal(context: CanvasRenderingContext2D, state: GameSta
         renderTransition(context, state);
         return;
     }
-    if (state.scene === 'fileSelect' || state.scene === 'chooseGameMode' ||
-            state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
+    if (state.scene === 'fileSelect' || state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
     ) {
         renderFileSelect(context, state);
-        return;
-    }
-    if (state.scene === 'title') {
-        renderTitle(context, state);
         return;
     }
     if (state.scene === 'options') {

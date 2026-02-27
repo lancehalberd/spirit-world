@@ -1,5 +1,5 @@
 import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { renderStandardFieldStack } from 'app/render/renderField';
+import { renderStandardFieldStack } from 'app/scenes/field/renderField';
 import { renderHUD } from 'app/renderHUD';
 import { getFileSelectOptions } from 'app/state';
 import { drawText } from 'app/utils/simpleWhiteFont';

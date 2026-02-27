@@ -5,7 +5,6 @@ import {
 } from 'app/userInput';
 import { playSound } from 'app/utils/sounds';
 import { getSettingsOptions } from 'app/state';
-import { showTitleScene } from 'app/scenes/title/showTitleScene';
 import { toggleShowControls } from 'app/scenes/controls/updateControls';
 
 export function updateSettings(state: GameState) {
@@ -26,11 +25,7 @@ export function updateSettings(state: GameState) {
             toggleShowControls(state);
             break;
         case 'RESUME':
-            if (state.location.zoneKey === 'title') {
-                showTitleScene(state);
-            } else {
-                state.scene = 'game';
-            }
+            state.sceneStack.pop();
             break;
         }
     }
