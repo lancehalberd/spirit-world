@@ -3,11 +3,10 @@ import {updateField} from 'app/scenes/field/updateField';
 import {sceneHash} from 'app/scenes/sceneHash';
 
 
-
 export class FieldScene implements GameScene {
-    capturesInput = true;
-    idleTime = 0;
-    menuIndex = 0;
+    sceneType = 'field';
+    paused = false;
+    blocksInput = true;
     update(state: GameState) {
         updateField(state);
     }

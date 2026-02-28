@@ -1,5 +1,5 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
-import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {showFileSelectScene} from 'app/scenes/fileSelect/showFileSelectScene';
 import {sceneHash} from 'app/scenes/sceneHash';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
@@ -11,7 +11,7 @@ import {
 import {requireImage} from 'app/utils/images';
 import {fillRect, pad} from 'app/utils/index';
 import {drawText} from 'app/utils/simpleWhiteFont';
-import {playSound} from 'app/utils/sounds';
+import {playSound, playTrack} from 'app/utils/sounds';
 
 const WIDTH = 102;
 const ROW_HEIGHT = 20;
@@ -32,7 +32,8 @@ function getTitleOptions(state: GameState): string[] {
 }
 
 export class TitleScene implements GameScene {
-    capturesInput = true;
+    blocksInput = true;
+    blocksUpdates = true;
     idleTime = 0;
     menuIndex = 0;
     update(state: GameState) {
@@ -63,9 +64,7 @@ export class TitleScene implements GameScene {
             playSound('menuTick');
             switch (selectedOption) {
             case 'START':
-                state.scene = 'fileSelect';
-                setSaveFileToState(state, 0, 0);
-                this.menuIndex = 0;
+                showFileSelectScene(state);
                 break;
             case 'SETTINGS':
                 state.scene = 'options';
@@ -77,6 +76,10 @@ export class TitleScene implements GameScene {
                 break;
             }
         }
+    }
+    updateMusic(state: GameState) {
+        playTrack('mainTheme', 0);
+        return true;
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
         renderStandardFieldStack(context, state);

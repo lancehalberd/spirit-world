@@ -84,10 +84,10 @@ export function updateDefeated(state: GameState) {
             fixProgressFlagsOnLoad(state);
             fixSpawnLocationOnLoad(state);
             returnToSpawnLocation(state);
-            state.paused = false;
+            // Probably pop the defeated scene here if we change it to a scene.
+            // state.paused = false;
         } else if (state.menuIndex === 1) {
             showTitleScene(state);
-            state.paused = false;
         }
     }
 }

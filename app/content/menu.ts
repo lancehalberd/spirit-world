@@ -1,6 +1,7 @@
 import {showHint} from 'app/content/hints';
 import {getLootFrame, getLootHelpMessage, getLootName, lootFrames, neutralElement} from 'app/content/loot';
 import {isRandomizer} from 'app/gameConstants';
+import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {fillRect, pad} from 'app/utils/index';
@@ -13,7 +14,7 @@ import {requireFrame} from 'app/utils/packedImages';
 
 
 export const frameSize = 24;
-const elementGeometry: Rect = {
+export const elementGeometry: Rect = {
     x: 0, y: 0,
     w: frameSize, h: frameSize,
 };
@@ -42,7 +43,7 @@ export const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
 const [/*small peach*/, /* full peach */, threeQuartersPeach, halfPeach, quarterPeach] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 const fullPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 54, y: 0, w: 20, h: 20});
-const peachMenuOption: MenuElement = {
+export const peachMenuOption: MenuElement = {
     ...elementGeometry,
     getLabel: (state: GameState) => 'Peach Pieces',
     isVisible: (state: GameState) => state.hero.savedData.peachQuarters > 0 || state.hero.savedData.maxLife > 4,
@@ -87,7 +88,7 @@ const neutralElementMenuOption: MenuElement = {
     },
 };
 
-const nimbusCloudMenuOption: MenuElement = {
+export const nimbusCloudMenuOption: MenuElement = {
     ...elementGeometry,
     getLabel: (state: GameState) => getLootName(state, {lootType: 'nimbusCloud'}),
     isVisible: (state: GameState) => !!(state.hero.savedData.passiveTools.nimbusCloud),
@@ -103,7 +104,7 @@ const nimbusCloudMenuOption: MenuElement = {
     }
 };
 
-const arDeviceMenuOption: MenuElement = {
+export const arDeviceMenuOption: MenuElement = {
     ...elementGeometry,
     getLabel: (state: GameState) => getLootName(state, {lootType: 'arDevice'}),
     isVisible: (state: GameState) => !!(state.hero.savedData.passiveTools.arDevice),
@@ -205,7 +206,8 @@ const mapMenuOption: MenuElement = {
         drawFrameCenteredAt(context, mapFrame, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
-        state.showMap = true;
+        state.sceneStack[state.sceneStack.length - 1].closeScene?.(state);
+        showMapScene(state);
         return false;
     },
 };
@@ -380,8 +382,7 @@ function getEquipmentElement(state: GameState, equipment: Equipment) {
             drawFrameCenteredAt(context, getLootFrame(state, {lootType: equipment, lootLevel: level}), this);
         },
         onSelect(state: GameState) {
-            setEquippedBoots(state, equipment);
-            return true;
+            return setEquippedBoots(state, equipment);
         },
         onUpgrade(state: GameState) {
             if (equipment === 'leatherBoots') {
@@ -511,7 +512,7 @@ function getMenuElement(state: GameState, option: ExtendedMenuOptionType): MenuE
     return {...emptyMenuElement};
 }
 
-function createMenuPanel(id: string, options: MenuElement[], rows: number, columns: number, {x, y, w, h}: Rect): MenuPanel {
+export function createMenuPanel(id: string, options: MenuElement[], rows: number, columns: number, {x, y, w, h}: Rect): MenuPanel {
     return {
         id,
         x, y, w, h,
@@ -523,70 +524,6 @@ function createMenuPanel(id: string, options: MenuElement[], rows: number, colum
             y: ((h - rows * frameSize) / 2) | 0,
         },
     };
-}
-
-export function getActivePanelAndOption(state: GameState): {activePanel: MenuPanel, activeOption: MenuElement} {
-    const cursor = state.fieldMenuState.cursor;
-    let activePanel = state.fieldMenuState.panels.find(panel => panel.id === cursor.panelId);
-    // If the active panel is invalid, default to the first panel.
-    if (!activePanel)  {
-        activePanel = state.fieldMenuState.panels[0];
-        cursor.panelId = activePanel.id;
-        cursor.optionIndex = 0;
-    }
-    if (!activePanel.options[cursor.optionIndex]) {
-        cursor.optionIndex = 0;
-    }
-    return {
-        activePanel,
-        activeOption: activePanel.options[cursor.optionIndex],
-    };
-}
-
-export function getMenuPanels(state: GameState): MenuPanel[] {
-
-    const panels: MenuPanel[] = [
-        // two left most columns
-        createMenuPanel('equipment', getEquipmentOptions(state), 4, 2, {x: 0, y: 0, w: 48, h: 96}),
-        createMenuPanel('elements', getElementOptions(state), 4, 1, {x: 57, y: 0, w: 24, h: 96}),
-
-        // row on bottom left
-        createMenuPanel('dungeon', getDungeonOptions(state), 1, 3, {x: 9, y: 105, w: 72, h: 28}),
-
-        // top row in the middle.
-        createMenuPanel('tools', getToolOptions(state), 2, 2, {x: 90, y: 0, w: 48, h: 48}),
-
-        // Column under left side of tools
-        createMenuPanel('special', [nimbusCloudMenuOption, arDeviceMenuOption], 2, 1, {x: 147, y: 0, w: 24, h: 48}),
-
-        // Various rows shown under the active tools
-        createMenuPanel('boots', getBootOptions(state), 1, 3, {x: 90, y: 57, w: 81, h: 24}),
-        createMenuPanel('eyes', getEyesOptions(state), 1, 3, {x: 90, y: 90, w: 81, h: 24}),
-        createMenuPanel('techniques', getTechniqueOptions(state), 1, 3, {x: 90, y: 123, w: 81, h: 24}),
-
-        // system options on the far right
-        createMenuPanel('menu', getSystemOptions(state), 4, 1, {x: 180, y: 0, w: 24, h: 96}),
-
-        createMenuPanel('peach', [peachMenuOption], 1, 1, {x: 180, y: 106, w: 24, h: 24})
-    ];
-
-    return panels;
-}
-
-export function updateMenuState(state: GameState) {
-    state.fieldMenuState.panels = getMenuPanels(state);
-    for (const panel of state.fieldMenuState.panels) {
-        let row = 0, column = 0;
-        for (const element of panel.options) {
-            element.x = column * frameSize + (panel.optionsOffset?.x ?? 0);
-            element.y = row * frameSize + (panel.optionsOffset?.y ?? 0);
-            column++;
-            if (column >= panel.columns) {
-                row++;
-                column = 0;
-            }
-        }
-    }
 }
 
 export function getSystemOptions(state: GameState): MenuElement[] {
@@ -628,6 +565,48 @@ export function getEyesOptions(state: GameState): MenuElement[] {
 
 export function getTechniqueOptions(state: GameState): MenuElement[] {
     return (<const>['roll', 'teleportation', 'ironSkin']).map(option => getMenuElement(state, option));
+}
+
+const silverOreMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Silver Ore',
+    isVisible: (state: GameState) => state.hero.savedData.totalSilverOre > 0,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'silverOre'}), {x: this.x, y: this.y, w: this.w, h: this.h});
+        drawARFont(context, state.hero.savedData.silverOre, this.x + this.w / 2, this.y + this.h + 1, {
+            textBaseline: 'middle', textAlign: 'center',
+        });
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, getLootHelpMessage(state, {lootType: 'silverOre'}));
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        state.hero.savedData.silverOre = ((state.hero.savedData.silverOre || 0) + 1) % 12;
+        state.hero.savedData.totalSilverOre = state.hero.savedData.silverOre;
+    }
+};
+const goldOreMenuOption: MenuElement = {
+    ...elementGeometry,
+    getLabel: () => 'Gold Ore',
+    isVisible: (state: GameState) => state.hero.savedData.totalGoldOre > 0,
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'goldOre'}), {x: this.x, y: this.y, w: this.w, h: this.h});
+        drawARFont(context, state.hero.savedData.goldOre, this.x + this.w / 2, this.y + this.h + 1, {
+            textBaseline: 'middle', textAlign: 'center',
+        });
+    },
+    onSelect(state: GameState, toolIndex?: number) {
+        showMessage(state, getLootHelpMessage(state, {lootType: 'goldOre'}));
+        return true;
+    },
+    onUpgrade(state: GameState) {
+        state.hero.savedData.goldOre = ((state.hero.savedData.goldOre || 0) + 1) % 12;
+        state.hero.savedData.totalGoldOre = state.hero.savedData.goldOre;
+    }
+};
+export function getMaterialOptions(state: GameState): MenuElement[] {
+    return [silverOreMenuOption, goldOreMenuOption];
 }
 
 function getDungeonItems(state: GameState) {
@@ -674,7 +653,7 @@ const smallKeyMenuOption: MenuElement = {
     isVisible: (state: GameState) => getDungeonItems(state).totalSmallKeys > 0,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, keyFrame, {x: this.x, y: this.y, w: this.w, h: this.h});
-        drawARFont(context, getDungeonItems(state).smallKeys, this.x + this.w / 2, this.y + this.h, {
+        drawARFont(context, getDungeonItems(state).smallKeys, this.x + this.w / 2, this.y + this.h + 1, {
             textBaseline: 'middle', textAlign: 'center',
         });
     },

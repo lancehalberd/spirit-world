@@ -5,6 +5,8 @@ import {setEquippedElement} from 'app/utils/menu';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
+import {showMapScene} from 'app/scenes/map/showMapScene';
+import {showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
 import {wasGameKeyPressed} from 'app/userInput';
 import {updateAllHeroes} from 'app/updateActor';
 import {updateCamera} from 'app/updateCamera';
@@ -14,6 +16,14 @@ import {rectanglesOverlap} from 'app/utils/index';
 import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects';
 
 export function updateField(this: void, state: GameState) {
+    if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        showMainMenuScene(state);
+        return;
+    }
+    if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+        showMapScene(state);
+        return;
+    }
     if (editingState.isEditing) {
         updateAllHeroes(state);
         updateCamera(state);

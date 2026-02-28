@@ -1,3 +1,5 @@
+import {showFieldScene} from 'app/scenes/field/showFieldScene';
+
 /**
  * Remove any temporary effects from the state such as script events,
  * transition effects, screen shakes, defeated state, camera speed, etc.
@@ -21,10 +23,10 @@ export function cleanState(state: GameState) {
         handledInput: false,
         queue: [],
     };
-    state.paused = false;
     state.hideHUD = false;
     delete state.camera.speed;
     delete state.hero.action;
     delete state.messagePage;
     delete state.transitionState;
+    showFieldScene(state);
 }

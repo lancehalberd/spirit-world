@@ -8,19 +8,6 @@ interface MenuPanel extends Rect {
     options: MenuElement[]
 }
 
-interface MenuState {
-    needsRefresh?: boolean
-    backgroundBuffer: CanvasBuffer
-    panelsBuffer: CanvasBuffer
-    panels: MenuPanel[]
-    cursor: {
-        // Which panel the cursor is in
-        panelId: string
-        // Which option the cursor has selected.
-        optionIndex: number
-    }
-}
-
 interface MenuElement extends Rect {
     getLabel: (state: GameState) => string
     isVisible: (state: GameState) => boolean

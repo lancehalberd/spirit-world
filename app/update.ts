@@ -1,5 +1,4 @@
 import {refreshAreaLogic} from 'app/content/areas';
-import {dungeonMaps} from 'app/content/sections';
 import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -14,16 +13,10 @@ import {
 } from 'app/userInput';
 import {updateControls} from 'app/scenes/controls/updateControls';
 import {updateDefeated} from 'app/scenes/defeated/updateDefeated';
-import {updateFieldMenu} from 'app/scenes/fieldMenu/updateFieldMenu';
 import {updatePrologue} from 'app/scenes/prologue/updatePrologue';
-import {updateFileSelect} from 'app/scenes/fileSelect/updateFileSelect';
 import {updateSettings} from 'app/scenes/settings/updateSettings';
 import {appendCallback, showMessage, waitForARGameToFinish} from 'app/scriptEvents';
-import {
-    canPauseGame,
-    getState,
-    shouldHideMenu,
-} from 'app/state';
+import {getState} from 'app/state';
 import {updateCamera} from 'app/updateCamera';
 import {updateScriptEvents} from 'app/updateScriptEvents';
 import {enterLocation} from 'app/utils/enterLocation';
@@ -45,20 +38,24 @@ export function update() {
     const state = getState();
     state.time += FRAME_LENGTH;
     // Player input cannot be blocked while the game is paused, otherwise the player will be unable to unpause the game.
-    if (state.paused && state.scriptEvents?.blockPlayerInput) {
+    /*if (state.paused && state.scriptEvents?.blockPlayerInput) {
         delete state.scriptEvents?.blockPlayerInput;
-    }
+    }*/
     updateKeyboardState(state);
     if (state.sceneStack.length) {
         let blockInput = false;
-        for (let i = state.sceneStack.length - 1; i >= 0; i++) {
+        for (let i = state.sceneStack.length - 1; i >= 0; i--) {
             const scene = state.sceneStack[i];
-            if (scene.paused) {
-                continue;
+            if (!scene) {
+                debugger;
             }
-            scene.update(state, blockInput);
+            scene.update(state, !blockInput);
             if (!blockInput) {
-                blockInput = scene.capturesInput;
+                blockInput = scene.blocksInput;
+            }
+            // Skip updating scenes below this if this scene blocks updates.
+            if (scene.blocksUpdates) {
+                break;
             }
         }
         return;
@@ -73,12 +70,12 @@ export function update() {
             updatePrologue(state);
             return;
         }
-        if (state.scene === 'fileSelect' ||
+       /* if (state.scene === 'fileSelect' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
             updateFileSelect(state);
             return;
-        }
+        }*/
         if (state.scene === 'options') {
             updateSettings(state);
             return;
@@ -100,7 +97,7 @@ export function update() {
                 return;
             }
             // Don't allow pausing while dialogue is displayed.
-            if (state.paused
+            /*if (state.paused
                 || (canPauseGame(state)
                     && !(
                         state.messagePage?.frames?.length
@@ -115,54 +112,23 @@ export function update() {
                     state.menuIndex = 0;
                 } else {
                     state.paused = !state.paused;
-                    state.fieldMenuState.needsRefresh = true;
-                    state.fieldMenuState.backgroundBuffer.needsRefresh = true;
-                    state.fieldMenuState.panelsBuffer.needsRefresh = true;
                     state.showMap = false;
                     state.menuIndex = 0;
                 }
                 updateSoundSettings(state);
-            }
+            }*/
         } else if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
             // Don't allow pausing while dialogue is displayed.
-            if (state.showMap
-                || (canPauseGame(state)
-                    && !(
-                        state.messagePage?.frames?.length
-                        || state.defeatState.defeated
-                        || state.scriptEvents.blockFieldUpdates
-                    )
-                )
-            ) {
-                state.showMap = !state.showMap || !state.paused;
-                const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
-                if (state.showMap && dungeonMap) {
-                    state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
-                    if (state.menuIndex < 0) {
-                        console.error('Could not find map floor', state.areaSection.definition.floorId, 'in', Object.keys(dungeonMap.floors));
-                        state.menuIndex = 0;
-                        debugger;
-                    }
-                }
-                state.paused = state.showMap;
-                updateSoundSettings(state);
-            }
+            /**/
         }
         if (state.areaInstance?.needsLogicRefresh) {
             refreshAreaLogic(state, state.areaInstance);
         } else if (state.alternateAreaInstance?.needsLogicRefresh) {
             refreshAreaLogic(state, state.alternateAreaInstance);
         }
-        const hideMenu = shouldHideMenu(state);
-        const showNextFrame = hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT);
-        if (state.paused && !showNextFrame) {
-            if (!hideMenu) {
-                updateFieldMenu(state);
-            }
-        } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
-            if (!state.paused || showNextFrame) {
-                updateTransition(state);
-            }
+        //const showNextFrame = hideMenu && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT);
+        if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
+            updateTransition(state);
         } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {

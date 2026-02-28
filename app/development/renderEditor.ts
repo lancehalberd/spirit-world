@@ -42,9 +42,9 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
 }
 
 function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
-    if (state.paused) {
+    /*if (state.paused) {
         return;
-    }
+    }*/
     const [x, y] = getAreaMousePosition();
     context.save();
         translateContextForAreaAndCamera(context, state, area);

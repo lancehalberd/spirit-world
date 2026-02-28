@@ -11,8 +11,10 @@ import {displayPropertyPanel, hideAllPropertyPanels} from 'app/development/prope
 import {createObjectDefinition, combinedObjectTypes} from 'app/development/objectEditor';
 import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
 import {isDebugMode} from 'app/gameConstants';
+import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {enterLocation} from 'app/utils/enterLocation';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {isFieldSceneInStack} from 'app/scenes/field/showFieldScene';
 
 
 export function toggleEditing(state: GameState) {
@@ -22,7 +24,10 @@ export function toggleEditing(state: GameState) {
     if (state.savedGameIndex < 0) {
         setSaveFileToState(state, 0, 0);
     }
-    state.scene = 'game';
+    // Switch to field scene if it isn't on the stack (typically means we are on the prologue/title/choose file scenes).
+    if (!isFieldSceneInStack(state)) {
+        showFieldScene(state);
+    }
     // Set this to 1 so the player doesn't immediately fall into pits when the editor is
     // rendered off underwater.
     state.hero.z = 1;
@@ -30,7 +35,7 @@ export function toggleEditing(state: GameState) {
     editingState.isEditing = !editingState.isEditing;
     editingState.recentAreas = [];
     state.map.needsRefresh = true;
-    state.fieldMenuState.needsRefresh = true;
+    // state.fieldMenuState.needsRefresh = true;
     if (editingState.isEditing) {
         startEditing(state);
     } else {

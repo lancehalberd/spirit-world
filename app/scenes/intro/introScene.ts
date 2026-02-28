@@ -7,7 +7,7 @@ import {drawFrameAt} from 'app/utils/animations';
 import {fillRect} from 'app/utils/index';
 import {requireFrame} from 'app/utils/packedImages';
 import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
-import {isATrackPlaying} from 'app/utils/sounds';
+import {isATrackPlaying, playTrack} from 'app/utils/sounds';
 
 const panels = [
     requireFrame('gfx/prologue/panel1.png', {x: 0, y: 0, w: 256, h: 224}),
@@ -33,7 +33,8 @@ const FULL_PANEL_DURATION = (2 * FADE_TIME + PANEL_DURATION);
 const INTRO_DURATION = 6 * FULL_PANEL_DURATION;
 
 export class IntroScene implements GameScene {
-    capturesInput = true;
+    blocksInput = true;
+    blocksUpdates = true;
     prologueTime = 0;
     update(state: GameState) {
         if (isKeyboardKeyDown(KEY.SHIFT)) {
@@ -65,6 +66,10 @@ export class IntroScene implements GameScene {
             showTitleScene(state);
             return;
         }
+    }
+    updateMusic(state: GameState) {
+        playTrack('dungeonTheme', this.prologueTime / 1000);
+        return true;
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
         let r = {x: 0, y: 0, w: CANVAS_WIDTH, h: CANVAS_HEIGHT};

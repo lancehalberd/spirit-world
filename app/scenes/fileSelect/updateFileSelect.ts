@@ -7,68 +7,68 @@ import {
 } from 'app/userInput';
 import {playSound} from 'app/utils/sounds';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
+import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
-import {
-    getFileSelectOptions,
-} from 'app/state';
+import {getFileSelectOptions} from 'app/scenes/fileSelect/getFileSelectOptions';
 import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation'
 import {saveGamesToLocalStorage,} from 'app/utils/saveGame';
 import {parseScriptText, setScript} from 'app/scriptEvents';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
+import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
 
-export function updateFileSelect(state: GameState) {
-    const options = getFileSelectOptions(state);
+export function updateFileSelect(state: GameState, scene: FileSelectScene) {
+    const options = getFileSelectOptions(state, scene);
     let changedOption = false;
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
+        scene.menuIndex = (scene.menuIndex - 1 + options.length) % options.length;
         changedOption = true;
         playSound('menuTick');
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        state.menuIndex = (state.menuIndex + 1) % options.length;
+        scene.menuIndex = (scene.menuIndex + 1) % options.length;
         changedOption = true;
         playSound('menuTick');
     }
     if (changedOption) {
-        if (state.scene === 'fileSelect' || state.scene === 'deleteSavedGame') {
-            if (state.menuIndex < state.savedGames.length) {
-                setSaveFileToState(state, state.menuIndex, 0);
+        if (scene.mode === 'select' || scene.mode === 'deleteSavedGame') {
+            if (scene.menuIndex < state.savedGames.length) {
+                setSaveFileToState(state, scene.menuIndex, 0);
             }
         }
     }
     if (wasConfirmKeyPressed(state)) {
         playSound('menuTick');
-        switch (state.scene) {
+        switch (scene.mode) {
             case 'deleteSavedGameConfirmation':
-                if (state.menuIndex === 1) {
+                if (scene.menuIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
                     saveGamesToLocalStorage(state);
                 }
-                state.scene = 'fileSelect';
-                state.menuIndex = state.savedGameIndex;
+                scene.mode = 'select';
+                scene.menuIndex = state.savedGameIndex;
                 setSaveFileToState(state, state.savedGameIndex, 0);
                 break;
             case 'deleteSavedGame':
-                if (state.menuIndex >= state.savedGames.length) {
-                    state.scene = 'fileSelect';
-                    state.menuIndex = 0;
-                    setSaveFileToState(state, state.menuIndex, 0);
+                if (scene.menuIndex >= state.savedGames.length) {
+                    scene.mode = 'select';
+                    scene.menuIndex = 0;
+                    setSaveFileToState(state, scene.menuIndex, 0);
                 } else {
-                    state.savedGameIndex = state.menuIndex;
-                    state.scene = 'deleteSavedGameConfirmation';
-                    state.menuIndex = 0;
+                    state.savedGameIndex = scene.menuIndex;
+                    scene.mode = 'deleteSavedGameConfirmation';
+                    scene.menuIndex = 0;
                 }
                 break;
-            case 'fileSelect':
-                if (state.menuIndex === state.savedGames.length
-                        && options[state.menuIndex] === 'DELETE') {
-                    state.scene = 'deleteSavedGame';
-                    state.menuIndex = 0;
-                    setSaveFileToState(state, state.menuIndex, 0);
-                } else if (state.menuIndex > state.savedGames.length
-                        && options[state.menuIndex] === 'TITLE') {
+            case 'select':
+                if (scene.menuIndex === state.savedGames.length
+                        && options[scene.menuIndex] === 'DELETE') {
+                    scene.mode = 'deleteSavedGame';
+                    scene.menuIndex = 0;
+                    setSaveFileToState(state, scene.menuIndex, 0);
+                } else if (scene.menuIndex > state.savedGames.length
+                        && options[scene.menuIndex] === 'TITLE') {
                     showTitleScene(state);
                 } else {
-                    selectSaveFile(state, state.menuIndex);
+                    selectSaveFile(state, scene.menuIndex);
                 }
                 break;
         }
@@ -81,7 +81,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
     if (!savedGame) {
         // For now go directly to starting the full game when selecting "New Game".
         state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;
-        state.scene = 'game';
+        showFieldScene(state);
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
         if (!isRandomizer) {
@@ -98,7 +98,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
         return;
     }
     setSaveFileToState(state, savedGameIndex);
-    state.scene = 'game';
+    showFieldScene(state);
     // Hack to prevent showing the falling animation a second time on loading a game in the peach cave.
     if (state.location.zoneKey === 'peachCave' && state.hero.z > 100) {
         state.hero.z = 0;

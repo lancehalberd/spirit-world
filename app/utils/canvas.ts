@@ -22,6 +22,14 @@ export function createCanvasAndContext(width: number, height: number): [HTMLCanv
     context.imageSmoothingEnabled = false;
     return [canvas, context];
 }
+export function createCanvasBuffer(width: number, height: number): CanvasBuffer {
+    const [canvas, context] = createCanvasAndContext(width, height);
+    return {
+        canvas,
+        context,
+        needsRefresh: true
+    }
+}
 
 const CANVAS_SCALE = 10;
 

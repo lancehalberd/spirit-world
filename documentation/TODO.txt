@@ -163,6 +163,9 @@ Current tasks:
         - Cocoon boss projectiles still getting blocked by boulders
         - High priority SFX
 
+    - Scene updates
+        - Dim audio using sceneVolume and call update sound settings when switching scenes.
+
     - Hint seems wrong for the rival 3 test state, tells you to talk to the spirit king.
         - Maybe because of no gold mail?
 

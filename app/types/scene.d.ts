@@ -8,13 +8,20 @@ interface CanvasBuffer {
 }
 
 interface GameScene {
-    // Whether this game scene is paused or not. Scenes are typically paused when they are not at the top of the scene stack.
-    paused?: boolean
+    // Hack to identify specific scene types on the stack.
+    sceneType?: string
     // Optional buffer for this scene which can be used to skip rendering in the background.
     buffer?: CanvasBuffer
     update?: (state: GameState, interactive: boolean) => void
     render?: (context: CanvasRenderingContext2D, state: GameState) => void
     // If true, other scenes below this scene in the stack should not process input.
     // Should be true in most cases.
-    capturesInput: boolean
+    blocksInput: boolean
+    // It true, scenes below this scene in the stack will not be updated.
+    blocksUpdates?: boolean
+    // If this is defined and returns true, the global music controller will be disabled while
+    // this is on the stack.
+    updateMusic?: (state: GameState) => boolean
+    // Some scenes have built in logic for closing them, such as the map and inventory scenes.
+    closeScene?: (state: GameState) => void
 }

@@ -26,7 +26,7 @@ window['setGlobalVolume'] = setGlobalVolume;
 export function getSoundSettings(state: GameState): SoundSettings {
     const muteTracks = (state.settings.muteAllSounds || state.settings.muteMusic || state.showControls || false);
     const muteSounds = (state.settings.muteAllSounds || state.settings.muteSounds || state.showControls || false);
-    const globalVolume = (state.settings.globalVolume ?? 1) * (state.paused ? 0.3 : 1);
+    const globalVolume = (state.settings.globalVolume ?? 1);// * (state.paused ? 0.3 : 1);
     return {
         muteTracks,
         muteSounds,

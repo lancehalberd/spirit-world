@@ -10,6 +10,7 @@ import {initializeSection} from 'app/development/sections';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, overworldKeys} from 'app/gameConstants';
 import {heroIcon} from 'app/render/heroAnimations';
 import {checkToRedrawTiles, drawEntireFrame} from 'app/scenes/field/renderField';
+import {isMapSceneActive} from 'app/scenes/map/showMapScene';
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import {mainCanvas} from 'app/utils/canvas';
 import {findObjectLocation} from 'app/utils/enterZoneByTarget';
@@ -646,7 +647,7 @@ export function getSectionUnderMouse(state: GameState): AreaSection | undefined 
     }
 }
 export function getDisplayedMapSections(state: GameState): number[] | undefined {
-    if (!state.showMap || !state.paused) {
+    if (!isMapSceneActive(state)) {
         return;
     }
     const mapId = state.areaSection?.definition.mapId;

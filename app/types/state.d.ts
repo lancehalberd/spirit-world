@@ -42,9 +42,7 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type Scene = 'prologue' | 'fileSelect'
-    | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
-    | 'game' | 'credits' | 'options';
+type Scene = 'prologue' | 'credits' | 'options';
 
 type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
@@ -99,10 +97,7 @@ interface GameState {
         targetZ?: number
     }
     mutationDuration?: number
-    paused: boolean
-    showMap: boolean
     showControls: boolean
-    fieldMenuState: MenuState
     menuIndex: number
     menuRow: number
     // This is mostly used for debugging animations.

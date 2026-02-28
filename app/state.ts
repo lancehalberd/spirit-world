@@ -1,12 +1,10 @@
 import {SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
 import {zones} from 'app/content/zones';
-import {CANVAS_HEIGHT, CANVAS_WIDTH, randomizerSeed, randomizerGoal } from 'app/gameConstants';
+import {randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import {getDefaultSavedState } from 'app/savedState'
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
-import {createCanvasAndContext} from 'app/utils/canvas';
-
-import {getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -58,11 +56,6 @@ export function eraseAllSaves(): void {
     window.localStorage.clear()
 }
 
-
-
-const [backgroundCanvas, backgroundContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
-const [panelsCanvas, panelsContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
-
 export function getDefaultState(): GameState {
     const state: GameState = {
         sceneStack: [],
@@ -88,24 +81,7 @@ export function getDefaultState(): GameState {
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],
-        paused: false,
         showControls: false,
-        showMap: false,
-        fieldMenuState:{
-            needsRefresh: true,
-            backgroundBuffer: {
-                needsRefresh: true,
-                canvas: backgroundCanvas,
-                context: backgroundContext,
-            },
-            panelsBuffer: {
-                needsRefresh: true,
-                canvas: panelsCanvas,
-                context: panelsContext,
-            },
-            panels: [],
-            cursor: {panelId: 'tools', optionIndex: 0},
-        },
         menuIndex: 0,
         menuRow: 0,
         defeatState: {
@@ -165,21 +141,6 @@ export function getState(): GameState {
 }
 window['getState'] = getState;
 
-export function getFileSelectOptions(state: GameState): string[] {
-    if (state.scene === 'deleteSavedGameConfirmation') {
-        return ['CANCEL', 'DELETE'];
-    }
-    const gameFiles = state.savedGames.map(savedGame => {
-        if (!savedGame) {
-            return 'New Game';
-        }
-        return getShortZoneName(savedGame.savedHeroData.spawnLocation);
-    });
-    if (state.scene === 'deleteSavedGame') {
-        return [...gameFiles, 'CANCEL'];
-    }
-    return [...gameFiles, 'DELETE', 'TITLE'];
-}
 
 export function getSettingsOptions(state: GameState): string[] {
     // add volume, other global game settings here

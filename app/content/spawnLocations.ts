@@ -1,5 +1,6 @@
-import { CANVAS_HEIGHT } from 'app/gameConstants';
-import { saveGame } from 'app/utils/saveGame';
+import {CANVAS_HEIGHT} from 'app/gameConstants';
+import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
+import {saveGame} from 'app/utils/saveGame';
 
 
 export const SPAWN_LOCATION_TITLE: ZoneLocation = {
@@ -473,7 +474,7 @@ const prioritizedSpawnLocations = [
 export function checkToUpdateSpawnLocation(state: GameState, location: ZoneLocation = state.location): void {
     // Only set the spawn location when in the game scene. This is to avoid accidentally setting
     // it from the title scene which can trigger unexpected saves.
-    if (state.scene !== 'game') {
+    if (!isFieldSceneActive(state)) {
         return;
     }
     for (const spawnPoint of prioritizedSpawnLocations) {
