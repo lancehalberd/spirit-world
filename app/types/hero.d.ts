@@ -157,16 +157,10 @@ interface SavedHeroData {
     // Karma is used as currency in the Vanara Dream World and can be obtained by
     // completing Vanara quests or completing optional Dream World challenges.
     karma: number
-    // Generic Aether Crystal can be sold for Aether.
-    aetherCrystals: number
-    silverOre: number
-    goldOre: number
-    // Total silver/gold ore ever found, used for randomizer logic.
-    totalSilverOre: number
-    totalGoldOre: number
-    peachQuarters: number
-    spiritTokens: number
-    victoryPoints: number
+    collectibles: {[key in Collectible]: number}
+    collectibleTotals: {[key in Collectible]: number}
+    consumables: {[key in Consumable]: number}
+    consumableTotals: {[key in Consumable]: number}
     activeTools: {[key in ActiveTool]: number}
     blueprints: {[key in Blueprints]: number}
     equipment: {[key in Equipment]: number}

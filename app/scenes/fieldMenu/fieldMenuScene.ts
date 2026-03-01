@@ -21,8 +21,8 @@ function selectClosestElement(scene: FieldMenuScene, x: number, y: number) {
         // This padding should be adjusted to account for any gaps that appear between menus.
         if (isPointInShortRect(x, y, pad(panel, 5))) {
             scene.cursor.panelId = panel.id;
-            const column = ((x - panel.x) / frameSize) | 0;
-            const row = ((y - panel.y) / frameSize) | 0;
+            const column = ((x - panel.x) / (panel.columnWidth ?? frameSize)) | 0;
+            const row = ((y - panel.y) / (panel.rowHeight ?? frameSize)) | 0;
             scene.cursor.optionIndex = clamp(column + row * panel.columns, 0, panel.options.length - 1);
             return;
         }
@@ -110,8 +110,8 @@ export class FieldMenuScene implements GameScene {
             for (const panel of this.panels) {
                 let row = 0, column = 0;
                 for (const element of panel.options) {
-                    element.x = panel.x + column * frameSize + (panel.optionsOffset?.x ?? 0);
-                    element.y = panel.y + row * frameSize + (panel.optionsOffset?.y ?? 0);
+                    element.x = panel.x + column * (panel.columnWidth ?? frameSize) + (panel.optionsOffset?.x ?? 0);
+                    element.y = panel.y + row * (panel.rowHeight ?? frameSize) + (panel.optionsOffset?.y ?? 0);
                     column++;
                     if (column >= panel.columns) {
                         row++;

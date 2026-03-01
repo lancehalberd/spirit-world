@@ -22,7 +22,7 @@ dialogueHash.mom = {
                 return `You must talk to me after defeating the final boss to finish.`;
             }
             if (randomizerGoalType === 'victoryPoints') {
-                if (state.hero.savedData.victoryPoints >= state.randomizer.goal) {
+                if (state.hero.savedData.collectibles.victoryPoint >= state.randomizer.goal) {
                     state.hero.savedData.winTime = state.hero.savedData.playTime;
                     saveGame(state);
                     return 'Finished!'

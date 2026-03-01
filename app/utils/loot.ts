@@ -37,6 +37,34 @@ export function isEquipment(lootType: string): lootType is Equipment {
     return equipment.includes(lootType as Equipment);
 }
 
+const collectibles: Collectible[] = [
+    'silverOre', 'goldOre',
+];
+export function isCollectible(lootType: string): lootType is Collectible {
+    return collectibles.includes(lootType as Collectible);
+}
+export function gainCollectible(state: GameState, collectible: Collectible) {
+    state.hero.savedData.collectibles[collectible]++;
+    state.hero.savedData.collectibleTotals[collectible]++;
+}
+
+const consumables: Consumable[] = [
+    'healthPotion', 'statusPotion', 'magicPotion'
+];
+export function isConsumable(lootType: string): lootType is Consumable {
+    return consumables.includes(lootType as Consumable);
+}
+export function gainConsumable(state: GameState, consumable: Consumable) {
+    state.hero.savedData.consumables[consumable]++;
+    state.hero.savedData.consumableTotals[consumable]++;
+}
+
+
+const weaponUpgrades: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
+export function isWeaponUpgrade(lootType: string): lootType is WeaponUpgrades {
+    return weaponUpgrades.includes(lootType as WeaponUpgrades);
+}
+
 export function doesLootRequireLevel(lootType: string) {
     return lootType === 'weapon' || isActiveTool(lootType) || isPassiveTool(lootType) || isEquipment(lootType);
 }

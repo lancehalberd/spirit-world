@@ -22,11 +22,16 @@ type Collectible = 'peachOfImmortality'
     | 'peachOfImmortalityPiece'
     | 'silverOre'
     | 'goldOre'
+    | 'magicBeans'
     | 'aetherCrystal'
     | 'victoryPoint';
-type Blueprints = 'spikeBoots' | 'flyingBoots' | 'forgeBoots' | 'silverMailSchematics' | 'goldMailSchematics';
+type Blueprints =
+    | 'spikeBoots' | 'flyingBoots' | 'forgeBoots'
+    | 'silverMailSchematics' | 'goldMailSchematics'
+    | 'healthPotionSchematics' | 'statusPotionSchematics' | 'magicPotionSchematics';
 type CommonLoot = 'money' | 'peach';
 type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
+type Consumable = 'healthPotion' | 'statusPotion' | 'magicPotion';
 
 type LootType = 'empty' | 'weapon'
     // In the randomizer spiritSight, astralProjection + teleportation are changed to this progressive spirit power
@@ -37,6 +42,7 @@ type LootType = 'empty' | 'weapon'
     // Neutral element is used to unequip elements in the menu
     | 'neutral' | MagicElement
     | Blueprints
+    | Consumable
     | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 type MenuOptionType = null | LootType | 'weapon2' | 'help' | 'return';

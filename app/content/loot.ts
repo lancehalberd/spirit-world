@@ -88,7 +88,7 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
             }
             return 'Spirit Sight';
         case 'victoryPoint':
-            return `${lootAmount}x VP(${state.hero.savedData.victoryPoints + lootAmount})`;
+            return `${lootAmount}x VP(${state.hero.savedData.collectibles.victoryPoint + lootAmount})`;
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
@@ -381,7 +381,7 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
 export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): void {
     // Skip instructions during the randomizer.
     if (state.randomizer?.seed) {
-        if (lootType === 'peachOfImmortalityPiece' && state.hero.savedData.peachQuarters === 0) {
+        if (lootType === 'peachOfImmortalityPiece' && state.hero.savedData.collectibles.peachOfImmortalityPiece === 0) {
             showMessage(state, '{item:peachOfImmortality}');
             return;
         }
@@ -415,13 +415,13 @@ export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmou
             }
             return showMessage(state, `${getMessage}{|} Your maximum health has increased!`);
         case 'peachOfImmortalityPiece':
-            if (state.hero.savedData.peachQuarters === 1) {
+            if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 1) {
                 return showMessage(state, getMessage + '{|}Find three more to increase your health!');
             }
-            if (state.hero.savedData.peachQuarters === 2) {
+            if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 2) {
                 return showMessage(state, getMessage + '{|}Find two more to increase your health!');
             }
-            if (state.hero.savedData.peachQuarters === 3) {
+            if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 3) {
                 return showMessage(state, getMessage + '{|}Find one more to increase your health!');
             }
             // Finding the 4th slice grants a full peach of immortality.
@@ -487,7 +487,7 @@ export const [
     goldOre, silverOre,
     spikeBoots, forgeBoots, flyingBoots,
     magicBeans,
-    healthPotion, magicPotion, magicElixer,
+    healthPotion, statusPotion, magicPotion,
     frostBoots, flameBoots, stormBoots,
     arDevice,
     flippers,
@@ -534,6 +534,8 @@ const [greyUpgrade, redUpgrade, blueUpgrade, /* goldUpgrade */ ] = createAnimati
 
 export const lootFrames = {
     smallKey: keyOutlineFrame,
+    magicBeans,
+    healthPotion, statusPotion, magicPotion,
     silverOre,
     goldOre,
     neutral: neutralElement,
@@ -578,9 +580,12 @@ export const lootFrames = {
     spikeBoots: greyUpgrade,
     flyingBoots: blueUpgrade,
     forgeBoots: redUpgrade,
-    // TODO: Add new graphics for these.
     silverMailSchematics,
     goldMailSchematics,
+    // TODO: Add unique schematic graphics for these.
+    healthPotionSchematics: redUpgrade,
+    statusPotionSchematics: blueUpgrade,
+    magicPotionSchematics: greyUpgrade,
     fireBlessing, rubyStud, rubyEarrings,
     waterBlessing, sapphireBangle, sapphireBracelet,
     lightningBlessing, topazPin, topazBadge,

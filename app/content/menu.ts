@@ -46,14 +46,14 @@ const fullPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 54, y: 0, w: 20, 
 export const peachMenuOption: MenuElement = {
     ...elementGeometry,
     getLabel: (state: GameState) => 'Peach Pieces',
-    isVisible: (state: GameState) => state.hero.savedData.peachQuarters > 0 || state.hero.savedData.maxLife > 4,
+    isVisible: (state: GameState) => state.hero.savedData.collectibleTotals.peachOfImmortalityPiece > 0,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, fullPeachFrame, this);
-        if (state.hero.savedData.peachQuarters === 3) {
+        if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 3) {
             drawFrameCenteredAt(context, threeQuartersPeach, this);
-        } else if (state.hero.savedData.peachQuarters === 2) {
+        } else if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 2) {
             drawFrameCenteredAt(context, halfPeach, this);
-        } else if (state.hero.savedData.peachQuarters === 1) {
+        } else if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 1) {
             drawFrameCenteredAt(context, quarterPeach, this);
         }
     },
@@ -62,9 +62,9 @@ export const peachMenuOption: MenuElement = {
         return true;
     },
     onUpgrade(state: GameState, toolIndex?: number) {
-        state.hero.savedData.peachQuarters++;
-        if (state.hero.savedData.peachQuarters >= 4) {
-            state.hero.savedData.peachQuarters = 0;
+        state.hero.savedData.collectibles.peachOfImmortalityPiece++;
+        if (state.hero.savedData.collectibles.peachOfImmortalityPiece >= 4) {
+            state.hero.savedData.collectibles.peachOfImmortalityPiece = 0;
             state.hero.savedData.maxLife++;
         }
         return true;
@@ -567,46 +567,56 @@ export function getTechniqueOptions(state: GameState): MenuElement[] {
     return (<const>['roll', 'teleportation', 'ironSkin']).map(option => getMenuElement(state, option));
 }
 
-const silverOreMenuOption: MenuElement = {
-    ...elementGeometry,
-    getLabel: () => 'Silver Ore',
-    isVisible: (state: GameState) => state.hero.savedData.totalSilverOre > 0,
-    render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'silverOre'}), {x: this.x, y: this.y, w: this.w, h: this.h});
-        drawARFont(context, state.hero.savedData.silverOre, this.x + this.w / 2, this.y + this.h + 1, {
-            textBaseline: 'middle', textAlign: 'center',
-        });
-    },
-    onSelect(state: GameState, toolIndex?: number) {
-        showMessage(state, getLootHelpMessage(state, {lootType: 'silverOre'}));
-        return true;
-    },
-    onUpgrade(state: GameState) {
-        state.hero.savedData.silverOre = ((state.hero.savedData.silverOre || 0) + 1) % 12;
-        state.hero.savedData.totalSilverOre = state.hero.savedData.silverOre;
+function getCollectibleMenuElement(state: GameState, collectible: Collectible): MenuElement {
+    return {
+        ...elementGeometry,
+        getLabel: () => getLootName(state, {lootType: collectible}),
+        isVisible: (state: GameState) => state.hero.savedData.collectibleTotals[collectible] > 0,
+        render(context: CanvasRenderingContext2D, state: GameState) {
+            drawFrameCenteredAt(context, getLootFrame(state, {lootType: collectible}), {x: this.x, y: this.y, w: this.w, h: this.h});
+            drawARFont(context, state.hero.savedData.collectibleTotals[collectible], this.x + this.w / 2, this.y + this.h + 1, {
+                textBaseline: 'middle', textAlign: 'center',
+            });
+        },
+        onSelect(state: GameState, toolIndex?: number) {
+            showMessage(state, getLootHelpMessage(state, {lootType: collectible}));
+            return true;
+        },
+        onUpgrade(state: GameState) {
+            state.hero.savedData.collectibles[collectible] = ((state.hero.savedData.collectibles[collectible] || 0) + 1) % 10;
+            state.hero.savedData.collectibleTotals[collectible] = state.hero.savedData.collectibles[collectible];
+        }
     }
-};
-const goldOreMenuOption: MenuElement = {
-    ...elementGeometry,
-    getLabel: () => 'Gold Ore',
-    isVisible: (state: GameState) => state.hero.savedData.totalGoldOre > 0,
-    render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'goldOre'}), {x: this.x, y: this.y, w: this.w, h: this.h});
-        drawARFont(context, state.hero.savedData.goldOre, this.x + this.w / 2, this.y + this.h + 1, {
-            textBaseline: 'middle', textAlign: 'center',
-        });
-    },
-    onSelect(state: GameState, toolIndex?: number) {
-        showMessage(state, getLootHelpMessage(state, {lootType: 'goldOre'}));
-        return true;
-    },
-    onUpgrade(state: GameState) {
-        state.hero.savedData.goldOre = ((state.hero.savedData.goldOre || 0) + 1) % 12;
-        state.hero.savedData.totalGoldOre = state.hero.savedData.goldOre;
-    }
-};
+}
+
 export function getMaterialOptions(state: GameState): MenuElement[] {
-    return [silverOreMenuOption, goldOreMenuOption];
+    return (<const>['silverOre', 'goldOre', 'aetherCrystal', 'magicBeans']).map(option => getCollectibleMenuElement(state, option));
+}
+
+function getConsumableMenuElement(state: GameState, consumable: Consumable): MenuElement {
+    return {
+        ...elementGeometry,
+        getLabel: () => getLootName(state, {lootType: consumable}),
+        isVisible: (state: GameState) => state.hero.savedData.consumableTotals[consumable] > 0,
+        render(context: CanvasRenderingContext2D, state: GameState) {
+            drawFrameCenteredAt(context, getLootFrame(state, {lootType: consumable}), {x: this.x, y: this.y, w: this.w, h: this.h});
+            drawARFont(context, state.hero.savedData.consumables[consumable], this.x + this.w / 2, this.y + this.h + 1, {
+                textBaseline: 'middle', textAlign: 'center',
+            });
+        },
+        onSelect(state: GameState, toolIndex?: number) {
+            showMessage(state, getLootHelpMessage(state, {lootType: consumable}));
+            return true;
+        },
+        onUpgrade(state: GameState) {
+            state.hero.savedData.consumables[consumable] = ((state.hero.savedData.consumables[consumable] || 0) + 1) % 10;
+            state.hero.savedData.consumableTotals[consumable] = state.hero.savedData.consumables[consumable];
+        }
+    }
+}
+
+export function getPotionOptions(state: GameState): MenuElement[] {
+    return (<const>['healthPotion', 'statusPotion', 'magicPotion']).map(option => getConsumableMenuElement(state, option));
 }
 
 function getDungeonItems(state: GameState) {

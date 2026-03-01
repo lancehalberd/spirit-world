@@ -198,21 +198,21 @@ export function renderInventory(context: CanvasRenderingContext2D, state: GameSt
         renderFaded(context, !(state.hero.savedData.weapon & 2),
             () => drawFrameCenteredAt(context, frame, weapon2Rect));
     }
-    if (state.hero.savedData.silverOre || editingState.isEditing) {
+    if (state.hero.savedData.collectibles.silverOre || editingState.isEditing) {
         const frame = getLootFrame(state, {lootType: 'silverOre'});
-        renderFaded(context, !state.hero.savedData.silverOre,
+        renderFaded(context, !state.hero.savedData.collectibles.silverOre,
             () => drawFrameCenteredAt(context, frame, silverRect));
-        drawText(context, `${state.hero.savedData.silverOre}`, silverRect.x + 24, silverRect.y + frameSize / 2, {
+        drawText(context, `${state.hero.savedData.collectibles.silverOre}`, silverRect.x + 24, silverRect.y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
             size: 16,
         });
     }
-    if (state.hero.savedData.goldOre || editingState.isEditing) {
+    if (state.hero.savedData.collectibles.goldOre || editingState.isEditing) {
         const frame = getLootFrame(state, {lootType: 'goldOre'});
-        renderFaded(context, !state.hero.savedData.goldOre,
+        renderFaded(context, !state.hero.savedData.collectibles.goldOre,
             () => drawFrameCenteredAt(context, frame, goldRect));
-        drawText(context, `${state.hero.savedData.goldOre}`, goldRect.x + 24, goldRect.y + frameSize / 2, {
+        drawText(context, `${state.hero.savedData.collectibles.goldOre}`, goldRect.x + 24, goldRect.y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
             size: 16,
@@ -310,11 +310,11 @@ mainCanvas.addEventListener('click', function (event) {
         return;
     }
     if (isPointInShortRect(mouseX, mouseY, silverRect)) {
-        state.hero.savedData.silverOre = ((state.hero.savedData.silverOre || 0) + 1) % 6;
+        state.hero.savedData.collectibles.silverOre = ((state.hero.savedData.collectibles.silverOre || 0) + 1) % 6;
         return;
     }
     if (isPointInShortRect(mouseX, mouseY, goldRect)) {
-        state.hero.savedData.goldOre = ((state.hero.savedData.goldOre || 0) + 1) % 6;
+        state.hero.savedData.collectibles.goldOre = ((state.hero.savedData.collectibles.goldOre || 0) + 1) % 6;
         return;
     }
     state.savedState.dungeonInventories[state.location.logicalZoneKey]

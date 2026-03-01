@@ -3,7 +3,9 @@ interface MenuPanel extends Rect {
     // Unique id for this panel.
     id: string
     rows: number
+    rowHeight?: number
     columns: number
+    columnWidth?: number
     optionsOffset?: Point
     options: MenuElement[]
 }

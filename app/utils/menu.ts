@@ -17,7 +17,6 @@ export function setRightTool(state: GameState, tool: ActiveTool): void {
 
 // Function to set the equipped boots on all copies of the hero.
 export function setEquippedBoots(state: GameState, boots: Equipment): boolean {
-    console.log('setEquippedBoots', boots);
     // Do nothing if these boots are already equipped.
     if (state.hero.savedData.equippedBoots === boots) {
         return true;

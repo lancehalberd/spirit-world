@@ -33,8 +33,18 @@ class MaterialsMenuScene extends FieldMenuScene {
     cursor = {panelId: 'elements', optionIndex: 0};
     getPanels(state: GameState) {
         return [
-            // Various rows shown under the active tools
-            createMenuPanel('materials', getMaterialOptions(state), 1, 3, {x: this.x, y: this.y, w: 72, h: 30}),
+            {
+                id: 'materials',
+                options: getMaterialOptions(state),
+                x: this.x, y: this.y, w: 48, h: 60,
+                rows: 2,
+                columns: 2,
+                rowHeight: 30,
+                optionsOffset: {
+                    x: 0,
+                    y: 0,
+                },
+            },
         ];
     }
 }

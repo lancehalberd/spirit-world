@@ -6,6 +6,7 @@ import {
     getDungeonOptions,
     getEyesOptions,
     getEquipmentOptions,
+    getPotionOptions,
     getSystemOptions,
     getTechniqueOptions,
     getToolOptions,
@@ -24,7 +25,6 @@ import {pushScene} from 'app/scenes/sceneHash';
 import {drawFrameCenteredAt} from 'app/utils/animations';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 import {wasGameKeyPressed} from 'app/userInput';
-
 
 
 const elementsMenuOption: MenuElement = {
@@ -87,23 +87,35 @@ class MainMenuScene extends FieldMenuScene {
         return [
             // two left most columns
             createMenuPanel('equipment', getEquipmentOptions(state), 4, 2, {x: 0, y: 0, w: 48, h: 96}),
-            createMenuPanel('elements', [elementsMenuOption], 1, 1, {x: 57, y: 0, w: 24, h: 24}),
-            createMenuPanel('boots', [bootsMenuOption], 1, 1, {x: 57, y: 27, w: 24, h: 24}),
-            createMenuPanel('backpack', [backpackMenuOption], 1, 1, {x: 57, y: 60, w: 24, h: 24}),
+            createMenuPanel('elements', [elementsMenuOption], 1, 1, {x: 57, y: 6, w: 24, h: 24}),
+            createMenuPanel('boots', [bootsMenuOption], 1, 1, {x: 57, y: 39, w: 24, h: 24}),
+            createMenuPanel('backpack', [backpackMenuOption], 1, 1, {x: 57, y: 72, w: 24, h: 24}),
 
             // row on bottom left
-            createMenuPanel('dungeon', getDungeonOptions(state), 1, 3, {x: 9, y: 105, w: 72, h: 30}),
+            {
+                id: 'dungeon',
+                options: getDungeonOptions(state),
+                x: 9, y: 105, w: 72, h: 30,
+                rows: 1,
+                columns: 3,
+                rowHeight: 30,
+                optionsOffset: {
+                    x: 0,
+                    y: 0,
+                },
+            },
 
             // top row in the middle.
-            createMenuPanel('tools', getToolOptions(state), 2, 2, {x: 90, y: 0, w: 48, h: 51}),
+            createMenuPanel('tools', getToolOptions(state), 2, 2, {x: 90, y: 6, w: 48, h: 51}),
 
             // Column under left side of tools
             createMenuPanel('nimbusCloud', [nimbusCloudMenuOption], 1, 1, {x: 147, y: 0, w: 24, h: 24}),
-            createMenuPanel('arDevice', [arDeviceMenuOption], 1, 1, {x: 147, y: 27, w: 24, h: 24}),
+            createMenuPanel('arDevice', [arDeviceMenuOption], 1, 1, {x: 147, y: 33, w: 24, h: 24}),
 
             // Various rows shown under the active tools
-            createMenuPanel('eyes', getEyesOptions(state), 1, 3, {x: 90, y: 60, w: 81, h: 24}),
-            createMenuPanel('techniques', getTechniqueOptions(state), 1, 3, {x: 90, y: 93, w: 81, h: 24}),
+            createMenuPanel('potions', getPotionOptions(state), 1, 3, {x: 90, y: 72, w: 81, h: 24}),
+            createMenuPanel('eyes', getEyesOptions(state), 1, 3, {x: 90, y: 105, w: 81, h: 24}),
+            createMenuPanel('techniques', getTechniqueOptions(state), 1, 3, {x: 90, y: 138, w: 81, h: 24}),
 
             // system options on the far right
             createMenuPanel('menu', getSystemOptions(state), 4, 1, {x: 180, y: 0, w: 24, h: 96}),

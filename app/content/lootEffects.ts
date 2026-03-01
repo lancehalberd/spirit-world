@@ -1,7 +1,13 @@
 import {setLeftTool, setRightTool} from 'app/utils/menu';
 import {playAreaSound} from 'app/musicController';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
-import {applyUpgrade, isActiveTool, isEquipment, isMagicElement, isPassiveTool} from 'app/utils/loot';
+import {
+    applyUpgrade,
+    gainCollectible,
+    gainConsumable,
+    isActiveTool, isCollectible, isConsumable,
+    isEquipment, isMagicElement, isPassiveTool,
+} from 'app/utils/loot';
 import {saveGame} from 'app/utils/saveGame';
 
 
@@ -51,15 +57,11 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             state.hero.savedData.blueprints[loot.lootType] = 1;
         } else if (loot.lootType === 'money') {
             state.hero.savedData.money += (loot.lootAmount || 1);
-        } else if (loot.lootType === 'silverOre') {
-            state.hero.savedData.silverOre++;
-            state.hero.savedData.totalSilverOre++;
-        } else if (loot.lootType === 'goldOre') {
-            state.hero.savedData.goldOre++;
-            state.hero.savedData.totalGoldOre++;
-        } else if (loot.lootType === 'victoryPoint') {
-            state.hero.savedData.victoryPoints += (loot.lootAmount || 1);
-        }  else {
+        } else if (isCollectible(lootType)) {
+            gainCollectible(state, lootType);
+        } else if (isConsumable(lootType)) {
+            gainConsumable(state, lootType);
+        } else {
             console.error('Unhandled loot type:', loot.lootType);
             // throw new Error('Unhandled loot type: ' + loot.lootType);
         }
@@ -87,13 +89,14 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         playAreaSound(state, state.areaInstance, 'drink');
     },
     peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        gainCollectible(state, 'peachOfImmortality');
         state.hero.savedData.maxLife++;
         state.hero.life = state.hero.savedData.maxLife;
     },
     peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.savedData.peachQuarters++;
-        if (state.hero.savedData.peachQuarters >= 4) {
-            state.hero.savedData.peachQuarters -= 4;
+        gainCollectible(state, 'peachOfImmortalityPiece');
+        if (state.hero.savedData.collectibles.peachOfImmortalityPiece >= 4) {
+            state.hero.savedData.collectibles.peachOfImmortalityPiece -= 4;
             if (simulate) {
                 state.hero.savedData.maxLife++;
             }

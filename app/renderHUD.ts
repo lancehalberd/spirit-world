@@ -240,7 +240,7 @@ function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): v
         const timeString = `${hours}:${minutesString}:${secondsString}`;
         const info = getCheckInfo(state);
         if (randomizerGoalType === 'victoryPoints') {
-            drawOutlinedText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.victoryPoints)}`, 2, CANVAS_HEIGHT - 9 - 17, {
+            drawOutlinedText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.collectibles.victoryPoint)}`, 2, CANVAS_HEIGHT - 9 - 17, {
                 textBaseline: 'middle',
                 textAlign: 'left',
                 size: 16,

@@ -573,7 +573,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
 function debugState(state: GameState) {
     console.log(state.hero.savedData.activeTools);
     console.log(state.hero.savedData.passiveTools);
-    console.log({totalSilverOre: state.hero.savedData.totalSilverOre, totalGoldOre: state.hero.savedData.totalGoldOre });
+    console.log({totalSilverOre: state.hero.savedData.collectibleTotals.silverOre, totalGoldOre: state.hero.savedData.collectibleTotals.goldOre });
     console.log(Object.keys(state.savedState.objectFlags));
 }
 
@@ -711,7 +711,7 @@ window.showRandomizerSolution = function (): void {
         return 'Peach Piece';
     }
     if (lootType === 'victoryPoint') {
-        return `${lootAmount}x VP(${state.hero.savedData.victoryPoints + lootAmount})`;
+        return `${lootAmount}x VP(${state.hero.savedData.collectibles.victoryPoint + lootAmount})`;
     }
 
     return lootType;
@@ -747,7 +747,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
         for (const flag of (check.progressFlags || [])) {
             state.savedState.objectFlags[flag] = true;
         }
-        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.savedData.victoryPoints >= randomizerGoal) {
+        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.savedData.collectibles.victoryPoint >= randomizerGoal) {
             console.log('');
             console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             console.log('Talk to mom to win.');
