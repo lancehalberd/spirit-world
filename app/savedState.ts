@@ -18,7 +18,8 @@ export function getDefaultSavedState(): SavedState {
         staffTowerLocation: 'desert',
         bossRushTimes: {
             none: {},
-            daredevil: {}
+            daredevil: {},
+            weak: {}
         },
     };
 }

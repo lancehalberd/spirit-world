@@ -157,10 +157,14 @@ type BossName =
   | "rush"
   | "rush2"
   | "rush3"
-  | "altGolem";
+  | "altGolem"
+  | "altRival2"
+  | "altGuardian"
+  | "altIdols"
+  ;
 
 
-type BossCondition = "none" | "daredevil"
+type BossCondition = "none" | "daredevil" | "weak"
 
 type bossRushState = {
   currentBoss: BossName;
@@ -169,6 +173,8 @@ type bossRushState = {
   currentCondition: BossCondition;
   storedLife: number;
   hasIronSkin: boolean;
+  hasWeaponUpgrades:{[key in WeaponUpgrades]?: boolean}
+  weaponNumber: number;
 }
 
 

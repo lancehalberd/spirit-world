@@ -2,6 +2,7 @@ import * as spawnLocations from 'app/content/spawnLocations';
 import {SPAWN_LOCATION_GAUNTLET, gauntletStartingState} from 'app/generator/delveGauntlet';
 import { getDefaultSavedState } from 'app/savedState'
 import {applyItemsToSavedState} from 'app/utils/applyItemsToSavedState'
+import { cloneDeep } from 'app/utils/index';
 
 const defaultSavedState = getDefaultSavedState();
 const peachBossState = applyItemsToSavedState(defaultSavedState, {weapon: 1, money: 50, secondChance: 1},
@@ -117,6 +118,21 @@ const staffAquiredState = applyItemsToSavedState(staffBossState, {lightning: 1},
 const warshipStartState = applyItemsToSavedState(staffAquiredState, {staff: 2, phoenixCrown: 1});
 
 const finalBoss1State = applyItemsToSavedState(warshipStartState, {clone: 2, maxLife: 5});
+
+
+//Boss Rush States
+
+export let altRival2 = cloneDeep(helixRivalStateBoss.savedHeroData);
+altRival2.hasRevive = false;
+altRival2.activeTools.cloak = 0;
+
+export let altElementalIdols = cloneDeep(warTempleBoss.savedHeroData);
+altElementalIdols.hasRevive = false;
+altElementalIdols.passiveTools.roll = 0;
+
+export let altGuardian = cloneDeep(cocoonBossState.savedHeroData);
+altGuardian.hasRevive = false;
+altGuardian.weapon = 0;
 
 
 export interface SpawnLocationOptions {
@@ -286,7 +302,6 @@ export const lateDungeonSpawnLocations: SpawnLocationOptions = {
         savedState: warshipStartState,
     },
 };
-
 
 // Minimizer states:
 export const LIGHT_1_START: ZoneLocation = {

@@ -158,6 +158,8 @@ export function getDefaultState(): GameState {
             currentCondition: 'none',
             storedLife: 3,
             hasIronSkin: false,
+            hasWeaponUpgrades: {},
+            weaponNumber: 2,
         },
     };
     return state;

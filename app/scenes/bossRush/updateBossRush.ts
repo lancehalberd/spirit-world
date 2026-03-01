@@ -12,11 +12,21 @@ import { fixCamera } from 'app/utils/fixCamera';
 const bossConditions = [
   "none",
   "daredevil",
+  "weak"
 ] as const;
 
 export function updateBossRushMenu(state: GameState) {
     const options = getBossRushOptions(state);
-    if (wasGameKeyPressed(state, GAME_KEY.LEFT) || wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
+    if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
+        let current = state.bossRushTrackers.currentCondition
+        const index = bossConditions.indexOf(current);
+        let nextIndex = (index - 1) % bossConditions.length;
+        if (nextIndex == -1) {nextIndex = bossConditions.length - 1}
+        state.bossRushTrackers.currentCondition = bossConditions[nextIndex];
+        playSound('menuTick');
+        return;
+    }
+    if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
         let current = state.bossRushTrackers.currentCondition
         const index = bossConditions.indexOf(current);
         const nextIndex = (index + 1) % bossConditions.length;
@@ -42,7 +52,7 @@ export function updateBossRushMenu(state: GameState) {
         playSound('menuTick');
         state.scene = 'game';
         let selectedBoss = options[state.menuIndex].key
-        state.bossRushTrackers.storedLife = state.savedState.savedHeroData.maxLife;
+        state.bossRushTrackers.storedLife = state.hero.savedData.maxLife;
         if (options[state.menuIndex].playerState) {
             alterHeroData(state, options[state.menuIndex].playerState)
             state.savedState.usingBackup = true;
@@ -55,14 +65,26 @@ export function updateBossRushMenu(state: GameState) {
 
 function applyConditions(state: GameState) {
     if (state.bossRushTrackers.currentCondition == "daredevil") {
-        if (state.savedState.savedHeroData.passiveTools.ironSkin = 1) {
+        if (state.hero.savedData.passiveTools.ironSkin = 1) {
             state.bossRushTrackers.hasIronSkin = true;
-            state.savedState.savedHeroData.ironSkinLife = 0;
+            state.hero.savedData.ironSkinLife = 0;
         }
-        state.savedState.savedHeroData.maxLife = 2;
-        state.savedState.savedHeroData.passiveTools.ironSkin = 0;
-        state.savedState.savedHeroData.ironSkinLife = 0;
-        state.hero.applySavedHeroData(state.savedState.savedHeroData);
+        state.hero.savedData.maxLife = 2;
+        state.hero.savedData.passiveTools.ironSkin = 0;
+        state.hero.savedData.ironSkinLife = 0;
+        //state.hero.applySavedHeroData(state.savedState.savedHeroData);
+    }
+    if (state.bossRushTrackers.currentCondition == "weak") {
+        state.bossRushTrackers.hasWeaponUpgrades = state.hero.savedData.weaponUpgrades
+        state.bossRushTrackers.weaponNumber = state.hero.savedData.weapon;
+        state.hero.savedData.weaponUpgrades = {
+            normalRange: false,
+            normalDamage: false,
+            spiritDamage: false,
+            spiritRange: false,
+        };
+        state.hero.savedData.weapon = Math.min(1, state.hero.savedData.weapon);
+        console.log(state.hero.savedData)
     }
 }
 

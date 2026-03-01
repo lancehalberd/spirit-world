@@ -4,7 +4,7 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 import { restoreHeroData } from 'app/utils/alterHeroData';
 import { endBossRush, startNextBoss, travelToLocation } from 'app/scenes/bossRush/bossRushOptions';
-import { returnFromBoss } from 'app/utils/updateBestTimes';
+import { removeConditions, returnFromBoss } from 'app/utils/updateBestTimes';
 import { showMessage } from 'app/scriptEvents';
 
 const MAX_LEVEL = 2;
@@ -108,11 +108,12 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         if(!['rush', 'rush2', 'rush3'].includes(state.bossRushTrackers.currentBoss)) {
             let timeMessage = returnFromBoss(state);
             showMessage(state, timeMessage)
+            travelToLocation(state, "dream", "bossRefightReturn");
+            removeConditions(state);
             if (state.savedState.usingBackup) {
                 state.savedState.usingBackup = false;
                 restoreHeroData(state)
             }
-            travelToLocation(state, "dream", "bossRefightReturn");
         } else {
             if (endBossRush(state)) {
                 let timeMessage = returnFromBoss(state);
@@ -125,6 +126,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
                 travelToLocation(state, "dream", "bossRefightReturn");
             } else {
                 state.bossRushTrackers.rushPosition += 1
+                //state.travel("dream", "bossRefightReturn", {instant: false});
                 startNextBoss(state);
             }
         }

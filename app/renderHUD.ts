@@ -13,7 +13,7 @@ import {createCanvasAndContext} from 'app/utils/canvas';
 import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 
-const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
+export const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
 const [, fullGreyHeart, threeGreyQuarters, halfGreyHeart, quarterGreyHeart] =
@@ -88,7 +88,7 @@ function formatTime(state: GameState, isRando: boolean, seconds: number): string
     else {return `${minutesString}:${secondsString}`;}
 }
 
-function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): void {
+export function renderHUDProper(context: CanvasRenderingContext2D, state: GameState): void {
     // Draw heart backs, and fillings
     let x = 26;
     let y = 5;
@@ -292,6 +292,25 @@ export function renderHudEffects(context: CanvasRenderingContext2D, state: GameS
         if (effects.drawPriority === 'hud' || effects.getDrawPriority?.(state) === 'hud') {
             effects.render(context, state);
         }
+    }
+}
+
+export function renderHearts(context: CanvasRenderingContext2D, state: GameState): void {
+    // Draw heart backs, and fillings
+    let h_x = 26;
+    let h_y = 5;
+    let shownLife = state.hero.savedData.maxLife;
+    if (state.bossRushTrackers.currentCondition == 'daredevil') {
+        shownLife = 2;
+    }
+    for (let i = 0; i < shownLife; i++) {
+        if (i === 10) {
+            h_y += 11;
+            h_x = 26;
+        }
+        drawFrame(context, emptyHeart, {...emptyHeart, x: h_x, y: h_y});
+        drawFrame(context, fullHeart, {...fullHeart, x: h_x, y: h_y});
+        h_x += 11;
     }
 }
 
