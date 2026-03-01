@@ -617,7 +617,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallTower-ironBoots", x: 288, y: 32, type: "bigChest", lootType: "ironBoots", lootLevel: 1},
         {status: "normal", id: "waterfallTower:s0:0x1-arrowTurret-0", x: 64, y: 144, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x1-arrowTurret-1", x: 352, y: 48, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
-        {status: "normal", id: "waterfallTower:s0:0x1-smallKey-0", x: 16, y: 96, type: "chest", lootType: "smallKey", lootLevel: 1},
+        {status: "normal", id: "waterfallTower:s0:0x1-smallKey-0", x: 16, y: 96, type: "chest", lootType: "smallKey"},
         {status: "normal", id: "waterfallTower-grateCSwitch", x: 224, y: 48, type: "floorSwitch", targetObjectId: "waterfallTower-grateC", saveStatus: "forever"},
         {status: "normal", id: "", x: 288, y: 400, type: "airBubbles"},
         {status: "normal", id: "", x: 304, y: 208, type: "airBubbles"},
@@ -1199,7 +1199,7 @@ const sf1_0x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "waterfallTowerMarkerB", x: 240, y: 208, type: "marker", locationCue: "Waterfall 1F"},
-        {status: "normal", id: "waterfallTowerBoss", x: 240, y: 48, type: "boss", enemyType: "crystalCollector", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "waterfallTowerBoss", x: 240, y: 48, type: "boss", enemyType: "crystalCollector", lootType: "peachOfImmortality", d: "down", params: {}},
         {status: "hidden", id: "", x: 112, y: 0, type: "beadCascade", onInterval: 400, height: 80},
         {status: "hidden", id: "", x: 144, y: 0, type: "beadCascade", onInterval: 400, height: 80},
         {status: "hidden", id: "", x: 176, y: 0, type: "beadCascade", onInterval: 400, height: 80},

@@ -4,6 +4,7 @@ import {zones} from 'app/content/zones/zoneHash';
 import {gameModifiers} from 'app/gameConstants';
 import {addDoorAndClearForegroundTiles} from 'app/generator/doors';
 import {getDefaultSavedState} from 'app/savedState'
+import {doesLootRequireLevel} from 'app/utils/loot';
 import Random from 'app/utils/Random';
 import {applyItemsToSavedState} from 'app/utils/applyItemsToSavedState'
 
@@ -32,7 +33,6 @@ const baseExitDefinition: EntranceDefinition = {
 const baseLootDefinition: LootObjectDefinition = {
     type: 'loot',
     lootType: 'money',
-    lootLevel: 0,
     status: 'hiddenEnemy',
     x: 150,
     y: 40,
@@ -147,6 +147,7 @@ function createDelveGauntlet() {
                         x: baseLootDefinition.x + x,
                         y: baseLootDefinition.y + y,
                         lootType,
+                        lootLevel: doesLootRequireLevel(lootType) ? 0 : undefined,
                     });
                 }
                 if (doorIndex % 8 === 7) {

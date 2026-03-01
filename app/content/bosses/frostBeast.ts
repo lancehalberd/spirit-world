@@ -315,13 +315,20 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
         underwaterHeart.animations = frostHeartWaterAnimations;
         underwaterHeart.changeToAnimation(underwaterHeart.currentAnimationKey, underwaterHeart.nextAnimationKey);
     }
-    surfaceHeart.z = 0;
-    underwaterHeart.z = 8;
     // If either form is defeated, both are defeated.
+    // Keep in mind this code will only be running on the heart that is not yet defeated as the
+    // defeated hearts stops calling `updateFrostHeart` once the death animation starts.
     if (isEnemyDefeated(surfaceHeart) || isEnemyDefeated(underwaterHeart)) {
-        enemy.status = 'gone';
+        if (surfaceHeart) {
+            surfaceHeart.status = 'gone';
+        }
+        if (underwaterHeart) {
+            underwaterHeart.status = 'gone';
+        }
         return;
     }
+    surfaceHeart.z = 0;
+    underwaterHeart.z = 8;
     if (enemy === underwaterHeart && surfaceHeart?.params?.active) {
         enemy.life = surfaceHeart.life;
         surfaceHeart.params.active = false;

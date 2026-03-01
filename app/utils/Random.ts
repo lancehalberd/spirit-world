@@ -1,38 +1,48 @@
+function toArray<T>(collection: Collection<T>): Array<T> {
+    if (Array.isArray(collection)) {
+        return collection;
+    }
+    if (collection instanceof Set) {
+        return [...collection];
+    }
+    return Object.values(collection);
+}
+
 const Random = {
-    /**
-     * @param {number} min  The smallest returned value
-     * @param {number} max  The largest returned value
-     */
     range(A:number, B:number): number {
         var min = Math.min(A, B);
         var max = Math.max(A, B);
         return Math.floor(Math.random() * (max + 1 - min)) + min;
     },
 
-    /**
-     * @param {Collection} collection  The collection of elements to return random element from
-     */
     element<T>(collection: Collection<T>): T {
-        if (Array.isArray(collection)) {
-            const array = collection as Array<any>;
-            return array[Math.floor(Math.random() * array.length)];
-        }
-        const keys = Object.keys(collection);
-        return collection[this.element(keys)];
+        const array = toArray(collection);
+        return array[Math.floor(Math.random() * array.length)];
     },
 
-    /**
-     * @param {Array} array  The array of elements to return random element from
-     */
+    elements<T>(collection: Collection<T>, count: number): Array<T> {
+        const array = [...toArray(collection)];
+        const result: Array<T> = [];
+        while (array.length && result.length < count) {
+            result.push(this.removeElement(array));
+        }
+        return result;
+    },
+
     removeElement<T>(collection: Collection<T>): T {
         if (Array.isArray(collection)) {
             const array = collection as Array<any>;
             return array.splice(Math.floor(Math.random() * array.length), 1)[0];
         }
+        if (collection instanceof Set) {
+            const value = this.element([...collection]);
+            collection.delete(value);
+            return value;
+        }
         const keys = Object.keys(collection);
         const key = this.element(keys);
         const value = collection[key];
-        collection[key] = null;
+        delete collection[key];
         return value;
     },
 

@@ -62,7 +62,10 @@ export class TextCue implements EffectInstance {
             } else if (this.duration > 0 && this.time > this.duration - fadeDuration) {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }
-            let x = padding, y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * rowHeight;
+            let x = padding;
+            // Trying with extar -8 to avoid rendering behind secondary boss health bars.
+            // TODO: just move these up when health bars are on the screen?
+            let y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * rowHeight - 8;
             let maxWidth = 0;
             for (const frameRow of this.textFrames) {
                 let rowWidth = 0;
@@ -120,7 +123,7 @@ export function removeTextCue(state: GameState, priority: number = 10000): boole
 
 export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): boolean {
     // Only add the new cue if it can override the previous one.
-    if (removeTextCue(state)) {
+    if (removeTextCue(state, priority)) {
         addEffectToArea(state, state.areaInstance, new TextCue(state, {
             duration,
             priority,

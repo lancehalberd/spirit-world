@@ -375,12 +375,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.y = hero.safeY;
             hero.justRespawned = true;
             let damage = 1;
-            /*if (hero.action === 'sankInLava') {
-                damage = 8;
-                if (hero.savedData.passiveTools.fireBlessing) {
-                    damage /= 2;
-                }
-            }*/
             hero.takeDamage(state, damage);
             destroyClone(state, hero);
             hero.action = null;

@@ -523,7 +523,7 @@ const f0_2x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "gauntletWaterEntrance", x: 416, y: 0, type: "door", style: "wooden", targetZone: "gauntletWater", targetObjectId: "gauntletWaterEntrance", d: "up"},
-        {status: "normal", id: "underwaterMoney", x: 240, y: 464, type: "chest", lootType: "money", lootLevel: 1, lootAmount: 50},
+        {status: "normal", id: "underwaterMoney", x: 240, y: 464, type: "chest", lootType: "money", lootAmount: 50},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 494, mapId: 'underwater', floorId: '1F', mapX: 4, mapY: 0},

@@ -53,6 +53,12 @@ export function renderLightningCircle(context: CanvasRenderingContext2D, {x, y, 
             context.stroke();
         }
     }
+    if (r >= 8) {
+        context.fillStyle = "yellow";
+        context.beginPath();
+        context.arc(x, y, strength, 0, 2 * Math.PI);
+        context.fill();
+    }
 }
 
 

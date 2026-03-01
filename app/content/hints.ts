@@ -446,7 +446,7 @@ const missions: Mission[] = [
                 && (state.hero.savedData.equipment.cloudBoots >= 1 || state.hero.savedData.elements.ice >= 1)
                 && (
                     // Any of these items can be used to get past the lightning barriers.
-                    state.hero.savedData.passiveTools.lightningBlessing >= 1
+                    state.hero.savedData.passiveTools.lightningBlessing >= 2
                     || state.hero.savedData.activeTools.cloak >= 2
                     || state.hero.savedData.elements.lightning >= 1
                     // The upgraded gloves allow entering through a secret passage.

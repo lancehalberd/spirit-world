@@ -2,17 +2,6 @@ import {allLootTypes, GAME_KEY} from 'app/gameConstants';
 import {parseMessage, textScriptToString} from 'app/render/renderMessage';
 import {getCameraTarget} from 'app/utils/fixCamera';
 
-export function clearScriptEvents(state: GameState) {
-    state.scriptEvents.queue = [];
-    state.scriptEvents.activeEvents = [];
-    delete state.scriptEvents.onSkipCutscene;
-    delete state.scriptEvents.overrideMusic;
-    delete state.scriptEvents.cameraTarget;
-    delete state.camera.speed;
-    delete state.hero.action;
-    state.hideHUD = false;
-    state.messagePage = null;
-}
 
 export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
     // hide HUD to show that player isn't controllable

@@ -1,6 +1,7 @@
-import { getLedgeDelta } from 'app/movement/getLedgeDelta';
-import { getTileBehaviors } from 'app/utils/getBehaviors';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta';
+import {getTileBehaviors} from 'app/utils/getBehaviors';
 import {getCardinalDirection} from 'app/utils/direction';
+import {getDistanceSquared} from 'app/utils/index';
 
 // Note this assumes the target is actually in the same area as the source.
 // Limiting the set of possible targets is handled by the set of targets passed into various targeting functions.
@@ -43,6 +44,19 @@ export function getTargetDistance(state: GameState, source: Target, target: Targ
     const dx = targetAnchor.x - sourceAnchor.x;
     const dy = targetAnchor.y - sourceAnchor.y;
     return Math.sqrt(dx * dx + dy * dy);
+}
+
+export function getClosestTarget<T extends Target>(source: Target, targets: T[]): T {
+    const sourceAnchor = getTargetingAnchor(source);
+    let best: T = null, bestDistanceSquared: number;
+    for (const target of targets) {
+        const distanceSquared = getDistanceSquared(sourceAnchor, getTargetingAnchor(target));
+        if (!best || distanceSquared < bestDistanceSquared) {
+            best = target;
+            bestDistanceSquared = distanceSquared;
+        }
+    }
+    return best;
 }
 
 export function getNearbyTarget(state: GameState, source: Target, radius: number,

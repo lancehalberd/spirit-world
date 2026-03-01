@@ -18,6 +18,7 @@ interface Props {
     fromPoint?: Point
     length?: number
     source: Actor
+    rect?: Rect
 }
 
 const baseFlameSize = 12;
@@ -27,7 +28,8 @@ export class FlameWall implements EffectInstance, Props {
     isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
-    damage: number;
+    damage = this.props.damage ?? 1;
+    delay = this.props.delay ?? 800;
     x: number;
     y: number;
     z: number = 0;
@@ -36,28 +38,21 @@ export class FlameWall implements EffectInstance, Props {
     vy: number;
     w: number = 12;
     h: number = 12;
-    fromPoint: Props['fromPoint']
+    fromPoint = this.props.fromPoint;
+    rect = this.props.rect;
     ignorePits = true;
-    length = 6;
-    delay: number;
-    animationTime = 0;
+    // Length of the flame wall in tiles.
+    length = this.props.length ?? 6;
+    animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
     time = 0;
-    direction: Direction;
+    direction = this.props.direction ?? 'down';
     status: ObjectStatus = 'normal';
     speed = 0;
     distance = 0;
-    source: Actor
+    source = this.props.source;
     // Set when the flame is destroyed and show the flameBrokenAnimation.
     destroyed = false;
-    constructor({damage = 1, delay = 800, direction = 'down', length = 6, fromPoint, source}: Props) {
-        this.delay = delay;
-        this.damage = damage;
-        this.direction = direction;
-        this.length = length;
-        this.fromPoint = fromPoint;
-        this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
-        this.source = source;
-    }
+    constructor(public props: Props) {}
     getHitbox(state: GameState) {
         return {
             x: this.x - this.w / 2,
@@ -69,6 +64,54 @@ export class FlameWall implements EffectInstance, Props {
     breakApart() {
         this.destroyed = true;
         this.animationTime = 0;
+    }
+    setSize(state: GameState) {
+        // If an exact rectangle is specified for the flame wall, just use that.
+        if (this.rect) {
+            this.x = this.rect.x + this.rect.w / 2;
+            this.y = this.rect.y + this.rect.h / 2;
+            this.w = this.rect.w;
+            this.h = this.rect.h;
+            return;
+        }
+        const { section } = getAreaSize(state);
+        let left = section.x + 16;
+        let top = section.y + 32;
+        let right = section.x + section.w - 16;
+        let bottom = section.y + section.h - 16;
+        left = Math.max(state.camera.x + baseFlameSize / 2, left);
+        right = Math.min(state.camera.x + CANVAS_WIDTH - baseFlameSize / 2, right);
+        top = Math.max(state.camera.y + baseFlameSize / 2, top);
+        bottom = Math.min(state.camera.y + CANVAS_HEIGHT - baseFlameSize / 2, bottom);
+        if (this.fromPoint) {
+            this.x = this.fromPoint.x;
+            this.y = this.fromPoint.y;
+            // This will always start 1 tile wide, but grow each tile it moves until it reaches max length
+            this.w = this.h = baseFlameSize;
+        } else {
+            const heroHitbox = state.hero.getHitbox();
+            if (this.direction === 'up' || this.direction === 'down') {
+                this.w = this.length * 16;
+                // Appear 2 tiles left or right of centered on the player.
+                this.x = heroHitbox.x + heroHitbox.w / 2 - 16 + Math.floor(Math.random() * 32);
+                this.x = Math.max(left + this.w / 2, Math.min(right - this.w / 2, this.x));
+                this.h = baseFlameSize;
+            } else {
+                this.h = this.length * 16;
+                this.y = heroHitbox.y + heroHitbox.h / 2 - 16 + Math.floor(Math.random() * 32);
+                this.y = Math.max(top + this.h / 2, Math.min(bottom - this.h / 2, this.y));
+                this.w = baseFlameSize;
+            }
+            if (this.direction === 'down') {
+                this.y = top + baseFlameSize / 2;
+            } else if (this.direction === 'up') {
+                this.y = bottom - baseFlameSize / 2;
+            } else if (this.direction === 'right') {
+                this.x = left + baseFlameSize / 2;
+            } else if (this.direction === 'left') {
+                this.x = right - baseFlameSize / 2;
+            }
+        }
     }
     update(state: GameState) {
         if (this.destroyed) {
@@ -84,39 +127,7 @@ export class FlameWall implements EffectInstance, Props {
         let right = section.x + section.w - 16;
         let bottom = section.y + section.h - 16;
         if (this.time === 0) {
-            left = Math.max(state.camera.x + baseFlameSize / 2, left);
-            right = Math.min(state.camera.x + CANVAS_WIDTH - baseFlameSize / 2, right);
-            top = Math.max(state.camera.y + baseFlameSize / 2, top);
-            bottom = Math.min(state.camera.y + CANVAS_HEIGHT - baseFlameSize / 2, bottom);
-            if (this.fromPoint) {
-                this.x = this.fromPoint.x;
-                this.y = this.fromPoint.y;
-                // This will always start 1 tile wide, but grow each tile it moves until it reaches max length
-                this.w = this.h = baseFlameSize;
-            } else {
-                const heroHitbox = state.hero.getHitbox();
-                if (this.direction === 'up' || this.direction === 'down') {
-                    this.w = this.length * 16;
-                    // Appear 2 tiles left or right of centered on the player.
-                    this.x = heroHitbox.x + heroHitbox.w / 2 - 16 + Math.floor(Math.random() * 32);
-                    this.x = Math.max(left + this.w / 2, Math.min(right - this.w / 2, this.x));
-                    this.h = baseFlameSize;
-                } else {
-                    this.h = this.length * 16;
-                    this.y = heroHitbox.y + heroHitbox.h / 2 - 16 + Math.floor(Math.random() * 32);
-                    this.y = Math.max(top + this.h / 2, Math.min(bottom - this.h / 2, this.y));
-                    this.w = baseFlameSize;
-                }
-                if (this.direction === 'down') {
-                    this.y = top + baseFlameSize / 2;
-                } else if (this.direction === 'up') {
-                    this.y = bottom - baseFlameSize / 2;
-                } else if (this.direction === 'right') {
-                    this.x = left + baseFlameSize / 2;
-                } else if (this.direction === 'left') {
-                    this.x = right - baseFlameSize / 2;
-                }
-            }
+            this.setSize(state);
         }
         this.time += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;

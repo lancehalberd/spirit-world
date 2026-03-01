@@ -537,8 +537,8 @@ const f0_0x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "", x: 16, y: 272, type: "door", style: "cavern", d: "left"},
         {status: "locked", id: "light1SmallLock", x: 112, y: 288, type: "keyBlock"},
-        {status: "normal", id: "light1SmallKey", x: 161, y: 431, type: "loot", lootType: "smallKey", lootLevel: 1},
-        {status: "normal", id: "light1BigKey", x: 208, y: 288, type: "chest", lootType: "bigKey", lootLevel: 1},
+        {status: "normal", id: "light1SmallKey", x: 161, y: 431, type: "loot", lootType: "smallKey"},
+        {status: "normal", id: "light1BigKey", x: 208, y: 288, type: "chest", lootType: "bigKey"},
         {status: "normal", id: "lightBackEntrance", x: 176, y: 0, type: "door", style: "cavernDownstairs", targetZone: "light1", targetObjectId: "lightBackEntrance", d: "up"},
         {status: "closedSwitch", id: "light1ArrowGate", x: 0, y: 176, type: "door", style: "cavern", targetObjectId: "lightBackEntrance", d: "left"},
         {status: "normal", id: "", x: 224, y: 32, type: "crystalSwitch", timer: 200, targetObjectId: "light1ArrowGate"},

@@ -100,7 +100,7 @@ export const forgeNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'forgeForge',
-        checks: [{objectId: 'forgeArmor'}],
+        checks: [{objectId: 'forgeBlessing'}],
         complexNpcs: [
             {
                 dialogueKey: 'forgeSmith',

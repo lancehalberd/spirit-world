@@ -12,6 +12,46 @@ import {resetTileBehavior} from 'app/utils/tileBehavior';
 
 export {directionMap, getDirection} from 'app/utils/direction';
 
+export function isRectOpen(state: GameState, area: AreaInstance, {x, y, w, h}: Rect, movementProperties: MovementProperties = {}): boolean {
+    movementProperties = {
+        canSwim: true,
+        canFall: true,
+        canMoveInLava: true,
+        ...movementProperties,
+    };
+    x = x | 0;
+    y = y | 0;
+    /*console.log(x, y, isPointOpen(state, area, {x: x, y: y}, movementProperties));
+    console.log(x + 15, y, isPointOpen(state, area, {x: x + 15, y: y}, movementProperties));
+    console.log(x, y + 15, isPointOpen(state, area, {x: x, y: y + 15}, movementProperties));
+    console.log(x + 15, y + 15, isPointOpen(state, area, {x: x + 15, y: y + 15}, movementProperties));*/
+    return isPointOpen(state, area, {x: x, y: y}, movementProperties) &&
+        isPointOpen(state, area, {x: x + w - 1, y: y}, movementProperties) &&
+        isPointOpen(state, area, {x: x, y: y + h - 1}, movementProperties) &&
+        isPointOpen(state, area, {x: x + w - 1, y: y + h - 1}, movementProperties);
+}
+
+export function areNPointsOpen(state: GameState, area: AreaInstance, points: Point[], count: number, movementProperties: MovementProperties = {}): boolean {
+    movementProperties = {
+        canSwim: true,
+        canFall: true,
+        canMoveInLava: true,
+        ...movementProperties,
+    };
+    let open = 0;
+    for (let {x, y} of points) {
+        x = x | 0;
+        y = y | 0;
+        if (isPointOpen(state, area, {x: x, y: y}, movementProperties)) {
+            open++;
+            if (open >= count) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 export function canTeleportToCoords(state: GameState, area: AreaInstance, {x, y}: Point): boolean {
     return isTileOpen(state, area, {x, y}) && !isUnderLedge(state, area, {x, y, w: 16, h: 16});
 }

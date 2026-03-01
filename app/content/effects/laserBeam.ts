@@ -229,3 +229,29 @@ export function drawJitteryLaser(context: CanvasRenderingContext2D, ray: Ray, al
         context.fill();
     context.restore();
 }
+
+
+export function setLaserBeamBySourceAndAngle(laserBeam: LaserBeam, source: ObjectInstance, theta: number, length = 1000) {
+    const hitbox = source.getHitbox();
+    const cx = hitbox.x + hitbox.w / 2;
+    const cy = hitbox.y + hitbox.h / 2;
+    const dx = Math.cos(theta), dy = Math.sin(theta);
+    laserBeam.sx = cx + dx * hitbox.w / 2;
+    laserBeam.sy = cy + dy * hitbox.h / 2;
+    laserBeam.tx = laserBeam.sx + length * dx;
+    laserBeam.ty = laserBeam.sy + length * dy;
+}
+
+export function stickLaserBeamToTarget(laserBeam: LaserBeam, target: ObjectInstance, theta: number) {
+    setLaserBeamBySourceAndAngle(laserBeam, target, theta);
+    laserBeam.beforeUpdate = (state: GameState, laserBeam: LaserBeam) => {
+        setLaserBeamBySourceAndAngle(laserBeam, target, theta);
+    };
+}
+export function rotateLaserBeamAroundTarget(laserBeam: LaserBeam, target: ObjectInstance, theta: number, thetaV: number) {
+    setLaserBeamBySourceAndAngle(laserBeam, target, theta);
+    laserBeam.beforeUpdate = (state: GameState, laserBeam: LaserBeam) => {
+        theta += thetaV * FRAME_LENGTH / 1000;
+        setLaserBeamBySourceAndAngle(laserBeam, target, theta);
+    };
+}

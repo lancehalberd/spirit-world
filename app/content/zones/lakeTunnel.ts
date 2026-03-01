@@ -174,7 +174,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "lakeTunnel:0:0x0-door-1", x: 112, y: 272, type: "door", style: "cavern", d: "up"},
         {status: "normal", id: "lakeTunnelEntrance", x: 96, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "lakeTunnelEntrance", d: "down", locationCue: "Lake Tunnel"},
         {status: "closedEnemy", id: "lakeTunnel:0:0x0-door-3", x: 96, y: 224, type: "door", style: "stone", d: "down"},
-        {status: "normal", id: "helixRivalBoss", x: 120, y: 36, type: "boss", enemyType: "rival2", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, customLogic: "testTombRival"},
+        {status: "normal", id: "helixRivalBoss", x: 120, y: 36, type: "boss", enemyType: "rival2", lootType: "empty", d: "down", params: {}, customLogic: "testTombRival"},
         {status: "normal", id: "lakeTunnelSave", x: 80, y: 304, type: "saveStatue"},
     ],
     sections: [

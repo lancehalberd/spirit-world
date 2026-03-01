@@ -359,7 +359,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 248, y: 272, type: "spawnMarker"},
         {status: "normal", id: "", x: 288, y: 336, type: "spawnMarker"},
         {status: "normal", id: "helixMarker", x: 120, y: 296, type: "marker", locationCue: "Helix 1F"},
-        {status: "normal", id: "helixBigKey", x: 120, y: 272, type: "loot", lootType: "bigKey", lootLevel: 1},
+        {status: "normal", id: "helixBigKey", x: 120, y: 272, type: "loot", lootType: "bigKey"},
         {status: "closedSwitch", id: "helixBigKeyShortcut", x: 120, y: 320, type: "door", style: "ladderUp", d: "up"},
         {status: "normal", id: "helixBigKeyShortcut", x: 120, y: 296, type: "floorSwitch", saveStatus: "forever", targetObjectId: "helixBigKeyShortcut"},
         {status: "normal", id: "", x: 512, y: 320, type: "door", style: "ladderUp", d: "up"},
@@ -735,7 +735,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "helixShortcut", x: 496, y: 320, type: "door", style: "ladderUp", d: "up"},
         {status: "normal", id: "helixSpiritMarker", x: 488, y: 280, locationCue: "Helix 1F", type: "marker"},
         {status: "normal", id: "helixBridgeTeleporter", x: 528, y: 280, targetZone: "helix", targetObjectId: "helixBridgeTeleporter", type: "teleporter", locationCue: "Helix 1F"},
-        {status: "normal", id: "helixMap", x: 312, y: 104, type: "chest", lootType: "map", lootLevel: 1},
+        {status: "normal", id: "helixMap", x: 312, y: 104, type: "chest", lootType: "map"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 268, mapId: 'helix', floorId: '1F', mapX: 3, mapY: 2},
@@ -2654,7 +2654,7 @@ const f3_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "helixBridgePortal", x: 80, y: 344, type: "teleporter", linked: true},
         {status: "normal", id: "helixSkyEntrance", x: 288, y: 560, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "helixSkyEntrance", d: "down", locationCue: "Helix Bridge"},
-        {status: "normal", id: "helixSilver", x: 544, y: 320, type: "chest", lootType: "silverOre", lootLevel: 1},
+        {status: "normal", id: "helixSilver", x: 544, y: 320, type: "chest", lootType: "silverOre"},
     ],
     sections: [
         {x: 0, y: 0, w: 40, h: 40, index: 273, mapId: 'helix', floorId: '4F', mapX: 1, mapY: 2},

@@ -133,7 +133,7 @@ export function getElementLightColor(element: MagicElement): LightColor {
 
 // Gameplay modifiers
 export const gameModifiers = {
-    globalDamageTaken: 1,
+    globalDamageTaken: 0.5,
     globalDamageDealt: 1,
     // Increases the composite difficulty by this multiplier.
     // Support is being added gradually for this and it does not effect all enemies or game modes.
@@ -161,7 +161,7 @@ type GameModifier = keyof typeof gameModifiers;
 
 export const challenge = readGetParameter('challenge');
 if (challenge === 'easy') {
-    gameModifiers.globalDamageTaken = 0.5;
+    gameModifiers.globalDamageTaken = 0.25;
     gameModifiers.globalDamageDealt = 2;
     gameModifiers.spiritEnergyCooldown = 0.75;
     gameModifiers.spiritEnergyRegeneration = 1.5;

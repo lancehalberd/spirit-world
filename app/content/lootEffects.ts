@@ -6,6 +6,7 @@ import { restoreHeroData } from 'app/utils/alterHeroData';
 import { endBossRush, startNextBoss, travelToLocation } from 'app/scenes/bossRush/bossRushOptions';
 import { removeConditions, returnFromBoss } from 'app/utils/updateBestTimes';
 import { showMessage } from 'app/scriptEvents';
+import {applyUpgrade} from 'app/utils/loot';
 
 const MAX_LEVEL = 2;
 
@@ -16,6 +17,7 @@ type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueL
     'flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight',
 ]*/
 
+/*
 function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
     // Non-progressive upgrades specify the exact level of the item.
     if (loot.lootLevel) {
@@ -31,7 +33,7 @@ function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObj
     }
     return currentLevel;
 }
-
+*/
 function getDungeonInventory(state: GameState): DungeonInventory {
     return state.savedState.dungeonInventories[state.location.logicalZoneKey] || {
         bigKey: false,
@@ -52,7 +54,7 @@ function isBlueprints(lootType: LootType): lootType is Blueprints {
     return blueprints.includes(lootType as Blueprints);
 }
 
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: AnyLootDefinition, simulate?: boolean) => void}> = {
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootData, simulate?: boolean) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'weapon') {
             state.hero.savedData.weapon = applyUpgrade(state.hero.savedData.weapon, loot);

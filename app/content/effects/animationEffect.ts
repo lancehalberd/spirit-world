@@ -29,9 +29,10 @@ interface AnimationProps {
     scale?: number
     ttl?: number
     delay?: number
-    target?: ObjectInstance | EffectInstance
+    target?: Target
     // If set to true it will adjust the coords to center the first frame of the animation.
     centerOnPoint?: boolean
+    doNotLoop?: boolean
     update?: (state: GameState, effect: FieldAnimationEffect) => void
 }
 
@@ -60,7 +61,9 @@ export class FieldAnimationEffect implements EffectInstance {
     az: number;
     rotation: number;
     scale: number;
-    target?: ObjectInstance | EffectInstance;
+    doNotLoop?: boolean;
+    // If this is set, the coords are relative to this target.
+    target?: Target;
     ttl: number;
     checkToCull?: (state: GameState) => boolean;
     onUpdate: (state: GameState, effect: FieldAnimationEffect) => void
@@ -69,7 +72,7 @@ export class FieldAnimationEffect implements EffectInstance {
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
         ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
-        friction = 0,
+        friction = 0, doNotLoop,
         target, ttl, delay = 0, centerOnPoint = false, update
      }: AnimationProps) {
         this.animation = animation;
@@ -96,6 +99,7 @@ export class FieldAnimationEffect implements EffectInstance {
         this.behaviors = {};
         this.target = target;
         this.onUpdate = update;
+        this.doNotLoop = doNotLoop;
         if (centerOnPoint) {
             const hitbox = this.getHitbox();
             this.x -= hitbox.w / 2;
@@ -143,12 +147,13 @@ export class FieldAnimationEffect implements EffectInstance {
         if (this.behaviors.brightness > 0) {
             this.behaviors.brightness *= 0.9;
         }
-        if (this.animationTime > this.ttl || this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
+        if (this.animationTime > this.ttl || this.z < 0 || ((this.animation.loop === false || this.doNotLoop) && this.animationTime >= this.animation.duration)) {
             this.done = true;
-            removeEffectFromArea(state, this);
         }
         if (this.boundingBox && !rectanglesOverlap(this.boundingBox, this.getGroundHitbox())) {
             this.done = true;
+        }
+        if (this.done) {
             removeEffectFromArea(state, this);
         }
     }
@@ -235,7 +240,7 @@ export function addParticleAnimations(
 }
 
 
-const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: false});
+const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: true});
 //const whiteSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 0, duration: 6, frameMap: [0,1,0]}, {loop: false});
 export const iceSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 2, duration: 6, frameMap: [0, 1, 0]}, {loop: false});
 const fireSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 4, duration: 6,  frameMap: [0,1,0,0]}, {loop: false});
@@ -286,7 +291,8 @@ export function makeSparkleAnimation(
         target,
         x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
         y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
-        z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0)
+        z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0),
+        doNotLoop: true,
     }
     if (velocity?.z) {
         animationProps.vz = velocity.z;

@@ -78,11 +78,15 @@ interface BaseFieldInstance {
     neverSkipFrames?: boolean
     getDrawPriority?: (state: GameState) => DrawPriority
     render: (context: CanvasRenderingContext2D, state: GameState) => void
+    // This has reduced opacity when objects have high z value.
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    // Warning is rendered over shadows and has no opacity reduction for high z values
+    renderWarning?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground2?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRenderWarning?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     // Called after the object is added to an area and initialized.
     // isActiveArea will be set to false when this object is being initialized in an inactive area,
@@ -365,7 +369,7 @@ interface HitProperties {
     // Alternate hitbox to use when checking for tile hits.
     tileHitbox?: Rect
     // Targets to ignore.
-    ignoreTargets?: Set<EffectInstance | ObjectInstance>
+    ignoreTargets?: Set<Target>
     // If true this hit will only apply to objects touching the ground.
     isGroundHit?: boolean
     // True if this is an arrow attack, targets may be strong/weak against arrows.
@@ -423,7 +427,7 @@ interface HitResult {
     // For example an arrow hitting a lit torch will gain the 'fire' element.
     setElement?: MagicElement
     // Returns the set of targets hit.
-    hitTargets?: Set<EffectInstance | ObjectInstance>
+    hitTargets?: Set<Target>
     // Additional data can be returned with a HitResult that might be helpful when debugging.
     debug?: any
 }

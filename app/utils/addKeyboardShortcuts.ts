@@ -4,7 +4,6 @@ import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
 import {isObject, isSelectionValid, isVariant, updateObjectInstance} from 'app/development/objectEditor';
 import {addVariantToArea} from 'app/development/variantEditor';
-import {clearScriptEvents} from 'app/scriptEvents';
 import {toggleShowControls} from 'app/scenes/controls/updateControls';
 import {getState} from 'app/state';
 import {isKeyboardKeyDown, KEY} from 'app/userInput'
@@ -12,6 +11,7 @@ import {enterLocation} from 'app/utils/enterLocation';
 import {findAllZoneFlags} from 'app/utils/findAllZoneFlags';
 import {cloneDeep} from 'app/utils/index';
 import {isDefinitionFromSection} from 'app/utils/sections';
+import {cleanState} from 'app/utils/state';
 
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
@@ -155,7 +155,7 @@ export function addKeyboardShortcuts() {
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location, {instant: true});
-            clearScriptEvents(state);
+            cleanState(state);
             event.preventDefault();
         } else if (keyCode === KEY.R) {
             // Reset the current screen as if you left and returned to it.

@@ -148,25 +148,75 @@ Graphics to Implement:
 Current tasks:
     - Preload music.
 
-    - Remove spirit energy debuff from burning, add "shocked" effect from lightning damage
-        - Delays spirit energy generation for 1s
+    - Mechanic idea:
+        - Survive with no life as long as you have spirit energy,
+
+    - Enemy with hard shell that can only be broken by Staff bonk or clone explosion
+        - Make clone immune to damage once detonation sequence cannot be aborted.
+
+    - Touch hit during movement applies too many times.
+        - This doesn't really matter since we ignore the duplicate effects
+            - iframes from the first damage hit prevent damage from future hits.
+            - knockback is ignored when the player is already knocked back.
+        - knockback is applies for each pixel we check blocking movement, instead of once per movement.
+        - Ideally, we would return a list of all hits+pixels and decide what the aggregate effect is.
+            - Some hits might take priority over others or prevent others.
+
+    - Add first daughter tree area
+        - Large beetle with hard shell immune to regular damage (except staff bonks+clone explosion)
+            - Higher resolution art requested.
+        - Plants on cliffs seed attacks can break the shell
+        - Beetle cannot be knocked back with regular attacks but it doesn't change directions very fast
+        - Summons small beetles to drop from the sky on occasion
+        - Faster when spike shell broken (shell is just a layer on top of the normal graphics)
+            - Spike shell shows damage frames over time + breaking animation.
+        - Drops a Peach Piece on defeat
+        - Add a thick spider web barrier blocking the tree that is removed when the boss is defeated.
+            - Pending art, for now I can just cobble something together by layering up existing web tiles.
+        - Add sticky web tiles
+            gfx/tiles/webtiles.png 3 tiles wide
+            - Boss either occasionally drops sticky webs where it is, or spits them at the player
+            - Sticky web tiles can be cleared with chakram or barrier burst, similar to slippery bead tiles.
+            - Special interaction with fire damage, adds a small fire nova on a 200ms delay that will spread to other tiles and hurt enemies+allies.
+                - Maybe make this isBurnable tile prop and apply to bushes as well.
+
+    - Add a dissipating spark effect when a circular spark is removed.
+        - This will make large sparks disappearing on hit/TTL/cleanup be less jarring with no mechanical impact (the effect isn't interactive).
+        - Just a shrinking spark effect.
 
     - Cocoon improvements
+        - Move turrets closer in and add more of them for the cloak tutorial
         - Add additional gauntlet gauntlet floor before the boss
             - Removing rolling stone puzzle from first gauntlet floor.
             - Add single rolling stone puzzle to new gauntlet floor
             - Add additional rolling stones that can be used to make gauntlet easier
         - Make Cocoon pits drop you to lower levels.
 
+    - Challenge puzzle ideas:
+        - Drop off 2 ledges with clone + staff to hit two buttons at once that opens locked door at the top of the ledge.
+        - Zero tool puzzle requiring you to carefully throw bushes to solve puzzles/defeat enemies
+        - Throw bushes to defeat enemies in the spirit world
+            - Allow spirit sight but don't allow moving projection while carrying something
+
     - Keep charging through rolls when wearing iron boots.
 
-    - Switch blessings to two progressive upgrades:
-        - Fire blessing:
-            - take no burning damage as long as you have spirit energy + take 25% less fire damage
-        - Water blessing:
-            - water no longer drains spirit energy (but spirit energy still does not recover) + take 25% less ice damage
-        - Lightning blessing:
-            - lightning traps do not damage you (but they still knock you away) + take 25% lightning damage
+    - Add Silver Armor:
+        - Choose location and add Silver Armor Schematics
+            - Karma reward in the Vanara Dream.
+        - Add Silver Armor to armor smith for Schematics + 3 silver
+        - Update randomizer logic
+
+    - Add Golden Armor:
+        - Choose location and add Golden Armor Schematics
+            - Possibly place this behind fully upgrading Golden Chakram, move Forge boots Schematics elsewhere.
+        - Add Golden Armor to spirit armor smith for Schematics + 3 gold + 2 silver + Silver Armor
+        - Update randomizer logic
+
+    - Add missing progressive upgrades:
+        - Water Blessing
+            - Karma reward in the Vanara Dream
+        - Lightning Blessing -> Upgraded by an enthusiastic NPC if you have the level 1 blessing.
+        - Update randomizer logic
 
     - Add armored shell graphics for balloon centipede boss to indicate invulnerable sections.
 
@@ -176,6 +226,21 @@ Current tasks:
 
     - Need better enemy for Cocoon B3 rolling ball puzzle.
 
+    - Cocoon boss improvements
+        - Allow boss to hit and move rolling balls with some attacks.
+            - Track source of ball hit on the ball, and apply it to damge from the ball.
+            - If the boss hits the ball into itself(check source is projection), add special dialog
+                "How embarrassing!"
+                "You got lucky!"
+                "I hit myself?!"
+        - Add a final pinch phase where the astral projection becomes undamagable and uses slow targeted attacks that impede
+          the player's ability to interact with the puzzle elements.
+            "I won't lose this easily!"
+            Taunts change
+            "My Spirit Energy is limitless"
+            When teleporting: "There is no escaping me!"
+            - Player will want to lure the projection away from the boss and complete the puzzle during its attacks.
+            - This occurs when the boss reaches 2 health and cancels any burning damage.
 
     - Hard mode recommendations:
         - No free revives/jade from statues.
