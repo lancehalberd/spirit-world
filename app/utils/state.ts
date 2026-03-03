@@ -10,10 +10,6 @@ import {showFieldScene} from 'app/scenes/field/showFieldScene';
  */
 export function cleanState(state: GameState) {
     state.screenShakes = [];
-    state.defeatState = {
-        defeated: false,
-        time: 0,
-    };
     state.scriptEvents = {
         activeEvents: [],
         blockEventQueue: false,
@@ -26,7 +22,6 @@ export function cleanState(state: GameState) {
     state.hideHUD = false;
     delete state.camera.speed;
     delete state.hero.action;
-    delete state.messagePage;
     delete state.transitionState;
     showFieldScene(state);
 }

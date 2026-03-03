@@ -38,6 +38,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             cloak: 0,
         },
         collectibles: {
+            peach: 0,
             peachOfImmortality: 0,
             peachOfImmortalityPiece: 0,
             silverOre: 0,
@@ -47,6 +48,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             aetherCrystal: 0,
         },
         collectibleTotals: {
+            peach: 0,
             peachOfImmortality: 0,
             peachOfImmortalityPiece: 0,
             silverOre: 0,

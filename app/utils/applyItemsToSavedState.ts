@@ -27,10 +27,12 @@ export function applyItemsToSavedState(savedState: SavedState, items: {[key: str
         if (isCollectible(key)) {
             savedState.savedHeroData.collectibles[key]++;
             savedState.savedHeroData.collectibleTotals[key]++;
+            continue;
         }
         if (isConsumable(key)) {
             savedState.savedHeroData.consumables[key]++;
             savedState.savedHeroData.consumableTotals[key]++;
+            continue;
         }
         if (key === 'weapon') {
             newState.savedHeroData.weapon = items[key];

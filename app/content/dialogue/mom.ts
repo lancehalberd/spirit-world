@@ -154,7 +154,7 @@ dialogueHash.mom = {
                     {|}Your father said that the Vanara Elder had some kind of magic power but he
                     said it was dangerous and they had to keep it secret.
                     {|}If you have the same kind of power you should talk to the Elder just in case.
-                    {|}The Elder lives in the Forest Village to the Southwest, just try not to bother them too much.
+                    {|}The Elder lives in the Forest Village to the southwest, just try not to bother them too much.
                     {flag:momElder}`,
                 },
             ],

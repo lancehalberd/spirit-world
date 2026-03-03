@@ -1,7 +1,7 @@
 import {isSceneActive, sceneHash} from 'app/scenes/sceneHash';
 
 export function showFieldScene(state: GameState) {
-    state.sceneStack = [sceneHash.field];
+    state.sceneStack = [sceneHash.field, sceneHash.hud];
 }
 
 export function isFieldSceneActive(state: GameState): boolean {

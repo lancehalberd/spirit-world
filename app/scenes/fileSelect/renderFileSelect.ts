@@ -1,6 +1,4 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
-import {renderStandardFieldStack} from 'app/scenes/field/renderField';
-import {renderHUD} from 'app/renderHUD';
 import {getFileSelectOptions} from 'app/scenes/fileSelect/getFileSelectOptions';
 import {drawText} from 'app/utils/simpleWhiteFont';
 import {fillRect, pad} from 'app/utils/index';
@@ -16,8 +14,6 @@ const textOptions = <const>{
 };
 
 export function renderFileSelect(context: CanvasRenderingContext2D, state: GameState, scene: FileSelectScene): void {
-    renderStandardFieldStack(context, state);
-    renderHUD(context, state);
     const options = getFileSelectOptions(state, scene);
     const h = ROW_HEIGHT * options.length + 8;
     let r = {

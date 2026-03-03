@@ -40,13 +40,11 @@ export class MapScene implements GameScene {
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-            console.log('switch map -> menu');
             this.closeScene(state);
             showMainMenuScene(state);
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
-            console.log('close map');
             this.closeScene(state);
             return;
         }

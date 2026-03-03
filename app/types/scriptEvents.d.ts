@@ -41,7 +41,7 @@ interface TextPageState extends TextPage {
 
 interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
-    textPage: TextPage
+    textPages: TextPage[]
 }
 interface ClearTextBoxScriptEvent {
     type: 'clearTextBox'

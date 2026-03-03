@@ -1,4 +1,5 @@
 import {EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
+import {getActiveDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
 import {isHeroFloating, isHeroSinking} from 'app/utils/actor';
 import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
 import {carryMap, directionMap, getDirection} from 'app/utils/direction';
@@ -31,11 +32,12 @@ export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak
 let lastPullAnimation: AnimationSet = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
-    if (state.defeatState.defeated) {
-        if (state.defeatState.reviving) {
-            animations = state.defeatState.time >= 3000 ? heroAnimations.kneel : heroAnimations.death;
+    const defeatedScene = getActiveDefeatedScene(state);
+    if (defeatedScene) {
+        if (defeatedScene.reviving) {
+            animations = defeatedScene.time >= 3000 ? heroAnimations.kneel : heroAnimations.death;
         } else {
-            animations = state.defeatState.time >= 1000 ? heroAnimations.death : heroAnimations.kneel;
+            animations = defeatedScene.time >= 1000 ? heroAnimations.death : heroAnimations.kneel;
         }
         return getFrame(animations[hero.d], hero.animationTime);
     }

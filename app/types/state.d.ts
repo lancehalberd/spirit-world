@@ -102,11 +102,6 @@ interface GameState {
     menuRow: number
     // This is mostly used for debugging animations.
     alwaysHideMenu?: boolean
-    defeatState: {
-        defeated: boolean
-        reviving?: boolean
-        time: number
-    }
     scene: Scene
     keyboard: {
         gameKeyValues: number[]
@@ -117,7 +112,6 @@ interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     }
-    messagePage?: TextPageState
     randomizer?: {
         seed: number
         goal: number

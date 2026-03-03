@@ -84,10 +84,6 @@ export function getDefaultState(): GameState {
         showControls: false,
         menuIndex: 0,
         menuRow: 0,
-        defeatState: {
-            defeated: false,
-            time: 0,
-        },
         scene: 'prologue',
         keyboard: {
             gameKeyValues: [],
@@ -157,11 +153,7 @@ export function shouldHideMenu(state: GameState): boolean {
         state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
         || state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput
         || state.scriptEvents.blockPlayerInput
-        // This prevents the player from pausing during script events that don't otherwise block player
-        // input. Let's delete these if the more specific checks above don't cause any issues with allowing
-        // players to pause during cutscenes.
-        //|| state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length
-        || state.messagePage || state.transitionState || state.defeatState.defeated
+        || state.transitionState
         || state.nextAreaSection || state.nextAreaInstance
         || state.areaInstance.priorityObjects?.length
         || state.hero.action === 'falling' || state.hero.action === 'fallen'

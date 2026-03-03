@@ -6,6 +6,7 @@ import {editingState} from 'app/development/editingState';
 import {EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {playAreaSound} from 'app/musicController';
+import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
 import {prependScript} from 'app/scriptEvents';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
@@ -311,10 +312,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             hero.action = null;
             hero.chargeTime = 0;
             hero.frozenDuration = 0;
-            state.defeatState = {
-                defeated: true,
-                time: 0,
-            };
+            showDefeatedScene(state);
             if (hero.heldChakram) {
                 removeEffectFromArea(state, hero.heldChakram);
                 delete hero.heldChakram;

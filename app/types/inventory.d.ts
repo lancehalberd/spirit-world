@@ -18,7 +18,9 @@ type PassiveTool =
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing'
     | 'arDevice';
 type MagicElement = 'fire' | 'ice' | 'lightning';
-type Collectible = 'peachOfImmortality'
+type Collectible =
+    | 'peach' // Can be collected only if you possess the peach basket.
+    | 'peachOfImmortality'
     | 'peachOfImmortalityPiece'
     | 'silverOre'
     | 'goldOre'

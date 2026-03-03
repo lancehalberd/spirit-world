@@ -1,12 +1,18 @@
+import type {DefeatedMenuScene} from 'app/scenes/defeated/defeatedMenuScene';
+import type {DefeatedScene} from 'app/scenes/defeated/defeatedScene';
 import type {FieldScene} from 'app/scenes/field/fieldScene';
 import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
+import type {HudScene} from 'app/scenes/hud/hudScene';
 import type {IntroScene} from 'app/scenes/intro/introScene';
 import type {MapScene} from 'app/scenes/map/mapScene';
 import type {TitleScene} from 'app/scenes/title/titleScene';
 
 interface AllScenes {
+    defeated: DefeatedScene
+    defeatedMenu: DefeatedMenuScene
     field: FieldScene
     fileSelect: FileSelectScene
+    hud: HudScene
     intro: IntroScene
     map: MapScene
     title: TitleScene

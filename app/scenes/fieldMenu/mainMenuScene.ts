@@ -16,12 +16,14 @@ import {
 import {GAME_KEY} from 'app/gameConstants';
 import {FieldMenuScene} from 'app/scenes/fieldMenu/fieldMenuScene';
 import {showMapScene} from 'app/scenes/map/showMapScene';
+import {showPauseScene} from 'app/scenes/pause/pauseScene';
 import {
     showBootsMenuScene,
     showElementsMenuScene,
     showMaterialsMenuScene,
 } from 'app/scenes/fieldMenu/subMenuScenes';
 import {pushScene} from 'app/scenes/sceneHash';
+import {canPauseGame} from 'app/state';
 import {drawFrameCenteredAt} from 'app/utils/animations';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 import {wasGameKeyPressed} from 'app/userInput';
@@ -136,6 +138,10 @@ class MainMenuScene extends FieldMenuScene {
 
 const mainMenuScene = new MainMenuScene();
 export function showMainMenuScene(state: GameState) {
-    pushScene(state, mainMenuScene);
-    updateSoundSettings(state);
+    if (canPauseGame(state)) {
+        pushScene(state, mainMenuScene);
+        updateSoundSettings(state);
+    } else {
+        showPauseScene(state);
+    }
 }

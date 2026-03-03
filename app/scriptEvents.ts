@@ -173,16 +173,10 @@ export function waitForInput(state: GameState, duration = 0) {
 export function parseScriptText(state: GameState, text: TextScript, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
     const events: ScriptEvent[] = [];
     const pages = parseMessage(state, text);
-    for (const page of pages) {
+    if (pages.length) {
         events.push({
             type: 'showTextBox',
-            textPage: page,
-        });
-        events.push({
-            type: 'wait',
-            blockFieldUpdates,
-            duration,
-            keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
+            textPages: pages,
         });
     }
     return events;
@@ -195,7 +189,8 @@ export function showMessage(
     if (!message){
         return;
     }
-    prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
+    prependScript(state, `${textScriptToString(state, message)}`);
+    // prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
 }
 
 export function parseEventScript(state: GameState, script: TextScript): ScriptEvent[] {
@@ -407,7 +402,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
     if (events.length) {
         //console.log('extra clear textbox');
         //console.log([...events]);
-        events.push({ type: 'clearTextBox' });
+        // events.push({ type: 'clearTextBox' });
     }
     return events;
 }

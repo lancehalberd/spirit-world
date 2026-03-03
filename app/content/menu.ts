@@ -590,7 +590,10 @@ function getCollectibleMenuElement(state: GameState, collectible: Collectible): 
 }
 
 export function getMaterialOptions(state: GameState): MenuElement[] {
-    return (<const>['silverOre', 'goldOre', 'aetherCrystal', 'magicBeans']).map(option => getCollectibleMenuElement(state, option));
+    return (<const>[
+        'peach', 'magicBeans', 'victoryPoint',
+        'silverOre', 'goldOre', 'aetherCrystal',
+    ]).map(option => getCollectibleMenuElement(state, option));
 }
 
 function getConsumableMenuElement(state: GameState, consumable: Consumable): MenuElement {

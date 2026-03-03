@@ -1,13 +1,14 @@
-import { addTextCue, removeTextCue } from 'app/content/effects/textCue';
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { getLoot } from 'app/content/objects/lootObject';
-import { GAME_KEY } from 'app/gameConstants';
+import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {getLoot} from 'app/content/objects/lootObject';
+import {GAME_KEY} from 'app/gameConstants';
+import {hideMessagePage, showMessagePage} from 'app/scenes/message/messageScene';
 import {prependScript} from 'app/scriptEvents';
-import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/userInput';
-import { playSound } from 'app/utils/sounds';
-import { enterLocation } from 'app/utils/enterLocation';
-import { clearObjectFlag, setObjectFlag } from 'app/utils/objectFlags';
-import { saveGame } from 'app/utils/saveGame';
+import {wasConfirmKeyPressed, wasGameKeyPressed} from 'app/userInput';
+import {playSound} from 'app/utils/sounds';
+import {enterLocation} from 'app/utils/enterLocation';
+import {clearObjectFlag, setObjectFlag} from 'app/utils/objectFlags';
+import {saveGame} from 'app/utils/saveGame';
 import {cleanState} from 'app/utils/state';
 
 
@@ -173,14 +174,13 @@ export function updateScriptEvents(state: GameState): void {
             case 'showTextBox':
                 // Text cues and text box cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
-                state.messagePage = {
-                    ...event.textPage,
-                    lineIndex: 0,
-                    animationTime: 0,
-                };
+                showMessagePage(state, event.textPages);
+                // This blocks additional events+field updates from happening this frame.
+                state.scriptEvents.blockFieldUpdates = true;
+                state.scriptEvents.blockEventQueue = true;
                 break;
             case 'clearTextBox':
-                state.messagePage = null;
+                hideMessagePage(state)
                 break;
             case 'clearFlag':
                 clearObjectFlag(state, event.flag);

@@ -190,7 +190,7 @@ const missions: Mission[] = [
         getMarkerLocation: getVanaraElderLocation,
         getScript(state: GameState) {
             return `The Vanara Elder said there was something I needed in his basement.
-                {|}He lives in the southwest tree in the forest.
+                {|}He lives in the northwest tree in the forest.
                 {addCue: Press [B_MAP] to view the map}`
         },
         isAvailable(state: GameState) {
@@ -207,7 +207,7 @@ const missions: Mission[] = [
         getScript(state: GameState) {
             if (state.location.zoneKey !== 'tomb') {
                 return `The elder said I could learn more about my powers if I explore the Vanara Tomb.
-                    {|}The Tomb is North of the woods in the Southwest.`;
+                    {|}The Tomb is North of the woods in the southwest.`;
             } else {
                 return `The elder said I could learn more about my powers if I explore this Tomb.`;
             }
@@ -359,7 +359,7 @@ const missions: Mission[] = [
         getScript(state: GameState) {
             if (state.location.isSpiritWorld) {
                 return `The Spirit King said I would find something useful in the Fertility Temple.
-                    {|}It is in the strange forest to the Southwest.`;
+                    {|}It is in the strange forest to the southwest.`;
             } else {
                 return `There is a portal to the spirit world in the middle of the Grand Temple, north of the Holy City.`;
             }
