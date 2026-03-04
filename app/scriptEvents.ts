@@ -1,5 +1,6 @@
 import {allLootTypes, GAME_KEY} from 'app/gameConstants';
 import {parseMessage, textScriptToString} from 'app/render/renderMessage';
+import {showMessagePage} from 'app/scenes/message/messageScene';
 import {getCameraTarget} from 'app/utils/fixCamera';
 
 
@@ -170,13 +171,14 @@ export function waitForInput(state: GameState, duration = 0) {
     });
 }
 
-export function parseScriptText(state: GameState, text: TextScript, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
-    const events: ScriptEvent[] = [];
+export function parseScriptText(state: GameState, text: TextScript, blockFieldUpdates = true): ShowTextBoxScriptEvent[] {
+    const events: ShowTextBoxScriptEvent[] = [];
     const pages = parseMessage(state, text);
     if (pages.length) {
         events.push({
             type: 'showTextBox',
             textPages: pages,
+            blockFieldUpdates,
         });
     }
     return events;
@@ -189,8 +191,42 @@ export function showMessage(
     if (!message){
         return;
     }
-    prependScript(state, `${textScriptToString(state, message)}`);
-    // prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
+    prependScript(state, textScriptToString(state, message));
+}
+
+// Shows a message box ignoring any additional scripting elements.
+// This allows us to effectively show messages outside of contexts where scripts run, for example
+// when showing messages from the inventory.
+export function showSimpleMessage(
+    state: GameState,
+    message: TextScript,
+): void {
+    if (!message){
+        return;
+    }
+    showMessagePage(state, parseScriptAsTextPages(state, textScriptToString(state, message)));
+}
+
+export function parseScriptAsTextPages(state: GameState, script: TextScript): TextPage[] {
+    let textPages: TextPage[] = [];
+    // Script is a bunch of text broken up by actions marked by brackets like `{weapon}`
+    const textAndActions = textScriptToString(state, script).split(/[{}]/);
+    while (textAndActions.length) {
+        const text = textAndActions.shift();
+        if (text) {
+            const textEvents = parseScriptText(state, text);
+            for (const event of textEvents) {
+                textPages = [...textPages, ...event.textPages];
+            }
+
+        }
+        // Skip any actions found in the text
+        const actionToken = textAndActions.shift();
+        if (actionToken && actionToken !== '|') {
+            console.warn('Attempted to process a script as a simple message', script);
+        }
+    }
+    return textPages;
 }
 
 export function parseEventScript(state: GameState, script: TextScript): ScriptEvent[] {

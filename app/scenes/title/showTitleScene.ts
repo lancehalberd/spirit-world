@@ -9,7 +9,7 @@ export function showTitleScene(state: GameState) {
     state.hero.savedData.spawnLocation = SPAWN_LOCATION_TITLE;
     state.sceneStack = [titleScene];
     titleScene.idleTime = 0;
-    titleScene.menuIndex = 0;
+    titleScene.cursorIndex = 0;
     state.hero.savedData.passiveTools.spiritSight = 1;
     returnToSpawnLocation(state);
     state.camera = { x: 46, y: 230 };

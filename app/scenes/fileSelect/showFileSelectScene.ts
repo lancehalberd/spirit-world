@@ -6,6 +6,6 @@ export function showFileSelectScene(state: GameState) {
     // the game when selecting a file.
     state.sceneStack = [sceneHash.field, sceneHash.hud, sceneHash.fileSelect];
     sceneHash.fileSelect.mode = 'select';
-    sceneHash.fileSelect.menuIndex = 0;
+    sceneHash.fileSelect.cursorIndex = 0;
     setSaveFileToState(state, 0, 0);
 }

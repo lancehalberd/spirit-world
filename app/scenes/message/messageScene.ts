@@ -26,7 +26,7 @@ export class MessageScene implements GameScene {
     nextPage(state: GameState) {
         this.lineIndex = 0;
         this.animationTime = 0;
-        this.pages.pop();
+        this.pages.shift();
         if (!this.pages.length) {
             state.sceneStack.pop();
             // Let the field update the frame the message closes so there isn't
@@ -36,7 +36,7 @@ export class MessageScene implements GameScene {
     }
     update(state: GameState, interactive: boolean) {
         const shouldSkipForward = wasConfirmKeyPressed(state) || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
-        const page = this.pages[this.pages.length - 1];
+        const page = this.pages[0];
         if (!page) {
             state.sceneStack.pop();
             return;
@@ -82,7 +82,7 @@ export class MessageScene implements GameScene {
         this.animationTime += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
-        const page = this.pages[this.pages.length - 1];
+        const page = this.pages[0];
         if (!page) {
             return;
         }
@@ -175,9 +175,10 @@ export class MessageScene implements GameScene {
     }
 }
 
-export function showMessagePage(state: GameState, textPages: TextPage[]) {
+export function showMessagePage(state: GameState, textPages: TextPage[], blocksUpdates = true) {
     const messageScene = new MessageScene();
     messageScene.pages = textPages;
+    messageScene.blocksUpdates = blocksUpdates;
     pushScene(state, messageScene)
 }
 

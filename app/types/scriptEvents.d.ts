@@ -42,6 +42,8 @@ interface TextPageState extends TextPage {
 interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
     textPages: TextPage[]
+    // This defaults to true.
+    blockFieldUpdates?: boolean
 }
 interface ClearTextBoxScriptEvent {
     type: 'clearTextBox'

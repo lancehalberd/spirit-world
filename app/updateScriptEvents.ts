@@ -174,7 +174,7 @@ export function updateScriptEvents(state: GameState): void {
             case 'showTextBox':
                 // Text cues and text box cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
-                showMessagePage(state, event.textPages);
+                showMessagePage(state, event.textPages, event.blockFieldUpdates);
                 // This blocks additional events+field updates from happening this frame.
                 state.scriptEvents.blockFieldUpdates = true;
                 state.scriptEvents.blockEventQueue = true;

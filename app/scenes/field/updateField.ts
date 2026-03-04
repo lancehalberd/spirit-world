@@ -20,7 +20,7 @@ import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects'
 
 export function updateField(this: void, state: GameState, interactive: boolean) {
     updateScriptEvents(state);
-    if (state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput || !interactive) {
+    if (state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput) {
         return;
     }
     if (state.areaInstance?.needsLogicRefresh) {
@@ -39,16 +39,16 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
     } else if (!state.hideHUD && state.hudOpacity < 1) {
         state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
     }
-    if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.MENU)) {
         showMainMenuScene(state);
         return;
     }
-    if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.MAP)) {
         showMapScene(state);
         return;
     }
     if (editingState.isEditing) {
-        updateAllHeroes(state);
+        updateAllHeroes(state, interactive);
         updateCamera(state);
         return;
     }
@@ -93,11 +93,11 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
         return;
     }
     addAmbientEffects(state);
-    updateAllHeroes(state);
+    updateAllHeroes(state, interactive);
     updateCamera(state);
-    if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
         switchElement(state, -1);
-    } else if (wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
+    } else if (interactive && wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
         switchElement(state, 1);
     }
     removeDefeatedEnemies(state, state.alternateAreaInstance);

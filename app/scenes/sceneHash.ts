@@ -5,6 +5,7 @@ import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
 import type {HudScene} from 'app/scenes/hud/hudScene';
 import type {IntroScene} from 'app/scenes/intro/introScene';
 import type {MapScene} from 'app/scenes/map/mapScene';
+import type {PrologueScene} from 'app/scenes/prologue/prologueScene';
 import type {TitleScene} from 'app/scenes/title/titleScene';
 
 interface AllScenes {
@@ -15,6 +16,7 @@ interface AllScenes {
     hud: HudScene
     intro: IntroScene
     map: MapScene
+    prologue: PrologueScene
     title: TitleScene
 }
 

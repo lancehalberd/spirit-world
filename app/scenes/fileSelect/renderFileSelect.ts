@@ -32,7 +32,7 @@ export function renderFileSelect(context: CanvasRenderingContext2D, state: GameS
     for (let i = 0; i < options.length; i++) {
         let text = options[i].slice(0, 13).toUpperCase();
         drawText(context, text, x, y, textOptions);
-        if (scene.menuIndex === i) {
+        if (scene.cursorIndex === i) {
             // Draw an arrow next to the selected option.
             context.beginPath();
             context.moveTo(r.x + 8, y - 8);

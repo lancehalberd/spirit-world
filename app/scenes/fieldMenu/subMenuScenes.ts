@@ -36,9 +36,9 @@ class MaterialsMenuScene extends FieldMenuScene {
             {
                 id: 'materials',
                 options: getMaterialOptions(state),
-                x: this.x, y: this.y, w: 48, h: 60,
-                rows: 2,
-                columns: 2,
+                x: this.x, y: this.y, w: 72, h: 90,
+                rows: 3,
+                columns: 3,
                 rowHeight: 30,
                 optionsOffset: {
                     x: 0,

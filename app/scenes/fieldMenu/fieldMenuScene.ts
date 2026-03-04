@@ -85,7 +85,7 @@ export class FieldMenuScene implements GameScene {
     needsRefresh = true;
     panels: MenuPanel[] = [];
     panelsBuffer: CanvasBuffer = createCanvasBuffer(CANVAS_WIDTH, CANVAS_HEIGHT);
-    buffer: CanvasBuffer = createCanvasBuffer(CANVAS_WIDTH, CANVAS_HEIGHT);
+    // buffer: CanvasBuffer = createCanvasBuffer(CANVAS_WIDTH, CANVAS_HEIGHT);
     cursor: {
         // Which panel the cursor is in
         panelId: string
@@ -104,7 +104,7 @@ export class FieldMenuScene implements GameScene {
     getPanels(state: GameState): MenuPanel[] {
         return [];
     }
-    update(state: GameState) {
+    update(state: GameState, interactive: boolean) {
         if (this.needsRefresh) {
             this.panels = this.getPanels(state);
             for (const panel of this.panels) {
@@ -119,6 +119,9 @@ export class FieldMenuScene implements GameScene {
                     }
                 }
             }
+        }
+        if (!interactive) {
+            return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
             this.closeScene(state);
@@ -201,7 +204,9 @@ export class FieldMenuScene implements GameScene {
             drawFrameCenteredAt(context, cursorFrame, activeOption);
 
             const label = activeOption.isVisible(state) && activeOption.getLabel(state);
-            if (label) {
+            // Only show the label for the active option if this menu is at the top of the scene stack,
+            // it is confusing to see labels for the main menu when submenus are open.
+            if (state.sceneStack[state.sceneStack.length - 1] === this && label) {
                 const nameBoxWidth = label.length * 8 + 12, h = 18 + 8;
                 const nameBoxRect = {
                     x: menuRect.w + 8 - nameBoxWidth,

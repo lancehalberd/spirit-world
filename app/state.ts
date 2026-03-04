@@ -4,6 +4,7 @@ import {randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import {getDefaultSavedState } from 'app/savedState'
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
+import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
 export function loadSavedData(): boolean {
@@ -84,7 +85,6 @@ export function getDefaultState(): GameState {
         showControls: false,
         menuIndex: 0,
         menuRow: 0,
-        scene: 'prologue',
         keyboard: {
             gameKeyValues: [],
             gameKeysDown: new Set(),
@@ -127,8 +127,7 @@ export function initializeState() {
     if (Math.random() < 0.5) {
         showIntroScene(state);
     } else {
-        // TODO: Change to prologue.
-        showIntroScene(state);
+        showPrologueScene(state);
     }
 }
 

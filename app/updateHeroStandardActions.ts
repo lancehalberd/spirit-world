@@ -32,7 +32,7 @@ import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
 import {showMessage} from 'app/scriptEvents';
 
-export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
+export function updateHeroStandardActions(this: void, state: GameState, hero: Hero, interactive: boolean) {
     hero.thrownChakrams = hero.thrownChakrams.filter(
         chakram => chakram.area === hero.area
     );
@@ -42,10 +42,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.activeBarrierBurst && hero.activeBarrierBurst.area !== hero.area) {
         delete hero.activeBarrierBurst;
     }
-    const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
-    const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
-    const isCloneToolDown = isToolButtonPressed(state, 'clone');
-    const isPlayerControlled = !hero.isUncontrollable
+    const wasPassiveButtonPressed = interactive && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
+    const isPassiveButtonDown = interactive && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
+    const isCloneToolDown = interactive && isToolButtonPressed(state, 'clone');
+    const isPlayerControlled = interactive && !hero.isUncontrollable
         && (
             (state.hero.action === 'meditating' && hero.isAstralProjection)
             || isCloneToolDown || hero === state.hero

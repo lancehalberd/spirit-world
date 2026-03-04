@@ -16,7 +16,8 @@ type PassiveTool =
     | 'armor'
     // Accessories
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing'
-    | 'arDevice';
+    // Etc
+    | 'peachBasket' | 'arDevice';
 type MagicElement = 'fire' | 'ice' | 'lightning';
 type Collectible =
     | 'peach' // Can be collected only if you possess the peach basket.

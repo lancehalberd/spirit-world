@@ -6,7 +6,6 @@ import {
     getDungeonOptions,
     getEyesOptions,
     getEquipmentOptions,
-    getPotionOptions,
     getSystemOptions,
     getTechniqueOptions,
     getToolOptions,
@@ -115,9 +114,8 @@ class MainMenuScene extends FieldMenuScene {
             createMenuPanel('arDevice', [arDeviceMenuOption], 1, 1, {x: 147, y: 33, w: 24, h: 24}),
 
             // Various rows shown under the active tools
-            createMenuPanel('potions', getPotionOptions(state), 1, 3, {x: 90, y: 72, w: 81, h: 24}),
-            createMenuPanel('eyes', getEyesOptions(state), 1, 3, {x: 90, y: 105, w: 81, h: 24}),
-            createMenuPanel('techniques', getTechniqueOptions(state), 1, 3, {x: 90, y: 138, w: 81, h: 24}),
+            createMenuPanel('eyes', getEyesOptions(state), 1, 3, {x: 90, y: 66, w: 81, h: 24}),
+            createMenuPanel('techniques', getTechniqueOptions(state), 1, 3, {x: 90, y: 99, w: 81, h: 24}),
 
             // system options on the far right
             createMenuPanel('menu', getSystemOptions(state), 4, 1, {x: 180, y: 0, w: 24, h: 96}),
@@ -125,14 +123,14 @@ class MainMenuScene extends FieldMenuScene {
             createMenuPanel('peach', [peachMenuOption], 1, 1, {x: 180, y: 106, w: 24, h: 24})
         ];
     }
-    update(state: GameState) {
+    update(state: GameState, interactive: boolean) {
         // We allow switching directly from the main menu to the map for convenience.
-        if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+        if (interactive && wasGameKeyPressed(state, GAME_KEY.MAP)) {
             this.closeScene(state);
             showMapScene(state);
             return;
         }
-        super.update(state);
+        super.update(state, interactive);
     }
 }
 

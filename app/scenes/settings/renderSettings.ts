@@ -4,6 +4,7 @@ import { renderStandardFieldStack } from 'app/scenes/field/renderField';
 import { fillRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { getSettingsOptions } from 'app/state';
+import type {SettingsScene} from 'app/scenes/settings/settingsScene';
 
 const MARGIN = 20;
 
@@ -45,7 +46,7 @@ const textOptions = <const>{
     size: 16,
 };
 
-export function renderSettings(context: CanvasRenderingContext2D, state: GameState): void {
+export function renderSettings(context: CanvasRenderingContext2D, state: GameState, scene: SettingsScene): void {
     renderStandardFieldStack(context, state);
 
     context.save();
@@ -73,7 +74,7 @@ export function renderSettings(context: CanvasRenderingContext2D, state: GameSta
     for (let i = 0; i < options.length; i++) {
         let text = options[i].slice(0, 13).toUpperCase();
         drawText(context, text, x, y, textOptions);
-        if (state.menuIndex === i) {
+        if (scene.index === i) {
             // Draw an arrow next to the selected option.
             context.beginPath();
             context.moveTo(r.x + 8, y - 8);

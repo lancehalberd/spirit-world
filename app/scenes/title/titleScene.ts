@@ -1,9 +1,10 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
+import {renderStandardFieldStack} from 'app/scenes/field/renderField';
 import {showFileSelectScene} from 'app/scenes/fileSelect/showFileSelectScene';
-import {sceneHash} from 'app/scenes/sceneHash';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
-import {renderStandardFieldStack} from 'app/scenes/field/renderField';
+import {sceneHash} from 'app/scenes/sceneHash';
+import {showSettingsScene} from 'app/scenes/settings/settingsScene';
 import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
@@ -35,7 +36,7 @@ export class TitleScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     idleTime = 0;
-    menuIndex = 0;
+    cursorIndex = 0;
     update(state: GameState) {
         const options = getTitleOptions(state);
 
@@ -49,13 +50,13 @@ export class TitleScene implements GameScene {
             return;
         }
 
-        const selectedOption = options[this.menuIndex];
+        const selectedOption = options[this.cursorIndex];
         if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-            this.menuIndex = (this.menuIndex - 1 + options.length) % options.length;
+            this.cursorIndex = (this.cursorIndex - 1 + options.length) % options.length;
             playSound('menuTick');
             this.idleTime = 0;
         } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-            this.menuIndex = (this.menuIndex + 1) % options.length;
+            this.cursorIndex = (this.cursorIndex + 1) % options.length;
             playSound('menuTick');
             this.idleTime = 0;
         }
@@ -67,8 +68,7 @@ export class TitleScene implements GameScene {
                 showFileSelectScene(state);
                 break;
             case 'SETTINGS':
-                state.scene = 'options';
-                this.menuIndex = 0;
+                showSettingsScene(state);
                 break;
             case 'QUIT':
                 console.log('quit game');
@@ -104,7 +104,7 @@ export class TitleScene implements GameScene {
         for (let i = 0; i < options.length; i++) {
             let text = options[i].slice(0, 13).toUpperCase();
             drawText(context, text, x, y, textOptions);
-            if (this.menuIndex === i) {
+            if (this.cursorIndex === i) {
                 // Draw an arrow next to the selected option.
                 context.beginPath();
                 context.moveTo(r.x + 8, y - 8);

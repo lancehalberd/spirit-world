@@ -104,6 +104,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             fireBlessing: 0,
             lightningBlessing: 0,
             arDevice: 0,
+            peachBasket: 0,
         },
         // Data from this function is considered mutable, so we need to return a copy of
         // this spawn location to avoid accidentally modifying it in the future.

@@ -88,7 +88,7 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
             }
             return 'Spirit Sight';
         case 'victoryPoint':
-            return `${lootAmount}x VP(${state.hero.savedData.collectibles.victoryPoint + lootAmount})`;
+            return `${state.hero.savedData.collectibles.victoryPoint}x Victory Points`;
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
@@ -105,7 +105,8 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
         case 'ironSkin': return 'Iron Skin';
         case 'catEyes': return 'Cat Eyes';
         case 'nimbusCloud': return 'Nimbus Cloud';
-        case 'arDevice': return 'AR Device';
+        case 'peachBasket': return 'Peach Basket';
+        case 'arDevice': return 'Aether Realm Device';
         case 'trueSight': return 'True Sight';
         case 'leatherBoots':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
@@ -147,6 +148,11 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
                 return 'Topaz Pin';
             }
             return 'Ancient Badge';
+        case 'healthPotion': return 'Peach Nectar';
+        case 'statusPotion': return 'Immunity Potion';
+        case 'magicPotion': return 'Spirit Elixer';
+        case 'magicBeans': return 'Fortified Seeds'
+        case 'aetherCrystal': return 'Aether Crystal'
         case 'silverOre': return 'Silver Ore';
         case 'goldOre': return 'Gold Ore';
     }
@@ -208,6 +214,11 @@ function getLootGetMessage(state: GameState, {lootType, lootLevel, lootAmount}: 
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
+        case 'healthPotion': return 'You obtained a bottle of ${lootName}!';
+        case 'statusPotion': return 'You obtained an ${lootName}!';
+        case 'magicPotion': return 'You obtained a ${lootName}!';
+        case 'magicBeans': return 'You obtained the ${lootName}!'
+        case 'aetherCrystal': return 'You obtained an ${lootName}!'
     }
     return `You obtained the ${lootName}!`;
 }
@@ -313,7 +324,7 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
                 + '{|}Your Astral Body can touch the Spirit World.'
                 + '{|}In your Astral Body, press [B_PASSIVE] to grab or pickup objects.';
         case 'teleportation':
-            return '';
+            return 'Now you can teleport your body to your Astral Body!';
             // There is a tutorial for teleportation now that probably makes this unnecessary.
             /*return 'Move your Astral Body away from you in the Sprit World'
                 + '{|}Press [B_TOOL] to teleport your Real Body to your Astral Body.'
@@ -374,6 +385,21 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
             return 'Maybe someone in the city can use this to make something.';
         case 'goldOre':
             return 'There must be someone in the world who can use this ore.';
+        case 'peachBasket':
+            return `You can hold extra peaches in this basket.
+                {|}You can trade 30 peaches to Ambrosia for a bottle of Peach Nectar.`;
+        case 'arDevice':
+            return 'Wearing this device allows you to see into the Aether Realms.';
+        case 'healthPotion':
+            return 'This concentrated brew will restore 10 hearts but reduces your max health by 1 until you rest at a Fairie Statue.';
+        case 'statusPotion': return 'This potion will make you immune to status effects for 1 minute.';
+        case 'magicPotion': return 'Drink this potion to constantly regenerate your spirit energy for 1 minute.';
+        case 'magicBeans': return 'These seeds will revive any dormant Daughter Trees you can find.'
+        case 'aetherCrystal':
+            if (state.hero.savedData.passiveTools.arDevice) {
+                return 'Collect these crystals to power up your AR Device'
+            }
+            return 'This mysterious crystal seems valuable in the Spirit World.';
     }
     return '';
 }
@@ -607,6 +633,10 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return spikeBoots;
         }
         return normalBoots;
+    }
+    if (lootType === 'peachBasket') {
+        if (lootAmount >= 10) return fullPeachBasket;
+        return emptyPeachBasket;
     }
     if (lootType === 'ironBoots') {
         if (lootLevel > 1) {

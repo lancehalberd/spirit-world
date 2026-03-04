@@ -27,10 +27,13 @@ export function update() {
         delete state.scriptEvents?.blockPlayerInput;
     }*/
     updateKeyboardState(state);
-    if (state.sceneStack.length) {
+    // Make a copy of the scene stack before processing it so that we ignore any updates to the scene stack
+    // this frame until the next frame.
+    const sceneStack = [...state.sceneStack];
+    if (sceneStack.length) {
         let blockInput = false;
-        for (let i = state.sceneStack.length - 1; i >= 0; i--) {
-            const scene = state.sceneStack[i];
+        for (let i = sceneStack.length - 1; i >= 0; i--) {
+            const scene = sceneStack[i];
             if (!scene) {
                 debugger;
             }

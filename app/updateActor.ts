@@ -21,14 +21,14 @@ import {removeObjectFromArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
 
-export function updateAllHeroes(this: void, state: GameState) {
+export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
         state.hero.justRespawned = false;
-        updateHeroSpecialActions(state, state.hero);
+        updateHeroSpecialActions(state, state.hero, interactive);
         return;
     }
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
-    if (state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
+    if (interactive && state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
         if (!state.hero.cloneToolReleased){
             state.hero.cloneToolReleased = true;
         } else {
@@ -45,7 +45,7 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     // This is for switching to thrown clone as you throw it.
-    if (state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
+    if (interactive && state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
         for (let i = 0; i < state.hero.clones.length; i++) {
             if (state.hero.clones[i].isUncontrollable
                 && !state.hero.clones[i].cannotSwapTo
@@ -70,17 +70,17 @@ export function updateAllHeroes(this: void, state: GameState) {
     }
     if (state.hero.astralProjection) {
         if (state.hero.spiritRadius > 0) {
-            updateHero(state, state.hero.astralProjection);
+            updateHero(state, state.hero.astralProjection, interactive);
         } else {
             removeObjectFromArea(state, state.hero.astralProjection);
             state.hero.astralProjection = null;
         }
     }
     if (!state.scriptEvents.blockPlayerUpdates) {
-        updateHero(state, state.hero);
+        updateHero(state, state.hero, interactive);
         for (let i = 0; i < state.hero.clones.length; i++) {
             const clone = state.hero.clones[i];
-            updateHero(state, clone);
+            updateHero(state, clone, interactive);
         }
     }
     const skipModulus = state.hero.savedData.passiveTools.spiritSight ? 100 : 40;
@@ -91,15 +91,15 @@ export function updateAllHeroes(this: void, state: GameState) {
     checkToStartScreenTransition(state, state.hero);
 }
 
-export function updateHero(this: void, state: GameState, hero: Hero) {
+export function updateHero(this: void, state: GameState, hero: Hero, interactive: boolean) {
     hero.justRespawned = false;
     // If the hero is performing some special action with logic that overrides default actions,
     // for example, falling into a pit, or transitioning between screens, this function will handle
     // the update and return `true`, indicating that normal behavior should be suspended.
-    const blockNormalActions = updateHeroSpecialActions(state, hero);
+    const blockNormalActions = updateHeroSpecialActions(state, hero, interactive);
     if (!blockNormalActions) {
         // This update relates to hero performing or completing actions + movement.
-        updateHeroStandardActions(state, hero);
+        updateHeroStandardActions(state, hero, interactive);
         if (!hero.area) {
             return;
         }
@@ -321,7 +321,6 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             if (state.hero.savedData.hasRevive) {
                 state.reviveTime = state.fieldTime;
             }
-            state.menuIndex = 0;
         }
     }
     // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.

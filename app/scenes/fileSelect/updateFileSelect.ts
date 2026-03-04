@@ -20,18 +20,18 @@ export function updateFileSelect(state: GameState, scene: FileSelectScene) {
     const options = getFileSelectOptions(state, scene);
     let changedOption = false;
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        scene.menuIndex = (scene.menuIndex - 1 + options.length) % options.length;
+        scene.cursorIndex = (scene.cursorIndex - 1 + options.length) % options.length;
         changedOption = true;
         playSound('menuTick');
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        scene.menuIndex = (scene.menuIndex + 1) % options.length;
+        scene.cursorIndex = (scene.cursorIndex + 1) % options.length;
         changedOption = true;
         playSound('menuTick');
     }
     if (changedOption) {
         if (scene.mode === 'select' || scene.mode === 'deleteSavedGame') {
-            if (scene.menuIndex < state.savedGames.length) {
-                setSaveFileToState(state, scene.menuIndex, 0);
+            if (scene.cursorIndex < state.savedGames.length) {
+                setSaveFileToState(state, scene.cursorIndex, 0);
             }
         }
     }
@@ -39,36 +39,36 @@ export function updateFileSelect(state: GameState, scene: FileSelectScene) {
         playSound('menuTick');
         switch (scene.mode) {
             case 'deleteSavedGameConfirmation':
-                if (scene.menuIndex === 1) {
+                if (scene.cursorIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
                     saveGamesToLocalStorage(state);
                 }
                 scene.mode = 'select';
-                scene.menuIndex = state.savedGameIndex;
+                scene.cursorIndex = state.savedGameIndex;
                 setSaveFileToState(state, state.savedGameIndex, 0);
                 break;
             case 'deleteSavedGame':
-                if (scene.menuIndex >= state.savedGames.length) {
+                if (scene.cursorIndex >= state.savedGames.length) {
                     scene.mode = 'select';
-                    scene.menuIndex = 0;
-                    setSaveFileToState(state, scene.menuIndex, 0);
+                    scene.cursorIndex = 0;
+                    setSaveFileToState(state, scene.cursorIndex, 0);
                 } else {
-                    state.savedGameIndex = scene.menuIndex;
+                    state.savedGameIndex = scene.cursorIndex;
                     scene.mode = 'deleteSavedGameConfirmation';
-                    scene.menuIndex = 0;
+                    scene.cursorIndex = 0;
                 }
                 break;
             case 'select':
-                if (scene.menuIndex === state.savedGames.length
-                        && options[scene.menuIndex] === 'DELETE') {
+                if (scene.cursorIndex === state.savedGames.length
+                        && options[scene.cursorIndex] === 'DELETE') {
                     scene.mode = 'deleteSavedGame';
-                    scene.menuIndex = 0;
-                    setSaveFileToState(state, scene.menuIndex, 0);
-                } else if (scene.menuIndex > state.savedGames.length
-                        && options[scene.menuIndex] === 'TITLE') {
+                    scene.cursorIndex = 0;
+                    setSaveFileToState(state, scene.cursorIndex, 0);
+                } else if (scene.cursorIndex > state.savedGames.length
+                        && options[scene.cursorIndex] === 'TITLE') {
                     showTitleScene(state);
                 } else {
-                    selectSaveFile(state, scene.menuIndex);
+                    selectSaveFile(state, scene.cursorIndex);
                 }
                 break;
         }
@@ -85,7 +85,8 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
         if (!isRandomizer) {
-            state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', 1000, false);
+            state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', false);
+            state.scriptEvents.queue.push({type: 'wait', duration: 1000});
             state.scriptEvents.queue.push({type: 'clearTextBox'});
         } else {
             if (randomizerGoalType === 'finalBoss') {

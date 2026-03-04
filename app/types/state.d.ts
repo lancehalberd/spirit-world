@@ -42,8 +42,6 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type Scene = 'prologue' | 'credits' | 'options';
-
 type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
 interface GameState {
@@ -102,7 +100,6 @@ interface GameState {
     menuRow: number
     // This is mostly used for debugging animations.
     alwaysHideMenu?: boolean
-    scene: Scene
     keyboard: {
         gameKeyValues: number[]
         gameKeysDown: Set<number>

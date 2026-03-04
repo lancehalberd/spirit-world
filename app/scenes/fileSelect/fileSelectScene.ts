@@ -9,7 +9,7 @@ export class FileSelectScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     mode: FileSelectMode = 'select';
-    menuIndex = 0;
+    cursorIndex = 0;
     update(state: GameState) {
         updateFileSelect(state, this);
     }

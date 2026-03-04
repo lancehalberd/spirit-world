@@ -9,10 +9,10 @@ export class PauseScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     update(state: GameState, interactive: boolean) {
-    if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-        state.sceneStack.pop()
-        return;
-    }
+        if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+            state.sceneStack.pop()
+            return;
+        }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
         // Remove the PAUSE text while holding shift in case we want to save a capture of the game.

@@ -66,7 +66,7 @@ export class DefeatedMenuScene implements GameScene {
         drawText(context, 'CONTINUE', x, y + 2, textOptions);
 
         y = r.y + r.h * 3 / 4 + 2;
-        if (state.menuIndex === 1) {
+        if (this.cursorIndex === 1) {
             selectedY = y;
         }
         drawText(context, 'QUIT', x, y + 2, textOptions);

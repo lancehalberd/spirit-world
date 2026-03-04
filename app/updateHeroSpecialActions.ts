@@ -97,7 +97,7 @@ export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, 
     return false;
 }
 
-export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
+export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero, interactive: boolean): boolean {
     const isPrimaryHero = hero === state.hero;
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
@@ -900,7 +900,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.swimming = false;
         hero.wading = false;
         // Double pressing roll performs a quick somersault.
-        if (wasGameKeyPressed(state, GAME_KEY.ROLL)
+        if (interactive && wasGameKeyPressed(state, GAME_KEY.ROLL)
             && hero.savedData.passiveTools.roll > 1
             && hero.actionFrame > 4
             && state.hero.magic > 0
@@ -909,7 +909,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             return true;
         }
         // Holding roll performs a normal somersault with preparation.
-        if (isGameKeyDown(state, GAME_KEY.ROLL)
+        if (interactive && isGameKeyDown(state, GAME_KEY.ROLL)
             && hero.savedData.passiveTools.roll > 1
             && hero.actionFrame === 11
             && state.hero.magic > 0

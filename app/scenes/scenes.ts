@@ -4,5 +4,8 @@ export * from 'app/scenes/fileSelect/fileSelectScene';
 export * from 'app/scenes/hud/hudScene';
 export * from 'app/scenes/intro/introScene';
 export * from 'app/scenes/map/mapScene';
+export * from 'app/scenes/message/messageScene';
 export * from 'app/scenes/pause/pauseScene';
+export * from 'app/scenes/prologue/prologueScene';
+export * from 'app/scenes/settings/settingsScene';
 export * from 'app/scenes/title/titleScene';
