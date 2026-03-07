@@ -81,7 +81,7 @@ type WaitActiveScriptEvent = WaitScriptEvent & {
 }
 interface ShowChoiceBoxScriptEvent {
     type: 'showChoiceBox'
-    prompt?: string
+    prompt?: TextPage
     choices: {
         text: string
         key: string

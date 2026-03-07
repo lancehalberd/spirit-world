@@ -1,6 +1,5 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {pushScene} from 'app/scenes/sceneHash';
-import {updateSoundSettings} from 'app/utils/soundSettings';
 import {wasGameKeyPressed, wasConfirmKeyPressed} from 'app/userInput';
 import {drawFrame} from 'app/utils/animations';
 import {fillRect, pad} from 'app/utils/index';
@@ -21,7 +20,6 @@ export class MessageScene implements GameScene {
         while (state.sceneStack.includes(this)) {
             state.sceneStack.pop();
         }
-        updateSoundSettings(state);
     }
     nextPage(state: GameState) {
         this.lineIndex = 0;

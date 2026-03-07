@@ -2,9 +2,10 @@ import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {getLoot} from 'app/content/objects/lootObject';
 import {GAME_KEY} from 'app/gameConstants';
+import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
 import {hideMessagePage, showMessagePage} from 'app/scenes/message/messageScene';
-import {prependScript} from 'app/scriptEvents';
-import {wasConfirmKeyPressed, wasGameKeyPressed} from 'app/userInput';
+import {followMessagePointer, prependScript} from 'app/scriptEvents';
+import {wasGameKeyPressed} from 'app/userInput';
 import {playSound} from 'app/utils/sounds';
 import {enterLocation} from 'app/utils/enterLocation';
 import {clearObjectFlag, setObjectFlag} from 'app/utils/objectFlags';
@@ -75,25 +76,6 @@ export function updateScriptEvents(state: GameState): void {
                 }
                 break;
             }
-            case 'showChoiceBox':
-                if (wasConfirmKeyPressed(state)) {
-                    const option = event.choices[event.choiceIndex];
-                    followMessagePointer(state, option.key);
-                    state.scriptEvents.handledInput = true;
-                    break;
-                }
-                const optionCount = event.choices.length;
-                if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-                    event.choiceIndex = (event.choiceIndex + optionCount - 1) % optionCount;
-                    state.scriptEvents.handledInput = true;
-                } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-                    event.choiceIndex = (event.choiceIndex + 1) % optionCount;
-                    state.scriptEvents.handledInput = true;
-                }
-                state.scriptEvents.blockEventQueue = true;
-                state.scriptEvents.blockFieldUpdates = true;
-                activeEvents.push(event);
-                break;
         }
         if (event.type !== 'wait') {
             activeEventCountSinceLastWaitEvent++;
@@ -164,10 +146,7 @@ export function updateScriptEvents(state: GameState): void {
             case 'showChoiceBox':
                 // Text cues and text choice cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
-                state.scriptEvents.activeEvents.push({
-                    ...event,
-                    choiceIndex: 0,
-                });
+                showChoiceScene(state, event.prompt, event.choices);
                 state.scriptEvents.blockFieldUpdates = true;
                 state.scriptEvents.blockEventQueue = true;
                 break;
@@ -251,24 +230,3 @@ export function updateScriptEvents(state: GameState): void {
     }
 }
 
-function followMessagePointer(state: GameState, pointer: string) {
-    if (!pointer) {
-        return;
-    }
-    const [dialogueKey, optionKey] = pointer.split('.');
-    const dialogueSet = dialogueHash[dialogueKey];
-    if (!dialogueSet) {
-        console.error('Missing dialogue set', dialogueKey, pointer);
-        return;
-    }
-    const script = dialogueSet.mappedOptions[optionKey];
-    // Empty string script does nothing.
-    if (script === '') {
-        return;
-    }
-    if (!script) {
-        console.error('Missing dialogue option',  dialogueSet.mappedOptions, optionKey);
-        return;
-    }
-    prependScript(state, script);
-}

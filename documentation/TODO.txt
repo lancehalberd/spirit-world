@@ -307,8 +307,6 @@ Current tasks:
         - dirt particles
         - test new lab tiles
         - new icons
-            - peach basket
-            - consumables
             - medallions
 
     - Fix Vanara Guardian boss looks bad when moving behind foreground tiles
@@ -348,16 +346,6 @@ Current tasks:
         - line up with hero within 100px
         - Charge up for 500ms, accelerating frame rate to 4x by 300ms, strafe to align with hero quickly at first, but slow to 0 speed by 300ms
         - Drop shield and rush forward for 1s.
-
-    - Peach collection quest
-        - NPC in waterfall village storage room:
-            "You look like you need some work to keep you out of trouble."
-            "Take this basket to collect peaches. If you bring me 20 peaches I'll give you a treat! {item:peachBasket}"
-            (hint before completion) "Make sure you aren't hurt when you collect peaches, otherwise you won't be able resist eating them yourself."
-            "Wow look at all these delicious peaches. Wait one moment."
-            "Here this is for you {item:peachPotion}"
-            (hint before completion) "You can bring me 20 more peaches if you want some spending money."
-            "{choice:Give 20 peaches?|Yes:peachCollector.jadeReward|No:peachCollector.no}"
 
     - Proposal
         - Require teleportation for fully entering the Spirit World.

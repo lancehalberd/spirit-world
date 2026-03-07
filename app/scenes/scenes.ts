@@ -1,3 +1,6 @@
+export * from 'app/scenes/choice/choiceScene';
+export * from 'app/scenes/controls/controlsScene';
+export * from 'app/scenes/defeated/defeatedScene';
 export * from 'app/scenes/field/fieldScene';
 export * from 'app/scenes/fieldMenu/fieldMenuScene';
 export * from 'app/scenes/fileSelect/fileSelectScene';

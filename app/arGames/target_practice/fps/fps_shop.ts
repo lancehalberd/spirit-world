@@ -2,7 +2,7 @@ import { boxesIntersect } from 'app/utils/index';
 import { wasGameKeyPressed } from 'app/userInput';
 import { GAME_KEY } from 'app/gameConstants';
 import { typedKeys } from 'app/utils/types';
-import { drawARFont } from 'app/arGames/arFont';
+import { drawARFont } from 'app/utils/smallFont';
 import { TargetPracticeState, ShopItem, TargetPracticeSavedState, UnlockKey } from './fps_types';
 import { shopItems, baseAmmo } from './fps_config';
 import { updateHeroPosition } from './fps_utility';

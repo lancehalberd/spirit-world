@@ -214,11 +214,11 @@ function getLootGetMessage(state: GameState, {lootType, lootLevel, lootAmount}: 
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
-        case 'healthPotion': return 'You obtained a bottle of ${lootName}!';
-        case 'statusPotion': return 'You obtained an ${lootName}!';
-        case 'magicPotion': return 'You obtained a ${lootName}!';
-        case 'magicBeans': return 'You obtained the ${lootName}!'
-        case 'aetherCrystal': return 'You obtained an ${lootName}!'
+        case 'healthPotion': return `You obtained a bottle of ${lootName}!`;
+        case 'statusPotion': return `You obtained an ${lootName}!`;
+        case 'magicPotion': return `You obtained a ${lootName}!`;
+        case 'magicBeans': return `You obtained the ${lootName}!`;
+        case 'aetherCrystal': return `You obtained an ${lootName}!`;
     }
     return `You obtained the ${lootName}!`;
 }
@@ -387,11 +387,11 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
             return 'There must be someone in the world who can use this ore.';
         case 'peachBasket':
             return `You can hold extra peaches in this basket.
-                {|}You can trade 30 peaches to Ambrosia for a bottle of Peach Nectar.`;
+                {|}Bring lots of peaches to Ambrosia for a reward.`;
         case 'arDevice':
             return 'Wearing this device allows you to see into the Aether Realms.';
         case 'healthPotion':
-            return 'This concentrated brew will restore 10 hearts but reduces your max health by 1 until you rest at a Fairie Statue.';
+            return 'This concentrated brew will restore 10 hearts but reduces your max health by 1 until you rest at a Fairy Statue.';
         case 'statusPotion': return 'This potion will make you immune to status effects for 1 minute.';
         case 'magicPotion': return 'Drink this potion to constantly regenerate your spirit energy for 1 minute.';
         case 'magicBeans': return 'These seeds will revive any dormant Daughter Trees you can find.'

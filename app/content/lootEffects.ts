@@ -85,8 +85,18 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         updateDungeonInventory(state, inventory, false);
     },
     peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.life = Math.min(state.hero.life + 1, state.hero.savedData.maxLife);
-        playAreaSound(state, state.areaInstance, 'drink');
+        if (state.hero.life >= state.hero.savedData.maxLife
+            && state.hero.savedData.passiveTools.peachBasket
+            // Basket only holds 30 peaches
+            && state.hero.savedData.collectibles.peach < 30
+        ) {
+            gainCollectible(state, 'peach');
+            // TODO: Consider a different sound effect for collecting a peach
+            playAreaSound(state, state.areaInstance, 'drink');
+        } else {
+            state.hero.life = Math.min(state.hero.life + 1, state.hero.savedData.maxLife);
+            playAreaSound(state, state.areaInstance, 'drink');
+        }
     },
     peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         gainCollectible(state, 'peachOfImmortality');

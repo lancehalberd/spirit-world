@@ -1,14 +1,10 @@
-import {CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY} from 'app/gameConstants';
-import type {MessageScene} from 'app/scenes/message/messageScene';
-import {drawFrame} from 'app/utils/animations';
-import {fillRect, pad} from 'app/utils/index';
+import {GAME_KEY} from 'app/gameConstants';
 import {simpleWhiteFont, keyboardMap, xboxMap} from 'app/utils/simpleWhiteFont';
 
 const font = simpleWhiteFont;
 
 const characterWidth = 8;
 const messageWidth = 160;
-const messageRows = 4;
 // This was used for animating characters every N ms.
 //const charTime = 4;
 
@@ -186,68 +182,3 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
     return pages;
 }
 
-export function renderTextRow(context: CanvasRenderingContext2D, text: string, {x, y}: {x: number, y: number}): void {
-    for (const character of text) {
-        const frame = font.frameMap[character];
-        if (!frame) {
-            x += characterWidth;
-            continue;
-        }
-        drawFrame(context, frame, {
-            x: x - (frame.content?.x || 0) * (frame.s || 1),
-            y: y - (frame.content?.y || 0) * (frame.s || 1),
-            w: frame.w * (frame.s || 1),
-            h: frame.h * (frame.s || 1),
-        });
-        x += frame.w;
-    }
-}
-
-export function renderChoice(context: CanvasRenderingContext2D, state: GameState, scene: MessageScene): void {
-    let h = messageRows * (16 + 2) + 6;
-    let w = messageWidth + 8;
-    let r = {
-        x: (CANVAS_WIDTH - w) / 2,
-        y: CANVAS_HEIGHT - h - 16,
-        w,
-        h,
-    };
-    //const {section} = getAreaSize(state);
-    if (state.hero.y - state.camera.y >= 128) {
-        r.y = 32;
-    }
-
-    const choice = state.scriptEvents.activeEvents.find(event => event.type === 'showChoiceBox') as ShowChoiceBoxActiveScriptEvent;
-    if (choice) {
-        let choiceIndex = choice.choiceIndex || 0;
-        h = Math.max(h, (1 + choice.choices.length) * (16 + 2) + 6);
-        let r = {
-            x: (CANVAS_WIDTH - w) / 2,
-            y: CANVAS_HEIGHT - h - 16,
-            w,
-            h,
-        };
-        fillRect(context, pad(r, 2), 'white');
-        fillRect(context, r, 'black');
-        r = pad(r, -4);
-        let y = r.y, x = r.x;
-        if (choice.prompt) {
-            renderTextRow(context, choice.prompt, {x, y});
-            y += 18;
-        }
-        x += 20;
-        for (let i = 0; i < choice.choices.length; i++) {
-            renderTextRow(context, choice.choices[i].text, {x, y});
-            if (choiceIndex === i) {
-                // Draw an arrow next to the selected option.
-                context.fillStyle = 'white';
-                context.beginPath();
-                context.moveTo(r.x + 8, y);
-                context.lineTo(r.x + 16, y + 8);
-                context.lineTo(r.x + 8, y + 16);
-                context.fill();
-            }
-            y += 18;
-        }
-    }
-}

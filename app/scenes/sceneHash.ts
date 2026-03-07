@@ -1,3 +1,4 @@
+import type {ChoiceScene} from 'app/scenes/choice/choiceScene';
 import type {DefeatedMenuScene} from 'app/scenes/defeated/defeatedMenuScene';
 import type {DefeatedScene} from 'app/scenes/defeated/defeatedScene';
 import type {FieldScene} from 'app/scenes/field/fieldScene';
@@ -9,6 +10,7 @@ import type {PrologueScene} from 'app/scenes/prologue/prologueScene';
 import type {TitleScene} from 'app/scenes/title/titleScene';
 
 interface AllScenes {
+    choice: ChoiceScene
     defeated: DefeatedScene
     defeatedMenu: DefeatedMenuScene
     field: FieldScene

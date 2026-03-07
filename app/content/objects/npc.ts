@@ -6,6 +6,7 @@ import {
 } from 'app/content/enemyAnimations';
 import {elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation} from 'app/content/enemies/elemental';
 import {
+    ambrosiaAnimations,
     archeologistAnimations,
     blacksmithOneAnimations,
     blacksmithTwoAnimations,
@@ -151,6 +152,12 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     },
     woman: {
         animations: womanAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 25,
+    },
+    ambrosia: {
+        animations: ambrosiaAnimations,
         shadowOffset: 2,
         flipLeft: true,
         height: 25,

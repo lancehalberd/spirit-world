@@ -24,13 +24,14 @@ const passiveTools: PassiveTool[] = [
     'gloves', 'roll', 'nimbusCloud', 'catEyes', 'spiritSight',
     'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'armor', 'phoenixCrown',
     'waterBlessing', 'fireBlessing', 'lightningBlessing',
+    'peachBasket', 'arDevice',
 ];
 export function isPassiveTool(lootType: string): lootType is PassiveTool {
     return passiveTools.includes(lootType as PassiveTool);
 }
-const elementLoot: MagicElement[] = ['fire', 'lightning', 'ice'];
+const magicElement: MagicElement[] = ['fire', 'lightning', 'ice'];
 export function isMagicElement(lootType: string): lootType is MagicElement {
-    return elementLoot.includes(lootType as MagicElement);
+    return magicElement.includes(lootType as MagicElement);
 }
 const equipment: Equipment[] = ['leatherBoots', 'cloudBoots', 'ironBoots'];
 export function isEquipment(lootType: string): lootType is Equipment {
@@ -38,7 +39,7 @@ export function isEquipment(lootType: string): lootType is Equipment {
 }
 
 const collectibles: Collectible[] = [
-    'silverOre', 'goldOre',
+    'silverOre', 'goldOre', 'victoryPoint',
 ];
 export function isCollectible(lootType: string): lootType is Collectible {
     return collectibles.includes(lootType as Collectible);
@@ -111,3 +112,27 @@ function getCurrentLootValue(state: GameState, lootType: LootType): number {
     }
     throw new Error(`Loot Type has no levels: ${lootType}`);
 }
+
+
+export const allLootTypes: LootType[] = [
+    'empty',
+    'peachOfImmortality',
+    'peachOfImmortalityPiece',
+    'money',
+    'weapon',
+    'bigKey',
+    'smallKey',
+    'map',
+    ...activeTools,
+    ...passiveTools,
+    ...collectibles,
+    ...consumables,
+    'secondChance',
+    // This is the special progressive spirit power loot used by the randomizer.
+    'spiritPower',
+    ...equipment,
+    ...magicElement,
+    // Blueprints
+    'spikeBoots', 'flyingBoots', 'forgeBoots',
+    'silverMailSchematics', 'goldMailSchematics',
+];

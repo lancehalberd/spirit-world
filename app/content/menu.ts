@@ -9,7 +9,7 @@ import {fillRect, pad} from 'app/utils/index';
 import {isActiveTool, isEquipment, isMagicElement, isPassiveTool} from 'app/utils/loot';
 import {setEquippedBoots, setEquippedElement, setLeftTool, setRightTool} from 'app/utils/menu';
 import {characterMap} from 'app/utils/simpleWhiteFont';
-import {drawARFont} from 'app/arGames/arFont';
+import {drawSmallWhiteFont} from 'app/utils/smallFont';
 import {requireFrame} from 'app/utils/packedImages';
 
 
@@ -65,6 +65,7 @@ export const peachMenuOption: MenuElement = {
     },
     onUpgrade(state: GameState, toolIndex?: number) {
         state.hero.savedData.collectibles.peachOfImmortalityPiece++;
+        state.hero.savedData.collectibleTotals.peachOfImmortalityPiece++;
         if (state.hero.savedData.collectibles.peachOfImmortalityPiece >= 4) {
             state.hero.savedData.collectibles.peachOfImmortalityPiece = 0;
             state.hero.savedData.maxLife++;
@@ -587,9 +588,7 @@ function getCollectibleMenuElement(state: GameState, collectible: Collectible): 
         isVisible: (state: GameState) => state.hero.savedData.collectibleTotals[collectible] > 0,
         render(context: CanvasRenderingContext2D, state: GameState) {
             drawFrameCenteredAt(context, getLootFrame(state, {lootType: collectible}), {x: this.x, y: this.y, w: this.w, h: this.h});
-            drawARFont(context, state.hero.savedData.collectibleTotals[collectible], this.x + this.w / 2, this.y + this.h + 1, {
-                textBaseline: 'middle', textAlign: 'center',
-            });
+            drawCount(context, state.hero.savedData.collectibleTotals[collectible], this);
         },
         onSelect(state: GameState, toolIndex?: number) {
             showSimpleMessage(state, getLootHelpMessage(state, {lootType: collectible}));
@@ -608,9 +607,7 @@ const peachBasketMenuElement = {
     isVisible: (state: GameState) => state.hero.savedData.passiveTools.peachBasket > 0,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'peachBasket', lootAmount: state.hero.savedData.collectibles.peach}), {x: this.x, y: this.y, w: this.w, h: this.h});
-        drawARFont(context, state.hero.savedData.collectibles.peach, this.x + this.w / 2, this.y + this.h + 1, {
-            textBaseline: 'middle', textAlign: 'center',
-        });
+        drawCount(context, state.hero.savedData.collectibles.peach, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
         // TODO: If player has a peach in the basket "Eat a peach?" (restore one health and subtract one peach).
@@ -642,9 +639,7 @@ function getConsumableMenuElement(state: GameState, consumable: Consumable): Men
         isVisible: (state: GameState) => state.hero.savedData.consumableTotals[consumable] > 0,
         render(context: CanvasRenderingContext2D, state: GameState) {
             drawFrameCenteredAt(context, getLootFrame(state, {lootType: consumable}), {x: this.x, y: this.y, w: this.w, h: this.h});
-            drawARFont(context, state.hero.savedData.consumables[consumable], this.x + this.w / 2, this.y + this.h + 1, {
-                textBaseline: 'middle', textAlign: 'center',
-            });
+            drawCount(context, state.hero.savedData.consumables[consumable], this);
         },
         onSelect(state: GameState, toolIndex?: number) {
             showSimpleMessage(state, getLootHelpMessage(state, {lootType: consumable}));
@@ -659,6 +654,12 @@ function getConsumableMenuElement(state: GameState, consumable: Consumable): Men
 
 export function getPotionOptions(state: GameState): MenuElement[] {
     return (<const>['healthPotion', 'statusPotion', 'magicPotion']).map(option => getConsumableMenuElement(state, option));
+}
+
+function drawCount(context: CanvasRenderingContext2D, count: string|number, r: Rect) {
+    drawSmallWhiteFont(context, `-${count}-`, r.x + r.w / 2, r.y + r.h + 1, {
+        textBaseline: 'middle', textAlign: 'center',
+    });
 }
 
 function getDungeonItems(state: GameState) {
@@ -705,9 +706,7 @@ const smallKeyMenuOption: MenuElement = {
     isVisible: (state: GameState) => getDungeonItems(state).totalSmallKeys > 0,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, keyFrame, {x: this.x, y: this.y, w: this.w, h: this.h});
-        drawARFont(context, getDungeonItems(state).smallKeys, this.x + this.w / 2, this.y + this.h + 1, {
-            textBaseline: 'middle', textAlign: 'center',
-        });
+        drawCount(context, getDungeonItems(state).smallKeys, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
         showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'smallKey'}));

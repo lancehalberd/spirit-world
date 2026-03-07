@@ -6,7 +6,9 @@ interface Tint {
     amount: number
 }
 
-const [globalTintCanvas, globalTintContext] = createCanvasAndContext(150, 300);
+// Currently this needs to be as large as the largest image we will tint in each dimension
+// In theory this is to improve performance, but I'm not sure this is actually useful.
+const [globalTintCanvas, globalTintContext] = createCanvasAndContext(300, 300);
 globalTintContext.imageSmoothingEnabled = false;
 
 // Cache of solid tinted images to avoid recreating them each time they are used.

@@ -13,7 +13,7 @@ import {getLootLevel} from 'app/utils/loot';
 import {setObjectFlag} from 'app/utils/objectFlags';
 import {addObjectToArea, getObjectStatus, removeObjectFromArea} from 'app/utils/objects';
 import {saveGame} from 'app/utils/saveGame';
-import {drawARFont} from 'app/arGames/arFont';
+import {drawARFont} from 'app/utils/smallFont';
 
 
 /*const [coin] =

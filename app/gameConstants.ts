@@ -81,37 +81,6 @@ export const enemySeed = readGetParameterAsInt('enemySeed');
 export const isRandomizer = !!entranceSeed || !!itemSeed || !!enemySeed;
 window.isRandomizer = isRandomizer;
 
-export const allLootTypes: LootType[] = [
-    'empty',
-    'peachOfImmortality',
-    'peachOfImmortalityPiece',
-    'money',
-    'silverOre',
-    'goldOre',
-    'weapon',
-    'bigKey',
-    'smallKey',
-    'map',
-    'secondChance',
-    // This is used for the basic goal in randomizer.
-    'victoryPoint',
-    // This is the special progressive spirit power loot used by the randomizer.
-    'spiritPower',
-    'bow', 'clone', 'staff', 'cloak',
-    'gloves',
-    'roll',
-    'nimbusCloud',
-    'catEyes', 'spiritSight', 'trueSight',
-    'astralProjection', 'teleportation',
-    'ironSkin', 'armor', 'phoenixCrown',
-    'waterBlessing', 'fireBlessing', 'lightningBlessing',
-    'leatherBoots', 'ironBoots', 'cloudBoots',
-    'fire', 'ice', 'lightning',
-    // Blueprints
-    'spikeBoots', 'flyingBoots', 'forgeBoots',
-    'silverMailSchematics', 'goldMailSchematics',
-];
-
 // 'foreground3' is rarely required for certain combinations of trees.
 export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];
 
