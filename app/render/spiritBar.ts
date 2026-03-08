@@ -1,5 +1,6 @@
 import {gameModifiers} from 'app/gameConstants';
 import {renderLightningRay} from 'app/render/renderLightning'
+import {getActiveDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
 import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
 import {createCanvasAndContext} from 'app/utils/canvas';
 
@@ -48,7 +49,7 @@ const spiritFrame: Frame = {
 let lastFrameHeight: number, hadRevive: boolean = false;
 function updateSpiritBarFrame(state: GameState): void {
     const reviveAnimationTime = state.fieldTime - state.reviveTime;
-    const hasRevive = state.hero.savedData.hasRevive && !state.defeatState.defeated;
+    const hasRevive = state.hero.savedData.hasRevive && !getActiveDefeatedScene(state);
     if (lastFrameHeight === state.hero.maxMagic
         && hadRevive === hasRevive
         && reviveAnimationTime >= reviveAnimation.duration) {
@@ -82,7 +83,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
     drawFrame(context, spiritFrame, {...spiritFrame, x: x - 8, y});
     // Draw the glow effect on top of the top cap if appropriate.
     const reviveAnimationTime = state.fieldTime - state.reviveTime;
-    const hasRevive = state.hero.savedData.hasRevive && !state.defeatState.defeated;
+    const hasRevive = state.hero.savedData.hasRevive && !getActiveDefeatedScene(state);
     if (hasRevive && reviveAnimationTime >= 400) {
         let animationTime = reviveAnimationTime - 400;
         // Start with the initial glow animation that plays with the top revive animation intro.

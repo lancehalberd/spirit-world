@@ -35,7 +35,7 @@ specialBehaviorsHash.craterLavaSwitch = {
             update(state: GameState) {
                 // Keep updating the hero (with controls disabled), to avoid getting stuck in an awkward frame
                 // such as slamming the staff.
-                updateAllHeroes(state);
+                updateAllHeroes(state, false);
                 // Wait for the current transition to complete before starting the next.
                 if (state.transitionState) {
                     return true;
@@ -110,7 +110,7 @@ function drainFlameBeastLava(state: GameState) {
         update(state: GameState) {
             // Keep updating the hero (with controls disabled), to avoid getting stuck in an awkward frame
             // such as slamming the staff.
-            updateAllHeroes(state);
+            updateAllHeroes(state, false);
             // Wait for the current transition to complete before starting the next.
             if (state.transitionState) {
                 return true;

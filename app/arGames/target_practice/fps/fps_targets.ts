@@ -1,5 +1,5 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawARFont } from 'app/arGames/arFont';
+import { drawARFont } from 'app/utils/smallFont';
 import { playAreaSound } from 'app/musicController';
 import { TargetPracticeState, TargetPracticeSavedState, FpsTarget, BullseyeEffect } from './fps_types';
 

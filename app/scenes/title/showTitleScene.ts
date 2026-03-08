@@ -1,13 +1,15 @@
-import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
-import { SPAWN_LOCATION_TITLE } from 'app/content/spawnLocations';
-import { Teleporter } from 'app/content/objects/teleporter';
+import {Teleporter} from 'app/content/objects/teleporter';
+import {SPAWN_LOCATION_TITLE} from 'app/content/spawnLocations';
+import {sceneHash} from 'app/scenes/sceneHash';
+import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
+import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation';
 
 export function showTitleScene(state: GameState) {
+    const titleScene = sceneHash.title;
     state.hero.savedData.spawnLocation = SPAWN_LOCATION_TITLE;
-    state.scene = 'title';
-    state.idleTime = 0;
-    state.menuIndex = 0;
+    state.sceneStack = [titleScene];
+    titleScene.idleTime = 0;
+    titleScene.cursorIndex = 0;
     state.hero.savedData.passiveTools.spiritSight = 1;
     returnToSpawnLocation(state);
     state.camera = { x: 46, y: 230 };

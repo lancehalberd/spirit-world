@@ -1,7 +1,8 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { fillRect } from 'app/utils/index';
-import { requireFrame } from 'app/utils/packedImages';
+import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
+import type {PrologueScene} from 'app/scenes/prologue/prologueScene';
+import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
+import {fillRect} from 'app/utils/index';
+import {requireFrame} from 'app/utils/packedImages';
 
 const scrollAnimation = createAnimation('gfx/prologue/scrollAnimation.png', {w: 256, h: 30},
     {rows: 3, duration: 3}, {loop: true}
@@ -19,10 +20,10 @@ const panFramesPerPixel = 3;
 // const panDuration = panFramesPerPixel * (panStartY - panEndY) * 20;
 
 
-export function renderPrologue(context: CanvasRenderingContext2D, state: GameState): void {
+export function renderPrologue(context: CanvasRenderingContext2D, state: GameState, scene: PrologueScene): void {
     let r = {x: 0, y: 0, w: CANVAS_WIDTH, h: CANVAS_HEIGHT};
     fillRect(context, r, 'black');
-    const unrollTime = Math.max(0, state.prologueTime - initialPause);
+    const unrollTime = Math.max(0, scene.time - initialPause);
     const unrollP = unrollTime / unrollDuration;
     const unrollY = 87 - Math.floor(144 * unrollP);
     const pauseTime = unrollTime - unrollDuration;
@@ -116,7 +117,6 @@ export function renderPrologue(context: CanvasRenderingContext2D, state: GameSta
         context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
     }
-
 }
 
 function renderFadeInText(

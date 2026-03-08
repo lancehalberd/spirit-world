@@ -1141,7 +1141,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 192, y: 96, type: "pushPull", style: "pot"},
         {status: "normal", id: "waterfallCaveEmptyRoomNpc", x: 316, y: 128, d: "right", behavior: "random", style: "vanaraGold", type: "npc", dialogue: "We recently finished digging this new room but we still need to furnish it.", dialogueIndex: 124},
         {status: "normal", id: "waterfallCave:0:0x0-npc-6", x: 88, y: 80, d: "down", behavior: "face", style: "girl", type: "npc", dialogue: "I wish I could sleep in more.", dialogueIndex: 121},
-        {status: "normal", id: "waterfallCave:0:0x0-npc-2", x: 320, y: 292, d: "right", behavior: "face", style: "woman", type: "npc", dialogue: "Who opened this chest?!", dialogueIndex: 172},
+        {status: "normal", id: "ambrosia", x: 236, y: 432, d: "down", behavior: "face", style: "ambrosia", type: "npc", dialogue: "", dialogueKey: "ambrosia"},
         {status: "normal", id: "", x: 166.5, y: 38, type: "decoration", d: "down", w: 16, h: 16, decorationType: "basket"},
         {status: "normal", id: "", x: 150.5, y: 46, type: "decoration", d: "down", w: 16, h: 16, decorationType: "basket"},
         {status: "normal", id: "", x: 202.5, y: 38, type: "decoration", d: "down", w: 16, h: 16, decorationType: "basket"},
@@ -1164,6 +1164,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 57, y: 28, type: "decoration", d: "right", w: 16, h: 16, decorationType: "shelves", seed: 13},
         {status: "normal", id: "", x: 40, y: 43, type: "decoration", d: "right", w: 16, h: 16, decorationType: "pottedPlant", seed: 12},
         {status: "normal", id: "", x: 150, y: 166, type: "decoration", d: "right", w: 16, h: 16, decorationType: "pottedPlant", seed: 10},
+        {status: "normal", id: "waterfallCave:0:0x0-npc-2", x: 320, y: 292, d: "right", behavior: "face", style: "woman", type: "npc", dialogue: "Who opened this chest?!", dialogueIndex: 172},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 126, mapId: 'overworld', entranceId: 'waterfallCaveEntrance'},

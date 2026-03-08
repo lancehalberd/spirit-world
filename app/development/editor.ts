@@ -1,24 +1,31 @@
-import { bossTypes } from 'app/content/bosses';
-import { enemyTypes } from 'app/content/enemies';
-import { editingState } from 'app/development/editingState';
-import { getBrushContextProperties } from 'app/development/getBrushContextProperties';
-import { getObjectProperties } from 'app/development/objectEditor';
-import { renderProgressTabContainer } from 'app/development/progressEditor';
-import { displayPanel } from 'app/development/propertyPanel';
-import { renderToolTabContainer } from 'app/development/toolTab';
-import { checkToRefreshMinimap, renderZoneTabContainer } from 'app/development/zoneEditor';
-import { displayPropertyPanel, hideAllPropertyPanels } from 'app/development/propertyPanel';
-import { createObjectDefinition, combinedObjectTypes } from 'app/development/objectEditor';
-import { getVariantProperties, isVariantSelected } from 'app/development/variantEditor';
-import { enterLocation } from 'app/utils/enterLocation';
-import {setSaveFileToState} from 'app/state';
+import {bossTypes} from 'app/content/bosses';
+import {enemyTypes} from 'app/content/enemies';
+import {editingState} from 'app/development/editingState';
+import {getBrushContextProperties} from 'app/development/getBrushContextProperties';
+import {getObjectProperties} from 'app/development/objectEditor';
+import {renderProgressTabContainer} from 'app/development/progressEditor';
+import {displayPanel} from 'app/development/propertyPanel';
+import {renderToolTabContainer} from 'app/development/toolTab';
+import {checkToRefreshMinimap, renderZoneTabContainer} from 'app/development/zoneEditor';
+import {displayPropertyPanel, hideAllPropertyPanels} from 'app/development/propertyPanel';
+import {createObjectDefinition, combinedObjectTypes} from 'app/development/objectEditor';
+import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
+import {isDebugMode} from 'app/gameConstants';
+import {showFieldScene} from 'app/scenes/field/showFieldScene';
+import {enterLocation} from 'app/utils/enterLocation';
+import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {isFieldSceneInStack} from 'app/scenes/field/showFieldScene';
 
 
 export function toggleEditing(state: GameState) {
-    if (state.scene === 'title' || state.scene === 'prologue' || state.scene === 'intro') {
-        setSaveFileToState(0, 0);
+    if (!isDebugMode) {
+        return;
     }
-    state.scene = 'game';
+    // Switch to field scene if it isn't on the stack (typically means we are on the prologue/title/choose file scenes).
+    if (!isFieldSceneInStack(state)) {
+        setSaveFileToState(state, 0, 0);
+        showFieldScene(state);
+    }
     // Set this to 1 so the player doesn't immediately fall into pits when the editor is
     // rendered off underwater.
     state.hero.z = 1;
@@ -26,6 +33,7 @@ export function toggleEditing(state: GameState) {
     editingState.isEditing = !editingState.isEditing;
     editingState.recentAreas = [];
     state.map.needsRefresh = true;
+    // state.fieldMenuState.needsRefresh = true;
     if (editingState.isEditing) {
         startEditing(state);
     } else {

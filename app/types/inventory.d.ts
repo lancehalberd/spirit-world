@@ -1,23 +1,40 @@
 type ActiveTool = 'bow' | 'staff' | 'clone' | 'cloak';
 type Equipment = 'leatherBoots' | 'cloudBoots' | 'ironBoots';
-type PassiveTool = 'gloves'
+type PassiveTool =
+    // Techniques
     | 'roll'
     | 'nimbusCloud'
+    | 'teleportation'
+    | 'ironSkin'
+    // Eyes
     | 'catEyes' | 'spiritSight' | 'trueSight'
-    | 'astralProjection' | 'teleportation'
-    | 'ironSkin' | 'goldMail' | 'phoenixCrown'
+    // Head
+    | 'astralProjection' | 'phoenixCrown'
+    // Hands
+    | 'gloves'
+    // Body
+    | 'armor'
+    // Accessories
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing'
-    | 'arDevice';
+    // Etc
+    | 'peachBasket' | 'arDevice';
 type MagicElement = 'fire' | 'ice' | 'lightning';
-type Collectible = 'peachOfImmortality'
+type Collectible =
+    | 'peach' // Can be collected only if you possess the peach basket.
+    | 'peachOfImmortality'
     | 'peachOfImmortalityPiece'
     | 'silverOre'
     | 'goldOre'
+    | 'magicBeans'
     | 'aetherCrystal'
     | 'victoryPoint';
-type Blueprints = 'spikeBoots' | 'flyingBoots' | 'forgeBoots';
+type Blueprints =
+    | 'spikeBoots' | 'flyingBoots' | 'forgeBoots'
+    | 'silverMailSchematics' | 'goldMailSchematics'
+    | 'healthPotionSchematics' | 'statusPotionSchematics' | 'magicPotionSchematics';
 type CommonLoot = 'money' | 'peach';
 type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
+type Consumable = 'healthPotion' | 'statusPotion' | 'magicPotion';
 
 type LootType = 'empty' | 'weapon'
     // In the randomizer spiritSight, astralProjection + teleportation are changed to this progressive spirit power
@@ -28,9 +45,10 @@ type LootType = 'empty' | 'weapon'
     // Neutral element is used to unequip elements in the menu
     | 'neutral' | MagicElement
     | Blueprints
+    | Consumable
     | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
-type MenuOptionType = LootType | 'help' | 'return';
+type MenuOptionType = null | LootType | 'weapon2' | 'help' | 'return';
 
 type WeaponUpgrades = 'normalDamage' | 'normalRange' | 'spiritDamage' | 'spiritRange';
 

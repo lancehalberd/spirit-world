@@ -7,6 +7,7 @@ export * from 'app/content/specialBehaviors';
 export * from 'app/development/tests';
 export * from 'app/development/tileEditor';
 export * from 'app/randomizer/main';
+export * from 'app/scenes/scenes';
 
 import { addContextMenuListeners } from 'app/development/contextMenu';
 import { editingState } from 'app/development/editingState';

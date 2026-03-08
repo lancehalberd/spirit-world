@@ -1,7 +1,5 @@
-
 import { enemyTypes } from 'app/content/enemies';
 import {
-    SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
     SPAWN_LOCATION_WATERFALL_VILLAGE,
 } from 'app/content/spawnLocations';
@@ -11,7 +9,8 @@ import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
 //import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
 import { findLootObjects, findReachableNodes } from 'app/randomizer/find';
-import { applySavedState, getDefaultState } from 'app/state';
+import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {getDefaultState } from 'app/state';
 import { allNodes } from 'app/randomizer/allNodes';
 import {
     applyLootAssignments, applyLootObjectToState, calculateKeyLogic, copyState, everyObject,
@@ -96,6 +95,5 @@ if (itemSeed) {
     } catch (e) {
         console.error('Failed to generate seed', e);
     }
-    Object.assign(SPAWN_LOCATION_DEMO, SPAWN_LOCATION_WATERFALL_VILLAGE);
     Object.assign(SPAWN_LOCATION_FULL, SPAWN_LOCATION_WATERFALL_VILLAGE);
 }

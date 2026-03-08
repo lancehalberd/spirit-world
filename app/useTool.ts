@@ -53,7 +53,7 @@ export function useTool(
             if (element === 'lightning') {
                 speed += 2;
             }
-            state.hero.spendMagic(magicCost);
+            state.hero.spendMagic(state, magicCost);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'bow';
             let direction: Direction = hero.d;
@@ -160,7 +160,7 @@ export function useTool(
                 playAreaSound(state, hero.area, 'error');
                 return;
             }
-            state.hero.spendMagic(magicCost);
+            state.hero.spendMagic(state, magicCost);
             hero.toolOnCooldown = 'cloak';
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
             hero.toolCooldown = 400;
@@ -185,7 +185,7 @@ export function useTool(
             if (isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)
                 && state.hero.clones.length < maxClones
             ) {
-                state.hero.spendMagic(10);
+                state.hero.spendMagic(state, 10);
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
@@ -204,7 +204,7 @@ export function useTool(
             }
             // The normal clone tool functionality only works when no clones currently exist.
             if (!state.hero.clones.length) {
-                state.hero.spendMagic(10);
+                state.hero.spendMagic(state, 10);
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
@@ -233,7 +233,7 @@ export function useTool(
                 playAreaSound(state, hero.area, 'error');
                 return;
             }
-            state.hero.spendMagic(10);
+            state.hero.spendMagic(state, 10);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'staff';
             hero.canceledStaffPlacement = false;

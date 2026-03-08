@@ -1,4 +1,4 @@
-import { drawARFont } from 'app/arGames/arFont';
+import { drawARFont } from 'app/utils/smallFont';
 import { wasGameKeyPressed } from 'app/userInput';
 import { GAME_KEY } from 'app/gameConstants';
 import { boxesIntersect, pad } from 'app/utils/index';

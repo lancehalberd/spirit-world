@@ -6,8 +6,9 @@ import {contextMenuState, editingState} from 'app/development/editingState';
 import {toggleEditing} from 'app/development/editor';
 import {tagElement} from 'app/dom';
 import {getCanvasScale} from 'app/development/getCanvasScale';
-import {overworldKeys} from 'app/gameConstants';
-import {checkToRedrawTiles, drawEntireFrame} from 'app/render/renderField';
+import {isDebugMode, overworldKeys} from 'app/gameConstants';
+import {checkToRedrawTiles, drawEntireFrame} from 'app/scenes/field/renderField';
+import {isMapSceneActive} from 'app/scenes/map/showMapScene';
 import {getState} from 'app/state';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {defeatAllEnemies} from 'app/utils/addKeyboardShortcuts';
@@ -111,7 +112,7 @@ export class ContextMenu {
 export function getContextMenu(): MenuOption[] {
     const state = getState()
     // Special context menu for editing map sections when the map is shown with the editor enabled.
-    if (state.paused && state.showMap && editingState.isEditing && !overworldKeys.includes(state.location.zoneKey)) {
+    if (isMapSceneActive(state) && editingState.isEditing && !overworldKeys.includes(state.location.zoneKey)) {
         const selectedSections = overworldKeys.includes(state.areaSection?.mapId)
             ? [state.areaSection.index] : editingState.selectedSections;
         if (selectedSections.length) {
@@ -350,6 +351,9 @@ export function hideContextMenu(): void {
 let lastContextClick: number[];
 
 export function addContextMenuListeners(): void {
+    if (!isDebugMode) {
+        return;
+    }
     document.addEventListener('mouseup', function (event) {
         if (event.which !== 1) {
             return;

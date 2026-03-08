@@ -15,7 +15,7 @@ dialogueHash.spiritKing = {
                 {
                     dialogueIndex: 53,
                     dialogueType: 'quest',
-                    text:`The Fertility Temple is far to the Southwest.
+                    text:`The Fertility Temple is far to the southwest.
                     {|}Once you are done there I suggest you continue gathering better equipment before you search for the Spirit Beasts.
                     `,
                 },
@@ -55,7 +55,7 @@ dialogueHash.spiritKing = {
                     {|}They appear to be growing stronger instead and are now hiding in the material world, biding their time.
                     {|}I fear you are not prepared to track down the beasts, let alone banish them from the material world.
                     {|}I have instructed the other Spirit Gods to provide aid and training if you approach them.
-                    {|}I suspect you will do as you please, but we suggest visiting the Fertility Temple to the Southwest.
+                    {|}I suspect you will do as you please, but we suggest visiting the Fertility Temple to the southwest.
                     {|}In addition to providing you with new tools, you may ask if the researchers there know how the
                     Spirit Beasts are able to stay in the material world.
                     {flag:spiritKingForestTemple}

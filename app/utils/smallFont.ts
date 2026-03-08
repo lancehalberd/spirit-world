@@ -1,4 +1,5 @@
-import { requireFrame } from 'app/utils/packedImages';
+import {requireFrame} from 'app/utils/packedImages';
+import {getSolidTintedImage} from 'app/utils/tintedImages';
 
 const spaceWidth = 4;
 const arFont = {
@@ -8,7 +9,7 @@ const arFont = {
     characters: '1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ/.*+!?$-()',
     height: 5,
     widths: [
-        // 1-90
+        // 1-9,0
         4,4,4,4,4,4,4,4,4,4,
         // A-G
         5,5,4,5,4,4,5,
@@ -22,6 +23,22 @@ const arFont = {
     frameMap: {} as {[key: string]: Frame},
     scale: 1,
 };
+const smallWhiteFont = {
+    ...arFont,
+    frameMap: {} as {[key: string]: Frame},
+};
+
+requireFrame(arFont.fontSource, {x: 0, y: 0, w: 282, h: 5}, frame => {
+    const smallWhiteFontFrame = getSolidTintedImage('#FFF', frame);
+    let x = 0;
+    for (let i = 0; i < smallWhiteFont.characters.length; i++) {
+        const w = smallWhiteFont.widths[i];
+        smallWhiteFont.frameMap[smallWhiteFont.characters[i]] = {
+            ...smallWhiteFontFrame, x, w, h: smallWhiteFont.height, s: smallWhiteFont.scale
+        };
+        x += w;
+    }
+});
 
 let x = 0;
 for (let i = 0; i < arFont.characters.length; i++) {
@@ -35,7 +52,20 @@ interface TextOptions {
     textBaseline: 'top' | 'middle' | 'bottom'
 }
 
-export function drawARFont(context: CanvasRenderingContext2D, text: string, x: number, y: number,
+export function drawARFont(context: CanvasRenderingContext2D, text: string|number, x: number, y: number,
+    textOptions: Partial<TextOptions>
+) {
+    return drawSmallFont(context, arFont, text, x, y, textOptions);
+}
+
+export function drawSmallWhiteFont(context: CanvasRenderingContext2D, text: string|number, x: number, y: number,
+    textOptions: Partial<TextOptions>
+) {
+    return drawSmallFont(context, smallWhiteFont, text, x, y, textOptions);
+}
+
+
+export function drawSmallFont(context: CanvasRenderingContext2D, font: typeof arFont, text: string|number, x: number, y: number,
     {textAlign = 'left', textBaseline = 'bottom'}: Partial<TextOptions>
 ) {
     text = `${text}`;
@@ -44,7 +74,7 @@ export function drawARFont(context: CanvasRenderingContext2D, text: string, x: n
 
     let textWidth = 0;
     for (let c of text) {
-        const frame = arFont.frameMap[c] || arFont.frameMap[c.toUpperCase()];
+        const frame = font.frameMap[c] || font.frameMap[c.toUpperCase()];
         if (frame) {
             textWidth += frame.w;
         } else {
@@ -52,14 +82,14 @@ export function drawARFont(context: CanvasRenderingContext2D, text: string, x: n
         }
     }
 
-    if (textBaseline === 'middle') y = Math.round(y - arFont.height / 2);
-    else if (textBaseline === 'bottom') y = Math.round(y -  arFont.height);
+    if (textBaseline === 'middle') y = Math.round(y - font.height / 2);
+    else if (textBaseline === 'bottom') y = Math.round(y -  font.height);
 
     if (textAlign === 'center') x = Math.round(x - textWidth / 2);
     else if (textAlign === 'right') x = Math.round(x - textWidth);
 
     for (const c of text) {
-        const frame = arFont.frameMap[c] || arFont.frameMap[c.toUpperCase()];
+        const frame = font.frameMap[c] || font.frameMap[c.toUpperCase()];
         if (frame) {
             context.drawImage(frame.image,
                 frame.x, frame.y, frame.w, frame.h,

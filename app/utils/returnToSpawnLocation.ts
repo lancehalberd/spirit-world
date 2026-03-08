@@ -1,6 +1,6 @@
-import { isRandomizer } from 'app/gameConstants';
-import { appendScript, wait } from 'app/scriptEvents';
-import { enterLocation } from 'app/utils/enterLocation';
+import {isRandomizer} from 'app/gameConstants';
+import {appendScript, wait} from 'app/scriptEvents';
+import {enterLocation} from 'app/utils/enterLocation';
 
 
 export function returnToSpawnLocation(state: GameState, preserveZoneFlags = false) {
@@ -10,7 +10,6 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
     if (state.hero.magicRegen) {
         state.hero.magic = state.hero.maxMagic;
     }
-    state.defeatState.defeated = false;
     // Clear out any state/flags that shouldn't be kept on the hero.
     state.hero.pickUpTile = null;
     state.hero.pickUpObject = null;

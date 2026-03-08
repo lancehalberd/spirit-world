@@ -4,6 +4,10 @@ import {isPixelInShortRect} from 'app/utils/index';
 import {saveGame} from 'app/utils/saveGame';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 
+export function isObject(object: BaseFieldInstance): object is ObjectInstance {
+    return !!(object as ObjectInstance).isObject;
+}
+
 export function initializeObject(state: GameState, object: ObjectInstance, isActiveArea: boolean): void {
     if (object.isInitialized) {
         return;

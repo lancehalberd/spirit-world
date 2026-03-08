@@ -4,7 +4,7 @@ import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
 import {isObject, isSelectionValid, isVariant, updateObjectInstance} from 'app/development/objectEditor';
 import {addVariantToArea} from 'app/development/variantEditor';
-import {toggleShowControls} from 'app/scenes/controls/updateControls';
+import {toggleControlsScene} from 'app/scenes/controls/controlsScene';
 import {getState} from 'app/state';
 import {isKeyboardKeyDown, KEY} from 'app/userInput'
 import {enterLocation} from 'app/utils/enterLocation';
@@ -48,7 +48,7 @@ export function addKeyboardShortcuts() {
             return;
         }
         if (keyCode === KEY.ESCAPE) {
-            toggleShowControls(state);
+            toggleControlsScene(state);
             return;
         }
         if (!editingState.isEditing) {

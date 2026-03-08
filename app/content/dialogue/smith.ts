@@ -35,13 +35,13 @@ dialogueHash.cityArmorSmith = {
             `;
         },
         upgradeLeatherBoots: (state: GameState) => {
-            if (state.hero.savedData.silverOre < 2) {
+            if (state.hero.savedData.collectibles.silverOre < 2) {
                 return `I'll need at least 2 Silver Ore to upgrade your boots.`;
             }
             if (state.hero.savedData.money < 100) {
                 return `I'm sorry but you don't have enough money.`;
             }
-            state.hero.savedData.silverOre -= 2;
+            state.hero.savedData.collectibles.silverOre -= 2;
             state.hero.savedData.money -= 100;
             return `Excellent! Take a look at these!{item:leatherBoots=2}`;
         },
@@ -160,26 +160,26 @@ dialogueHash.citySmith = {
             {choice:Upgrade Damage?|Yes:citySmith.craftDamage|No:citySmith.no}
         `,
         craftRange: (state: GameState) => {
-            if (state.hero.savedData.silverOre < 2) {
+            if (state.hero.savedData.collectibles.silverOre < 2) {
                 return `I'll need at least 2 Silver Ore to upgrade your damage.`;
             }
             if (state.hero.savedData.money < 100) {
                 return `{@citySmith.fail}`;
             }
-            state.hero.savedData.silverOre -= 2;
+            state.hero.savedData.collectibles.silverOre -= 2;
             state.hero.savedData.money -= 100;
             state.hero.savedData.weaponUpgrades.normalRange = true;
             saveGame(state);
             return `Excellent! Your Chakram is faster than ever!`;
         },
         craftDamage: (state: GameState) => {
-            if (state.hero.savedData.silverOre < 3) {
+            if (state.hero.savedData.collectibles.silverOre < 3) {
                 return `I'll need at least 3 Silver Ore to upgrade your damage.`;
             }
             if (state.hero.savedData.money < 100) {
                 return `{@citySmith.fail}`;
             }
-            state.hero.savedData.silverOre -= 3;
+            state.hero.savedData.collectibles.silverOre -= 3;
             state.hero.savedData.money -= 100;
             state.hero.savedData.weaponUpgrades.normalDamage = true;
             saveGame(state);
@@ -330,13 +330,13 @@ dialogueHash.forgeArmorSmith = {
             {choice:Upgrade Iron Boots?|Yes:forgeArmorSmith.upgradeIronBoots|No:forgeArmorSmith.no}
         `,
         upgradeIronBoots: (state: GameState) => {
-            if (state.hero.savedData.goldOre < 1) {
+            if (state.hero.savedData.collectibles.goldOre < 1) {
                 return `I'll need some Gold Ore to upgrade your boots.`;
             }
             if (state.hero.savedData.money < 200) {
                 return `I'm sorry but you don't have enough money.`;
             }
-            state.hero.savedData.goldOre -= 1;
+            state.hero.savedData.collectibles.goldOre -= 1;
             state.hero.savedData.money -= 200;
             return `Excellent! Take a look at these!{item:ironBoots=2}`;
         },
@@ -347,13 +347,13 @@ dialogueHash.forgeArmorSmith = {
             {choice:Upgrade Cloud Boots?|Yes:forgeArmorSmith.upgradeCloudBoots|No:forgeArmorSmith.no}
         `,
         upgradeCloudBoots: (state: GameState) => {
-            if (state.hero.savedData.goldOre < 1) {
+            if (state.hero.savedData.collectibles.goldOre < 1) {
                 return `I'll need some Gold Ore to upgrade your boots.`;
             }
             if (state.hero.savedData.money < 200) {
                 return `I'm sorry but you don't have enough money.`;
             }
-            state.hero.savedData.goldOre -= 1;
+            state.hero.savedData.collectibles.goldOre -= 1;
             state.hero.savedData.money -= 200;
             return `Excellent! Take a look at these!{item:cloudBoots=2}`;
         },
@@ -434,34 +434,34 @@ dialogueHash.forgeSmith = {
             {choice:Upgrade Damage?|Yes:forgeSmith.craftDamage|No:forgeSmith.no}
         `,
         craftRange: (state: GameState) => {
-            if (state.hero.savedData.goldOre < 1) {
+            if (state.hero.savedData.collectibles.goldOre < 1) {
                 return `I'll need some Gold Ore to upgrade your range.`;
             }
-            if (state.hero.savedData.silverOre < 2) {
+            if (state.hero.savedData.collectibles.silverOre < 2) {
                 return `I'll need at least 2 Silver Ore to upgrade your damage.`;
             }
             if (state.hero.savedData.money < 200) {
                 return `{@forgeSmith.fail}`;
             }
-            state.hero.savedData.goldOre -= 1;
-            state.hero.savedData.silverOre -= 2;
+            state.hero.savedData.collectibles.goldOre -= 1;
+            state.hero.savedData.collectibles.silverOre -= 2;
             state.hero.savedData.money -= 200;
             state.hero.savedData.weaponUpgrades.spiritRange = true;
             saveGame(state);
             return `Excellent! Your Chakram is faster than ever!`;
         },
         craftDamage: (state: GameState) => {
-            if (state.hero.savedData.goldOre < 1) {
+            if (state.hero.savedData.collectibles.goldOre < 1) {
                 return `I'll need some Gold Ore to upgrade your range.`;
             }
-            if (state.hero.savedData.silverOre < 3) {
+            if (state.hero.savedData.collectibles.silverOre < 3) {
                 return `I'll need at least 3 Silver Ore to upgrade your damage.`;
             }
             if (state.hero.savedData.money < 200) {
                 return `{@forgeSmith.fail}`;
             }
-            state.hero.savedData.goldOre -= 1;
-            state.hero.savedData.silverOre -= 3;
+            state.hero.savedData.collectibles.goldOre -= 1;
+            state.hero.savedData.collectibles.silverOre -= 3;
             state.hero.savedData.money -= 200;
             state.hero.savedData.weaponUpgrades.spiritDamage = true;
             saveGame(state);

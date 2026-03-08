@@ -17,35 +17,76 @@ export function applyUpgrade(currentLevel: number, loot: LootData): number {
 }
 
 const activeTools: ActiveTool[] = ['bow', 'staff', 'clone', 'cloak'];
-export function isActiveTool(lootType: LootType): lootType is ActiveTool {
+export function isActiveTool(lootType: string): lootType is ActiveTool {
     return activeTools.includes(lootType as ActiveTool);
 }
 const passiveTools: PassiveTool[] = [
     'gloves', 'roll', 'nimbusCloud', 'catEyes', 'spiritSight',
-    'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
+    'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'armor', 'phoenixCrown',
     'waterBlessing', 'fireBlessing', 'lightningBlessing',
+    'peachBasket', 'arDevice',
 ];
-export function isPassiveTool(lootType: LootType): lootType is PassiveTool {
+export function isPassiveTool(lootType: string): lootType is PassiveTool {
     return passiveTools.includes(lootType as PassiveTool);
 }
-const elementLoot: MagicElement[] = ['fire', 'lightning', 'ice'];
-export function isMagicElement(lootType: LootType): lootType is MagicElement {
-    return elementLoot.includes(lootType as MagicElement);
+const magicElement: MagicElement[] = ['fire', 'lightning', 'ice'];
+export function isMagicElement(lootType: string): lootType is MagicElement {
+    return magicElement.includes(lootType as MagicElement);
 }
 const equipment: Equipment[] = ['leatherBoots', 'cloudBoots', 'ironBoots'];
-export function isEquipment(lootType: LootType): lootType is Equipment {
+export function isEquipment(lootType: string): lootType is Equipment {
     return equipment.includes(lootType as Equipment);
 }
 
-export function doesLootRequireLevel(lootType: LootType) {
+const collectibles: Collectible[] = [
+    'silverOre', 'goldOre', 'victoryPoint',
+];
+export function isCollectible(lootType: string): lootType is Collectible {
+    return collectibles.includes(lootType as Collectible);
+}
+export function gainCollectible(state: GameState, collectible: Collectible) {
+    state.hero.savedData.collectibles[collectible]++;
+    state.hero.savedData.collectibleTotals[collectible]++;
+}
+
+const consumables: Consumable[] = [
+    'healthPotion', 'statusPotion', 'magicPotion'
+];
+export function isConsumable(lootType: string): lootType is Consumable {
+    return consumables.includes(lootType as Consumable);
+}
+export function gainConsumable(state: GameState, consumable: Consumable) {
+    state.hero.savedData.consumables[consumable]++;
+    state.hero.savedData.consumableTotals[consumable]++;
+}
+
+const blueprints: Blueprints[] = [
+    'spikeBoots', 'flyingBoots', 'forgeBoots',
+    'silverMailSchematics', 'goldMailSchematics',
+    'healthPotionSchematics', 'statusPotionSchematics', 'magicPotionSchematics',
+];
+export function isBlueprints(lootType: LootType): lootType is Blueprints {
+    return blueprints.includes(lootType as Blueprints);
+}
+
+const weaponUpgrades: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
+export function isWeaponUpgrade(lootType: string): lootType is WeaponUpgrades {
+    return weaponUpgrades.includes(lootType as WeaponUpgrades);
+}
+
+export function doesLootRequireLevel(lootType: string) {
     return lootType === 'weapon' || isActiveTool(lootType) || isPassiveTool(lootType) || isEquipment(lootType);
 }
 
-export function doesLootRequireAmount(lootType: LootType) {
+export function doesLootRequireAmount(lootType: string) {
     return lootType === 'money';
 }
 
 export function getLootLevel(state: GameState, loot: LootData): number {
+    // Default to the current loot level for loot that requires a level and has non defined.
+    if (loot.lootLevel === undefined && doesLootRequireLevel(loot.lootType)) {
+        return getCurrentLootValue(state, loot.lootType);
+    }
     // 0 represents progressive loot. If the loot is not progressive, it has
     // the exact level given (or not given for many items that have no concept of level).
     if (loot.lootLevel !== 0 || !doesLootRequireLevel(loot.lootType)) {
@@ -79,3 +120,25 @@ function getCurrentLootValue(state: GameState, lootType: LootType): number {
     }
     throw new Error(`Loot Type has no levels: ${lootType}`);
 }
+
+
+export const allLootTypes: LootType[] = [
+    'empty',
+    'peachOfImmortality',
+    'peachOfImmortalityPiece',
+    'money',
+    'weapon',
+    'bigKey',
+    'smallKey',
+    'map',
+    ...activeTools,
+    ...passiveTools,
+    ...collectibles,
+    ...consumables,
+    'secondChance',
+    // This is the special progressive spirit power loot used by the randomizer.
+    'spiritPower',
+    ...equipment,
+    ...magicElement,
+    ...blueprints,
+];

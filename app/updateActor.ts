@@ -6,6 +6,7 @@ import {editingState} from 'app/development/editingState';
 import {EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {playAreaSound} from 'app/musicController';
+import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
 import {prependScript} from 'app/scriptEvents';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
@@ -20,14 +21,14 @@ import {removeObjectFromArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
 
-export function updateAllHeroes(this: void, state: GameState) {
+export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
         state.hero.justRespawned = false;
-        updateHeroSpecialActions(state, state.hero);
+        updateHeroSpecialActions(state, state.hero, interactive);
         return;
     }
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
-    if (state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
+    if (interactive && state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
         if (!state.hero.cloneToolReleased){
             state.hero.cloneToolReleased = true;
         } else {
@@ -44,7 +45,7 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     // This is for switching to thrown clone as you throw it.
-    if (state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
+    if (interactive && state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
         for (let i = 0; i < state.hero.clones.length; i++) {
             if (state.hero.clones[i].isUncontrollable
                 && !state.hero.clones[i].cannotSwapTo
@@ -69,17 +70,17 @@ export function updateAllHeroes(this: void, state: GameState) {
     }
     if (state.hero.astralProjection) {
         if (state.hero.spiritRadius > 0) {
-            updateHero(state, state.hero.astralProjection);
+            updateHero(state, state.hero.astralProjection, interactive);
         } else {
             removeObjectFromArea(state, state.hero.astralProjection);
             state.hero.astralProjection = null;
         }
     }
     if (!state.scriptEvents.blockPlayerUpdates) {
-        updateHero(state, state.hero);
+        updateHero(state, state.hero, interactive);
         for (let i = 0; i < state.hero.clones.length; i++) {
             const clone = state.hero.clones[i];
-            updateHero(state, clone);
+            updateHero(state, clone, interactive);
         }
     }
     const skipModulus = state.hero.savedData.passiveTools.spiritSight ? 100 : 40;
@@ -90,15 +91,15 @@ export function updateAllHeroes(this: void, state: GameState) {
     checkToStartScreenTransition(state, state.hero);
 }
 
-export function updateHero(this: void, state: GameState, hero: Hero) {
+export function updateHero(this: void, state: GameState, hero: Hero, interactive: boolean) {
     hero.justRespawned = false;
     // If the hero is performing some special action with logic that overrides default actions,
     // for example, falling into a pit, or transitioning between screens, this function will handle
     // the update and return `true`, indicating that normal behavior should be suspended.
-    const blockNormalActions = updateHeroSpecialActions(state, hero);
+    const blockNormalActions = updateHeroSpecialActions(state, hero, interactive);
     if (!blockNormalActions) {
         // This update relates to hero performing or completing actions + movement.
-        updateHeroStandardActions(state, hero);
+        updateHeroStandardActions(state, hero, interactive);
         if (!hero.area) {
             return;
         }
@@ -172,7 +173,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     }
     // Hero takes one damage every half second while in a hot room.
     if (!editingState.isEditing && state.areaSection?.isHot) {
-        hero.applyBurn(1, 500);
+        hero.applyBurn(state, 1, 500);
     }
     // Life is restored as soon as it is visibly lost in the Dream world.
     if (state.location.zoneKey === 'dream' && hero.displayLife < hero.savedData.maxLife) {
@@ -234,13 +235,13 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         let modValue = 100;
         if (hero.hasBarrier) {
             // Burning no longer prevents magic regen cooldown, so the 40ms added here will get reduced by 20ms each frame.
-            state.hero.spendMagic(drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 40);
+            state.hero.spendMagic(state, drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 40);
         } else if (hero.savedData.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
             hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - state.hero.burnDamage / 2 * FRAME_LENGTH / 1000);
         } else if (state.hero.savedData.passiveTools.fireBlessing && state.hero.magic > 0) {
             // The fire blessing causes burns to apply to magic instead of life, but does not increase cooldown.
-            state.hero.spendMagic(drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 0);
+            state.hero.spendMagic(state, drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 0);
         } else {
             // 100% of burn damage goes to life without iron skin or magic.
             state.hero.life = Math.max(0, state.hero.life - state.hero.burnDamage * FRAME_LENGTH / 1000);
@@ -311,10 +312,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             hero.action = null;
             hero.chargeTime = 0;
             hero.frozenDuration = 0;
-            state.defeatState = {
-                defeated: true,
-                time: 0,
-            };
+            showDefeatedScene(state);
             if (hero.heldChakram) {
                 removeEffectFromArea(state, hero.heldChakram);
                 delete hero.heldChakram;
@@ -323,7 +321,6 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             if (state.hero.savedData.hasRevive) {
                 state.reviveTime = state.fieldTime;
             }
-            state.menuIndex = 0;
         }
     }
     // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.
@@ -352,7 +349,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             drainAmount *= 2;
         }
         state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainAmount);
-        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
+        state.hero.increaseMagicRegenCooldown(state, drainCoefficient * FRAME_LENGTH / 2);
     } else if (hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
@@ -392,6 +389,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen = Math.max(1, state.hero.actualMagicRegen);
         }
     }
+    // No magic regen cooldown if a magic potion is in effect.
+    if (state.hero.magicPotionExpiresAt > state.fieldTime) {
+        state.hero.magicRegenCooldown = 0;
+    }
     const isTryingToRun = state.hero.action === 'walking' && state.hero.isRunning;
     const isActuallyRunning = isTryingToRun && state.hero.magic > 0;
     const preventCooldownRegeneration = isInvisible
@@ -420,7 +421,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
         // Slowly expend spirit energy while running.
-        state.hero.spendMagic(drainCoefficient * 5 * FRAME_LENGTH / 1000, drainCoefficient * FRAME_LENGTH / 5);
+        state.hero.spendMagic(state, drainCoefficient * 5 * FRAME_LENGTH / 1000, drainCoefficient * FRAME_LENGTH / 5);
     } else if (state.hero.actualMagicRegen < 0) {
         // Magic is being drained for some reason
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
@@ -430,7 +431,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     if (state.hero.clones.length) {
         // Clones drain 2 magic per second but do not effect cooldown time.
-        state.hero.spendMagic(2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
+        state.hero.spendMagic(state, 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
     }
     // Meditation grants 3 additional spirit energy per second.
     if (hero.action === 'meditating' && canRegnerateMagic) {
@@ -444,11 +445,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
-                state.hero.spendMagic(drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient, 0);
+                state.hero.spendMagic(state, drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient, 0);
                 targetLightRadius = 200 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.savedData.passiveTools.catEyes > 0) {
-                state.hero.spendMagic(drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient, 0);
+                state.hero.spendMagic(state, drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient, 0);
                 targetLightRadius = 70 * coefficient;
                 minLightRadius += 10 * coefficient;
             }

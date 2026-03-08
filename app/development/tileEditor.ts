@@ -21,7 +21,9 @@ import {
 import {updateBrushCanvas} from 'app/development/propertyPanel';
 import {setEditingTool} from 'app/development/toolTab';
 import {addVariantToArea, createVariantDataAtScreenCoords} from 'app/development/variantEditor';
-import {getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords} from 'app/render/renderMap';
+import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
+import {getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords} from 'app/scenes/map/renderMap';
+import {isMapSceneActive} from 'app/scenes/map/showMapScene'
 import {getState} from 'app/state';
 import {KEY, isKeyboardKeyDown } from 'app/userInput';
 import {mainCanvas} from 'app/utils/canvas';
@@ -62,8 +64,8 @@ mainCanvas.addEventListener('mousemove', function () {
     }
     const state = getState();
     const [x, y] = getAreaMousePosition();
-    if (state.paused) {
-        if (editingState.sectionDragData && state.showMap && isMouseDown() && editingState.selectedSections.length) {
+    if (isMapSceneActive(state)) {
+        if (isMouseDown() && editingState.selectedSections.length) {
             const sectionIndex = editingState.sectionDragData.sectionIndex;
             const section = allSections[sectionIndex].section;
             const mapCoords = roundMapCoords(mouseCoordsToMapCoords({x, y}));
@@ -81,6 +83,9 @@ mainCanvas.addEventListener('mousemove', function () {
             // Attempt to move all selected sections by the calculated map deltas.
             moveSections(editingState.selectedSections, dx, dy);
         }
+        return;
+    }
+    if (!isFieldSceneActive(state)) {
         return;
     }
     switch(editingState.tool) {
@@ -116,55 +121,56 @@ mainCanvas.addEventListener('mousedown', function (event) {
     }
     const state = getState();
     const [x, y] = getAreaMousePosition();
-    if (state.paused) {
-        if (state.showMap) {
-            if (editingState.selectedSections.length && !isKeyboardKeyDown(KEY.SHIFT)) {
-                const mapCoords = roundMapCoords(mouseCoordsToMapCoords({x, y}));
-                // The anchor section is arbitrarily set to the first selected section.
-                // It will be used to keep track of how much we need to move the sections at any point
-                // during the drag operation.
-                const sectionIndex = editingState.selectedSections[0];
-                const section = allSections[sectionIndex].section;
-                editingState.sectionDragData = {
-                    dragged: false,
-                    movedCount: 0,
-                    x: mapCoords.x,
-                    y: mapCoords.y,
-                    sectionIndex,
-                    originalSectionX: section.mapX,
-                    originalSectionY: section.mapY,
-                };
-            }
+    if (isMapSceneActive(state)) {
+        if (editingState.selectedSections.length && !isKeyboardKeyDown(KEY.SHIFT)) {
+            const mapCoords = roundMapCoords(mouseCoordsToMapCoords({x, y}));
+            // The anchor section is arbitrarily set to the first selected section.
+            // It will be used to keep track of how much we need to move the sections at any point
+            // during the drag operation.
+            const sectionIndex = editingState.selectedSections[0];
+            const section = allSections[sectionIndex].section;
+            editingState.sectionDragData = {
+                dragged: false,
+                movedCount: 0,
+                x: mapCoords.x,
+                y: mapCoords.y,
+                sectionIndex,
+                originalSectionX: section.mapX,
+                originalSectionY: section.mapY,
+            };
         }
         return;
     }
-    switch(editingState.tool) {
-        case 'select':
-            onMouseDownSelect(state, editingState, x, y);
-            break;
-        case 'boss':
-        case 'enemy':
-        case 'object':
-            onMouseDownObject(state, editingState, x, y);
-            break;
-        case 'variant':
-            onMouseDownVariant(state, editingState, x, y);
-        case 'tileChunk':
-            editingState.dragOffset = {x, y};
-            break;
-        case 'brush':
-            if (isKeyboardKeyDown(KEY.SHIFT)) {
-                wasSelectingTiles = true;
+    if (isFieldSceneActive(state)) {
+        switch(editingState.tool) {
+            case 'select':
+                onMouseDownSelect(state, editingState, x, y);
+                break;
+            case 'boss':
+            case 'enemy':
+            case 'object':
+                onMouseDownObject(state, editingState, x, y);
+                break;
+            case 'variant':
+                onMouseDownVariant(state, editingState, x, y);
+            case 'tileChunk':
                 editingState.dragOffset = {x, y};
-                updateBrushSelection(x, y);
-            } else {
-                wasSelectingTiles = false;
-                drawBrush(x, y);
-            }
-            break;
-        case 'replace':
-            replaceTiles(state, x, y);
-            break;
+                break;
+            case 'brush':
+                if (isKeyboardKeyDown(KEY.SHIFT)) {
+                    wasSelectingTiles = true;
+                    editingState.dragOffset = {x, y};
+                    updateBrushSelection(x, y);
+                } else {
+                    wasSelectingTiles = false;
+                    drawBrush(x, y);
+                }
+                break;
+            case 'replace':
+                replaceTiles(state, x, y);
+                break;
+        }
+        return;
     }
 });
 document.addEventListener('mouseup', (event) => {
@@ -192,23 +198,21 @@ document.addEventListener('mouseup', (event) => {
     editingState.dragOffset = null;
     if (!editingState.sectionDragData?.dragged) {
         const state = getState();
-        if (state.paused) {
-            if (state.showMap) {
-                const section = getSectionUnderMouse(state);
-                if (isKeyboardKeyDown(KEY.SHIFT)) {
-                    if (section) {
-                        const arrayIndex = editingState.selectedSections.indexOf(section.index);
-                        if (arrayIndex >= 0) {
-                            editingState.selectedSections.splice(arrayIndex, 1);
-                        } else {
-                            editingState.selectedSections.push(section.index);
-                        }
+        if (isMapSceneActive(state)) {
+            const section = getSectionUnderMouse(state);
+            if (isKeyboardKeyDown(KEY.SHIFT)) {
+                if (section) {
+                    const arrayIndex = editingState.selectedSections.indexOf(section.index);
+                    if (arrayIndex >= 0) {
+                        editingState.selectedSections.splice(arrayIndex, 1);
+                    } else {
+                        editingState.selectedSections.push(section.index);
                     }
-                } else if (!section || (editingState.selectedSections.length === 1 && editingState.selectedSections[0] === section.index)) {
-                    editingState.selectedSections = [];
-                } else {
-                    editingState.selectedSections = [section.index];
                 }
+            } else if (!section || (editingState.selectedSections.length === 1 && editingState.selectedSections[0] === section.index)) {
+                editingState.selectedSections = [];
+            } else {
+                editingState.selectedSections = [section.index];
             }
         }
     }
@@ -555,15 +559,16 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: R
 
 export function selectAllTiles() {
     const state = getState();
-    if (state.paused) {
-        if (state.showMap) {
-            const allSections = getDisplayedMapSections(state);
-            if (editingState.selectedSections.length === allSections.length) {
-                editingState.selectedSections = [];
-            } else {
-                editingState.selectedSections = [...allSections];
-            }
+    if (isMapSceneActive(state)) {
+        const allSections = getDisplayedMapSections(state);
+        if (editingState.selectedSections.length === allSections.length) {
+            editingState.selectedSections = [];
+        } else {
+            editingState.selectedSections = [...allSections];
         }
+        return;
+    }
+    if (!isFieldSceneActive(state)) {
         return;
     }
     if (editingState.tool === 'brush') {

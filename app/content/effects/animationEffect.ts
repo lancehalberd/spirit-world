@@ -1,10 +1,9 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { getCompositeBehaviors } from 'app/utils/getBehaviors'
-import { rectanglesOverlap } from 'app/utils/index';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, drawFrame, frameAnimation, getFrame} from 'app/utils/animations';
+import {addEffectToArea, isEffect, removeEffectFromArea} from 'app/utils/effects';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors'
+import {rectanglesOverlap} from 'app/utils/index';
 import Random from 'app/utils/Random';
-
 
 
 interface AnimationProps {
@@ -34,77 +33,50 @@ interface AnimationProps {
     centerOnPoint?: boolean
     doNotLoop?: boolean
     update?: (state: GameState, effect: FieldAnimationEffect) => void
+    onCleanup?: (state: GameState, effect: FieldAnimationEffect) => void
 }
 
 export class FieldAnimationEffect implements EffectInstance {
     alpha = 1
     area: AreaInstance;
-    boundingBox: Rect;
-    delay: number = 0;
+    boundingBox: Rect = this.props.boundingBox;
+    delay: number = this.props.delay ?? 0;
     done = false;
-    drawPriority: DrawPriority;
-    drawPriorityIndex?: number;
-    animation: FrameAnimation;
-    animationTime: number;
-    behaviors: TileBehaviors;
+    drawPriority: DrawPriority = this.props.drawPriority ?? 'background';
+    drawPriorityIndex?: number = this.props.drawPriorityIndex;
+    animation: FrameAnimation = this.props.animation
+    animationTime: number = 0
+    behaviors: TileBehaviors = {};
     friction = 0;
     isEffect = <const>true;
-    x: number;
-    y: number;
-    z: number;
-    vx: number;
-    vy: number;
-    vz: number;
-    vstep: number;
-    ax: number;
-    ay: number;
-    az: number;
-    rotation: number;
-    scale: number;
-    doNotLoop?: boolean;
+    x: number = this.props.x ?? 0;
+    y: number = this.props.y ?? 0;
+    z: number = this.props.z ?? 0;
+    vx: number = this.props.vx ?? 0;
+    vy: number = this.props.vy ?? 0;
+    vz: number = this.props.vz ?? 0;
+    vstep: number = this.props.vstep ?? 0;
+    ax: number = this.props.ax ?? 0;
+    ay: number = this.props.ay ?? 0;
+    az: number = this.props.az ?? 0;
+    rotation: number = this.props.rotation ?? 0;
+    scale: number = this.props.scale ?? 1;
+    doNotLoop?: boolean = this.props.doNotLoop;
     // If this is set, the coords are relative to this target.
-    target?: Target;
-    ttl: number;
+    target?: Target = this.props.target;
+    ttl: number = this.props.ttl;
     checkToCull?: (state: GameState) => boolean;
-    onUpdate: (state: GameState, effect: FieldAnimationEffect) => void
-    constructor({
-        animation, boundingBox, drawPriority = 'background', drawPriorityIndex,
-        x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
-        ax = 0, ay = 0, az = 0,
-        rotation = 0, scale = 1, alpha = 1,
-        friction = 0, doNotLoop,
-        target, ttl, delay = 0, centerOnPoint = false, update
-     }: AnimationProps) {
-        this.animation = animation;
-        this.animationTime = 0;
-        this.boundingBox = boundingBox;
-        this.drawPriority = drawPriority;
-        this.drawPriorityIndex = drawPriorityIndex;
-        this.friction = friction;
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.vx = vx;
-        this.vy = vy;
-        this.vz = vz;
-        this.vstep = vstep;
-        this.ax = ax;
-        this.ay = ay;
-        this.az = az;
-        this.rotation = rotation;
-        this.scale = scale;
-        this.alpha = alpha;
-        this.ttl = ttl;
-        this.delay = delay;
-        this.behaviors = {};
-        this.target = target;
-        this.onUpdate = update;
-        this.doNotLoop = doNotLoop;
-        if (centerOnPoint) {
+    onCleanup = this.props.onCleanup;
+    onUpdate = this.props.update;
+    constructor(public props: AnimationProps) {
+        if (props.centerOnPoint) {
             const hitbox = this.getHitbox();
             this.x -= hitbox.w / 2;
             this.y -= hitbox.h / 2;
         }
+    }
+    cleanup(state: GameState) {
+        this.onCleanup?.(state, this);
     }
     getHitbox() {
         const frame = getFrame(this.animation, this.animationTime);
@@ -539,6 +511,25 @@ export function addBurstEffect(this: void, state: GameState, actor: Actor, area:
         y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
     });
     addEffectToArea(state, area, animation);
+}
+
+/**
+ * Animation that replaces itself with an object/effect when it completes.
+ */
+export function spawnAnimation(props: AnimationProps, nextInstance: ObjectInstance | EffectInstance, copyPosition = true): FieldAnimationEffect {
+    return new FieldAnimationEffect({
+        ...props,
+        onCleanup(state: GameState, effect: FieldAnimationEffect) {
+            if (isEffect(nextInstance)) {
+                if (copyPosition) {
+                    nextInstance.x = effect.x;
+                    nextInstance.y = effect.y;
+                    nextInstance.z = effect.z;
+                }
+                addEffectToArea(state, effect.area, nextInstance);
+            }
+        }
+    });
 }
 
 class _FieldAnimationEffect extends FieldAnimationEffect {}

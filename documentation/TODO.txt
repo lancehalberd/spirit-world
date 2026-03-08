@@ -146,10 +146,43 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Preload music.
+    - Demo blockers
+        - Preload music.
+        - Demo flag
+            - Disable access to waterfall tower.
+            - Replace Helix rival fight with demo ending, possibly unlock randomizer.
+        - Cleanup overworld
+            - Finish adding grass
+            - [Optional] add ash to spirit world
+        - Finish cocoon update
+            - New pod graphics
+            - Falling between floors
+            - Missing floor
+        - Add new peach tree graphics
+        - Cocoon boss projectiles still getting blocked by boulders
+        - High priority SFX
+
+    - Support implicit cancel option for choice options:
+        {choice: Quit AR?|CANCEL:arGame.no|No:arGame.no|Yes:arGame.quitGame}
+        This would not be displayed, but used if the player presses GAME_KEY.CANCEL.
+
+    - Add visualization for potion effects
+        - maybe just colored bars on the magic meter for timing.
+        - particle effects on the player.
+
+    - Scene updates
+        - Dim audio using sceneVolume and call update sound settings when switching scenes.
+
+    - Hint seems wrong for the rival 3 test state, tells you to talk to the spirit king.
+        - Maybe because of no gold mail?
 
     - Mechanic idea:
         - Survive with no life as long as you have spirit energy,
+
+    - Add crystal switch puzzles before bow:
+        - two switches you have to hit with chakram to open basement door, Elder gives a hint.
+            - Add some bushes for randomizer.
+        - one switch out of range in the basement, sign explains you can hold the attack button to throw further.
 
     - Enemy with hard shell that can only be broken by Staff bonk or clone explosion
         - Make clone immune to damage once detonation sequence cannot be aborted.
@@ -281,8 +314,6 @@ Current tasks:
         - dirt particles
         - test new lab tiles
         - new icons
-            - peach basket
-            - consumables
             - medallions
 
     - Fix Vanara Guardian boss looks bad when moving behind foreground tiles
@@ -322,16 +353,6 @@ Current tasks:
         - line up with hero within 100px
         - Charge up for 500ms, accelerating frame rate to 4x by 300ms, strafe to align with hero quickly at first, but slow to 0 speed by 300ms
         - Drop shield and rush forward for 1s.
-
-    - Peach collection quest
-        - NPC in waterfall village storage room:
-            "You look like you need some work to keep you out of trouble."
-            "Take this basket to collect peaches. If you bring me 20 peaches I'll give you a treat! {item:peachBasket}"
-            (hint before completion) "Make sure you aren't hurt when you collect peaches, otherwise you won't be able resist eating them yourself."
-            "Wow look at all these delicious peaches. Wait one moment."
-            "Here this is for you {item:peachPotion}"
-            (hint before completion) "You can bring me 20 more peaches if you want some spending money."
-            "{choice:Give 20 peaches?|Yes:peachCollector.jadeReward|No:peachCollector.no}"
 
     - Proposal
         - Require teleportation for fully entering the Spirit World.
