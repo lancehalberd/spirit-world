@@ -977,7 +977,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
 function performSomersault(this: void, state: GameState, hero: Hero) {
     // Cloud somersault roll activated by rolling again mid roll.
     const [dx, dy] = getCloneMovementDeltas(state, hero);
-    state.hero.spendMagic(10, 500);
+    state.hero.spendMagic(state, 10, 500);
     hero.d = (dx || dy) ? getCardinalDirection(dx, dy) : hero.d;
     // Default direction is the direction the current roll uses.
     const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);

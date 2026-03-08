@@ -7,10 +7,7 @@ import {sceneHash} from 'app/scenes/sceneHash';
 import {createCanvasBuffer} from 'app/utils/canvas';
 import {isSectionExplored} from 'app/utils/sections';
 import {updateSoundSettings} from 'app/utils/soundSettings';
-import {
-    wasGameKeyPressed,
-    wasMenuConfirmKeyPressed,
-} from 'app/userInput';
+import {wasGameKeyPressed} from 'app/userInput';
 
 
 export class MapScene implements GameScene {
@@ -33,10 +30,15 @@ export class MapScene implements GameScene {
             state.sceneStack.pop();
         }
         updateSoundSettings(state);
+            editingState.selectedSections = [];
     }
     update(state: GameState, interactive: boolean) {
         // Currently the map doesn't update unless the player interacts with it.
         if (!interactive) {
+            return;
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.CANCEL)) {
+            this.closeScene(state);
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
@@ -67,15 +69,6 @@ export class MapScene implements GameScene {
         if (safety > 500) {
             console.log('infinite loop warning');
             debugger;
-        }
-        if (wasMenuConfirmKeyPressed(state)) {
-            // I expect the map is at the top of the stack when it is interactive, but it will close anything
-            // below it as well if that is not the case.
-            while (state.sceneStack.includes(this)) {
-                state.sceneStack.pop();
-            }
-            updateSoundSettings(state);
-            editingState.selectedSections = [];
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {

@@ -38,6 +38,13 @@ interface TextPageState extends TextPage {
     lineIndex: number
     animationTime: number
 }
+interface ChoiceOption {
+    text: string
+    // Script to run when choosing this option.
+    key?: string
+    // Function to call when choosing this option.
+    activate?: (state: GameState) => void
+}
 
 interface ShowTextBoxScriptEvent {
     type: 'showTextBox'

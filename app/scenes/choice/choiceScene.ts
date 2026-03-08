@@ -36,10 +36,7 @@ export class ChoiceScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     prompt: TextPage;
-    choices: {
-        text: string
-        key: string
-    }[] = [];
+    choices: ChoiceOption[] = [];
     cursorIndex: number = 0;
     closeScene(state: GameState) {
         while (state.sceneStack.includes(this)) {
@@ -49,7 +46,12 @@ export class ChoiceScene implements GameScene {
     update(state: GameState, interactive: boolean) {
         if (wasConfirmKeyPressed(state)) {
             const option = this.choices[this.cursorIndex];
-            followMessagePointer(state, option.key);
+            if (option.activate) {
+                option.activate(state);
+            }
+            if (option.key) {
+                followMessagePointer(state, option.key);
+            }
             state.scriptEvents.handledInput = true;
             this.closeScene(state);
             return;

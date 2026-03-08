@@ -63,6 +63,7 @@ export function packSprites(prefixes: string[], gridSize: number = 16, columns: 
     return packedImages;
 }
 window['packSprites'] = packSprites;
+// Usage refreshPackedSprite('packed-2025-11-28-other'), then save the image over the existing version.
 export async function refreshPackedSprite(name: string) {
     const data = getPackedImage(name);
     const [canvas, context] = createCanvasAndContext(data.image.width, data.image.height);

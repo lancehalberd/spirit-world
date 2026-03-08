@@ -60,6 +60,14 @@ export function gainConsumable(state: GameState, consumable: Consumable) {
     state.hero.savedData.consumableTotals[consumable]++;
 }
 
+const blueprints: Blueprints[] = [
+    'spikeBoots', 'flyingBoots', 'forgeBoots',
+    'silverMailSchematics', 'goldMailSchematics',
+    'healthPotionSchematics', 'statusPotionSchematics', 'magicPotionSchematics',
+];
+export function isBlueprints(lootType: LootType): lootType is Blueprints {
+    return blueprints.includes(lootType as Blueprints);
+}
 
 const weaponUpgrades: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
 export function isWeaponUpgrade(lootType: string): lootType is WeaponUpgrades {
@@ -132,7 +140,5 @@ export const allLootTypes: LootType[] = [
     'spiritPower',
     ...equipment,
     ...magicElement,
-    // Blueprints
-    'spikeBoots', 'flyingBoots', 'forgeBoots',
-    'silverMailSchematics', 'goldMailSchematics',
+    ...blueprints,
 ];

@@ -1,5 +1,6 @@
 import {showHint} from 'app/content/hints';
 import {getLootFrame, getLootHelpMessage, getLootName, lootFrames, neutralElement} from 'app/content/loot';
+import {useConsumable} from 'app/content/lootEffects';
 import {isRandomizer} from 'app/gameConstants';
 import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showSettingsScene} from 'app/scenes/settings/settingsScene';
@@ -21,7 +22,7 @@ export const elementGeometry: Rect = {
     w: frameSize, h: frameSize,
 };
 
-const emptyMenuElement: MenuElement = {
+export const emptyMenuElement: MenuElement = {
     ...elementGeometry,
     getLabel: () => '',
     isVisible: () => false,
@@ -642,7 +643,7 @@ function getConsumableMenuElement(state: GameState, consumable: Consumable): Men
             drawCount(context, state.hero.savedData.consumables[consumable], this);
         },
         onSelect(state: GameState, toolIndex?: number) {
-            showSimpleMessage(state, getLootHelpMessage(state, {lootType: consumable}));
+            useConsumable(state, consumable);
             return false;
         },
         onUpgrade(state: GameState) {

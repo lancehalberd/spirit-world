@@ -2,13 +2,13 @@ import {CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY} from 'app/gameConstants';
 import {cursorFrame, frameSize} from 'app/content/menu';
 import {contextMenuState, editingState} from 'app/development/editingState';
 import {getCanvasScale} from 'app/development/getCanvasScale';
+import {renderMenuFrame} from 'app/render/renderMenuFrame';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {getState} from 'app/state';
 import {
     wasGameKeyPressed,
-    wasMenuConfirmKeyPressed,
 } from 'app/userInput';
-import {createAnimation, drawFrame, drawFrameCenteredAt} from 'app/utils/animations';
+import {drawFrameCenteredAt} from 'app/utils/animations';
 import {createCanvasBuffer, drawCanvas, mainCanvas} from 'app/utils/canvas';
 import {clamp, isPointInShortRect, pad} from 'app/utils/index';
 import {getMousePosition} from 'app/utils/mouse';
@@ -30,25 +30,10 @@ function selectClosestElement(scene: FieldMenuScene, x: number, y: number) {
 }
 
 const menuRect: Rect = {
-    x: 25,
+    x: 32,
     y: 35,
     w: CANVAS_WIDTH - 2 * 25,
     h: CANVAS_HEIGHT - 40,
-}
-
-const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
-export function renderMenuFrame(context: CanvasRenderingContext2D, r: Rect): void {
-    drawFrame(context, menuSlices[0], {x: r.x, y: r.y, w: 8, h: 8});
-    drawFrame(context, menuSlices[1], {x: r.x + 8, y: r.y, w: r.w - 16, h: 8});
-    drawFrame(context, menuSlices[2], {x: r.x + r.w - 8, y: r.y, w: 8, h: 8});
-
-    drawFrame(context, menuSlices[3], {x: r.x, y: r.y + 8, w: 8, h: r.h - 16});
-    drawFrame(context, menuSlices[4], {x: r.x + 8, y: r.y + 8, w: r.w - 16, h: r.h - 16});
-    drawFrame(context, menuSlices[5], {x: r.x + r.w - 8, y: r.y + 8, w: 8, h: r.h - 16});
-
-    drawFrame(context, menuSlices[6], {x: r.x, y: r.y + r.h - 8, w: 8, h: 8});
-    drawFrame(context, menuSlices[7], {x: r.x + 8, y: r.y + r.h - 8, w: r.w - 16, h: 8});
-    drawFrame(context, menuSlices[8], {x: r.x + r.w - 8, y: r.y + r.h - 8, w: 8, h: 8});
 }
 
 function getActiveOption(scene: FieldMenuScene): MenuElement {
@@ -123,7 +108,7 @@ export class FieldMenuScene implements GameScene {
         if (!interactive) {
             return;
         }
-        if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        if (wasGameKeyPressed(state, GAME_KEY.MENU) || wasGameKeyPressed(state, GAME_KEY.CANCEL)) {
             this.closeScene(state);
             return;
         }
@@ -147,7 +132,11 @@ export class FieldMenuScene implements GameScene {
         } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
             selectClosestElement(this, x + movementDelta, y);
         }
-        if (activeOption && wasMenuConfirmKeyPressed(state)) {
+        if (activeOption && (
+            wasGameKeyPressed(state, GAME_KEY.CONFIRM)
+            || wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+        )) {
             if (editingState.isEditing) {
                 activeOption.onUpgrade?.(state);
                 updateHeroMagicStats(state);

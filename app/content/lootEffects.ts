@@ -5,10 +5,11 @@ import {
     applyUpgrade,
     gainCollectible,
     gainConsumable,
-    isActiveTool, isCollectible, isConsumable,
+    isActiveTool, isBlueprints, isCollectible, isConsumable,
     isEquipment, isMagicElement, isPassiveTool,
 } from 'app/utils/loot';
 import {saveGame} from 'app/utils/saveGame';
+import {playSound} from 'app/utils/sounds';
 
 
 function getDungeonInventory(state: GameState): DungeonInventory {
@@ -24,11 +25,6 @@ function updateDungeonInventory(state: GameState, inventory: DungeonInventory, s
     if (save) {
         saveGame(state);
     }
-}
-
-const blueprints: Blueprints[] = ['spikeBoots', 'flyingBoots', 'forgeBoots', 'silverMailSchematics', 'goldMailSchematics'];
-function isBlueprints(lootType: LootType): lootType is Blueprints {
-    return blueprints.includes(lootType as Blueprints);
 }
 
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootData, simulate?: boolean) => void}> = {
@@ -128,4 +124,32 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             }
         }
     }
+}
+
+export function useConsumable(state: GameState, consumable: Consumable): void {
+    if (!(state.hero.savedData.consumables[consumable] > 0)) {
+        playSound('error');
+        return;
+    }
+    if (consumable === 'healthPotion') {
+        // Cannot use health potion at full life.
+        if (state.hero.savedData.maxLife <= state.hero.life) {
+            playSound('error');
+            return;
+        }
+        state.hero.life = Math.min(state.hero.savedData.maxLife, (state.hero.life + 10));
+        playSound('drink');
+    }
+    if (consumable === 'statusPotion') {
+        state.hero.burnDuration = 0;
+        state.hero.frozenDuration = 0;
+        state.hero.shockDuration = 0;
+        state.hero.statusPotionExpiresAt = Math.max(state.hero.statusPotionExpiresAt, state.fieldTime) + 60000;
+        playSound('drink');
+    }
+    if (consumable === 'magicPotion') {
+        state.hero.magicPotionExpiresAt = Math.max(state.hero.magicPotionExpiresAt, state.fieldTime) + 60000;
+        playSound('drink');
+    }
+    state.hero.savedData.consumables[consumable]--;
 }

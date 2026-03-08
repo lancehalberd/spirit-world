@@ -1,5 +1,5 @@
 import {GAME_KEY} from 'app/gameConstants';
-import {wasMenuConfirmKeyPressed, wasGameKeyPressed} from 'app/userInput';
+import {wasGameKeyPressed} from 'app/userInput';
 import {renderControls} from 'app/scenes/controls/renderControls'
 import {pushScene} from 'app/scenes/sceneHash';
 
@@ -9,7 +9,8 @@ export class ControlsScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     update(state: GameState, interactive: boolean) {
-        if (wasMenuConfirmKeyPressed(state)
+        if (wasGameKeyPressed(state, GAME_KEY.CONFIRM)
+            || wasGameKeyPressed(state, GAME_KEY.CANCEL)
             || wasGameKeyPressed(state, GAME_KEY.MENU)
             || wasGameKeyPressed(state, GAME_KEY.MAP)
         ) {

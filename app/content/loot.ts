@@ -391,7 +391,8 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
         case 'arDevice':
             return 'Wearing this device allows you to see into the Aether Realms.';
         case 'healthPotion':
-            return 'This concentrated brew will restore 10 hearts but reduces your max health by 1 until you rest at a Fairy Statue.';
+            return 'This concentrated brew will restore 10 hearts.' 
+            //but reduces your max health by 1 until you rest at a Fairy Statue.';
         case 'statusPotion': return 'This potion will make you immune to status effects for 1 minute.';
         case 'magicPotion': return 'Drink this potion to constantly regenerate your spirit energy for 1 minute.';
         case 'magicBeans': return 'These seeds will revive any dormant Daughter Trees you can find.'

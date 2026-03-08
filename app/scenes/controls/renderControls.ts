@@ -79,17 +79,18 @@ export function renderControls(context: CanvasRenderingContext2D, state: GameSta
         size: 16,
     });
 
+    let x = 55;
     y += 30;
-    r = renderControlFrames(context, state, GAME_KEY.WEAPON, {x: 60, y});
-    drawText(context, 'Confirm/' + (savedData.weapon ? 'Chakram' : '???'), r.x + r.w + 2, r.y + r.h / 2, {
+    r = renderControlFrames(context, state, GAME_KEY.WEAPON, {x, y});
+    drawText(context, (savedData.weapon ? 'Chakram' : '???') + '/Cancel', r.x + r.w + 2, r.y + r.h / 2, {
         textBaseline: 'middle',
         textAlign: 'left',
         size: 16,
     });
 
     y += 20;
-    r = renderControlFrames(context, state, GAME_KEY.RIGHT_TOOL, {x: 60, y});
-    renderControlFrames(context, state, GAME_KEY.LEFT_TOOL, {x: 40, y});
+    r = renderControlFrames(context, state, GAME_KEY.RIGHT_TOOL, {x, y});
+    renderControlFrames(context, state, GAME_KEY.LEFT_TOOL, {x: x - 20, y});
     drawText(context, 'Equip/Use Tools', r.x + r.w + 2, r.y + r.h / 2, {
         textBaseline: 'middle',
         textAlign: 'left',
@@ -97,8 +98,8 @@ export function renderControls(context: CanvasRenderingContext2D, state: GameSta
     });
 
     y += 20;
-    r = renderControlFrames(context, state, GAME_KEY.PASSIVE_TOOL, {x: 60, y});
-    drawText(context, 'Talk/Grab/' + (state.hero.magicRegen ? 'Run' : '???'), r.x + r.w + 2, r.y + r.h / 2, {
+    r = renderControlFrames(context, state, GAME_KEY.PASSIVE_TOOL, {x, y});
+    drawText(context, 'Yes/Talk/Grab/' + (state.hero.magicRegen ? 'Run' : '???'), r.x + r.w + 2, r.y + r.h / 2, {
         textBaseline: 'middle',
         textAlign: 'left',
         size: 16,

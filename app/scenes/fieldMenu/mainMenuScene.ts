@@ -3,6 +3,7 @@ import {
     arDeviceMenuOption,
     createMenuPanel,
     elementGeometry,
+    emptyMenuElement,
     getDungeonOptions,
     getEyesOptions,
     getEquipmentOptions,
@@ -85,7 +86,42 @@ const backpackMenuOption: MenuElement = {
 class MainMenuScene extends FieldMenuScene {
     cursor = {panelId: 'tools', optionIndex: 0};
     getPanels(state: GameState) {
-        return [
+        const panels: MenuPanel[] =  [
+            createMenuPanel('tools', getToolOptions(state), 2, 2, {x: 33, y: 0, w: 48, h: 48}),
+            createMenuPanel('menus', [elementsMenuOption, bootsMenuOption, backpackMenuOption], 3, 1, {x: 90, y: 0, w: 24, h: 81}),
+            createMenuPanel('special', [nimbusCloudMenuOption, arDeviceMenuOption], 1, 2, {x: 33, y: 57, w: 48, h: 24}),
+            // row on bottom left
+            {
+                id: 'dungeon',
+                options: getDungeonOptions(state),
+                x: 33, y: 90, w: 81, h: 30,
+                rows: 1,
+                columns: 3,
+                rowHeight: 30,
+                optionsOffset: {
+                    x: 5,
+                    y: 0,
+                },
+            },
+            // right most column.
+            createMenuPanel('equipment',
+                [
+                emptyMenuElement,
+                ...getEquipmentOptions(state),
+                ...getEyesOptions(state),
+                ...getTechniqueOptions(state),
+            ], 5, 3, {x: 123, y: 0, w: 72, h: 120}),
+        ];
+        // The 'return home' option is added to the system options for randomizer only, which increases the height of the panel a bit.
+        const systemOptions = getSystemOptions(state);
+        const systemPanelHeight = Math.max(87, systemOptions.length * 24);
+        const systemPanel = createMenuPanel('system', systemOptions, systemOptions.length, 1, {x: 0, y: 0, w: 24, h: systemPanelHeight});
+        panels.push(systemPanel);
+        // Peach panel is displayed directly below the system panel.
+        const peachPanel = createMenuPanel('peach', [peachMenuOption], 1, 1, {x: 0, y: systemPanel.y + systemPanel.h + 9, w: 24, h: 24});
+        panels.push(peachPanel);
+        return panels;
+        /*return [
             // two left most columns
             createMenuPanel('equipment', getEquipmentOptions(state), 4, 2, {x: 0, y: 0, w: 48, h: 96}),
             createMenuPanel('elements', [elementsMenuOption], 1, 1, {x: 57, y: 6, w: 24, h: 24}),
@@ -121,7 +157,7 @@ class MainMenuScene extends FieldMenuScene {
             createMenuPanel('menu', getSystemOptions(state), 4, 1, {x: 180, y: 0, w: 24, h: 96}),
 
             createMenuPanel('peach', [peachMenuOption], 1, 1, {x: 180, y: 106, w: 24, h: 24})
-        ];
+        ];*/
     }
     update(state: GameState, interactive: boolean) {
         // We allow switching directly from the main menu to the map for convenience.

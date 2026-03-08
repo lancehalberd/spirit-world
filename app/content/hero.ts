@@ -193,6 +193,9 @@ export class Hero implements Actor {
     // reset their position to prevent softlocks.
     stuckFrames: number = 0;
 
+    statusPotionExpiresAt = 0;
+    magicPotionExpiresAt = 0;
+
     constructor(public savedData: SavedHeroData = getDefaultSavedState().savedHeroData) {
     }
 
@@ -278,7 +281,7 @@ export class Hero implements Actor {
         }
         if (hit.damage) {
             // Astral projection damage is applied to the magic meter at 5x effectiveness.
-            state.hero.spendMagic(Math.max(10, hit.damage * 5));
+            state.hero.spendMagic(state, Math.max(10, hit.damage * 5));
             // Astral projection has fewer invulnerability frames since it can't be killed
             // and magic regenerates automatically.
             this.invulnerableFrames = 20;
@@ -364,7 +367,7 @@ export class Hero implements Actor {
                 reflectDamage++;
             }
             if (hit.damage && state.hero.invulnerableFrames <= 0) {
-                state.hero.spendMagic(spiritDamage);
+                state.hero.spendMagic(state, spiritDamage);
                 state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, iframeMultiplier * 10);
                 // state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
             }
@@ -401,14 +404,14 @@ export class Hero implements Actor {
                 const burnDuration = 2000;
                 damage *= this.getFireBlessingDamageMultiplier();
                 burnDamage = damage / 2;
-                this.applyBurn(burnDamage, burnDuration);
+                this.applyBurn(state, burnDamage, burnDuration);
             }
             if (hit.element === 'ice') {
                 damage *= this.getWaterBlessingDamageMultiplier();
             }
             if (hit.element === 'lightning') {
                 damage *= this.getLightningBlessingDamageMultiplier();
-                this.applyShock(2000 * damage);
+                this.applyShock(state, 2000 * damage);
             }
             if (state.hero.savedData.passiveTools.armor >= 2) {
                 if (gameModifiers.nerfGoldenMail) {
@@ -446,17 +449,19 @@ export class Hero implements Actor {
         } else if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && this.frozenDuration <= -500) {
-            const duration = this.savedData.passiveTools.waterBlessing ? 800 : 1600;
-            if (hadIronSkin) {
-                this.frozenHeartDuration = 2 * duration;
-            } else {
-                // Getting hit by ice freezes you unless you have iron skin up.
-                this.frozenDuration = duration;
-                this.vx = this.vy = 0;
+            if (!this.isImmuneToStatusEffects(state)) {
+                const duration = this.savedData.passiveTools.waterBlessing ? 800 : 1600;
+                if (hadIronSkin) {
+                    this.frozenHeartDuration = 2 * duration;
+                } else {
+                    // Getting hit by ice freezes you unless you have iron skin up.
+                    this.frozenDuration = duration;
+                    this.vx = this.vy = 0;
+                }
+                playAreaSound(state, state.areaInstance, 'freeze');
+                // ice hits remove burns.
+                this.burnDuration = 0;
             }
-            playAreaSound(state, state.areaInstance, 'freeze');
-            // ice hits remove burns.
-            this.burnDuration = 0;
         }
         return { hit: true };
     }
@@ -500,7 +505,14 @@ export class Hero implements Actor {
         }
     }
 
-    applyBurn(burnDamage: number, burnDuration: number) {
+    isImmuneToStatusEffects(state: GameState) {
+        return this.statusPotionExpiresAt > state.fieldTime;
+    }
+
+    applyBurn(state: GameState, burnDamage: number, burnDuration: number) {
+        if (this.isImmuneToStatusEffects(state)) {
+            return;
+        }
         // This damage does not go through the apply damage function, so we need
         // to apply the global damage multiplier to it separately.
         burnDamage *= gameModifiers.globalDamageTaken;
@@ -513,7 +525,10 @@ export class Hero implements Actor {
         this.frozenHeartDuration = 0;
     }
 
-    applyShock(shockDuration: number) {
+    applyShock(state: GameState, shockDuration: number) {
+        if (this.isImmuneToStatusEffects(state)) {
+            return;
+        }
         let maxShockEffect = 1000 * this.maxMagic / 10;
         if (this.savedData.passiveTools.lightningBlessing >= 2) {
             maxShockEffect /= 2;
@@ -1060,7 +1075,7 @@ export class Hero implements Actor {
     }
 
     // This should only be called on `state.hero`.
-    spendMagic(amount: number, cooldownAmount?: number) {
+    spendMagic(state: GameState, amount: number, cooldownAmount?: number) {
         // console.log('spendMagic', amount, cooldownAmount);
         // Only show them spending as much magic as they actually have, since the visualization for recent magic spent
         // treats the zero point as the bottom.
@@ -1075,14 +1090,17 @@ export class Hero implements Actor {
                 this.magicRegenCooldown =  Math.max(this.magicRegenCooldown, cooldownAmount, 100);
             }
         } else if (cooldownAmount > 0) {
-            this.increaseMagicRegenCooldown(cooldownAmount);
+            this.increaseMagicRegenCooldown(state, cooldownAmount);
         } else if (cooldownAmount !== 0) {
-            this.increaseMagicRegenCooldown(100 * amount);
+            this.increaseMagicRegenCooldown(state, 100 * amount);
         }
     }
 
     // This should only be called on `state.hero`.
-    increaseMagicRegenCooldown(amount: number): void {
+    increaseMagicRegenCooldown(state: GameState, amount: number): void {
+        if (this.magicPotionExpiresAt > state.fieldTime) {
+            return;
+        }
         //console.log('increaseMagicRegenCooldown', amount);
         this.magicRegenCooldown = Math.min(
             Math.max(100 * gameModifiers.spiritEnergyCooldown, this.magicRegenCooldown + amount * gameModifiers.spiritEnergyCooldown),

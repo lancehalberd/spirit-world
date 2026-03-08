@@ -136,17 +136,6 @@ export function getState(): GameState {
 }
 window['getState'] = getState;
 
-
-export function getSettingsOptions(state: GameState): string[] {
-    // add volume, other global game settings here
-    const settingsMenu = ['VIEW CONTROLS'];
-    // only display 'FULLSCREEN' toggle if game is being played inside of Electron as a desktop app
-    if (window.electronAPI && state.gameHasBeenInitialized) {
-        return [...settingsMenu, 'FULLSCREEN', 'RESUME'];
-    }
-    return [...settingsMenu, 'RESUME'];
-}
-
 export function shouldHideMenu(state: GameState): boolean {
     return !!(
         state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject

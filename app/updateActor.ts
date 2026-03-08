@@ -173,7 +173,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     }
     // Hero takes one damage every half second while in a hot room.
     if (!editingState.isEditing && state.areaSection?.isHot) {
-        hero.applyBurn(1, 500);
+        hero.applyBurn(state, 1, 500);
     }
     // Life is restored as soon as it is visibly lost in the Dream world.
     if (state.location.zoneKey === 'dream' && hero.displayLife < hero.savedData.maxLife) {
@@ -235,13 +235,13 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         let modValue = 100;
         if (hero.hasBarrier) {
             // Burning no longer prevents magic regen cooldown, so the 40ms added here will get reduced by 20ms each frame.
-            state.hero.spendMagic(drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 40);
+            state.hero.spendMagic(state, drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 40);
         } else if (hero.savedData.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
             hero.savedData.ironSkinLife = Math.max(0, hero.savedData.ironSkinLife - state.hero.burnDamage / 2 * FRAME_LENGTH / 1000);
         } else if (state.hero.savedData.passiveTools.fireBlessing && state.hero.magic > 0) {
             // The fire blessing causes burns to apply to magic instead of life, but does not increase cooldown.
-            state.hero.spendMagic(drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 0);
+            state.hero.spendMagic(state, drainCoefficient * 20 * state.hero.burnDamage * FRAME_LENGTH / 1000, 0);
         } else {
             // 100% of burn damage goes to life without iron skin or magic.
             state.hero.life = Math.max(0, state.hero.life - state.hero.burnDamage * FRAME_LENGTH / 1000);
@@ -349,7 +349,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             drainAmount *= 2;
         }
         state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainAmount);
-        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
+        state.hero.increaseMagicRegenCooldown(state, drainCoefficient * FRAME_LENGTH / 2);
     } else if (hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
@@ -389,6 +389,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen = Math.max(1, state.hero.actualMagicRegen);
         }
     }
+    // No magic regen cooldown if a magic potion is in effect.
+    if (state.hero.magicPotionExpiresAt > state.fieldTime) {
+        state.hero.magicRegenCooldown = 0;
+    }
     const isTryingToRun = state.hero.action === 'walking' && state.hero.isRunning;
     const isActuallyRunning = isTryingToRun && state.hero.magic > 0;
     const preventCooldownRegeneration = isInvisible
@@ -417,7 +421,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
         // Slowly expend spirit energy while running.
-        state.hero.spendMagic(drainCoefficient * 5 * FRAME_LENGTH / 1000, drainCoefficient * FRAME_LENGTH / 5);
+        state.hero.spendMagic(state, drainCoefficient * 5 * FRAME_LENGTH / 1000, drainCoefficient * FRAME_LENGTH / 5);
     } else if (state.hero.actualMagicRegen < 0) {
         // Magic is being drained for some reason
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
@@ -427,7 +431,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     if (state.hero.clones.length) {
         // Clones drain 2 magic per second but do not effect cooldown time.
-        state.hero.spendMagic(2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
+        state.hero.spendMagic(state, 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
     }
     // Meditation grants 3 additional spirit energy per second.
     if (hero.action === 'meditating' && canRegnerateMagic) {
@@ -441,11 +445,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.
-                state.hero.spendMagic(drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient, 0);
+                state.hero.spendMagic(state, drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient, 0);
                 targetLightRadius = 200 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.savedData.passiveTools.catEyes > 0) {
-                state.hero.spendMagic(drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient, 0);
+                state.hero.spendMagic(state, drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient, 0);
                 targetLightRadius = 70 * coefficient;
                 minLightRadius += 10 * coefficient;
             }

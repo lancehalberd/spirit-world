@@ -2,7 +2,7 @@ import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
 import {sceneHash} from 'app/scenes/sceneHash';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
-import {isGameKeyDown, isKeyboardKeyDown, KEY, wasGameKeyPressed, wasMenuConfirmKeyPressed} from 'app/userInput';
+import {isGameKeyDown, isKeyboardKeyDown, KEY, wasGameKeyPressed} from 'app/userInput';
 import {drawFrameAt} from 'app/utils/animations';
 import {fillRect} from 'app/utils/index';
 import {requireFrame} from 'app/utils/packedImages';
@@ -59,7 +59,8 @@ export class IntroScene implements GameScene {
         // This timestamp needs to be kept in sync with the rendering code so that we switch
         // to the title shortly after the prologue fades to black.
         if (this.prologueTime >= INTRO_DURATION
-            || wasMenuConfirmKeyPressed(state)
+            || wasGameKeyPressed(state, GAME_KEY.CONFIRM)
+            || wasGameKeyPressed(state, GAME_KEY.CANCEL)
             || wasGameKeyPressed(state, GAME_KEY.MENU)
             || wasGameKeyPressed(state, GAME_KEY.MAP)
         ) {

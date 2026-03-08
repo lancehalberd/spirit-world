@@ -380,7 +380,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (state.hero.savedData.element) {
                     magicCost += 10;
                 }
-                state.hero.spendMagic(magicCost);
+                state.hero.spendMagic(state, magicCost);
                 if (hero.savedData.activeTools.cloak >= 2) {
                     hero.isInvisible = true;
                 }
@@ -668,7 +668,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (!preventTeleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero.area, {x: hero.x, y: hero.y})
             ) {
-                state.hero.spendMagic(10);
+                state.hero.spendMagic(state, 10);
                 state.hero.x = hero.x;
                 state.hero.y = hero.y;
                 // match the projection to the hero eyes.
@@ -882,7 +882,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 delete hero.heldChakram;
             }
             hero.chargingLeftTool = hero.chargingRightTool = false;
-            state.hero.spendMagic(5);
+            state.hero.spendMagic(state, 5);
             hero.action = 'roll';
             hero.isAirborn = true;
             hero.actionFrame = 0;

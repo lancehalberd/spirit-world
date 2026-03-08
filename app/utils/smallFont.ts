@@ -30,7 +30,6 @@ const smallWhiteFont = {
 
 requireFrame(arFont.fontSource, {x: 0, y: 0, w: 282, h: 5}, frame => {
     const smallWhiteFontFrame = getSolidTintedImage('#FFF', frame);
-    window.debugCanvas(smallWhiteFontFrame, 3);
     let x = 0;
     for (let i = 0; i < smallWhiteFont.characters.length; i++) {
         const w = smallWhiteFont.widths[i];

@@ -148,7 +148,6 @@ Graphics to Implement:
 Current tasks:
     - Demo blockers
         - Preload music.
-        - New inventory+contorls+options
         - Demo flag
             - Disable access to waterfall tower.
             - Replace Helix rival fight with demo ending, possibly unlock randomizer.
@@ -162,6 +161,14 @@ Current tasks:
         - Add new peach tree graphics
         - Cocoon boss projectiles still getting blocked by boulders
         - High priority SFX
+
+    - Support implicit cancel option for choice options:
+        {choice: Quit AR?|CANCEL:arGame.no|No:arGame.no|Yes:arGame.quitGame}
+        This would not be displayed, but used if the player presses GAME_KEY.CANCEL.
+
+    - Add visualization for potion effects
+        - maybe just colored bars on the magic meter for timing.
+        - particle effects on the player.
 
     - Scene updates
         - Dim audio using sceneVolume and call update sound settings when switching scenes.
