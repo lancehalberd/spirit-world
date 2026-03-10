@@ -7,6 +7,8 @@ import { playSound } from 'app/utils/sounds';
 import { getBossRushOptions, BossRushOption } from './bossRushOptions';
 import { alterHeroData } from 'app/utils/alterHeroData';
 import { fixCamera } from 'app/utils/fixCamera';
+import {sceneHash} from 'app/scenes/sceneHash';
+import { BossRushScene } from './bossRushScene';
 
 
 const bossConditions = [
@@ -15,7 +17,7 @@ const bossConditions = [
   "weak"
 ] as const;
 
-export function updateBossRushMenu(state: GameState) {
+export function updateBossRushMenu(state: GameState, scene: BossRushScene) {
     const options = getBossRushOptions(state);
     if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
         let current = state.bossRushTrackers.currentCondition
@@ -36,29 +38,29 @@ export function updateBossRushMenu(state: GameState) {
     }
     if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
         state.travel("dream", "bossRefightReturn", {instant: true});
-        state.scene = 'game';
+        state.sceneStack = [sceneHash.field, sceneHash.hud]; //Replace with call to showFieldScene?
         return
     }
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
+        scene.cursorIndex = (scene.cursorIndex - 1 + options.length) % options.length;
         playSound('menuTick');
-        changeBackground(state, options);
+        changeBackground(state, options, scene);
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        state.menuIndex = (state.menuIndex + 1) % options.length;
+        scene.cursorIndex = (scene.cursorIndex + 1) % options.length;
         playSound('menuTick');
-        changeBackground(state, options);
+        changeBackground(state, options, scene);
     }
     if (wasConfirmKeyPressed(state)) {
         playSound('menuTick');
-        state.scene = 'game';
-        let selectedBoss = options[state.menuIndex].key
+        state.sceneStack = [sceneHash.field, sceneHash.hud]; //RE
+        let selectedBoss = options[scene.cursorIndex].key
         state.bossRushTrackers.storedLife = state.hero.savedData.maxLife;
         if (options[state.menuIndex].playerState) {
-            alterHeroData(state, options[state.menuIndex].playerState)
+            alterHeroData(state, options[scene.cursorIndex].playerState)
             state.savedState.usingBackup = true;
         }
         applyConditions(state);
-        let selectedLocation = options[state.menuIndex].location[0];
+        let selectedLocation = options[scene.cursorIndex].location[0];
         startRefight(state, selectedBoss, selectedLocation);
     }
 }
@@ -72,7 +74,6 @@ function applyConditions(state: GameState) {
         state.hero.savedData.maxLife = 2;
         state.hero.savedData.passiveTools.ironSkin = 0;
         state.hero.savedData.ironSkinLife = 0;
-        //state.hero.applySavedHeroData(state.savedState.savedHeroData);
     }
     if (state.bossRushTrackers.currentCondition == "weak") {
         state.bossRushTrackers.hasWeaponUpgrades = state.hero.savedData.weaponUpgrades
@@ -88,8 +89,8 @@ function applyConditions(state: GameState) {
     }
 }
 
-function changeBackground(state: GameState, options: BossRushOption[]) {
-    let selectedLocation = options[state.menuIndex].location[0];
+function changeBackground(state: GameState, options: BossRushOption[], scene: BossRushScene) {
+    let selectedLocation = options[scene.cursorIndex].location[0];
     state.travel("bossRefights", selectedLocation, {instant: true});
     fixCamera(state);
 }

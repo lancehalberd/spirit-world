@@ -5,10 +5,10 @@ import {getDefaultSavedState } from 'app/savedState'
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
-import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
-import {getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
-import {cloneDeep, mergeDeep} from 'app/utils/index';
-import {returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+//import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
+import {getFullZoneLocation, /*getShortZoneName*/ } from 'app/utils/getFullZoneLocation';
+//import {cloneDeep, mergeDeep} from 'app/utils/index';
+//import {returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 import { enterZoneByTarget } from './utils/enterZoneByTarget';
 
 export function loadSavedData(): boolean {

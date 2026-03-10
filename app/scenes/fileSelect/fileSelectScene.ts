@@ -22,4 +22,5 @@ export class FileSelectScene implements GameScene {
     }
 }
 
+
 sceneHash.fileSelect = new FileSelectScene();

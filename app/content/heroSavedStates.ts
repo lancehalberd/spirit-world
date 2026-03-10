@@ -14,14 +14,6 @@ export const altGolemState: SavedHeroData = {
     money: 0,
     aether: 0,
     karma: 0,
-    aetherCrystals: 0,
-    silverOre: 0,
-    totalSilverOre: 0,
-    goldOre: 0,
-    totalGoldOre: 0,
-    peachQuarters: 0,
-    spiritTokens: 0,
-    victoryPoints: 0,
     weapon: 0,
     weaponUpgrades: {},
     activeTools: {
@@ -34,6 +26,11 @@ export const altGolemState: SavedHeroData = {
         spikeBoots: 0,
         flyingBoots: 0,
         forgeBoots: 0,
+        silverMailSchematics: 0,
+        goldMailSchematics: 0,
+        healthPotionSchematics: 0,
+        statusPotionSchematics: 0,
+        magicPotionSchematics: 0
     },
     element: null,
     elements: {
@@ -56,15 +53,20 @@ export const altGolemState: SavedHeroData = {
         astralProjection: 0,
         teleportation: 0,
         ironSkin: 0,
-        goldMail: 0,
         phoenixCrown: 0,
         waterBlessing: 0,
         fireBlessing: 0,
         lightningBlessing: 0,
         arDevice: 0,
+        armor: 0,
+        peachBasket: 0
     },
-    
+
     spawnLocation: cloneDeep(SPAWN_DREAM_ENTRANCE),
+    collectibles: undefined,
+    collectibleTotals: undefined,
+    consumables: undefined,
+    consumableTotals: undefined
 }
 
 

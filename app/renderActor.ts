@@ -271,11 +271,11 @@ export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, 
         const frame = getFrame(cloudPoofAnimation, hero.animationTime);
         drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
         return;
-    }*/
+    }
 
     if (state.scene == 'bossRush') {
         return;
-    }
+    }*/
 
     if (hero.wading && !hero.swimming) {
         const frame = getFrame(wadingAnimation, hero.animationTime);

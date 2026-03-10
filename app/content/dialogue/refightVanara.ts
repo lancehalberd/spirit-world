@@ -1,3 +1,4 @@
+import { showBossRushScene } from 'app/scenes/bossRush/bossRushScene';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 
 
@@ -11,9 +12,8 @@ dialogueHash.refightVanara = {
                     }`;
         },
         openMenu: (state: GameState) => {
-            state.menuIndex = 0;
             state.travel("bossRefights", "beetleRefight", {instant: true});
-            state.scene = 'bossRush';
+            showBossRushScene(state)
             return ''
         },
         no: '',

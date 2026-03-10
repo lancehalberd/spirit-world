@@ -1,11 +1,12 @@
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { renderStandardFieldStack } from 'app/render/renderField';
+//import { renderStandardFieldStack } from 'app/render/renderField';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 import { getBossRushOptions, getKarmaTimeByKey } from './bossRushOptions';
-import { fullHeart, emptyHeart } from 'app/renderHUD';
+import { fullHeart, emptyHeart } from 'app/scenes/hud/hudScene';
 import { drawFrame } from 'app/utils/animations';
-
+import {sceneHash} from 'app/scenes/sceneHash';
+import { BossRushScene } from './bossRushScene';
 
 
 const WIDTH = 144;
@@ -49,14 +50,14 @@ function getHighScore(state: GameState, boss: BossName): string {
 
 
 
-export function renderBossRushMenu(context: CanvasRenderingContext2D, state: GameState): void {
-    renderStandardFieldStack(context, state, false);
+export function renderBossRushMenu(context: CanvasRenderingContext2D, state: GameState, scene: BossRushScene): void {
+    //renderStandardFieldStack(context, state, false);
 
     const options = getBossRushOptions(state);
 
     //If somehow someone gets to this menu too early, this prevents issues
     if (!options || options.length === 0) {
-        state.scene = 'game';
+        state.sceneStack = [sceneHash.field, sceneHash.hud]; //Replace with call to showFieldScene?
         state.travel("dream", "bossRefightReturn", {instant: true});
         return;
     }
@@ -81,7 +82,7 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
     
     // Calculate visible window
     const startIndex = Math.max(0, Math.min(
-        state.menuIndex - 1, 
+        scene.cursorIndex - 1, 
         options.length - MAX_VISIBLE
     ));
     const endIndex = Math.min(startIndex + MAX_VISIBLE, options.length);
@@ -107,7 +108,7 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
         let text = visibleOptions[i].label.slice(0, 13).toUpperCase();
         drawText(context, text, x, y, textOptions);
         
-        if (state.menuIndex === actualIndex) {
+        if (scene.cursorIndex === actualIndex) {
             context.beginPath();
             context.moveTo(r.x + 8, y - 8);
             context.lineTo(r.x + 16, y);
@@ -138,7 +139,7 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
     }
 
     // High Score Display
-    const selectedBoss = options[state.menuIndex].key;
+    const selectedBoss = options[scene.cursorIndex].key;
     const highScoreTime = getHighScore(state, selectedBoss); 
 
     if (highScoreTime) {
