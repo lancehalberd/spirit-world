@@ -11,7 +11,7 @@ import { renderPropertyRows } from 'app/development/propertyPanel';
 import { editingState } from 'app/development/editingState';
 import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { checkToRedrawTiles, drawRemainingFrames } from 'app/render/renderField';
+import { checkToRedrawTiles, drawRemainingFrames } from 'app/scenes/field/renderField';
 import { getState } from 'app/state';
 import { updateAreaSection } from 'app/utils/area';
 import { createCanvasAndContext } from 'app/utils/canvas';

@@ -1,6 +1,9 @@
-import {allLootTypes, GAME_KEY} from 'app/gameConstants';
-import {parseMessage, textScriptToString} from 'app/render/renderMessage';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {GAME_KEY} from 'app/gameConstants';
+import {showMessagePage} from 'app/scenes/message/messageScene';
 import {getCameraTarget} from 'app/utils/fixCamera';
+import {allLootTypes} from 'app/utils/loot';
+import {parseMessage, textScriptToString} from 'app/utils/parseMessage';
 
 
 export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
@@ -170,19 +173,36 @@ export function waitForInput(state: GameState, duration = 0) {
     });
 }
 
-export function parseScriptText(state: GameState, text: TextScript, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
-    const events: ScriptEvent[] = [];
+export function followMessagePointer(state: GameState, pointer: string) {
+    if (!pointer) {
+        return;
+    }
+    const [dialogueKey, optionKey] = pointer.split('.');
+    const dialogueSet = dialogueHash[dialogueKey];
+    if (!dialogueSet) {
+        console.error('Missing dialogue set', dialogueKey, pointer);
+        return;
+    }
+    const script = dialogueSet.mappedOptions[optionKey];
+    // Empty string script does nothing.
+    if (script === '') {
+        return;
+    }
+    if (!script) {
+        console.error('Missing dialogue option',  dialogueSet.mappedOptions, optionKey);
+        return;
+    }
+    prependScript(state, script);
+}
+
+export function parseScriptText(state: GameState, text: TextScript, blockFieldUpdates = true): ShowTextBoxScriptEvent[] {
+    const events: ShowTextBoxScriptEvent[] = [];
     const pages = parseMessage(state, text);
-    for (const page of pages) {
+    if (pages.length) {
         events.push({
             type: 'showTextBox',
-            textPage: page,
-        });
-        events.push({
-            type: 'wait',
+            textPages: pages,
             blockFieldUpdates,
-            duration,
-            keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
         });
     }
     return events;
@@ -195,7 +215,55 @@ export function showMessage(
     if (!message){
         return;
     }
-    prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
+    prependScript(state, textScriptToString(state, message));
+}
+
+// Shows a message box ignoring any additional scripting elements.
+// This allows us to effectively show messages outside of contexts where scripts run, for example
+// when showing messages from the inventory.
+export function showSimpleMessage(
+    state: GameState,
+    message: TextScript,
+): void {
+    if (!message){
+        return;
+    }
+    showMessagePage(state, parseScriptAsTextPages(state, textScriptToString(state, message)));
+}
+
+export function parseScriptAsTextPages(state: GameState, script: TextScript): TextPage[] {
+    let textPages: TextPage[] = [];
+    // Script is a bunch of text broken up by actions marked by brackets like `{weapon}`
+    const textAndActions = textScriptToString(state, script).split(/[{}]/);
+    while (textAndActions.length) {
+        const text = textAndActions.shift();
+        if (text) {
+            const textEvents = parseScriptText(state, text);
+            for (const event of textEvents) {
+                textPages = [...textPages, ...event.textPages];
+            }
+
+        }
+        // Skip any actions found in the text
+        const actionToken = textAndActions.shift();
+        if (actionToken && actionToken !== '|') {
+            console.warn('Attempted to process a script as a simple message', script);
+        }
+    }
+    return textPages;
+}
+
+export function parseScriptAsTextPage(state: GameState, script: TextScript): TextPage {
+    const textPages = parseScriptAsTextPages(state, script);
+    const textPage: TextPage = {
+        textRows: [],
+        frames: [],
+    }
+    for (const page of textPages) {
+        textPage.textRows = [...textPage.textRows, ...page.textRows];
+        textPage.frames = [...textPage.frames, ...page.frames];
+    }
+    return textPage;
 }
 
 export function parseEventScript(state: GameState, script: TextScript): ScriptEvent[] {
@@ -283,7 +351,9 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             });
             events.push({
                 type: 'showChoiceBox',
-                prompt,
+                // We don't support multiple pages on the prompt, we just grow
+                // it vertically.
+                prompt: parseScriptAsTextPage(state, prompt),
                 choices,
             });
             continue;
@@ -407,7 +477,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
     if (events.length) {
         //console.log('extra clear textbox');
         //console.log([...events]);
-        events.push({ type: 'clearTextBox' });
+        // events.push({ type: 'clearTextBox' });
     }
     return events;
 }

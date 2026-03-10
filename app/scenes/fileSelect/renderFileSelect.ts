@@ -1,9 +1,8 @@
-import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { renderStandardFieldStack } from 'app/render/renderField';
-import { renderHUD } from 'app/renderHUD';
-import { getFileSelectOptions } from 'app/state';
-import { drawText } from 'app/utils/simpleWhiteFont';
-import { fillRect, pad } from 'app/utils/index';
+import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
+import {getFileSelectOptions} from 'app/scenes/fileSelect/getFileSelectOptions';
+import {drawText} from 'app/utils/simpleWhiteFont';
+import {fillRect, pad} from 'app/utils/index';
+import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
 
 const WIDTH = 144;
 const ROW_HEIGHT = 20;
@@ -14,10 +13,8 @@ const textOptions = <const>{
     size: 16,
 };
 
-export function renderFileSelect(context: CanvasRenderingContext2D, state: GameState): void {
-    renderStandardFieldStack(context, state);
-    renderHUD(context, state);
-    const options = getFileSelectOptions(state);
+export function renderFileSelect(context: CanvasRenderingContext2D, state: GameState, scene: FileSelectScene): void {
+    const options = getFileSelectOptions(state, scene);
     const h = ROW_HEIGHT * options.length + 8;
     let r = {
         x: (CANVAS_WIDTH - WIDTH) / 2,
@@ -35,7 +32,7 @@ export function renderFileSelect(context: CanvasRenderingContext2D, state: GameS
     for (let i = 0; i < options.length; i++) {
         let text = options[i].slice(0, 13).toUpperCase();
         drawText(context, text, x, y, textOptions);
-        if (state.menuIndex === i) {
+        if (scene.cursorIndex === i) {
             // Draw an arrow next to the selected option.
             context.beginPath();
             context.moveTo(r.x + 8, y - 8);

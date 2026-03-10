@@ -1,13 +1,14 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { getRandomizerZoneDescription } from 'app/content/hints';
-import { isLogicValid } from 'app/content/logic';
-import { lootEffects } from 'app/content/lootEffects';
-import { getZone, zones } from 'app/content/zones';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {getRandomizerZoneDescription} from 'app/content/hints';
+import {isLogicValid} from 'app/content/logic';
+import {getLootName} from 'app/content/loot';
+import {lootEffects} from 'app/content/lootEffects';
+import {getZone, zones} from 'app/content/zones';
 
-import { CHAKRAM_2_NAME, randomizerGoal, randomizerGoalType, randomizerTotal } from 'app/gameConstants';
+import {randomizerGoal, randomizerGoalType, randomizerTotal} from 'app/gameConstants';
 
-import { allNodes } from 'app/randomizer/allNodes';
-import { addCheck } from 'app/randomizer/checks';
+import {allNodes} from 'app/randomizer/allNodes';
+import {addCheck} from 'app/randomizer/checks';
 import {
     canOpenDoor,
     findDoorById,
@@ -16,25 +17,24 @@ import {
     findReachableChecks,
     findReachableNodes,
 } from 'app/randomizer/find';
-import { missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce } from 'app/randomizer/warnOnce';
+import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
 
-import { cloneDeep } from 'app/utils/index';
-import { applySavedState, getDefaultState } from 'app/state';
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import {cloneDeep} from 'app/utils/index';
+import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {getDefaultState} from 'app/state';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import SRandom from 'app/utils/SRandom';
 
 
-
-
-interface LootData {
+interface LootDrops {
     loot: {
         location: FullZoneLocation
         object: LootObjectDefinition
     }[]
 }
 
-function getAllLootDrops(): LootData {
-    const lootDrops: LootData = {
+function getAllLootDrops(): LootDrops {
+    const lootDrops: LootDrops = {
         loot: [],
     }
     for (let zoneKey in zones) {
@@ -276,7 +276,9 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
                 highPriority.push(lootWithLocation);
                 break;
             // Low priority checks are important items that give access to no or very few checks.
-            case 'goldMail':
+            case 'armor':
+            case 'silverMailSchematics':
+            case 'goldMailSchematics':
             case 'ironSkin':
                 lowPriority.push(lootWithLocation);
                 break;
@@ -571,7 +573,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
 function debugState(state: GameState) {
     console.log(state.hero.savedData.activeTools);
     console.log(state.hero.savedData.passiveTools);
-    console.log({totalSilverOre: state.hero.savedData.totalSilverOre, totalGoldOre: state.hero.savedData.totalGoldOre });
+    console.log({totalSilverOre: state.hero.savedData.collectibleTotals.silverOre, totalGoldOre: state.hero.savedData.collectibleTotals.goldOre });
     console.log(Object.keys(state.savedState.objectFlags));
 }
 
@@ -683,16 +685,7 @@ window.showRandomizerSolution = function (): void {
 }
 
 
-function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState) {
-    if (lootType === 'spiritPower') {
-        if (state.hero.savedData.passiveTools.astralProjection) {
-            return 'Teleportation';
-        }
-        if (state.hero.savedData.passiveTools.spiritSight) {
-            return 'Astral Projection';
-        }
-        return 'Spirit Sight';
-    }
+/*function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState) {
     if (lootType === 'weapon') {
         if (state.hero.savedData.weapon) {
             return CHAKRAM_2_NAME;
@@ -718,11 +711,11 @@ function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState
         return 'Peach Piece';
     }
     if (lootType === 'victoryPoint') {
-        return `${lootAmount}x VP(${state.hero.savedData.victoryPoints + lootAmount})`;
+        return `${lootAmount}x VP(${state.hero.savedData.collectibles.victoryPoint + lootAmount})`;
     }
 
     return lootType;
-}
+}*/
 
 function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): GameState {
     const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
@@ -742,9 +735,9 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
             )) {
                 // debugState(state);
                 if (check.location) {
-                    console.log(`Get ${getLootName(check.lootObject, state)} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
+                    console.log(`Get ${getLootName(state, check.lootObject)} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
                 } else {
-                    console.log(`Get ${getLootName(check.lootObject, state)} from ${check.dialogueKey}:${check.optionKey}`);
+                    console.log(`Get ${getLootName(state, check.lootObject)} from ${check.dialogueKey}:${check.optionKey}`);
                 }
             }
         }
@@ -754,7 +747,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
         for (const flag of (check.progressFlags || [])) {
             state.savedState.objectFlags[flag] = true;
         }
-        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.savedData.victoryPoints >= randomizerGoal) {
+        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.savedData.collectibles.victoryPoint >= randomizerGoal) {
             console.log('');
             console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             console.log('Talk to mom to win.');

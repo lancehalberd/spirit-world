@@ -1,9 +1,8 @@
-import { addSparkleAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
-// import { FRAME_LENGTH } from 'app/gameConstants';
+import {addSparkleAnimation, FieldAnimationEffect, spawnAnimation} from 'app/content/effects/animationEffect';
 // import { editingState } from 'app/development/editingState';
-import { createAnimation } from 'app/utils/animations';
-import { addEffectToArea } from 'app/utils/effects';
-import { getCompositeBehaviors} from 'app/utils/getBehaviors';
+import {createAnimation} from 'app/utils/animations';
+import {addEffectToArea} from 'app/utils/effects';
+import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import Random from 'app/utils/Random';
 
 let points: Point[] = [];
@@ -35,16 +34,26 @@ export function addAmbientEffects(this: void, state: GameState) {
     );*/
 }
 
+const smallBubbleSpawnAnimation = createAnimation('gfx/effects/smallBubble.png', {w: 8, h: 8}, {y: 1, cols: 11, duration: 3, loop: false});
+const smallBubbleAnimation = createAnimation('gfx/effects/smallBubble.png', {w: 8, h: 8}, {cols: 12, duration: 6});
+const smallBubblePopAnimation = createAnimation('gfx/effects/smallBubble.png',
+    {w: 24, h: 24, content: {x: 8, y: 8, w: 8, h: 8}}, {top: 16, cols: 3, duration: 3, loop: false}
+);
 
-const bubbleGeometry: FrameDimensions = {w: 16, h: 16, content: {x: 3, w: 10, y: 6, h: 4}};
-const smallLavaBubbleAnimation = createAnimation('gfx/tiles/lavaAnimations.png', bubbleGeometry, {top: 240, cols: 6, duration: 6}, { loop: false });
-const mediumLavaBubbleAnimation = createAnimation('gfx/tiles/lavaAnimations.png', bubbleGeometry, {top: 256, cols: 6, duration: 6, frameMap: [0, 0, 1, 1, 2, 3, 4, 5]}, { loop: false });
-const largeLavaBubbleAnimation = createAnimation('gfx/tiles/lavaAnimations.png', bubbleGeometry, {top: 272, cols: 6, duration: 6, frameMap: [0, 0, 1, 1, 2, 2, 3, 3, 4, 5]}, { loop: false });
+const largeBubbleSpawnAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {y: 1, cols: 22, duration: 3, loop: false});
+const largeBubbleAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {cols: 12, duration: 6});
+const largeBubblePopAnimation = createAnimation('gfx/effects/largeBubble.png', {w: 48, h: 48}, {y: 2, cols: 3, duration: 3, loop: false});
+
+
+const lavaBubbleGeometry: FrameDimensions = {w: 16, h: 16, content: {x: 3, w: 10, y: 6, h: 4}};
+const smallLavaBubbleAnimation = createAnimation('gfx/tiles/lavaAnimations.png', lavaBubbleGeometry, {top: 240, cols: 6, duration: 6, loop: false});
+const mediumLavaBubbleAnimation = createAnimation('gfx/tiles/lavaAnimations.png', lavaBubbleGeometry, {top: 256, cols: 6, duration: 6, frameMap: [0, 0, 1, 1, 2, 3, 4, 5]}, { loop: false });
+const largeLavaBubbleAnimation = createAnimation('gfx/tiles/lavaAnimations.png', lavaBubbleGeometry, {top: 272, cols: 6, duration: 6, frameMap: [0, 0, 1, 1, 2, 2, 3, 3, 4, 5]}, { loop: false });
 const lavaBubbleAnimations = [smallLavaBubbleAnimation, mediumLavaBubbleAnimation, largeLavaBubbleAnimation];
 const frameMap = [0,1,2,3,4,5,0,1,2,3,4,5,0,1,2,3,4,5];
-const lavaDiamond1 = createAnimation('gfx/tiles/lavaAnimations.png', bubbleGeometry, {top: 288, cols: 6, duration: 5, frameMap}, { loop: false });
-const lavaDiamond2 = createAnimation('gfx/tiles/lavaAnimations.png', bubbleGeometry, {top: 304, cols: 6, duration: 5, frameMap}, { loop: false });
-const lavaDiamond3 = createAnimation('gfx/tiles/lavaAnimations.png', bubbleGeometry, {top: 320, cols: 6, duration: 5, frameMap}, { loop: false });
+const lavaDiamond1 = createAnimation('gfx/tiles/lavaAnimations.png', lavaBubbleGeometry, {top: 288, cols: 6, duration: 5, frameMap}, { loop: false });
+const lavaDiamond2 = createAnimation('gfx/tiles/lavaAnimations.png', lavaBubbleGeometry, {top: 304, cols: 6, duration: 5, frameMap}, { loop: false });
+const lavaDiamond3 = createAnimation('gfx/tiles/lavaAnimations.png', lavaBubbleGeometry, {top: 320, cols: 6, duration: 5, frameMap}, { loop: false });
 const lavaDiamondAnimations = [lavaDiamond1, lavaDiamond2, lavaDiamond3];
 const iceSparkleAnimation1 = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 2, duration: 6, frameMap: [0, 0, 1, 0, 0, 1, 0, 0]}, {loop: false});
 const iceSparkleAnimation2 = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 2, duration: 6, frameMap: [0, 0, 0, 1, 1, 0, 0]}, {loop: false});
@@ -57,7 +66,8 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
     const blBehaviors = getCompositeBehaviors(state, area, {x: x - 2, y: y + 2});
     const brBehaviors = getCompositeBehaviors(state, area, {x: x + 2, y: y + 2});*/
     //if (tlBehaviors.isLava && trBehaviors.isLava && blBehaviors.isLava && brBehaviors.isLava) {
-    if (getCompositeBehaviors(state, area, {x: x, y}).isLava) {
+    const behavior = getCompositeBehaviors(state, area, {x: x, y});
+    if (behavior.isLava) {
         if (Math.random() < 0.1) {
             addLavaAnimationEffectToBackground(state, area, Random.element(lavaDiamondAnimations), {x, y});
             return;
@@ -68,6 +78,41 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
         }
         addLavaBubbleEffectToBackground(state, area, {x, y});
         return;
+    }
+    if (state.location.zoneKey === 'dream' && !behavior.pit && !behavior.pitWall && !behavior.solid && Math.random() < 0.05) {
+        if (Math.random() < 0.9) {
+            addEffectToArea(state, area, spawnAnimation({
+                animation: smallBubbleSpawnAnimation,
+                drawPriority: 'sprites',
+                x, y,
+                centerOnPoint: true,
+            }, spawnAnimation({
+                animation: smallBubbleAnimation,
+                drawPriority: 'sprites',
+                ttl: 3000,
+                vz: 0.5,
+            }, new FieldAnimationEffect({
+                animation: smallBubblePopAnimation,
+                drawPriority: 'sprites',
+                vz: 0,
+            }))));
+        } else {
+            addEffectToArea(state, area, spawnAnimation({
+                animation: largeBubbleSpawnAnimation,
+                drawPriority: 'sprites',
+                x, y,
+                centerOnPoint: true,
+            }, spawnAnimation({
+                animation: largeBubbleAnimation,
+                drawPriority: 'sprites',
+                ttl: 4000,
+                vz: 0.5,
+            }, new FieldAnimationEffect({
+                animation: largeBubblePopAnimation,
+                drawPriority: 'sprites',
+                vz: 0,
+            }))));
+        }
     }
     if (state.areaInstance === area && state.areaSection?.isHot) {
         const sparkle = addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'fire' });

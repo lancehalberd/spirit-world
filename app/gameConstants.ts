@@ -23,7 +23,9 @@ export const GAME_KEY = {
     LEFT_TOOL: 1,
     RIGHT_TOOL: 2,
     PASSIVE_TOOL: 3,
+    CONFIRM: 3,
     WEAPON: 4,
+    CANCEL: 4,
     PREVIOUS_ELEMENT: 5,
     NEXT_ELEMENT: 6,
     UP: 7,
@@ -51,6 +53,10 @@ export const RIVAL_NAME = 'Saru';
 
 export const CHAKRAM_2_NAME = 'Golden Chakram';
 
+export const isDemoMode = false;
+
+export const isDebugMode = !isDemoMode;
+
 export const entranceSeed = readGetParameterAsInt('entranceSeed');
 // Entrance randomizer may not be completable with randomized items, so item randomizer
 // defaults to the entrance seed if one is not set.
@@ -76,38 +82,6 @@ export const enemySeed = readGetParameterAsInt('enemySeed');
 // In randomizer mode, story elements are removed and HUD elements are added showing remaining checks/victory points.
 export const isRandomizer = !!entranceSeed || !!itemSeed || !!enemySeed;
 window.isRandomizer = isRandomizer;
-
-export const allLootTypes: LootType[] = [
-    'empty',
-    'peachOfImmortality',
-    'peachOfImmortalityPiece',
-    'money',
-    'silverOre',
-    'goldOre',
-    'weapon',
-    'bigKey',
-    'smallKey',
-    'map',
-    'secondChance',
-    // This is used for the basic goal in randomizer.
-    'victoryPoint',
-    // This triggers events in boss refight mode.
-    'bossRefight',
-    // This is the special progressive spirit power loot used by the randomizer.
-    'spiritPower',
-    'bow', 'clone', 'staff', 'cloak',
-    'gloves',
-    'roll',
-    'nimbusCloud',
-    'catEyes', 'spiritSight', 'trueSight',
-    'astralProjection', 'teleportation',
-    'ironSkin', 'goldMail', 'phoenixCrown',
-    'waterBlessing', 'fireBlessing', 'lightningBlessing',
-    'leatherBoots', 'ironBoots', 'cloudBoots',
-    'fire', 'ice', 'lightning',
-    // Blueprints
-    'spikeBoots', 'flyingBoots', 'forgeBoots',
-];
 
 // 'foreground3' is rarely required for certain combinations of trees.
 export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];

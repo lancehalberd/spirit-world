@@ -1,21 +1,54 @@
 import {updateAR} from 'app/arGames/arGame';
+import {refreshAreaLogic} from 'app/content/areas';
 import {addObjectFallAnimation, addEnemyFallAnimation, addSplashAnimation} from 'app/content/effects/animationEffect';
 import {Enemy} from 'app/content/enemy';
-import {setEquippedElement} from 'app/content/menu';
+import {setEquippedElement} from 'app/utils/menu';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
+import {showMapScene} from 'app/scenes/map/showMapScene';
+import {showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
 import {wasGameKeyPressed} from 'app/userInput';
 import {updateAllHeroes} from 'app/updateActor';
 import {updateCamera} from 'app/updateCamera';
+import {updateScriptEvents} from 'app/updateScriptEvents';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
+import {refreshAreaIce} from 'app/utils/refreshAreaIce';
 import {rectanglesOverlap} from 'app/utils/index';
 import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects';
 
-export function updateField(this: void, state: GameState) {
+export function updateField(this: void, state: GameState, interactive: boolean) {
+    updateScriptEvents(state);
+    if (state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput) {
+        return;
+    }
+    if (state.areaInstance?.needsLogicRefresh) {
+        refreshAreaLogic(state, state.areaInstance);
+    } else if (state.alternateAreaInstance?.needsLogicRefresh) {
+        refreshAreaLogic(state, state.alternateAreaInstance);
+    }
+    if (state.areaInstance?.needsIceRefresh) {
+        refreshAreaIce(state, state.areaInstance);
+    } else if (state.alternateAreaInstance?.needsIceRefresh) {
+        refreshAreaIce(state, state.alternateAreaInstance);
+    }
+    // Update the HUD opacity as long as script events can be run.
+    if (state.hideHUD && state.hudOpacity > 0) {
+        state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
+    } else if (!state.hideHUD && state.hudOpacity < 1) {
+        state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
+    }
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        showMainMenuScene(state);
+        return;
+    }
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.MAP)) {
+        showMapScene(state);
+        return;
+    }
     if (editingState.isEditing) {
-        updateAllHeroes(state);
+        updateAllHeroes(state, interactive);
         updateCamera(state);
         return;
     }
@@ -60,11 +93,11 @@ export function updateField(this: void, state: GameState) {
         return;
     }
     addAmbientEffects(state);
-    updateAllHeroes(state);
+    updateAllHeroes(state, interactive);
     updateCamera(state);
-    if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
         switchElement(state, -1);
-    } else if (wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
+    } else if (interactive && wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
         switchElement(state, 1);
     }
     removeDefeatedEnemies(state, state.alternateAreaInstance);

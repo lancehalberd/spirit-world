@@ -6,6 +6,7 @@ import {
 } from 'app/content/enemyAnimations';
 import {elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation} from 'app/content/enemies/elemental';
 import {
+    ambrosiaAnimations,
     archeologistAnimations,
     blacksmithOneAnimations,
     blacksmithTwoAnimations,
@@ -151,6 +152,12 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     },
     woman: {
         animations: womanAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 25,
+    },
+    ambrosia: {
+        animations: ambrosiaAnimations,
         shadowOffset: 2,
         flipLeft: true,
         height: 25,
@@ -422,6 +429,7 @@ export class NPC implements Actor, ObjectInstance  {
     dialogueIndex = 0;
     lastDialogueOption: DialogueOption;
     hasFinishedDialog = false;
+    hideDialogueMarker = false;
     constructor(state: GameState, definition: NPCDefinition) {
         this.definition = definition;
         this.d = definition.d || 'down';
@@ -580,8 +588,8 @@ export class NPC implements Actor, ObjectInstance  {
         // Dialogue indicators should not be drawn while script events are running since they are
         // distracting during cut scenes, and you cannot usually interract with NPCs while events are running.
         // Also hide dialogue bubbles on the title screen
-        if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length
-            && state.scene !== 'title') {
+        // if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length
+        if (!state.hideHUD && !this.hideDialogueMarker) {
             const dialogue = this.getNextDialogue(state);
             if (dialogue) {
                 context.save();

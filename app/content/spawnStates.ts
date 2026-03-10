@@ -37,7 +37,7 @@ const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey
 cocoonBossState.savedHeroData.rightTool = 'cloak';
 const vanaraDreamStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1},
     ['cocoonBossStarted', 'cocoonBoss']);
-const helixRivalStateStory = applyItemsToSavedState(vanaraDreamStateStory, {teleportation: 1},
+const helixRivalStateStory = applyItemsToSavedState(vanaraDreamStateStory, {armor: 1, teleportation: 1},
     ['teleportationTutorialSwitch']);
 const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
 const helixStartState = applyItemsToSavedState(helixRivalStateStory, {},
@@ -58,12 +58,12 @@ const skyPalaceStartState = applyItemsToSavedState(helixEndState, {
     maxLife: 3,
     clone: 1, cloudBoots: 1,
     ironBoots: 1, cloak: 3,
-    gloves: 3, goldMail: 1,
+    gloves: 3, armor: 2,
 }, []);
 
 const holySanctumStartState = applyItemsToSavedState(helixEndState, {
     maxLife: 5,
-    gloves: 3, goldMail: 1,
+    gloves: 3, armor: 2,
     cloudBoots: 1, clone: 1,
     trueSight: 1, ironSkin: 1,
     ironBoots:1, cloak: 3,
@@ -79,7 +79,7 @@ const beastState = applyItemsToSavedState(helixEndState, {
     cloudBoots: 1, clone: 1,
     ironBoots: 1, cloak: 3,
     trueSight: 1, ironSkin: 1,
-    gloves: 3, goldMail: 1,
+    gloves: 3, armor: 2,
     roll: 3, nimbusCloud: 1,
     bow: 3,
     spiritDamage: 1, spiritRange: 1,

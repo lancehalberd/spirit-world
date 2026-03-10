@@ -1,4 +1,5 @@
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 import {
     fadeOutPlayingTracks,
@@ -14,13 +15,13 @@ export const updateMusic = (state: GameState): void => {
         return;
     }
     updateAudio(state);
-    if (state.scene === 'prologue' || state.scene === 'intro') {
-        playTrack('dungeonTheme', state.prologueTime / 1000);
-        return;
-    }
-    if (state.scene !== 'game') {
-        playTrack('mainTheme', 0);
-        return;
+    if (state.sceneStack.length) {
+        for (let i = state.sceneStack.length - 1; i >= 0; i--) {
+            const scene = state.sceneStack[i];
+            if (scene.updateMusic?.(state)) {
+                return;
+            }
+        }
     }
     if (state.scriptEvents.overrideMusic) {
         playTrack(state.scriptEvents.overrideMusic, 0);
@@ -196,10 +197,9 @@ export const updateMusic = (state: GameState): void => {
 }
 
 export function playAreaSound(state: GameState, area: AreaInstance, key: string): AudioInstance | undefined {
-    // Do not play area sound effects during the various title scenes. We run updated code
-    // during these scenes to render the location in the background, but we shouldn't be
-    // playing any sound effects.
-    if (state.scene != 'game') {
+    // Area sounds should only be played when the field scene is active on the stack.
+    // Having this check prevents some background processes from accidentally triggering sounds.
+    if (!isFieldSceneActive(state)) {
         return;
     }
     if (!key || state.areaInstance !== area) {
@@ -213,10 +213,9 @@ export function playAreaSound(state: GameState, area: AreaInstance, key: string)
 }
 
 export function playObjectSound(state: GameState, object: ObjectInstance | EffectInstance, key: string): AudioInstance | undefined {
-    // Do not play area sound effects during the various title scenes. We run updated code
-    // during these scenes to render the location in the background, but we shouldn't be
-    // playing any sound effects.
-    if (state.scene != 'game') {
+    // Area sounds should only be played when the field scene is active on the stack.
+    // Having this check prevents some background processes from accidentally triggering sounds.
+    if (!isFieldSceneActive(state)) {
         return;
     }
     if (!key || !object.area || state.areaInstance !== object.area) {

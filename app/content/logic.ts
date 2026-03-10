@@ -37,16 +37,16 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         return state.hero.savedData.maxLife >= level;
     }
     if (itemFlag === 'totalSilverOre') {
-        return state.hero.savedData.totalSilverOre >= level;
+        return state.hero.savedData.collectibleTotals.silverOre >= level;
     }
     if (itemFlag === 'totalGoldOre') {
-        return state.hero.savedData.totalGoldOre >= level;
+        return state.hero.savedData.collectibleTotals.goldOre >= level;
     }
     if (itemFlag === 'silverOre') {
-        return state.hero.savedData.silverOre >= level;
+        return state.hero.savedData.collectibles.silverOre >= level;
     }
     if (itemFlag === 'goldOre') {
-        return state.hero.savedData.goldOre >= level;
+        return state.hero.savedData.collectibles.goldOre >= level;
     }
     return state.hero.savedData.activeTools[itemFlag as ActiveTool] >= level
         || state.hero.savedData.passiveTools[itemFlag as PassiveTool] >= level

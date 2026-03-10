@@ -1,4 +1,3 @@
-import {applySavedState, getState} from 'app/state';
 import {setSpawnLocation} from 'app/content/spawnLocations';
 import {
     earlyDungeonSpawnLocations,
@@ -9,6 +8,9 @@ import {
     devSpawnLocations,
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
+import {showFieldScene} from 'app/scenes/field/showFieldScene';
+import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
+import {getState} from 'app/state';
 import {cloneDeep} from 'app/utils/index';
 import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation';
 import {setSaveSlot} from 'app/utils/saveGame';
@@ -32,7 +34,7 @@ function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedS
                 if (spawnLocations[name].savedState.savedHeroData.life) {
                     state.hero.life = spawnLocations[name].savedState.savedHeroData.life;
                 }
-                state.scene = 'game';
+                showFieldScene(state);
             }
         }
     });

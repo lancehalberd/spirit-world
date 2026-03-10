@@ -45,13 +45,10 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type Scene = 'intro' | 'prologue' | 'title' | 'fileSelect'
-    | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
-    | 'game' | 'credits' | 'options' | 'bossRush';
-
 type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
 interface GameState {
+    sceneStack: GameScene[]
     savedState: SavedState
     settings: Settings
     savedGames: SavedState[]
@@ -59,10 +56,6 @@ interface GameState {
     hero: Hero
     camera: { x: number, y: number, speed?: number }
     fieldTime: number
-    // This can be used any time we want to track player idlesness,
-    // for example to show the prologue again when the player is idle
-    // on the title screen.
-    idleTime: number
     prologueTime: number
     // Time that advances forward regardles of scene or whether the game is paused.
     time: number
@@ -105,19 +98,11 @@ interface GameState {
         targetZ?: number
     }
     mutationDuration?: number
-    paused: boolean
-    showMap: boolean
     showControls: boolean
     menuIndex: number
     menuRow: number
     // This is mostly used for debugging animations.
     alwaysHideMenu?: boolean
-    defeatState: {
-        defeated: boolean
-        reviving?: boolean
-        time: number
-    }
-    scene: Scene
     keyboard: {
         gameKeyValues: number[]
         gameKeysDown: Set<number>
@@ -127,7 +112,6 @@ interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     }
-    messagePage?: TextPageState
     randomizer?: {
         seed: number
         goal: number

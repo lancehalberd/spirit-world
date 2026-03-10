@@ -1,4 +1,5 @@
-import { noteFrequencies } from './noteFrequencies';
+import {noteFrequencies} from './noteFrequencies';
+import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
 
 const sounds = new Map<string, GameSound>();
 window.sounds = sounds;
@@ -250,7 +251,7 @@ export function updateAudio(state: GameState) {
     }
     for (let i = 0; i < state.loopingSoundEffects.length; i++) {
         const soundEffect = state.loopingSoundEffects[i];
-        const areSoundEffectsPaused = state.paused;
+        const areSoundEffectsPaused = !isFieldSceneActive(state);
         if (areSoundEffectsPaused && !soundEffect.stopTime) {
             stopSound(soundEffect);
         } else if (!areSoundEffectsPaused && soundEffect.stopTime) {

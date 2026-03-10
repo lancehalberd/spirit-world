@@ -323,15 +323,7 @@ export function getCloneMovementDeltas(state: GameState, hero: Hero, force = fal
 }
 
 export function wasConfirmKeyPressed(state: GameState): boolean {
-    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
-        || wasGameKeyPressed(state, GAME_KEY.MENU));
-}
-
-export function wasMenuConfirmKeyPressed(state: GameState): boolean {
-    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
-        || wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
-        || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL));
+    return wasGameKeyPressed(state, GAME_KEY.CONFIRM);
+        //|| wasGameKeyPressed(state, GAME_KEY.MENU));
 }
 

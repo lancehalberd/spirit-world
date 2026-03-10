@@ -1,6 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { HeldChakram } from 'app/content/effects/thrownChakram';
-import { setEquippedBoots } from 'app/content/menu';
+import { setEquippedBoots } from 'app/utils/menu';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import {allTiles} from 'app/content/tiles';
@@ -32,7 +32,7 @@ import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
 import {showMessage} from 'app/scriptEvents';
 
-export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
+export function updateHeroStandardActions(this: void, state: GameState, hero: Hero, interactive: boolean) {
     hero.thrownChakrams = hero.thrownChakrams.filter(
         chakram => chakram.area === hero.area
     );
@@ -42,10 +42,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.activeBarrierBurst && hero.activeBarrierBurst.area !== hero.area) {
         delete hero.activeBarrierBurst;
     }
-    const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
-    const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
-    const isCloneToolDown = isToolButtonPressed(state, 'clone');
-    const isPlayerControlled = !hero.isUncontrollable
+    const wasPassiveButtonPressed = interactive && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
+    const isPassiveButtonDown = interactive && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
+    const isCloneToolDown = interactive && isToolButtonPressed(state, 'clone');
+    const isPlayerControlled = interactive && !hero.isUncontrollable
         && (
             (state.hero.action === 'meditating' && hero.isAstralProjection)
             || isCloneToolDown || hero === state.hero
@@ -380,7 +380,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (state.hero.savedData.element) {
                     magicCost += 10;
                 }
-                state.hero.spendMagic(magicCost);
+                state.hero.spendMagic(state, magicCost);
                 if (hero.savedData.activeTools.cloak >= 2) {
                     hero.isInvisible = true;
                 }
@@ -668,7 +668,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (!preventTeleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero.area, {x: hero.x, y: hero.y})
             ) {
-                state.hero.spendMagic(10);
+                state.hero.spendMagic(state, 10);
                 state.hero.x = hero.x;
                 state.hero.y = hero.y;
                 // match the projection to the hero eyes.
@@ -882,7 +882,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 delete hero.heldChakram;
             }
             hero.chargingLeftTool = hero.chargingRightTool = false;
-            state.hero.spendMagic(5);
+            state.hero.spendMagic(state, 5);
             hero.action = 'roll';
             hero.isAirborn = true;
             hero.actionFrame = 0;

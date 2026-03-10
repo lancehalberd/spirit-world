@@ -38,10 +38,19 @@ interface TextPageState extends TextPage {
     lineIndex: number
     animationTime: number
 }
+interface ChoiceOption {
+    text: string
+    // Script to run when choosing this option.
+    key?: string
+    // Function to call when choosing this option.
+    activate?: (state: GameState) => void
+}
 
 interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
-    textPage: TextPage
+    textPages: TextPage[]
+    // This defaults to true.
+    blockFieldUpdates?: boolean
 }
 interface ClearTextBoxScriptEvent {
     type: 'clearTextBox'
@@ -79,7 +88,7 @@ type WaitActiveScriptEvent = WaitScriptEvent & {
 }
 interface ShowChoiceBoxScriptEvent {
     type: 'showChoiceBox'
-    prompt?: string
+    prompt?: TextPage
     choices: {
         text: string
         key: string

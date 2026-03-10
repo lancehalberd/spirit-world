@@ -2,7 +2,7 @@ import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH, GAME_KEY} from 'app/gameConst
 import {ArCrosshairIcon} from 'app/render/heroAnimations';
 import {drawFrame} from 'app/utils/animations';
 import {boxesIntersect, pad} from 'app/utils/index';
-import {drawARFont} from 'app/arGames/arFont';
+import {drawARFont} from 'app/utils/smallFont';
 import {playAreaSound} from 'app/musicController';
 import {wasGameKeyPressed, getMovementDeltas} from 'app/userInput';
 import {saveGame} from 'app/utils/saveGame';

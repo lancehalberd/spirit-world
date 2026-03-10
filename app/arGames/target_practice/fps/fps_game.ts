@@ -1,7 +1,7 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
 import { ArCrosshairIcon } from 'app/render/heroAnimations';
-import { drawARFont } from 'app/arGames/arFont';
+import { drawARFont } from 'app/utils/smallFont';
 import { TargetPracticeState } from './fps_types';
 import { startTargetPractice, updateLevel } from './fps_level';
 import { updateShop, renderShop } from './fps_shop';

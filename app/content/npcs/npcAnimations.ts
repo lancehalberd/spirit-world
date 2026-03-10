@@ -47,6 +47,18 @@ export const womanAnimations: ActorAnimations = createHumanNpcActorAnimations({
     shoes: 1,
 });
 
+export const ambrosiaAnimations: ActorAnimations = createHumanNpcActorAnimations({
+    isWoman: true,
+    skin: 2,
+    hairColor: 0,
+    hairStyle: 1,
+    eyeColor: 1,
+    lipColor: 1,
+    shirt: 1,
+    pants: 1,
+    shoes: 0,
+});
+
 export const girlAnimations: ActorAnimations = createHumanNpcActorAnimations({
     isWoman: true,
     isChild: true,

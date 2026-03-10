@@ -1,5 +1,6 @@
+import {sceneHash} from 'app/scenes/sceneHash';
 
 export function showIntroScene(state: GameState) {
-    state.scene = 'intro';
-    state.prologueTime = 0;
+    state.sceneStack = [sceneHash.intro];
+    sceneHash.intro.prologueTime = 0;
 }

@@ -1,7 +1,7 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
-import { parseMessage } from 'app/render/renderMessage';
-import { drawFrame } from 'app/utils/animations';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH} from 'app/gameConstants';
+import {parseMessage} from 'app/utils/parseMessage';
+import {drawFrame} from 'app/utils/animations';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 
 
 const characterWidth = 8;
