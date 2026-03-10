@@ -5,7 +5,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 572, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 572, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 0}, 
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -13,7 +13,7 @@ const f0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 606, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 606, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 0}, 
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -21,7 +21,7 @@ const f0_2x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 607, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 607, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 0}, 
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -29,7 +29,7 @@ const f0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 608, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 608, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 2}, 
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -352,16 +352,18 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 280, y: 580, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 280, y: 552, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 344, y: 552, type: "spawnMarker", linked: true},
-        {status: "normal", id: "", x: 40, y: 280, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Some day we'll teach you how to play some ancient Vanaran games if you like.", hasCustomLogic: true, customLogic: "", dialogueIndex: 210, specialBehaviorKey: "proximal"},
-        {status: "normal", id: "", specialBehaviorKey: "ephemeral", x: 312, y: 540, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Your body isn't substantial enough to hit this switch.\n{|}Does that seem strange to you?\n{|}The World of the Dreaming is created from the World of the Waking so the rules work the same way, usually...", hasCustomLogic: true, customLogic: "!$teleportation", dialogueIndex: 197},
-        {status: "normal", id: "", x: 584, y: 88, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Mostly we just like to have fun in the dreaming. Stories, games, competitions, performances you name it! \n{|}We even turn our training into games and competitions.", hasCustomLogic: true, customLogic: "", dialogueIndex: 199, specialBehaviorKey: "proximal"},
-        {status: "normal", id: "", x: 584, y: 280, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "There is usually a lot more happening in the Dreaming, but everything has slowed down since the Daughter Trees started disappearing.", hasCustomLogic: true, customLogic: "", dialogueIndex: 200, specialBehaviorKey: "proximal"},
-        {status: "normal", id: "", x: 468, y: 40, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Training in the Dreaming is no substitute for the real thing, but you can still learn a lot by practicing here!", hasCustomLogic: true, customLogic: "", dialogueIndex: 201, specialBehaviorKey: "proximal"},
-        {status: "normal", id: "", x: 156, y: 40, d: "right", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "We can recreate anything from the experiences of all the Vanara that are part of the Dreaming, even yours!\n{|}If you can imagine it, you can live it in the Dreaming.", hasCustomLogic: true, customLogic: "", dialogueIndex: 195, specialBehaviorKey: "proximal"},
-        {status: "normal", id: "", x: 40, y: 88, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Some Vanara like to spend their time in the Dreaming creating and solving puzzles.\n{|}Some of their puzzles are used in the Cocoon and the Helix, but don't worry, the more challenging ones are always optional.", hasCustomLogic: true, customLogic: "", dialogueIndex: 203, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "", x: 40, y: 280, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Some day we'll teach you how to play some ancient Vanaran games if you like.", hasCustomLogic: true, customLogic: "", dialogueIndex: 198, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "", specialBehaviorKey: "ephemeral", x: 312, y: 540, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Your body isn't substantial enough to hit this switch.\n{|}Does that seem strange to you?\n{|}The World of the Dreaming is created from the World of the Waking so the rules work the same way, usually...", hasCustomLogic: true, customLogic: "!$teleportation", dialogueIndex: 202},
+        {status: "normal", id: "", x: 584, y: 88, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Mostly we just like to have fun in the dreaming. Stories, games, competitions, performances you name it! \n{|}We even turn our training into games and competitions.", hasCustomLogic: true, customLogic: "", dialogueIndex: 207, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "", x: 584, y: 280, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "There is usually a lot more happening in the Dreaming, but everything has slowed down since the Daughter Trees started disappearing.", hasCustomLogic: true, customLogic: "", dialogueIndex: 201, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "", x: 468, y: 40, d: "left", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Training in the Dreaming is no substitute for the real thing, but you can still learn a lot by practicing here!", hasCustomLogic: true, customLogic: "", dialogueIndex: 203, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "", x: 156, y: 40, d: "right", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "We can recreate anything from the experiences of all the Vanara that are part of the Dreaming, even yours!\n{|}If you can imagine it, you can live it in the Dreaming.", hasCustomLogic: true, customLogic: "", dialogueIndex: 208, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "", x: 40, y: 88, d: "down", behavior: "idle", style: "vanaraProjection", type: "npc", dialogue: "Some Vanara like to spend their time in the Dreaming creating and solving puzzles.\n{|}Some of their puzzles are used in the Cocoon and the Helix, but don't worry, the more challenging ones are always optional.", hasCustomLogic: true, customLogic: "", dialogueIndex: 209, specialBehaviorKey: "proximal"},
+        {status: "normal", id: "bossReplayVanara", x: 316, y: 232, d: "down", behavior: "none", style: "vanaraProjection", type: "npc", dialogueKey: "refightVanara"},
+        {status: "normal", id: "bossRefightReturn", x: 316, y: 260, type: "marker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 638, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 642, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 2}, //638 or 642??
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -369,7 +371,7 @@ const f0_2x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 609, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 609, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 2}, 
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -377,7 +379,7 @@ const f0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 610, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 40, index: 610, mapId: 'dream', floorId: '1F', mapX: 0, mapY: 4}, 
     ],
 };
 const f0_1x2: AreaDefinition = {
@@ -798,7 +800,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "dreamPortal", linked: true, x: 312, y: 280, type: "teleporter", spirit: true, logicKey: "dreamSpiritWorld"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 547, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 40, index: 547, mapId: 'dream', floorId: '1F', mapX: 2, mapY: 4}, 
     ],
 };
 const f0_2x2: AreaDefinition = {
@@ -806,7 +808,7 @@ const f0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 611, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 40, index: 611, mapId: 'dream', floorId: '1F', mapX: 4, mapY: 4}, 
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -816,7 +818,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 548, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 548, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 0}, 
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -826,7 +828,7 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 612, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 612, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 0}, 
     ],
 };
 const sf0_2x0: AreaDefinition = {
@@ -836,7 +838,7 @@ const sf0_2x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 613, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 0},
+        {x: 0, y: 0, w: 40, h: 40, index: 613, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 0}, 
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -846,7 +848,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 614, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 614, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 2}, 
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -1174,7 +1176,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "teleportationTutorialSwitch", x: 312, y: 568, requireAll: false, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "!isRandomizer", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 1019, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 1019, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 2}, 
     ],
 };
 const sf0_2x1: AreaDefinition = {
@@ -1184,7 +1186,7 @@ const sf0_2x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 615, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 40, h: 40, index: 615, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 2}, 
     ],
 };
 const sf0_0x2: AreaDefinition = {
@@ -1194,7 +1196,7 @@ const sf0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 618, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 40, index: 618, mapId: 'dreamSpirit', floorId: '1F', mapX: 0, mapY: 4}, 
     ],
 };
 const sf0_1x2: AreaDefinition = {
@@ -1562,7 +1564,7 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "dreamPortal", linked: true, x: 312, y: 280, type: "teleporter", logicKey: "dreamSpiritWorld"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 571, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 40, index: 571, mapId: 'dreamSpirit', floorId: '1F', mapX: 2, mapY: 4}, 
     ],
 };
 const sf0_2x2: AreaDefinition = {
@@ -1572,7 +1574,7 @@ const sf0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 40, index: 637, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 40, index: 637, mapId: 'dreamSpirit', floorId: '1F', mapX: 4, mapY: 4}, 
     ],
 };
 zones.dream = {

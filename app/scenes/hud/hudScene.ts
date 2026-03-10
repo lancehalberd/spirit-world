@@ -14,7 +14,7 @@ import {createCanvasAndContext} from 'app/utils/canvas';
 import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 
-const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
+export const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
 const [, fullGreyHeart, threeGreyQuarters, halfGreyHeart, quarterGreyHeart] =

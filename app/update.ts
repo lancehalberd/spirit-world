@@ -4,10 +4,12 @@ import {
     updateKeyboardState,
     wasGameKeyPressed,
 } from 'app/userInput';
-import {appendCallback, showMessage, waitForARGameToFinish} from 'app/scriptEvents';
 import {getState} from 'app/state';
 import {areAllImagesLoaded} from 'app/utils/images';
 import {updateSoundSettings} from 'app/utils/soundSettings';
+import {appendCallback, showMessage, waitForARGameToFinish} from 'app/scriptEvents';
+
+//import { updateBossRushMenu } from './scenes/bossRush/updateBossRush';
 
 let isGameInitialized = false;
 export function update() {
@@ -24,6 +26,9 @@ export function update() {
     state.time += FRAME_LENGTH;
     // Player input cannot be blocked while the game is paused, otherwise the player will be unable to unpause the game.
     /*if (state.paused && state.scriptEvents?.blockPlayerInput) {
+        delete state.scriptEvents?.blockPlayerInput;
+    }
+    if (state.scene === 'bossRush') {
         delete state.scriptEvents?.blockPlayerInput;
     }*/
     updateKeyboardState(state);

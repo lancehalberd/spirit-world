@@ -214,6 +214,7 @@ function getLootGetMessage(state: GameState, {lootType, lootLevel, lootAmount}: 
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
+        case 'bossRefight': return '';
         case 'healthPotion': return `You obtained a bottle of ${lootName}!`;
         case 'statusPotion': return `You obtained an ${lootName}!`;
         case 'magicPotion': return `You obtained a ${lootName}!`;
@@ -557,7 +558,7 @@ const [
 const scrollGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 const [map] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 1, cols: 1}).frames;
 const [greyUpgrade, redUpgrade, blueUpgrade, /* goldUpgrade */ ] = createAnimation('gfx/hud/scrolls.png', scrollGeometry, {y: 3, cols: 4}).frames;
-
+const emptyFrame = requireFrame('gfx/tiles/empty.png', {x: 0, y: 0, w: 16, h: 16 }); //WIP: Make sure still works
 
 export const lootFrames = {
     smallKey: keyOutlineFrame,
@@ -569,6 +570,7 @@ export const lootFrames = {
     fire: fireElement,
     ice: iceElement,
     lightning: lightningElement,
+    emptyFrame,
     // Summoner's Circlet.
     astralProjection: circlet,
     phoenixCrown,
@@ -749,6 +751,11 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return silverMedal;
         }
         return bronzeMedal;
+    }
+
+    //WIP:Change later!
+    if (lootType === 'bossRefight') {
+        return emptyFrame;
     }
     return lootFrames[lootType] || lootFrames.unknown;
 }
