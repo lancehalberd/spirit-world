@@ -29,10 +29,10 @@ export class DefeatedMenuScene implements GameScene {
     update(state: GameState) {
         if (wasGameKeyPressed(state, GAME_KEY.UP)) {
             this.cursorIndex = (this.cursorIndex + 1) % 2;
-            playSound('tick');
+            playSound('menuTick');
         } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
             this.cursorIndex = (this.cursorIndex + 1) % 2;
-            playSound('tick');
+            playSound('menuTick');
         } else if (wasConfirmKeyPressed(state)) {
             if (this.cursorIndex === 0) {
                 fixProgressFlagsOnLoad(state);

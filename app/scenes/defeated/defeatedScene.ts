@@ -37,15 +37,6 @@ export class DefeatedScene implements GameScene {
         if (this.time < 2000) {
             return;
         }
-        if (state.hero.savedData.hasRevive) {
-            this.reviving = true;
-            state.hero.savedData.hasRevive = false;
-            state.hero.frozenDuration = 0;
-            state.hero.burnDuration = 0;
-        } else {
-            showDefeatedMenuScene(state);
-            return;
-        }
         if (this.reviving) {
             // Show a burst of particles right before the MC gets up
             // and starts regaining life.
@@ -58,12 +49,16 @@ export class DefeatedScene implements GameScene {
                 return;
             }
             // This is a hack to make the reviveTime advance even though the fieldTime is paused while
-            // reviving.
+            // reviving. `reviveTime` is used for displaying the frame for the animation at the top of
+            // the spirit bar that represents whether the player has a revive. It plays in reverse
+            // when the hero consumes the revive here.
             state.reviveTime -= FRAME_LENGTH;
             if (this.time % 200 === 0) {
                 state.hero.life = Math.min(state.hero.savedData.maxLife, state.hero.life + 0.5);
                 if (state.hero.life === state.hero.savedData.maxLife) {
                     state.sceneStack.pop();
+                    // Give the hero 1 second of iframes after reviving.
+                    state.hero.invulnerableFrames = 50;
                     saveGame(state);
                 }
                 state.hero.displayLife = state.hero.life;
@@ -74,6 +69,13 @@ export class DefeatedScene implements GameScene {
             // same 0.5 life per 200ms that the life increases discretely.
             const smoothMagicValue = state.hero.maxMagic * (state.hero.life + 0.5 * (this.time % 200) / 200) / state.hero.savedData.maxLife;
             state.hero.magic = clamp(smoothMagicValue, state.hero.magic, state.hero.maxMagic);
+        } else if (state.hero.savedData.hasRevive) {
+            this.reviving = true;
+            state.hero.savedData.hasRevive = false;
+            state.hero.frozenDuration = 0;
+            state.hero.burnDuration = 0;
+        } else {
+            showDefeatedMenuScene(state);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {

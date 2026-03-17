@@ -1,4 +1,4 @@
-import {getLootFrame, getLootName} from 'app/content/loot';
+import {backpack, getLootFrame, getLootName} from 'app/content/loot';
 import {
     arDeviceMenuOption,
     createMenuPanel,
@@ -71,7 +71,7 @@ const backpackMenuOption: MenuElement = {
     getLabel: () => 'Backpack',
     isVisible: () => true,
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameCenteredAt(context, getLootFrame(state, {lootType: state.hero.savedData.equippedBoots}), this);
+        drawFrameCenteredAt(context, backpack, this);
     },
     onSelect(state: GameState) {
         showMaterialsMenuScene(state, this.x + 6, this.y + 6);

@@ -1,5 +1,8 @@
 import {showHint} from 'app/content/hints';
-import {getLootFrame, getLootHelpMessage, getLootName, lootFrames, neutralElement} from 'app/content/loot';
+import {
+    getLootFrame, getLootHelpMessage, getLootName, lootFrames, neutralElement,
+    settingsGear, simpleMap,
+} from 'app/content/loot';
 import {useConsumable} from 'app/content/lootEffects';
 import {isRandomizer} from 'app/gameConstants';
 import {showMapScene} from 'app/scenes/map/showMapScene';
@@ -7,6 +10,7 @@ import {showSettingsScene} from 'app/scenes/settings/settingsScene';
 import {showMessage, showSimpleMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {fillRect, pad} from 'app/utils/index';
+import {isOverworldLocation} from 'app/utils/location';
 import {isActiveTool, isEquipment, isMagicElement, isPassiveTool} from 'app/utils/loot';
 import {setEquippedBoots, setEquippedElement, setLeftTool, setRightTool} from 'app/utils/menu';
 import {characterMap} from 'app/utils/simpleWhiteFont';
@@ -34,7 +38,6 @@ export const emptyMenuElement: MenuElement = {
     },
 };
 
-export const [optionFrame, speakerFrame, speakerSoundFrame] = createAnimation('gfx/hud/options.png', {w: 24, h: 24}).frames;
 export const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: 24, h: 24}).frames[0];
 export const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: 24, h: 24}).frames[0];
 export const cursorFrame = createAnimation('gfx/hud/cursortemp.png', {w: 24, h: 24}).frames[0];
@@ -219,7 +222,13 @@ const mapMenuOption: MenuElement = {
     getLabel: () => 'Map',
     isVisible: () => true,
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameCenteredAt(context, mapFrame, this);
+        if (isOverworldLocation(state) || getDungeonItems(state)?.map) {
+            drawFrameCenteredAt(context, mapFrame, this);
+        } else {
+            // In the context of a dungeon, draw the simple map frame if
+            // the player does not possess the full dungeon map item.
+            drawFrameCenteredAt(context, simpleMap, this);
+        }
     },
     onSelect(state: GameState, toolIndex?: number) {
         state.sceneStack[state.sceneStack.length - 1].closeScene?.(state);
@@ -233,7 +242,7 @@ const optionMenuOption: MenuElement = {
     getLabel: () => 'Options',
     isVisible: () => true,
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameCenteredAt(context, optionFrame, this);
+        drawFrameCenteredAt(context, settingsGear, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
         showSettingsScene(state);

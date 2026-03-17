@@ -16,6 +16,7 @@ import {mainCanvas} from 'app/utils/canvas';
 import {findObjectLocation} from 'app/utils/enterZoneByTarget';
 import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
 import {clamp, isPointInShortRect, boxesIntersect, pad} from 'app/utils/index';
+import {getOverworldMapId} from 'app/utils/location';
 import {getMousePosition, isMouseDown} from 'app/utils/mouse';
 import {getObjectAndParts, getObjectStatus} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
@@ -49,10 +50,9 @@ const mapIconMap = {
 }
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
-    if (overworldKeys.includes(state.location.zoneKey)) {
-        renderOverworldMap(context, state, state.location.zoneKey);
-    } else if (overworldKeys.includes(state.areaSection?.definition?.mapId)) {
-        renderOverworldMap(context, state, state.areaSection?.definition?.mapId);
+    const overworldMapId = getOverworldMapId(state);
+    if (overworldMapId) {
+        renderOverworldMap(context, state, overworldMapId);
     } else {
         renderDungeonMap(context, state);
     }

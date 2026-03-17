@@ -523,8 +523,11 @@ export const [
     rubyStud, rubyEarrings,
     sapphireBangle, sapphireBracelet,
     topazPin, topazBadge,
+    settingsGear,
+    backpack,
+    simpleMap,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 68}
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 71}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */

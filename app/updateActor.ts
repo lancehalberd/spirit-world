@@ -13,7 +13,6 @@ import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
 import {isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased} from 'app/useTool';
 import {isUnderwater} from 'app/utils/actor';
 import {removeAllClones, setNextAreaSection } from 'app/utils/area';
-import {removeEffectFromArea} from 'app/utils/effects';
 import {directionMap} from 'app/utils/field';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {boxesIntersect, pad} from 'app/utils/index';
@@ -308,19 +307,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             // The elder rescues you from defeat by the rival if certain conditions are met.
             prependScript(state, '{@elder.tombRescue}');
         } else {
-            state.hero.life = 0;
-            hero.action = null;
-            hero.chargeTime = 0;
-            hero.frozenDuration = 0;
             showDefeatedScene(state);
-            if (hero.heldChakram) {
-                removeEffectFromArea(state, hero.heldChakram);
-                delete hero.heldChakram;
-            }
-            hero.endInvisibility(state);
-            if (state.hero.savedData.hasRevive) {
-                state.reviveTime = state.fieldTime;
-            }
         }
     }
     // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.
