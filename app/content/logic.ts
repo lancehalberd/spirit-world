@@ -1,4 +1,4 @@
-import { isRandomizer } from 'app/gameConstants';
+import {isDemoMode, isRandomizer} from 'app/gameConstants';
 
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
@@ -26,6 +26,9 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     }
     if (itemFlag === 'isSpirit') {
         return !!state.hero.astralProjection;
+    }
+    if (itemFlag === 'demo') {
+        return isDemoMode;
     }
     if (itemFlag === 'randomizer') {
         return isRandomizer;
@@ -341,6 +344,9 @@ export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,
     hasMediumRange,
     hasRangedPush,
+    isDemo: {
+        requiredFlags: ['$demo'],
+    },
     isRandomizer: {
         requiredFlags: ['$randomizer'],
     },

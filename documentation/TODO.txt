@@ -147,9 +147,7 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Preload music.
         - Demo flag
-            - Disable access to waterfall tower.
             - Replace Helix rival fight with demo ending, possibly unlock randomizer.
         - Cleanup overworld
             - Finish adding grass
@@ -159,8 +157,10 @@ Current tasks:
             - Falling between floors
             - Missing floor
         - Add new peach tree graphics
+        - Randomizer for demo mode
         - Cocoon boss projectiles still getting blocked by boulders
         - High priority SFX
+
 
     - Support implicit cancel option for choice options:
         {choice: Quit AR?|CANCEL:arGame.no|No:arGame.no|Yes:arGame.quitGame}

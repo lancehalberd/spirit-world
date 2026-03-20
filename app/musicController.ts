@@ -4,11 +4,15 @@ import {isObjectInCurrentSection} from 'app/utils/sections';
 import {
     fadeOutPlayingTracks,
     isATrackPlaying,
+    musicTracks,
     playSound,
     playTrack,
+    requireTrack,
     stopSound,
     updateAudio,
 } from 'app/utils/sounds';
+
+const requiredTracks: Set<string> = new Set();
 
 export const updateMusic = (state: GameState): void => {
     if (!state?.gameHasBeenInitialized) {
@@ -23,6 +27,61 @@ export const updateMusic = (state: GameState): void => {
             }
         }
     }
+    const location = getFullZoneLocation(state.location);
+    // Preload music logic
+    // We do not support streaming music, so tracks will not play until completed downloaded.
+    // This means that we need to start loading tracks up to 10s before we need to play them on
+    // slower connections when the files are not cached locally.
+    // To avoid downloading all files immediately, we trigger the downloads at specific points in the game.
+    // This doesn't really need to be perfect, when players eventually download the game on steam, preloading
+    // will not matter, and the consequence of not preloading music just means new BGM will be delayed when it
+    // isn't preloaded.
+    if (!requiredTracks.has('newGame')) {
+        requiredTracks.add('newGame');
+        // These are the tracks used for the first boss.
+        requireTrack(musicTracks.bossIntro);
+        requireTrack(musicTracks.bossA);
+        requireTrack(musicTracks.bossB);
+        // This track is used when talking to the Peach Tree.
+        requireTrack(musicTracks.vanaraDreamTheme);
+    }
+    if (!requiredTracks.has('overworld') && location.zoneKey === 'overworld') {
+        requiredTracks.add('overworld');
+        // Holy city
+        requireTrack(musicTracks.village);
+        requireTrack(musicTracks.waterfallVillageTheme);
+        requireTrack(musicTracks.forestTheme);
+        // Southeast ruins
+        requireTrack(musicTracks.ruins);
+        // Random cave/house music
+        requireTrack(musicTracks.idleTheme);
+    }
+    if (!requiredTracks.has('sky') && location.zoneKey === 'overworld' && location.areaGridCoords.x === 0 && location.areaGridCoords.y === 0) {
+        requiredTracks.add('sky');
+        requireTrack(musicTracks.skyTheme);
+    }
+    if (!requiredTracks.has('forest') && location.zoneKey === 'forest') {
+        requiredTracks.add('forest');
+        // Vanara village in the forest.
+        requireTrack(musicTracks.vanaraForestTheme);
+    }
+    if (!requiredTracks.has('tomb') && location.zoneKey === 'overworld' && location.areaGridCoords.x === 0 && location.areaGridCoords.y === 1) {
+        requiredTracks.add('tomb');
+        requireTrack(musicTracks.tombTheme);
+    }
+    if (!requiredTracks.has('cocoon') && state.hero.savedData.passiveTools.astralProjection) {
+        requiredTracks.add('cocoon');
+        // This track is used during the cutscene with the Grand Priest after completing the War Temple.
+        requireTrack(musicTracks.grandPriestTheme);
+        requireTrack(musicTracks.cocoonTheme);
+    }
+    if (!requiredTracks.has('helix') && state.hero.savedData.passiveTools.teleportation) {
+        requiredTracks.add('helix');
+        // Technically this gets preloaded as grandPriestTheme, but that may not be the case in the future.
+        requireTrack(musicTracks.helixTheme);
+    }
+    // TODO: possibly preload tracks used after the end of the DEMO.
+
     if (state.scriptEvents.overrideMusic) {
         playTrack(state.scriptEvents.overrideMusic, 0);
         return;
@@ -49,7 +108,6 @@ export const updateMusic = (state: GameState): void => {
         }
     }
     */
-    const location = getFullZoneLocation(state.location);
     if (revealedBoss.length || livingBosses.length) {
         if (!livingBosses.length) {
             // Fade out the boss music once the last boss is defeated.

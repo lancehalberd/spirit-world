@@ -284,7 +284,7 @@ export function updateAudio(state: GameState) {
     playingTracks = playingTracks.filter(track => track.instances.length);
 }
 
-const musicTracks: {[key in string]: TrackDefinition} = {
+export const musicTracks: {[key in string]: TrackDefinition} = {
     // Tracks from Nick
     // Used in various caves
     caveTheme: {key: 'caveTheme', source: 'bgm/Spirit 1.mp3', volume: 20 },
@@ -323,10 +323,13 @@ const musicTracks: {[key in string]: TrackDefinition} = {
     bossA: {key: 'bossA', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
     bossB: {key: 'bossB', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
-// Immediately load the theme for the prologue scene.
+// Load sounds files used early in the game to prevent delayed music transitions.
+// This track is used during the prologue/intro.
 requireTrack(musicTracks.dungeonTheme);
-// Also load the theme for the title scene.
+// This track is used for the title scene.
 requireTrack(musicTracks.mainTheme);
+// This is the track for the opening area.
+requireTrack(musicTracks.caveTheme);
 export function playTrack(trackKey: TrackKey, seekTime: number, fadeOutOthers = true, crossFade = true, startTime = audioContext.currentTime): GameTrack|false {
     const track = requireTrack(musicTracks[trackKey]);
     if (!isAudioUnlocked()) {

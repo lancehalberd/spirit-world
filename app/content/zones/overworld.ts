@@ -775,7 +775,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up"},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 68, y: 284, type: "waterfall", w: 56, h: 111},
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 68, y: 368, type: "waterfall", w: 72, h: 67},
-        {status: "normal", id: "waterfallTowerEntrance", x: 88, y: 24, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter"},
+        {status: "normal", id: "waterfallTowerEntrance", x: 88, y: 24, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter", hasCustomLogic: true, customLogic: "!$demo"},
         {status: "normal", id: "overworld:0:1x0-beetleHorned-0", x: 368, y: 192, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x0-beetleHorned-1", x: 384, y: 80, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x0-beetleMini-0", x: 384, y: 352, type: "enemy", enemyType: "beetleMini", d: "down", params: {}},
