@@ -30,6 +30,7 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
     // Do this before entering the new location, which may trigger new events.
     state.scriptEvents.queue = [];
     state.scriptEvents.activeEvents = [];
+    delete state.savedState.objectFlags['bossRefight']; // Added for dying during boss refights
     enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags});
     state.fadeLevel = (state.areaSection.dark || 0) / 100;
 

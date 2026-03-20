@@ -10,6 +10,8 @@ interface SavedState {
     // Flags that remain set as long as the character does not leave the current zone.
     zoneFlags: {[key: string]: boolean | number | number[] | string}
     savedHeroData: SavedHeroData
+    backupHeroData: SavedHeroData
+    usingBackup: boolean
     savedArData: SavedARState
     dungeonInventories: {
         [key: string]: DungeonInventory
@@ -19,6 +21,7 @@ interface SavedState {
     luckyBeetles: string[]
     exploredSections: number[]
     heardDialogue: number[]
+    bossRushTimes: Record<BossCondition, Partial<Record<BossName, number>>>;
 }
 
 // These settings are global and can be saved independent of saved state
@@ -148,6 +151,8 @@ interface GameState {
         renderedFloorId?: string
     }
     arState: ARState
+    bossRushTrackers: bossRushState
+    travel?: (zoneKey: string, markerId: string, options?: any) => void
 }
 
 type ARGameID = 'dodger'|'hota'|'target'|'targetFPS';

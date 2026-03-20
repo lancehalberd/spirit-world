@@ -11,6 +11,11 @@ import {
 import {saveGame} from 'app/utils/saveGame';
 import {playSound} from 'app/utils/sounds';
 
+import { restoreHeroData } from 'app/utils/alterHeroData';
+import { endBossRush, startNextBoss, travelToLocation } from 'app/scenes/bossRush/bossRushOptions';
+import { removeConditions, returnFromBoss } from 'app/utils/updateBestTimes';
+import { showMessage } from 'app/scriptEvents';
+
 
 function getDungeonInventory(state: GameState): DungeonInventory {
     return state.savedState.dungeonInventories[state.location.logicalZoneKey] || {
@@ -67,6 +72,33 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         const inventory = getDungeonInventory(state);
         inventory.bigKey = true;
         updateDungeonInventory(state, inventory, false);
+    },
+    bossRefight: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        if(!['rush', 'rush2', 'rush3'].includes(state.bossRushTrackers.currentBoss)) {
+            let timeMessage = returnFromBoss(state);
+            showMessage(state, timeMessage)
+            travelToLocation(state, "dream", "bossRefightReturn");
+            removeConditions(state);
+            if (state.savedState.usingBackup) {
+                state.savedState.usingBackup = false;
+                restoreHeroData(state)
+            }
+        } else {
+            if (endBossRush(state)) {
+                let timeMessage = returnFromBoss(state);
+                showMessage(state, timeMessage)
+                state.bossRushTrackers.rushPosition = 0;
+                if (state.savedState.usingBackup) {
+                    state.savedState.usingBackup = false;
+                    restoreHeroData(state)
+                }
+                travelToLocation(state, "dream", "bossRefightReturn");
+            } else {
+                state.bossRushTrackers.rushPosition += 1
+                //state.travel("dream", "bossRefightReturn", {instant: false});
+                startNextBoss(state);
+            }
+        }
     },
     map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);

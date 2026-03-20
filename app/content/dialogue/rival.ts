@@ -40,6 +40,10 @@ dialogueHash.rival = {
 
         startSecondFight: (state: GameState) => {
             const rival = getRivalBoss(state);
+            //Skip intro for boss refight version
+            if (state.savedState.objectFlags["helixRivalBoss"]) {
+                return '';
+            }
             // Make the character walk north to get the rival on the screen.
             if (state.hero.y > 96) {
                 // Entering from the south, the hero walks north until the Rival is in frame.

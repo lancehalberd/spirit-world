@@ -3,6 +3,7 @@ import {CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
 import {getState} from 'app/state';
 import {drawCanvas, mainContext} from 'app/utils/canvas';
 import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
+//import { renderBossRushMenu } from './scenes/bossRush/renderBossRush';
 
 let frameDurations: number[] = [];
 export function render() {

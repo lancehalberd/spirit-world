@@ -12,8 +12,15 @@ export function getDefaultSavedState(): SavedState {
         zoneFlags: {},
         luckyBeetles: [],
         savedHeroData: getDefaultSavedHeroData(),
+        backupHeroData: getDefaultSavedHeroData(),
+        usingBackup: false,
         savedArData: {gameData: {}},
         staffTowerLocation: 'desert',
+        bossRushTimes: {
+            none: {},
+            daredevil: {},
+            weak: {}
+        },
     };
 }
 
