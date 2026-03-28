@@ -40,8 +40,8 @@ dialogueHash.rival = {
 
         startSecondFight: (state: GameState) => {
             const rival = getRivalBoss(state);
-            //Skip intro for boss rush version
-            if (state.savedState.objectFlags["helixRivalBoss"]) {
+            // Don't show the intro during Boss Rush fights.
+            if (state.bossRushState) {
                 return '';
             }
             // Make the character walk north to get the rival on the screen.

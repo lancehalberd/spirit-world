@@ -21,6 +21,10 @@ import Random from 'app/utils/Random';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
 
 export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
+    // Skip this if the hero isn't currently part of any area.
+    if (!state.hero.area) {
+        return;
+    }
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
         state.hero.justRespawned = false;
         updateHeroSpecialActions(state, state.hero, interactive);
@@ -354,7 +358,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     const isHoldingBreath = isUnderwater(state, state.hero);
     // Corrosive areas drain mana unless you have the water blessing.
-    let waterDrainingMagicSpeed = (isHoldingBreath && state.areaSection?.isCorrosive) ? 1 : 0;
+    let waterDrainingMagicSpeed = (isHoldingBreath || state.areaSection?.isCorrosive) ? 1 : 0;
     if (state.hero.savedData.passiveTools.waterBlessing >= 2) {
         waterDrainingMagicSpeed = 0;
     } else if (state.hero.savedData.passiveTools.waterBlessing >= 1) {
@@ -372,10 +376,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             // a depleted spirit recharge point.
             state.hero.actualMagicRegen = 0;
         }
-    } else if (waterDrainingMagicSpeed > 0) {
-        state.hero.actualMagicRegen = Math.min(-20 * waterDrainingMagicSpeed, state.hero.actualMagicRegen);
+    } else if (state.areaSection?.isCorrosive) {
+        state.hero.actualMagicRegen = Math.min(-20 * waterDrainingMagicSpeed, isInvisible ? state.hero.actualMagicRegen : 0);
     } else if (isHoldingBreath) {
-        state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
+        state.hero.actualMagicRegen = Math.min(-2 * waterDrainingMagicSpeed, isInvisible ? state.hero.actualMagicRegen : 0);
     } else if (!isInvisible && !hasBarrier) {
         state.hero.actualMagicRegen = !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen;
         // Even if the hero has 0 magicRegen, they are still able to regenerate magic up to 0.
@@ -403,10 +407,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.recentMagicSpent = 0;
     }
     // Trying to run and the shock status effect both prevent magic from regnerating.
-    const canRegnerateMagic = !isTryingToRun && state.hero.shockDuration <= 0 && state.hero.magicRegenCooldown <= 0;
+    const canRegenerateMagic = !isTryingToRun && state.hero.shockDuration <= 0 && state.hero.magicRegenCooldown <= 0;
     if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
         // Double regeneration rate while idle.
-        if (canRegnerateMagic) {
+        if (canRegenerateMagic) {
             state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000 * gameModifiers.spiritEnergyRegeneration;
         }
     } else if (isActuallyRunning) {
@@ -419,7 +423,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     } else if (state.hero.actualMagicRegen < 0) {
         // Magic is being drained for some reason
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
-    } else if (canRegnerateMagic) {
+    } else if (canRegenerateMagic) {
         // Normal regeneration rate.
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000 * gameModifiers.spiritEnergyRegeneration;
     }
@@ -428,7 +432,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.spendMagic(state, 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000, 0);
     }
     // Meditation grants 3 additional spirit energy per second.
-    if (hero.action === 'meditating' && canRegnerateMagic) {
+    if (hero.action === 'meditating' && canRegenerateMagic) {
         state.hero.magic += 3 * FRAME_LENGTH / 1000;
     }
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {

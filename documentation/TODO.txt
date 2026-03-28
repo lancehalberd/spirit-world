@@ -146,9 +146,8 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Fix Boss Rush
-        - Fix Saru fight doesn't end.
-        - Test all bosses.
+    - Boss Rush Fixes:
+        - Storm Beast is missing teleporters + Orb enemies.
 
     - Replace Karma with Virtue:
         - Honour -

@@ -90,13 +90,14 @@ function updateBestTimes(state: GameState): string {
     }
     let returnLines: string[] = [];
     if (!bestTime || finishTime <= bestTime) {
-        returnLines.push('New speed record: ' + formatMinutesAndSeconds(finishTime) + '!');
+        returnLines.push('New best time: ' + formatMinutesAndSeconds(finishTime) + '!');
         updatedBossRushData.bestTime = finishTime;
     }
     if (!highScore || currentScore >= highScore) {
         returnLines.push('New high score: ' + currentScore + '!');
         updatedBossRushData.highScore = currentScore;
     }
+    state.savedState.bossRushData[option.key] = updatedBossRushData;
     return returnLines.join('{|}');
 }
 

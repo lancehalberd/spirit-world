@@ -1,34 +1,35 @@
-import { CrystalSpike } from 'app/content/effects/arrow';
-import { DelayedEffect } from 'app/content/effects/delayedEffect';
+import {CrystalSpike} from 'app/content/effects/arrow';
+import {DelayedEffect} from 'app/content/effects/delayedEffect';
 import {Fireball} from 'app/content/effects/flame';
-import { addBurstEffect } from 'app/content/effects/animationEffect';
-import { Spark } from 'app/content/effects/spark';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
-import { rivalAnimations } from 'app/content/enemyAnimations';
-import { getLoot } from 'app/content/objects/lootObject';
+import {addBurstEffect} from 'app/content/effects/animationEffect';
+import {Spark} from 'app/content/effects/spark';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {FRAME_LENGTH, isRandomizer} from 'app/gameConstants';
+import {rivalAnimations} from 'app/content/enemyAnimations';
+import {getLoot} from 'app/content/objects/lootObject';
 import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
     heroAnimations, treeStaffAnimations, heroSpiritAnimations,
 } from 'app/render/heroAnimations';
-import { appendScript } from 'app/scriptEvents';
-import { removeTextCue } from 'app/content/effects/textCue';
-import { drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
+import {appendCallback, appendScript} from 'app/scriptEvents';
+import {removeTextCue} from 'app/content/effects/textCue';
+import {drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
+import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {
     faceTarget,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { addObjectToArea } from 'app/utils/objects';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {addObjectToArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
-import { saveGame } from 'app/utils/saveGame';
+import {saveGame} from 'app/utils/saveGame';
 import {
     getVectorToNearbyTarget,
     getVectorToTarget,
@@ -656,7 +657,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
                 blockPlayerInput: true,
                 duration: 1000,
             });
-            if (!isRandomizer && !state.savedState.objectFlags.skipRivalHelixStory) {
+            if (!state.bossRushState && !isRandomizer && !state.savedState.objectFlags.skipRivalHelixStory) {
                 appendScript(state, '{@rival.lostSecondFight}');
             }
             enemy.setMode('escaping');
@@ -668,15 +669,26 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
             addBurstEffect(state, enemy, state.hero.area);
             enemy.status = 'gone';
             checkIfAllEnemiesAreDefeated(state, state.hero.area);
-            const bossDefinition = enemy.definition as BossObjectDefinition;
-            // Since this boss doesn't actually die, we have to explicitly grant its
-            // loot on escape. Note this only matters for randomizer as the helix rival
-            // has no loot in the base game.
-            state.savedState.objectFlags[enemy.definition.id] = true;
-            if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
-                getLoot(state, bossDefinition);
+            if (state.bossRushState) {
+                state.scriptEvents.queue.push({
+                    type: 'wait',
+                    blockPlayerInput: true,
+                    duration: 200,
+                });
+                appendCallback(state, (state: GameState) => {
+                    onBossRushBossDefeated(state);
+                });
+            } else {
+                const bossDefinition = enemy.definition as BossObjectDefinition;
+                // Since this boss doesn't actually die, we have to explicitly grant its
+                // loot on escape. Note this only matters for randomizer as the helix rival
+                // has no loot in the base game.
+                state.savedState.objectFlags[enemy.definition.id] = true;
+                if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
+                    getLoot(state, bossDefinition);
+                }
+                saveGame(state);
             }
-            saveGame(state);
         }
         return;
     }

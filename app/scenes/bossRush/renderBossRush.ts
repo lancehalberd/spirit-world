@@ -150,27 +150,27 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
         const karmaValue = highScore > bossRushOption.karma * 10 ? `${10 * bossRushOption.karma}(${highScore})` : highScore;
         drawTextBox(context, {
             x: CANVAS_WIDTH - scoreBoxWidth - MARGIN,
-            y: CANVAS_HEIGHT - 3 * (scoreBoxHeight + 10),
+            y: CANVAS_HEIGHT - 3 * (scoreBoxHeight + MARGIN),
             w: scoreBoxWidth,
             h: scoreBoxHeight,
-        }, `Karma: ${karmaValue}`);
+        }, `Karma ${karmaValue}`);
     }
     if (bestTime > 0) {
         drawTextBox(context, {
             x: CANVAS_WIDTH - scoreBoxWidth - MARGIN,
-            y: CANVAS_HEIGHT - 2 * (scoreBoxHeight + 10), // Position above the high score box
+            y: CANVAS_HEIGHT - 2 * (scoreBoxHeight + MARGIN), // Position above the high score box
             w: scoreBoxWidth,
             h: scoreBoxHeight,
-        }, `Best: ${formatMinutesAndSeconds(bestTime)}`);
+        }, `Best ${formatMinutesAndSeconds(bestTime)}`);
 
     }
     const targetTime = formatMinutesAndSeconds(bossRushOption.targetTime);
     drawTextBox(context, {
         x: CANVAS_WIDTH - scoreBoxWidth - MARGIN,
-        y: CANVAS_HEIGHT - 1 * (scoreBoxHeight + 10), // Position above the high score box
+        y: CANVAS_HEIGHT - 1 * (scoreBoxHeight + MARGIN), // Position above the high score box
         w: scoreBoxWidth,
         h: scoreBoxHeight,
-    }, `Goal: ${targetTime}`);
+    }, `Goal ${targetTime}`);
 }
 
 function drawTextBox(context: CanvasRenderingContext2D, rect: Rect, text: string) {

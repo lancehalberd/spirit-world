@@ -21,9 +21,6 @@ import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects'
 
 export function updateField(this: void, state: GameState, interactive: boolean) {
     updateScriptEvents(state);
-    if (state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput) {
-        return;
-    }
     if (state.areaInstance?.needsLogicRefresh) {
         refreshAreaLogic(state, state.areaInstance);
     } else if (state.alternateAreaInstance?.needsLogicRefresh) {
@@ -33,6 +30,14 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
         refreshAreaIce(state, state.areaInstance);
     } else if (state.alternateAreaInstance?.needsIceRefresh) {
         refreshAreaIce(state, state.alternateAreaInstance);
+    }
+    if (state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput) {
+        return;
+    }
+    // If `refreshAreaLogic` started a transition effect, skip this update since we
+    // don't want to perform field updates until the transition effect completes.
+    if (state.transitionState) {
+        return;
     }
     // Update the HUD opacity as long as script events can be run.
     if (state.hideHUD && state.hudOpacity > 0) {
