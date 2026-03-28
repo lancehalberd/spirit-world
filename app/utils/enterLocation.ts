@@ -5,6 +5,7 @@ import {zones} from 'app/content/zones';
 import {editingState} from 'app/development/editingState';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {removeTextCue} from 'app/content/effects/textCue';
+import {FADE_OUT_DURATION, FAST_FADE_OUT_DURATION, FRAME_LENGTH} from 'app/gameConstants';
 import {cleanupHeroFromArea, getAreaSectionInstanceForPoint, updateAreaSection} from 'app/utils/area'
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
@@ -19,7 +20,8 @@ interface OptionalEnterLocationParams {
     isEndOfTransition?: boolean
     doNotRefreshEditor?: boolean
     preserveZoneFlags?: boolean
-    transitionType?: 'circle'|'fade'
+    transitionType?: TransitionType
+    transitionColor?: string
 }
 
 export function enterLocation(
@@ -33,6 +35,7 @@ export function enterLocation(
         doNotRefreshEditor = false,
         preserveZoneFlags = false,
         transitionType,
+        transitionColor = '',
     }: OptionalEnterLocationParams = {}
 ): void {
     // Remve astral projection when switching areas.
@@ -51,7 +54,10 @@ export function enterLocation(
         state.transitionState = {
             callback,
             nextLocation: location,
-            time: 0,
+            // If we happen to switch to another transition in the middle of another, preserve the time, up to the half way point.
+            // This should only happen during boss rush menu selection, and this makes the transition a bit less jarring.
+            // Note this only works for 'fade'+'fastFade' transition and needs some additional logic to correctly support other transitions.
+            time: Math.min(state.transitionState?.time ?? 0, FADE_OUT_DURATION - FRAME_LENGTH),
             type: 'fade',
         };
         const newZone = zones[location.zoneKey];
@@ -64,7 +70,10 @@ export function enterLocation(
             state.transitionState.type = 'circle';
         } else if (transitionType === 'fade') {
             state.transitionState.type = 'fade';
-        } else if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
+        } else if (transitionType === 'fastFade') {
+            state.transitionState.type = 'fastFade';
+            state.transitionState.time = Math.min(state.transitionState.time, FAST_FADE_OUT_DURATION - FRAME_LENGTH);
+        }  else if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
             state.transitionState.type = 'diving';
             state.transitionState.nextAreaInstance = state.underwaterAreaInstance;
             state.transitionState.nextAreaSection = getAreaSectionInstanceForPoint(state, newZone, state.underwaterAreaInstance.definition, x, y);
@@ -84,6 +93,9 @@ export function enterLocation(
             } else {
                 state.transitionState.type = 'circle';
             }
+        }
+        if (transitionColor) {
+            state.transitionState.fadeColor = transitionColor;
         }
         const targetAreaDefinition = getAreaFromLocation(location);
         if (state.alternateAreaInstance.definition === targetAreaDefinition) {

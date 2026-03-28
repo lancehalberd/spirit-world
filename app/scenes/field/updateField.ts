@@ -8,6 +8,7 @@ import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
 import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
+import {showMessage} from 'app/scriptEvents';
 import {wasGameKeyPressed} from 'app/userInput';
 import {updateAllHeroes} from 'app/updateActor';
 import {updateCamera} from 'app/updateCamera';
@@ -38,6 +39,15 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
         state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
     } else if (!state.hideHUD && state.hudOpacity < 1) {
         state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
+    }
+    if (interactive && state.arState.active && (wasGameKeyPressed(state, GAME_KEY.MENU) || wasGameKeyPressed(state, GAME_KEY.MAP))) {
+        showMessage(state, '{@arGame.quit}');
+        return;
+    }
+    // The map isn't useful during boss rush so we use it to show a quit menu.
+    if (interactive && state.bossRushState && wasGameKeyPressed(state, GAME_KEY.MAP)) {
+        showMessage(state, '{@bossRushVanara.quitMenu}');
+        return;
     }
     if (interactive && wasGameKeyPressed(state, GAME_KEY.MENU)) {
         showMainMenuScene(state);

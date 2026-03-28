@@ -40,7 +40,7 @@ dialogueHash.rival = {
 
         startSecondFight: (state: GameState) => {
             const rival = getRivalBoss(state);
-            //Skip intro for boss refight version
+            //Skip intro for boss rush version
             if (state.savedState.objectFlags["helixRivalBoss"]) {
                 return '';
             }

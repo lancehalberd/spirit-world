@@ -142,42 +142,6 @@ interface Hero extends Actor, SavedHeroData {
     spiritRadius: number
 }*/
 
-type BossName =
-  | "none"
-  | "beetle"
-  | "golem"
-  | "idols"
-  | "guardian"
-  | "forest"
-  | "rival2"
-  | "collector"
-  | "stormBeast"
-  | "flameBeast"
-  | "frostBeast"
-  | "rush"
-  | "rush2"
-  | "rush3"
-  | "altGolem"
-  | "altRival2"
-  | "altGuardian"
-  | "altIdols"
-  ;
-
-
-type BossCondition = "none" | "daredevil" | "weak"
-
-type bossRushState = {
-  currentBoss: BossName;
-  bossStartTime: number;
-  rushPosition: number;
-  currentCondition: BossCondition;
-  storedLife: number;
-  hasIronSkin: boolean;
-  hasWeaponUpgrades:{[key in WeaponUpgrades]?: boolean}
-  weaponNumber: number;
-}
-
-
 interface SavedHeroData {
     maxLife: number
     ironSkinLife: number
@@ -212,7 +176,6 @@ interface SavedHeroData {
     playTime: number
     // How long the player had been playing when they "won" the game.
     winTime: number
-    //bossRushTimes: Record<BossCondition, Partial<Record<BossName, number>>>;
 }
 
 type Computable<T> = T | (() => T);

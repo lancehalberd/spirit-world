@@ -1,34 +1,34 @@
-import {
-    iceFrontAnimation,
-} from 'app/content/animations/iceOverlay';
-import { addSparkleAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { addTextCue } from 'app/content/effects/textCue';
-import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
-import { objectHash } from 'app/content/objects/objectHash';
-import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
-import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH, gameModifiers } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
-import { renderEnemyShadow } from 'app/renderActor';
-import { appendCallback } from 'app/scriptEvents';
+import {iceFrontAnimation} from 'app/content/animations/iceOverlay';
+import {addSparkleAnimation, FieldAnimationEffect} from 'app/content/effects/animationEffect';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {addTextCue} from 'app/content/effects/textCue';
+import {dropItemFromTable, getLoot} from 'app/content/objects/lootObject';
+import {objectHash} from 'app/content/objects/objectHash';
+import {bossDeathExplosionAnimation, enemyDeathAnimation} from 'app/content/enemyAnimations';
+import {editingState} from 'app/development/editingState';
+import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {renderEnemyShadow} from 'app/renderActor';
+import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
+import {appendCallback} from 'app/scriptEvents';
 import {drawFrame, getFrame, isAnimationFinished} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
-import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
+import {checkForFloorEffects, moveEnemy} from 'app/utils/enemies';
 import {trackEnemyTookDamage} from 'app/utils/enemyDamageTracking';
-import { breakBrittleTilesInRect } from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { pad } from 'app/utils/index';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import {breakBrittleTilesInRect} from 'app/utils/field';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {pad} from 'app/utils/index';
+import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
 import Random from 'app/utils/Random';
-import { isTargetVisible } from 'app/utils/target';
+import {isTargetVisible} from 'app/utils/target';
 
 interface EnemyAbilityWithCharges {
     definition: EnemyAbility<any>
     cooldown: number
     charges: number
 }
+
 
 
 export class Enemy<Params=any> implements Actor, ObjectInstance {
@@ -572,6 +572,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                         }
                     }
                     if (bossDefinition.type === 'boss'){
+                        if (state.bossRushState) {
+                            onBossRushBossDefeated(state);
+                            return;
+                        }
                         // Do nothing if this boss was already defeated.
                         if (getObjectStatus(state, bossDefinition)) {
                             return;

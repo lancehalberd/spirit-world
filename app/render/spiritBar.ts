@@ -157,6 +157,11 @@ export function updateHeroMagicStats(state: GameState) {
     state.hero.magicRegenCooldownLimit = 2000;
     state.hero.maxMagic = 20;
     state.hero.magicRegen = 4;
+    if (state.hero.isMagicDisabled) {
+        state.hero.magic = 0;
+        state.hero.magicRegen = 0;
+        return;
+    }
     let bonusMagicRegen = 0;
     if (state.hero.savedData.passiveTools.catEyes) {
         state.hero.maxMagic += 5;

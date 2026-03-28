@@ -146,6 +146,16 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Fix Boss Rush
+        - Fix Saru fight doesn't end.
+        - Test all bosses.
+
+    - Replace Karma with Virtue:
+        - Honour -
+        - Valor - Boss Rush
+        - Wisdom - Puzzles
+        - Passion - Games
+
     - Demo blockers
         - Demo flag
             - Replace Helix rival fight with demo ending, possibly unlock randomizer.
@@ -156,6 +166,7 @@ Current tasks:
             - New pod graphics
             - Falling between floors
             - Missing floor
+        - Fix Collector projectiles are blocked by wall.
         - Add new peach tree graphics
         - Randomizer for demo mode
         - Cocoon boss projectiles still getting blocked by boulders

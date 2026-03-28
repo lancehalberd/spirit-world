@@ -1,13 +1,13 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { objectHash } from 'app/content/objects/objectHash';
-import { setSpawnLocation } from 'app/content/spawnLocations';
-import { isRandomizer } from 'app/gameConstants';
-import { showMessage } from 'app/scriptEvents';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {objectHash} from 'app/content/objects/objectHash';
+import {setSpawnLocation} from 'app/content/spawnLocations';
+import {isRandomizer} from 'app/gameConstants';
+import {showMessage} from 'app/scriptEvents';
 import {drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
-import { selectDialogueOption } from 'app/utils/dialogue';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import {selectDialogueOption} from 'app/utils/dialogue';
+import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import {FRAME_LENGTH} from 'app/gameConstants';
 
 
 //const [saveStatue] = createAnimation('gfx/tiles/savepoint.png', geometry).frames;

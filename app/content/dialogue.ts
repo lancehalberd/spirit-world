@@ -2,6 +2,7 @@
 export * from 'app/content/dialogue/dialogueHash';
 export * from 'app/content/dialogue/ambrosia';
 export * from 'app/content/dialogue/arGame';
+export * from 'app/content/dialogue/bossRushVanara';
 export * from 'app/content/dialogue/elder';
 export * from 'app/content/dialogue/jadeChampion';
 export * from 'app/content/dialogue/jadeChampionCrater';
@@ -23,4 +24,3 @@ export * from 'app/content/dialogue/vanaraVillager';
 export * from 'app/content/dialogue/spiritKing';
 export * from 'app/content/dialogue/spiritTree';
 export * from 'app/content/dialogue/waterfallDragon';
-export * from 'app/content/dialogue/refightVanara';

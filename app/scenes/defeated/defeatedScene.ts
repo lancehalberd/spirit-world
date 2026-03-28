@@ -1,5 +1,6 @@
 import {addDustBurst, addReviveBurst} from 'app/content/effects/animationEffect';
 import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
+import {returnToBossRushMenu} from 'app/scenes/bossRush/showBossRushScene';
 import {showDefeatedMenuScene} from 'app/scenes/defeated/showDefeatedScene';
 import {translateContextForAreaAndCamera} from 'app/scenes/field/renderField';
 import {sceneHash} from 'app/scenes/sceneHash';
@@ -75,13 +76,21 @@ export class DefeatedScene implements GameScene {
             state.hero.frozenDuration = 0;
             state.hero.burnDuration = 0;
         } else {
-            showDefeatedMenuScene(state);
+            if (state.bossRushState) {
+                returnToBossRushMenu(state);
+            } else {
+                showDefeatedMenuScene(state);
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
         context.save();
             if (this.reviving) {
                 context.globalAlpha *= 0.7 * (1 - state.hero.life / state.hero.savedData.maxLife);
+            }  else if (state.bossRushState && !state.hero.savedData.hasRevive) {
+                // The screen doesn't darken when defeated during the boss rush currently.
+                // This avoids awkard transitions with the game UI faded out.
+                context.globalAlpha = 0;
             } else {
                 context.globalAlpha *= (state.hero.savedData.hasRevive ? 0.7 : 1) * Math.min(1, this.time / 1000);
             }

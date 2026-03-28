@@ -11,6 +11,7 @@ import {createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt} from 'app/
 import {requireFrame} from 'app/utils/packedImages';
 import {drawOutlinedText} from 'app/utils/simpleWhiteFont';
 import {createCanvasAndContext} from 'app/utils/canvas';
+import {formatMinutesAndSeconds} from 'app/utils/formatters';
 import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 
@@ -405,6 +406,14 @@ export class HudScene implements GameScene {
             drawOutlinedText(context, `${info.checksCompleted}/${info.totalChecks}`, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 9, {
                 textBaseline: 'middle',
                 textAlign: 'right',
+                size: 16,
+            });
+        }
+        if (state.bossRushState?.bossStartTime) {
+            const currentTime = state.hero.savedData.playTime - state.bossRushState.bossStartTime;
+            drawOutlinedText(context, formatMinutesAndSeconds(currentTime), 2, CANVAS_HEIGHT - 9, {
+                textBaseline: 'middle',
+                textAlign: 'left',
                 size: 16,
             });
         }

@@ -8,7 +8,7 @@ import type {IntroScene} from 'app/scenes/intro/introScene';
 import type {MapScene} from 'app/scenes/map/mapScene';
 import type {PrologueScene} from 'app/scenes/prologue/prologueScene';
 import type {TitleScene} from 'app/scenes/title/titleScene';
-import { BossRushScene } from './bossRush/bossRushScene';
+import type {BossRushScene} from './bossRush/bossRushScene';
 
 interface AllScenes {
     choice: ChoiceScene

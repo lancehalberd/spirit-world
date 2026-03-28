@@ -141,6 +141,8 @@ export class Hero implements Actor {
     magicRegenCooldown: number = 0;
     // This is the maximum value magic regen cooldown can reach. It is reduced by certain items.
     magicRegenCooldownLimit: number = 2000;
+    // This flag is used to disable Spirit Energy for the "Mundane" Boss Rush condition.
+    isMagicDisabled = false;
     // How much magic the hero has spent recently. This is drawn as a red bar on top of remaining magic
     // and is used to visualize both how much magic the hero spent and how long until magic regen starts again.
     recentMagicSpent: number = 0;
@@ -204,30 +206,6 @@ export class Hero implements Actor {
         // references to the original savedHeroData.
         mergeDeep(this.savedData, cloneDeep(savedHeroData));
         this.life = this.savedData.maxLife;
-        /*if (savedHeroData) {
-            Object.assign(this.savedData, savedHeroData);
-        }
-        this.savedData.passiveTools = {
-            ...defaultSavedHeroData.passiveTools,
-            ...savedHeroData?.passiveTools,
-        };
-        this.savedData.activeTools = {
-            ...defaultSavedHeroData.activeTools,
-            ...savedHeroData?.activeTools,
-        };
-        this.savedData.elements = {
-            ...defaultSavedHeroData.elements,
-            ...savedHeroData?.elements,
-        };
-        this.savedData.equipment = {
-            ...defaultSavedHeroData.equipment,
-            ...savedHeroData?.equipment,
-        };
-        this.savedData.weaponUpgrades = {
-            ...defaultSavedHeroData.weaponUpgrades,
-            ...savedHeroData?.weaponUpgrades,
-        };
-        this.life = this.savedData.maxLife;*/
     }
 
     getCopy(this: Hero): Hero {

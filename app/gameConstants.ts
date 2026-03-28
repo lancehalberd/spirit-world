@@ -39,6 +39,8 @@ export const GAME_KEY = {
 
 export const FADE_IN_DURATION = 600;
 export const FADE_OUT_DURATION = 600;
+export const FAST_FADE_IN_DURATION = 200;
+export const FAST_FADE_OUT_DURATION = 200;
 export const CIRCLE_WIPE_IN_DURATION = 1000;
 export const CIRCLE_WIPE_OUT_DURATION = 1000;
 export const WATER_TRANSITION_DURATION = 200;

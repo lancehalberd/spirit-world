@@ -1,3 +1,4 @@
+export * from 'app/scenes/bossRush/bossRushScene';
 export * from 'app/scenes/choice/choiceScene';
 export * from 'app/scenes/controls/controlsScene';
 export * from 'app/scenes/defeated/defeatedMenuScene';

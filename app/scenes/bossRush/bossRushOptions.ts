@@ -1,65 +1,138 @@
-import { altGolemState, altElementalIdols, altGuardian, altRival2 } from "app/content/heroSavedStates"
+import {Enemy} from 'app/content/enemy';
+import {tombBossState, warTempleBoss, cocoonBossState, helixRivalStateBoss} from 'app/content/spawnStates';
+import {updateHeroMagicStats} from 'app/render/spiritBar';
+import {getRealSavedHeroData} from 'app/utils/alterHeroData';
+import {hitTargets} from 'app/utils/field';
+import {cloneDeep} from "app/utils/index";
+import {addObjectToArea} from 'app/utils/objects';
 
-export interface BossRushOption {
-    // Name of the boss rush displayed to the player
-    label: string
-    // Key for the boss rush used to track best score
-    key: BossName
-    // List of bosses the player will defeat in order
-    bosses: BossName[]
-    // Player state to use for special scenarios
-    playerState?: SavedHeroData
-    // Teleporter name in boss rush map
-    location: string[]
-    // Special logic for unlocking this boss rush
-    isVisible?: (state: GameState) => boolean
-    karma?: {[key in BossCondition]: number}
-    //WIP: Give differing amounts of karma for beating time threshold.
-    targetTime: number
+
+export const bossRushConditions: BossRushCondition[] = [
+    {
+        key: 'confident',
+        label: 'Confident',
+        description: 'Compete without a Second Chance.',
+        modifier: 1,
+        apply(state: GameState) {
+            state.hero.savedData.hasRevive = false;
+        },
+    },
+    {
+        key: 'weak',
+        label: 'Dull Blade',
+        description: 'No Chakram Upgrades.',
+        modifier: 2,
+        apply(state: GameState) {
+            state.hero.savedData.weapon = 1;
+            delete state.hero.savedData.weaponUpgrades.normalDamage;
+            delete state.hero.savedData.weaponUpgrades.normalRange;
+        },
+    },
+    {
+        key: 'exposed',
+        label: 'Exposed',
+        description: 'No Armor or Blessings.',
+        modifier: 3,
+        apply(state: GameState) {
+            delete state.hero.savedData.passiveTools.armor;
+            delete state.hero.savedData.passiveTools.fireBlessing;
+            delete state.hero.savedData.passiveTools.waterBlessing;
+            delete state.hero.savedData.passiveTools.lightningBlessing;
+        },
+    },
+    {
+        key: 'daredevil',
+        label: 'Dare Devil',
+        description: 'Reduced Life.',
+        modifier: 4,
+        apply(state: GameState) {
+            state.hero.life = state.hero.savedData.maxLife = 2;
+            state.hero.savedData.ironSkinLife = 0;
+            delete state.hero.savedData.passiveTools.ironSkin;
+        },
+    },
+    {
+        key: 'mundane',
+        label: 'Mundane',
+        description: 'No Spirit Energy.',
+        modifier: 5,
+        apply(state: GameState) {
+            state.hero.isMagicDisabled = true;
+            updateHeroMagicStats(state);
+        },
+    },
+];
+
+function getBoss(state: GameState, boss: BossType): Enemy {
+    return state.areaInstance.objects.find(o => (o.definition as BossObjectDefinition).enemyType === boss) as Enemy;
 }
 
 
-const bossFlags: {[key in BossName]: string} = {
-    none: 'WARNING',
-    beetle: 'peachCaveBoss',
-    golem: 'tombBoss',
-    idols: 'warTempleBoss',
-    guardian: 'cocoonBoss',
-    forest: 'forestTempleBoss', 
-    rival2: 'helixRivalBoss',
-    collector: 'waterfallTowerBoss',
-    stormBeast: 'stormBeast',
-    flameBeast: 'flameBeast',
-    frostBeast: 'frostBeast',
-    rush: 'cocoonBoss',
-    rush2: 'cocoonBoss', //WIP: give real flag
-    rush3: 'WARNING',
-    altGolem: 'WARNING',
-    altGuardian: 'WARNING',
-    altIdols: 'WARNING',
-    altRival2: 'WARNING'
-};
+const specialGolemState = cloneDeep(tombBossState.savedHeroData);
+specialGolemState.hasRevive = false;
+specialGolemState.weapon = 0;
+specialGolemState.activeTools.bow = 0;
+delete specialGolemState.leftTool;
+
+const specialIdolsState = cloneDeep(warTempleBoss.savedHeroData);
+specialIdolsState.hasRevive = false;
+specialIdolsState.passiveTools.roll = 0;
+
+const specialGuardianState = cloneDeep(cocoonBossState.savedHeroData);
+specialGuardianState.hasRevive = false;
+specialGuardianState.weapon = 0;
+specialGuardianState.activeTools.bow = 0;
+specialGuardianState.leftTool = 'cloak';
+delete specialGuardianState.rightTool;
+
+const specialRivalState = cloneDeep(helixRivalStateBoss.savedHeroData);
+specialRivalState.hasRevive = false;
+specialRivalState.activeTools.cloak = 0;
+delete specialRivalState.rightTool;
 
 
-const fightLocations: {[key in BossName]: string[]} = {
-    none: [],
-    beetle: ['beetleRefight'],
-    golem: ['golemRefight'],
-    idols: ['warTempleRefight'],
-    guardian: ['guardianRefight'],
-    forest: ['forestTempleRefight'],
-    rival2: ['rival2Refight'],
-    collector: ['collectorRefight'],
-    stormBeast: ['stormBeastRefight'],
-    flameBeast: ['flameBeastRefight'],
-    frostBeast: ['frostBeastRefight'],
-    rush: ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight'],
-    rush2: ['forestTempleRefight', 'rival2Refight', 'collectorRefight'],
-    rush3: ['flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight'],
-    altGolem: ['golemRefight'],
-    altGuardian: ['guardianRefight'],
-    altIdols: ['warTempleRefight'],
-    altRival2: ['rival2Refight'],
+const minute = 60000;
+
+function fixBeetlePreview(state: GameState) {
+    const boss = getBoss(state, 'beetleBoss');
+    // Throw a copy of the boss in frame
+    /*const boss = new Enemy(state, {
+        type: 'boss',
+        id: 'bossPreview',
+        status: 'normal',
+        saveStatus: 'never',
+        enemyType: 'beetleBoss',
+        lootType: 'empty',
+        x: state.camera.x + 107,
+        y: state.camera.y + 24,
+    });*/
+    boss.setMode('preview');
+    addObjectToArea(state, state.areaInstance, boss);
+}
+
+function fixGuardianPreview(state: GameState) {
+    // Throw a copy of the boss in frame
+    const boss = new Enemy(state, {
+        type: 'enemy',
+        id: 'bossPreview',
+        status: 'normal',
+        saveStatus: 'never',
+        enemyType: 'guardianProjection',
+        x: 0,
+        y: 0,
+    });
+    boss.scale = 2;
+    boss.x = 256 - boss.w;
+    boss.y = 256 - boss.h / 2;
+    boss.setMode('preview');
+    addObjectToArea(state, state.areaInstance, boss);
+}
+function fixFlameBeastPreview(state: GameState) {
+    const boss = getBoss(state, 'flameBeast');
+    boss.x = 256 + 8;
+    boss.y = 256 + 32;
+    // This should be a mode the renders the special lava pool instead of a regular shadow.
+    boss.setMode('emerge');
 }
 
 export const allBossRushOptions: BossRushOption[] = [
@@ -67,283 +140,210 @@ export const allBossRushOptions: BossRushOption[] = [
         label: 'Beetle',
         key: 'beetle',
         bosses: ['beetle'],
-        location: ['beetleRefight'],
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 30000,
+        karma: 1,
+        targetTime: 0.5 * minute,
+        fixPreview: fixBeetlePreview,
     },
     {
         label: 'Golem',
         key: 'golem',
         bosses: ['golem'],
-        location: ['golemRefight'],
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 60000,
+        karma: 2,
+        targetTime: 1 * minute,
     },
     {
         label: 'War Idols',
         key: 'idols',
         bosses: ['idols'],
-        location: ['warTempleRefight'],
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 50000,
+        karma: 2,
+        targetTime: 1.5 * minute,
     },
     {
         label: 'Guardian',
         key: 'guardian',
         bosses: ['guardian'],
-        location: ['guardianRefight'],
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 90000,
+        karma: 2,
+        targetTime: 1.5 * minute,
+        fixPreview: fixGuardianPreview,
     },
     {
-        label: 'Forest Idols',
-        key: 'forest',
-        bosses: ['forest'],
-        location: ['forestTempleRefight'],
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 50000,
-    },
-    {
-        label: 'Rival 2',
+        label: 'Saru',
         key: 'rival2',
         bosses: ['rival2'],
-        location: ['rival2Refight'],
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 75000,
+        karma: 4,
+        targetTime: 1 * minute,
+    },
+    {
+        label: 'Prototypes',
+        key: 'forestTempleBoss',
+        bosses: ['forestTempleBoss'],
+        karma: 5,
+        targetTime: 1 * minute,
     },
     {
         label: 'Collector',
         key: 'collector',
         bosses: ['collector'],
-        location: ['collectorRefight'],
-        karma: {
-            none: 0,
-            daredevil: 2,
-            weak: 2,
+        karma: 5,
+        targetTime: 1.5 * minute,
+        fixPreview(state: GameState) {
+            const boss = getBoss(state, 'crystalCollector');
+            boss.changeToAnimation('idle')
+            boss.setMode('choose');
         },
-        targetTime: 60000,
     },
     {
         label: 'Flame Beast',
         key: 'flameBeast',
         bosses: ['flameBeast'],
-        location: ['flameBeastRefight'],
-        karma: {
-            none: 0,
-            daredevil: 2,
-            weak: 2,
-        },
-        targetTime: 120000,
+        karma: 10,
+        targetTime: 2 * minute,
+        fixPreview: fixFlameBeastPreview,
     },
     {
         label: 'Frost Beast',
         key: 'frostBeast',
         bosses: ['frostBeast'],
-        location: ['frostBeastRefight'],
-        karma: {
-            none: 0,
-            daredevil: 3,
-            weak: 3,
+        karma: 10,
+        targetTime: 2 * minute,
+        fixPreview(state: GameState) {
+            const boss = getBoss(state, 'frostBeast');
+            boss.x = 256;
+            boss.y = 256 + 48;
+            // Destroy the ice where the serpent emerges.
+            hitTargets(state, state.areaInstance, {
+                element: 'fire',
+                hitCircle: {
+                    x: boss.x + boss.w / 2,
+                    y: boss.y + 32,
+                    r: 36,
+                },
+                hitTiles: true,
+                source: boss,
+            });
+            boss.params.submerged = false;
+            boss.setMode('choose');
         },
-        targetTime: 90000,
     },
     {
         label: 'Storm Beast',
         key: 'stormBeast',
         bosses: ['stormBeast'],
-        location: ['stormBeastRefight'],
-        karma: {
-            none: 0,
-            daredevil: 3,
-            weak: 3,
+        karma: 10,
+        targetTime: 2 * minute,
+        fixPreview(state: GameState) {
+            const boss = getBoss(state, 'stormBeast');
+            boss.x = 256 + 48;
+            boss.y = 256 - 128;
+            boss.rotation = Math.PI / 6;
+            boss.changeToAnimation('charging');
+            boss.setMode('choose');
         },
-        targetTime: 90000,
     },
     {
         label: 'Rush 1',
         key: 'rush',
         bosses: ['beetle', 'golem', 'idols', 'guardian'],
-        location: ['beetleRefight', 'golemRefight', 'warTempleRefight', 'guardianRefight'],
-        karma: {
-            none: 2,
-            daredevil: 5,
-            weak: 4,
-        },
-        targetTime: 180000,
+        karma: 5,
+        targetTime: 3 * minute,
+        fixPreview: fixBeetlePreview,
     },
     {
         label: 'Rush 2',
         key: 'rush2',
-        bosses: ['forest', 'rival2', 'collector'],
-        location: ['forestTempleRefight', 'rival2Refight', 'collectorRefight'],
-        karma: {
-            none: 2,
-            daredevil: 7,
-            weak: 4,
-        },
-        targetTime: 150000,
-        isVisible(state: GameState) {
-            return !!(state.savedState.objectFlags.elementalBeastsEscaped);
-        }
+        bosses: ['rival2', 'forestTempleBoss', 'collector'],
+        karma: 10,
+        targetTime: 3 * minute,
     },
     {
         label: 'Rush 3',
         key: 'rush3',
-        location: ['flameBeastRefight', 'frostBeastRefight', 'stormBeastRefight'],
         bosses: ['flameBeast', 'frostBeast', 'stormBeast'],
-        karma: {
-            none: 2,
-            daredevil: 10,
-            weak: 7,
-        },
-        targetTime: 400000,
-        isVisible(state: GameState) {
-            return !!(state.savedState.objectFlags.flameBeast && 
-                      state.savedState.objectFlags.frostBeast &&
-                      state.savedState.objectFlags.stormBeast && 1);
-        }
+        karma: 20,
+        targetTime: 5 * minute,
+        fixPreview: fixFlameBeastPreview,
     },
     {
         label: 'Odd Golem',
         key: 'altGolem',
         bosses: ['golem'],
-        location: ['golemRefight'],
-        playerState: altGolemState,
-        karma: {
-            none: 0,
-            daredevil: 1,
-            weak: 1,
-        },
-        targetTime: 120000,
+        playerState: specialGolemState,
+        karma: 20,
+        targetTime: 1 * minute,
         // Also requires gloves to unlock.
-        isVisible(state: GameState) {
-            return !!(state.savedState.objectFlags.tombBoss
-                && state.hero.savedData.passiveTools.gloves && (state.hero.savedData.karma >= 3));
-        }
-    },
-    {
-        label: 'Odd Guardian',
-        key: 'altGuardian',
-        bosses: ['guardian'],
-        location: ['guardianRefight'],
-        playerState: altGuardian,
-        karma: {
-            none: 1,
-            daredevil: 2,
-            weak: 0,
+        isVisible(state: GameState, realSavedHeroData: SavedHeroData) {
+            return realSavedHeroData.passiveTools.gloves && (realSavedHeroData.karma >= 3);
         },
-        targetTime: 180000,
-        isVisible(state: GameState) {
-            return !!(state.savedState.objectFlags.cocoonBoss && (state.hero.savedData.karma >= 1));
-        }
     },
     {
         label: 'Odd Idols',
         key: 'altIdols',
         bosses: ['idols'],
-        location: ['warTempleRefight'],
-        playerState: altElementalIdols,
-        karma: {
-            none: 1,
-            daredevil: 1,
-            weak: 1,
+        playerState: specialIdolsState,
+        karma: 30,
+        targetTime: 1.5 * minute,
+        isVisible(state: GameState, realSavedHeroData: SavedHeroData) {
+            return realSavedHeroData.karma >= 4;
         },
-        targetTime: 90000,
-        isVisible(state: GameState) {
-            return !!(state.savedState.objectFlags.warTempleBoss && (state.hero.savedData.karma >= 4));
-        }
     },
     {
-        label: 'Odd Rival 2',
+        label: 'Odd Guardian',
+        key: 'altGuardian',
+        bosses: ['guardian'],
+        playerState: specialGuardianState,
+        karma: 50,
+        targetTime: 3 * minute,
+        isVisible(state: GameState, realSavedHeroData: SavedHeroData) {
+            return realSavedHeroData.karma >= 1;
+        },
+        fixPreview: fixGuardianPreview,
+    },
+    {
+        label: 'Odd Saru',
         key: 'altRival2',
         bosses: ['rival2'],
-        location: ['rival2Refight'],
-        playerState: altRival2,
-        karma: {
-            none: 1,
-            daredevil: 1,
-            weak: 1,
+        playerState: specialRivalState,
+        karma: 50,
+        targetTime: 1.5 * minute,
+        isVisible(state: GameState, realSavedHeroData: SavedHeroData) {
+            return realSavedHeroData.karma >= 4;
         },
-        targetTime: 90000,
-        isVisible(state: GameState) {
-            return !!(state.savedState.objectFlags.helixRivalBoss && (state.hero.savedData.karma >= 4));
-        }
     },
 ];
 
-const karmaByKey: Record<BossName,  {[key in BossCondition]: number}> =
-    allBossRushOptions.reduce((acc, option) => {
-        acc[option.key] = option.karma;
-        return acc;
-    }, {} as Record<BossName,  {[key in BossCondition]: number}>);
 
-const karmaTimeByKey: Record<BossName, number> =
-    allBossRushOptions.reduce((acc, option) => {
-        acc[option.key] = option.targetTime;
-        return acc;
-    }, {} as Record<BossName, number>);
-
-export function getKarmaTimeByKey(key: BossName): number {
-    return karmaTimeByKey[key] ?? 0;
-}
-
-export function getKarmaForKey(key: BossName, condition: BossCondition): number {
-    return karmaByKey[key][condition] ?? 0;
-}
+const bossFlags: {[key in BossKey]?: string} = {
+    // The first boss is always unlocked so that the boss rush menu can never be empty.
+    beetle: undefined,
+    golem: 'tombBoss',
+    idols: 'warTempleBoss',
+    guardian: 'cocoonBoss',
+    rival2: 'helixRivalBoss',
+    forestTempleBoss: 'forestTempleBoss',
+    collector: 'waterfallTowerBoss',
+    stormBeast: 'stormBeast',
+    flameBeast: 'flameBeast',
+    frostBeast: 'frostBeast',
+};
 
 export function isBossRushOptionVisible(state: GameState, bossRushOption: BossRushOption): boolean {
-    if (bossRushOption.isVisible) {
-        return bossRushOption.isVisible(state);
-    }
+    const realSavedHeroData = getRealSavedHeroData(state);
+    // You cannot enter a boss rush if you are missing the progress flag for defeating one of the bosses.
+    // If there are special bosses that can only be encountered as a boss rush, the bossFlags values
+    // can be set to a falsey value to skip this requirement.
     for (const bossKey of bossRushOption.bosses) {
-        if (!state.savedState.objectFlags[bossFlags[bossKey]]) {
+        if (bossFlags[bossKey] && !state.savedState.objectFlags[bossFlags[bossKey]]) {
             return false;
         }
-    } return true;
+    }
+    if (bossRushOption.isVisible) {
+        return bossRushOption.isVisible(state, realSavedHeroData);
+    }
+    return true;
 }
 export function getBossRushOptions(state: GameState): BossRushOption[] {
     return allBossRushOptions.filter(bossRushOption => isBossRushOptionVisible(state, bossRushOption));
 }
-
-export function endBossRush(state: GameState): boolean {
-    if (state.bossRushTrackers.rushPosition + 1 >= fightLocations[state.bossRushTrackers.currentBoss].length) {
-        return true;
-    } return false;
-}
-
-export function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
-  if (state.travel) {
-    state.travel(zoneKey, markerId, {instant: false});
-    return '';
-  }
-  console.log("Can't find travel function!")
-}
-
-export function startNextBoss(state: GameState): string {
-    return travelToLocation(state, 'bossRefights', fightLocations[state.bossRushTrackers.currentBoss]
-        [state.bossRushTrackers.rushPosition]);
+export function getBossRushOption(key: BossRushKey): BossRushOption {
+    return allBossRushOptions.find(option => option.key === key);
 }

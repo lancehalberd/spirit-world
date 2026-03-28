@@ -4,7 +4,8 @@ export function saveGame(state: GameState): void {
     if (state.savedGameIndex < 0) {
         return;
     }
-    if (state.savedState.usingBackup) {
+    // Do not save while the real hero data is stored on backupHeroData.
+    if (state.backupHeroData) {
         return;
     }
     state.savedState.savedHeroData = cloneDeep(state.hero.savedData);

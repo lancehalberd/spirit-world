@@ -56,8 +56,8 @@ export * from 'app/content/zones/title-noBottomWall';
 // WIP zones
 export * from 'app/content/zones/delve';
 export * from 'app/content/zones/jadeCityInterior';
-export * from 'app/content/zones/bossRefights';
-export * from 'app/content/zones/bossRefightsWater';
+export * from 'app/content/zones/bossRush';
+export * from 'app/content/zones/bossRushWater';
 //Comment out below to play game normally
 //export * from 'app/content/zones/overworldBig';
 

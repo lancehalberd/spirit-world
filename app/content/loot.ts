@@ -214,7 +214,6 @@ function getLootGetMessage(state: GameState, {lootType, lootLevel, lootAmount}: 
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}!`;
-        case 'bossRefight': return '';
         case 'healthPotion': return `You obtained a bottle of ${lootName}!`;
         case 'statusPotion': return `You obtained an ${lootName}!`;
         case 'magicPotion': return `You obtained a ${lootName}!`;
@@ -756,10 +755,6 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         return bronzeMedal;
     }
 
-    //WIP:Change later!
-    if (lootType === 'bossRefight') {
-        return emptyFrame;
-    }
     return lootFrames[lootType] || lootFrames.unknown;
 }
 

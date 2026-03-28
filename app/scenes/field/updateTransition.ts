@@ -1,6 +1,7 @@
 import {
     FRAME_LENGTH,
     FADE_IN_DURATION, FADE_OUT_DURATION,
+    FAST_FADE_IN_DURATION, FAST_FADE_OUT_DURATION,
     GAME_KEY,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     MUTATE_DURATION, WATER_TRANSITION_DURATION,
@@ -52,14 +53,17 @@ export function updateTransition(state: GameState) {
             updateCamera(state);
             state.transitionState = null;
         }
-    } else if (state.transitionState.type === 'fade') {
-        if (state.transitionState.time === FADE_OUT_DURATION) {
+    } else if (state.transitionState.type === 'fade' || state.transitionState.type === 'fastFade') {
+        const isFast = state.transitionState.type === 'fastFade';
+        const fadeInDuration = isFast ? FAST_FADE_IN_DURATION : FADE_IN_DURATION;
+        const fadeOutDuration = isFast ? FAST_FADE_OUT_DURATION : FADE_OUT_DURATION;
+        if (state.transitionState.time === fadeOutDuration) {
             enterLocation(state, state.transitionState.nextLocation, {
                 instant: true,
                 callback: state.transitionState.callback,
             });
             updateCamera(state);
-        } else if (state.transitionState.time > FADE_OUT_DURATION + FADE_IN_DURATION) {
+        } else if (state.transitionState.time > fadeOutDuration + fadeInDuration) {
             state.transitionState = null;
         }
     } else {

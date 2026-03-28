@@ -20,7 +20,8 @@ interface OptionalEnterZoneByTargetParams {
     callback?: (state: GameState) => void
     skipObject?: ObjectDefinition
     doNotFixCamera?: boolean
-    transitionType?: 'circle'|'fade'
+    transitionType?: TransitionType
+    transitionColor?: string
 }
 
 export function enterZoneByTarget(
@@ -31,7 +32,8 @@ export function enterZoneByTarget(
         skipObject,
         instant = false,
         callback,
-        transitionType
+        transitionType,
+        transitionColor,
     }: OptionalEnterZoneByTargetParams = {}
 ): boolean {
     const zone = zones[zoneKey];
@@ -44,7 +46,11 @@ export function enterZoneByTarget(
         return false;
     }
     const targetAreaDefinition = getAreaFromLocation(objectLocation);
-    if (state.areaInstance.definition === targetAreaDefinition) {
+    // If we are entering the area we are already in and no override transitionType is specified,
+    // move to the new location without a transition and just have the camera pan to the new location.
+    // TODO: This should probably be updated  to check that this is the same AreaSection rather than AreaInstance, otherwise it could
+    // cause some bad transitions when transitioning between two sections that happen to be in the same area instance.
+    if (!transitionType && state.areaInstance.definition === targetAreaDefinition) {
         onEnterLocation(state, targetObjectId, {doNotFixCamera: true, skipObject, callback});
         return true;
     }
@@ -59,6 +65,7 @@ export function enterZoneByTarget(
         instant,
         callback: () => onEnterLocation(state, targetObjectId, {skipObject, callback}),
         transitionType,
+        transitionColor,
     });
     return true;
 }

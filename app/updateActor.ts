@@ -91,6 +91,10 @@ export function updateAllHeroes(this: void, state: GameState, interactive: boole
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero, interactive: boolean) {
+    // Don't update the hero if they aren't currently in any area.
+    if (!hero.area) {
+        return;
+    }
     hero.justRespawned = false;
     // If the hero is performing some special action with logic that overrides default actions,
     // for example, falling into a pit, or transitioning between screens, this function will handle
@@ -280,6 +284,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.toolCooldown <= 0) {
             hero.toolOnCooldown = null;
         }
+    }
+    if (hero.isMagicDisabled) {
+        hero.magic = 0;
     }
 }
 

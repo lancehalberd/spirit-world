@@ -5,6 +5,7 @@ import {editingState} from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
+    FAST_FADE_IN_DURATION, FAST_FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
     WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
@@ -831,7 +832,7 @@ export function renderAreaObjectsBeforeHero(
                 object.alternateRenderWarning?.(context, state);
             }
         }
-        if (!state.hero.renderParent) {
+        if (!state.hero.renderParent && state.hero.area === area) {
             if (area === state.areaInstance && !editingState.isEditing) {
                 renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
             } else if (state.transitionState?.type === 'mutating' && area === state.transitionState.nextAreaInstance) {
@@ -1158,19 +1159,22 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         }
-    } else if (state.transitionState.type === 'fade') {
+    } else if (state.transitionState.type === 'fade' || state.transitionState.type === 'fastFade') {
+        const isFast = state.transitionState.type === 'fastFade';
+        const fadeInDuration = isFast ? FAST_FADE_IN_DURATION : FADE_IN_DURATION;
+        const fadeOutDuration = isFast ? FAST_FADE_OUT_DURATION : FADE_OUT_DURATION;
         renderStandardFieldStack(context, state);
         const fadeColor = state.transitionState.fadeColor ?? '#000';
-        if (state.transitionState.time <= FADE_OUT_DURATION) {
+        if (state.transitionState.time <= fadeOutDuration) {
             context.save();
-                const p = Math.min(1, 1.5 * state.transitionState.time / FADE_OUT_DURATION);
+                const p = Math.min(1, 1.5 * state.transitionState.time / fadeOutDuration);
                 context.globalAlpha = p;
                 context.fillStyle = fadeColor
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         } else {
             context.save();
-                const alpha = 1.5 - 1.5 * (state.transitionState.time - FADE_OUT_DURATION) / FADE_IN_DURATION;
+                const alpha = 1.5 - 1.5 * (state.transitionState.time - fadeOutDuration) / fadeInDuration;
                 context.globalAlpha = Math.max(0, Math.min(1, alpha));
                 context.fillStyle = fadeColor;
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);

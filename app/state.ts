@@ -9,7 +9,6 @@ import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
 import {getFullZoneLocation, /*getShortZoneName*/ } from 'app/utils/getFullZoneLocation';
 //import {cloneDeep, mergeDeep} from 'app/utils/index';
 //import {returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
-import { enterZoneByTarget } from './utils/enterZoneByTarget';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -118,19 +117,6 @@ export function getDefaultState(): GameState {
         arState: {
             active: false,
             scene: 'choose',
-        },
-        travel: (zoneKey: string, markerId: string, options?: any) => {
-            enterZoneByTarget(state, zoneKey, markerId, options);
-        },
-        bossRushTrackers: {
-            currentBoss: "none",
-            bossStartTime: 0,
-            rushPosition: 0,
-            currentCondition: 'none',
-            storedLife: 3,
-            hasIronSkin: false,
-            hasWeaponUpgrades: {},
-            weaponNumber: 2,
         },
     };
     return state;

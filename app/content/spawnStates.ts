@@ -24,22 +24,22 @@ tombRivalDefeatState.savedHeroData.life = 0.25;
 const tombStartState = applyItemsToSavedState(tombRivalStateStory, {},
     ['tombEntrance', 'enteredTomb']
 );
-const tombBossState = applyItemsToSavedState(tombStartState, {roll: 1, 'tomb:bigKey': 1, 'tomb:map': 1, silverOre: 1},
+export const tombBossState = applyItemsToSavedState(tombStartState, {roll: 1, 'tomb:bigKey': 1, 'tomb:map': 1, silverOre: 1},
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tombRoll']
 );
 const warTempleStart = applyItemsToSavedState(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'tombTeleporter', 'momRuins', 'warTempleEntrance']);
-const warTempleBoss = applyItemsToSavedState(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
+export const warTempleBoss = applyItemsToSavedState(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
 const warTempleEnd = applyItemsToSavedState(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss']);
 const cocoonStartState = applyItemsToSavedState(warTempleEnd, {maxLife: 1, astralProjection: 1, normalRange: 1},
     ['jadeChampionWarTemple', 'tombExit']);
-const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
+export const cocoonBossState = applyItemsToSavedState(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
 const vanaraDreamStateStory = applyItemsToSavedState(cocoonBossState, {maxLife: 1},
     ['cocoonBossStarted', 'cocoonBoss']);
 const helixRivalStateStory = applyItemsToSavedState(vanaraDreamStateStory, {armor: 1, teleportation: 1},
     ['teleportationTutorialSwitch']);
-const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
+export const helixRivalStateBoss = applyItemsToSavedState(helixRivalStateStory, {}, ['skipRivalHelixStory']);
 const helixStartState = applyItemsToSavedState(helixRivalStateStory, {},
     ['helixRivalBoss']);
 // Seting weapon to 3 correctly gives both the regular and golden chakrams (1 | 2 = 3).
@@ -83,7 +83,8 @@ const beastState = applyItemsToSavedState(helixEndState, {
     roll: 3, nimbusCloud: 1,
     bow: 3,
     spiritDamage: 1, spiritRange: 1,
-});
+    // Currently there is no boss in the Gauntlet.
+}, ['forestTempleBoss', 'waterfallTowerBoss', 'forgeBoss', 'skyPalaceBoss']);
 
 const riverTempleStartState = applyItemsToSavedState(beastState, {
     staff: 3, lightning: 1,

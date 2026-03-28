@@ -172,7 +172,9 @@ export function defeatAllEnemies() {
     const state = getState();
     const allEnemies = [...state.areaInstance?.enemies, ...state.alternateAreaInstance?.enemies];
     for (const enemy of allEnemies) {
-        enemy.showDeathAnimation(state);
+        if (enemy.isFromCurrentSection(state)) {
+            enemy.showDeathAnimation(state);
+        }
     }
     event.preventDefault();
 }

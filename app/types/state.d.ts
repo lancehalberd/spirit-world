@@ -4,14 +4,17 @@ interface SavedARState {
     gameData: {[key: string]: any}
 }
 
+interface SavedBossRushRecord {
+    bestTime: number
+    highScore: number
+}
+
 interface SavedState {
     // Flags that are set permanently for objects, like opened treasure chests or defeated bosses.
     objectFlags: {[key: string]: boolean | number | number[] | string}
     // Flags that remain set as long as the character does not leave the current zone.
     zoneFlags: {[key: string]: boolean | number | number[] | string}
     savedHeroData: SavedHeroData
-    backupHeroData: SavedHeroData
-    usingBackup: boolean
     savedArData: SavedARState
     dungeonInventories: {
         [key: string]: DungeonInventory
@@ -21,7 +24,7 @@ interface SavedState {
     luckyBeetles: string[]
     exploredSections: number[]
     heardDialogue: number[]
-    bossRushTimes: Record<BossCondition, Partial<Record<BossName, number>>>;
+    bossRushData: {[key in BossRushKey]?: SavedBossRushRecord}
 }
 
 // These settings are global and can be saved independent of saved state
@@ -45,7 +48,7 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type TransitionType = 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
+type TransitionType = 'circle' | 'fade' | 'fastFade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
 interface GameState {
     sceneStack: GameScene[]
@@ -151,8 +154,11 @@ interface GameState {
         renderedFloorId?: string
     }
     arState: ARState
-    bossRushTrackers: bossRushState
+    bossRushState?: BossRushState
     travel?: (zoneKey: string, markerId: string, options?: any) => void
+    // This stores the current hero data when we apply special configurations to the hero
+    // data for certain mini games, such as special conditions during Boss Rush battles.
+    backupHeroData?: SavedHeroData
 }
 
 type ARGameID = 'dodger'|'hota'|'target'|'targetFPS';

@@ -1,17 +1,13 @@
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-//import { renderStandardFieldStack } from 'app/render/renderField';
-import { drawText } from 'app/utils/simpleWhiteFont';
-import { fillRect, pad } from 'app/utils/index';
-import { getBossRushOptions, getKarmaTimeByKey } from './bossRushOptions';
-import { fullHeart, emptyHeart } from 'app/scenes/hud/hudScene';
-import { drawFrame } from 'app/utils/animations';
-import {sceneHash} from 'app/scenes/sceneHash';
-import { BossRushScene } from './bossRushScene';
+import {CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
+import {bossRushConditions, getBossRushOptions} from 'app/scenes/bossRush/bossRushOptions';
+import {getSavedBossRushData} from 'app/scenes/bossRush/showBossRushScene';
+import {BossRushScene} from 'app/scenes/bossRush/bossRushScene';
+import {formatMinutesAndSeconds} from 'app/utils/formatters';
+import {fillRect, pad} from 'app/utils/index';
+import {drawText} from 'app/utils/simpleWhiteFont';
 
 
-const WIDTH = 144;
 const ROW_HEIGHT = 20;
-const MAX_VISIBLE = 4;
 
 const textOptions = <const>{
     textBaseline: 'middle',
@@ -19,80 +15,13 @@ const textOptions = <const>{
     size: 16,
 };
 
-function getConditionColor(state: GameState): string | CanvasGradient | CanvasPattern {
-    switch (state.bossRushTrackers.currentCondition) {
-        case 'none':
-            return 'white'
-        case 'daredevil':
-            return 'red'
-        case 'weak':
-            return 'green'
-    }
-}
-
-function formatTime(ms: number): string {
-  const totalSeconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-  const paddedSeconds = seconds.toString().padStart(2, '0');
-  
-  return `${minutes}\'${paddedSeconds}\"`;
-}
-
-function getHighScore(state: GameState, boss: BossName): string {
-    let condition = state.bossRushTrackers.currentCondition;
-    let bestTime = state.savedState.bossRushTimes[condition][boss];
-    if (typeof bestTime !== 'number' || !Number.isFinite(bestTime)) {
-            return `--`;
-        }
-    return formatTime(bestTime)
-}
-
-
-
-export function renderBossRushMenu(context: CanvasRenderingContext2D, state: GameState, scene: BossRushScene): void {
-    //renderStandardFieldStack(context, state, false);
-
-    const options = getBossRushOptions(state);
-
-    //If somehow someone gets to this menu too early, this prevents issues
-    if (!options || options.length === 0) {
-        state.sceneStack = [sceneHash.field, sceneHash.hud]; //Replace with call to showFieldScene?
-        state.travel("dream", "bossRefightReturn", {instant: true});
-        return;
-    }
-    //Render Hearts
-    let h_x = 26;
-    let h_y = 5;
-    let shownLife = state.hero.savedData.maxLife;
-
-    if (state.bossRushTrackers.currentCondition == 'daredevil') {
-        shownLife = 2;
-    }
-
-    for (let i = 0; i < shownLife; i++) {
-        if (i === 10) {
-            h_y += 11;
-            h_x = 26;
-        }
-        drawFrame(context, emptyHeart, {...emptyHeart, x: h_x, y: h_y});
-        drawFrame(context, fullHeart, {...fullHeart, x: h_x, y: h_y});
-        h_x += 11;
-    }
-    
-    // Calculate visible window
-    const startIndex = Math.max(0, Math.min(
-        scene.cursorIndex - 1, 
-        options.length - MAX_VISIBLE
-    ));
-    const endIndex = Math.min(startIndex + MAX_VISIBLE, options.length);
-    const visibleOptions = options.slice(startIndex, endIndex);
-    
-    const h = ROW_HEIGHT * visibleOptions.length + 8;
+const MARGIN = 5;
+export function renderConditionsMenu(context: CanvasRenderingContext2D, state: GameState, scene: BossRushScene): void {
+    const h = ROW_HEIGHT * bossRushConditions.length + 8;
     let r = {
-        x: 0,
-        y: CANVAS_HEIGHT - h - 10,
-        w: WIDTH,
+        x: MARGIN,
+        y: CANVAS_HEIGHT - MARGIN - h,
+        w: 145,
         h,
     };
     fillRect(context, r, 'white');
@@ -100,19 +29,92 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
 
     r = pad(r, -4);
 
-    context.fillStyle = getConditionColor(state)
-    let x = r.x + 20, y = r.y + ROW_HEIGHT / 2;
+    let x = r.x + 12, y = r.y + ROW_HEIGHT / 2;
+    let totalMultiplier = 1;
+    for (let index = 0; index < bossRushConditions.length; index++) {
+        const condition = bossRushConditions[index]
+        context.fillStyle = 'white';
+        drawText(context, condition.label, x, y, textOptions);
+
+        // Draw Checkbox
+        const s = 12;
+        const checkRect = {x: x + 90, y: y - s / 2, w: s, h: s};
+        fillRect(context, checkRect, 'white');
+        fillRect(context, pad(checkRect, -1), 'black');
+        if (scene.activeConditions.has(condition)) {
+            fillRect(context, pad(checkRect, -1), '#0F0');
+            totalMultiplier += condition.modifier;
+        }
+
+        drawText(context, `${condition.modifier}x`, x + 105, y, textOptions);
+        // Draw cursor
+        if (scene.conditionsIndex === index) {
+            context.fillStyle = 'white';
+            context.beginPath();
+            context.moveTo(x - 10, y - 8);
+            context.lineTo(x - 2, y);
+            context.lineTo(x - 10, y + 8);
+            context.fill();
+        }
+
+        y += ROW_HEIGHT;
+    }
+
+    const boxWidth = 90, boxHeight = 30;
+    drawTextBox(context, {
+        x: CANVAS_WIDTH - boxWidth - MARGIN,
+        y: CANVAS_HEIGHT - boxHeight - MARGIN, // Position above the high score box
+        w: boxWidth,
+        h: boxHeight,
+    }, `${Math.min(10, totalMultiplier)}x Karma`);
+}
+
+const MAX_VISIBLE = 4;
+export function renderBossRushMenu(context: CanvasRenderingContext2D, state: GameState, scene: BossRushScene): void {
+    const options = getBossRushOptions(state);
+    
+    // Calculate visible window
+    const startIndex = Math.max(0, Math.min(
+        scene.bossRushIndex - 1,
+        options.length - MAX_VISIBLE
+    ));
+    const endIndex = Math.min(startIndex + MAX_VISIBLE, options.length);
+    const visibleOptions = options.slice(startIndex, endIndex);
+    
+    const h = ROW_HEIGHT * visibleOptions.length + 8 + 16;
+    let r = {
+        x: MARGIN,
+        y: CANVAS_HEIGHT - MARGIN - h,
+        w: 120,
+        h,
+    };
+    fillRect(context, r, 'white');
+    fillRect(context, pad(r, -2), 'black');
+
+    r = pad(r, -4);
+
+    context.fillStyle = 'white';
+    let x = r.x + 12, y = r.y + ROW_HEIGHT / 2 + 8;
+
+    // Render small arrow pointing right to indicate presence of conditions menu.
+    context.fillStyle = 'white';
+    const rightX = r.x + r.w - 8;
+    context.beginPath();
+    context.moveTo(rightX, r.y + r.h / 2 - 4);
+    context.lineTo(rightX + 4, r.y + r.h / 2);
+    context.lineTo(rightX, r.y + r.h / 2 + 4);
+    context.fill();
     
     for (let i = 0; i < visibleOptions.length; i++) {
         const actualIndex = startIndex + i;
         let text = visibleOptions[i].label.slice(0, 13).toUpperCase();
         drawText(context, text, x, y, textOptions);
         
-        if (scene.cursorIndex === actualIndex) {
+        if (scene.bossRushIndex === actualIndex) {
             context.beginPath();
-            context.moveTo(r.x + 8, y - 8);
-            context.lineTo(r.x + 16, y);
-            context.lineTo(r.x + 8, y + 8);
+            context.moveTo(x - 10, y - 8);
+            context.lineTo(x - 2, y);
+            context.lineTo(x - 10, y + 8);
             context.fill();
         }
         y += ROW_HEIGHT;
@@ -120,7 +122,7 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
     
     if (startIndex > 0) {
         context.fillStyle = 'white';
-        const upY = r.y - 6;
+        const upY = r.y + 4;
         context.beginPath();
         context.moveTo(r.x + r.w / 2 - 4, upY);
         context.lineTo(r.x + r.w / 2, upY - 4);
@@ -130,91 +132,56 @@ export function renderBossRushMenu(context: CanvasRenderingContext2D, state: Gam
     
     if (endIndex < options.length) {
         context.fillStyle = 'white';
-        const downY = r.y + r.h + 6;
+        const downY = r.y + r.h - 8;
         context.beginPath();
         context.moveTo(r.x + r.w / 2 - 4, downY);
         context.lineTo(r.x + r.w / 2, downY + 4);
         context.lineTo(r.x + r.w / 2 + 4, downY);
         context.fill();
     }
-
     // High Score Display
-    const selectedBoss = options[scene.cursorIndex].key;
-    const highScoreTime = getHighScore(state, selectedBoss); 
+    const bossRushOption = options[scene.bossRushIndex];
+    const {bestTime, highScore} = getSavedBossRushData(state, bossRushOption.key);
 
-    if (highScoreTime) {
-        let timeToBeat = formatTime(getKarmaTimeByKey(selectedBoss));
-        const scoreBoxWidth = 100;
-        const scoreBoxHeight = 30;
-        const scoreBox = {
-            x: CANVAS_WIDTH - scoreBoxWidth - 10, 
-            y: CANVAS_HEIGHT - scoreBoxHeight - 10,
+    const scoreBoxWidth = 120;
+    const scoreBoxHeight = 30;
+
+    if (highScore > 0) {
+        const karmaValue = highScore > bossRushOption.karma * 10 ? `${10 * bossRushOption.karma}(${highScore})` : highScore;
+        drawTextBox(context, {
+            x: CANVAS_WIDTH - scoreBoxWidth - MARGIN,
+            y: CANVAS_HEIGHT - 3 * (scoreBoxHeight + 10),
             w: scoreBoxWidth,
             h: scoreBoxHeight,
-        };
-        let condition = state.bossRushTrackers.currentCondition;
-        let boxColor = 'white';
-        fillRect(context, scoreBox, boxColor);
-        fillRect(context, pad(scoreBox, -2), 'black');
-        
-        context.fillStyle = 'white';
-        drawText(context, `Best: ${highScoreTime}`, 
-            scoreBox.x + scoreBoxWidth / 2, 
-            scoreBox.y + scoreBoxHeight / 2, 
-            { ...textOptions, textAlign: 'center' }
-        );
-        if (condition == 'none') {
-            const toBeatBox = {
-                x: CANVAS_WIDTH - scoreBoxWidth - 10, 
-                y: CANVAS_HEIGHT - (scoreBoxHeight * 2) - 20, // Position above the high score box
-                w: scoreBoxWidth,
-                h: scoreBoxHeight,
-            };
-
-
-            let beatBestTime = state.savedState.bossRushTimes[condition][selectedBoss] < getKarmaTimeByKey(selectedBoss)
-            let boxColor = (beatBestTime) ? 'yellow' : 'white';
-            fillRect(context, toBeatBox, boxColor);
-            fillRect(context, pad(toBeatBox, -2), 'black');
-
-            context.fillStyle = 'white';
-            
-            if (beatBestTime) {
-                drawText(context, `Time Beat!`, 
-                    toBeatBox.x + scoreBoxWidth / 2, 
-                    toBeatBox.y + scoreBoxHeight / 2, 
-                    { ...textOptions, textAlign: 'center', size: 14 }
-                );
-            } else {
-                drawText(context, `Beat: ${timeToBeat}`, 
-                    toBeatBox.x + scoreBoxWidth / 2, 
-                    toBeatBox.y + scoreBoxHeight / 2, 
-                    { ...textOptions, textAlign: 'center', size: 14 }
-                );
-            }
-        }
+        }, `Karma: ${karmaValue}`);
     }
+    if (bestTime > 0) {
+        drawTextBox(context, {
+            x: CANVAS_WIDTH - scoreBoxWidth - MARGIN,
+            y: CANVAS_HEIGHT - 2 * (scoreBoxHeight + 10), // Position above the high score box
+            w: scoreBoxWidth,
+            h: scoreBoxHeight,
+        }, `Best: ${formatMinutesAndSeconds(bestTime)}`);
 
-    
-
-    // Karma display
-    const karmaBoxWidth = 100;
-    const karmaBoxHeight = 30;
-    const karmaBox = {
-        x: CANVAS_WIDTH - karmaBoxWidth - 10,
-        y: 10,
-        w: karmaBoxWidth,
-        h: karmaBoxHeight,
-    };
-    
-    fillRect(context, karmaBox, 'white');
-    fillRect(context, pad(karmaBox, -2), 'black');
-    
-    context.fillStyle = 'white';
-    drawText(context, `KARMA: ${state.savedState.savedHeroData.karma}`, 
-        karmaBox.x + 6, 
-        karmaBox.y + karmaBoxHeight / 2, 
-        { ...textOptions, textAlign: 'left' }
-    );
+    }
+    const targetTime = formatMinutesAndSeconds(bossRushOption.targetTime);
+    drawTextBox(context, {
+        x: CANVAS_WIDTH - scoreBoxWidth - MARGIN,
+        y: CANVAS_HEIGHT - 1 * (scoreBoxHeight + 10), // Position above the high score box
+        w: scoreBoxWidth,
+        h: scoreBoxHeight,
+    }, `Goal: ${targetTime}`);
 }
 
+function drawTextBox(context: CanvasRenderingContext2D, rect: Rect, text: string) {
+    fillRect(context, rect, 'white');
+    fillRect(context, pad(rect, -2), 'black');
+
+    context.fillStyle = 'white';
+    drawText(context, text,
+        rect.x + rect.w / 2,
+        rect.y + rect.h / 2,
+        { ...textOptions, textAlign: 'center' }
+    );
+
+}

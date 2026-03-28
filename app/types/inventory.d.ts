@@ -41,7 +41,6 @@ type LootType = 'empty' | 'weapon'
     // ability so that you will always get the abilities in an order that they can be used immediately.
     | 'spiritPower'
     | 'secondChance'
-    | 'bossRefight'
     | ActiveTool | Equipment | PassiveTool
     // Neutral element is used to unequip elements in the menu
     | 'neutral' | MagicElement
