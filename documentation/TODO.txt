@@ -149,15 +149,13 @@ Current tasks:
     - Demo blockers
         - Demo flag
             - Replace Helix rival fight with demo ending, possibly unlock randomizer.
-        - Cleanup overworld
-            - Finish adding grass
-            - [Optional] add ash to spirit world
         - Finish cocoon update
             - New pod graphics
             - Falling between floors
             - Missing floor
         - Add new peach tree graphics
         - Randomizer for demo mode
+        - [Optional] add ash to spirit world
         - High priority SFX
 
     - Graphics added but not used yet:
