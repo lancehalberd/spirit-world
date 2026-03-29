@@ -146,6 +146,14 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Graphics added but not used yet:
+        - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
+        - hud/aetherCrystal
+        - objects/webBarrier
+        - tiles/ash
+        - tiles/grates
+        - tiles/treeHome
+
     - Boss Rush Fixes:
         - Storm Beast is missing teleporters + Orb enemies.
 
@@ -156,6 +164,7 @@ Current tasks:
         - Passion - Games
 
     - Demo blockers
+        - Fix Collector projectiles are blocked by wall.
         - Demo flag
             - Replace Helix rival fight with demo ending, possibly unlock randomizer.
         - Cleanup overworld
@@ -165,7 +174,6 @@ Current tasks:
             - New pod graphics
             - Falling between floors
             - Missing floor
-        - Fix Collector projectiles are blocked by wall.
         - Add new peach tree graphics
         - Randomizer for demo mode
         - Cocoon boss projectiles still getting blocked by boulders
@@ -728,13 +736,6 @@ Current tasks:
         - When in a background tab.
         - When showing the game controls.
 
-    - peach cave narrative
-        - Add a message to the chakram chest if you check it after opening it.
-        - Add dialogue after defeating the beetle boss
-            *A voice echoes through the cave*
-            {|}Thank you for saving me.
-            [-]
-
     - Minor issue with ledges
         - Should be able to grab ledges when below them just like you can grab solid tiles.
 
@@ -914,15 +915,14 @@ Current tasks:
     - Allow looking underwater with R2 when you do not have iron boots.
         - Use same effect as spirit sight
 
-    - Forest temple boss should provide a golden peach in addition to the clone tool.
+    - Forest temple boss should provide a golden peach instead of clone tool.
+        - NPC after boss will give seeds, clone tool obtained in Dream land after reviving 1-2 trees.
 
     - Hot room status is incorrect in alternate world, it is always matching the current world.
         - Fixing this will prevent ice tiles from forming incorrectly in hot rooms in the alternate world.
         - It will also allow us to make hot rooms consistently burn enemies.
 
     - Add respawn flag to objects that causes them to respawn if destroyed.
-
-    - Use grey cloud tiles for clouds covering storm heart.
 
     - Make it easier to find the gloves
         - Add a quest state that highlights the entrance with the gloves.
@@ -942,9 +942,6 @@ Current tasks:
         - War God convinces Rival to summon the beasts to the material world to distract the Spirit Gods from his plan
         - While they are "missing" they are actually being given their Vanaran Hearts
 
-    - Forge
-        - Gold mail offered by NPC if you bring gold ore and 500 money
-
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
         - We can fix this by tracking totalSmallKeys independent of current small keys and have the logic be based on the total.
@@ -955,10 +952,6 @@ Current tasks:
         - waterfall near the waterfall
         - outside of staff tower when it is setup in the tile
         - empty sky/abyss tiles when falling through random sky tiles.
-
-    - Flame wall improvement
-        - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
-
 
     - Support multiple active missions
         - On map, highlight the first mission and display a location name
@@ -1024,9 +1017,6 @@ Current tasks:
         - Lava appears under floor 2 in the middle of void tree fight
         - Certain tiles can be frozen in lava on voidFlame
 
-    Cocoon Boss
-        - Improve visuals for persistent blast attacks
-
     - Add crucible to the end of the Grand Temple
 
     - Add 'only' visibility option to layers that hides everything else when selected.
@@ -1035,9 +1025,6 @@ Current tasks:
         - Populate with War God Alcolytes and the Progenitor Spirit
 
     - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
-
-    - Prevent grabbing tiles/objects across ledges
-        - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
 
     - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
 
@@ -1069,13 +1056,8 @@ Current tasks:
         - Use a clone to jump off a cliff to press one switch, then destroy it and make another clone to jump down another cliff to press another switch to open a door at the top of the cliff.
         - A linked pot needs to be dragged to cover a switch in the other world, but there are pits only in the other world that you must use spirit sight/trueSight to see.
 
-    Change prep animation for explosion
-        charge particles form randomly in a circle around the hero shooting into them,
-        with shorter radius and more density as time passes.
-
     Gold Armor Upgrade
-        If Spirit Chakram is fully upgraded and the player has golden mail they can use:
-        500 Jade + 2 gold and 5 silver to double effectiveness of golden mail
+        Gold Mail Receipe + 500 Jade + 2 gold and 5 silver to unlock gold mail
 
     Editor Improvements
         - Track which zones have been changes since the last time they were exported
@@ -1087,10 +1069,6 @@ Current tasks:
             - (low priority) super tile layout selection
 
     - Add SFX when the MC is damaged
-
-    - Add sleeping Vanara to the Cocoon.
-        - Can use a special NPC that doesn't face you when talking for now.
-        - Use a variety of colors.
 
     World Tree
         Tower is a series of 2x2 super tiles with a vine for climbing to the next section that
@@ -1184,8 +1162,6 @@ Current tasks:
     - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
         - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
 
-    - Game occasionally plays small bits of music while muted.
-
     - Make sure ice tiles are removed from frost beast+heat sink battles after they are defeated.
 
     - Add new hold+walk chakram animations
@@ -1199,12 +1175,9 @@ Current tasks:
     - Would be nice if staff could go across ledges.
 
 Combat Ideas:
-    - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
     - Rolling enemy that leaves a trail of ice/fire behind it and bounces off walls. Hitting it knocks it in different directions.
 
 Minigame Ideas:
-    - Add Vanara VR dream world with mini games.
-        - Boss practice
     - Could add something like an AR arcade to spirit city
 
 Staff Improvements:
@@ -1213,11 +1186,6 @@ Staff Improvements:
         - Preview will only show the max size that will fit in the current space
         - Ideally you could move around while charging and the preview will update appropriately
         - Would be nice to have this preview behavior when holding down the staff button for staff 1.
-
-Respawn improvements:
-    Only adjust respawn when in the same screen area as the spawn point.
-    Or possibly only adjust respawn when using specific doors.
-        Map dungeon entrances to respawn points?
 
 Tutorial Improvements:
     Add advanced combat/tool tutorials
@@ -1237,25 +1205,19 @@ High level list of things left to do:
     Areas missing significant content:
         Lab
         World Tree
+        Add larger overworld
     Missing Bosses for existing areas:
         Forge Boss
         Phoenix boss in Holy Sanctum
         Eight Trigram Furnace at the end of the Gauntlet
         Crater midboss
     Missing mechanics:
-        - Vanara dreamland boss simulator with difficulty modifiers
         Hero helping during first flame beast/frost beast fights
         Rival during last beast fight for all elements
         Spirit Gates + Spirit Keys
             - Probably do beanstalks instead of this.
         Spirit shop + Jade Idols
-        Treasure Hunter Shop
         Fertility shrine donations
-    Items missing implementation:
-        Gloves charge 1 + 2
-
-Generic boss improvements
-    - Add vulnerable phases for bosses where they take ~5x damage, increase boss health by ~2x
 
 Misc improvements
     - allow facing diagonals while not moving?
@@ -1264,26 +1226,11 @@ Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
 
-
 Simple randomization ideas:
     - Allow floor switches under covered tiles, randomizer the location of a floor switch to open a door.
         - Make sure true sight reveals this.
     - Place a key under a random pot
         - Make sure spirit sight reveals this.
-
-Treasure Hunter Store
-    - Initially can only carry 200 coins
-    - Treasure hunter sells
-        - Full life for  20 coins
-        - 500 coin wallet for 50 coins
-        - 1000 coin wallet for 200 coins
-    - The first time you find money in a chest that would exceed wallet size you find a coupon from the treasure hunter for the value of the chest advertising his store.
-    - Future chests that would exceed your wallet size contain treasures that you can sell to the treasure hunter for the value of the coins from the chest.
-    - Every 5 chests containing money unlock new items in the treasure hunter store
-        - Peach Piece for 100 coins
-        - 1000 coin wallet for 200 coins
-        - Jade Idol for 300 coins
-        - Lodestone necklace (50% damage from lightning attacks) for 500 coins
 
 Fertility Shrine
     - Donate 50 coins at a time in the material world
