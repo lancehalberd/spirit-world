@@ -146,6 +146,20 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Demo blockers
+        - Demo flag
+            - Replace Helix rival fight with demo ending, possibly unlock randomizer.
+        - Cleanup overworld
+            - Finish adding grass
+            - [Optional] add ash to spirit world
+        - Finish cocoon update
+            - New pod graphics
+            - Falling between floors
+            - Missing floor
+        - Add new peach tree graphics
+        - Randomizer for demo mode
+        - High priority SFX
+
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
         - hud/aetherCrystal
@@ -162,23 +176,6 @@ Current tasks:
         - Valor - Boss Rush
         - Wisdom - Puzzles
         - Passion - Games
-
-    - Demo blockers
-        - Fix Collector projectiles are blocked by wall.
-        - Demo flag
-            - Replace Helix rival fight with demo ending, possibly unlock randomizer.
-        - Cleanup overworld
-            - Finish adding grass
-            - [Optional] add ash to spirit world
-        - Finish cocoon update
-            - New pod graphics
-            - Falling between floors
-            - Missing floor
-        - Add new peach tree graphics
-        - Randomizer for demo mode
-        - Cocoon boss projectiles still getting blocked by boulders
-        - High priority SFX
-
 
     - Support implicit cancel option for choice options:
         {choice: Quit AR?|CANCEL:arGame.no|No:arGame.no|Yes:arGame.quitGame}

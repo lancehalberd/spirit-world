@@ -25,6 +25,7 @@ import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {
     getClosestTarget,
+    getMovementAnchor,
     getNearbyTarget,
     getTargetingAnchor,
     getTargetDistance,
@@ -741,10 +742,14 @@ function switchToNextMode(state: GameState, enemy: Enemy<ProjectionParams>) {
 }
 
 function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta: number) {
-    const hitbox = enemy.getMovementHitbox();
+    // The movement anchor is used to make the projection move on top of the rocks, so we
+    // also want to use it as the origin point for the projectiles so that they evenly
+    // spawn around the rock, otherwise some projectiles may be blocked by the rocks.
+    const movementAnchor = getMovementAnchor(enemy);
     const dx = Math.cos(theta), dy = Math.sin(theta);
-    const x = hitbox.x + hitbox.w / 2 + 12 * dx, y = hitbox.y + hitbox.h + 12 * dy;
+    const x = movementAnchor.x + 14 * dx, y = movementAnchor.y + 14 * dy;
     const delay = 400;
+    const ignoreWallsDuration = 100;
     if (enemy.params.element === 'lightning') {
         const spark = new Spark({
             x, y,
@@ -754,6 +759,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             damage: 1,
             hitCircle: {x: 0, y: 0, r: 10},
             source: enemy,
+            ignoreWallsDuration,
         })
         addEffectToArea(state, enemy.area, spark);
         return spark;
@@ -767,6 +773,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             damage: 1,
             ttl: 1500,
             source: enemy,
+            ignoreWallsDuration,
         });
         addEffectToArea(state, enemy.area, frost);
         return frost;
@@ -779,6 +786,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
             vy: 3 * dy,
             scale: 1.5,
             source: enemy,
+            ignoreWallsDuration,
         });
         addEffectToArea(state, enemy.area, fireball);
         return fireball;
@@ -790,6 +798,7 @@ function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta
         vy: 3 * dy,
         damage: 1,
         source: enemy,
+        ignoreWallsDuration,
     });
     addEffectToArea(state, enemy.area, crystalSpike);
     return crystalSpike;
@@ -942,7 +951,9 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     }
 
 
-    if (testMode && enemy.mode !== testMode) enemy.setMode(testMode);
+    if (testMode && enemy.mode !== testMode && getTargetDistance(state, state.hero, enemy) < 8 * 16) {
+        enemy.setMode(testMode);
+    }
 
     if (enemy.params.isEnraged) {
         if (moveEnemyToTargetLocation(state, enemy, centralPosition.x, centralPosition.y)) {
