@@ -463,7 +463,6 @@ export function createObjectDefinition(
                 targetObjectId: definition.targetObjectId,
                 type: definition.type,
                 openLogic: definition.openLogic,
-                d: definition.d || 'down',
                 locationCue: definition.locationCue,
             };
         case 'teleporter':
@@ -910,6 +909,27 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 'cocoon',
                 'floorBed',
             ];
+            const defaultParams = decorationTypes[object.decorationType]?.params;
+            if (defaultParams) {
+                for (let key in defaultParams) {
+                    const paramValue = defaultParams[key];
+                    const defaultValue = Array.isArray(paramValue) ? paramValue[0] : paramValue;
+                    rows.push({
+                        name: key,
+                        value: object.params?.[key] ?? defaultValue,
+                        values: Array.isArray(paramValue) ? paramValue : undefined,
+                        onChange(newValue: any) {
+                            object.params = object.params || {};
+                            if (newValue === defaultValue) {
+                                delete object.params[key];
+                            } else {
+                                object.params[key] = newValue;
+                            }
+                            updateObjectInstance(state, object);
+                        },
+                    });
+                }
+            }
             if (supportedTypes.includes(object.decorationType)) {
                 const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance]);
                 rows.push({

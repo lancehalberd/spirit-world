@@ -1,8 +1,9 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {createAnimation, drawFrameContentAt, getFrame, getFrameHitbox } from 'app/utils/animations';
+import {createAnimation, drawFrameContentAt, getFrame, getFrameHitbox, requireFrame} from 'app/utils/animations';
 import {LootObject} from 'app/content/objects/lootObject';
 import {showMessage} from 'app/scriptEvents';
+import {clamp} from 'app/utils/index';
 import {addObjectToArea} from 'app/utils/objects';
 
 const peachTreeGeometry: FrameDimensions ={w: 92, h: 96, content: {x: 0, y: 72, w: 90, h: 20}};
@@ -10,9 +11,16 @@ const peachTreeAnimation = createAnimation('gfx/objects/peachTree.png', peachTre
 const peachTreeGatheringAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {cols: 5, loop: true});
 const peachTreeWeakAnimation = createAnimation('gfx/objects/peachTreeWeak.png', peachTreeGeometry, {cols: 5, duration: 20});
 const peachTreeDeathAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {x: 5, cols: 18});
-const peachTreeDeadFrame = peachTreeDeathAnimation.frames[peachTreeDeathAnimation.frames.length - 1];
+//const peachTreeDeadFrame = peachTreeDeathAnimation.frames[peachTreeDeathAnimation.frames.length - 1];
 const peachGeometry: FrameDimensions ={w: 50, h: 50, content: {x: 17, y: 17, w: 16, h: 16}};
 const peachAnimation = createAnimation('gfx/objects/peachAnimation.png', peachGeometry, {cols: 9});
+
+
+const newPeachTreeGeometry: FrameDimensions = {w: 80, h: 96, content: {x: 9, y: 76, w: 54, h: 20}};
+const peachTreeFrame = requireFrame('gfx/objects/peachTree2.png', {x: 0, y: 0, ...newPeachTreeGeometry});
+const peachTreeDeadFrame = requireFrame('gfx/objects/peachTreeDead.png', {x: 0, y: 0, ...newPeachTreeGeometry});
+// const peachTreeEnergyAnimation = createAnimation('gfx/objects/peachTreeCondensed22.png', newPeachTreeGeometry, {cols: 22, duration: 20});
+const peachTreeEnergyAnimation = createAnimation('gfx/objects/peachTreeCondensed16.png', newPeachTreeGeometry, {cols: 16, duration: 20});
 
 const peachLightColor = {r:255, g: 200, b: 0};
 export class PeachTree implements ObjectInstance {
@@ -47,7 +55,7 @@ export class PeachTree implements ObjectInstance {
             const p = Math.min(1, this.peachAnimationTime / 400);
             lightSources.push({
                 x: this.x + 48,
-                y: this.y - 24,
+                y: this.y - 30,
                 brightness: 0.8 * p,
                 radius: 24 * p,
                 color: peachLightColor,
@@ -60,11 +68,11 @@ export class PeachTree implements ObjectInstance {
             p = Math.max(0, 1 - this.animationTime / 1000);
         }
         lightSources.push({
-            x: this.x + 46,
-            y: this.y - 24,
-            brightness: 0.6 * p,
-            radius: 10 + 50 * p,
-            color: {r:200, g: 255, b: 255},
+            x: this.x + 30,
+            y: this.y - 45,
+            brightness: 0.4 * p,
+            radius: 10 + 40 * p,
+            color: {r: 150, g: 255, b: 200},
         });
         return lightSources;
     }
@@ -121,14 +129,51 @@ export class PeachTree implements ObjectInstance {
         let frame = getFrame(peachTreeAnimation, this.animationTime);
         if (this.specialStatus === 'gathering') {
             frame = getFrame(peachTreeGatheringAnimation, this.animationTime);
+            // TODO: Add new gathering animation.
+            frame = peachTreeFrame;
         } else if (this.specialStatus === 'dying') {
             frame = getFrame(peachTreeDeathAnimation, this.animationTime);
+            // TODO: Add new dying animation.
+            frame = peachTreeFrame;
         } else if (this.specialStatus === 'dead') {
             frame = peachTreeDeadFrame;
         } else if (this.specialStatus === 'weak') {
             frame = getFrame(peachTreeWeakAnimation, this.animationTime);
+            // TODO: Add new weak animation.
+            frame = peachTreeFrame;
         }
         drawFrameContentAt(context, frame, this);
+        if (frame !== peachTreeDeadFrame) {
+            const frameDuration = FRAME_LENGTH * peachTreeEnergyAnimation.frameDuration;
+            // Fade the next frame in over time
+            context.save();
+                context.globalAlpha *= 0.8;
+                context.save();
+                    context.globalAlpha *= clamp((this.animationTime % frameDuration) / frameDuration / 2, 0, 0.5);
+                    frame = getFrame(peachTreeEnergyAnimation, this.animationTime + 2 * frameDuration);
+                    drawFrameContentAt(context, frame, this);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= clamp(0.5 + (this.animationTime % frameDuration) / frameDuration / 2, 0.5, 1);
+                    frame = getFrame(peachTreeEnergyAnimation, this.animationTime + frameDuration);
+                    drawFrameContentAt(context, frame, this);
+                context.restore();
+                // Draw current frame at full alpha
+                frame = getFrame(peachTreeEnergyAnimation, this.animationTime);
+                drawFrameContentAt(context, frame, this);
+                // Fade the previous frame out over time
+                context.save();
+                    context.globalAlpha *= clamp(1 - (this.animationTime % frameDuration) / frameDuration / 2, 0.5, 1);
+                    frame = getFrame(peachTreeEnergyAnimation, this.animationTime - frameDuration);
+                    drawFrameContentAt(context, frame, this);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= clamp(0.5 - (this.animationTime % frameDuration) / frameDuration / 2, 0, 0.5);
+                    frame = getFrame(peachTreeEnergyAnimation, this.animationTime - 2 * frameDuration);
+                    drawFrameContentAt(context, frame, this);
+                context.restore();
+            context.restore();
+        }
         if (this.peachAnimationTime >= 0) {
             frame = getFrame(peachAnimation, this.peachAnimationTime);
             drawFrameContentAt(context, frame, {x: this.x + 40, y: this.y - 32});

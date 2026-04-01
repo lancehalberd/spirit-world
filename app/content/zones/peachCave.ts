@@ -2576,7 +2576,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "peachCave:1:0x0-luckyBeetle-0", x: 384, y: 144, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "runInstructions", x: 344, y: 256, type: "narration", message: "", w: 144, h: 32, saveStatus: "never", specialBehaviorKey: "runInstructions"},
         {status: "normal", id: "runInstructions", x: 368, y: 424, type: "narration", message: "", w: 80, h: 32, saveStatus: "forever"},
-        {status: "normal", id: "", x: 80, y: 72, type: "peachTree"},
+        {status: "normal", id: "", x: 100, y: 68, type: "peachTree"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 166, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 1},

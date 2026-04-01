@@ -10,7 +10,7 @@ import {requireFrame} from 'app/utils/packedImages';
 import {getVariantRandom} from 'app/utils/variants';
 
 
-export class Decoration implements ObjectInstance {
+export class Decoration<Params = any> implements ObjectInstance {
     area: AreaInstance;
     isNeutralTarget = true;
     isObject = <const>true;
@@ -27,11 +27,15 @@ export class Decoration implements ObjectInstance {
     w = this.definition.w;
     h = this.definition.h;
     d = this.definition.d || 'up';
-    decorationType = decorationTypes[this.definition.decorationType];
+    decorationType = decorationTypes[this.definition.decorationType] as DecorationType<Params>;
     // Don't set this function unless the behavior is actually defined.
     onHit = this.decorationType.onHit
-        ? (state: GameState, hit: HitProperties) => this.decorationType.onHit(state, this, hit)
+        ? (state: GameState, hit: HitProperties): HitResult => this.decorationType.onHit(state, this, hit)
         : undefined;
+    params: Params = {
+        ...(this.decorationType.params ?? {}),
+        ...(this.definition.params ?? {}),
+    } as Params;
     constructor(state: GameState, public definition: DecorationDefinition) {}
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
         return this.decorationType.getBehaviors?.(state, this, x, y) || this.decorationType.behaviors;
@@ -60,7 +64,11 @@ export class Decoration implements ObjectInstance {
         const targetId = this.definition.targetObjectId;
         if (targetId && targetId !== this.child?.definition?.id) {
             this.child = this.area.objects.find(o => o.definition?.id === targetId);
-            this.child.renderParent = this;
+            if (this.child) {
+                this.child.renderParent = this;
+            } else {
+                console.warn('Missing child for targetId', targetId);
+            }
         }
     }
     update(state: GameState) {
@@ -108,7 +116,7 @@ const flameBeastStatueFrame = requireFrame('gfx/decorations/flameBeastStatue.png
 const frostBeastStatueFrame = requireFrame('gfx/decorations/frostBeastStatue.png', {x: 0, y: 0, w: 115, h: 98, content: {x: 16, y: 58, w: 88, h: 32}});
 const stormBeastStatueFrame = requireFrame('gfx/decorations/largeStatueStorm.png', {x: 0, y: 0, w: 84, h: 88, content: {x: 16, y: 64, w: 56, h: 24}});
 
-interface DecorationType {
+interface DecorationType<Params = any> {
     render: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) => void
@@ -120,6 +128,7 @@ interface DecorationType {
     getYDepth?: (decoration: Decoration) => number
     onGrab?:(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) => void
     onHit?: (state: GameState, decoration: Decoration, hit: HitProperties) => HitResult
+    params?: Params
 }
 
 const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',
@@ -947,12 +956,122 @@ const windowOctogonal: DecorationType = {
     },
 };
 
+const podSouthGeometry = {w: 64, h: 48, content: {x: 20, y: 20, w: 24, h: 24}};
 
-const cocoonFrame = requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
-const cocoonBackFrame = requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
-const cocoon: DecorationType = {
-    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        if (decoration.d === 'right') {
+const [
+    podSouth,
+    podSouthDoor,
+    podSSEBack,
+    podSSERim,
+    podSSEDoor,
+    podESEBack,
+    podESERim,
+    podESEDoor,
+    podEastBack,
+    podEastRim,
+    podEastDoor,
+    // The front of these are obscured so they have no additional frames.
+    podENEBack,
+    podNNEBack,
+    podNorthBack,
+] = createAnimation('gfx/objects/pod.png', podSouthGeometry, {y: 0, rows: 14}).frames;
+
+//const cocoonFrame = requireFrame('gfx/objects/cocoon.png', {x: 0, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
+//const cocoonBackFrame = requireFrame('gfx/objects/cocoon.png', {x: 24, y: 0, w: 24, h: 42, content: {x: 2, y: 22, w: 20, h: 20}});
+interface CocoonParams {
+    angle: number
+}
+const cocoon: DecorationType<CocoonParams> = {
+    render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration<CocoonParams>) {
+        const angle = (decoration.params.angle + 360) % 360;
+        let backFrame: Frame = podNorthBack, rimFrame: Frame = undefined, doorFrame: Frame = undefined;
+        let reflected = false
+        if (angle >= 345 || angle < 15) {
+            backFrame = podEastBack;
+            rimFrame = podEastRim;
+            doorFrame = podEastDoor;
+        } else if (angle >= 15 && angle < 45) {
+            backFrame = podESEBack;
+            rimFrame = podESERim;
+            doorFrame = podESEDoor;
+        } else if (angle >= 45 && angle < 75) {
+            backFrame = podSSEBack;
+            rimFrame = podSSERim;
+            doorFrame = podSSEDoor;
+        } else if (angle >= 75 && angle < 105) {
+            backFrame = podSouth;
+            rimFrame = undefined;
+            doorFrame = podSouthDoor;
+        } else if (angle >= 105 && angle < 135) {
+            reflected = true;
+            backFrame = podSSEBack;
+            rimFrame = podSSERim;
+            doorFrame = podSSEDoor;
+        } else if (angle >= 135 && angle < 165) {
+            reflected = true;
+            backFrame = podESEBack;
+            rimFrame = podESERim;
+            doorFrame = podESEDoor;
+        } else if (angle >= 165 && angle < 195) {
+            reflected = true;
+            backFrame = podEastBack;
+            rimFrame = podEastRim;
+            doorFrame = podEastDoor;
+        } else if (angle >= 195 && angle < 225) {
+            reflected = true;
+            backFrame = podENEBack;
+            rimFrame = undefined;
+            doorFrame = undefined;
+        } else if (angle >= 225 && angle < 255) {
+            reflected = true;
+            backFrame = podNNEBack;
+            rimFrame = undefined;
+            doorFrame = undefined;
+        } else if (angle >= 255 && angle < 285) {
+            backFrame = podNorthBack;
+            rimFrame = undefined;
+            doorFrame = undefined;
+        } else if (angle >= 285 && angle < 315) {
+            backFrame = podNNEBack;
+            rimFrame = undefined;
+            doorFrame = undefined;
+        } else {
+            backFrame = podENEBack;
+            rimFrame = undefined;
+            doorFrame = undefined;
+        }
+        if (reflected) {
+            drawFrameContentReflectedAt(context, backFrame, decoration);
+            // Only draw the child if the door can be seen.
+            if (doorFrame && decoration.child) {
+                decoration.child.x = decoration.x + 4;
+                decoration.child.y = decoration.y + 4;
+                decoration.child.render(context, state);
+            }
+            // Draw contained object here.
+            if (rimFrame) {
+                drawFrameContentReflectedAt(context, rimFrame, decoration);
+            }
+            if (doorFrame) {
+                drawFrameContentReflectedAt(context, doorFrame, decoration);
+            }
+        } else {
+            drawFrameContentAt(context, backFrame, decoration);
+            // Only draw the child if the door can be seen.
+            if (doorFrame && decoration.child) {
+                decoration.child.x = decoration.x + 4;
+                decoration.child.y = decoration.y + 4;
+                decoration.child.render(context, state);
+            }
+            // Draw contained object here.
+            if (rimFrame) {
+                drawFrameContentAt(context, rimFrame, decoration);
+            }
+            if (doorFrame) {
+                drawFrameContentAt(context, doorFrame, decoration);
+            }
+        }
+        /*if (decoration.d === 'right') {
             drawFrameContentReflectedAt(context, cocoonBackFrame, decoration);
             if (decoration.child) {
                 decoration.child.x = decoration.x;
@@ -970,7 +1089,7 @@ const cocoon: DecorationType = {
             }
             // Draw contained object here.
             drawFrameContentAt(context, cocoonFrame, decoration);
-        }
+        }*/
     },
     alternateRender(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         /*if (decoration.child?.alternateRender) {
@@ -985,13 +1104,16 @@ const cocoon: DecorationType = {
         };
     },
     getHitbox(decoration: Decoration): Rect {
-        return getFrameHitbox(cocoonFrame, decoration);
+        return getFrameHitbox(podNorthBack, decoration);
     },
     onGrab(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) {
         hero.action = null;
         if (decoration.child) {
             decoration.child.onGrab?.(state, direction, hero);
         }
+    },
+    params: {
+        angle: 0,
     }
 };
 

@@ -2,6 +2,8 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {createCanvas, createCanvasAndContext, debugCanvas, drawCanvas} from 'app/utils/canvas';
 import {requireFrame} from 'app/utils/packedImages';
 
+export {requireFrame} from 'app/utils/packedImages';
+
 export function frame(
     x: number, y: number, w: number, h: number,
     content: Rect = null

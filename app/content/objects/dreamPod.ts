@@ -10,9 +10,9 @@ import {requireFrame} from 'app/utils/packedImages'
 
 
 const podSouthGeometry = {w: 64, h: 48, content: {x: 20, y: 20, w: 24, h: 24}};
-const podSouthFrame = requireFrame('gfx/objects/podSouth.png', {x: 0, y: 0, ...podSouthGeometry});
+const podSouthFrame = requireFrame('gfx/objects/pod.png', {x: 0, y: 0, ...podSouthGeometry});
 //const podSouthDoorClosedFrame = requireFrame('gfx/objects/podSouth.png', {x: 0, y: 48, ...podSouthGeometry});
-const podSouthDoorOpenAnimation = createAnimation('gfx/objects/podSouth.png', podSouthGeometry, {y: 1, cols: 6}, {loop: false});
+const podSouthDoorOpenAnimation = createAnimation('gfx/objects/pod.png', podSouthGeometry, {y: 1, cols: 6}, {loop: false});
 const podSouthDoorCloseAnimation = reverseAnimation(podSouthDoorOpenAnimation);
 
 export class DreamPod implements ObjectInstance {

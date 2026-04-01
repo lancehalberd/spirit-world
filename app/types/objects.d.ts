@@ -613,6 +613,8 @@ interface DecorationDefinition extends BaseObjectDefinition, VariantSeedData {
     // Some decorations can combine with other objects, in particular bed decorations
     // may target NPCs to render NPCs inside of the bed.
     targetObjectId?: string
+    // Allow specifying mostly arbitrary params on specific decoration types, similar to enemy params.
+    params?: {[key: string]: any}
 }
 
 type DirectionalObjectType = 'waterPot';

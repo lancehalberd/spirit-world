@@ -6,6 +6,7 @@ import {setEquippedElement} from 'app/utils/menu';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
+import {showPauseScene} from 'app/scenes/pause/pauseScene';
 import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
 import {showMessage} from 'app/scriptEvents';
@@ -13,6 +14,7 @@ import {wasGameKeyPressed} from 'app/userInput';
 import {updateAllHeroes} from 'app/updateActor';
 import {updateCamera} from 'app/updateCamera';
 import {updateScriptEvents} from 'app/updateScriptEvents';
+import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import {refreshAreaIce} from 'app/utils/refreshAreaIce';
@@ -54,9 +56,14 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
         showMessage(state, '{@bossRushVanara.quitMenu}');
         return;
     }
-    if (interactive && wasGameKeyPressed(state, GAME_KEY.MENU)) {
-        showMainMenuScene(state);
-        return;
+    if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        if (isKeyboardKeyDown(KEY.SHIFT)) {
+            showPauseScene(state);
+            return;
+        } else if (interactive) {
+            showMainMenuScene(state);
+            return;
+        }
     }
     if (interactive && wasGameKeyPressed(state, GAME_KEY.MAP)) {
         showMapScene(state);

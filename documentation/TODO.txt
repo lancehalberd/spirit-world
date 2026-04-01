@@ -165,6 +165,7 @@ Current tasks:
         - tiles/ash
         - tiles/grates
         - tiles/treeHome
+        - npcs/ambrosia, npcs/elder, npcs/guardian, npcs/rival (testing only since we don't have battle sprites yet)
 
     - Boss Rush Fixes:
         - Storm Beast is missing teleporters + Orb enemies.
