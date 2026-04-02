@@ -123,7 +123,7 @@ function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: nu
     // This is the time in the audio buffer where the sound is scheduled to end or repeat.
     const bufferEndTime = sound.duration ? (offset + sound.duration) : sound.audioBuffer.duration;
     const firstDuration = bufferEndTime - offset;
-    const otherDurations =  bufferEndTime - repeatFrom;
+    const otherDurations = bufferEndTime - repeatFrom;
     // The time that playbook should start from in the audio buffer. This will be updated based
     // on the seek time, offset, and looping behavior of the sound.
     if (sound.loop) {
@@ -162,7 +162,7 @@ function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: nu
     return instance;
 }
 
-export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime): AudioInstance | undefined {
+export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime): AudioInstance|undefined {
     const sound = sounds.get(key);
     if (!sound) {
         throw new Error('Tried to play missing sound ' + key);
@@ -200,7 +200,7 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             sound.play(soundEffectGainNode, targetTime);
             return instance;
         }
-    } catch(e) {
+    } catch (e) {
         console.log(e);
         debugger;
     }
@@ -287,41 +287,41 @@ export function updateAudio(state: GameState) {
 export const musicTracks: {[key in string]: TrackDefinition} = {
     // Tracks from Nick
     // Used in various caves
-    caveTheme: {key: 'caveTheme', source: 'bgm/Spirit 1.mp3', volume: 20 },
+    caveTheme: {key: 'caveTheme', source: 'bgm/Spirit 1.mp3', volume: 20},
     // Used on the title screen and world map
-    mainTheme: {key: 'mainTheme', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
+    mainTheme: {key: 'mainTheme', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10},
     // Used for holy city, but a bit to relaxed for that.
-    waterfallVillageTheme: {key : 'waterfallVillageTheme', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
-    forestTheme: {key: 'forestTheme', source: 'bgm/forestTheme.mp3', volume: 10 },
-    vanaraForestTheme: {key: 'vanaraForestTheme', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
-    tombTheme: {key: 'tombTheme', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
+    waterfallVillageTheme: {key: 'waterfallVillageTheme', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
+    forestTheme: {key: 'forestTheme', source: 'bgm/forestTheme.mp3', volume: 10},
+    vanaraForestTheme: {key: 'vanaraForestTheme', source: 'bgm/Spirit 16_concept.mp3', volume: 10},
+    tombTheme: {key: 'tombTheme', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10},
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
-    cocoonTheme: {key: 'cocoonTheme', source: 'bgm/Spirit 6 Demo.mp3', volume: 10 },
-    vanaraDreamTheme: {key: 'vanaraDreamTheme', source: 'bgm/Spirit 18_concept.mp3', volume: 10 },
-    helixTheme: {key: 'helixTheme', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10 },
-    waterfallTowerTheme: {key: 'waterfallTowerTheme', source: 'bgm/Public Surface_concept.mp3', volume: 10 },
-    forgeTheme: {key: 'forgeTheme', source: 'bgm/Public Surface.b_concept.mp3', volume: 10 },
-    craterTheme: {key: 'craterTheme', source: 'bgm/Fatty Richness_demo.mp3', volume: 10 },
+    cocoonTheme: {key: 'cocoonTheme', source: 'bgm/Spirit 6 Demo.mp3', volume: 10},
+    vanaraDreamTheme: {key: 'vanaraDreamTheme', source: 'bgm/Spirit 18_concept.mp3', volume: 10},
+    helixTheme: {key: 'helixTheme', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10},
+    waterfallTowerTheme: {key: 'waterfallTowerTheme', source: 'bgm/Public Surface_concept.mp3', volume: 10},
+    forgeTheme: {key: 'forgeTheme', source: 'bgm/Public Surface.b_concept.mp3', volume: 10},
+    craterTheme: {key: 'craterTheme', source: 'bgm/Fatty Richness_demo.mp3', volume: 10},
     // Used for the tower after it is activated.
-    towerTheme: {key: 'towerTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10 },
-    skyTheme: {key: 'skyTheme', source: 'bgm/Spirit 14_demo.mp3', volume: 10 },
+    towerTheme: {key: 'towerTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10},
+    skyTheme: {key: 'skyTheme', source: 'bgm/Spirit 14_demo.mp3', volume: 10},
     // Used for the lake temple
-    lakeTheme: {key: 'lakeTheme', source: 'bgm/ocean.mp3', volume: 8 },
-    skyPalaceTheme: {key: 'skyPalaceTheme', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
+    lakeTheme: {key: 'lakeTheme', source: 'bgm/ocean.mp3', volume: 8},
+    skyPalaceTheme: {key: 'skyPalaceTheme', source: 'bgm/Spirit 9 Demo.mp3', volume: 10},
     // Used for holy city, but a bit to relaxed for that.
-    village: {key : 'village', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
+    village: {key: 'village', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
     // Used for summoner ruins.
-    ruins: {key : 'ruins', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
-    labTheme: {key: 'labTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10, speed: 0.5 },
-    grandPriestTheme: {key: 'grandPriestTheme', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10, speed: 0.8 },
+    ruins: {key: 'ruins', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
+    labTheme: {key: 'labTheme', source: 'bgm/Spirit 15.4.mp3', volume: 10, speed: 0.5},
+    grandPriestTheme: {key: 'grandPriestTheme', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10, speed: 0.8},
 
     // Tracks from Leon
     // For War Temple and other dungeons
-    dungeonTheme: {key: 'dungeonTheme', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 20 },
-    idleTheme: {key: 'idleTheme', source: 'bgm/IdleMusic.mp3', volume: 20 },
-    bossIntro: {key: 'bossIntro', source: 'bgm/SpookyThemeIntro.mp3', volume: 40, nextTrack: 'bossA' },
-    bossA: {key: 'bossA', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
-    bossB: {key: 'bossB', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
+    dungeonTheme: {key: 'dungeonTheme', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 20},
+    idleTheme: {key: 'idleTheme', source: 'bgm/IdleMusic.mp3', volume: 20},
+    bossIntro: {key: 'bossIntro', source: 'bgm/SpookyThemeIntro.mp3', volume: 40, nextTrack: 'bossA'},
+    bossA: {key: 'bossA', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB'},
+    bossB: {key: 'bossB', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA'},
 };
 // Load sounds files used early in the game to prevent delayed music transitions.
 // This track is used during the prologue/intro.
@@ -421,11 +421,13 @@ const preloadSounds = () => {
         {key: 'unlock', source: 'sfx/Cube click_odrive.wav', volume: 50, instanceLimit: 2},
         {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, instanceLimit: 2},
         {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 40, instanceLimit: 2},
-        {key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
+        {
+            key: 'keyBlockScraping', source: 'sfx/rollingBall.wav',
             duration: 0.7, volume: 60, instanceLimit: 2
         },
         {key: 'rumble', source: 'sfx/3x3_odrive.wav', volume: 50, instanceLimit: 1, speed: 0.4, loop: true},
-        {key: 'rollingBall', source: 'sfx/rollingBall.wav',
+        {
+            key: 'rollingBall', source: 'sfx/rollingBall.wav',
             duration: 1.4, loop: true, volume: 20, instanceLimit: 2
         },
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, instanceLimit: 2},
@@ -433,15 +435,23 @@ const preloadSounds = () => {
         {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 30, instanceLimit: 2},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
         //     offset: 0.2, duration: 0.3', volume: 10, instanceLimit: 2},
-        {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
-             offset: 0.3, duration: 0.2, volume: 20, instanceLimit: 2},
-        {key: 'bossDeath', source: 'sfx/enemyDeath.wav',
-             offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 2},
+        {
+            key: 'enemyHit', source: 'sfx/enemyDeath.wav',
+            offset: 0.3, duration: 0.2, volume: 20, instanceLimit: 2
+        },
+        {
+            key: 'bossDeath', source: 'sfx/enemyDeath.wav',
+            offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 2
+        },
         {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, instanceLimit: 2, duration: 0.4, customDelay: 0.1},
-        {key: 'getMoney', source: 'sfx/coin wood c.wav',
-            duration: 0.25, volume: 10, instanceLimit: 2},
-        {key: 'blockAttack', source: 'sfx/coin wood c.wav',
-            duration: 0.1, volume: 20, instanceLimit: 3},
+        {
+            key: 'getMoney', source: 'sfx/coin wood c.wav',
+            duration: 0.25, volume: 10, instanceLimit: 2
+        },
+        {
+            key: 'blockAttack', source: 'sfx/coin wood c.wav',
+            duration: 0.1, volume: 20, instanceLimit: 3
+        },
         {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 100, instanceLimit: 1},
         {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 50, instanceLimit: 3},
         {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 50, instanceLimit: 2},
@@ -458,7 +468,7 @@ const preloadSounds = () => {
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, instanceLimit: 5},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 2},
-        {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 100, instanceLimit: 4}, 
+        {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 100, instanceLimit: 4},
         {key: 'hitShot', source: 'sfx/enemyDeath.wav', offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 5},
         {key: 'hitBullseye', source: 'sfx/chime 14_1.wav', duration: 1, volume: 4, instanceLimit: 5},
         {key: 'laser', source: 'sfx/pulseBeam.ogg', instanceLimit: 4},
@@ -511,7 +521,7 @@ function playBeeps(inputFrequencies: number[], volume: number, duration: number,
             oscillator.frequency.setValueAtTime(frequencies[i], time + duration * i / frequencies.length);
         }
     }
-    let lastNode:AudioNode = oscillator;
+    let lastNode: AudioNode = oscillator;
 
     const gainNode = audioContext.createGain();
     if (swell) {
@@ -671,7 +681,7 @@ sounds.set('barrierBurst', {
         oscillator.start(time);
         oscillator.stop(time + 0.1);
 
-        oscillator.onended = function() {
+        oscillator.onended = function () {
             pinkNoiseNode.disconnect(noiseGainNode);
         };
     },
@@ -703,6 +713,33 @@ sounds.set('arrow', {
 sounds.set('error', {
     play(target: AudioNode, time: number) {
         playBeeps([200, 100, 20, 200, 100, 20], 0.04, this.duration, {smooth: false, taper: 0.2, swell: 0.2, type: 'sawtooth'}, target, time);
+    },
+    duration: 0.4,
+    instanceLimit: 2,
+    instances: [],
+});
+
+sounds.set('waterJump', {
+    play(target: AudioNode, time: number) {
+        // Splash noise
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.setValueAtTime(0, time);
+        noiseGainNode.gain.linearRampToValueAtTime(0.2, time + 0.05);
+        noiseGainNode.gain.linearRampToValueAtTime(0, time + this.duration);
+        pinkNoiseNode.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+
+        // Water bloop
+        playBeeps([200, 100, 200], 0.4, 0.25, {smooth: true, taper: 0.1, swell: 0.1, type: 'sine'}, target, time);
+
+        // Disconnect pink noise after duration.
+        // Use an oscillator to use audio context to match the exact timing.
+        const stopOscillator = audioContext.createOscillator();
+        stopOscillator.start(time);
+        stopOscillator.stop(time + this.duration);
+        stopOscillator.onended = () => {
+            pinkNoiseNode.disconnect(noiseGainNode);
+        };
     },
     duration: 0.4,
     instanceLimit: 2,

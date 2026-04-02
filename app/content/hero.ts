@@ -530,6 +530,7 @@ export class Hero implements Actor {
         addEffectToArea(state, this.area, this.activeBarrierBurst);
     }
     fallIntoPit(state: GameState) {
+        playAreaSound(state, state.areaInstance, 'fall');
         this.throwHeldObject(state);
         this.heldChakram?.throw(state);
         this.endInvisibility(state);

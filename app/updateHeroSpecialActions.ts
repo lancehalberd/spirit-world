@@ -1,40 +1,41 @@
-import { refreshAreaLogic } from 'app/content/areas';
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { LightningAnimationEffect } from 'app/content/effects/lightningAnimationEffect';
-import { Door } from 'app/content/objects/door';
-import { Staff } from 'app/content/objects/staff';
-import { zones } from 'app/content/zones/zoneHash';
-import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import { editingState } from 'app/development/editingState';
-import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/userInput';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
-import { playAreaSound } from 'app/musicController';
-import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
-import { isUnderwater } from 'app/utils/actor';
-import { updateAreaSection } from 'app/utils/area';
+import {refreshAreaLogic} from 'app/content/areas';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {LightningAnimationEffect} from 'app/content/effects/lightningAnimationEffect';
+import {Door} from 'app/content/objects/door';
+import {Staff} from 'app/content/objects/staff';
+import {zones} from 'app/content/zones/zoneHash';
+import {CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
+import {editingState} from 'app/development/editingState';
+import {getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed} from 'app/userInput';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {getSectionBoundingBox, moveActor} from 'app/movement/moveActor';
+import {playAreaSound} from 'app/musicController';
+import {cloudPoofAnimation, fallAnimation, heroAnimations} from 'app/render/heroAnimations';
+import {isUnderwater} from 'app/utils/actor';
+import {updateAreaSection} from 'app/utils/area';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {
     directionMap,
     getCardinalDirection,
     getDirection,
 } from 'app/utils/direction';
-import { destroyClone } from 'app/utils/destroyClone';
-import { addEffectToArea } from 'app/utils/effects';
-import { enterLocation } from 'app/utils/enterLocation';
+import {destroyClone} from 'app/utils/destroyClone';
+import {addEffectToArea} from 'app/utils/effects';
+import {enterLocation} from 'app/utils/enterLocation';
 import {
     breakBrittleTilesInRect,
     canSomersaultToCoords,
     hitTargets,
     isTileOpen,
 } from 'app/utils/field';
-import { fixCamera } from 'app/utils/fixCamera';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { getCompositeBehaviors, getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
-import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
-import { addObjectToArea } from 'app/utils/objects';
-import { saveGame } from 'app/utils/saveGame';
-import { getVectorToTarget } from 'app/utils/target';
+import {fixCamera} from 'app/utils/fixCamera';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {getCompositeBehaviors, getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
+import {boxesIntersect, isObjectInsideTarget, pad} from 'app/utils/index';
+import {addObjectToArea} from 'app/utils/objects';
+import {saveGame} from 'app/utils/saveGame';
+import {getVectorToTarget} from 'app/utils/target';
+import {playSound} from './utils/sounds';
 
 const rollSpeed = [
     5, 5, 5, 5,
@@ -46,7 +47,7 @@ const rollSpeed = [
 let sommersaultCount = 0;
 
 function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true) {
-    const { section } = getAreaSize(state);
+    const {section} = getAreaSize(state);
     let best: ObjectInstance = null, bestDistance: number;
     for (const object of state.areaInstance.objects) {
         if (object.definition?.type !== 'spawnMarker') {
@@ -58,7 +59,7 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
         ) {
             continue;
         }
-        const { mag } = getVectorToTarget(state, object, hero);
+        const {mag} = getVectorToTarget(state, object, hero);
         if (!best || mag < bestDistance) {
             best = object;
             bestDistance = mag;
@@ -74,13 +75,14 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
     }
 }
 
-export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, vz : number): boolean {
+export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, vz: number): boolean {
     if (vz > -3 || state.hero.savedData.equippedBoots === 'cloudBoots' || hero !== state.hero) {
         return false;
     }
     if (hero.swimming && state.underwaterAreaInstance &&
         isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y})
     ) {
+        playSound('waterJump');
         enterLocation(state, {
             ...state.location,
             floor: zones[state.zone.underwaterKey].floors.length - 1,
@@ -133,7 +135,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     // Handle section transitions.
-    const { section } = getAreaSize(state);
+    const {section} = getAreaSize(state);
     if (isPrimaryHero && hero.x + hero.w > section.x + section.w) {
         hero.actionDx = Math.min(0, hero.actionDx);
         hero.vx = Math.min(0, hero.vx);
@@ -224,7 +226,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 // We only let the hero move south ~6 pixels onto this tile so that they will
                 // fall towards the southern part of the pitwall tile without moving too far onto
                 // the non-pit tile to the south.
-                if (dy >=0 || (hitbox.y % 16) < 4) {
+                if (dy >= 0 || (hitbox.y % 16) < 4) {
                     hero.y++;
                 }
             } else if (dy < 0) {
@@ -566,8 +568,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.actionDy = 1;
             }
         }
-
-
         if (hero.z <= groundZ) {
             // This is supposed to protect against landing slightly outside of the area causing the player to take damage
             // as if they landed somewhere invalid but it seems like it might not be needed with fixes to isPointOpen.
@@ -726,7 +726,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         const jumpDuration = heroAnimations.staffJump[hero.d].duration;
         const slamDuration = heroAnimations.staffSlam[hero.d].duration;
-       // console.log(hero.animationTime, jumpDuration, slamDuration);
+        // console.log(hero.animationTime, jumpDuration, slamDuration);
         if (hero.animationTime < jumpDuration - FRAME_LENGTH) {
             hero.vz = 1 - 1 * hero.animationTime / jumpDuration;
             hero.z += hero.vz;
@@ -803,7 +803,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 } else if (hero.savedData.equippedBoots === 'ironBoots') {
                     vz = 1;
                 }
-                hero.knockBack(state, {vx: -2.5*dx, vy: -2.5*dy, vz});
+                hero.knockBack(state, {vx: -2.5 * dx, vy: -2.5 * dy, vz});
                 state.screenShakes.push({
                     dx: staffLevel > 1 ? 5 : 2,
                     dy: staffLevel > 1 ? 5 : 2,
@@ -999,7 +999,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
                 lastOpenPosition.x = hero.x;
                 lastOpenPosition.y = hero.y;
             }
-            addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.savedData.element });
+            addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), {element: hero.savedData.element});
             continue;
         }
         hero.area = alternateArea;
@@ -1014,7 +1014,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
             lastOpenPosition.x = hero.x;
             lastOpenPosition.y = hero.y;
         }
-        addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.savedData.element });
+        addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), {element: hero.savedData.element});
     }
     // Enable jumping after cloud sommersault.
     hero.canJumpOffLedges = true;
@@ -1060,7 +1060,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
                 y: endPosition.y + 19 * Math.sin(theta) - 3,
                 w: 6, h: 6,
             },
-            { element: hero.savedData.element }
+            {element: hero.savedData.element}
         );
     }
     hitTargets(state, hero.area, destinationHit);
@@ -1088,7 +1088,7 @@ function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {
-        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
         if (tileBehavior.solid) {
             return false
         }
@@ -1102,7 +1102,7 @@ function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero, dx =
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {
-        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
         if (tileBehavior.isSouthernWall) {
             return true
         }
@@ -1115,7 +1115,7 @@ function isHeroOnVeryTallWall(this: void, state: GameState, hero: Hero): boolean
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {
-        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
         if (tileBehavior.isVeryTall && tileBehavior.solid === true) {
             return true
         }

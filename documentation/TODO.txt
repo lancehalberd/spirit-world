@@ -147,8 +147,7 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Demo flag
-            - Replace Helix rival fight with demo ending, possibly unlock randomizer.
+        - Replace Helix rival fight with demo ending, possibly unlock randomizer.
         - Finish cocoon update
             - New pod graphics
             - Falling between floors
@@ -157,6 +156,10 @@ Current tasks:
         - Randomizer for demo mode
         - [Optional] add ash to spirit world
         - High priority SFX
+            - Golem charge
+            - Golem laser
+            - Plant grenade explosion
+            - Frost grenade explosion
 
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
