@@ -30,6 +30,7 @@ interface AudioInstance {
     // This will not be set on looping tracks.
     endTime?: number
     sound: GameSound
+    customStop?: void | ((time: number) => void)
 }
 interface GameSound {
     key?: string
@@ -50,7 +51,7 @@ interface GameSound {
     volume?: number
     speed?: number
     // This is just used by custom audio context sounds
-    play?: (target: AudioNode, time: number) => void
+    play?: (target: AudioNode, time: number) => void | ((time: number) => void)
 }
 
 interface GameTrack extends GameSound {

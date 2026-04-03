@@ -194,10 +194,10 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             const instance: AudioInstance = {
                 sound,
                 startTime: targetTime,
-                endTime: targetTime + sound.duration,
+                endTime: sound.duration ? targetTime + sound.duration : undefined,
             };
             sound.instances.push(instance);
-            sound.play(soundEffectGainNode, targetTime);
+            instance.customStop = sound.play(soundEffectGainNode, targetTime);
             return instance;
         }
     } catch (e) {
@@ -210,10 +210,15 @@ export function stopSound(instance?: AudioInstance, time = audioContext.currentT
         return;
     }
     instance.stopTime = time;
-    instance.sourceNode.stop(time);
+    if (instance.sourceNode) {
+        instance.sourceNode.stop(time);
+    }
+    if (instance.customStop) {
+        instance.customStop(time);
+    }
     const index = instance.sound.instances.indexOf(instance);
     if (index >= 0) {
-        instance.sound.instances.splice(index);
+        instance.sound.instances.splice(index, 1);
     }
 }
 window['stopSound'] = stopSound;
@@ -743,6 +748,51 @@ sounds.set('waterJump', {
     },
     duration: 0.4,
     instanceLimit: 2,
+    instances: [],
+});
+
+sounds.set('chargeLaser', {
+    play(target: AudioNode, time: number) {
+        const maxVolume = 0.1;
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(50, time);
+        // Exponential sweep up; can support up to 3 seconds smoothly
+        oscillator.frequency.exponentialRampToValueAtTime(1000, time + 3);
+
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.setValueAtTime(0, time);
+        noiseGainNode.gain.linearRampToValueAtTime(maxVolume / 2, time + 0.1);
+
+        const oscillatorGainNode = audioContext.createGain();
+        oscillatorGainNode.gain.setValueAtTime(0, time);
+        oscillatorGainNode.gain.linearRampToValueAtTime(maxVolume, time + 0.1);
+
+        pinkNoiseNode.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+
+        oscillator.connect(oscillatorGainNode);
+        oscillatorGainNode.connect(target);
+
+        oscillator.start(time);
+
+        return (stopTime: number) => {
+            // A short fade out prevents clicking when stopped early
+            noiseGainNode.gain.linearRampToValueAtTime(0, stopTime + 0.1);
+            oscillatorGainNode.gain.linearRampToValueAtTime(0, stopTime + 0.1);
+            oscillator.stop(stopTime + 0.1);
+
+            const stopOscillator = audioContext.createOscillator();
+            stopOscillator.start(time);
+            stopOscillator.stop(stopTime + 0.1);
+            stopOscillator.onended = () => {
+                pinkNoiseNode.disconnect(noiseGainNode);
+                oscillator.disconnect();
+            };
+        };
+    },
+    duration: 0,
+    instanceLimit: 3,
     instances: [],
 });
 
