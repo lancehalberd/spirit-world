@@ -156,8 +156,6 @@ Current tasks:
         - Randomizer for demo mode
         - [Optional] add ash to spirit world
         - High priority SFX
-            - Golem charge
-            - Golem laser
             - Plant grenade explosion
             - Frost grenade explosion
 

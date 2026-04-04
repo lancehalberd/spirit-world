@@ -738,13 +738,9 @@ sounds.set('waterJump', {
         playBeeps([200, 100, 200], 0.4, 0.25, {smooth: true, taper: 0.1, swell: 0.1, type: 'sine'}, target, time);
 
         // Disconnect pink noise after duration.
-        // Use an oscillator to use audio context to match the exact timing.
-        const stopOscillator = audioContext.createOscillator();
-        stopOscillator.start(time);
-        stopOscillator.stop(time + this.duration);
-        stopOscillator.onended = () => {
+        audioCallback(() => {
             pinkNoiseNode.disconnect(noiseGainNode);
-        };
+        }, time + this.duration);
     },
     duration: 0.4,
     instanceLimit: 2,
@@ -777,24 +773,131 @@ sounds.set('chargeLaser', {
         oscillator.start(time);
 
         return (stopTime: number) => {
+            const actualStopTime = stopTime + 0.1;
             // A short fade out prevents clicking when stopped early
-            noiseGainNode.gain.linearRampToValueAtTime(0, stopTime + 0.1);
-            oscillatorGainNode.gain.linearRampToValueAtTime(0, stopTime + 0.1);
+            noiseGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
+            oscillatorGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
             oscillator.stop(stopTime + 0.1);
 
-            const stopOscillator = audioContext.createOscillator();
-            stopOscillator.start(time);
-            stopOscillator.stop(stopTime + 0.1);
-            stopOscillator.onended = () => {
+            audioCallback(() => {
                 pinkNoiseNode.disconnect(noiseGainNode);
                 oscillator.disconnect();
-            };
+            }, actualStopTime);
         };
     },
     duration: 0,
     instanceLimit: 3,
     instances: [],
 });
+
+sounds.set('fireLaser', {
+    play(target: AudioNode, time: number) {
+        const maxVolume = 0.2;
+
+        const burstDuration = 1;
+
+        // Initial high-impact burst sweeping down
+        const burstOscillator = audioContext.createOscillator();
+        burstOscillator.type = 'sawtooth';
+        burstOscillator.frequency.setValueAtTime(1000, time);
+        //burstOscillator.frequency.setValueAtTime(1000, time + 0.2);
+        //burstOscillator.frequency.linearRampToValueAtTime(800, time + 0.5);
+        // This version sounds a bit like the dragon sound from FF5
+        //burstOscillator.frequency.setValueAtTime(1000, time);
+        //burstOscillator.frequency.linearRampToValueAtTime(1200, time + 0.2);
+        //burstOscillator.frequency.setValueAtTime(1200, time + 0.3);
+        //burstOscillator.frequency.linearRampToValueAtTime(800, time + 0.5);
+
+        const burstLfo = audioContext.createOscillator();
+        burstLfo.type = 'sine';
+        burstLfo.frequency.setValueAtTime(40, time); // 15 Hz wobble rate
+
+        const burstLfoGain = audioContext.createGain();
+        burstLfoGain.gain.setValueAtTime(20, time); // +/- 20 Hz wobble amplitude
+
+        burstLfo.connect(burstLfoGain);
+        burstLfoGain.connect(burstOscillator.frequency);
+        burstLfo.start(time);
+
+        const burstGainNode = audioContext.createGain();
+        burstGainNode.gain.setValueAtTime(0, time);
+        burstGainNode.gain.linearRampToValueAtTime(2 * maxVolume, time + 0.05);
+        burstGainNode.gain.setValueAtTime(2 * maxVolume, time + 0.1);
+        burstGainNode.gain.linearRampToValueAtTime(maxVolume / 4, time + burstDuration);
+        //burstGainNode.gain.exponentialRampToValueAtTime(0.02, time + burstDuration);
+
+        burstOscillator.connect(burstGainNode);
+        burstGainNode.connect(target);
+        burstOscillator.start(time);
+        //burstOscillator.stop(time + burstDuration);
+
+        // Continuous beam sound
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sawtooth';
+        oscillator.frequency.setValueAtTime(200, time);
+        oscillator.frequency.linearRampToValueAtTime(150, time + 0.2);
+
+        // LFO for pitch oscillation
+        const lfo = audioContext.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(15, time); // 15 Hz wobble rate
+
+        const lfoGain = audioContext.createGain();
+        lfoGain.gain.setValueAtTime(20, time); // +/- 20 Hz wobble amplitude
+
+        lfo.connect(lfoGain);
+        lfoGain.connect(oscillator.frequency);
+        lfo.start(time);
+
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.setValueAtTime(0, time);
+        noiseGainNode.gain.linearRampToValueAtTime(maxVolume, time + 0.1);
+
+        const oscillatorGainNode = audioContext.createGain();
+        oscillatorGainNode.gain.setValueAtTime(0, time);
+        oscillatorGainNode.gain.linearRampToValueAtTime(maxVolume, time + 0.1);
+
+        pinkNoiseNode.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+
+        oscillator.connect(oscillatorGainNode);
+        oscillatorGainNode.connect(target);
+
+        oscillator.start(time);
+
+        return (stopTime: number) => {
+            const actualStopTime = stopTime + 0.3;
+            noiseGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
+            oscillatorGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
+            burstGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
+            oscillator.stop(actualStopTime);
+            lfo.stop(actualStopTime);
+
+            audioCallback(() => {
+                pinkNoiseNode.disconnect(noiseGainNode);
+                oscillator.disconnect();
+                burstOscillator.disconnect();
+                lfo.disconnect();
+            }, actualStopTime);
+        };
+    },
+    duration: 0,
+    instanceLimit: 3,
+    instances: [],
+});
+
+// Use an oscillator to trigger callbacks based on audio times.
+// I'm not positive this is more precise than setTimeout, but it should
+// prevent code from being called too soon, for example, disconnecting nodes
+// before they completely finish fading out.
+function audioCallback(callback: () => void, time: number) {
+    const stopOscillator = audioContext.createOscillator();
+    stopOscillator.start();
+    stopOscillator.stop(time);
+    stopOscillator.onended = () => {
+        callback();
+    };
+}
 
 // Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
 const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];

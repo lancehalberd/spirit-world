@@ -376,6 +376,7 @@ enemyDefinitions.golem = {
     },
     onDeath(state: GameState, enemy: Enemy): void {
         stopChargeSound(enemy);
+        stopFireSound(enemy);
     },
 };
 enemyDefinitions.golemHand = {
@@ -535,6 +536,13 @@ function stopChargeSound(enemy: Enemy) {
     }
 }
 
+function stopFireSound(enemy: Enemy) {
+    if (enemy.params.fireSoundParams) {
+        stopSound(enemy.params.fireSoundParams);
+        delete enemy.params.fireSoundParams;
+    }
+}
+
 function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     enemy.d = 'down';
     // This gets all hands since the golem is not a golemHand.
@@ -618,6 +626,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             stopChargeSound(enemy);
             enemy.params.leftEyeLaser = fireLaser(state, enemy, 1500, 6, getLeftEyeLaserCoords(state, enemy));
             enemy.params.rightEyeLaser = fireLaser(state, enemy, 1500, 6, getRightEyeLaserCoords(state, enemy));
+            enemy.params.fireSoundParams = playSound('fireLaser');
             enemy.setMode('fireStrafeLaser');
         }
     } else if (enemy.mode === 'fireStrafeLaser') {
@@ -631,6 +640,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             removeEffectFromArea(state, enemy.params.rightEyeLaser);
             delete enemy.params.leftEyeLaser;
             delete enemy.params.rightEyeLaser;
+            stopFireSound(enemy);
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'strafeSlamHands') {
@@ -682,9 +692,11 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'fireLaser') {
         enemy.changeToAnimation(isAngry ? 'angryShootMouth' : 'shootMouth');
         enemy.params.mouthLaser = fireLaser(state, enemy, 900, 8, getMouthLaserCoords(state, enemy));
+        enemy.params.fireSoundParams = playSound('fireLaser');
         enemy.setMode('firingLaser')
     } else if (enemy.mode === 'firingLaser') {
         if (enemy.modeTime >= 1000) {
+            stopFireSound(enemy);
             enemy.setMode('cooldown');
         }
     } else if (enemy.mode === 'cooldown') {
@@ -722,6 +734,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 delete enemy.params.mouthLaser;
             }
             stopChargeSound(enemy);
+            stopFireSound(enemy);
             enemy.setMode('choose');
         }
         // If the hands are alive, add an additional initial enraged attack of slamming hands.
