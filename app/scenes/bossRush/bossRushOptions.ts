@@ -2,6 +2,7 @@ import {Enemy} from 'app/content/enemy';
 import {tombBossState, warTempleBoss, cocoonBossState, helixRivalStateBoss} from 'app/content/spawnStates';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {getRealSavedHeroData} from 'app/utils/alterHeroData';
+import {bossFlags, bossNames} from 'app/utils/bosses';
 import {hitTargets} from 'app/utils/field';
 import {cloneDeep} from "app/utils/index";
 import {addObjectToArea} from 'app/utils/objects';
@@ -58,7 +59,7 @@ export const bossRushConditions: BossRushCondition[] = [
         modifier: 5,
         apply(state: GameState) {
             state.hero.isMagicDisabled = true;
-            updateHeroMagicStats(state);
+            updateHeroMagicStats(state, true);
         },
     },
 ];
@@ -135,55 +136,49 @@ function fixFlameBeastPreview(state: GameState) {
     boss.setMode('emerge');
 }
 
+function singleBoss(bossKey: BossKey) {
+    return {
+        label: bossNames[bossKey],
+        key: bossKey,
+        bosses: [bossKey],
+    }
+}
+
 export const allBossRushOptions: BossRushOption[] = [
     {
-        label: 'Beetle',
-        key: 'beetle',
-        bosses: ['beetle'],
+        ...singleBoss('beetle'),
         karma: 1,
         targetTime: 0.5 * minute,
         fixPreview: fixBeetlePreview,
     },
     {
-        label: 'Golem',
-        key: 'golem',
-        bosses: ['golem'],
+        ...singleBoss('golem'),
         karma: 2,
         targetTime: 1 * minute,
     },
     {
-        label: 'War Idols',
-        key: 'idols',
-        bosses: ['idols'],
+        ...singleBoss('idols'),
         karma: 2,
         targetTime: 1.5 * minute,
     },
     {
-        label: 'Guardian',
-        key: 'guardian',
-        bosses: ['guardian'],
+        ...singleBoss('guardian'),
         karma: 2,
         targetTime: 1.5 * minute,
         fixPreview: fixGuardianPreview,
     },
     {
-        label: 'Saru',
-        key: 'rival2',
-        bosses: ['rival2'],
+        ...singleBoss('rival2'),
         karma: 4,
         targetTime: 1 * minute,
     },
     {
-        label: 'Prototypes',
-        key: 'forestTempleBoss',
-        bosses: ['forestTempleBoss'],
+        ...singleBoss('forestTempleBoss'),
         karma: 5,
         targetTime: 1 * minute,
     },
     {
-        label: 'Collector',
-        key: 'collector',
-        bosses: ['collector'],
+        ...singleBoss('collector'),
         karma: 5,
         targetTime: 1.5 * minute,
         fixPreview(state: GameState) {
@@ -193,17 +188,13 @@ export const allBossRushOptions: BossRushOption[] = [
         },
     },
     {
-        label: 'Flame Beast',
-        key: 'flameBeast',
-        bosses: ['flameBeast'],
+        ...singleBoss('flameBeast'),
         karma: 10,
         targetTime: 2 * minute,
         fixPreview: fixFlameBeastPreview,
     },
     {
-        label: 'Frost Beast',
-        key: 'frostBeast',
-        bosses: ['frostBeast'],
+        ...singleBoss('frostBeast'),
         karma: 10,
         targetTime: 2 * minute,
         fixPreview(state: GameState) {
@@ -226,9 +217,7 @@ export const allBossRushOptions: BossRushOption[] = [
         },
     },
     {
-        label: 'Storm Beast',
-        key: 'stormBeast',
-        bosses: ['stormBeast'],
+        ...singleBoss('stormBeast'),
         karma: 10,
         targetTime: 2 * minute,
         fixPreview(state: GameState) {
@@ -312,19 +301,6 @@ export const allBossRushOptions: BossRushOption[] = [
 ];
 
 
-const bossFlags: {[key in BossKey]?: string} = {
-    // The first boss is always unlocked so that the boss rush menu can never be empty.
-    beetle: undefined,
-    golem: 'tombBoss',
-    idols: 'warTempleBoss',
-    guardian: 'cocoonBoss',
-    rival2: 'helixRivalBoss',
-    forestTempleBoss: 'forestTempleBoss',
-    collector: 'waterfallTowerBoss',
-    stormBeast: 'stormBeast',
-    flameBeast: 'flameBeast',
-    frostBeast: 'frostBeast',
-};
 
 export function isBossRushOptionVisible(state: GameState, bossRushOption: BossRushOption): boolean {
     const realSavedHeroData = getRealSavedHeroData(state);
@@ -332,7 +308,7 @@ export function isBossRushOptionVisible(state: GameState, bossRushOption: BossRu
     // If there are special bosses that can only be encountered as a boss rush, the bossFlags values
     // can be set to a falsey value to skip this requirement.
     for (const bossKey of bossRushOption.bosses) {
-        if (bossFlags[bossKey] && !state.savedState.objectFlags[bossFlags[bossKey]]) {
+        if (bossKey !== 'beetle' && !state.savedState.objectFlags[bossFlags[bossKey]]) {
             return false;
         }
     }

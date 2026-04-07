@@ -4,7 +4,6 @@ import {
     settingsGear, simpleMap,
 } from 'app/content/loot';
 import {useConsumable} from 'app/content/lootEffects';
-import {isRandomizer} from 'app/gameConstants';
 import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showSettingsScene} from 'app/scenes/settings/settingsScene';
 import {showMessage, showSimpleMessage} from 'app/scriptEvents';
@@ -194,7 +193,7 @@ const goldChakramMenuOption: MenuElement = {
 const returnMenuOption: MenuElement = {
     ...elementGeometry,
     getLabel: () => 'Return',
-    isVisible: (state: GameState) => isRandomizer,
+    isVisible: (state: GameState) => !!state.randomizerState,
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'nimbusCloud'}), this);
     },
@@ -552,7 +551,7 @@ export function createMenuPanel(id: string, options: MenuElement[], rows: number
 
 export function getSystemOptions(state: GameState): MenuElement[] {
     const systemOptions: MenuElement[] = [];
-    if (isRandomizer) {
+    if (state.randomizerState) {
         systemOptions.push(returnMenuOption);
     }
     systemOptions.push(helpMenuOption);

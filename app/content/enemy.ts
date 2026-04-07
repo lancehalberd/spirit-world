@@ -8,6 +8,7 @@ import {bossDeathExplosionAnimation, enemyDeathAnimation} from 'app/content/enem
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import {playAreaSound} from 'app/musicController';
+import {getMappedLootData} from 'app/randomizer/utils';
 import {renderEnemyShadow} from 'app/renderActor';
 import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
 import {appendCallback} from 'app/scriptEvents';
@@ -583,7 +584,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                         // Make sure to save status before gaining loot since gaining loot refreshes object status.
                         saveObjectStatus(state, bossDefinition);
                         // Gain loot if any is defined.
-                        if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
+                        const lootData = getMappedLootData(state.randomizerState, bossDefinition);
+                        if (lootData.lootType && lootData.lootType !== 'empty') {
                             getLoot(state, bossDefinition);
                         } else {
                             state.areaInstance.needsLogicRefresh = true;

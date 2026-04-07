@@ -1,4 +1,4 @@
-import { enemyTypes } from 'app/content/enemies';
+/*import { enemyTypes } from 'app/content/enemies';
 import {
     SPAWN_LOCATION_FULL,
     SPAWN_LOCATION_WATERFALL_VILLAGE,
@@ -73,7 +73,7 @@ function checkForEntranceIdConflicts() {
     }
 }
 checkForEntranceIdConflicts//();
-
+/*
 if (enemySeed) {
     const enemyRandom = SRandom.seed(enemySeed)
     everyObject((location, zone, area, object) => {
@@ -91,9 +91,10 @@ if (entranceSeed) {
 if (itemSeed) {
     try {
         const assignmentsState = reverseFill(SRandom.seed(itemSeed), allNodes, [mainOverworldNode]);
-        applyLootAssignments(assignmentsState.assignments);
+        applyLootAssignments(Object.values(assignmentsState.assignments));
     } catch (e) {
         console.error('Failed to generate seed', e);
     }
     Object.assign(SPAWN_LOCATION_FULL, SPAWN_LOCATION_WATERFALL_VILLAGE);
 }
+*/

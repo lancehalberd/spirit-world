@@ -1,3 +1,4 @@
+import type {BossRushScene} from 'app/scenes/bossRush/bossRushScene';
 import type {ChoiceScene} from 'app/scenes/choice/choiceScene';
 import type {DefeatedMenuScene} from 'app/scenes/defeated/defeatedMenuScene';
 import type {DefeatedScene} from 'app/scenes/defeated/defeatedScene';
@@ -7,10 +8,11 @@ import type {HudScene} from 'app/scenes/hud/hudScene';
 import type {IntroScene} from 'app/scenes/intro/introScene';
 import type {MapScene} from 'app/scenes/map/mapScene';
 import type {PrologueScene} from 'app/scenes/prologue/prologueScene';
+import type {RandomizerScene} from 'app/scenes/randomizer/randomizerScene';
 import type {TitleScene} from 'app/scenes/title/titleScene';
-import type {BossRushScene} from './bossRush/bossRushScene';
 
 interface AllScenes {
+    bossRush: BossRushScene
     choice: ChoiceScene
     defeated: DefeatedScene
     defeatedMenu: DefeatedMenuScene
@@ -20,8 +22,8 @@ interface AllScenes {
     intro: IntroScene
     map: MapScene
     prologue: PrologueScene
+    randomizer: RandomizerScene
     title: TitleScene
-    bossRush: BossRushScene
 }
 
 // Each scene

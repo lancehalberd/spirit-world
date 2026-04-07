@@ -125,6 +125,13 @@ export function getContextMenu(): MenuOption[] {
         getTestStateContextMenuOption(),
         ...getSaveOptions(state),
         {
+            label: state.settings.isRandomizerUnlocked ? 'Hide Randomizer' : 'Unlock Randomizer',
+            onSelect() {
+                state.settings.isRandomizerUnlocked = !state.settings.isRandomizerUnlocked;
+                saveSettings(state);
+            }
+        },
+        {
             label: editingState.isEditing ? 'Stop Map Editor' : 'Start Map Editor',
             onSelect() {
                 toggleEditing(getState());
@@ -213,7 +220,7 @@ function getSaveOptions(state: GameState): MenuOption[] {
         },
     ];
     // This option is only valid when using an actual save slot, otherwise it will be ignored.
-    if (state.savedGameIndex >= 0) {
+    if (state.savedGameIndex >= 0 && state.savedGameMode !== 'test') {
         options.push({
             label: 'Save Location',
             onSelect() {

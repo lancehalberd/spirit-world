@@ -1,14 +1,13 @@
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { variantSeed } from 'app/gameConstants';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import SRandom from 'app/utils/SRandom';
 
 
-const gauntletRandom = SRandom.seed(variantSeed).addSeed(726235);
+const gauntletRandom = (state: GameState) => SRandom.seed(state.variantSeed).addSeed(726235);
 
 specialBehaviorsHash.gauntletSwitch = {
     type: 'floorSwitch',
     apply(state: GameState, object: ObjectInstance) {
-        const random = gauntletRandom.addSeed(object.definition.x + object.definition.y);
+        const random = gauntletRandom(state).addSeed(object.definition.x + object.definition.y);
         object.x = object.definition.x + 16 * Math.floor(5 * random.generateAndMutate());
         object.y = object.definition.y + 16 * Math.floor(5 * random.generateAndMutate());
     }
@@ -31,7 +30,7 @@ specialBehaviorsHash.gauntletBallGoal = {
         }
         const allGoals = object.area.objects.filter(o => o.definition?.type === 'ballGoal' && o.definition.specialBehaviorKey === 'gauntletBallGoal');
         const index = allGoals.indexOf(object);
-        const random = gauntletRandom.addSeed(975324);
+        const random = gauntletRandom(state).addSeed(975324);
         const goal1 = random.range(0, totalGoals - 1);
         random.generateAndMutate();
         const goal2 = random.range(0, totalGoals - 1);

@@ -330,7 +330,7 @@ export const treeVillageNodes: LogicNode[] = [
         nodeId: 'southeastTreeEntrance',
         complexNpcs: [{
             dialogueKey: 'storageVanara',
-            optionKey: 'peachReward',
+            optionKey: 'peachRewardItem',
             logic: {requiredFlags: ['clearedTreeVillageStorageRoom']},
         }],
         entranceIds: [

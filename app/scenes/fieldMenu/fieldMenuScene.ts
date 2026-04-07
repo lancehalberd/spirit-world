@@ -139,7 +139,7 @@ export class FieldMenuScene implements GameScene {
         )) {
             if (editingState.isEditing) {
                 activeOption.onUpgrade?.(state);
-                updateHeroMagicStats(state);
+                updateHeroMagicStats(state, true);
             } else if (activeOption.isVisible?.(state)) {
                 let toolIndex: number;
                 if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
@@ -252,5 +252,5 @@ mainCanvas.addEventListener('click', function (event) {
     const [mouseX, mouseY] = getMousePosition(mainCanvas, getCanvasScale());
     const menuElement = elementUnderPoint(fieldMenuScene, mouseX - menuRect.x, mouseY - menuRect.y);
     menuElement?.onUpgrade?.(state);
-    updateHeroMagicStats(state);
+    updateHeroMagicStats(state, true);
 });

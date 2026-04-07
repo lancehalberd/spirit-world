@@ -219,6 +219,12 @@ function getLootGetMessage(state: GameState, {lootType, lootLevel, lootAmount}: 
         case 'magicPotion': return `You obtained a ${lootName}!`;
         case 'magicBeans': return `You obtained the ${lootName}!`;
         case 'aetherCrystal': return `You obtained an ${lootName}!`;
+        case 'victoryPoint':
+            if (lootAmount === 1) {
+                return `You found a Victory Point!`;
+            } else {
+                return `You found ${lootAmount} Victory Points!`;
+            }
     }
     return `You obtained the ${lootName}!`;
 }
@@ -407,7 +413,7 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
 
 export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): void {
     // Skip instructions during the randomizer.
-    if (state.randomizer?.seed) {
+    if (state.randomizerState) {
         if (lootType === 'peachOfImmortalityPiece' && state.hero.savedData.collectibles.peachOfImmortalityPiece === 0) {
             showMessage(state, '{item:peachOfImmortality}');
             return;

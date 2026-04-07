@@ -1,9 +1,8 @@
-import { zones } from 'app/content/zones/zoneHash';
-import { isRandomizer } from 'app/gameConstants';
-import { isCheckTrash } from 'app/randomizer/checks';
-import { findReachableChecksFromStart } from 'app/randomizer/find';
-import { setScript } from 'app/scriptEvents';
-import { findObjectLocation } from 'app/utils/enterZoneByTarget';
+import {zones} from 'app/content/zones/zoneHash';
+import {isCheckTrash} from 'app/randomizer/checks';
+import {findReachableChecksFromStart} from 'app/randomizer/find';
+import {setScript} from 'app/scriptEvents';
+import {findObjectLocation} from 'app/utils/enterZoneByTarget';
 import Random from 'app/utils/Random';
 
 type ObjectZoneLocation = ZoneLocation & { object?: ObjectDefinition };
@@ -583,8 +582,8 @@ export function showHint(state: GameState): void {
     if (state.scriptEvents.activeEvents.length || state.scriptEvents.queue.length) {
         return;
     }
-    if (isRandomizer) {
-        setScript(state, getRandomizerHint(state));
+    if (state.randomizerState) {
+        setScript(state, getRandomizerHint(state.randomizerState, state));
         return;
     }
     for (const mission of missions) {
@@ -603,7 +602,7 @@ export function showHint(state: GameState): void {
 }
 
 export function getMapTargets(state: GameState): ObjectZoneLocation[] {
-    if (isRandomizer) {
+    if (state.randomizerState) {
         return [];
     }
     const locations: ObjectZoneLocation[] = [];
@@ -694,8 +693,8 @@ export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
     return zone;
 }
 
-export function getRandomizerHint(state: GameState): string {
-    const reachableChecks: LootWithLocation[] = findReachableChecksFromStart(state);
+export function getRandomizerHint(randomizerState: RandomizerState, state: GameState): string {
+    const reachableChecks: LootWithLocation[] = findReachableChecksFromStart(state.randomizerState, state);
     for (const check of Random.shuffle(reachableChecks)) {
         // Example debug code for finding source of bad check in Staff Tower.
         // Ignore all hints for checks outside of staff tower and log any that are in logic.
@@ -705,7 +704,7 @@ export function getRandomizerHint(state: GameState): string {
             console.log(check);
         }*/
         // Don't suggest checks that we know aren't useful.
-        if (isCheckTrash(state, check)){
+        if (isCheckTrash(randomizerState, state, check)){
             continue;
         }
         if (check.location) {

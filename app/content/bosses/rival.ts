@@ -1,19 +1,19 @@
-import { CrystalSpike } from 'app/content/effects/arrow';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
-import { rivalAnimations } from 'app/content/enemyAnimations';
-import { heroAnimations, treeStaffAnimations } from 'app/render/heroAnimations';
-import { appendScript } from 'app/scriptEvents';
-import { removeTextCue } from 'app/content/effects/textCue';
-import { drawFrameAt, getFrame } from 'app/utils/animations';
+import {CrystalSpike} from 'app/content/effects/arrow';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {rivalAnimations} from 'app/content/enemyAnimations';
+import {heroAnimations, treeStaffAnimations} from 'app/render/heroAnimations';
+import {appendScript} from 'app/scriptEvents';
+import {removeTextCue} from 'app/content/effects/textCue';
+import {drawFrameAt, getFrame} from 'app/utils/animations';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
-import { removeObjectFromArea } from 'app/utils/objects';
-import { saveGame } from 'app/utils/saveGame';
+import {removeObjectFromArea} from 'app/utils/objects';
+import {saveGame} from 'app/utils/saveGame';
 import {
     getVectorToNearbyTarget,
     isTargetVisible,
@@ -265,7 +265,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
                 blockPlayerInput: true,
                 duration: 1000,
             });
-            if (!isRandomizer && !state.savedState.objectFlags.skipRivalTombStory) {
+            if (!state.randomizerState && !state.savedState.objectFlags.skipRivalTombStory) {
                 appendScript(state, '{@rival.lostFirstFight}');
             }
             enemy.setMode('escaping');
@@ -293,7 +293,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.speakWhenTombOpens = true;
     }
     if (enemy.params.speakWhenTombOpens && state.savedState.objectFlags.tombEntrance) {
-        if (!isRandomizer) {
+        if (!state.randomizerState) {
             appendScript(state, '{@rival.tombOpened}');
         }
         enemy.params.speakWhenTombOpens = false;

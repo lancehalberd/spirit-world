@@ -25,6 +25,7 @@ interface SavedState {
     exploredSections: number[]
     heardDialogue: number[]
     bossRushData: {[key in BossRushKey]?: SavedBossRushRecord}
+    savedRandomizerData?: SavedRandomizerState
 }
 
 // These settings are global and can be saved independent of saved state
@@ -38,6 +39,7 @@ interface Settings {
     globalVolume?: number
     musicVolume?: number
     soundVolume?: number
+    isRandomizerUnlocked?: boolean
 }
 
 interface DungeonInventory {
@@ -50,12 +52,18 @@ interface DungeonInventory {
 
 type TransitionType = 'circle' | 'fade' | 'fastFade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
 
+type GameMode = 'normal'|'randomizer'|'test';
+
 interface GameState {
     sceneStack: GameScene[]
     savedState: SavedState
     settings: Settings
+    savedRandomizerGames: SavedState[]
     savedGames: SavedState[]
     savedGameIndex: number
+    // Different game modes use different save slot arrays, so we need to track
+    // the current game mode in order to determine which array to save to.
+    savedGameMode: GameMode
     hero: Hero
     camera: { x: number, y: number, speed?: number }
     fieldTime: number
@@ -115,10 +123,6 @@ interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     }
-    randomizer?: {
-        seed: number
-        goal: number
-    }
     scriptEvents: {
         activeEvents: ActiveScriptEvent[]
         blockEventQueue: boolean
@@ -155,10 +159,81 @@ interface GameState {
     }
     arState: ARState
     bossRushState?: BossRushState
+    randomizerState?: RandomizerState
+    // This seed is used for randomizing minor variations in the game, such as the solution to some puzzles
+    // and certain random elements and areas. By default it is 0 in the normal game and uses the same
+    // value as the randomizer seed for randomized games.
+    variantSeed: number
     travel?: (zoneKey: string, markerId: string, options?: any) => void
     // This stores the current hero data when we apply special configurations to the hero
     // data for certain mini games, such as special conditions during Boss Rush battles.
     backupHeroData?: SavedHeroData
+    generatedLogicNodes: LogicNode[]
+}
+interface RandomizerGoal {
+    // How many combined points are required to finish.
+    combinedGoal?: number
+    victoryPoints?: {
+        // How many victory points are required to finish.
+        goal?: number
+        // How many victory points are available
+        total: number
+    }
+    bossPoints?: {
+        // How many boss points are required to finish.
+        goal?: number
+        // Map of boss key to point value for defeating that boss.
+        bossPoints: {[key in BossKey]?: number}
+    }
+}
+
+type RequiredKeysMap = {[key in string]: number};
+// Randomizer data that must be saved in order to recreate a randomizer seed.
+interface SavedRandomizerState {
+    goal: RandomizerGoal
+    itemSeed?: number
+    enemySeed?: number
+    entranceSeed?: number
+}
+interface RandomizerState extends SavedRandomizerState {
+    allChecks: Set<string>
+    lootAssignmentByKey: {[key: string]: LootAssignment}
+    checksByZone: {[key: string]: Set<string>}
+    dungeonItemCountByZone: {[key: string]: number}
+    logicalZoneKeyByCheckKey: {[key: string]: LogicalZoneKey}
+    dialogueReplacements: {[npcKey: string]: {
+        [optionKey: string]: TextScript
+    }}
+
+    random?: SRandom
+    // The full set of logic nodes that are in bounds for randomization.
+    // Typically this should include any node in the game that either contains a randomizable element
+    // or is relevant to traveling between nodes with randomizable elements.
+    allNodes: LogicNode[]
+    // The set of nodes that are possible starting places for the player in the randomizer.
+    startingNodes: LogicNode[]
+    // Maps entranceId => # of zone keys to put that entrance in logic.
+    // This does not include zone on the key since entranceIds are shared across all zones
+    // and locked doors should not be shared between zones since small keys are zone specific.
+    requiredKeysMap?: RequiredKeysMap
+    // The set of all loot objects found within the randomized nodes.
+    allLootObjects?: LootWithLocation[]
+    // This represents the progress/result of randomizing the items in the game.
+    // When loot is found during the game, it will be replaced based on this assignment if one is present.
+    // Maps object.id (which uses `${dialogueKey}:${optionKey}` for loot gained in dialogue)
+    // to the LootData that has been assigned by the randomizer.
+    lootAssignments?: {[key in string]: LootData}
+    // State used to store assignment data while generating item randomization.
+    assignmentsState?: AssignmentState
+    // All items remaining to be placed grouped and prioritize by category
+    allItemSets?: LootWithLocation[][]
+    // All items remaining to be placed. Until an item is going to be placed, it is assumed to be collected by the
+    // player before determining which placement locations are in logic for the currently placed item.
+    remainingLoot?: LootWithLocation[]
+    // The initial state used as a starting point for calculating what is in logic for each item placement.
+    initialState?: GameState
+    // Items that do not effect game logic and can be quickly placed randomly after all other assignments have been made.
+    trashLoot?: LootWithLocation[]
 }
 
 type ARGameID = 'dodger'|'hota'|'target'|'targetFPS';

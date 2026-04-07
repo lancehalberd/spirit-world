@@ -1,7 +1,6 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {objectHash} from 'app/content/objects/objectHash';
 import {setSpawnLocation} from 'app/content/spawnLocations';
-import {isRandomizer} from 'app/gameConstants';
 import {showMessage} from 'app/scriptEvents';
 import {drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
@@ -71,7 +70,7 @@ export class SaveStatue implements ObjectInstance {
             } else {
                 showMessage(state, `You will return here if defeated.`);
             }
-        } else if (isRandomizer) {
+        } else if (state.randomizerState) {
             showMessage(state, '{@saveStatue.randomizer}');
             saveObjectStatus(state, this.definition, true);
         } else {

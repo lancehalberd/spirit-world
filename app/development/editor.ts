@@ -1,3 +1,4 @@
+import {generateZoneVariations} from 'app/generator/generateZoneVariations';
 import {bossTypes} from 'app/content/bosses';
 import {enemyTypes} from 'app/content/enemies';
 import {editingState} from 'app/development/editingState';
@@ -23,7 +24,9 @@ export function toggleEditing(state: GameState) {
     }
     // Switch to field scene if it isn't on the stack (typically means we are on the prologue/title/choose file scenes).
     if (!isFieldSceneInStack(state)) {
-        setSaveFileToState(state, 0, 0);
+        setSaveFileToState(state, 0, 'normal');
+        // Make sure generated zones have been created since we bypassed the file select scene.
+        generateZoneVariations(state);
         showFieldScene(state);
     }
     // Set this to 1 so the player doesn't immediately fall into pits when the editor is

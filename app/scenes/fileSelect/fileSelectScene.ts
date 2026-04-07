@@ -3,13 +3,15 @@ import {updateFileSelect} from 'app/scenes/fileSelect/updateFileSelect';
 import {sceneHash} from 'app/scenes/sceneHash';
 import {playTrack} from 'app/utils/sounds';
 
-type FileSelectMode = 'select' | 'deleteSavedGame' | 'deleteSavedGameConfirmation';
+type FileSelectMode = 'select'|'customizeRandomizer'|'deleteSavedGame'|'deleteSavedGameConfirmation';
 
 export class FileSelectScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     mode: FileSelectMode = 'select';
     cursorIndex = 0;
+    savedGames: SavedState[] = [null];
+    gameMode: GameMode = 'normal';
     update(state: GameState) {
         updateFileSelect(state, this);
     }

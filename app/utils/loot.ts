@@ -69,6 +69,15 @@ export function isBlueprints(lootType: LootType): lootType is Blueprints {
     return blueprints.includes(lootType as Blueprints);
 }
 
+const dungeonLoot: DungeonLoot[] = [
+    'map', 'smallKey', 'bigKey',
+];
+export function isDungeonLoot(lootType: LootType): lootType is DungeonLoot {
+    return dungeonLoot.includes(lootType as DungeonLoot);
+}
+
+
+
 const weaponUpgrades: WeaponUpgrades[] = ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'];
 export function isWeaponUpgrade(lootType: string): lootType is WeaponUpgrades {
     return weaponUpgrades.includes(lootType as WeaponUpgrades);

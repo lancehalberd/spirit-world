@@ -2,7 +2,7 @@
 import {editingState} from 'app/development/editingState';
 import {renderARHUD} from 'app/arGames/arGame';
 import {getLootFrame} from 'app/content/loot';
-import {CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType} from 'app/gameConstants';
+import {CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
 import {getCheckInfo} from 'app/randomizer/checks';
 import {renderSpiritBar} from 'app/render/spiritBar';
 import {sceneHash} from 'app/scenes/sceneHash';
@@ -376,7 +376,8 @@ export class HudScene implements GameScene {
                 x += barWidth + spacing;
             }
         }
-        if (isRandomizer) {
+        const randomizerState = state.randomizerState;
+        if (randomizerState) {
             // Freeze on the display of the win time once the game is completed.
             let seconds = (state.hero.savedData.winTime || state.hero.savedData.playTime) / 1000;
             const hours = (seconds / 3600) | 0;
@@ -385,9 +386,10 @@ export class HudScene implements GameScene {
             const minutesString = `${minutes}`.padStart(2, '0');
             const secondsString = seconds.toFixed(1).padStart(4, '0');
             const timeString = `${hours}:${minutesString}:${secondsString}`;
-            const info = getCheckInfo(state);
-            if (randomizerGoalType === 'victoryPoints') {
-                drawOutlinedText(context, `${Math.max(0, state.randomizer.goal - state.hero.savedData.collectibles.victoryPoint)}`, 2, CANVAS_HEIGHT - 9 - 17, {
+            const info = getCheckInfo(randomizerState, state);
+            const victoryPointGoal = randomizerState.goal.victoryPoints?.goal;
+            if (victoryPointGoal) {
+                drawOutlinedText(context, `${Math.max(0, victoryPointGoal - state.hero.savedData.collectibles.victoryPoint)}`, 2, CANVAS_HEIGHT - 9 - 17, {
                     textBaseline: 'middle',
                     textAlign: 'left',
                     size: 16,

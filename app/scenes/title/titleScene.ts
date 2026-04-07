@@ -24,10 +24,14 @@ const textOptions = <const>{
 };
 
 function getTitleOptions(state: GameState): string[] {
-    const titleMenu = ['START', 'SETTINGS'];
+    const titleMenu = ['START'];
+    if (state.settings.isRandomizerUnlocked) {
+        titleMenu.push('RANDOM');
+    }
+    titleMenu.push('SETTINGS');
     // only display 'QUIT' if game is being played inside of Electron as a desktop app
     if (window.electronAPI && state.gameHasBeenInitialized) {
-        return [...titleMenu, 'QUIT'];
+        titleMenu.push('QUIT');
     }
     return titleMenu;
 }
@@ -65,7 +69,10 @@ export class TitleScene implements GameScene {
             playSound('menuTick');
             switch (selectedOption) {
             case 'START':
-                showFileSelectScene(state);
+                showFileSelectScene(state, 'normal');
+                break;
+            case 'RANDOM':
+                showFileSelectScene(state, 'randomizer');
                 break;
             case 'SETTINGS':
                 showSettingsScene(state);

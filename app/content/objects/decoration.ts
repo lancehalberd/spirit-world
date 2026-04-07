@@ -136,7 +136,7 @@ const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow]
 ).frames;
 const logPile: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
             if (x + 16 > decoration.x + decoration.w) {
                 drawFrameContentAt(context, oneLog, {x: x - 4, y: decoration.y});
@@ -150,7 +150,7 @@ const logPile: DecorationType = {
         }
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         for (let x = decoration.x; x < decoration.x + decoration.w; x += 16) {
             if (x + 16 > decoration.x + decoration.w) {
                 drawFrameContentAt(context, oneLogShadow, {x: x - 4, y: decoration.y});
@@ -209,7 +209,7 @@ const basketFrames = [basketEmptyFrame, basketRiceFrame, basketBeansFrame,
     basketClothesFrame, basketLidFrame];
 const basket: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.element(basketFrames);
         drawFrameContentAt(context, variantFrame, decoration);
     },
@@ -268,7 +268,7 @@ const [cushionShadaowFrame] = createAnimation('gfx/objects/furniture/beds.png',
 ).frames;
 const cushion: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.element(cushionFrames);
         drawFrameContentAt(context, variantFrame, decoration);
     },
@@ -340,7 +340,7 @@ const fireplaceAnimation = createAnimation('gfx/objects/furniture/woodAndFirepla
 const fireplace: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, fireplaceFrame, decoration);
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const target = {
             x: decoration.x + 6,
             y: decoration.y - 4,
@@ -449,7 +449,7 @@ const kettleFrames = createAnimation('gfx/objects/furniture/dishware.png',
 ).frames;
 const kettle: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.element(kettleFrames);
         if (decoration.d === 'left') {
             drawFrameContentReflectedAt(context, variantFrame, decoration);
@@ -483,7 +483,7 @@ const fancySilverwareMap = {
 };
 const placeSettingFancy: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.mutate().element([fancyPlate, fancyBowl]);
         const elements = [{
             frame: variantFrame,
@@ -554,7 +554,7 @@ const claySilverwareMap = {
 };
 const placeSettingNormal: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.mutate().element([clayPlate, clayBowl]);
         const elements = [{
             frame: variantFrame,
@@ -612,7 +612,7 @@ const pottedPlantFrames = createAnimation('gfx/objects/furniture/pottedPlants.pn
 ).frames;
 const pottedPlant: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.element(pottedPlantFrames);
         drawFrameContentAt(context, variantFrame, decoration);
     },
@@ -653,7 +653,7 @@ const topRightCobwebs = requireFrame('gfx/objects/furniture/shelves.png', {x: 26
 const shelfYOffsets = [-10, -19, -28]
 const shelves: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         let x = decoration.x;
         while (x < decoration.x + decoration.w) {
             if (x <= decoration.x + decoration.w - 32) {
@@ -711,7 +711,7 @@ const shelves: DecorationType = {
 
 const emptyShelves: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         let x = decoration.x;
         while (x < decoration.x + decoration.w) {
             if (x <= decoration.x + decoration.w - 32) {
@@ -768,7 +768,7 @@ const [stumpFrame, stumpShadowFrame, stumpAxe1Frame, stumpAxe2Frame] = createAni
 const stump: DecorationType = {
     render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
         drawFrameContentAt(context, stumpFrame, decoration);
-        const random = getVariantRandom(decoration.definition);
+        const random = getVariantRandom(state, decoration.definition);
         const variantFrame = random.element([null, stumpAxe1Frame, stumpAxe2Frame]);
         if (variantFrame){
             drawFrameContentAt(context, variantFrame, {x: decoration.x + 2, y: decoration.y});

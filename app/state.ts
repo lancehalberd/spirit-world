@@ -1,19 +1,15 @@
 import {SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
 import {zones} from 'app/content/zones';
-import {randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import {getDefaultSavedState } from 'app/savedState'
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
-//import {fixProgressFlagsOnLoad, fixSpawnLocationOnLoad} from 'app/utils/fixState';
 import {getFullZoneLocation, /*getShortZoneName*/ } from 'app/utils/getFullZoneLocation';
-//import {cloneDeep, mergeDeep} from 'app/utils/index';
-//import {returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import {readGetParameterAsInt} from 'app/utils/index';
 
-export function loadSavedData(): boolean {
-    //return false;
+export function loadSavedData() {
     if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {
-        return false;
+        return;
     }
     const importedSettings = window.localStorage.getItem('settings');
     if (importedSettings) {
@@ -25,14 +21,7 @@ export function loadSavedData(): boolean {
     }
     // This window variable should be set on page load from the users stored preferences.
     state.settings.muteAllSounds = window['muteAllSounds'] ?? state.settings.muteAllSounds;
-
-    if (randomizerSeed) {
-        state.randomizer = {
-            seed: randomizerSeed,
-            goal: randomizerGoal,
-        };
-    }
-    const importedSaveData = window.localStorage.getItem('savedGames' + (randomizerSeed || ''));
+    const importedSaveData = window.localStorage.getItem('savedGames');
     if (importedSaveData) {
         const rawSavedGames = JSON.parse(importedSaveData);
         // Migrate hero => savedHeroData for older save files.
@@ -42,18 +31,26 @@ export function loadSavedData(): boolean {
                 delete savedGame.hero;
             }
         }
+        // Enfore a limit of 3 regular save files.
         state.savedGames = rawSavedGames.slice(0, 3);
-        // Only show a single save file when using seeds.
-        if (randomizerSeed) {
-           state.savedGames = rawSavedGames.slice(0, 1);
+    }
+    const importedRandomizerSaveData = window.localStorage.getItem('savedRandomizerGames');
+    if (importedRandomizerSaveData) {
+        const rawSavedGames = JSON.parse(importedRandomizerSaveData);
+        // Migrate hero => savedHeroData for older save files.
+        for (const savedGame of rawSavedGames) {
+            if (savedGame?.hero) {
+                savedGame.savedHeroData = savedGame.hero;
+                delete savedGame.hero;
+            }
         }
-        return true;
-    } else {
-        if (randomizerSeed) {
-            state.savedGames = [null];
+        // Enfore a limit of 10 randomizer save files.
+        state.savedRandomizerGames = rawSavedGames.slice(0, 10);
+        // As long as there are fewer than 10 slots, make sure there is a new empty slot at the end of the list.
+        if (state.savedRandomizerGames.length < 10 && state.savedRandomizerGames[state.savedRandomizerGames.length - 1] !== null) {
+            state.savedRandomizerGames.push(null);
         }
     }
-    return false;
 }
 
 export function eraseAllSaves(): void {
@@ -65,7 +62,10 @@ export function getDefaultState(): GameState {
         sceneStack: [],
         savedState: getDefaultSavedState(),
         savedGames: [null, null, null],
+        // Start with a single randomizer slot. This can be increased by up to 10.
+        savedRandomizerGames: [null],
         savedGameIndex: -1,
+        savedGameMode: 'normal',
         settings: {
             muteAllSounds: false,
         },
@@ -118,6 +118,9 @@ export function getDefaultState(): GameState {
             active: false,
             scene: 'choose',
         },
+        variantSeed: readGetParameterAsInt('variantSeed'),
+        // logic nodes for generated content will be stored here.
+        generatedLogicNodes: [],
     };
     return state;
 }
@@ -126,7 +129,7 @@ let state: GameState;
 export function initializeState() {
     state = getDefaultState();
     loadSavedData();
-    setSaveFileToState(state, 0);
+    setSaveFileToState(state, 0, 'normal');
     if (Math.random() < 0.5) {
         showIntroScene(state);
     } else {

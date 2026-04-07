@@ -4,7 +4,7 @@ import {getLootFrame, getLootShadowFrame, showLootMessage} from 'app/content/loo
 import {lootEffects} from 'app/content/lootEffects';
 import {editingState} from 'app/development/editingState';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
-import {playSound} from 'app/utils/sounds';
+import {getMappedLootData} from 'app/randomizer/utils';
 import {showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrame, drawFrameAt, getFrameHitbox} from 'app/utils/animations';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
@@ -14,6 +14,7 @@ import {setObjectFlag} from 'app/utils/objectFlags';
 import {addObjectToArea, getObjectStatus, removeObjectFromArea} from 'app/utils/objects';
 import {saveGame} from 'app/utils/saveGame';
 import {drawARFont} from 'app/utils/smallFont';
+import {playSound} from 'app/utils/sounds';
 
 
 /*const [coin] =
@@ -143,7 +144,7 @@ export class LootObject implements ObjectInstance {
     time = 0;
     constructor(state: GameState, definition: LootObjectDefinition) {
         this.definition = definition;
-        this.frame = getLootFrame(state, definition);
+        this.frame = getLootFrame(state, getActualLootDefinition(state, this.definition));
         this.x = definition.x;
         this.y = definition.y;
         this.z = definition.z ?? 0;
@@ -152,7 +153,7 @@ export class LootObject implements ObjectInstance {
             this.status = 'gone';
         }
     }
-    getHitbox(state?: GameState) {
+    getHitbox() {
         return getFrameHitbox(this.frame, this);
     }
     isVisibleToPlayer(state: GameState): boolean {
@@ -185,7 +186,8 @@ export class LootObject implements ObjectInstance {
             state.savedState.objectFlags[this.definition.id + '-peeked'] = true;
             // Mark empty loot as gone when it is peeked so it will automatically advance
             // the check counter in randomizer when peeked.
-            if (this.definition.lootType === 'empty') {
+            const lootData = getMappedLootData(state.randomizerState, this.definition);
+            if (lootData.lootType === 'empty') {
                 state.savedState.objectFlags[this.definition.id] = true;
                 this.status = 'gone';
                 return;
@@ -249,7 +251,8 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
-        if (!editingState.isEditing && this.definition.lootType === 'empty') {
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
+        if (!editingState.isEditing && lootData.lootType === 'empty') {
             return;
         }
         drawFrameAt(context, this.frame, { x: this.x, y: this.y - this.z });
@@ -260,7 +263,8 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
-        if (this.definition.lootType === 'empty') {
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
+        if (lootData.lootType === 'empty') {
             return;
         }
         const frame = getLootShadowFrame(this.definition);
@@ -272,35 +276,46 @@ export class LootObject implements ObjectInstance {
 }
 
 function getActualLootDefinition(this: void, state: GameState, definition: AnyLootDefinition): AnyLootDefinition {
-    if (definition.lootType === 'spiritPower') {
+    const lootData = getMappedLootData(state.randomizerState, definition);
+    if (lootData.lootType === 'spiritPower') {
         if (!state.hero.savedData.passiveTools.spiritSight) {
             return {
                 ...definition,
+                ...lootData,
                 lootType: 'spiritSight',
             };
         } else if (!state.hero.savedData.passiveTools.astralProjection) {
             return {
                 ...definition,
+                ...lootData,
                 lootType: 'astralProjection',
             };
         }
         return {
             ...definition,
+            ...lootData,
             lootType: 'teleportation',
         };
     }
-    if (definition.lootType === 'secondChance' && state.hero.savedData.hasRevive) {
+    if (lootData.lootType === 'secondChance' && state.hero.savedData.hasRevive) {
         return {
             ...definition,
+            ...lootData,
             lootType: 'money',
             lootAmount: 50,
         };
     }
-    return definition;
+    return {
+        ...definition,
+        ...lootData,
+    };
 }
 
 export function getLoot(this: void, state: GameState, definition: AnyLootDefinition): void {
     definition = getActualLootDefinition(state, definition);
+    if (!definition.lootType || definition.lootType === 'empty') {
+        return;
+    }
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
     state.hero.action = 'getItem';
     const lootAnimation = new LootGetAnimation(state, definition);
@@ -413,7 +428,8 @@ export class ChestObject implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     isOpen(state: GameState): boolean {
-        return (!!state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
+        return (!!state.savedState.objectFlags[this.definition.id] || lootData.lootType === 'empty');
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         if (hero.isAstralProjection) {
@@ -430,7 +446,8 @@ export class ChestObject implements ObjectInstance {
         }
         state.hero.action = null;
         if (this.isOpen(state)) {
-            if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
+            const lootData = getMappedLootData(state.randomizerState, this.definition);
+            if (state.savedState.objectFlags[this.definition.id] && lootData.lootType !== 'empty') {
                 showMessage(state, 'You already opened this chest.');
             } else {
                 showMessage(state, 'Looks like somebody already opened this chest.');
@@ -445,12 +462,13 @@ export class ChestObject implements ObjectInstance {
         state.map.needsRefresh = true;
     }
     update(state: GameState) {
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
         // Make sure empty chests are recorded as opened for the randomizer, since some logic
         // depends on whether a chest was opened yet (cocoon small key chest, for example).
         if (this.definition.id && !state.savedState.objectFlags[this.definition.id] && this.isOpen(state)) {
             if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
                 && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
-                && this.definition.lootType === 'empty'
+                && lootData.lootType === 'empty'
             ) {
                 setObjectFlag(state, this.definition.id);
                 saveGame(state);
@@ -507,8 +525,9 @@ export class BigChest extends ChestObject implements ObjectInstance {
             return;
         }
         state.hero.action = null;
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
         if (this.isOpen(state)) {
-            if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
+            if (state.savedState.objectFlags[this.definition.id] && lootData.lootType !== 'empty') {
                 showMessage(state, 'You already opened this chest.');
             } else {
                 showMessage(state, 'Looks like somebody already opened this chest.');
@@ -585,9 +604,10 @@ export class ShopObject extends LootObject implements ObjectInstance {
         ) {
             return;
         }
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
         if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
             && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
-            && this.definition.lootType === 'empty'
+            && lootData.lootType === 'empty'
         ) {
             state.savedState.objectFlags[this.definition.id] = true;
             this.status = 'gone';
@@ -601,11 +621,12 @@ export class ShopObject extends LootObject implements ObjectInstance {
         ) {
             return;
         }
-        if (!editingState.isEditing && this.definition.lootType === 'empty') {
+        const lootData = getMappedLootData(state.randomizerState, this.definition);
+        if (!editingState.isEditing && lootData.lootType === 'empty') {
             return;
         }
         drawFrameAt(context, this.frame, { x: this.x, y: this.y });
-        const hitbox = this.getHitbox(state);
+        const hitbox = this.getHitbox();
         /*drawFrameCenteredAt(context, coin, {
             x: hitbox.x + hitbox.w / 2 - coin.w / 2,
             y: hitbox.y + hitbox.h,

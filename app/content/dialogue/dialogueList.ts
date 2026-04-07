@@ -1,6 +1,5 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { zones } from 'app/content/zones/zoneHash';
-import { isRandomizer } from 'app/gameConstants';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {zones} from 'app/content/zones/zoneHash';
 
 
 interface DialogueData {
@@ -146,7 +145,7 @@ export function populateAllDialogue() {
     }
     for (let index = 0; index < allDialogue.length; index++) {
         const dialogue = allDialogue[index];
-        if (!isRandomizer && dialogue?.wasMoved) {
+        if (dialogue?.wasMoved) {
             console.log(dialogue.hashData
                 ? dialogue.hashData
                 : `Zone dialogue from ${dialogue.objectData.zoneKey}:${dialogue.oldIndex}`,

@@ -1,17 +1,16 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { variantSeed } from 'app/gameConstants';
 import { removeObjectFromArea } from 'app/utils/objects';
 import { Indicator } from 'app/content/objects/indicator';
 import { addObjectToArea } from 'app/utils/objects';
 import SRandom from 'app/utils/SRandom';
 
 
-const warTempleRandom = SRandom.seed(variantSeed).addSeed(972356);
+const warTempleRandom = (state: GameState) => SRandom.seed(state.variantSeed).addSeed(972356);
 
 specialBehaviorsHash.warTempleEntranceSwitch = {
     type: 'floorSwitch',
     apply(state: GameState, object: ObjectInstance) {
-        const random = warTempleRandom.addSeed(object.definition.x + object.definition.y);
+        const random = warTempleRandom(state).addSeed(object.definition.x + object.definition.y);
         object.x = object.definition.x + 16 * Math.floor(2 * random.generateAndMutate());
         object.y = object.definition.y + 16 * Math.floor(3 * random.generateAndMutate());
     }
@@ -22,12 +21,12 @@ specialBehaviorsHash.warTempleEntrancePot = {
     apply(state: GameState, object: ObjectInstance) {
         const offsets = [[0, 0], [16, 0], [0, 16]];
         if (object.definition.id === 'overworldWarTemplePotA') {
-            const [x, y] = warTempleRandom.addSeed(3).element(offsets);
+            const [x, y] = warTempleRandom(state).addSeed(3).element(offsets);
             object.x = object.definition.x + x;
             object.y = object.definition.y + y;
         }
         if (object.definition.id === 'overworldWarTemplePotB') {
-            const [x, y] = warTempleRandom.addSeed(4).element(offsets);
+            const [x, y] = warTempleRandom(state).addSeed(4).element(offsets);
             object.x = object.definition.x - x;
             object.y = object.definition.y + y;
         }
@@ -37,7 +36,7 @@ specialBehaviorsHash.warTempleEntrancePot = {
 specialBehaviorsHash.warTempleSpiritPot = {
     type: 'pushPull',
     apply(state: GameState, object: ObjectInstance) {
-        const index = warTempleRandom.addSeed(5).range(0, 3);
+        const index = warTempleRandom(state).addSeed(5).range(0, 3);
         if (object.definition.id === 'warTemplePot' + index) {
             removeObjectFromArea(state, object);
         } else {
@@ -57,7 +56,7 @@ specialBehaviorsHash.warTempleCrackedPot = {
     type: 'tippable',
     apply(state: GameState, object: ObjectInstance) {
         const offsets = [[0, 0], [16, -16], [16, 16], [32, 0]];
-        const [x, y] = warTempleRandom.addSeed(3).element(offsets);
+        const [x, y] = warTempleRandom(state).addSeed(3).element(offsets);
         object.x = object.definition.x + x;
         object.y = object.definition.y + y;
     }

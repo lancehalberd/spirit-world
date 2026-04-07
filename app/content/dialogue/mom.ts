@@ -1,6 +1,6 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { randomizerGoalType } from 'app/gameConstants';
-import { saveGame } from 'app/utils/saveGame';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {getPendingRandomizerGoals} from 'app/randomizer/goal';
+import {saveGame} from 'app/utils/saveGame';
 
 
 dialogueHash.mom = {
@@ -13,23 +13,14 @@ dialogueHash.mom = {
             if (state.hero.savedData.winTime) {
                 return 'You did great!{|}Feel free to keep exploring if you like!';
             }
-            if (randomizerGoalType === 'finalBoss') {
-                if (state.location.zoneKey === 'void') {
-                    state.hero.savedData.winTime = state.hero.savedData.playTime;
-                    saveGame(state);
-                    return 'Finished!'
-                }
-                return `You must talk to me after defeating the final boss to finish.`;
+            const requirements = getPendingRandomizerGoals(state.randomizerState, state);
+            if (!requirements.length) {
+                state.hero.savedData.winTime = state.hero.savedData.playTime;
+                saveGame(state);
+                return 'Finished!'
             }
-            if (randomizerGoalType === 'victoryPoints') {
-                if (state.hero.savedData.collectibles.victoryPoint >= state.randomizer.goal) {
-                    state.hero.savedData.winTime = state.hero.savedData.playTime;
-                    saveGame(state);
-                    return 'Finished!'
-                }
-                return `You must find ${state.randomizer.goal} victory points and talk to me to finish!`;
-            }
-            return `Your guess is as good as mine.`;
+            requirements.push('Then speak with me to finish.')
+            return requirements.join('[-]');
         },
     },
     options: [

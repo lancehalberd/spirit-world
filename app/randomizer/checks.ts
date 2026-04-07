@@ -1,29 +1,21 @@
+import {isDungeonLoot} from 'app/utils/loot';
 
-
-const allChecks = new Set<string>();
-const lootAssignmentByKey: {[key: string]: LootAssignment} = {};
-const checksByZone: {[key: string]: Set<string>} = {};
-const dungeonItemCountByZone: {[key: string]: number} = {};
-const logicalZoneKeyByCheckKey: {[key: string]: LogicalZoneKey} = {};
-window['allChecks'] = allChecks;
-window['checksByZone'] = checksByZone;
-
-export function getCheckInfo(state: GameState, logicalZoneKey = state.location.logicalZoneKey) {
+export function getCheckInfo(randomizerState: RandomizerState, state: GameState, logicalZoneKey = state.location.logicalZoneKey) {
     let checksCompleted = 0;
     let zoneChecksCompleted = 0;
-    for (const key of allChecks.keys()) {
+    for (const key of randomizerState.allChecks.keys()) {
         if (state.savedState.objectFlags[key]) {
             checksCompleted++;
         }
     }
-    const zoneChecks = checksByZone[logicalZoneKey] || new Set<string>();
+    const zoneChecks = randomizerState.checksByZone[logicalZoneKey] || new Set<string>();
     for (const key of zoneChecks.keys()) {
         if (state.savedState.objectFlags[key]) {
             zoneChecksCompleted++;
         }
     }
     return {
-        totalChecks: allChecks.size,
+        totalChecks: randomizerState.allChecks.size,
         checksCompleted,
         totalZoneChecks: zoneChecks.size,
         zoneChecksCompleted,
@@ -40,7 +32,7 @@ const dungeonLoot: LootType[] = [
     'smallKey', 'bigKey', 'map'
 ];
 
-export function isCheckTrash(state: GameState, check: LootWithLocation): boolean {
+export function isCheckTrash(randomizerState: RandomizerState, state: GameState, check: LootWithLocation): boolean {
     try {
         // Peeked items are trash
         if (state.savedState.objectFlags[check.lootObject.id + '-peeked']) {
@@ -60,7 +52,7 @@ export function isCheckTrash(state: GameState, check: LootWithLocation): boolean
             const {dialogueKey, optionKey} = check;
             checkFlag = `${dialogueKey}-${optionKey}`;
         }
-        const logicalZoneKey = logicalZoneKeyByCheckKey[checkFlag];
+        const logicalZoneKey = randomizerState.logicalZoneKeyByCheckKey[checkFlag];
         // Dungeon items are trash even if they aren't peeked if we know there are no non-dungeon items left
         // to get.
         if (dungeonLoot.includes(check.lootObject.lootType)) {
@@ -82,13 +74,13 @@ export function isCheckTrash(state: GameState, check: LootWithLocation): boolean
                 // The big key is the only required dungeon item to reach the boss.
                 return false;
             }
-            const zoneChecks = checksByZone[logicalZoneKey] || new Set<string>();
+            const zoneChecks = randomizerState.checksByZone[logicalZoneKey] || new Set<string>();
             // If we find any non-dungeon loot left in this zone, then any un-peeked checks might be good.
             for (const key of zoneChecks.keys()) {
                 if (state.savedState.objectFlags[key]) {
                     continue;
                 }
-                const lootType = lootAssignmentByKey[key].lootType;
+                const lootType = randomizerState.lootAssignmentByKey[key].lootType;
                 if (state.savedState.objectFlags[key + '-peeked'] && trashLoot.includes(lootType)) {
                     continue;
                 }
@@ -110,13 +102,14 @@ export function isCheckTrash(state: GameState, check: LootWithLocation): boolean
 }
 window.isCheckTrash = isCheckTrash;
 
-export function addCheck(checkId: string, assignment: LootAssignment, logicalZoneKey: LogicalZoneKey) {
+export function addCheck(randomizerState: RandomizerState, checkId: string, assignment: LootAssignment, logicalZoneKey: LogicalZoneKey) {
+    const {allChecks, checksByZone, dungeonItemCountByZone, lootAssignmentByKey, logicalZoneKeyByCheckKey} = randomizerState;
     allChecks.add(checkId);
     checksByZone[logicalZoneKey] = checksByZone[logicalZoneKey] || new Set();
     checksByZone[logicalZoneKey].add(checkId);
     lootAssignmentByKey[checkId] = assignment;
     logicalZoneKeyByCheckKey[checkId] = logicalZoneKey;
-    if (dungeonLoot.includes(assignment.lootType)) {
+    if (isDungeonLoot(assignment.lootType)) {
         dungeonItemCountByZone[logicalZoneKey] = (dungeonItemCountByZone[logicalZoneKey] || 0) + 1;
     }
 }

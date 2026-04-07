@@ -1,11 +1,10 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
-import {isRandomizer} from 'app/gameConstants';
 
 dialogueHash.spiritTree = {
     key: 'spiritTree',
     mappedOptions: {
         interact(state: GameState) {
-            if (isRandomizer) {
+            if (state.randomizerState) {
                 if (state.savedState.objectFlags.spiritTreeRandomizerReward) {
                     return `That's all I have for you this time.`;
                 }

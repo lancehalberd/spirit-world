@@ -1,4 +1,4 @@
-import { readGetParameter, readGetParameterAsInt } from 'app/utils/index';
+import {readGetParameter, readGetParameterAsInt} from 'app/utils/index';
 
 // Update duration in milliseconds.
 export const FRAME_LENGTH = 20;
@@ -68,22 +68,7 @@ export const itemSeed = readGetParameterAsInt('itemSeed') || randomizerSeed;
 // For future use, seed that will control variations that modify the overall structure and flow of the game.
 // This could change the overworld layout, which dungeons are present, etc.
 export const worldSeed = readGetParameterAsInt('worldSeed');
-
-// This seed is used for randomizing minor variations in the game, such as the solution to some puzzles
-// and certain random elements and areas.
-export const variantSeed = readGetParameterAsInt('variantSeed') || randomizerSeed;
-// Limit randomizer total to 999 to avoid having the victory point display get too large.
-export const randomizerTotal = Math.min(readGetParameterAsInt('total') || 30, 999);
-const isBossGoal = readGetParameter('goal') === 'boss';
-export const randomizerGoalType: 'victoryPoints' | 'finalBoss' = isBossGoal ? 'finalBoss' : 'victoryPoints';
-const defaultGoalCount = (randomizerTotal * 2 / 3) | 0;
-export const randomizerGoal = Math.min(randomizerTotal, readGetParameterAsInt('goal') || defaultGoalCount);
 export const enemySeed = readGetParameterAsInt('enemySeed');
-
-// Setting any of these seeds will put the game in randomizer mode.
-// In randomizer mode, story elements are removed and HUD elements are added showing remaining checks/victory points.
-export const isRandomizer = !!entranceSeed || !!itemSeed || !!enemySeed;
-window.isRandomizer = isRandomizer;
 
 // 'foreground3' is rarely required for certain combinations of trees.
 export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];

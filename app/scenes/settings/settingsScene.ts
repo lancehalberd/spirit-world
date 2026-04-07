@@ -14,17 +14,6 @@ import {updateAndExportSoundSettings} from 'app/utils/soundSettings';
 
 
 const MARGIN = 20;
-
-
-export const outerMenuFrame = {
-    x: MARGIN * 1.5,
-    y: MARGIN * 1.5,
-    w: CANVAS_WIDTH - 3 * MARGIN,
-    h: CANVAS_HEIGHT - 2.5 * MARGIN,
-};
-
-export const innerMenuFrame = pad(outerMenuFrame, -10);
-
 const WIDTH = CANVAS_WIDTH - 3 * MARGIN;
 const ROW_HEIGHT = 20;
 

@@ -6,7 +6,6 @@ export * from 'app/content/variants';
 export * from 'app/content/specialBehaviors';
 export * from 'app/development/tests';
 export * from 'app/development/tileEditor';
-export * from 'app/randomizer/main';
 export * from 'app/scenes/scenes';
 
 import { addContextMenuListeners } from 'app/development/contextMenu';
@@ -24,6 +23,8 @@ import { getState } from 'app/state';
 import { updateMusic } from 'app/musicController';
 
 export * from 'app/development/packFont';
+
+export * from 'app/randomizer/showRandomizerSolution';
 
 // setInterval(update, FRAME_LENGTH);
 

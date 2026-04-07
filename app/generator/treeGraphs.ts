@@ -7,9 +7,8 @@ import {
     hasSmallKey, hasSpiritBarrier, hasWeapon,
 } from 'app/content/logic';
 import { zones } from 'app/content/zones/zoneHash';
-import { variantSeed } from 'app/gameConstants';
 import { getOrAddLayer } from 'app/utils/layers';
-import srandom from 'app/utils/SRandom';
+import SRandom from 'app/utils/SRandom';
 import { createSpecialCaveFloor } from 'app/generator/styles/cave';
 import { createSpecialStoneFloor } from 'app/generator/styles/stone';
 import { generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath } from 'app/generator/skeletons/basic';
@@ -17,7 +16,7 @@ import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } f
 import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
 import { pad } from 'app/utils/index';
 
-const baseVariantRandom = srandom.seed(variantSeed);
+const baseVariantRandom = (state: GameState) => SRandom.seed(state.variantSeed);
 
 /* 
 TODO: Add location cues to stairs/entrances/teleporters
@@ -1199,77 +1198,78 @@ const tombTreeNoLocks: TreeNode = {
 };
 
 
-
-createZoneFromTree({
-    random: baseVariantRandom,
-    zoneId: 'hiddenTomb',
-    tree: tombTreeNoLocks,
-    constraints: {
-        // The dungeon cannot extend south past the entrance.
-        maxY: 1,
-        // The dungeon is at most 3x3 super tiles
-        maxW: 6,
-        maxH: 6,
-        // The dungeon has no upper floors.
-        maxZ: 0,
-    },
-    // Make the entrance on the south side of the top floor of the dungeon near the center.
-    entrance: {x: [2, 3], y: [1,1], z: [0, 0]},
-});
-
-
-// Enemy set: Snake, all beetles
-// Unique Enemy Set: Golem Hand, Ent, Arrow Turret, elements+plants
-const mountainPassage: TreeNode = {
-    entrance: {
-        d: 'down',
-        type: 'door',
-        id: 'tombEntrance',
-        targetZone: 'overworld',
-        targetObjectId: 'mountainPassageEntrance',
-    },
-    style: 'cave',
-    nodes: [
-        { lootType: 'money', lootAmount: 50},
-        { lootType: 'peachOfImmortalityPiece', requirements: [[hasMediumRange], [hasSpiritBarrier]]},
-        {
-            difficultyModifier: 5,
-            nodes: [
-                // TODO: Add a portal to this cave when we support hybrid caves.
-                //{ type: 'portal', requirements: [[hasClone], [hasStaff]]},
-                {
-                    entrance: {
-                        d: 'down',
-                        type: 'door',
-                        id: 'tombEntrance',
-                        targetZone: 'overworld',
-                        targetObjectId: 'mountainPassageEntrance',
-                    },
-                    requirements: [[hasCloudBoots], [hasAstralProjection]]
-                },
-            ],
+export function generateZones(state: GameState) {
+    createZoneFromTree({
+        random: baseVariantRandom(state),
+        zoneId: 'hiddenTomb',
+        tree: tombTreeNoLocks,
+        constraints: {
+            // The dungeon cannot extend south past the entrance.
+            maxY: 1,
+            // The dungeon is at most 3x3 super tiles
+            maxW: 6,
+            maxH: 6,
+            // The dungeon has no upper floors.
+            maxZ: 0,
         },
-    ],
-};
+        // Make the entrance on the south side of the top floor of the dungeon near the center.
+        entrance: {x: [2, 3], y: [1,1], z: [0, 0]},
+    });
 
-createZoneFromTree({
-    random: baseVariantRandom,
-    zoneId: 'mountainPassage',
-    // TODO: swap these when actually generating the mountain passage.
-    tree: {...mountainPassage, nodes: []},
-    // tree: mountainPassage,
-    constraints: {
-        // The dungeon cannot extend south past the entrance.
-        maxY: 1,
-        // The dungeon is at most 3x3 super tiles
-        maxW: 6,
-        maxH: 6,
-        // The dungeon has no upper floors.
-        maxZ: 0,
-    },
-    // Make the entrance on the south side of the top floor of the dungeon near the center.
-    entrance: {x: [2, 3], y: [1,1], z: [0, 0]},
-});
+
+    // Enemy set: Snake, all beetles
+    // Unique Enemy Set: Golem Hand, Ent, Arrow Turret, elements+plants
+    const mountainPassage: TreeNode = {
+        entrance: {
+            d: 'down',
+            type: 'door',
+            id: 'tombEntrance',
+            targetZone: 'overworld',
+            targetObjectId: 'mountainPassageEntrance',
+        },
+        style: 'cave',
+        nodes: [
+            { lootType: 'money', lootAmount: 50},
+            { lootType: 'peachOfImmortalityPiece', requirements: [[hasMediumRange], [hasSpiritBarrier]]},
+            {
+                difficultyModifier: 5,
+                nodes: [
+                    // TODO: Add a portal to this cave when we support hybrid caves.
+                    //{ type: 'portal', requirements: [[hasClone], [hasStaff]]},
+                    {
+                        entrance: {
+                            d: 'down',
+                            type: 'door',
+                            id: 'tombEntrance',
+                            targetZone: 'overworld',
+                            targetObjectId: 'mountainPassageEntrance',
+                        },
+                        requirements: [[hasCloudBoots], [hasAstralProjection]]
+                    },
+                ],
+            },
+        ],
+    };
+
+    createZoneFromTree({
+        random: baseVariantRandom(state),
+        zoneId: 'mountainPassage',
+        // TODO: swap these when actually generating the mountain passage.
+        tree: {...mountainPassage, nodes: []},
+        // tree: mountainPassage,
+        constraints: {
+            // The dungeon cannot extend south past the entrance.
+            maxY: 1,
+            // The dungeon is at most 3x3 super tiles
+            maxW: 6,
+            maxH: 6,
+            // The dungeon has no upper floors.
+            maxZ: 0,
+        },
+        // Make the entrance on the south side of the top floor of the dungeon near the center.
+        entrance: {x: [2, 3], y: [1,1], z: [0, 0]},
+    });
+}
 /*
 
     - Exit blocked by Cloud Boots/Ice(U-turn cracked ground) or Astral Projection (pot switches in both worlds)

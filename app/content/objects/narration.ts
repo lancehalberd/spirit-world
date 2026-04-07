@@ -1,9 +1,9 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
-import { setScript } from 'app/scriptEvents';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
-import { isObjectInCurrentSection } from 'app/utils/sections';
+import {objectHash} from 'app/content/objects/objectHash';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {setScript} from 'app/scriptEvents';
+import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import {isObjectInCurrentSection} from 'app/utils/sections';
 
 
 export class Narration implements ObjectInstance {
@@ -36,7 +36,7 @@ export class Narration implements ObjectInstance {
         return { x: this.x, y: this.y, w: this.definition.w, h: this.definition.h };
     }
     runScript(state: GameState): void {
-        if (isRandomizer && !this.definition.important) {
+        if (state.randomizerState && !this.definition.important) {
             return;
         }
         setScript(state, this.definition.message);
@@ -45,7 +45,7 @@ export class Narration implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.status === 'gone') {
-            if (this.definition.specialBehaviorKey && (!isRandomizer || this.definition.important) && isObjectInCurrentSection(state, this)) {
+            if (this.definition.specialBehaviorKey && (!state.randomizerState || this.definition.important) && isObjectInCurrentSection(state, this)) {
                 const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNarrationBehavior;
                 specialBehavior?.update(state, this);
             }
@@ -56,7 +56,7 @@ export class Narration implements ObjectInstance {
             this.status = 'gone';
             return;
         }
-        if (isRandomizer && !this.definition.important) {
+        if (state.randomizerState && !this.definition.important) {
             this.status = 'gone';
             saveObjectStatus(state, this.definition);
             return;

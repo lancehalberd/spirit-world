@@ -60,7 +60,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             console.error('Unhandled loot type:', loot.lootType);
             // throw new Error('Unhandled loot type: ' + loot.lootType);
         }
-        updateHeroMagicStats(state);
+        updateHeroMagicStats(state, false);
     },
     bigKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);

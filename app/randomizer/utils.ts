@@ -1,29 +1,14 @@
-import {dialogueHash} from 'app/content/dialogue/dialogueHash';
-import {getRandomizerZoneDescription} from 'app/content/hints';
 import {isLogicValid} from 'app/content/logic';
-import {getLootName} from 'app/content/loot';
 import {lootEffects} from 'app/content/lootEffects';
 import {getZone, zones} from 'app/content/zones';
-
-import {randomizerGoal, randomizerGoalType, randomizerTotal} from 'app/gameConstants';
-
-import {allNodes} from 'app/randomizer/allNodes';
-import {addCheck} from 'app/randomizer/checks';
 import {
     canOpenDoor,
     findDoorById,
-    findLootById,
-    findLootObjects,
-    findReachableChecks,
     findReachableNodes,
 } from 'app/randomizer/find';
 import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
-
 import {cloneDeep} from 'app/utils/index';
-import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
-import {getDefaultState} from 'app/state';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
-import SRandom from 'app/utils/SRandom';
 
 
 interface LootDrops {
@@ -105,7 +90,7 @@ function exportLootData() {
 window['exportLootData'] = exportLootData;
 
 
-export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
+/*export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
     const handledIds = new Set<string>();
     for (const node of allNodes) {
         const zone = getZone(node.zoneId);
@@ -216,9 +201,9 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
         }
     }
     //console.log(exitToUpdate.id, 'calculated as', exitToUpdate.requiredKeysForLogic, 'keys');
-}
+}*/
 
-function organizeLootObjects(lootObjects: LootWithLocation[]) {
+export function organizeLootObjects(lootObjects: LootWithLocation[]) {
     const bigKeys: LootWithLocation[] = [];
     const smallKeys: LootWithLocation[] = [];
     const maps: LootWithLocation[] = [];
@@ -307,20 +292,25 @@ export function copyState(state: GameState): GameState {
     };
 }
 
-export function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLocation): GameState {
-    if (lootWithLocation.lootObject.lootType === 'empty') {
-        return state;
+export function getMappedLootData(randomizerState: RandomizerState, lootObject: AnyLootDefinition): LootData {
+    return randomizerState?.lootAssignments?.[lootObject.id] ?? lootObject;
+}
+
+export function applyLootObjectToState(randomizerState: RandomizerState, simulatedState: GameState, lootWithLocation: LootWithLocation): GameState {
+    const lootData = getMappedLootData(randomizerState, lootWithLocation.lootObject);
+    if (lootData.lootType === 'empty') {
+        return simulatedState;
     }
     // We need to set the current location to the loot location so that dungeon items are applied to the correct state.
-    const stateCopy = copyState(state);
+    const stateCopy = copyState(simulatedState);
     if (lootWithLocation.location) {
         stateCopy.location = lootWithLocation.location;
     }
-    const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
+    const onPickup = lootEffects[lootData.lootType] || lootEffects.unknown;
     // Loot is always progressive in the randomizer, so set lootLevel to 0.
-    // onPickup(stateCopy, lootWithLocation.lootObject);
+    // onPickup(stateCopy, lootData);
     try {
-        onPickup(stateCopy, {...lootWithLocation.lootObject, lootLevel: 0}, true);
+        onPickup(stateCopy, {...lootData, lootLevel: 0}, true);
     } catch (e) {
         debugger;
     }
@@ -330,11 +320,12 @@ export function applyLootObjectToState(state: GameState, lootWithLocation: LootW
     return stateCopy;
 }
 
-export function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], startingNodes: LogicNode[]): GameState {
-    let changed, updatedState = state;
+export function setAllFlagsInLogic(randomizerState: RandomizerState, simulatedState: GameState): GameState {
+    let {startingNodes} = randomizerState;
+    let changed, updatedState = simulatedState;
     do {
         changed = false;
-        startingNodes = findReachableNodes(allNodes, startingNodes, updatedState);
+        startingNodes = findReachableNodes(randomizerState, updatedState);
         for (const node of startingNodes) {
             for (const flag of (node.flags || [])) {
                 if (flag.logic && !isLogicValid(updatedState, flag.logic)) {
@@ -343,14 +334,14 @@ export function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], star
                 }
                 if (flag.doorId) {
                     const zone = getZone(node.zoneId);
-                    const { object, location } = findDoorById(zone, flag.doorId, state);
-                    if (!canOpenDoor(location, state, object as EntranceDefinition)) {
+                    const { object, location } = findDoorById(zone, flag.doorId, simulatedState);
+                    if (!canOpenDoor(randomizerState, location, simulatedState, object as EntranceDefinition)) {
                         continue;
                     }
                 }
                 if (!updatedState.savedState.objectFlags[flag.flag]) {
-                    if (updatedState === state) {
-                        updatedState = copyState(state);
+                    if (updatedState === simulatedState) {
+                        updatedState = copyState(simulatedState);
                     }
                     updatedState.savedState.objectFlags[flag.flag] = true;
                     //console.log('    Setting flag', flag.flag);
@@ -362,7 +353,7 @@ export function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], star
     return updatedState;
 }
 
-
+/*
 export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): AssignmentState {
     calculateKeyLogic(allNodes, startingNodes);
     //console.log({ allNodes, startingNodes });
@@ -490,9 +481,9 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     }
     //console.log({ allLootObjects, allReachableCheckIds });
     const assignmentsState: AssignmentState = {
-        assignments: [],
-        assignedLocations: [],
-        assignedContents: [],
+        assignments: {},
+        assignedLocations: new Set(),
+        assignedContents: new Set(),
     }
 
     const initialReachableChecks = findReachableChecks(allNodes, startingNodes, initialState);
@@ -553,29 +544,15 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
             break;
         }
         // console.log('Placing: ', loot.lootObject.id);
-        if (assignmentsState.assignedLocations.includes(location.lootObject.id)) {
+        if (assignmentsState.assignedLocations.has(location.lootObject.id)) {
             continue;
         }
         const loot = trashLoot.pop();
-        assignmentsState.assignments.push({
-            lootType: loot.lootObject.lootType,
-            lootAmount: loot.lootObject.lootAmount,
-            lootLevel: loot.lootObject.lootLevel,
-            source: loot,
-            target: location,
-        });
-        assignmentsState.assignedContents.push(loot.lootObject.id);
-        assignmentsState.assignedLocations.push(location.lootObject.id);
+        assignItemToLocation(assignmentsState, loot, location);
     }
     return assignmentsState;
 }
 
-function debugState(state: GameState) {
-    console.log(state.hero.savedData.activeTools);
-    console.log(state.hero.savedData.passiveTools);
-    console.log({totalSilverOre: state.hero.savedData.collectibleTotals.silverOre, totalGoldOre: state.hero.savedData.collectibleTotals.goldOre });
-    console.log(Object.keys(state.savedState.objectFlags));
-}
 
 function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[], originalState: GameState, assignmentsState: AssignmentState, loot: LootWithLocation): string {
     let currentState = copyState(originalState);
@@ -592,12 +569,8 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
         currentState = setAllFlagsInLogic(currentState, allNodes, startingNodes);
     } while (currentState !== previousState);
     const allReachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, currentState);
-    const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
+    const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.has(lootWithLocation.lootObject.id));
     let allAppropriateChecks = allAvailableChecks;
-    /*if (loot.lootObject.lootType === 'spiritSight') {
-        console.log('hasTeleportation', isLogicValid(currentState, hasTeleportation));
-        debugger;
-    }*/
     if (loot.lootObject.lootType === 'bigKey'
         || loot.lootObject.lootType === 'smallKey'
         || loot.lootObject.lootType === 'map'
@@ -621,8 +594,56 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     assignItemToLocation(assignmentsState, loot, assignedLocation);
 }
 
+function assignItemToLocation(assignmentsState: AssignmentState, loot: LootWithLocation, assignedLocation: LootWithLocation): void {
+    //debugState(currentState);
+    assignmentsState.assignments[assignedLocation.lootObject.id] = {
+        lootType: loot.lootObject.lootType,
+        lootAmount: loot.lootObject.lootAmount,
+        // Only progressive loot is placed in randomizer.
+        lootLevel: 0,
+        //lootLevel: loot.lootObject.lootLevel,
+        source: loot,
+        target: assignedLocation,
+    };
+    assignmentsState.assignedContents.add(loot.lootObject.id);
+    assignmentsState.assignedLocations.add(assignedLocation.lootObject.id);
+}
 
-function debugLocations(loot: LootWithLocation[]) {
+
+function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
+    const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
+    // console.log(debugLocations(reachableChecks));
+    for (const check of reachableChecks) {
+        // Ignore checks that have already been made.
+        if (state.savedState.objectFlags[check.lootObject.id]) {
+            continue;
+        }
+        const assignment = assignmentsState.assignments[check.lootObject.id];
+        // Only gain the loot if it has already been assigned. Otherwise we pretend the check is still empty.
+        if (assignment) {
+            state = applyLootObjectToState(state, assignment.source);
+        }
+        // Set progress flags related to the check even if it has not been assigned, for example,
+        // Talking to the Vanara Commander should still release elemental beasts even if a check is
+        // not assigned to him yet.
+        state.savedState.objectFlags[check.lootObject.id] = true;
+        for (const flag of (check.progressFlags || [])) {
+            state.savedState.objectFlags[flag] = true;
+        }
+    }
+    return state;
+}
+*/
+
+
+export function debugState(state: GameState) {
+    console.log(state.hero.savedData.activeTools);
+    console.log(state.hero.savedData.passiveTools);
+    console.log({totalSilverOre: state.hero.savedData.collectibleTotals.silverOre, totalGoldOre: state.hero.savedData.collectibleTotals.goldOre });
+    console.log(Object.keys(state.savedState.objectFlags));
+}
+
+export function debugLocations(loot: LootWithLocation[]) {
     return loot.map(debugLocation).join(',');
 }
 
@@ -633,57 +654,6 @@ function debugLocation(loot: LootWithLocation) {
         return loot.dialogueKey + '::' + loot.optionKey;
     }
 }
-
-function assignItemToLocation(assignmentsState: AssignmentState, loot: LootWithLocation, assignedLocation: LootWithLocation): void {
-    //debugState(currentState);
-    /*if (assignedLocation.location) {
-        console.log('placing', loot.lootObject.lootType, ' at ', assignedLocation.location.zoneKey, assignedLocation.lootObject.id);
-    } else {
-        console.log('placing', loot.lootObject.lootType, ' to dialogue ', assignedLocation.dialogueKey, assignedLocation.optionKey);
-    }*/
-    assignmentsState.assignments.push({
-        lootType: loot.lootObject.lootType,
-        lootAmount: loot.lootObject.lootAmount,
-        // Only progressive loot is placed in randomizer.
-        lootLevel: 0,
-        //lootLevel: loot.lootObject.lootLevel,
-        source: loot,
-        target: assignedLocation,
-    });
-    assignmentsState.assignedContents.push(loot.lootObject.id);
-    assignmentsState.assignedLocations.push(assignedLocation.lootObject.id);
-}
-
-let finishedRandomizerSolution = false;
-window.showRandomizerSolution = function (): void {
-    let currentState = getDefaultState();
-    applySavedState(currentState, currentState.savedState);
-    let previousState = currentState;
-    let counter = 0;
-    const startingNodes = [allNodes[0]];
-    finishedRandomizerSolution = false;
-    do {
-        if (counter++ > 200) {
-            console.error('infinite loop');
-            debugger;
-            return null;
-        }
-        previousState = currentState;
-        console.log(`Sphere ${counter}`);
-        currentState = collectAllLootForSolution(allNodes, startingNodes, previousState);
-        currentState = setAllFlagsInLogic(currentState, allNodes, startingNodes);
-
-        if (!finishedRandomizerSolution && randomizerGoalType === 'finalBoss' && currentState.savedState.objectFlags.voidTree) {
-            console.log('');
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-            console.log('Defeat final boss and talk to mom to win.');
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-            console.log('');
-            finishedRandomizerSolution = true;
-        }
-    } while (currentState !== previousState);
-}
-
 
 /*function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState) {
     if (lootType === 'weapon') {
@@ -715,77 +685,6 @@ window.showRandomizerSolution = function (): void {
     }
 
     return lootType;
-}*/
-
-function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): GameState {
-    const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
-    for (const check of reachableChecks) {
-        // We can only open checks that have been assigned, contents of other checks are not yet determined.
-        //if (!assignmentsState.assignedLocations.includes(check.lootObject.id)) {
-        //    continue;
-        //}
-        // Don't open a check that has already been opened.
-        if (state.savedState.objectFlags[check.lootObject.id]) {
-            continue;
-        }
-        if (check.lootObject.lootType !== 'money' && check.lootObject.lootType !== 'empty') {
-            if (state.hero.savedData.maxLife < 7 || (
-                check.lootObject.lootType !== 'peachOfImmortality'
-                && check.lootObject.lootType !== 'peachOfImmortalityPiece'
-            )) {
-                // debugState(state);
-                if (check.location) {
-                    console.log(`Get ${getLootName(state, check.lootObject)} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
-                } else {
-                    console.log(`Get ${getLootName(state, check.lootObject)} from ${check.dialogueKey}:${check.optionKey}`);
-                }
-            }
-        }
-        state = applyLootObjectToState(state, check);
-        // Indicate this check has already been opened.
-        state.savedState.objectFlags[check.lootObject.id] = true;
-        for (const flag of (check.progressFlags || [])) {
-            state.savedState.objectFlags[flag] = true;
-        }
-        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.savedData.collectibles.victoryPoint >= randomizerGoal) {
-            console.log('');
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-            console.log('Talk to mom to win.');
-            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-            console.log('');
-            finishedRandomizerSolution = true;
-        }
-    }
-    return state;
-}
-
-function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
-    const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
-    // console.log(debugLocations(reachableChecks));
-    for (const check of reachableChecks) {
-        // Ignore checks that have already been made.
-        if (state.savedState.objectFlags[check.lootObject.id]) {
-            continue;
-        }
-        const assignment = assignmentsState.assignments.find(assignment => assignment.target.lootObject.id === check.lootObject.id);
-        // Only gain the loot if it has already been assigned. Otherwise we pretend the check is still empty.
-        if (assignment) {
-            state = applyLootObjectToState(state, assignment.source);
-            /*if (assignment.target.location) {
-                console.log(`    Get ${getLootName(assignment.source.lootObject, state)} at ${assignment.target.location.zoneKey}:${assignment.target.lootObject.id}`);
-            } else {
-                console.log(`    Get ${getLootName(assignment.source.lootObject, state)} from ${assignment.target.dialogueKey}:${assignment.target.optionKey}`);
-            }*/
-        }
-        // Set progress flags related to the check even if it has not been assigned, for example,
-        // Talking to the Vanara Commander should still release elemental beasts even if a check is
-        // not assigned to him yet.
-        state.savedState.objectFlags[check.lootObject.id] = true;
-        for (const flag of (check.progressFlags || [])) {
-            state.savedState.objectFlags[flag] = true;
-        }
-    }
-    return state;
 }
 
 function getLootAmount(loot: LootAssignment): number {
@@ -794,7 +693,6 @@ function getLootAmount(loot: LootAssignment): number {
     }
     return 0;
 }
-
 export function applyLootAssignments(assignments: LootAssignment[]): void {
     // console.log('applying assignments:');
     // console.log(assignments);
@@ -894,24 +792,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             }
         }
     }
-}
-
-function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDefinition | BossObjectDefinition)[] {
-    const results: (LootObjectDefinition | BossObjectDefinition)[] = [];
-    const zone = zones[lootWithLocation.location.zoneKey];
-    const floor = lootWithLocation.location.floor;
-    for( const areaGrid of [zone.floors[floor].spiritGrid, zone.floors[floor].grid]){
-        const areaDefinition = areaGrid[lootWithLocation.location.areaGridCoords.y][lootWithLocation.location.areaGridCoords.x];
-        for (const object of (areaDefinition?.objects || [])) {
-            if (object.id === lootWithLocation.lootObject.id) {
-                results.push(object as (LootObjectDefinition | BossObjectDefinition));
-            }
-        }
-    }
-    return results;
-}
-
-
+}*/
 
 function everyZone(callback: (location: Partial<ZoneLocation>, zone: Zone) => void ) {
     for (const zoneKey in zones) {
@@ -952,7 +833,8 @@ export function everyObject(callback: (location: FullZoneLocation, zone: Zone, a
     });
 }
 
-export function verifyNodeConnections() {
+export function verifyNodeConnections(randomizerState: RandomizerState) {
+    const {allNodes} = randomizerState;
     for (const currentNode of allNodes) {
         // console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);

@@ -1,9 +1,9 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { appendCallback, appendScript, wait } from 'app/scriptEvents';
-import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
-import { moveActor } from 'app/movement/moveActor';
-import { saveGame } from 'app/utils/saveGame';
-import { updateCamera } from 'app/updateCamera';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {appendCallback, appendScript, wait} from 'app/scriptEvents';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {moveActor} from 'app/movement/moveActor';
+import {saveGame} from 'app/utils/saveGame';
+import {updateCamera} from 'app/updateCamera';
 
 
 
@@ -19,7 +19,7 @@ dialogueHash.rival = {
     key: 'rival',
     mappedOptions: {
         startFirstFight: (state: GameState) => {
-            if (isRandomizer || state.savedState.objectFlags.skipRivalTombStory) {
+            if (state.randomizerState || state.savedState.objectFlags.skipRivalTombStory) {
                 return '';
             }
             // If the hero escapes without entering the tomb or defeating the rival, the
@@ -93,7 +93,7 @@ dialogueHash.rival = {
                 blockFieldUpdates: true,
             });
             wait(state, 500);
-            if (state.savedState.objectFlags.helixRivalIntro || isRandomizer || state.savedState.objectFlags.skipRivalHelixStory) {
+            if (state.savedState.objectFlags.helixRivalIntro || state.randomizerState || state.savedState.objectFlags.skipRivalHelixStory) {
                 // In randomizer, set the helixRivalIntro to make sure the rival despawns from in front of the Tomb.
                 state.savedState.objectFlags.helixRivalIntro = true;
                 saveGame(state);

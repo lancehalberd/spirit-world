@@ -1,7 +1,7 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { isLogicValid, orLogic } from 'app/content/logic';
-import { CHAKRAM_2_NAME, isRandomizer } from 'app/gameConstants';
-import { saveGame } from 'app/utils/saveGame';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {isLogicValid, orLogic} from 'app/content/logic';
+import {CHAKRAM_2_NAME} from 'app/gameConstants';
+import {saveGame} from 'app/utils/saveGame';
 
 const canUpgradeLeatherBoots: LogicCheck = {
     // You just need the recipe.
@@ -187,14 +187,21 @@ dialogueHash.citySmith = {
         },
         fail: 'This work doesn\'t come cheap, you need to bring more Jade.',
         no: 'Another time then.',
-        citySmithReward: isRandomizer ? `{item:flyingBoots} {flag:citySmithReward}` : `
-            Wait!{-}
-            Let me take a look at those boots...
-            {|}I once had a dream I made a pair of boots that could walk on the very air itself.
-            {|}I don't possess the skill to make them, but take these blueprints with you.
-            {|}If there really is a Spirit Forge, maybe they can make my dream a reality!
-            {item:flyingBoots} {flag:citySmithReward}
-        `,
+        citySmithReward(state: GameState) {
+            // Skip dialogue that doesn't make sense when items are randomized
+            if (state.randomizerState) {
+                return `{@citySmith.citySmithRewardItem}`;
+            }
+            return `
+                Wait!{-}
+                Let me take a look at those boots...
+                {|}I once had a dream I made a pair of boots that could walk on the very air itself.
+                {|}I don't possess the skill to make them, but take these blueprints with you.
+                {|}If there really is a Spirit Forge, maybe they can make my dream a reality!
+                {@citySmith.citySmithRewardItem}
+            `;
+        },
+        citySmithRewardItem: `{item:flyingBoots} {flag:citySmithReward}`
     },
     options: [
         // The smith will give you blueprints for the flying boots once you obtain all normal upgrades
@@ -469,10 +476,17 @@ dialogueHash.forgeSmith = {
         },
         fail: 'You still need Jade even in the Spirit World.',
         no: 'Another time then.',
-        forgeSmithReward: isRandomizer ? `{item:forgeBoots} {flag:forgeSmithReward}` : `
-            With the right materials my friend could turn those Iron Boots into a pair of our famous Forge Boots.
-            {item:forgeBoots} {flag:forgeSmithReward}
-        `,
+        forgeSmithReward(state: GameState) {
+            // Skip dialogue that doesn't make sense when items are randomized.
+            if (state.randomizerState) {
+                return `{@forgeSmith.forgeSmithRewardItem}`;
+            }
+            return `
+                With the right materials my friend could turn those Iron Boots into a pair of our famous Forge Boots.
+                {@forgeSmith.forgeSmithRewardItem}
+            `;
+        },
+        forgeSmithRewardItem: `{item:forgeBoots} {flag:forgeSmithReward}`,
     },
     options: [
         // The forge smith will give you blueprints for the forge boots once you obtain all spirit upgrades

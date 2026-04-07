@@ -1,12 +1,12 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { isLogicValid } from 'app/content/logic';
-import { getZone } from 'app/content/zones';
-import { allNodes } from 'app/randomizer/allNodes';
-import { missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce } from 'app/randomizer/warnOnce';
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {isLogicValid} from 'app/content/logic';
+import {getZone} from 'app/content/zones';
+import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
 
-export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LogicNode[] {
+export function findReachableNodes(randomizerState: RandomizerState, state: GameState): LogicNode[] {
+    const {allNodes, startingNodes} = randomizerState;
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
@@ -28,7 +28,7 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
             }
             if (path.doorId) {
                 const { object, location } = findDoorById(zone, path.doorId, state);
-                if (!canOpenDoor(location, state, object as EntranceDefinition)) {
+                if (!canOpenDoor(randomizerState, location, state, object as EntranceDefinition)) {
                     continue;
                 }
             }
@@ -49,7 +49,7 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
             const { object, location } = findDoorById(zone, exit.objectId, state);
             const exitObject = object as EntranceDefinition;
             // console.log(exit.objectId);
-            if (!canOpenDoor(location, state, exitObject)) {
+            if (!canOpenDoor(randomizerState, location, state, exitObject)) {
                 //console.log('cannot open', exitObject);
                 continue;
             }
@@ -81,24 +81,23 @@ export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNo
     }
     return reachableNodes;
 }
-window['allNodes'] = allNodes;
 window['findReachableNodes'] = findReachableNodes;
 
-export function findReachableChecksFromStart(state: GameState) {
-    return findReachableChecks(allNodes, [allNodes[0]], state);
+export function findReachableChecksFromStart(randomizerState: RandomizerState, simulatedState: GameState) {
+    return findReachableChecks(randomizerState, simulatedState);
 }
 window['findReachableChecksFromStart'] = findReachableChecksFromStart;
 
-export function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LootWithLocation[] {
-    const reachableNodes: LogicNode[] = findReachableNodes(allNodes, startingNodes, state);
-    return findLootObjects(reachableNodes, state);
+export function findReachableChecks(randomizerState: RandomizerState, simulatedState: GameState): LootWithLocation[] {
+    const reachableNodes: LogicNode[] = findReachableNodes(randomizerState, simulatedState);
+    return findLootObjects(reachableNodes, simulatedState);
 }
 
 export function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
     return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'staffTower', 'helixTop', 'teleporter']);
 }
 export function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
-    return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss']);
+    return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss', 'npc']);
 }
 
 const findObjectByIdCache: {[key: string]: {
@@ -162,6 +161,22 @@ export function findObjectById(
     findObjectByIdCache[cacheKey] = {object: null, location: null, needsCatEyes: false, needsTrueSight: false};
     return findObjectByIdCache[cacheKey];
 }
+
+export function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDefinition | BossObjectDefinition)[] {
+    const results: (LootObjectDefinition | BossObjectDefinition)[] = [];
+    const zone = getZone(lootWithLocation.location.zoneKey);
+    const floor = lootWithLocation.location.floor;
+    for( const areaGrid of [zone.floors[floor].spiritGrid, zone.floors[floor].grid]){
+        const areaDefinition = areaGrid[lootWithLocation.location.areaGridCoords.y][lootWithLocation.location.areaGridCoords.x];
+        for (const object of (areaDefinition?.objects || [])) {
+            if (object.id === lootWithLocation.lootObject.id) {
+                results.push(object as (LootObjectDefinition | BossObjectDefinition));
+            }
+        }
+    }
+    return results;
+}
+
 
 export function findLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLocation[] {
     const lootObjects: LootWithLocation[] = [];
@@ -236,7 +251,7 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
     return lootObjects;
 }
 
-export function canOpenDoor(location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
+export function canOpenDoor(randomizerState: RandomizerState, location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
     if (!door) {
         return false;
     }
@@ -246,7 +261,12 @@ export function canOpenDoor(location: FullZoneLocation, state: GameState, door: 
     // Only pass through
     if (door.status === 'locked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
-        return dungeonInventory?.totalSmallKeys >= door.requiredKeysForLogic;
+        const requiredKeys = randomizerState.requiredKeysMap[door.id];
+        if (!requiredKeys) {
+            console.error('Object missing required keys', door, randomizerState.requiredKeysMap);
+            throw new Error('Missing required keys for lock');
+        }
+        return dungeonInventory?.totalSmallKeys >= requiredKeys;
     }
     if (door.status === 'bigKeyLocked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];

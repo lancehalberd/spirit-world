@@ -1,5 +1,5 @@
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
-import {FRAME_LENGTH, isRandomizer} from 'app/gameConstants';
+import {FRAME_LENGTH} from 'app/gameConstants';
 import {appendCallback, appendScript, hideHUD, resetCamera, runPlayerBlockingCallback, showHUD, textCueWithInput, waitForCamera} from 'app/scriptEvents';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
@@ -30,7 +30,7 @@ specialBehaviorsHash.peachCave = {
                 peachTree.specialStatus = 'dead';
             }
         } else if (peachTree && state.savedState.objectFlags.peachCaveBoss) {
-            if (isRandomizer) {
+            if (state.randomizerState) {
                 state.savedState.objectFlags.peachCaveTree = true;
                 state.areaInstance.needsLogicRefresh = true;
             } else {

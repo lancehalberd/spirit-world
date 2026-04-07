@@ -1,9 +1,8 @@
-import { zones } from 'app/content/zones/zoneHash';
-import { variantSeed } from 'app/gameConstants';
-import { generateRoomAndLogic } from 'app/generator/generateRoomAndLogic';
-import srandom from 'app/utils/SRandom';
+import {zones} from 'app/content/zones/zoneHash';
+import {generateRoomAndLogic} from 'app/generator/generateRoomAndLogic';
+import SRandom from 'app/utils/SRandom';
 
-const baseVariantRandom = srandom.seed(variantSeed);
+const baseVariantRandom = (state: GameState) => SRandom.seed(state.variantSeed);
 
 
 const materialArea: AreaDefinition = {
@@ -40,32 +39,35 @@ function getAreaContext(area: AreaDefinition, alternateArea: AreaDefinition) {
     return { area, alternateArea, baseArea, childArea};
 }
 
-
-const { logicNodes } = generateRoomAndLogic({
-    random: baseVariantRandom,
-    zoneId: 'warPalaceWestRoom',
-    roomId: 'room',
-    ...getAreaContext( spiritArea, materialArea),
-    section: spiritArea.sections[0],
-    rules: {
-        entrances: [{
-            id: 'warPalaceWestDoor',
-            targetZone: 'overworld',
-            targetObjectId: 'warPalaceWestDoor',
-            direction: 'down',
-            type: 'door',
-        }],
-        checks: [{
-            id: 'warPalaceWestPeachPiece',
-            lootType: 'peachOfImmortalityPiece',
-            // Currently only a single requirement will be respected at the room level.
-            requiredItemSets: [['teleportation']],
-        }],
-        style: 'stone',
-    }
-});
-spiritArea.sections[0].mapId = 'overworld';
-spiritArea.sections[0].entranceId = 'warPalaceWestDoor';
-spiritArea.sections[0].index = 500;
-
-export const warPalaceWestRoomNodes = logicNodes;
+export function generateWarPalaceWestRoom(state: GameState) {
+    const { logicNodes } = generateRoomAndLogic({
+        random: baseVariantRandom(state),
+        zoneId: 'warPalaceWestRoom',
+        roomId: 'room',
+        ...getAreaContext( spiritArea, materialArea),
+        section: spiritArea.sections[0],
+        rules: {
+            entrances: [{
+                id: 'warPalaceWestDoor',
+                targetZone: 'overworld',
+                targetObjectId: 'warPalaceWestDoor',
+                direction: 'down',
+                type: 'door',
+            }],
+            checks: [{
+                id: 'warPalaceWestPeachPiece',
+                lootType: 'peachOfImmortalityPiece',
+                // Currently only a single requirement will be respected at the room level.
+                requiredItemSets: [['teleportation']],
+            }],
+            style: 'stone',
+        }
+    });
+    spiritArea.sections[0].mapId = 'overworld';
+    spiritArea.sections[0].entranceId = 'warPalaceWestDoor';
+    spiritArea.sections[0].index = 500;
+    state.generatedLogicNodes = [
+        ...state.generatedLogicNodes,
+        ...logicNodes,
+    ];
+}

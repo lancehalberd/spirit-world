@@ -40,12 +40,12 @@ interface LootAssignment {
 }
 
 interface AssignmentState {
-    // The array of loot assignments that can be used to apply this assignment state to the game.
-    assignments: LootAssignment[]
+    // Map of target loot id to loot that has been assigned to overwrite that loot.
+    assignments: {[targetId in string]: LootAssignment}
     // The ids of all the checks that have contents assigned to them already.
-    assignedLocations: string[]
+    assignedLocations: Set<string>
     // The ids of all the check contents that have been assigned to some location.
-    assignedContents: string[]
+    assignedContents: Set<string>
 }
 
 interface LightColor {

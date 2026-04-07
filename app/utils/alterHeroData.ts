@@ -14,7 +14,7 @@ export function alterHeroData(state: GameState, newHeroData: SavedHeroData): voi
     const savedHeroData = cloneDeep(newHeroData);
     state.hero = new Hero(savedHeroData);
     state.hero.applySavedHeroData(savedHeroData);
-    updateHeroMagicStats(state);
+    updateHeroMagicStats(state, true);
     // Start with full spirit energy if it is available at all.
     if (state.hero.maxMagic > 20) {
         state.hero.magic = state.hero.maxMagic;
@@ -27,7 +27,7 @@ export function restoreHeroData(state: GameState): void {
     }
     state.hero = new Hero(state.backupHeroData);
     state.hero.applySavedHeroData(state.backupHeroData);
-    updateHeroMagicStats(state);
+    updateHeroMagicStats(state, true);
     delete state.backupHeroData;
 }
 

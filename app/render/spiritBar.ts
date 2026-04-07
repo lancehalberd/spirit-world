@@ -153,7 +153,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
     }
 }
 
-export function updateHeroMagicStats(state: GameState) {
+export function updateHeroMagicStats(state: GameState, refillMagic: boolean) {
     state.hero.magicRegenCooldownLimit = 2000;
     state.hero.maxMagic = 20;
     state.hero.magicRegen = 4;
@@ -199,9 +199,12 @@ export function updateHeroMagicStats(state: GameState) {
     state.hero.magicRegen += bonusMagicRegen * gameModifiers.bonusSpiritRegeneration;
     // During a normal game, magic regen is 0 until you get at least one magic item.
     // During randomizer seeds, Hero always has access to spirit energy.
-    if (!state.randomizer?.seed && state.hero.maxMagic <= 20) {
+    if (!state.randomizerState && state.hero.maxMagic <= 20) {
         state.hero.magic = 0;
         state.hero.magicRegen = 0;
+    }
+    if (refillMagic && state.hero.magicRegen > 0) {
+        state.hero.magic = state.hero.maxMagic;
     }
 }
 

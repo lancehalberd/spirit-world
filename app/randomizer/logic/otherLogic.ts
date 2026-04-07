@@ -318,7 +318,7 @@ export const holyCityNodes: LogicNode[] = [
         complexNpcs: [
             {
                 dialogueKey: 'citySmith',
-                optionKey: 'citySmithReward',
+                optionKey: 'citySmithRewardItem',
                 // Must fully upgrade the normal chakram and have cloud boots to obtain this reward.
                 // Upgrading costs 5 silver, but you could spend an additional 7 upgrading the magic chakram and spike boots.
                 logic: { requiredFlags: ['$weapon:1', '$cloudBoots', '$totalSilverOre:12']},

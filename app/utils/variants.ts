@@ -1,9 +1,9 @@
-import { variantHash } from 'app/content/variants/variantHash';
-import { variantSeed } from 'app/gameConstants';
-import { everyArea } from 'app/utils/every';
+import {isLogicValid} from 'app/content/logic';
+import {variantHash} from 'app/content/variants/variantHash';
+import {everyArea} from 'app/utils/every';
 import SRandom from 'app/utils/SRandom';
 
-const baseVariantRandom = SRandom.seed(variantSeed);
+const baseVariantRandom = (state: GameState) => SRandom.seed(state.variantSeed);
 
 function chooseStyleVariant(styles: string[], random: SRandom, data: VariantData) {
     if (!data.styleWeights) {
@@ -24,18 +24,18 @@ function chooseStyleVariant(styles: string[], random: SRandom, data: VariantData
     return styles[0];
 }
 
-export function getVariantRandom(seedData: VariantSeedData): SRandom {
+export function getVariantRandom(state: GameState, seedData: VariantSeedData): SRandom {
     // Fixed variants do not depend on the base variant seed.
     if (seedData.fixed) {
         return SRandom.seed(seedData.seed || 0);
     }
     // Non-fixed variants depend on the base variant seed.
-    return baseVariantRandom.addSeed(seedData.seed || 0);
+    return baseVariantRandom(state).addSeed(seedData.seed || 0);
 }
 
 export function applyVariantsToArea(state: GameState, area: AreaInstance): void {
     for (const variantData of (area.definition.variants || [])) {
-        const variantRandom = getVariantRandom(variantData);
+        const variantRandom = getVariantRandom(state, variantData);
         const definition = variantHash[variantData.type];
         const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
         definition.applyToArea(style, variantRandom, state, area, variantData);
@@ -56,15 +56,17 @@ function getVariantById(variantId: string) {
 }
 
 export function variantLogic(variantId: string): LogicCheck {
-    const variantData = getVariantById(variantId);
-    if (!variantData) {
-        debugger;
+    return (state: GameState) => {
+        const variantData = getVariantById(variantId);
+        if (!variantData) {
+            debugger;
+        }
+        const definition = variantHash[variantData.type];
+        if (!definition) {
+            throw new Error(variantData.type + " variant type not found");
+        }
+        const variantRandom = getVariantRandom(state, variantData);
+        const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
+        return isLogicValid(state, definition.getLogic(style, variantRandom, variantData));
     }
-    const definition = variantHash[variantData.type];
-    if (!definition) {
-        throw new Error(variantData.type + " variant type not found");
-    }
-    const variantRandom = getVariantRandom(variantData);
-    const style = chooseStyleVariant(definition.styles, variantRandom, variantData);
-    return definition.getLogic(style, variantRandom, variantData);
 }

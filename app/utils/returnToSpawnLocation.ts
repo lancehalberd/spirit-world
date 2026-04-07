@@ -1,4 +1,3 @@
-import {isRandomizer} from 'app/gameConstants';
 import {appendScript, wait} from 'app/scriptEvents';
 import {enterLocation} from 'app/utils/enterLocation';
 
@@ -35,7 +34,7 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
 
 
     // Don't display hints in randomizer mode.
-    if (isRandomizer) {
+    if (state.randomizerState) {
         return;
     }
 

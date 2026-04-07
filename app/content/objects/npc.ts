@@ -493,7 +493,13 @@ export class NPC implements Actor, ObjectInstance  {
         this.modeTime = 0;
     }
     getNextDialogue(state: GameState, advanceIndex = false): Dialogue|undefined {
-        if (!this.definition.dialogueKey) {
+        // The randomizer can override the dialogue for an NPC by creating a new mapped dialogue
+        // set for it on `state.randomizerState?.dialogueReplacement`.
+        // So if this is present, use this dialogue set instead of the default dialogue for this NPC.
+        const npcKey = `${this.area.location.zoneKey}-${this.definition.id}`;
+        const isRandomized = !!state.randomizerState?.dialogueReplacements?.[npcKey]
+        const dialogueKey = isRandomized ? npcKey : this.definition.dialogueKey;
+        if (!dialogueKey) {
             // custom dialogue is not used on the astral projection.
             if (state.hero.astralProjection) {
                 return;
@@ -507,7 +513,7 @@ export class NPC implements Actor, ObjectInstance  {
                 dialogueType: this.definition.dialogueType,
             };
         }
-        const dialogueOption = selectDialogueOption(state, this.definition.dialogueKey);
+        const dialogueOption = selectDialogueOption(state, dialogueKey);
         if (!dialogueOption) {
             if (advanceIndex) {
                 this.hasFinishedDialog = true;

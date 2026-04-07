@@ -4,7 +4,7 @@ import {Fireball} from 'app/content/effects/flame';
 import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {Spark} from 'app/content/effects/spark';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
-import {FRAME_LENGTH, isRandomizer} from 'app/gameConstants';
+import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations} from 'app/content/enemyAnimations';
 import {getLoot} from 'app/content/objects/lootObject';
 import {
@@ -657,7 +657,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
                 blockPlayerInput: true,
                 duration: 1000,
             });
-            if (!state.bossRushState && !isRandomizer && !state.savedState.objectFlags.skipRivalHelixStory) {
+            if (!state.bossRushState && !state.randomizerState && !state.savedState.objectFlags.skipRivalHelixStory) {
                 appendScript(state, '{@rival.lostSecondFight}');
             }
             enemy.setMode('escaping');
@@ -684,9 +684,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
                 // loot on escape. Note this only matters for randomizer as the helix rival
                 // has no loot in the base game.
                 state.savedState.objectFlags[enemy.definition.id] = true;
-                if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
-                    getLoot(state, bossDefinition);
-                }
+                getLoot(state, bossDefinition);
                 saveGame(state);
             }
         }

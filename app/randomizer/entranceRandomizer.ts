@@ -1,6 +1,5 @@
 import {zoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
 import {overworldKeys} from 'app/gameConstants';
-import SRandom from 'app/utils/SRandom';
 
 import {
     everyObject, verifyNodeConnections
@@ -161,7 +160,8 @@ const spiritLoopableEntrancePairs = [
     {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
 ];
 
-export function randomizeEntrances(random: typeof SRandom) {
+export function randomizeEntrances(randomizerState: RandomizerState) {
+    const {random} = randomizerState;
     const connectedNormalEntrances = new Set<string>();
     const connectedSpiritEntrances = new Set<string>();
     const normalEntrances = new Set<string>();
@@ -460,6 +460,6 @@ export function randomizeEntrances(random: typeof SRandom) {
             pitEntrance.targetObjectId = objectId;
         }
     }
-    verifyNodeConnections();
+    verifyNodeConnections(randomizerState);
 }
 

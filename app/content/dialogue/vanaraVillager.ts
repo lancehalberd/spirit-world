@@ -1,5 +1,4 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { isRandomizer } from 'app/gameConstants';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 
 dialogueHash.vanaraVillager = {
     key: 'vanaraVillager',
@@ -111,7 +110,20 @@ dialogueHash.vanaraVillager = {
 dialogueHash.storageVanara = {
     key: 'storageVanara',
     mappedOptions: {
-        peachReward: `{item:peachOfImmortalityPiece}{flag:vanaraStoragePeachPiece}`,
+        peachReward(state: GameState) {
+            // Skip long dialogue in randomizer.
+            if (state.randomizerState) {
+                return `Thanks!{@storageVanara.peachRewardItem}`;
+            }
+            return `
+                Wait you got rid of all those bugs in the basement?
+                {|}When did you get so helpful?
+                {|}Nevermind, go ahead and take this, I found it in
+                one of the storage chests, it seemed to be attracting those things.
+                {@storageVanara.peachRewardItem}
+            `;
+        },
+        peachRewardItem: `{item:peachOfImmortalityPiece}{flag:vanaraStoragePeachPiece}`,
     },
     options: [
         {
@@ -147,11 +159,7 @@ dialogueHash.storageVanara = {
                 {
                     dialogueIndex: 87,
                     dialogueType: 'subquest',
-                    text: isRandomizer ? 'Thanks!{@storageVanara.peachReward}' : `Wait you got rid of all those bugs in the basement?
-                    {|}When did you get so helpful?
-                    {|}Nevermind, go ahead and take this, I found it in
-                    one of the storage chests, it seemed to be attracting those things.
-                    {@storageVanara.peachReward}`,
+                    text: `{@storageVanara.peachReward}`,
                 },
             ],
         },

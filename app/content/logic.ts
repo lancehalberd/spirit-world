@@ -1,4 +1,4 @@
-import {isDemoMode, isRandomizer} from 'app/gameConstants';
+import {isDemoMode} from 'app/gameConstants';
 
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
@@ -31,7 +31,7 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         return isDemoMode;
     }
     if (itemFlag === 'randomizer') {
-        return isRandomizer;
+        return !!state.randomizerState;
     }
     if (itemFlag === 'weapon') {
         return (state.hero.savedData.weapon & level) > 0;
@@ -400,7 +400,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
     beastsDefeated,
     jadeChampionStaffTowerEntrance: (state: GameState) => {
         // Disable all cut scenes in randomizer.
-        if (isRandomizer) {
+        if (state.randomizerState) {
             return false;
         }
         // Disable once the cut scene has played.
@@ -415,7 +415,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
     },
     jadeChampionStaffTowerTop: (state: GameState) => {
         // Disable all cut scenes in randomizer.
-        if (isRandomizer) {
+        if (state.randomizerState) {
             return false;
         }
         // Disable once the cut scene has played.
@@ -441,7 +441,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
     },
     jadeChampionStaffCraterEntrance: (state: GameState) => {
         // Disable all cut scenes in randomizer.
-        if (isRandomizer) {
+        if (state.randomizerState) {
             return false;
         }
         // Disable once the cut scene has played.
@@ -471,7 +471,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
     },
     jadeChampionStaffLakeTempleEntrance: (state: GameState) => {
         // Disable all cut scenes in randomizer.
-        if (isRandomizer) {
+        if (state.randomizerState) {
             return false;
         }
         // Disable once the cut scene has played.
