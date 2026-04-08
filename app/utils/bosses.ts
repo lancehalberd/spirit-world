@@ -11,6 +11,7 @@ export const bossFlags: {[key in BossKey]: string} = {
     stormBeast: 'stormBeast',
     flameBeast: 'flameBeast',
     frostBeast: 'frostBeast',
+    voidTree: 'voidTree',
 };
 
 export const bossNames: {[key in BossKey]: string} = {
@@ -24,6 +25,7 @@ export const bossNames: {[key in BossKey]: string} = {
     stormBeast: 'Storm Beast',
     flameBeast: 'Flame Beast',
     frostBeast: 'Frost Beast',
+    voidTree: 'Void Tree',
 }
 
 export function isBossDefeated(state: GameState, bossKey: BossKey): boolean {

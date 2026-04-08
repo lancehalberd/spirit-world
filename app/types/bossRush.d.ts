@@ -1,25 +1,26 @@
 type BossKey =
-  | "beetle"
-  | "golem"
-  | "idols"
-  | "guardian"
-  | "forestTempleBoss"
-  | "rival2"
-  | "collector"
-  | "stormBeast"
-  | "flameBeast"
-  | "frostBeast"
+  | 'beetle'
+  | 'golem'
+  | 'idols'
+  | 'guardian'
+  | 'forestTempleBoss'
+  | 'rival2'
+  | 'collector'
+  | 'stormBeast'
+  | 'flameBeast'
+  | 'frostBeast'
+  | 'voidTree'
   ;
 
 type BossRushKey =
   BossKey
-  | "rush"
-  | "rush2"
-  | "rush3"
-  | "altGolem"
-  | "altRival2"
-  | "altGuardian"
-  | "altIdols"
+  | 'rush'
+  | 'rush2'
+  | 'rush3'
+  | 'altGolem'
+  | 'altRival2'
+  | 'altGuardian'
+  | 'altIdols'
   ;
 
 interface BossRushOption {

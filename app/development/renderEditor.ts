@@ -11,6 +11,7 @@ import {
 import {fixVariantPosition} from 'app/development/variantEditor';
 import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
 import {renderZoneEditor} from 'app/development/zoneEditor';
+import {getMappedLootData} from 'app/randomizer/utils';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {translateContextForAreaAndCamera} from 'app/scenes/field/renderField';
 import {drawFrame} from 'app/utils/animations';
@@ -70,8 +71,23 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest/boss on top as well.
             if (object.type === 'bigChest' || object.type === 'chest' || object.type === 'boss') {
-                const frame = getLootFrame(state, object);
-                drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
+                const baseFrame = getLootFrame(state, object);
+                drawFrame(context, baseFrame, {...baseFrame, x: object.x - (baseFrame.content?.x || 0), y: object.y - (baseFrame.content?.y || 0)});
+                const randomFrame = getLootFrame(state, getMappedLootData(state.randomizerState, object));
+                if (randomFrame !== baseFrame) {
+                    drawFrame(context, randomFrame, {
+                        ...randomFrame,
+                        x: object.x - (randomFrame.content?.x || 0) + 4,
+                        y: object.y - (randomFrame.content?.y || 0) - 4,
+                    });
+                }
+            } else if (object.type === 'loot' || object.type === 'shopItem') {
+                const baseFrame = getLootFrame(state, object);
+                const randomFrame = getLootFrame(state, getMappedLootData(state.randomizerState, object));
+                if (randomFrame !== baseFrame) {
+                    // The randomizer frame is already visible, so just draw the base frame on top.
+                    drawFrame(context, baseFrame, {...baseFrame, x: object.x - (baseFrame.content?.x || 0), y: object.y - (baseFrame.content?.y || 0)});;
+                }
             }
         }
         for (const variantData of (area.definition.variants || [])) {

@@ -19,6 +19,8 @@ export const bossSpawnPoints: {[key in BossKey]: string} = {
     stormBeast: 'stormBeastHeroSpawnPoint',
     flameBeast: 'flameBeastHeroSpawnPoint',
     frostBeast: 'frostBeastHeroSpawnPoint',
+    // Unimplemented boss rush bosses:
+    voidTree: 'voideTreeHeroSpawnPoint,'
 };
 
 // Initialize and show the boss rush menu scene.

@@ -1,7 +1,14 @@
 import {bossNames, isBossDefeated} from 'app/utils/bosses';
 import {typedKeys} from 'app/utils/types';
 
-
+function getTotalBossPoints(randomizerState: RandomizerState) {
+    let bossPoints = 0;
+    const bossKeys = typedKeys(randomizerState.goal?.bossPoints.bossPoints) ?? [];
+    for (const bossKey of bossKeys) {
+        bossPoints += randomizerState.goal.bossPoints.bossPoints[bossKey];
+    }
+    return bossPoints;
+}
 function getBossPoints(randomizerState: RandomizerState, state: GameState): number {
     let bossPoints = 0;
     const bossKeys = typedKeys(randomizerState.goal?.bossPoints.bossPoints) ?? [];
@@ -17,11 +24,22 @@ export function getPendingRandomizerGoals(randomizerState: RandomizerState, stat
     const requirements: string[] = [];
     const bossPointGoal = randomizerState.goal?.bossPoints?.goal;
     if (bossPointGoal && getBossPoints(randomizerState, state) < bossPointGoal) {
+        const totalBossPoints = getTotalBossPoints(randomizerState);
         const bossKeys = typedKeys(randomizerState.goal?.bossPoints.bossPoints);
-        if (bossKeys.length === 1 && !isBossDefeated(state, bossKeys[0])) {
-            requirements.push('Defeat ' + bossNames[bossKeys[0]]);
-        } else if (bossKeys.length > 1) {
-            requirements.push(`Claim ${bossPointGoal} boss points`);
+        if (totalBossPoints === bossPointGoal) {
+            // Don't mention boss points if the goal requires defeating all bosses.
+            for (const bossKey of bossKeys) {
+                if (!isBossDefeated(state, bossKey)) {
+                    requirements.push('Defeat ' + bossNames[bossKey]);
+                }
+            }
+        } else {
+            requirements.push(`Claim ${bossPointGoal} more boss points`);
+            for (const bossKey of bossKeys) {
+                if (!isBossDefeated(state, bossKey)) {
+                    requirements.push(randomizerState.goal.bossPoints.bossPoints[bossKey] + 'pt ' + bossNames[bossKey]);
+                }
+            }
         }
     }
     const victoryPointGoal = randomizerState.goal?.victoryPoints?.goal;
