@@ -28,7 +28,8 @@ export * from 'app/randomizer/showRandomizerSolution';
 
 // setInterval(update, FRAME_LENGTH);
 
-let isBrowserTimeThrottled = false, throttleCount = 0;
+let isBrowserTimeThrottled = false;
+window.throttleCount = 0;
 
 let focused = true;
 
@@ -46,13 +47,13 @@ function updateLoop() {
         // Track how many excessively late frames occur in a row and turn on the
         // isBrowserTimeThrottled once we hit 20 frames consectuive frames.
         if (now - nextUpdateTime > FRAME_LENGTH + 5 && focused) {
-            throttleCount++;
-            if (throttleCount > 20) {
+            window.throttleCount++;
+            if (window.throttleCount > 20) {
                 console.warn('20 consecutive frames were throttled, switching to throttled mode.');
                 isBrowserTimeThrottled = true;
             }
         } else {
-            throttleCount = 0;
+            window.throttleCount = 0;
         }
         setTimeout(updateLoop, FRAME_LENGTH);
         update();

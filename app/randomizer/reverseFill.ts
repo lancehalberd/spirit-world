@@ -369,6 +369,9 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
 }
 
 export function reverseFill(randomizerState: RandomizerState, steps: number): boolean {
+    // During reverse fill, frames take a while to process, so ignore frames that appear
+    // throttled while it is running.
+    window.throttleCount = 0;
     //const startTime = Date.now();
     const {
         allLootObjects,
