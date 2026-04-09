@@ -1,6 +1,7 @@
 import {evaluateLogicDefinition} from 'app/content/logic';
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';;
+import {getMappedEntranceData} from 'app/randomizer/utils';
 import {renderHeroShadow} from 'app/renderActor';
 import {moveActorTowardsLocation} from 'app/movement/moveActor';
 import {showMessage} from 'app/scriptEvents';
@@ -98,7 +99,8 @@ export class DreamPod implements ObjectInstance {
 
             // Hero transitions to next area when the pod finishes closing.
             if (this.animationTime >= this.getAnimation().duration) {
-                enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+                const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+                enterZoneByTarget(state, targetZone, targetObjectId, {
                     skipObject: this.definition,
                     callback: () => {
                         if (state.hero.renderParent === this) {
@@ -129,7 +131,8 @@ export class DreamPod implements ObjectInstance {
             showMessage(state, `It won't open.`);
             return;
         }
-        if (!this.definition.targetZone || !this.definition.targetObjectId) {
+        const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+        if (!targetZone || !targetObjectId) {
             showMessage(state, `It doesn't seem to be working.`);
             return;
         }

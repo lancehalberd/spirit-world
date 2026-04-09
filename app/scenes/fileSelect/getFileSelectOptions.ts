@@ -1,4 +1,4 @@
-
+import {resetZoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
 import {SPAWN_LOCATION_FULL, SPAWN_LOCATION_WATERFALL_VILLAGE} from 'app/content/spawnLocations';
 import {showHint} from 'app/content/hints';
 import {isDemoMode} from 'app/gameConstants';
@@ -108,6 +108,24 @@ const seedOption: FileSelectOption = {
     },
 };
 
+const entranceSeedOption: FileSelectOption = {
+    onLeft(state: GameState, scene: FileSelectScene) {
+        scene.randomizerConfig.entranceSeed--;
+        if (scene.randomizerConfig.entranceSeed <= 0) {
+            scene.randomizerConfig.entranceSeed = 1e9 - 1;
+        }
+    },
+    onRight(state: GameState, scene: FileSelectScene) {
+        scene.randomizerConfig.entranceSeed++;
+        if (scene.randomizerConfig.entranceSeed >= 1e9) {
+            scene.randomizerConfig.entranceSeed = 1;
+        }
+    },
+    render: (context: CanvasRenderingContext2D, state: GameState, scene: FileSelectScene, r: Rect) => {
+        drawText(context, `E. Seed < ${scene.randomizerConfig.entranceSeed} >`, r.x, r.y + r.h / 2, textOptions);
+    },
+};
+
 const pointsTotalOption: FileSelectOption = {
     onLeft(state: GameState, scene: FileSelectScene) {
         scene.randomizerConfig.goal.victoryPoints.total = (scene.randomizerConfig.goal.victoryPoints.total - 1 + 100) % 100;
@@ -212,15 +230,20 @@ const entranceOption: FileSelectOption = {
 };
 
 export function getRandomizerOptions(state: GameState, scene: FileSelectScene): FileSelectOption[] {
-    const options = [
+    let options = [
         backOption,
         seedOption,
         entranceOption,
+    ];
+    if (scene.randomizerConfig.entranceSeed) {
+        options.push(entranceSeedOption);
+    }
+    options = [
+        ...options,
         pointsTotalOption,
         pointsGoalOption,
         bossGoalOption,
     ];
-
     return options;
 }
 
@@ -270,7 +293,9 @@ export function getFileSelectOptions(state: GameState, scene: FileSelectScene): 
 }
 
 function selectSaveFile(state: GameState, scene: FileSelectScene): void {
+    delete state.randomizerState;
     let savedGame = getSavedGames(state, scene.gameMode)[scene.cursorIndex];
+    resetZoneEntranceMap();
     if (!savedGame) {
         // Choose correct starting location and condition based on game mode.
         if (scene.gameMode === 'randomizer') {

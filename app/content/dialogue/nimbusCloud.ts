@@ -4,16 +4,7 @@ import { addBurstEffect } from 'app/content/effects/animationEffect';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
-
-
-// Currently only one default entrance is supported for each dungeon.
-// Eventually we should track the last entrance used by the player and
-// pick that specific entry by tracking something like:
-// escapeExit: `${zone}:${entranceId}:${isSpiritWorld}`
-// Then we can use that exact key for returning, and use a small map
-// for things like pits to map to some reasonable alternative,
-// or add the ability for entering a zone from a pit.
-export const zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
+export const defaultZoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     'peachCave': 'overworld:peachCaveTopEntrance',
     // peachCaveWaterEntrance
     'tomb': 'overworld:tombEntrance',
@@ -51,6 +42,25 @@ export const zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     'tree': 'lab:treeEntrance',
     'void': 'lab:treeEntrance',
 };
+
+
+// Currently only one default entrance is supported for each dungeon.
+// Eventually we should track the last entrance used by the player and
+// pick that specific entry by tracking something like:
+// escapeExit: `${zone}:${entranceId}:${isSpiritWorld}`
+// Then we can use that exact key for returning, and use a small map
+// for things like pits to map to some reasonable alternative,
+// or add the ability for entering a zone from a pit.
+let zoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
+    ...defaultZoneEntranceMap,
+};
+
+export function resetZoneEntranceMap() {
+    zoneEntranceMap = {...defaultZoneEntranceMap};
+}
+export function getZoneEntranceMap() {
+    return zoneEntranceMap;
+}
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
     if (enterZoneByTarget(state, zoneKey, markerId, {instant: true})) {

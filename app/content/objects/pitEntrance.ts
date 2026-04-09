@@ -2,6 +2,7 @@ import {renderIndicator} from 'app/content/objects/indicator';
 import {objectHash} from 'app/content/objects/objectHash';
 import {playAreaSound} from 'app/musicController';
 import {CANVAS_HEIGHT} from 'app/gameConstants';
+import {getMappedEntranceData} from 'app/randomizer/utils';
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
@@ -149,7 +150,8 @@ export class PitEntrance implements ObjectInstance {
             && isObjectInsideTarget(hero.getMovementHitbox(), pad(hitbox, 4))
         ) {
             if (hero.action === 'fallen') {
-                enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+                const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+                enterZoneByTarget(state, targetZone, targetObjectId, {
                     skipObject: this.definition,
                     callback: onEnterZoneFromPit,
                 });

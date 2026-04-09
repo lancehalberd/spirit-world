@@ -1,6 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
+import {getMappedEntranceData} from 'app/randomizer/utils';
 import {appendScript} from 'app/scriptEvents';
 import {drawFrame, drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
 import {createCanvasAndContext} from 'app/utils/canvas';
@@ -54,25 +55,27 @@ export class StaffTower implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        this.door = createObjectInstance(state, {
-            type: 'door',
-            id: definition.id,
-            status: definition.status,
-            d: 'up',
-            style: 'future',
-            x: this.x + 70,
-            y: this.y + 138,
-            targetZone: definition.targetZone,
-            targetObjectId: definition.targetObjectId,
-        });
-        // Door's normally render on the background layer, but this door must render on top of the tower, which is in the sprite layer.
-        this.door.renderParent = this;
         this.balcony = new Balcony(this);
         this.top = new StaffTowerTop(this);
     }
     // Make sure door area gets set as soon as this object is added to an area.
-    onInitialize(state: GameState) {
+    onInitialize(state: GameState, isActiveArea: boolean) {
+        const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+        this.door = createObjectInstance(state, {
+            type: 'door',
+            id: this.definition.id,
+            status: this.definition.status,
+            d: 'up',
+            style: 'future',
+            x: this.x + 70,
+            y: this.y + 138,
+            targetZone,
+            targetObjectId,
+        });
+        // Door's normally render on the background layer, but this door must render on top of the tower, which is in the sprite layer.
         this.door.area = this.area;
+        this.door.renderParent = this;
+        this.door.onInitialize(state, isActiveArea);
     }
     collapse(state: GameState) {
         this.specialStatus = 'collapsing';

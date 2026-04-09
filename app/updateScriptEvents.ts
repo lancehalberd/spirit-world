@@ -188,12 +188,15 @@ export function updateScriptEvents(state: GameState): void {
                 delete state.scriptEvents.overrideMusic;
                 break;
             case 'runDialogueScript':
+
                 const dialogueSet = dialogueHash[event.npcKey];
                 if (!dialogueSet) {
                     console.error('Missing dialogue set', event.npcKey, dialogueSet);
                     return;
                 }
-                const script = dialogueSet.mappedOptions[event.scriptKey];
+                // Use the updated script for the randomizer, if one exists.
+                const randomizedScript = state.randomizerState?.items?.dialogueReplacements?.[event.npcKey]?.[event.scriptKey];
+                const script = randomizedScript ?? dialogueSet.mappedOptions[event.scriptKey];
                 prependScript(state, script);
                 // Since this overwrites remaining events, don't continue processing events this frame.
                 state.scriptEvents.blockEventQueue = true;

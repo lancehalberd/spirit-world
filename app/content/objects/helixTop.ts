@@ -1,6 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {BehaviorObject} from 'app/content/objects/behaviorObject';
 import {editingState} from 'app/development/editingState';
+import {getMappedEntranceData} from 'app/randomizer/utils';
 import {drawFrameContentAt} from 'app/utils/animations';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 
@@ -35,17 +36,6 @@ export class HelixTop implements ObjectInstance {
     walls: BehaviorObject[];
     door: ObjectInstance;
     constructor(state: GameState, public definition: EntranceDefinition) {
-        this.door = createObjectInstance(state, {
-            type: 'door',
-            id: this.definition.id,
-            status: this.definition.status,
-            d: 'up',
-            style: 'square',
-            x: this.x + 47 - helixTopFrame.content.x,
-            y: this.y + 198 - helixTopFrame.content.y,
-            targetZone: this.definition.targetZone,
-            targetObjectId: this.definition.targetObjectId,
-        });
         this.floor = new BehaviorObject(this, {
                 x: floorRect.x - helixTopFrame.content.x,
                 y: floorRect.y - helixTopFrame.content.y,
@@ -78,8 +68,21 @@ export class HelixTop implements ObjectInstance {
         this.door.update(state);
     }
     // Make sure door area gets set as soon as this object is added to an area.
-    onInitialize(state: GameState) {
+    onInitialize(state: GameState, isActiveArea: boolean) {
+        const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+        this.door = createObjectInstance(state, {
+            type: 'door',
+            id: this.definition.id,
+            status: this.definition.status,
+            d: 'up',
+            style: 'square',
+            x: this.x + 47 - helixTopFrame.content.x,
+            y: this.y + 198 - helixTopFrame.content.y,
+            targetZone,
+            targetObjectId,
+        });
         this.door.area = this.area;
+        this.door.onInitialize(state, isActiveArea);
     }
     // This draws the top 200px of the top layer of the tower, which includes all of the
     // graphics that need to be drawn in front of objects that might pass behind it.

@@ -1,10 +1,10 @@
 import {generateZoneVariations} from 'app/generator/generateZoneVariations';
 import {getAllNodes} from 'app/randomizer/allNodes';
 import {calculateKeyLogic} from 'app/randomizer/calculateKeyLogic';
-import {
-    findLootObjects,
-} from 'app/randomizer/find';
+import {initializeEntranceRandomizer, randomizeEntrances} from 'app/randomizer/entranceRandomizer';
+import {findLootObjects} from 'app/randomizer/find';
 import {applyLootAssignments, initializeReverseFill, replaceTrash, reverseFill} from 'app/randomizer/reverseFill';
+import {verifyNodeConnections} from 'app/randomizer/utils';
 import {mainOverworldNode} from 'app/randomizer/logic/overworldLogic';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
@@ -51,15 +51,12 @@ export class RandomizerScene implements GameScene {
         // a distinct step so that we can generate zones over multiple frames.
         generateZoneVariations(state);
         state.randomizerState = {
-            allNodes: getAllNodes(state),
             allChecks: new Set<string>(),
             lootAssignmentByKey: {},
-            dialogueReplacements: {},
             checksByZone: {},
             dungeonItemCountByZone: {},
             logicalZoneKeyByCheckKey: {},
-            goal: config.goal,
-            startingNodes: [mainOverworldNode],
+            ...config,
         };
         this.startNextStep(state);
     }
@@ -70,15 +67,24 @@ export class RandomizerScene implements GameScene {
                 case 'entrances':
                     if (this.config.entranceSeed) {
                         this.step = 'entrances';
-                        // randomizeEntrances(SRandom.seed(entranceSeed));
+                        this.stepStatus = 'Initializing Entrances';
+                        initializeEntranceRandomizer(state.randomizerState);
+                        return;
                     }
                     break;
                 case 'items':
                     if (this.config.itemSeed) {
                         this.step = 'items';
-                        state.randomizerState.random = SRandom.seed(this.config.itemSeed);
+                        state.randomizerState.items = {
+                            allNodes: getAllNodes(state),
+                            startingNodes: [mainOverworldNode],
+                            dialogueReplacements: {},
+                            random: SRandom.seed(this.config.itemSeed),
+                        };
+                        verifyNodeConnections(state.randomizerState);
+                        return;
                     }
-                    break;
+                    return;
                 case 'enemies':
                     if (this.config.enemySeed) {
                         this.step = 'enemies';
@@ -91,11 +97,11 @@ export class RandomizerScene implements GameScene {
                             }
                         });
                         */
+                        return;
                     }
                     break;
                 case 'finished':
                     updateHeroMagicStats(state, true);
-
                     returnToSpawnLocation(state);
                     showFieldScene(state);
                     break;
@@ -105,6 +111,14 @@ export class RandomizerScene implements GameScene {
     }
     update(state: GameState, interactive: boolean) {
         switch (this.step) {
+            case 'entrances':
+                try {
+                    this.updateEntrances(state);
+                } catch (e) {
+                    this.step = 'failure';
+                    console.error('Failed entrance generation', e);
+                }
+                break;
             case 'items':
                 try {
                     this.updateItems(state);
@@ -115,18 +129,23 @@ export class RandomizerScene implements GameScene {
                 break;
         }
     }
+    updateEntrances(state: GameState) {
+        this.stepStatus = 'Pairing Entrances';
+        randomizeEntrances(state.randomizerState, 10);
+        this.startNextStep(state);
+    }
     updateItems(state: GameState) {
         const randomizerState = state.randomizerState;
-        if (!randomizerState.requiredKeysMap) {
+        if (!randomizerState.items.requiredKeysMap) {
             this.stepStatus = 'Counting Keys';
-            randomizerState.requiredKeysMap = calculateKeyLogic(randomizerState.allNodes, randomizerState.startingNodes);
+            randomizerState.items.requiredKeysMap = calculateKeyLogic(randomizerState);
             return;
         }
-        if (!randomizerState.allLootObjects) {
+        if (!randomizerState.items.allLootObjects) {
             this.stepStatus = 'Creating Pool.';
-            randomizerState.allLootObjects = findLootObjects(randomizerState.allNodes);
+            randomizerState.items.allLootObjects = findLootObjects(randomizerState.items.allNodes);
             const lootMap: {[key: string]: LootType } = {};
-            for (const lootWithLocation of randomizerState.allLootObjects) {
+            for (const lootWithLocation of randomizerState.items.allLootObjects) {
                 if (lootMap[lootWithLocation.lootObject.id] &&
                     lootMap[lootWithLocation.lootObject.id] !== lootWithLocation.lootObject.lootType) {
                     console.warn('Duplicate loot id with mismatched type',
@@ -138,20 +157,20 @@ export class RandomizerScene implements GameScene {
             }
             return;
         }
-        if (!randomizerState.lootAssignments) {
+        if (!randomizerState.items.lootAssignments) {
             this.stepStatus = 'Adding Victory Points.';
-            randomizerState.lootAssignments = {};
+            randomizerState.items.lootAssignments = {};
             if (randomizerState.goal.victoryPoints?.total) {
                 replaceTrash(randomizerState);
             }
         }
-        if (!randomizerState.assignmentsState) {
+        if (!randomizerState.items.assignmentsState) {
             this.stepStatus = 'Preparing Reverse Fill.';
             initializeReverseFill(randomizerState);
             return;
         }
         if (!reverseFill(randomizerState, 1)) {
-            this.stepStatus = 'Assigning Items ' + randomizerState.remainingLoot.length;
+            this.stepStatus = 'Assigning Items ' + randomizerState.items.remainingLoot.length;
             return;
         }
         applyLootAssignments(randomizerState);

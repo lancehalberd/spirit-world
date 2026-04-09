@@ -173,6 +173,8 @@ class MainMenuScene extends FieldMenuScene {
 const mainMenuScene = new MainMenuScene();
 export function showMainMenuScene(state: GameState) {
     if (canPauseGame(state)) {
+        mainMenuScene.needsRefresh = true;
+        mainMenuScene.update(state, false);
         pushScene(state, mainMenuScene);
         updateSoundSettings(state);
     } else {

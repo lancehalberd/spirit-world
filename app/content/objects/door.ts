@@ -1,18 +1,19 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { evaluateLogicDefinition } from 'app/content/logic';
-import { DoorStyleDefinition, doorStyles } from 'app/content/objects/doorStyles';
-import { objectHash } from 'app/content/objects/objectHash';
-import { editingState } from 'app/development/editingState';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {evaluateLogicDefinition} from 'app/content/logic';
+import {DoorStyleDefinition, doorStyles} from 'app/content/objects/doorStyles';
+import {objectHash} from 'app/content/objects/objectHash';
+import {editingState} from 'app/development/editingState';
 import {playObjectSound} from 'app/musicController';
-import { renderHeroShadow } from 'app/renderActor';
-import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import {getMappedEntranceData} from 'app/randomizer/utils';
+import {renderHeroShadow} from 'app/renderActor';
+import {showMessage} from 'app/scriptEvents';
+import {createAnimation, drawFrame} from 'app/utils/animations';
 import {enterZoneByTarget, findObjectLocation} from 'app/utils/enterZoneByTarget';
-import { directionMap } from 'app/utils/field';
-import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
+import {directionMap} from 'app/utils/field';
+import {boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad} from 'app/utils/index';
 import {isLocationHot} from 'app/utils/isLocationHot';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
-import { drawText } from 'app/utils/simpleWhiteFont';
+import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import {drawText} from 'app/utils/simpleWhiteFont';
 
 const [
     entranceLightFrame
@@ -100,6 +101,8 @@ export class Door implements ObjectInstance {
     x = this.definition.x;
     y = this.definition.y;
     status: ObjectStatus = 'normal';
+    targetZone?: string;
+    targetObjectId?: string;
     style: DoorStyleDefinition = doorStyles[this.definition.style] || doorStyles.cavern;
     doorPath = new OpenDoorPath(this);
     // This gets set to true if this instance has been opened and is used to prevent the door
@@ -113,7 +116,13 @@ export class Door implements ObjectInstance {
         if (this.definition.d === 'up' && this.definition.price) {
             this.definition.status = 'closed';
         }
-        this.status = definition.status || 'normal';
+    }
+    onInitialize(state: GameState) {
+        const {targetZone, targetObjectId, status} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+        this.status = status ?? (this.definition.status || 'normal');
+        this.targetZone = targetZone;
+        this.targetObjectId = targetObjectId;
+        // Event if a mapped entrance is defined, it may not have a status set, so default to the original status.
         this.refreshLogic(state);
     }
     refreshLogic(state: GameState) {
@@ -148,7 +157,7 @@ export class Door implements ObjectInstance {
         }
         this.refreshHotStatus = false;
         // For a door you can walk through, we need to check if the section on the other side is hot.
-        if (!this.definition.targetObjectId || !this.definition.targetZone) {
+        if (!this.targetObjectId || !this.targetZone) {
             // This logic is only valid if this door is at the same coordinates as the current super tile.
             if (this.area !== state.areaInstance && this.area !== state.alternateAreaInstance) {
                 return;
@@ -185,8 +194,8 @@ export class Door implements ObjectInstance {
         }
         const location = findObjectLocation(
             state,
-            this.definition.targetZone,
-            this.definition.targetObjectId,
+            this.targetZone,
+            this.targetObjectId,
             this.area.definition.isSpiritWorld,
             this.definition
         );
@@ -207,7 +216,7 @@ export class Door implements ObjectInstance {
     // Hero cannot enter doors while they are jumping down/falling in front of a door.
     heroCanEnter(state: GameState): boolean {
         // Ladders that don't connect zone cannot be entered, they just apply the climbable behavior behind them.
-        if (this.style.isLadderUp && !this.definition.targetZone) {
+        if (this.style.isLadderUp && !this.targetZone) {
             return false;
         }
         // The hero can walk over closed ladders down as they are plain ground tiles, so this should return false
@@ -468,7 +477,7 @@ export class Door implements ObjectInstance {
                         hero.isExitingDoor = true;
                         // Go back down the ladder if this was a missing target object.
                         // Otherwise keep going up so the ladder can be used to climb short walls.
-                        if (this.definition.targetZone && this.definition.targetObjectId) {
+                        if (this.targetZone && this.targetObjectId) {
                             hero.actionDx = -directionMap[this.definition.d][0];
                             hero.actionDy = -directionMap[this.definition.d][1];
                         }
@@ -485,7 +494,7 @@ export class Door implements ObjectInstance {
                     }
                 }
             } else {
-                const shouldChangeZones = this.definition.targetZone && this.definition.targetObjectId
+                const shouldChangeZones = this.targetZone && this.targetObjectId
                     && (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox));
                 if (shouldChangeZones && !this.travelToZone(state)) {
                     hero.isExitingDoor = true;
@@ -497,10 +506,10 @@ export class Door implements ObjectInstance {
     }
     travelToZone(state: GameState) {
         let hero = state.hero;
-        if (hero.isExitingDoor || !this.definition.targetZone || !this.definition.targetObjectId) {
+        if (hero.isExitingDoor || !this.targetZone || !this.targetObjectId) {
             return false;
         }
-        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+        return enterZoneByTarget(state, this.targetZone, this.targetObjectId, {
             skipObject:this.definition,
         });
     }
@@ -519,7 +528,7 @@ export class Door implements ObjectInstance {
             if (this.definition.d === 'down'
                 // This is similar to the list of overworldKeys, but currently we exclude the `underwater` area because
                 // it feels wrong to show the doorlight for underwater doors.
-                && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'forest' || this.definition.targetZone === 'sky')
+                && (this.targetZone === 'overworld' || this.targetZone === 'forest' || this.targetZone === 'sky')
                 && this.isOpen()
             ) {
                 // For some reasont his renders when the door is closed while editing, which isn't a problem,

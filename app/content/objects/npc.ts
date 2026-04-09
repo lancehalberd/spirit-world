@@ -497,7 +497,7 @@ export class NPC implements Actor, ObjectInstance  {
         // set for it on `state.randomizerState?.dialogueReplacement`.
         // So if this is present, use this dialogue set instead of the default dialogue for this NPC.
         const npcKey = `${this.area.location.zoneKey}-${this.definition.id}`;
-        const isRandomized = !!state.randomizerState?.dialogueReplacements?.[npcKey]
+        const isRandomized = !!state.randomizerState?.items?.dialogueReplacements?.[npcKey]
         const dialogueKey = isRandomized ? npcKey : this.definition.dialogueKey;
         if (!dialogueKey) {
             // custom dialogue is not used on the astral projection.

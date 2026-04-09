@@ -51,6 +51,9 @@ export function loadSavedData() {
             state.savedRandomizerGames.push(null);
         }
     }
+    /*console.log("loaded saved data");
+    console.log("normal saves", state.savedGames);
+    console.log("randomizer saves", state.savedRandomizerGames);*/
 }
 
 export function eraseAllSaves(): void {

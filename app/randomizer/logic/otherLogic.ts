@@ -25,7 +25,6 @@ export const waterfallCaveNodes: LogicNode[] = [
             { objectId: 'waterfallCaveBackRight' },
             { objectId: 'waterfallCaveLeft' },
             { objectId: 'waterfallCaveRight' },
-
         ],
     },
     {
@@ -48,6 +47,10 @@ export const waterfallCaveNodes: LogicNode[] = [
         zoneId: 'waterfallCave',
         nodeId: 'waterfallCaveLeft',
         checks: [{ objectId: 'waterfallCaveEmptyChest' }],
+        complexNpcs: [
+            {dialogueKey: 'ambrosia', optionKey: 'helpItem'},
+            {dialogueKey: 'ambrosia', optionKey: 'questItem'},
+        ],
         entranceIds: ['waterfallCaveLeft'],
         exits: [{ objectId: 'waterfallCaveLeft' }],
     },

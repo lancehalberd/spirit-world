@@ -1,9 +1,8 @@
-import {zoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
+import {getZoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
 import {overworldKeys} from 'app/gameConstants';
+import {everyObject} from 'app/randomizer/utils';
+import SRandom from 'app/utils/SRandom'
 
-import {
-    everyObject, verifyNodeConnections
-} from 'app/randomizer/utils';
 
 // Warning: The terms entrance/exit don't seem to be used consistently in this file.
 // Going forward we will try to use "entrances" for ids like 'overworld:peachCaveEntrance' (id of the object on the overworld)
@@ -48,10 +47,6 @@ const disabledDoors = [
     'forest:forestTowerEntranceSpirit',
 ];
 
-interface DoorLocation {
-    location: ZoneLocation
-    definition: EntranceDefinition
-}
 
 // These groups of entrances are not reachable except from one of the other exits, so at least
 // one needs to be connected to a reachable entrance using a connected exit group.
@@ -160,23 +155,46 @@ const spiritLoopableEntrancePairs = [
     {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
 ];
 
-export function randomizeEntrances(randomizerState: RandomizerState) {
-    const {random} = randomizerState;
-    const connectedNormalEntrances = new Set<string>();
-    const connectedSpiritEntrances = new Set<string>();
-    const normalEntrances = new Set<string>();
-    const spiritEntrances = new Set<string>();
-    const waterEntrances = new Set<string>();
-    const normalExits = new Set<string>();
-    const spiritExits = new Set<string>();
-    const waterExits = new Set<string>();
-    const normalPitEntrances: EntranceDefinition[] = [];
-    const spiritPitEntrances: EntranceDefinition[] = [];
-    const normalPitTargets = new Set<string>();
-    const spiritPitTargets = new Set<string>();
-    const targetIdMap: {[key in string]: DoorLocation[]} = {};
-    const allTargetedKeys = new Set<string>();
-    const fixedNimbusCloudZones = new Set<string>();
+export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
+    randomizerState.entrances = {
+        entranceAssignments: {},
+        random: SRandom.seed(randomizerState.entranceSeed),
+        connectedNormalEntrances: new Set<string>(),
+        connectedSpiritEntrances: new Set<string>(),
+        normalEntrances: new Set<string>(),
+        spiritEntrances: new Set<string>(),
+        waterEntrances: new Set<string>(),
+        normalExits: new Set<string>(),
+        spiritExits: new Set<string>(),
+        waterExits: new Set<string>(),
+        normalPitEntrances: [],
+        spiritPitEntrances: [],
+        normalPitTargets: new Set<string>(),
+        spiritPitTargets: new Set<string>(),
+        targetIdMap: {},
+        allTargetedKeys: new Set<string>(),
+        fixedNimbusCloudZones: new Set<string>(),
+        forbiddenSpiritExitsKeysByEntranceKey: {},
+        allUnreachableSpiritExits: [],
+    };
+
+    const {
+        allTargetedKeys,
+        allUnreachableSpiritExits,
+        targetIdMap,
+        normalEntrances,
+        normalExits,
+        spiritEntrances,
+        spiritExits,
+        waterEntrances,
+        waterExits,
+        connectedNormalEntrances,
+        connectedSpiritEntrances,
+        normalPitEntrances,
+        normalPitTargets,
+        spiritPitEntrances,
+        spiritPitTargets,
+    } = randomizerState.entrances;
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
         if (ignoredZones.includes(zone.key)) {
             return;
@@ -188,10 +206,10 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
             const targetKey = `${object.targetZone}:${object.targetObjectId}`;
             if (area.isSpiritWorld) {
                 spiritPitTargets.add(targetKey);
-                spiritPitEntrances.push(object);
+                spiritPitEntrances.push({location, definition: object});
             } else {
                 normalPitTargets.add(targetKey);
-                normalPitEntrances.push(object);
+                normalPitEntrances.push({location, definition: object});
             }
             return;
         }
@@ -267,11 +285,33 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
     }
 
     // Collect a list of all unreachable spirit entrance targets so we can easily exclude them from invalid assignments.
-    const allUnreachableSpiritExits: string[] = [];
     for (const unreachableExit of unreachableSpiritExitGroups) {
         allUnreachableSpiritExits.push(...unreachableExit);
     }
-    const forbiddenSpiritExitsKeysByEntranceKey: {[key: string]: string[]} = {};
+}
+
+export function randomizeEntrances(randomizerState: RandomizerState, steps: number) {
+    console.log('randomizeEntrances');
+    const {
+        entranceAssignments,
+        allTargetedKeys,
+        normalEntrances,
+        normalExits,
+        spiritEntrances,
+        spiritExits,
+        waterEntrances,
+        waterExits,
+        connectedNormalEntrances,
+        connectedSpiritEntrances,
+        normalPitEntrances,
+        normalPitTargets,
+        spiritPitEntrances,
+        spiritPitTargets,
+        random,
+        forbiddenSpiritExitsKeysByEntranceKey,
+        allUnreachableSpiritExits,
+    } = randomizerState.entrances;
+
 
     //console.log('EXIT ONLY ENTRANCE ASSIGNMENTS:');
     // Assign all unreachable entrances first to a random entrance with other connections.
@@ -301,7 +341,7 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
                 console.error('Entrance ID not found, was it moved or removed?', entrance);
                 debugger;
             }
-            assignEntranceExitPair(unreachableExit, entrance);
+            assignEntranceExitPair(randomizerState, unreachableExit, entrance);
             // If only spirit world exits remain, mark them all as forbidden to match with
             // any other unreachable spirit entrange targets, otherwise this strategy may fail
             // to actually connect this unreachable exit group to reachable areas.
@@ -320,111 +360,16 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
     // Assign loopable entrances first to make sure the entire graph is connected.
     for (const loopableEntrancePair of random.shuffle(normalLoopableEntrancePairs)) {
         const exit = random.element([...connectedNormalEntrances]);
-        assignEntranceExitPair(loopableEntrancePair.outerTarget, exit);
+        assignEntranceExitPair(randomizerState, loopableEntrancePair.outerTarget, exit);
         connectedNormalEntrances.add(loopableEntrancePair.innerTarget);
     }
     //console.log('SPIRIT LOOPABLE ENTRANCE ASSIGNMENTS:');
     for (const loopableEntrancePair of random.shuffle(spiritLoopableEntrancePairs)) {
         const exit = random.element([...connectedSpiritEntrances]);
-        assignEntranceExitPair(loopableEntrancePair.outerTarget, exit);
+        assignEntranceExitPair(randomizerState, loopableEntrancePair.outerTarget, exit);
         connectedSpiritEntrances.add(loopableEntrancePair.innerTarget);
     }
 
-    function assignEntranceExitPair(targetIdOfEntrance: string, targetIdOfExit: string) {
-        let entranceZone: string, entranceTarget: string, exitZone: string, exitTarget: string;
-        if (!targetIdMap[targetIdOfEntrance]) {
-            debugger;
-        }
-        for (const entrance of targetIdMap[targetIdOfEntrance]) {
-            if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
-                entranceZone = entrance.location.zoneKey;
-                entranceTarget = entrance.definition.id;
-            }
-        }
-        if (!entranceZone) {
-            console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
-            return;
-        }
-        if (!targetIdMap[targetIdOfExit]) {
-            debugger;
-        }
-        for (const entrance of targetIdMap[targetIdOfExit]) {
-            if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
-                exitZone = entrance.location.zoneKey;
-                exitTarget = entrance.definition.id;
-            }
-        }
-
-        if (!exitZone) {
-            console.error('Could not find a targeted exit that targets', targetIdOfExit);
-            return;
-        }
-
-        for (const zone in zoneEntranceMap) {
-            if (fixedNimbusCloudZones.has(zone)) {
-                continue;
-            }
-            if (zoneEntranceMap[zone as keyof typeof zoneEntranceMap] === targetIdOfEntrance) {
-                zoneEntranceMap[zone as keyof typeof zoneEntranceMap] = `${exitZone}:${exitTarget}`;
-                // console.log(zone + ' => ' + zoneEntranceMap[zone]);
-                fixedNimbusCloudZones.add(zone);
-            }
-        }
-
-        if (!targetIdMap[targetIdOfEntrance]) {
-            debugger;
-        }
-
-        for (const entrance of targetIdMap[targetIdOfEntrance]) {
-            /*console.log(
-                `${entrance.location.zoneKey}::${entrance.definition.id}`, '=>',
-                `${exitZone}::${exitTarget}`
-            );*/
-            entrance.definition.targetZone = exitZone;
-            entrance.definition.targetObjectId = exitTarget;
-            if (entrance.definition.status === 'cracked') {
-                entrance.definition.status = 'blownOpen';
-            }
-        }
-        for (const exit of targetIdMap[targetIdOfExit]) {
-            /*console.log(
-                `${exit.location.zoneKey}::${exit.definition.id}`, '=>',
-                `${entranceZone}::${entranceTarget}`
-            );*/
-            exit.definition.targetZone = entranceZone;
-            exit.definition.targetObjectId = entranceTarget;
-        }
-        // Remove assigned targets so they cannot be used in the pool any longer.
-        for (const set of [
-            normalEntrances, spiritEntrances, normalExits, spiritExits,
-            connectedNormalEntrances, connectedSpiritEntrances,
-        ]) {
-            set.delete(targetIdOfExit);
-            set.delete(targetIdOfEntrance);
-        }
-
-        if (normalEntrances.size !== normalExits.size) {
-            console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
-            console.error(`normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
-            console.error([...normalEntrances]);
-            console.error([...normalExits]);
-            return;
-        }
-        if (spiritEntrances.size !== spiritExits.size) {
-            console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
-            console.error(`spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
-            console.error([...spiritEntrances]);
-            console.error([...spiritExits]);
-            return;
-        }
-        if (waterEntrances.size !== waterExits.size) {
-            console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
-            console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
-            console.error([...waterEntrances]);
-            console.error([...waterExits]);
-            return;
-        }
-    }
 
     //console.log('RESTRICTED ASSIGNMENTS:');
     // Make sure any spirit exits with entrance restrictions are assigned first to make sure
@@ -432,7 +377,7 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
     for (const spiritEntranceId of Object.keys(forbiddenSpiritExitsKeysByEntranceKey)) {
         const badEntrances = forbiddenSpiritExitsKeysByEntranceKey[spiritEntranceId];
         const spiritExitId = random.shuffle([...spiritExits]).filter(entrance => !badEntrances.includes(entrance))[0];
-        assignEntranceExitPair(spiritEntranceId, spiritExitId);
+        assignEntranceExitPair(randomizerState, spiritEntranceId, spiritExitId);
     }
 
     //console.log('GENERAL ASSIGNMENTS:');
@@ -445,7 +390,7 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
         const exitIds = [...exits];
         for (const entranceId of random.shuffle([...entrances])) {
             const exitId = exitIds.pop();
-            assignEntranceExitPair(entranceId, exitId);
+            assignEntranceExitPair(randomizerState, entranceId, exitId);
         }
     }
     for (const [pitTargets, pitEntrances] of [
@@ -456,10 +401,139 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
         for (const pitEntrance of random.shuffle(pitEntrances)) {
             const exitId = targetIds.pop();
             const [zone, objectId] = exitId.split(':');
-            pitEntrance.targetZone = zone;
-            pitEntrance.targetObjectId = objectId;
+            entranceAssignments[pitEntrance.location.zoneKey + ':' + pitEntrance.definition.id] = {
+                targetZone: zone,
+                targetObjectId: objectId,
+            };
         }
     }
-    verifyNodeConnections(randomizerState);
 }
 
+function assignEntranceExitPair(randomizerState: RandomizerState, targetIdOfEntrance: string, targetIdOfExit: string) {
+    console.log('assignEntranceExitPair', targetIdOfEntrance, targetIdOfExit);
+    const {
+        entranceAssignments,
+        allTargetedKeys,
+        fixedNimbusCloudZones,
+        targetIdMap,
+        normalEntrances,
+        normalExits,
+        spiritEntrances,
+        spiritExits,
+        waterEntrances,
+        waterExits,
+        connectedNormalEntrances,
+        connectedSpiritEntrances,
+    } = randomizerState.entrances;
+    let entranceZone: string, entranceTarget: string, exitZone: string, exitTarget: string;
+    if (!targetIdMap[targetIdOfEntrance]) {
+        debugger;
+    }
+    for (const entrance of targetIdMap[targetIdOfEntrance]) {
+        if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
+            entranceZone = entrance.location.zoneKey;
+            entranceTarget = entrance.definition.id;
+            // In case something breaks, remember that I added this during the refactor, but it should be fine.
+            break;
+        }
+    }
+    if (!entranceZone) {
+        console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
+        return;
+    }
+    if (!targetIdMap[targetIdOfExit]) {
+        debugger;
+    }
+    for (const entrance of targetIdMap[targetIdOfExit]) {
+        if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
+            exitZone = entrance.location.zoneKey;
+            exitTarget = entrance.definition.id;
+            // In case something breaks, remember that I added this during the refactor, but it should be fine.
+            break;
+        }
+    }
+
+    if (!exitZone) {
+        console.error('Could not find a targeted exit that targets', targetIdOfExit);
+        return;
+    }
+
+    const zoneEntranceMap = getZoneEntranceMap();
+    for (const zone in zoneEntranceMap) {
+        if (fixedNimbusCloudZones.has(zone)) {
+            continue;
+        }
+        if (zoneEntranceMap[zone as keyof typeof zoneEntranceMap] === targetIdOfEntrance) {
+            zoneEntranceMap[zone as keyof typeof zoneEntranceMap] = `${exitZone}:${exitTarget}`;
+            // console.log(zone + ' => ' + zoneEntranceMap[zone]);
+            fixedNimbusCloudZones.add(zone);
+        }
+    }
+
+    if (!targetIdMap[targetIdOfEntrance]) {
+        debugger;
+    }
+
+    for (const entrance of targetIdMap[targetIdOfEntrance]) {
+        /*console.log(
+            `${entrance.location.zoneKey}::${entrance.definition.id}`, '=>',
+            `${exitZone}::${exitTarget}`
+        );*/
+        /*entrance.definition.targetZone = exitZone;
+        entrance.definition.targetObjectId = exitTarget;
+        if (entrance.definition.status === 'cracked') {
+            entrance.definition.status = 'blownOpen';
+        }*/
+        const entranceKey = entrance.location.zoneKey+':' + entrance.definition.id;
+        entranceAssignments[entranceKey] = {
+            targetZone: exitZone,
+            targetObjectId: exitTarget,
+        };
+        if (entrance.definition.status === 'cracked') {
+            entranceAssignments[entranceKey].status = 'blownOpen';
+        }
+    }
+    for (const exit of targetIdMap[targetIdOfExit]) {
+        /*console.log(
+            `${exit.location.zoneKey}::${exit.definition.id}`, '=>',
+            `${entranceZone}::${entranceTarget}`
+        );*/
+        //exit.definition.targetZone = entranceZone;
+        //exit.definition.targetObjectId = entranceTarget;
+        const exitKey = exit.location.zoneKey+':' + exit.definition.id;
+        entranceAssignments[exitKey] = {
+            targetZone: entranceZone,
+            targetObjectId: entranceTarget,
+        };
+    }
+    // Remove assigned targets so they cannot be used in the pool any longer.
+    for (const set of [
+        normalEntrances, spiritEntrances, normalExits, spiritExits,
+        connectedNormalEntrances, connectedSpiritEntrances,
+    ]) {
+        set.delete(targetIdOfExit);
+        set.delete(targetIdOfEntrance);
+    }
+
+    if (normalEntrances.size !== normalExits.size) {
+        console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
+        console.error(`normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
+        console.error([...normalEntrances]);
+        console.error([...normalExits]);
+        return;
+    }
+    if (spiritEntrances.size !== spiritExits.size) {
+        console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
+        console.error(`spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
+        console.error([...spiritEntrances]);
+        console.error([...spiritExits]);
+        return;
+    }
+    if (waterEntrances.size !== waterExits.size) {
+        console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
+        console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
+        console.error([...waterEntrances]);
+        console.error([...waterExits]);
+        return;
+    }
+}

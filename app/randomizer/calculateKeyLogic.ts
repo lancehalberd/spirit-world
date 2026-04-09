@@ -1,8 +1,10 @@
 import {getZone} from 'app/content/zones';
 import {findDoorById} from 'app/randomizer/find';
+import {getMappedEntranceData} from 'app/randomizer/utils';
 import {missingExitNodeSet, missingNodeSet, warnOnce} from 'app/randomizer/warnOnce';
 
-export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]): RequiredKeysMap {
+export function calculateKeyLogic(randomizerState: RandomizerState): RequiredKeysMap {
+    const {allNodes} = randomizerState.items;
     const requiredKeysMap: RequiredKeysMap = {};
     for (const node of allNodes) {
         const zone = getZone(node.zoneId);
@@ -20,7 +22,7 @@ export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNod
             }
 
             if (exitObject.status === 'locked' && !exitObject.requiredKeysForLogic) {
-                requiredKeysMap[exitObject.id] = countRequiredKeysForEntrance(allNodes, startingNodes, location.logicalZoneKey, exitObject);
+                requiredKeysMap[exitObject.id] = countRequiredKeysForEntrance(randomizerState, location.logicalZoneKey, exitObject);
             } else if (exitObject.requiredKeysForLogic) {
                 console.log(exitObject.id, 'manually set to', exitObject.requiredKeysForLogic, 'keys');
                 requiredKeysMap[exitObject.id] = exitObject.requiredKeysForLogic;
@@ -46,11 +48,11 @@ export function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNod
 }
 
 function countRequiredKeysForEntrance(
-    allNodes: LogicNode[],
-    startingNodes: LogicNode[],
+    randomizerState: RandomizerState,
     logicalZoneKey: LogicalZoneKey,
     exitToUpdate: EntranceDefinition
 ): number {
+    const {allNodes, startingNodes} = randomizerState.items;
     const countedDoorIds = new Set<string>();
     let requiredKeysForLogic = 1;
     const reachableNodes = [...startingNodes];
@@ -104,10 +106,11 @@ function countRequiredKeysForEntrance(
                 countedDoorIds.add(exitObject.id);
                 requiredKeysForLogic++;
             }
+            const {targetZone, targetObjectId} = getMappedEntranceData(randomizerState, zone.key, exitObject);
             const nextNode = allNodes.find(node =>
-                (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
-                && node.zoneId === exitObject.targetZone
-                && node.entranceIds?.includes(exitObject.targetObjectId)
+                (node !== currentNode || targetObjectId !== exit.objectId)
+                && node.zoneId === targetZone
+                && node.entranceIds?.includes(targetObjectId)
             );
             if (!nextNode) {
                 warnOnce(missingExitNodeSet,

@@ -16,12 +16,11 @@ import {
 import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {getDefaultState} from 'app/state';
 
-
 function assignLoot(randomizerState: RandomizerState, lootWithLocation: LootWithLocation, lootData: LootData) {
     // Note that we expect to overwrite assignments because we do assignments in two waves for victory points:
     // 1. Replace optional items with victory points
     // 2. Randomize location of all items.
-    randomizerState.lootAssignments[lootWithLocation.lootObject.id] = lootData;
+    randomizerState.items.lootAssignments[lootWithLocation.lootObject.id] = lootData;
 }
 
 const victoryPoint: LootData = {lootType: 'victoryPoint', lootAmount: 1};
@@ -35,7 +34,7 @@ export function replaceTrash(randomizerState: RandomizerState) {
         console.error('No victory points to hide:', randomizerState.goal);
         return;
     }
-    const {allLootObjects, random} = randomizerState;
+    const {allLootObjects, lootAssignments, random} = randomizerState.items;
     // Try to replace as many unimportant checks with victory points as we can
     // until we either run out of checks or hit the victory point target.
     let victoryPointsHidden = 0, replaceGoodChecks = false;
@@ -50,8 +49,8 @@ export function replaceTrash(randomizerState: RandomizerState) {
             const lootData = getMappedLootData(randomizerState, lootWithLocation.lootObject);
             switch (lootData.lootType) {
                 case 'victoryPoint':
-                    if (randomizerState.lootAssignments[lootWithLocation.lootObject.id]) {
-                        randomizerState.lootAssignments[lootWithLocation.lootObject.id].lootAmount++;
+                    if (lootAssignments[lootWithLocation.lootObject.id]) {
+                        lootAssignments[lootWithLocation.lootObject.id].lootAmount++;
                     } else {
                         // This is probably an error if this happens.
                         console.warn('Found a victory point in the base game', lootWithLocation);
@@ -201,7 +200,7 @@ function organizeLootObjects(randomizerState: RandomizerState, lootObjects: Loot
 
 
 function assignItemToLocation(randomizerState: RandomizerState, loot: LootWithLocation, assignedLocation: LootWithLocation): void {
-    const {assignmentsState} = randomizerState;
+    const {assignmentsState} = randomizerState.items;
     const lootData = getMappedLootData(randomizerState, loot.lootObject);
     //debugState(currentState);
     /*if (assignedLocation.location) {
@@ -221,8 +220,8 @@ function assignItemToLocation(randomizerState: RandomizerState, loot: LootWithLo
     assignmentsState.assignedLocations.add(assignedLocation.lootObject.id);
 }
 
-function collectAllLoot(randomizerState: RandomizerState, simulatedState: GameState): GameState {
-    const {assignmentsState} = randomizerState;
+function collectAllLoot(randomizerState: RandomizerState, simulatedState: GameState, ignoreUnassignedChecks = false): GameState {
+    const {assignmentsState} = randomizerState.items;
     const reachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, simulatedState);
     // console.log(debugLocations(reachableChecks));
     for (const check of reachableChecks) {
@@ -239,6 +238,8 @@ function collectAllLoot(randomizerState: RandomizerState, simulatedState: GameSt
             } else {
                 console.log(`    Get ${getLootName(assignment.source.lootObject, state)} from ${assignment.target.dialogueKey}:${assignment.target.optionKey}`);
             }*/
+        } else if (ignoreUnassignedChecks) {
+            continue;
         }
         // Set progress flags related to the check even if it has not been assigned, for example,
         // Talking to the Vanara Commander should still release elemental beasts even if a check is
@@ -252,7 +253,7 @@ function collectAllLoot(randomizerState: RandomizerState, simulatedState: GameSt
 }
 
 function placeItem(randomizerState: RandomizerState, originalState: GameState, loot: LootWithLocation): string {
-    const {assignmentsState, random} = randomizerState;
+    const {assignmentsState, random} = randomizerState.items;
     let currentState = copyState(originalState);
     let previousState = originalState;
     let counter = 0;
@@ -297,14 +298,14 @@ function placeItem(randomizerState: RandomizerState, originalState: GameState, l
 }
 
 export function initializeReverseFill(randomizerState: RandomizerState) {
-    const {allLootObjects, random} = randomizerState;
+    const {allLootObjects, random} = randomizerState.items;
 
     //console.log({ allNodes, startingNodes });
     //console.log(allLootObjects.map(object => object.lootObject.lootType + ':' + object.location.zoneKey));
-    randomizerState.initialState = getDefaultState();
-    applySavedState(randomizerState.initialState, randomizerState.initialState.savedState);
+    randomizerState.items.initialState = getDefaultState();
+    applySavedState(randomizerState.items.initialState, randomizerState.items.initialState.savedState);
 
-    let finalState = copyState(randomizerState.initialState);
+    let finalState = copyState(randomizerState.items.initialState);
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(randomizerState, finalState, lootWithLocation);
         finalState.savedState.objectFlags[lootWithLocation.lootObject.id] = true;
@@ -324,13 +325,13 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
         }
     }
     //console.log({ allLootObjects, allReachableCheckIds });
-    randomizerState.assignmentsState = {
+    randomizerState.items.assignmentsState = {
         assignments: {},
         assignedLocations: new Set(),
         assignedContents: new Set(),
     }
 
-    const initialReachableChecks = findReachableChecks(randomizerState, randomizerState.initialState);
+    const initialReachableChecks = findReachableChecks(randomizerState, randomizerState.items.initialState);
     console.log('sphere 0 checks: ', initialReachableChecks.length);
     let placeFullPeachFirst = initialReachableChecks.length < 13;
 
@@ -338,7 +339,7 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
     let { bigKeys, smallKeys, maps, peachLoot, progressLoot, trashLoot } = organizeLootObjects(randomizerState, allLootObjects);
     peachLoot = random.shuffle(peachLoot);
     random.generateAndMutate();
-    randomizerState.trashLoot = random.shuffle(trashLoot);
+    randomizerState.items.trashLoot = random.shuffle(trashLoot);
     random.generateAndMutate();
     // This is a bit of a hack to prevent generation from failing when there are too few
     // checks in sphere 0. Typically the error occurs if we generate to the point that cat eyes
@@ -356,13 +357,13 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
         console.log('Placing', fullPeach, 'at', location)
         assignItemToLocation(randomizerState, fullPeach, location);
     }
-    randomizerState.allItemSets = [bigKeys, smallKeys, maps, ...progressLoot, peachLoot];
-    randomizerState.remainingLoot = [];
-    for (let i = 0; i < randomizerState.allItemSets.length; i++) {
-        randomizerState.allItemSets[i] = random.shuffle(randomizerState.allItemSets[i]);
+    randomizerState.items.allItemSets = [bigKeys, smallKeys, maps, ...progressLoot, peachLoot];
+    randomizerState.items.remainingLoot = [];
+    for (let i = 0; i < randomizerState.items.allItemSets.length; i++) {
+        randomizerState.items.allItemSets[i] = random.shuffle(randomizerState.items.allItemSets[i]);
         random.generateAndMutate();
-        for (const item of randomizerState.allItemSets[i]) {
-            randomizerState.remainingLoot.push(item);
+        for (const item of randomizerState.items.allItemSets[i]) {
+            randomizerState.items.remainingLoot.push(item);
         }
     }
 }
@@ -377,7 +378,7 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
         remainingLoot,
         initialState,
         trashLoot,
-    } = randomizerState;
+    } = randomizerState.items;
 
     for (let itemSet of allItemSets) {
         while (itemSet.length) {
@@ -397,6 +398,22 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
             placeItem(randomizerState, simulatedState, itemToPlace);
             //console.log('place item', Date.now() - startTime);
             //console.log('placed ', (Date.now() - startTime) / 1000);
+
+            // Update initialState + startingNodes after each item is placed.
+            let counter = 0;
+            let currentState = initialState, previousState = initialState;
+            do {
+                if (counter++ > 100) {
+                    console.error('infinite loop');
+                    debugger;
+                    return null;
+                }
+                previousState = currentState;
+                currentState = collectAllLoot(randomizerState, previousState, true);
+                currentState = setAllFlagsInLogic(randomizerState, currentState);
+            } while (currentState !== previousState);
+            randomizerState.items.initialState = currentState;
+
             steps--;
             if (steps <= 0) {
                 return false;
@@ -414,15 +431,6 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
         }
         const loot = trashLoot.pop();
         assignItemToLocation(randomizerState, loot, location);
-        /*assignmentsState.assignments.push({
-            lootType: loot.lootObject.lootType,
-            lootAmount: loot.lootObject.lootAmount,
-            lootLevel: loot.lootObject.lootLevel,
-            source: loot,
-            target: location,
-        });
-        assignmentsState.assignedContents.add(loot.lootObject.id);
-        assignmentsState.assignedLocations.add(location.lootObject.id);*/
     }
     return true;
 }
@@ -435,7 +443,7 @@ function getLootAmount(loot: LootAssignment): number {
 }
 
 export function applyLootAssignments(randomizerState: RandomizerState): void {
-    const {assignmentsState, dialogueReplacements} = randomizerState;
+    const {assignmentsState, dialogueReplacements} = randomizerState.items;
     const assignments = Object.values(assignmentsState.assignments);
     // console.log('applying assignments:');
     // console.log(assignments);
@@ -473,6 +481,8 @@ export function applyLootAssignments(randomizerState: RandomizerState): void {
                 addCheck(randomizerState, flag, assignment, 'forge');
             } else if (dialogueKey === 'spiritTree') {
                 addCheck(randomizerState, flag, assignment, 'dream');
+            } else if (dialogueKey === 'ambrosia') {
+                addCheck(randomizerState, flag, assignment, 'waterfallCave');
             } else {
                 console.error('Unhandled dialogue key', dialogueKey);
             }
@@ -529,9 +539,6 @@ export function applyLootAssignments(randomizerState: RandomizerState): void {
                         },
                     ],
                 };
-                /*assignment.target.lootObject.lootType = assignment.lootType;
-                assignment.target.lootObject.lootAmount = assignment.lootAmount;
-                assignment.target.lootObject.lootLevel = 0;*/
             } else {
                 addCheck(randomizerState, assignment.target.lootObject.id, assignment, assignment.target.location.logicalZoneKey);
                 assignLoot(randomizerState, assignment.target, {lootType: assignment.lootType, lootAmount: assignment.lootAmount, lootLevel: 0});

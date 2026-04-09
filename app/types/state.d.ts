@@ -187,6 +187,76 @@ interface RandomizerGoal {
     }
 }
 
+interface DoorLocation {
+    location: ZoneLocation
+    definition: EntranceDefinition
+}
+interface EntranceData {
+    targetZone?: string
+    targetObjectId?: string
+    status?: ObjectStatus
+}
+interface RandomizerEntrances {
+    // This represents the progress/result of randomizing the entrances in the game.
+    // Entrances in the game will check for their `${zoneKey}:${objectId}` on this map
+    // and use the defined targetZone+targetObjectId if found
+    entranceAssignments: {[key in string]: EntranceData}
+    random: SRandom
+    allTargetedKeys: Set<string>
+    fixedNimbusCloudZones: Set<string>
+    allUnreachableSpiritExits: string[]
+    forbiddenSpiritExitsKeysByEntranceKey: {[key: string]: string[]}
+    targetIdMap: {[key in string]: DoorLocation[]}
+    normalEntrances: Set<string>
+    normalExits: Set<string>
+    spiritEntrances: Set<string>
+    spiritExits:Set<string>
+    waterEntrances:Set<string>
+    waterExits:Set<string>
+    connectedNormalEntrances: Set<string>
+    connectedSpiritEntrances: Set<string>
+    normalPitEntrances: DoorLocation[]
+    normalPitTargets: Set<string>
+    spiritPitEntrances: DoorLocation[]
+    spiritPitTargets: Set<string>
+}
+interface RandomizerItems {
+    // This represents the progress/result of randomizing the items in the game.
+    // When loot is found during the game, it will be replaced based on this assignment if one is present.
+    // Maps object.id (which uses `${dialogueKey}:${optionKey}` for loot gained in dialogue)
+    // to the LootData that has been assigned by the randomizer.
+    lootAssignments?: {[key in string]: LootData}
+    random?: SRandom
+    // The full set of logic nodes that are in bounds for randomization.
+    // Typically this should include any node in the game that either contains a randomizable element
+    // or is relevant to traveling between nodes with randomizable elements.
+    allNodes: LogicNode[]
+    // The set of nodes that are possible starting places for the player in the randomizer.
+    startingNodes: LogicNode[]
+    // Maps entranceId => # of zone keys to put that entrance in logic.
+    // This does not include zone on the key since entranceIds are shared across all zones
+    // and locked doors should not be shared between zones since small keys are zone specific.
+    requiredKeysMap?: RequiredKeysMap
+    // The set of all loot objects found within the randomized nodes.
+    allLootObjects?: LootWithLocation[]
+    // It is necessary to remap certain dialogue options in order to change the the item
+    // rewards given by talking to NPCs.
+    dialogueReplacements: {[npcKey: string]: {
+        [optionKey: string]: TextScript
+    }}
+    // State used to store assignment data while generating item randomization.
+    assignmentsState?: AssignmentState
+    // All items remaining to be placed grouped and prioritize by category
+    allItemSets?: LootWithLocation[][]
+    // All items remaining to be placed. Until an item is going to be placed, it is assumed to be collected by the
+    // player before determining which placement locations are in logic for the currently placed item.
+    remainingLoot?: LootWithLocation[]
+    // The initial state used as a starting point for calculating what is in logic for each item placement.
+    initialState?: GameState
+    // Items that do not effect game logic and can be quickly placed randomly after all other assignments have been made.
+    trashLoot?: LootWithLocation[]
+}
+
 type RequiredKeysMap = {[key in string]: number};
 // Randomizer data that must be saved in order to recreate a randomizer seed.
 interface SavedRandomizerState {
@@ -201,39 +271,8 @@ interface RandomizerState extends SavedRandomizerState {
     checksByZone: {[key: string]: Set<string>}
     dungeonItemCountByZone: {[key: string]: number}
     logicalZoneKeyByCheckKey: {[key: string]: LogicalZoneKey}
-    dialogueReplacements: {[npcKey: string]: {
-        [optionKey: string]: TextScript
-    }}
-
-    random?: SRandom
-    // The full set of logic nodes that are in bounds for randomization.
-    // Typically this should include any node in the game that either contains a randomizable element
-    // or is relevant to traveling between nodes with randomizable elements.
-    allNodes: LogicNode[]
-    // The set of nodes that are possible starting places for the player in the randomizer.
-    startingNodes: LogicNode[]
-    // Maps entranceId => # of zone keys to put that entrance in logic.
-    // This does not include zone on the key since entranceIds are shared across all zones
-    // and locked doors should not be shared between zones since small keys are zone specific.
-    requiredKeysMap?: RequiredKeysMap
-    // The set of all loot objects found within the randomized nodes.
-    allLootObjects?: LootWithLocation[]
-    // This represents the progress/result of randomizing the items in the game.
-    // When loot is found during the game, it will be replaced based on this assignment if one is present.
-    // Maps object.id (which uses `${dialogueKey}:${optionKey}` for loot gained in dialogue)
-    // to the LootData that has been assigned by the randomizer.
-    lootAssignments?: {[key in string]: LootData}
-    // State used to store assignment data while generating item randomization.
-    assignmentsState?: AssignmentState
-    // All items remaining to be placed grouped and prioritize by category
-    allItemSets?: LootWithLocation[][]
-    // All items remaining to be placed. Until an item is going to be placed, it is assumed to be collected by the
-    // player before determining which placement locations are in logic for the currently placed item.
-    remainingLoot?: LootWithLocation[]
-    // The initial state used as a starting point for calculating what is in logic for each item placement.
-    initialState?: GameState
-    // Items that do not effect game logic and can be quickly placed randomly after all other assignments have been made.
-    trashLoot?: LootWithLocation[]
+    items?: RandomizerItems
+    entrances?: RandomizerEntrances
 }
 
 type ARGameID = 'dodger'|'hota'|'target'|'targetFPS';

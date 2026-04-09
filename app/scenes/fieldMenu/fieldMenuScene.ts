@@ -92,6 +92,7 @@ export class FieldMenuScene implements GameScene {
     update(state: GameState, interactive: boolean) {
         if (this.needsRefresh) {
             this.panels = this.getPanels(state);
+            this.panelsBuffer.needsRefresh = true;
             for (const panel of this.panels) {
                 let row = 0, column = 0;
                 for (const element of panel.options) {

@@ -10,7 +10,9 @@ function getDailySeed(): number {
     const year = (date.getFullYear() % 100).toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const day = date.getDate().toString().padStart(2, '0');
-    return parseInt(`${year}${month}${day}`, 10);
+    // 10x so that you can easily increment to 10 new seeds before
+    // running into the next daily seed.
+    return parseInt(`${year}${month}${day}`, 10) * 10;
 }
 
 export class FileSelectScene implements GameScene {

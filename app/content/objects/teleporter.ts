@@ -1,22 +1,23 @@
-import { renderIndicator } from 'app/content/objects/indicator';
-import { objectHash } from 'app/content/objects/objectHash';
-import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
+import {renderIndicator} from 'app/content/objects/indicator';
+import {objectHash} from 'app/content/objects/objectHash';
+import {editingState} from 'app/development/editingState';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {getMappedEntranceData} from 'app/randomizer/utils';
 import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,
     renderForegroundObjects,
 } from 'app/scenes/field/renderField';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { getBackgroundFrame } from 'app/utils/area';
-import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
-import { enterLocation } from 'app/utils/enterLocation';
-import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
-import { getTileBehaviorsAndObstacles } from 'app/utils/getBehaviors';
-import { isObjectInsideTarget, pad } from 'app/utils/index';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
-import { getVectorToTarget } from 'app/utils/target';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {getBackgroundFrame} from 'app/utils/area';
+import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
+import {enterLocation} from 'app/utils/enterLocation';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
+import {getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
+import {isObjectInsideTarget, pad} from 'app/utils/index';
+import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import {getVectorToTarget} from 'app/utils/target';
 
 
 
@@ -152,7 +153,8 @@ export class Teleporter implements ObjectInstance {
                 },
             });
         } else {
-            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, {
+            const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+            enterZoneByTarget(state, targetZone, targetObjectId, {
                 skipObject: this.definition,
             });
         }

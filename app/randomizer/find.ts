@@ -6,7 +6,7 @@ import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
 
 export function findReachableNodes(randomizerState: RandomizerState, state: GameState): LogicNode[] {
-    const {allNodes, startingNodes} = randomizerState;
+    const {allNodes, startingNodes} = randomizerState?.items;
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
@@ -261,9 +261,9 @@ export function canOpenDoor(randomizerState: RandomizerState, location: FullZone
     // Only pass through
     if (door.status === 'locked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
-        const requiredKeys = randomizerState.requiredKeysMap[door.id];
+        const requiredKeys = randomizerState.items.requiredKeysMap[door.id];
         if (!requiredKeys) {
-            console.error('Object missing required keys', door, randomizerState.requiredKeysMap);
+            console.error('Object missing required keys', door, randomizerState.items.requiredKeysMap);
             throw new Error('Missing required keys for lock');
         }
         return dungeonInventory?.totalSmallKeys >= requiredKeys;

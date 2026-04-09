@@ -146,19 +146,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - In Game Randomizer
-        - Map of entranceKey (zoneKey:objectId) => targetZone+targetId
-            - Build list of entrances+exits in one frame
-            - Set N ~= 10 entrances per frame
-            - customize options
-                * (Entrance Seed) < 260408 >
-        - Test progressive loot from NPC dialogue
-        - Smooth item placement
-            - Precalculate everything in logic with no items to avoid redundant work
-                - Update this to include everything in logic after checks while ignoring unplaced items
-                - We can probably just do this by updating initialState + startingNodes in place
-            - Store state for placing an item so that we can place a single item over multiple frames
-
     - Demo blockers
         - Replace Helix rival fight with demo ending + unlock randomizer.
         - Finish cocoon update
@@ -166,7 +153,12 @@ Current tasks:
             - Falling between floors
             - Missing floor
         - Add new peach tree graphics
-        - Randomizer for demo mode
+        - Item Randomizer for demo mode
+            - Just update the logic based on isDemoFlag and make sure it doesn't fail because of unreachable checks
+            - Disable entrance randomizer initially.
+        - Entrance Randomizer for demo mode
+            - Need to disable unreachable entrances+exits based on demo logic.
+            - Maybe collected entrances+exits based on node logic exploration instead of reading frome areas.
         - [Optional] add ash to spirit world
         - High priority SFX
             - Plant grenade explosion
