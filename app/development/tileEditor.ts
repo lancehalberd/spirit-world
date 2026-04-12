@@ -24,6 +24,7 @@ import {addVariantToArea, createVariantDataAtScreenCoords} from 'app/development
 import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
 import {getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords} from 'app/scenes/map/renderMap';
 import {isMapSceneActive} from 'app/scenes/map/showMapScene'
+import {sceneHash} from "app/scenes/sceneHash";
 import {getState} from 'app/state';
 import {KEY, isKeyboardKeyDown } from 'app/userInput';
 import {mainCanvas} from 'app/utils/canvas';
@@ -199,7 +200,7 @@ document.addEventListener('mouseup', (event) => {
     if (!editingState.sectionDragData?.dragged) {
         const state = getState();
         if (isMapSceneActive(state)) {
-            const section = getSectionUnderMouse(state);
+            const section = getSectionUnderMouse(state, sceneHash.map);
             if (isKeyboardKeyDown(KEY.SHIFT)) {
                 if (section) {
                     const arrayIndex = editingState.selectedSections.indexOf(section.index);
@@ -560,7 +561,7 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: R
 export function selectAllTiles() {
     const state = getState();
     if (isMapSceneActive(state)) {
-        const allSections = getDisplayedMapSections(state);
+        const allSections = getDisplayedMapSections(state, sceneHash.map);
         if (editingState.selectedSections.length === allSections.length) {
             editingState.selectedSections = [];
         } else {

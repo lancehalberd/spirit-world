@@ -53,7 +53,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         } else if (loot.lootType === 'money') {
             state.hero.savedData.money += (loot.lootAmount || 1);
         } else if (isCollectible(lootType)) {
-            gainCollectible(state, lootType);
+            gainCollectible(state, lootType, (loot.lootAmount || 1));
         } else if (isConsumable(lootType)) {
             gainConsumable(state, lootType);
         } else {

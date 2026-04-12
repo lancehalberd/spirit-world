@@ -1,5 +1,6 @@
 import {SPAWN_LOCATION_FULL} from 'app/content/spawnLocations';
 import {zones} from 'app/content/zones';
+import {isDemoMode} from 'app/gameConstants';
 import {getDefaultSavedState } from 'app/savedState'
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
@@ -89,8 +90,6 @@ export function getDefaultState(): GameState {
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],
         showControls: false,
-        menuIndex: 0,
-        menuRow: 0,
         keyboard: {
             gameKeyValues: [],
             gameKeysDown: new Set(),
@@ -124,6 +123,7 @@ export function getDefaultState(): GameState {
         variantSeed: readGetParameterAsInt('variantSeed'),
         // logic nodes for generated content will be stored here.
         generatedLogicNodes: [],
+        isDemoMode,
     };
     return state;
 }

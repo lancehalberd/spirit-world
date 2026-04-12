@@ -90,6 +90,8 @@ export const waterfallTowerNodes: LogicNode[] = [
                 logic: orLogic(hasIronBoots, andLogic(hasWaterBlessing, hasRoll), andLogic(hasWaterBlessing, hasStaff)),
                 doorId: 'waterfallTowerBigKeyBlock'
             },
+            // Opening this keyblock creates a waterfall you can use to get to the big chest area.
+            {nodeId: 'waterfallTowerBigChest', doorId: 'waterfallTowerBigKeyBlock'},
             {nodeId: 'waterfallTowerBeforeSecondGuardian'},
         ],
     },

@@ -1,6 +1,5 @@
 import {zones} from 'app/content/zones/zoneHash';
 import {showToast} from 'app/development/toast';
-import {itemSeed, enemySeed, entranceSeed, worldSeed} from 'app/gameConstants';
 
 
 export function exportZoneToClipboard(zone: Zone): void {
@@ -9,9 +8,6 @@ export function exportZoneToClipboard(zone: Zone): void {
 }
 
 export function serializeZone(zone: Zone) {
-    if (itemSeed || enemySeed || entranceSeed || worldSeed) {
-        throw new Error('Cannot export zone while randomizer is active, randomized elements will be included.');
-    }
     const emptyAreas = [];
     for (const floor of zone.floors) {
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {

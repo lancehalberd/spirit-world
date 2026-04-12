@@ -1,6 +1,3 @@
-import {isDemoMode} from 'app/gameConstants';
-
-
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
     return { operation: 'and', logicChecks};
 }
@@ -10,6 +7,11 @@ export function orLogic(...logicChecks: LogicCheck[]): OrLogicCheck {
     return { operation: 'or', logicChecks};
 }
 window['orLogic'] = orLogic;
+
+export function notLogic(logicCheck: LogicCheck): LogicCheck {
+    return (state: GameState) => isLogicValid(state, logicCheck, true);
+}
+window['notLogic'] = notLogic;
 
 export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     let level = 1, levelString: string;
@@ -28,7 +30,7 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         return !!state.hero.astralProjection;
     }
     if (itemFlag === 'demo') {
-        return isDemoMode;
+        return state.isDemoMode;
     }
     if (itemFlag === 'randomizer') {
         return !!state.randomizerState;
@@ -339,6 +341,8 @@ export const beastsDefeated: LogicCheck = {requiredFlags: ['flameBeast', 'frostB
 // object+chest ids that require keys/big keys automatically apply key logic already.
 export const hasSmallKey: LogicCheck = {requiredFlags: ['$smallKey']};
 export const hasBigKey: LogicCheck = {requiredFlags: ['$bigKey']};
+
+export const isDemoModeLogic: LogicCheck = {requiredFlags: ['$demo']};
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

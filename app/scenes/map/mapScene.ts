@@ -72,7 +72,7 @@ export class MapScene implements GameScene {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
-        renderMap(context, state);
+        renderMap(context, state, this);
     }
 }
 

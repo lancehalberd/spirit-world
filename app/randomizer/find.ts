@@ -1,12 +1,12 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
-import {isLogicValid} from 'app/content/logic';
+import {evaluateLogicDefinition, isLogicValid} from 'app/content/logic';
 import {getZone} from 'app/content/zones';
 import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
 
 export function findReachableNodes(randomizerState: RandomizerState, state: GameState): LogicNode[] {
-    const {allNodes, startingNodes} = randomizerState?.items;
+    const {allNodesById, allNodesByZoneKey, startingNodes} = randomizerState;
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
@@ -32,7 +32,7 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                     continue;
                 }
             }
-            const nextNode = allNodes.find(node => node.nodeId === path.nodeId);
+            const nextNode = allNodesById[path.nodeId];
             if (!nextNode) {
                 warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
                 continue;
@@ -54,7 +54,7 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                 continue;
             }
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
-            const nextNode = allNodes.find(node =>
+            const nextNode = allNodesByZoneKey[exitObject.targetZone].find(node =>
                 (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
                 // If isSpiritWorld is defined for both nodes, they must match.
                 && (
@@ -64,7 +64,6 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                     // Teleporters can link material/spirit world together.
                     exitObject.type === 'teleporter'
                 )
-                && node.zoneId === exitObject.targetZone
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
             if (!nextNode) {
@@ -252,9 +251,11 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
 }
 
 export function canOpenDoor(randomizerState: RandomizerState, location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
-    if (!door) {
+    // Return false if door does not exist or is currently out of logic.
+    if (!door || !evaluateLogicDefinition(state, door)) {
         return false;
     }
+    if (door.hasCustomLogic)
     if (door.type === 'teleporter') {
         return state.hero.savedData.passiveTools.spiritSight > 0 || state.hero.savedData.passiveTools.trueSight > 0;
     }

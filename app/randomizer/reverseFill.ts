@@ -34,7 +34,8 @@ export function replaceTrash(randomizerState: RandomizerState) {
         console.error('No victory points to hide:', randomizerState.goal);
         return;
     }
-    const {allLootObjects, lootAssignments, random} = randomizerState.items;
+    const {allLootObjects} = randomizerState;
+    const {lootAssignments, random} = randomizerState.items;
     // Try to replace as many unimportant checks with victory points as we can
     // until we either run out of checks or hit the victory point target.
     let victoryPointsHidden = 0, replaceGoodChecks = false;
@@ -298,7 +299,8 @@ function placeItem(randomizerState: RandomizerState, originalState: GameState, l
 }
 
 export function initializeReverseFill(randomizerState: RandomizerState) {
-    const {allLootObjects, random} = randomizerState.items;
+    const {allLootObjects} = randomizerState;
+    const {random} = randomizerState.items;
 
     //console.log({ allNodes, startingNodes });
     //console.log(allLootObjects.map(object => object.lootObject.lootType + ':' + object.location.zoneKey));
@@ -373,8 +375,8 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
     // throttled while it is running.
     window.throttleCount = 0;
     //const startTime = Date.now();
+    const {allLootObjects} = randomizerState;
     const {
-        allLootObjects,
         random,
         assignmentsState,
         allItemSets,
@@ -472,8 +474,9 @@ export function applyLootAssignments(randomizerState: RandomizerState): void {
             const flag = `${dialogueKey}-${optionKey}`;
             const flagScript = `{flag:${flag}}`;
             // it is not straightforward to calculate the correct zone based on
-            // the dialogueKey+optionKet so we just manually set the correct zone
+            // the dialogueKey+optionKey so we just manually set the correct zone
             // for each dialogue key check here.
+            //console.log('Adding dialogue check', dialogueKey, flag);
             if (dialogueKey === 'streetVendor') {
                 addCheck(randomizerState, flag, assignment, 'overworld');
             } else if (dialogueKey === 'storageVanara') {

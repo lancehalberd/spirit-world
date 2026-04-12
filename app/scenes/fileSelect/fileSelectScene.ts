@@ -24,14 +24,7 @@ export class FileSelectScene implements GameScene {
     gameMode: GameMode = 'normal';
     randomizerBossGoalIndex = 0;
     randomizerConfig: SavedRandomizerState = {
-        goal: {
-            victoryPoints: {
-                // How many victory points are available
-                total: 30,
-                // How many victory points are required to finish.
-                goal: 20,
-            }
-        },
+        goal: {},
         //enemySeed?: number
         //entranceSeed?: number
         itemSeed: getDailySeed(),

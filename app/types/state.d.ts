@@ -110,8 +110,6 @@ interface GameState {
     }
     mutationDuration?: number
     showControls: boolean
-    menuIndex: number
-    menuRow: number
     // This is mostly used for debugging animations.
     alwaysHideMenu?: boolean
     keyboard: {
@@ -169,6 +167,7 @@ interface GameState {
     // data for certain mini games, such as special conditions during Boss Rush battles.
     backupHeroData?: SavedHeroData
     generatedLogicNodes: LogicNode[]
+    isDemoMode?: boolean
 }
 interface RandomizerGoal {
     // How many combined points are required to finish.
@@ -220,6 +219,8 @@ interface RandomizerEntrances {
     spiritPitEntrances: DoorLocation[]
     spiritPitTargets: Set<string>
 }
+type NodesByZoneKey = {[zoneKey in string]: LogicNode[]};
+type NodesById = {[nodeId in string]: LogicNode};
 interface RandomizerItems {
     // This represents the progress/result of randomizing the items in the game.
     // When loot is found during the game, it will be replaced based on this assignment if one is present.
@@ -227,18 +228,10 @@ interface RandomizerItems {
     // to the LootData that has been assigned by the randomizer.
     lootAssignments?: {[key in string]: LootData}
     random?: SRandom
-    // The full set of logic nodes that are in bounds for randomization.
-    // Typically this should include any node in the game that either contains a randomizable element
-    // or is relevant to traveling between nodes with randomizable elements.
-    allNodes: LogicNode[]
-    // The set of nodes that are possible starting places for the player in the randomizer.
-    startingNodes: LogicNode[]
     // Maps entranceId => # of zone keys to put that entrance in logic.
     // This does not include zone on the key since entranceIds are shared across all zones
     // and locked doors should not be shared between zones since small keys are zone specific.
     requiredKeysMap?: RequiredKeysMap
-    // The set of all loot objects found within the randomized nodes.
-    allLootObjects?: LootWithLocation[]
     // It is necessary to remap certain dialogue options in order to change the the item
     // rewards given by talking to NPCs.
     dialogueReplacements: {[npcKey: string]: {
@@ -266,6 +259,24 @@ interface SavedRandomizerState {
     entranceSeed?: number
 }
 interface RandomizerState extends SavedRandomizerState {
+    // The full set of logic nodes that are in bounds for randomization.
+    // Typically this should include any node in the game that either contains a randomizable element
+    // or is relevant to traveling between nodes with randomizable elements.
+    allNodes: LogicNode[]
+    allNodesById: NodesById
+    allNodesByZoneKey: NodesByZoneKey
+    // The set of all loot objects found within the randomized nodes.
+    // This does not include every check found in reachable nodes.
+    // For example, only the first item from the merchant will be present in demo mode since the
+    // other items cannot be purchased until after the end of the demo.
+    allLootObjects: LootWithLocation[]
+    // The set of all loot etrances that can be used within the nodes.
+    // This does not include every entrance/exit in reachable nodes.
+    // For example, this does not include the grand temple entrance in demo mode, because even though
+    // it is in the node, it cannot be used in the demo.
+    allEntrances: DoorLocation[]
+    // The set of nodes that are possible starting places for the player in the randomizer.
+    startingNodes: LogicNode[]
     allChecks: Set<string>
     lootAssignmentByKey: {[key: string]: LootAssignment}
     checksByZone: {[key: string]: Set<string>}

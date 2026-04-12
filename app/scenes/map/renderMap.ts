@@ -24,6 +24,8 @@ import {isSectionExplored } from 'app/utils/sections';
 import {drawText} from 'app/utils/simpleWhiteFont';
 import {fogCanvas} from 'app/render/fog';
 
+import type {MapScene} from 'app/scenes/map/mapScene';
+
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
 
@@ -49,12 +51,12 @@ const mapIconMap = {
     chest: chestFrame,
 }
 
-export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
+export function renderMap(context: CanvasRenderingContext2D, state: GameState, scene: MapScene): void {
     const overworldMapId = getOverworldMapId(state);
     if (overworldMapId) {
         renderOverworldMap(context, state, overworldMapId);
     } else {
-        renderDungeonMap(context, state);
+        renderDungeonMap(context, state, scene);
     }
 }
 
@@ -314,7 +316,7 @@ const floorMarkerRectangle = {
     h: worldSize,
 };
 
-export function getSelectedFloorId(state: GameState): string {
+function getSelectedFloorId(state: GameState, scene: MapScene): string {
     // This happens when visiting an unpopulated super tile, for example when a new super tile is created in the editor
     // or a super tile is never edited after being created.
     if (!state.areaSection?.definition?.mapId) {
@@ -326,12 +328,12 @@ export function getSelectedFloorId(state: GameState): string {
         return '1F';
     }
     const floorIds = Object.keys(map.floors);
-    const selectedFloorIndex = state.menuIndex % floorIds.length;
+    const selectedFloorIndex = scene.floorIndex % floorIds.length;
     return floorIds[selectedFloorIndex];
 }
 
-function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): void {
-    const selectedFloorId = getSelectedFloorId(state);
+function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState, scene: MapScene): void {
+    const selectedFloorId = getSelectedFloorId(state, scene);
     drawMapFrame(context, fullDungeonMapRectangle);
     // Refresh the dungeon map if necessary
     refreshDungeonMap(state, state.areaSection?.definition.mapId, selectedFloorId);
@@ -347,7 +349,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
         });
     }
     if (editingState.isEditing) {
-        const hoverSection = isMouseDown() ? undefined : getSectionUnderMouse(state);
+        const hoverSection = isMouseDown() ? undefined : getSectionUnderMouse(state, scene);
         if (hoverSection) {
             context.save();
                 context.globalAlpha *= 0.3;
@@ -386,7 +388,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     const r = floorMarkerRectangle;
     const rowHeight = 24;
     const floorIds = Object.keys(dungeonMaps[state.areaSection?.definition.mapId].floors || {});
-    const selectedFloorIndex = state.menuIndex % floorIds.length;
+    const selectedFloorIndex = scene.floorIndex % floorIds.length;
     const hasMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map;
     let y = r.y + r.h;
     for (let floor = 0; floor < floorIds.length; floor++) {
@@ -626,8 +628,8 @@ export function mouseCoordsToMapCoords({x, y}: {x: number, y: number}): {x: numb
     }
 }
 
-export function getSectionUnderMouse(state: GameState): AreaSection | undefined {
-    const sections = getDisplayedMapSections(state);
+export function getSectionUnderMouse(state: GameState, scene: MapScene): AreaSection | undefined {
+    const sections = getDisplayedMapSections(state, scene);
     if (!sections) {
         return;
     }
@@ -646,7 +648,7 @@ export function getSectionUnderMouse(state: GameState): AreaSection | undefined 
         }
     }
 }
-export function getDisplayedMapSections(state: GameState): number[] | undefined {
+export function getDisplayedMapSections(state: GameState, scene: MapScene): number[] | undefined {
     if (!isMapSceneActive(state)) {
         return;
     }
@@ -654,7 +656,7 @@ export function getDisplayedMapSections(state: GameState): number[] | undefined 
     if (overworldKeys.includes(mapId)) {
         return [];
     }
-    const selectedFloorId = getSelectedFloorId(state);
+    const selectedFloorId = getSelectedFloorId(state, scene);
     const map = dungeonMaps[mapId];
     return map.floors[selectedFloorId].sections;
 }

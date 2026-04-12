@@ -55,10 +55,11 @@ export const RIVAL_NAME = 'Saru';
 
 export const CHAKRAM_2_NAME = 'Golden Chakram';
 
-export const isDemoMode = false;
+export const isDemoMode = !!readGetParameterAsInt('demo');
 
 export const isDebugMode = !isDemoMode;
 
+/*
 export const entranceSeed = readGetParameterAsInt('entranceSeed');
 // Entrance randomizer may not be completable with randomized items, so item randomizer
 // defaults to the entrance seed if one is not set.
@@ -68,7 +69,7 @@ export const itemSeed = readGetParameterAsInt('itemSeed') || randomizerSeed;
 // For future use, seed that will control variations that modify the overall structure and flow of the game.
 // This could change the overworld layout, which dungeons are present, etc.
 export const worldSeed = readGetParameterAsInt('worldSeed');
-export const enemySeed = readGetParameterAsInt('enemySeed');
+export const enemySeed = readGetParameterAsInt('enemySeed');*/
 
 // 'foreground3' is rarely required for certain combinations of trees.
 export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];

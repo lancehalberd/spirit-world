@@ -2,6 +2,8 @@ import {
     andLogic, canCross2Gaps, canCrossPrecise2Gaps, canHasSpikeBoots, canHasFlyingBoots, canHasTowerStaff, hasSpiritBarrier, hasClone,
     hasRangedPush, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility, hasIronBoots, hasLongSomersault, hasStaff,
     hasWaterBlessing, canRemoveHeavyStones, hasPhoenixCrown, hasSomersault, hasTeleportation,
+    isDemoModeLogic,
+    notLogic,
     orLogic,
 } from 'app/content/logic';
 
@@ -49,7 +51,7 @@ export const waterfallCaveNodes: LogicNode[] = [
         checks: [{ objectId: 'waterfallCaveEmptyChest' }],
         complexNpcs: [
             {dialogueKey: 'ambrosia', optionKey: 'helpItem'},
-            {dialogueKey: 'ambrosia', optionKey: 'questItem'},
+            {dialogueKey: 'ambrosia', optionKey: 'questItem', logic: {requiredFlags: ['$peachBasket']}},
         ],
         entranceIds: ['waterfallCaveLeft'],
         exits: [{ objectId: 'waterfallCaveLeft' }],
@@ -90,7 +92,9 @@ export const waterfallCaveNodes: LogicNode[] = [
 ];
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
-const canAscendToCrater = orLogic(canRemoveHeavyStones, hasIce, hasInvisibility, {requiredFlags: ['flameBeast']});
+// The cave cannot be filled with lava during the demo, so it is in logic as long as the hero can roll over the
+// basic lava hazards.
+const canAscendToCrater = orLogic(andLogic(isDemoModeLogic, canCross2Gaps), canRemoveHeavyStones, hasIce, hasInvisibility, {requiredFlags: ['flameBeast']});
 const canNavigateSpiritAscentCave = orLogic(hasInvisibility, hasFireBlessing, hasPhoenixCrown, {requiredFlags: ['flameBeast']});
 export const cavesNodes: LogicNode[] = [
     // This cave connects the NW corner of the overworld to the sky and is one way.
@@ -193,7 +197,7 @@ export const cavesNodes: LogicNode[] = [
         paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasSpiritBarrier)}],
         entranceIds: ['helixEntrance'],
         exits: [
-            { objectId: 'helixEntrance' },
+            { objectId: 'helixEntrance', logic: notLogic(isDemoModeLogic)},
         ],
     },
 

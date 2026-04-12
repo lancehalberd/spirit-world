@@ -183,7 +183,8 @@ export function followMessagePointer(state: GameState, pointer: string) {
         console.error('Missing dialogue set', dialogueKey, pointer);
         return;
     }
-    const script = dialogueSet.mappedOptions[optionKey];
+    const randomizedScript = state.randomizerState?.items?.dialogueReplacements?.[dialogueKey]?.[optionKey];
+    const script = randomizedScript ?? dialogueSet.mappedOptions[optionKey];
     // Empty string script does nothing.
     if (script === '') {
         return;

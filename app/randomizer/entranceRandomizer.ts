@@ -1,6 +1,7 @@
 import {getZoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
 import {overworldKeys} from 'app/gameConstants';
-import {everyObject} from 'app/randomizer/utils';
+import {getAreaFromLocation} from 'app/content/areas';
+import {getZone} from 'app/content/zones';
 import SRandom from 'app/utils/SRandom'
 
 
@@ -195,7 +196,15 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
         spiritPitEntrances,
         spiritPitTargets,
     } = randomizerState.entrances;
-    everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+    // Previously we read every object in the game, but to support limited game
+    // modes like the demo randomizer, we switched to the set of entrances that
+    // were found when building the set of nodes/items/entrances for the current game mode.
+    //everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+    for (const doorLocation of randomizerState.allEntrances) {
+        const location = doorLocation.location;
+        const zone = getZone(location.zoneKey);
+        const area = getAreaFromLocation(location);
+        const object = doorLocation.definition;
         if (ignoredZones.includes(zone.key)) {
             return;
         }
@@ -270,7 +279,7 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
                 normalEntrances.add(targetKey);
             }
         }
-    });
+    }
     if (normalEntrances.size !== normalExits.size) {
         console.error(`initial normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
         console.error([...normalEntrances]);

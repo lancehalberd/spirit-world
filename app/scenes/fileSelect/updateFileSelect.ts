@@ -1,4 +1,4 @@
-import {GAME_KEY, itemSeed, entranceSeed, isDemoMode} from 'app/gameConstants';
+import {GAME_KEY} from 'app/gameConstants';
 import {getFileSelectOptions} from 'app/scenes/fileSelect/getFileSelectOptions';
 import {
     wasGameKeyPressed,
@@ -13,7 +13,7 @@ export function updateFileSelect(state: GameState, scene: FileSelectScene) {
     // Any users that try to use the old URL params for item or entrance randomization
     // will have the randomizer mode automatically unlocked for them instead of
     // manually unlocking it through beating the game or using the context menu.
-    if (!state.settings.isRandomizerUnlocked && (!isDemoMode || itemSeed || entranceSeed)) {
+    if (!state.settings.isRandomizerUnlocked && !state.isDemoMode) {
         state.settings.isRandomizerUnlocked = true;
         saveSettings(state);
     }

@@ -20,6 +20,8 @@ import {staffTowerNodes} from 'app/randomizer/logic/staffTower';
 import {labNodes} from 'app/randomizer/logic/labLogic';
 import {treeNodes, voidNodes} from 'app/randomizer/logic/treeLogic';
 
+// Returns all nodes the exist in the game, including generated logic nodes,
+// which are stored on the state.
 export function getAllNodes(state: GameState) {
     return [
         ...overworldNodes,

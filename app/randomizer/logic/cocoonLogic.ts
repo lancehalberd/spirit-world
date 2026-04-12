@@ -114,7 +114,7 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonBoss',
         paths: [
-            {nodeId: 'dreamMain', logic: hasTeleportation},
+            {nodeId: 'dreamMain'},
         ],
         checks: [
             {objectId: 'cocoonBoss', logic: hasSpiritSight},

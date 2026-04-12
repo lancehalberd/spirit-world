@@ -1,8 +1,7 @@
 import {generateZoneVariations} from 'app/generator/generateZoneVariations';
-import {getAllNodes} from 'app/randomizer/allNodes';
+import {getAllReachableContent} from 'app/randomizer/getAllReachableContent';
 import {calculateKeyLogic} from 'app/randomizer/calculateKeyLogic';
 import {initializeEntranceRandomizer, randomizeEntrances} from 'app/randomizer/entranceRandomizer';
-import {findLootObjects} from 'app/randomizer/find';
 import {applyLootAssignments, initializeReverseFill, replaceTrash, reverseFill} from 'app/randomizer/reverseFill';
 import {verifyNodeConnections} from 'app/randomizer/utils';
 import {mainOverworldNode} from 'app/randomizer/logic/overworldLogic';
@@ -50,7 +49,33 @@ export class RandomizerScene implements GameScene {
         // When we have more zones to generate, we will probably need to add this as
         // a distinct step so that we can generate zones over multiple frames.
         generateZoneVariations(state);
+        const startingNodes = [mainOverworldNode];
+        const {allNodes, allLootObjects, allEntrances} = getAllReachableContent(state, startingNodes);
+        const allNodesById: NodesById = {};
+        const allNodesByZoneKey: NodesByZoneKey = {};
+        for (const node of allNodes) {
+            allNodesById[node.nodeId] = node;
+            allNodesByZoneKey[node.zoneId] = allNodesByZoneKey[node.zoneId] ?? [];
+            allNodesByZoneKey[node.zoneId].push(node);
+        }
+        const lootMap: {[key: string]: LootType } = {};
+        for (const lootWithLocation of allLootObjects) {
+            if (lootMap[lootWithLocation.lootObject.id] &&
+                lootMap[lootWithLocation.lootObject.id] !== lootWithLocation.lootObject.lootType) {
+                console.warn('Duplicate loot id with mismatched type',
+                    lootWithLocation.lootObject.id,
+                    lootMap[lootWithLocation.lootObject.id], '!=', lootWithLocation.lootObject.lootType
+                );
+            }
+            lootMap[lootWithLocation.lootObject.id] = lootWithLocation.lootObject.lootType;
+        }
         state.randomizerState = {
+            allNodes,
+            allNodesById,
+            allNodesByZoneKey,
+            allLootObjects,
+            allEntrances,
+            startingNodes: [mainOverworldNode],
             allChecks: new Set<string>(),
             lootAssignmentByKey: {},
             checksByZone: {},
@@ -76,8 +101,6 @@ export class RandomizerScene implements GameScene {
                     if (this.config.itemSeed) {
                         this.step = 'items';
                         state.randomizerState.items = {
-                            allNodes: getAllNodes(state),
-                            startingNodes: [mainOverworldNode],
                             dialogueReplacements: {},
                             random: SRandom.seed(this.config.itemSeed),
                         };
@@ -139,22 +162,6 @@ export class RandomizerScene implements GameScene {
         if (!randomizerState.items.requiredKeysMap) {
             this.stepStatus = 'Counting Keys';
             randomizerState.items.requiredKeysMap = calculateKeyLogic(randomizerState);
-            return;
-        }
-        if (!randomizerState.items.allLootObjects) {
-            this.stepStatus = 'Creating Pool.';
-            randomizerState.items.allLootObjects = findLootObjects(randomizerState.items.allNodes);
-            const lootMap: {[key: string]: LootType } = {};
-            for (const lootWithLocation of randomizerState.items.allLootObjects) {
-                if (lootMap[lootWithLocation.lootObject.id] &&
-                    lootMap[lootWithLocation.lootObject.id] !== lootWithLocation.lootObject.lootType) {
-                    console.warn('Duplicate loot id with mismatched type',
-                        lootWithLocation.lootObject.id,
-                        lootMap[lootWithLocation.lootObject.id], '!=', lootWithLocation.lootObject.lootType
-                    );
-                }
-                lootMap[lootWithLocation.lootObject.id] = lootWithLocation.lootObject.lootType;
-            }
             return;
         }
         if (!randomizerState.items.lootAssignments) {

@@ -146,6 +146,18 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Randomizer
+        - Test entrance randomize on full+demo mode
+
+    - Improve entrance randomizer game names
+        - Increased width 1. Goal: Victory Points or (Defeat Beasts)
+        - Add small text below seed=13123123 pts=0/20 bosses=0/1
+
+    - Add built in tests for validating randomizer logic
+        - All nodes + checks are eventually reachable in both normal+demo mode.
+            - Need a way to toggle demo mode off.
+                - Store+read demo mode from state. Set initially from constant.
+
     - Demo blockers
         - Replace Helix rival fight with demo ending + unlock randomizer.
         - Finish cocoon update
@@ -153,12 +165,6 @@ Current tasks:
             - Falling between floors
             - Missing floor
         - Add new peach tree graphics
-        - Item Randomizer for demo mode
-            - Just update the logic based on isDemoFlag and make sure it doesn't fail because of unreachable checks
-            - Disable entrance randomizer initially.
-        - Entrance Randomizer for demo mode
-            - Need to disable unreachable entrances+exits based on demo logic.
-            - Maybe collected entrances+exits based on node logic exploration instead of reading frome areas.
         - [Optional] add ash to spirit world
         - High priority SFX
             - Plant grenade explosion

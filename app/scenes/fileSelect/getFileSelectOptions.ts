@@ -1,7 +1,6 @@
 import {resetZoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
 import {SPAWN_LOCATION_FULL, SPAWN_LOCATION_WATERFALL_VILLAGE} from 'app/content/spawnLocations';
 import {showHint} from 'app/content/hints';
-import {isDemoMode} from 'app/gameConstants';
 import {generateZoneVariations} from 'app/generator/generateZoneVariations';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
@@ -162,28 +161,34 @@ const pointsGoalOption: FileSelectOption = {
     },
 };
 
-const bossChoices = isDemoMode ? ['None', 'Guardian'] : ['None', 'Guardian', 'Beasts', 'Void Tree'];
+function getBossChoices(state: GameState) {
+    return state.isDemoMode ? ['None', 'Guardian', 'Saru'] : ['None', 'Guardian', 'Saru', 'Beasts', 'Void Tree'];
+}
 const bossGoalOption: FileSelectOption = {
     onLeft(state: GameState, scene: FileSelectScene) {
+        const bossChoices = getBossChoices(state);
         scene.randomizerBossGoalIndex--;
         if (scene.randomizerBossGoalIndex < 0) {
             scene.randomizerBossGoalIndex = bossChoices.length - 1;
         }
-        updateBossGoal(scene);
+        updateBossGoal(state, scene);
     },
     onRight(state: GameState, scene: FileSelectScene) {
+        const bossChoices = getBossChoices(state);
         scene.randomizerBossGoalIndex++;
         if (scene.randomizerBossGoalIndex >= bossChoices.length) {
             scene.randomizerBossGoalIndex = 0;
         }
-        updateBossGoal(scene);
+        updateBossGoal(state, scene);
     },
     render: (context: CanvasRenderingContext2D, state: GameState, scene: FileSelectScene, r: Rect) => {
+        const bossChoices = getBossChoices(state);
         drawText(context, `Boss < ${bossChoices[scene.randomizerBossGoalIndex]} >`, r.x, r.y + r.h / 2, textOptions);
     },
 };
 
-function updateBossGoal(scene: FileSelectScene) {
+function updateBossGoal(state: GameState, scene: FileSelectScene) {
+        const bossChoices = getBossChoices(state);
     switch (bossChoices[scene.randomizerBossGoalIndex]) {
         case 'None':
             delete scene.randomizerConfig.goal.bossPoints;

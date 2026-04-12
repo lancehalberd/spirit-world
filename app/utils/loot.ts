@@ -44,9 +44,9 @@ const collectibles: Collectible[] = [
 export function isCollectible(lootType: string): lootType is Collectible {
     return collectibles.includes(lootType as Collectible);
 }
-export function gainCollectible(state: GameState, collectible: Collectible) {
-    state.hero.savedData.collectibles[collectible]++;
-    state.hero.savedData.collectibleTotals[collectible]++;
+export function gainCollectible(state: GameState, collectible: Collectible, amount = 1) {
+    state.hero.savedData.collectibles[collectible] += amount;
+    state.hero.savedData.collectibleTotals[collectible] += amount;
 }
 
 const consumables: Consumable[] = [

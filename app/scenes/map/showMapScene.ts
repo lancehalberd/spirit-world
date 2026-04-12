@@ -14,10 +14,10 @@ export function showMapScene(state: GameState) {
     if (canPauseGame(state)) {
         const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
         if (dungeonMap) {
-            state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
-            if (state.menuIndex < 0) {
+            sceneHash.map.floorIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
+            if (sceneHash.map.floorIndex < 0) {
                 console.error('Could not find map floor', state.areaSection.definition.floorId, 'in', Object.keys(dungeonMap.floors));
-                state.menuIndex = 0;
+                sceneHash.map.floorIndex = 0;
                 debugger;
             }
         }
