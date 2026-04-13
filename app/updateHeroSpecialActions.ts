@@ -251,6 +251,25 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     // sankInLava action is no longer supported, but used to be handled here similar to 'fallen'.
     // if (hero.action === 'sankInLava') {
     if (hero.action === 'fallen') {
+        // TODO: Add 'staffTower' here once it has been updated to support falling between floors.
+        // Possibly add 'helix' as well.
+        const towerZones = ['cocoon'];
+        if (hero === state.hero && towerZones.includes(state.location.zoneKey) && state.location.floor > 0) {
+            // Simply logic for falling between floors, automatically falls to the next lower floor index
+            // and then snaps to the closest spawn marker to prevent landing at an invalid location.
+            enterLocation(state, {
+                ...state.location,
+                z: CANVAS_HEIGHT,
+                floor: (state.location.floor - 1),
+            }, {
+                callback: () => {
+                    hero.action = 'knocked';
+                    hero.isAirborn = true;
+                    moveToClosestSpawnMarker(state, hero, false);
+                },
+            });
+            return true;
+        }
         // Special logic for falling from the sky to the overworld.
         if (hero === state.hero && state.location.zoneKey === 'sky') {
             // The southwest corner of the sky is over the forest tile in the overwrld, which is

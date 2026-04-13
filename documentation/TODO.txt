@@ -146,6 +146,12 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Finish Cocoon update
+        - New pod graphics
+        - Update randomizer logic
+            - New floor + cocoonPotion check
+            - Add paths for falling between floors
+
     - Randomizer
         - Test entrance randomize on full+demo mode
 
@@ -160,15 +166,14 @@ Current tasks:
 
     - Demo blockers
         - Replace Helix rival fight with demo ending + unlock randomizer.
-        - Finish cocoon update
-            - New pod graphics
-            - Falling between floors
-            - Missing floor
         - Add new peach tree graphics
-        - [Optional] add ash to spirit world
+        - Add ash tiles and apply to spirit world
         - High priority SFX
             - Plant grenade explosion
             - Frost grenade explosion
+
+    - If a rolling ball hits an obstacle in the other world and not the current world and the player has spirit sight
+        - Add an effect to the over world that is a ~20 diamater view into the spirit world, using the same effect as the teleporters.
 
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna

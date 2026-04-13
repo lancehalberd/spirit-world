@@ -173,9 +173,17 @@ export function saveObjectStatus(state: GameState, definition: ObjectDefinition,
     }
     if (flag !== false && hash[fullKey] !== flag) {
         hash[fullKey] = flag;
+        // This was added on 2026-04-12 in case it causes regression.
+        if (state.areaInstance) {
+            state.areaInstance.needsLogicRefresh = true;
+        }
         saveGame(state);
     } else if (flag === false && hash[fullKey]) {
         delete hash[fullKey];
+        // This was added on 2026-04-12 in case it causes regression.
+        if (state.areaInstance) {
+            state.areaInstance.needsLogicRefresh = true;
+        }
         saveGame(state);
     }
 }

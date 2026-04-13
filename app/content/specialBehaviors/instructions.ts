@@ -187,11 +187,7 @@ specialBehaviorsHash.barrierReflectInstructions = {
         } else if (state.hero.savedData.activeTools.cloak) {
             helpText = `Press [B_MENU] to open your inventory and assign Spirit Cloak to [B_TOOL]`;
         }
-        // Stop showing this help text once the player has successfully defeated the enemies.
-        // Do not show the text again in the future if the boss teleporter is already unlocked.
-        if (!state.areaInstance.enemies.find(enemy => enemy.status !== 'gone' && !enemy.isDefeated)
-            || state.savedState.objectFlags.cocoonBossTeleporter
-        ) {
+        if (state.savedState.objectFlags.hideBarrierReflectInstructions) {
             helpText = '';
         }
         const textCue = findTextCue(state);
