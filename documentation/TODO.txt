@@ -147,7 +147,6 @@ Graphics to Implement:
 
 Current tasks:
     - Finish Cocoon update
-        - New pod graphics
         - Update randomizer logic
             - New floor + cocoonPotion check
             - Add paths for falling between floors
@@ -167,6 +166,7 @@ Current tasks:
     - Demo blockers
         - Replace Helix rival fight with demo ending + unlock randomizer.
         - Add new peach tree graphics
+        - New Rival graphics
         - Add ash tiles and apply to spirit world
         - High priority SFX
             - Plant grenade explosion
