@@ -6,6 +6,7 @@ import {
     hasAstralProjection,
     hasBossWeapon,
     hasGloves,
+    hasRangedPush,
     hasSpiritBarrier,
     hasSpiritSight,
     canRemoveLightStones,
@@ -20,21 +21,31 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonEntrance',
         paths: [
-            {nodeId: 'cocoon4NW', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
-            {nodeId: 'cocoon4NE', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
+            {nodeId: 'cocoon1FNW', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
+            {nodeId: 'cocoon1FNE', logic: andLogic(canUseTeleporters, hasBossWeapon, canCross2Gaps)},
+            // Falling into any pits will take you to the main B1 area in the material world.
+            {nodeId: 'cocoonB1'},
         ],
         entranceIds: ['cocoonEntrance'],
         exits: [{objectId: 'cocoonEntrance'}],
     },
     {
         zoneId,
-        nodeId: 'cocoon4NW',
+        nodeId: 'cocoon1FNW',
+        paths: [
+            // Fall into the pit.
+            {nodeId: 'cocoonB1NW'},
+        ],
         entranceIds: ['cocoonLadderNW'],
         exits: [{objectId: 'cocoonLadderNW', logic: andLogic(hasBossWeapon, canRemoveLightStones)}],
     },
     {
         zoneId,
-        nodeId: 'cocoon4NE',
+        nodeId: 'cocoon1FNE',
+        paths: [
+            // Fall into the pit.
+            {nodeId: 'cocoonB1NE'},
+        ],
         entranceIds: ['cocoonLadderNE', 'cocoonBigLock'],
         exits: [
             {objectId: 'cocoonLadderNE', logic: andLogic(hasBossWeapon, canRemoveLightStones)},
@@ -43,40 +54,48 @@ export const cocoonNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'cocoon4SW',
+        nodeId: 'cocoon1FSW',
         checks: [{objectId: 'cocoonSmallKey', logic: canCross2Gaps}],
-        paths: [{nodeId: 'cocoonEntrance', logic: andLogic(canUseTeleporters, canCross2Gaps)}],
+        paths: [
+            {nodeId: 'cocoonEntrance', logic: andLogic(canUseTeleporters, canCross2Gaps)},
+            // Fall into the pit.
+            {nodeId: 'cocoonB1SW'},
+        ],
         exits: [{objectId: 'cocoonOpenDoor'}],
         entranceIds: ['cocoonOpenDoor'],
     },
     {
         zoneId,
-        nodeId: 'cocoon4SE',
+        nodeId: 'cocoon1FSE',
         checks: [{objectId: 'cocoonBigKey', logic: andLogic(hasAstralProjection, canRemoveLightStones)}],
-        paths: [{nodeId: 'cocoonEntrance', logic: canUseTeleporters}],
+        paths: [
+            {nodeId: 'cocoonEntrance', logic: canUseTeleporters},
+            // Fall into the pit.
+            {nodeId: 'cocoonB1SE'},
+        ],
         entranceIds: ['cocoonSealedLockedDoor'],
     },
     {
         zoneId,
-        nodeId: 'cocoon3',
+        nodeId: 'cocoonB1',
         paths: [
-            {nodeId: 'cocoon3SW', logic: canUseTeleporters},
-            {nodeId: 'cocoon3SE', logic: canUseTeleporters},
+            {nodeId: 'cocoonB1SW', logic: canUseTeleporters},
+            {nodeId: 'cocoonB1SE', logic: canUseTeleporters},
         ],
     },
     {
         zoneId,
-        nodeId: 'cocoon3NW',
-        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
+        nodeId: 'cocoonB1NW',
+        paths: [{nodeId: 'cocoonB1', logic: canUseTeleporters}],
         entranceIds: ['cocoonLadderNW'],
     },
     {
         zoneId,
-        nodeId: 'cocoon3NE',
+        nodeId: 'cocoonB1NE',
         // This puzzle requires gloves specifically because destroying the stones with the staff
         // doesn't remove them in the material world.
         checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, hasGloves)}],
-        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
+        paths: [{nodeId: 'cocoonB1', logic: canUseTeleporters}],
         entranceIds: ['cocoonLadderNE'],
     },
     {
@@ -88,24 +107,29 @@ export const cocoonNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'cocoon3SW',
-        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
+        nodeId: 'cocoonB1SW',
+        paths: [{nodeId: 'cocoonB1', logic: canUseTeleporters}],
         entranceIds: ['cocoonOpenDoor'],
         exits: [{objectId: 'cocoonOpenDoor'}]
     },
     {
         zoneId,
-        nodeId: 'cocoon3SE',
+        nodeId: 'cocoonB1SE',
         checks: [{objectId: 'cocoonMap'}],
-        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
+        paths: [{nodeId: 'cocoonB1', logic: canUseTeleporters}],
         entranceIds: ['cocoonLockedDoor'],
         exits: [{objectId: 'cocoonLockedDoor'}]
     },
+    // This nod represent basically all of B2 + B3. Nothing is in logic in these nodes until you
+    // use the teleporter blocked by the spirit cloak switch tutorial, but after that you only
+    // need the Chakram/Bow to solve the rolling ball puzzles+defeat some enemies to reach the boss.
     {
         zoneId,
-        nodeId: 'cocoonBack',
+        nodeId: 'cocoonB2AndB3',
+        checks: [{objectId: 'cocoonPotion', logic: andLogic(hasBossWeapon, hasSpiritBarrier)}],
+        flags: [{flag: 'cocoonBossStarted'}],
         paths: [
-            {nodeId: 'cocoonBoss', logic: andLogic(hasBossWeapon, canUseTeleporters, hasSpiritBarrier)},
+            {nodeId: 'cocoonBoss', logic: andLogic(hasBossWeapon, hasRangedPush, canUseTeleporters, hasSpiritBarrier)},
         ],
         entranceIds: ['cocoonLadderBack'],
         exits: [{objectId: 'cocoonLadderBack'}],

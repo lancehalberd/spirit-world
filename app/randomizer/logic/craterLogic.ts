@@ -15,6 +15,7 @@ import {
 
 const lava1Drained = {requiredFlags: ['craterLava1']};
 const lava2Drained = {requiredFlags: ['craterLava2']};
+const lava3Drained = {requiredFlags: ['craterLava3']};
 const canCrossLava = orLogic(hasSomersault, hasInvisibility, hasIce);
 
 // This logic does not appropriately support traversing the tower in reverse.
@@ -33,7 +34,11 @@ export const craterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'craterEntrance',
         checks: [{objectId: 'craterMap'}],
-        flags: [{flag: 'craterLava1', logic: andLogic(hasBossWeapon, canPressHeavySwitches)}],
+        flags: [
+            // Both of these flags are set when the lava drains.
+            {flag: 'craterLava1', logic: andLogic(hasBossWeapon, canPressHeavySwitches)},
+            {flag: 'craterLava1Objects', logic: andLogic(hasBossWeapon, canPressHeavySwitches)},
+        ],
         paths: [
             // The player must defeat a guardian and then press a heavy switch to drain the lava.
             {nodeId: 'craterLevel2', logic: lava1Drained },
@@ -133,7 +138,7 @@ export const craterNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'createKeyPuzzle',
+        nodeId: 'craterKeyPuzzle',
         checks: [{objectId: 'craterKey3', logic: andLogic(orLogic(hasFireBlessing, hasPhoenixCrown), canRemoveLightStones)}],
         entranceIds: ['craterStairs'],
         exits: [{objectId: 'craterStairs'}],
@@ -141,8 +146,9 @@ export const craterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'craterRiverCaveTop',
+        flags: [{flag: 'craterLava3', doorId: 'craterLava3', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)}],
         paths: [
-            {nodeId: 'craterRiverCaveBottom', doorId: 'craterLava3', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)},
+            {nodeId: 'craterRiverCaveBottom', logic: lava3Drained},
         ],
         entranceIds: ['craterEastDoor'],
         exits: [{objectId: 'craterEastDoor'}],

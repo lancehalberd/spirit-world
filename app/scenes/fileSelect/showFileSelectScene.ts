@@ -12,8 +12,8 @@ export function showFileSelectScene(state: GameState, gameMode: GameMode) {
     sceneHash.fileSelect.savedGames = getSavedGames(state, gameMode);
     // Initialize victory points the first time we show the randomizer. This isn't
     // hard coded because we want the amount to be lower if this is the demo mode.
-    if (gameMode === 'randomizer' && !state.randomizerState.goal.victoryPoints) {
-        state.randomizerState.goal.victoryPoints = {
+    if (gameMode === 'randomizer' && !sceneHash.fileSelect.randomizerConfig.goal?.victoryPoints) {
+        sceneHash.fileSelect.randomizerConfig.goal.victoryPoints = {
             // How many victory points are available
             total: state.isDemoMode ? 15 : 30,
             // How many victory points are required to finish.

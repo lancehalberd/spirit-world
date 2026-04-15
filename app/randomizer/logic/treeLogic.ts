@@ -30,7 +30,7 @@ export const treeNodes: LogicNode[] = [
 export const voidNodes: LogicNode[] = [
     {
         zoneId: 'void',
-        nodeId: 'tree',
+        nodeId: 'void',
         entranceIds: ['voidEntrance'],
         flags: [{flag: 'voidTree', logic: andLogic(hasBossWeapon, canAvoidBossAttacks) }],
         exits: [],

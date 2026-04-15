@@ -107,7 +107,7 @@ function countRequiredKeysForEntrance(
                 requiredKeysForLogic++;
             }
             const {targetZone, targetObjectId} = getMappedEntranceData(randomizerState, zone.key, exitObject);
-            const nextNode = allNodesByZoneKey[targetZone].find(node =>
+            const nextNode = allNodesByZoneKey[targetZone]?.find(node =>
                 (node !== currentNode || targetObjectId !== exit.objectId)
                 && node.entranceIds?.includes(targetObjectId)
             );

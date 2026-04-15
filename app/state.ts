@@ -6,7 +6,7 @@ import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showIntroScene} from 'app/scenes/intro/showIntroScene';
 import {showPrologueScene} from 'app/scenes/prologue/showPrologueScene';
 import {getFullZoneLocation, /*getShortZoneName*/ } from 'app/utils/getFullZoneLocation';
-import {readGetParameterAsInt} from 'app/utils/index';
+import {cloneDeep, readGetParameterAsInt} from 'app/utils/index';
 
 export function loadSavedData() {
     if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {
@@ -85,7 +85,7 @@ export function getDefaultState(): GameState {
         prologueTime: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
-        location: getFullZoneLocation(SPAWN_LOCATION_FULL),
+        location: cloneDeep(getFullZoneLocation(SPAWN_LOCATION_FULL)),
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],

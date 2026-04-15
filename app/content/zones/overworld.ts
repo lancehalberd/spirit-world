@@ -1288,7 +1288,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "citySave", x: 292, y: 120, type: "saveStatue", linked: true},
         {status: "normal", id: "", x: 144, y: 320, style: "short", type: "sign", message: "Wager your fortune in the Arrow Maze, only 25 Jade!"},
         {status: "normal", id: "holyCityMarker", x: 296, y: 148, type: "marker"},
-        {status: "normal", id: "cityCliffMoney", x: 48, y: 16, type: "chest", lootType: "money", lootAmount: 100},
+        {status: "normal", id: "cityCliffSilver", x: 48, y: 16, type: "chest", lootType: "silverOre", lootAmount: 100},
         {status: "normal", id: "jadeChampionFirstMeeting", x: 112, y: 432, type: "narration", message: "{@jadeChampion.firstConversation}", trigger: "touch", delay: 0, w: 64, h: 32, hasCustomLogic: true, customLogic: "!$astralProjection", linked: false},
         {status: "normal", id: "", x: 87, y: 443, type: "decoration", w: 16, h: 16, decorationType: "stump"},
         {status: "normal", id: "", x: 0, y: 429, type: "decoration", w: 48, h: 16, decorationType: "logPile", seed: 7},

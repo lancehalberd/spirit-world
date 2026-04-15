@@ -111,6 +111,7 @@ export function findObjectById(
     state: GameState = null,
     typeFilter?: ObjectType[]
 ): {object: ObjectDefinition, location: FullZoneLocation} {
+    let objectFoundButNotInLogic = false;
     const cacheKey = zone.key + ':' + id;
     const cachedResult = findObjectByIdCache[cacheKey];
     if (cachedResult) {
@@ -131,6 +132,11 @@ export function findObjectById(
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.id === id) {
                             if (typeFilter && !typeFilter.includes(object.type)) {
+                                continue;
+                            }
+                            // Ignore any objects currently out of logic when state is defined.
+                            if (state && !evaluateLogicDefinition(state, object)) {
+                                objectFoundButNotInLogic = true;
                                 continue;
                             }
                             const location = getFullZoneLocation({
@@ -155,6 +161,9 @@ export function findObjectById(
                 }
             }
         }
+    }
+    if (objectFoundButNotInLogic) {
+        return {object: null, location: null};
     }
     warnOnce(missingObjectSet, zone.key + '::' + id, 'Missing object: ');
     findObjectByIdCache[cacheKey] = {object: null, location: null, needsCatEyes: false, needsTrueSight: false};

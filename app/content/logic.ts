@@ -225,6 +225,7 @@ export function evaluateLogicDefinition(state: GameState, logicDefinition?: Logi
 }
 window['isLogicValid'] = isLogicValid;
 
+export const isDemoModeLogic: LogicCheck = {requiredFlags: ['$demo']};
 export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
 export const hasTrueSight: LogicCheck = { requiredFlags: ['$trueSight'] };
 export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
@@ -297,7 +298,11 @@ export const canMoveHeavyStairs = hasMitts;
 export const canCrossLightningBarriers = orLogic(hasLightningBlessing, hasInvisibility, hasSomersault);
 export const canPressHeavySwitches = orLogic(hasStaff, andLogic(hasClone, hasIronBoots));
 
-export const canHasSpikeBoots = {requiredFlags: ['canReachCitySmith', '$spikeBoots', '$totalSilverOre:12']};
+export const canHasSpikeBoots = orLogic(
+    {requiredFlags: ['canReachCitySmith', '$spikeBoots', '$totalSilverOre:12']},
+    // The spirit forge is not available in the demo, so only 7 ore are required to put spike boots in logic.
+    andLogic(isDemoModeLogic, {requiredFlags: ['canReachCitySmith', '$spikeBoots', '$totalSilverOre:7']})
+);
 export const canHasFlyingBoots = {requiredFlags: ['canReachForgeSmith', '$cloudBoots', '$flyingBoots', '$totalGoldOre:4']};
 export const canHasForgeBoots = {requiredFlags: ['canReachForgeSmith', '$ironBoots', '$forgeBoots', '$totalGoldOre:4']};
 
@@ -342,7 +347,6 @@ export const beastsDefeated: LogicCheck = {requiredFlags: ['flameBeast', 'frostB
 export const hasSmallKey: LogicCheck = {requiredFlags: ['$smallKey']};
 export const hasBigKey: LogicCheck = {requiredFlags: ['$bigKey']};
 
-export const isDemoModeLogic: LogicCheck = {requiredFlags: ['$demo']};
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

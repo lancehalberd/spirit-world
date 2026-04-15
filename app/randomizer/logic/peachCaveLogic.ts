@@ -49,6 +49,9 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'peachCaveBoss',
+        flags: [
+            { flag: 'peachCaveTree', logic: hasBossWeapon},
+        ],
         checks: [{ objectId: 'peachCave:fullPeach', logic: hasBossWeapon }],
         paths: [
             // There is no path to `peachCave:stairsDown` from here because:

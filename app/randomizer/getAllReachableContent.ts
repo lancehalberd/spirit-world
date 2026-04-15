@@ -37,7 +37,7 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
     let  counter = 0, changed = false;
     do {
         changed = false;
-        console.log('previousCount', nodes.length);
+        //console.log('previousCount', nodes.length);
         if (counter++ > 100) {
             console.error('infinite loop');
             debugger;
@@ -47,8 +47,22 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
         changed = collectAllLootFromNodesInLogic(simulatedState, [...nodes], allLootObjects) || changed;
         changed = setAllFlagsInNodes(simulatedState, nodes) || changed;
     } while (changed);
-    console.log("No new nodes, stopping");
-    return {allNodes, allLootObjects, allEntrances};
+    //console.log("No new nodes, stopping");
+    if (!state.isDemoMode) {
+        // Outside demo mode, we expect every node and check to be reachable.
+        for (const node of allNodes) {
+            if (!nodes.includes(node)) {
+                console.log('Missing node', node);
+            }
+        }
+        for (const loot of findLootObjects(allNodes)) {
+            if (!simulatedState.savedState.objectFlags[loot.lootObject.id]) {
+                console.log('Missing loot', loot);
+            }
+        }
+    }
+    //console.log(Object.keys(simulatedState.savedState.objectFlags));
+    return {allNodes: nodes, allLootObjects, allEntrances};
 }
 
 
@@ -92,7 +106,7 @@ export function expandNodes(
             if (!nodes.includes(nextNode)) {
                 nodes.push(nextNode);
                 changed = true;
-                console.log("Adding path node", path, nextNode);
+                //console.log("Adding path node", path, nextNode);
             }
         }
         for (const exit of (currentNode.exits || [])) {
@@ -132,7 +146,7 @@ export function expandNodes(
             if (!nodes.includes(nextNode)) {
                 nodes.push(nextNode);
                 changed = true;
-                console.log("Adding door node", exit, nextNode);
+                //console.log("Adding door node", exit, nextNode);
             }
         }
     }
@@ -160,7 +174,9 @@ function collectAllLootFromNodesInLogic(simulatedState: GameState, nodes: LogicN
         foundNewLoot = true;
         lootObjects.push(check);
         if (check.lootObject.lootType !== 'empty') {
-            console.log("Obtained loot", getLootName(simulatedState, check.lootObject), check);
+            if (window.debugGetAllReachableContent) {
+                console.log("Obtained loot", getLootName(simulatedState, check.lootObject), check);
+            }
             // We need to set the current location to the loot location so that dungeon items are applied to the correct state.
             if (check.location) {
                 simulatedState.location = check.location;
@@ -194,6 +210,9 @@ export function setAllFlagsInNodes(simulatedState: GameState, nodes: LogicNode[]
         changed = false;
         for (const node of nodes) {
             for (const flag of (node.flags || [])) {
+                if (simulatedState.savedState.objectFlags[flag.flag]) {
+                    continue;
+                }
                 if (flag.logic && !isLogicValid(simulatedState, flag.logic)) {
                     //console.log('Invalid logic', flag);
                     continue;
@@ -205,13 +224,10 @@ export function setAllFlagsInNodes(simulatedState: GameState, nodes: LogicNode[]
                         continue;
                     }
                 }
-                if (!simulatedState.savedState.objectFlags[flag.flag]) {
-                    simulatedState.savedState.objectFlags[flag.flag] = true;
-                    console.log("Setting flag", flag.flag);
-                    //console.log('    Setting flag', flag.flag);
-                    changed = true;
-                    setFlag = true;
-                }
+                //console.log('    Setting flag', flag.flag);
+                simulatedState.savedState.objectFlags[flag.flag] = true;
+                changed = true;
+                setFlag = true;
             }
         }
     } while (changed);
@@ -236,3 +252,4 @@ function canUseDoor(simulatedState: GameState, location: FullZoneLocation, door:
     }
     return true;
 }
+window.canUseDoor = canUseDoor;

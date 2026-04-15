@@ -138,31 +138,31 @@ export function setAllFlagsInLogic(randomizerState: RandomizerState, simulatedSt
         startingNodes = findReachableNodes(randomizerState, updatedState);
         for (const node of startingNodes) {
             for (const flag of (node.flags || [])) {
+                if (updatedState.savedState.objectFlags[flag.flag]) {
+                    continue;
+                }
                 if (flag.logic && !isLogicValid(updatedState, flag.logic)) {
                     //console.log('Invalid logic', flag);
                     continue;
                 }
                 if (flag.doorId) {
                     const zone = getZone(node.zoneId);
-                    const { object, location } = findDoorById(zone, flag.doorId, simulatedState);
-                    if (!canOpenDoor(randomizerState, location, simulatedState, object as EntranceDefinition)) {
+                    const { object, location } = findDoorById(zone, flag.doorId, updatedState);
+                    if (!canOpenDoor(randomizerState, location, updatedState, object as EntranceDefinition)) {
                         continue;
                     }
                 }
-                if (!updatedState.savedState.objectFlags[flag.flag]) {
-                    if (updatedState === simulatedState) {
-                        updatedState = copyState(simulatedState);
-                    }
-                    updatedState.savedState.objectFlags[flag.flag] = true;
-                    //console.log('    Setting flag', flag.flag);
-                    changed = true;
+                if (updatedState === simulatedState) {
+                    updatedState = copyState(simulatedState);
                 }
+                updatedState.savedState.objectFlags[flag.flag] = true;
+                // console.log('    Setting flag', flag.flag, updatedState.savedState.objectFlags[flag.flag]);
+                changed = true;
             }
         }
     } while (changed);
     return updatedState;
 }
-
 
 
 export function debugState(state: GameState) {
@@ -255,7 +255,7 @@ export function verifyNodeConnections(randomizerState: RandomizerState) {
             }
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
             const {targetZone, targetObjectId} = getMappedEntranceData(randomizerState, zone.key, exitObject);
-            const nextNode = allNodesByZoneKey[targetZone].find(node =>
+            const nextNode = allNodesByZoneKey[targetZone]?.find(node =>
                 (node !== currentNode || targetObjectId !== exit.objectId)
                 && node.entranceIds?.includes(targetObjectId)
             );

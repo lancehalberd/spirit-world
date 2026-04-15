@@ -82,6 +82,7 @@ interface V1DoorFrames {
     southDoorEmpty: Frame
     southDoorOpen: Frame
     southDoorClosed: Frame
+    southDoorTrim?: Frame
     southCrackedWall: Frame
 }
 
@@ -169,6 +170,12 @@ function renderV1DoorAfterHero(this: void, context: CanvasRenderingContext2D, st
 function renderV1DoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door, v1DoorFrames: V1DoorFrames, h = 12) {
     checkToRenderFrozenDoorForeground(context, state, door);
     if (door.definition.d === 'down') {
+        if (v1DoorFrames.southDoorTrim && door.definition.status !== 'cracked' && door.definition.status !== 'blownOpen') {
+            const frame = v1DoorFrames.southDoorTrim;
+            const width = frame.content?.w ?? frame.w;
+            const height = frame.content?.h ?? frame.h;
+            drawFrameContentAt(context, v1DoorFrames.southDoorTrim, {x: door.x + 32 - width / 2, y: door.y - height});
+        }
         let frame = v1DoorFrames.southDoorEmpty;
         // This frame is used if the doorway can have a door in it (closed or locked).
         if (door.definition.status !== 'normal'
@@ -786,7 +793,9 @@ const jadeLight1IntDoorOpen = requireFrame(jadeLightIntImage, {x: 208, y: 0, w: 
 const jadeLight1IntDoorClosed = requireFrame(jadeLightIntImage, {x: 272, y: 64, w: 32, h: 32});
 const jadeLight1IntStairsDown = requireFrame(jadeLightIntImage, {x: 240, y: 0, w: 32, h: 32});
 const jadeLight1IntStairsUp = requireFrame(jadeLightIntImage, {x: 272, y: 0, w: 32, h: 32});
-const jadeLight1IntSouthDoor = requireFrame(jadeLightIntImage, {x: 304, y: 0, w: 32, h: 32});
+const jadeLight1IntSouthTrim = requireFrame(jadeLightIntImage, {x: 304, y: 11, w: 32, h: 5});
+const jadeLight1IntSouthOpen = requireFrame(jadeLightIntImage, {x: 256, y: 128, w: 64, h: 16});
+const jadeLight1IntSouthClosed = requireFrame(jadeLightIntImage, {x: 256, y: 144, w: 64, h: 16});
 const jadeLight1IntEastTrim = requireFrame(jadeLightIntImage, {x: 336, y: 96, w: 16, h: 64});
 const jadeLight1IntEastOpen = requireFrame(jadeLightIntImage, {x: 352, y: 96, w: 16, h: 48});
 const jadeLight1IntEastClosed = requireFrame(jadeLightIntImage, {x: 368, y: 96, w: 16, h: 48});
@@ -811,9 +820,10 @@ const jadeLight1DoorFrames: V1DoorFrames = {
     westDoorOpenForeground: jadeLight1IntEastOpen,
     westDoorClosed: jadeLight1IntEastClosed,
     northDoorway: jadeLight1IntDoorOpen,
-    southDoorEmpty: jadeLight1IntSouthDoor,
-    southDoorOpen: jadeLight1IntSouthDoor,
-
+    southDoorTrim: jadeLight1IntSouthTrim,
+    southDoorEmpty: jadeLight1IntSouthOpen,
+    southDoorOpen: jadeLight1IntSouthOpen,
+    southDoorClosed: jadeLight1IntSouthClosed
 }
 /*
 const jadeLight2DoorFrames:  V1DoorFrames = {
@@ -881,7 +891,9 @@ const jadeDark1IntDoorOpen = requireFrame(jadeDarkIntImage, {x: 208, y: 0, w: 32
 const jadeDark1IntDoorClosed = requireFrame(jadeDarkIntImage, {x: 272, y: 64, w: 32, h: 32});
 const jadeDark1IntStairsDown = requireFrame(jadeDarkIntImage, {x: 240, y: 0, w: 32, h: 32})
 const jadeDark1IntStairsUp = requireFrame(jadeDarkIntImage, {x: 272, y: 0, w: 32, h: 32})
-const jadeDark1IntSouthDoor = requireFrame(jadeDarkIntImage, {x: 304, y: 0, w: 32, h: 32})
+const jadeDark1IntSouthTrim = requireFrame(jadeDarkIntImage, {x: 304, y: 11, w: 32, h: 5});
+const jadeDark1IntSouthOpen = requireFrame(jadeDarkIntImage, {x: 256, y: 128, w: 64, h: 16});
+const jadeDark1IntSouthClosed = requireFrame(jadeDarkIntImage, {x: 256, y: 144, w: 64, h: 16});
 const jadeDark1IntEastTrim = requireFrame(jadeDarkIntImage, {x: 336, y: 96, w: 16, h: 64});
 const jadeDark1IntEastOpen = requireFrame(jadeDarkIntImage, {x: 352, y: 96, w: 16, h: 48});
 const jadeDark1IntEastClosed = requireFrame(jadeDarkIntImage, {x: 368, y: 96, w: 16, h: 48});
@@ -908,8 +920,10 @@ const jadeDark1DoorFrames: V1DoorFrames = {
     westDoorOpenForeground: jadeDark1IntEastOpen,
     westDoorClosed: jadeDark1IntEastClosed,
     northDoorway: jadeDark1IntDoorOpen,
-    southDoorEmpty: jadeDark1IntSouthDoor,
-    southDoorOpen: jadeDark1IntSouthDoor,
+    southDoorEmpty: jadeDark1IntSouthOpen,
+    southDoorOpen: jadeDark1IntSouthOpen,
+    southDoorClosed: jadeDark1IntSouthClosed,
+    southDoorTrim: jadeDark1IntSouthTrim,
 }
 
 /*

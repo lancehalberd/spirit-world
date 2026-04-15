@@ -146,16 +146,12 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Finish Cocoon update
-        - Update randomizer logic
-            - New floor + cocoonPotion check
-            - Add paths for falling between floors
 
     - Randomizer
         - Test entrance randomize on full+demo mode
 
-    - Improve entrance randomizer game names
-        - Increased width 1. Goal: Victory Points or (Defeat Beasts)
+    - Improve randomizer game names
+        - Increased width: "1. Goal: Victory Points" (or Defeat Beasts)
         - Add small text below seed=13123123 pts=0/20 bosses=0/1
 
     - Add built in tests for validating randomizer logic
@@ -172,17 +168,27 @@ Current tasks:
             - Plant grenade explosion
             - Frost grenade explosion
 
+    - Enemies that fall from the ceiling when you get close to them.
+
     - If a rolling ball hits an obstacle in the other world and not the current world and the player has spirit sight
         - Add an effect to the over world that is a ~20 diamater view into the spirit world, using the same effect as the teleporters.
 
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
         - hud/aetherCrystal
+        - objects/peachTreeGatherAnimation
         - objects/webBarrier
+        - objects/helixTop
+        - new tiles in tiles/grass (interior angles)
+        - new tiles in tiles/vanara (cliff edges, large vine walls)
+        - new tiles in tiles/stoneTileset (blown open doors)
         - tiles/ash
         - tiles/grates
         - tiles/treeHome
         - npcs/ambrosia, npcs/elder, npcs/guardian, npcs/rival (testing only since we don't have battle sprites yet)
+            npcs/vanaraChef npcs/vanaraFarmer
+
+    - Fix hero can be seen behind door frame when moving south through jade interior door styles.
 
     - Boss Rush Fixes:
         - Storm Beast is missing teleporters + Orb enemies.

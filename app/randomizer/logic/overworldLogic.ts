@@ -26,7 +26,7 @@ export const mainOverworldNode: LogicNode = {
         {nodeId: 'overworldLakeTunnel', logic: orLogic(canRemoveLightStones, hasTeleportation)},
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
-        {nodeId: 'forestTowerSky', logic: andLogic({requiredFlags: ['stormBeast']})},
+        {nodeId: 'forestTowerSky', logic: {requiredFlags: ['stormBeast']}},
         {nodeId: 'underRiver', logic: hasIronBoots},
         {nodeId: 'underLake', logic: andLogic(hasIronBoots,
             orLogic({requiredFlags: ['frostBeast']}, hasFire)
@@ -168,7 +168,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'overworldMountain',
         checks: [
             { objectId: 'overworldCliffPeachPiece' },
-            { objectId: 'cityCliffMoney' },
+            { objectId: 'cityCliffSilver' },
         ],
         paths: [
             { nodeId: 'overworldMain' },
