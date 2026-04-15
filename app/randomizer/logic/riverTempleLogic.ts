@@ -102,6 +102,7 @@ export const riverTempleNodes: LogicNode[] = [
             {nodeId: 'riverTempleAcrossFromChest', logic: orLogic(canRemoveHeavyStones, canMeltIce)},
         ],
         entranceIds: ['riverTempleUpperEntrance'],
+        exits: [{objectId: 'riverTempleUpperEntrance'}],
     },
     {
         zoneId,

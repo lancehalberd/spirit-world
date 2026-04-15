@@ -54,6 +54,18 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
             if (!nodes.includes(node)) {
                 console.log('Missing node', node);
             }
+            // These checks are too noisy in general, but they can be useful when missing entrances/exits
+            // are breaking the entrance randomizer.
+            /*for (const entranceId of node.entranceIds ?? []) {
+                if (!node.exits?.find(exit => exit.objectId === entranceId)) {
+                    console.warn('Possible missing exit', entranceId, node);
+                }
+            }
+            for (const exit of node.exits ?? []) {
+                if (!node.entranceIds?.find(entranceId => exit.objectId === entranceId)) {
+                    console.warn('Possible missing entranceId', exit, node);
+                }
+            }*/
         }
         for (const loot of findLootObjects(allNodes)) {
             if (!simulatedState.savedState.objectFlags[loot.lootObject.id]) {
@@ -146,7 +158,7 @@ export function expandNodes(
             if (!nodes.includes(nextNode)) {
                 nodes.push(nextNode);
                 changed = true;
-                //console.log("Adding door node", exit, nextNode);
+                // console.log("Adding door node", exit, nextNode);
             }
         }
     }

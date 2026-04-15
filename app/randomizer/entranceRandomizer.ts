@@ -134,6 +134,25 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     },*/
 ];
 
+const demoConnectedExitGrops = [
+    {
+        normalEntranceTargets: ['overworld:peachCaveTopEntrance', 'overworld:peachCaveWaterEntrance'],
+    },
+    {
+        normalEntranceTargets: ['overworld:caves-ascentEntrance', 'sky:caves-ascentExit'],
+    },
+    {
+        normalEntranceTargets: [
+            'overworld:warTempleNortheastEntrance',
+            'overworld:warTempleEastEntrance',
+            'overworld:warTempleKeyDoor',
+        ],
+        // Main war temple entrance isn't actually immutable,
+        // but the other entrances don't allow exiting from it.
+        immutableEntranceTargets: ['overworld:warTempleEntrance'],
+    },
+];
+
 // Loopable entrance pairs occur when a zone contains both an entrance and an exit.
 // If such a zone pairs its entrance and exit together, or multiple zones form a loop,
 // then they will disconnected from the rest of the map.
@@ -144,6 +163,10 @@ const normalLoopableEntrancePairs = [
     {outerTarget: 'overworld:lakeTunnelEntrance', innerTarget: 'helix:helixEntrance'},
     // Grand temple -> Gauntlet
     {outerTarget: 'overworld:grandTempleEntrance', innerTarget: 'gauntlet:gauntletEntrance'},
+];
+const demoNormalLoopableEntrancePairs = [
+    // Tomb -> Cocoon
+    {outerTarget: 'overworld:tombEntrance', innerTarget: 'cocoon:cocoonEntrance'},
 ];
 const spiritLoopableEntrancePairs = [
     // Elder Spirit -> Forest Temple Back
@@ -205,14 +228,18 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
         const zone = getZone(location.zoneKey);
         const area = getAreaFromLocation(location);
         const object = doorLocation.definition;
+        const targetKey = `${object.targetZone}:${object.targetObjectId}`;
+        /*console.log(targetKey);
+        if (targetKey === 'holyCityInterior:jadeCityMazeExit' || targetKey === 'sky:waterfallTowerTopEntrance') {
+            debugger;
+        }*/
         if (ignoredZones.includes(zone.key)) {
-            return;
+            continue;
         }
         if (object.type === 'pitEntrance') {
             if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
-                return;
+                continue;
             }
-            const targetKey = `${object.targetZone}:${object.targetObjectId}`;
             if (area.isSpiritWorld) {
                 spiritPitTargets.add(targetKey);
                 spiritPitEntrances.push({location, definition: object});
@@ -220,24 +247,23 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
                 normalPitTargets.add(targetKey);
                 normalPitEntrances.push({location, definition: object});
             }
-            return;
+            continue;
         }
         if (object.type !== 'door' && object.type !== 'staffTower' && object.type !== 'helixTop') {
-            return;
+            continue;
         }
         if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
-            return;
+            continue;
         }
         if (ignoredZones.includes(object.targetZone)) {
-            return;
+            continue;
         }
         const key = `${zone.key}:${object.id}`;
-        const targetKey = `${object.targetZone}:${object.targetObjectId}`;
         if (!object.id) {
             console.log('missing object ID:', key, targetKey);
         }
         if (disabledDoors.includes(key) || disabledDoors.includes(targetKey)) {
-            return;
+            continue;
         }
         targetIdMap[targetKey] = targetIdMap[targetKey] || [];
         targetIdMap[targetKey].push({ definition: object, location });
@@ -248,7 +274,7 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
             } else {
                 waterEntrances.add(targetKey);
             }
-            return;
+            continue;
         }
         if (outsideZones.includes(zone.key)
             // There are a few special "entrances" inside other zones
@@ -299,7 +325,7 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
     }
 }
 
-export function randomizeEntrances(randomizerState: RandomizerState, steps: number) {
+export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode: boolean) {
     console.log('randomizeEntrances');
     const {
         entranceAssignments,
@@ -326,7 +352,8 @@ export function randomizeEntrances(randomizerState: RandomizerState, steps: numb
     // Assign all unreachable entrances first to a random entrance with other connections.
     // Currently this is only done for the Spirit World as the only unreachable exit in the material world
     // is the top of the money maze which has no checks or other entrances.
-    for (const unreachableExits of unreachableSpiritExitGroups) {
+    // The spirit world is not accessible in demo mode, so we just skip this section.
+    for (const unreachableExits of isDemoMode ? [] : unreachableSpiritExitGroups) {
         // Choose one entrance in the group to assign as a forced connection through a reachable
         // exit.
         const unreachableExit = random.shuffle(unreachableExits)[0];
@@ -334,7 +361,7 @@ export function randomizeEntrances(randomizerState: RandomizerState, steps: numb
             console.error('Exit ID not found, was it moved or removed?', unreachableExit);
             debugger;
         }
-        for (const exitGroup of random.shuffle(connectedExitGroups)) {
+        for (const exitGroup of random.shuffle(isDemoMode ? demoConnectedExitGrops : connectedExitGroups)) {
             const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
             const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
             const immutableExits = exitGroup.immutableEntranceTargets?.length ?? 0;
@@ -367,13 +394,13 @@ export function randomizeEntrances(randomizerState: RandomizerState, steps: numb
 
     //console.log('NORMAL LOOPABLE ENTRANCE ASSIGNMENTS:');
     // Assign loopable entrances first to make sure the entire graph is connected.
-    for (const loopableEntrancePair of random.shuffle(normalLoopableEntrancePairs)) {
+    for (const loopableEntrancePair of random.shuffle(isDemoMode ? demoNormalLoopableEntrancePairs : normalLoopableEntrancePairs)) {
         const exit = random.element([...connectedNormalEntrances]);
         assignEntranceExitPair(randomizerState, loopableEntrancePair.outerTarget, exit);
         connectedNormalEntrances.add(loopableEntrancePair.innerTarget);
     }
     //console.log('SPIRIT LOOPABLE ENTRANCE ASSIGNMENTS:');
-    for (const loopableEntrancePair of random.shuffle(spiritLoopableEntrancePairs)) {
+    for (const loopableEntrancePair of random.shuffle(isDemoMode ? [] : spiritLoopableEntrancePairs)) {
         const exit = random.element([...connectedSpiritEntrances]);
         assignEntranceExitPair(randomizerState, loopableEntrancePair.outerTarget, exit);
         connectedSpiritEntrances.add(loopableEntrancePair.innerTarget);

@@ -59,14 +59,14 @@ export const forestTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'forestTemple2BeforeLock',
         checks: [
+            // The chest appears in the dead end section, but the switch to make it appear is in this section.
             {objectId: 'forestTempleSmallKey2'},
             {objectId: 'forestTempleMap'},
         ],
         paths: [
+            {nodeId: 'forestTempleDeadEnd'},
             {nodeId: 'forestTemple2AfterLock', doorId: 'forestTempleLock2'},
         ],
-        entranceIds: [],
-        exits: [{objectId: 'forestTempleNortheastCaveEntrance'}],
     },
     {
         zoneId,
@@ -122,6 +122,7 @@ export const forestTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'forestTempleBack',
         entranceIds: ['forestTempleBackDoor'],
+        exits: [{objectId: 'forestTempleBackDoor'}],
         paths: [{nodeId: 'forestTempleBoss', doorId: 'forestTempleBossDoor'}],
     },
     {

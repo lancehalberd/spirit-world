@@ -154,7 +154,7 @@ export class RandomizerScene implements GameScene {
     }
     updateEntrances(state: GameState) {
         this.stepStatus = 'Pairing Entrances';
-        randomizeEntrances(state.randomizerState, 10);
+        randomizeEntrances(state.randomizerState, state.isDemoMode);
         this.startNextStep(state);
     }
     updateItems(state: GameState) {

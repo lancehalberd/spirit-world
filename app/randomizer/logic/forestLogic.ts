@@ -180,7 +180,10 @@ export const forestNodes: LogicNode[] = [
             {nodeId: 'forestTempleNorthLadder', logic: canCross2Gaps},
             {nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
-        entranceIds: ['forestTempleNorthwestTreeEntrance'],
+        entranceIds: [
+            'forestTempleNorthwestTreeEntrance',
+            'forestTempleBigKeyEntrance',
+        ],
         exits: [
             {objectId: 'forestTempleNorthwestTreeEntrance'},
             {objectId:'forestTempleBigKeyEntrance'},
@@ -339,6 +342,7 @@ export const treeVillageNodes: LogicNode[] = [
         ],
         exits: [
             { objectId: 'southeastTreeEntrance' },
+            { objectId: 'vanaraStorageStairs', logic: {requiredFlags: ['clearedTreeVillageStorageRoom']} },
         ],
     },
     {
@@ -365,6 +369,7 @@ export const treeVillageNodes: LogicNode[] = [
         flags: [{flag: 'clearedTreeVillageStorageRoom', logic: hasWeapon }],
         entranceIds: [
             'treeVillageStorageMarker',
+            'vanaraStorageStairs',
         ],
         exits: [
             { objectId: 'vanaraStorageStairs' },
