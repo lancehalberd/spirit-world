@@ -1,5 +1,6 @@
 import {setSpawnLocation} from 'app/content/spawnLocations';
 import {sceneHash} from "app/scenes/sceneHash";
+import {showTransitionScene} from "app/scenes/transition/transitionScene";
 import {appendCallback, showMessage} from 'app/scriptEvents';
 import {backupHeroData, restoreHeroData} from 'app/utils/alterHeroData';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
@@ -31,8 +32,7 @@ export function showBossRushScene(state: GameState) {
     // This spawn location will be used when returning the player to the location they started the boss rush from.
     setSpawnLocation(state, {...state.location});
     backupHeroData(state);
-    sceneHash.bossRush.updateBackground(state);
-    state.sceneStack = [sceneHash.field, sceneHash.hud, sceneHash.bossRush];
+    fadeToBossRushMenu(state);
 }
 
 export function onBossRushBossDefeated(state: GameState) {
@@ -44,13 +44,7 @@ export function onBossRushBossDefeated(state: GameState) {
     showMessage(state, timeMessage);
     // Show the Boss Rush Menu again after all the text is displayed.
     appendCallback(state, (state: GameState) => {
-        // Save game in case hero set any records. This should be done right before
-        // returning to the menu since this will reset the hero stats and remove them
-        // from the current area.
-        restoreHeroData(state);
-        saveGame(state);
-        backupHeroData(state);
-        returnToBossRushMenu(state);
+        returnToBossRushMenu(state, true);
     });
 }
 
@@ -58,17 +52,45 @@ export function onBossRushBossDefeated(state: GameState) {
 export function startNextBoss(state: GameState): void {
     const nextBoss = state.bossRushState.remainingBosses.shift();
     const markerId = bossSpawnPoints[nextBoss];
-    enterZoneByTarget(state, 'bossRush', markerId, {transitionType: 'fade', transitionColor: '#FFF'});
-    fixCamera(state);
+    showTransitionScene(state,
+        {
+            transitionType: 'fade',
+            transitionColor: '#FFF',
+            newStack: [sceneHash.field, sceneHash.hud],
+            onSwitch(state: GameState) {
+                enterZoneByTarget(state, 'bossRush', markerId, {instant: true});
+                fixCamera(state);
+            },
+        },
+    );
 }
 
 
 // Return to the boss rush menu from a boss rush.
-export function returnToBossRushMenu(state: GameState) {
+export function returnToBossRushMenu(state: GameState, shouldSaveGame = false) {
     delete state.bossRushState;
-    sceneHash.bossRush.updateBackground(state);
-    sceneHash.bossRush.updatePlayerState(state);
-    state.sceneStack = [sceneHash.field, sceneHash.hud, sceneHash.bossRush];
+    fadeToBossRushMenu(state, 'white', shouldSaveGame);
+}
+function fadeToBossRushMenu(state: GameState, transitionColor = 'black', shouldSaveGame = false) {
+    showTransitionScene(state,
+        {
+            transitionType: 'fade',
+            transitionColor,
+            newStack: [sceneHash.field, sceneHash.hud, sceneHash.bossRush],
+            onSwitch(state: GameState) {
+                if (shouldSaveGame) {
+                    // Save game in case hero set any records. This should be done right before
+                    // returning to the menu since this will reset the hero stats and remove them
+                    // from the current area.
+                    restoreHeroData(state);
+                    saveGame(state);
+                    backupHeroData(state);
+                }
+                sceneHash.bossRush.updateBackground(state, true);
+                sceneHash.bossRush.updatePlayerState(state);
+            },
+        },
+    );
 }
 
 function updateBestTimes(state: GameState): string {

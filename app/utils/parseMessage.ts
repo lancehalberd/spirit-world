@@ -60,6 +60,10 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
             return getGameKeyFrames(GAME_KEY.PREVIOUS_ELEMENT);
         case 'B_NEXT_ELEMENT':
             return getGameKeyFrames(GAME_KEY.NEXT_ELEMENT);
+        case 'B_CONFIRM':
+            return getGameKeyFrames(GAME_KEY.CONFIRM);
+        case 'B_CANCEL':
+            return getGameKeyFrames(GAME_KEY.CANCEL);
     }
     console.error('Unhandled escape sequence', escapedToken);
     debugger;

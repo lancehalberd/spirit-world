@@ -146,10 +146,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Improve randomizer game names
-        - Increased width: "1. Goal: Victory Points" (or Defeat Beasts)
-        - Add small text below seed=13123123 pts=0/20 bosses=0/1
-
     - Demo blockers
         - Replace Helix rival fight with demo ending + unlock randomizer.
         - Add new peach tree graphics
@@ -158,6 +154,10 @@ Current tasks:
         - High priority SFX
             - Plant grenade explosion
             - Frost grenade explosion
+        - Review hints seem correct for campaign
+        - Test randomizer hints look good.
+
+    - Implement blocksRenders functionality and test transition state again.
 
     - Enemies that fall from the ceiling when you get close to them.
 
@@ -200,6 +200,8 @@ Current tasks:
 
     - Scene updates
         - Dim audio using sceneVolume and call update sound settings when switching scenes.
+
+    - Replace old fade+circle transitions then remove old transition code for fade/circle
 
     - Hint seems wrong for the rival 3 test state, tells you to talk to the spirit king.
         - Maybe because of no gold mail?
@@ -245,14 +247,6 @@ Current tasks:
         - This will make large sparks disappearing on hit/TTL/cleanup be less jarring with no mechanical impact (the effect isn't interactive).
         - Just a shrinking spark effect.
 
-    - Cocoon improvements
-        - Move turrets closer in and add more of them for the cloak tutorial
-        - Add additional gauntlet gauntlet floor before the boss
-            - Removing rolling stone puzzle from first gauntlet floor.
-            - Add single rolling stone puzzle to new gauntlet floor
-            - Add additional rolling stones that can be used to make gauntlet easier
-        - Make Cocoon pits drop you to lower levels.
-
     - Challenge puzzle ideas:
         - Drop off 2 ledges with clone + staff to hit two buttons at once that opens locked door at the top of the ledge.
         - Zero tool puzzle requiring you to carefully throw bushes to solve puzzles/defeat enemies
@@ -284,8 +278,6 @@ Current tasks:
     - Add pixel precision to water tiles:
         - water edges
         - shallow -> deep water transitions
-
-    - Need better enemy for Cocoon B3 rolling ball puzzle.
 
     - Cocoon boss improvements
         - Allow boss to hit and move rolling balls with some attacks.

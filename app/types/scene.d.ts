@@ -17,6 +17,10 @@ interface GameScene {
     // If true, other scenes below this scene in the stack should not process input.
     // Should be true in most cases.
     blocksInput: boolean
+    // If true, other scenes below this in the stack should not render.
+    // Typically this is set because a scene either covers the whole screen or has cached
+    // the contents of the scene behind it manually.
+    blocksRenders?: boolean
     // It true, scenes below this scene in the stack will not be updated.
     blocksUpdates?: boolean
     // If this is defined and returns true, the global music controller will be disabled while

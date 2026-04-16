@@ -17,6 +17,9 @@ export function setSaveFileToState(state: GameState, savedGameIndex: number, gam
         savedGame.savedHeroData.spawnLocation = gameMode === 'randomizer' ? SPAWN_LOCATION_WATERFALL_VILLAGE : SPAWN_LOCATION_FULL;
     }
     applySavedState(state, savedGame);
+    if (gameMode === 'randomizer') {
+        state.hero.magic = state.hero.maxMagic;
+    }
 }
 
 export function applySavedState(state: GameState, savedState: Partial<SavedState>): void {

@@ -326,7 +326,6 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
 }
 
 export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode: boolean) {
-    console.log('randomizeEntrances');
     const {
         entranceAssignments,
         allTargetedKeys,
@@ -446,7 +445,7 @@ export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode:
 }
 
 function assignEntranceExitPair(randomizerState: RandomizerState, targetIdOfEntrance: string, targetIdOfExit: string) {
-    console.log('assignEntranceExitPair', targetIdOfEntrance, targetIdOfExit);
+    // console.log('assignEntranceExitPair', targetIdOfEntrance, targetIdOfExit);
     const {
         entranceAssignments,
         allTargetedKeys,

@@ -1,5 +1,5 @@
 import {GAME_KEY} from 'app/gameConstants';
-import {isSceneActive, sceneHash} from "app/scenes/sceneHash";
+import {sceneHash} from "app/scenes/sceneHash";
 import {bossRushConditions, getBossRushOptions} from 'app/scenes/bossRush/bossRushOptions';
 import {bossSpawnPoints, getSavedBossRushData, startNextBoss} from 'app/scenes/bossRush/showBossRushScene';
 import {renderBossRushMenu, renderConditionsMenu} from "app/scenes/bossRush/renderBossRush";
@@ -114,10 +114,10 @@ export class BossRushScene implements GameScene {
         }
     }
 
-    updateBackground(state: GameState) {
+    updateBackground(state: GameState, instant = false) {
         const option = getBossRushOptions(state)[this.bossRushIndex];
         const markerId = bossSpawnPoints[option.bosses[0]];
-        enterZoneByTarget(state, 'bossRush', markerId, {transitionType: 'fastFade', callback: (state: GameState) => {
+        enterZoneByTarget(state, 'bossRush', markerId, {instant, transitionType: 'fastFade', callback: (state: GameState) => {
             // Remove the hero from the area.
             delete state.hero.area;
             option.fixPreview?.(state);
@@ -132,9 +132,9 @@ export class BossRushScene implements GameScene {
 
     render(context: CanvasRenderingContext2D, state: GameState): void {
         // This is a bit of a hack to prevent rendering Boss Rush menus when text boxes are showing.
-        if (!isSceneActive(state, sceneHash.bossRush)) {
-            return;
-        }
+        //if (!isSceneActive(state, sceneHash.bossRush)) {
+        //    return;
+        //}
         if (!this.showConditionsMenu) {
             renderBossRushMenu(context, state, this);
         } else {

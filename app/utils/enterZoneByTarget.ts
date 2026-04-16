@@ -50,7 +50,7 @@ export function enterZoneByTarget(
     // move to the new location without a transition and just have the camera pan to the new location.
     // TODO: This should probably be updated  to check that this is the same AreaSection rather than AreaInstance, otherwise it could
     // cause some bad transitions when transitioning between two sections that happen to be in the same area instance.
-    if (!transitionType && state.areaInstance.definition === targetAreaDefinition) {
+    if (!transitionType && !instant && state.areaInstance.definition === targetAreaDefinition) {
         onEnterLocation(state, targetObjectId, {doNotFixCamera: true, skipObject, callback});
         return true;
     }

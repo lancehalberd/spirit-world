@@ -1,3 +1,4 @@
+import {GAME_KEY} from 'app/gameConstants';
 import {generateZoneVariations} from 'app/generator/generateZoneVariations';
 import {getAllReachableContent} from 'app/randomizer/getAllReachableContent';
 import {calculateKeyLogic} from 'app/randomizer/calculateKeyLogic';
@@ -7,8 +8,10 @@ import {verifyNodeConnections} from 'app/randomizer/utils';
 import {mainOverworldNode} from 'app/randomizer/logic/overworldLogic';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
+import {showTransitionScene} from 'app/scenes/transition/transitionScene';
 import {sceneHash} from 'app/scenes/sceneHash';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
+import {wasGameKeyPressed} from 'app/userInput';
 import {fillRect, pad} from 'app/utils/index';
 import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation';
 import {drawText} from 'app/utils/simpleWhiteFont';
@@ -107,7 +110,7 @@ export class RandomizerScene implements GameScene {
                         verifyNodeConnections(state.randomizerState);
                         return;
                     }
-                    return;
+                    break;
                 case 'enemies':
                     if (this.config.enemySeed) {
                         this.step = 'enemies';
@@ -124,9 +127,8 @@ export class RandomizerScene implements GameScene {
                     }
                     break;
                 case 'finished':
-                    updateHeroMagicStats(state, true);
-                    returnToSpawnLocation(state);
-                    showFieldScene(state);
+                    delete this.stepStatus;
+                    this.step = 'finished';
                     break;
             }
             stepIndex++;
@@ -150,6 +152,16 @@ export class RandomizerScene implements GameScene {
                     console.error('Failed item generation', e);
                 }
                 break;
+            case 'finished':
+                if (wasGameKeyPressed(state, GAME_KEY.CONFIRM)) {
+                    updateHeroMagicStats(state, true);
+                    returnToSpawnLocation(state);
+                    const oldStack = [...state.sceneStack];
+                    showFieldScene(state);
+                    showTransitionScene(state, {oldStack, transitionType: 'fade', transitionColor: '#FFF'});
+                    // Use the same fade effect as the dream world when starting/loading a randomizer game.
+                }
+
         }
     }
     updateEntrances(state: GameState) {
@@ -192,6 +204,10 @@ export class RandomizerScene implements GameScene {
         let statusLines = ['Generating Random Seed'];
         if (this.step === 'entrances') {
             statusLines.push('Randomizing entrances');
+        } else if (this.step === 'finished') {
+            statusLines.push('Ready!');
+            // drawText doesn't support escaping control strings.
+            // statusLines.push('Press [B_CONFIRM] to start');
         } else {
             statusLines.push('Randomizing items');
         }

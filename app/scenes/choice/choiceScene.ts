@@ -45,6 +45,10 @@ export class ChoiceScene implements GameScene {
     }
     update(state: GameState, interactive: boolean) {
         if (wasConfirmKeyPressed(state)) {
+            state.scriptEvents.handledInput = true;
+            // Make sure to close this before calling results, otherwise
+            // this might clear scene changes added by the action.
+            this.closeScene(state);
             const option = this.choices[this.cursorIndex];
             if (option.activate) {
                 option.activate(state);
@@ -52,8 +56,6 @@ export class ChoiceScene implements GameScene {
             if (option.key) {
                 followMessagePointer(state, option.key);
             }
-            state.scriptEvents.handledInput = true;
-            this.closeScene(state);
             return;
         }
         const optionCount = this.choices.length;

@@ -9,11 +9,14 @@ import {showRandomizerScene} from 'app/scenes/randomizer/randomizerScene';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
 import {parseScriptText, setScript} from 'app/scriptEvents';
 import {getDefaultState} from 'app/state';
+import {bossNames} from 'app/utils/bosses';
 import {getShortZoneName } from 'app/utils/getFullZoneLocation';
 import {fillRect, pad} from 'app/utils/index';
 import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation'
 import {drawText} from 'app/utils/simpleWhiteFont';
+import {drawSmallWhiteFont} from 'app/utils/smallFont';
 import {getSavedGames, saveGamesToLocalStorage,} from 'app/utils/saveGame';
+import {typedKeys} from 'app/utils/types';
 
 import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
 
@@ -28,9 +31,14 @@ interface FileSelectOption {
 }
 
 
-function optionLabelRenderer(label: string) {
+function optionLabelRenderer(label: string, subtext?: string) {
     return (context: CanvasRenderingContext2D, state: GameState, scene: FileSelectScene, r: Rect) => {
         drawText(context, label, r.x, r.y + r.h / 2, textOptions);
+        if (subtext) {
+            drawSmallWhiteFont(context, subtext, r.x + 16, r.y + r.h - 1, {
+                textBaseline: 'top', textAlign: 'left',
+            });
+        }
     };
 }
 
@@ -252,14 +260,36 @@ export function getRandomizerOptions(state: GameState, scene: FileSelectScene): 
     return options;
 }
 
-function getSavedGameLabel(savedGame: SavedState): string {
+function getSavedGameLabel(savedGame: SavedState, index: number): string {
     if (!savedGame) {
         return 'New Game';
     }
     if (savedGame.savedRandomizerData) {
-        return `${savedGame.savedRandomizerData.itemSeed}`;
+        const bossKeys = typedKeys(savedGame.savedRandomizerData.goal.bossPoints?.bossPoints ?? {});
+        let goal = "Treasure Hunt";
+        if (bossKeys.length === 3 && bossKeys.includes('flameBeast') && bossKeys.includes('frostBeast') && bossKeys.includes('stormBeast')) {
+            goal = "Defeat the Beasts"
+        } else if (bossKeys.length > 1) {
+            goal = "Boss Hunt";
+        } else if (bossKeys.length === 1) {
+            goal = "Defeat " + bossNames[bossKeys[0]];
+        }
+        return `${index + 1}.${goal}`;
     }
     return getShortZoneName(savedGame.savedHeroData.spawnLocation);
+}
+
+function getSavedGameSubtext(savedGame: SavedState): string|undefined {
+    if (!savedGame) {
+        return;
+    }
+    if (!savedGame.savedRandomizerData) {
+        return;
+    }
+    if (savedGame.savedRandomizerData.entranceSeed) {
+        return `Entrance Seed=${savedGame.savedRandomizerData.itemSeed}`;
+    }
+    return `Seed=${savedGame.savedRandomizerData.itemSeed}`;
 }
 
 export function getFileSelectOptions(state: GameState, scene: FileSelectScene): FileSelectOption[] {
@@ -269,7 +299,7 @@ export function getFileSelectOptions(state: GameState, scene: FileSelectScene): 
     if (scene.mode === 'deleteSavedGameConfirmation') {
         return [cancelDeleteOption, confirmDeleteOption];
     }
-    const options: FileSelectOption[] = scene.savedGames.map(savedGame => {
+    const options: FileSelectOption[] = scene.savedGames.map((savedGame: SavedState, index: number) => {
         return {
             onHighlight(state: GameState, scene: FileSelectScene) {
                 setSaveFileToState(state, scene.cursorIndex, scene.gameMode);
@@ -283,7 +313,7 @@ export function getFileSelectOptions(state: GameState, scene: FileSelectScene): 
                     scene.cursorIndex = 0;
                 }
             },
-            render: optionLabelRenderer(getSavedGameLabel(savedGame)),
+            render: optionLabelRenderer(getSavedGameLabel(savedGame, index), getSavedGameSubtext(savedGame)),
         };
     });
     if (scene.mode === 'deleteSavedGame') {
