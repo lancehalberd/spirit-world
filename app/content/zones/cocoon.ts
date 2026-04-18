@@ -748,7 +748,7 @@ const f1_0x0: AreaDefinition = {
                     [,,,,,,,,,,,,147,148,,,,,149,150],
                     [,,,,,,,,,,,,,151,130,130,130,130,152],
                     [],
-                    [,,,,,,,,,,],
+                    [,,,,,,,,,],
                     [],
                     [],
                     [],
@@ -1412,7 +1412,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 456, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 300, y: 432, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", linked: true, x: 368, y: 48, style: "vanaraLarge", type: "sign", message: "You can roll boulders into enemies to damage them.", spirit: true},
-        {status: "normal", id: "", x: 432, y: 128, type: "ballGoal", requireAll: true, targetObjectId: "cocoonB3Portal", linked: true, spirit: true},
+        {status: "normal", id: "", x: 432, y: 128, type: "ballGoal", requireAll: true, linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 252, mapId: 'cocoon', floorId: 'B3', mapX: 3, mapY: 2},

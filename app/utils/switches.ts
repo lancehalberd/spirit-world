@@ -39,15 +39,16 @@ function getTargetObjectIdsByTypesAndArea(area: AreaInstance, types: ObjectType[
     return area.objects.filter(object => types.includes(object.definition?.type)).map(object => object.definition?.id).filter(id => id);
 }
 
+const switchTargetTypes: ObjectType[] = [
+    'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'keyBlock',
+    'narration', 'pitEntrance', 'shieldingUnit',
+    'teleporter', 'torch', 'escalator', 'airStream', 'anode',
+];
+
 export function getSwitchTargetIds(area: AreaInstance): string[] {
-    return [
+    return [...new Set([
         'none',
-        ...getTargetObjectIdsByTypesAndArea(area,
-            [
-                'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'keyBlock',
-                'narration', 'pitEntrance', 'shieldingUnit',
-                'teleporter', 'torch', 'escalator', 'airStream', 'anode',
-            ]
-        )
-    ];
+        ...getTargetObjectIdsByTypesAndArea(area, switchTargetTypes),
+        ...getTargetObjectIdsByTypesAndArea(area.alternateArea, switchTargetTypes),
+    ])];
 }
