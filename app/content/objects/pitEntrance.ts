@@ -2,7 +2,7 @@ import {renderIndicator} from 'app/content/objects/indicator';
 import {objectHash} from 'app/content/objects/objectHash';
 import {playAreaSound} from 'app/musicController';
 import {CANVAS_HEIGHT} from 'app/gameConstants';
-import {getMappedEntranceData} from 'app/randomizer/utils';
+import {getMappedEntranceData} from 'app/randomizer/find';
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';

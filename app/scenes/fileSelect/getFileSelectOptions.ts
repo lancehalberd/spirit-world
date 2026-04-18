@@ -293,10 +293,11 @@ function getSavedGameSubtext(savedGame: SavedState): string|undefined {
     if (!savedGame.savedRandomizerData) {
         return;
     }
+    let result = `I=${savedGame.savedRandomizerData.itemSeed}`;
     if (savedGame.savedRandomizerData.entranceSeed) {
-        return `Entrance Seed=${savedGame.savedRandomizerData.itemSeed}`;
+        result += ` E=${savedGame.savedRandomizerData.entranceSeed}`;
     }
-    return `Seed=${savedGame.savedRandomizerData.itemSeed}`;
+    return result;
 }
 
 export function getFileSelectOptions(state: GameState, scene: FileSelectScene): FileSelectOption[] {

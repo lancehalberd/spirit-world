@@ -1,6 +1,5 @@
 import {getZone} from 'app/content/zones';
-import {findDoorById} from 'app/randomizer/find';
-import {getMappedEntranceData} from 'app/randomizer/utils';
+import {findDoorById, getMappedEntranceData} from 'app/randomizer/find';
 // import {missingExitNodeSet, missingNodeSet, warnOnce} from 'app/randomizer/warnOnce';
 
 export function calculateKeyLogic(randomizerState: RandomizerState): RequiredKeysMap {

@@ -96,7 +96,7 @@ export class RandomizerScene implements GameScene {
                     if (this.config.entranceSeed) {
                         this.step = 'entrances';
                         this.stepStatus = 'Initializing Entrances';
-                        initializeEntranceRandomizer(state.randomizerState);
+                        initializeEntranceRandomizer(state.randomizerState, state.isDemoMode);
                         return;
                     }
                     break;

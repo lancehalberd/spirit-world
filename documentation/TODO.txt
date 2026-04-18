@@ -147,12 +147,26 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
+        - Fix rest of the game is accessible via Helix in the randomizer.
         - Add ash tiles and apply to spirit world
             - Map grass tiles to ash tiles
         - Add weakened peach tree animation.
-        - Review hints seem correct for campaign
         - Test randomizer hints look good.
         - BLOCKED: New Rival graphics
+
+    - Fix Entrance Randomizer
+        This group isn't actually fully connected as you cannot reach other entrances from warTempleKeyDoor
+            normalEntranceTargets: [
+                'overworld:warTempleNortheastEntrance',
+                'overworld:warTempleEastEntrance',
+                // TODO: fix this, you cannot reach other entrances from this door.
+                'overworld:warTempleKeyDoor',
+            ],
+        We could augment these groups with 'entranceOnly' doors that are not reachable from other doors, such as the
+        main entrance to the war temple, or 'exitOnly' doors that cannot reach any other doors, such as the war temple
+        key door. These categories would be sufficient for existing graphs but do not capture all possible graphs.
+
+        Brainstorm a more rigorous entrance randomizer now that we are generating all entrances from the logic.
 
     - Implement blocksRenders functionality and test transition state again.
 

@@ -1,7 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
-import {getMappedEntranceData} from 'app/randomizer/utils';
+import {getMappedEntranceData} from 'app/randomizer/find';
 import {appendScript} from 'app/scriptEvents';
 import {drawFrame, drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
 import {createCanvasAndContext} from 'app/utils/canvas';

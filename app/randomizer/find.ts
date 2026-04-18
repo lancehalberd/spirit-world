@@ -5,6 +5,10 @@ import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'ap
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
 
+export function getMappedEntranceData(randomizerState: RandomizerState, zoneKey: string, entrance: EntranceDefinition): EntranceData {
+    return randomizerState?.entrances?.entranceAssignments?.[`${zoneKey}:${entrance.id}`] ?? entrance;
+}
+
 export function findReachableNodes(randomizerState: RandomizerState, state: GameState): LogicNode[] {
     const {allNodesById, allNodesByZoneKey, startingNodes} = randomizerState;
     const reachableNodes = [...startingNodes];
@@ -54,8 +58,9 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                 continue;
             }
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
-            const nextNode = allNodesByZoneKey[exitObject.targetZone].find(node =>
-                (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
+            const {targetZone, targetObjectId} = getMappedEntranceData(randomizerState, currentNode.zoneId, exitObject);
+            const nextNode = allNodesByZoneKey[targetZone].find(node =>
+                (node !== currentNode || targetObjectId !== exit.objectId)
                 // If isSpiritWorld is defined for both nodes, they must match.
                 && (
                     node.isSpiritWorld === undefined ||
@@ -64,12 +69,12 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                     // Teleporters can link material/spirit world together.
                     exitObject.type === 'teleporter'
                 )
-                && node.entranceIds?.includes(exitObject.targetObjectId)
+                && node.entranceIds?.includes(targetObjectId)
             );
             if (!nextNode) {
                 warnOnce(missingExitNodeSet,
                     zone.key + '::' + exitObject.id + ' => '
-                    + exitObject.targetZone + '::' + exitObject.targetObjectId,
+                    + targetZone + '::' + targetObjectId,
                     'Missing node for exit: ');
                 continue;
             }
@@ -264,12 +269,12 @@ export function canOpenDoor(randomizerState: RandomizerState, location: FullZone
     if (!door || !evaluateLogicDefinition(state, door)) {
         return false;
     }
-    if (door.hasCustomLogic)
     if (door.type === 'teleporter') {
         return state.hero.savedData.passiveTools.spiritSight > 0 || state.hero.savedData.passiveTools.trueSight > 0;
     }
+    const {status} = getMappedEntranceData(randomizerState, location.zoneKey, door);
     // Only pass through
-    if (door.status === 'locked') {
+    if (status === 'locked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
         const requiredKeys = randomizerState.items.requiredKeysMap[door.id];
         if (!requiredKeys) {
@@ -278,11 +283,11 @@ export function canOpenDoor(randomizerState: RandomizerState, location: FullZone
         }
         return dungeonInventory?.totalSmallKeys >= requiredKeys;
     }
-    if (door.status === 'bigKeyLocked') {
+    if (status === 'bigKeyLocked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
         return dungeonInventory?.bigKey;
     }
-    if (door.status === 'cracked') {
+    if (status === 'cracked') {
         return state.hero.savedData.activeTools.clone > 0;
     }
     return true;

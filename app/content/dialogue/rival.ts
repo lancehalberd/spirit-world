@@ -96,7 +96,7 @@ dialogueHash.rival = {
                 blockFieldUpdates: true,
             });
             wait(state, 500);
-            if (state.isDemoMode) {
+            if (state.isDemoMode && !state.randomizerState) {
                 if (!state.settings.isRandomizerUnlocked) {
                     state.settings.isRandomizerUnlocked = true;
                     saveSettings(state);

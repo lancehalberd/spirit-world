@@ -203,7 +203,9 @@ interface RandomizerEntrances {
     random: SRandom
     allTargetedKeys: Set<string>
     fixedNimbusCloudZones: Set<string>
+    allUnreachableNormalExits: string[]
     allUnreachableSpiritExits: string[]
+    forbiddenNormalExitsKeysByEntranceKey: {[key: string]: string[]}
     forbiddenSpiritExitsKeysByEntranceKey: {[key: string]: string[]}
     targetIdMap: {[key in string]: DoorLocation[]}
     normalEntrances: Set<string>

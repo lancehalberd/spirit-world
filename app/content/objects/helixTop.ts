@@ -1,7 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {BehaviorObject} from 'app/content/objects/behaviorObject';
 import {editingState} from 'app/development/editingState';
-import {getMappedEntranceData} from 'app/randomizer/utils';
+import {getMappedEntranceData} from 'app/randomizer/find';
 import {drawFrameContentAt} from 'app/utils/animations';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 

@@ -1,5 +1,6 @@
 import {
     andLogic,
+    isDemoModeLogic,
     beastsDefeated,
     canCross2Gaps, hasGloves,
     canUseTeleporters, hasReleasedBeasts, canTravelFarUnderWater,
@@ -56,7 +57,7 @@ export const mainOverworldNode: LogicNode = {
         {objectId: 'lakeDreamTeleporter'},
         {objectId: 'peachCaveTopEntrance'},
         // This entrance becomes frozen while the frost beast is active.
-        {objectId: 'peachCaveWaterEntrance', logic: orLogic({requiredFlags: ['frostBeast']}, hasFire)},
+        {objectId: 'peachCaveWaterEntrance', logic: orLogic(isDemoModeLogic, {requiredFlags: ['frostBeast']}, hasFire)},
         {objectId: 'staffTowerEntrance'},
         {objectId: 'tombEntrance', logic: hasMediumRange},
         {objectId: 'waterfallCaveEntrance'},

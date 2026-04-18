@@ -60,6 +60,15 @@ const unreachableSpiritExitGroups = [
     ['staffTower:staffTowerSpiritEntrance'],
 ];
 
+function getUnreachableNormalExitGroups(isDemoMode: boolean): string[][] {
+    if (isDemoMode) {
+        return [
+            ['caves:caves-ascentExit'],
+        ];
+    }
+    return [];
+}
+
 interface ConnectedExitGroup {
     normalEntranceTargets?: string[]
     spiritEntranceTargets?: string[]
@@ -80,6 +89,7 @@ const connectedExitGroups: ConnectedExitGroup[] = [
         normalEntranceTargets: [
             'overworld:warTempleNortheastEntrance',
             'overworld:warTempleEastEntrance',
+            // TODO: fix this, you cannot reach other entrances from this door.
             'overworld:warTempleKeyDoor',
         ],
         // Main war temple entrance isn't actually immutable,
@@ -136,7 +146,10 @@ const connectedExitGroups: ConnectedExitGroup[] = [
 
 const demoConnectedExitGrops = [
     {
-        normalEntranceTargets: ['overworld:peachCaveTopEntrance', 'overworld:peachCaveWaterEntrance'],
+        normalEntranceTargets: ['overworld:peachCaveWaterEntrance'],
+        // Not actually immutable, but in the demo, you cannot reach this exit from the water entrance
+        // as Iron Boots or Clone Tool are required for this.
+        immutableEntranceTargets: ['overworld:peachCaveTopEntrance'],
     },
     {
         normalEntranceTargets: ['overworld:caves-ascentEntrance', 'sky:caves-ascentExit'],
@@ -145,11 +158,14 @@ const demoConnectedExitGrops = [
         normalEntranceTargets: [
             'overworld:warTempleNortheastEntrance',
             'overworld:warTempleEastEntrance',
+            // TODO: fix this, you cannot reach other entrances from this door.
             'overworld:warTempleKeyDoor',
         ],
         // Main war temple entrance isn't actually immutable,
         // but the other entrances don't allow exiting from it.
-        immutableEntranceTargets: ['overworld:warTempleEntrance'],
+        immutableEntranceTargets: [
+            'overworld:warTempleEntrance',
+        ],
     },
 ];
 
@@ -179,7 +195,7 @@ const spiritLoopableEntrancePairs = [
     {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
 ];
 
-export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
+export function initializeEntranceRandomizer(randomizerState: RandomizerState, isDemoMode: boolean) {
     randomizerState.entrances = {
         entranceAssignments: {},
         random: SRandom.seed(randomizerState.entranceSeed),
@@ -198,12 +214,15 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
         targetIdMap: {},
         allTargetedKeys: new Set<string>(),
         fixedNimbusCloudZones: new Set<string>(),
+        forbiddenNormalExitsKeysByEntranceKey: {},
         forbiddenSpiritExitsKeysByEntranceKey: {},
+        allUnreachableNormalExits: [],
         allUnreachableSpiritExits: [],
     };
 
     const {
         allTargetedKeys,
+        allUnreachableNormalExits,
         allUnreachableSpiritExits,
         targetIdMap,
         normalEntrances,
@@ -323,6 +342,9 @@ export function initializeEntranceRandomizer(randomizerState: RandomizerState) {
     for (const unreachableExit of unreachableSpiritExitGroups) {
         allUnreachableSpiritExits.push(...unreachableExit);
     }
+    for (const unreachableExit of getUnreachableNormalExitGroups(isDemoMode)) {
+        allUnreachableNormalExits.push(...unreachableExit);
+    }
 }
 
 export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode: boolean) {
@@ -342,7 +364,9 @@ export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode:
         spiritPitEntrances,
         spiritPitTargets,
         random,
+        forbiddenNormalExitsKeysByEntranceKey,
         forbiddenSpiritExitsKeysByEntranceKey,
+        allUnreachableNormalExits,
         allUnreachableSpiritExits,
     } = randomizerState.entrances;
 
@@ -352,12 +376,50 @@ export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode:
     // Currently this is only done for the Spirit World as the only unreachable exit in the material world
     // is the top of the money maze which has no checks or other entrances.
     // The spirit world is not accessible in demo mode, so we just skip this section.
-    for (const unreachableExits of isDemoMode ? [] : unreachableSpiritExitGroups) {
+    for (const unreachableNormalExits of getUnreachableNormalExitGroups(isDemoMode)) {
         // Choose one entrance in the group to assign as a forced connection through a reachable
         // exit.
-        const unreachableExit = random.shuffle(unreachableExits)[0];
-        if (!allTargetedKeys.has(unreachableExit)) {
-            console.error('Exit ID not found, was it moved or removed?', unreachableExit);
+        const unreachableNormalExit = random.shuffle(unreachableNormalExits)[0];
+        if (!allTargetedKeys.has(unreachableNormalExit)) {
+            console.error('Exit ID not found, was it moved or removed?', unreachableNormalExit);
+            debugger;
+        }
+        for (const exitGroup of random.shuffle(isDemoMode ? demoConnectedExitGrops : connectedExitGroups)) {
+            const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
+            const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
+            const immutableExits = exitGroup.immutableEntranceTargets?.length ?? 0;
+            // Must have a normal exit to connect to a normal unreachable entrance.
+            if (!normalExits
+                // Must have more than one assignable exit if we are going to assign one to an unreachable entrance.
+                || spiritExits + normalExits + immutableExits < 2
+            ) {
+                continue;
+            }
+            const normalEntrance = random.removeElement(exitGroup.normalEntranceTargets);
+            if (!allTargetedKeys.has(normalEntrance)) {
+                console.error('Entrance ID not found, was it moved or removed?', normalEntrance);
+                debugger;
+            }
+            assignEntranceExitPair(randomizerState, unreachableNormalExit, normalEntrance);
+            // If only normal world exits remain, mark them all as forbidden to match with
+            // any other unreachable normal entrance targets, otherwise this strategy may fail
+            // to actually connect this unreachable exit group to reachable areas.
+            // For example, it may pair the other end with another unreachable exit group or even to
+            // another door in the same unreachable exit group.
+            if (spiritExits + immutableExits <= 0) {
+                for (const otherEntrance of exitGroup.normalEntranceTargets) {
+                    forbiddenNormalExitsKeysByEntranceKey[otherEntrance] = allUnreachableNormalExits;
+                }
+            }
+            break;
+        }
+    }
+    for (const unreachableSpiritExits of isDemoMode ? [] : unreachableSpiritExitGroups) {
+        // Choose one entrance in the group to assign as a forced connection through a reachable
+        // exit.
+        const unreachableSpiritExit = random.shuffle(unreachableSpiritExits)[0];
+        if (!allTargetedKeys.has(unreachableSpiritExit)) {
+            console.error('Exit ID not found, was it moved or removed?', unreachableSpiritExit);
             debugger;
         }
         for (const exitGroup of random.shuffle(isDemoMode ? demoConnectedExitGrops : connectedExitGroups)) {
@@ -371,12 +433,12 @@ export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode:
             ) {
                 continue;
             }
-            const entrance = random.removeElement(exitGroup.spiritEntranceTargets);
-            if (!allTargetedKeys.has(entrance)) {
-                console.error('Entrance ID not found, was it moved or removed?', entrance);
+            const spiritEntrance = random.removeElement(exitGroup.spiritEntranceTargets);
+            if (!allTargetedKeys.has(spiritEntrance)) {
+                console.error('Entrance ID not found, was it moved or removed?', spiritEntrance);
                 debugger;
             }
-            assignEntranceExitPair(randomizerState, unreachableExit, entrance);
+            assignEntranceExitPair(randomizerState, unreachableSpiritExit, spiritEntrance);
             // If only spirit world exits remain, mark them all as forbidden to match with
             // any other unreachable spirit entrange targets, otherwise this strategy may fail
             // to actually connect this unreachable exit group to reachable areas.
@@ -407,6 +469,13 @@ export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode:
 
 
     //console.log('RESTRICTED ASSIGNMENTS:');
+    // Make sure any normal exits with entrance restrictions are assigned first to make sure
+    // an option that satisfies the restrictions will be available.
+    for (const normalEntranceId of Object.keys(forbiddenNormalExitsKeysByEntranceKey)) {
+        const badEntrances = forbiddenNormalExitsKeysByEntranceKey[normalEntranceId];
+        const normalExitId = random.shuffle([...normalExits]).filter(entrance => !badEntrances.includes(entrance))[0];
+        assignEntranceExitPair(randomizerState, normalEntranceId, normalExitId);
+    }
     // Make sure any spirit exits with entrance restrictions are assigned first to make sure
     // an option that satisfies the restrictions will be available.
     for (const spiritEntranceId of Object.keys(forbiddenSpiritExitsKeysByEntranceKey)) {

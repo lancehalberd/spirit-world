@@ -5,6 +5,7 @@ import {
     canOpenDoor,
     findDoorById,
     findReachableNodes,
+    getMappedEntranceData,
 } from 'app/randomizer/find';
 import {missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
 import {cloneDeep} from 'app/utils/index';
@@ -221,11 +222,6 @@ export function everyObject(callback: (location: FullZoneLocation, zone: Zone, a
             callback(location, zone, area, area.objects[i]);
         }
     });
-}
-
-
-export function getMappedEntranceData(randomizerState: RandomizerState, zoneKey: string, entrance: EntranceDefinition): EntranceData {
-    return randomizerState?.entrances?.entranceAssignments?.[`${zoneKey}:${entrance.id}`] ?? entrance;
 }
 
 export function verifyNodeConnections(randomizerState: RandomizerState) {

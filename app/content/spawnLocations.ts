@@ -131,7 +131,7 @@ export const SPAWN_WAR_TEMPLE_BOSS: ZoneLocation = {
 };
 export const SPAWN_COCOON_ENTRANCE: ZoneLocation = {
     zoneKey: 'cocoon',
-    floor: 3,
+    floor: 4,
     x: 120,
     y: 440,
     z: 0,

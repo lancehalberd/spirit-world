@@ -3,7 +3,7 @@ import {objectHash} from 'app/content/objects/objectHash';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound} from 'app/musicController';
-import {getMappedEntranceData} from 'app/randomizer/utils';
+import {getMappedEntranceData} from 'app/randomizer/find';
 import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,

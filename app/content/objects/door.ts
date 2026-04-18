@@ -4,7 +4,7 @@ import {DoorStyleDefinition, doorStyles} from 'app/content/objects/doorStyles';
 import {objectHash} from 'app/content/objects/objectHash';
 import {editingState} from 'app/development/editingState';
 import {playObjectSound} from 'app/musicController';
-import {getMappedEntranceData} from 'app/randomizer/utils';
+import {getMappedEntranceData} from 'app/randomizer/find';
 import {renderHeroShadow} from 'app/renderActor';
 import {showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrame} from 'app/utils/animations';
