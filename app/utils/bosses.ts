@@ -1,3 +1,4 @@
+import {RIVAL_NAME} from 'app/gameConstants';
 
 export const bossFlags: {[key in BossKey]: string} = {
     // The first boss is always unlocked so that the boss rush menu can never be empty.
@@ -19,7 +20,7 @@ export const bossNames: {[key in BossKey]: string} = {
     golem: 'Golem',
     idols: 'War Idols',
     guardian: 'Guardian',
-    rival2: 'Saru',
+    rival2: RIVAL_NAME,
     forestTempleBoss: 'Prototypes',
     collector: 'Collector',
     stormBeast: 'Storm Beast',

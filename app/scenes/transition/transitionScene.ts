@@ -2,6 +2,7 @@ import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH, GAME_KEY} from 'app/gameConst
 import {showPauseScene} from 'app/scenes/pause/pauseScene';
 import {KEY, isKeyboardKeyDown, wasGameKeyPressed} from 'app/userInput';
 import {createCanvasBuffer, drawCanvas, mainCanvas} from 'app/utils/canvas';
+import {removeElementFromArray} from 'app/utils/index';
 
 interface TransitionProps {
     // Defaults to the current stack.
@@ -16,7 +17,7 @@ interface TransitionProps {
     transitionColor: string
     duration: number
     // Called once after switching to the new stack.
-    onSwitch?: (state: GameState) => void
+    onSwitch?: (state: GameState, transitionScene: TransitionScene) => void
 }
 
 // This simple pause scene will display when the player attempts to pause the game when
@@ -39,10 +40,13 @@ export class TransitionScene implements GameScene {
             this.internalBuffer.needsRefresh = true;
             this.blocksRenders = false;
             state.sceneStack = [...this.props.newStack, this, ...this.props.activeStack];
-            this.props.onSwitch?.(state);
+            // This is called after setting sceneStack in case it is used to set a new stack directly.
+            this.props.onSwitch?.(state, this);
         }
         if (this.transitionTime >= this.props.duration) {
-            state.sceneStack = [...this.props.newStack, ...this.props.activeStack];
+            // This does not set the entire sceneStack in case the scene stack was manually adjusted
+            // in the `this.props.onSwitch` call.
+            removeElementFromArray(state.sceneStack, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {

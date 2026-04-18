@@ -1,9 +1,12 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {showTransitionScene} from 'app/scenes/transition/transitionScene';
+import {showTitleScene} from 'app/scenes/title/showTitleScene';
 import {appendCallback, appendScript, wait} from 'app/scriptEvents';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {moveActor} from 'app/movement/moveActor';
-import {saveGame} from 'app/utils/saveGame';
 import {updateCamera} from 'app/updateCamera';
+import {saveGame} from 'app/utils/saveGame';
+import {saveSettings} from 'app/utils/saveSettings';
 
 
 
@@ -93,6 +96,29 @@ dialogueHash.rival = {
                 blockFieldUpdates: true,
             });
             wait(state, 500);
+            if (state.isDemoMode) {
+                if (!state.settings.isRandomizerUnlocked) {
+                    state.settings.isRandomizerUnlocked = true;
+                    saveSettings(state);
+                }
+                appendScript(state, `
+                    So you're here just like the Commander said.
+                    {|}Normally this is where we would have our second duel, but today I'm here to tell you...
+                    {|}You did it! You completed the demo!
+                    {|}I hope you are excited to find out what happens next, but for the best experience,
+                    you should probably wait for the rest of the game to be finished.
+                    {|}If you want to play more, I've unlocked the randomizer option for you on the title
+                    screen. I'll even let you preview our second fight if you manage to make it back here while playing the randomizer.
+                    {|}Either way, thanks for playing to the end of the demo! We are working hard on finishing the rest of the game.
+                `);
+                appendCallback(state, (state: GameState) => {
+                    showTransitionScene(state, {onSwitch(state: GameState, transitionScene) {
+                        showTitleScene(state);
+                        state.sceneStack.push(transitionScene);
+                    }, transitionType: 'fade', transitionColor: '#FFF'});
+                });
+                return ``;
+            }
             if (state.savedState.objectFlags.helixRivalIntro || state.randomizerState || state.savedState.objectFlags.skipRivalHelixStory) {
                 // In randomizer, set the helixRivalIntro to make sure the rival despawns from in front of the Tomb.
                 state.savedState.objectFlags.helixRivalIntro = true;

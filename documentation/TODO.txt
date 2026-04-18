@@ -147,12 +147,12 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Replace Helix rival fight with demo ending + unlock randomizer.
-        - Add weakend peach tree animation.
-        - New Rival graphics
         - Add ash tiles and apply to spirit world
+            - Map grass tiles to ash tiles
+        - Add weakened peach tree animation.
         - Review hints seem correct for campaign
         - Test randomizer hints look good.
+        - BLOCKED: New Rival graphics
 
     - Implement blocksRenders functionality and test transition state again.
 

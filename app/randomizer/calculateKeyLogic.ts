@@ -1,7 +1,7 @@
 import {getZone} from 'app/content/zones';
 import {findDoorById} from 'app/randomizer/find';
 import {getMappedEntranceData} from 'app/randomizer/utils';
-import {missingExitNodeSet, missingNodeSet, warnOnce} from 'app/randomizer/warnOnce';
+// import {missingExitNodeSet, missingNodeSet, warnOnce} from 'app/randomizer/warnOnce';
 
 export function calculateKeyLogic(randomizerState: RandomizerState): RequiredKeysMap {
     const {allNodes} = randomizerState;
@@ -76,7 +76,9 @@ function countRequiredKeysForEntrance(
             }
             const nextNode = allNodesById[path.nodeId];
             if (!nextNode) {
-                warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
+                // This warning doesn't make sense for partial seeds.
+                // This check should be done earlier.
+                // warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -112,11 +114,13 @@ function countRequiredKeysForEntrance(
                 && node.entranceIds?.includes(targetObjectId)
             );
             if (!nextNode) {
-                warnOnce(missingExitNodeSet,
+                // This warning doesn't make sense for partial seeds.
+                // This check should be done earlier.
+                /*warnOnce(missingExitNodeSet,
                     zone.key + '::' + exitObject.id + ' => '
                     + exitObject.targetZone + '::' + exitObject.targetObjectId,
                     'Missing node for exit: '
-                );
+                );*/
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {

@@ -6,7 +6,7 @@ import {
     findDoorById,
     findReachableNodes,
 } from 'app/randomizer/find';
-import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
+import {missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
 import {cloneDeep} from 'app/utils/index';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 
@@ -240,7 +240,9 @@ export function verifyNodeConnections(randomizerState: RandomizerState) {
         for (const path of (currentNode.paths || [])) {
             const nextNode = allNodesById[path.nodeId];
             if (!nextNode) {
-                warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
+                // This warning doesn't make sense for partial seeds.
+                // This check should be done earlier.
+                // warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
                 continue;
             }
         }
@@ -260,10 +262,12 @@ export function verifyNodeConnections(randomizerState: RandomizerState) {
                 && node.entranceIds?.includes(targetObjectId)
             );
             if (!nextNode) {
-                warnOnce(missingExitNodeSet,
+                // This warning doesn't make sense for partial seeds.
+                // This check should be done earlier.
+                /*warnOnce(missingExitNodeSet,
                     zone.key + '::' + exitObject.id + ' => '
                     + targetZone + '::' + targetObjectId + `(original ${exitObject.targetZone}::${exitObject.targetObjectId}`,
-                    'Missing node for exit: ');
+                    'Missing node for exit: ');*/
                 continue;
             }
         }

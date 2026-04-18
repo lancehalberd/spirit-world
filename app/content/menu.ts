@@ -4,6 +4,7 @@ import {
     settingsGear, simpleMap,
 } from 'app/content/loot';
 import {useConsumable} from 'app/content/lootEffects';
+import {CHAKRAM_2_NAME} from 'app/gameConstants';
 import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showSettingsScene} from 'app/scenes/settings/settingsScene';
 import {showMessage, showSimpleMessage} from 'app/scriptEvents';
@@ -160,7 +161,7 @@ const chakramMenuOption: MenuElement = {
 
 const goldChakramMenuOption: MenuElement = {
     ...elementGeometry,
-    getLabel: () => 'Gold Chakram',
+    getLabel: () => CHAKRAM_2_NAME,
     isVisible: (state: GameState) => !!(state.hero.savedData.weapon & 2),
     render(context: CanvasRenderingContext2D, state: GameState) {
         drawFrameCenteredAt(context, getLootFrame(state, {lootType: 'weapon', lootLevel: 2}), this);

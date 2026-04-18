@@ -1,6 +1,7 @@
 import {resetZoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
 import {SPAWN_LOCATION_FULL, SPAWN_LOCATION_WATERFALL_VILLAGE} from 'app/content/spawnLocations';
 import {showHint} from 'app/content/hints';
+import {RIVAL_NAME} from 'app/gameConstants';
 import {generateZoneVariations} from 'app/generator/generateZoneVariations';
 import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
@@ -170,7 +171,7 @@ const pointsGoalOption: FileSelectOption = {
 };
 
 function getBossChoices(state: GameState) {
-    return state.isDemoMode ? ['None', 'Guardian', 'Saru'] : ['None', 'Guardian', 'Saru', 'Beasts', 'Void Tree'];
+    return state.isDemoMode ? ['None', 'Guardian', RIVAL_NAME] : ['None', 'Guardian', RIVAL_NAME, 'Beasts', 'Void Tree'];
 }
 const bossGoalOption: FileSelectOption = {
     onLeft(state: GameState, scene: FileSelectScene) {
