@@ -78,6 +78,10 @@ export class Door implements ObjectInstance {
     alwaysReset = true;
     updateDuringTransition = true;
     area: AreaInstance;
+    // Door's with status 'enemyClosed' are assumed to be open until we confirm an
+    // enemy is present. This flag is set in that case to prevent the door from opening
+    // again during logic refreshes, which can trigger invalid door opening/closing sound effects.
+    blockingEnemiesConfirmed: boolean = false;
     //drawPriority: DrawPriority = 'background';
     getDrawPriority(state: GameState): DrawPriority {
         if (this.style.getDrawPriority) {
@@ -136,7 +140,7 @@ export class Door implements ObjectInstance {
                 }
                 this.changeStatus(state, 'normal');
             }
-        } else if (this.definition.status === 'closedEnemy') {
+        } else if (this.definition.status === 'closedEnemy' && !this.blockingEnemiesConfirmed) {
             // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
             // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
             // door where the enemies are already defeated (or there are not yet enemies).
@@ -258,6 +262,9 @@ export class Door implements ObjectInstance {
             return;
         }
         this.status = status;
+        if (this.status === 'closedEnemy') {
+            this.blockingEnemiesConfirmed = true;
+        }
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
         }
