@@ -430,11 +430,11 @@ const f0_1x0: AreaDefinition = {
                     [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,849],
                     [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,851],
                     [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,849],
-                    [,,,,,,,,,,,,,,,,,,],
-                    [,,,,,,,,,,,,,,,,,,,],
-                    [,,,,,,,,,,,,,,,,,,,,],
                     [,,,,,,,,,,,,,,,,,],
                     [,,,,,,,,,,,,,,,,,,],
+                    [,,,,,,,,,,,,,,,,,,,],
+                    [,,,,,,,,,,,,,,,,],
+                    [,,,,,,,,,,,,,,,,,],
                     [],
                     [],
                     [],
@@ -1547,7 +1547,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "treeVillage:1:0x0-tippable-0", x: 160, y: 176, type: "tippable"},
         {id: "", linked: false, spirit: false, status: "normal", x: 144, y: 176, type: "floorSwitch", targetObjectId: "elderPeachPiece", toggleOnRelease: false},
         {id: "elderPeachPiece", linked: false, spirit: false, status: "hiddenSwitch", x: 128, y: 112, type: "chest", lootType: "peachOfImmortalityPiece"},
-        {id: "treeVillage:1:0x0-door-0", spirit: false, status: "normal", x: 304, y: 112, type: "door", style: "cavern", d: "right"},
+        {id: "cellarDoor", spirit: false, status: "closedSwitch", x: 304, y: 112, type: "door", style: "cavern", d: "right"},
         {status: "normal", id: "vanaraStorageStairs", x: 432, y: 400, type: "door", style: "cavernUpstairs", targetZone: "treeVillage", targetObjectId: "vanaraStorageStairs", d: "up"},
         {status: "normal", id: "treeVillageStagBeetle", x: 376, y: 520, type: "enemy", enemyType: "beetleHorned", d: "up", saveStatus: "forever", params: {}},
         {status: "normal", id: "treeVillageWingedBeetle", x: 528, y: 472, type: "enemy", enemyType: "beetleWinged", d: "up", saveStatus: "forever", params: {}},
@@ -1564,6 +1564,8 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 400, y: 464, type: "pushPull"},
         {status: "normal", id: "", x: 400, y: 448, type: "tippable"},
         {status: "closedSwitch", id: "elderBasementSealedDoor", x: 592, y: 112, type: "door", style: "cavern", d: "right", saveStatus: "forever", linked: true, spirit: false},
+        {id: "", spirit: false, status: "normal", x: 208, y: 144, type: "crystalSwitch", timer: 0, targetObjectId: "cellarDoor"},
+        {id: "", spirit: false, status: "normal", x: 268, y: 84, type: "crystalSwitch", timer: 0, targetObjectId: "cellarDoor"},
     ],
     sections: [
         {x: 0, y: 0, w: 20, h: 20, index: 1103, dark: 100, mapId: 'forest', entranceId: 'elderEntrance', mapX: 2, mapY: 2},
@@ -2828,8 +2830,8 @@ const f0_2x2: AreaDefinition = {
         {status: "closed", id: "", linked: true, spirit: false, x: 0, y: 80, type: "door", style: "stone", d: "left"},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 20, index: 1081, mapId: 'forestTemple', floorId: '1F', mapX: 4, mapY: 4},
-        {x: 0, y: 20, w: 40, h: 20, index: 1082, mapId: 'forestTemple', floorId: '1F', mapX: 4, mapY: 5},
+        {x: 0, y: 0, w: 40, h: 20, index: 500, mapId: 'forestTemple', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 20, w: 40, h: 20, index: 619, mapId: 'forestTemple', floorId: '1F', mapX: 4, mapY: 5},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -3901,7 +3903,7 @@ const sf0_2x1: AreaDefinition = {
         {x: 0, y: 0, w: 20, h: 20, index: 1077, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 2},
         {x: 20, y: 0, w: 20, h: 20, index: 1078, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 5, mapY: 2},
         {x: 0, y: 20, w: 20, h: 20, index: 1079, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 3},
-        {x: 20, y: 20, w: 20, h: 20, index: 1080, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 5, mapY: 3},
+        {x: 20, y: 20, w: 20, h: 20, index: 296, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 5, mapY: 3},
     ],
 };
 const sf0_0x2: AreaDefinition = {
@@ -4313,7 +4315,7 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "", x: 160, y: 183, type: "decoration", d: "down", w: 16, h: 16, decorationType: "glassWall", linked: true, spirit: false},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 20, index: 1085, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 40, h: 20, index: 289, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 4},
         {x: 0, y: 20, w: 40, h: 20, index: 1086, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 5.5},
     ],
 };
@@ -4351,8 +4353,8 @@ const sf0_2x2: AreaDefinition = {
         {status: "locked", id: "forestTempleLock1", x: 432, y: 64, type: "keyBlock", freezePlayer: false, requireAll: false},
     ],
     sections: [
-        {x: 0, y: 0, w: 40, h: 20, index: 1083, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 4},
-        {x: 0, y: 20, w: 40, h: 20, index: 1084, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 5},
+        {x: 0, y: 0, w: 40, h: 20, index: 285, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 0, y: 20, w: 40, h: 20, index: 288, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 5},
     ],
 };
 zones.forestTemple = {

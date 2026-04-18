@@ -8,6 +8,10 @@ export function getSavedGames(state: GameState, gameMode: GameMode) {
     if (gameMode === 'test') {
         return [];
     }
+    // As long as there are fewer than 10 slots, make sure there is a new empty slot at the end of the list.
+    if (state.savedRandomizerGames.length < 10 && state.savedRandomizerGames[state.savedRandomizerGames.length - 1] !== null) {
+        state.savedRandomizerGames.push(null);
+    }
     return state.savedRandomizerGames;
 }
 

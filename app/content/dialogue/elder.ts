@@ -77,6 +77,7 @@ dialogueHash.elder = {
                     style: 'vanaraGray',
                     d: 'up',
                 }) as NPC;
+                elder.hideDialogueMarker = true;
                 elder.speed = 1.5;
                 addObjectToArea(state, state.hero.area, elder);
                 state.scriptEvents.activeEvents.push({

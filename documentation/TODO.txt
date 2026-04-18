@@ -164,7 +164,6 @@ Current tasks:
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
         - hud/aetherCrystal
-        - objects/peachTreeGatherAnimation
         - objects/webBarrier
         - objects/helixTop
         - new tiles in tiles/grass (interior angles)
@@ -173,8 +172,15 @@ Current tasks:
         - tiles/ash
         - tiles/grates
         - tiles/treeHome
-        - npcs/ambrosia, npcs/elder, npcs/guardian, npcs/rival (testing only since we don't have battle sprites yet)
-            npcs/vanaraChef npcs/vanaraFarmer
+        - npcs/ambrosia
+        - npcs/vanaraChef
+        - npcs/vanaraFarmer
+        - npcs/elder
+            - Blocked until I have movement animations
+        - npcs/guardian
+            - Blocked until I have kneeling sprite for staggering
+        - npcs/rival
+            - Blocked until I have battle sprites
 
     - Fix hero can be seen behind door frame when moving south through jade interior door styles.
 

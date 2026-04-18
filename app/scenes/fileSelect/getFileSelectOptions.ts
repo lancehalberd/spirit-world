@@ -197,7 +197,7 @@ const bossGoalOption: FileSelectOption = {
 };
 
 function updateBossGoal(state: GameState, scene: FileSelectScene) {
-        const bossChoices = getBossChoices(state);
+    const bossChoices = getBossChoices(state);
     switch (bossChoices[scene.randomizerBossGoalIndex]) {
         case 'None':
             delete scene.randomizerConfig.goal.bossPoints;
@@ -218,6 +218,12 @@ function updateBossGoal(state: GameState, scene: FileSelectScene) {
             scene.randomizerConfig.goal.bossPoints = {
                 goal: 1,
                 bossPoints: {guardian: 1},
+            };
+            break;
+        case RIVAL_NAME:
+            scene.randomizerConfig.goal.bossPoints = {
+                goal: 1,
+                bossPoints: {rival2: 1},
             };
             break;
     }

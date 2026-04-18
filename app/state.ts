@@ -47,10 +47,6 @@ export function loadSavedData() {
         }
         // Enfore a limit of 10 randomizer save files.
         state.savedRandomizerGames = rawSavedGames.slice(0, 10);
-        // As long as there are fewer than 10 slots, make sure there is a new empty slot at the end of the list.
-        if (state.savedRandomizerGames.length < 10 && state.savedRandomizerGames[state.savedRandomizerGames.length - 1] !== null) {
-            state.savedRandomizerGames.push(null);
-        }
     }
     /*console.log("loaded saved data");
     console.log("normal saves", state.savedGames);

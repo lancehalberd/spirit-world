@@ -1,5 +1,5 @@
 import {
-    andLogic, canCross2Gaps, canRemoveLightStones,
+    andLogic, canCross2Gaps, canHitCrystalSwitches, canRemoveLightStones,
     hasCloudBoots, hasWeapon, hasCatEyes, hasIce, hasInvisibility,
     hasMediumRange, hasBow, hasIronBoots, hasNimbusCloud,
     orLogic,
@@ -264,8 +264,8 @@ export const treeVillageNodes: LogicNode[] = [
         zoneId: 'forestTemple',
         nodeId: 'elderDownstairs',
         checks: [
-            { objectId: 'elderPeachPiece', logic: hasMediumRange },
-            { objectId: 'treeVillageBow', logic: hasCatEyes },
+            { objectId: 'elderPeachPiece', logic: andLogic(hasCatEyes, hasMediumRange) },
+            { objectId: 'treeVillageBow', logic: andLogic(hasCatEyes, canHitCrystalSwitches) },
         ],
         entranceIds: [
             'elderUpstairs',
