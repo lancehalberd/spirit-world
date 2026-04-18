@@ -438,6 +438,7 @@ const preloadSounds = () => {
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, instanceLimit: 2},
         {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, instanceLimit: 2},
         {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 30, instanceLimit: 2},
+        {key: 'grenadeExplosion', source: 'sfx/cloneExplosion.wav', volume: 20, instanceLimit: 3, duration: 0.4},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
         //     offset: 0.2, duration: 0.3', volume: 10, instanceLimit: 2},
         {
@@ -602,6 +603,15 @@ sounds.set('fall', {
     instanceLimit: 1,
     instances: [],
 });
+sounds.set('grenade', {
+    play(target: AudioNode, time: number) {
+        playBeeps([1200, 1600, 1200, 800, 600], 0.1, this.duration, {smooth: true, taper: 0.1, swell: 0.4, type: 'sine'}, target, time);
+    },
+    duration: 0.2,
+    instanceLimit: 3,
+    instances: [],
+});
+
 sounds.set('freeze', {
     play(target: AudioNode, time: number) {
         const x = 1200;

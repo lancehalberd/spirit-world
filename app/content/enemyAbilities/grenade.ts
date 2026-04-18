@@ -1,4 +1,3 @@
-
 import {throwIceGrenadeAtLocation} from 'app/content/effects/frostGrenade';
 import {throwSeedBombAtLocation} from 'app/content/effects/grenade';
 import {getVectorToNearbyTarget} from 'app/utils/target';
@@ -17,6 +16,7 @@ export const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
         const hitbox = target.target.getHitbox();
         throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2}, {damage: 1, z: 20, source: enemy});
     },
+    globalCooldown: 200,
     cooldown: 3000,
     initialCooldown: 1000,
     initialCharges: 0,
@@ -37,6 +37,7 @@ export const seedBombAbility: EnemyAbility<NearbyTargetType> = {
         const hitbox = target.target.getHitbox();
         throwSeedBombAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2}, {damage: 2, z: 20, source: enemy});
     },
+    globalCooldown: 200,
     cooldown: 3000,
     initialCooldown: 1000,
     initialCharges: 0,

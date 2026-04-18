@@ -58,6 +58,7 @@ export function startNextBoss(state: GameState): void {
             transitionColor: '#FFF',
             newStack: [sceneHash.field, sceneHash.hud],
             onSwitch(state: GameState) {
+                delete state.transitionState;
                 enterZoneByTarget(state, 'bossRush', markerId, {instant: true});
                 fixCamera(state);
             },
@@ -113,11 +114,11 @@ function updateBestTimes(state: GameState): string {
         highScore,
     }
     let returnLines: string[] = [];
-    if (!bestTime || finishTime <= bestTime) {
+    if (!bestTime || finishTime < bestTime) {
         returnLines.push('New best time: ' + formatMinutesAndSeconds(finishTime) + '!');
         updatedBossRushData.bestTime = finishTime;
     }
-    if (!highScore || currentScore >= highScore) {
+    if (!highScore || currentScore > highScore) {
         returnLines.push('New high score: ' + currentScore + '!');
         updatedBossRushData.highScore = currentScore;
     }

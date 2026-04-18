@@ -1,6 +1,7 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {Blast} from 'app/content/effects/blast';
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 
@@ -60,9 +61,13 @@ export class FrostGrenade implements EffectInstance, Props {
             }
         }
     }
+    onInitialize(state: GameState) {
+        playAreaSound(state, this.area, 'grenade');
+    }
     // The default behavior is to just create an ice blast, but this can be changed in
     // the props to do other things.
     defaultActivate(state: GameState) {
+        playAreaSound(state, this.area, 'freeze');
         const frostBlast = new Blast({
             x: this.x,
             y: this.y,

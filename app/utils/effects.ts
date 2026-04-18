@@ -16,6 +16,7 @@ export function addEffectToArea(state: GameState, area: AreaInstance, effect: Ef
     } else {
         area.effects.push(effect);
     }
+    effect.onInitialize?.(state, true);
 }
 export function removeEffectFromArea(state: GameState, effect: EffectInstance): void {
     if (!effect.area) {

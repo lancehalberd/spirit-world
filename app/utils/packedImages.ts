@@ -506,7 +506,7 @@ const imagePacks: PackedImageData[] = [
         {x:768,y:1200,w:92,h:96,originalSource:'gfx/objects/peachTreeWeak.png',frameStrings:['184,0,92,96']},
         {x:288,y:1216,w:92,h:96,originalSource:'gfx/objects/peachTreeWeak.png',frameStrings:['92,0,92,96']},
         {x:384,y:1216,w:92,h:96,originalSource:'gfx/objects/peachTreeWeak.png',frameStrings:['0,0,92,96']},
-        {x:768,y:912,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['400,0,50,50']},
+        /*{x:768,y:912,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['400,0,50,50']},
         {x:960,y:1008,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['350,0,50,50']},
         {x:960,y:1072,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['300,0,50,50']},
         {x:960,y:1136,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['250,0,50,50']},
@@ -514,7 +514,7 @@ const imagePacks: PackedImageData[] = [
         {x:480,y:1216,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['150,0,50,50']},
         {x:544,y:1216,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['100,0,50,50']},
         {x:608,y:1216,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['50,0,50,50']},
-        {x:0,y:1232,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['0,0,50,50']},
+        {x:0,y:1232,w:50,h:50,originalSource:'gfx/objects/peachAnimation.png',frameStrings:['0,0,50,50']},*/
         {x:64,y:1232,w:32,h:32,originalSource:'gfx/objects/Pots.png',frameStrings:['8,256,32,32']},
         {x:112,y:1232,w:32,h:32,originalSource:'gfx/objects/Pots.png',frameStrings:['168,160,32,32']},
         {x:160,y:1232,w:32,h:32,originalSource:'gfx/objects/Pots.png',frameStrings:['136,160,32,32']},

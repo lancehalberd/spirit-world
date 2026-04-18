@@ -148,12 +148,9 @@ Graphics to Implement:
 Current tasks:
     - Demo blockers
         - Replace Helix rival fight with demo ending + unlock randomizer.
-        - Add new peach tree graphics
+        - Add weakend peach tree animation.
         - New Rival graphics
         - Add ash tiles and apply to spirit world
-        - High priority SFX
-            - Plant grenade explosion
-            - Frost grenade explosion
         - Review hints seem correct for campaign
         - Test randomizer hints look good.
 

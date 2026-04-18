@@ -1,6 +1,7 @@
 // import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {Blast} from 'app/content/effects/blast';
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
 import {createAnimation, drawFrameCenteredAt, getFrame, frameAnimation} from 'app/utils/animations';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {requireFrame} from 'app/utils/packedImages';
@@ -53,6 +54,9 @@ export class Grenade implements EffectInstance, Props {
     source: Enemy = this.props.source;
     activate = this.props.activate;
     constructor(public props: Props) {}
+    onInitialize(state: GameState) {
+        playAreaSound(state, this.area, 'grenade');
+    }
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -74,6 +78,7 @@ export class Grenade implements EffectInstance, Props {
     }
     // The default behavior is to just create a blast.
     defaultActivate(state: GameState) {
+        playAreaSound(state, this.area, 'grenadeExplosion');
         const blast = new Blast({
             x: this.x,
             y: this.y,

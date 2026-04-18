@@ -7,12 +7,10 @@ import {clamp} from 'app/utils/index';
 import {addObjectToArea} from 'app/utils/objects';
 
 const peachTreeGeometry: FrameDimensions ={w: 92, h: 96, content: {x: 0, y: 72, w: 90, h: 20}};
-const peachTreeAnimation = createAnimation('gfx/objects/peachTree.png', peachTreeGeometry, {cols: 5});
-const peachTreeGatheringAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {cols: 5, loop: true});
 const peachTreeWeakAnimation = createAnimation('gfx/objects/peachTreeWeak.png', peachTreeGeometry, {cols: 5, duration: 20});
 const peachTreeDeathAnimation = createAnimation('gfx/objects/peachTreeDeath.png', peachTreeGeometry, {x: 5, cols: 18});
 //const peachTreeDeadFrame = peachTreeDeathAnimation.frames[peachTreeDeathAnimation.frames.length - 1];
-const peachGeometry: FrameDimensions ={w: 50, h: 50, content: {x: 17, y: 17, w: 16, h: 16}};
+const peachGeometry: FrameDimensions ={w: 48, h: 48, content: {x: 16, y: 16, w: 16, h: 16}};
 const peachAnimation = createAnimation('gfx/objects/peachAnimation.png', peachGeometry, {cols: 9});
 
 
@@ -21,6 +19,23 @@ const peachTreeFrame = requireFrame('gfx/objects/peachTree2.png', {x: 0, y: 0, .
 const peachTreeDeadFrame = requireFrame('gfx/objects/peachTreeDead.png', {x: 0, y: 0, ...newPeachTreeGeometry});
 // const peachTreeEnergyAnimation = createAnimation('gfx/objects/peachTreeCondensed22.png', newPeachTreeGeometry, {cols: 22, duration: 20});
 const peachTreeEnergyAnimation = createAnimation('gfx/objects/peachTreeCondensed16.png', newPeachTreeGeometry, {cols: 16, duration: 20});
+const cols = 5360 / 80;
+const peachTreeGatherEnergyToRoots
+    = createAnimation('gfx/objects/peachTreeGatherAnimation.png', newPeachTreeGeometry, {y: 0, cols, duration: 2});
+const peachTreeGatherEnergyToBranch
+    = createAnimation('gfx/objects/peachTreeGatherAnimation.png', newPeachTreeGeometry, {y: 3, cols, duration: 3});
+/*const peachTreeGatherEnergyAnimations = [
+    // Thin lines going down
+    createAnimation('gfx/objects/peachTreeGatherAnimation.png', newPeachTreeGeometry, {y: 0, cols, duration: 1}),
+    // Glowing lines going down
+    //createAnimation('gfx/objects/peachTreeGatherAnimation.png', newPeachTreeGeometry, {y: 1, cols, duration: 5}),
+    // Thin lines going up
+    //createAnimation('gfx/objects/peachTreeGatherAnimation.png', newPeachTreeGeometry, {y: 2, cols, duration: 1}),
+    // Glowing lines going up
+    createAnimation('gfx/objects/peachTreeGatherAnimation.png', newPeachTreeGeometry, {y: 3, cols, duration: 5}),
+];*/
+
+
 
 const peachLightColor = {r:255, g: 200, b: 0};
 export class PeachTree implements ObjectInstance {
@@ -52,10 +67,10 @@ export class PeachTree implements ObjectInstance {
             return lightSources;
         }
         if (this.peachAnimationTime >= 0) {
-            const p = Math.min(1, this.peachAnimationTime / 400);
+            const p = Math.min(1, this.peachAnimationTime / peachAnimation.duration);
             lightSources.push({
-                x: this.x + 48,
-                y: this.y - 30,
+                x: this.x + 31,
+                y: this.y - 50,
                 brightness: 0.8 * p,
                 radius: 24 * p,
                 color: peachLightColor,
@@ -98,12 +113,16 @@ export class PeachTree implements ObjectInstance {
         return getFrameHitbox(peachTreeDeadFrame, this);
     }
     update(state: GameState) {
+        /*if (this.animationTime > 2000) {
+            this.growPeach(state);
+        }*/
         this.animationTime += FRAME_LENGTH;
         if (this.peachAnimationTime >= 0) {
             this.peachAnimationTime += FRAME_LENGTH;
             if (this.peachAnimationTime >= peachAnimation.duration) {
                 this.peachAnimationTime = -1;
-                const peach = new LootObject(state, {id: 'peachCave:fullPeach', type: 'loot', lootType: 'peachOfImmortality', x: this.x + 40, y: this.y + 24, z: 56});
+                const peach = new LootObject(state, {id: 'peachCave:fullPeach', type: 'loot', lootType: 'peachOfImmortality',
+                    x: this.x + 23, y: this.y + 20, z: 78});
                 // Make the glow of the peach item match the glow used by the tree.
                 peach.lightColor = peachLightColor;
                 peach.time = 2000;
@@ -126,12 +145,8 @@ export class PeachTree implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        let frame = getFrame(peachTreeAnimation, this.animationTime);
-        if (this.specialStatus === 'gathering') {
-            frame = getFrame(peachTreeGatheringAnimation, this.animationTime);
-            // TODO: Add new gathering animation.
-            frame = peachTreeFrame;
-        } else if (this.specialStatus === 'dying') {
+        let frame = peachTreeFrame;
+         if (this.specialStatus === 'dying') {
             frame = getFrame(peachTreeDeathAnimation, this.animationTime);
             // TODO: Add new dying animation.
             frame = peachTreeFrame;
@@ -143,12 +158,44 @@ export class PeachTree implements ObjectInstance {
             frame = peachTreeFrame;
         }
         drawFrameContentAt(context, frame, this);
-        if (frame !== peachTreeDeadFrame) {
+        if (this.specialStatus === 'gathering') {
+            let waves = 3;
+            for (let waveIndex = 0; waveIndex < waves; waveIndex++) {
+                const animation = peachTreeGatherEnergyToRoots;
+                const frameDuration = FRAME_LENGTH * animation.frameDuration;
+                context.save();
+                    context.globalAlpha *= 0.8;
+                    blurFrames(context, animation, this.animationTime + waveIndex * animation.duration / waves, 2 * frameDuration,
+                        (context: CanvasRenderingContext2D, frame: Frame) => {
+                            drawFrameContentAt(context, frame, this);
+                        },
+                    );
+                context.restore();
+            }
+            waves = 6;
+            for (let waveIndex = 0; waveIndex < waves; waveIndex++) {
+                const animation = peachTreeGatherEnergyToBranch;
+                const frameDuration = FRAME_LENGTH * animation.frameDuration;
+                context.save();
+                    context.globalAlpha *= 0.8;
+                    blurFrames(context, animation, this.animationTime + waveIndex * animation.duration / waves, 2 * frameDuration,
+                        (context: CanvasRenderingContext2D, frame: Frame) => {
+                            drawFrameContentAt(context, frame, this);
+                        },
+                    );
+                context.restore();
+            }
+        } else if (frame !== peachTreeDeadFrame) {
             const frameDuration = FRAME_LENGTH * peachTreeEnergyAnimation.frameDuration;
             // Fade the next frame in over time
             context.save();
                 context.globalAlpha *= 0.8;
-                context.save();
+                blurFrames(context, peachTreeEnergyAnimation, this.animationTime, 2 * frameDuration,
+                    (context: CanvasRenderingContext2D, frame: Frame) => {
+                        drawFrameContentAt(context, frame, this);
+                    },
+                );
+                /*context.save();
                     context.globalAlpha *= clamp((this.animationTime % frameDuration) / frameDuration / 2, 0, 0.5);
                     frame = getFrame(peachTreeEnergyAnimation, this.animationTime + 2 * frameDuration);
                     drawFrameContentAt(context, frame, this);
@@ -171,13 +218,41 @@ export class PeachTree implements ObjectInstance {
                     context.globalAlpha *= clamp(0.5 - (this.animationTime % frameDuration) / frameDuration / 2, 0, 0.5);
                     frame = getFrame(peachTreeEnergyAnimation, this.animationTime - 2 * frameDuration);
                     drawFrameContentAt(context, frame, this);
-                context.restore();
+                context.restore();*/
             context.restore();
         }
         if (this.peachAnimationTime >= 0) {
             frame = getFrame(peachAnimation, this.peachAnimationTime);
-            drawFrameContentAt(context, frame, {x: this.x + 40, y: this.y - 32});
+            drawFrameContentAt(context, frame, {x: this.x + 23, y: this.y - 58});
         }
+    }
+}
+
+function blurFrames(
+    context: CanvasRenderingContext2D,
+    animation: FrameAnimation,
+    animationTime: number,
+    // In milliseconds.
+    blurRadius: number,
+    drawFrame: (context: CanvasRenderingContext2D, frame: Frame) => void
+) {
+    const frameDuration = FRAME_LENGTH * animation.frameDuration;
+    const startFrame = ((animationTime - blurRadius) / frameDuration | 0);
+    const endFrame = ((animationTime + frameDuration + blurRadius) / frameDuration | 0);
+    for (let frameIndex = startFrame; frameIndex <= endFrame; frameIndex++) {
+        context.save();
+            // Frame is at full opacity for the period of [frameIndex * frameDuration, (frameIndex + 1) * frameDuration]
+            // and fades out to 0 after blurRadius ms
+            const frameStartTime = frameIndex * frameDuration;
+            const frameEndTime = frameStartTime + frameDuration;
+            if (animationTime < frameStartTime) {
+                context.globalAlpha *= clamp(1 - (frameStartTime - animationTime) / blurRadius, 0, 1);
+            } else if (animationTime > frameEndTime) {
+                context.globalAlpha *= clamp(1 - (animationTime - frameEndTime) / blurRadius, 0, 1);
+            }
+            const frame = getFrame(animation, frameIndex * frameDuration);
+            drawFrame(context, frame);
+        context.restore();
     }
 }
 
