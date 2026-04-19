@@ -47,7 +47,7 @@ export const womanAnimations: ActorAnimations = createHumanNpcActorAnimations({
     shoes: 1,
 });
 
-export const ambrosiaAnimations: ActorAnimations = createHumanNpcActorAnimations({
+export const woman2Animations: ActorAnimations = createHumanNpcActorAnimations({
     isWoman: true,
     skin: 2,
     hairColor: 0,
@@ -364,4 +364,11 @@ const blacksmithTwoImage: string = 'gfx/npcs/blacksmithTwo.png';
 const blacksmithTwoGeometry: FrameDimensions = {w: 36, h: 36, content: {x: 10, y: 20, w: 16, h: 16}};
 export const blacksmithTwoAnimations: ActorAnimations = {
     idle: omniAnimation(createAnimation(blacksmithTwoImage, blacksmithTwoGeometry, {y: 2})),
+};
+
+
+const ambrosiaImage: string = 'gfx/npcs/ambrosia.png';
+const ambrosiaGeometry: FrameDimensions = {w: 19, h: 27, content: {x: 3, y: 17, w: 14, h: 10}};
+export const ambrosiaAnimations: ActorAnimations = {
+    idle: omniAnimation(createAnimation(ambrosiaImage, ambrosiaGeometry, {y: 0})),
 };
