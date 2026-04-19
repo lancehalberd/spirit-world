@@ -43,34 +43,35 @@ import {
     topRightWall,
     unliftableStoneBehavior,
 } from 'app/content/tiles/constants';
-import { paletteHash } from 'app/content/tiles/paletteHash';
+import {paletteHash} from 'app/content/tiles/paletteHash';
+import {allAshTiles} from 'app/content/tiles/ash';
 import {
     allCavePitTileSources,
     cavePitHorizontalWalls,
     cavePitAngledWallsIn,
     cavePitAngledWallsOut,
 } from 'app/content/tiles/cavePits';
-import { allCrystalCavePitTileSources, crystalCaveWallToPitTileSources } from 'app/content/tiles/crystalCavePits';
+import {allCrystalCavePitTileSources, crystalCaveWallToPitTileSources} from 'app/content/tiles/crystalCavePits';
 import {allCrystalCaveTileSources, crystalTransparentFloor} from 'app/content/tiles/crystalCaveTiles';
 import {allCrystalSpikeTiles} from 'app/content/tiles/crystalSpikes';
-import { allDesertTileSources } from 'app/content/tiles/desertTiles';
-import { allFancyStoneCeilingTileSources } from 'app/content/tiles/fancyStoneTiles';
-import { allFuturisticTileSources } from 'app/content/tiles/futuristicTiles';
+import {allDesertTileSources} from 'app/content/tiles/desertTiles';
+import {allFancyStoneCeilingTileSources} from 'app/content/tiles/fancyStoneTiles';
+import {allFuturisticTileSources} from 'app/content/tiles/futuristicTiles';
 import {allFlowerTiles, allGardenTiles} from 'app/content/tiles/garden';
 import {allGrassTiles} from 'app/content/tiles/grass';
 import {rugTiles} from 'app/content/tiles/houseInterior';
-import { lava, lavaBubbles, lavaStone } from 'app/content/tiles/lava';
+import {lava, lavaBubbles, lavaStone} from 'app/content/tiles/lava';
 import {allMossTiles} from 'app/content/tiles/moss';
-import { allObsidianTileSources } from 'app/content/tiles/obsidianTiles';
-import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
-import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
-import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
+import {allObsidianTileSources} from 'app/content/tiles/obsidianTiles';
+import {allStoneTileSources} from 'app/content/tiles/stoneTiles';
+import {allStoneCeilingTileSources} from 'app/content/tiles/stoneCeilingTiles';
+import {allStoneExteriorTileSources} from 'app/content/tiles/stoneExteriorTiles';
 import {allVanaraPitTileSources, vanaraAngledPits} from 'app/content/tiles/vanaraPits';
-import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
-import { drawFrame } from 'app/utils/animations';
-import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
-import { allImagesLoaded } from 'app/utils/images';
-import { requireFrame } from 'app/utils/packedImages';
+import {allWoodTileSources, extraWoodWalls} from 'app/content/tiles/woodTiles';
+import {drawFrame} from 'app/utils/animations';
+import {createCanvasAndContext, debugCanvas} from 'app/utils/canvas';
+import {allImagesLoaded} from 'app/utils/images';
+import {requireFrame} from 'app/utils/packedImages';
 import {
     allVanaraTileSources,
     vanaraHoleyTransitionTile,
@@ -81,8 +82,8 @@ import {
 } from 'app/content/tiles/vanaraTree'
 import {allLightJadeCityTileSources} from 'app/content/tiles/jadeCityLight';
 import {allDarkJadeCityTileSources} from 'app/content/tiles/jadeCityDark';
-import { allJadeInteriorLightTileSources } from 'app/content/tiles/jadeInteriorLight';
-import { allJadeInteriorDarkTileSources } from 'app/content/tiles/jadeInteriorDark';
+import {allJadeInteriorLightTileSources} from 'app/content/tiles/jadeInteriorLight';
+import {allJadeInteriorDarkTileSources} from 'app/content/tiles/jadeInteriorDark';
 import {bigKnobbyTreeSources, bigTreeSources, smallTreeSources} from 'app/content/tiles/trees';
 import {warnOnce} from 'app/randomizer/warnOnce';
 
@@ -1175,6 +1176,7 @@ addTiles([
     ...vanaraWallEdges,
     halves,
     ...allGrassTiles,
+    ...allAshTiles,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

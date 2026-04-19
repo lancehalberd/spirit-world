@@ -147,9 +147,8 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
+        - Skipping city cutscene opens menu, should prevent interacting the frame we skip the cutscene.
         - Fix rest of the game is accessible via Helix in the randomizer.
-        - Add ash tiles and apply to spirit world
-            - Map grass tiles to ash tiles
         - Add weakened peach tree animation.
         - BLOCKED: New Rival graphics
 
@@ -158,10 +157,8 @@ Current tasks:
         - hud/aetherCrystal
         - objects/webBarrier
         - objects/helixTop
-        - new tiles in tiles/grass (interior angles)
         - new tiles in tiles/vanara (cliff edges, large vine walls)
         - new tiles in tiles/stoneTileset (blown open doors)
-        - tiles/ash
         - tiles/grates
         - tiles/treeHome
         - npcs/vanaraChef
