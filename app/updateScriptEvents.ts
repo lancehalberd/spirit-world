@@ -30,6 +30,7 @@ export function updateScriptEvents(state: GameState): void {
     if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.scriptEvents.onSkipCutscene) {
         if ((state.scriptEvents.skipTime ?? -2000) + 2000 > state.time) {
             skipCutscene(state);
+            state.scriptEvents.handledInput = true;
         } else {
             state.scriptEvents.skipTime = state.time;
         }

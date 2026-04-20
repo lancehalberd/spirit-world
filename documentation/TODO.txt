@@ -147,7 +147,6 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Skipping city cutscene opens menu, should prevent interacting the frame we skip the cutscene.
         - Fix rest of the game is accessible via Helix in the randomizer.
         - Add weakened peach tree animation.
         - BLOCKED: New Rival graphics
@@ -185,6 +184,8 @@ Current tasks:
         Brainstorm a more rigorous entrance randomizer now that we are generating all entrances from the logic.
 
     - Implement blocksRenders functionality and test transition state again.
+
+    - Cannot skip cutscenes while message are displayed since scripts are updated in the field and the messages disable field updates by default.
 
     - Enemies that fall from the ceiling when you get close to them.
 

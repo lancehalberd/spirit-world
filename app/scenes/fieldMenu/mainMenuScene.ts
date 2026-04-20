@@ -24,6 +24,7 @@ import {
 } from 'app/scenes/fieldMenu/subMenuScenes';
 import {pushScene} from 'app/scenes/sceneHash';
 import {canPauseGame} from 'app/state';
+import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {drawFrameCenteredAt} from 'app/utils/animations';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 import {wasGameKeyPressed} from 'app/userInput';
@@ -177,7 +178,7 @@ export function showMainMenuScene(state: GameState) {
         mainMenuScene.update(state, false);
         pushScene(state, mainMenuScene);
         updateSoundSettings(state);
-    } else {
+    } else if (isKeyboardKeyDown(KEY.SHIFT)){
         showPauseScene(state);
     }
 }
