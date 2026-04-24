@@ -1,42 +1,18 @@
 import {getZoneEntranceMap} from 'app/content/dialogue/nimbusCloud';
-import {overworldKeys} from 'app/gameConstants';
-import {getAreaFromLocation} from 'app/content/areas';
-import {getZone} from 'app/content/zones';
+import {findNextNodeForExitTarget} from 'app/randomizer/find';
 import SRandom from 'app/utils/SRandom'
+import {typedKeys} from 'app/utils/types';
 
-
-// Warning: The terms entrance/exit don't seem to be used consistently in this file.
-// Going forward we will try to use "entrances" for ids like 'overworld:peachCaveEntrance' (id of the object on the overworld)
-// And "exits" for ids like 'peachCave:peachCaveEntrance' (id of the object in the peach cave.)
-
-const ignoredZones = [
+const ignoredZones = new Set([
     // These zones are part of the 'Holy Sanctum' and should not be randomized.
     'fireSanctum', 'iceSanctum', 'lightningSanctum', 'holySanctumBack',
     // The void is part of the 'Tree' zone and should not be randomized.
     'void',
-    'jadeCityInterior',
-];
+]);
 
-const zoneSets = [
-    new Set(['forestTemple', 'treeVillage', 'caves']),
-];
-
-const equivalentZones: {[key in string]: Set<string>} = {}
-for (const zoneSet of zoneSets) {
-    for (const zoneKey of zoneSet) {
-        equivalentZones[zoneKey] = zoneSet;
-    }
-}
-
-const outsideZones = overworldKeys;
-
-// This stores a list of zone+object ids that should be ignored, (not target zone+object ids).
-const disabledDoors = [
-    // Money maze isn't designed to allow entering from the exit, so just disable this door.
-    'overworld:moneyMazeExit',
-    // Neither this door or its target are reachable in the game.
-    // This door just exists as a reason for there to be corresponding cave in the spirit world.
-    'sky:hypeCaveEntrance',
+// This solves the same problem as ignoredZones except for
+// zones that are connected to outside zones.
+const disabledDoors = new Set([
     // Currently we do not randomize entrances between "outside" areas.
     'overworld:forestNorthEntrance',
     'forest:forestNorthEntrance',
@@ -46,598 +22,377 @@ const disabledDoors = [
     'forest:forestEastEntrance',
     'overworld:forestTowerEntranceSpirit',
     'forest:forestTowerEntranceSpirit',
-];
+    // treeVillage and forestTemple are considered a single zone for randomizer purposes.
+    'treeVillage:elderDownstairs',
+    'forestTemple:elderUpstairs',
+    'treeVillage:vanaraStorageStairs',
+    'forestTemple:vanaraStorageStairs',
+]);
 
-
-// These groups of entrances are not reachable except from one of the other exits, so at least
-// one needs to be connected to a reachable entrance using a connected exit group.
-const unreachableSpiritExitGroups = [
-    // There is currently a ladder leading to this cave in the Spirit World.
-    //['caves:caves-ascentExitSpirit'],   
-    ['holyCityInterior:jadeCityMazeExit'],
-    ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
-    // When the tower is placed in the forest, this exit is the only way to reach this area in the Spirit World.
-    ['staffTower:staffTowerSpiritEntrance'],
-];
-
-function getUnreachableNormalExitGroups(isDemoMode: boolean): string[][] {
-    if (isDemoMode) {
-        return [
-            ['caves:caves-ascentExit'],
-        ];
-    }
-    return [];
-}
-
-interface ConnectedExitGroup {
-    normalEntranceTargets?: string[]
-    spiritEntranceTargets?: string[]
-    immutableEntranceTargets?: string[]
-}
-
-// Exits that are logically connected. Eventually we should calculate this based on
-// exploring nodes using only paths+non zone changing entrances, but I'm hardcoding it now
-// for simplicity
-const connectedExitGroups: ConnectedExitGroup[] = [
-    {
-        normalEntranceTargets: ['overworld:peachCaveTopEntrance', 'overworld:peachCaveWaterEntrance'],
-    },
-    {
-        normalEntranceTargets: ['overworld:caves-ascentEntrance', 'sky:caves-ascentExit'],
-    },
-    {
-        normalEntranceTargets: [
-            'overworld:warTempleNortheastEntrance',
-            'overworld:warTempleEastEntrance',
-            // TODO: fix this, you cannot reach other entrances from this door.
-            'overworld:warTempleKeyDoor',
-        ],
-        // Main war temple entrance isn't actually immutable,
-        // but the other entrances don't allow exiting from it.
-        immutableEntranceTargets: ['overworld:warTempleEntrance'],
-    },
-    {
-        normalEntranceTargets: ['lakeTunnel:helixEntrance', 'sky:helixSkyEntrance'],
-    },
-    {
-        spiritEntranceTargets: ['sky:waterfallTowerTopEntrance'],
-        immutableEntranceTargets: ['overworld:waterfallTowerEntrance'],
-    },
-    {
-        normalEntranceTargets: ['overworld:riverTempleUpperEntrance'],
-        immutableEntranceTargets: ['underwater:riverTempleWaterEntrance'],
-    },
-    {
-        normalEntranceTargets: ['overworld:staffTowerEntrance', 'sky:staffTowerSkyEntrance',],
-        spiritEntranceTargets: ['overworld:staffTowerSpiritEntrance', 'sky:staffTowerSpiritSkyEntrance'],
-    },
-    // forestTempleEntranceSpirit is no longer considered randomizable because it is considered an intrazone door.
-    /*{
-        spiritEntranceTargets: ['overworld:fertilityTempleSpiritEntrance', 'forestTemple:forestTempleEntranceSpirit'],
-    },*/
-    {
-        spiritEntranceTargets: ['forest:forestTempleSoutheastLadder', 'forest:forestTempleNortheastTreeEntrance'],
-    },
-    /*
-    // Unsupported one way tunnel from  forestTempleNorthLadder -> forestTempleNortheastCaveEntrance
-    {
-        spiritEntranceTargets: ['overworld:forestTempleNortheastCaveEntrance', 'overworld:forestTempleNorthLadder'],
-    },*/
-    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
-    {
-        spiritEntranceTargets: ['overworld:caves-ascentEntranceSpirit'],
-        immutableEntranceTargets: ['sky:caves-ascentExitSpirit'],
-    },*/
-    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
-    have support for a one way tunnel, so this cannot currently function as a connected exit group.
-    {
-        spiritEntranceTargets: ['overworld:jadeCityMazeExit'],
-        // It is not possible to reach the entrance door when entering from the exit door.
-        immutableEntranceTargets: ['overworld:jadeCityWestDoor'],
-    },*/
-    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
-    have support for a one way tunnel, so this cannot currently function as a connected exit group.
-    {
-        spiritEntranceTargets: ['overworld:cloneCaveExit'],
-        // It is not possible to reach the entrance door when entering from the exit door.
-        immutableEntranceTargets: ['overworld:cloneCaveEntrance'],
-    },*/
-];
-
-const demoConnectedExitGrops = [
-    {
-        normalEntranceTargets: ['overworld:peachCaveWaterEntrance'],
-        // Not actually immutable, but in the demo, you cannot reach this exit from the water entrance
-        // as Iron Boots or Clone Tool are required for this.
-        immutableEntranceTargets: ['overworld:peachCaveTopEntrance'],
-    },
-    {
-        normalEntranceTargets: ['overworld:caves-ascentEntrance', 'sky:caves-ascentExit'],
-    },
-    {
-        normalEntranceTargets: [
-            'overworld:warTempleNortheastEntrance',
-            'overworld:warTempleEastEntrance',
-            // TODO: fix this, you cannot reach other entrances from this door.
-            'overworld:warTempleKeyDoor',
-        ],
-        // Main war temple entrance isn't actually immutable,
-        // but the other entrances don't allow exiting from it.
-        immutableEntranceTargets: [
-            'overworld:warTempleEntrance',
-        ],
-    },
-];
-
-// Loopable entrance pairs occur when a zone contains both an entrance and an exit.
-// If such a zone pairs its entrance and exit together, or multiple zones form a loop,
-// then they will disconnected from the rest of the map.
-const normalLoopableEntrancePairs = [
-    // Tomb -> Cocoon
-    {outerTarget: 'overworld:tombEntrance', innerTarget: 'cocoon:cocoonEntrance'},
-    // Lake Tunnel -> Helix
-    {outerTarget: 'overworld:lakeTunnelEntrance', innerTarget: 'helix:helixEntrance'},
-    // Grand temple -> Gauntlet
-    {outerTarget: 'overworld:grandTempleEntrance', innerTarget: 'gauntlet:gauntletEntrance'},
-];
-const demoNormalLoopableEntrancePairs = [
-    // Tomb -> Cocoon
-    {outerTarget: 'overworld:tombEntrance', innerTarget: 'cocoon:cocoonEntrance'},
-];
-const spiritLoopableEntrancePairs = [
-    // Elder Spirit -> Forest Temple Back
-    // {outerTarget: 'forest:elderSpiritEntrance', innerTarget: 'forestTemple:forestTempleBackDoor'},
-    // War Temple Spirit -> Lab
-    {outerTarget: 'overworld:warTempleEntranceSpirit', innerTarget: 'lab:labEntrance'},
-    // Lab -> Tree
-    {outerTarget: 'warTemple:labEntrance', innerTarget: 'tree:treeEntrance'},
-    // Jade Palace -> Holy Sanctum
-    {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
-];
-
-export function initializeEntranceRandomizer(randomizerState: RandomizerState, isDemoMode: boolean) {
+export function randomizeEntrances(randomizerState: RandomizerState) {
+    const {allEntrances, allNodesById} = randomizerState;
     randomizerState.entrances = {
         entranceAssignments: {},
         random: SRandom.seed(randomizerState.entranceSeed),
-        connectedNormalEntrances: new Set<string>(),
-        connectedSpiritEntrances: new Set<string>(),
-        normalEntrances: new Set<string>(),
-        spiritEntrances: new Set<string>(),
-        waterEntrances: new Set<string>(),
-        normalExits: new Set<string>(),
-        spiritExits: new Set<string>(),
-        waterExits: new Set<string>(),
-        normalPitEntrances: [],
-        spiritPitEntrances: [],
-        normalPitTargets: new Set<string>(),
-        spiritPitTargets: new Set<string>(),
-        targetIdMap: {},
-        allTargetedKeys: new Set<string>(),
         fixedNimbusCloudZones: new Set<string>(),
-        forbiddenNormalExitsKeysByEntranceKey: {},
-        forbiddenSpiritExitsKeysByEntranceKey: {},
-        allUnreachableNormalExits: [],
-        allUnreachableSpiritExits: [],
+        targetIdMap: {},
     };
-
-    const {
-        allTargetedKeys,
-        allUnreachableNormalExits,
-        allUnreachableSpiritExits,
-        targetIdMap,
-        normalEntrances,
-        normalExits,
-        spiritEntrances,
-        spiritExits,
-        waterEntrances,
-        waterExits,
-        connectedNormalEntrances,
-        connectedSpiritEntrances,
-        normalPitEntrances,
-        normalPitTargets,
-        spiritPitEntrances,
-        spiritPitTargets,
-    } = randomizerState.entrances;
-    // Previously we read every object in the game, but to support limited game
-    // modes like the demo randomizer, we switched to the set of entrances that
-    // were found when building the set of nodes/items/entrances for the current game mode.
-    //everyObject((location, zone: Zone, area: AreaDefinition, object) => {
-    for (const doorLocation of randomizerState.allEntrances) {
-        const location = doorLocation.location;
-        const zone = getZone(location.zoneKey);
-        const area = getAreaFromLocation(location);
-        const object = doorLocation.definition;
-        const targetKey = `${object.targetZone}:${object.targetObjectId}`;
-        /*console.log(targetKey);
-        if (targetKey === 'holyCityInterior:jadeCityMazeExit' || targetKey === 'sky:waterfallTowerTopEntrance') {
-            debugger;
-        }*/
-        if (ignoredZones.includes(zone.key)) {
+    const {entranceAssignments, random, targetIdMap} = randomizerState.entrances;
+    // This will be the set of all entrance ids that are targeted by entrances available in the seed.
+    // If an entrance ID appears on a LogicNode but is not in this set, it means that the entrance is not reachable
+    // for the current game settings. For example, the entrance that leads to the Grand Temple is on the holy city
+    // overworld node, but it is not reachable in the demo because the player can never reach the entrance inside
+    // the Grand Temple that connects to it, so this entrance should be ignored by the entrance randomizer.
+    const allAssignableEntranceIds = new Set<string>();
+    const entrancesById: {[key in string]: DoorLocation} = {};
+    // Assign all entrances that are considered to be connecting areas within the same zone so that they will not be
+    // randomized. We can remove this step if we want to support door randomizers that can scramble the internal
+    // contents of dungeons, although we would want to handle the implications for key logic and setting LogicalZone
+    // that would be caused by this
+    const entranceIds = new Set<string>();
+    const exitIds = new Set<string>();
+    for (const doorLocation of allEntrances) {
+        entrancesById[doorLocation.key] = doorLocation;
+        const definition = doorLocation.definition;
+        if (!isEntranceDefinition(definition)) {
             continue;
         }
-        if (object.type === 'pitEntrance') {
-            if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
-                continue;
-            }
-            if (area.isSpiritWorld) {
-                spiritPitTargets.add(targetKey);
-                spiritPitEntrances.push({location, definition: object});
-            } else {
-                normalPitTargets.add(targetKey);
-                normalPitEntrances.push({location, definition: object});
-            }
-            continue;
-        }
-        if (object.type !== 'door' && object.type !== 'staffTower' && object.type !== 'helixTop') {
-            continue;
-        }
-        if (!object.targetZone || object.targetZone === zone.key || equivalentZones[zone.key]?.has(object.targetZone)) {
-            continue;
-        }
-        if (ignoredZones.includes(object.targetZone)) {
-            continue;
-        }
-        const key = `${zone.key}:${object.id}`;
-        if (!object.id) {
-            console.log('missing object ID:', key, targetKey);
-        }
-        if (disabledDoors.includes(key) || disabledDoors.includes(targetKey)) {
-            continue;
-        }
-        targetIdMap[targetKey] = targetIdMap[targetKey] || [];
-        targetIdMap[targetKey].push({ definition: object, location });
-        allTargetedKeys.add(targetKey);
-        if (zone.surfaceKey && !area.isSpiritWorld) {
-            if (zone.key === 'underwater') {
-                waterExits.add(targetKey);
-            } else {
-                waterEntrances.add(targetKey);
-            }
-            continue;
-        }
-        if (outsideZones.includes(zone.key)
-            // There are a few special "entrances" inside other zones
-            || zone.key === 'tomb' && object.targetZone === 'cocoon'
-            //|| zone.key === 'treeVillage' && object.targetZone === 'forestTemple'
-            || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
-            || zone.key === 'warTemple' && object.targetZone === 'lab'
-            || zone.key === 'lab' && object.targetZone === 'tree'
-            || zone.key === 'grandTemple' && object.targetZone === 'gauntlet'
-            || zone.key === 'grandTemple' && object.targetZone === 'holySanctum'
+        targetIdMap[doorLocation.originalTargetKey] = targetIdMap[doorLocation.originalTargetKey] ?? [];
+        targetIdMap[doorLocation.originalTargetKey].push(doorLocation);
+        if (disabledDoors.has(doorLocation.key)
+            || ignoredZones.has(doorLocation.location.zoneKey)
+            || ignoredZones.has(definition.targetZone)
+            || doorLocation.location.zoneKey === definition.targetZone
         ) {
-            if (outsideZones.includes(zone.key)) {
-                if (area.isSpiritWorld) {
-                   connectedSpiritEntrances.add(targetKey);
-                } else {
-                   connectedNormalEntrances.add(targetKey);
-                }
-            }
-            if (area.isSpiritWorld) {
-                spiritExits.add(targetKey);
-            } else {
-                normalExits.add(targetKey);
-            }
-        } else {
-            if (area.isSpiritWorld) {
-                spiritEntrances.add(targetKey);
-            } else {
-                normalEntrances.add(targetKey);
-            }
-        }
-    }
-    if (normalEntrances.size !== normalExits.size) {
-        console.error(`initial normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
-        console.error([...normalEntrances]);
-        console.error([...normalExits]);
-        return;
-    }
-    if (spiritEntrances.size !== spiritExits.size) {
-        console.error(`initial spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
-        console.error([...spiritEntrances]);
-        console.error([...spiritExits]);
-        return;
-    }
-
-    // Collect a list of all unreachable spirit entrance targets so we can easily exclude them from invalid assignments.
-    for (const unreachableExit of unreachableSpiritExitGroups) {
-        allUnreachableSpiritExits.push(...unreachableExit);
-    }
-    for (const unreachableExit of getUnreachableNormalExitGroups(isDemoMode)) {
-        allUnreachableNormalExits.push(...unreachableExit);
-    }
-}
-
-export function randomizeEntrances(randomizerState: RandomizerState, isDemoMode: boolean) {
-    const {
-        entranceAssignments,
-        allTargetedKeys,
-        normalEntrances,
-        normalExits,
-        spiritEntrances,
-        spiritExits,
-        waterEntrances,
-        waterExits,
-        connectedNormalEntrances,
-        connectedSpiritEntrances,
-        normalPitEntrances,
-        normalPitTargets,
-        spiritPitEntrances,
-        spiritPitTargets,
-        random,
-        forbiddenNormalExitsKeysByEntranceKey,
-        forbiddenSpiritExitsKeysByEntranceKey,
-        allUnreachableNormalExits,
-        allUnreachableSpiritExits,
-    } = randomizerState.entrances;
-
-
-    //console.log('EXIT ONLY ENTRANCE ASSIGNMENTS:');
-    // Assign all unreachable entrances first to a random entrance with other connections.
-    // Currently this is only done for the Spirit World as the only unreachable exit in the material world
-    // is the top of the money maze which has no checks or other entrances.
-    // The spirit world is not accessible in demo mode, so we just skip this section.
-    for (const unreachableNormalExits of getUnreachableNormalExitGroups(isDemoMode)) {
-        // Choose one entrance in the group to assign as a forced connection through a reachable
-        // exit.
-        const unreachableNormalExit = random.shuffle(unreachableNormalExits)[0];
-        if (!allTargetedKeys.has(unreachableNormalExit)) {
-            console.error('Exit ID not found, was it moved or removed?', unreachableNormalExit);
-            debugger;
-        }
-        for (const exitGroup of random.shuffle(isDemoMode ? demoConnectedExitGrops : connectedExitGroups)) {
-            const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
-            const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
-            const immutableExits = exitGroup.immutableEntranceTargets?.length ?? 0;
-            // Must have a normal exit to connect to a normal unreachable entrance.
-            if (!normalExits
-                // Must have more than one assignable exit if we are going to assign one to an unreachable entrance.
-                || spiritExits + normalExits + immutableExits < 2
-            ) {
-                continue;
-            }
-            const normalEntrance = random.removeElement(exitGroup.normalEntranceTargets);
-            if (!allTargetedKeys.has(normalEntrance)) {
-                console.error('Entrance ID not found, was it moved or removed?', normalEntrance);
-                debugger;
-            }
-            assignEntranceExitPair(randomizerState, unreachableNormalExit, normalEntrance);
-            // If only normal world exits remain, mark them all as forbidden to match with
-            // any other unreachable normal entrance targets, otherwise this strategy may fail
-            // to actually connect this unreachable exit group to reachable areas.
-            // For example, it may pair the other end with another unreachable exit group or even to
-            // another door in the same unreachable exit group.
-            if (spiritExits + immutableExits <= 0) {
-                for (const otherEntrance of exitGroup.normalEntranceTargets) {
-                    forbiddenNormalExitsKeysByEntranceKey[otherEntrance] = allUnreachableNormalExits;
-                }
-            }
-            break;
-        }
-    }
-    for (const unreachableSpiritExits of isDemoMode ? [] : unreachableSpiritExitGroups) {
-        // Choose one entrance in the group to assign as a forced connection through a reachable
-        // exit.
-        const unreachableSpiritExit = random.shuffle(unreachableSpiritExits)[0];
-        if (!allTargetedKeys.has(unreachableSpiritExit)) {
-            console.error('Exit ID not found, was it moved or removed?', unreachableSpiritExit);
-            debugger;
-        }
-        for (const exitGroup of random.shuffle(isDemoMode ? demoConnectedExitGrops : connectedExitGroups)) {
-            const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
-            const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
-            const immutableExits = exitGroup.immutableEntranceTargets?.length ?? 0;
-            // This group is no longer useable if all but one entrances have been assigned
-            // to unreachable entrances.
-            if (!exitGroup.spiritEntranceTargets?.length
-                || spiritExits + normalExits + immutableExits < 2
-            ) {
-                continue;
-            }
-            const spiritEntrance = random.removeElement(exitGroup.spiritEntranceTargets);
-            if (!allTargetedKeys.has(spiritEntrance)) {
-                console.error('Entrance ID not found, was it moved or removed?', spiritEntrance);
-                debugger;
-            }
-            assignEntranceExitPair(randomizerState, unreachableSpiritExit, spiritEntrance);
-            // If only spirit world exits remain, mark them all as forbidden to match with
-            // any other unreachable spirit entrange targets, otherwise this strategy may fail
-            // to actually connect this unreachable exit group to reachable areas.
-            // For example, it may pair the other end with another unreachable exit group or even to
-            // another door in the same unreachable exit group.
-            if (normalExits + immutableExits <= 0) {
-                for (const otherEntrance of exitGroup.spiritEntranceTargets) {
-                    forbiddenSpiritExitsKeysByEntranceKey[otherEntrance] = allUnreachableSpiritExits;
-                }
-            }
-            break;
-        }
-    }
-
-    //console.log('NORMAL LOOPABLE ENTRANCE ASSIGNMENTS:');
-    // Assign loopable entrances first to make sure the entire graph is connected.
-    for (const loopableEntrancePair of random.shuffle(isDemoMode ? demoNormalLoopableEntrancePairs : normalLoopableEntrancePairs)) {
-        const exit = random.element([...connectedNormalEntrances]);
-        assignEntranceExitPair(randomizerState, loopableEntrancePair.outerTarget, exit);
-        connectedNormalEntrances.add(loopableEntrancePair.innerTarget);
-    }
-    //console.log('SPIRIT LOOPABLE ENTRANCE ASSIGNMENTS:');
-    for (const loopableEntrancePair of random.shuffle(isDemoMode ? [] : spiritLoopableEntrancePairs)) {
-        const exit = random.element([...connectedSpiritEntrances]);
-        assignEntranceExitPair(randomizerState, loopableEntrancePair.outerTarget, exit);
-        connectedSpiritEntrances.add(loopableEntrancePair.innerTarget);
-    }
-
-
-    //console.log('RESTRICTED ASSIGNMENTS:');
-    // Make sure any normal exits with entrance restrictions are assigned first to make sure
-    // an option that satisfies the restrictions will be available.
-    for (const normalEntranceId of Object.keys(forbiddenNormalExitsKeysByEntranceKey)) {
-        const badEntrances = forbiddenNormalExitsKeysByEntranceKey[normalEntranceId];
-        const normalExitId = random.shuffle([...normalExits]).filter(entrance => !badEntrances.includes(entrance))[0];
-        assignEntranceExitPair(randomizerState, normalEntranceId, normalExitId);
-    }
-    // Make sure any spirit exits with entrance restrictions are assigned first to make sure
-    // an option that satisfies the restrictions will be available.
-    for (const spiritEntranceId of Object.keys(forbiddenSpiritExitsKeysByEntranceKey)) {
-        const badEntrances = forbiddenSpiritExitsKeysByEntranceKey[spiritEntranceId];
-        const spiritExitId = random.shuffle([...spiritExits]).filter(entrance => !badEntrances.includes(entrance))[0];
-        assignEntranceExitPair(randomizerState, spiritEntranceId, spiritExitId);
-    }
-
-    //console.log('GENERAL ASSIGNMENTS:');
-    for (const entrancePairing of [
-        [normalEntrances, normalExits],
-        [spiritEntrances, spiritExits],
-        [waterEntrances, waterExits],
-    ]) {
-        const [entrances, exits] = entrancePairing;
-        const exitIds = [...exits];
-        for (const entranceId of random.shuffle([...entrances])) {
-            const exitId = exitIds.pop();
-            assignEntranceExitPair(randomizerState, entranceId, exitId);
-        }
-    }
-    for (const [pitTargets, pitEntrances] of [
-        <const>[normalPitTargets, normalPitEntrances],
-        <const>[spiritPitTargets, spiritPitEntrances],
-    ]) {
-        const targetIds = [...pitTargets];
-        for (const pitEntrance of random.shuffle(pitEntrances)) {
-            const exitId = targetIds.pop();
-            const [zone, objectId] = exitId.split(':');
-            entranceAssignments[pitEntrance.location.zoneKey + ':' + pitEntrance.definition.id] = {
-                targetZone: zone,
-                targetObjectId: objectId,
+            entranceAssignments[doorLocation.key] = {
+                targetZone: definition.targetZone,
+                targetObjectId: definition.targetObjectId,
             };
+            // Go ahead and link the target back so that target pit markers by invalid entrances
+            // are also marked as preassigned as they otherwise won't get processed here.
+            entranceAssignments[doorLocation.originalTargetKey] = {
+                targetZone: doorLocation.location.zoneKey,
+                targetObjectId: doorLocation.definition.id,
+            };
+        } else {
+            // If the door is not ignored, then its target is considered assignable. For example a pit within a zone will be
+            // ignored and assign in the previous block, but a pit from the overworld into a zone will be assignable and
+            // add the target id here.
+            allAssignableEntranceIds.add(doorLocation.originalTargetKey);
+            // Pause if we notice any assumptions are wrong.
+            if (doorLocation.isExit) {
+                entranceIds.add(doorLocation.originalTargetKey);
+                exitIds.add(doorLocation.key);
+                if (entranceIds.has(doorLocation.key) || exitIds.has(doorLocation.originalTargetKey)) {
+                    debugger;
+                }
+            } else if (doorLocation.isEntrance) {
+                entranceIds.add(doorLocation.key);
+                exitIds.add(doorLocation.originalTargetKey);
+                if (entranceIds.has(doorLocation.originalTargetKey) || exitIds.has(doorLocation.key)) {
+                    debugger;
+                }
+            } else {
+                debugger;
+            }
+        }
+    }
+    if (entranceIds.size !== exitIds.size) {
+        console.error('Entrances + Exits are not balanced', [...entranceIds], [...exitIds]);
+        debugger;
+    }
+    // We expand the set of connected nodes until it contains all nodes required by the randomizer settings.
+    for (const currentNode of randomizerState.allNodes) {
+        currentNode.metadata = {
+            // Set of entrance ids that this node can be reached from
+            assignableEntranceKeys: new Set(),
+            nextNodes: new Set(),
+        };
+        // Initialize assignableEntranceKeys to be all entranceIds that are included in the list of all entrances (which means they can be used under the current settings).
+        for (const entranceId of (currentNode.entranceIds ?? [])) {
+            const entranceKey = `${currentNode.zoneId}:${entranceId}`;
+            if (allAssignableEntranceIds.has(entranceKey) && !entranceAssignments[entranceKey]) {
+                currentNode.metadata.assignableEntranceKeys.add(entranceKey);
+            }
+        }
+        for (const path of (currentNode.paths || [])) {
+            const nextNode = allNodesById[path.nodeId];
+            if (nextNode) {
+                currentNode.metadata.nextNodes.add(nextNode);
+            }
+        }
+        for (const exit of (currentNode.exits || [])) {
+            const exitKey = currentNode.zoneId + ':' + exit.objectId;
+            if (!entranceAssignments[exitKey]) {
+                continue;
+            }
+            const {targetZone, targetObjectId} = entranceAssignments[exitKey];
+            const nextNode = findNextNodeForExitTarget(randomizerState, currentNode, exit.objectId, targetZone, targetObjectId);
+            if (nextNode) {
+                currentNode.metadata.nextNodes.add(nextNode);
+            }
+        }
+    }
+    const connectedNodes = initializeConnectedNodes(randomizerState);
+    /*console.log("Before propagation");
+    for (const node of randomizerState.allNodes) {
+        console.log(node.nodeId, [...node.metadata.assignableEntranceKeys]);
+    }*/
+    propagateAssignableEntranceKeys(randomizerState, randomizerState.allNodes);
+    //console.log("After propagation");
+    for (const node of randomizerState.allNodes) {
+        if (!node.metadata.assignableEntranceKeys.size && !connectedNodes.has(node)) {
+            console.error('Required node started with no assignable entrance keys', node);
+            debugger;
+            throw new Error('Required node started with no assignable entrance keys');
+        }
+        // console.log(node.nodeId, [...node.metadata.assignableEntranceKeys]);
+    }
+    // This could eventually be configured to be a smaller set of nodes, such as only the set of nodes
+    // containing checks, or only the set of nodes required by the race goal, such as nods for certain bosses.
+    const allRequiredNodes = [...randomizerState.allNodes];
+    // Repeat this process until all required nodes are connected.
+    let requiredNodesLeft = allRequiredNodes.filter(node => !connectedNodes.has(node));
+    while (requiredNodesLeft.length) {
+        // Prioritize any required nodes with limited entrances remaining
+        let candidates = requiredNodesLeft.filter(node => node.metadata.assignableEntranceKeys.size < 2);
+        if (!candidates.length) {
+            candidates = requiredNodesLeft;
+        }
+        const nodeToAssign = random.mutate().element(candidates);
+        // console.log('Connecting node ' + nodeToAssign.nodeId);
+        if (!nodeToAssign.metadata.assignableEntranceKeys.size) {
+            console.error('Required node has no assignable entrance keys left', nodeToAssign);
+            debugger;
+            throw new Error('Required node has no assignable entrance keys left');
+        }
+        const entranceKey = random.mutate().element(nodeToAssign.metadata.assignableEntranceKeys);
+        const entrance = entrancesById[entranceKey];
+        // Remove this key from all sets of assignableEntranceKeys before proceeding.
+        for (const node of randomizerState.allNodes) {
+            node.metadata.assignableEntranceKeys.delete(entrance.key);
+        }
+        const matchingEntrances = getUnassignedMatchingEntrances(randomizerState, entrance);
+        const target = random.mutate().element(matchingEntrances.filter(match => {
+            // A matching entrance is only valid if it leads to a node with another assignable entrance or
+            // a node that is already connected to the start.
+            return connectedNodes.has(match.node)
+                // Any node with multiple assignable entrances is valid, since it will have at least one left after the assignment.
+                || match.node.metadata.assignableEntranceKeys.size > 1
+                // A node with exactly one entrance left is only valid if that entrance is not the one we are planning to assign.
+                || (match.node.metadata.assignableEntranceKeys.size === 1 && !match.node.metadata.assignableEntranceKeys.has(match.key));
+        }));
+        if (!target) {
+            // TODO: debug why we end up here.
+            console.error('Found no matching target for entrance', nodeToAssign, entrance);
+            debugger;
+            throw new Error('Found no matching target for entrance');
+        }
+        // Remove the target key from all sets of assignableEntranceKeys since it is about to be assigned.
+        for (const node of randomizerState.allNodes) {
+            node.metadata.assignableEntranceKeys.delete(target.key);
+        }
+        assignEntranceExitPair(randomizerState, entrance, target);
+        // The entrances that can reach the target node can now be propagated to all nodes that are reachable
+        // from the entrance node.
+        target.node.metadata.nextNodes.add(entrance.node);
+        propagateAssignableEntranceKeys(randomizerState, [target.node]);
+        if (connectedNodes.has(target.node)) {
+            propagateConnectedNodes(connectedNodes, [target.node]);
+        }
+        // Debug code, catch early if we leave a disconnected node with no entrance.
+        for (const node of randomizerState.allNodes) {
+            if (!node.metadata.assignableEntranceKeys.size && !connectedNodes.has(node)) {
+                console.error('Removed last assignable entrance key from unconnected node');
+                debugger;
+            }
+        }
+        // Repeat until there are no disconnected required nodes.
+        requiredNodesLeft = allRequiredNodes.filter(node => !connectedNodes.has(node));
+    }
+    // Once all requirede nodes are connected, iterate over all remaining entrances and assign them a random matching entrance.
+    const shuffledEntrances = random.mutate().shuffle(randomizerState.allEntrances);
+    for (const entrance of shuffledEntrances) {
+        if (entranceAssignments[entrance.key]) {
+            continue;
+        }
+        if (!isEntranceDefinition(entrance.definition)) {
+            console.error('unassigned marker', entrance);
+            continue;
+        }
+        const target = random.mutate().element(getUnassignedMatchingEntrances(randomizerState, entrance));
+        if (!target) {
+            console.error('No matching target found for entrance', entrance);
+            debugger;
+            throw new Error('No matching target found for entrance');
+        }
+        assignEntranceExitPair(randomizerState, entrance, target);
+    }
+}
+export function getUnassignedMatchingEntrances(randomizerState: RandomizerState, source: DoorLocation): DoorLocation[] {
+    const matchingEntrances: DoorLocation[] = [];
+    for (const target of randomizerState.allEntrances) {
+        if (randomizerState.entrances.entranceAssignments[target.key]) {
+            continue;
+        }
+        if ((source.definition.type === 'pitEntrance' && target.definition.type !== 'marker' && target.definition.type !== 'spawnMarker')
+            || ((source.definition.type === 'marker' || source.definition.type === 'spawnMarker')  && target.definition.type !== 'pitEntrance')
+            || (target.definition.type === 'pitEntrance' && source.definition.type !== 'marker' && source.definition.type !== 'spawnMarker')
+            || ((target.definition.type === 'marker' || target.definition.type === 'spawnMarker') && source.definition.type !== 'pitEntrance')
+        ) {
+            continue;
+        }
+        if (source.definition.type !== 'pitEntrance' && target.definition.type !== 'pitEntrance' && source.isUnderWater !== target.isUnderWater) {
+            continue;
+        }
+        if ((source.isEntrance && !target.isExit) || (source.isExit && !target.isEntrance)) {
+            continue;
+        }
+        if ((source.definition.type === 'teleporter' || target.definition.type === 'teleporter') && target.definition.type !== source.definition.type) {
+            continue;
+        }
+        // Only teleporters are allowed to link between worlds. This is necessary to allow if we want to include the entrance
+        // to waterfall tower in the pool, since we could have an odd number of teleporters in each world with it included.
+        if (source.definition.type !== 'teleporter' && source.location.isSpiritWorld !== target.location.isSpiritWorld) {
+            continue;
+        }
+        // Optionally we could connect cracked entrances+exits together.
+        matchingEntrances.push(target);
+    }
+    if (!matchingEntrances.length) {
+        // These sets should mirror the logic in the for loop above to help determine at which point different options were filtered out.
+        const assignableEntrances = randomizerState.allEntrances.filter(target => !randomizerState.entrances.entranceAssignments[target.key]);
+        const matchingWater = assignableEntrances.filter(
+            target => source.definition.type === 'pitEntrance' || target.definition.type === 'pitEntrance' || source.isUnderWater === target.isUnderWater
+        );
+        const matchingPitMarker = assignableEntrances.filter(target =>
+            (source.definition.type !== 'pitEntrance' || target.definition.type === 'marker' || target.definition.type === 'spawnMarker')
+            && ((source.definition.type !== 'marker' && source.definition.type !== 'spawnMarker') || target.definition.type === 'pitEntrance')
+            && (target.definition.type !== 'pitEntrance' || source.definition.type === 'marker' || source.definition.type === 'spawnMarker')
+            && ((target.definition.type !== 'marker' && target.definition.type !== 'spawnMarker') || source.definition.type === 'pitEntrance'));
+        const matchingEntranceExit = assignableEntrances.filter(target => source.isEntrance === target.isExit && source.isExit === target.isEntrance);
+        const matchesTeleporter = assignableEntrances.filter(target => source.definition.type !== 'teleporter' || target.definition.type !== 'teleporter' || target.definition.type === source.definition.type);
+        const matchesWorld = assignableEntrances.filter(target => source.definition.type === 'teleporter' || source.location.isSpiritWorld === target.location.isSpiritWorld);
+        // TODO: debug why we end up here.
+        console.error('Found no matching target for entrance', source, matchingWater, matchingPitMarker, matchingEntranceExit, matchesTeleporter, matchesWorld);
+        debugger;
+        throw new Error('Found no matching target for entrance');
+    }
+    return matchingEntrances;
+}
+
+// Initialize and return a set of nodes connected to the start based on the starting nodes defined on the randomizer state
+// and the metadata on each node indicating which nodes are currently reachable.
+export function initializeConnectedNodes(randomizerState: RandomizerState): Set<LogicNode> {
+    const connectedNodes = new Set(randomizerState.startingNodes);
+    propagateConnectedNodes(connectedNodes, [...connectedNodes]);
+    return connectedNodes;
+}
+export function propagateConnectedNodes(connectedNodes: Set<LogicNode>, nodes: LogicNode[]) {
+    const queue = [...nodes];
+    while (queue.length) {
+        const currentNode = queue.shift();
+        if (!connectedNodes.has(currentNode)) {
+            console.error('Tried to propagate non-connected node', currentNode, connectedNodes);
+            throw new Error('Tried to propagate non-connected node');
+        }
+        for (const nextNode of [...currentNode.metadata.nextNodes]) {
+            if (!connectedNodes.has(nextNode)) {
+                connectedNodes.add(nextNode);
+                queue.push(nextNode);
+            }
+        }
+    }
+}
+export function propagateAssignableEntranceKeys(randomizerState: RandomizerState, nodes: LogicNode[]) {
+    const queue = [...nodes];
+    while (queue.length) {
+        const currentNode = queue.shift();
+        const assignableEntranceKeys = [...currentNode.metadata.assignableEntranceKeys];
+        for (const nextNode of [...currentNode.metadata.nextNodes]) {
+            const combinedSet = new Set([...nextNode.metadata.assignableEntranceKeys, ...assignableEntranceKeys]);
+            if (combinedSet.size > nextNode.metadata.assignableEntranceKeys.size) {
+                nextNode.metadata.assignableEntranceKeys = combinedSet;
+                queue.push(nextNode);
+            }
         }
     }
 }
 
-function assignEntranceExitPair(randomizerState: RandomizerState, targetIdOfEntrance: string, targetIdOfExit: string) {
-    // console.log('assignEntranceExitPair', targetIdOfEntrance, targetIdOfExit);
+function isEntranceDefinition(definition: EntranceDefinition | MarkerDefinition): definition is EntranceDefinition {
+    return definition.type !== 'marker' && definition.type !== 'spawnMarker'
+}
+
+function assignEntranceExitPair(randomizerState: RandomizerState, entranceA: DoorLocation, entranceB: DoorLocation) {
     const {
         entranceAssignments,
-        allTargetedKeys,
         fixedNimbusCloudZones,
         targetIdMap,
-        normalEntrances,
-        normalExits,
-        spiritEntrances,
-        spiritExits,
-        waterEntrances,
-        waterExits,
-        connectedNormalEntrances,
-        connectedSpiritEntrances,
     } = randomizerState.entrances;
-    let entranceZone: string, entranceTarget: string, exitZone: string, exitTarget: string;
-    if (!targetIdMap[targetIdOfEntrance]) {
-        debugger;
-    }
-    for (const entrance of targetIdMap[targetIdOfEntrance]) {
-        if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
-            entranceZone = entrance.location.zoneKey;
-            entranceTarget = entrance.definition.id;
-            // In case something breaks, remember that I added this during the refactor, but it should be fine.
-            break;
-        }
-    }
-    if (!entranceZone) {
-        console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
-        return;
-    }
-    if (!targetIdMap[targetIdOfExit]) {
-        debugger;
-    }
-    for (const entrance of targetIdMap[targetIdOfExit]) {
-        if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
-            exitZone = entrance.location.zoneKey;
-            exitTarget = entrance.definition.id;
-            // In case something breaks, remember that I added this during the refactor, but it should be fine.
-            break;
-        }
+    const entrance = entranceA.isEntrance ? entranceA : entranceB;
+    const exit = entrance !== entranceA ? entranceA : entranceB;
+    if (entrance.definition.type === 'marker' || entrance.definition.type === 'spawnMarker'
+        || exit.definition.type === 'marker' || exit.definition.type === 'spawnMarker') {
+        console.log('assignEntranceExitPair', entrance.key, exit.key);
     }
 
-    if (!exitZone) {
-        console.error('Could not find a targeted exit that targets', targetIdOfExit);
-        return;
-    }
-
-    const zoneEntranceMap = getZoneEntranceMap();
-    for (const zone in zoneEntranceMap) {
-        if (fixedNimbusCloudZones.has(zone)) {
-            continue;
-        }
-        if (zoneEntranceMap[zone as keyof typeof zoneEntranceMap] === targetIdOfEntrance) {
-            zoneEntranceMap[zone as keyof typeof zoneEntranceMap] = `${exitZone}:${exitTarget}`;
-            // console.log(zone + ' => ' + zoneEntranceMap[zone]);
-            fixedNimbusCloudZones.add(zone);
+    // If we reassign the exit that targets the entrance to a dungeon that can be escaped using the Nimbus Cloud
+    // we need to remap the Nimbus Cloud exit for that zone to the new entrance that was assigned to that exit.
+    // This way when a player enters a randomized entrance that takes them to the main entrance of a dungeon,
+    // using the Nimbus Cloud will return them back to that entrance, instead of the vanilla dungeon entrance.
+    const exitDefinition = exit.definition;
+    if (isEntranceDefinition(exitDefinition)) {
+        const zoneEntranceMap = getZoneEntranceMap();
+        for (const zone of typedKeys(zoneEntranceMap)) {
+            if (fixedNimbusCloudZones.has(zone)) {
+                continue;
+            }
+            if (zoneEntranceMap[zone] === `${exitDefinition.targetZone}:${exitDefinition.targetObjectId}`) {
+                zoneEntranceMap[zone] = entrance.key;
+                // console.log(zone + ' => ' + zoneEntranceMap[zone]);
+                fixedNimbusCloudZones.add(zone);
+            }
         }
     }
 
-    if (!targetIdMap[targetIdOfEntrance]) {
-        debugger;
-    }
-
-    for (const entrance of targetIdMap[targetIdOfEntrance]) {
+    // This line is redundant with the loop, except in the case of pit markers.
+    // Pit marker assignments are not functional, but are useful for debugging which
+    // pit entrance is assigned to a marker.
+    entranceAssignments[entrance.key] = {
+        targetZone: exit.location.zoneKey,
+        targetObjectId: exit.definition.id,
+    };
+    // This will not be set for 'pitMarker' "entrances" which do not need to be assigned.
+    for (const entranceToAssign of targetIdMap[entrance.originalTargetKey] ?? []) {
         /*console.log(
             `${entrance.location.zoneKey}::${entrance.definition.id}`, '=>',
             `${exitZone}::${exitTarget}`
         );*/
-        /*entrance.definition.targetZone = exitZone;
-        entrance.definition.targetObjectId = exitTarget;
-        if (entrance.definition.status === 'cracked') {
-            entrance.definition.status = 'blownOpen';
-        }*/
-        const entranceKey = entrance.location.zoneKey+':' + entrance.definition.id;
-        entranceAssignments[entranceKey] = {
-            targetZone: exitZone,
-            targetObjectId: exitTarget,
+        entranceAssignments[entranceToAssign.key] = {
+            targetZone: exit.location.zoneKey,
+            targetObjectId: exit.definition.id,
         };
-        if (entrance.definition.status === 'cracked') {
-            entranceAssignments[entranceKey].status = 'blownOpen';
-        }
     }
-    for (const exit of targetIdMap[targetIdOfExit]) {
+    // This line is redundant with the loop, except in the case of pit markers.
+    // Pit marker assignments are not functional, but are useful for debugging which
+    // pit entrance is assigned to a marker.
+    entranceAssignments[exit.key] = {
+        targetZone: entrance.location.zoneKey,
+        targetObjectId: entrance.definition.id,
+    };
+    // This will not be set for 'pitMarker' "entrances" which do not need to be assigned.
+    for (const exitToAssign of targetIdMap[exit.originalTargetKey] ?? []) {
         /*console.log(
             `${exit.location.zoneKey}::${exit.definition.id}`, '=>',
             `${entranceZone}::${entranceTarget}`
         );*/
-        //exit.definition.targetZone = entranceZone;
-        //exit.definition.targetObjectId = entranceTarget;
-        const exitKey = exit.location.zoneKey+':' + exit.definition.id;
-        entranceAssignments[exitKey] = {
-            targetZone: entranceZone,
-            targetObjectId: entranceTarget,
+        entranceAssignments[exitToAssign.key] = {
+            targetZone: entrance.location.zoneKey,
+            targetObjectId: entrance.definition.id,
         };
-    }
-    // Remove assigned targets so they cannot be used in the pool any longer.
-    for (const set of [
-        normalEntrances, spiritEntrances, normalExits, spiritExits,
-        connectedNormalEntrances, connectedSpiritEntrances,
-    ]) {
-        set.delete(targetIdOfExit);
-        set.delete(targetIdOfEntrance);
-    }
-
-    if (normalEntrances.size !== normalExits.size) {
-        console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
-        console.error(`normal entrances/exits: ${normalEntrances.size}/${normalExits.size}`);
-        console.error([...normalEntrances]);
-        console.error([...normalExits]);
-        return;
-    }
-    if (spiritEntrances.size !== spiritExits.size) {
-        console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
-        console.error(`spirit entrances/exits: ${spiritEntrances.size}/${spiritExits.size}`);
-        console.error([...spiritEntrances]);
-        console.error([...spiritExits]);
-        return;
-    }
-    if (waterEntrances.size !== waterExits.size) {
-        console.error(`after assignEntranceExitPair ${targetIdOfEntrance} -> ${targetIdOfExit}`);
-        console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
-        console.error([...waterEntrances]);
-        console.error([...waterExits]);
-        return;
+        // Remove cracked status from the exit when assigned to an entrance that isn't cracked.
+        if (exitToAssign.definition.status === 'cracked' && entrance.definition.status !== 'cracked') {
+            entranceAssignments[exitToAssign.key].status = 'blownOpen';
+        }
     }
 }

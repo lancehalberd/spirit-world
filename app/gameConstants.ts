@@ -76,7 +76,7 @@ export const enemySeed = readGetParameterAsInt('enemySeed');*/
 // 'foreground3' is rarely required for certain combinations of trees.
 export const layersInOrder = ['water', 'floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2', 'foreground3', 'behaviors'];
 
-export const overworldKeys = ['overworld', 'underwater', 'sky', 'forest', 'forestWater'];
+export const overworldKeys = new Set(['overworld', 'underwater', 'sky', 'forest', 'forestWater']);
 
 export function getElementColor(element: MagicElement) {
     switch(element){

@@ -2,8 +2,10 @@ import {evaluateLogicDefinition, isLogicValid} from 'app/content/logic';
 import {getLootName} from 'app/content/loot';
 import {lootEffects} from 'app/content/lootEffects';
 import {getZone} from 'app/content/zones';
+import {overworldKeys} from 'app/gameConstants';
 import {
     findDoorById,
+    findDoorOrMarkerById,
     findLootObjects,
 } from 'app/randomizer/find';
 import {getAllNodes} from 'app/randomizer/allNodes';
@@ -126,8 +128,7 @@ export function expandNodes(
                 //console.log('Invalid logic', exit);
                 continue;
             }
-            const { object, location } = findDoorById(zone, exit.objectId, simulatedState);
-            const exitObject = object as EntranceDefinition;
+            const {object: exitObject,  location } = findDoorById(zone, exit.objectId, simulatedState);
             // console.log(exit.objectId);
             if (!canUseDoor(simulatedState, location, exitObject)) {
                 //console.log('cannot open', exitObject);
@@ -154,7 +155,54 @@ export function expandNodes(
                     'Missing node for exit: ');
                 continue;
             }
-            addEntranceIfNew(allEntrances, {location, definition: exitObject});
+            // Assigning isExit instead of isEntrance to avoid name collision.
+            const isExit = !isEntrance(location.zoneKey, exitObject.targetZone);
+            const isUnderWater = zone.surfaceKey && !location.isSpiritWorld;
+            addEntranceIfNew(allEntrances, {
+                key: `${location.zoneKey}:${exitObject.id}`,
+                // This can be used to collect all entrances that share a common target,
+                // such as when a dungeon entrance + shortcut exit point to the same target.
+                // Typically we want these to point to the same target after randomizing since
+                // it will be confusing and often inconvenient if shortcut exits point to a
+                // random entrance.
+                originalTargetKey: `${exitObject.targetZone}:${exitObject.targetObjectId}`,
+                location,
+                definition: exitObject,
+                node: currentNode,
+                isEntrance: !isExit,
+                isExit,
+                isUnderWater,
+            });
+            // Add random code block so I can redeclare consts for the target entrance.
+            {
+                const zone = getZone(exitObject.targetZone);
+                // We don't pass in simulated state because the target of an exit is always considered in logic, for example,
+                // you can leave through locked/cracked doors even if you don't have the tools to use them. The logic only
+                // applies to the entrance you are leaving an area from, not the one you are traveling to.
+                const {object, location} = findDoorOrMarkerById(zone, exitObject.targetObjectId);
+                if (!object) {
+                    console.error('Could not find entrance or marker for', exitObject.targetZone, exitObject.targetObjectId);
+                    debugger;
+                    findDoorOrMarkerById(zone, exitObject.targetObjectId, simulatedState);
+                    throw new Error('Could not find entrance or marker.');
+                }
+                const isExit = !isEntranceDefinition(object) || !isEntrance(location.zoneKey, object.targetZone);
+                const isUnderWater = zone.surfaceKey && !location.isSpiritWorld;
+                // Since we found this object as the target of an exit, it may be an entrance with no target itself,
+                // such as a pit marker.
+                const originalTargetKey = isEntranceDefinition(object) ? `${object.targetZone}:${object.targetObjectId}` : '';
+                addEntranceIfNew(allEntrances, {
+                    key: `${location.zoneKey}:${object.id}`,
+                    originalTargetKey,
+                    location,
+                    definition: object,
+                    node: nextNode,
+                    isEntrance: !isExit,
+                    isExit,
+                    isUnderWater,
+                });
+            }
+
             if (!nodes.includes(nextNode)) {
                 nodes.push(nextNode);
                 changed = true;
@@ -163,6 +211,33 @@ export function expandNodes(
         }
     }
     return changed;
+}
+
+
+function isEntranceDefinition(definition: EntranceDefinition | MarkerDefinition): definition is EntranceDefinition {
+    return definition.type !== 'marker' && definition.type !== 'spawnMarker'
+}
+
+// Entrance+Exit are ambiguous. In this case, we use entrance to mean
+// the door that takes you from the overworld into another zone and
+// exit to mean the reverse.
+// There are a special set of entrances inside of non overworld zones where we
+// pick one zone as the "outside" based on what seems intuitive. For example
+// the Tomb is considered outside of the Cocoon. Intuitively, the zone
+// that is further away from the overworld or is a dead end is considered "inside".
+function isEntrance(zoneKey: string, targetZoneKey: string): boolean {
+    return overworldKeys.has(zoneKey)
+        // There are a few special "entrances" inside other zones
+        || zoneKey === 'tomb' && targetZoneKey === 'cocoon'
+        || zoneKey === 'treeVillage' && targetZoneKey === 'forestTemple'
+        || zoneKey === 'caves' && targetZoneKey === 'forestTemple'
+        || zoneKey === 'lakeTunnel' && targetZoneKey === 'helix'
+        || zoneKey === 'warTemple' && targetZoneKey === 'lab'
+        || zoneKey === 'lab' && targetZoneKey === 'tree'
+        || zoneKey === 'grandTemple' && targetZoneKey === 'gauntlet'
+        || zoneKey === 'grandTemple' && targetZoneKey === 'holySanctum'
+        // Dream world is connected to a lot of different zones, any of those entrance objects are considered entrances.
+        || targetZoneKey === 'dream';
 }
 
 function addEntranceIfNew(allEntrances: DoorLocation[], newDoorLocation: DoorLocation) {

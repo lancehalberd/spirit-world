@@ -112,8 +112,8 @@ export class ContextMenu {
 export function getContextMenu(): MenuOption[] {
     const state = getState()
     // Special context menu for editing map sections when the map is shown with the editor enabled.
-    if (isMapSceneActive(state) && editingState.isEditing && !overworldKeys.includes(state.location.zoneKey)) {
-        const selectedSections = overworldKeys.includes(state.areaSection?.mapId)
+    if (isMapSceneActive(state) && editingState.isEditing && !overworldKeys.has(state.location.zoneKey)) {
+        const selectedSections = overworldKeys.has(state.areaSection?.mapId)
             ? [state.areaSection.index] : editingState.selectedSections;
         if (selectedSections.length) {
             return getMapOptions(state, selectedSections);

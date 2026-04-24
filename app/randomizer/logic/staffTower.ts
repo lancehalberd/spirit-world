@@ -257,6 +257,9 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF5South',
+        // This flag combined with the stormBeast flag puts the Tower Staff item in logic,
+        // making canHasTowerStaff logic return true.
+        flags: [{'flag': 'staffTowerTerminalAccess'}],
         paths: [
             {nodeId: 'staffTowerF5North', logic: canRemoveLightStones},
             // Terminal is off until the beasts are released.

@@ -99,7 +99,7 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     refreshWorldMap(state, zone);
     drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, innerWorldMapRectangle);
 
-    if (overworldKeys.includes(state.location.zoneKey)) {
+    if (overworldKeys.has(state.location.zoneKey)) {
         if (state.time % 1000 <= 600) {
             const mapCoordinates = convertLocationToMapCoordinates(state.location);
             drawFrame(context, heroIcon, {
@@ -653,7 +653,7 @@ export function getDisplayedMapSections(state: GameState, scene: MapScene): numb
         return;
     }
     const mapId = state.areaSection?.definition.mapId;
-    if (overworldKeys.includes(mapId)) {
+    if (overworldKeys.has(mapId)) {
         return [];
     }
     const selectedFloorId = getSelectedFloorId(state, scene);

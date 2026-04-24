@@ -148,4 +148,11 @@ interface LogicNode {
         objectId: string
         logic?: LogicCheck
     }[]
+    // Metadata that gets set during entrance randomization.
+    metadata?: {
+        // Set of entrance ids that this node can be reached from that are still assignable.
+        assignableEntranceKeys: Set<string>
+        // Set of nodes that can be reached immediately from this node using either paths or exits.
+        nextNodes: Set<LogicNode>
+    }
 }

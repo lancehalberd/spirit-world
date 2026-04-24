@@ -7,7 +7,7 @@ import { overworldKeys } from 'app/gameConstants';
 export function getMapOptions(state: GameState, selectedSections: number[]): MenuOption[] {
     const areAllSectionsHidden = selectedSections.every(index => allSections[index].section.hideMap);
     let mapIds = Object.keys(dungeonMaps);
-    if (!overworldKeys.includes(state.areaSection.definition.mapId)) {
+    if (!overworldKeys.has(state.areaSection.definition.mapId)) {
         mapIds = [state.areaSection.definition.mapId, ...mapIds.filter(mapId => mapId !== state.areaSection.definition.mapId)];
     }
     return [
@@ -15,7 +15,7 @@ export function getMapOptions(state: GameState, selectedSections: number[]): Men
             label: 'setMapId',
             getChildren() {
                 return [
-                    ...overworldKeys.map( zoneId => {
+                    ...[...overworldKeys].map( zoneId => {
                         const entranceIds: string[] = [];
                         const zone = zones[zoneId];
                         const spiritEntranceIds: string[] = [];

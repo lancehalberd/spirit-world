@@ -30,9 +30,9 @@ export function isOverworldLocation(state: GameState) {
     return !!getOverworldMapId(state);
 }
 export function getOverworldMapId(state: GameState): string|undefined {
-    if (overworldKeys.includes(state.location.zoneKey)) {
+    if (overworldKeys.has(state.location.zoneKey)) {
         return state.location.zoneKey;
-    } else if (overworldKeys.includes(state.areaSection?.definition?.mapId)) {
+    } else if (overworldKeys.has(state.areaSection?.definition?.mapId)) {
         return state.areaSection?.definition?.mapId;
     }
 }

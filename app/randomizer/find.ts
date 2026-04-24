@@ -1,5 +1,5 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
-import {evaluateLogicDefinition, isLogicValid} from 'app/content/logic';
+import {evaluateLogicDefinition, isLogicValid, canHasTowerStaff} from 'app/content/logic';
 import {getZone} from 'app/content/zones';
 import {missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce} from 'app/randomizer/warnOnce';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
@@ -10,7 +10,7 @@ export function getMappedEntranceData(randomizerState: RandomizerState, zoneKey:
 }
 
 export function findReachableNodes(randomizerState: RandomizerState, state: GameState): LogicNode[] {
-    const {allNodesById, allNodesByZoneKey, startingNodes} = randomizerState;
+    const {allNodesById, startingNodes} = randomizerState;
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
@@ -59,18 +59,7 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
             }
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
             const {targetZone, targetObjectId} = getMappedEntranceData(randomizerState, currentNode.zoneId, exitObject);
-            const nextNode = allNodesByZoneKey[targetZone].find(node =>
-                (node !== currentNode || targetObjectId !== exit.objectId)
-                // If isSpiritWorld is defined for both nodes, they must match.
-                && (
-                    node.isSpiritWorld === undefined ||
-                    currentNode.isSpiritWorld === undefined ||
-                    node.isSpiritWorld === currentNode.isSpiritWorld ||
-                    // Teleporters can link material/spirit world together.
-                    exitObject.type === 'teleporter'
-                )
-                && node.entranceIds?.includes(targetObjectId)
-            );
+            const nextNode = findNextNodeForExitTarget(randomizerState, currentNode, exit.objectId, targetZone, targetObjectId, state);
             if (!nextNode) {
                 warnOnce(missingExitNodeSet,
                     zone.key + '::' + exitObject.id + ' => '
@@ -78,7 +67,7 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                     'Missing node for exit: ');
                 continue;
             }
-            if (!reachableNodes.includes(nextNode)) {
+            if (nextNode && !reachableNodes.includes(nextNode)) {
                 reachableNodes.push(nextNode);
             }
         }
@@ -86,6 +75,39 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
     return reachableNodes;
 }
 window['findReachableNodes'] = findReachableNodes;
+
+export function findNextNodeForExitTarget(
+    randomizerState: RandomizerState,
+    currentNode: LogicNode,
+    exitId: string,
+    targetZone: string,
+    targetObjectId: string,
+    simulatedState?: GameState,
+) {
+    const {allNodesByZoneKey} = randomizerState;
+    const {object} = findDoorById(getZone(targetZone), targetObjectId, simulatedState);
+    const exitObject = object as EntranceDefinition;
+    const nextNode = allNodesByZoneKey[targetZone].find(node =>
+        (node !== currentNode || targetObjectId !== exitId)
+        // If isSpiritWorld is defined for both nodes, they must match.
+        && (
+            node.isSpiritWorld === undefined ||
+            currentNode.isSpiritWorld === undefined ||
+            node.isSpiritWorld === currentNode.isSpiritWorld ||
+            // Teleporters can link material/spirit world together.
+            exitObject.type === 'teleporter'
+        )
+        && node.entranceIds?.includes(targetObjectId)
+    );
+    if (!nextNode) {
+        warnOnce(missingExitNodeSet,
+            currentNode.zoneId + '::' + exitObject.id + ' => '
+            + targetZone + '::' + targetObjectId,
+            'Missing node for exit: ');
+        return;
+    }
+    return nextNode;
+}
 
 export function findReachableChecksFromStart(randomizerState: RandomizerState, simulatedState: GameState) {
     return findReachableChecks(randomizerState, simulatedState);
@@ -97,8 +119,13 @@ export function findReachableChecks(randomizerState: RandomizerState, simulatedS
     return findLootObjects(reachableNodes, simulatedState);
 }
 
-export function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
-    return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'staffTower', 'helixTop', 'teleporter']);
+
+export function findDoorOrMarkerById(zone: Zone, id: string, state: GameState = null)  {
+    return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'staffTower', 'helixTop', 'teleporter', 'marker', 'spawnMarker']) as {object: EntranceDefinition|MarkerDefinition, location: FullZoneLocation};
+}
+
+export function findDoorById(zone: Zone, id: string, state: GameState = null)  {
+    return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'staffTower', 'helixTop', 'teleporter']) as {object: EntranceDefinition, location: FullZoneLocation};
 }
 export function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
     return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss', 'npc']);
@@ -140,7 +167,7 @@ export function findObjectById(
                                 continue;
                             }
                             // Ignore any objects currently out of logic when state is defined.
-                            if (state && !evaluateLogicDefinition(state, object)) {
+                            if (state && !canObjectBeInLogic(state, object)) {
                                 objectFoundButNotInLogic = true;
                                 continue;
                             }
@@ -264,9 +291,26 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
     return lootObjects;
 }
 
+// Similar to evaluateLogicDefinition, but returns true if the object can be in logic from the current
+// state, even if it is not currently in logic. For example, Staff Tower doors are out of logic while
+// holding the Tower Staff, but the Tower Staff can be deposited to get access to them.
+// This does have one issue which is that the logic is not smart enough to know that if an entrance is
+// blocked by placing the Tower Staff, the Tower Staff will not be available to use in those areas.
+export function canObjectBeInLogic(state: GameState, object: ObjectDefinition): boolean {
+    // The default location for the Staff Tower is always in logic.
+    if (object.logicKey === 'desertTower') {
+        return true;
+    }
+    // Other staff tower locations are in logic once the player obtains the Tower Staff.
+    if (object.logicKey === 'mountainTower' || object.logicKey === 'mountainTower') {
+        return isLogicValid(state, canHasTowerStaff);
+    }
+    return evaluateLogicDefinition(state, object);
+}
+
 export function canOpenDoor(randomizerState: RandomizerState, location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
     // Return false if door does not exist or is currently out of logic.
-    if (!door || !evaluateLogicDefinition(state, door)) {
+    if (!door || !canObjectBeInLogic(state, door)) {
         return false;
     }
     if (door.type === 'teleporter') {

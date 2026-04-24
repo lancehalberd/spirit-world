@@ -29,7 +29,7 @@ export function initializeSection(section: AreaSection, location: ZoneLocation) 
         }
     }
     // Sections that show overworld areas aren't added to any dungeon maps.
-    if (overworldKeys.includes(section.mapId)) {
+    if (overworldKeys.has(section.mapId)) {
         return;
     }
     const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};

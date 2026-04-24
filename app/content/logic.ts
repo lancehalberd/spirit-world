@@ -265,7 +265,7 @@ export const hasLongSomersault: LogicCheck = andLogic(
 );
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
 export const hasTowerStaff: LogicCheck = {requiredFlags: ['$staff:2']};
-export const canHasTowerStaff: LogicCheck = {requiredFlags: ['stormBeast']};
+export const canHasTowerStaff: LogicCheck = {requiredFlags: ['stormBeast', 'staffTowerTerminalAccess']};
 // This check is for having a weapon that can be used to defeat most bosses.
 // Primarily we don't want having the Spirit Cloak to put any bosses in logic since
 // it is excessively tedious to defeat bosses with.

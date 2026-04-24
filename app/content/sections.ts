@@ -108,7 +108,7 @@ function populateSectionMapData(): void {
             }
         }
         // Sections that show overworld areas aren't added to any dungeon maps.
-        if (overworldKeys.includes(section.mapId)) {
+        if (overworldKeys.has(section.mapId)) {
             continue;
         }
         const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};

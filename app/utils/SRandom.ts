@@ -1,4 +1,12 @@
-type Collection<T> = {[key:string]: T} | Array<T>;
+function toArray<T>(collection: Collection<T>): Array<T> {
+    if (Array.isArray(collection)) {
+        return collection;
+    }
+    if (collection instanceof Set) {
+        return [...collection];
+    }
+    return Object.values(collection);
+}
 
 const MAX_INT = 2 ** 32;
 
@@ -66,17 +74,9 @@ class SRandom {
         return Math.floor(this.random() * (max + 1 - min)) + min;
     }
 
-    /**
-     * @param {Collection} collection  The collection of elements to return random element from
-     */
     element<T>(collection: Collection<T>): T {
-        if (Array.isArray(collection)) {
-            const array = collection as Array<any>;
-            const roll = this.random();
-            return array[Math.floor(roll * array.length)];
-        }
-        const keys = Object.keys(collection);
-        return collection[this.element(keys)];
+        const array = toArray(collection);
+        return array[Math.floor(this.random() * array.length)];
     }
 
     // Remove a random element from the array/object.
@@ -85,11 +85,15 @@ class SRandom {
             const array = collection as Array<any>;
             return array.splice(Math.floor(this.random() * array.length), 1)[0];
         }
-        const object: {[key:string]: T}  = collection;
-        const keys = Object.keys(object);
+        if (collection instanceof Set) {
+            const value = this.element([...collection]);
+            collection.delete(value);
+            return value;
+        }
+        const keys = Object.keys(collection);
         const key = this.element(keys);
-        const value = object[key];
-        delete object[key];
+        const value = collection[key];
+        delete collection[key];
         return value;
     }
 

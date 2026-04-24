@@ -2,7 +2,7 @@ import {GAME_KEY} from 'app/gameConstants';
 import {generateZoneVariations} from 'app/generator/generateZoneVariations';
 import {getAllReachableContent} from 'app/randomizer/getAllReachableContent';
 import {calculateKeyLogic} from 'app/randomizer/calculateKeyLogic';
-import {initializeEntranceRandomizer, randomizeEntrances} from 'app/randomizer/entranceRandomizer';
+import {randomizeEntrances} from 'app/randomizer/entranceRandomizer';
 import {applyLootAssignments, initializeReverseFill, replaceTrash, reverseFill} from 'app/randomizer/reverseFill';
 import {verifyNodeConnections} from 'app/randomizer/utils';
 import {mainOverworldNode} from 'app/randomizer/logic/overworldLogic';
@@ -96,7 +96,7 @@ export class RandomizerScene implements GameScene {
                     if (this.config.entranceSeed) {
                         this.step = 'entrances';
                         this.stepStatus = 'Initializing Entrances';
-                        initializeEntranceRandomizer(state.randomizerState, state.isDemoMode);
+                        //initializeEntranceRandomizer(state.randomizerState, state.isDemoMode);
                         return;
                     }
                     break;
@@ -166,7 +166,7 @@ export class RandomizerScene implements GameScene {
     }
     updateEntrances(state: GameState) {
         this.stepStatus = 'Pairing Entrances';
-        randomizeEntrances(state.randomizerState, state.isDemoMode);
+        randomizeEntrances(state.randomizerState);
         this.startNextStep(state);
     }
     updateItems(state: GameState) {
