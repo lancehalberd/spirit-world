@@ -192,6 +192,10 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
         }
         const matchingEntrances = getUnassignedMatchingEntrances(randomizerState, entrance);
         const target = random.mutate().element(matchingEntrances.filter(match => {
+            // Unreliable doors may not be assigned for required connections.
+            if (unreliableDoors.has(match.key)) {
+                return false;
+            }
             // A matching entrance is only valid if it leads to a node with another assignable entrance or
             // a node that is already connected to the start.
             return connectedNodes.has(match.node)
