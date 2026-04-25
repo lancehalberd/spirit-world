@@ -45,6 +45,7 @@ export interface DoorStyleDefinition {
     left?: DoorStyleFrames
     mapIcon?: MapIcon
     getDrawPriority?: (state: GameState, door: Door) => DrawPriority|undefined
+    hideEntranceLight?: boolean
     // Possible options for dynamic map icons:
     // getMapIcon?: (state: GameState, door: Door) => void
     // renderMapIcon?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
@@ -306,6 +307,7 @@ const wideSquareDoorStyle = {
             // the MCs head from peaking over the top of the frame as they move left/right.
             : {x: door.x, y: door.y + 10, w: 32, h: 16};
     },
+    hideEntranceLight: true,
 };
 
 const commonBaseDoorStyle = {
@@ -1253,6 +1255,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
                 : {x: door.x, y: door.y, w: 16, h: 64};
         },
         render: renderBlocksWhenClosed,
+        hideEntranceLight: true,
     },
     pathEntrance: {
         // We use isNotSolid here since we see the ground type for this entrance.
@@ -1269,6 +1272,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
                 : {x: door.x, y: door.y, w: 16, h: 32};
         },
         render: renderBlocksWhenClosed,
+        hideEntranceLight: true,
     },
 };
 export type DoorStyle = keyof typeof doorStyles;

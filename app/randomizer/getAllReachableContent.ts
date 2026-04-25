@@ -7,6 +7,7 @@ import {
     findDoorById,
     findDoorOrMarkerById,
     findLootObjects,
+    isTeleporterOpen,
 } from 'app/randomizer/find';
 import {getAllNodes} from 'app/randomizer/allNodes';
 import {missingExitNodeSet, missingNodeSet, warnOnce} from 'app/randomizer/warnOnce';
@@ -44,7 +45,8 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
     const allEntrances: DoorLocation[] = [];
     let simulatedState = getDefaultState();
     applySavedState(simulatedState, simulatedState.savedState);
-    const nodes = [...startingNodes];
+    const nodesSeen: Set<LogicNode> = new Set(startingNodes);
+    const nodePaths: NodePath[] = startingNodes.map(node => ({path: [], node}));
     let  counter = 0, changed = false;
     do {
         changed = false;
@@ -54,15 +56,15 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
             debugger;
             return null;
         }
-        changed = expandNodes(simulatedState, nodes, allNodesById, allNodesByZoneKey, allEntrances) || changed;
-        changed = collectAllLootFromNodesInLogic(simulatedState, [...nodes], allLootObjects) || changed;
-        changed = setAllFlagsInNodes(simulatedState, nodes) || changed;
+        changed = expandNodes(simulatedState, nodesSeen, nodePaths, allNodesById, allNodesByZoneKey, allEntrances) || changed;
+        changed = collectAllLootFromNodesInLogic(simulatedState, nodePaths, allLootObjects) || changed;
+        changed = setAllFlagsInNodes(simulatedState, nodePaths) || changed;
     } while (changed);
     //console.log("No new nodes, stopping");
     if (!state.isDemoMode) {
         // Outside demo mode, we expect every node and check to be reachable.
         for (const node of allNodes) {
-            if (!nodes.includes(node)) {
+            if (!nodesSeen.has(node)) {
                 console.log('Missing node', node);
             }
             // These checks are too noisy in general, but they can be useful when missing entrances/exits
@@ -78,33 +80,34 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
                 }
             }*/
         }
-        for (const loot of findLootObjects(allNodes)) {
+        for (const loot of findLootObjects(nodePaths)) {
             if (!simulatedState.savedState.objectFlags[loot.lootObject.id]) {
                 console.log('Missing loot', loot);
             }
         }
     }
     //console.log(Object.keys(simulatedState.savedState.objectFlags));
-    return {allNodes: nodes, allLootObjects, allEntrances};
+    return {allNodes: nodePaths.map(path => path.node), allLootObjects, allEntrances};
 }
 
-
-export function expandNodes(
+function expandNodes(
     simulatedState: GameState,
-    nodes: LogicNode[],
+    nodesSeen: Set<LogicNode>,
+    nodePaths: NodePath[],
     allNodesById: NodesById,
     allNodesByZoneKey: NodesByZoneKey,
     allEntrances: DoorLocation[],
 ): boolean {
     let changed = false;
-    for (let i = 0; i < nodes.length; i++) {
-        const currentNode = nodes[i];
+    for (let i = 0; i < nodePaths.length; i++) {
+        const currentNodePath = nodePaths[i];
+        const currentNode = currentNodePath.node;
         if (!currentNode) {
             console.error('Found undefined node');
             break;
         }
         if (window['debugFindReachableNodes']) {
-            // console.log(currentNode.zoneId, currentNode.nodeId);
+            console.log(currentNode.zoneId, currentNode.nodeId);
         }
         // console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);
@@ -127,8 +130,12 @@ export function expandNodes(
                 continue;
             }
             path.isAvailable = true;
-            if (!nodes.includes(nextNode)) {
-                nodes.push(nextNode);
+            if (!nodesSeen.has(nextNode)) {
+                nodesSeen.add(nextNode);
+                nodePaths.push({
+                    path: [...currentNodePath.path, {node: currentNode, path}],
+                    node: nextNode,
+                });
                 changed = true;
                 //console.log("Adding path node", path, nextNode);
             }
@@ -213,10 +220,14 @@ export function expandNodes(
                 });
             }
 
-            if (!nodes.includes(nextNode)) {
-                nodes.push(nextNode);
+            if (!nodesSeen.has(nextNode)) {
+                nodesSeen.add(nextNode);
+                nodePaths.push({
+                    path: [...currentNodePath.path, {node: currentNode, exit}],
+                    node: nextNode,
+                });
                 changed = true;
-                // console.log("Adding door node", exit, nextNode);
+                //console.log("Adding path node", path, nextNode);
             }
         }
     }
@@ -257,9 +268,9 @@ function addEntranceIfNew(allEntrances: DoorLocation[], newDoorLocation: DoorLoc
     }
 }
 
-function collectAllLootFromNodesInLogic(simulatedState: GameState, nodes: LogicNode[], lootObjects: LootWithLocation[]): boolean {
+function collectAllLootFromNodesInLogic(simulatedState: GameState, nodePaths: NodePath[], lootObjects: LootWithLocation[]): boolean {
     let foundNewLoot = false;
-    const reachableChecks: LootWithLocation[] = findLootObjects(nodes, simulatedState);
+    const reachableChecks: LootWithLocation[] = findLootObjects(nodePaths, simulatedState);
     // console.log(debugLocations(reachableChecks));
     for (const check of reachableChecks) {
         // Ignore checks that have already been made.
@@ -299,11 +310,12 @@ function collectAllLootFromNodesInLogic(simulatedState: GameState, nodes: LogicN
     return foundNewLoot;
 }
 
-export function setAllFlagsInNodes(simulatedState: GameState, nodes: LogicNode[]) {
+export function setAllFlagsInNodes(simulatedState: GameState, nodePaths: NodePath[]) {
     let changed, setFlag = false;
     do {
         changed = false;
-        for (const node of nodes) {
+        for (const nodePath of nodePaths) {
+            const node = nodePath.node;
             for (const flag of (node.flags || [])) {
                 if (simulatedState.savedState.objectFlags[flag.flag]) {
                     continue;
@@ -335,7 +347,7 @@ function canUseDoor(simulatedState: GameState, location: FullZoneLocation, door:
         return false;
     }
     if (door.type === 'teleporter') {
-        return simulatedState.hero.savedData.passiveTools.spiritSight > 0 || simulatedState.hero.savedData.passiveTools.trueSight > 0;
+        return isTeleporterOpen(simulatedState, location, door);
     }
     // For this method, we assume that if a player can reach a locked door, the key for the locked door will
     // eventually be in logic.

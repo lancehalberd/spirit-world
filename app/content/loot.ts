@@ -155,6 +155,10 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
         case 'aetherCrystal': return 'Aether Crystal'
         case 'silverOre': return 'Silver Ore';
         case 'goldOre': return 'Gold Ore';
+        case 'peachOfImmortalityPiece': return "Peach Piece";
+        case 'peachOfImmortality': return "Full Peach";
+        case 'bigKey': return "Big Key";
+        case 'smallKey': return "Small Key";
     }
     return '?' + lootType;
 }

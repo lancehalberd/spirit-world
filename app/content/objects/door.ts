@@ -560,9 +560,11 @@ export class Door implements ObjectInstance {
                 && (this.targetZone === 'overworld' || this.targetZone === 'forest' || this.targetZone === 'sky')
                 && this.isOpen()
             ) {
-                // For some reasont his renders when the door is closed while editing, which isn't a problem,
+                // For some reason this renders when the door is closed while editing, which isn't a problem,
                 // but I would like to understand at some point.
-                drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: this.x, y: this.y - 16});
+                if (!this.style.hideEntranceLight) {
+                    drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: this.x, y: this.y - 16});
+                }
             }
         } else if (this.style[this.definition.d]) {
             let frame: Frame;

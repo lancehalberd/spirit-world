@@ -9,11 +9,13 @@ export function getMappedEntranceData(randomizerState: RandomizerState, zoneKey:
     return randomizerState?.entrances?.entranceAssignments?.[`${zoneKey}:${entrance.id}`] ?? entrance;
 }
 
-export function findReachableNodes(randomizerState: RandomizerState, state: GameState, showWarnings = true): LogicNode[] {
+export function findReachableNodes(randomizerState: RandomizerState, state: GameState, showWarnings = true): NodePath[] {
     const {allNodesById, startingNodes} = randomizerState;
-    const reachableNodes = [...startingNodes];
-    for (let i = 0; i < reachableNodes.length; i++) {
-        const currentNode = reachableNodes[i];
+    const nodesSeen: Set<LogicNode> = new Set();
+    const nodePaths: NodePath[] = startingNodes.map(node => ({path: [], node}));
+    for (let i = 0; i < nodePaths.length; i++) {
+        const currentNodePath = nodePaths[i];
+        const currentNode = currentNodePath.node;
         if (!currentNode) {
             console.error('Found undefined node');
             return [];
@@ -47,8 +49,12 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                 warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
                 continue;
             }
-            if (!reachableNodes.includes(nextNode)) {
-                reachableNodes.push(nextNode);
+            if (nextNode && !nodesSeen.has(nextNode)) {
+                nodesSeen.add(nextNode);
+                nodePaths.push({
+                    path: [...currentNodePath.path, {node: currentNode, path}],
+                    node: nextNode,
+                });
             }
         }
         for (const exit of (currentNode.exits || [])) {
@@ -73,13 +79,17 @@ export function findReachableNodes(randomizerState: RandomizerState, state: Game
                     'Missing node for exit: ');
                 continue;
             }
-            if (nextNode && !reachableNodes.includes(nextNode)) {
-                reachableNodes.push(nextNode);
+            if (nextNode && !nodesSeen.has(nextNode)) {
+                nodesSeen.add(nextNode);
+                nodePaths.push({
+                    path: [...currentNodePath.path, {node: currentNode, exit}],
+                    node: nextNode,
+                });
             }
         }
         state.hero.savedData.activeTools.staff = originalStaffValue;
     }
-    return reachableNodes;
+    return nodePaths;
 }
 window['findReachableNodes'] = findReachableNodes;
 
@@ -127,7 +137,7 @@ export function findReachableChecksFromStart(randomizerState: RandomizerState, s
 window['findReachableChecksFromStart'] = findReachableChecksFromStart;
 
 export function findReachableChecks(randomizerState: RandomizerState, simulatedState: GameState, showWarnings = true): LootWithLocation[] {
-    const reachableNodes: LogicNode[] = findReachableNodes(randomizerState, simulatedState, showWarnings);
+    const reachableNodes = findReachableNodes(randomizerState, simulatedState, showWarnings);
     return findLootObjects(reachableNodes, simulatedState);
 }
 
@@ -245,9 +255,10 @@ export function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootO
 }
 
 
-export function findLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLocation[] {
+export function findLootObjects(nodePaths: NodePath[], state: GameState = null): LootWithLocation[] {
     const lootObjects: LootWithLocation[] = [];
-    for (const node of nodes) {
+    for (const nodePath of nodePaths) {
+        const node = nodePath.node;
         const zone = getZone(node.zoneId);
         if (!zone) {
             continue;
@@ -277,6 +288,7 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
             lootObjects.push({
                 lootObject: object as AnyLootDefinition,
                 location,
+                path: nodePath,
             });
         }
         for (const npc of (node.npcs || [])) {
@@ -292,6 +304,7 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
                 lootObject: npc.loot,
                 location,
                 progressFlags: npc.progressFlags,
+                path: nodePath,
             });
         }
         for (const npc of (node.complexNpcs || [])) {
@@ -320,7 +333,8 @@ export function findLootObjects(nodes: LogicNode[], state: GameState = null): Lo
                     lootAmount: parseInt(amountOrLevel, 10) || 0
                 },
                 dialogueKey,
-                optionKey
+                optionKey,
+                path: nodePath,
             });
         }
         if (originalStaffValue) {

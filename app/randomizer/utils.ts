@@ -132,12 +132,12 @@ export function applyLootObjectToState(randomizerState: RandomizerState, simulat
 }
 
 export function setAllFlagsInLogic(randomizerState: RandomizerState, simulatedState: GameState): GameState {
-    let {startingNodes} = randomizerState;
     let changed, updatedState = simulatedState;
     do {
         changed = false;
-        startingNodes = findReachableNodes(randomizerState, updatedState, false);
-        for (const node of startingNodes) {
+        const nodePaths = findReachableNodes(randomizerState, updatedState, false);
+        for (const nodePath of nodePaths) {
+            const node = nodePath.node;
             const originalStaffValue = simulatedState.hero.savedData.activeTools.staff;
             // If the tower staff is not available in this node, temporarily remove it while we process
             // the logic for these flags.
@@ -276,62 +276,3 @@ export function verifyNodeConnections(randomizerState: RandomizerState) {
         }
     }
 }
-
-
-
-/*
-Debug code from the old randomizer:
-
-function testConnectivity() {
-    calculateKeyLogic(allNodes, [mainOverworldNode]);
-    let initialState = getDefaultState();
-        applySavedState(initialState, initialState.savedState);
-    const allLootObjects = findLootObjects(allNodes);
-    let finalState = copyState(initialState);
-    for (const lootWithLocation of allLootObjects) {
-        finalState = applyLootObjectToState(finalState, lootWithLocation);
-        finalState.savedState.objectFlags[lootWithLocation.lootObject.id] = true;
-        for (const flag of (lootWithLocation.progressFlags || [])) {
-            finalState.savedState.objectFlags[flag] = true;
-        }
-    }
-    const entrance1 = staffTowerNodes.find(node => node.nodeId === 'staffTowerF1Downstairs');
-    const entrance2 = staffTowerNodes.find(node => node.nodeId === 'staffTowerF4Spirit');
-    finalState.hero.savedData.elements.lightning = 0;
-    finalState.hero.savedData.activeTools.staff = 0;
-    finalState.hero.savedData.activeTools.clone = 1;
-    finalState.hero.savedData.equipment.ironBoots = 1;
-    finalState.savedState.dungeonInventories.staffTower.smallKeys = 0;
-    finalState.savedState.dungeonInventories.staffTower.totalSmallKeys = 0;
-    finalState = setAllFlagsInLogic(finalState, allNodes,  [mainOverworldNode]);
-    //initialState.hero.savedData.activeTools.staff = 1;
-    //initialState = setAllFlagsInLogic(initialState, craterNodes,  [entrance]);
-    const reachableNodes = findReachableNodes(staffTowerNodes, [entrance1, entrance2], finalState);
-    console.log(reachableNodes);
-    for (const node of staffTowerNodes) {
-        if (!reachableNodes.includes(node)) {
-            console.log('Could not reach node', node);
-        }
-    }
-}
-window.forgeNodes = forgeNodes;
-testConnectivity;//();
-function checkForEntranceIdConflicts() {
-    const idToNode: {[key in string]: LogicNode[]} = {};
-    for (const node of allNodes) {
-        for (const entranceId of node.entranceIds || []) {
-            if (!idToNode[entranceId]) {
-                idToNode[entranceId] = [node];
-            } else if (idToNode[entranceId].length > 1) {
-                // TODO: Handle the case when isSpiritWorld is set on nodes, then we allow
-                // one pair in the material world, and one pair in the spirit world.
-                // TODO: Handle the case for markers that should only have 1 entranceId per world.
-                console.error('conflict', entranceId, idToNode[entranceId], node);
-            } else {
-                idToNode[entranceId].push(node);
-            }
-        }
-    }
-}
-checkForEntranceIdConflicts//();
-*/

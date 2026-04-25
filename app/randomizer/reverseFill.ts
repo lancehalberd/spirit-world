@@ -320,15 +320,16 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
     //const initialCheckIds = findReachableChecks(allNodes, startingNodes, initialState).map(l => l.lootObject.id);
     //console.log(initialCheckIds);
     //debugState(finalState);
-    const allReachableNodes = findReachableNodes(randomizerState, finalState);
+    const allReachableNodePaths = findReachableNodes(randomizerState, finalState);
+    const allReachableNodes = new Set(allReachableNodePaths.map(nodePath => nodePath.node));
     for (const node of allNodes) {
-        if (!allReachableNodes.includes(node)) {
+        if (!allReachableNodes.has(node)) {
             debugState(finalState);
             console.warn(node.nodeId, ' will never be reachable');
             debugger;
         }
     }
-    const allReachableCheckIds = findLootObjects(allReachableNodes, finalState).map(l => l.lootObject.id);
+    const allReachableCheckIds = findLootObjects(allReachableNodePaths, finalState).map(l => l.lootObject.id);
     for (const lootWithLocation of allLootObjects) {
         if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id) && !finalState.savedState.objectFlags[lootWithLocation.lootObject.id]) {
             debugState(finalState);
@@ -341,7 +342,7 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
     // Calculate the set of all nodes that can be reached with the staff in inventory.
     // The final state doesn't collect the staff, so we have to explicitly add it here (and then reset it below):
     finalState.hero.savedData.activeTools.staff |= 2;
-    const allReachableNodesWithTowerStaff = new Set(findReachableNodes(randomizerState, finalState, false));
+    const allReachableNodesWithTowerStaff = new Set(findReachableNodes(randomizerState, finalState, false).map(path => path.node));
     for (const node of randomizerState.allNodes) {
         node.metadata = node.metadata ?? {assignableEntranceKeys: new Set(), nextNodes: new Set()};
         node.metadata.excludesTowerStaff = !allReachableNodesWithTowerStaff.has(node);

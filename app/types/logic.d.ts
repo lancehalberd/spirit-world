@@ -103,6 +103,27 @@ type DialogueKey =
     // Gives you an item after defeating the Forest Temple Boss.
     |'vanaraScientist';
 
+// A direct connection from one LogicNode to another, which may be restricted by logic or being able to use some door/lock mechanism
+interface LogicNodePath {
+    nodeId: string
+    logic?: LogicCheck
+    // If there is a door blocking this path that might be blocked, use the id instead
+    // of specifying logic so that the logic can be based on the state of the door.
+    doorId?: string
+    // Flag set during randomization that indicates whether this path can ever be used.
+    isAvailable?: boolean
+}
+// A connection from one LogicNode to another that is done through an EntranceObject which points to another EntranceObject.
+// The connected node is determined by finding the id of the target EntranceObject and finding a LogicNode containing this id on
+// its set of entranceIds.
+interface LogicNodeExit {
+    // The id of the object, which can be used to find connected nodes by finding the connected exit
+    // and then finding the logic node with the corresponding entranceId.
+    objectId: string
+    logic?: LogicCheck
+    // Flag set during randomization that indicates whether this exit can ever be used.
+    isAvailable?: boolean
+}
 // Node used for building the logical graph of the game used for randomization.
 interface LogicNode {
     // The id of the zone this node is in
@@ -139,27 +160,12 @@ interface LogicNode {
         progressFlags?: string[]
     }[]
     // Array of fixed paths to other logic nodes along with requirements for using them.
-    paths?: {
-        nodeId: string
-        logic?: LogicCheck
-        // If there is a door blocking this path that might be blocked, use the id instead
-        // of specifying logic so that the logic can be based on the state of the door.
-        doorId?: string
-        // Flag set during randomization that indicates whether this path can ever be used.
-        isAvailable?: boolean
-    }[],
+    paths?: LogicNodePath[],
     // Ids of any entrance objects
     entranceIds?: string[]
     // Ids of any exits along with logic requirements for using them. These ids are for objects
     // and the exits will point to entranceIds of objects in other nodes.
-    exits?: {
-        // The id of the object, which can be used to find connected nodes by finding the connected exit
-        // and then finding the logic node with the corresponding entranceId.
-        objectId: string
-        logic?: LogicCheck
-        // Flag set during randomization that indicates whether this exit can ever be used.
-        isAvailable?: boolean
-    }[]
+    exits?: LogicNodeExit[]
     // Metadata that gets set during entrance randomization.
     metadata?: {
         // Set of entrance ids that this node can be reached from that are still assignable.
@@ -172,4 +178,14 @@ interface LogicNode {
         // randomizer this could apply to almost any nodes not directly connected to the starting nodes.
         excludesTowerStaff?: boolean
     }
+}
+// This represents a path to a specific node starting from some set of starting nodes.
+interface NodePath {
+    // Either path or exit should be set to indicate the route from each section to the next.
+    path: {
+        node: LogicNode
+        path?: LogicNodePath
+        exit?: LogicNodeExit
+    }[]
+    node: LogicNode
 }

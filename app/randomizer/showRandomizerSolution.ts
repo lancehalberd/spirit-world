@@ -2,7 +2,7 @@ import {getRandomizerZoneDescription} from 'app/content/hints';
 import {getLootName} from 'app/content/loot';
 import {findReachableChecks} from 'app/randomizer/find';
 import {getPendingRandomizerGoals} from 'app/randomizer/goal';
-import {applyLootObjectToState, setAllFlagsInLogic} from 'app/randomizer/utils';
+import {applyLootObjectToState, getMappedLootData, setAllFlagsInLogic} from 'app/randomizer/utils';
 import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {getDefaultState, getState} from 'app/state';
 
@@ -28,6 +28,7 @@ export function showRandomizerSolution(): void {
 }
 window.showRandomizerSolution = showRandomizerSolution;
 
+const trashTypes: LootType[] = ['money', 'empty', 'map'];
 function collectAllLootForSolution(randomizerState: RandomizerState, simulatedState: GameState): GameState {
     const reachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, simulatedState);
     for (const check of reachableChecks) {
@@ -39,16 +40,23 @@ function collectAllLootForSolution(randomizerState: RandomizerState, simulatedSt
         if (simulatedState.savedState.objectFlags[check.lootObject.id]) {
             continue;
         }
-        if (check.lootObject.lootType !== 'money' && check.lootObject.lootType !== 'empty') {
+        const {lootType} = getMappedLootData(randomizerState, check.lootObject);
+        if (!trashTypes.includes(lootType)) {
             if (simulatedState.hero.savedData.maxLife < 7 || (
-                check.lootObject.lootType !== 'peachOfImmortality'
-                && check.lootObject.lootType !== 'peachOfImmortalityPiece'
+                lootType !== 'peachOfImmortality'
+                && lootType !== 'peachOfImmortalityPiece'
             )) {
                 // debugState(state);
                 if (check.location) {
-                    console.log(`Get ${getLootName(simulatedState, check.lootObject)} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
+                    console.log(`Get ${getLootName(simulatedState, {lootType})} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
                 } else {
-                    console.log(`Get ${getLootName(simulatedState, check.lootObject)} from ${check.dialogueKey}:${check.optionKey}`);
+                    console.log(`Get ${getLootName(simulatedState, {lootType})} from ${check.dialogueKey}:${check.optionKey}`);
+                }
+                if (randomizerState.entrances && check.path.path.length) {
+                    console.log(' ' + check.path.path.map(segment => {
+                        return segment.node.nodeId
+                            + (segment.exit ? `[${segment.exit.objectId}]` : '');
+                    }).join('>'));
                 }
             }
         }

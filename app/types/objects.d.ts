@@ -29,6 +29,7 @@ interface LootWithLocation {
     optionKey?: string
     lootObject: AnyLootDefinition
     progressFlags?: string[]
+    path?: NodePath
 }
 
 interface LootAssignment {
