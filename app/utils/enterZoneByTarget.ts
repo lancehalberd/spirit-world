@@ -1,11 +1,11 @@
 import {getAreaFromLocation} from 'app/content/areas';
 import {TextCue} from 'app/content/effects/textCue';
-import {evaluateLogicDefinition} from 'app/content/logic';
 import {Door} from 'app/content/objects/door';
 import {DreamPod} from 'app/content/objects/dreamPod';
 import {Teleporter} from 'app/content/objects/teleporter';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {zones} from 'app/content/zones';
+import {findObjectLocation} from 'app/randomizer/find';
 import {updateAreaSection} from 'app/utils/area';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
@@ -108,58 +108,6 @@ function onEnterLocation(
         enterZoneByDreamPodCallback(state, targetObjectId);
     }
     callback?.(state);
-}
-
-export function findObjectLocation(
-    state: GameState,
-    zoneKey: string,
-    targetObjectIds: string | string[],
-    checkSpiritWorldFirst = false,
-    skipObject: ObjectDefinition = null,
-    showErrorIfMissing = false
-): ZoneLocation & {object: ObjectDefinition} | false {
-    const zone = zones[zoneKey];
-    const objectIds = Array.isArray(targetObjectIds) ? targetObjectIds : [targetObjectIds];
-    if (!zone) {
-        debugger;
-        console.error('Missing zone', zoneKey);
-        return false;
-    }
-    for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
-        for (let floor = 0; floor < zone.floors.length; floor++) {
-            // Search the corresponding spirit/material world before checking in the alternate world.
-            const areaGrids = checkSpiritWorldFirst
-                ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
-                : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
-            const areaGrid = areaGrids[worldIndex];
-            const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
-            for (let y = 0; y < areaGrid.length; y++) {
-                for (let x = 0; x < areaGrid[y].length; x++) {
-                    for (const object of (areaGrid[y][x]?.objects || [])) {
-                        if (objectIds.includes(object.id) && object !== skipObject) {
-                            if (!evaluateLogicDefinition(state, object)) {
-                                continue;
-                            }
-                            return {
-                                zoneKey,
-                                floor,
-                                areaGridCoords: {x, y},
-                                x: object.x,
-                                y: object.y,
-                                d: state.hero.d,
-                                isSpiritWorld: inSpiritWorld,
-                                object,
-                            };
-                        }
-                    }
-                }
-            }
-        }
-    }
-    if (showErrorIfMissing) {
-        console.error('Could not find', targetObjectIds, 'in', zoneKey);
-    }
-    return false;
 }
 
 function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: string, skipObject: ObjectDefinition) {

@@ -186,21 +186,16 @@ interface RandomizerGoal {
     }
 }
 
-interface SimpleDoorLocation {
-    location: ZoneLocation
-    definition: EntranceDefinition
-}
-
 interface DoorLocation {
     key: string
     originalTargetKey: string
     location: ZoneLocation
     definition: EntranceDefinition|MarkerDefinition
     node: LogicNode
-    isEntrance?: boolean
-    isExit?: boolean
-    isUnderWater?: boolean
-    linkedDoors?: Set<string>
+    // Entrance is considered "inside" and should be paired
+    // with an entrance considered "outside".
+    isInterior: boolean
+    isUnderWater: boolean
 }
 interface EntranceData {
     targetZone?: string

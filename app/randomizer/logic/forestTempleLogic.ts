@@ -2,6 +2,7 @@ import {
     andLogic,
     hasBossWeapon,
     hasBow,
+    hasSpiritBarrier,
     hasCloudBoots, hasIce, hasLongSomersault,
     canAvoidBossAttacks,
     orLogic,
@@ -23,9 +24,22 @@ export const forestTempleNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'forestTemple1BeforeLock',
+        nodeId: 'forestTemple1Platform',
         checks: [
             {objectId: 'forestTempleSmallKey1', logic: hasBow},
+        ],
+        paths: [
+            // Jump down to the rest of the area.
+            {nodeId: 'forestTemple1BeforeLock'},
+        ],
+        // This node can only be entered by falling from the forest area, which is described
+        // by a path in the forest.
+    },
+    {
+        zoneId,
+        nodeId: 'forestTemple1BeforeLock',
+        checks: [
+            {objectId: 'forestTempleSmallKey1', logic: hasSpiritBarrier},
             {objectId: 'forestTempleSilver'},
             {objectId: 'forestTempleSmallMoney'},
         ],
@@ -114,8 +128,10 @@ export const forestTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'forestTempleSouthwest',
         paths: [{nodeId: 'forestTempleBigChest', logic: canPassLongCrumbleFloors}],
-        entranceIds: ['forestTempleSouthwestCaveEntrance'],
-        exits: [{objectId: 'forestTempleSouthwestCaveEntrance'}],
+        flags: [{flag: 'forestTempleTeleporterUnlocked'}],
+        entranceIds: ['forestTempleSouthwestCaveEntrance', 'forestTempleDreamTeleporter'],
+        exits: [{objectId: 'forestTempleSouthwestCaveEntrance'}, {objectId: 'forestTempleDreamTeleporter'}],
+        complexNpcs: [{dialogueKey: 'vanaraScientist', optionKey: 'itemReward', logic: {requiredFlags: ['forestTempleBoss']}}],
     },
 
     {

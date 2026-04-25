@@ -33,11 +33,11 @@ export const mainOverworldNode: LogicNode = {
             orLogic({requiredFlags: ['frostBeast']}, hasFire)
         )},
         {nodeId: 'underCity', logic: hasIronBoots},
-        {nodeId: 'dreamEntranceInner', logic: hasTeleportation},
     ],
     entranceIds: [
         'sideArea:noToolEntrance',
-        'tombTeleporter',
+        // This teleporter gets removed once the user has teleportation so it is permanently out of logic.
+        'tombBackDoor',
         'lakeDreamTeleporter',
         'peachCaveTopEntrance', 'peachCaveWaterEntrance',
         'staffTowerEntrance',
@@ -53,7 +53,8 @@ export const mainOverworldNode: LogicNode = {
     ],
     exits: [
         {objectId: 'sideArea:noToolEntrance'},
-        {objectId: 'tombTeleporter'},
+        // This is only unlockable from the tomb, so it is added to list of unreliable entrances for entrance randomizer.
+        {objectId: 'tombBackDoor', logic: {requiredFlags: ['tombBackDoor']}},
         {objectId: 'lakeDreamTeleporter'},
         {objectId: 'peachCaveTopEntrance'},
         // This entrance becomes frozen while the frost beast is active.

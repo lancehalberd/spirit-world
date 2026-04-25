@@ -473,6 +473,8 @@ export function createObjectDefinition(
                 type: definition.type,
                 saveStatus: definition.saveStatus,
                 status: definition.status || commonProps.status,
+                openLogic: definition.openLogic,
+                locationCue: definition.locationCue,
             };
         case 'chest':
         case 'bigChest':
@@ -1116,7 +1118,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'staffTower':
         case 'teleporter':
         case 'dreamPod':
-            if (object.type === 'dreamPod') {
+            if (object.type === 'dreamPod' || object.type === 'teleporter') {
                 rows = [
                     ...rows,
                     ...getLogicProperties(state, 'Is Open?', object.openLogic, updatedLogic => {
@@ -1150,7 +1152,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 if (object.type === 'pitEntrance') {
                     targetTypes = ['marker'];
                 } else if (object.type === 'teleporter' || object.type === 'dreamPod') {
-                    targetTypes = ['teleporter', 'marker', 'dreamPod'];
+                    targetTypes = ['teleporter', 'dreamPod'];
                 } else if (doorTypes.includes(object.type)) {
                     // Staff tower objects also function as doors.
                     targetTypes = doorTypes;

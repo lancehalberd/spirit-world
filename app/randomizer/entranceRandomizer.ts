@@ -29,6 +29,16 @@ const disabledDoors = new Set([
     'forestTemple:vanaraStorageStairs',
 ]);
 
+// These doors are not reliably useable and are not suitable as parts of critical paths for
+// guaranteeing connectivity for required nodes.
+const unreliableDoors = new Set([
+    // These entrances are unlocked by interior switches
+    'overworld:staffTowerSpiritEntrance',
+    'sky:staffTowerSkyEntrance',
+    'overworld:warTempleKeyDoor',
+    'overworld:tombBackDoor',
+]);
+
 export function randomizeEntrances(randomizerState: RandomizerState) {
     const {allEntrances, allNodesById} = randomizerState;
     randomizerState.entrances = {
@@ -80,20 +90,18 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
             // add the target id here.
             allAssignableEntranceIds.add(doorLocation.originalTargetKey);
             // Pause if we notice any assumptions are wrong.
-            if (doorLocation.isExit) {
+            if (doorLocation.isInterior) {
                 entranceIds.add(doorLocation.originalTargetKey);
                 exitIds.add(doorLocation.key);
                 if (entranceIds.has(doorLocation.key) || exitIds.has(doorLocation.originalTargetKey)) {
                     debugger;
                 }
-            } else if (doorLocation.isEntrance) {
+            } else {
                 entranceIds.add(doorLocation.key);
                 exitIds.add(doorLocation.originalTargetKey);
                 if (entranceIds.has(doorLocation.originalTargetKey) || exitIds.has(doorLocation.key)) {
                     debugger;
                 }
-            } else {
-                debugger;
             }
         }
     }
@@ -111,17 +119,27 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
         // Initialize assignableEntranceKeys to be all entranceIds that are included in the list of all entrances (which means they can be used under the current settings).
         for (const entranceId of (currentNode.entranceIds ?? [])) {
             const entranceKey = `${currentNode.zoneId}:${entranceId}`;
-            if (allAssignableEntranceIds.has(entranceKey) && !entranceAssignments[entranceKey]) {
+            if (allAssignableEntranceIds.has(entranceKey) && !entranceAssignments[entranceKey] && !unreliableDoors.has(entranceKey)) {
                 currentNode.metadata.assignableEntranceKeys.add(entranceKey);
             }
         }
         for (const path of (currentNode.paths || [])) {
+            // A path may be unavailable if the item necessary to traverse it
+            // isn't present in the current game mode. For example underwater
+            // paths are typically not available without iron boots.
+            if (!path.isAvailable) {
+                continue;
+            }
             const nextNode = allNodesById[path.nodeId];
             if (nextNode) {
                 currentNode.metadata.nextNodes.add(nextNode);
             }
         }
         for (const exit of (currentNode.exits || [])) {
+            // Similar to paths above, some exits may never be available in the current game mode.
+            if (!exit.isAvailable) {
+                continue;
+            }
             const exitKey = currentNode.zoneId + ':' + exit.objectId;
             if (!entranceAssignments[exitKey]) {
                 continue;
@@ -146,7 +164,7 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
             debugger;
             throw new Error('Required node started with no assignable entrance keys');
         }
-        // console.log(node.nodeId, [...node.metadata.assignableEntranceKeys]);
+        //console.log(node.nodeId, [...node.metadata.assignableEntranceKeys]);
     }
     // This could eventually be configured to be a smaller set of nodes, such as only the set of nodes
     // containing checks, or only the set of nodes required by the race goal, such as nods for certain bosses.
@@ -217,7 +235,8 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
             continue;
         }
         if (!isEntranceDefinition(entrance.definition)) {
-            console.error('unassigned marker', entrance);
+            // This is expected as long as there are still pit entrances remaining in the list to assign to this.
+            // console.error('unassigned marker', entrance);
             continue;
         }
         const target = random.mutate().element(getUnassignedMatchingEntrances(randomizerState, entrance));
@@ -228,9 +247,15 @@ export function randomizeEntrances(randomizerState: RandomizerState) {
         }
         assignEntranceExitPair(randomizerState, entrance, target);
     }
+    for (const entrance of shuffledEntrances) {
+        if (!entranceAssignments[entrance.key]) {
+            console.warn(entrance.key + ' was never assigned.');
+        }
+    }
 }
 export function getUnassignedMatchingEntrances(randomizerState: RandomizerState, source: DoorLocation): DoorLocation[] {
     const matchingEntrances: DoorLocation[] = [];
+    const sourceIsTeleporter = source.definition.type === 'teleporter' || source.definition.type === 'dreamPod';
     for (const target of randomizerState.allEntrances) {
         if (randomizerState.entrances.entranceAssignments[target.key]) {
             continue;
@@ -245,15 +270,17 @@ export function getUnassignedMatchingEntrances(randomizerState: RandomizerState,
         if (source.definition.type !== 'pitEntrance' && target.definition.type !== 'pitEntrance' && source.isUnderWater !== target.isUnderWater) {
             continue;
         }
-        if ((source.isEntrance && !target.isExit) || (source.isExit && !target.isEntrance)) {
+        if (source.isInterior === target.isInterior) {
             continue;
         }
-        if ((source.definition.type === 'teleporter' || target.definition.type === 'teleporter') && target.definition.type !== source.definition.type) {
+        // Teleporters and dream pods should be mapped together.
+        const targetIsTelporter = target.definition.type === 'teleporter' || target.definition.type === 'dreamPod';
+        if (sourceIsTeleporter !== targetIsTelporter) {
             continue;
         }
         // Only teleporters are allowed to link between worlds. This is necessary to allow if we want to include the entrance
         // to waterfall tower in the pool, since we could have an odd number of teleporters in each world with it included.
-        if (source.definition.type !== 'teleporter' && source.location.isSpiritWorld !== target.location.isSpiritWorld) {
+        if (!sourceIsTeleporter && source.location.isSpiritWorld !== target.location.isSpiritWorld) {
             continue;
         }
         // Optionally we could connect cracked entrances+exits together.
@@ -270,9 +297,9 @@ export function getUnassignedMatchingEntrances(randomizerState: RandomizerState,
             && ((source.definition.type !== 'marker' && source.definition.type !== 'spawnMarker') || target.definition.type === 'pitEntrance')
             && (target.definition.type !== 'pitEntrance' || source.definition.type === 'marker' || source.definition.type === 'spawnMarker')
             && ((target.definition.type !== 'marker' && target.definition.type !== 'spawnMarker') || source.definition.type === 'pitEntrance'));
-        const matchingEntranceExit = assignableEntrances.filter(target => source.isEntrance === target.isExit && source.isExit === target.isEntrance);
-        const matchesTeleporter = assignableEntrances.filter(target => source.definition.type !== 'teleporter' || target.definition.type !== 'teleporter' || target.definition.type === source.definition.type);
-        const matchesWorld = assignableEntrances.filter(target => source.definition.type === 'teleporter' || source.location.isSpiritWorld === target.location.isSpiritWorld);
+        const matchingEntranceExit = assignableEntrances.filter(target => source.isInterior !== target.isInterior);
+        const matchesTeleporter = assignableEntrances.filter(target => sourceIsTeleporter === (target.definition.type === 'teleporter' || target.definition.type === 'dreamPod'));
+        const matchesWorld = assignableEntrances.filter(target => sourceIsTeleporter || source.location.isSpiritWorld === target.location.isSpiritWorld);
         // TODO: debug why we end up here.
         console.error('Found no matching target for entrance', source, matchingWater, matchingPitMarker, matchingEntranceExit, matchesTeleporter, matchesWorld);
         debugger;
@@ -329,18 +356,15 @@ function assignEntranceExitPair(randomizerState: RandomizerState, entranceA: Doo
         fixedNimbusCloudZones,
         targetIdMap,
     } = randomizerState.entrances;
-    const entrance = entranceA.isEntrance ? entranceA : entranceB;
-    const exit = entrance !== entranceA ? entranceA : entranceB;
-    if (entrance.definition.type === 'marker' || entrance.definition.type === 'spawnMarker'
-        || exit.definition.type === 'marker' || exit.definition.type === 'spawnMarker') {
-        console.log('assignEntranceExitPair', entrance.key, exit.key);
-    }
+    const interiorEntrance = entranceA.isInterior ? entranceA : entranceB;
+    const exteriorEntrance = interiorEntrance !== entranceA ? entranceA : entranceB;
+    // console.log('assignEntranceExitPair', exteriorEntrance.key, interiorEntrance.key);
 
     // If we reassign the exit that targets the entrance to a dungeon that can be escaped using the Nimbus Cloud
     // we need to remap the Nimbus Cloud exit for that zone to the new entrance that was assigned to that exit.
     // This way when a player enters a randomized entrance that takes them to the main entrance of a dungeon,
     // using the Nimbus Cloud will return them back to that entrance, instead of the vanilla dungeon entrance.
-    const exitDefinition = exit.definition;
+    const exitDefinition = interiorEntrance.definition;
     if (isEntranceDefinition(exitDefinition)) {
         const zoneEntranceMap = getZoneEntranceMap();
         for (const zone of typedKeys(zoneEntranceMap)) {
@@ -348,7 +372,7 @@ function assignEntranceExitPair(randomizerState: RandomizerState, entranceA: Doo
                 continue;
             }
             if (zoneEntranceMap[zone] === `${exitDefinition.targetZone}:${exitDefinition.targetObjectId}`) {
-                zoneEntranceMap[zone] = entrance.key;
+                zoneEntranceMap[zone] = exteriorEntrance.key;
                 // console.log(zone + ' => ' + zoneEntranceMap[zone]);
                 fixedNimbusCloudZones.add(zone);
             }
@@ -358,41 +382,39 @@ function assignEntranceExitPair(randomizerState: RandomizerState, entranceA: Doo
     // This line is redundant with the loop, except in the case of pit markers.
     // Pit marker assignments are not functional, but are useful for debugging which
     // pit entrance is assigned to a marker.
-    entranceAssignments[entrance.key] = {
-        targetZone: exit.location.zoneKey,
-        targetObjectId: exit.definition.id,
+    entranceAssignments[exteriorEntrance.key] = {
+        targetZone: interiorEntrance.location.zoneKey,
+        targetObjectId: interiorEntrance.definition.id,
     };
     // This will not be set for 'pitMarker' "entrances" which do not need to be assigned.
-    for (const entranceToAssign of targetIdMap[entrance.originalTargetKey] ?? []) {
+    for (const entranceToAssign of targetIdMap[exteriorEntrance.originalTargetKey] ?? []) {
         /*console.log(
-            `${entrance.location.zoneKey}::${entrance.definition.id}`, '=>',
-            `${exitZone}::${exitTarget}`
+            entranceToAssign.key, '=>', interiorEntrance.key
         );*/
         entranceAssignments[entranceToAssign.key] = {
-            targetZone: exit.location.zoneKey,
-            targetObjectId: exit.definition.id,
+            targetZone: interiorEntrance.location.zoneKey,
+            targetObjectId: interiorEntrance.definition.id,
         };
     }
     // This line is redundant with the loop, except in the case of pit markers.
     // Pit marker assignments are not functional, but are useful for debugging which
     // pit entrance is assigned to a marker.
-    entranceAssignments[exit.key] = {
-        targetZone: entrance.location.zoneKey,
-        targetObjectId: entrance.definition.id,
+    entranceAssignments[interiorEntrance.key] = {
+        targetZone: exteriorEntrance.location.zoneKey,
+        targetObjectId: exteriorEntrance.definition.id,
     };
     // This will not be set for 'pitMarker' "entrances" which do not need to be assigned.
-    for (const exitToAssign of targetIdMap[exit.originalTargetKey] ?? []) {
+    for (const entranceToAssign of targetIdMap[interiorEntrance.originalTargetKey] ?? []) {
         /*console.log(
-            `${exit.location.zoneKey}::${exit.definition.id}`, '=>',
-            `${entranceZone}::${entranceTarget}`
+            entranceToAssign.key, '=>', exteriorEntrance.key
         );*/
-        entranceAssignments[exitToAssign.key] = {
-            targetZone: entrance.location.zoneKey,
-            targetObjectId: entrance.definition.id,
+        entranceAssignments[entranceToAssign.key] = {
+            targetZone: exteriorEntrance.location.zoneKey,
+            targetObjectId: exteriorEntrance.definition.id,
         };
-        // Remove cracked status from the exit when assigned to an entrance that isn't cracked.
-        if (exitToAssign.definition.status === 'cracked' && entrance.definition.status !== 'cracked') {
-            entranceAssignments[exitToAssign.key].status = 'blownOpen';
+        // Remove cracked status from the interiorEntrance when assigned to an entrance that isn't cracked.
+        if (entranceToAssign.definition.status === 'cracked' && exteriorEntrance.definition.status !== 'cracked') {
+            entranceAssignments[entranceToAssign.key].status = 'blownOpen';
         }
     }
 }

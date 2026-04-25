@@ -127,7 +127,7 @@ dialogueHash.tombGuardian = {
         },
         {
             logicCheck: {
-                requiredFlags: ['$spiritSight', 'tombTeleporter'],
+                requiredFlags: ['$spiritSight', 'tombBackDoor'],
                 excludedFlags: ['tombExit'],
             },
             isExclusive: true,
@@ -188,7 +188,7 @@ dialogueHash.tombGuardian = {
         {
             logicCheck: {
                 requiredFlags: [],
-                excludedFlags: ['tombTeleporter'],
+                excludedFlags: ['tombBackDoor'],
             },
             isExclusive: true,
             text: [
@@ -203,7 +203,7 @@ dialogueHash.tombGuardian = {
         },
         {
             logicCheck: {
-                requiredFlags: ['tombTeleporter'],
+                requiredFlags: ['tombBackDoor'],
                 excludedFlags: ['$astralProjection'],
             },
             isExclusive: true,

@@ -127,6 +127,10 @@ export const forestNodes: LogicNode[] = [
             {nodeId: 'spiritForestWest', logic: canCrossCracks},
             {nodeId: 'treeVillageSpirit', logic: canCrossCracks},
             {nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
+            // Fall into the pits in the southeast section.
+            {nodeId: 'forestTemple1Platform'},
+            // Fall into pits in the northeast section.
+            {nodeId: 'forestTempleEntranceSpirit'},
         ],
         entranceIds: [
             'forestTempleEastTreeEntrance',
@@ -342,7 +346,9 @@ export const treeVillageNodes: LogicNode[] = [
         ],
         exits: [
             { objectId: 'southeastTreeEntrance' },
-            { objectId: 'vanaraStorageStairs', logic: {requiredFlags: ['clearedTreeVillageStorageRoom']} },
+            // This exit does not allow additional traversability and is difficult to account for
+            // in the entrance randomizer, so we do not include it.
+            // { objectId: 'vanaraStorageStairs', logic: {requiredFlags: ['clearedTreeVillageStorageRoom']} },
         ],
     },
     {
@@ -369,7 +375,7 @@ export const treeVillageNodes: LogicNode[] = [
         flags: [{flag: 'clearedTreeVillageStorageRoom', logic: hasWeapon }],
         entranceIds: [
             'treeVillageStorageMarker',
-            'vanaraStorageStairs',
+            // 'vanaraStorageStairs',
         ],
         exits: [
             { objectId: 'vanaraStorageStairs' },

@@ -88,12 +88,20 @@ interface DialogueSet {
 }
 
 type DialogueKey =
+    // Gives you an item when you first talk to her, and another after collecting 20 peaches.
     |'ambrosia'
+    // Gives an item if you fully upgrade the regular chakram and have cloud boots.
     |'citySmith'
+    // Gives an item if you fully upgrade the gold chakram and have iron boots.
     |'forgeSmith'
+    // Gives an item the first time you talk to her.
     |'spiritTree'
+    // Gives an item if you defeat the bugs in the storage room.
     |'storageVanara'
-    |'streetVendor';
+    // Sells 1 item initially, a second item after releasing the beasts, and a third item after the beasts are all defeated.
+    |'streetVendor'
+    // Gives you an item after defeating the Forest Temple Boss.
+    |'vanaraScientist';
 
 // Node used for building the logical graph of the game used for randomization.
 interface LogicNode {
@@ -137,6 +145,8 @@ interface LogicNode {
         // If there is a door blocking this path that might be blocked, use the id instead
         // of specifying logic so that the logic can be based on the state of the door.
         doorId?: string
+        // Flag set during randomization that indicates whether this path can ever be used.
+        isAvailable?: boolean
     }[],
     // Ids of any entrance objects
     entranceIds?: string[]
@@ -147,6 +157,8 @@ interface LogicNode {
         // and then finding the logic node with the corresponding entranceId.
         objectId: string
         logic?: LogicCheck
+        // Flag set during randomization that indicates whether this exit can ever be used.
+        isAvailable?: boolean
     }[]
     // Metadata that gets set during entrance randomization.
     metadata?: {
@@ -154,5 +166,10 @@ interface LogicNode {
         assignableEntranceKeys: Set<string>
         // Set of nodes that can be reached immediately from this node using either paths or exits.
         nextNodes: Set<LogicNode>
+        // This is populated on nodes before item randomization to indicate that the player cannot use
+        // the tower staff in these nodes because the nodes are only reachable from doors on the Staff Tower
+        // exterior. By default, this should only be true inside the Staff Tower zone, but on entrance
+        // randomizer this could apply to almost any nodes not directly connected to the starting nodes.
+        excludesTowerStaff?: boolean
     }
 }

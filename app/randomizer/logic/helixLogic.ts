@@ -122,12 +122,12 @@ export const helixNodes: LogicNode[] = [
         ],
         paths: [
             {nodeId: 'helixBridge', logic: canUseTeleporters},
-            {nodeId: 'dreamMain'},
         ],
-        entranceIds: ['helixBridgeTeleporter', 'helixSkySpiritEntrance'],
+        entranceIds: ['helixBridgeTeleporter', 'helixSkySpiritEntrance', 'helixBridgeDreamTeleporter'],
         exits: [
             {objectId: 'helixBridgeTeleporter'},
             {objectId: 'helixSkySpiritEntrance'},
+            {objectId: 'helixBridgeDreamTeleporter'},
         ],
     },
     {

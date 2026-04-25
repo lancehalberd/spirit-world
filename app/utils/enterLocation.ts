@@ -128,8 +128,10 @@ export function enterLocation(
     state.hero.y = location.y;
     state.hero.endInvisibility(state);
     // If the player somehow enters the staff tower while the tower staff is equipped (such as returning to last save)
-    // Remove the tower staff from their inventory.
-    if (state.location.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff & 2) {
+    // Remove the tower staff from their inventory so they do not get soft locked.
+    // This behavior is not present in randomizer since it is possible to enter Staff Tower without using the external
+    // entrances in entrance randomizer, and players can use the "return to home" action to avoid being softlocked.
+    if (!state.randomizerState && state.location.zoneKey === 'staffTower' && state.hero.savedData.activeTools.staff & 2) {
         state.hero.savedData.activeTools.staff &= ~2;
     }
 

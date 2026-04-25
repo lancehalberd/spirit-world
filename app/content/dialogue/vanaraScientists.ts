@@ -5,6 +5,9 @@ dialogueHash.vanaraScientist = {
     key: 'vanaraScientist',
     mappedOptions: {
         questions(state: GameState) {
+            if (state.randomizerState) {
+                return `You should focus on finishing the race!`;
+            }
             const questions: string[] = [
                 'Spirit Beasts:vanaraScientist.spiritBeasts',
                 'Your Research:vanaraScientist.research',
@@ -12,14 +15,16 @@ dialogueHash.vanaraScientist = {
             ];
             return `
                 {choice:What do you want to know?
-                    ${questions.join('|')}
+                |${questions.join('|')}
                 |That's all:vanaraScientist.goodbye
                 }`;
         },
         spiritBeasts(state: GameState) {
             if (isLogicValid(state, beastsDefeated)) {
                 return `
-
+                    Even though you've defeated the beasts you should remain vigilant.
+                    {|}Whoever stole our reserach could be on the verge of creating something much worse!
+                    {@vanaraScientist.questions}
                 `;
             } else if (isLogicValid(state, someBeastDefeated)) {
                 return `
@@ -28,6 +33,7 @@ dialogueHash.vanaraScientist = {
                     {|}These hearts appear to be Vanaran in origin.
                     {|}Be careful, whoever created these may have the ability to do something much worse!
                     {|}At least they were smart enough not to try and build the hearts directly into the Spirit Beasts...
+                    {@vanaraScientist.questions}
                 `;
             } else {
                 return `
@@ -39,6 +45,7 @@ dialogueHash.vanaraScientist = {
                     {|}Without a conduit for that energy, the Spirit Beasts should burn themselves out in moments if they don't return to the Spirit World.
                     {|}There must be something providing the Spirit Beasts with energy. When you find them, search for their energy source, otherwise I fear
                     they will be unstoppable.
+                    {@vanaraScientist.questions}
                 `;
             }
         },
@@ -47,6 +54,7 @@ dialogueHash.vanaraScientist = {
             {|}Unfortunately, this differences makes the Vanaran ecosystem we brought with us incredibly invasive here.
             {|}Without our research efforts here, the local ecosystem would have been wiped out centuries ago.
             {|}Even now we must continue our work to preserve the delicate balance between ecosystems.
+            {@vanaraScientist.questions}
         `,
         enemy(state: GameState) {
             if (isLogicValid(state, beastsDefeated)) {
@@ -55,15 +63,17 @@ dialogueHash.vanaraScientist = {
                     {|}As has ever been the case since we arrived on this planet, the War God's ambition vastly exceeds its reach.
                     {|}We ask you to accept the War God's challenge as our champion and defeat whatever monstrosity it has devised this time.
                     {|}Perhaps when fully confronted by the futility of this conflict the War God will finally be released from this obsession.
+                    {@vanaraScientist.questions}
                 `;
             } else {
                 return `
                     When we first arrived on this world, we were attacked by the Summoner's War God and their Spirit Beasts.
-                    {|}But the War God did not anticipate the inherent strength of Vanara spirit powers and was completely outmatched.
-                    {|}Afterwards the use of the Spirit Beasts was banned by a peace treaty between the Vanara and the newly appointed Spirit King.
+                    {|}But the War God did not anticipate the strength of Vanara spirit powers and was completely outmatched.
+                    {|}Afterwards the use of the Spirit Beasts was banned by a treaty between the Vanara and the newly appointed Spirit King.
                     {|}Since then, worship of the War God dwindled, but as is its nature it is constantly seeking the power and opportunity to
                     challenge the Vanara again.
-                    {|}Whether or not the War God is responsible for releasing the beasts it is certain it seeks to use this chance to attack us.
+                    {|}Even if the War God is not responsible for releasing the beasts it won't pass up this chance.
+                    {@vanaraScientist.questions}
                 `;
             }
         },
@@ -76,7 +86,8 @@ dialogueHash.vanaraScientist = {
             } else {
                 return 'It looks like some of the locals may have run off with our research, be careful!'
             }
-        }
+        },
+        itemReward: `{item:clone}`,
     },
     options: [
         {
@@ -122,13 +133,18 @@ dialogueHash.vanaraScientist = {
                 {
                     dialogueType: 'quest',
                     dialogueIndex: 224,
-                    text: `
-                        Hold that thought, I'm almost finished up here...
-                        {|}Got it! {flag:jadePalaceTeleporterUnlocked}
-                        In light of the recent attacks, the Spirit King has agreed to
-                        let us install these pods here.
-                        {|}Feel free to use them if you ever want to travel to the Dreaming.
-                    `,
+                    text(state: GameState) {
+                        if (state.randomizerState) {
+                            return `It's unlocked now! {flag:jadePalaceTeleporterUnlocked}`;
+                        }
+                        return `
+                            Hold that thought, I'm almost finished up here...
+                            {|}Got it! {flag:jadePalaceTeleporterUnlocked}
+                            In light of the recent attacks, the Spirit King has agreed to
+                            let us install these pods here.
+                            {|}Feel free to use them if you ever want to travel to the Dreaming.
+                        `;
+                    },
                 },
             ],
         },
@@ -160,12 +176,48 @@ dialogueHash.vanaraScientist = {
                 {
                     dialogueType: 'quest',
                     dialogueIndex: 219,
-                    text: `
-                        One moment, I've almost got these fixed... 
-                        {|}That should do it! {flag:forestTempleTeleporterUnlocked}
-                        These pods were damage in the attack, but you should be able to use
-                        now to visit the Dreaming and return here easily.
-                    `,
+                    text(state: GameState) {
+                        if (state.randomizerState) {
+                            return `It's unlocked now! {flag:forestTempleTeleporterUnlocked}`;
+                        }
+                        return `
+                            One moment, I've almost got these fixed...
+                            {|}That should do it! {flag:forestTempleTeleporterUnlocked}
+                            These pods were damage in the attack, but you should be able to use
+                            now to visit the Dreaming and return here easily.
+                        `;
+                    },
+                },
+            ],
+        },
+        // This should be right after the action for unlocking the teleporter so that it takes priority over
+        // other options in randomizer.
+        {
+            logicCheck: {
+                requiredFlags: ['forestTempleBoss'],
+                excludedFlags: ['forestTempleItemReward'],
+                zones: ['forestTemple'],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueType: 'quest',
+                    dialogueIndex: 222,
+                    text(state: GameState) {
+                        if (state.randomizerState) {
+                            return `Thanks! {@vanaraScientist.itemReward}{flag:forestTempleItemReward}`;
+                        }
+                        // TODO: this is currently worded for the Clone Technique, but eventually this NPC will give you
+                        // the magic seeds and the Clone Technique will be granted by the Spirit Tree, so this
+                        // dialogue will need to be udpated then.
+                        return`
+                            Amazing, thanks for taking care of that!
+                            {|}I think you are ready for something a little more complicated.
+                            {|}Some of the more challenging ruins were intended for groups of explorers,
+                            but we are a bit short handed at the moment, so you'll have to try using this instead.
+                            {@vanaraScientist.itemReward}{flag:forestTempleItemReward}
+                        `;
+                    },
                 },
             ],
         },
@@ -220,29 +272,8 @@ dialogueHash.vanaraScientist = {
         },
         {
             logicCheck: {
-                requiredFlags: ['forestTempleBoss'],
-                excludedFlags: ['$clone'],
-                zones: ['forestTemple'],
-            },
-            isExclusive: true,
-            text: [
-                {
-                    dialogueType: 'quest',
-                    dialogueIndex: 222,
-                    text: `
-                        Amazing, thanks for taking care of that!
-                        {|}I think you are ready for something a little more complicated.
-                        {|}Some of the more challenging ruins were intended for groups of explorers,
-                        but we are a bit short handed at the moment, so you'll have to try using this instead.
-                        {item:clone}
-                    `,
-                },
-            ],
-        },
-        {
-            logicCheck: {
                 requiredFlags: [],
-                excludedFlags: ['beastsDefeated'],
+                excludedFlags: [],
                 zones: ['forestTemple'],
             },
             isExclusive: true,

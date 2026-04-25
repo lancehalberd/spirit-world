@@ -136,8 +136,14 @@ export function setAllFlagsInLogic(randomizerState: RandomizerState, simulatedSt
     let changed, updatedState = simulatedState;
     do {
         changed = false;
-        startingNodes = findReachableNodes(randomizerState, updatedState);
+        startingNodes = findReachableNodes(randomizerState, updatedState, false);
         for (const node of startingNodes) {
+            const originalStaffValue = simulatedState.hero.savedData.activeTools.staff;
+            // If the tower staff is not available in this node, temporarily remove it while we process
+            // the logic for these flags.
+            if (node.metadata?.excludesTowerStaff) {
+                simulatedState.hero.savedData.activeTools.staff &= ~2;
+            }
             for (const flag of (node.flags || [])) {
                 if (updatedState.savedState.objectFlags[flag.flag]) {
                     continue;
@@ -160,6 +166,7 @@ export function setAllFlagsInLogic(randomizerState: RandomizerState, simulatedSt
                 // console.log('    Setting flag', flag.flag, updatedState.savedState.objectFlags[flag.flag]);
                 changed = true;
             }
+            simulatedState.hero.savedData.activeTools.staff = originalStaffValue;
         }
     } while (changed);
     return updatedState;

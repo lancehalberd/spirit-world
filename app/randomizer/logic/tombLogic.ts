@@ -1,6 +1,6 @@
 import {
     andLogic, orLogic,
-    canCross2Gaps, hasSpiritSight, hasTeleportation, hasTrueSight,
+    canCross2Gaps,
     hasAstralProjection, hasClone, canBeatGolem, canRemoveLightStones, hasMediumRange,
     hasRangedPush, hasWeapon,
 } from 'app/content/logic';
@@ -102,15 +102,19 @@ export const tombNodes: LogicNode[] = [
         zoneId,
         nodeId: 'tombGuardian',
         npcs: [
-            {loot: {type: 'dialogueLoot', id: 'tomb:0:1x0-npc-0', lootType: 'spiritSight'}, progressFlags: ['tombTeleporter']},
+            {loot: {type: 'dialogueLoot', id: 'tomb:0:1x0-npc-0', lootType: 'spiritSight'}, progressFlags: ['tombBackDoor']},
         ],
         paths: [
             {nodeId: 'tombCocoonEntrance', logic: canRemoveLightStones},
-            {nodeId: 'dreamEntranceInner', logic: hasTeleportation},
         ],
-        entranceIds: ['tombTeleporter', 'tombDreamTeleporter'],
+        entranceIds: [
+            // This teleporter gets removed once the user has teleportation so it is permanently out of logic.
+            'tombBackDoor',
+            'tombDreamTeleporter'
+        ],
         exits: [
-            {objectId: 'tombTeleporter', logic: orLogic(hasSpiritSight, hasTrueSight)},
+            {objectId: 'tombBackDoor', logic: {requiredFlags: ['tombBackDoor']}},
+            {objectId: 'tombDreamTeleporter'},
         ],
     },
     {

@@ -140,6 +140,8 @@ export const cocoonNodes: LogicNode[] = [
         paths: [
             {nodeId: 'dreamMain'},
         ],
+        entranceIds: ['cocoonDreamTeleporter'],
+        exits: [{objectId: 'cocoonDreamTeleporter'}],
         checks: [
             {objectId: 'cocoonBoss', logic: hasSpiritSight},
             {objectId: 'cocoonSilver', logic: orLogic(hasTeleportation, hasSomersault) },

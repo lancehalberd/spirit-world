@@ -1,8 +1,7 @@
 import {zones} from 'app/content/zones/zoneHash';
 import {isCheckTrash} from 'app/randomizer/checks';
-import {findReachableChecksFromStart} from 'app/randomizer/find';
+import {findObjectLocation, findReachableChecksFromStart} from 'app/randomizer/find';
 import {setScript} from 'app/scriptEvents';
-import {findObjectLocation} from 'app/utils/enterZoneByTarget';
 import Random from 'app/utils/Random';
 
 type ObjectZoneLocation = ZoneLocation & { object?: ObjectDefinition };
@@ -50,7 +49,7 @@ const getVanaraElderLocation = (state: GameState) => {
 
 const getTombLocation = (state: GameState) => findMaterialWorldObject(state, 'tombEntrance');
 const getWarTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'warTempleEntrance');
-const getLakeTeleporterLocation = (state: GameState) => findMaterialWorldObject(state, ['tombTeleporter', 'lakeDreamTeleporter']);
+const getTombBackDoorLocation = (state: GameState) => findMaterialWorldObject(state, 'tombBackDoor');
 
 const getLakeTunnelLocation = (state: GameState) => findMaterialWorldObject(state, 'lakeTunnelEntrance');
 const getGrandTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'grandTempleEntrance');
@@ -266,11 +265,11 @@ const missions: Mission[] = [
         },
     },
     {
-        getMarkerLocation: getLakeTeleporterLocation,
+        getMarkerLocation: getTombBackDoorLocation,
         getScript(state: GameState) {
             if (state.location.zoneKey !== 'tomb') {
                 return `The Guardian of the Tomb said to come back when I could "touch the spirit world".
-                    {|}There was a teleporter by the lake that will take me back to the Tomb.`;
+                    {|}There was a shortcut to the back of the Tomb near the mountains.`;
             } else {
                 return `I should ask the Guardian what to do next.`;
             }
@@ -283,7 +282,7 @@ const missions: Mission[] = [
         },
     },
     {
-        getMarkerLocation: getLakeTeleporterLocation,
+        getMarkerLocation: getTombBackDoorLocation,
         getScript(state: GameState) {
             if (state.location.zoneKey === 'cocoon') {
                 return `There must be something important at the bottom of this strange cave.`;
@@ -291,7 +290,7 @@ const missions: Mission[] = [
                 return `There must be something important in that strange cave behind this Tomb.`;
             } else {
                 return `There must be something important in that strange cave behind the Tomb.
-                    {|}There was a teleporter by the lake that will take me back to the Tomb.`;
+                    {|}There was a shortcut to the back of the Tomb near the mountains.`;
             }
         },
         isAvailable(state: GameState) {

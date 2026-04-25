@@ -3,7 +3,7 @@ import {objectHash} from 'app/content/objects/objectHash';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound} from 'app/musicController';
-import {getMappedEntranceData} from 'app/randomizer/find';
+import {getMappedEntranceData, isTeleporterOpen} from 'app/randomizer/find';
 import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,
@@ -38,11 +38,19 @@ export class Teleporter implements ObjectInstance {
     wasUnderObject: boolean;
     actualRadius: number = 0;
     disabledUntilHeroLeaves = false;
+    isOpen = true;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
+        // this.isOpen = evaluateLogicDefinition(state, this.definition.openLogic, true);
         this.x = definition.x;
         this.y = definition.y;
         this.status = getObjectStatus(state, definition) ? 'normal' : this.definition.status;
+    }
+    onInitialize(state: GameState) {
+        this.refreshLogic(state);
+    }
+    refreshLogic(state: GameState) {
+        this.isOpen = isTeleporterOpen(state, this.area.location, this.definition);
     }
     changeStatus(state: GameState, status: ObjectStatus) {
         this.status = status;
@@ -96,7 +104,11 @@ export class Teleporter implements ObjectInstance {
         return isObjectInsideTarget(state.hero, pad(this.getHitbox(), 9));
     }
 
+
     update(state: GameState) {
+        if (!this.isOpen) {
+            return;
+        }
         if (this.disabledUntilHeroLeaves) {
             if (!this.isHeroInPortal(state)) {
                 this.disabledUntilHeroLeaves = false;
@@ -160,6 +172,9 @@ export class Teleporter implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (!this.isOpen) {
+            return;
+        }
         if (this.status !== 'normal' && !editingState.isEditing) {
             if (state.hero.savedData.passiveTools.trueSight) {
                 renderIndicator(context, this.getHitbox(), state.fieldTime);

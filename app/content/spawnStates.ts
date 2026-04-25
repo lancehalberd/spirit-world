@@ -28,7 +28,7 @@ export const tombBossState = applyItemsToSavedState(tombStartState, {roll: 1, 't
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tombRoll']
 );
 const warTempleStart = applyItemsToSavedState(tombBossState, {maxLife: 1, spiritSight: 1},
-    ['tombBoss', 'tombTeleporter', 'momRuins', 'warTempleEntrance']);
+    ['tombBoss', 'tombBackDoor', 'momRuins', 'warTempleEntrance']);
 export const warTempleBoss = applyItemsToSavedState(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
 const warTempleEnd = applyItemsToSavedState(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss']);
 const cocoonStartState = applyItemsToSavedState(warTempleEnd, {maxLife: 1, astralProjection: 1, normalRange: 1},

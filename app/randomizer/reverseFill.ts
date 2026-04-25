@@ -3,7 +3,9 @@ import {getZone} from 'app/content/zones';
 import {addCheck} from 'app/randomizer/checks';
 import {
     findLootById,
+    findLootObjects,
     findReachableChecks,
+    findReachableNodes,
 } from 'app/randomizer/find';
 import {
     applyLootObjectToState,
@@ -223,7 +225,7 @@ function assignItemToLocation(randomizerState: RandomizerState, loot: LootWithLo
 
 function collectAllLoot(randomizerState: RandomizerState, simulatedState: GameState, ignoreUnassignedChecks = false): GameState {
     const {assignmentsState} = randomizerState.items;
-    const reachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, simulatedState);
+    const reachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, simulatedState, false);
     // console.log(debugLocations(reachableChecks));
     for (const check of reachableChecks) {
         // Ignore checks that have already been made.
@@ -268,7 +270,7 @@ function placeItem(randomizerState: RandomizerState, originalState: GameState, l
         currentState = collectAllLoot(randomizerState, previousState);
         currentState = setAllFlagsInLogic(randomizerState, currentState);
     } while (currentState !== previousState);
-    const allReachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, currentState);
+    const allReachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, currentState, false);
     const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.has(lootWithLocation.lootObject.id));
     let allAppropriateChecks = allAvailableChecks;
     /*if (loot.lootObject.lootType === 'spiritSight') {
@@ -283,8 +285,7 @@ function placeItem(randomizerState: RandomizerState, originalState: GameState, l
             return lootWithLocation.location?.logicalZoneKey === loot.location?.logicalZoneKey
         });
     }
-    const assignedLocation = random.element(allAppropriateChecks);
-    random.generateAndMutate();
+    const assignedLocation = random.mutate().element(allAppropriateChecks);
     if (!assignedLocation) {
         console.error('Failed to place item', { assignmentsState, originalState, currentState, loot});
         console.error({ allReachableChecks, allAvailableChecks, allAppropriateChecks });
@@ -299,7 +300,7 @@ function placeItem(randomizerState: RandomizerState, originalState: GameState, l
 }
 
 export function initializeReverseFill(randomizerState: RandomizerState) {
-    const {allLootObjects} = randomizerState;
+    const {allLootObjects, allNodes} = randomizerState;
     const {random} = randomizerState.items;
 
     //console.log({ allNodes, startingNodes });
@@ -319,13 +320,37 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
     //const initialCheckIds = findReachableChecks(allNodes, startingNodes, initialState).map(l => l.lootObject.id);
     //console.log(initialCheckIds);
     //debugState(finalState);
-    const allReachableCheckIds = findReachableChecks(randomizerState, finalState).map(l => l.lootObject.id);
-    for (const lootWithLocation of allLootObjects) {
-        if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id)) {
+    const allReachableNodes = findReachableNodes(randomizerState, finalState);
+    for (const node of allNodes) {
+        if (!allReachableNodes.includes(node)) {
             debugState(finalState);
-            console.warn(lootWithLocation.lootObject.id, ' will never be reachable');
+            console.warn(node.nodeId, ' will never be reachable');
+            debugger;
         }
     }
+    const allReachableCheckIds = findLootObjects(allReachableNodes, finalState).map(l => l.lootObject.id);
+    for (const lootWithLocation of allLootObjects) {
+        if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id) && !finalState.savedState.objectFlags[lootWithLocation.lootObject.id]) {
+            debugState(finalState);
+            console.warn(lootWithLocation.lootObject.id, ' will never be reachable');
+            debugger;
+        }
+    }
+    // Populate metadata.excludesTowerStaff for all nodes based on the current final state+world.
+    const originalStaffValue = finalState.hero.savedData.activeTools.staff;
+    // Calculate the set of all nodes that can be reached with the staff in inventory.
+    // The final state doesn't collect the staff, so we have to explicitly add it here (and then reset it below):
+    finalState.hero.savedData.activeTools.staff |= 2;
+    const allReachableNodesWithTowerStaff = new Set(findReachableNodes(randomizerState, finalState, false));
+    for (const node of randomizerState.allNodes) {
+        node.metadata = node.metadata ?? {assignableEntranceKeys: new Set(), nextNodes: new Set()};
+        node.metadata.excludesTowerStaff = !allReachableNodesWithTowerStaff.has(node);
+        //if (node.metadata.excludesTowerStaff) {
+        //    console.log(node);
+        //}
+    }
+    finalState.hero.savedData.activeTools.staff = originalStaffValue;
+
     //console.log({ allLootObjects, allReachableCheckIds });
     randomizerState.items.assignmentsState = {
         assignments: {},
@@ -333,16 +358,16 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
         assignedContents: new Set(),
     }
 
-    const initialReachableChecks = findReachableChecks(randomizerState, randomizerState.items.initialState);
+    // TODO: Don't warn on missing entrances, like peachCaveTopEntrance, which is in a dark area and
+    // is not expected to be in logic from the initial state.
+    const initialReachableChecks = findReachableChecks(randomizerState, randomizerState.items.initialState, false);
     console.log('sphere 0 checks: ', initialReachableChecks.length);
     let placeFullPeachFirst = initialReachableChecks.length < 13;
 
 
     let { bigKeys, smallKeys, maps, peachLoot, progressLoot, trashLoot } = organizeLootObjects(randomizerState, allLootObjects);
-    peachLoot = random.shuffle(peachLoot);
-    random.generateAndMutate();
-    randomizerState.items.trashLoot = random.shuffle(trashLoot);
-    random.generateAndMutate();
+    peachLoot = random.mutate().shuffle(peachLoot);
+    randomizerState.items.trashLoot = random.mutate().shuffle(trashLoot);
     // This is a bit of a hack to prevent generation from failing when there are too few
     // checks in sphere 0. Typically the error occurs if we generate to the point that cat eyes
     // are required for all remaining checks outside of sphere 0, and there are fewer than 4 unused
@@ -362,8 +387,7 @@ export function initializeReverseFill(randomizerState: RandomizerState) {
     randomizerState.items.allItemSets = [bigKeys, smallKeys, maps, ...progressLoot, peachLoot];
     randomizerState.items.remainingLoot = [];
     for (let i = 0; i < randomizerState.items.allItemSets.length; i++) {
-        randomizerState.items.allItemSets[i] = random.shuffle(randomizerState.items.allItemSets[i]);
-        random.generateAndMutate();
+        randomizerState.items.allItemSets[i] = random.mutate().shuffle(randomizerState.items.allItemSets[i]);
         for (const item of randomizerState.items.allItemSets[i]) {
             randomizerState.items.remainingLoot.push(item);
         }
@@ -387,8 +411,7 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
 
     for (let itemSet of allItemSets) {
         while (itemSet.length) {
-            const itemToPlace = random.removeElement(itemSet);
-            random.generateAndMutate();
+            const itemToPlace = random.mutate().removeElement(itemSet);
             remainingLoot.splice(remainingLoot.indexOf(itemToPlace), 1);
             // Compute the current state without the chosen item or any of the previously placed items.
             //const startTime = Date.now();
@@ -489,6 +512,8 @@ export function applyLootAssignments(randomizerState: RandomizerState): void {
                 addCheck(randomizerState, flag, assignment, 'dream');
             } else if (dialogueKey === 'ambrosia') {
                 addCheck(randomizerState, flag, assignment, 'waterfallCave');
+            } else if (dialogueKey === 'vanaraScientist') {
+                addCheck(randomizerState, flag, assignment, 'forestTemple');
             } else {
                 console.error('Unhandled dialogue key', dialogueKey);
             }

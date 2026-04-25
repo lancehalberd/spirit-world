@@ -397,7 +397,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 50, y: 268, type: "decoration", d: "right", w: 16, h: 16, decorationType: "bearRug", drawPriority: "background"},
         {status: "normal", id: "", x: 49, y: 203, type: "decoration", d: "right", w: 32, h: 16, decorationType: "shelves", drawPriority: "background", seed: 12},
         {status: "normal", id: "", linked: false, x: 56, y: 264, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, specialBehaviorKey: "spiritSightInstructions", saveStatus: "never"},
-        {status: "hidden", id: "tombTeleporter", x: 176, y: 272, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && !$teleportation"},
+        {status: "closed", id: "tombBackDoor", x: 168, y: 176, type: "door", style: "cavernUpstairs", targetZone: "overworld", targetObjectId: "tombBackDoor", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 182, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 1},
@@ -1100,8 +1100,8 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 80, toggleOnRelease: true, type: "floorSwitch", spirit: true, targetObjectId: "tombSpiritExit"},
         {status: "normal", id: "", x: 64, y: 80, toggleOnRelease: true, type: "floorSwitch", spirit: true, targetObjectId: "tombSpiritExit"},
         {status: "normal", id: "tombEscapePot", linked: true, x: 64, y: 352, type: "pushPull", spirit: true, savePosition: "forever", style: "pot"},
-        {status: "normal", id: "tombTeleporter", x: 176, y: 352, type: "floorSwitch", saveStatus: "forever", targetObjectId: "tombSwitchAction"},
-        {status: "normal", id: "tombSwitchAction", x: 192, y: 352, type: "narration", message: "{removeCue}\n{playSound:secretChime}\n{flag:tombTeleporter}", delay: 0, w: 16, h: 16, saveStatus: "never", hasCustomLogic: true, customLogic: "", trigger: "activate"},
+        {status: "normal", id: "tombBackDoor", x: 176, y: 352, type: "floorSwitch", saveStatus: "forever", targetObjectId: "tombSwitchAction"},
+        {status: "normal", id: "tombSwitchAction", x: 192, y: 352, type: "narration", message: "{removeCue}\n{playSound:secretChime}\n{flag:tombBackDoor}", delay: 0, w: 16, h: 16, saveStatus: "never",  trigger: "activate"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 192, mapId: 'tombSpirit', floorId: '1F', mapX: 2, mapY: 0},

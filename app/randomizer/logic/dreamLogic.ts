@@ -1,4 +1,5 @@
 import {
+    dreamSpiritWorld,
     hasTeleportation,
 } from 'app/content/logic';
 
@@ -11,14 +12,15 @@ export const dreamNodes: LogicNode[] = [
         // Note that the tutorial walls are just removed in randomizer.
         nodeId: 'dreamMain',
         paths: [
+            // This portal only appears once dream pods have been unlocked
+            // that connect to the Spirit World in the dream.
+            {nodeId: 'dreamSpirit', logic: dreamSpiritWorld},
             {nodeId: 'dreamEntranceInner', logic: hasTeleportation},
         ],
         entranceIds: ['cocoonTeleporter', 'helixTeleporter'],
         exits: [
-            // Don't include this as it can only be opened from beating the cocoon boss.
-            //{objectId: 'cocoonTeleporter', logic: hasTeleportation},
-            // Don't include this as it can only be opened from releasing the beasts.
-            //{objectId: 'helixTeleporter', logic: hasTeleportation},
+            {objectId: 'cocoonTeleporter'},
+            {objectId: 'helixTeleporter'},
         ],
         complexNpcs: [
             // Note that currently the spirit tree is actually a decoration that behaves like an NPC.
@@ -34,8 +36,26 @@ export const dreamNodes: LogicNode[] = [
         ],
         entranceIds: ['tombTeleporter', 'lakeTeleporter'],
         exits: [
-            {objectId: 'tombTeleporter', logic: hasTeleportation},
-            {objectId: 'lakeTeleporter', logic: hasTeleportation},
+            {objectId: 'tombTeleporter'},
+            {objectId: 'lakeTeleporter'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'dreamSpirit',
+        paths: [
+            // This portal only appears once dream pods have been unlocked
+            // that connect to the Spirit World in the dream.
+            {nodeId: 'dreamMain', logic: dreamSpiritWorld},
+        ],
+        entranceIds: ['forestTempleTeleporter', 'jadePalaceTeleporter'],
+        exits: [
+            {objectId: 'forestTempleTeleporter'},
+            {objectId: 'jadePalaceTeleporter'},
+        ],
+        complexNpcs: [
+            // Note that currently the spirit tree is actually a decoration that behaves like an NPC.
+            {dialogueKey: 'spiritTree', optionKey: 'randomizerReward'},
         ],
     },
 ];

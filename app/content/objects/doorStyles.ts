@@ -1146,6 +1146,20 @@ function ladderDown(topFrame: Frame, downFrame: Frame): DoorStyleDefinition {
     };
 }
 
+// These are tiles 10+189 used as solid single walls in material+spirit worlds respectively.
+const normalBlockFrame = requireFrame('gfx/tiles/rocks.png', {x: 160, y: 0, w: 16, h: 16});
+const spiritBlockFrame = requireFrame('gfx/tiles/rocksspirit.png', {x: 160, y: 0, w: 16, h: 16});
+function renderBlocksWhenClosed(this: DoorStyleDefinition, context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.status !== 'normal') {
+        const hitbox = this.getHitbox(door);
+        for (let y = hitbox.y; y < hitbox.y + hitbox.h; y += 16) {
+            for (let x = hitbox.x; x < hitbox.x + hitbox.w; x += 16) {
+                drawFrameAt(context, door.definition.spirit ? spiritBlockFrame : normalBlockFrame, {x, y});
+            }
+        }
+    }
+}
+
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavern: cavernDoorStyle,
     cavernDownstairs: stairsDoorStyle(cavernDoorStyle, cavernStairsDown, 'down'),
@@ -1220,7 +1234,10 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     futureLadderUp: ladderUp(futureLadderTop, futureLadderMiddle, futureLadderBottom, 1),
     futureLadderUpTall: tallLadderUp(futureLadderMiddle, futureLadderBottom, 1),
     futureLadderDown: ladderDown(futureLadderTop, futureLadderDownFrame),
-    square: wideSquareDoorStyle,
+    square: {
+        ...wideSquareDoorStyle,
+        render: renderBlocksWhenClosed,
+    },
     wideEntrance: {
         // We use isNotSolid here since we see the ground type for this entrance.
         // for example the player should swim through water or wade through shallow water behind this entrance.
@@ -1235,6 +1252,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
                 ? {x: door.x, y: door.y, w: 64, h: 16}
                 : {x: door.x, y: door.y, w: 16, h: 64};
         },
+        render: renderBlocksWhenClosed,
     },
     pathEntrance: {
         // We use isNotSolid here since we see the ground type for this entrance.
@@ -1250,6 +1268,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
                 ? {x: door.x, y: door.y, w: 32, h: 16}
                 : {x: door.x, y: door.y, w: 16, h: 32};
         },
+        render: renderBlocksWhenClosed,
     },
 };
 export type DoorStyle = keyof typeof doorStyles;

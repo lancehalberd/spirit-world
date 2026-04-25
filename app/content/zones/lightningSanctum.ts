@@ -214,7 +214,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "", x: 240, y: 32, type: "door", style: "crystal", targetObjectId: "lightningSanctumTorchDoor", d: "right"},
         {status: "normal", id: "", x: 272, y: 32, type: "door", style: "crystal", targetObjectId: "lightningSanctumTorchDoor", d: "left"},
-        {status: "normal", id: "", x: 288, y: 464, targetObjectId: "lightningSanctumTorchDoor", type: "teleporter", customLogic: "", linked: true, spirit: false},
+        {status: "normal", id: "", x: 288, y: 464, targetObjectId: "lightningSanctumTorchDoor", type: "teleporter", linked: true, spirit: false},
         {status: "normal", id: "", x: 32, y: 64, targetObjectId: "lightningSanctumTorchDoor", type: "teleporter"},
         {status: "normal", id: "", linked: true, x: 56, y: 464, targetObjectId: "lightningSanctumTorchDoor", type: "teleporter"},
         {status: "normal", id: "lightningSanctumPeachPiece", linked: false, x: 224, y: 432, type: "chest", lootType: "peachOfImmortalityPiece", spirit: true},
@@ -464,7 +464,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 384, y: 368, type: "movingPlatform", d: "left", w: 32, h: 32, speed: 2, turn: "bounce"},
         {status: "normal", id: "", x: 320, y: 224, type: "anode", style: "coil"},
         {status: "normal", id: "", x: 432, y: 224, type: "cathode"},
-        {status: "hidden", id: "lightningSanctumKey", x: 288, y: 464, targetObjectId: "lightningSanctumTorchDoor", type: "teleporter", customLogic: "", linked: true, spirit: true},
+        {status: "hidden", id: "lightningSanctumKey", x: 288, y: 464, targetObjectId: "lightningSanctumTorchDoor", type: "teleporter", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 381, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 2, mapY: 1},

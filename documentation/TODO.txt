@@ -146,18 +146,15 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Test new entrance randomizer in demo mode.
+    - Test more normal entrance randomizer seeds to find errors.
+        - Add path descriptions to entrance randomizer solutions.
+
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
         - Add weakened peach tree animation.
         - New Rival graphics
-
-    - Fix obscure entrance randomizer issue:
-        - If an area inside a Staff Tower may require Tower Staff even though it is not possible to have while using those entrances.
-            - We could solve this by creating a flag on zones, 'excludesTowerStaff' that is set at the end of entrance randomization
-              for all nodes that can only be reached through Staff Tower doors, if any. Then we could add some logic to
-              canHasTowerStaff that makes it return false if used in the context of these nodes. This might require additional work
-              to pass LogicNode into logic evaluations for this purpose.
-        - Investigate what happens in entrance randomizer if you attempt to exit a Staff Tower entrance while Tower Staff is in your inventory.
+            - BLOCKED New Rival projection graphics
 
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna

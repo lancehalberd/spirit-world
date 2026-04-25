@@ -8,7 +8,7 @@ export const defaultZoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     'peachCave': 'overworld:peachCaveTopEntrance',
     // peachCaveWaterEntrance
     'tomb': 'overworld:tombEntrance',
-    // tombTeleporter
+    // tombBackDoor
     'warTemple': 'overworld:warTempleEntrance',
     // warTempleNorthEntrance
     // warTempleNortheastEntrance

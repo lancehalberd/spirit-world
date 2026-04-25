@@ -24,6 +24,15 @@ export function getAllReachableContent(state: GameState, startingNodes: LogicNod
     allEntrances: DoorLocation[]
 } {
     const allNodes = getAllNodes(state);
+    // Mark all paths+exits as unavailable initially.
+    for (const node of allNodes) {
+        for (const path of (node.paths ?? [])) {
+            path.isAvailable = false;
+        }
+        for (const exit of (node.exits ?? [])) {
+            exit.isAvailable = false;
+        }
+    }
     const allNodesByZoneKey: NodesByZoneKey = {};
     const allNodesById: NodesById = {};
     for (const node of allNodes) {
@@ -95,7 +104,7 @@ export function expandNodes(
             break;
         }
         if (window['debugFindReachableNodes']) {
-            console.log(currentNode.zoneId, currentNode.nodeId);
+            // console.log(currentNode.zoneId, currentNode.nodeId);
         }
         // console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);
@@ -117,6 +126,7 @@ export function expandNodes(
                 warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
                 continue;
             }
+            path.isAvailable = true;
             if (!nodes.includes(nextNode)) {
                 nodes.push(nextNode);
                 changed = true;
@@ -155,8 +165,9 @@ export function expandNodes(
                     'Missing node for exit: ');
                 continue;
             }
+            exit.isAvailable = true;
             // Assigning isExit instead of isEntrance to avoid name collision.
-            const isExit = !isEntrance(location.zoneKey, exitObject.targetZone);
+            const isInterior = !isExterior(location.zoneKey, exitObject.targetZone);
             const isUnderWater = zone.surfaceKey && !location.isSpiritWorld;
             addEntranceIfNew(allEntrances, {
                 key: `${location.zoneKey}:${exitObject.id}`,
@@ -169,8 +180,7 @@ export function expandNodes(
                 location,
                 definition: exitObject,
                 node: currentNode,
-                isEntrance: !isExit,
-                isExit,
+                isInterior,
                 isUnderWater,
             });
             // Add random code block so I can redeclare consts for the target entrance.
@@ -186,7 +196,6 @@ export function expandNodes(
                     findDoorOrMarkerById(zone, exitObject.targetObjectId, simulatedState);
                     throw new Error('Could not find entrance or marker.');
                 }
-                const isExit = !isEntranceDefinition(object) || !isEntrance(location.zoneKey, object.targetZone);
                 const isUnderWater = zone.surfaceKey && !location.isSpiritWorld;
                 // Since we found this object as the target of an exit, it may be an entrance with no target itself,
                 // such as a pit marker.
@@ -197,8 +206,9 @@ export function expandNodes(
                     location,
                     definition: object,
                     node: nextNode,
-                    isEntrance: !isExit,
-                    isExit,
+                    // Entrances must be paired in interior/exterior pairs to keep the sets balanced for matching
+                    // currently. So this must be the opposite of the previous entrance.
+                    isInterior: !isInterior,
                     isUnderWater,
                 });
             }
@@ -218,14 +228,12 @@ function isEntranceDefinition(definition: EntranceDefinition | MarkerDefinition)
     return definition.type !== 'marker' && definition.type !== 'spawnMarker'
 }
 
-// Entrance+Exit are ambiguous. In this case, we use entrance to mean
-// the door that takes you from the overworld into another zone and
-// exit to mean the reverse.
+// Returns true if the source zone considered "outside" of the target zone.
 // There are a special set of entrances inside of non overworld zones where we
 // pick one zone as the "outside" based on what seems intuitive. For example
 // the Tomb is considered outside of the Cocoon. Intuitively, the zone
 // that is further away from the overworld or is a dead end is considered "inside".
-function isEntrance(zoneKey: string, targetZoneKey: string): boolean {
+function isExterior(zoneKey: string, targetZoneKey: string): boolean {
     return overworldKeys.has(zoneKey)
         // There are a few special "entrances" inside other zones
         || zoneKey === 'tomb' && targetZoneKey === 'cocoon'

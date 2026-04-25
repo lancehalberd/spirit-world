@@ -4,11 +4,11 @@ import {DoorStyleDefinition, doorStyles} from 'app/content/objects/doorStyles';
 import {objectHash} from 'app/content/objects/objectHash';
 import {editingState} from 'app/development/editingState';
 import {playObjectSound} from 'app/musicController';
-import {getMappedEntranceData} from 'app/randomizer/find';
+import {findObjectLocation, getMappedEntranceData} from 'app/randomizer/find';
 import {renderHeroShadow} from 'app/renderActor';
 import {showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrame} from 'app/utils/animations';
-import {enterZoneByTarget, findObjectLocation} from 'app/utils/enterZoneByTarget';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {directionMap} from 'app/utils/field';
 import {boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad} from 'app/utils/index';
 import {isLocationHot} from 'app/utils/isLocationHot';
@@ -116,6 +116,10 @@ export class Door implements ObjectInstance {
     isHot = false;
     refreshHotStatus = true;
     isLadder = false;
+    // This was added to gracefully disable doors that may temporarily not have destinations.
+    // One place this comes up is randomized entrances connected to staff tower exterior entrances
+    // when the tower is not currently placed.
+    isTargetMissing = false;
     constructor(state: GameState, public definition: EntranceDefinition) {
         if (this.definition.d === 'up' && this.definition.price) {
             this.definition.status = 'closed';
@@ -130,23 +134,36 @@ export class Door implements ObjectInstance {
         this.refreshLogic(state);
     }
     refreshLogic(state: GameState) {
-        // If the player already opened this door, set it to the appropriate open status.
-        if (getObjectStatus(state, this.definition) || this.wasOpened) {
-            if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
-                this.changeStatus(state, 'blownOpen');
-            } else {
-                if (this.definition.status === 'closedSwitch') {
-                    // debugger;
-                }
-                this.changeStatus(state, 'normal');
+        this.isTargetMissing = false;
+        const {targetZone, targetObjectId} = getMappedEntranceData(state.randomizerState, this.area.location.zoneKey, this.definition);
+        if (targetZone && targetObjectId) {
+            const targetObject = findObjectLocation(state, targetZone, targetObjectId, this.area.definition.isSpiritWorld, this.definition);
+            if (!targetObject) {
+                this.isTargetMissing = true;
             }
-        } else if (this.definition.status === 'closedEnemy' && !this.blockingEnemiesConfirmed) {
-            // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
-            // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
-            // door where the enemies are already defeated (or there are not yet enemies).
-            this.changeStatus(state, 'normal');
+        }
+
+        if (this.isTargetMissing) {
+            this.status = 'closed';
         } else {
-            this.changeStatus(state, this.definition.status);
+            // If the player already opened this door, set it to the appropriate open status.
+            if (getObjectStatus(state, this.definition) || this.wasOpened) {
+                if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
+                    this.changeStatus(state, 'blownOpen');
+                } else {
+                    if (this.definition.status === 'closedSwitch') {
+                        // debugger;
+                    }
+                    this.changeStatus(state, 'normal');
+                }
+            } else if (this.definition.status === 'closedEnemy' && !this.blockingEnemiesConfirmed) {
+                // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
+                // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
+                // door where the enemies are already defeated (or there are not yet enemies).
+                this.changeStatus(state, 'normal');
+            } else {
+                this.changeStatus(state, this.definition.status);
+            }
         }
         if (this.definition.frozenLogic) {
             const frozenByDefault = evaluateLogicDefinition(state, this.definition.frozenLogic, false);
@@ -244,6 +261,11 @@ export class Door implements ObjectInstance {
         return this.isHeroTriggeringDoor(state) || this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
+        // Entrances with missing targets are locked in the closed state as they cannot be used.
+        if (this.isTargetMissing) {
+            this.status = 'closed';
+            return;
+        }
         const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
         let isOpen = status === 'normal' || status === 'blownOpen';
         const wasOpen = this.status === 'normal' || this.status === 'blownOpen';
