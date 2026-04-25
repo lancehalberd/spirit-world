@@ -146,8 +146,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Test more normal entrance randomizer seeds to find errors.
-
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
         - Add weakened peach tree animation.
@@ -171,6 +169,8 @@ Current tasks:
             - Blocked until I have kneeling sprite for staggering
         - npcs/rival
             - Blocked until I have battle sprites
+
+    - Test more normal entrance randomizer seeds to find errors.
 
     - Implement blocksRenders functionality and test transition state again.
 

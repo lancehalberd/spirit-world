@@ -2,7 +2,7 @@ import {getRandomizerZoneDescription} from 'app/content/hints';
 import {getLootName} from 'app/content/loot';
 import {findReachableChecks} from 'app/randomizer/find';
 import {getPendingRandomizerGoals} from 'app/randomizer/goal';
-import {applyLootObjectToState, getMappedLootData, setAllFlagsInLogic} from 'app/randomizer/utils';
+import {applyLootObjectToState, setAllFlagsInLogic} from 'app/randomizer/utils';
 import {applySavedState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {getDefaultState, getState} from 'app/state';
 
@@ -30,6 +30,7 @@ window.showRandomizerSolution = showRandomizerSolution;
 
 const trashTypes: LootType[] = ['money', 'empty', 'map'];
 function collectAllLootForSolution(randomizerState: RandomizerState, simulatedState: GameState): GameState {
+    const assignments = Object.values(randomizerState.items.assignmentsState.assignments)
     const reachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, simulatedState);
     for (const check of reachableChecks) {
         // We can only open checks that have been assigned, contents of other checks are not yet determined.
@@ -40,7 +41,8 @@ function collectAllLootForSolution(randomizerState: RandomizerState, simulatedSt
         if (simulatedState.savedState.objectFlags[check.lootObject.id]) {
             continue;
         }
-        const {lootType} = getMappedLootData(randomizerState, check.lootObject);
+        // Map the check to its assignment directly so we can avoid having to parse the loot type from dialogue scripts.
+        const {lootAmount, lootType, lootLevel} = assignments.find(a => a.target.lootObject.id === check.lootObject.id);
         if (!trashTypes.includes(lootType)) {
             if (simulatedState.hero.savedData.maxLife < 7 || (
                 lootType !== 'peachOfImmortality'
@@ -48,9 +50,9 @@ function collectAllLootForSolution(randomizerState: RandomizerState, simulatedSt
             )) {
                 // debugState(state);
                 if (check.location) {
-                    console.log(`Get ${getLootName(simulatedState, {lootType})} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
+                    console.log(`Get ${getLootName(simulatedState, {lootType, lootAmount, lootLevel})} at ${getRandomizerZoneDescription(check.location.logicalZoneKey)}:${check.lootObject.id}`);
                 } else {
-                    console.log(`Get ${getLootName(simulatedState, {lootType})} from ${check.dialogueKey}:${check.optionKey}`);
+                    console.log(`Get ${getLootName(simulatedState, {lootType, lootAmount, lootLevel})} from ${check.dialogueKey}:${check.optionKey}`);
                 }
                 if (randomizerState.entrances && check.path.path.length) {
                     console.log(' ' + check.path.path.map(segment => {

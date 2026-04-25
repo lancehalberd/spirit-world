@@ -37,32 +37,32 @@ function getChargeMessage(state: GameState) {
 export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}: LootData): string {
     switch (lootType) {
         case 'bow':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Spirit Bow';
             }
             return 'Golden Bow';
         case 'cloak':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Spirit Cloak';
             }
             return 'Invisibility Cloak';
         case 'staff':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Tree Staff';
             }
             return 'Tower Staff';
         case 'clone':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Shadow Clone';
             }
             return 'Double Clone';
         case 'roll':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Mist Roll';
             }
             return 'Cloud Somersault';
         case 'gloves':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Spirit Bracers';
             }
             return 'Magical Bracers';
@@ -75,7 +75,7 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
             }
             return 'Teleportation';
         case 'weapon':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Chakram';
             }
             return CHAKRAM_2_NAME;
@@ -88,7 +88,12 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
             }
             return 'Spirit Sight';
         case 'victoryPoint':
-            return `${state.hero.savedData.collectibles.victoryPoint}x Victory Points`;
+            if (lootAmount === 1) {
+                return 'Victory Point'
+            } else if (lootAmount > 1) {
+                return `${lootAmount} Victory Points`;
+            }
+            return `Victory Points`;
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
@@ -98,7 +103,7 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
         case 'lightning': return 'Lightning Element';
         case 'phoenixCrown': return 'Phoenix Crown';
         case 'armor':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Silver Mail';
             }
             return 'Golden Mail';
@@ -109,17 +114,17 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
         case 'arDevice': return 'Aether Realm Device';
         case 'trueSight': return 'True Sight';
         case 'leatherBoots':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Leather Boots';
             }
             return 'Spike Boots';
         case 'ironBoots':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Iron Boots';
             }
             return 'Forge Boots';
         case 'cloudBoots':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Cloud Boots';
             }
             return 'Flying Boots';
@@ -134,17 +139,17 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
         case 'goldMailSchematics':
             return 'Gold Mail Schematics';
         case 'fireBlessing':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Ruby Stud';
             }
             return 'Ruby Earrings';
         case 'waterBlessing':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Sapphire Bangle';
             }
             return 'Sapphire Bracelet';
         case 'lightningBlessing':
-            if (getLootLevel(state, {lootType, lootLevel}) === 1) {
+            if (getLootLevel(state, {lootType, lootLevel}) <= 1) {
                 return 'Topaz Pin';
             }
             return 'Ancient Badge';
