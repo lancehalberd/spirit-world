@@ -148,7 +148,6 @@ Graphics to Implement:
 Current tasks:
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
-        - Add weakened peach tree animation.
         - New Rival graphics
             - BLOCKED New Rival projection graphics
 
