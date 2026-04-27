@@ -148,7 +148,13 @@ Graphics to Implement:
 Current tasks:
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
-        - New Rival graphics
+        - New Elder graphics
+        - Peach grow animation
+        - Plant seed bomb sprite
+        - New Rival graphics+behavior
+            - Staff swing attack
+            - new throw animation
+                - new projectile frame
             - BLOCKED New Rival projection graphics
 
     - Graphics added but not used yet:
@@ -168,6 +174,8 @@ Current tasks:
             - Blocked until I have kneeling sprite for staggering
         - npcs/rival
             - Blocked until I have battle sprites
+        - Fix hero can be seen behind door frame when moving south through jade interior door styles.
+            Just add updated jade interior tiles and test them
 
     - Test more normal entrance randomizer seeds to find errors.
 
@@ -176,12 +184,13 @@ Current tasks:
     - Cannot skip cutscenes while message are displayed since scripts are updated in the field and the messages disable field updates by default.
 
     - Enemies that fall from the ceiling when you get close to them.
+        - Maybe we can do this with existing enemy props+hidden status and a narration trigger around them.
+        - Perhaps add this as a variation block where you can set a large area and the enemies types+position+number are randomly based on variation seed.
 
     - If a rolling ball hits an obstacle in the other world and not the current world and the player has spirit sight
         - Add an effect to the over world that is a ~20 diamater view into the spirit world, using the same effect as the teleporters.
 
 
-    - Fix hero can be seen behind door frame when moving south through jade interior door styles.
 
     - Boss Rush Fixes:
         - Storm Beast is missing teleporters + Orb enemies.
