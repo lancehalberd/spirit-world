@@ -74,7 +74,7 @@ dialogueHash.elder = {
                     y: 272,
                     type: 'npc',
                     behavior: 'none',
-                    style: 'vanaraGray',
+                    style: 'elder',
                     d: 'up',
                 }) as NPC;
                 elder.hideDialogueMarker = true;

@@ -11,6 +11,7 @@ import {
     blacksmithOneAnimations,
     blacksmithTwoAnimations,
     crystalDragonAnimations,
+    elderAnimations,
     emptyAnimations,
     fatherAnimations,
     stormBeastAnimations,
@@ -160,6 +161,11 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: ambrosiaAnimations,
         shadowOffset: 2,
         flipLeft: true,
+        height: 25,
+    },
+    elder: {
+        animations: elderAnimations,
+        shadowOffset: 2,
         height: 25,
     },
     girl: {

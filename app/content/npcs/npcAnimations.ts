@@ -372,3 +372,20 @@ const ambrosiaGeometry: FrameDimensions = {w: 19, h: 27, content: {x: 3, y: 17, 
 export const ambrosiaAnimations: ActorAnimations = {
     idle: omniAnimation(createAnimation(ambrosiaImage, ambrosiaGeometry, {y: 0})),
 };
+
+const elderImage: string = 'gfx/npcs/elder.png';
+const elderGeometry: FrameDimensions = {w: 21, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+export const elderAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(elderImage, elderGeometry, {x: 2}),
+        left: createAnimation(elderImage, elderGeometry, {x: 3}),
+        down: createAnimation(elderImage, elderGeometry, {x: 0}),
+        right: createAnimation(elderImage, elderGeometry, {x: 1}),
+    },
+    move: {
+        up: createAnimation(elderImage, elderGeometry, {y: 3, cols: 8}),
+        left: createAnimation(elderImage, elderGeometry, {y: 4, cols: 8}),
+        down: createAnimation(elderImage, elderGeometry, {y: 1, cols: 8}),
+        right: createAnimation(elderImage, elderGeometry, {y: 2, cols: 8}),
+    },
+};

@@ -204,7 +204,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {id: "elderEntrance", spirit: false, status: "normal", x: 128, y: 592, type: "door", style: "wooden", targetZone: "forest", targetObjectId: "elderEntrance", d: "down"},
         {id: "elderDownstairs", spirit: false, status: "normal", x: 128, y: 384, type: "door", style: "woodenDownstairs", targetZone: "forestTemple", targetObjectId: "elderUpstairs", d: "up"},
-        {status: "normal", type: "npc", x: 152, y: 472, d: "down", behavior: "none", style: "vanaraGray", dialogueKey: "elder", id: "treeVillage:0:0x0-npc-0"},
+        {status: "normal", type: "npc", x: 152, y: 488, d: "down", behavior: "none", style: "elder", dialogueKey: "elder", id: "treeVillage:0:0x0-npc-0"},
         {status: "normal", id: "southeastTreeEntrance", x: 448, y: 592, type: "door", style: "wooden", targetZone: "forest", targetObjectId: "southeastTreeEntrance", d: "down"},
         {status: "normal", id: "northeastTreeEntrance", x: 448, y: 272, type: "door", style: "wooden", targetZone: "forest", targetObjectId: "northeastTreeEntrance", d: "down"},
         {status: "normal", id: "southwestTreeEntrance", x: 128, y: 272, type: "door", style: "wooden", targetZone: "forest", targetObjectId: "southwestTreeEntrance", d: "down"},
