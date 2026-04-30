@@ -428,8 +428,8 @@ Frame 8 - hurt frame*/
 // row 16: staff-left; row 17: kneel;
 // row 18: staff-right-body; row 19: staff-up-body
 // row 20: staff-left-body; row 21: staff-down-body
-const rivalGeometry: FrameDimensions = { w: 30, h: 28, content: { x: 7, y: 12, w: 16, h: 16} };
-const rivalImg = 'gfx/enemies/rival.png';
+const rivalGeometry: FrameDimensions = { w: 30, h: 36, content: { x: 7, y: 15, w: 16, h: 16} };
+const rivalImg = 'gfx/rival/rival.png';
 
 // rival animations
 const rivalStillDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 0, cols: 1});
@@ -442,29 +442,34 @@ const rivalWalkRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalG
 const rivalWalkUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 3, cols: 8});
 const rivalWalkLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 4, cols: 8});
 
-const rivalRollDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 5, duration: 4}, {loop: false});
-const rivalRollRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 6, duration: 4}, {loop: false});
-const rivalRollUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 7, duration: 4}, {loop: false});
-const rivalRollLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 8, duration: 4}, {loop: false});
+const rivalRollDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 5, duration: 4, loop: false});
+const rivalRollRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 6, duration: 4, loop: false});
+const rivalRollUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 7, duration: 4, loop: false});
+const rivalRollLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 8, duration: 4, loop: false});
 
-const rivalAttackDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 9, cols: 5});
-const rivalAttackRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 10, cols: 5});
-const rivalAttackUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 11, cols: 5});
-const rivalAttackLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 12, cols: 5});
+const rivalAttackDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 14, cols: 2, loop: false});
+const rivalAttackRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 15, cols: 2, loop: false});
+const rivalAttackUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 16, cols: 2, loop: false});
+const rivalAttackLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 17, cols: 2, loop: false});
 
-const rivalKneelDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 17, cols: 1});
-const rivalKneelRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 17, cols: 1});
-const rivalKneelUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 2, y: 17, cols: 1});
-const rivalKneelLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 17, cols: 1});
+const rivalPrepareAttackDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 14, cols: 3, loop: false});
+const rivalPrepareAttackRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 15, cols: 3, loop: false});
+const rivalPrepareAttackUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 16, cols: 3, loop: false});
+const rivalPrepareAttackLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 17, cols: 3, loop: false});
 
-const rivalStaffJumpDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 18, duration: 3,  frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
-const rivalStaffJumpRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 19, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
-const rivalStaffJumpUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 2, x: 1, y: 20, duration: 3,   frameMap: [0, 0, 0, 0, 0, 1, 1, 1, 1]});
-const rivalStaffJumpLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 21, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
-const rivalStaffSlamDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 18, duration: 9});
-const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 19, duration: 9});
-const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 3, y: 20, duration: 9});
-const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 21, duration: 9});
+const rivalKneelDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 9, cols: 1});
+const rivalKneelRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 9, cols: 1});
+const rivalKneelUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 2, y: 9, cols: 1});
+const rivalKneelLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 9, cols: 1});
+
+const rivalStaffJumpDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 10, duration: 3,  frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffJumpRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 11, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffJumpUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 12, duration: 3,   frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffJumpLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 13, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffSlamDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 10, duration: 9});
+const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 11, duration: 9});
+const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 3, y: 12, duration: 9});
+const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 13, duration: 9});
 
 export const rivalAnimations: ActorAnimations = {
     idle: {
@@ -484,6 +489,12 @@ export const rivalAnimations: ActorAnimations = {
         right: rivalRollRightAnimation,
         up: rivalRollUpAnimation,
         left: rivalRollLeftAnimation,
+    },
+    prepareAttack: {
+        down: rivalPrepareAttackDownAnimation,
+        right: rivalPrepareAttackRightAnimation,
+        up: rivalPrepareAttackUpAnimation,
+        left: rivalPrepareAttackLeftAnimation,
     },
     attack: {
         down: rivalAttackDownAnimation,

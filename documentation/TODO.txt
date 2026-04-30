@@ -146,16 +146,22 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Reduce laser sound by 30%
+    - Add eye tiles to War Temple entrance
+    - Roll help text "You avoid most damage while rolling and can also cross small gaps."
+    - Ice snake projectile TTL is too long now.
+        - Might keep the long TTL on hard mode though.
+
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
-        - New Rival graphics+behavior
-            - Staff swing attack
-            - new throw animation
-                - new projectile frame
-            - BLOCKED New Rival projection graphics
+        - New Rival Staff swing attack for first fight (keep slam for other fights)
+            rival/rivalStaffSwing.png
+        - Add SFX to flame wall + lightning bolt abilities for Idols fight
+        - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
 
     - Graphics added but not used yet:
+        - mc equipment mc/armor1/*, mc/phoenixCrown/*, mc/ironBoots/*
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
         - hud/aetherCrystal
         - objects/webBarrier
@@ -166,7 +172,6 @@ Current tasks:
         - tiles/treeHome
         - npcs/vanaraChef
         - npcs/vanaraFarmer
-        - npcs/guardian
         - Fix hero can be seen behind door frame when moving south through jade interior door styles.
             Just add updated jade interior tiles and test them
         - Cherry tree

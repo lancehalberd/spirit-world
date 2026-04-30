@@ -14,6 +14,7 @@ import {
     elderAnimations,
     emptyAnimations,
     fatherAnimations,
+    guardianAnimations,
     stormBeastAnimations,
     merchantAnimations,
     momAnimations,
@@ -165,6 +166,11 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     },
     elder: {
         animations: elderAnimations,
+        shadowOffset: 2,
+        height: 25,
+    },
+    guardian: {
+        animations: guardianAnimations,
         shadowOffset: 2,
         height: 25,
     },

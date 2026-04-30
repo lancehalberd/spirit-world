@@ -13,7 +13,7 @@ import {Enemy} from 'app/content/enemy';
 import {lightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
 import {Indicator} from 'app/content/objects/indicator';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH} from 'app/gameConstants';
-import {vanaraBlueAnimations} from 'app/render/npcAnimations';
+import {guardianAnimations} from 'app/content/npcs/npcAnimations';
 import {createAnimation} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
@@ -562,7 +562,7 @@ interface GuardianParams {
 const guardian: EnemyDefinition<GuardianParams> = {
     naturalDifficultyRating: 20,
     // This should match the NPC style of the Tomb Guardian.
-    animations: vanaraBlueAnimations,
+    animations: guardianAnimations,
     life: 32, touchDamage: 0, update: updateGuardian,
     onHit(this: void, state: GameState, enemy: Enemy<GuardianParams>, hit: HitProperties): HitResult {
         // Guardian is invulnerable while recovering from stagger.

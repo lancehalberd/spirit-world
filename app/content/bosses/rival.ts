@@ -1,4 +1,4 @@
-import {CrystalSpike} from 'app/content/effects/arrow';
+import {Rock} from 'app/content/effects/arrow';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations} from 'app/content/enemyAnimations';
@@ -79,15 +79,16 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTaunt(state, 'throw');
         enemy.d = getCardinalDirection(target.x, target.y);
-        enemy.changeToAnimation('kneel');
+        enemy.changeToAnimation('prepareAttack');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
-        enemy.changeToAnimation('roll');
+        enemy.changeToAnimation('attack');
         const dx = target.x, dy = target.y;
-        CrystalSpike.spawn(state, enemy.area, {
+        Rock.spawn(state, enemy.area, {
             delay: 100,
             x: enemy.x + enemy.w / 2 + enemy.w / 4 * dx,
-            y: enemy.y + enemy.h / 2 + enemy.h / 4 * dy,
+            y: enemy.y + enemy.h / 2 + enemy.h / 4 * dy + 6,
+            z: 6,
             damage: 1,
             vx: 4 * dx,
             vy: 4 * dy,
@@ -122,7 +123,7 @@ const staffAbility: EnemyAbility<CardinalDirection> = {
         enemy.changeToAnimation('staffJump');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
-        enemy.changeToAnimation('staffSlam');
+        enemy.changeToAnimation('staffSlam', 'kneel');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
         enemy.makeSound(state, 'bossDeath');
         hitTargets(state, enemy.area, {
@@ -221,11 +222,16 @@ enemyDefinitions.rival = {
 };
 
 function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    // Stop rendering the staff once the rival reaches the kneeling frame, otherwise it will repeat the slam effect.
+    if (enemy.currentAnimationKey === 'kneel') {
+        return;
+    }
     let animationTime = enemy.animationTime;
     if (enemy.activeAbility.used) {
         animationTime += enemy.activeAbility.definition.prepTime;
     }
-    if (animationTime < treeStaffAnimations[enemy.d].duration + 20) {
+    // The first frame of the rival animation still displays the staff, so don't render the staff effect until the second frame.
+    if (animationTime >= enemy.currentAnimation.frameDuration * 2 * FRAME_LENGTH && animationTime < treeStaffAnimations[enemy.d].duration + FRAME_LENGTH) {
         const frame = getFrame(treeStaffAnimations[enemy.d], animationTime);
         let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
         if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {

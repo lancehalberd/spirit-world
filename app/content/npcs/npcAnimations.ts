@@ -373,6 +373,23 @@ export const ambrosiaAnimations: ActorAnimations = {
     idle: omniAnimation(createAnimation(ambrosiaImage, ambrosiaGeometry, {y: 0})),
 };
 
+const guardianImage: string = 'gfx/npcs/guardian.png';
+const guardianGeometry: FrameDimensions = {w: 20, h: 27, content: {x: 2, y: 11, w: 16, h: 16}};
+export const guardianAnimations: ActorAnimations = {
+    idle: {
+        up: createAnimation(guardianImage, guardianGeometry, {x: 2}),
+        left: createAnimation(guardianImage, guardianGeometry, {x: 3}),
+        down: createAnimation(guardianImage, guardianGeometry, {x: 0}),
+        right: createAnimation(guardianImage, guardianGeometry, {x: 1}),
+    },
+    kneel: {
+        up: createAnimation(guardianImage, guardianGeometry, {y: 1, x: 2}),
+        left: createAnimation(guardianImage, guardianGeometry, {y: 1, x: 3}),
+        down: createAnimation(guardianImage, guardianGeometry, {y: 1, x: 0}),
+        right: createAnimation(guardianImage, guardianGeometry, {y: 1, x: 1}),
+    },
+};
+
 const elderImage: string = 'gfx/npcs/elder.png';
 const elderGeometry: FrameDimensions = {w: 21, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
 export const elderAnimations: ActorAnimations = {

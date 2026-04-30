@@ -1,12 +1,14 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { getLedgeDelta, updateProjectileHeight } from 'app/movement/getLedgeDelta';
-import { playAreaSound } from 'app/musicController';
-import { renderLightningCircle } from 'app/render/renderLightning';
-import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, /*getTilesInRectangle,*/ hitTargets } from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {getLedgeDelta, updateProjectileHeight} from 'app/movement/getLedgeDelta';
+import {playAreaSound} from 'app/musicController';
+import {renderLightningCircle} from 'app/render/renderLightning';
+import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
+import {directionMap, getDirection, /*getTilesInRectangle,*/ hitTargets} from 'app/utils/field';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {requireFrame} from 'app/utils/packedImages';
+import Random from 'app/utils/Random';
 
 
 const upGeometry = {w: 16, h: 16, content: {x: 4, y: 0, w: 7, h: 5}};
@@ -672,6 +674,28 @@ export class Spike extends CrystalSpike {
             this.x + this.w / 2, this.y - this.z + this.h / 2,
             this.vx, this.vy
         );
+    }
+}
+
+const rockFrames = [
+    requireFrame('gfx/effects/rocks.png', {x: 13, y: 12, w: 5, h: 5}),
+    requireFrame('gfx/effects/rocks.png', {x: 43, y: 12, w: 5, h: 5}),
+];
+export class Rock extends CrystalSpike {
+    isPlayerAttack = false;
+    isEnemyAttack = true;
+    w = 5;
+    h = 5;
+    constructor(props: Props) {
+        super(props);
+        this.frame = Random.element(rockFrames);
+    }
+    static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
+        const rock = new Rock(arrowProps);
+        addEffectToArea(state, area, rock);
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        drawFrameAt(context, this.frame, { x: this.x - this.frame.w / 2, y: this.y - this.frame.h / 2});
     }
 }
 
