@@ -149,13 +149,12 @@ Current tasks:
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
         - New Elder graphics
-        - Peach grow animation
-        - Plant seed bomb sprite
         - New Rival graphics+behavior
             - Staff swing attack
             - new throw animation
                 - new projectile frame
             - BLOCKED New Rival projection graphics
+        - BLOCKED New spike shell graphics for normal beetles.
 
     - Graphics added but not used yet:
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
@@ -176,6 +175,26 @@ Current tasks:
             - Blocked until I have battle sprites
         - Fix hero can be seen behind door frame when moving south through jade interior door styles.
             Just add updated jade interior tiles and test them
+        - Cherry tree
+        - dirt particles
+        - test new lab tiles
+        - new icons
+            - medallions
+
+    - Add new cave for first daughter tree in tree door by forest tower.
+        - Large beetle with hard shell immune to regular damage (except staff bonks+clone explosion)
+        - Plants on cliffs seed attacks can break the shell
+        - Beetle cannot be knocked back with regular attacks but it doesn't change directions very fast
+        - Summons small beetles to drop from the sky on occasion
+        - Faster when spike shell broken (shell is just a layer on top of the normal graphics)
+        - Drops a Peach Piece on defeat
+        - Add a thick spider web barrier blocking the tree that is removed when the boss is defeated.
+        - Add sticky web tiles
+            gfx/tiles/webtiles.png 3 tiles wide
+            - Boss either occasionally drops sticky webs where it is, or spits them at the player
+            - Sticky web tiles can be cleared with chakram or barrier burst, similar to slippery bead tiles.
+            - Special interaction with fire damage, adds a small fire nova on a 200ms delay that will spread to other tiles and hurt enemies+allies.
+                - Maybe make this isBurnable tile prop and apply to bushes as well.
 
     - Test more normal entrance randomizer seeds to find errors.
 
@@ -186,6 +205,7 @@ Current tasks:
     - Enemies that fall from the ceiling when you get close to them.
         - Maybe we can do this with existing enemy props+hidden status and a narration trigger around them.
         - Perhaps add this as a variation block where you can set a large area and the enemies types+position+number are randomly based on variation seed.
+        - Add to beetleLair
 
     - If a rolling ball hits an obstacle in the other world and not the current world and the player has spirit sight
         - Add an effect to the over world that is a ~20 diamater view into the spirit world, using the same effect as the teleporters.
@@ -220,11 +240,6 @@ Current tasks:
     - Mechanic idea:
         - Survive with no life as long as you have spirit energy,
 
-    - Add crystal switch puzzles before bow:
-        - two switches you have to hit with chakram to open basement door, Elder gives a hint.
-            - Add some bushes for randomizer.
-        - one switch out of range in the basement, sign explains you can hold the attack button to throw further.
-
     - Enemy with hard shell that can only be broken by Staff bonk or clone explosion
         - Make clone immune to damage once detonation sequence cannot be aborted.
 
@@ -235,24 +250,6 @@ Current tasks:
         - knockback is applies for each pixel we check blocking movement, instead of once per movement.
         - Ideally, we would return a list of all hits+pixels and decide what the aggregate effect is.
             - Some hits might take priority over others or prevent others.
-
-    - Add first daughter tree area
-        - Large beetle with hard shell immune to regular damage (except staff bonks+clone explosion)
-            - Higher resolution art requested.
-        - Plants on cliffs seed attacks can break the shell
-        - Beetle cannot be knocked back with regular attacks but it doesn't change directions very fast
-        - Summons small beetles to drop from the sky on occasion
-        - Faster when spike shell broken (shell is just a layer on top of the normal graphics)
-            - Spike shell shows damage frames over time + breaking animation.
-        - Drops a Peach Piece on defeat
-        - Add a thick spider web barrier blocking the tree that is removed when the boss is defeated.
-            - Pending art, for now I can just cobble something together by layering up existing web tiles.
-        - Add sticky web tiles
-            gfx/tiles/webtiles.png 3 tiles wide
-            - Boss either occasionally drops sticky webs where it is, or spits them at the player
-            - Sticky web tiles can be cleared with chakram or barrier burst, similar to slippery bead tiles.
-            - Special interaction with fire damage, adds a small fire nova on a 200ms delay that will spread to other tiles and hurt enemies+allies.
-                - Maybe make this isBurnable tile prop and apply to bushes as well.
 
     - Add a dissipating spark effect when a circular spark is removed.
         - This will make large sparks disappearing on hit/TTL/cleanup be less jarring with no mechanical impact (the effect isn't interactive).
@@ -340,13 +337,6 @@ Current tasks:
 
     - Add actual pathing algorithm for NPCs+enemies at some point.
 
-    - Add new graphics
-        - Cherry tree
-        - dirt particles
-        - test new lab tiles
-        - new icons
-            - medallions
-
     - Fix Vanara Guardian boss looks bad when moving behind foreground tiles
         - Move more tiles to the background.
         - Prevent the Guardian from going over as many wall tiles
@@ -360,7 +350,6 @@ Current tasks:
                 - In the Fertility Temple Vanara researchers have created a treatment to protect the Daughter Trees from the beetles cutting them off from the Spirit Tree.
                 - One of the crew on the Helix recommends visiting the temple to assist them.
         - Design+comission avatar for the Spirit Tree
-            - Fully grown Helix exterior in a prominent location of the Dream World
             - Approaching the tree will cause the avatar of the Spirit Tree to appear which looks like some kind of heavenly being?
                 - Work with artist on design details.
         - Expansion(Peach Cave Tree) 1: boss rush
@@ -453,19 +442,10 @@ Current tasks:
         - if the heart is up "I'll deal with the beast, focus on the heart!"
         - Brainstorm additional behavior improvements.
 
-    - Cut a new version
-        - Test on staging
-        - Ask if anyone else wants to test staging.
-        - Release to production.
-
     - Make floating/flying enemies fall into pits/water when frozen.
 
     - Hide hud for longer cut scenes
         - End of rival fight, start of rival 2 fight.
-
-    - Add NPC options to bed decorations
-        - Maybe add the NPC separate from the bed, but have the bed target them which turns the NPC into
-          a display child of the bed and renders them below the sheets.
 
     - Bug: Astral projection can pull linked pots on top of the hero.
 
@@ -479,8 +459,6 @@ Current tasks:
         - Helix
 
     - Exit from peach cave water doesn't render frozen correctly.
-
-    - Investigate: Masked tiles are not inherited in the spirit world.
 
     - Draw wadingAnimation instead of enemy shadows for enemies near the ground over water.
 
@@ -562,15 +540,6 @@ Current tasks:
     - Fix clone movement is broken when controlling multiple clones while grabbing something.
 
     - Hitting moving pots should not completely overwrite existing pot movement.
-
-    - Remove old graphics
-        - Replace remaining old cave graphics.
-            - Underwater - Use cave tileset.
-            - River Temple Boss+Underwater - use stone tileset
-        - Replace old cave tiles with deleted tiles.
-        - Remove all references to the cave tiles, but keep the image itself.
-        - Replace remaining cave doors and remove graphics + door style.
-            - Set cavern as default door style.
 
     - Add tutorial sections for clone
         - Swapping between clones

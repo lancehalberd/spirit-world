@@ -64,22 +64,53 @@ declare global {
     export type EnemyType = typeof enemyTypes[number];
 }
 
-enemyDefinitions.beetle = {
+interface BeetleParams {
+    shieldLife: number
+}
+
+const beetle: EnemyDefinition<BeetleParams> = {
     naturalDifficultyRating: 1,
     abilities: [],
     animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
     lootTable: simpleLootTable,
     shadowRadius: 9,
-    initialize(state: GameState, enemy: Enemy<any>) {
+    params: {
+        // By default beetle is unshielded, but this can be incremented to give the beetle
+        // a spikey shell that can only be removed with staff/clone explosion/seed bombs.
+        shieldLife: 0,
+    },
+    initialize(state: GameState, enemy: Enemy<BeetleParams>) {
         if (enemy.difficulty > this.naturalDifficultyRating) {
             enemy.gainAbility(crystalProjectileAbility);
         }
     },
-    update(state: GameState, enemy: Enemy<any>) {
+    update(state: GameState, enemy: Enemy<BeetleParams>) {
         enemy.useRandomAbility(state);
         scurryAndChase(state, enemy);
     },
-    onDeath(state: GameState, enemy: Enemy<any>) {
+    onHit(state: GameState, enemy: Enemy<BeetleParams>, hit: HitProperties) {
+        if (!(enemy.params.shieldLife > 0)) {
+            return enemy.defaultOnHit(state, hit);
+        }
+        if (!hit.canDamageSpikeyShells) {
+            // Blocked attacks knock the enemy back, but at 50% effectiveness.
+            enemy.applyKnockbackFromHit(state, hit, 0.5);
+            return enemy.defaultBlockHit(state, hit);
+        }
+        enemy.enemyInvulnerableFrames = 20;
+        enemy.makeSound(state, 'enemyHit');
+        return {hit: true};
+    },
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<BeetleParams>) {
+        if (enemy.params.shieldLife > 0) {
+            const hitbox = enemy.getHitbox();
+            context.beginPath();
+            context.fillStyle = 'white';
+            context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 3, 5, 0, 2 * Math.PI);
+            context.fill();
+        }
+    },
+    onDeath(state: GameState, enemy: Enemy<BeetleParams>) {
         if (enemy.difficulty <= this.naturalDifficultyRating) {
             return;
         }
@@ -103,6 +134,7 @@ enemyDefinitions.beetle = {
         }
     }
 };
+enemyDefinitions.beetle = beetle;
 
 enemyDefinitions.climbingBeetle = {
     naturalDifficultyRating: 1,

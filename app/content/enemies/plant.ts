@@ -6,6 +6,7 @@ import {fastVolcanoAbility, volcanoAbility} from 'app/content/enemyAbilities/vol
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {iceGrenadeAbility, seedBombAbility} from 'app/content/enemyAbilities/grenade';
 import {addEffectToArea} from 'app/utils/effects';
+import {isEnemyDefeated} from 'app/utils/enemies';
 import {getVectorToNearbyTarget} from 'app/utils/target';
 import {omniAnimation} from 'app/content/enemyAnimations';
 import {createAnimation} from 'app/utils/animations';
@@ -62,13 +63,17 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
 
 export const spawnBeetleAbility: EnemyAbility<boolean> = {
     // This skill will only be used when there is no nearby target.
-    getTarget(this: void, state: GameState, enemy: Enemy): boolean {
+    isEnabled(this: void, state: GameState, enemy: Enemy<Summoner>) {
+        enemy.params.summons = enemy.params.summons.filter(e => !isEnemyDefeated(e));
+        return enemy.params.summons.length < 2;
+    },
+    getTarget(this: void, state: GameState, enemy: Enemy<Summoner>): boolean {
         return !getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
+    prepareAbility(this: void, state: GameState, enemy: Enemy<Summoner>, target: boolean) {
         enemy.changeToAnimation('prepare');
     },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: boolean): void {
+    useAbility(this: void, state: GameState, enemy: Enemy<Summoner>, target: boolean): void {
         enemy.changeToAnimation('attack');
         const hitbox = enemy.getHitbox();
         const flyingBeetle = new Enemy(state, {
@@ -84,6 +89,7 @@ export const spawnBeetleAbility: EnemyAbility<boolean> = {
         flyingBeetle.z = enemy.z + 8;
         flyingBeetle.vz = 4;
         addObjectToArea(state, enemy.area, flyingBeetle);
+        enemy.params.summons.push(flyingBeetle);
     },
     // This skill has a very long cooldown
     cooldown: 30000,
@@ -98,8 +104,11 @@ export const spawnBeetleAbility: EnemyAbility<boolean> = {
     globalCooldown: 10000,
 };
 
+interface Summoner {
+    summons: Enemy<any>[]
+}
 
-const basePlantDefinition: Partial<EnemyDefinition<any>> = {
+const basePlantDefinition: Partial<EnemyDefinition<Summoner>> = {
     alwaysReset: true,
     speed: 0.7,
     aggroRadius: 112,
@@ -110,6 +119,9 @@ const basePlantDefinition: Partial<EnemyDefinition<any>> = {
     life: 4,
     touchDamage: 1,
     canBeKnockedBack: false,
+    params: {
+        summons: [],
+    },
     update(state: GameState, enemy: Enemy): void {
         if (!enemy.activeAbility) {
             enemy.changeToAnimation('idle');
@@ -135,7 +147,7 @@ enemyDefinitions.plant = {
         'elementalFrost': 'plantFrost',
         'elementalStorm': 'plantStorm',
     },
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+    onHit(state: GameState, enemy: Enemy<Summoner>, hit: HitProperties): HitResult {
         if (hit.isThrownObject && hit.damage < enemy.life) {
             enemy.useAbiltyFromDefinition(state, spawnBeetleAbility, true);
         }

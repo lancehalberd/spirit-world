@@ -393,5 +393,3 @@ export function deletedTiles(n: number): TileSource {
         tileCoordinates: [...new Array(n)].map(() => [0, 0]),
     };
 }
-// Add this to ignore if deletedTiles isn't called
-deletedTiles;

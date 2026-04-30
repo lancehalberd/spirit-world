@@ -862,6 +862,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 isBonk: staff.staffBonked,
                 canPush: staff.staffBonked,
                 canDamageCrystalShields: staff.staffBonked,
+                canDamageSpikeyShells: true,
                 source: hero,
             });
             breakBrittleTilesInRect(state, state.areaInstance, pad(baseTarget, 2))

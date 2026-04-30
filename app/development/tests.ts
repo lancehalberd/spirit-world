@@ -1,5 +1,7 @@
 import {BITMAP_BOTTOM} from 'app/content/bitMasks';
 import {evaluateFlagString} from 'app/content/logic';
+import {allTiles} from 'app/content/tiles';
+import {deletedTileSource} from 'app/content/tiles/constants';
 import {everyArea, everyObject} from 'app/utils/every';
 import {hitTargets} from 'app/utils/field';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
@@ -69,6 +71,31 @@ export const tests: {[key: string]: () => void} = {
                 }
             }
         });
+    },
+    checkDeletedTiles() {
+        const badZones = new Set<string>();
+        const deletedTilesUsed = new Set<number>();
+        everyArea((location, zone, area) => {
+            for (let i = 0; i < area.layers.length; i++) {
+                const layer = area.layers[i];
+                const tiles = layer.grid.tiles;
+                for (let y = 0; y < tiles.length; y++) {
+                    if (!tiles[y]) {
+                        continue;
+                    }
+                    for (let x = 0; x < tiles[y].length; x++) {
+                        if (allTiles[tiles[y][x]]?.frame.image === deletedTileSource.source.image) {
+                            deletedTilesUsed.add(tiles[y][x]);
+                            badZones.add(zone.key);
+                        }
+                    }
+                }
+            }
+        });
+        if (deletedTilesUsed.size) {
+            console.log('Deleted tiles used', [...deletedTilesUsed]);
+            console.error('Found in zones: ', [...badZones]);
+        }
     },
     checkEmptyTiles() {
         const updatedZones = new Set<string>();

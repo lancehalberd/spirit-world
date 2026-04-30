@@ -41,6 +41,7 @@ export class CloneExplosionEffect implements EffectInstance {
                 damage: 4,
                 canPush: true,
                 cutsGround: true,
+                canDamageSpikeyShells: true,
                 destroysObjects: true,
                 knockAwayFromHit: true,
                 hitCircle: {x: this.x, y: this.y, r},

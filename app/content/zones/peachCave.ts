@@ -2572,11 +2572,11 @@ const f1_0x0: AreaDefinition = {
         {id: "peachCave:1:0x0-beetleWinged-3", linked: false, spirit: false, status: "normal", x: 400, y: 400, type: "enemy", enemyType: "beetleWinged"},
         {id: "peachCaveBoss", linked: false, spirit: false, status: "normal", x: 108, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "empty"},
         {status: "normal", id: "peachCaveSprout2", x: 48, y: 336, type: "vineSprout", customLogic: "!peachCaveTree"},
-        {status: "normal", id: "peachCave:fullPeach", x: 120, y: 96, type: "loot", lootType: "peachOfImmortality", hasCustomLogic: true, customLogic: "peachCaveTree"},
+        {status: "normal", id: "peachCave:fullPeach", x: 120, y: 96, type: "loot", lootType: "peachOfImmortality", hasCustomLogic: true, customLogic: "peachCaveTreeDied"},
         {status: "normal", id: "peachCave:1:0x0-luckyBeetle-0", x: 384, y: 144, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "runInstructions", x: 344, y: 256, type: "narration", message: "", w: 144, h: 32, saveStatus: "never", specialBehaviorKey: "runInstructions"},
         {status: "normal", id: "runInstructions", x: 368, y: 424, type: "narration", message: "", w: 80, h: 32, saveStatus: "forever"},
-        {status: "normal", id: "", x: 100, y: 68, type: "peachTree"},
+        {status: "normal", id: "peachCaveTree", x: 100, y: 68, type: "peachTree"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 166, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 1},

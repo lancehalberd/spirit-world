@@ -4,20 +4,23 @@ import {appendCallback, appendScript, hideHUD, resetCamera, runPlayerBlockingCal
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
 
-
 specialBehaviorsHash.peachCave = {
     type: 'area',
     apply(state: GameState, area: AreaInstance) {
         this.onRefreshLogic(state, area);
     },
     applyToSection(state: GameState, section: AreaSection) {
-        const caveIsDark = !!state.savedState.objectFlags.peachCaveTree;
+        const caveIsDark = !!state.savedState.objectFlags.peachCaveTreeDied;
         if (caveIsDark) {
             section.dark = Math.max(section.dark, 90);
         }
     },
     onRefreshLogic(state: GameState, area: AreaInstance) {
-        const caveIsDark = !!state.savedState.objectFlags.peachCaveTree;
+        // After the peach tree dies, it has the same behavior as other peach trees,
+        // which are all dead when you initially find them.
+        if (state.savedState.objectFlags.peachCaveTreeDied ) {
+            return;
+        }
         let peachTree: PeachTree|undefined;
         for (const object of area.objects) {
             if (object instanceof PeachTree) {
@@ -25,17 +28,13 @@ specialBehaviorsHash.peachCave = {
                 break;
             }
         }
-        if (caveIsDark) {
-            if (peachTree) {
-                peachTree.specialStatus = 'dead';
-            }
-        } else if (peachTree && state.savedState.objectFlags.peachCaveBoss) {
+        if (state.savedState.objectFlags.peachCaveBoss) {
             if (state.randomizerState) {
-                state.savedState.objectFlags.peachCaveTree = true;
+                state.savedState.objectFlags.peachCaveTreeDied = true;
                 state.areaInstance.needsLogicRefresh = true;
             } else {
                 hideHUD(state, (state: GameState) => {
-                    appendScript(state, '{flag:peachCaveTree}');
+                    appendScript(state, '{flag:peachCaveTreeDied}');
                 });
                 appendScript(state, '{playTrack:vanaraDreamTheme}{wait:500');
                 // Clear all the bushes to unblock player movement and give some extra loot before they all disappear.
@@ -108,7 +107,7 @@ specialBehaviorsHash.peachCave = {
                     return true;
                 });
                 textCueWithInput(state, `...the Fruit of Life.`);
-                appendScript(state, '{flag:peachCaveTree}{stopTrack}');
+                appendScript(state, '{flag:peachCaveTreeDied}{stopTrack}');
                 // Wait for the area to finish refreshing before resetting the camera and showing the HUD.
                 runPlayerBlockingCallback(state, (state: GameState) => {
                     if (state.nextAreaInstance) {

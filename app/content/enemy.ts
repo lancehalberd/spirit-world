@@ -405,6 +405,27 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
         };
     }
+    applyKnockbackFromHit(state: GameState, hit: HitProperties, factor = 1) {
+        if (hit.knockback) {
+            if (factor !== 1) {
+                this.knockBack(state, {
+                    vx: factor * hit.knockback.vx,
+                    vy: factor * hit.knockback.vy,
+                    vz: factor * hit.knockback.vz,
+                });
+            } else {
+                this.knockBack(state, hit.knockback);
+            }
+        } else if (hit.knockAwayFrom) {
+            const hitbox = this.getHitbox();
+            const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+            const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+            const mag = Math.sqrt(dx * dx + dy * dy);
+            if (mag) {
+                this.knockBack(state, {vx: factor * 4 * dx / mag, vy:  factor * 4 * dy / mag, vz: 0});
+            }
+        }
+    }
     defaultOnHit(state: GameState, hit: HitProperties): HitResult {
         if (this.status === 'off') {
             if (hit.element === 'lightning') {
@@ -443,17 +464,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 return this.defaultBlockHit(state, hit);
             }
         }
-        if (hit.knockback) {
-            this.knockBack(state, hit.knockback);
-        } else if (hit.knockAwayFrom) {
-            const hitbox = this.getHitbox();
-            const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
-            const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
-            const mag = Math.sqrt(dx * dx + dy * dy);
-            if (mag) {
-                this.knockBack(state, {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0});
-            }
-        }
+        this.applyKnockbackFromHit(state, hit);
         let damageDealt = 0;
         if (hit.damage) {
             const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;

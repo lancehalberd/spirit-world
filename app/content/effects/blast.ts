@@ -4,6 +4,7 @@ import {renderLightningCircle} from 'app/render/renderLightning';
 import {drawFrameCenteredAt, getFrame} from 'app/utils/animations';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
+import {clamp} from 'app/utils/index';
 import Random from 'app/utils/Random';
 
 
@@ -159,20 +160,28 @@ export class Blast implements EffectInstance {
     }
     getLightSources(state: GameState): LightSource[] {
         const lights: LightSource[] = [];
-        const circle = this.getHitCircle();
         const color = getElementLightColor(this.element);
-        if (circle) {
-            lights.push({
-                x: circle.x, y: circle.y,
-                brightness: 0.8,
-                radius: circle.r,
-                color,
-            });
-        } else if (this.animationTime <= this.tellDuration && this.element === 'lightning') {
+        if (this.animationTime <= this.tellDuration) {
+            if (this.element === 'lightning') {
+                lights.push({
+                    x: this.x, y: this.y,
+                    brightness: 0.8,
+                    radius: 20 * Math.min(1, 2 * this.animationTime / this.tellDuration),
+                    color,
+                });
+            }
+        } else {
+            const time = this.animationTime - this.tellDuration;
+            const totalDuration = this.animation.duration ?? this.tellDuration + this.expansionDuration + this.persistDuration;
+            const decayDuration = 100;
+            const decayStartTime = totalDuration - decayDuration;
+            const decay =  clamp(1 - (this.animationTime - decayStartTime) / decayDuration, 0, 1);
+            const p = Math.min(1.2, time / this.expansionDuration);
+            // The light grows quite a bit larger than the explosion.
             lights.push({
                 x: this.x, y: this.y,
-                brightness: 0.8,
-                radius: 20 * Math.min(1, 2 * this.animationTime / this.tellDuration),
+                brightness: 0.7 * decay,
+                radius: 6 + p * this.radius * decay,
                 color,
             });
         }

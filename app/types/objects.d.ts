@@ -332,6 +332,9 @@ interface HitProperties {
     // Whether this hit can break crystal shields on certain enemies like
     // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
     canDamageCrystalShields?: boolean
+    // Whether this hit can break spikey shells on certain enemies like
+    // beetles and the spikey balloon megapede sections.
+    canDamageSpikeyShells?: boolean
     // Lightning barriers hurt the hero even when rolling.
     canDamageRollingHero?: boolean
     // Normally spirit barrier + iron boots prevent the hero from being knocked back, but if this property is

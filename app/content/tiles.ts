@@ -379,18 +379,6 @@ const caveFloorSpiritPalette: TileSource = {
     behaviors: {},
 };
 
-const caveCornersPalette: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavewalls.png', {x: 32, y: 0, w: 8 * 32, h: 32}),
-    behaviors: {'all': {solid: true}},
-};
-const caveWallsPalette: TileSource = {
-    w: 16, h: 16,
-    source: requireFrame('gfx/tiles/cavewalls.png', {x: 0, y: 32, w: 32, h: 4 * 32}),
-    behaviors: {'all': {solid: true}},
-};
-
-
 const spiritPlantsPalette: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/spiritplants.png', {x: 0, y: 0, w: 5 * 16, h: 16}),
@@ -1075,8 +1063,7 @@ addTiles([
     caveFloorPalette,
     // 'Abyss' between walls.
     singleTileSource('gfx/tiles/cavearranged2.png', { defaultLayer: 'foreground', isVeryTall: true, solid: true }, 0, 240),
-    caveWallsPalette,
-    caveCornersPalette,
+    deletedTiles(48),
     spiritPlantsPalette,
     brightGrass,
     floorEyeTile,

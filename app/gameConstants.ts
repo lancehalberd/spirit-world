@@ -92,7 +92,8 @@ export function getElementLightColor(element: MagicElement): LightColor {
         case 'ice': return {r: 255, g: 255, b: 255};
         case 'lightning': return {r: 255, g: 255, b: 0};
     }
-    return {r: 150, g: 150, b: 150};
+    // This will make a light with no color overlay.
+    return undefined; //{r: 255, g: 255, b: 255};
 }
 
 // Gameplay modifiers

@@ -6,7 +6,7 @@ import {createAnimation, drawFrameCenteredAt, getFrame, frameAnimation} from 'ap
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {requireFrame} from 'app/utils/packedImages';
 
-const seedFrame = requireFrame('gfx/tiles/crops.png', {x: 147, y: 28, w: 12, h: 20, content:{x: 1, y: 10, w: 9, h: 9}});
+const acornFrame = requireFrame('gfx/effects/acorn.png', {x: 0, y: 0, w: 12, h: 12});
 
 const explosionGeometry: FrameDimensions = {w: 32, h: 32, content: {x: 4, y: 4, w: 24, h: 24}};
 const explosionAnimation = createAnimation('gfx/effects/explosion.png', explosionGeometry, {cols: 6, duration: 2,
@@ -28,6 +28,7 @@ interface Props {
     auraColor?: string
     shadowColor?: string
     activate?: (state: GameState, grenade: Grenade) => void
+    hitProperties?: Partial<HitProperties>
 }
 
 export class Grenade implements EffectInstance, Props {
@@ -53,6 +54,7 @@ export class Grenade implements EffectInstance, Props {
     animation = this.props.animation;
     source: Enemy = this.props.source;
     activate = this.props.activate;
+    hitProperties = this.props.hitProperties;
     constructor(public props: Props) {}
     onInitialize(state: GameState) {
         playAreaSound(state, this.area, 'grenade');
@@ -88,6 +90,7 @@ export class Grenade implements EffectInstance, Props {
             tellDuration: 0,
             animation: explosionAnimation,
             expansionDuration: 140,
+            hitProperties: this.hitProperties,
             source: this.source,
         });
         addEffectToArea(state, this.area, blast);
@@ -143,10 +146,15 @@ export function throwSeedBombAtLocation(state: GameState, enemy: Enemy, {tx, ty}
     const seedBomb = new Grenade({
         // Default props.
         auraColor: 'brown',
-        animation: frameAnimation(seedFrame),
-        radius: 16,
+        animation: frameAnimation(acornFrame),
+        radius: 24,
         damage: 1,
         z: 8,
+        hitProperties: {
+            // This is an important mechanic for fighting spikey beetles in certain areas before
+            // the player has access to clone explosion or staff.
+            canDamageSpikeyShells: true,
+        },
         ...props,
         x,
         y,
