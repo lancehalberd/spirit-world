@@ -1,8 +1,9 @@
 import {flameHeartAnimations} from 'app/content/bosses/flameHeart';
-import {frostHeartAnimations, shootFrostInCone} from 'app/content/bosses/frostBeast';
+import {frostHeartAnimations} from 'app/content/bosses/frostBeast';
 import {addSlamEffect} from 'app/content/bosses/golem';
 import {stormHeartAnimations} from 'app/content/bosses/stormHeart';
 import {FlameWall} from 'app/content/effects/flameWall';
+import {shootFrostInCone} from 'app/content/effects/frost';
 import {LaserBeam} from 'app/content/effects/laserBeam';
 import {LightningDischarge} from 'app/content/effects/lightningDischarge';
 import {addArcOfShockWaves, addRadialShockWaves} from 'app/content/effects/shockWave';
@@ -253,7 +254,7 @@ function useSpinningFrostAttack(state: GameState, enemy: Enemy): void {
         if (frostTime % 40 === 0) {
             enemy.params.frostTheta = (enemy.params.frostTheta || 0) + Math.PI / 64;
             // Track a nearby target when using the frostBreathArc attack, otherwise attack in the same direction.
-            shootFrostInCone(state, enemy, enemy.params.frostTheta, 2, Math.min(4, frostTime / 500), false);
+            shootFrostInCone(state, enemy, enemy.params.frostTheta, {speed: Math.min(4, frostTime / 500)});
         }
     }
 }

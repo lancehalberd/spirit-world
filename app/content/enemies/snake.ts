@@ -1,7 +1,7 @@
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
-import {shootFrostInCone} from 'app/content/bosses/frostBeast';
 import {Blast} from 'app/content/effects/blast';
 import {Fireball, Flame} from 'app/content/effects/flame';
+import {shootFrostInCone} from 'app/content/effects/frost';
 import {simpleLootTable} from 'app/content/lootTables';
 import {snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations} from 'app/content/enemyAnimations';
 import {renderLightningCircle, renderLightningRay} from 'app/render/renderLightning'
@@ -9,6 +9,7 @@ import {directionMap, directionToRadiansMap} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
 import {canMoveEnemy, moveEnemy, paceRandomly} from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
+import {clamp} from 'app/utils/index';
 import {getLineOfSightTargetAndDirection, getVectorToNearbyTarget} from 'app/utils/target';
 import Random from 'app/utils/Random';
 
@@ -75,8 +76,8 @@ const chasingFireBallAbility: EnemyAbility<boolean> = {
             x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
             isPreparing: true,
-            vx: 0,
-            vy: 0,
+            vx: dx,
+            vy: dy,
             z: 4,
             az: 0,
             scale: 0.1,
@@ -166,9 +167,13 @@ const frostConeAbility: EnemyAbility<LineOfSightTargetType> = {
     },
     updateAbility(this: void, state: GameState, enemy: Enemy, target: LineOfSightTargetType) {
         const frostTime = enemy.activeAbility.time;
+        let ttl = 400;
+        if (enemy.difficulty > enemy.enemyDefinition.naturalDifficultyRating) {
+            ttl = 2000;
+        }
         if (frostTime >= 0 && frostTime % 100 === 0) {
             // Start with very slow projectiles to give the player some warning.
-            shootFrostInCone(state, enemy, directionToRadiansMap[enemy.d], 2, Math.min(4, frostTime / 300), false);
+            shootFrostInCone(state, enemy, directionToRadiansMap[enemy.d], {speed: clamp(frostTime / 300, 1, 4), ttl});
         }
     },
     cooldown: 2000,

@@ -759,7 +759,7 @@ sounds.set('waterJump', {
 
 sounds.set('chargeLaser', {
     play(target: AudioNode, time: number) {
-        const maxVolume = 0.1;
+        const maxVolume = 0.07;
         const oscillator = audioContext.createOscillator();
         oscillator.type = 'sawtooth';
         oscillator.frequency.setValueAtTime(50, time);
@@ -802,7 +802,7 @@ sounds.set('chargeLaser', {
 
 sounds.set('fireLaser', {
     play(target: AudioNode, time: number) {
-        const maxVolume = 0.2;
+        const maxVolume = 0.12;
 
         const burstDuration = 1;
 

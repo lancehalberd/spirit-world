@@ -317,8 +317,8 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
                 + '{|}Face an object and use [B_PASSIVE] to try to lift it.';
         case 'roll':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
-                return 'Press [B_ROLL] to do a quick roll forward.'
-                    + '{|}You can avoid most damage while rolling and cross small gaps.'
+                return 'Press [B_ROLL] to do a quick roll that makes you immune to most damage.'
+                    + '{|}Use your roll to cross small pits and other hazards.'
             }
             return `Press and hold [B_ROLL] to slow down time while rolling.
                 {|}While time is slowed, press [B_DPAD] to teleport in any direction, damaging enemies in the way.

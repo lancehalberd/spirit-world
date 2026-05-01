@@ -146,12 +146,6 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Reduce laser sound by 30%
-    - Add eye tiles to War Temple entrance
-    - Roll help text "You avoid most damage while rolling and can also cross small gaps."
-    - Ice snake projectile TTL is too long now.
-        - Might keep the long TTL on hard mode though.
-
     - Demo blockers
         - Fix rest of the game is accessible via Helix in the randomizer.
         - New Rival Staff swing attack for first fight (keep slam for other fights)

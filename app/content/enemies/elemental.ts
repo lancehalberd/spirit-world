@@ -155,6 +155,11 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
         const hitbox = target.getHitbox();
         if (moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2) < 8) {
             const hybridEnemyType = target.enemyDefinition?.hybrids?.[enemy.definition.enemyType as EnemyType];
+            // The hybrid difficulty is scaled off the larger of the target or the elementals level modifier.
+            const difficultyScale = Math.max(
+                enemy.difficulty / enemy.enemyDefinition.naturalDifficultyRating,
+                target.difficulty / target.enemyDefinition.naturalDifficultyRating,
+            );
             const hybridEnemy = new Enemy(state, {
                 id: target.definition?.id,
                 status: 'normal',
@@ -162,6 +167,7 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
                 enemyType: hybridEnemyType,
                 x: target.x,
                 y: target.y,
+                difficulty: difficultyScale * enemyDefinitions[hybridEnemyType].naturalDifficultyRating,
             });
             hybridEnemy.z = target.z;
             removeObjectFromArea(state, target);

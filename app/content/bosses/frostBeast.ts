@@ -1,25 +1,25 @@
-import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import {FieldAnimationEffect} from 'app/content/effects/animationEffect';
 import {Blast} from 'app/content/effects/blast';
-import {Frost} from 'app/content/effects/frost';
+import {shootFrostInCone} from 'app/content/effects/frost';
 import {LandMine, throwMineAtLocation} from 'app/content/effects/landMine';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FrostGrenade, throwIceGrenadeAtLocation} from 'app/content/effects/frostGrenade';
-import { Enemy } from 'app/content/enemy';
-import { enemyDeathAnimation, omniAnimation, snakeAnimations } from 'app/content/enemyAnimations';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, getFrame, drawFrame } from 'app/utils/animations';
-//import { createCanvasAndContext } from 'app/utils/canvas';
+import {Enemy} from 'app/content/enemy';
+import {enemyDeathAnimation, omniAnimation, snakeAnimations} from 'app/content/enemyAnimations';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {createAnimation, getFrame, drawFrame} from 'app/utils/animations';
+//import {createCanvasAndContext} from 'app/utils/canvas';
 import {getCardinalDirection} from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
+import {addEffectToArea} from 'app/utils/effects';
 import {
     accelerateInDirection,
     isEnemyDefeated,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { hitTargets } from 'app/utils/field';
-//import { allImagesLoaded } from 'app/utils/images';
-import { sample } from 'app/utils/index';
+import {hitTargets} from 'app/utils/field';
+//import {allImagesLoaded} from 'app/utils/images';
+import {sample} from 'app/utils/index';
 import {getNearbyTargetAnchor, getVectorToNearbyTarget} from 'app/utils/target';
 
 
@@ -727,7 +727,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                     enemy.d = getCardinalDirection(Math.cos(enemy.params.attackTheta), Math.sin(enemy.params.attackTheta), enemy.d);
                     enemy.changeToAnimation('idle');
                 }
-                shootFrostInCone(state, enemy, enemy.params.attackTheta, 1, 5);
+                shootFrostInCone(state, enemy, enemy.params.attackTheta, {hitEnemies: true, speed: 5});
             }
             if (enemy.modeTime >= 1500) {
                 enemy.setMode('chooseTarget');
@@ -837,7 +837,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
                     enemy.changeToAnimation('idle');
                 }
             }
-            shootFrostInCone(state, enemy, enemy.params.attackTheta);
+            shootFrostInCone(state, enemy, enemy.params.attackTheta, {hitEnemies: true});
         }
         if (enemy.modeTime >= 500) {
             enemy.setMode('chooseTarget');
@@ -851,21 +851,4 @@ function atan3(y: number, x: number) {
     return (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
 }
 
-export function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 2, speed = 4, hitEnemies = true): void {
-    const hitbox = enemy.getHitbox();
-    const x = hitbox.x + hitbox.w / 2 + Math.cos(theta) * hitbox.w / 2;
-    const y = hitbox.y + hitbox.h / 2 + Math.sin(theta) * hitbox.h / 2;
-    const attackTheta = theta - Math.PI / 10 + Math.random() * Math.PI / 5;
-    const frost = new Frost({
-        damage,
-        x,
-        y,
-        vx: speed * Math.cos(attackTheta),
-        vy: speed * Math.sin(attackTheta),
-        hitEnemies,
-        ignoreTargets: new Set([enemy]),
-        source: enemy,
-    });
-    addEffectToArea(state, enemy.area, frost);
-}
 
