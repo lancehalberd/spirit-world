@@ -8,7 +8,13 @@ import {pushScene} from 'app/scenes/sceneHash';
 export class PauseScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
+    wasAdvanceKeyPressed = false;
     update(state: GameState, interactive: boolean) {
+        // Hack to detect single key press.
+        const isAdvanceKeyPressed = isKeyboardKeyDown(KEY.PERIOD);
+        this.blocksUpdates = this.blocksInput = !(isAdvanceKeyPressed && !this.wasAdvanceKeyPressed);
+        this.wasAdvanceKeyPressed = isAdvanceKeyPressed;
+
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
             state.sceneStack.pop()
             return;

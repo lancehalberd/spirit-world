@@ -180,6 +180,8 @@ interface Props {
     style?: ArrowStyle
     hybridWorlds?: boolean
     source: Actor
+    // Can be set in some inputs that don't require exact velocity to set speed directly.
+    speed?: number
 }
 
 export class Arrow implements EffectInstance, Projectile {
@@ -309,6 +311,7 @@ export class Arrow implements EffectInstance, Projectile {
             const dx = directionMap[direction][0], dy = directionMap[direction][1];
             // This range is set pretty precisely for the MC to be able to shoot off the top of ledges over walls but
             // not be able to shoot past ledges up walls.
+            // TODO: This should just be based on the anchor point of the shooter.
             const ledgeDelta = getLedgeDelta(state, this.area, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
             this.isHigh = ledgeDelta < 0;
             //console.log(ledgeDelta, this.isHigh, this.vx, this.vy, {x: x - 10 * dx, y: y - 10 * dy}, {x: x + 6 * dx, y: y + 6 * dy});
@@ -356,6 +359,12 @@ export class Arrow implements EffectInstance, Projectile {
         this.x += this.vx;
         this.y += this.vy;
         const anchorPoint = this.getAnchorPoint();
+        const ledgeDelta = getLedgeDelta(state, this.area, oldAnchorPoint, this.getAnchorPoint());
+        if (ledgeDelta > 0 && !this.isHigh) {
+            if (this.checkIfStopped(state, {hit: true, stopped: true})) {
+                return;
+            }
+        }
         this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, anchorPoint);
         const { section } = getAreaSize(state);
         if (this.x + this.w <= section.x || this.y + this.h <= section.y
@@ -418,25 +427,7 @@ export class Arrow implements EffectInstance, Projectile {
                 this.direction = getDirection(this.vx, this.vy, true);
                 return;
             }
-            const persist = !(this.animationTime >= this.ignoreWallsDuration);
-            if (!persist && (hitResult.blocked || hitResult.stopped)) {
-                this.stuckFrames = 1;
-                this.blocked = true;
-                this.vz = 1;
-                this.animationTime = 0;
-                return;
-            }
-            if (!persist && hitResult.hit && !hitResult.pierced) {
-                this.stuckFrames = 1;
-                this.animationTime = 0;
-                if (hitResult.hitTargets.size) {
-                    const object = [...hitResult.hitTargets.values()][0];
-                    this.stuckTo = {
-                        object,
-                        dx: this.x - object.x,
-                        dy: this.y - object.y,
-                    };
-                }
+            if (this.checkIfStopped(state, hitResult)) {
                 return;
             }
             // This is used to make torches light arrows on fire.
@@ -444,6 +435,33 @@ export class Arrow implements EffectInstance, Projectile {
                 this.element = hitResult.setElement;
             }
         }
+    }
+    checkIfStopped(state: GameState, hitResult: HitResult): boolean {
+        const persist = !(this.animationTime >= this.ignoreWallsDuration);
+        if (persist) {
+            return false;
+        }
+        if (hitResult.blocked || hitResult.stopped) {
+            this.stuckFrames = 1;
+            this.blocked = true;
+            this.vz = 1;
+            this.animationTime = 0;
+            return true;
+        }
+        if (hitResult.hit && !hitResult.pierced) {
+            this.stuckFrames = 1;
+            this.animationTime = 0;
+            if (hitResult.hitTargets.size) {
+                const object = [...hitResult.hitTargets.values()][0];
+                this.stuckTo = {
+                    object,
+                    dx: this.x - object.x,
+                    dy: this.y - object.y,
+                };
+            }
+            return true;
+        }
+        return false;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const animationSet = arrowStyles[this.style][this.direction];
@@ -677,6 +695,141 @@ export class Spike extends CrystalSpike {
     }
 }
 
+export class CrystalBurst extends Arrow {
+    isPlayerAttack = false;
+    isEnemyAttack = true;
+    spikes: Spike[];
+    theta: number
+    w = 12;
+    h = 12;
+    static spawn(state: GameState, area: AreaInstance, count: number, burstProps: Props, arrowProps: Props) {
+        const burst = new CrystalBurst(burstProps);
+        burst.spikes = [];
+        burst.theta = 2 * Math.PI * Math.random();
+        for (let i = 0; i < count; i++) {
+            const theta = 2 * Math.PI * i / count;
+            const spike = new CrystalSpike(arrowProps);
+            const dx = Math.cos(theta), dy = Math.sin(theta);
+            spike.x = 6 * dx;
+            spike.y = 6 * dy;
+            spike.vx = (arrowProps.speed ?? 4) * dx;
+            spike.vy = (arrowProps.speed ?? 4) * dy;
+            burst.spikes.push(spike);
+        }
+        addEffectToArea(state, area, burst);
+    }
+    burst(state: GameState) {
+        const dx = Math.cos(this.theta), dy = Math.sin(this.theta);
+        const nx = [dx, dy], ny = [-dy, dx];
+        for (const spike of this.spikes) {
+            const {x, y, vx, vy} = spike;
+            spike.x = this.x + nx[0] * x + ny[0] * y - spike.w / 2;
+            spike.y = this.y + nx[1] * x + ny[1] * y - spike.h / 2;
+            spike.vx = nx[0] * vx + ny[0] * vy;
+            spike.vy = nx[1] * vx + ny[1] * vy;
+            addEffectToArea(state, this.area, spike);
+        }
+        removeEffectFromArea(state, this);
+    }
+    getHitbox() {
+        return {
+            x: this.x - this.w / 2,
+            y: this.y - this.h / 2,
+            w: this.w,
+            h: this.h,
+        };
+    }
+    getAnchorPoint() {
+        return {x: this.x, y: this.y};
+    }
+    getHitProperties(state: GameState): HitProperties {
+        return {
+            canPush: false,
+            damage: this.damage,
+            spiritCloakDamage: this.spiritCloakDamage,
+            canDamageCrystalShields: true,
+            direction: this.direction,
+            hitbox: this,
+            knockback: { vx: this.vx, vy: this.vy, vz: 0},
+            tileHitbox: {
+                w: this.w,
+                h: this.h,
+                x: this.x - this.vx,
+                y: this.y - this.vy,
+            },
+            vx: this.vx,
+            vy: this.vy,
+            element: this.element,
+            hitAllies: !this.reflected,
+            hitEnemies: this.reflected,
+            hitObjects: true,
+            hitTiles: true,
+            anchorPoint: this.getAnchorPoint(),
+            isHigh: this.isHigh,
+            source: this.source,
+        };
+    }
+    update(state: GameState) {
+        if (!this.area) {
+            return;
+        }
+        if (this.delay > 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
+        this.theta += Math.PI / 50;
+        if (this.ax) {
+            this.vx += this.ax;
+        }
+        if (this.ay) {
+            this.vy += this.ay;
+        }
+        this.animationTime += FRAME_LENGTH;
+        if (this.ttl && this.animationTime >= this.ttl) {
+            this.burst(state);
+            return;
+        }
+        const oldAnchorPoint = this.getAnchorPoint();
+        const newAnchorPoint = {x: oldAnchorPoint.x + this.vx, y: oldAnchorPoint.y + this.vy};
+        const ledgeDelta = getLedgeDelta(state, this.area, oldAnchorPoint, newAnchorPoint);
+        if (ledgeDelta > 0 && !this.isHigh) {
+            this.burst(state);
+            return;
+        }
+        this.x += this.vx;
+        this.y += this.vy;
+        this.isHigh = updateProjectileHeight(state, this.area, this.isHigh, oldAnchorPoint, newAnchorPoint);
+        const { section } = getAreaSize(state);
+        if (this.x + this.w <= section.x || this.y + this.h <= section.y
+            || this.x >= section.x + section.w || this.y  >= section.y + section.h
+        ) {
+            this.burst(state);
+            return;
+        }
+        const hitResults: HitResult[] = [];
+        const hitProps = this.getHitProperties(state);
+        hitResults.push(hitTargets(state, this.area, hitProps));
+        if (this.hybridWorlds) {
+            hitResults.push(hitTargets(state, this.area.alternateArea, hitProps));
+        }
+        for (const hitResult of hitResults) {
+            if (hitResult.reflected || hitResult.blocked || hitResult.stopped || hitResult.hit) {
+                this.burst(state);
+                return;
+            }
+        }
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        context.save();
+            context.translate(this.x, this.y);
+            context.rotate(this.theta);
+            for (const spike of this.spikes) {
+                spike.render(context, state);
+            }
+        context.restore();
+    }
+}
+
 const rockFrames = [
     requireFrame('gfx/effects/rocks.png', {x: 13, y: 12, w: 5, h: 5}),
     requireFrame('gfx/effects/rocks.png', {x: 43, y: 12, w: 5, h: 5}),
@@ -690,12 +843,22 @@ export class Rock extends CrystalSpike {
         super(props);
         this.frame = Random.element(rockFrames);
     }
+    getHitbox() {
+        return {x: this.x, y: this.y, w: this.w, h: this.h};
+    }
+    getAnchorPoint() {
+        const hitbox = this.getHitbox();
+        return {
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2,
+        };
+    }
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const rock = new Rock(arrowProps);
         addEffectToArea(state, area, rock);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrameAt(context, this.frame, { x: this.x - this.frame.w / 2, y: this.y - this.frame.h / 2});
+        drawFrameAt(context, this.frame, { x: this.x, y: this.y - this.z});
     }
 }
 

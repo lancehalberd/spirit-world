@@ -64,7 +64,7 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
 export const spawnBeetleAbility: EnemyAbility<boolean> = {
     // This skill will only be used when there is no nearby target.
     isEnabled(this: void, state: GameState, enemy: Enemy<Summoner>) {
-        enemy.params.summons = enemy.params.summons.filter(e => !isEnemyDefeated(e));
+        enemy.params.summons = (enemy.params.summons ?? []).filter(e => !isEnemyDefeated(e));
         return enemy.params.summons.length < 2;
     },
     getTarget(this: void, state: GameState, enemy: Enemy<Summoner>): boolean {
@@ -89,6 +89,7 @@ export const spawnBeetleAbility: EnemyAbility<boolean> = {
         flyingBeetle.z = enemy.z + 8;
         flyingBeetle.vz = 4;
         addObjectToArea(state, enemy.area, flyingBeetle);
+        enemy.params.summons = (enemy.params.summons ?? []);
         enemy.params.summons.push(flyingBeetle);
     },
     // This skill has a very long cooldown
@@ -105,7 +106,7 @@ export const spawnBeetleAbility: EnemyAbility<boolean> = {
 };
 
 interface Summoner {
-    summons: Enemy<any>[]
+    summons?: Enemy<any>[]
 }
 
 const basePlantDefinition: Partial<EnemyDefinition<Summoner>> = {
@@ -120,7 +121,6 @@ const basePlantDefinition: Partial<EnemyDefinition<Summoner>> = {
     touchDamage: 1,
     canBeKnockedBack: false,
     params: {
-        summons: [],
     },
     update(state: GameState, enemy: Enemy): void {
         if (!enemy.activeAbility) {

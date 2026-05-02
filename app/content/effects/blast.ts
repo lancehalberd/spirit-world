@@ -172,7 +172,7 @@ export class Blast implements EffectInstance {
             }
         } else {
             const time = this.animationTime - this.tellDuration;
-            const totalDuration = this.animation.duration ?? this.tellDuration + this.expansionDuration + this.persistDuration;
+            const totalDuration = this.animation?.duration ?? (this.tellDuration + this.expansionDuration + this.persistDuration);
             const decayDuration = 100;
             const decayStartTime = totalDuration - decayDuration;
             const decay =  clamp(1 - (this.animationTime - decayStartTime) / decayDuration, 0, 1);

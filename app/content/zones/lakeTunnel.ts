@@ -176,6 +176,7 @@ const f0_0x0: AreaDefinition = {
         {status: "closedEnemy", id: "lakeTunnel:0:0x0-door-3", x: 96, y: 224, type: "door", style: "stone", d: "down"},
         {status: "normal", id: "helixRivalBoss", x: 120, y: 36, type: "boss", enemyType: "rival2", lootType: "empty", d: "down", params: {}, customLogic: "testTombRival"},
         {status: "normal", id: "lakeTunnelSave", x: 80, y: 304, type: "saveStatue"},
+        {status: "normal", id: "demoBeetle", x: 234, y: 6, type: "enemy", enemyType: "climbingBeetle", d: "up", params: {}, hasCustomLogic: true, customLogic: "isDemo"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 259, mapId: 'overworld', entranceId: 'lakeTunnelEntrance', mapX: 0, mapY: 0},

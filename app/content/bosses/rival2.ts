@@ -1,4 +1,4 @@
-import {CrystalSpike} from 'app/content/effects/arrow';
+import {CrystalBurst, CrystalSpike} from 'app/content/effects/arrow';
 import {DelayedEffect} from 'app/content/effects/delayedEffect';
 import {Fireball} from 'app/content/effects/flame';
 import {addBurstEffect} from 'app/content/effects/animationEffect';
@@ -31,6 +31,7 @@ import {addObjectToArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {saveGame} from 'app/utils/saveGame';
 import {
+    getTargetingAnchor,
     getVectorToNearbyTarget,
     getVectorToTarget,
     isTargetVisible,
@@ -104,10 +105,10 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTauntFromList(state, ['attack1', 'attack2']);
         enemy.d = getCardinalDirection(target.x, target.y);
-        enemy.changeToAnimation('kneel');
+        enemy.changeToAnimation('prepareAttack');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
-        enemy.changeToAnimation('roll');
+        enemy.changeToAnimation('attack');
         const dx = target.x, dy = target.y;
         CrystalSpike.spawn(state, enemy.area, {
             delay: 100,
@@ -127,6 +128,45 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     chargesRecovered: 5,
     prepTime: 200,
     recoverTime: 200,
+};
+
+const crystalBurstAbility: EnemyAbility<true> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): true {
+        return true;
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy): void {
+        enemy.changeToAnimation('prepareAttack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy): void {
+        enemy.changeToAnimation('attack');
+        const anchor = getTargetingAnchor(enemy);
+        const {section} = getAreaSize(state);
+        const cx = section.x + section.w / 2, cy = section.y + section.h / 2;
+        const theta = Math.atan2(cy - anchor.y, cx - anchor.x);
+        const dx = Math.cos(theta), dy = Math.sin(theta);
+        CrystalBurst.spawn(state, enemy.area, 12, {
+            delay: 100,
+            x: anchor.x + 8 * dx,
+            y: anchor.y + 8 * dy,
+            damage: 1,
+            vx: 2 * dx,
+            ax: -2 * dx / 40,
+            vy: 2 * dy,
+            ay: -2 * dy / 40,
+            ttl: 1000,
+            source: enemy,
+        }, {
+            damage: 1,
+            speed: 4,
+            source: enemy,
+        })
+    },
+    cooldown: 4000,
+    initialCharges: 1,
+    charges: 1,
+    chargesRecovered: 1,
+    prepTime: 400,
+    recoverTime: 500,
 };
 
 
@@ -263,7 +303,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
     recoverTime: 3000,
 };
 
-const staffAbility: EnemyAbility<CardinalDirection> = {
+ const staffSlamAbility: EnemyAbility<CardinalDirection> = {
     getTarget(this: void, state: GameState, enemy: Enemy): CardinalDirection|null {
         for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
             if (!hero) {
@@ -283,7 +323,7 @@ const staffAbility: EnemyAbility<CardinalDirection> = {
         enemy.changeToAnimation('staffJump');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
-        enemy.changeToAnimation('staffSlam');
+        enemy.changeToAnimation('staffSlam', 'kneel');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
         enemy.makeSound(state, 'bossDeath');
         hitTargets(state, enemy.area, {
@@ -300,7 +340,6 @@ const staffAbility: EnemyAbility<CardinalDirection> = {
     },
     cancelsOtherAbilities: true,
     cannotBeCanceled: true,
-    initialCharges: 0,
     cooldown: 4000,
     prepTime: rivalAnimations.staffJump.down.duration,
     recoverTime: rivalAnimations.staffSlam.down.duration + 500,
@@ -342,16 +381,25 @@ function getTargetLocation(state: GameState, enemy: Enemy): Point {
     return center;
 }
 
+interface Params {
+    staggerDamage: number
+    afterFrames?: Enemy[]
+    introduced?: boolean
+    targetLocation?: Point
+}
 
 const maxImageCount = 13;
-enemyDefinitions.rival2 = {
+const rival2: EnemyDefinition<Params> = {
     naturalDifficultyRating: 20,
     // This should match the NPC style of the Rival.
     animations: rivalAnimations,
     abilities: [
-        rollAbility, staffAbility, throwAbility,
+        rollAbility, staffSlamAbility, throwAbility,
         iceSpikeAbility, flameRingAbility, chasingSparkAbility,
     ],
+    params: {
+        staggerDamage: 0,
+    },
     taunts: {
         attackIntro: { text: 'Should I go easy on you?', priority: 5, limit: 1},
         attack1: { text: 'No escape for you this time!', priority: 1},
@@ -378,11 +426,13 @@ enemyDefinitions.rival2 = {
         // Enemy suffers a hit while staggered
         staggerDamage1: { text: 'Why you!', priority: 3},
         staggerDamage2: { text: 'You mongrel!', priority: 3},
-        staff: { text: 'Remember this?', priority: 4},
+        staff: { text: 'Dodge this!', priority: 4},
+        staffRetaliate: { text: 'Back off!', priority: 4},
+        throwRetaliate: { text: 'Payback!', priority: 4},
     },
     isImmortal: true,
-    life: 24, touchDamage: 0, update: updateRival2,
-    onHit(this: void, state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+    life: 40, touchDamage: 0, update: updateRival2,
+    onHit(this: void, state: GameState, enemy: Enemy<Params>, hit: HitProperties): HitResult {
         if (enemy.invulnerableFrames) {
             return {};
         }
@@ -390,9 +440,10 @@ enemyDefinitions.rival2 = {
         if (enemy.activeAbility?.definition === rollAbility) {
             return {};
         }
-        if (enemy.area === state.hero.area) {
-            // Rival cannot dodge roll while staggered.
-            if (enemy.mode !== 'staggered' && enemy.tryUsingAbility(state, rollAbility)) {
+        if (enemy.mode === 'retaliate') {
+            hit = {...hit, damage: hit.damage / 5};
+        } else if (enemy.mode !== 'staggered' && enemy.area === state.hero.area) {
+            if (enemy.tryUsingAbility(state, rollAbility)) {
                 enemy.useTaunt(state, 'dodge');
                 return {};
             }
@@ -402,21 +453,27 @@ enemyDefinitions.rival2 = {
                 abilityWithCharges.charges++;
             }
         }
-        if (enemy.mode === 'staggered') {
-            hit = {...hit, damage: hit.damage * 2};
-        }
         const hitResult = enemy.defaultOnHit(state, hit);
         if (hitResult.damageDealt) {
             if (enemy.area === state.hero.area) {
                 if (enemy.mode === 'staggered') {
                     enemy.useTauntFromList(state, ['staggerDamage1', 'staggerDamage2']);
-                } else {
+                } else if (enemy.mode !== 'retaliate') {
                     enemy.useTauntFromList(state, ['normalDamage', 'normalDamage2']);
                 }
-                // This will potentially allow the rival to dodge a second attack after he is hit once while staggered.
-                // Sometimes this can be triggered when multiple ice shards hit him, which is not ideal.
-                // Consider not applying this when hit by his own projectiles.
-                enemy.setMode('hurt');
+                // If the player damages the rival enough he will retaliate, using a staff
+                // slam and taking reduced damage until he disappears again.
+                if (enemy.mode === 'staggered') {
+                    enemy.params.staggerDamage += hitResult.damageDealt;
+                    // Stagger is extended any time the Rival is hit while staggered.
+                    enemy.modeTime = 1000;
+                    if (enemy.params.staggerDamage >= 5) {
+                        enemy.setMode('retaliate');
+                    } else {
+                        // Enemy has reduced iframes when staggered to make them easier to hit.
+                        enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 5;
+                    }
+                }
             } else {
                 if (hit.element === 'ice') {
                     enemy.frozenDuration = 1000;
@@ -435,7 +492,7 @@ enemyDefinitions.rival2 = {
     },
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         enemy.defaultRender(context, state);
-        if (enemy.activeAbility?.definition === staffAbility) {
+        if (enemy.activeAbility?.definition === staffSlamAbility) {
             renderStaff(context, state, enemy);
         }
     },
@@ -507,16 +564,20 @@ enemyDefinitions.rival2 = {
         }
     },
     acceleration: 0.3, speed: 1.5,
-    params: {
-    },
 };
+enemyDefinitions.rival2 = rival2;
 
 function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    // Stop rendering the staff once the rival reaches the kneeling frame, otherwise it will repeat the slam effect.
+    if (enemy.currentAnimationKey === 'kneel') {
+        return;
+    }
     let animationTime = enemy.animationTime;
     if (enemy.activeAbility.used) {
         animationTime += enemy.activeAbility.definition.prepTime;
     }
-    if (animationTime < treeStaffAnimations[enemy.d].duration + 20) {
+    // The first frame of the rival animation still displays the staff, so don't render the staff effect until the second frame.
+    if (animationTime >= enemy.currentAnimation.frameDuration * 2 * FRAME_LENGTH && animationTime < treeStaffAnimations[enemy.d].duration + FRAME_LENGTH) {
         const frame = getFrame(treeStaffAnimations[enemy.d], animationTime);
         let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
         if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {
@@ -526,7 +587,7 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
     }
 }
 
-function updateSpiritRival(this: void, state: GameState, enemy: Enemy): void {
+function updateSpiritRival(this: void, state: GameState, enemy: Enemy<Params>): void {
     // The enemy gets no IFrames so that if multiple attacks land at once they can all go through.
     enemy.invulnerableFrames = enemy.enemyInvulnerableFrames = 0;
     // Return to the world the hero is in when defeated.
@@ -578,7 +639,7 @@ function updateSpiritRival(this: void, state: GameState, enemy: Enemy): void {
     }
 }
 
-function usePrioritizedAbility(state: GameState, enemy: Enemy, abilities: EnemyAbility<any>[]): boolean {
+function usePrioritizedAbility(state: GameState, enemy: Enemy<Params>, abilities: EnemyAbility<any>[]): boolean {
     for (const ability of abilities) {
         if (enemy.tryUsingAbility(state, ability)) {
             return true;
@@ -586,10 +647,11 @@ function usePrioritizedAbility(state: GameState, enemy: Enemy, abilities: EnemyA
     }
 }
 
-function staggerRival(state: GameState, enemy: Enemy): void {
+function staggerRival(state: GameState, enemy: Enemy<Params>): void {
     // Make the enemy iframes very brief on stagger so that the player doesn't have to wait to hit them.
     enemy.invulnerableFrames = 5;
     enemy.enemyInvulnerableFrames = 5;
+    enemy.params.staggerDamage = 0;
     enemy.setMode('staggered');
     enemy.changeToAnimation('kneel');
     enemy.useTauntFromList(state, ['staggered', 'staggered2']);
@@ -598,7 +660,7 @@ function staggerRival(state: GameState, enemy: Enemy): void {
         moveRivalToArea(state, state.hero.area, enemy);
     }
 }
-function moveRivalToArea(state: GameState, area: AreaInstance, rival: Enemy): void {
+function moveRivalToArea(state: GameState, area: AreaInstance, rival: Enemy<Params>): void {
     if (rival.area !== area) {
         addObjectToArea(state, area, rival);
         // Add an object doesn't currently update the enemies array immediately which can cause the boss music to
@@ -607,7 +669,7 @@ function moveRivalToArea(state: GameState, area: AreaInstance, rival: Enemy): vo
     }
 }
 
-function updateRival2(this: void, state: GameState, enemy: Enemy): void {
+function updateRival2(this: void, state: GameState, enemy: Enemy<Params>): void {
     // The hero can get stuck in the doorway if we initiate the cutscene before they finish exiting the door.
     if (state.hero.isUsingDoor) {
         enemy.healthBarTime = 0;
@@ -700,7 +762,20 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (!enemy.activeAbility && enemy.life <= enemy.maxLife - 2 && enemy.area === state.hero.area) {
+    if (enemy.mode === 'retaliate') {
+        // When retaliating, use the Staff Slam ability if there is a target in range,
+        // otherwise use the crystal burst ability, which can hit anywhere on the screen.
+        const target = staffSlamAbility.getTarget(state, enemy);
+        if (target) {
+            enemy.useTaunt(state, 'staffRetaliate');
+            enemy.useAbiltyFromDefinition(state, staffSlamAbility, target);
+        } else {
+            enemy.useTaunt(state, 'throwRetaliate');
+            enemy.useAbiltyFromDefinition(state, crystalBurstAbility, true);
+        }
+        enemy.setMode('idle');
+    }
+    if (!enemy.activeAbility && enemy.life <= enemy.maxLife - 10 && enemy.area === state.hero.area) {
         if (enemy.modeTime < 400) {
             return;
         }
@@ -719,13 +794,9 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
     }
 
     // These attacks are only used at the start of the fight, which is similar to the first rival encounter.
-    if (enemy.life > enemy.maxLife - 2) {
-        // Use the staff attack whenever possible. This actually makes the
-        // fight a bit easier since this is when the rival is most vulnerable.
-        enemy.tryUsingAbility(state, staffAbility)
-        if (!enemy.activeAbility) {
-            enemy.tryUsingAbility(state, throwAbility);
-        }
+    enemy.tryUsingAbility(state, staffSlamAbility)
+    if (!enemy.activeAbility) {
+        enemy.tryUsingAbility(state, throwAbility);
     }
     if (enemy.activeAbility?.definition === rollAbility) {
         const [x, y] = directionMap[enemy.d];
@@ -733,7 +804,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy): void {
         const speed = rollSpeed[frame] || 0;
         moveEnemy(state, enemy, speed * x, speed * y);
     }
-    if (enemy.activeAbility?.definition === staffAbility) {
+    if (enemy.activeAbility?.definition === staffSlamAbility) {
         const jumpDuration = enemy.activeAbility.definition.prepTime;
         if (!enemy.activeAbility.used) {
             // Jumping up

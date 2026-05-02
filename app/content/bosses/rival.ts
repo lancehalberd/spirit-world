@@ -2,30 +2,22 @@ import {Rock} from 'app/content/effects/arrow';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations} from 'app/content/enemyAnimations';
-import {heroAnimations, treeStaffAnimations} from 'app/render/heroAnimations';
 import {appendScript} from 'app/scriptEvents';
 import {removeTextCue} from 'app/content/effects/textCue';
-import {drawFrameAt, getFrame} from 'app/utils/animations';
+import {editingState} from 'app/development/editingState';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import {hitTargets} from 'app/utils/field';
+import {fillRect} from 'app/utils/index'
 import {removeObjectFromArea} from 'app/utils/objects';
 import {saveGame} from 'app/utils/saveGame';
 import {
     getVectorToNearbyTarget,
     isTargetVisible,
 } from 'app/utils/target';
-
-
-
-// const rivalMergedAnimations = {
-//     ...rivalAnimations,
-//     staffJump: heroAnimations.staffJump,
-//     staffSlam: heroAnimations.staffSlam,
-// }
 
 const rollSpeed = [
     5, 5, 5, 5,
@@ -59,15 +51,15 @@ const rollAbility: EnemyAbility<RollTargetType> = {
 function getStaffHitbox(enemy: Enemy, d: Direction): Rect {
     const enemyHitbox = enemy.getHitbox();
     if (d === 'left') {
-        return {...enemyHitbox, x: enemyHitbox.x - 48, w: 48};
+        return {...enemyHitbox, x: enemyHitbox.x - 20, w: 32};
     }
     if (d === 'right') {
-        return {...enemyHitbox, x: enemyHitbox.x + enemyHitbox.w, w: 48};
+        return {...enemyHitbox, x: enemyHitbox.x + enemyHitbox.w - 12, w: 32};
     }
     if (d === 'up') {
-        return {...enemyHitbox, y: enemyHitbox.y - 48, h: 48};
+        return {...enemyHitbox, y: enemyHitbox.y - 20, h: 32};
     }
-    return {...enemyHitbox, y: enemyHitbox.y + enemyHitbox.h, h: 48};
+    return {...enemyHitbox, y: enemyHitbox.y + enemyHitbox.h - 12, h: 32};
 }
 
 type ThrowTargetType = ReturnType<typeof getVectorToNearbyTarget>;
@@ -95,7 +87,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
             source: enemy,
         });
     },
-    cooldown: 1000,
+    cooldown: 2000,
     initialCharges: 3,
     charges: 3,
     chargesRecovered: 3,
@@ -103,7 +95,20 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
     recoverTime: 300,
 };
 
-const staffAbility: EnemyAbility<CardinalDirection> = {
+const staffSwingHitBoxes = {
+    down: [{x: 17, y: 22, w: 13, h: 32}, {x: 30, y: 41, w: 20, h: 22}, {x: 23, y: 50, w: 10, h: 10}],
+    right: [{x: 46, y: 21, w: 21, h: 20}, {x: 31, y: 41, w: 28, h: 9}],
+    up: [{x: 23, y: 1, w: 24, h: 24}, {x: 45, y: 9, w: 10, h: 30}],
+    left: [{x: 3, y: 33, w: 24, h: 16}, {x: 13, y: 22, w: 30, h: 11}, {x: 7, y: 27, w: 6, h: 6}],
+};
+function getStaffSwingHitbox(enemy: Enemy, hitbox: Rect): Rect {
+    return {
+        ...hitbox,
+        x: (enemy.x - rivalAnimations.staffSwing.down.frames[0].content.x) + hitbox.x,
+        y: (enemy.y - rivalAnimations.staffSwing.down.frames[0].content.y) + hitbox.y,
+    };
+}
+const staffSwingAbility: EnemyAbility<CardinalDirection> = {
     getTarget(this: void, state: GameState, enemy: Enemy): CardinalDirection|null {
         for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
             if (!hero) {
@@ -120,34 +125,36 @@ const staffAbility: EnemyAbility<CardinalDirection> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
         enemy.useTaunt(state, 'staff');
         enemy.d = target;
-        enemy.changeToAnimation('staffJump');
+        enemy.changeToAnimation('prepareStaffSwing');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
-        enemy.changeToAnimation('staffSlam', 'kneel');
+        enemy.changeToAnimation('staffSwing', 'idle');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
-        enemy.makeSound(state, 'bossDeath');
-        hitTargets(state, enemy.area, {
-            damage: 2,
-            hitbox: getStaffHitbox(enemy, enemy.d),
-            hitAllies: true,
-            knockAwayFromHit: true,
-            isStaff: true,
-            source: enemy,
-        });
-        state.screenShakes.push({
-            dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
-        });
+        // enemy.makeSound(state, 'bossDeath');
+        for (const hitbox of staffSwingHitBoxes[enemy.d]) {
+            hitTargets(state, enemy.area, {
+                damage: 2,
+                hitbox: getStaffSwingHitbox(enemy, hitbox),
+                hitAllies: true,
+                knockAwayFromHit: true,
+                isStaff: true,
+                source: enemy,
+            });
+        }
     },
     cancelsOtherAbilities: true,
     cannotBeCanceled: true,
-    cooldown: 4000,
-    prepTime: rivalAnimations.staffJump.down.duration,
-    recoverTime: rivalAnimations.staffSlam.down.duration + 500,
+    cooldown: 3000,
+    prepTime: rivalAnimations.prepareStaffSwing.down.duration + 400,
+    recoverTime: rivalAnimations.staffSwing.down.duration + 500,
 };
 
 // This is hardcoded for the area outside of the tomb.
 const midPoint: Coords = [128, 176];
 function getTargetLocation(state: GameState, enemy: Enemy): Coords {
+    const swingAbility = enemy.getAbility(staffSwingAbility);
+    // The rival will try to move closer to the hero when his swing ability is available.
+    const targetDistance = swingAbility.charges ? 16 : 48;
     for (const target of enemy.area.allyTargets) {
         if (!isTargetVisible(state, enemy, target)) {
             continue;
@@ -163,11 +170,11 @@ function getTargetLocation(state: GameState, enemy: Enemy): Coords {
             // Target is close to the center, try to be directly left/right
             // while staying on the same side of the target.
             if (cx > enemyHitbox.x + enemyHitbox.w / 2) {
-                return [cx - 48, cy];
+                return [cx - targetDistance, cy];
             }
-            return [cx + 48, cy];
+            return [cx + targetDistance, cy];
         }
-        return [cx + v[0] * 48 / mag, cy + v[1] * 48 / mag];
+        return [cx + v[0] * targetDistance / mag, cy + v[1] * targetDistance / mag];
     }
     return midPoint;
 }
@@ -175,14 +182,14 @@ function getTargetLocation(state: GameState, enemy: Enemy): Coords {
 enemyDefinitions.rival = {
     // This should match the NPC style of the Rival.
     animations: rivalAnimations,
-    abilities: [rollAbility, staffAbility, throwAbility],
+    abilities: [rollAbility, staffSwingAbility, throwAbility],
     naturalDifficultyRating: 20,
     taunts: {
         throw: { text: 'Get out of here!', priority: 1},
         dodge: { text: 'Nice try!', priority: 2},
         smallDamage: { text: 'Ugh!', priority: 3},
         bigDamage: { text: `You'll pay for that`, priority: 3},
-        staff: { text: 'Dodge this!', priority: 4},
+        staff: { text: 'Back off!', priority: 4},
     },
     isImmortal: true,
     life: 7, touchDamage: 0, update: updateRival,
@@ -210,10 +217,14 @@ enemyDefinitions.rival = {
         }
         return hitResult;
     },
-    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        enemy.defaultRender(context, state);
-        if (enemy.activeAbility?.definition === staffAbility) {
-            renderStaff(context, state, enemy);
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (!editingState.showHitboxes) {
+            return;
+        }
+        if (enemy.currentAnimationKey === 'staffSwing' && enemy.animationTime < 100) {
+            for (const hitbox of staffSwingHitBoxes[enemy.d]) {
+                fillRect(context, getStaffSwingHitbox(enemy, hitbox), 'rgba(255, 0, 0, 0.2)');
+            }
         }
     },
     acceleration: 0.3, speed: 1.5,
@@ -221,25 +232,6 @@ enemyDefinitions.rival = {
     },
 };
 
-function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    // Stop rendering the staff once the rival reaches the kneeling frame, otherwise it will repeat the slam effect.
-    if (enemy.currentAnimationKey === 'kneel') {
-        return;
-    }
-    let animationTime = enemy.animationTime;
-    if (enemy.activeAbility.used) {
-        animationTime += enemy.activeAbility.definition.prepTime;
-    }
-    // The first frame of the rival animation still displays the staff, so don't render the staff effect until the second frame.
-    if (animationTime >= enemy.currentAnimation.frameDuration * 2 * FRAME_LENGTH && animationTime < treeStaffAnimations[enemy.d].duration + FRAME_LENGTH) {
-        const frame = getFrame(treeStaffAnimations[enemy.d], animationTime);
-        let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
-        if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {
-            y -= enemy.z;
-        }
-        drawFrameAt(context, frame, { x, y });
-    }
-}
 
 function updateRival(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.area !== state.hero.area) {
@@ -311,8 +303,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
     }
     // Use the staff attack whenever possible. This actually makes the
     // fight a bit easier since this is when the rival is most vulnerable.
-    enemy.tryUsingAbility(state, staffAbility);
-    if (!enemy.activeAbility) {
+    if (!enemy.tryUsingAbility(state, staffSwingAbility)) {
         enemy.tryUsingAbility(state, throwAbility);
     }
     if (enemy.activeAbility?.definition === rollAbility) {
@@ -320,23 +311,6 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         const frame = enemy.animationTime / FRAME_LENGTH;
         const speed = rollSpeed[frame] || 0;
         moveEnemy(state, enemy, speed * x, speed * y);
-    }
-    if (enemy.activeAbility?.definition === staffAbility) {
-        const jumpDuration = enemy.activeAbility.definition.prepTime;
-        if (!enemy.activeAbility.used) {
-            // Jumping up
-           // console.log(hero.animationTime, jumpDuration, slamDuration);
-            if (enemy.animationTime < jumpDuration - FRAME_LENGTH) {
-                enemy.vz = 1 - 1 * enemy.animationTime / jumpDuration;
-                enemy.z += enemy.vz;
-            } else if (enemy.animationTime === jumpDuration - FRAME_LENGTH) {
-                enemy.vz = -4;
-                enemy.z = Math.max(enemy.z + enemy.vz, 0);
-            }
-        } else {
-            // Slamming down.
-            enemy.z = Math.max(enemy.z + enemy.vz, 0);
-        }
     }
     if (!enemy.activeAbility) {
         const targetLocation = getTargetLocation(state, enemy);

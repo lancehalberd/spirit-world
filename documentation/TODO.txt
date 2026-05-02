@@ -147,9 +147,6 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Fix rest of the game is accessible via Helix in the randomizer.
-        - New Rival Staff swing attack for first fight (keep slam for other fights)
-            rival/rivalStaffSwing.png
         - Add SFX to flame wall + lightning bolt abilities for Idols fight
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.

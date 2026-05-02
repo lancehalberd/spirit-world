@@ -17,6 +17,7 @@ export const KEY = {
     DOWN: 40,
     DELETE: 46,
     COMMAND: 91,
+    PERIOD: 190,
     LEFT_BRACKET: 219,
     BACK_SLASH: 220,
     RIGHT_BRACKET: 221,

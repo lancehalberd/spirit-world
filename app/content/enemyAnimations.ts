@@ -471,6 +471,24 @@ const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, r
 const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 3, y: 12, duration: 9});
 const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 13, duration: 9});
 
+const rivalStaffSwingGeometry: FrameDimensions = { w: 70, h: 64, content: { x: 29, y: 29, w: 16, h: 16} };
+const rivalStaffSwingImg = 'gfx/rival/rivalStaffSwing.png';
+const rivalPrepareStaffSwingDownAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 1, y: 0, cols: 5, duration: 2, loop: false});
+const rivalPrepareStaffSwingRightAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 1, y: 1, cols: 5, duration: 2,loop: false});
+const rivalPrepareStaffSwingUpAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 1, y: 2, cols: 5, duration: 2, loop: false});
+const rivalPrepareStaffSwingLeftAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 1, y: 3, cols: 5, duration: 2, loop: false});
+
+// hitboxes on frame 1. Add 2-3 rectangles to mostly cover these arcs without including too much empty space.
+// [{x: 17, y: 22, w: 13, h: 32}, {x: 30, y: 41, w: 20, h: 22}, {x: 23, y: 50, w: 10, h: 10}]
+const rivalStaffSwingDownAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 6, y: 0, cols: 3, loop: false});
+// [{x: 46, y: 21, w: 21, h: 20}, {x: 31, y: 41, w: 28, h: 9}]
+const rivalStaffSwingRightAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 6, y: 1, cols: 3, loop: false});
+// [{x: 23, y: 1, w: 24, h: 24}, {x: 45, y: 9, w: 10, h: 30}]
+const rivalStaffSwingUpAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 6, y: 2, cols: 3, loop: false});
+// [{x: 3, y: 33, w: 24, h: 16}, {x: 13, y: 22, w: 30, h: 11}, {x: 7, y: 27, w: 6, h: 6}]
+const rivalStaffSwingLeftAnimation: FrameAnimation = createAnimation(rivalStaffSwingImg, rivalStaffSwingGeometry, { x: 6, y: 3, cols: 3, loop: false});
+
+
 export const rivalAnimations: ActorAnimations = {
     idle: {
         down: rivalStillDownAnimation,
@@ -501,6 +519,18 @@ export const rivalAnimations: ActorAnimations = {
         right: rivalAttackRightAnimation,
         up: rivalAttackUpAnimation,
         left: rivalAttackLeftAnimation,
+    },
+    prepareStaffSwing: {
+        down: rivalPrepareStaffSwingDownAnimation,
+        right: rivalPrepareStaffSwingRightAnimation,
+        up: rivalPrepareStaffSwingUpAnimation,
+        left: rivalPrepareStaffSwingLeftAnimation,
+    },
+    staffSwing: {
+        down: rivalStaffSwingDownAnimation,
+        right: rivalStaffSwingRightAnimation,
+        up: rivalStaffSwingUpAnimation,
+        left: rivalStaffSwingLeftAnimation,
     },
     kneel: {
         down: rivalKneelDownAnimation,

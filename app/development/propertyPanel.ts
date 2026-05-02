@@ -518,7 +518,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                         ${property.name}
                         <input type="checkbox" ${property.value ? 'checked' : ''} name="${property.id || property.name}" />
                     </span>`;
-        } else if (isStringArrayProperty(property)) {
+        } else if (isStringArrayProperty(property) && property.values) {
             const options = property.values.filter(v => !property.value.includes(v));
             const selectedContainer = property.value.length ? `
                 <div class="pp-tag-container" name="${property.id || property.name}">
@@ -536,7 +536,6 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                         ${selectedContainer}
                     </span>`;
         }
-    } else {
-        return `<span class="pp-property">${property.name}: ${property.value}</span>`;
     }
+    return `<span class="pp-property">${property.name}: ${property.value}</span>`;
 }
