@@ -1,11 +1,12 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { editingState } from 'app/development/editingState';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, rotateDirection } from 'app/utils/direction';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {editingState} from 'app/development/editingState';
+import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {directionMap, rotateDirection} from 'app/utils/direction';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
+import {getAreaSize} from 'app/utils/getAreaSize';
 
 
 const flameAnimation = createAnimation('gfx/effects/flame.png', {w: 32, h: 48, content: {x: 8, y: 36, w: 16, h: 12}}, {cols: 4, duration: 3});
@@ -43,7 +44,7 @@ export class FlameWall implements EffectInstance, Props {
     ignorePits = true;
     // Length of the flame wall in tiles.
     length = this.props.length ?? 6;
-    animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
+    animationTime = 0;// Math.floor(Math.random() * 10) * FRAME_LENGTH;
     time = 0;
     direction = this.props.direction ?? 'down';
     status: ObjectStatus = 'normal';
@@ -167,6 +168,8 @@ export class FlameWall implements EffectInstance, Props {
                     addSparkleAnimation(state, this.area, hitbox, { element: 'fire' });
                 }
             }
+        } else if (this.animationTime % 100 === 20 && this.animationTime < 400) {
+            playAreaSound(state, this.area, 'lightFlame');
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

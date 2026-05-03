@@ -896,6 +896,68 @@ sounds.set('fireLaser', {
     instances: [],
 });
 
+sounds.set('lightFlame', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration;
+
+        const whooshDuration = duration; // Shorter whoosh
+
+        // 1. Filtered Noise element for the gas "whoosh"
+        const noiseGainNode = audioContext.createGain();
+        noiseGainNode.gain.setValueAtTime(0, time);
+        noiseGainNode.gain.linearRampToValueAtTime(0.8, time + 0.05); // Faster attack
+        noiseGainNode.gain.exponentialRampToValueAtTime(0.01, time + whooshDuration);
+        noiseGainNode.gain.linearRampToValueAtTime(0, time + whooshDuration + 0.1);
+
+        const filterNode = audioContext.createBiquadFilter();
+        filterNode.type = 'lowpass';
+        // Start filter high and sweep down to muffle it as it dies out
+        filterNode.frequency.setValueAtTime(800, time);
+        filterNode.frequency.exponentialRampToValueAtTime(200, time + whooshDuration);
+
+        pinkNoiseNode.connect(filterNode);
+        filterNode.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+
+        // 2. Low frequency rumble for the burner
+        const waveDuration = duration - 0.1;
+        const waveGainNode = audioContext.createGain();
+        waveGainNode.gain.setValueAtTime(0, time);
+        waveGainNode.gain.linearRampToValueAtTime(0.6, time + 0.15); // Swell in
+        waveGainNode.gain.exponentialRampToValueAtTime(0.01, time + waveDuration);
+        waveGainNode.gain.linearRampToValueAtTime(0, time + waveDuration + 0.1);
+
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sine'; // Sine is smoother, less "thump", more "rumble"
+        oscillator.frequency.setValueAtTime(60, time); // Low rumble
+
+        // Adding a slight wobble to the rumble
+        const lfo = audioContext.createOscillator();
+        lfo.type = 'sine';
+        lfo.frequency.setValueAtTime(20, time); // 20Hz wobble rate
+        const lfoGain = audioContext.createGain();
+        lfoGain.gain.setValueAtTime(10, time); // +/- 10Hz variation
+        lfo.connect(lfoGain);
+        lfoGain.connect(oscillator.frequency);
+        lfo.start(time);
+        lfo.stop(time + waveDuration + 0.1);
+
+        oscillator.connect(waveGainNode);
+        waveGainNode.connect(target);
+        oscillator.start(time);
+        oscillator.stop(time + duration + 0.1);
+
+        audioCallback(() => {
+            pinkNoiseNode.disconnect(filterNode);
+            oscillator.disconnect();
+            lfo.disconnect();
+        }, time + duration + 0.1);
+    },
+    duration: 0.4,
+    instanceLimit: 5,
+    instances: [],
+});
+
 // Use an oscillator to trigger callbacks based on audio times.
 // I'm not positive this is more precise than setTimeout, but it should
 // prevent code from being called too soon, for example, disconnecting nodes

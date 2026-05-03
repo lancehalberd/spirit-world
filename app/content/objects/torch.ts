@@ -1,7 +1,8 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { hitTargets } from 'app/utils/field';
-import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import {objectHash} from 'app/content/objects/objectHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {hitTargets} from 'app/utils/field';
+import {getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import SRandom from 'app/utils/SRandom';
 
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -117,6 +118,7 @@ export class Torch implements ObjectInstance {
         } else if (this.status === 'normal' && hit.element === 'fire') {
             this.status = 'active';
             this.behaviors.element = 'fire';
+            playAreaSound(state, this.area, 'lightFlame');
         }
         return { hit: true, pierced: true, setElement: this.behaviors.element };
     }
