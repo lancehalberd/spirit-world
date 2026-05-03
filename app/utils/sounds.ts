@@ -494,10 +494,20 @@ const audioContext: AudioContext = new (window.AudioContext || window['webkitAud
 window['audioContext'] = audioContext;
 
 let pinkNoiseNode: AudioWorkletNode;
+let whiteNoiseNode: AudioWorkletNode;
+let brownNoiseNode: AudioWorkletNode;
 async function registerAndCreateAudioWorklets(): Promise<void> {
-    await audioContext.audioWorklet.addModule('audio/pink-noise-processor.js');
+    await Promise.all([
+        audioContext.audioWorklet.addModule('audio/pink-noise-processor.js'),
+        audioContext.audioWorklet.addModule('audio/white-noise-processor.js'),
+        audioContext.audioWorklet.addModule('audio/brown-noise-processor.js')
+    ]);
     pinkNoiseNode = new AudioWorkletNode(audioContext, 'pink-noise');
+    whiteNoiseNode = new AudioWorkletNode(audioContext, 'white-noise');
+    brownNoiseNode = new AudioWorkletNode(audioContext, 'brown-noise');
     window['pinkNoiseNode'] = pinkNoiseNode;
+    window['whiteNoiseNode'] = whiteNoiseNode;
+    window['brownNoiseNode'] = brownNoiseNode;
 }
 registerAndCreateAudioWorklets();
 
@@ -968,7 +978,7 @@ sounds.set('lightFlame', {
         filterNode.frequency.setValueAtTime(800, time);
         filterNode.frequency.exponentialRampToValueAtTime(200, time + duration);
 
-        pinkNoiseNode.connect(filterNode);
+        whiteNoiseNode.connect(filterNode);
         filterNode.connect(noiseGainNode);
         noiseGainNode.connect(target);
 
@@ -997,7 +1007,7 @@ sounds.set('lightFlame', {
         oscillator.stop(time + duration);
 
         audioCallback(() => {
-            pinkNoiseNode.disconnect(filterNode);
+            whiteNoiseNode.disconnect(filterNode);
             oscillator.disconnect();
             lfo.disconnect();
         }, time + duration);
@@ -1033,7 +1043,7 @@ function gainTremolo(source: AudioNode, amplitude: number, startFrequence: numbe
 
 function playThunderClap(target: AudioNode, time: number, duration: number, basePitch: number) {
     // 1. Filtered pink noise for the broadband rumble
-    const masterVolume = 0.5;
+    const masterVolume = 0.4;
 
     const filterNode = audioContext.createBiquadFilter();
     filterNode.type = 'lowpass';
@@ -1044,7 +1054,7 @@ function playThunderClap(target: AudioNode, time: number, duration: number, base
 
     const noiseGainNode = createGainEnvelope(masterVolume, 0.4, time, duration, 0.1, 0.5);
 
-    pinkNoiseNode.connect(filterNode);
+    brownNoiseNode.connect(filterNode);
     filterNode.connect(noiseGainNode);
     const noiseTremolo = gainTremolo(noiseGainNode, 1.5, 2, 2.5, time, duration);
     noiseTremolo.connect(target);
@@ -1074,7 +1084,7 @@ function playThunderClap(target: AudioNode, time: number, duration: number, base
     oscillator.stop(time + duration);
 
     audioCallback(() => {
-        pinkNoiseNode.disconnect(filterNode);
+        brownNoiseNode.disconnect(filterNode);
         oscillator.disconnect();
     }, time + duration);
 }
@@ -1091,7 +1101,7 @@ sounds.set('spawnThunderCloud', {
 sounds.set('lightningStrike', {
     play(target: AudioNode, time: number) {
         const duration = this.duration || 0.5;
-        const masterVolume = 0.3;
+        const masterVolume = 0.2;
 
         // 1. Electrical crackle (high-pass filtered pink noise)
         const noiseFilter = audioContext.createBiquadFilter();
@@ -1106,7 +1116,7 @@ sounds.set('lightningStrike', {
         // Tremolo makes the noise sound more like chaotic electrical arcing
         const noiseTremolo = gainTremolo(noiseGainNode, 0.8, 40, 15, time, duration);
 
-        pinkNoiseNode.connect(noiseFilter);
+        whiteNoiseNode.connect(noiseFilter);
         noiseFilter.connect(noiseGainNode);
         noiseTremolo.connect(target);
 
@@ -1117,13 +1127,13 @@ sounds.set('lightningStrike', {
         snapFilter.Q.setValueAtTime(1.0, time);
 
         const snapGain = createGainEnvelope(masterVolume * 2, .5, time, 0.2, 0.01, 0.05);
-        pinkNoiseNode.connect(snapFilter);
+        whiteNoiseNode.connect(snapFilter);
         snapFilter.connect(snapGain);
         snapGain.connect(target);
 
         audioCallback(() => {
-            pinkNoiseNode.disconnect(noiseFilter);
-            pinkNoiseNode.disconnect(snapFilter);
+            whiteNoiseNode.disconnect(noiseFilter);
+            whiteNoiseNode.disconnect(snapFilter);
         }, time + duration);
     },
     duration: 0.5,
@@ -1134,7 +1144,7 @@ sounds.set('lightningStrike', {
 sounds.set('sparkBurst', {
     play(target: AudioNode, time: number) {
         const duration = this.duration || 0.5;
-        const masterVolume = 0.3;
+        const masterVolume = 0.2;
 
         // 1. Electrical crackle (high-pass filtered pink noise)
         const noiseFilter = audioContext.createBiquadFilter();
@@ -1149,7 +1159,7 @@ sounds.set('sparkBurst', {
         // Tremolo makes the noise sound more like chaotic electrical arcing
         const noiseTremolo = gainTremolo(noiseGainNode, 0.8, 40, 15, time, duration);
 
-        pinkNoiseNode.connect(noiseFilter);
+        whiteNoiseNode.connect(noiseFilter);
         noiseFilter.connect(noiseGainNode);
         noiseTremolo.connect(target);
 
@@ -1160,13 +1170,13 @@ sounds.set('sparkBurst', {
         snapFilter.Q.setValueAtTime(1.0, time);
 
         const snapGain = createGainEnvelope(masterVolume * 2, .5, time, 0.2, 0.01, 0.05);
-        pinkNoiseNode.connect(snapFilter);
+        whiteNoiseNode.connect(snapFilter);
         snapFilter.connect(snapGain);
         snapGain.connect(target);
 
         audioCallback(() => {
-            pinkNoiseNode.disconnect(noiseFilter);
-            pinkNoiseNode.disconnect(snapFilter);
+            whiteNoiseNode.disconnect(noiseFilter);
+            whiteNoiseNode.disconnect(snapFilter);
         }, time + duration);
     },
     duration: 0.4,
