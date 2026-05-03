@@ -1,9 +1,10 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { getLedgeDelta } from 'app/movement/getLedgeDelta';
-import { renderLightningCircle, renderLightningRay } from 'app/render/renderLightning'
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
-import { getVectorToTarget, isTargetVisible } from 'app/utils/target';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta';
+import {playAreaSound} from 'app/musicController';
+import {renderLightningCircle, renderLightningRay} from 'app/render/renderLightning'
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
+import {getVectorToTarget, isTargetVisible} from 'app/utils/target';
 
 
 interface Props {
@@ -31,6 +32,7 @@ interface Props {
     source: Actor
     strength?: number
     treeSize?: number
+    soundKey?: string
 }
 
 export class Spark implements EffectInstance, Props {
@@ -85,6 +87,7 @@ export class Spark implements EffectInstance, Props {
     ignoreWallsDuration = this.props.ignoreWallsDuration;
     delay = this.props.delay;
     source = this.props.source;
+    soundKey = this.props.soundKey;
     strength = this.props.strength;
     treeSize = this.props.treeSize;
     constructor(readonly props: Props) {
@@ -149,6 +152,9 @@ export class Spark implements EffectInstance, Props {
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
+        }
+        if (this.soundKey, this.animationTime === 0) {
+            playAreaSound(state, this.area, this.soundKey);
         }
         if (this.props.target && isTargetVisible(state, this, this.props.target)) {
             const {x, y} = getVectorToTarget(state, this, this.props.target);
@@ -260,8 +266,13 @@ export function addRadialSparks(this: void,
             vx: speed * dx,
             vy: speed * dy,
             ttl: 1000,
+            soundKey: 'sparkBurst',
             ...extraProps,
         });
+        // Only play 1 sound effect per set of sparks.
+        if (i !== 0) {
+            delete spark.soundKey;
+        }
         addEffectToArea(state, area, spark);
     }
 }

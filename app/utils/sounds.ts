@@ -1,5 +1,6 @@
 import {noteFrequencies} from './noteFrequencies';
 import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
+import {clamp} from 'app/utils/index';
 
 const sounds = new Map<string, GameSound>();
 window.sounds = sounds;
@@ -443,7 +444,7 @@ const preloadSounds = () => {
         //     offset: 0.2, duration: 0.3', volume: 10, instanceLimit: 2},
         {
             key: 'enemyHit', source: 'sfx/enemyDeath.wav',
-            offset: 0.3, duration: 0.2, volume: 20, instanceLimit: 2
+            offset: 0.3, duration: 0.2, volume: 60, instanceLimit: 2
         },
         {
             key: 'bossDeath', source: 'sfx/enemyDeath.wav',
@@ -463,14 +464,14 @@ const preloadSounds = () => {
         {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 50, instanceLimit: 2},
         {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', offset: 0.3, duration: 0.2, volume: 100, instanceLimit: 1},
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 100, instanceLimit: 1},
-        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, instanceLimit: 1},
-        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: 0.06, duration: 0.1, instanceLimit: 1},
+        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 3, offset: 0.06, duration: 0.1, instanceLimit: 1},
+        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 3, offset: 0.06, duration: 0.1, instanceLimit: 1},
         //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: 0, duration: 80, instanceLimit: 2},
         //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, instanceLimit: 2},
         //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, instanceLimit: 2},
-        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, instanceLimit: 2},
-        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, instanceLimit: 2},
-        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, instanceLimit: 2},
+        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 3, instanceLimit: 2},
+        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 6, instanceLimit: 2},
+        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 10, instanceLimit: 2},
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, instanceLimit: 5},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 2},
@@ -551,6 +552,48 @@ function playBeeps(inputFrequencies: number[], volume: number, duration: number,
     oscillator.stop(time + duration);
 }
 window['playBeeps'] = playBeeps;
+
+const minRampDuration = 0.01, minRampVolume = 0.01;
+function createGainEnvelope(volume: number, decay: number, time: number, duration: number, swell: number = minRampDuration, taper: number = minRampDuration) {
+    // Don't play any sounds shorter than the min ramp/decay times.
+    if (duration <= 2 * minRampDuration) {
+        const gainNode = audioContext.createGain();
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        return gainNode;
+    }
+    // To avoid clipping, there is an enforced minimum ramp duration for both swell + taper.
+    swell = clamp(swell, minRampDuration, duration - minRampDuration);
+    taper = clamp(taper, minRampDuration, duration - swell);
+    const gainNode = audioContext.createGain();
+    const now = audioContext.currentTime;
+    // Make sure the node is silent until the specified time.
+    if (now < time) {
+        gainNode.gain.setValueAtTime(0, now);
+    }
+    gainNode.gain.setValueAtTime(0, time);
+    if (swell > minRampDuration) {
+        // If the swell has a duration beyond the minimum, use exponentialRampToValueAtTime for most of it,
+        // which in theory sounds more even to human ears.
+        gainNode.gain.linearRampToValueAtTime(minRampVolume, time + minRampDuration);
+        gainNode.gain.exponentialRampToValueAtTime(volume, time + swell);
+    } else {
+        gainNode.gain.linearRampToValueAtTime(volume, time + minRampDuration);
+    }
+    if (decay !== 1) {
+        // Decay over the sustain duration.
+        gainNode.gain.exponentialRampToValueAtTime(volume * decay, time + duration - taper);
+    } else {
+        // Sustain until it is time to taper
+        gainNode.gain.setValueAtTime(volume, time + duration - taper);
+    }
+    // If the taper has duration beyond the minimum, use exponentialRampToValueAtTime for most of it,
+    // which in theory sounds more even to human ears.
+    if (taper > minRampDuration) {
+        gainNode.gain.exponentialRampToValueAtTime(minRampVolume, time + duration - minRampDuration);
+    }
+    gainNode.gain.linearRampToValueAtTime(0, time + duration);
+    return gainNode;
+}
 
 
 function playBellSound(
@@ -782,7 +825,7 @@ sounds.set('chargeLaser', {
 
         oscillator.start(time);
 
-        return (stopTime: number) => {
+        return stopSafely((stopTime: number) => {
             const actualStopTime = stopTime + 0.1;
             // A short fade out prevents clicking when stopped early
             noiseGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
@@ -793,12 +836,27 @@ sounds.set('chargeLaser', {
                 pinkNoiseNode.disconnect(noiseGainNode);
                 oscillator.disconnect();
             }, actualStopTime);
-        };
+        }, time + 5);
     },
     duration: 0,
     instanceLimit: 3,
     instances: [],
 });
+
+function stopSafely(stopSoundProper: (stopTime: number) => void, forceStopTime: number) {
+    let wasStopped = false;
+    function stopSound(stopTime: number) {
+        if (wasStopped) {
+            return;
+        }
+        wasStopped = true;
+        stopSoundProper(stopTime);
+    }
+    audioCallback(() => {
+        stopSound(audioContext.currentTime);
+    }, forceStopTime);
+    return stopSound;
+}
 
 sounds.set('fireLaser', {
     play(target: AudioNode, time: number) {
@@ -875,7 +933,7 @@ sounds.set('fireLaser', {
 
         oscillator.start(time);
 
-        return (stopTime: number) => {
+        return stopSafely((stopTime: number) => {
             const actualStopTime = stopTime + 0.3;
             noiseGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
             oscillatorGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
@@ -889,7 +947,7 @@ sounds.set('fireLaser', {
                 burstOscillator.disconnect();
                 lfo.disconnect();
             }, actualStopTime);
-        };
+        }, time + 5);
     },
     duration: 0,
     instanceLimit: 3,
@@ -898,34 +956,25 @@ sounds.set('fireLaser', {
 
 sounds.set('lightFlame', {
     play(target: AudioNode, time: number) {
+        const masterVolume = 0.3;
         const duration = this.duration;
 
-        const whooshDuration = duration; // Shorter whoosh
-
         // 1. Filtered Noise element for the gas "whoosh"
-        const noiseGainNode = audioContext.createGain();
-        noiseGainNode.gain.setValueAtTime(0, time);
-        noiseGainNode.gain.linearRampToValueAtTime(0.8, time + 0.05); // Faster attack
-        noiseGainNode.gain.exponentialRampToValueAtTime(0.01, time + whooshDuration);
-        noiseGainNode.gain.linearRampToValueAtTime(0, time + whooshDuration + 0.1);
+        const noiseGainNode = createGainEnvelope(masterVolume * 0.8, 0.8, time, duration, 0.05, 0.05);
 
         const filterNode = audioContext.createBiquadFilter();
         filterNode.type = 'lowpass';
         // Start filter high and sweep down to muffle it as it dies out
         filterNode.frequency.setValueAtTime(800, time);
-        filterNode.frequency.exponentialRampToValueAtTime(200, time + whooshDuration);
+        filterNode.frequency.exponentialRampToValueAtTime(200, time + duration);
 
         pinkNoiseNode.connect(filterNode);
         filterNode.connect(noiseGainNode);
         noiseGainNode.connect(target);
 
         // 2. Low frequency rumble for the burner
-        const waveDuration = duration - 0.1;
-        const waveGainNode = audioContext.createGain();
-        waveGainNode.gain.setValueAtTime(0, time);
-        waveGainNode.gain.linearRampToValueAtTime(0.6, time + 0.15); // Swell in
-        waveGainNode.gain.exponentialRampToValueAtTime(0.01, time + waveDuration);
-        waveGainNode.gain.linearRampToValueAtTime(0, time + waveDuration + 0.1);
+        const waveDuration = duration * 0.75;
+        const waveGainNode = createGainEnvelope(masterVolume * 0.1, 0.1, time, waveDuration, 0.15, 0.1);
 
         const oscillator = audioContext.createOscillator();
         oscillator.type = 'sine'; // Sine is smoother, less "thump", more "rumble"
@@ -940,21 +989,188 @@ sounds.set('lightFlame', {
         lfo.connect(lfoGain);
         lfoGain.connect(oscillator.frequency);
         lfo.start(time);
-        lfo.stop(time + waveDuration + 0.1);
+        lfo.stop(time + waveDuration);
 
         oscillator.connect(waveGainNode);
         waveGainNode.connect(target);
         oscillator.start(time);
-        oscillator.stop(time + duration + 0.1);
+        oscillator.stop(time + duration);
 
         audioCallback(() => {
             pinkNoiseNode.disconnect(filterNode);
             oscillator.disconnect();
             lfo.disconnect();
-        }, time + duration + 0.1);
+        }, time + duration);
+    },
+    duration: 0.6,
+    instanceLimit: 5,
+    instances: [],
+});
+
+function gainTremolo(source: AudioNode, amplitude: number, startFrequence: number, endFrequency: number, time: number, duration: number): AudioNode {
+    const tremolo = audioContext.createGain();
+    tremolo.gain.setValueAtTime(0, audioContext.currentTime); // Silent until starting time
+    tremolo.gain.setValueAtTime(1, time); // Base volume
+
+    const lfo = audioContext.createOscillator();
+    lfo.type = 'sine';
+    lfo.frequency.setValueAtTime(startFrequence, time); // 12Hz rumble/rolling rate
+    lfo.frequency.exponentialRampToValueAtTime(endFrequency, time + duration); // slow down the roll
+
+    const lfoGain = audioContext.createGain();
+    lfoGain.gain.setValueAtTime(amplitude, time); // amplitude of the wobble
+    lfo.connect(lfoGain);
+    lfoGain.connect(tremolo.gain);
+    lfo.start(time);
+    lfo.stop(time + duration);
+
+    source.connect(tremolo);
+    audioCallback(() => {
+        lfo.disconnect();
+    }, time + duration);
+    return tremolo;
+}
+
+function playThunderClap(target: AudioNode, time: number, duration: number, basePitch: number) {
+    // 1. Filtered pink noise for the broadband rumble
+    const masterVolume = 0.5;
+
+    const filterNode = audioContext.createBiquadFilter();
+    filterNode.type = 'lowpass';
+    // Filter sweeps down to make the rumble deeper as it decays
+    // Tie the cutoff frequency to the base pitch so the noise reflects the pitch
+    filterNode.frequency.setValueAtTime(basePitch * 6, time);
+    //filterNode.frequency.exponentialRampToValueAtTime(basePitch * 4, time + duration);
+
+    const noiseGainNode = createGainEnvelope(masterVolume, 0.4, time, duration, 0.1, 0.5);
+
+    pinkNoiseNode.connect(filterNode);
+    filterNode.connect(noiseGainNode);
+    const noiseTremolo = gainTremolo(noiseGainNode, 1.5, 2, 2.5, time, duration);
+    noiseTremolo.connect(target);
+
+    // 2. Low frequency oscillator for the physical vibration/bass
+
+    const oscillator = audioContext.createOscillator();
+    oscillator.type = 'sine'; // Sawtooth has rich harmonics for thunder
+    // Pitch sweeps down slightly
+    oscillator.frequency.setValueAtTime(basePitch, time);
+    //oscillator.frequency.exponentialRampToValueAtTime(basePitch * 0.95, time + duration);
+
+    // Add a lowpass filter specifically for the sawtooth to roll off harshness
+    // (may want to add this back in if we switch oscillator back to sawtooth)
+    /*const sawFilter = audioContext.createBiquadFilter();
+    sawFilter.type = 'lowpass';
+    sawFilter.frequency.setValueAtTime(100, time);*/
+    // sawFilter.frequency.exponentialRampToValueAtTime(50, time + duration);
+
+    const waveGainNode = createGainEnvelope(masterVolume * 0.1, 0.5, time, duration, 0.15, 0.5);
+    const waveTremolo = gainTremolo(oscillator, 0.5, 1, 4, time, duration);
+
+    //oscillator.connect(sawFilter);
+    waveTremolo.connect(waveGainNode);
+    waveGainNode.connect(target);
+    oscillator.start(time);
+    oscillator.stop(time + duration);
+
+    audioCallback(() => {
+        pinkNoiseNode.disconnect(filterNode);
+        oscillator.disconnect();
+    }, time + duration);
+}
+
+sounds.set('spawnThunderCloud', {
+    play(target: AudioNode, time: number) {
+        playThunderClap(target, time, this.duration, 60);
+    },
+    duration: 1.6,
+    instanceLimit: 3,
+    instances: [],
+});
+
+sounds.set('lightningStrike', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.3;
+
+        // 1. Electrical crackle (high-pass filtered pink noise)
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        // Start high, sweep down a bit to give a "sizzle"
+        noiseFilter.frequency.setValueAtTime(3000, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(1000, time + duration);
+
+        // Crackle envelope: sharp attack, fairly quick decay
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.1, time, duration, 0.05, 0.1);
+
+        // Tremolo makes the noise sound more like chaotic electrical arcing
+        const noiseTremolo = gainTremolo(noiseGainNode, 0.8, 40, 15, time, duration);
+
+        pinkNoiseNode.connect(noiseFilter);
+        noiseFilter.connect(noiseGainNode);
+        noiseTremolo.connect(target);
+
+        // Broadband noise burst for the "snap" of the whip
+        const snapFilter = audioContext.createBiquadFilter();
+        snapFilter.type = 'bandpass';
+        snapFilter.frequency.setValueAtTime(2500, time); // High frequency snap
+        snapFilter.Q.setValueAtTime(1.0, time);
+
+        const snapGain = createGainEnvelope(masterVolume * 2, .5, time, 0.2, 0.01, 0.05);
+        pinkNoiseNode.connect(snapFilter);
+        snapFilter.connect(snapGain);
+        snapGain.connect(target);
+
+        audioCallback(() => {
+            pinkNoiseNode.disconnect(noiseFilter);
+            pinkNoiseNode.disconnect(snapFilter);
+        }, time + duration);
+    },
+    duration: 0.5,
+    instanceLimit: 5,
+    instances: [],
+});
+
+sounds.set('sparkBurst', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.3;
+
+        // 1. Electrical crackle (high-pass filtered pink noise)
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'highpass';
+        // Start high, sweep down a bit to give a "sizzle"
+        noiseFilter.frequency.setValueAtTime(6000, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(2000, time + duration);
+
+        // Crackle envelope: sharp attack, fairly quick decay
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.1, time, duration, 0.05, 0.1);
+
+        // Tremolo makes the noise sound more like chaotic electrical arcing
+        const noiseTremolo = gainTremolo(noiseGainNode, 0.8, 40, 15, time, duration);
+
+        pinkNoiseNode.connect(noiseFilter);
+        noiseFilter.connect(noiseGainNode);
+        noiseTremolo.connect(target);
+
+        // Broadband noise burst for the "snap" of the whip
+        const snapFilter = audioContext.createBiquadFilter();
+        snapFilter.type = 'bandpass';
+        snapFilter.frequency.setValueAtTime(5000, time); // High frequency snap
+        snapFilter.Q.setValueAtTime(1.0, time);
+
+        const snapGain = createGainEnvelope(masterVolume * 2, .5, time, 0.2, 0.01, 0.05);
+        pinkNoiseNode.connect(snapFilter);
+        snapFilter.connect(snapGain);
+        snapGain.connect(target);
+
+        audioCallback(() => {
+            pinkNoiseNode.disconnect(noiseFilter);
+            pinkNoiseNode.disconnect(snapFilter);
+        }, time + duration);
     },
     duration: 0.4,
-    instanceLimit: 5,
+    instanceLimit: 3,
     instances: [],
 });
 

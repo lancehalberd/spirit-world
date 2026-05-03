@@ -4,6 +4,7 @@ import {Fireball, Flame} from 'app/content/effects/flame';
 import {shootFrostInCone} from 'app/content/effects/frost';
 import {simpleLootTable} from 'app/content/lootTables';
 import {snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations} from 'app/content/enemyAnimations';
+import {playAreaSound} from 'app/musicController';
 import {renderLightningCircle, renderLightningRay} from 'app/render/renderLightning'
 import {directionMap, directionToRadiansMap} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
@@ -125,6 +126,8 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
             scale: 0.75,
             persist: true,
         });
+        // It's too noisy having all of these make sounds effects.
+        delete flame.soundKey;
         addEffectToArea(state, enemy.area, flame);
     },
     cooldown: 600,
@@ -329,6 +332,9 @@ enemyDefinitions.snakeStorm = {
             }
         }
         if (enemy.modeTime >= 400) {
+            if (enemy.modeTime === 400) {
+                playAreaSound(state, enemy.area, 'sparkBurst');
+            }
             enemy.changeToAnimation('move');
             // Lightning snake will stop when it is lined up with the hero on harder difficulties.
             if (enemy.difficulty >= this.naturalDifficultyRating) {

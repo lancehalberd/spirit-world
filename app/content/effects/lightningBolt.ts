@@ -1,11 +1,12 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addRadialSparks } from 'app/content/effects/spark';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { renderLightningRay } from 'app/render/renderLightning';
-import { drawFrameAt } from 'app/utils/animations';
-import { removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
-import { requireFrame } from 'app/utils/packedImages';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {addRadialSparks} from 'app/content/effects/spark';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {renderLightningRay} from 'app/render/renderLightning';
+import {drawFrameAt} from 'app/utils/animations';
+import {removeEffectFromArea} from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
+import {requireFrame} from 'app/utils/packedImages';
 
 interface LightningBoltProps {
     x?: number
@@ -58,6 +59,9 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
     constructor(public props: LightningBoltProps) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        if (this.animationTime === FRAME_LENGTH) {
+            playAreaSound(state, this.area, 'spawnThunderCloud');
+        }
         this.x += this.vx;
         this.y += this.vy;
         const strikeTime = this.animationTime % this.delay;
@@ -75,6 +79,8 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
         } else if (strikeTime === 0) {
             // A lightning bolt is added at strike time.
             this.lastBolt = {x: this.x, y: this.y};
+            playAreaSound(state, this.area, 'lightningStrike');
+            playAreaSound(state, this.area, 'sparkBurst');
         } else if (this.lastBolt && strikeTime === LIGHTNING_ANIMATION_DURATION && this.shockWaves) {
             // The lightning bolt releases sparks when they hit.
             addRadialSparks(

@@ -147,7 +147,6 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Add SFX to flame wall + lightning bolt abilities for Idols fight
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
 

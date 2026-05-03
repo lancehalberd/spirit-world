@@ -1,5 +1,6 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {FRAME_LENGTH, getElementColor, getElementLightColor} from 'app/gameConstants';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {renderLightningCircle} from 'app/render/renderLightning';
 import {drawFrameCenteredAt, getFrame} from 'app/utils/animations';
 import {removeEffectFromArea} from 'app/utils/effects';
@@ -52,7 +53,17 @@ export class Blast implements EffectInstance {
     tellDuration: number = this.props.tellDuration ?? 1000;
     expansionDuration: number = this.props.expansionDuration ?? 140;
     persistDuration: number = this.props.persistDuration ?? 60;
+    chargeSound?: AudioInstance;
     constructor(public props: BlastProps) {}
+    cleanup(state: GameState) {
+        this.stopChargeSound(state);
+    }
+    stopChargeSound(state: GameState) {
+        if (this.chargeSound) {
+            stopAreaSound(state, this.chargeSound);
+            delete this.chargeSound;
+        }
+    }
     update(state: GameState) {
         if (this.delay >= 0) {
             this.delay -= FRAME_LENGTH;
@@ -68,6 +79,22 @@ export class Blast implements EffectInstance {
             ) {
                 removeEffectFromArea(state, this);
                 return;
+            }
+        }
+        if (this.animationTime < this.tellDuration && this.animationTime === FRAME_LENGTH) {
+            if (this.element === 'fire') {
+                playAreaSound(state, this.area, 'lightFlame');
+            } else {
+                this.chargeSound = playAreaSound(state, this.area, 'chargeLaser');
+            }
+        } else if (this.animationTime === this.tellDuration) {
+            this.stopChargeSound(state);
+            if (this.element === 'fire') {
+                playAreaSound(state, this.area, 'lightFlame');
+            } else if (this.element === 'ice') {
+                playAreaSound(state, this.area, 'freeze');
+            } else {
+                playAreaSound(state, this.area, 'sparkBurst');
             }
         }
         if (this.animationTime % 40 === 0 && this.animationTime < this.tellDuration - Math.min(200, this.tellDuration / 3)) {

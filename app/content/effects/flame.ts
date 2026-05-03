@@ -1,6 +1,7 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {getLedgeDelta, updateProjectileHeight} from 'app/movement/getLedgeDelta';
+import {playAreaSound} from 'app/musicController';
 import {createAnimation, drawFrameCenteredAt, drawFrameAt, getFrame} from 'app/utils/animations';
 import {removeEffectFromArea} from 'app/utils/effects';
 import {getDirection, hitTargets} from 'app/utils/field';
@@ -36,6 +37,7 @@ interface Props {
     persist?: boolean
     beforeUpdate?: (state: GameState, flame: Flame) => void
     source: Actor
+    soundKey?: string
 }
 
 export class Flame implements EffectInstance, Props {
@@ -96,10 +98,11 @@ export class Flame implements EffectInstance, Props {
     isHigh = false;
     persist = false;
     source: Actor;
+    soundKey: string;
     beforeUpdate?: (state: GameState, flame: Flame) => void;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3,
         delay = 0, ignoreWallsDuration = 0, damage = 1, scale = 1, ttl = 2000, hybridWorlds = false, isPreparing = false, groundFriction = 0, minVz = -8, beforeUpdate,
-        source, persist
+        soundKey = 'lightFlame', source, persist
     }: Props) {
         this.damage = damage;
         this.delay = delay;
@@ -123,6 +126,7 @@ export class Flame implements EffectInstance, Props {
         this.source = source;
         this.persist = persist;
         this.hybridWorlds = hybridWorlds;
+        this.soundKey = soundKey;
     }
     getAnchorPoint() {
         const hitbox = this.getHitbox();
@@ -155,6 +159,9 @@ export class Flame implements EffectInstance, Props {
         this.animationTime = 0;
     }
     update(state: GameState) {
+        if (this.soundKey && this.animationTime === 0) {
+            playAreaSound(state, this.area, this.soundKey);
+        }
         if (this.destroyed) {
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime >= flameBrokenAnimation.duration) {
