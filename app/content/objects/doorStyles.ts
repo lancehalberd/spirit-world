@@ -875,7 +875,7 @@ const jadeLight1DoorStyle: DoorStyleDefinition = {
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeLight1DoorFrames),
     renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeLight1DoorFrames),
     renderAfterHero: (context, state, door) => renderV1DoorAfterHero(context, state, door, jadeLight1DoorFrames),
-    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight1DoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeLight1DoorFrames, 8),
 };
 
 /*
@@ -942,7 +942,7 @@ const jadeDark1DoorStyle: DoorStyleDefinition = {
     render: (context, state, door) => renderV1DoorBackground(context, state, door, jadeDark1DoorFrames),
     renderCover: (context, state, door) => renderV1DoorCover(context, state, door, jadeDark1DoorFrames),
     renderAfterHero: (context, state, door) => renderV1DoorAfterHero(context, state, door, jadeDark1DoorFrames),
-    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark1DoorFrames),
+    renderForeground: (context, state, door) => renderV1DoorForeground(context, state, door, jadeDark1DoorFrames, 8),
 };
 
 

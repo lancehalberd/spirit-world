@@ -147,10 +147,9 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Update packed sprites
-            - Make sure jade door fix is present.
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
+        - BLOCKED Update packed sprites
 
     - Graphics added but not used yet:
         - mc equipment mc/armor1/*, mc/phoenixCrown/*, mc/ironBoots/*
