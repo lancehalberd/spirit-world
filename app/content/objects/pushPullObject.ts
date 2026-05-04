@@ -235,7 +235,7 @@ function moveObjectThenHero(this: void, state: GameState, hero: Hero, object: Ob
     const ox = object.x, oy = object.y;
     const {mx, my} = moveLinkedObject(state, object, dx, dy, {excludedObjects: new Set([hero])});
     if (!mx && !my) {
-        const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
+        const heroHitbox = hero.getMovementHitbox(), objectHitbox = object.getHitbox();
         // The hero can move independently of the object as long as it isn't moving further away from the bounds of the object.
         if (
             (dx < 0 && heroHitbox.x > objectHitbox.x)
@@ -254,7 +254,7 @@ function moveObjectThenHero(this: void, state: GameState, hero: Hero, object: Ob
     // The move is only valid if the hero can still be grabbing the object, and the object is not intersecting the hero.
     // Multiplying by dx/dy when comparing mx/my values allows wiggling the object to get through narrow openings by only requiring
     // matching movement in the direction the player is trying to move.
-    const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
+    const heroHitbox = hero.getMovementHitbox(), objectHitbox = object.getHitbox();
     if (mx * dx === mx1 * dx && my * dy === my1 * dy
         && getActorTargets(state, hero).objects.includes(hero.grabObject)
         && !boxesIntersect(heroHitbox, objectHitbox)
@@ -298,7 +298,7 @@ function moveHeroThenObject(this: void, state: GameState, hero: Hero, object: Ob
     const {mx, my} = moveHero(state, hero, dx, dy, {excludedObjects: new Set([object])});
     if (!mx && !my) {
         // The object can move independently of the hero as long as it isn't moving further away from the bounds of the hero.
-        const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
+        const heroHitbox = hero.getMovementHitbox(), objectHitbox = object.getHitbox();
         if (
             (dx < 0 && objectHitbox.x > heroHitbox.x)
             || (dx > 0 && objectHitbox.x + objectHitbox.w < heroHitbox.x + heroHitbox.w)
@@ -315,7 +315,7 @@ function moveHeroThenObject(this: void, state: GameState, hero: Hero, object: Ob
     // The move is only valid if the hero can still be grabbing the object, and the object is not intersecting the hero.
     // Multiplying by dx/dy when comparing mx/my values allows wiggling the object to get through narrow openings by only requiring
     // matching movement in the direction the player is trying to move.
-    const heroHitbox = hero.getHitbox(), objectHitbox = object.getHitbox();
+    const heroHitbox = hero.getMovementHitbox(), objectHitbox = object.getHitbox();
     if (mx * dx === mx1 * dx && my * dy === my1 * dy
         && getActorTargets(state, hero).objects.includes(hero.grabObject)
         && !boxesIntersect(heroHitbox, objectHitbox)

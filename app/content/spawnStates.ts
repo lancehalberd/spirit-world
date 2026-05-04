@@ -12,7 +12,7 @@ const peachBossDefeatedState = applyItemsToSavedState(peachBossState, {},
     ['peachCaveBoss']
 );
 const peachCaveExitState = applyItemsToSavedState(peachBossDefeatedState, {maxLife: 1, catEyes: 1},
-    ['peachCaveTree', 'peachCave:fullPeach', 'homeInstructions']
+    ['peachCaveTreeDied', 'peachCave:fullPeach', 'homeInstructions']
 );
 const tombRivalStateStory = applyItemsToSavedState(peachCaveExitState, {bow: 1},
     ['momElder', 'treeVillageBow', 'closedBowDoor', 'elderTomb']

@@ -51,7 +51,7 @@ export const peachCaveNodes: LogicNode[] = [
         zoneId,
         nodeId: 'peachCaveBoss',
         flags: [
-            { flag: 'peachCaveTree', logic: hasBossWeapon},
+            { flag: 'peachCaveTreeDied', logic: hasBossWeapon},
         ],
         checks: [{ objectId: 'peachCave:fullPeach', logic: hasBossWeapon }],
         paths: [

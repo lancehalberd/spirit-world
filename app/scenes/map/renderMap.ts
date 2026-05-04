@@ -1,5 +1,6 @@
 import {createAreaInstance, getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
 import {convertLocationToMapCoordinates, getMapTargets} from 'app/content/hints';
+import {decorationTypes} from 'app/content/objects/decoration';
 import {doorStyles } from 'app/content/objects/doorStyles';
 import {evaluateLogicDefinition} from 'app/content/logic';
 import {allSections, dungeonMaps} from 'app/content/sections';
@@ -425,9 +426,6 @@ const mapObjectTypes: ObjectType[] = [
     'decoration', 'helixTop',
     'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
 ];
-const mapDecorationTypes = [
-    'helixBase', 'spiritTree', 'flameBeastStatue', 'frostBeastStatue', 'stormBeastStatue'
-];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
@@ -455,7 +453,7 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
             if (!mapObjectTypes.includes(object.definition?.type)) {
                 continue;
             }
-            if (object.definition.type === 'decoration' && !mapDecorationTypes.includes(object.definition.decorationType)) {
+            if (object.definition.type === 'decoration' && decorationTypes[object.definition.decorationType].hideOnMap) {
                 continue;
             }
             let hitbox = object.getHitbox();

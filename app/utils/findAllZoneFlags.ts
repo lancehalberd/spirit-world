@@ -38,7 +38,8 @@ export function findAllZoneFlags(zone: Zone): string[] {
     });
     // Ad Hoc overrides for keys set by script objects.
     if (zone.key === 'peachCave') {
-        flags.push('peachCaveTree');
+        // When the peach cave tree dies during the cut scene
+        flags.push('peachCaveTreeDied');
     }
     return flags;
 }

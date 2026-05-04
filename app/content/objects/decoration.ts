@@ -38,6 +38,9 @@ export class Decoration<Params = any> implements ObjectInstance {
     } as Params;
     constructor(state: GameState, public definition: DecorationDefinition) {}
     getBehaviors(state: GameState, x?: number, y?: number): TileBehaviors|undefined {
+        if (this.drawPriority === 'foreground') {
+            return;
+        }
         return this.decorationType.getBehaviors?.(state, this, x, y) || this.decorationType.behaviors;
     }
     getLightSources(state: GameState): LightSource[] {
@@ -129,6 +132,7 @@ interface DecorationType<Params = any> {
     onGrab?:(state: GameState, decoration: Decoration, direction: Direction, hero: Hero) => void
     onHit?: (state: GameState, decoration: Decoration, hit: HitProperties) => HitResult
     params?: Params
+    hideOnMap?: boolean
 }
 
 const [oneLog, oneLogShadow, twoLogs, twoLogsShadow, threeLogs, threeLogsShadow] = createAnimation('gfx/objects/furniture/woodAndFireplace.png',

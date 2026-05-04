@@ -1,26 +1,26 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { HeldChakram } from 'app/content/effects/thrownChakram';
-import { setEquippedBoots } from 'app/utils/menu';
-import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
-import { AstralProjection } from 'app/content/objects/astralProjection';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {HeldChakram} from 'app/content/effects/thrownChakram';
+import {setEquippedBoots} from 'app/utils/menu';
+import {CloneExplosionEffect} from 'app/content/effects/CloneExplosionEffect';
+import {AstralProjection} from 'app/content/objects/astralProjection';
 import {allTiles} from 'app/content/tiles';
-import { zones } from 'app/content/zones';
-import { EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
-import { getActorTargets } from 'app/getActorTargets';
-import { playAreaSound } from 'app/musicController';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { canActorMove, getSectionBoundingBox, moveActor } from 'app/movement/moveActor';
+import {zones} from 'app/content/zones';
+import {EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS} from 'app/gameConstants';
+import {getActorTargets} from 'app/getActorTargets';
+import {playAreaSound} from 'app/musicController';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {canActorMove, getSectionBoundingBox, moveActor} from 'app/movement/moveActor';
 import {
     getCloneMovementDeltas,
     isGameKeyDown,
     wasGameKeyPressed,
 } from 'app/userInput';
-import { isToolButtonPressed, useTool } from 'app/useTool';
-import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
-import { destroyClone } from 'app/utils/destroyClone';
-import { destroyTile } from 'app/utils/destroyTile';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { enterLocation } from 'app/utils/enterLocation';
+import {isToolButtonPressed, useTool} from 'app/useTool';
+import {isHeroFloating, isHeroSinking, isUnderwater} from 'app/utils/actor';
+import {destroyClone} from 'app/utils/destroyClone';
+import {destroyTile} from 'app/utils/destroyTile';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {enterLocation} from 'app/utils/enterLocation';
 import {
     canTeleportToCoords,
     directionMap,
@@ -28,8 +28,8 @@ import {
     areNPointsOpen,
     isTileOpen,
 } from 'app/utils/field';
-import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
-import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
+import {getChargeLevelAndElement} from 'app/utils/getChargeLevelAndElement';
+import {addObjectToArea, getObjectBehaviors} from 'app/utils/objects';
 import {showMessage} from 'app/scriptEvents';
 
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero, interactive: boolean) {

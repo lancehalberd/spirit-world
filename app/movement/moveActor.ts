@@ -195,7 +195,8 @@ function moveActorInDirection(
         result = moveRight(state, actor, movementProperties, amount);
     }
     if (actor.canJumpOffLedges && !actor.ignoreLedges && actor.action !== 'climbing') {
-        const jv = getJumpVector(state, actor.area, actor.getHitbox());
+        const hitbox = actor.getMovementHitbox?.() ?? actor.getHitbox();
+        const jv = getJumpVector(state, actor.area, hitbox);
         if (jv[0] !== 0 || jv[1] !== 0) {
             if (actor.pickUpObject || actor.pickUpTile) {
                 (actor as Hero).throwHeldObject?.(state);

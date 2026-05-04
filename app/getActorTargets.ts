@@ -1,12 +1,12 @@
-import { Hero } from 'app/content/hero';
-import { isPixelInShortRect } from 'app/utils/index';
-import { getObjectBehaviors, getObjectAndParts } from 'app/utils/objects';
-import { moveObject } from 'app/movement/moveObject';
+import {Hero} from 'app/content/hero';
+import {isPixelInShortRect} from 'app/utils/index';
+import {getObjectBehaviors, getObjectAndParts} from 'app/utils/objects';
+import {moveObject} from 'app/movement/moveObject';
 
 
 const tileSize = 16;
 export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoords[], objects: ObjectInstance[]} {
-    const hitbox = actor.getHitbox();
+    const hitbox = actor.getMovementHitbox();
     const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
     const checkPoints: Point[] = [];
     const usedCheckPoints: Point[] = [];

@@ -231,7 +231,9 @@ export class Hero implements Actor {
         return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
     }
     getMovementHitbox(this: Hero): Rect {
-        return { x: this.x | 0, y: this.y | 0, w: this.w, h: this.h };
+        // Moved the hitbox down 1px so that it includes the entire shadow around the hero, which prevents the
+        // shadow from bleeding over walls or from behind some foreground tiles.
+        return { x: this.x | 0, y: (this.y + 1) | 0, w: this.w, h: this.h };
     }
     // This is used when checking what part of the floor the hero is touching for things like standing on platforms
     // or damaging floor. The hero's normal movement hitbox is much taller than the hero appears so using this

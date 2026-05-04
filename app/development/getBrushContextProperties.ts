@@ -148,8 +148,14 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                 onChange(disableBehaviors: boolean) {
                     if (!disableBehaviors) {
                         delete definition.disableBehaviors;
+                        if (alternateDefinition) {
+                            delete alternateDefinition.disableBehaviors;
+                        }
                     } else {
                         definition.disableBehaviors = true;
+                        if (alternateDefinition) {
+                            alternateDefinition.disableBehaviors = true;
+                        }
                     }
                     refreshArea(state);
                 },

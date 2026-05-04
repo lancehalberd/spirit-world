@@ -147,6 +147,9 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
+        - Test with movement hitbox changes.
+        - Test maps with decoration changes
+            - Set hideOnMap for any decorations that look bad on the map.
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
         - BLOCKED Update packed sprites
