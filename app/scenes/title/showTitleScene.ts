@@ -19,6 +19,7 @@ export function showTitleScene(state: GameState) {
     const jadeChampion = findObjectInstanceById(state.hero.area, 'jadeChampion') as NPC;
     jadeChampion.changeToAnimation('thrust');
     jadeChampion.animationTime = 300;
+    jadeChampion.hideDialogueMarker = true;
 
     // uncomment these lines to hide the characters from the title screen
     // state.hero.x = -500;

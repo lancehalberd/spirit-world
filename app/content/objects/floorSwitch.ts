@@ -1,11 +1,11 @@
-import { renderIndicator } from 'app/content/objects/indicator';
-import { objectHash } from 'app/content/objects/objectHash';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {renderIndicator} from 'app/content/objects/indicator';
+import {objectHash} from 'app/content/objects/objectHash';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {playObjectSound} from 'app/musicController';
-import { createAnimation, drawFrame } from 'app/utils/animations';
-import { rectanglesOverlap } from 'app/utils/index';
-import { deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
-import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
+import {createAnimation, drawFrame} from 'app/utils/animations';
+import {rectanglesOverlap} from 'app/utils/index';
+import {deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import {checkIfAllSwitchesAreActivated} from 'app/utils/switches';
 
 
 const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
