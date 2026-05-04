@@ -202,8 +202,8 @@ dialogueHash.jadeChampionWarTemple = {
                 grandPriest.changeToAnimation('idle', 'down');
             });
             appendScript(state, `What do you know of the disappearance of the Spirit Beasts, child?
-                {|}...
-                {|}I can see that you don't know of what I speak.`);
+                {|}...I see...
+                {|}It is clear that you do not know of what I speak.`);
             runPlayerBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
@@ -269,7 +269,7 @@ dialogueHash.jadeChampionWarTemple = {
                 }
                 grandPriest.changeToAnimation('idle', 'up');
             });
-            appendScript(state, `Silence! My commands are beyond the understanding of mortals.`);
+            appendScript(state, `Silence! The commands of the Spirit King are beyond the understanding of us mortals.`);
             appendScript(state, '{wait:500}');
             // JC is chastised, returns to her resting spot
             runPlayerBlockingCallback(state, (state: GameState) => {

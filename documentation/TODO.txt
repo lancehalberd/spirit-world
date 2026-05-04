@@ -147,6 +147,8 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
+        - Update packed sprites
+            - Make sure jade door fix is present.
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
 

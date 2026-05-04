@@ -598,7 +598,7 @@ function getCollectibleMenuElement(state: GameState, collectible: Collectible): 
         isVisible: (state: GameState) => state.hero.savedData.collectibleTotals[collectible] > 0,
         render(context: CanvasRenderingContext2D, state: GameState) {
             drawFrameCenteredAt(context, getLootFrame(state, {lootType: collectible}), {x: this.x, y: this.y, w: this.w, h: this.h});
-            drawCount(context, state.hero.savedData.collectibleTotals[collectible], this);
+            drawCount(context, state.hero.savedData.collectibles[collectible], this);
         },
         onSelect(state: GameState, toolIndex?: number) {
             showSimpleMessage(state, getLootHelpMessage(state, {lootType: collectible}));
