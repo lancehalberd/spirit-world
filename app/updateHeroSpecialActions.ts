@@ -625,6 +625,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // Run this to check if the hero is in water.
             checkForFloorEffects(state, hero);
             if (isHardLanding && !hero.swimming) {
+                playSound('thump');
                 state.screenShakes.push({
                     dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
                 });
@@ -721,6 +722,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             checkForFloorEffects(state, hero);
             // Shake the screen if the hero has a hard landing on a solid surface.
             if (isHardLanding && !hero.swimming && hero.action !== 'falling') {
+                playSound('thump');
                 state.screenShakes.push({
                     dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
                 });

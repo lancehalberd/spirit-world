@@ -189,7 +189,14 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             }
             const volume = Math.min(1, sound.volume);
             instance.gainNode.connect(soundEffectGainNode);
-            instance.gainNode.gain.setValueAtTime(volume, targetTime);
+            // Add a tiny ramp to all SFX to prevent clicking at start/end of sound
+            // if the middle of a clip is used.
+            instance.gainNode.gain.setValueAtTime(0, targetTime);
+            instance.gainNode.gain.linearRampToValueAtTime(volume, targetTime + 0.01);
+            if (instance.endTime) {
+                instance.gainNode.gain.setValueAtTime(volume, instance.endTime - 0.01);
+                instance.gainNode.gain.linearRampToValueAtTime(0, instance.endTime);
+            }
             return instance;
         } else if (sound.play) {
             const instance: AudioInstance = {
@@ -439,6 +446,7 @@ const preloadSounds = () => {
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, instanceLimit: 2},
         {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, instanceLimit: 2},
         {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 30, instanceLimit: 2},
+        {key: 'thump', source: 'sfx/cloneExplosion.wav', volume: 30, instanceLimit: 2, duration: 0.15},
         {key: 'grenadeExplosion', source: 'sfx/cloneExplosion.wav', volume: 20, instanceLimit: 3, duration: 0.4},
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
         //     offset: 0.2, duration: 0.3', volume: 10, instanceLimit: 2},

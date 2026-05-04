@@ -58,7 +58,7 @@ dialogueHash.tombGuardian = {
             logicCheck: {
                 requiredFlags: ['$teleportation'],
                 excludedFlags: [],
-                zones: ['cocoon'],
+                zones: [],
             },
             isExclusive: true,
             text: [
