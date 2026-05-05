@@ -46,11 +46,17 @@ dialogueHash.tombGuardian = {
                 {
                     dialogueIndex: 60,
                     dialogueType: 'quest',
-                    text: `You have come far, but there is no going back after this step.
-                    {|}Show me your determination if you wish to proceed!
-                    {@tombGuardian.teleport}
-                    {flag:cocoonBossStarted}
-                    `,
+                    text(state: GameState) {
+                        if (state.randomizerState) {
+                            return `{@tombGuardian.teleport}{flag:cocoonBossStarted}`;
+                        }
+                        return `
+                            You have come far, but there is no going back after this step.
+                            {|}Show me your determination if you wish to proceed!
+                            {@tombGuardian.teleport}
+                            {flag:cocoonBossStarted}
+                        `;
+                    },
                 },
             ],
         },

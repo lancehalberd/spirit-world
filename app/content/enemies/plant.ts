@@ -44,7 +44,7 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
             y: hitbox.y + hitbox.h / 2,
             damage: 2,
             element: 'lightning',
-            tellDuration: 800,
+            tellDuration: 1200,
             expansionDuration: 100,
             persistDuration: 200,
             radius: 80,
@@ -53,7 +53,7 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
         });
         addEffectToArea(state, enemy.area, blast);
     },
-    cooldown: 3000,
+    cooldown: 2500,
     initialCooldown: 1000,
     charges: 1,
     initialCharges: 0,

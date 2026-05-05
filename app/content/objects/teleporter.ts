@@ -159,8 +159,12 @@ export class Teleporter implements ObjectInstance {
                 isSpiritWorld: !state.location.isSpiritWorld,
             }, {
                 callback: () => {
-                    if (this.linkedObject) {
-                        this.linkedObject.disabledUntilHeroLeaves = true;
+                    // Disable all teleporter objects in the other world to prevent
+                    // getting stuck teleporting back and forth.
+                    for (const object of this.area.alternateArea.objects) {
+                        if (object instanceof Teleporter) {
+                            object.disabledUntilHeroLeaves = true;
+                        }
                     }
                 },
             });

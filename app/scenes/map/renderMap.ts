@@ -424,7 +424,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState, s
 
 const mapObjectTypes: ObjectType[] = [
     'decoration', 'helixTop',
-    'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock',
+    'waterfall', 'staffTower', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter', 'chest', 'bigChest', 'keyBlock', 'peachTree',
 ];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
@@ -443,12 +443,15 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
     }
 }
 
+
 export function renderMapObjects(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect, drawChests: boolean = false) {
     const xScale = 4 / area.w, yScale = 4 / area.h;
     // Draw additional objects that we want to show on the map.
     context.save();
         context.translate(target.x, target.y);
         // context.scale(4 / area.w, 4 / area.h);
+        const objectsToRender = [];
+        const specialObjectsToRender = [];
         for (const object of area.objects) {
             if (!mapObjectTypes.includes(object.definition?.type)) {
                 continue;
@@ -460,10 +463,72 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
             if (!boxesIntersect(hitbox, source)) {
                 continue;
             }
+            if (object.definition?.type === 'keyBlock'
+                || object.definition?.type === 'chest'
+                || object.definition?.type === 'bigChest'
+            ) {
+                specialObjectsToRender.push(object);
+                continue;
+            }
+            if (object.definition?.type === 'door') {
+                specialObjectsToRender.push(object);
+            }
+            objectsToRender.push(...getObjectAndParts(state, object));
+        }
+        for (const object of objectsToRender) {
+            if (object.getYDepth) {
+                object.yDepth = object.getYDepth();
+            } else if (object.getHitbox) {
+                const hitbox = object.getHitbox();
+                object.yDepth = hitbox.y + hitbox.h;
+            } else {
+                object.yDepth = object.y;
+            }
+        }
+        objectsToRender.sort((A, B) => {
+            const priorityA = A.drawPriority ?? 'background';
+            const priorityB = B.drawPriority ?? 'background';
+            if (priorityA !== priorityB) {
+                if (priorityA === 'foreground') return -1;
+                if (priorityB === 'foreground') return 1;
+                if (priorityA === 'sprites') return -1;
+                return 1;
+            }
+            if (priorityA === 'background') {
+                return (A.drawPriorityIndex || 0) - (B.drawPriorityIndex || 0);
+            }
+            return A.yDepth - B.yDepth;
+        });
+
+        // Basic rendering of objects just draws them as is to the map.
+        for (const object of objectsToRender) {
+            context.save();
+                context.scale(4 / area.w, 4 / area.h);
+                context.translate(-source.x, -source.y);
+                const objectAndParts = getObjectAndParts(state, object)
+                for(const part of objectAndParts) {
+                    if ((part.getDrawPriority?.(state) || part.drawPriority) === 'background') {
+                        part.render(context, state);
+                    }
+                }
+                for(const part of objectAndParts) {
+                    if ((part.getDrawPriority?.(state) || part.drawPriority) === 'sprites') {
+                        part.render(context, state);
+                    }
+                }
+                for(const part of objectAndParts) {
+                    if ((part.getDrawPriority?.(state) || part.drawPriority) === 'foreground') {
+                        part.render(context, state);
+                    }
+                    part.renderForeground?.(context, state);
+                }
+            context.restore();
+        }
+
+        // Special objects draw specific icons to the map, like unopened chests, stair cases, and locks.
+        for (const object of specialObjectsToRender) {
+            let hitbox = object.getHitbox();
             hitbox = {...hitbox, x: hitbox.x - source.x, y: hitbox.y - source.y};
-            /*if (object.definition.id === 'warTempleNorthEntrance') {
-                debugger;
-            }*/
             if (object.definition?.type === 'keyBlock') {
                 if (!state.savedState.objectFlags[object.definition.id]) {
                     if (object.definition?.status === 'bigKeyLocked') {
@@ -491,30 +556,7 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                         y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - chestFrame.h / 2,
                     });
                 }
-            } else {
-                context.save();
-                    context.scale(4 / area.w, 4 / area.h);
-                    context.translate(-source.x, -source.y);
-                    const objectAndParts = getObjectAndParts(state, object)
-                    for(const part of objectAndParts) {
-                        if ((part.getDrawPriority?.(state) || part.drawPriority) === 'background') {
-                            part.render(context, state);
-                        }
-                    }
-                    for(const part of objectAndParts) {
-                        if ((part.getDrawPriority?.(state) || part.drawPriority) === 'sprites') {
-                            part.render(context, state);
-                        }
-                    }
-                    for(const part of objectAndParts) {
-                        if ((part.getDrawPriority?.(state) || part.drawPriority) === 'foreground') {
-                            part.render(context, state);
-                        }
-                        part.renderForeground?.(context, state);
-                    }
-                context.restore();
             }
-
             if (object.definition?.type === 'door') {
                 // Do not render cracked doors unless they have already been opened.
                 const isOpened = state.savedState.objectFlags[object.definition.id];
@@ -536,34 +578,17 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                     });
                 }
                 if (isFrozen && !getObjectStatus(state, object.definition, 'melted')) {
-                    /*drawFrame(context, switchDoorFrame, {...switchDoorFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - switchDoorFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - switchDoorFrame.h / 2,
-                    });*/
                     drawDoorFrame(switchDoorFrame);
                 } else if (wasClosed && !isOpened) {
                     // Ladders are hidden when closed, so do not draw them to the map.
                     if (doorStyle.isLadderUp || doorStyle.isLadderDown) {
                         continue;
                     }
-                    //const canOpenDoor = object.definition.price > 0 || object.definition.status !== 'closed';
                     const frame = (isZoneDoor ? switchDoorFrame : blockedFrame);
-                    /*drawFrame(context, frame, {...frame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2,
-                    });*/
                     drawDoorFrame(frame);
                 } else if (object.definition.status === 'locked' && !isOpened) {
-                    /*drawFrame(context, smallLockFrame, {...smallLockFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
-                    });*/
                     drawDoorFrame(smallLockFrame);
                 } else if (object.definition.status === 'bigKeyLocked' && !isOpened) {
-                    /*drawFrame(context, bigLockFrame, {...bigLockFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
-                    });*/
                     drawDoorFrame(bigLockFrame);
                 } else if (isZoneDoor) {
                     let mapIcon: MapIcon = object.definition.mapIcon ?? doorStyle.mapIcon;
@@ -575,43 +600,9 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
                     }
                     const frame = mapIconMap[mapIcon] ?? doorFrame;
                     drawDoorFrame(frame);
-                    /*drawFrame(context, frame, {...frame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2
-                            + (mapIcon === 'right' ? -2 : (mapIcon === 'left' ? 2 : 0)),
-                           // + (object.definition.d === 'right' ? -2 : 0),
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
-                            // Render southern doors further up.
-                            + (mapIcon === 'down' ? -2 : (mapIcon === 'up' ? 2 : 0)),
-                            //+ (object.definition.d === 'down' ? -2 : 0),
-                    });*/
-                    /*if (!mapIcon && ) {
-                    } else if (object.definition.style === 'wideEntrance' || object.definition.style === 'pathEntrance') {
-                        const frame = {up: upFrame, down: downFrame, left: leftFrame, right: rightFrame}[object.definition.d ?? 'up'];
-                        drawFrame(context, frame, {...frame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2,
-                            y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2
-                                // Render southern doors further up.
-                                + (object.definition.d === 'down' ? -2 : 0),
-                        });
-                    } else {
-                        drawFrame(context, doorFrame, {...doorFrame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - doorFrame.w / 2,
-                            y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - doorFrame.h / 2
-                                // Render southern doors further up.
-                                + (object.definition.d === 'down' ? -2 : 0),
-                        });
-                    }*/
                 } else if (object.definition?.d === 'up' || object.definition?.d === 'down') {
-                    /*drawFrame(context, verticalFrame, {...verticalFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - verticalFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - verticalFrame.h / 2,
-                    });*/
                     drawDoorFrame(verticalFrame);
                 } else {
-                    /*drawFrame(context, horizontalFrame, {...horizontalFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - horizontalFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - horizontalFrame.h / 2,
-                    });*/
                     drawDoorFrame(horizontalFrame);
                 }
             }

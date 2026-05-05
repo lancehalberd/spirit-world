@@ -146,6 +146,8 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Remove spirit energy cooldown in dream world, similar to spirit tonic.
+
     - Demo blockers
         - Test with movement hitbox changes.
         - Test maps with decoration changes
