@@ -829,7 +829,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 400, y: 288, type: "door", style: "wooden", d: "up"},
         {status: "normal", id: "", x: 384, y: 240, type: "door", style: "wooden", d: "down"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 232, y: 392, d: "down", behavior: "random", style: "darkMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueIndex: 110},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 232, y: 392, d: "down", behavior: "random", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueIndex: 110},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 89, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 0},

@@ -5,6 +5,7 @@ import {Enemy} from 'app/content/enemy';
 import {editingState} from 'app/development/editingState';
 import {EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta'
 import {playAreaSound} from 'app/musicController';
 import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
 import {prependScript} from 'app/scriptEvents';
@@ -19,6 +20,7 @@ import {boxesIntersect, pad} from 'app/utils/index';
 import {removeObjectFromArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
+import {getTargetingAnchor} from 'app/utils/target';
 
 export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
     // Skip this if the hero isn't currently part of any area.
@@ -387,8 +389,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen = Math.max(1, state.hero.actualMagicRegen);
         }
     }
-    // No magic regen cooldown if a magic potion is in effect.
-    if (state.hero.magicPotionExpiresAt > state.fieldTime) {
+    // No magic regen cooldown if a magic potion is in effect or in the dream world.
+    if (state.hero.magicPotionExpiresAt > state.fieldTime || state.location.zoneKey === 'dream') {
         state.hero.magicRegenCooldown = 0;
     }
     const isTryingToRun = state.hero.action === 'walking' && state.hero.isRunning;
@@ -510,7 +512,9 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
             continue;
         }
         const enemyHitbox = enemy.getTouchHitbox();
-        if (boxesIntersect(heroHitbox, enemyHitbox)) {
+        if (boxesIntersect(heroHitbox, enemyHitbox)
+            && getLedgeDelta(state, hero.area, hero.getAnchorPoint(), getTargetingAnchor(enemy)) === 0
+        ) {
             let dx = (heroHitbox.x + heroHitbox.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
             let dy = (heroHitbox.y + heroHitbox.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);
             if (!dx && !dy) {

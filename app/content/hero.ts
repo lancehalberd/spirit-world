@@ -1079,7 +1079,7 @@ export class Hero implements Actor {
 
     // This should only be called on `state.hero`.
     increaseMagicRegenCooldown(state: GameState, amount: number): void {
-        if (this.magicPotionExpiresAt > state.fieldTime) {
+        if (this.magicPotionExpiresAt > state.fieldTime || state.location.zoneKey === 'dream') {
             return;
         }
         //console.log('increaseMagicRegenCooldown', amount);

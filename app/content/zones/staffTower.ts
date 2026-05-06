@@ -305,7 +305,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerEntrance", x: 288, y: 624, type: "door", style: "future", targetZone: "overworld", targetObjectId: "staffTowerEntrance", d: "down", locationCue: "Tower 1F"},
         {status: "normal", id: "", x: 168, y: 304, type: "tippable", linked: true, shattered: true},
         {status: "normal", id: "", x: 208, y: 320, type: "tippable", linked: true, shattered: true},
-        {status: "normal", id: "", x: 224, y: 400, d: "down", behavior: "idle", style: "guy2", type: "npc", dialogue: "This tower disappears into the clouds but there is no way to reach the upper floors.\n{|}Nobody knows who built the tower, but I read it is even older than the ruins to the South.", hasCustomLogic: true, customLogic: "!elementalBeastsEscaped", dialogueIndex: 97},
+        {status: "normal", id: "", x: 224, y: 400, d: "down", behavior: "idle", style: "archeologist", type: "npc", dialogue: "This tower disappears into the clouds but there is no way to reach the upper floors.\n{|}Nobody knows who built the tower, but I read it is even older than the ruins to the South.", hasCustomLogic: true, customLogic: "!elementalBeastsEscaped", dialogueIndex: 97},
         {status: "normal", id: "towerEscalatorUpOn", x: 190, y: 231, speed: "slow", d: "up", w: 18, h: 76, style: "escalator", type: "escalator", linked: true},
         {status: "normal", id: "towerEscalatorDownOn", x: 431, y: 231, speed: "fast", d: "down", w: 18, h: 76, style: "escalator", type: "escalator", linked: true},
         {status: "normal", id: "", x: 304, y: 100, style: "stoneTerminal", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},

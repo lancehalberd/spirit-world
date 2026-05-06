@@ -7,6 +7,7 @@ import {removeEffectFromArea} from 'app/utils/effects';
 import {rectanglesOverlap} from 'app/utils/index';
 import {getDrawPriority} from 'app/utils/layers';
 import {getObjectBehaviors, isObject, removeObjectFromArea} from 'app/utils/objects';
+import {getTargetingAnchor} from 'app/utils/target';
 import {resetTileBehavior} from 'app/utils/tileBehavior';
 
 
@@ -271,6 +272,26 @@ export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitPro
     return hit?.hitObjects === true;
 }
 
+function isObjectInPlaneOfHit(state: GameState, object: Target, hit: HitProperties){
+    if (!hit.anchorPoint) {
+        return true;
+    }
+    // Projectiles from high attacks ignore anything that isn't very tall or flying.
+    const objectAnchor = getTargetingAnchor(object);
+    const delta = getLedgeDelta(state, object.area, hit.anchorPoint, objectAnchor);
+    // At high heights, only hit objects above the anchor point or very tall objects,
+    // or objects sufficiently high off the ground.
+    if (hit.isHigh && !(object.behaviors?.isVeryTall || delta > 0 || object.z >= 6)) {
+        return false;
+    }
+    // At normal height only hit objects on the same level
+    // This includes delta == 0 or delta < 0 for very tall objects.
+    if (hit.isHigh === false && delta && !(object.behaviors?.isVeryTall && delta <= 0)) {
+        return false;
+    }
+    return true;
+}
+
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
     const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
     if (!area) {
@@ -311,23 +332,6 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
         }
         const hitbox = object.getHitbox(state);
-        // Projectiles from high attacks ignore anything that isn't very tall.
-        if (hit.anchorPoint) {
-            const objectAnchor = {
-                x: hitbox.x + hitbox.w / 2,
-                y: hitbox.y + hitbox.h / 2,
-            };
-            const delta = getLedgeDelta(state, area, hit.anchorPoint, objectAnchor);
-            // At high heights, only hit objects above the anchor point or very tall objects.
-            if (hit.isHigh && !(object.behaviors?.isVeryTall || delta > 0)) {
-                continue;
-            }
-            // At normal height only hit objects on the same level
-            // This includes delta == 0 or delta < 0 for very tall objects.
-            if (hit.isHigh === false && delta && !(object.behaviors?.isVeryTall && delta <= 0)) {
-                continue;
-            }
-        }
         if (hit.hitCircle) {
             const r = hit.hitCircle.r;
             // Fudge a little by pretending the target is a circle.
@@ -335,7 +339,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             const r2 = (r + fakeRadius) ** 2;
             const dx = hitbox.x + hitbox.w / 2 - hit.hitCircle.x;
             const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
-            if (dx * dx + dy * dy < r2) {
+            if (dx * dx + dy * dy < r2 && isObjectInPlaneOfHit(state, object, hit)) {
                 let knockback = hit.knockback;
                 let knockAwayFrom = hit.knockAwayFrom || (hit.knockAwayFromHit && hit.hitCircle);
                 if (!knockback && knockAwayFrom) {
@@ -353,7 +357,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 hit.hitRay
             );
             const didHit = distance <= (hit.hitRay.r + fakeRadius);
-            if (didHit) {
+            if (didHit && isObjectInPlaneOfHit(state, object, hit)) {
                 let knockback = hit.knockback;
                 if (!knockback && hit.knockAwayFrom) {
                     const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
@@ -373,7 +377,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
                 applyHitToObject(state, object, {...hit, direction: getDirection(dx, dy), knockback}, combinedResult);
             }
-        } else if (hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox)) {
+        } else if (hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox) && isObjectInPlaneOfHit(state, object, hit)) {
             const direction = hit.direction || getDirection(
                 hitbox.x - hit.hitbox.x + 8 * (hit.vx || 0),
                 hitbox.y - hit.hitbox.y + 8 * (hit.vy || 0)

@@ -146,9 +146,8 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Remove spirit energy cooldown in dream world, similar to spirit tonic.
-
     - Demo blockers
+        - Plant bombs should remove shells from little beetles.
         - Test with movement hitbox changes.
         - Test maps with decoration changes
             - Set hideOnMap for any decorations that look bad on the map.
@@ -157,6 +156,8 @@ Current tasks:
         - BLOCKED Update packed sprites
 
     - Graphics added but not used yet:
+        - npcs/vanaraChef
+        - npcs/vanaraFarmer
         - mc equipment mc/armor1/*, mc/phoenixCrown/*, mc/ironBoots/*
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
         - hud/aetherCrystal
@@ -166,10 +167,6 @@ Current tasks:
         - new tiles in tiles/stoneTileset (blown open doors)
         - tiles/grates
         - tiles/treeHome
-        - npcs/vanaraChef
-        - npcs/vanaraFarmer
-        - Fix hero can be seen behind door frame when moving south through jade interior door styles.
-            Just add updated jade interior tiles and test them
         - Cherry tree
         - dirt particles
         - test new lab tiles
@@ -190,8 +187,6 @@ Current tasks:
             - Sticky web tiles can be cleared with chakram or barrier burst, similar to slippery bead tiles.
             - Special interaction with fire damage, adds a small fire nova on a 200ms delay that will spread to other tiles and hurt enemies+allies.
                 - Maybe make this isBurnable tile prop and apply to bushes as well.
-
-    - Test more normal entrance randomizer seeds to find errors.
 
     - Implement blocksRenders functionality and test transition state again.
 

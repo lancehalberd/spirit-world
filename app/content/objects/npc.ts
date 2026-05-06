@@ -33,15 +33,10 @@ import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehavior
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {heroAnimations} from 'app/render/heroAnimations';
 import {
-    galAnimations, gal2Animations,
-    guyAnimations, guy2Animations,
-    // paleMonkAnimations, midMonkAnimations,
-    darkMonkAnimations,
     vanaraBlackAnimations, vanaraBlueAnimations,
     vanaraBrownAnimations, vanaraGoldAnimations,
     vanaraGrayAnimations, vanaraPurpleAnimations,
     vanaraRedAnimations,
-    zoroAnimations,
 } from 'app/render/npcAnimations';
 import {shadowFrame, smallShadowFrame} from 'app/renderActor';
 import {showMessage} from 'app/scriptEvents';
@@ -75,6 +70,9 @@ interface NPCStyleDefinition {
 }
 
 function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state: GameState, npc: NPC): void {
+    if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight) {
+        return;
+    }
     const animationStyle = npcStyles[npc.definition.style];
     const scale = animationStyle.scale || 1;
     const allAnimations = createTintedSpiritActorAnimations(animationStyle.color ?? 'brown')
@@ -217,22 +215,6 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: stormBeastAnimations,
         shadowOffset: -20,
     },
-    gal: {
-        animations: galAnimations,
-        shadowOffset: 1,
-    },
-    gal2: {
-        animations: gal2Animations,
-        shadowOffset: 1,
-    },
-    guy: {
-        animations: guyAnimations,
-        shadowOffset: 1,
-    },
-    guy2: {
-        animations: guy2Animations,
-        shadowOffset: 1,
-    },
     father: {
         animations: fatherAnimations,
         shadowOffset: 1,
@@ -260,10 +242,6 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: midGuyPriestAnimations,
         shadowOffset: 1,
         height: 26,
-    },
-    darkMonk: {
-        animations: darkMonkAnimations,
-        shadowOffset: 1,
     },
     vanara: {
         animations: heroAnimations,
@@ -312,10 +290,6 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         shadowOffset: 1,
         alternateRender: renderVanaraSpirit,
         color: '#C55D4D',
-    },
-    zoro: {
-        animations: zoroAnimations,
-        shadowOffset: 1,
     },
 };
 

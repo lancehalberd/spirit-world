@@ -2256,7 +2256,7 @@ const f0_2x0: AreaDefinition = {
     objects: [
         {status: "closed", id: "moneyMazeExit", x: 240, y: 464, type: "door", style: "jadeDark", targetZone: "holyCityInterior", targetObjectId: "moneyMazeExit", d: "up"},
         {status: "closed", id: "grandTempleEntrance", x: 480, y: 0, type: "door", style: "wideEntrance", targetZone: "grandTemple", targetObjectId: "grandTempleEntrance", d: "up", openLogic: {"logicKey":"hasReleasedBeasts"}},
-        {status: "normal", id: "streetVendor", x: 456, y: 340, d: "down", behavior: "idle", style: "guy2", type: "npc", dialogueKey: "streetVendor"},
+        {status: "normal", id: "streetVendor", x: 456, y: 340, d: "down", behavior: "idle", style: "merchant", type: "npc", dialogueKey: "streetVendor"},
         {status: "normal", id: "", x: 80, y: 432, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 160, y: 432, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 176, y: 320, type: "spawnMarker", linked: true},

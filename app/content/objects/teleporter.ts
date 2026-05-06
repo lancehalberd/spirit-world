@@ -197,14 +197,29 @@ export class Teleporter implements ObjectInstance {
         if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight) {
             return;
         }
-        const gradient = context.createLinearGradient(0, 0, 0, 16);
+        const h = 2 + Math.sin(this.animationTime / 500) / 2;
+        context.save();
+            context.translate(this.x + 8, this.y + 8);
+            context.fillStyle = 'white';
+            context.globalAlpha *= 0.2;
+            for (let i = 0; i < 5; i++) {
+                context.translate(0,  -i * h);
+                //context.rotate(i * h * Math.PI / 24);
+                context.fillRect(-(16 - i ) / 2, -(16 - i ) / 2, 16 - i, 16 - i);
+                //context.fillRect(-8, -8, 16, 16);
+                //context.rotate(-i * h * Math.PI / 24);
+                context.translate(0,  i * h);
+                context.globalAlpha *= 0.8;
+            }
+        context.restore();
+        /*const gradient = context.createLinearGradient(0, 0, 0, 16);
         gradient.addColorStop(0.2 + 0.1 * Math.cos(this.animationTime / 400), 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(0.8 + 0.1 * Math.cos(this.animationTime / 400), 'rgba(255, 255, 255, 0.7)');
         context.save();
         context.fillStyle = gradient;
         context.translate(this.x, this.y);
         context.fillRect(0, 0, 16, 16);
-        context.restore();
+        context.restore();*/
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && !editingState.isEditing) {

@@ -93,11 +93,11 @@ export function getLedgeDelta(
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + tx);
                 // We are under the ledge if the start is upleft but the end corner of the hitbox is downright.
-                if (start.y + start.x <= N + 1 && end.y + end.x > N) {
+                if (start.y + start.x <= N + 1 && end.y + end.x > N + 1) {
                     delta++;
                     continue;
                 }
-                if (end.y + end.x <= N + 1 && start.y + start.x > N) {
+                if (end.y + end.x <= N + 1 && start.y + start.x > N + 1) {
                     delta--
                     continue;
                 }
@@ -132,11 +132,11 @@ export function getLedgeDelta(
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + tx);
                 // We are under the ledge if the start is downright but end corner of the hitbox is upleft.
-                if (start.y + start.x >= N + 1 && end.y + end.x < N) {
+                if (start.y + start.x >= N + 1 && end.y + end.x < N + 1) {
                     delta++;
                     continue;
                 }
-                if (end.y + end.x >= N + 1 && start.y + start.x < N) {
+                if (end.y + end.x >= N + 1 && start.y + start.x < N + 1) {
                     delta--;
                     continue;
                 }
@@ -150,7 +150,6 @@ window['getLedgeDelta'] = getLedgeDelta;
 
 export function updateProjectileHeight(this: void, state: GameState, area: AreaInstance, isHigh: boolean, oldAnchorPoint: Point, anchorPoint: Point): boolean {
     const ledgeDelta = getLedgeDelta(state, area, oldAnchorPoint, anchorPoint);
-    // console.log(ledgeDelta, oldAnchorPoint, anchorPoint);
     if (isHigh) {
         if (ledgeDelta > 0) {
             return false;
