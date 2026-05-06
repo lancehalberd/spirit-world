@@ -18,9 +18,7 @@ specialBehaviorsHash.peachCave = {
     onRefreshLogic(state: GameState, area: AreaInstance) {
         // After the peach tree dies, it has the same behavior as other peach trees,
         // which are all dead when you initially find them.
-        if (state.savedState.objectFlags.peachCaveTreeDied ) {
-            return;
-        }
+
         let peachTree: PeachTree|undefined;
         for (const object of area.objects) {
             if (object instanceof PeachTree) {
@@ -28,11 +26,20 @@ specialBehaviorsHash.peachCave = {
                 break;
             }
         }
+        if (state.savedState.objectFlags.peachCaveTreeDied && !state.savedState.objectFlags.peachCaveTre) {
+            if (peachTree) {
+                peachTree.specialStatus = 'dead';
+            }
+            return;
+        }
         if (state.savedState.objectFlags.peachCaveBoss) {
             if (state.randomizerState) {
                 state.savedState.objectFlags.peachCaveTreeDied = true;
                 state.areaInstance.needsLogicRefresh = true;
             } else {
+                if (peachTree) {
+                    peachTree.specialStatus = 'weak';
+                }
                 hideHUD(state, (state: GameState) => {
                     appendScript(state, '{flag:peachCaveTreeDied}');
                 });
@@ -45,7 +52,7 @@ specialBehaviorsHash.peachCave = {
                         hitTiles: true,
                         source: null,
                     });
-                    peachTree.specialStatus = undefined;
+                    delete peachTree.specialStatus;
                 });
                 // Hero jumps back a bit in surprise at the bushes being destroyed
                 appendCallback(state, (state: GameState) => {

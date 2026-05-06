@@ -1,7 +1,7 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 
-dialogueHash.vanaraVillager = {
-    key: 'vanaraVillager',
+dialogueHash.vanaraFarmer = {
+    key: 'vanaraFarmer',
     options: [
         {
             logicCheck: {
@@ -33,12 +33,85 @@ dialogueHash.vanaraVillager = {
             },
             isExclusive: true,
             text: [
-                /*{
+                {
+                    dialogueIndex: 237,
                     text: `First there was that earthquake and then the fog finally lifted.`,
                 },
                 {
+                    dialogueIndex: 238,
                     text: `I'm glad the fog is gone, but will we be okay with the village exposed like this?`,
-                },*/
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$spiritSight'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueIndex: 239,
+                    text: `I love being out in the woods, but I get uncomfortable if I stay out in the fog too long.`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$bow'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueIndex: 240,
+                    text: `Please be careful with that!`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: [],
+            },
+            text: [
+                {
+                    dialogueIndex: 241,
+                    text: `Here to ruin our crops again?`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+    ],
+};
+
+dialogueHash.vanaraVillager = {
+    key: 'vanaraVillager',
+    options: [
+        {
+            logicCheck: {
+                requiredFlags: ['beastsDefeated'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueIndex: 242,
+                    text: `Is it true you are the one who defeated the beasts?`,
+                },
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['elementalBeastsEscaped'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
                 {
                     dialogueIndex: 214,
                     text: `The Elder says the Spirit Tree is still watching over us, I hope that's true!`,
@@ -53,9 +126,6 @@ dialogueHash.vanaraVillager = {
             },
             isExclusive: true,
             text: [
-                /*{
-                    text: `I love being out in the woods, but I get uncomfortable if I stay out in the fog too long.`,
-                },*/
                 {
                     dialogueIndex: 215,
                     text: `They say you don't mind getting wet because your mother is a human.`,

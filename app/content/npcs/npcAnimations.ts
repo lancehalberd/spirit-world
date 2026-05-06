@@ -366,11 +366,22 @@ export const blacksmithTwoAnimations: ActorAnimations = {
     idle: omniAnimation(createAnimation(blacksmithTwoImage, blacksmithTwoGeometry, {y: 2})),
 };
 
-
 const ambrosiaImage: string = 'gfx/npcs/ambrosia.png';
-const ambrosiaGeometry: FrameDimensions = {w: 19, h: 27, content: {x: 3, y: 17, w: 14, h: 10}};
+const ambrosiaGeometry: FrameDimensions = {w: 19, h: 27, content: {x: 3, y: 11, w: 14, h: 16}};
 export const ambrosiaAnimations: ActorAnimations = {
     idle: omniAnimation(createAnimation(ambrosiaImage, ambrosiaGeometry, {y: 0})),
+};
+
+const vanaraChefImage: string = 'gfx/npcs/vanaraChef.png';
+const vanaraChefGeometry: FrameDimensions = {w: 24, h: 27, content: {x: 5, y: 11, w: 14, h: 16}};
+export const vanaraChefAnimations: ActorAnimations = {
+    idle: omniAnimation(createAnimation(vanaraChefImage, vanaraChefGeometry, {left: 19, y: 0})),
+};
+
+const vanaraFarmerImage: string = 'gfx/npcs/vanaraFarmer.png';
+const vanaraFarmerGeometry: FrameDimensions = {w: 26, h: 26, content: {x: 3, y: 10, w: 14, h: 16}};
+export const vanaraFarmerAnimations: ActorAnimations = {
+    idle: omniAnimation(createAnimation(vanaraFarmerImage, vanaraFarmerGeometry, {y: 0})),
 };
 
 const guardianImage: string = 'gfx/npcs/guardian.png';

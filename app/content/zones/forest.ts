@@ -608,7 +608,7 @@ const f0_1x0: AreaDefinition = {
                     [],
                     [],
                     [],
-                    [,,,,,852,,,,,851,,852,,,,,851,,,,,,,,,],
+                    [,,,,,852,,,,,851,,852,,,,,851,,,,,,,],
                     [,,,,850,,,,,,,,,,,,,,,,,,852,,,,851],
                     [,,,852],
                     [],
@@ -1955,7 +1955,7 @@ const f0_1x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", type: "npc", x: 144, y: 48, d: "down", behavior: "none", style: "vanaraBrown", dialogueKey: "vanaraGuard", id: "vanaraGuard"},
-        {status: "normal", type: "npc", x: 240, y: 272, d: "down", behavior: "random", style: "vanaraBrown", dialogueKey: "vanaraVillager", id: "vanaraVillager"},
+        {status: "normal", type: "npc", x: 68, y: 208, d: "down", behavior: "none", style: "vanaraFarmer", dialogueKey: "vanaraFarmer", id: "vanaraVillager"},
         {status: "normal", id: "", linked: true, x: 124, y: 84, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 436, y: 120, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 396, y: 344, type: "spawnMarker"},
@@ -1975,6 +1975,7 @@ const f0_1x1: AreaDefinition = {
         {id: "northeastTreeEntrance", linked: false, spirit: false, status: "normal", x: 352, y: 144, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "northeastTreeEntrance", d: "up"},
         {id: "southwestTreeEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "southwestTreeEntrance", d: "up"},
         {status: "normal", id: "", linked: true, x: 244, y: 140, type: "spawnMarker"},
+        {status: "normal", type: "npc", x: 240, y: 272, d: "down", behavior: "random", style: "vanaraBrown", dialogueKey: "vanaraVillager", id: "vanaraVillager"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 643, mapId: 'overworld', entranceId: 'forestMarkerM', mapX: 2, mapY: 2},

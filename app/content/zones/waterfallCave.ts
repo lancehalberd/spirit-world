@@ -1141,7 +1141,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 192, y: 96, type: "pushPull", style: "pot"},
         {status: "normal", id: "waterfallCaveEmptyRoomNpc", x: 316, y: 128, d: "right", behavior: "random", style: "vanaraGold", type: "npc", dialogue: "We recently finished digging this new room but we still need to furnish it.", dialogueIndex: 124},
         {status: "normal", id: "waterfallCave:0:0x0-npc-6", x: 88, y: 80, d: "down", behavior: "face", style: "girl", type: "npc", dialogue: "I wish I could sleep in more.", dialogueIndex: 121},
-        {status: "normal", id: "ambrosia", x: 232, y: 428, d: "down", behavior: "face", style: "ambrosia", type: "npc", dialogue: "", dialogueKey: "ambrosia"},
+        {status: "normal", id: "ambrosia", x: 232, y: 420, d: "down", behavior: "face", style: "ambrosia", type: "npc", dialogue: "", dialogueKey: "ambrosia"},
         {status: "normal", id: "", x: 166.5, y: 38, type: "decoration", d: "down", w: 16, h: 16, decorationType: "basket"},
         {status: "normal", id: "", x: 150.5, y: 46, type: "decoration", d: "down", w: 16, h: 16, decorationType: "basket"},
         {status: "normal", id: "", x: 202.5, y: 38, type: "decoration", d: "down", w: 16, h: 16, decorationType: "basket"},

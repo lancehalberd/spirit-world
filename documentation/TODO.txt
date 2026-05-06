@@ -147,16 +147,12 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Test with movement hitbox changes.
-        - Test maps with decoration changes
-            - Set hideOnMap for any decorations that look bad on the map.
+        - Test: Add SFX for spark ball attacks (Guardian fight).
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
         - BLOCKED Update packed sprites
 
     - Graphics added but not used yet:
-        - npcs/vanaraChef
-        - npcs/vanaraFarmer
         - mc equipment mc/armor1/*, mc/phoenixCrown/*, mc/ironBoots/*
         - bosses/beetleGround, bosses/beetleFlying, bosses/beetleEyes, bosses/beetleAntenna
         - hud/aetherCrystal

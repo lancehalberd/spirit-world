@@ -87,7 +87,7 @@ export class Spark implements EffectInstance, Props {
     ignoreWallsDuration = this.props.ignoreWallsDuration;
     delay = this.props.delay;
     source = this.props.source;
-    soundKey = this.props.soundKey;
+    soundKey = this.props.soundKey ?? 'sparkBurst';
     strength = this.props.strength;
     treeSize = this.props.treeSize;
     constructor(readonly props: Props) {
@@ -266,7 +266,6 @@ export function addRadialSparks(this: void,
             vx: speed * dx,
             vy: speed * dy,
             ttl: 1000,
-            soundKey: 'sparkBurst',
             ...extraProps,
         });
         // Only play 1 sound effect per set of sparks.
@@ -296,6 +295,10 @@ export function addArcOfSparks(this: void,
             ttl: 1000,
             ...extraProps,
         });
+        // Only play 1 sound effect per set of sparks.
+        if (i !== 0) {
+            delete spark.soundKey;
+        }
         addEffectToArea(state, area, spark);
     }
 }

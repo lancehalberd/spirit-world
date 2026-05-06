@@ -26,6 +26,8 @@ import {
     grandPriestAnimations,
     midGuyPriestAnimations,
     paleLadyPriestAnimations,
+    vanaraChefAnimations,
+    vanaraFarmerAnimations,
     // testAnimations,
 } from 'app/content/npcs/npcAnimations'
 import {createTintedSpiritActorAnimations} from 'app/development/npcBuilder';
@@ -66,6 +68,7 @@ interface NPCStyleDefinition {
     // Defaults to the frame height.
     height?: number
     color?: string
+    spiritOffset?: Point
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState, npc: NPC) => void
 }
 
@@ -81,8 +84,8 @@ function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state
     context.save();
         context.globalAlpha *= 0.2;
         drawFrame(context, frame, { ...frame,
-            x: npc.x - (frame?.content?.x || 0) * scale,
-            y: npc.y - (frame?.content?.y || 0) * scale - npc.z,
+            x: npc.x - (frame?.content?.x || 0) * scale + (animationStyle.spiritOffset?.x ?? 0),
+            y: npc.y - (frame?.content?.y || 0) * scale - npc.z + (animationStyle.spiritOffset?.y ?? 0),
             w: frame.w * scale,
             h: frame.h * scale,
         });
@@ -161,6 +164,8 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         shadowOffset: 2,
         flipLeft: true,
         height: 25,
+        alternateRender: renderVanaraSpirit,
+        spiritOffset: {x: -1, y: 1},
     },
     elder: {
         animations: elderAnimations,
@@ -171,6 +176,8 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
         animations: guardianAnimations,
         shadowOffset: 2,
         height: 25,
+        alternateRender: renderVanaraSpirit,
+        color: '#4C7BB0',
     },
     girl: {
         animations: girlAnimations,
@@ -218,10 +225,28 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     father: {
         animations: fatherAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     },
     mom: {
         animations: momAnimations,
         shadowOffset: 1,
+    },
+    vanaraChef: {
+        animations: vanaraChefAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 25,
+        alternateRender: renderVanaraSpirit,
+        color: '#C55D4D',
+        spiritOffset: {x: -1, y: 2},
+    },
+    vanaraFarmer: {
+        animations: vanaraFarmerAnimations,
+        shadowOffset: 2,
+        flipLeft: true,
+        height: 25,
+        alternateRender: renderVanaraSpirit,
+        spiritOffset: {x: -1, y: 1},
     },
     vanaraProjection: {
         animations: createTintedSpiritActorAnimations('#DA8'),
