@@ -97,6 +97,7 @@ const beetle: EnemyDefinition<BeetleParams> = {
             enemy.applyKnockbackFromHit(state, hit, 0.5);
             return enemy.defaultBlockHit(state, hit);
         }
+        enemy.params.shieldLife -= hit.damage;
         enemy.enemyInvulnerableFrames = 20;
         enemy.makeSound(state, 'enemyHit');
         return {hit: true};

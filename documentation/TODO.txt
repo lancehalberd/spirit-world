@@ -147,7 +147,6 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Plant bombs should remove shells from little beetles.
         - Test with movement hitbox changes.
         - Test maps with decoration changes
             - Set hideOnMap for any decorations that look bad on the map.
