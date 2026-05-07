@@ -898,7 +898,7 @@ const f0_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", type: "npc", x: 144, y: 256, d: "down", behavior: "idle", style: "vanaraRed", id: "waterfallCaveGuard", dialogue: "If you duck through the waterfall quickly enough you can get into the cave without getting too wet.", dialogueIndex: 17},
-        {status: "normal", id: "peachCaveTopEntrance", x: 256, y: 384, type: "door", style: "cavern", targetZone: "peachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
+        {status: "normal", id: "peachCaveTopEntrance", x: 264, y: 384, type: "door", style: "cavern", targetZone: "peachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
         {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up"},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 68, y: 284, type: "waterfall", w: 56, h: 111},
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 68, y: 368, type: "waterfall", w: 72, h: 67},
