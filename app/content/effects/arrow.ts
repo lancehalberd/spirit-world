@@ -182,6 +182,7 @@ interface Props {
     source: Actor
     // Can be set in some inputs that don't require exact velocity to set speed directly.
     speed?: number
+    soundKey?: string
 }
 
 export class Arrow implements EffectInstance, Projectile {
@@ -223,10 +224,12 @@ export class Arrow implements EffectInstance, Projectile {
     isHigh = false;
     refreshIsHigh = true;
     source: Actor;
+    soundKey?: string;
+    persistsAfterSource = true;
     constructor({
         x = 0, y = 0, z = 0, vx = 0, vy = 0, ax = 0, ay = 0, chargeLevel = 0, damage = 1,
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, hybridWorlds = false, style = 'normal',
-        ignoreWallsDuration = 0, source, ttl = 0
+        ignoreWallsDuration = 0, source, ttl = 0, soundKey
     }: Props) {
         this.x = x | 0;
         this.y = y | 0;
@@ -251,6 +254,7 @@ export class Arrow implements EffectInstance, Projectile {
         this.hybridWorlds = hybridWorlds;
         this.source = source;
         this.ttl = ttl
+        this.soundKey = soundKey;
     }
     getAnchorPoint() {
         const direction = getDirection(this.vx, this.vy, true);
@@ -319,6 +323,9 @@ export class Arrow implements EffectInstance, Projectile {
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
+        }
+        if (this.soundKey && this.animationTime === this.delay) {
+            playAreaSound(state, this.area, this.soundKey);
         }
         if (this.ax) {
             this.vx += this.ax;

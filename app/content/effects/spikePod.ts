@@ -47,7 +47,8 @@ export class SpikePod implements EffectInstance, Props {
     animationTime = 0;
     hasBurst: boolean = false;
     isEnemyTarget: boolean = true;
-    source: Actor
+    source: Actor;
+    persistsAfterSource = true;
     constructor({x = 0, y = 0, damage = 2, source}: Props) {
         this.x = x - this.w / 2;
         this.y = y - this.h / 2;

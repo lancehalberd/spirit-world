@@ -87,6 +87,7 @@ export class Spark implements EffectInstance, Props {
     ignoreWallsDuration = this.props.ignoreWallsDuration;
     delay = this.props.delay;
     source = this.props.source;
+    persistsAfterSource = true;
     soundKey = this.props.soundKey ?? 'sparkBurst';
     strength = this.props.strength;
     treeSize = this.props.treeSize;

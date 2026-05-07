@@ -1,7 +1,7 @@
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
-import { appendScript } from 'app/scriptEvents';
-import { saveGame } from 'app/utils/saveGame';
+import {appendScript} from 'app/scriptEvents';
+import {saveGame} from 'app/utils/saveGame';
 import {updateAllHeroes} from 'app/updateActor';
 
 specialBehaviorsHash.craterLavaSwitch = {

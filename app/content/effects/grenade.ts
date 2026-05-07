@@ -55,6 +55,7 @@ export class Grenade implements EffectInstance, Props {
     source: Enemy = this.props.source;
     activate = this.props.activate;
     hitProperties = this.props.hitProperties;
+    persistsAfterSource = true;
     constructor(public props: Props) {}
     onInitialize(state: GameState) {
         playAreaSound(state, this.area, 'grenade');

@@ -98,6 +98,7 @@ export class Flame implements EffectInstance, Props {
     isHigh = false;
     persist = false;
     source: Actor;
+    persistsAfterSource = true;
     soundKey: string;
     beforeUpdate?: (state: GameState, flame: Flame) => void;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3,

@@ -194,6 +194,7 @@ enemyDefinitions.beetleWingedFrost = {
             persistDuration: 200,
             radius: 40,
             source: enemy,
+            persistsAfterSource: true,
         });
         addEffectToArea(state, enemy.area, blast);
     }

@@ -14,6 +14,8 @@ import {lightningBoltAbility} from 'app/content/enemyAbilities/lightningBolt';
 import {Indicator} from 'app/content/objects/indicator';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH} from 'app/gameConstants';
 import {guardianAnimations} from 'app/content/npcs/npcAnimations';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
+import {appendScript} from 'app/scriptEvents';
 import {createAnimation} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
@@ -327,6 +329,9 @@ const projectileRingAbility: EnemyAbility<Target> = {
             projectile.ttl = 400;
             projectile.ignoreWallsDuration = 400;
             projectile.delay = projectileRingAbility.prepTime;
+            if (i !== 0) {
+                delete projectile.soundKey;
+            }
         }
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
@@ -340,6 +345,7 @@ const projectileRingAbility: EnemyAbility<Target> = {
     recoverTime: guardianSpiritFinishAttackAnimation.duration,
 };
 
+let rumbleSoundReference: AudioInstance|undefined;
 const growingThornsAbility: EnemyAbility<Target> = {
     getTarget(this: void, state: GameState, enemy: Enemy): Target {
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets).target;
@@ -349,6 +355,13 @@ const growingThornsAbility: EnemyAbility<Target> = {
         if (!guardian) {
             return;
         }
+        rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
+        state.screenShakes.push({
+            dx: 0.7,
+            dy: 0.7,
+            startTime: state.fieldTime,
+            id: 'growingThorns',
+        });
         enemy.changeToAnimation('startCast', 'holdCast');
         const count = 6 + 8 * (1 - guardian.life / guardian.maxLife);
         const anchor = getTargetingAnchor(target);
@@ -371,6 +384,10 @@ const growingThornsAbility: EnemyAbility<Target> = {
         const count = 6 + 8 * (1 - guardian.life / guardian.maxLife);
         (enemy.params.parent || enemy).life -= count / 2;
         enemy.changeToAnimation('finishCast', 'idle');
+    },
+    cleanupAbility(state: GameState) {
+        stopAreaSound(state, rumbleSoundReference);
+        appendScript(state, '{stopScreenShake:growingThorns}');
     },
     cooldown: 1000,
     initialCharges: 0,

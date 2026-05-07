@@ -109,6 +109,8 @@ interface BaseFieldInstance {
     // The source of this object or effect, if any. This is often set to enemies for effects that
     // are part of enemy attacks.
     source?: Actor
+    // If set to true, this object/effect will remain even if its source is removed.
+    persistsAfterSource?: boolean
 }
 
 interface ObjectInstance extends BaseFieldInstance {

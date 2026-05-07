@@ -170,12 +170,14 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
         return;
     }
     const currentTime = audioContext.currentTime;
-    // Synth sounds don't support instances yet.
+    if (startTime < currentTime) {
+        return;
+    }
     // Clean up references to any instances that should have completed.
     sound.instances = sound.instances.filter(instance => instance.endTime && instance.endTime >= currentTime);
     // Ignore this sound if we have already scheduled the maximum number of simultaneous effects.
     const instanceLimit = sound.instanceLimit ?? 5;
-    if (sound.instances.length >= instanceLimit) {
+    if (sound.instances.length >= instanceLimit && !force) {
         return;
     }
     const delay = sound.customDelay ?? 0.04;
@@ -516,6 +518,7 @@ async function registerAndCreateAudioWorklets(): Promise<void> {
     window['pinkNoiseNode'] = pinkNoiseNode;
     window['whiteNoiseNode'] = whiteNoiseNode;
     window['brownNoiseNode'] = brownNoiseNode;
+    // This is a good place to add code for testing sounds on refresh since noise generators are now available.
 }
 registerAndCreateAudioWorklets();
 
@@ -571,10 +574,10 @@ function playBeeps(inputFrequencies: number[], volume: number, duration: number,
 }
 window['playBeeps'] = playBeeps;
 
-const minRampDuration = 0.01, minRampVolume = 0.01;
+const minRampDuration = 0.01, minRampVolume = 0.01, minSustainDuration = 0.01;
 function createGainEnvelope(volume: number, decay: number, time: number, duration: number, swell: number = minRampDuration, taper: number = minRampDuration) {
     // Don't play any sounds shorter than the min ramp/decay times.
-    if (duration <= 2 * minRampDuration) {
+    if (duration <= 2 * minRampDuration + minSustainDuration) {
         const gainNode = audioContext.createGain();
         gainNode.gain.setValueAtTime(0, audioContext.currentTime);
         return gainNode;
@@ -582,6 +585,10 @@ function createGainEnvelope(volume: number, decay: number, time: number, duratio
     // To avoid clipping, there is an enforced minimum ramp duration for both swell + taper.
     swell = clamp(swell, minRampDuration, duration - minRampDuration);
     taper = clamp(taper, minRampDuration, duration - swell);
+    if (swell + taper >= duration) {
+        swell -= minSustainDuration / 2;
+        taper -= minSustainDuration / 2;
+    }
     const gainNode = audioContext.createGain();
     const now = audioContext.currentTime;
     // Make sure the node is silent until the specified time.
@@ -802,21 +809,40 @@ sounds.set('waterJump', {
         noiseGainNode.gain.setValueAtTime(0, time);
         noiseGainNode.gain.linearRampToValueAtTime(0.2, time + 0.05);
         noiseGainNode.gain.linearRampToValueAtTime(0, time + this.duration);
-        pinkNoiseNode.connect(noiseGainNode);
+        connectUntil(pinkNoiseNode, noiseGainNode, time + this.duration);
         noiseGainNode.connect(target);
 
         // Water bloop
         playBeeps([200, 100, 200], 0.4, 0.25, {smooth: true, taper: 0.1, swell: 0.1, type: 'sine'}, target, time);
-
-        // Disconnect pink noise after duration.
-        audioCallback(() => {
-            pinkNoiseNode.disconnect(noiseGainNode);
-        }, time + this.duration);
     },
     duration: 0.4,
     instanceLimit: 2,
     instances: [],
 });
+sounds.set('frost', {
+    play(target: AudioNode, time: number) {
+        const masterVolume = 0.2;
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.2, time, this.duration, 0.2, 0.2);
+        const filterNode = audioContext.createBiquadFilter();
+        filterNode.type = 'bandpass';
+        // Start filter high and sweep down to muffle it as it dies out
+        filterNode.Q.setValueAtTime(1, time);
+        filterNode.frequency.setValueAtTime(8000, time);
+        filterNode.frequency.exponentialRampToValueAtTime(4000, time + this.duration);
+        connectUntil(pinkNoiseNode, filterNode, time + this.duration);
+        filterNode.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.6,
+    instanceLimit: 4,
+    customDelay: 0.15,
+    instances: [],
+});
+
+function connectUntil(source: AudioNode, target: AudioNode, until: number) {
+    source.connect(target);
+    audioCallback(() => source.disconnect(target), until);
+}
 
 sounds.set('chargeLaser', {
     play(target: AudioNode, time: number) {
@@ -1189,6 +1215,60 @@ sounds.set('sparkBurst', {
     },
     duration: 0.4,
     instanceLimit: 3,
+    instances: [],
+});
+
+sounds.set('airBurst', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.8;
+
+        // 1. Electrical crackle (high-pass filtered pink noise)
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        // Start high, sweep down a bit to give a "sizzle"
+        noiseFilter.Q.setValueAtTime(2, time);
+        noiseFilter.frequency.setValueAtTime(800, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(1600, time + duration / 2);
+        noiseFilter.frequency.exponentialRampToValueAtTime(800, time + duration);
+
+        // Crackle envelope: sharp attack, fairly quick decay
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.4, time, duration, 0.1, 0.4);
+
+
+        connectUntil(pinkNoiseNode, noiseFilter, time + duration);
+        noiseFilter.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.6,
+    instanceLimit: 2,
+    instances: [],
+});
+
+sounds.set('airBlast', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.5;
+
+        // 1. Electrical crackle (high-pass filtered pink noise)
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        // Start high, sweep down a bit to give a "sizzle"
+        noiseFilter.Q.setValueAtTime(0.5, time);
+        noiseFilter.frequency.setValueAtTime(800, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(1600, time + duration / 2);
+        noiseFilter.frequency.exponentialRampToValueAtTime(800, time + duration);
+
+        // Crackle envelope: sharp attack, fairly quick decay
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.4, time, duration, 0.05, 0.4);
+
+
+        connectUntil(pinkNoiseNode, noiseFilter, time + duration);
+        noiseFilter.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.6,
+    instanceLimit: 2,
     instances: [],
 });
 

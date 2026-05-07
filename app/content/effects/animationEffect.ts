@@ -1,4 +1,5 @@
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
 import {createAnimation, drawFrame, frameAnimation, getFrame} from 'app/utils/animations';
 import {addEffectToArea, isEffect, removeEffectFromArea} from 'app/utils/effects';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors'
@@ -511,6 +512,7 @@ export function addBurstEffect(this: void, state: GameState, actor: Actor, area:
         y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
     });
     addEffectToArea(state, area, animation);
+    playAreaSound(state, area, 'airBurst');
 }
 
 /**

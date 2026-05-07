@@ -161,7 +161,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         } as Params;
         this.status = definition.status;
         if (this.definition.id && getObjectStatus(state, this.definition)) {
-            this.status = 'gone';
+            this.prepareForRemoval(state);
         }
         this.alwaysReset = this.enemyDefinition.alwaysReset;
         this.updateDrawPriority();
@@ -183,6 +183,15 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.canSwim = this.enemyDefinition.canSwim || this.enemyDefinition.baseMovementProperties?.canSwim;
         this.canMoveInLava = this.enemyDefinition.canMoveInLava || this.enemyDefinition.baseMovementProperties?.canMoveInLava;
         this.isBoss = this.definition.type === 'boss';
+    }
+    cleanup(state: GameState) {
+        // DO NOT USE
+        // This may not be called when enemies are removed.
+        // Perform cleanup actions when setting this.status = 'gone' by calling this.prepareForRemoval(state);
+    }
+    prepareForRemoval(state: GameState) {
+        this.status = 'gone';
+        this.cancelAttacks(state);
     }
     gainAbility(ability: EnemyAbility<any>) {
         this.abilities.push({
@@ -360,7 +369,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         // Interrupt any abilities underway if this was a normal knockback.
         if (this.canBeKnockedBack) {
-            this.activeAbility = null;
+            this.cancelAttacks(state);
         }
         if (!this.enemyDefinition.hasCustomHurtAnimation) {
             this.changeToAnimation('hurt');
@@ -580,7 +589,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 appendCallback(state, (state: GameState) => {
                     for (const enemy of allEnemies) {
                         if (enemy.isBoss) {
-                            enemy.status = 'gone';
+                            enemy.prepareForRemoval(state);
                         }
                     }
                     if (bossDefinition.type === 'boss'){
@@ -619,7 +628,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.enemyDefinition.onDeath) {
             this.enemyDefinition.onDeath(state, this);
         }
-        this.status = 'gone';
+        this.prepareForRemoval(state);
         if (this.definition.id) {
             saveObjectStatus(state, this.definition);
         }
@@ -724,10 +733,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             target,
             time: 0,
         };
-        ability.definition.prepareAbility?.(state, this, target);
-        if ((ability.definition.prepTime || 0) <= 0) {
-            ability.definition.useAbility?.(state, this, target);
+        this.activeAbility.definition.prepareAbility?.(state, this, target);
+        if ((this.activeAbility.definition.prepTime || 0) <= 0) {
+            this.activeAbility.definition.useAbility?.(state, this, target);
             this.activeAbility.used = true;
+            this.activeAbility.definition.cleanupAbility?.(state, this, this.activeAbility.target);
             if ((ability.definition.recoverTime || 0) <= 0) {
                 this.activeAbility = null;
                 this.changeToAnimation('idle');
@@ -881,6 +891,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (!this.activeAbility.used && this.activeAbility.time >= (this.activeAbility.definition.prepTime || 0)) {
                 this.activeAbility.definition.useAbility?.(state, this, this.activeAbility.target);
                 this.activeAbility.used = true;
+                this.activeAbility.definition.cleanupAbility?.(state, this, this.activeAbility.target);
             } else if (!this.activeAbility.used && this.activeAbility.definition.updateAbility) {
                 if (this.activeAbility.definition.updateAbility(state, this, this.activeAbility.target) === false) {
                     this.activeAbility = null;
@@ -900,7 +911,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.addBossDeathEffect(state);
             }
             if (this.animationTime >= 2800) {
-                this.status = 'gone';
+                this.prepareForRemoval(state);
             }
             return;
         } else {
@@ -1187,10 +1198,14 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     }
     cancelAttacks(state: GameState) {
         if (this.activeAbility) {
+            this.activeAbility.definition.cleanupAbility?.(state, this, this.activeAbility.target);
             delete this.activeAbility;
         }
-        for (const effect of [...state.areaInstance.effects, ...state.areaInstance.alternateArea.effects]) {
-            if (effect.source === this) {
+        if (!this.area) {
+            return;
+        }
+        for (const effect of [...this.area.effects, ...this.area.alternateArea.effects]) {
+            if (effect.source === this && !effect.persistsAfterSource) {
                 removeEffectFromArea(state, effect);
             }
         }

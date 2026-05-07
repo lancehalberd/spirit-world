@@ -56,6 +56,7 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
     lastBolt: Point;
     totalDuration = this.strikes * this.delay + LIGHTNING_ANIMATION_DURATION + STRIKE_DURATION;
     source = this.props.source;
+    persistsAfterSource = true;
     constructor(public props: LightningBoltProps) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;

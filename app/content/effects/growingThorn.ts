@@ -38,6 +38,7 @@ export class GrowingThorn implements EffectInstance, Props {
     animationTime = 0;
     animationSpeed = this.props.animationSpeed ?? 1;
     source: Enemy = this.props.source;
+    persistsAfterSource = true;
     constructor(public props: Props) {
     }
     getHitbox() {

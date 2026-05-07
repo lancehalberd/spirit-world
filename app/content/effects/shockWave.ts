@@ -47,6 +47,7 @@ export class ShockWave implements EffectInstance, Props {
     ttl: number;
     delay: number;
     source: Actor;
+    persistsAfterSource = true;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, ax = 0, ay = 0, az = -0.3, damage = 1, maxSpeed = 0, ttl = 2000, delay = 0, source}: Props) {
         this.damage = damage;
         this.maxSpeed = maxSpeed;

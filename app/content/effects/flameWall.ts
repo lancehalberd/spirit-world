@@ -51,6 +51,7 @@ export class FlameWall implements EffectInstance, Props {
     speed = 0;
     distance = 0;
     source = this.props.source;
+    persistsAfterSource = true;
     // Set when the flame is destroyed and show the flameBrokenAnimation.
     destroyed = false;
     constructor(public props: Props) {}

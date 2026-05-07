@@ -9,6 +9,8 @@ interface EnemyAbility<T> {
     updateAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => boolean|void
     // Called when the ability is used, at the end of its prep time.
     useAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
+    // Called when the ability completes or is interrupted.
+    cleanupAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
     // Can be set to enable the ability conditionally.
     // For example an ability is only available at low health, or is disabled when a limb is destroyed.
     isEnabled?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy) => boolean

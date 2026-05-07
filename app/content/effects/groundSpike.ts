@@ -44,6 +44,7 @@ export class GroundSpike implements EffectInstance, Props {
     tellDuration: number;
     animationTime = 0;
     source: Actor;
+    persistsAfterSource = true;
     constructor({x = 0, y = 0, damage = 2, delay = 0, tellDuration = 1000, source}: Props) {
         this.x = x - this.w / 2;
         this.y = y - this.h / 2;

@@ -147,10 +147,13 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Test: Add SFX for spark ball attacks (Guardian fight).
+        - Add SFX for crystal projectiles.
+            - Maybe a whooshing sound similar to the chakram.
         - BLOCKED New Rival projection graphics
         - BLOCKED New spike shell graphics for normal beetles.
         - BLOCKED Update packed sprites
+
+    - Add grass + moss tiles to the forest.
 
     - Graphics added but not used yet:
         - mc equipment mc/armor1/*, mc/phoenixCrown/*, mc/ironBoots/*
@@ -182,6 +185,8 @@ Current tasks:
             - Sticky web tiles can be cleared with chakram or barrier burst, similar to slippery bead tiles.
             - Special interaction with fire damage, adds a small fire nova on a 200ms delay that will spread to other tiles and hurt enemies+allies.
                 - Maybe make this isBurnable tile prop and apply to bushes as well.
+
+    - Add beetle lair to randomizer logic.
 
     - Implement blocksRenders functionality and test transition state again.
 

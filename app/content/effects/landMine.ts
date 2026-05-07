@@ -48,6 +48,7 @@ export class LandMine implements EffectInstance, Props {
     duration = this.props.duration ?? 10000;
     triggered = false;
     source = this.props.source;
+    persistsAfterSource = true;
     constructor(public props: Props) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;

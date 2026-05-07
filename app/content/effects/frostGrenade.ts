@@ -41,6 +41,7 @@ export class FrostGrenade implements EffectInstance, Props {
     speed = 0;
     source: Enemy = this.props.source;
     activate = this.props.activate;
+    persistsAfterSource = true;
     constructor(public props: Props) {}
     update(state: GameState) {
         this.x += this.vx;

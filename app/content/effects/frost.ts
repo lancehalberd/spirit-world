@@ -1,5 +1,6 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
@@ -22,6 +23,7 @@ interface Props {
     ignoreWallsDuration?: number
     hitEnemies?: boolean
     source: Actor
+    soundKey?: string
 }
 
 export class Frost implements EffectInstance, Props {
@@ -50,7 +52,13 @@ export class Frost implements EffectInstance, Props {
     animationOffset: number;
     hitEnemies: boolean;
     source: Actor;
-    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, hitEnemies = false, delay = 0, ignoreWallsDuration, ignoreTargets, source}: Props) {
+    soundKey?: string;
+    persistsAfterSource = true;
+    constructor({
+        x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400,
+        soundKey = 'frost',
+        hitEnemies = false, delay = 0, ignoreWallsDuration, ignoreTargets, source
+    }: Props) {
         this.damage = damage;
         this.x = x - 6;
         this.y = y - 6;
@@ -66,6 +74,7 @@ export class Frost implements EffectInstance, Props {
         this.hitEnemies = hitEnemies;
         this.animationOffset = ((Math.random() * 10) | 0) * 20;
         this.source = source;
+        this.soundKey = soundKey;
     }
     getHitbox() {
         return this;
@@ -74,6 +83,9 @@ export class Frost implements EffectInstance, Props {
         if (this.animationTime < this.delay) {
             this.animationTime += FRAME_LENGTH;
             return;
+        }
+        if (this.soundKey && this.animationTime === this.delay) {
+            playAreaSound(state, this.area, this.soundKey);
         }
         this.x += this.vx;
         this.y += this.vy;

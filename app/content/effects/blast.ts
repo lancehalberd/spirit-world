@@ -22,6 +22,7 @@ export interface BlastProps {
     boundSource?: Enemy
     // This source just tracks which enemy created the blast.
     source: Actor
+    persistsAfterSource?: boolean
     // Time before this effect becoems active in milliseconds.
     delay?: number
     animation?: FrameAnimation
@@ -46,6 +47,7 @@ export class Blast implements EffectInstance {
     minRadius: number = this.props.minRadius ?? 4;
     boundSource: Enemy = this.props.boundSource;
     source: Actor = this.props.source;
+    persistsAfterSource = this.props.persistsAfterSource;
     hitProperties: Partial<HitProperties> = this.props.hitProperties ?? {};
     hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.boundSource, this.source]);
     delay = this.props.delay ?? 0;
@@ -93,8 +95,10 @@ export class Blast implements EffectInstance {
                 playAreaSound(state, this.area, 'lightFlame');
             } else if (this.element === 'ice') {
                 playAreaSound(state, this.area, 'freeze');
-            } else {
+            } else if (this.element === 'lightning') {
                 playAreaSound(state, this.area, 'sparkBurst');
+            } else {
+                playAreaSound(state, this.area, 'airBlast');
             }
         }
         if (this.animationTime % 40 === 0 && this.animationTime < this.tellDuration - Math.min(200, this.tellDuration / 3)) {
