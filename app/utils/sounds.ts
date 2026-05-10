@@ -540,7 +540,7 @@ const preloadSounds = () => {
         {key: 'rumble', source: 'sfx/3x3_odrive.wav', volume: 50, instanceLimit: 1, speed: 0.4, loop: true},
         {
             key: 'rollingBall', source: 'sfx/rollingBall.wav',
-            duration: 1.4, loop: true, volume: 20, instanceLimit: 2
+            duration: 1.4, loop: true, volume: 40, instanceLimit: 2
         },
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 30, instanceLimit: 2},
         {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 30, instanceLimit: 2},
