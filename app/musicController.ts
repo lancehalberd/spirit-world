@@ -263,11 +263,7 @@ export function playAreaSound(state: GameState, area: AreaInstance, key: string)
     if (!key || state.areaInstance !== area) {
         return;
     }
-    const audioInstance = playSound(key);
-    if (audioInstance?.sound.loop) {
-        state.loopingSoundEffects.push(audioInstance);
-    }
-    return audioInstance;
+    return playSound(key);
 }
 
 export function playObjectSound(state: GameState, object: ObjectInstance | EffectInstance, key: string): AudioInstance | undefined {
@@ -282,20 +278,12 @@ export function playObjectSound(state: GameState, object: ObjectInstance | Effec
     if (!isObjectInCurrentSection(state, object)) {
         return;
     }
-    const audioInstance = playSound(key);
-    if (audioInstance?.sound.loop) {
-        state.loopingSoundEffects.push(audioInstance);
-    }
-    return audioInstance;
+    return playSound(key);
 }
 
 export function stopAreaSound(state: GameState, instance: AudioInstance) {
     if (!instance) {
         return;
-    }
-    const index = state.loopingSoundEffects.indexOf(instance);
-    if (index >= 0) {
-        state.loopingSoundEffects.splice(index, 1);
     }
     stopSound(instance);
 }

@@ -324,7 +324,7 @@ export class Arrow implements EffectInstance, Projectile {
             this.delay -= FRAME_LENGTH;
             return;
         }
-        if (this.soundKey && this.animationTime === this.delay) {
+        if (!this.blocked && !this.stuckFrames && this.soundKey && this.animationTime === this.delay) {
             playAreaSound(state, this.area, this.soundKey);
         }
         if (this.ax) {
@@ -553,6 +553,9 @@ export function getChargedArrowAnimation(this: void, chargeLevel: number, elemen
 export class EnemyArrow extends Arrow {
     isPlayerAttack = false;
     isEnemyAttack = true;
+    constructor(props: Props) {
+        super({soundKey: props.soundKey ?? 'shoot', ...props});
+    }
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const enemyArrow = new EnemyArrow(arrowProps);
         addEffectToArea(state, area, enemyArrow);
@@ -600,6 +603,9 @@ const crystalDownLeftAnimation = createAnimation('gfx/effects/shard2.png', {w: 9
 export class CrystalSpike extends Arrow {
     isPlayerAttack = false;
     isEnemyAttack = true;
+    constructor(props: Props) {
+        super({soundKey: props.soundKey ?? 'shoot', ...props});
+    }
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const spike = new CrystalSpike(arrowProps);
         addEffectToArea(state, area, spike);
@@ -690,6 +696,9 @@ export function drawCrystal(this: void, context: CanvasRenderingContext2D, anima
 export class Spike extends CrystalSpike {
     isPlayerAttack = false;
     isEnemyAttack = true;
+    constructor(props: Props) {
+        super({soundKey: props.soundKey ?? 'shoot', ...props});
+    }
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const spike = new Spike(arrowProps);
         addEffectToArea(state, area, spike);
@@ -709,6 +718,9 @@ export class CrystalBurst extends Arrow {
     theta: number
     w = 12;
     h = 12;
+    constructor(props: Props) {
+        super({soundKey: props.soundKey ?? 'bigShot', ...props});
+    }
     static spawn(state: GameState, area: AreaInstance, count: number, burstProps: Props, arrowProps: Props) {
         const burst = new CrystalBurst(burstProps);
         burst.spikes = [];
@@ -722,6 +734,9 @@ export class CrystalBurst extends Arrow {
             spike.vx = (arrowProps.speed ?? 4) * dx;
             spike.vy = (arrowProps.speed ?? 4) * dy;
             burst.spikes.push(spike);
+            if (i !== 0) {
+                delete spike.soundKey;
+            }
         }
         addEffectToArea(state, area, burst);
     }
@@ -847,7 +862,7 @@ export class Rock extends CrystalSpike {
     w = 5;
     h = 5;
     constructor(props: Props) {
-        super(props);
+        super({soundKey: props.soundKey ?? 'shoot', ...props});
         this.frame = Random.element(rockFrames);
     }
     getHitbox() {

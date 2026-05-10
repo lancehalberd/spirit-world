@@ -148,7 +148,6 @@ interface GameState {
     // used to ease the hot effect in and out
     hotLevel: number
     screenShakes: ScreenShake[]
-    loopingSoundEffects: AudioInstance[]
     map: {
         needsRefresh: boolean
         restoreOriginalTiles?: boolean

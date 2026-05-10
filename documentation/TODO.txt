@@ -146,11 +146,19 @@ Graphics to Implement:
 
 
 Current tasks:
+    - Move randomizer customization as step after New Game with Start Game as the top option.
+
     - Demo blockers
-        - Add SFX for crystal projectiles.
-            - Maybe a whooshing sound similar to the chakram.
-        - BLOCKED New Rival projection graphics
-        - BLOCKED New spike shell graphics for normal beetles.
+        - Cannot jump horizontally across cliffs if there is a wall directly above you (forest platforms, for example)
+        - Map marker for elder doesn't display when you are inside tree village areas.
+        - Guardian sit sprite
+            - guardian.png
+        - New Rival projection graphics
+            rivalCastEffect + rivalSpirit
+        - Fixed rival crouch
+            rival.png
+        - New spike shell graphics for normal beetles.
+            genericBeetleShell
         - BLOCKED Update packed sprites
 
     - Add grass + moss tiles to the forest.
@@ -163,6 +171,8 @@ Current tasks:
         - objects/helixTop
         - new tiles in tiles/vanara (cliff edges, large vine walls)
         - new tiles in tiles/stoneTileset (blown open doors)
+        - new crew sprites
+            - Captain, security, chief scientist, scientest, crew
         - tiles/grates
         - tiles/treeHome
         - Cherry tree

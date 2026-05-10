@@ -25,6 +25,7 @@ import {getAreaSize} from 'app/utils/getAreaSize';
 import {pad, removeElementFromArray} from 'app/utils/index';
 import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
+import {extendSound} from 'app/utils/sounds';
 import {
     getClosestTarget,
     getMovementAnchor,
@@ -379,6 +380,11 @@ const growingThornsAbility: EnemyAbility<Target> = {
             addEffectToArea(state, enemy.area, thorns);
         }
     },
+    updateAbility(this: void, state: GameState, enemy: Enemy, target: Target) {
+        if (rumbleSoundReference) {
+            extendSound(rumbleSoundReference);
+        }
+    },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
         const guardian = getGuardian(state);
         const count = 6 + 8 * (1 - guardian.life / guardian.maxLife);
@@ -387,6 +393,7 @@ const growingThornsAbility: EnemyAbility<Target> = {
     },
     cleanupAbility(state: GameState) {
         stopAreaSound(state, rumbleSoundReference);
+        rumbleSoundReference = undefined;
         appendScript(state, '{stopScreenShake:growingThorns}');
     },
     cooldown: 1000,

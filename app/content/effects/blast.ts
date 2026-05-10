@@ -7,6 +7,7 @@ import {removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
 import {clamp} from 'app/utils/index';
 import Random from 'app/utils/Random';
+import {extendSound} from 'app/utils/sounds';
 
 
 export interface BlastProps {
@@ -70,6 +71,9 @@ export class Blast implements EffectInstance {
         if (this.delay >= 0) {
             this.delay -= FRAME_LENGTH;
             return;
+        }
+        if (this.chargeSound) {
+            extendSound(this.chargeSound);
         }
         this.animationTime += FRAME_LENGTH;
         // If this effect has an enemy as a source, remove it if the source disappears during the tell duration.

@@ -1,6 +1,7 @@
 import {noteFrequencies} from './noteFrequencies';
+import {editingState} from 'app/development/editingState';
 import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
-import {clamp} from 'app/utils/index';
+import {clamp, removeElementFromArray} from 'app/utils/index';
 
 const sounds = new Map<string, GameSound>();
 window.sounds = sounds;
@@ -163,11 +164,35 @@ function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: nu
     return instance;
 }
 
+// How long to extend an ongoing effect duration by any time it is extended.
+// This is also used as the base duration for ongoing effects.
+// This should be long enough that it is unlikely to expire before the next
+// frame the source of the effect calls to extend it, but short enough that
+// the effect won't last very long if the sound is not explicitly stopped,
+// for example if there is an error in the cleanup code for an effect
+// that generates an ongoing sound effect like the charge laser sound.
+const EXTEND_EFFECT_DURATION = 0.5;
+
+export function extendSound(instance: AudioInstance) {
+    const extendedStopTime = audioContext.currentTime + EXTEND_EFFECT_DURATION;
+    if (extendedStopTime > instance.scheduledStopTime) {
+        instance.scheduledStopTime = extendedStopTime;
+    }
+}
+
 export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime): AudioInstance|undefined {
     const sound = sounds.get(key);
     if (!sound) {
         throw new Error('Tried to play missing sound ' + key);
         return;
+    }
+    if (isNaN(seekTime) || isNaN(startTime)) {
+        debugger;
+        return;
+    }
+    // Make sure sound.key gets populated for any sound before it is used.
+    if (!sound.key) {
+        sound.key = key;
     }
     const currentTime = audioContext.currentTime;
     if (startTime < currentTime) {
@@ -189,6 +214,9 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             if (!instance) {
                 return;
             }
+            if (instance.sound.loop) {
+                instance.scheduledStopTime = targetTime + EXTEND_EFFECT_DURATION;
+            }
             const volume = Math.min(1, sound.volume);
             instance.gainNode.connect(soundEffectGainNode);
             // Add a tiny ramp to all SFX to prevent clicking at start/end of sound
@@ -199,15 +227,20 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
                 instance.gainNode.gain.setValueAtTime(volume, instance.endTime - 0.01);
                 instance.gainNode.gain.linearRampToValueAtTime(0, instance.endTime);
             }
+            activeSoundInstances.push(instance);
             return instance;
         } else if (sound.play) {
             const instance: AudioInstance = {
                 sound,
-                startTime: targetTime,
+                startTime: targetTime - seekTime,
                 endTime: sound.duration ? targetTime + sound.duration : undefined,
             };
             sound.instances.push(instance);
-            instance.customStop = sound.play(soundEffectGainNode, targetTime);
+            instance.customStop = sound.play(soundEffectGainNode, targetTime - seekTime);
+            if (instance.customStop) {
+                instance.scheduledStopTime = targetTime + EXTEND_EFFECT_DURATION;
+            }
+            activeSoundInstances.push(instance);
             return instance;
         }
     } catch (e) {
@@ -219,7 +252,6 @@ export function stopSound(instance?: AudioInstance, time = audioContext.currentT
     if (!instance) {
         return;
     }
-    instance.stopTime = time;
     if (instance.sourceNode) {
         instance.sourceNode.stop(time);
     }
@@ -230,10 +262,42 @@ export function stopSound(instance?: AudioInstance, time = audioContext.currentT
     if (index >= 0) {
         instance.sound.instances.splice(index, 1);
     }
+    removeElementFromArray(activeSoundInstances, instance);
+}
+export function pauseSound(instance?: AudioInstance, time = audioContext.currentTime): void {
+    if (!instance) {
+        return;
+    }
+    // Only looping sounds and sounds with customStop functions can be paused currently.
+    // We can add an explicit "canPause" property to the sound if we need to support
+    // other cases in the future.
+    if (!instance.sound.loop && !instance.customStop) {
+        stopSound(instance, time);
+        return;
+    }
+    if (instance.sourceNode) {
+        instance.sourceNode.stop(time);
+        instance.restartTime = time - instance.startTime;
+        pausedSoundInstances.push(instance);
+    }
+    if (instance.customStop) {
+        instance.customStop(time);
+        instance.restartTime = time - instance.startTime;
+        pausedSoundInstances.push(instance);
+    }
+    const index = instance.sound.instances.indexOf(instance);
+    if (index >= 0) {
+        instance.sound.instances.splice(index, 1);
+    }
+    removeElementFromArray(activeSoundInstances, instance);
 }
 window['stopSound'] = stopSound;
 
 
+let activeSoundInstances: AudioInstance[] = [];
+let pausedSoundInstances: AudioInstance[] = [];
+window.activeSoundInstances = activeSoundInstances;
+window.pausedSoundInstances = pausedSoundInstances;
 let playingTracks: GameTrack[] = [];
 let fadingTracks: GameTrack[] = [];
 export function getPlayingTracks(): GameTrack[] {
@@ -243,6 +307,21 @@ window['playingTracks'] = playingTracks;
 
 // This is called every frame during the game.
 export function updateAudio(state: GameState) {
+    // This code pauses audio and allows it to be resumed.
+    // We can move synth based audio SFX here to allow pausing them with the field.
+    // The natural thing to do is probably to move all field based SFX to a context that pauses when the field is not active.
+    /*if (!isFieldSceneActive(state)) {
+        if (audioContext.state === 'running') {
+            audioContext.suspend();
+        }
+    } else {
+        if (audioContext.state === 'suspended') {
+            audioContext.resume();
+        }
+    }
+    if (audioContext.state !== 'running') {
+        return;
+    }*/
     const currentTime = audioContext.currentTime;
     // Schedule the next track to play if necessary.
     for (const currentTrack of playingTracks) {
@@ -264,36 +343,54 @@ export function updateAudio(state: GameState) {
             }
         }
     }
-    for (let i = 0; i < state.loopingSoundEffects.length; i++) {
-        const soundEffect = state.loopingSoundEffects[i];
-        const areSoundEffectsPaused = !isFieldSceneActive(state);
-        if (areSoundEffectsPaused && !soundEffect.stopTime) {
-            stopSound(soundEffect);
-        } else if (!areSoundEffectsPaused && soundEffect.stopTime) {
-            const seekTime = currentTime - soundEffect.startTime;
-            let instance: AudioInstance|false;
+    const areSoundEffectsPaused = !isFieldSceneActive(state) || editingState.isEditing;
+    // Make a copy of activeSoundInstances since it will be updated during this loop.
+    const currentActiveSoundInstances = [...activeSoundInstances];
+    for (let i = 0; i < currentActiveSoundInstances.length; i++) {
+        const audioInstance = currentActiveSoundInstances[i];
+        if (audioInstance.scheduledStopTime < currentTime) {
+            stopSound(audioInstance);
+            continue;
+        }
+        if (audioInstance.endTime && audioInstance.endTime < currentTime) {
+            removeElementFromArray(activeSoundInstances, audioInstance);
+            continue;
+        }
+        // Need a way to tag audio instances as paused when the field is paused so that
+        // audio instances for menus are not also paused.
+        if (areSoundEffectsPaused) {
+            pauseSound(audioInstance);
+        }
+    }
+    if (!areSoundEffectsPaused) {
+        for (const pausedAudioInstance of pausedSoundInstances) {
+            const seekTime = pausedAudioInstance.restartTime;
+            if (!pausedAudioInstance.sound.key) {
+                debugger;
+            }
+            let newInstance: AudioInstance|undefined;
             if (seekTime >= 0) {
                 // Force sounds to play on resume so that we don't introduce an extra delay on them.
-                instance = playSound(soundEffect.sound.key, seekTime, true);
+                newInstance = playSound(pausedAudioInstance.sound.key, seekTime, true);
             } else {
                 // If seekTime is negative, it means the sound was stopped before it started playing so
                 // it is still scheduled to play in the future.
-                instance = playSound(soundEffect.sound.key, 0, true, currentTime - seekTime);
+                newInstance = playSound(pausedAudioInstance.sound.key, 0, true, currentTime - seekTime);
             }
-            if (instance) {
+            if (newInstance) {
                 // If a new instance was created, overwrite the existing instance in place so
                 // that existing references to it get the updated instance.
-                //for (const key in instance) {
-                //    soundEffect[key] = instance[key];
-                //}
-                Object.assign(soundEffect, instance);
-                delete soundEffect.stopTime;
+                Object.assign(pausedAudioInstance, newInstance);
+                const index = activeSoundInstances.indexOf(newInstance);
+                if (index >=0) {
+                    activeSoundInstances[index] = pausedAudioInstance;
+                }
             } else {
                 // If the new instance didn't start for some reason, just remove it from the array.
-                console.log('Looping instance failed to start again', soundEffect);
-                state.loopingSoundEffects.splice(i--, 1);
+                console.log('Audio instance failed to start again', pausedAudioInstance);
             }
         }
+        pausedSoundInstances = [];
     }
     // Remove tracks with no instances left.
     playingTracks = playingTracks.filter(track => track.instances.length);
@@ -869,7 +966,7 @@ sounds.set('chargeLaser', {
 
         oscillator.start(time);
 
-        return stopSafely((stopTime: number) => {
+        const customStop = stopSafely((stopTime: number) => {
             const actualStopTime = stopTime + 0.1;
             // A short fade out prevents clicking when stopped early
             noiseGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
@@ -879,13 +976,23 @@ sounds.set('chargeLaser', {
             audioCallback(() => {
                 pinkNoiseNode.disconnect(noiseGainNode);
                 oscillator.disconnect();
+                cleanupSoundByCustomStop(customStop);
             }, actualStopTime);
         }, time + 5);
+        return customStop;
     },
     duration: 0,
     instanceLimit: 3,
     instances: [],
 });
+
+function cleanupSoundByCustomStop(customStop: Function) {
+    for (let i = 0; i < activeSoundInstances.length; i++) {
+        if (activeSoundInstances[i].customStop === customStop) {
+            activeSoundInstances.splice(i--, 1);
+        }
+    }
+}
 
 function stopSafely(stopSoundProper: (stopTime: number) => void, forceStopTime: number) {
     let wasStopped = false;
@@ -977,7 +1084,7 @@ sounds.set('fireLaser', {
 
         oscillator.start(time);
 
-        return stopSafely((stopTime: number) => {
+        const customStop = stopSafely((stopTime: number) => {
             const actualStopTime = stopTime + 0.3;
             noiseGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
             oscillatorGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
@@ -990,8 +1097,10 @@ sounds.set('fireLaser', {
                 oscillator.disconnect();
                 burstOscillator.disconnect();
                 lfo.disconnect();
+                cleanupSoundByCustomStop(customStop);
             }, actualStopTime);
         }, time + 5);
+        return customStop;
     },
     duration: 0,
     instanceLimit: 3,
@@ -1250,10 +1359,8 @@ sounds.set('airBlast', {
         const duration = this.duration || 0.5;
         const masterVolume = 0.5;
 
-        // 1. Electrical crackle (high-pass filtered pink noise)
         const noiseFilter = audioContext.createBiquadFilter();
         noiseFilter.type = 'bandpass';
-        // Start high, sweep down a bit to give a "sizzle"
         noiseFilter.Q.setValueAtTime(0.5, time);
         noiseFilter.frequency.setValueAtTime(800, time);
         noiseFilter.frequency.exponentialRampToValueAtTime(1600, time + duration / 2);
@@ -1268,6 +1375,74 @@ sounds.set('airBlast', {
         noiseGainNode.connect(target);
     },
     duration: 0.6,
+    instanceLimit: 2,
+    instances: [],
+});
+
+sounds.set('shoot', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.5;
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.Q.setValueAtTime(1, time);
+        noiseFilter.frequency.setValueAtTime(3200, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(1600, time + duration / 2);
+        noiseFilter.frequency.exponentialRampToValueAtTime(3200, time + duration);
+
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.8, time, duration, 0.05, 0.2);
+
+        connectUntil(pinkNoiseNode, noiseFilter, time + duration);
+        noiseFilter.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.3,
+    instanceLimit: 2,
+    instances: [],
+});
+
+sounds.set('bigShot', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.5;
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.Q.setValueAtTime(1, time);
+        noiseFilter.frequency.setValueAtTime(1600, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(400, time + duration / 2);
+        noiseFilter.frequency.exponentialRampToValueAtTime(1600, time + duration);
+
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.8, time, duration, 0.1, 0.4);
+
+        connectUntil(pinkNoiseNode, noiseFilter, time + duration);
+        noiseFilter.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.6,
+    instanceLimit: 2,
+    instances: [],
+});
+
+sounds.set('staffSwing', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration || 0.5;
+        const masterVolume = 0.5;
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.Q.setValueAtTime(1, time);
+        noiseFilter.frequency.setValueAtTime(1600, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(400, time + duration);
+
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.8, time, duration, 0.1, 0.2);
+
+        connectUntil(pinkNoiseNode, noiseFilter, time + duration);
+        noiseFilter.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.4,
     instanceLimit: 2,
     instances: [],
 });

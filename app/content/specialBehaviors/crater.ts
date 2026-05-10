@@ -2,6 +2,7 @@ import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehavior
 import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {appendScript} from 'app/scriptEvents';
 import {saveGame} from 'app/utils/saveGame';
+import {extendSound} from 'app/utils/sounds';
 import {updateAllHeroes} from 'app/updateActor';
 
 specialBehaviorsHash.craterLavaSwitch = {
@@ -29,10 +30,13 @@ specialBehaviorsHash.craterLavaSwitch = {
             startTime: state.fieldTime,
             id: 'craterLava',
         });
-        const rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
+        let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
         state.scriptEvents.activeEvents.push({
             type: 'update',
             update(state: GameState) {
+                if (rumbleSoundReference) {
+                    extendSound(rumbleSoundReference);
+                }
                 // Keep updating the hero (with controls disabled), to avoid getting stuck in an awkward frame
                 // such as slamming the staff.
                 updateAllHeroes(state, false);
@@ -79,6 +83,7 @@ specialBehaviorsHash.craterLavaSwitch = {
                 delete state.mutationDuration;
                 appendScript(state, '{stopScreenShake:craterLava}');
                 stopAreaSound(state, rumbleSoundReference);
+                rumbleSoundReference = undefined;
                 return false;
             }
         });
@@ -104,10 +109,13 @@ function drainFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
-    const rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
+    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
     state.scriptEvents.activeEvents.push({
         type: 'update',
         update(state: GameState) {
+            if (rumbleSoundReference) {
+                extendSound(rumbleSoundReference);
+            }
             // Keep updating the hero (with controls disabled), to avoid getting stuck in an awkward frame
             // such as slamming the staff.
             updateAllHeroes(state, false);
@@ -151,6 +159,7 @@ function drainFlameBeastLava(state: GameState) {
             // If the Jade Champion is present, she should enter combat mode.
             appendScript(state, '{@jadeChampionCrater.flameBeast}');
             stopAreaSound(state, rumbleSoundReference);
+            rumbleSoundReference = undefined;
             return false;
         }
     });
@@ -171,10 +180,13 @@ export function fillFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
-    const rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
+    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
     state.scriptEvents.activeEvents.push({
         type: 'update',
         update(state: GameState) {
+            if (rumbleSoundReference) {
+                extendSound(rumbleSoundReference);
+            }
             const timeElapsed = state.fieldTime - startTime;
             // Do nothing if the game is still running a transition.
             if (timeElapsed === 2000) {
@@ -212,6 +224,7 @@ export function fillFlameBeastLava(state: GameState) {
                 delete state.mutationDuration;
                 appendScript(state, '{stopScreenShake:craterLava}');
                 stopAreaSound(state, rumbleSoundReference);
+                rumbleSoundReference = undefined;
                 return false;
             }
             return true;

@@ -1,12 +1,13 @@
-import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { objectHash } from 'app/content/objects/objectHash';
-import { lightStoneParticles } from 'app/content/tiles/constants';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveObject } from 'app/movement/moveObject';
-import { playAreaSound, stopAreaSound } from 'app/musicController';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, hitTargets } from 'app/utils/field';
-import { getObjectStatus, removeObjectFromArea, saveObjectStatus } from 'app/utils/objects';
+import {addParticleAnimations} from 'app/content/effects/animationEffect';
+import {objectHash} from 'app/content/objects/objectHash';
+import {lightStoneParticles} from 'app/content/tiles/constants';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {moveObject} from 'app/movement/moveObject';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
+import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
+import {directionMap, hitTargets} from 'app/utils/field';
+import {getObjectStatus, removeObjectFromArea, saveObjectStatus} from 'app/utils/objects';
+import {extendSound} from 'app/utils/sounds';
 
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
@@ -36,7 +37,7 @@ export class RollingBallObject implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     stuck: boolean = false;
-    soundReference: AudioInstance;
+    soundReference: AudioInstance|undefined;
     groundHeight = 0;
     constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
@@ -214,10 +215,14 @@ export class RollingBallObject implements ObjectInstance {
     stopRollingSound(state: GameState) {
         if (this.soundReference) {
             stopAreaSound(state, this.soundReference);
-            this.soundReference = null;
+            delete this.soundReference;
         }
     }
     update(state: GameState) {
+        if (this.soundReference) {
+            extendSound(this.soundReference);
+        }
+
         // Unlink this ball if the linked ball is destroyed.
         if (this.linkedObject && !this.linkedObject.area) {
             delete this.linkedObject;

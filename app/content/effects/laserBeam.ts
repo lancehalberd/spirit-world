@@ -1,11 +1,13 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { getLedgeDelta } from 'app/movement/getLedgeDelta';
-import { renderDamageWarning } from 'app/render/renderDamageWarning';
-import { removeEffectFromArea } from 'app/utils/effects';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
+import {renderDamageWarning} from 'app/render/renderDamageWarning';
+import {removeEffectFromArea} from 'app/utils/effects';
 import {isEnemyDefeated} from 'app/utils/enemies';
-import { hitTargets } from 'app/utils/field';
-import { getTileBehaviors} from 'app/utils/getBehaviors';
+import {hitTargets} from 'app/utils/field';
+import {getTileBehaviors} from 'app/utils/getBehaviors';
 import Random from 'app/utils/Random';
+import {extendSound} from 'app/utils/sounds';
 
 
 function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {
@@ -88,7 +90,18 @@ export class LaserBeam implements EffectInstance, Props {
     animationTime = 0;
     done = false;
     memoizedHitRay: Ray;
+    audioInstance: AudioInstance;
+    muteSounds = false;
     constructor(public props: Props) {}
+    cleanup(state: GameState) {
+        this.stopSounds(state);
+    }
+    stopSounds(state: GameState) {
+        if (this.audioInstance) {
+            stopAreaSound(state, this.audioInstance);
+            delete this.audioInstance;
+        }
+    }
     getHitRay(state: GameState): Ray {
         if (this.memoizedHitRay) {
             return this.memoizedHitRay;
@@ -119,9 +132,21 @@ export class LaserBeam implements EffectInstance, Props {
             this.delay -= FRAME_LENGTH;
             return;
         }
+        // Extend any playing audio as long as this effect is still being updated.
+        if (this.audioInstance) {
+            extendSound(this.audioInstance);
+        }
         if (this.tellDuration > 0) {
+            if (!this.muteSounds && !this.audioInstance) {
+                this.audioInstance = playAreaSound(state, this.area, 'chargeLaser');
+            }
             this.tellDuration -= FRAME_LENGTH;
             return;
+        }
+        if (!this.muteSounds && this.animationTime === 0 && this.duration > 0) {
+            // Stop the charge sound if it is playing.
+            this.stopSounds(state);
+            this.audioInstance = playAreaSound(state, this.area, 'fireLaser');
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime <= this.duration) {

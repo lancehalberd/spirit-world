@@ -127,6 +127,8 @@ function addLaserBarrageToArea(state: GameState, enemy: Enemy, count: number) {
                 delay: 500 * i,
                 source: enemy,
             });
+            // Only the first laser should make noise.
+            laser.muteSounds = (x !== LASER_BARRAGE_SPACING / 2);
             addEffectToArea(state, state.hero.area, laser);
         }
     }
@@ -143,8 +145,20 @@ function addLaserWarningToArea(state: GameState, source: Enemy) {
             delay: 2 * x,
             source,
         });
+        // Sounds are handled separately
+        laser.muteSounds = true;
         addEffectToArea(state, state.hero.area, laser);
     }
+    // Use this single offscreen laser for the charge sound.
+    const laser = new LaserBeam({
+        sx: -100, sy: 0, tx: - 100, ty: 512,
+        radius: LASER_BARRAGE_RADIUS, damage: 0,
+        ignoreWalls: true,
+        tellDuration: 1000,
+        duration: 0,
+        source,
+    });
+    addEffectToArea(state, state.hero.area, laser);
 }
 
 const voidTreeIceGrenadeAbility: EnemyAbility<NearbyTargetType> = {

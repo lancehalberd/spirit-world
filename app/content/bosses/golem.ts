@@ -4,6 +4,7 @@ import {LaserBeam} from 'app/content/effects/laserBeam';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {Enemy} from 'app/content/enemy';
 import {editingState} from 'app/development/editingState';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {renderDamageWarning} from 'app/render/renderDamageWarning';
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import {
@@ -17,7 +18,7 @@ import {addScreenShake, hitTargets, isTargetHit} from 'app/utils/field';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {pad} from 'app/utils/index';
 import {addObjectToArea} from 'app/utils/objects';
-import {playSound, stopSound} from 'app/utils/sounds';
+import {extendSound} from 'app/utils/sounds';
 import {getNearbyTarget} from 'app/utils/target';
 
 
@@ -375,8 +376,7 @@ enemyDefinitions.golem = {
         return enemy.defaultOnHit(state, hit);
     },
     onDeath(state: GameState, enemy: Enemy): void {
-        stopChargeSound(enemy);
-        stopFireSound(enemy);
+        stopChargeSound(state, enemy);
     },
 };
 enemyDefinitions.golemHand = {
@@ -529,21 +529,17 @@ function fireLaser(this: void, state: GameState, enemy: Enemy, duration: number,
     return laser;
 }
 
-function stopChargeSound(enemy: Enemy) {
+function stopChargeSound(state: GameState, enemy: Enemy) {
     if (enemy.params.chargeSoundParams) {
-        stopSound(enemy.params.chargeSoundParams);
+        stopAreaSound(state, enemy.params.chargeSoundParams);
         delete enemy.params.chargeSoundParams;
     }
 }
 
-function stopFireSound(enemy: Enemy) {
-    if (enemy.params.fireSoundParams) {
-        stopSound(enemy.params.fireSoundParams);
-        delete enemy.params.fireSoundParams;
-    }
-}
-
 function updateGolem(this: void, state: GameState, enemy: Enemy): void {
+    if (enemy.params.chargeSoundParams) {
+        extendSound(enemy.params.chargeSoundParams);
+    }
     enemy.d = 'down';
     // This gets all hands since the golem is not a golemHand.
     const hands = getOtherHands(state, enemy);
@@ -617,16 +613,15 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.setMode('strafeSlamHands');
             } else {
                 enemy.setMode('chargeStrafeLaser');
-                enemy.params.chargeSoundParams = playSound('chargeLaser');
+                enemy.params.chargeSoundParams = playAreaSound(state, enemy.area, 'chargeLaser');
             }
         }
     } else if (enemy.mode === 'chargeStrafeLaser') {
         enemy.changeToAnimation(isAngry ? 'angryChargeEyes' : 'chargeEyes');
         if (enemy.modeTime >= FAST_LASER_CHARGE_TIME) {
-            stopChargeSound(enemy);
+            stopChargeSound(state, enemy);
             enemy.params.leftEyeLaser = fireLaser(state, enemy, 1500, 6, getLeftEyeLaserCoords(state, enemy));
             enemy.params.rightEyeLaser = fireLaser(state, enemy, 1500, 6, getRightEyeLaserCoords(state, enemy));
-            enemy.params.fireSoundParams = playSound('fireLaser');
             enemy.setMode('fireStrafeLaser');
         }
     } else if (enemy.mode === 'fireStrafeLaser') {
@@ -640,7 +635,6 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             removeEffectFromArea(state, enemy.params.rightEyeLaser);
             delete enemy.params.leftEyeLaser;
             delete enemy.params.rightEyeLaser;
-            stopFireSound(enemy);
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'strafeSlamHands') {
@@ -677,7 +671,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.useTaunt(state, 'flurry');
             } else {
                 enemy.setMode('chargeLaser');
-                enemy.params.chargeSoundParams = playSound('chargeLaser');
+                enemy.params.chargeSoundParams = playAreaSound(state, enemy.area, 'chargeLaser');
                 if (hands.length) {
                     enemy.useTaunt(state, 'protect');
                 }
@@ -686,17 +680,15 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'chargeLaser') {
         enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
         if (enemy.modeTime >= LASER_CHARGE_TIME) {
-            stopChargeSound(enemy);
+            stopChargeSound(state, enemy);
             enemy.setMode('fireLaser');
         }
     } else if (enemy.mode === 'fireLaser') {
         enemy.changeToAnimation(isAngry ? 'angryShootMouth' : 'shootMouth');
         enemy.params.mouthLaser = fireLaser(state, enemy, 900, 8, getMouthLaserCoords(state, enemy));
-        enemy.params.fireSoundParams = playSound('fireLaser');
         enemy.setMode('firingLaser')
     } else if (enemy.mode === 'firingLaser') {
         if (enemy.modeTime >= 1000) {
-            stopFireSound(enemy);
             enemy.setMode('cooldown');
         }
     } else if (enemy.mode === 'cooldown') {
@@ -733,8 +725,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 removeEffectFromArea(state, enemy.params.mouthLaser);
                 delete enemy.params.mouthLaser;
             }
-            stopChargeSound(enemy);
-            stopFireSound(enemy);
+            stopChargeSound(state, enemy);
             enemy.setMode('choose');
         }
         // If the hands are alive, add an additional initial enraged attack of slamming hands.

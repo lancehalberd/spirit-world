@@ -24,9 +24,16 @@ interface AudioInstance {
     gainNode?: GainNode
     // When the sound is/was scheduled to start.
     startTime: number
-    // When the sound is/was scheduled to stop.
-    // This will only be set if a sound is explicitly stopped.
-    stopTime?: number
+    // When the sound is scheduled to stop.
+    // This will be set on long running sounds that need to
+    // be explicitly stopped. The code that actually stops
+    // the sound is in the update loop so it will not stop
+    // at this exact time.
+    scheduledStopTime?: number
+    // The time to seek to if a sound is restarted. This should
+    // not be calculated from scheduledStopTime which is not
+    // the same as the time the sound actually stopped at.
+    restartTime?: number
     // This will not be set on looping tracks.
     endTime?: number
     sound: GameSound
