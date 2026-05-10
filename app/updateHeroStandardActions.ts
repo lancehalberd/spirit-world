@@ -924,14 +924,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = 'meditating';
                 hero.spiritRadius = 0;
                 hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
+                const hitbox = hero.getMovementHitbox();
                 //if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
                 // Astral Projection will be valid as long as at least 2 corners are open. This mostly prevents spawning the projection
                 // completely stuck inside walls.
                 if (state.areaSection?.isFoggy || !areNPointsOpen(state, state.hero.area.alternateArea, [
-                    {x: hero.x + 2, y: hero.y + 2},
-                    {x: hero.x + 13, y: hero.y + 2},
-                    {x: hero.x + 2, y: hero.y + 13},
-                    {x: hero.x + 13, y: hero.y + 13},
+                    {x: hitbox.x + 2, y: hitbox.y + 2},
+                    {x: hitbox.x + hitbox.w - 3, y: hitbox.y + 2},
+                    {x: hitbox.x + 2, y: hitbox.y + hitbox.h - 3},
+                    {x: hitbox.x + hitbox.w - 3, y: hitbox.y + hitbox.h - 3},
                 ], 2)) {
                     hero.maxSpiritRadius = 24;
                 }

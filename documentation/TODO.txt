@@ -149,7 +149,6 @@ Current tasks:
     - Move randomizer customization as step after New Game with Start Game as the top option.
 
     - Demo blockers
-        - Cannot jump horizontally across cliffs if there is a wall directly above you (forest platforms, for example)
         - Guardian sit sprite
             - guardian.png
         - New Rival projection graphics

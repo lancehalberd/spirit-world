@@ -4,7 +4,7 @@ import {isUnderLedge} from 'app/movement/isUnderLedge';
 import {destroyTile} from 'app/utils/destroyTile';
 import {directionMap, getDirection} from 'app/utils/direction';
 import {removeEffectFromArea} from 'app/utils/effects';
-import {rectanglesOverlap} from 'app/utils/index';
+import {pad, rectanglesOverlap} from 'app/utils/index';
 import {getDrawPriority} from 'app/utils/layers';
 import {getObjectBehaviors, isObject, removeObjectFromArea} from 'app/utils/objects';
 import {getTargetingAnchor} from 'app/utils/target';
@@ -54,15 +54,33 @@ export function areNPointsOpen(state: GameState, area: AreaInstance, points: Poi
 }
 
 export function canTeleportToCoords(state: GameState, area: AreaInstance, {x, y}: Point): boolean {
-    return isTileOpen(state, area, {x, y}) && !isUnderLedge(state, area, {x, y, w: 16, h: 16});
+    // This 1px padding allows the player to get 1px inside of walls in order to make movement more
+    // permissive. This shouldn't be enough to get on the wrong side of a cliff, which would require
+    // moving 8px inside a cliff. In the worst case this may allow a player to appear somewhere too
+    // narrow that prevents movement, but there is additional protection to prevent softlocking in
+    // this case.
+    const movementHitbox = pad(state.hero.getMovementHitbox(), -1);
+    movementHitbox.x += (x - state.hero.x);
+    movementHitbox.y += (y - state.hero.y);
+    return isRectOpen(state, area, movementHitbox) && !isUnderLedge(state, area, movementHitbox);
 }
 
 export function canSomersaultToCoords(state: GameState, area: AreaInstance, {x, y}: Point): boolean {
-    return isTileOpen(state, area, {x, y}) && !isUnderLedge(state, area, {x, y, w: 16, h: 16});
+    // See not above for details on this padding.
+    const movementHitbox = pad(state.hero.getMovementHitbox(), -1);
+    movementHitbox.x += (x - state.hero.x);
+    movementHitbox.y += (y - state.hero.y);
+    return isRectOpen(state, area, movementHitbox) && !isUnderLedge(state, area, movementHitbox);
 }
 window.canSomersaultToCoords = canSomersaultToCoords;
 
 export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Point, movementProperties: MovementProperties = {}): boolean {
+    // Adjust the x/y values to use the actual top left corner of the movement hitbox for the hero,
+    // which does not always match the hero's actual x/y coordinate.
+    const movementHitbox = state.hero.getMovementHitbox();
+    const dx = movementHitbox.x - state.hero.x, dy  = movementHitbox.y - state.hero.y;
+    x += dx;
+    y += dy;
     movementProperties = {
         canSwim: true,
         canFall: true,
