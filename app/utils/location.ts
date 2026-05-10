@@ -29,10 +29,20 @@ export function isLocationHot(state: GameState, location: ZoneLocation): boolean
 export function isOverworldLocation(state: GameState) {
     return !!getOverworldMapId(state);
 }
-export function getOverworldMapId(state: GameState): string|undefined {
-    if (overworldKeys.has(state.location.zoneKey)) {
-        return state.location.zoneKey;
-    } else if (overworldKeys.has(state.areaSection?.definition?.mapId)) {
-        return state.areaSection?.definition?.mapId;
+export function isOverworldZoneKey(zoneKey: string): zoneKey is OverworldZoneKeys {
+    return overworldKeys.has(zoneKey as OverworldZoneKeys);
+}
+
+export function getOverworldMapId(state: GameState): OverworldMapZoneKey|undefined {
+    for (const zoneKey of [state.location.zoneKey, state.areaSection?.definition?.mapId]) {
+        if (isOverworldZoneKey(zoneKey)) {
+            if (zoneKey === 'underwater') {
+                return 'overworld';
+            }
+            if (zoneKey === 'forestWater') {
+                return 'forest';
+            }
+            return zoneKey;
+        }
     }
 }

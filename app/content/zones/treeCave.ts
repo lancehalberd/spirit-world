@@ -183,10 +183,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 352, y: 100, type: "peachTree"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 1063, mapId: 'treeCave', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 0, w: 16, h: 16, index: 1063, mapId: 'overworld', entranceId: 'treeCaveEntrance', mapX: 0, mapY: 0},
         {x: 16, y: 0, w: 16, h: 16, index: 1064, dark: 75, mapId: 'treeCave', floorId: '1F', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 1065, mapId: 'treeCave', floorId: '1F', mapX: 0, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 1066, mapId: 'treeCave', floorId: '1F', mapX: 1, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 1065, mapId: 'overworld', entranceId: 'treeCaveEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 1066, mapId: 'forest', entranceId: 'forestSecretEntrance', mapX: 1, mapY: 1},
     ],
 };
 const sf0_0x0: AreaDefinition = {

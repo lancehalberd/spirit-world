@@ -977,10 +977,10 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "beetleLairShortcut", x: 320, y: 160, type: "vineSprout"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 706, mapId: 'caves', floorId: '1F', mapX: 0, mapY: 2},
-        {x: 16, y: 0, w: 16, h: 16, index: 707, mapId: 'caves', floorId: '1F', mapX: 1, mapY: 2},
-        {x: 0, y: 16, w: 16, h: 16, index: 708, mapId: 'caves', floorId: '1F', mapX: 0, mapY: 3},
-        {x: 16, y: 16, w: 16, h: 16, index: 709, mapId: 'caves', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 0, w: 16, h: 16, index: 706, mapId: 'overworld', entranceId: 'beetleLairEntrance', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 707, mapId: 'overworld', entranceId: 'beetleLairEntrance', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 708, mapId: 'overworld', entranceId: 'beetleLairEntrance', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 709, mapId: 'overworld', entranceId: 'beetleLairEntrance', mapX: 1, mapY: 3},
     ],
     dark: 100,
 };

@@ -150,7 +150,6 @@ Current tasks:
 
     - Demo blockers
         - Cannot jump horizontally across cliffs if there is a wall directly above you (forest platforms, for example)
-        - Map marker for elder doesn't display when you are inside tree village areas.
         - Guardian sit sprite
             - guardian.png
         - New Rival projection graphics

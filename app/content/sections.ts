@@ -1,6 +1,6 @@
-import { getAreaFromLocation } from 'app/content/areas';
-import { zones } from 'app/content/zones/zoneHash';
-import { overworldKeys } from 'app/gameConstants';
+import {getAreaFromLocation} from 'app/content/areas';
+import {zones} from 'app/content/zones/zoneHash';
+import {isOverworldZoneKey} from 'app/utils/location';
 
 
 interface SectionData {
@@ -108,7 +108,7 @@ function populateSectionMapData(): void {
             }
         }
         // Sections that show overworld areas aren't added to any dungeon maps.
-        if (overworldKeys.has(section.mapId)) {
+        if (isOverworldZoneKey(section.mapId)) {
             continue;
         }
         const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};

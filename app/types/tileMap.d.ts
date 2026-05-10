@@ -309,6 +309,14 @@ interface ZoneLocation {
     d: CardinalDirection
 }
 
+
+// These zones use the overworld map rendering functionality instead of the dungeon rendering functionality,
+// and sub-zones can link to them to display the player icon at a particular entrance in an overworld map
+// rather than the map for the sub-zone.
+type OverworldMapZoneKey = 'overworld' | 'sky' | 'forest';
+
+type OverworldZoneKeys = OverworldMapZoneKey | 'underwater' | 'forestWater';
+
 type LogicalZoneKey =
     'overworld' | 'sky' | 'forest'
     // Material world towns

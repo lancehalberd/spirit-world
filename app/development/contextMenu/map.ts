@@ -1,13 +1,14 @@
-import { allSections, dungeonMaps } from 'app/content/sections';
-import { zones } from 'app/content/zones/zoneHash';
-import { updateMapSections } from 'app/development/sections';
-import { overworldKeys } from 'app/gameConstants';
+import {allSections, dungeonMaps} from 'app/content/sections';
+import {zones} from 'app/content/zones/zoneHash';
+import {updateMapSections} from 'app/development/sections';
+import {overworldKeys} from 'app/gameConstants';
+import {isOverworldZoneKey} from 'app/utils/location';
 
 
 export function getMapOptions(state: GameState, selectedSections: number[]): MenuOption[] {
     const areAllSectionsHidden = selectedSections.every(index => allSections[index].section.hideMap);
     let mapIds = Object.keys(dungeonMaps);
-    if (!overworldKeys.has(state.areaSection.definition.mapId)) {
+    if (!isOverworldZoneKey(state.areaSection.definition.mapId)) {
         mapIds = [state.areaSection.definition.mapId, ...mapIds.filter(mapId => mapId !== state.areaSection.definition.mapId)];
     }
     return [

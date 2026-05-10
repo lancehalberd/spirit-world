@@ -17,7 +17,7 @@ import {createAnimation, drawFrame} from 'app/utils/animations';
 import {mainCanvas} from 'app/utils/canvas';
 import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
 import {clamp, isPointInShortRect, boxesIntersect, pad} from 'app/utils/index';
-import {getOverworldMapId} from 'app/utils/location';
+import {getOverworldMapId, isOverworldZoneKey} from 'app/utils/location';
 import {getMousePosition, isMouseDown} from 'app/utils/mouse';
 import {getObjectAndParts, getObjectStatus} from 'app/utils/objects';
 import {requireFrame} from 'app/utils/packedImages';
@@ -88,19 +88,13 @@ const innerWorldMapRectangle = {
     w: worldSize,
     h: worldSize,
 };
-export function renderOverworldMap(context: CanvasRenderingContext2D, state: GameState, zone: string): void {
-    if (zone === 'underwater') {
-        zone = 'overworld';
-    }
-    if (zone === 'forestWater') {
-        zone = 'forest';
-    }
+export function renderOverworldMap(context: CanvasRenderingContext2D, state: GameState, zone: OverworldMapZoneKey): void {
     drawMapFrame(context, fullWorldMapRectangle);
     const r = innerWorldMapRectangle;
     refreshWorldMap(state, zone);
     drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, innerWorldMapRectangle);
 
-    if (overworldKeys.has(state.location.zoneKey)) {
+    if (isOverworldZoneKey(state.location.zoneKey)) {
         if (state.time % 1000 <= 600) {
             const mapCoordinates = convertLocationToMapCoordinates(state.location);
             drawFrame(context, heroIcon, {

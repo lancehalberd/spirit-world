@@ -2,6 +2,7 @@ import {zones} from 'app/content/zones/zoneHash';
 import {isCheckTrash} from 'app/randomizer/checks';
 import {findObjectLocation, findReachableChecksFromStart} from 'app/randomizer/find';
 import {setScript} from 'app/scriptEvents';
+import {getOverworldMapId} from 'app/utils/location';
 import Random from 'app/utils/Random';
 
 type ObjectZoneLocation = ZoneLocation & { object?: ObjectDefinition };
@@ -33,14 +34,14 @@ function findSpiritSkyObject(state: GameState, objectIds: string | string[]) {
 const getPeachCaveLocation = (state: GameState) => findMaterialWorldObject(state, 'peachCaveTopEntrance');
 const getWaterfallVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallCaveEntrance');
 const getVanaraVillageLocation = (state: GameState) => {
-    if (state.location.zoneKey === 'forest') {
+    if (getOverworldMapId(state) === 'forest') {
         return findMaterialForestObject(state, 'vanaraVillageMarker');
     } else {
         return findMaterialWorldObject(state, 'forestMarkerM')
     }
 }
 const getVanaraElderLocation = (state: GameState) => {
-    if (state.location.zoneKey === 'forest') {
+    if (getOverworldMapId(state) === 'forest') {
         return findMaterialForestObject(state, 'elderEntrance');
     } else {
         return findMaterialWorldObject(state, 'forestMarkerM')
@@ -615,6 +616,7 @@ export function getMapTargets(state: GameState): ObjectZoneLocation[] {
     }
     return locations;
 }
+window.getMapTargets = getMapTargets;
 
 export function convertLocationToMapCoordinates(location: ZoneLocation & {object?: ObjectDefinition}): {x: number, y: number} {
     const zone = zones[location.zoneKey];
