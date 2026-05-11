@@ -319,6 +319,7 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
 };
 
 export const npcBehaviors: {[key in string]?: {
+    defaultAnimationKey?: string
     interact?: (state: GameState, npc: NPC) => void
     update?: (state: GameState, npc: NPC) => void
 }} = {
@@ -327,6 +328,7 @@ export const npcBehaviors: {[key in string]?: {
     },
     // This behavior is only used by the Vanara Guardian currently.
     meditate: {
+        defaultAnimationKey: 'meditate',
         interact(state: GameState, npc: NPC) {
             // Always update to face original direction.
             npc.d = npc.definition.d || 'down';
@@ -460,9 +462,18 @@ export class NPC implements Actor, ObjectInstance  {
         this.x = definition.x;
         this.y = definition.y;
         const animationStyle = npcStyles[this.definition.style];
-        this.currentAnimation = animationStyle.animations.idle[this.d];
+        this.currentAnimation = this.getAnimation()[this.d];
         this.z = animationStyle.z || 0;
         this.params = {};
+    }
+    getDefaultAnimationKey() {
+        return npcBehaviors[this.definition.behavior]?.defaultAnimationKey ?? 'idle';
+    }
+    getAnimation(animationKey = this.getDefaultAnimationKey()) {
+        const animationStyle = npcStyles[this.definition.style];
+        return animationStyle.animations[animationKey]
+            || animationStyle.animations.idle
+            || Object.values(animationStyle.animations)[0];
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -497,8 +508,7 @@ export class NPC implements Actor, ObjectInstance  {
             this.d = d;
         }
         this.currentAnimationKey = type;
-        const animationStyle = npcStyles[this.definition.style];
-        const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;
+        const animationSet = this.getAnimation(type);
         const targetAnimation = animationSet[this.d];
         if (this.currentAnimation !== targetAnimation) {
             this.currentAnimation = targetAnimation;
@@ -507,8 +517,7 @@ export class NPC implements Actor, ObjectInstance  {
     }
     setAnimation(type: string, d: Direction, time: number = 0) {
         this.currentAnimationKey = type;
-        const animationStyle = npcStyles[this.definition.style];
-        const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;
+        const animationSet = this.getAnimation(type);
         this.currentAnimation = animationSet[d];
         this.animationTime = time;
     }
