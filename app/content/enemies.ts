@@ -1,3 +1,4 @@
+import {addFieldAnimation} from 'app/content/effects/animationEffect';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {Enemy} from 'app/content/enemy';
 import {crystalNovaAbility, crystalProjectileAbility, crystalProjectileArcAbility} from 'app/content/enemyAbilities/crystalProjectile';
@@ -12,6 +13,7 @@ import {
 import {certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable} from 'app/content/lootTables';
 import {renderIndicator} from 'app/content/objects/indicator';
 import {editingState} from 'app/development/editingState';
+import {getFrame} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
 import {paceAndCharge, scurryAndChase} from 'app/utils/enemies';
 import {coverTile} from 'app/utils/field';
@@ -100,15 +102,15 @@ const beetle: EnemyDefinition<BeetleParams> = {
         enemy.params.shieldLife -= hit.damage;
         enemy.enemyInvulnerableFrames = 20;
         enemy.makeSound(state, 'enemyHit');
+        if (enemy.params.shieldLife <= 0) {
+            addFieldAnimation(state, enemy.area, beetleAnimations.shellBreaking[enemy.d], {x: enemy.x, y: enemy.y});
+        }
         return {hit: true};
     },
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<BeetleParams>) {
         if (enemy.params.shieldLife > 0) {
-            const hitbox = enemy.getHitbox();
-            context.beginPath();
-            context.fillStyle = 'white';
-            context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2 - 3, 5, 0, 2 * Math.PI);
-            context.fill();
+            const animationSet = enemy.enemyInvulnerableFrames > 0 ? beetleAnimations.shellDamaged : beetleAnimations.shell
+            enemy.defaultRender(context, state, getFrame(animationSet[enemy.d], enemy.animationTime));
         }
     },
     onDeath(state: GameState, enemy: Enemy<BeetleParams>) {

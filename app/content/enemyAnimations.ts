@@ -131,6 +131,8 @@ const beetleRightAnimation: FrameAnimation = genericBeetleAnimation({ y: 1, cols
 const beetleUpAnimation: FrameAnimation = genericBeetleAnimation({ y: 2, cols: 4});
 const beetleLeftAnimation: FrameAnimation = genericBeetleAnimation({ y: 4, cols: 4});
 const beetleClimbAnimation: FrameAnimation = genericBeetleAnimation({ y: 3, cols: 4});
+
+const beetleShellGeometry: FrameDimensions = { w: 20, h: 19, content: { x: 3, y: 6, w: 14, h: 12} };
 export const beetleAnimations: ActorAnimations = {
     climbing: omniAnimation(beetleClimbAnimation),
     idle: {
@@ -139,10 +141,14 @@ export const beetleAnimations: ActorAnimations = {
         left: beetleLeftAnimation,
         right: beetleRightAnimation,
     },
+    shell: omniAnimation(createAnimation('gfx/enemies/genericbeetleShell.png', beetleShellGeometry)),
+    shellDamaged: omniAnimation(createAnimation('gfx/enemies/genericbeetleShell.png', beetleShellGeometry, {x: 1})),
+    shellBreaking: omniAnimation(createAnimation('gfx/enemies/genericbeetleShell.png', beetleShellGeometry, {y: 1, x: 1, cols: 3, loop: false})),
 };
 export const climbingBeetleAnimations: ActorAnimations = {
     idle: omniAnimation(beetleClimbAnimation),
 };
+
 
 
 function goldenBeetleAnimation(props: CreateAnimationOptions, extra?: ExtraAnimationProperties) {

@@ -151,10 +151,6 @@ Current tasks:
     - Demo blockers
         - New Rival projection graphics
             rivalCastEffect + rivalSpirit
-        - Fixed rival crouch
-            rival.png
-        - New spike shell graphics for normal beetles.
-            genericBeetleShell
         - BLOCKED Update packed sprites
 
     - Add grass + moss tiles to the forest.
