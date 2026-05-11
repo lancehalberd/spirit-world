@@ -389,7 +389,7 @@ const f0_1x0: AreaDefinition = {
     objects: [
         {status: "closed", id: "tomb:0:1x0-door-0", x: 96, y: 496, type: "door", style: "cavern", targetObjectId: "tombEntrance", d: "down"},
         {status: "closedSwitch", id: "tombExit", x: 112, y: 16, type: "door", style: "vanara", targetZone: "cocoon", targetObjectId: "cocoonEntrance", d: "up", linked: true, saveStatus: "forever", locationCue: "Tomb B1"},
-        {status: "normal", id: "tomb:0:1x0-npc-0", x: 64, y: 272, d: "down", behavior: "none", style: "guardian", type: "npc", dialogueKey: "tombGuardian"},
+        {status: "normal", id: "tomb:0:1x0-npc-0", x: 64, y: 272, d: "down", behavior: "meditate", style: "guardian", type: "npc", dialogueKey: "tombGuardian"},
         {status: "normal", id: "tombDreamTeleporter", x: 176, y: 272, targetZone: "dream", targetObjectId: "tombTeleporter", type: "teleporter", locationCue: "Tomb B1", hasCustomLogic: true, customLogic: "!$AR && $teleportation"},
         {status: "normal", id: "tombEscapePot", linked: true, x: 64, y: 352, type: "pushPull", style: "pot", savePosition: "forever"},
         {status: "normal", id: "", x: 48, y: 352, type: "pushPull", style: "pot"},

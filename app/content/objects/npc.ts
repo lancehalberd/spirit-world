@@ -325,6 +325,19 @@ export const npcBehaviors: {[key in string]?: {
     none: {
         // Do nothing for this behavior.
     },
+    // This behavior is only used by the Vanara Guardian currently.
+    meditate: {
+        interact(state: GameState, npc: NPC) {
+            // Always update to face original direction.
+            npc.d = npc.definition.d || 'down';
+            npc.changeToAnimation('sit');
+        },
+        update(state: GameState, npc: NPC) {
+            // Always update to face original direction.
+            npc.d = npc.definition.d || 'down';
+            npc.changeToAnimation('meditate');
+        },
+    },
     sleeping: {
         interact(state: GameState, npc: NPC) {
             // Always update to face original direction.

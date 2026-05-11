@@ -399,6 +399,8 @@ export const guardianAnimations: ActorAnimations = {
         down: createAnimation(guardianImage, guardianGeometry, {y: 1, x: 0}),
         right: createAnimation(guardianImage, guardianGeometry, {y: 1, x: 1}),
     },
+    sit: omniAnimation(createAnimation(guardianImage, guardianGeometry, {y: 2})),
+    meditate: omniAnimation(createAnimation(guardianImage, guardianGeometry, {y: 2, x: 1})),
 };
 
 const elderImage: string = 'gfx/npcs/elder.png';
