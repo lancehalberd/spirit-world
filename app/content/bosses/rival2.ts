@@ -7,6 +7,7 @@ import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations, rivalSpiritAnimations} from 'app/content/enemyAnimations';
 import {getLoot} from 'app/content/objects/lootObject';
+import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
@@ -30,6 +31,7 @@ import {getAreaSize} from 'app/utils/getAreaSize';
 import {addObjectToArea} from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {saveGame} from 'app/utils/saveGame';
+import {extendSound} from 'app/utils/sounds';
 import {
     getTargetingAnchor,
     getVectorToNearbyTarget,
@@ -165,6 +167,15 @@ const crystalBurstAbility: EnemyAbility<true> = {
     recoverTime: 500,
 };
 
+function playChargeSound(state: GameState, enemy: Enemy<Params>) {
+    enemy.params.chargeAudioInstance = playAreaSound(state, enemy.area.alternateArea, 'chargeSpell');
+}
+function stopChargeSound(state: GameState, enemy: Enemy<Params>) {
+    if (enemy.params.chargeAudioInstance) {
+        stopAreaSound(state, enemy.params.chargeAudioInstance);
+        delete enemy.params.chargeAudioInstance;
+    }
+}
 
 const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): ThrowTargetType|null {
@@ -174,8 +185,10 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
         enemy.d = getCardinalDirection(target.x, target.y);
         enemy.changeToAnimation('prepareAttack');
+        playChargeSound(state, enemy);
     },
     updateAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
+        extendSound(enemy.params.chargeAudioInstance);
         if (enemy.activeAbility.time < 400) {
             const vector = getVectorToTarget(state, enemy, target.target);
             enemy.activeAbility.target.x = vector.x;
@@ -194,8 +207,8 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
             const theta = baseTheta + i * Math.PI / 6;
             const dx = Math.cos(theta), dy = Math.sin(theta);
             const speed = i === iceIndex ? 1.5 : 2.5;
-            CrystalSpike.spawn(state, enemy.area, {
-                delay: 100,
+            CrystalSpike.spawn(state, enemy.area.alternateArea, {
+                delay: 0,
                 x: enemy.x + enemy.w / 2 + enemy.w / 4 * dx,
                 y: enemy.y + enemy.h / 2 + enemy.h / 4 * dy,
                 damage: 1,
@@ -211,9 +224,12 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
         enemy.knockBack(state, {vx: -1 * target.x, vy: -1 * target.y, vz: 2}, true, 'attack', 'attack');
         enemy.setMode('knocked');
     },
+    cleanupAbility(this: void, state: GameState, enemy: Enemy) {
+        stopChargeSound(state, enemy);
+    },
     cooldown: 4000,
     charges: 1,
-    prepTime: 800,
+    prepTime: 1000,
     recoverTime: 2000,
 };
 
@@ -227,6 +243,10 @@ const flameRingAbility: EnemyAbility<true> = {
         const center = getCenterRect(state);
         enemy.d = getCardinalDirection(center.x - (hitbox.x + hitbox.w / 2), center.y - (enemy.y + enemy.h / 2));
         enemy.changeToAnimation('prepareAttack');
+        playChargeSound(state, enemy);
+    },
+    updateAbility(this: void, state: GameState, enemy: Enemy, target: true): void {
+        extendSound(enemy.params.chargeAudioInstance);
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: true): void {
         enemy.changeToAnimation('attack');
@@ -251,6 +271,9 @@ const flameRingAbility: EnemyAbility<true> = {
             });
             addEffectToArea(state, state.hero.area, delayedFlame);
         }
+    },
+    cleanupAbility(this: void, state: GameState, enemy: Enemy) {
+        stopChargeSound(state, enemy);
     },
     cooldown: 8000,
     charges: 1,
@@ -293,8 +316,10 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
             soundKey: 'lightningStrike',
         });
         addEffectToArea(state, state.hero.area, spark);
+        playChargeSound(state, enemy);
     },
     updateAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
+        extendSound(enemy.params.chargeAudioInstance);
         if (enemy.activeAbility.time === enemy.activeAbility.definition.prepTime - 120) {
             enemy.changeToAnimation('attack', 'attack');
         }
@@ -304,6 +329,9 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
         // The second animation key is what will be used when the enemy lands after the knocback.
         enemy.knockBack(state, {vx: -3 * target.x, vy: -3 * target.y, vz: 2}, true, 'attack', 'attack');
         enemy.setMode('knocked');
+    },
+    cleanupAbility(this: void, state: GameState, enemy: Enemy) {
+        stopChargeSound(state, enemy);
     },
     cooldown: 6000,
     charges: 1,
@@ -394,6 +422,7 @@ interface Params {
     afterFrames?: Enemy[]
     introduced?: boolean
     targetLocation?: Point
+    chargeAudioInstance?: AudioInstance
 }
 
 const maxImageCount = 13;

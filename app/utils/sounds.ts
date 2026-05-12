@@ -174,6 +174,9 @@ function startAudioBufferSound(sound: GameSound, seekTime: number, startTime: nu
 const EXTEND_EFFECT_DURATION = 0.5;
 
 export function extendSound(instance: AudioInstance) {
+    if (!instance) {
+        return;
+    }
     const extendedStopTime = audioContext.currentTime + EXTEND_EFFECT_DURATION;
     if (extendedStopTime > instance.scheduledStopTime) {
         instance.scheduledStopTime = extendedStopTime;
@@ -978,6 +981,52 @@ sounds.set('chargeLaser', {
 
             audioCallback(() => {
                 pinkNoiseNode.disconnect(noiseGainNode);
+                oscillator.disconnect();
+                cleanupSoundByCustomStop(customStop);
+            }, actualStopTime);
+        }, time + 5);
+        return customStop;
+    },
+    duration: 0,
+    instanceLimit: 3,
+    instances: [],
+});
+
+sounds.set('chargeSpell', {
+    play(target: AudioNode, time: number) {
+        const maxVolume = 0.2;
+        const oscillator = audioContext.createOscillator();
+        oscillator.type = 'sawtooth';
+        const minFrequency = 50;
+        oscillator.frequency.setValueAtTime(minFrequency, time);
+        // Exponential sweep up; can support up to 3 seconds smoothly
+        oscillator.frequency.exponentialRampToValueAtTime(500, time + 2);
+
+        const smoothSawFilter = audioContext.createBiquadFilter();
+        smoothSawFilter.type = 'bandpass';
+        // Match frequence of the oscilattor
+        smoothSawFilter.frequency.setValueAtTime(minFrequency, time);
+        smoothSawFilter.frequency.exponentialRampToValueAtTime(500, time + 2);
+        smoothSawFilter.Q.setValueAtTime(1, time);
+        smoothSawFilter.Q.exponentialRampToValueAtTime(0.6, time + 2);
+
+        const oscillatorGainNode = audioContext.createGain();
+        oscillatorGainNode.gain.setValueAtTime(0, time);
+        oscillatorGainNode.gain.linearRampToValueAtTime(maxVolume, time + 0.1);
+
+        oscillator.connect(smoothSawFilter);
+        smoothSawFilter.connect(oscillatorGainNode);
+        oscillatorGainNode.connect(target);
+
+        oscillator.start(time);
+
+        const customStop = stopSafely((stopTime: number) => {
+            const actualStopTime = stopTime + 0.2;
+            // A short fade out prevents clicking when stopped early
+            oscillatorGainNode.gain.linearRampToValueAtTime(0, actualStopTime);
+            oscillator.stop(actualStopTime);
+
+            audioCallback(() => {
                 oscillator.disconnect();
                 cleanupSoundByCustomStop(customStop);
             }, actualStopTime);
