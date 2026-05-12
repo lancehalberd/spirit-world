@@ -3,11 +3,28 @@ import {pushScene} from 'app/scenes/sceneHash';
 import {wasGameKeyPressed, wasConfirmKeyPressed} from 'app/userInput';
 import {drawFrame} from 'app/utils/animations';
 import {fillRect, pad} from 'app/utils/index';
+import {cleanState} from 'app/utils/state';
 
 const characterWidth = 8;
 const messageWidth = 160;
 const messageRows = 4;
 
+function skipCutscene(state: GameState) {
+    const onSkipCutscene = state.scriptEvents.onSkipCutscene;
+    cleanState(state);
+    onSkipCutscene?.(state);
+}
+
+export function updateSkipCutscene(state: GameState) {
+    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.scriptEvents.onSkipCutscene) {
+        if ((state.scriptEvents.skipTime ?? -2000) + 2000 > state.time) {
+            skipCutscene(state);
+            state.scriptEvents.handledInput = true;
+        } else {
+            state.scriptEvents.skipTime = state.time;
+        }
+    }
+}
 
 export class MessageScene implements GameScene {
     sceneType = 'message';
@@ -33,6 +50,8 @@ export class MessageScene implements GameScene {
         }
     }
     update(state: GameState, interactive: boolean) {
+        // Allow skipping cutscenes even though script events in general are paused during messages.
+        updateSkipCutscene(state);
         const shouldSkipForward = wasConfirmKeyPressed(state) || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
         const page = this.pages[0];
         if (!page) {

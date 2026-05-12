@@ -147,8 +147,7 @@ Graphics to Implement:
 
 Current tasks:
     - Demo blockers
-        - Test all cutscenes in demo.
-            - Test skipping all cutscenes at different times.
+        - Add SFX for water splash effect.
         - Update packed sprites
         - Test final version
 

@@ -1,23 +1,16 @@
 import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {getLoot} from 'app/content/objects/lootObject';
-import {GAME_KEY} from 'app/gameConstants';
 import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
-import {hideMessagePage, showMessagePage} from 'app/scenes/message/messageScene';
+import {hideMessagePage, showMessagePage, updateSkipCutscene} from 'app/scenes/message/messageScene';
 import {followMessagePointer, prependScript} from 'app/scriptEvents';
 import {wasGameKeyPressed} from 'app/userInput';
 import {playSound} from 'app/utils/sounds';
 import {enterLocation} from 'app/utils/enterLocation';
 import {clearObjectFlag, setObjectFlag} from 'app/utils/objectFlags';
 import {saveGame} from 'app/utils/saveGame';
-import {cleanState} from 'app/utils/state';
 
 
-export function skipCutscene(state: GameState) {
-    const onSkipCutscene = state.scriptEvents.onSkipCutscene;
-    cleanState(state);
-    onSkipCutscene?.(state);
-}
 
 export function updateScriptEvents(state: GameState): void {
     state.scriptEvents.blockEventQueue = false;
@@ -25,16 +18,9 @@ export function updateScriptEvents(state: GameState): void {
     state.scriptEvents.blockPlayerInput = false;
     state.scriptEvents.blockPlayerUpdates = false;
     state.scriptEvents.handledInput = false;
+    updateSkipCutscene(state);
     const activeEvents: ActiveScriptEvent[] = [];
     let activeEventCountSinceLastWaitEvent = 0;
-    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.scriptEvents.onSkipCutscene) {
-        if ((state.scriptEvents.skipTime ?? -2000) + 2000 > state.time) {
-            skipCutscene(state);
-            state.scriptEvents.handledInput = true;
-        } else {
-            state.scriptEvents.skipTime = state.time;
-        }
-    }
     for (const event of state.scriptEvents.activeEvents) {
         switch (event.type) {
             case 'update': {

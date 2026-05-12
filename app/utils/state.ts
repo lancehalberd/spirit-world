@@ -1,8 +1,10 @@
+import {removeTextCue} from 'app/content/effects/textCue';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 
 /**
  * Remove any temporary effects from the state such as script events,
- * transition effects, screen shakes, defeated state, camera speed, etc.
+ * transition effects, screen shakes, defeated state, camera speed, etc
+ * and text cues.
  *
  * This is called after setting state from the test menu or after skipping
  * most cutscenes to make sure special settings from the cutscene are
@@ -23,5 +25,6 @@ export function cleanState(state: GameState) {
     delete state.camera.speed;
     delete state.hero.action;
     delete state.transitionState;
+    removeTextCue(state);
     showFieldScene(state);
 }

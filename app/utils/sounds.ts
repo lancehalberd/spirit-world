@@ -639,7 +639,7 @@ function playBeeps(inputFrequencies: number[], volume: number, duration: number,
         taper = 0,
         type = 'square' as OscillatorType,
     },
-    destination: AudioNode,
+    destination: AudioNode = audioContext.destination,
     time = audioContext.currentTime
 ) {
     const frequencies = Float32Array.from(inputFrequencies);
@@ -919,6 +919,15 @@ sounds.set('waterJump', {
         playBeeps([200, 100, 200], 0.4, 0.25, {smooth: true, taper: 0.1, swell: 0.1, type: 'sine'}, target, time);
     },
     duration: 0.4,
+    instanceLimit: 2,
+    instances: [],
+});
+sounds.set('waterSplash', {
+    play(target: AudioNode, time: number) {
+        playBeeps([100, 100, 50, 200, 300, 300], 0.03, 0.2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'}, target, time);
+        playBeeps([150, 150, 75, 300, 600, 600], 0.03, 0.2, {smooth: true, taper: 0.2, swell: 0.2, type: 'sine'}, target, time + 0.1);
+    },
+    duration: 0.3,
     instanceLimit: 2,
     instances: [],
 });

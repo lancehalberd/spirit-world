@@ -1,3 +1,4 @@
+import {refreshAreaLogic} from 'app/content/areas';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {appendCallback, appendScript, hideHUD, resetCamera, runPlayerBlockingCallback, showHUD, textCueWithInput, waitForCamera} from 'app/scriptEvents';
@@ -41,7 +42,9 @@ specialBehaviorsHash.peachCave = {
                     peachTree.specialStatus = 'weak';
                 }
                 hideHUD(state, (state: GameState) => {
-                    appendScript(state, '{flag:peachCaveTreeDied}');
+                    state.hero.y = 136;
+                    state.savedState.objectFlags.peachCaveTreeDied = true;
+                    refreshAreaLogic(state, state.areaInstance, true);
                 });
                 state.hero.prepareForCutScene();
                 appendScript(state, '{playTrack:vanaraDreamTheme}{wait:500');
