@@ -19,6 +19,7 @@ export class FileSelectScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
     mode: FileSelectMode = 'select';
+    menuStack: {cursorIndex: number, mode: FileSelectMode}[] = [];
     cursorIndex = 0;
     savedGames: SavedState[] = [null];
     gameMode: GameMode = 'normal';
@@ -26,7 +27,6 @@ export class FileSelectScene implements GameScene {
     randomizerConfig: SavedRandomizerState = {
         goal: {},
         //enemySeed?: number
-        //entranceSeed?: number
         itemSeed: getDailySeed(),
     };
     update(state: GameState) {

@@ -44,8 +44,16 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         area.objects.push(object);
     }
 }
+export function removeObjectFromAreaById(state: GameState, area: AreaInstance, id: string): boolean {
+    const object = area.objects.find(o => o.definition?.id === id);
+    if (object) {
+        removeObjectFromArea(state, object);
+        return true;
+    }
+    return false;
+}
 export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
-    if (!object.area) {
+    if (!object?.area) {
         return;
     }
     if (object.definition) {

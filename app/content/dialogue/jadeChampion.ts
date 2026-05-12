@@ -15,6 +15,7 @@ dialogueHash.jadeChampion = {
             hideHUD(state, (state: GameState) => {
                 removeObjectFromArea(state, jadeChampion);
             });
+            state.hero.prepareForCutScene();
             // add Jade Champion to the screen
             const jadeChampion = createObjectInstance(state, {
                 id: 'jadeChampion',

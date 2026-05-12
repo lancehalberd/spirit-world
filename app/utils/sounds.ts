@@ -206,6 +206,9 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
         return;
     }
     const delay = sound.customDelay ?? 0.04;
+    if (sound.skipDuplicates && startTime < sound.canPlayAfter) {
+        return;
+    }
     const targetTime = Math.max(sound.canPlayAfter || 0, startTime);
     sound.canPlayAfter = targetTime + delay;
     try {
@@ -268,11 +271,11 @@ export function pauseSound(instance?: AudioInstance, time = audioContext.current
     if (!instance) {
         return;
     }
-    // Only looping sounds and sounds with customStop functions can be paused currently.
+    // Only looping sounds and sounds with customStop functions can be paused currently,
+    // other sounds are short enough we just let them finish playing.
     // We can add an explicit "canPause" property to the sound if we need to support
     // other cases in the future.
     if (!instance.sound.loop && !instance.customStop) {
-        stopSound(instance, time);
         return;
     }
     if (instance.sourceNode) {
@@ -580,8 +583,8 @@ const preloadSounds = () => {
         {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 6, instanceLimit: 2},
         {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 10, instanceLimit: 2},
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, instanceLimit: 5},
-        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 2},
-        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 2},
+        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', duration: 2, volume: 4, instanceLimit: 3},
+        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', duration: 2, volume: 4, instanceLimit: 3},
         {key: 'missedShot', source: 'sfx/thwack.wav', duration: 2, volume: 100, instanceLimit: 4},
         {key: 'hitShot', source: 'sfx/enemyDeath.wav', offset: 0.17, duration: 0.3, volume: 20, instanceLimit: 5},
         {key: 'hitBullseye', source: 'sfx/chime 14_1.wav', duration: 1, volume: 4, instanceLimit: 5},
@@ -1379,6 +1382,30 @@ sounds.set('airBlast', {
     instances: [],
 });
 
+sounds.set('smallShot', {
+    play(target: AudioNode, time: number) {
+        const duration = this.duration;
+        const masterVolume = 0.3;
+
+        const noiseFilter = audioContext.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.Q.setValueAtTime(4, time);
+        noiseFilter.frequency.setValueAtTime(6400, time);
+        noiseFilter.frequency.exponentialRampToValueAtTime(1600, time + duration);
+        //noiseFilter.frequency.exponentialRampToValueAtTime(3200, time + duration);
+
+        const noiseGainNode = createGainEnvelope(masterVolume, 0.8, time, duration, 0.1, 0.4);
+
+        connectUntil(pinkNoiseNode, noiseFilter, time + duration);
+        noiseFilter.connect(noiseGainNode);
+        noiseGainNode.connect(target);
+    },
+    duration: 0.1,
+    skipDuplicates: true,
+    instanceLimit: 8,
+    instances: [],
+});
+
 sounds.set('shoot', {
     play(target: AudioNode, time: number) {
         const duration = this.duration || 0.5;
@@ -1398,6 +1425,7 @@ sounds.set('shoot', {
         noiseGainNode.connect(target);
     },
     duration: 0.3,
+    skipDuplicates: true,
     instanceLimit: 2,
     instances: [],
 });
@@ -1421,6 +1449,7 @@ sounds.set('bigShot', {
         noiseGainNode.connect(target);
     },
     duration: 0.6,
+    skipDuplicates: true,
     instanceLimit: 2,
     instances: [],
 });

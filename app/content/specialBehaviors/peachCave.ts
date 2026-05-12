@@ -43,6 +43,7 @@ specialBehaviorsHash.peachCave = {
                 hideHUD(state, (state: GameState) => {
                     appendScript(state, '{flag:peachCaveTreeDied}');
                 });
+                state.hero.prepareForCutScene();
                 appendScript(state, '{playTrack:vanaraDreamTheme}{wait:500');
                 // Clear all the bushes to unblock player movement and give some extra loot before they all disappear.
                 appendCallback(state, () => {

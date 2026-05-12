@@ -5,18 +5,18 @@ import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {Spark} from 'app/content/effects/spark';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {rivalAnimations} from 'app/content/enemyAnimations';
+import {rivalAnimations, rivalSpiritAnimations} from 'app/content/enemyAnimations';
 import {getLoot} from 'app/content/objects/lootObject';
 import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
-    heroAnimations, treeStaffAnimations, heroSpiritAnimations,
+    heroAnimations, treeStaffAnimations,
 } from 'app/render/heroAnimations';
 import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
 import {appendCallback, appendScript} from 'app/scriptEvents';
 import {removeTextCue} from 'app/content/effects/textCue';
-import {drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
+import {drawFrameAt, getFrame} from 'app/utils/animations';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
@@ -68,17 +68,13 @@ const rollAbility: EnemyAbility<RollTargetType> = {
 
 
 function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    const scale = enemy.scale;
-    const animationSet = heroSpiritAnimations[enemy.currentAnimationKey] || heroSpiritAnimations.idle;
-    const frame = getFrame(animationSet[enemy.d], enemy.animationTime);
     context.save();
-        context.globalAlpha *= 0.2;
-        drawFrame(context, frame, { ...frame,
-            x: enemy.x - (frame?.content?.x || 0) * scale,
-            y: enemy.y - (frame?.content?.y || 0) * scale - enemy.z,
-            w: frame.w * scale,
-            h: frame.h * scale,
-        });
+        context.globalAlpha *= 0.6;
+        const animationSet = rivalSpiritAnimations[enemy.currentAnimationKey] || rivalSpiritAnimations.idle;
+        let frame = getFrame(rivalSpiritAnimations.tail[enemy.d], enemy.animationTime);
+        enemy.defaultRender(context, state, frame);
+        frame = getFrame(animationSet[enemy.d], enemy.animationTime);
+        enemy.defaultRender(context, state, frame);
     context.restore();
 }
 
@@ -177,7 +173,7 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
         enemy.d = getCardinalDirection(target.x, target.y);
-        enemy.changeToAnimation('kneel');
+        enemy.changeToAnimation('prepareAttack');
     },
     updateAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         if (enemy.activeAbility.time < 400) {
@@ -186,9 +182,11 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
             enemy.activeAbility.target.y = vector.y;
             enemy.d = getCardinalDirection(vector.x, vector.y);
         }
+        if (enemy.activeAbility.time === enemy.activeAbility.definition.prepTime - 120) {
+            enemy.changeToAnimation('attack', 'attack');
+        }
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
-        enemy.changeToAnimation('roll');
         const dx = target.x, dy = target.y;
         const iceIndex = (Math.random() * 3) | 0;
         const baseTheta = Math.atan2(dy, dx) - Math.PI / 6;
@@ -208,7 +206,9 @@ const iceSpikeAbility: EnemyAbility<ThrowTargetType> = {
                 source: enemy,
             });
         }
-        enemy.knockBack(state, {vx: -1 * target.x, vy: -1 * target.y, vz: 2}, true);
+        // Override knocback animations.
+        // The second animation key is what will be used when the enemy lands after the knocback.
+        enemy.knockBack(state, {vx: -1 * target.x, vy: -1 * target.y, vz: 2}, true, 'attack', 'attack');
         enemy.setMode('knocked');
     },
     cooldown: 4000,
@@ -226,10 +226,10 @@ const flameRingAbility: EnemyAbility<true> = {
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
         const center = getCenterRect(state);
         enemy.d = getCardinalDirection(center.x - (hitbox.x + hitbox.w / 2), center.y - (enemy.y + enemy.h / 2));
-        enemy.changeToAnimation('kneel');
+        enemy.changeToAnimation('prepareAttack');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: true): void {
-        enemy.changeToAnimation('roll');
+        enemy.changeToAnimation('attack');
         const center = getCenterRect(state);
         const count = 12;
         for (let i = 0; i < count; i++) {
@@ -266,7 +266,7 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
         enemy.useTauntFromList(state, ['spiritAttack1', 'spiritAttack2', 'spiritAttack3']);
         enemy.d = getCardinalDirection(target.x, target.y);
-        enemy.changeToAnimation('kneel');
+        enemy.changeToAnimation('prepareAttack');
         const dx = target.x, dy = target.y;
         const spark = new Spark({
             delay: 1200,
@@ -290,11 +290,19 @@ const chasingSparkAbility: EnemyAbility<ThrowTargetType> = {
             },
             ttl: 3000,
             source: enemy,
+            soundKey: 'lightningStrike',
         });
         addEffectToArea(state, state.hero.area, spark);
     },
+    updateAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
+        if (enemy.activeAbility.time === enemy.activeAbility.definition.prepTime - 120) {
+            enemy.changeToAnimation('attack', 'attack');
+        }
+    },
     useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
-        enemy.knockBack(state, {vx: -3 * target.x, vy: -3 * target.y, vz: 2}, true);
+        // Override knocback animations.
+        // The second animation key is what will be used when the enemy lands after the knocback.
+        enemy.knockBack(state, {vx: -3 * target.x, vy: -3 * target.y, vz: 2}, true, 'attack', 'attack');
         enemy.setMode('knocked');
     },
     cooldown: 6000,
@@ -499,7 +507,8 @@ const rival2: EnemyDefinition<Params> = {
     alternateRender(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         if (enemy.activeAbility?.definition === iceSpikeAbility
             && !enemy.activeAbility.used
-            && enemy.activeAbility.time >= enemy.activeAbility.definition.prepTime - 400) {
+            && enemy.activeAbility.time >= enemy.activeAbility.definition.prepTime - 400
+        ) {
             const animation = chargeIceBackAnimation;
             context.save();
                 context.globalAlpha *= 0.8;
@@ -509,7 +518,8 @@ const rival2: EnemyDefinition<Params> = {
         }
         if (enemy.activeAbility?.definition === chasingSparkAbility
             && !enemy.activeAbility.used
-            && enemy.activeAbility.time >= enemy.activeAbility.definition.prepTime - 400) {
+            && enemy.activeAbility.time >= enemy.activeAbility.definition.prepTime - 400
+        ) {
             const animation = chargeLightningBackAnimation;
             context.save();
                 context.globalAlpha *= 0.8;
@@ -530,11 +540,19 @@ const rival2: EnemyDefinition<Params> = {
         }
         const afterFrames = enemy.params.afterFrames ?? [];
         for (let i = afterFrames.length - 1; i >= 0; i -= 2) {
+            // After image effect looks bad during attacks
+            if (enemy.activeAbility && i !== 0) {
+                continue;
+            }
             context.save();
-                context.globalAlpha *= 0.6 * (1 - (i + 1) / (maxImageCount + 2));
-                if (enemy.currentAnimationKey === 'kneel') {
-                    context.globalAlpha *= 0.7 + 0.3 * Math.cos(enemy.animationTime / 200);
+                if (enemy.activeAbility) {
+                    context.globalAlpha *= 0.8;
+                } else {
+                    context.globalAlpha *= 0.6 * (1 - (i + 1) / (maxImageCount + 2));
                 }
+                //if (enemy.currentAnimationKey === 'kneel') {
+                //    context.globalAlpha *= 0.7 + 0.3 * Math.cos(enemy.animationTime / 200);
+                //}
                 renderVanaraSpirit(context, state, afterFrames[i]);
             context.restore();
         }
@@ -608,7 +626,7 @@ function updateSpiritRival(this: void, state: GameState, enemy: Enemy<Params>): 
     // Make sure the rival returns to the kneeling animation when they land after being knocked back.
     if (enemy.mode === 'knocked' && enemy.action !== 'knocked') {
         if (enemy.activeAbility) {
-            enemy.changeToAnimation('kneel');
+            //enemy.changeToAnimation('kneel');
         } else {
             enemy.setMode('choose');
         }

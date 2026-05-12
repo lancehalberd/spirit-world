@@ -558,6 +558,28 @@ export const rivalAnimations: ActorAnimations = {
     },
 };
 
+
+const rivalSpiritGeometry: FrameDimensions = { w: 42, h: 36, content: { x: 11, y: 15, w: 16, h: 16} };
+
+// This can be used for any animation set that is 4 uniform rows in the order down/right/up/left.
+function standardAnimationSet(image: string, geometry: FrameDimensions, props: CreateAnimationOptions & ExtraAnimationProperties): AnimationSet {
+    return {
+        down: createAnimation(image, geometry, {y: 0, ...props}),
+        right: createAnimation(image, geometry, {y: 1, ...props}),
+        up: createAnimation(image, geometry, {y: 2, ...props}),
+        left: createAnimation(image, geometry, {y: 3, ...props}),
+    };
+}
+
+// Rival spirit animations
+export const rivalSpiritAnimations: ActorAnimations = {
+    idle: standardAnimationSet('gfx/rival/rivalSpirit.png', rivalSpiritGeometry, {cols: 1}),
+    prepareAttack: standardAnimationSet('gfx/rival/rivalSpiritCastPrepare.png', rivalSpiritGeometry, {x: 1, cols: 4, duration: 2, loop: false}),
+    attack: standardAnimationSet('gfx/rival/rivalSpiritCast.png', rivalSpiritGeometry, {x: 1, cols: 3, duration: 2, loop: false}),
+    // This is rendered under all the other spirit animations
+    tail: standardAnimationSet('gfx/rival/rivalSpiritTail.png', rivalSpiritGeometry, {cols: 8}),
+};
+
 /*
 Frame 1 - Idle facing 4 directions "horizontal/vertical"
 Frames 2-3 - runs at 5FPS, is the attacking animation

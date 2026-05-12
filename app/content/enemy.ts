@@ -363,7 +363,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // since we increment modeTime by FRAME_LENGTH between each update.
         this.modeTime = -FRAME_LENGTH;
     }
-    knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}, force = false) {
+    knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}, force = false,
+        animationKey = 'hurt', nextAnimationKey = 'idle'
+    ) {
         if (!this.canBeKnockedBack && !force) {
             return;
         }
@@ -371,14 +373,15 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.canBeKnockedBack) {
             this.cancelAttacks(state);
         }
-        if (!this.enemyDefinition.hasCustomHurtAnimation) {
-            this.changeToAnimation('hurt');
+        if (animationKey && !this.enemyDefinition.hasCustomHurtAnimation) {
+            this.changeToAnimation(animationKey);
         }
+        this.nextAnimationKey = nextAnimationKey;
         this.action = 'knocked';
         if (vz > 0 || this.z > 0) {
             this.isAirborn = true;
         }
-        this.animationTime = 0;
+        // this.animationTime = 0;
         this.az = Math.min(-0.2, this.az);
         this.vx = vx;
         this.vy = vy;
@@ -868,7 +871,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         // Switch to the next animation if we reach the end of the current animation.
-        if (this.nextAnimationKey && isAnimationFinished(this.currentAnimation, this.animationTime)) {
+        if (this.action !== 'knocked' && this.nextAnimationKey && isAnimationFinished(this.currentAnimation, this.animationTime)) {
             this.changeToAnimation(this.nextAnimationKey);
         }
         for (const ability of this.abilities) {
@@ -931,8 +934,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime >= 200 && this.z <= minZ) {
                 this.action = null;
-                this.changeToAnimation('idle');
-                this.animationTime = 0;
+                this.changeToAnimation(this.nextAnimationKey ?? 'idle');
                 this.checkIfDefeated(state);
             }
             // Normally enemies do not update when knocked. But forced knockbacks

@@ -223,6 +223,13 @@ export class Hero implements Actor {
         return copy;
     }
 
+    prepareForCutScene(this: Hero) {
+        delete this.chargingLeftTool;
+        delete this.chargingRightTool;
+        delete this.action;
+        this.frozenDuration = 0;
+    }
+
     getHitbox(): Rect {
         if (this.hasBarrier) {
             const p = 4;

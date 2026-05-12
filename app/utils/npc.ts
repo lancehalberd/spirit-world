@@ -40,9 +40,9 @@ export function moveNPCToTargetLocation(
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > npc.speed) {
-        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {boundingBox: false, ...movementProperties});
+        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {boundingBox: false, canPassWalls: true, ...movementProperties});
         return mag - npc.speed;
     }
-    moveNPC(state, npc, dx, dy, {boundingBox: false, ...movementProperties});
+    moveNPC(state, npc, dx, dy, {boundingBox: false, canPassWalls: true, ...movementProperties});
     return 0;
 }

@@ -146,12 +146,11 @@ Graphics to Implement:
 
 
 Current tasks:
-    - Move randomizer customization as step after New Game with Start Game as the top option.
-
     - Demo blockers
-        - New Rival projection graphics
-            rivalCastEffect + rivalSpirit
-        - BLOCKED Update packed sprites
+        - Test all cutscenes in demo.
+            - Test skipping all cutscenes at different times.
+        - Update packed sprites
+        - Test final version
 
     - Add grass + moss tiles to the forest.
 
@@ -164,7 +163,8 @@ Current tasks:
         - new tiles in tiles/vanara (cliff edges, large vine walls)
         - new tiles in tiles/stoneTileset (blown open doors)
         - new crew sprites
-            - Captain, security, chief scientist, scientest, crew
+            - npcs/crewCaptain, npcs/crewSecurityOfficer, npcs/crewScienceOffier, npcs/crewScientist, npcs/crewEnsign
+        - bosses/balloonMegapede
         - tiles/grates
         - tiles/treeHome
         - Cherry tree

@@ -44,6 +44,7 @@ dialogueHash.jadeChampionStaffTower = {
                 state.savedState.objectFlags.jadeChampionStaffTowerTop = true;
                 saveGame(state);
             });
+            state.hero.prepareForCutScene();
             // Find the Jade Champion NPC object.
             const jadeChampion = findObjectInstanceById(state.hero.area, 'jadeChampion') as NPC;
             jadeChampion.speed = 1.75;

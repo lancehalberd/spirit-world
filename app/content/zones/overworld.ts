@@ -4008,7 +4008,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "", x: 272, y: 400, targetObjectId: "overworldWarTempleSwitchB", type: "indicator"},
         {status: "normal", id: "", x: 224, y: 368, targetObjectId: "overworldWarTemplePotA", type: "indicator"},
         {status: "normal", id: "summonerRuinsSave", x: 244, y: 448, type: "saveStatue", linked: true},
-        {status: "normal", id: "jadeChampionWarTemple", x: 240, y: 380, type: "narration", message: "{@jadeChampionWarTemple.warTempleEncounter}", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "never", hasCustomLogic: true, customLogic: "$astralProjection"},
+        {status: "normal", id: "jadeChampionWarTemple", x: 208, y: 380, type: "narration", message: "{@jadeChampionWarTemple.warTempleEncounter}", trigger: "touch", delay: 0, w: 112, h: 48, saveStatus: "never", hasCustomLogic: true, customLogic: "$astralProjection"},
         {status: "normal", id: "desertMoney", x: 32, y: 400, type: "chest", lootType: "money", lootAmount: 20},
     ],
     sections: [

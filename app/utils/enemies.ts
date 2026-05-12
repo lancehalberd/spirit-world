@@ -1,5 +1,5 @@
 import {addEnemyFallAnimation, addSplashAnimation} from 'app/content/effects/animationEffect';
-import {directionMap, getCardinalDirection} from 'app/utils/direction';
+import {directionMap, getBestCardinalDirection, getCardinalDirection} from 'app/utils/direction';
 import {hitTargets} from 'app/utils/field';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
@@ -18,7 +18,7 @@ export function moveEnemyToTargetLocation(
     const hitbox = enemy.getMovementHitbox();
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
-        enemy.d = getCardinalDirection(dx, dy, enemy.d);
+        enemy.d = getBestCardinalDirection(dx, dy, enemy.d);
         enemy.changeToAnimation(animationStyle)
     }
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];

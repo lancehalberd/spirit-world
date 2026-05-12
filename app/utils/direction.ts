@@ -73,6 +73,15 @@ export const carryMap = {
     'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
 };
 
+// Returns a cardinal direction that favors the current direction if it makes sense.
+export function getBestCardinalDirection(dx: number, dy: number, currentDirection: CardinalDirection): CardinalDirection {
+    const vectorDirection = getDirection(dx, dy, true, currentDirection);
+    if (vectorDirection.includes(currentDirection)) {
+        return currentDirection;
+    }
+    return getCardinalDirection(dx, dy, currentDirection);
+}
+
 export function getCardinalDirection(dx: number, dy: number, defaultDirection: CardinalDirection = null): CardinalDirection {
     if (Math.abs(dy) < 0.2) {
         dy = 0;

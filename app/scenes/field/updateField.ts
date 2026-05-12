@@ -23,6 +23,12 @@ import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects'
 
 export function updateField(this: void, state: GameState, interactive: boolean) {
     updateScriptEvents(state);
+    // Update the HUD opacity as long as script events can be run.
+    if (state.hideHUD && state.hudOpacity > 0) {
+        state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
+    } else if (!state.hideHUD && state.hudOpacity < 1) {
+        state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
+    }
     if (state.areaInstance?.needsLogicRefresh) {
         refreshAreaLogic(state, state.areaInstance);
     } else if (state.alternateAreaInstance?.needsLogicRefresh) {
@@ -40,12 +46,6 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
     // don't want to perform field updates until the transition effect completes.
     if (state.transitionState) {
         return;
-    }
-    // Update the HUD opacity as long as script events can be run.
-    if (state.hideHUD && state.hudOpacity > 0) {
-        state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
-    } else if (!state.hideHUD && state.hudOpacity < 1) {
-        state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
     }
     if (interactive && state.arState.active && (wasGameKeyPressed(state, GAME_KEY.MENU) || wasGameKeyPressed(state, GAME_KEY.MAP))) {
         showMessage(state, '{@arGame.quit}');

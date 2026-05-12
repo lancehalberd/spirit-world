@@ -96,7 +96,7 @@ export class TitleScene implements GameScene {
         const options = getTitleOptions(state);
         const h = ROW_HEIGHT * options.length + 8;
         let r = {
-            x: 7 * (CANVAS_WIDTH - WIDTH) / 8,
+            x: (7 * (CANVAS_WIDTH - WIDTH) / 8) | 0,
             y: CANVAS_HEIGHT - h - 16,
             w: WIDTH,
             h,

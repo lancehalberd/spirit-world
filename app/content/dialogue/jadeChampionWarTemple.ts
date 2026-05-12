@@ -1,12 +1,12 @@
-import { addBurstEffect } from 'app/content/effects/animationEffect';
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import {moveActorTowardsLocation} from 'app/movement/moveActor';
-import { appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD } from 'app/scriptEvents';
-import { createObjectInstance } from 'app/utils/createObjectInstance';
-import { moveNPCToTargetLocation } from 'app/utils/npc';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
+import {addBurstEffect} from 'app/content/effects/animationEffect';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {cutSceneWalkToLocation} from 'app/movement/moveActor';
+import {appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
+import {moveNPCToTargetLocation} from 'app/utils/npc';
+import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
 
 function npcAndHeroTeleportAnimation(state: GameState, npc: NPC) {
@@ -62,6 +62,7 @@ dialogueHash.jadeChampionWarTemple = {
                     },
                 });
             });
+            state.hero.prepareForCutScene();
             appendScript(state, '{playTrack:village}{wait:100');
             // add Jade Champion to the screen
             const jadeChampion = createObjectInstance(state, {
@@ -83,7 +84,7 @@ dialogueHash.jadeChampionWarTemple = {
                 jadeChampion.speed = 1;
                 jadeChampion.animationTime += FRAME_LENGTH;
                 state.hero.animationTime += FRAME_LENGTH;
-                const heroIsMoving = moveActorTowardsLocation(state, state.hero, {x: 256, y: 380}) > 0;
+                const heroIsMoving = cutSceneWalkToLocation(state, state.hero, {x: 256, y: 380}) > 0;
                 const jadeChampionIsMoving = moveNPCToTargetLocation(state, jadeChampion, 162, 476, 'move') > 0;
                 // console.log(heroIsMoving, jadeChampionIsMoving);
                 if (heroIsMoving || jadeChampionIsMoving) {
@@ -202,7 +203,8 @@ dialogueHash.jadeChampionWarTemple = {
                 grandPriest.changeToAnimation('idle', 'down');
             });
             appendScript(state, `What do you know of the disappearance of the Spirit Beasts, child?
-                {|}...I see...
+                {|}...
+                {|}...[-] [-]...I see...
                 {|}It is clear that you do not know of what I speak.`);
             runPlayerBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;

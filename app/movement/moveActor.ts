@@ -286,6 +286,31 @@ export function moveActorTowardsLocation(
     return 0;
 }
 
+export function cutSceneWalkToLocation(
+    state: GameState,
+    hero: Hero,
+    {x, y}: Point,
+    speed = 1,
+): number {
+    const anchor = getMovementAnchor(hero);
+    const dx = x - anchor.x, dy = y - anchor.y;
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    if (mag <= 0.01) {
+        return 0;
+    }
+    hero.d = getCardinalDirection(dx, dy, hero.d);
+    hero.action = 'walking';
+    if (mag > speed) {
+        hero.x += speed * dx / mag;
+        hero.y += speed * dy / mag;
+        return mag - speed;
+    }
+    hero.x += dx;
+    hero.y += dy;
+    delete hero.action;
+    return 0;
+}
+
 export function getDistanceToPoint(state: GameState, actor: Actor, {x, y}: Point) {
     const anchor = getMovementAnchor(actor);
     const dx = x - anchor.x, dy = y - anchor.y;

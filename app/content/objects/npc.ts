@@ -1,7 +1,8 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {
     droneDirectionalAnimations, sentryBotAnimations,
-    rivalAnimations, snakeAnimations,
+    rivalAnimations, rivalSpiritAnimations,
+    snakeAnimations,
     omniAnimation,
 } from 'app/content/enemyAnimations';
 import {elementalFlameAnimation, elementalFrostAnimation, elementalStormAnimation} from 'app/content/enemies/elemental';
@@ -255,7 +256,15 @@ export const npcStyles: {[key in string]: NPCStyleDefinition} = {
     rival: {
         animations: rivalAnimations,
         shadowOffset: 1,
-        alternateRender: renderVanaraSpirit,
+        alternateRender(context: CanvasRenderingContext2D, state: GameState, npc: NPC) {
+            context.save();
+                context.globalAlpha *= 0.4;
+                let frame = getFrame(rivalSpiritAnimations.tail[npc.d], npc.animationTime);
+                npc.defaultRender(context, state, frame);
+                frame = getFrame(rivalSpiritAnimations.idle[npc.d], npc.animationTime);
+                npc.defaultRender(context, state, frame);
+            context.restore();
+        },
         color: '#444',
     },
     paleMonk: {
@@ -592,9 +601,11 @@ export class NPC implements Actor, ObjectInstance  {
         this.modeTime += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        this.defaultRender(context, state);
+    }
+    defaultRender(context: CanvasRenderingContext2D, state: GameState, frame: Frame = this.getFrame()) {
         this.applyAlpha(context, () => {
             const animationStyle = npcStyles[this.definition.style];
-            const frame = this.getFrame();
             const scale = animationStyle.scale || 1;
             if ((this.d === 'right' && animationStyle.flipRight) || (this.d === 'left' && animationStyle.flipLeft)) {
                 // Some sprites only have a left or a right frame that we flip to produce the other frame.

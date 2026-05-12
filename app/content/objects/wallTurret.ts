@@ -1,9 +1,10 @@
-import { CrystalSpike, drawArrow, drawCrystal, EnemyArrow } from 'app/content/effects/arrow';
-import { objectHash } from 'app/content/objects/objectHash';
+import {CrystalSpike, drawArrow, drawCrystal, EnemyArrow} from 'app/content/effects/arrow';
+import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
-import { createAnimation, drawFrame } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { directionMap } from 'app/utils/field';
+import {createAnimation, drawFrame} from 'app/utils/animations';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {directionMap} from 'app/utils/field';
+import {getAreaSize} from 'app/utils/getAreaSize';
 
 const underFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}).frames[0];
 const overFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}, {x: 1}).frames[0];
@@ -24,6 +25,7 @@ export const turretStyles = <const>{
                 vx: 4 * dx,
                 vy: 4 * dy,
                 source,
+                soundKey: 'smallShot',
             });
         },
         renderProjectile(this: void, context: CanvasRenderingContext2D, turret: WallTurret) {
@@ -42,6 +44,7 @@ export const turretStyles = <const>{
                 vx: 4 * dx,
                 vy: 4 * dy,
                 source,
+                soundKey: 'smallShot',
             });
         },
         renderProjectile(this: void, context: CanvasRenderingContext2D, turret: WallTurret) {
@@ -66,6 +69,7 @@ export class WallTurret implements ObjectInstance {
     fireOffset: number;
     style: TurretStyle;
     status: ObjectStatus = 'normal';
+    alwaysUpdate = false;
     constructor(state: GameState, definition: TurretDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -98,7 +102,14 @@ export class WallTurret implements ObjectInstance {
         const style = turretStyles[this.style] || turretStyles.arrow;
         style.fire(state, this, source);
     }
+    isInCurrentSection(state: GameState): boolean {
+        const {section} = getAreaSize(state);
+        return !(this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h);
+    }
     update(state: GameState) {
+        if (!this.alwaysUpdate && !this.isInCurrentSection(state)) {
+            return;
+        }
         this.animationTime += FRAME_LENGTH;
         // If fire override time is set, fire once the cooldown completes
         if (this.fireOverrideTime > 0) {

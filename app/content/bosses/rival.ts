@@ -247,6 +247,9 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
     }
     // Don't run any update logic while cutscenes are playing.
     if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length) {
+        if (!enemy.activeAbility) {
+            enemy.changeToAnimation('idle');
+        }
         return;
     }
     if (enemy.life <= 0) {

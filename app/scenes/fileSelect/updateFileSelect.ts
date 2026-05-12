@@ -1,5 +1,5 @@
 import {GAME_KEY} from 'app/gameConstants';
-import {getFileSelectOptions} from 'app/scenes/fileSelect/getFileSelectOptions';
+import {getFileSelectOptions, popMenuStack} from 'app/scenes/fileSelect/getFileSelectOptions';
 import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
@@ -34,6 +34,11 @@ export function updateFileSelect(state: GameState, scene: FileSelectScene) {
     }
     if (wasConfirmKeyPressed(state)) {
         highlightedOption.onConfirm?.(state, scene);
+        return;
+    }
+    if (wasGameKeyPressed(state, GAME_KEY.CANCEL)) {
+        popMenuStack(state, scene);
+        return;
     }
     if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
         highlightedOption.onLeft?.(state, scene);

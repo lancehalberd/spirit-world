@@ -57,17 +57,19 @@ function simpleOption(label: string, onConfirm: (state: GameState, scene: FileSe
 }
 
 const backOption = simpleOption('BACK', (state: GameState, scene: FileSelectScene) => {
-    scene.mode = 'select';
+    popMenuStack(state, scene);
+    setSaveFileToState(state, scene.cursorIndex, scene.gameMode);
 });
 
 const cancelDeleteOption = simpleOption('CANCEL', (state: GameState, scene: FileSelectScene) => {
-    scene.mode = 'select';
-    scene.cursorIndex = state.savedGameIndex;
+    popMenuStack(state, scene);
     setSaveFileToState(state, state.savedGameIndex, scene.gameMode);
 });
 
 const confirmDeleteOption = simpleOption('DELETE', (state: GameState, scene: FileSelectScene) => {
     scene.mode = 'select';
+    console.log('deleting', state.savedGameIndex);
+    const initialLength = scene.savedGames.length;
     if (scene.gameMode === 'randomizer') {
         scene.savedGames.splice(state.savedGameIndex, 1);
         // Make sure there is still a "New Game" option at the end of the list.
@@ -78,20 +80,26 @@ const confirmDeleteOption = simpleOption('DELETE', (state: GameState, scene: Fil
         scene.savedGames[state.savedGameIndex] = null;
     }
     saveGamesToLocalStorage(state);
-    scene.cursorIndex = state.savedGameIndex;
+    // Pop both the select file to delete and the confirm delete dialog.
+    popMenuStack(state, scene);
+    popMenuStack(state, scene);
+    // Adjust the cursor position if an entry was full removed from the
+    scene.cursorIndex -= (initialLength - scene.savedGames.length);
     setSaveFileToState(state, state.savedGameIndex, scene.gameMode);
 });
 
-const customRandomizerOption = simpleOption('CUSTOMIZE', (state: GameState, scene: FileSelectScene) => {
-    scene.mode = 'customizeRandomizer';
-    scene.cursorIndex = 0;
-    setSaveFileToState(state, -1, scene.gameMode);
+const startRandomizerOption = simpleOption('START', (state: GameState, scene: FileSelectScene) => {
+    startNewRandomizerGame(state, scene);
 });
 
 const deleteOption = simpleOption('DELETE', (state: GameState, scene: FileSelectScene) => {
-    scene.mode = 'deleteSavedGame';
-    scene.cursorIndex = 0;
-    setSaveFileToState(state, scene.cursorIndex, scene.gameMode);
+    pushMenuStack(state, scene, 'deleteSavedGame');
+    // Show the first saved game that can be deleted when switching to the delete menu.
+    for (let i = 0; i < scene.savedGames.length; i++) {
+        if (!scene.savedGames[i]) continue;
+        setSaveFileToState(state, i, scene.gameMode);
+        break;
+    }
 });
 
 const titleOption = simpleOption('TITLE', (state: GameState, scene: FileSelectScene) => {
@@ -251,6 +259,7 @@ const entranceOption: FileSelectOption = {
 
 export function getRandomizerOptions(state: GameState, scene: FileSelectScene): FileSelectOption[] {
     let options = [
+        startRandomizerOption,
         backOption,
         seedOption,
         entranceOption,
@@ -307,18 +316,19 @@ export function getFileSelectOptions(state: GameState, scene: FileSelectScene): 
     if (scene.mode === 'deleteSavedGameConfirmation') {
         return [cancelDeleteOption, confirmDeleteOption];
     }
-    const options: FileSelectOption[] = scene.savedGames.map((savedGame: SavedState, index: number) => {
+    const options: FileSelectOption[] = scene.savedGames
+        .filter(game => scene.mode !== 'deleteSavedGame' || game)
+        .map((savedGame: SavedState, index: number) => {
         return {
             onHighlight(state: GameState, scene: FileSelectScene) {
-                setSaveFileToState(state, scene.cursorIndex, scene.gameMode);
+                setSaveFileToState(state, scene.savedGames.indexOf(savedGame), scene.gameMode);
             },
             onConfirm(state: GameState, scene: FileSelectScene) {
                 if (scene.mode === 'select') {
                     selectSaveFile(state, scene);
                 } else if (scene.mode === 'deleteSavedGame') {
-                    state.savedGameIndex = scene.cursorIndex;
-                    scene.mode = 'deleteSavedGameConfirmation';
-                    scene.cursorIndex = 0;
+                    state.savedGameIndex = scene.savedGames.indexOf(savedGame);
+                    pushMenuStack(state, scene, 'deleteSavedGameConfirmation');
                 }
             },
             render: optionLabelRenderer(getSavedGameLabel(savedGame, index), getSavedGameSubtext(savedGame)),
@@ -327,12 +337,35 @@ export function getFileSelectOptions(state: GameState, scene: FileSelectScene): 
     if (scene.mode === 'deleteSavedGame') {
         return [...options, cancelDeleteOption];
     }
-    if (scene.gameMode === 'randomizer') {
-        options.push(customRandomizerOption);
+    if (scene.savedGames.filter(game => game).length) {
+        options.push(deleteOption);
     }
-    options.push(deleteOption);
     options.push(titleOption);
     return options;
+}
+
+function startNewRandomizerGame(state: GameState, scene: FileSelectScene): void {
+    state.hero.savedData.spawnLocation = SPAWN_LOCATION_WATERFALL_VILLAGE;
+    state.savedState.savedRandomizerData = scene.randomizerConfig;
+    showRandomizerScene(state, state.savedState.savedRandomizerData);
+    const {goal, total} = state.savedState.savedRandomizerData.goal?.victoryPoints ?? {};
+    if (goal && total) {
+        setScript(state, `Find ${goal} of ${total} Victory Points then talk to your mom to win!`);
+    }
+}
+function pushMenuStack(state: GameState, scene: FileSelectScene, mode: FileSelectScene['mode']) {
+    scene.menuStack.push({cursorIndex: scene.cursorIndex, mode: scene.mode});
+    scene.cursorIndex = 0;
+    scene.mode = mode;
+}
+export function popMenuStack(state: GameState, scene: FileSelectScene) {
+    if (!scene.menuStack.length) {
+        showTitleScene(state);
+    } else {
+        const {cursorIndex, mode} = scene.menuStack.pop();
+        scene.cursorIndex = cursorIndex;
+        scene.mode = mode;
+    }
 }
 
 function selectSaveFile(state: GameState, scene: FileSelectScene): void {
@@ -342,35 +375,23 @@ function selectSaveFile(state: GameState, scene: FileSelectScene): void {
     if (!savedGame) {
         // Choose correct starting location and condition based on game mode.
         if (scene.gameMode === 'randomizer') {
-            state.hero.savedData.spawnLocation = SPAWN_LOCATION_WATERFALL_VILLAGE;
+            setSaveFileToState(state, scene.cursorIndex, scene.gameMode);
+            pushMenuStack(state, scene, 'customizeRandomizer');
+            return;
         } else {
             state.hero.savedData.spawnLocation = SPAWN_LOCATION_FULL;
         }
-        if (scene.gameMode === 'randomizer') {
-            state.savedState.savedRandomizerData = scene.randomizerConfig;
-            showRandomizerScene(state, state.savedState.savedRandomizerData);
-            const {goal, total} = state.savedState.savedRandomizerData.goal?.victoryPoints ?? {};
-            if (goal && total) {
-                setScript(state, `Find ${goal} of ${total} Victory Points then talk to your mom to win!`);
-            }
-            /*if (randomizerGoalType === 'finalBoss') {
-                setScript(state, `Defeat the final boss then talk to your mom to win!`);
-            } else if (randomizerGoalType === 'victoryPoints') {
-                setScript(state, `Find ${randomizerGoal} of ${randomizerTotal} Victory Points then talk to your mom to win!`);
-            }*/
-        } else {
-            // Note that currently variantSeed is not saved on non-randomizer save files.
-            // Changes between variants are intended to be mild enough that it won't effect
-            // your game progress to switch from one variant to another.
-            state.variantSeed = getDefaultState().variantSeed;
-            generateZoneVariations(state);
-            updateHeroMagicStats(state, true);
-            returnToSpawnLocation(state);
-            showFieldScene(state);
-            state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', false);
-            state.scriptEvents.queue.push({type: 'wait', duration: 1000});
-            state.scriptEvents.queue.push({type: 'clearTextBox'});
-        }
+        // Note that currently variantSeed is not saved on non-randomizer save files.
+        // Changes between variants are intended to be mild enough that it won't effect
+        // your game progress to switch from one variant to another.
+        state.variantSeed = getDefaultState().variantSeed;
+        generateZoneVariations(state);
+        updateHeroMagicStats(state, true);
+        returnToSpawnLocation(state);
+        showFieldScene(state);
+        state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', false);
+        state.scriptEvents.queue.push({type: 'wait', duration: 1000});
+        state.scriptEvents.queue.push({type: 'clearTextBox'});
         return;
     }
     setSaveFileToState(state, scene.cursorIndex, scene.gameMode);

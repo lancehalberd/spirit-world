@@ -1,15 +1,18 @@
-import { logicHash } from 'app/content/logic';
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { FRAME_LENGTH, RIVAL_NAME } from 'app/gameConstants';
+import {logicHash} from 'app/content/logic';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {FRAME_LENGTH, RIVAL_NAME} from 'app/gameConstants';
 import {getMovementAnchor, moveActorTowardsLocation} from 'app/movement/moveActor';
-import {appendCallback, appendScript, runBlockingCallback, runPlayerBlockingCallback, wait} from 'app/scriptEvents';
-import { updateGenericHeroState } from 'app/updateActor';
+import {
+    appendCallback, appendScript, hideHUD,
+    runBlockingCallback, runPlayerBlockingCallback, showHUD, wait
+} from 'app/scriptEvents';
+import {updateGenericHeroState} from 'app/updateActor';
 import {faceTarget} from 'app/utils/actor';
-import { createObjectInstance } from 'app/utils/createObjectInstance';
-import { saveGame } from 'app/utils/saveGame';
-import { moveEnemyToTargetLocation } from 'app/utils/enemies';
-import { moveNPCToTargetLocation } from 'app/utils/npc';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
+import {saveGame} from 'app/utils/saveGame';
+import {moveEnemyToTargetLocation} from 'app/utils/enemies';
+import {moveNPCToTargetLocation} from 'app/utils/npc';
+import {addObjectToArea, removeObjectFromArea, removeObjectFromAreaById} from 'app/utils/objects';
 
 
 function getRivalBoss(state: GameState): Enemy {
@@ -36,6 +39,12 @@ dialogueHash.elder = {
             if (!rival) {
                 return '';
             }
+            hideHUD(state, (state: GameState) => {
+                removeObjectFromArea(state, rival);
+                removeObjectFromAreaById(state, state.areaInstance, 'elder');
+                state.hero.life = state.hero.savedData.maxLife;
+            });
+            state.hero.prepareForCutScene();
             rival.activeAbility = null;
             //rival.z = 0;
             rival.healthBarTime = -10000;
@@ -193,6 +202,7 @@ dialogueHash.elder = {
                             }
                             removeObjectFromArea(state, rival);
                             delete state.scriptEvents.overrideMusic;
+                            showHUD(state);
                             return false;
                         },
                     });

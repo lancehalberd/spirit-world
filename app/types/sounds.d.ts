@@ -57,6 +57,9 @@ interface GameSound {
     instanceLimit?: number
     volume?: number
     speed?: number
+    // If this is set to true, duplicate instanecs of this sound on the same frame
+    // will be skipped instead of doubled up or staggered.
+    skipDuplicates?: boolean
     // This is just used by custom audio context sounds
     play?: (target: AudioNode, time: number) => void | ((time: number) => void)
 }
