@@ -104,7 +104,17 @@ export function copyState(state: GameState): GameState {
 }
 
 export function getMappedLootData(randomizerState: RandomizerState, lootObject: AnyLootDefinition): LootData {
-    return randomizerState?.items?.lootAssignments?.[lootObject.id] ?? lootObject;
+    const mappedObject = randomizerState?.items?.lootAssignments?.[lootObject.id] ?? lootObject;
+    if (mappedObject.lootType === 'spiritSight'
+        || mappedObject.lootType === 'astralProjection'
+        || mappedObject.lootType === 'teleportation'
+    ) {
+        return {
+            ...mappedObject,
+            lootType: 'spiritPower',
+        };
+    }
+    return mappedObject;
 }
 
 export function applyLootObjectToState(randomizerState: RandomizerState, simulatedState: GameState, lootWithLocation: LootWithLocation): GameState {

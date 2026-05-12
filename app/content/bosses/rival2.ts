@@ -485,10 +485,10 @@ const rival2: EnemyDefinition<Params> = {
                 return {};
             }
             // Gain a use of the roll ability on taking damage in order to avoid followup attacks.
-            const abilityWithCharges = enemy.getAbility(rollAbility);
+            /*const abilityWithCharges = enemy.getAbility(rollAbility);
             if (abilityWithCharges.charges < (rollAbility.charges || 1)) {
                 abilityWithCharges.charges++;
-            }
+            }*/
         }
         const hitResult = enemy.defaultOnHit(state, hit);
         if (hitResult.damageDealt) {

@@ -1,4 +1,5 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {getLootName} from 'app/content/loot';
 import {getZone} from 'app/content/zones';
 import {addCheck} from 'app/randomizer/checks';
 import {
@@ -211,6 +212,14 @@ function assignItemToLocation(randomizerState: RandomizerState, loot: LootWithLo
     } else {
         console.log('placing', loot.lootObject.lootType, ' to dialogue ', assignedLocation.dialogueKey, assignedLocation.optionKey);
     }*/
+    // Change spirit powers into progressive spirit powers when placing them.
+    /*let lootType = lootData.lootType;
+    if (lootType === 'spiritSight'
+        || lootType === 'astralProjection'
+        || lootType === 'teleportation'
+    ) {
+        lootType = 'spiritPower';
+    }*/
     assignmentsState.assignments[assignedLocation.lootObject.id] = {
         lootType: lootData.lootType,
         lootAmount: lootData.lootAmount,
@@ -235,12 +244,17 @@ function collectAllLoot(randomizerState: RandomizerState, simulatedState: GameSt
         const assignment = assignmentsState.assignments[check.lootObject.id];
         // Only gain the loot if it has already been assigned. Otherwise we pretend the check is still empty.
         if (assignment) {
+            // This can be set to observe when the initial randomizer state gets updated during reverse fill
+            // to check that the logic matches our expectations.
+            if (window.debugInitialRandomizerState && ignoreUnassignedChecks) {
+                const lootData = getMappedLootData(randomizerState, assignment.source.lootObject);
+                if (assignment.target.location) {
+                    console.log(`    Get ${getLootName(simulatedState, {...lootData, lootLevel: 0})} at ${assignment.target.location.zoneKey}:${assignment.target.lootObject.id}`);
+                } else {
+                    console.log(`    Get ${getLootName(simulatedState, {...lootData, lootLevel: 0})} from ${assignment.target.dialogueKey}:${assignment.target.optionKey}`);
+                }
+            }
             simulatedState = applyLootObjectToState(randomizerState, simulatedState, assignment.source);
-            /*if (assignment.target.location) {
-                console.log(`    Get ${getLootName(assignment.source.lootObject, state)} at ${assignment.target.location.zoneKey}:${assignment.target.lootObject.id}`);
-            } else {
-                console.log(`    Get ${getLootName(assignment.source.lootObject, state)} from ${assignment.target.dialogueKey}:${assignment.target.optionKey}`);
-            }*/
         } else if (ignoreUnassignedChecks) {
             continue;
         }
@@ -273,10 +287,6 @@ function placeItem(randomizerState: RandomizerState, originalState: GameState, l
     const allReachableChecks: LootWithLocation[] = findReachableChecks(randomizerState, currentState, false);
     const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.has(lootWithLocation.lootObject.id));
     let allAppropriateChecks = allAvailableChecks;
-    /*if (loot.lootObject.lootType === 'spiritSight') {
-        console.log('hasTeleportation', isLogicValid(currentState, hasTeleportation));
-        debugger;
-    }*/
     if (loot.lootObject.lootType === 'bigKey'
         || loot.lootObject.lootType === 'smallKey'
         || loot.lootObject.lootType === 'map'
@@ -401,7 +411,7 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
     window.throttleCount = 0;
     //const startTime = Date.now();
     const {allLootObjects} = randomizerState;
-    const {
+    let {
         random,
         assignmentsState,
         allItemSets,
@@ -413,6 +423,10 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
     for (let itemSet of allItemSets) {
         while (itemSet.length) {
             const itemToPlace = random.mutate().removeElement(itemSet);
+            /*if (itemToPlace.lootObject.lootType === 'cloak') {
+                console.log('initialState hasTeleportation', initialState.hero.savedData.passiveTools.teleportation);
+                debugger;
+            }*/
             remainingLoot.splice(remainingLoot.indexOf(itemToPlace), 1);
             // Compute the current state without the chosen item or any of the previously placed items.
             //const startTime = Date.now();
@@ -441,7 +455,11 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
                 currentState = collectAllLoot(randomizerState, previousState, true);
                 currentState = setAllFlagsInLogic(randomizerState, currentState);
             } while (currentState !== previousState);
-            randomizerState.items.initialState = currentState;
+            initialState = randomizerState.items.initialState = currentState;
+            /*if (initialState.hero.savedData.passiveTools.teleportation) {
+                console.log('initialState hasTeleportation', initialState.hero.savedData.passiveTools.teleportation);
+                debugger;
+            }*/
 
             steps--;
             if (steps <= 0) {
@@ -449,6 +467,7 @@ export function reverseFill(randomizerState: RandomizerState, steps: number): bo
             }
         }
     }
+
     // Placing trash loot requires no simulation, so we can do this in a single frame.
     for (const location of allLootObjects) {
         if (!trashLoot.length) {
@@ -477,13 +496,6 @@ export function applyLootAssignments(randomizerState: RandomizerState): void {
     // console.log('applying assignments:');
     // console.log(assignments);
     for (const assignment of assignments) {
-        // Change spirit powers into progressive spirit powers.
-        if (assignment.lootType === 'spiritSight'
-            || assignment.lootType === 'astralProjection'
-            || assignment.lootType === 'teleportation'
-        ) {
-            assignment.lootType = 'spiritPower';
-        }
         if (assignment.target.dialogueKey) {
             const {dialogueKey, optionKey} = assignment.target;
             const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
