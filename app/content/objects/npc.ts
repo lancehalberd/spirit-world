@@ -74,7 +74,7 @@ interface NPCStyleDefinition {
 }
 
 function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state: GameState, npc: NPC): void {
-    if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight) {
+    if (!state.hero.savedData.passiveTools.spiritSight && !state.hero.savedData.passiveTools.trueSight && state.hero.maxSpiritRadius <= 0) {
         return;
     }
     const animationStyle = npcStyles[npc.definition.style];

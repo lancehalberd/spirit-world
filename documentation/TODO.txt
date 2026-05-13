@@ -148,7 +148,6 @@ Graphics to Implement:
 Current tasks:
     - Demo blockers
         - Arrows in war temple are audible in section to the left.
-        - Guardian spirit suddenly appears when learning spirit sight
         - Rando chest not making noise, maybe because empty?
         - Add SFX for water splash effect.
         - Update packed sprites
