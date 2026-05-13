@@ -301,12 +301,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     }
     isInCurrentSection(state: GameState): boolean {
         const { section } = getAreaSize(state);
-        return !(this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h)
+        return !(this.x < section.x || this.x >= section.x + section.w || this.y < section.y || this.y >= section.y + section.h)
     }
     isFromCurrentSection(state: GameState): boolean {
         const { section } = getAreaSize(state);
-        return !(this.spawnX < section.x || this.spawnX > section.x + section.w ||
-                this.spawnY < section.y || this.spawnY > section.y + section.h)
+        return !(this.spawnX < section.x || this.spawnX >= section.x + section.w ||
+                this.spawnY < section.y || this.spawnY >= section.y + section.h)
     }
     changeToAnimation(type: string, nextAnimationKey?: string) {
         if (!this.animations) {

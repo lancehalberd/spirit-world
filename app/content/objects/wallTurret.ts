@@ -104,7 +104,7 @@ export class WallTurret implements ObjectInstance {
     }
     isInCurrentSection(state: GameState): boolean {
         const {section} = getAreaSize(state);
-        return !(this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h);
+        return !(this.x < section.x || this.x >= section.x + section.w || this.y < section.y || this.y >= section.y + section.h);
     }
     update(state: GameState) {
         if (!this.alwaysUpdate && !this.isInCurrentSection(state)) {
