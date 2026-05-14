@@ -105,9 +105,17 @@ export class LootGetAnimation implements EffectInstance {
             } else if (this.loot.lootType === 'peachOfImmortalityPiece' || this.loot.lootType === 'money'
                 || this.loot.lootType === 'smallKey' || this.loot.lootType === 'map' || this.loot.lootType === 'peach'
             ) {
-                playSound('smallSuccessChime');
+                const audioInstance = playSound('smallSuccessChime');
+                if (!audioInstance) {
+                    console.log(this);
+                    debugger;
+                }
             } else {
-                playSound('bigSuccessChime');
+                const audioInstance = playSound('bigSuccessChime');
+                if (!audioInstance) {
+                    console.log(this);
+                    debugger;
+                }
             }
         }
         if (this.animationTime === 1000) {

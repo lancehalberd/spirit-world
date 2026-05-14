@@ -148,10 +148,6 @@ Graphics to Implement:
 Current tasks:
     - Sometimes chests are not playing SFX, difficult to reproduce.
 
-    - Demo blockers
-        - Update packed sprites
-        - Test final version
-
     - Add grass + moss tiles to the forest.
 
     - Graphics added but not used yet:
