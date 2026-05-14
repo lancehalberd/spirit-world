@@ -10,9 +10,7 @@ import {saveSettings} from 'app/utils/saveSettings';
 import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
 
 export function updateFileSelect(state: GameState, scene: FileSelectScene) {
-    // Any users that try to use the old URL params for item or entrance randomization
-    // will have the randomizer mode automatically unlocked for them instead of
-    // manually unlocking it through beating the game or using the context menu.
+    // Randomizer is unlocked by default outside of the demo.
     if (!state.settings.isRandomizerUnlocked && !state.isDemoMode) {
         state.settings.isRandomizerUnlocked = true;
         saveSettings(state);
