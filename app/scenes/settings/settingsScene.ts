@@ -107,7 +107,7 @@ export class SettingsScene implements GameScene {
                             state.sceneStack.pop();
                         },
                     }]
-                )
+                );
                 playSound('menuTick');
                 break;
             case muteAllSounds:

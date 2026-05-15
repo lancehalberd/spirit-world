@@ -1,6 +1,4 @@
-
 import {editingState} from 'app/development/editingState';
-import {renderARHUD} from 'app/arGames/arGame';
 import {getLootFrame} from 'app/content/loot';
 import {CANVAS_HEIGHT, CANVAS_WIDTH} from 'app/gameConstants';
 import {getCheckInfo} from 'app/randomizer/checks';
@@ -219,7 +217,6 @@ export class HudScene implements GameScene {
             // Render the HUD normally.
             this.renderProper(context, state);
         }
-        renderARHUD(context, state);
     }
     renderProper(context: CanvasRenderingContext2D, state: GameState) {
         // Draw heart backs, and fillings
@@ -419,7 +416,6 @@ export class HudScene implements GameScene {
                 size: 16,
             });
         }
-        //renderARHUD(context, state);
     }
 }
 

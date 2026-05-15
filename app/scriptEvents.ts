@@ -36,23 +36,6 @@ export function appendCallback(state: GameState, callback: (state: GameState) =>
     });
 }
 
-export function waitForARGameToFinish(state: GameState) {
-    appendCallback(state, (state) => {
-        state.scriptEvents.activeEvents.push({
-            type: 'wait',
-            time: 0,
-            callback(state: GameState) {
-                return state.arState.active;
-            },
-            blockPlayerUpdates: true,
-        });
-        // Make sure these block player/field updates as soon as this is appended and not on the next frame.
-        state.scriptEvents.blockPlayerUpdates = true;
-        // Make sure no other scripts are processed until this finishes.
-        return true;
-    });
-}
-
 export function runBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
     appendCallback(state, (state) => {
         state.scriptEvents.activeEvents.push({

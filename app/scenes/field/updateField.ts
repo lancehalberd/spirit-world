@@ -1,4 +1,3 @@
-import {updateAR} from 'app/arGames/arGame';
 import {refreshAreaLogic} from 'app/content/areas';
 import {addObjectFallAnimation, addEnemyFallAnimation, addSplashAnimation} from 'app/content/effects/animationEffect';
 import {Enemy} from 'app/content/enemy';
@@ -45,10 +44,6 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
     // If `refreshAreaLogic` started a transition effect, skip this update since we
     // don't want to perform field updates until the transition effect completes.
     if (state.transitionState) {
-        return;
-    }
-    if (interactive && state.arState.active && (wasGameKeyPressed(state, GAME_KEY.MENU) || wasGameKeyPressed(state, GAME_KEY.MAP))) {
-        showMessage(state, '{@arGame.quit}');
         return;
     }
     // The map isn't useful during boss rush so we use it to show a quit menu.
@@ -129,7 +124,6 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
         updateAreaObjects(state, state.nextAreaInstance);
     }
     updateAreaObjects(state, state.alternateAreaInstance);
-    updateAR(state)
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {

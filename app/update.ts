@@ -28,7 +28,7 @@ export function update() {
         if (!scene) {
             debugger;
         }
-        scene.update(state, !blockInput);
+        scene.update?.(state, !blockInput);
         if (!blockInput) {
             blockInput = scene.blocksInput;
         }

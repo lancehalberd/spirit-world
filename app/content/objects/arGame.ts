@@ -1,5 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
-import {showMessage} from 'app/scriptEvents';
+import {showARGameScene} from 'app/scenes/arGame/arGameScene';
+import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
+import {appendCallback, parseScriptAsTextPage, showMessage} from 'app/scriptEvents';
 import {drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
 import {arDevice} from 'app/content/loot';
 
@@ -32,11 +34,26 @@ export class ARGame implements ObjectInstance {
         if (!this.isVisible(state)) {
             return;
         }
-        state.arState.scene = 'choose';
-        if (this.definition.gameId) {
-            state.arState.scene = this.definition.gameId;
+        if (!this.definition.gameId) {
+            showMessage(state, `It's an AR device, but it doesn't seem to be working.`);
+            return;
         }
-        showMessage(state, '{@arGame.start}');
+        showMessage(state, `It's an AR device`);
+        appendCallback(state, state => {
+            showChoiceScene(state, parseScriptAsTextPage(state, 'Play AR?'),
+                [{
+                    text: 'Yes',
+                    activate: (state: GameState) => {
+                        showARGameScene(state, this.definition.gameId);
+                    },
+                },{
+                    text: 'No',
+                    activate(state: GameState) {
+                        return;
+                    },
+                }]
+            );
+        });
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (!this.isVisible(state)) {
