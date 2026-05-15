@@ -55,7 +55,7 @@ export const RIVAL_NAME = 'Saru';
 
 export const CHAKRAM_2_NAME = 'Golden Chakram';
 
-// TODO: Use the hardcoded values below when releasing the demo:
+// Use the hardcoded values below when releasing the demo:
 //export const isDemoMode = true;
 //export const isDebugMode = false;
 export const isDemoMode = !!readGetParameterAsInt('demo');
