@@ -34,3 +34,4 @@ export function toggleControlsScene(state: GameState) {
         pushScene(state, controlsScene);
     }
 }
+window.toggleShowControls = toggleControlsScene;
