@@ -67,7 +67,9 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
     }
     if (best) {
         hero.x = best.x;
-        hero.y = best.y;
+        // subtract 1 here to account for the hero's movement hitbox being 1px lower than
+        // its normal hitbox. Without this, the movement hitbox will not perfectly match 16x16 targets.
+        hero.y = best.y - 1;
         if (!inSection) {
             updateAreaSection(state, true);
         }

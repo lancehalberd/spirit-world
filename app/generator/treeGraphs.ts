@@ -6,15 +6,16 @@ import {
     hasMediumRange,
     hasSmallKey, hasSpiritBarrier, hasWeapon,
 } from 'app/content/logic';
-import { zones } from 'app/content/zones/zoneHash';
-import { getOrAddLayer } from 'app/utils/layers';
+import {populateAllSections} from 'app/content/sections';
+import {zones} from 'app/content/zones/zoneHash';
+import {getOrAddLayer} from 'app/utils/layers';
 import SRandom from 'app/utils/SRandom';
-import { createSpecialCaveFloor } from 'app/generator/styles/cave';
-import { createSpecialStoneFloor } from 'app/generator/styles/stone';
-import { generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath } from 'app/generator/skeletons/basic';
-import { addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors } from 'app/generator/doors';
-import { populateTombBoss, populateTombGuardianRoom } from 'app/generator/rooms/tomb';
-import { pad } from 'app/utils/index';
+import {createSpecialCaveFloor} from 'app/generator/styles/cave';
+import {createSpecialStoneFloor} from 'app/generator/styles/stone';
+import {generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath} from 'app/generator/skeletons/basic';
+import {addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors} from 'app/generator/doors';
+import {populateTombBoss, populateTombGuardianRoom} from 'app/generator/rooms/tomb';
+import {pad} from 'app/utils/index';
 
 const baseVariantRandom = (state: GameState) => SRandom.seed(state.variantSeed);
 
@@ -25,17 +26,15 @@ TODO:
     A. Starting with the deepest leaf, do a BFS of the grid up to depth 3 and stop on encountering a populated node.
     B. For each populated node, record the node, path and the difference in node depth
 
-TODO: Improve performance by creating zones on demand. (This might be more work than it is worth)
+TODO: Improve performance by creating zones on demand.
     Make generation within each zone independent of other zones.
     Only generate data needed for randomization initially
         Randomizer logic with full definitions needed for randomization
             lootObject: {id, type, amount, level} instead of just objectId on checks
             doorObject: {...} instead of objectId for entrances/locked doors
-        Update randomizer to modify these values during entrance/item randomization when they are found
-    Make generation read definitions from generated logic when generated the final zone so that randomizer changes are applied.
-
-    * If this is too much work, an alternative would be to use in demand generation for procedural only so that mode is fast, and
-    then for randomizer just generate everything initially as part of randomization since randomization takes a while anyway.
+    Latest randomization code should be able to work with these as is since they are all based on logic and the mappings get applied
+    at run time so they will automatically override the correct checks/doors assuming the logic is defined correctly and correctly
+    implemented by the generator.
 
 TODO: Add tags that can be set on nodes/slots/paths that can be used for additional context for example:
     'high'/'low' to indicate relative z value
@@ -227,8 +226,7 @@ function attemptToPlaceChild(
     console.log(normalCoords);
     console.log(badCoords);*/
     for (const coordsList of [goodCoords, normalCoords, badCoords]) {
-        random.generateAndMutate();
-        for (const coords of random.shuffle(coordsList)) {
+        for (const coords of random.mutate().shuffle(coordsList)) {
             if (tryPlacingNode(nodeMap, child, coords)) {
                 return child;
             }
@@ -260,7 +258,7 @@ function attemptToPlaceChild(
         return attemptToPlaceChild(random, nodeMap, {xMin, xMax, yMin, yMax, zMin, zMax}, constraints, parent, newNode);
     }
     // If we failed to place the child and it has defined entrance directions, we need to add an intermediate node without
-    // the entrance direction restriction. To make sure this resolves as quickly as possible, we
+    // the entrance direction restriction. To make sure this resolves as quickly as possible, we:
     if (child.entranceDirections) {
         // Exhaust all paths that stay on the same floor first.
         const pathMapGood: {[key in CardinalDirection]: number[][][]} = {
@@ -301,11 +299,9 @@ function attemptToPlaceChild(
             ],
         };
         for (const pathMap of [pathMapGood, pathMapBad]) {
-            random.generateAndMutate();
-            for (const direction of random.shuffle(Object.keys(pathMap)  as CardinalDirection[])) {
+            for (const direction of random.mutate().shuffle(Object.keys(pathMap)  as CardinalDirection[])) {
                 if (child.entranceDirections.includes(direction)) {
-                    random.generateAndMutate();
-                    for (const path of random.shuffle(pathMap[direction])) {
+                    for (const path of random.mutate().shuffle(pathMap[direction])) {
                         const [x1, y1, z1] = path[0];
                         const [x2, y2, z2] = path[1];
                         // Validate all the coordinates respect the constraints
@@ -365,7 +361,7 @@ function checkToExpandPlacedNode(
         if (node.wide !== undefined) {
             return;
         }
-        if (random.generateAndMutate() > expandRoomChance) {
+        if (random.mutateAndGenerate() > expandRoomChance) {
             return;
         }
         // Can only expand if the new coordinate fits within the constraints for the x value.
@@ -387,7 +383,7 @@ function checkToExpandPlacedNode(
         if (node.tall !== undefined) {
             return;
         }
-        if (random.generateAndMutate() > expandRoomChance) {
+        if (random.mutateAndGenerate() > expandRoomChance) {
             return;
         }
         // Can only expand if the new coordinate fits within the constraints for the y value.
@@ -408,8 +404,7 @@ function checkToExpandPlacedNode(
             node.dimensions.h = 1;
         }
     }
-    random.generateAndMutate();
-    if (random.generateAndMutate() < 0.5) {
+    if (random.mutateAndGenerate() < 0.5) {
         tryMakingWider();
         tryMakingTaller();
     } else {
@@ -449,12 +444,9 @@ function createZoneFromTree(props: {
 
     const nodeMap: NodeMap = {};
     // Choose random parity for the starting room so that the initial room is not always placed in the top left corner
-    random.generateAndMutate();
-    const startX = random.range(entrance.x[0], entrance.x[1]);
-    random.generateAndMutate();
-    const startY = random.range(entrance.y[0], entrance.y[1]);
-    random.generateAndMutate();
-    const startZ = random.range(entrance.z[0], entrance.z[1]);
+    const startX = random.mutate().range(entrance.x[0], entrance.x[1]);
+    const startY = random.mutate().range(entrance.y[0], entrance.y[1]);
+    const startZ = random.mutate().range(entrance.z[0], entrance.z[1]);
     let xMin = startX, xMax = startX, yMin = startY, yMax = startY, zMin = startZ, zMax = startZ;
     if (xMin % 2) {
         xMin--;
@@ -765,8 +757,7 @@ function createZoneFromTree(props: {
                         if (fieldLayer.grid.tiles[y][x] !== 0 && fieldLayer.grid.tiles[y][x] !== 1) {
                             continue;
                         }
-                        random.generateAndMutate();
-                        fieldLayer.grid.tiles[y][x] = random.element(tiles);
+                        fieldLayer.grid.tiles[y][x] = random.mutate().element(tiles);
                     }
                 }
             }
@@ -779,7 +770,7 @@ function createZoneFromTree(props: {
         }
         if (node.type === 'treasure') {
             node.lootType = 'money'
-            const roll = random.generateAndMutate();
+            const roll = random.mutateAndGenerate();
             if (roll < 0.1) {
                 node.lootAmount = 100;
             } else if (roll < 0.5) {
@@ -873,12 +864,11 @@ function createZoneFromTree(props: {
                 const mustAddEnemy = enemyRequired && !enemyDifficulty;
                 if (mustAddEnemy || (enemyDifficulty < roomDifficulty && random.mutate().random() < 0.8)) {
                     // TODO: Use enemies code to add an enemy that matches contextual requirements and difficulty.
-                    random.generateAndMutate();
                     node.baseArea.objects.push({
                         type: 'enemy',
                         enemyType: node.baseArea.isSpiritWorld
-                            ? random.element(['plantFlame','plantFrost','plantStorm'])
-                            : random.element(['beetleHorned', 'snake', 'plant', 'beetleWinged']) ,
+                            ? random.mutate().element(['plantFlame','plantFrost','plantStorm'])
+                            : random.mutate().element(['beetleHorned', 'snake', 'plant', 'beetleWinged']) ,
                         id: `${node.id}-enemy`,
                         d: 'down',
                         status: 'normal',
@@ -1004,8 +994,7 @@ function tryPlacingNode(nodeMap: NodeMap, node: TreeNode, coords: Point): boolea
 
 function normalizeTree(random: SRandom, tree: TreeNode) {
     if (tree.requirements?.[0].length > 1) {
-        random.generateAndMutate();
-        const firstRequirement = random.removeElement(tree.requirements[0]);
+        const firstRequirement = random.mutate().removeElement(tree.requirements[0]);
         // The new node will have all the properties of the current node except for the one removed requirement.
         const newNode: TreeNode = {
             ...tree,
@@ -1017,8 +1006,7 @@ function normalizeTree(random: SRandom, tree: TreeNode) {
     // Normalized tree has at most 4 edges per node: one entrance + three exits.
     const childCount = (tree.nodes?.length || 0);
     if (childCount > 3) {
-        random.generateAndMutate();
-        const allNodes = random.shuffle(tree.nodes);
+        const allNodes = random.mutate().shuffle(tree.nodes);
         const cutoff = Math.min(2, (tree.nodes.length / 2) | 0);
         tree.nodes = allNodes.slice(0, cutoff);
         // This new node will get recursively normalized if it still has too many edges.
@@ -1031,19 +1019,17 @@ function normalizeTree(random: SRandom, tree: TreeNode) {
 
 
 function mutateTree(random: SRandom, tree: TreeNode) {
-    random.generateAndMutate();
     const childCount = (tree.nodes?.length || 0);
     // non-leaf nodes that are not full have a chance of adding an extra leaf to them
     // which might be a bonus treasure or a trap room
     if (childCount === 1 || childCount === 2) {
-        const roll = random.generateAndMutate();
+        const roll = random.mutateAndGenerate();
         if (roll < 0.1) {
             tree.nodes.push({
                 lootType: 'smallKey',
             });
-            const i = random.range(0, 1);
-            random.generateAndMutate();
-            if (random.generateAndMutate() > 0.3) {
+            const i = random.mutate().range(0, 1);
+            if (random.mutateAndGenerate() > 0.3) {
                 // Most of the time add the locked door immediately to this node.
                 tree.nodes.splice(i, 1, {
                     nodes: [tree.nodes[i]],
@@ -1060,7 +1046,7 @@ function mutateTree(random: SRandom, tree: TreeNode) {
             }
         } else if (roll < 0.2) {
             tree.nodes.push({
-                type: (random.generateAndMutate()) < 0.25 ? 'trap' : 'treasure'
+                type: (random.mutateAndGenerate()) < 0.25 ? 'trap' : 'treasure'
             });
         }
     }
@@ -1069,7 +1055,7 @@ function mutateTree(random: SRandom, tree: TreeNode) {
         // node will be inserted before the leaf.
         for (let i = 0; i < tree.nodes.length; i++) {
             const child = tree.nodes[i];
-            if (!child.nodes?.length && random.generateAndMutate() <= 0.5) {
+            if (!child.nodes?.length && random.mutateAndGenerate() <= 0.5) {
                 tree.nodes.splice(i, 1, {
                     nodes: [child]
                 });
@@ -1269,7 +1255,10 @@ export function generateZones(state: GameState) {
         // Make the entrance on the south side of the top floor of the dungeon near the center.
         entrance: {x: [2, 3], y: [1,1], z: [0, 0]},
     });
+
+    populateAllSections();
 }
+window.generateZones = generateZones;
 /*
 
     - Exit blocked by Cloud Boots/Ice(U-turn cracked ground) or Astral Projection (pot switches in both worlds)

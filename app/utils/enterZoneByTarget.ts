@@ -83,14 +83,15 @@ function onEnterLocation(
     if (target?.getHitbox) {
         const hitbox = target.getHitbox(state);
         state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-        state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+        // subtract 1 here to account for the hero's movement hitbox being 1px lower than
+        // its normal hitbox. Without this, the movement hitbox will not perfectly match 16x16 targets.
+        state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 1;
         updateAreaSection(state, true);
         checkForFloorEffects(state, state.hero);
         if (!doNotFixCamera) {
             fixCamera(state);
         }
     }
-    // Technically this could also be a MarkerDefinition.
     const definition = target.definition as EntranceDefinition|MarkerDefinition;
     if (definition.locationCue) {
         const textCue = new TextCue(state, { text: definition.locationCue});

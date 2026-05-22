@@ -26,6 +26,10 @@ export function showMapScene(state: GameState) {
     }
 }
 
+export function isMapSceneInStack(state: GameState) {
+    return state.sceneStack.includes(sceneHash.map);
+}
+
 export function isMapSceneActive(state: GameState) {
     return isSceneActive(state, sceneHash.map);
 }

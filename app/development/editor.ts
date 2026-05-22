@@ -13,9 +13,12 @@ import {createObjectDefinition, combinedObjectTypes} from 'app/development/objec
 import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
 import {isDebugMode} from 'app/gameConstants';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
+import {isMainMenuSceneInStack, showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
+import {isMapSceneInStack, showMapScene} from 'app/scenes/map/showMapScene';
 import {enterLocation} from 'app/utils/enterLocation';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {isFieldSceneInStack} from 'app/scenes/field/showFieldScene';
+import {cleanState} from 'app/utils/state';
 
 
 export function toggleEditing(state: GameState) {
@@ -57,6 +60,14 @@ function startEditing(state: GameState) {
     refreshEditor(state);
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
+    const wasShowingMenu = isMainMenuSceneInStack(state);
+    const wasShowingMap = isMapSceneInStack(state);
+    cleanState(state);
+    if (wasShowingMap) {
+        showMapScene(state);
+    } else if (wasShowingMenu) {
+        showMainMenuScene(state);
+    }
     // This was a drag+drop experiment for dialogue editing, but I'm not adding this to
     // the editor for now, it works better to just edit directly in the code for now.
     /*const div = document.createElement('div');
@@ -132,6 +143,7 @@ function stopEditing(state: GameState) {
     }
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
+    state.areaInstance.needsLogicRefresh = true;
 }
 
 export function refreshEditor(state: GameState) {

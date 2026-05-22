@@ -38,9 +38,10 @@ specialBehaviorsHash.peachCave = {
                 state.savedState.objectFlags.peachCaveTreeDied = true;
                 state.areaInstance.needsLogicRefresh = true;
             } else {
-                if (peachTree) {
-                    peachTree.specialStatus = 'weak';
+                if (!peachTree) {
+                    return;
                 }
+                peachTree.specialStatus = 'weak';
                 hideHUD(state, (state: GameState) => {
                     state.hero.y = 136;
                     state.savedState.objectFlags.peachCaveTreeDied = true;

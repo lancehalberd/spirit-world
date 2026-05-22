@@ -621,11 +621,12 @@ export function getSectionUnderMouse(state: GameState, scene: MapScene): AreaSec
     y -= innerDungeonMapRectangle.y;
     for (const sectionIndex of [...sections].reverse()) {
         const section = allSections[sectionIndex].section;
+        const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
         if (isPointInShortRect(x, y, {
             x: section.mapX * 32,
             y: section.mapY * 32,
-            w: 2 * section.w * 32 / state.zone.areaSize.w,
-            h: 2 * section.h * 32 / state.zone.areaSize.h,
+            w: 2 * section.w * 32 / areaSize.w,
+            h: 2 * section.h * 32 / areaSize.h,
         })) {
             return section;
         }

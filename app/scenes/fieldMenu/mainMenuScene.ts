@@ -182,3 +182,7 @@ export function showMainMenuScene(state: GameState) {
         showPauseScene(state);
     }
 }
+
+export function isMainMenuSceneInStack(state: GameState) {
+    return state.sceneStack.includes(mainMenuScene);
+}
