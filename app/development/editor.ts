@@ -205,7 +205,13 @@ function getContextProperties(state: GameState): PanelRows {
         return getBrushContextProperties(state);
     } else if (editingState.tool === 'variant' || (editingState.tool === 'select' && isVariantSelected(state, editingState))) {
         return getVariantProperties(state);
-    } else {
+    } else if (
+        editingState.tool === 'object'
+        || editingState.tool === 'enemy'
+        || editingState.tool === 'boss'
+        || editingState.tool === 'select'
+    ) {
         return getObjectProperties(state, editingState);
     }
+    return [];
 }

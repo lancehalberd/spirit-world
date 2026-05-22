@@ -131,7 +131,14 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             }
             if (editingState.tool === 'brush') {
                 const w = 16, h = 16;
-                if (isKeyboardKeyDown(KEY.SHIFT)) {
+                if (editingState.brushType === 'special') {
+                    const tx = ((state.camera.x + x) / w) | 0, ty = ((state.camera.y + y) / h) | 0;
+                    context.lineWidth = 2;
+                    context.beginPath();
+                    context.strokeStyle = isKeyboardKeyDown(KEY.SHIFT) ? 'red' : 'white';
+                    context.arc(w * (tx + 0.5), h * (ty + 0.5), w / 2, 0, 2 * Math.PI);
+                    context.stroke();
+                } else if (isKeyboardKeyDown(KEY.SHIFT)) {
                     let x1 = x, y1 = y;
                     if (isMouseDown() && editingState.dragOffset) {
                         x1 = editingState.dragOffset.x;

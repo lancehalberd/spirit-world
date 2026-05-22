@@ -3,6 +3,7 @@ import {allTiles} from 'app/content/tiles';
 import {zones} from 'app/content/zones';
 import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
 import {contextMenuState, editingState} from 'app/development/editingState';
+import {specialBrushes} from 'app/development/specialBrushes';
 import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
 import {addMissingLayer} from 'app/utils/layers';
 import {
@@ -94,6 +95,10 @@ mainCanvas.addEventListener('mousemove', function () {
             onMouseMoveSelect(state, editingState, x, y);
             break;
         case 'brush':
+            if (editingState.brushType === 'special') {
+                applySpecialBrush(state, x, y);
+                break;
+            }
             if (isKeyboardKeyDown(KEY.SHIFT) && editingState.dragOffset) {
                 wasSelectingTiles = true;
                 updateBrushSelection(x, y);
@@ -103,6 +108,36 @@ mainCanvas.addEventListener('mousemove', function () {
             break;
     }
 });
+function applySpecialBrush(state: GameState, x: number, y: number) {
+    x += state.camera.x;
+    y += state.camera.y;
+    const specialBrush = specialBrushes[editingState.specialBrushKey];
+    if (specialBrush) {
+        const updatedPoints = specialBrush.apply(state.areaInstance.definition, state.alternateAreaInstance.definition, {x, y}, isKeyboardKeyDown(KEY.SHIFT));
+        for (const point of updatedPoints) {
+            resetTile(state, point);
+        }
+    }
+}
+// TODO: make sure this applies material -> spirit mappings as well.
+function resetTile(state: GameState, {x, y}: Point) {
+    const area = state.areaInstance;
+    // If a new layer was added, just refresh everything for simplicity.
+    // Refreshing everything is slow, but this typically only happens once per tool use.
+    if (area.definition.layers.length !== area.layers.length) {
+        refreshArea(state);
+        editingState.hasChanges = true;
+        return;
+    }
+    for (const layer of area.layers) {
+        layer.originalTiles[y][x] = layer.tiles[y][x] = allTiles[layer.definition.grid.tiles[y][x]];
+        if (layer.definition.grid.mask) {
+            layer.maskTiles[y][x] = allTiles[layer.definition.grid.mask[y][x]];
+        }
+    }
+    markTileAsDirty(area, {x, y});
+}
+
 function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number) {
     if (onMouseDownSelectObject(state, editingState, x, y)) {
         return;
@@ -158,6 +193,10 @@ mainCanvas.addEventListener('mousedown', function (event) {
                 editingState.dragOffset = {x, y};
                 break;
             case 'brush':
+                if (editingState.brushType === 'special') {
+                    applySpecialBrush(state, x, y);
+                    break;
+                }
                 if (isKeyboardKeyDown(KEY.SHIFT)) {
                     wasSelectingTiles = true;
                     editingState.dragOffset = {x, y};
@@ -476,7 +515,10 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
         layer.tiles[y][x] = fullTile;
         layer.originalTiles[y][x] = fullTile;
     }
+    markTileAsDirty(area, {x, y});
     applyTileChangeToSpiritWorld(area.alternateArea, layer.definition, x, y, fullTile);
+}
+function markTileAsDirty(area: AreaInstance, {x, y}: Point){
     if (area.tilesDrawn[y]?.[x]) {
         area.tilesDrawn[y][x] = false;
     }

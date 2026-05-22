@@ -4,6 +4,8 @@ interface ContextMenuState {
 
 export const editingState: EditingState = {
     tool: 'brush',
+    brushType: 'palette',
+    specialBrushKey: 'cavePitBrush',
     previousTool: 'select',
     hasChanges: false,
     isEditing: false,

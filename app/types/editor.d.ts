@@ -62,12 +62,18 @@ type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];
 
 type SelectableDefinition = ObjectDefinition | VariantData;
 
+interface SpecialBrush {
+    apply: (area: AreaDefinition, alternateArea: AreaDefinition, point: Point, erase: boolean) => Point[]
+}
+
 type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select' | 'tileChunk' | 'variant';
 interface EditingState {
     tool: EditorToolType
     previousTool: EditorToolType
     hasChanges: boolean
     isEditing: boolean
+    brushType: 'palette' | 'special'
+    specialBrushKey?: string
     brush?: {[key: string]: TileGridDefinition}
     clipboardObjects?: SelectableDefinition[]
     needsRefresh?: boolean

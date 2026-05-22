@@ -6,6 +6,7 @@ import {getVariantTypeSelector, isVariantSelected} from 'app/development/variant
 import {
     renderPropertyRows, updateBrushCanvas,
 } from 'app/development/propertyPanel';
+import {specialBrushes} from 'app/development/specialBrushes';
 import {TabContainer} from 'app/development/tabContainer';
 import {getState} from 'app/state';
 import {readImageFromFile} from 'app/utils/index';
@@ -143,6 +144,7 @@ function getTileChunkProperties(): PanelRows {
     return rows;
 }
 
+
 function getBrushPaletteProperties(): PanelRows {
     const state = getState();
     let rows: PanelRows = [];
@@ -162,59 +164,86 @@ function getBrushPaletteProperties(): PanelRows {
             break;
     }
     rows.push([{
-        name: 'palette',
-        value: editingState.paletteKey,
-        values: [...Object.keys(paletteHash), ...Object.keys(sourcePalettes)],
-        onChange(key: string) {
-            editingState.paletteKey = key;
-            state.areaInstance.tilesDrawn = [];
-            state.areaInstance.checkToRedrawTiles = true;
+        name: 'brush',
+        value: editingState.brushType,
+        values: ['palette', 'special'],
+        onChange(key: 'palette'|'special') {
+            if (key === editingState.brushType) {
+                return;
+            }
+            editingState.brushType = key;
             editingState.needsRefresh = true;
-        },
-    },{
-        name: 'Add Source',
-        async onClick() {
-            const { image, fileName } = await readImageFromFile();
-            sourcePalettes[fileName] = {
-                source: {
-                    image,
-                    x: 0, y: 0, w: image.width, h: image.height,
-                },
-                tiles: [],
-                grid: [],
-            };
-            editingState.paletteKey = fileName;
-            state.areaInstance.tilesDrawn = [];
-            state.areaInstance.checkToRedrawTiles = true;
-            editingState.needsRefresh = true;
+            if (key === 'special' && !editingState.specialBrushKey) {
+                editingState.specialBrushKey = Object.keys(specialBrushes)[0];
+            }
         },
     }]);
-    if (paletteHash[editingState.paletteKey]) {
-        rows.push({
-            name: 'brush',
-            value: editingState.brush,
-            palette: paletteHash[editingState.paletteKey],
-            onChange(tiles: TileGridDefinition) {
-                editingState.brush = {'none': tiles};
-                updateBrushCanvas(editingState.brush);
-                if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                    setEditingTool('brush');
+    if (editingState.brushType === 'special') {
+        rows.push([{
+            name: 'brush type',
+            value: editingState.specialBrushKey,
+            values: Object.keys(specialBrushes),
+            onChange(key: string) {
+                editingState.specialBrushKey = key;
+                editingState.needsRefresh = true;
+            },
+        }]);
+    } else if (editingState.brushType === 'palette') {
+        rows.push([{
+            name: 'palette',
+            value: editingState.paletteKey,
+            values: [...Object.keys(paletteHash), ...Object.keys(sourcePalettes)],
+            onChange(key: string) {
+                editingState.paletteKey = key;
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+                editingState.needsRefresh = true;
+            },
+        },{
+            name: 'Add Source',
+            async onClick() {
+                const { image, fileName } = await readImageFromFile();
+                sourcePalettes[fileName] = {
+                    source: {
+                        image,
+                        x: 0, y: 0, w: image.width, h: image.height,
+                    },
+                    tiles: [],
+                    grid: [],
+                };
+                editingState.paletteKey = fileName;
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+                editingState.needsRefresh = true;
+            },
+        }]);
+        if (paletteHash[editingState.paletteKey]) {
+            rows.push({
+                name: 'brush tile',
+                value: editingState.brush,
+                palette: paletteHash[editingState.paletteKey],
+                onChange(tiles: TileGridDefinition) {
+                    editingState.brush = {'none': tiles};
+                    updateBrushCanvas(editingState.brush);
+                    if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                        setEditingTool('brush');
+                    }
                 }
-            }
-        });
-    } else if (sourcePalettes[editingState.paletteKey]) {
-        rows.push({
-            name: 'brush',
-            value: editingState.brush,
-            sourcePalette: sourcePalettes[editingState.paletteKey],
-            onChange(tiles: TileGridDefinition) {
-                editingState.brush = {'none': tiles};
-                updateBrushCanvas(editingState.brush);
-                if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                    setEditingTool('brush');
+            });
+        } else if (sourcePalettes[editingState.paletteKey]) {
+            rows.push({
+                name: 'brush tile',
+                value: editingState.brush,
+                sourcePalette: sourcePalettes[editingState.paletteKey],
+                onChange(tiles: TileGridDefinition) {
+                    editingState.brush = {'none': tiles};
+                    updateBrushCanvas(editingState.brush);
+                    if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                        setEditingTool('brush');
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     return rows;
 }
