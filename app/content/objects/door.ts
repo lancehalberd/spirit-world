@@ -255,7 +255,10 @@ export class Door implements ObjectInstance {
         return this.area && (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     isHeroTriggeringDoor(state: GameState) {
-        return boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getOffsetHitbox()) && this.heroCanEnter(state);
+        // Hero does not trigger doors while falling. This avoid an edge case where falling into a pit
+        // near a door can push the hero into the door hitbox activating the door when it doesn't make sense.
+        return state.hero.action !== 'fallen' && state.hero.action !== 'falling'
+            && boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getOffsetHitbox()) && this.heroCanEnter(state);
     }
     renderOpen(state: GameState): boolean {
         return this.isHeroTriggeringDoor(state) || this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;

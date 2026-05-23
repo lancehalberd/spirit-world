@@ -139,7 +139,9 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
     }
     const C = cavePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
     if (!C) {
-        return removeFieldDecorations();
+        removeFieldDecorations();
+        removeField2Decorations()
+        return changed;
     }
     const N = cavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
     const S = cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
