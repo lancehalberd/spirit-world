@@ -149,9 +149,7 @@ Current tasks:
     - Fix making a new zone, opening map and pressing W/S hits an infinite loop because of missing map data on the section.
         - Populate section data whenever adding new sections?
 
-    - Spikes in cocoon are too punishing, add floor spikes around them to make them harder to run into on accident.
-
-    - Spikes in cocoon are not knocking the player back.
+    - diagonal spike edges aren't knocking the player back.
 
     - Sometimes chests are not playing SFX, difficult to reproduce.
 
