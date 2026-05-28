@@ -1,7 +1,7 @@
-import {getOrAddLayer} from 'app/utils/layers';
+import {getLayer, getOrAddLayer} from 'app/utils/layers';
 
 const singlePitTileIndex = 4;
-const cavePitExteror: NineSlice = {
+const cavePitExterior: NineSlice = {
     w: 3,
     h: 3,
     r: {x: 1, y: 1, w: 1, h: 1},
@@ -14,7 +14,6 @@ const cavePitExteror: NineSlice = {
         ],
     }],
 };
-const cavePitTiles: Set<number> = new Set([singlePitTileIndex, 336, 337, 338, 339, 340, 341, 342, 343, 344]);
 const cavePitInterior: NineSlice = {
     w: 3,
     h: 3,
@@ -28,7 +27,38 @@ const cavePitInterior: NineSlice = {
         ],
     }],
 };
-const cavePitDecorationTiles: Set<number> = new Set([...cavePitTiles, 345, 346, 347, 348, 349, 350, 351]);
+
+// Where these tiles are present north of a pit they will be replaced with cavePitWallTiles
+const caveWallTiles = new Set([762, 763]);
+const cavePitWallTiles = [
+    [380, 381], // The wall section (field2 to cover but preserve the wall)
+    [382, 383], // The pit wall section (floor2)
+];
+// TL corner on the left, TR corner on the right
+const cavePitAngledWallTiles = [
+    [384, 385], // This goes on top of the full wall tile (field2 to cover but preserve the wall)
+    [386, 387], // This is the start of the actual pit, floor2, clearing field+field2 or using for pit edge decorations.
+    [388, 389], // This is the bottom of the pit wall, if visible, floor 2
+];
+/*const caveAngledWallTiles = [
+    [758,755],
+    [770,764],
+    [770,767],
+];*/
+
+const cavePitTiles: Set<number> = new Set([
+    singlePitTileIndex,
+    336, 337, 338, 339, 340, 341, 342, 343, 344,
+    ...cavePitWallTiles[1],
+    ...cavePitAngledWallTiles[1],
+    ...cavePitAngledWallTiles[2],
+]);
+const cavePitDecorationTiles: Set<number> = new Set([
+    ...cavePitTiles,
+    345, 346, 347, 348, 349, 350, 351,
+    ...cavePitAngledWallTiles[0],
+    ...cavePitWallTiles[0],
+]);
 
 
 const cavePitBrush: SpecialBrush = {
@@ -98,6 +128,14 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
         //if (N && E && !S && !W) {
         //    update(floor2Layer, {x, y}, )
         //}
+        // TODO: when placing a diagonal pit, check for a diagonal wall above it to merge with.
+    }
+    if (!N) {
+        // If the tile above this is not a pit, check the field layer to see if it is a wall so we can
+        // convert this pit into wall pit that matches with the wall.
+        if (caveWallTiles.has(getLayer('field', area)?.grid.tiles[y - 1]?.[x])) {
+            return changeLayerTile(floor2Layer, {x, y}, cavePitWallTiles[1][x % 2]);
+        }
     }
     // Single isolated pit.
     if (!N && !S && !E && !W) {
@@ -114,8 +152,14 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
     } else if (W && !E) {
         column = 2;
     }
-    return changeLayerTile(floor2Layer, {x, y}, cavePitExteror.layers[0].grid[row][column]);
+    return changeLayerTile(floor2Layer, {x, y}, cavePitExterior.layers[0].grid[row][column]);
 }
+/*function hasCeilingTile(area: AreaDefinition, {x, y}: Point) {
+    // TODO: Improve this check if it is giving false positives.
+    console.log(getLayer('foreground', area)?.grid.tiles[y]?.[x], getLayer('foreground2', area)?.grid.tiles[y]?.[x]);
+    return getLayer('foreground', area)?.grid.tiles[y]?.[x] !== 0
+        || getLayer('foreground2', area)?.grid.tiles[y]?.[x] !== 0
+}*/
 function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point): boolean {
     let changed = false;
     function update(layer: AreaLayerDefinition, {x, y}: Point, tile: number) {
@@ -132,96 +176,94 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
         return changed;
     }
     function removeField2Decorations() {
-        if (cavePitDecorationTiles.has(field2Layer.grid.tiles[y]?.[x])) {
+        const tile = field2Layer.grid.tiles[y]?.[x];
+        if (cavePitDecorationTiles.has(tile)) {
             update(field2Layer, {x, y}, 0);
         }
         return changed;
     }
     const C = cavePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
+    const S = cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
     if (!C) {
+        // Add or remove cave pit wall decorations depending on whether there is a pit to
+        // the south.
+        // TODO: this should also support angled pit walls.
+        if (S && caveWallTiles.has(fieldLayer.grid.tiles[y]?.[x])) {
+            changed = changeLayerTile(field2Layer, {x, y}, cavePitWallTiles[0][x % 2]);
+        } else {
+            removeField2Decorations()
+        }
+        /*if ((E || N || W) && hasCeilingTile(area, {x, y})) {
+            // TODO: set this to match pit edges instead of always using the interior pit tile.
+            console.log('Adding pit under ceiling', x, y);
+            changed = changeLayerTile(fieldLayer, {x, y}, cavePitExterior.layers[0].grid[1][1]) || changed;
+        } else {
+            removeFieldDecorations();
+        }*/
         removeFieldDecorations();
-        removeField2Decorations()
         return changed;
     }
     const N = cavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
-    const S = cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
     const W = cavePitTiles.has(floor2Layer.grid.tiles[y]?.[x - 1]);
     const E = cavePitTiles.has(floor2Layer.grid.tiles[y]?.[x + 1]);
+    // These flags will track which edges are part of the base pit sprite.
+    let hasNEdge = false, hasSEdge = false, hasWEdge = false, hasEEdge = false;
+    if (caveWallTiles.has(fieldLayer.grid.tiles[y - 1]?.[x])) {
+        hasNEdge = true;
+    } else if (!N && !E && !W && !S) {
     // 0 adjacent pits, this is a single pit tile with no decorations.
-    if (!N && !E && !W && !S) {
         removeFieldDecorations();
         removeField2Decorations();
         return changed;
+    } else {
+        if (!W) {
+            hasWEdge = true;
+        } else if (!E) {
+            hasEEdge = true;
+        }
+        if (!N) {
+            hasNEdge = true;
+        } else if (!S) {
+            hasSEdge = true;
+        }
     }
-    // 1 adjacent pits, this is a narrow pit with 3 edges, 2 on the floor2 layer,
-    // and one missing to be added on the field layer.
-    // For floor2, N edges are prioritized over S edges, and W edges are prioritized over E edges.
-    if (!N && !E && !W) {
-        // NW edges are in the floor2 layer
-        // Just add the missing W edge.
-        update(fieldLayer, {x, y}, cavePitInterior.layers[0].grid[1][0]);
-        removeField2Decorations();
-        return changed;
+    const decorationTiles: number[] = [];
+    // Add any missing edges to the list of decorations needed.
+    if (!N && !hasNEdge) {
+        console.error('Unexpected missing North edge');
     }
-    if (!S && !E && !W) {
-        // SW edges are in the floor2 layer
-        // Just add the missing W edge.
-        update(fieldLayer, {x, y}, cavePitInterior.layers[0].grid[1][0]);
-        removeField2Decorations();
-        return changed;
+    if (!W && !hasWEdge) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[1][2]);
+        hasWEdge = true;
     }
-    if (!N && !E && !S) {
-        // NE edges are in the floor2 layer
-        // Just add the missing S edge.
-        update(fieldLayer, {x, y}, cavePitInterior.layers[0].grid[0][1]);
-        removeField2Decorations();
-        return changed;
+    if (!E && !hasEEdge) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[1][0]);
+        hasEEdge = true;
     }
-    if (!N && !W && !S) {
-        // NW edges are in the floor2 layer
-        // Just add the missing S edge.
-        update(fieldLayer, {x, y}, cavePitInterior.layers[0].grid[0][1]);
-        removeField2Decorations();
-        return changed;
+    if (!S && !hasSEdge) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[0][1]);
+        hasSEdge = true;
     }
-    // 2 or more adjacent pits, floor2 layer handles all the direct edges except
-    // opposite ledges
-    if (!N && !S) {
-        // Just add the missing S edge.
-        update(fieldLayer, {x, y}, cavePitInterior.layers[0].grid[0][1]);
-        removeField2Decorations();
-        return changed;
+    // Add any missing corners to the list of decorations needed.
+    if (!hasNEdge && !hasWEdge && !cavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1])) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[2][2]);
     }
-    if (!E && !W) {
-        // Just add the missing W edge.
-        update(fieldLayer, {x, y}, cavePitInterior.layers[0].grid[1][0]);
-        removeField2Decorations();
-        return changed;
+    if (!hasNEdge && !hasEEdge && !cavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1])) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[2][0]);
     }
-    // All remaining decorations are corners pieces.
-    // We could need 4 corner pieces if this is the center of a + shape, but I only want
-    // to use floor2, field + field2, so we just stop once we reach 2 pieces, which supports
-    // every other pattern.
-    const cornerTiles: number[] = [];
-    if (N && W && !cavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1])) {
-        cornerTiles.push(cavePitInterior.layers[0].grid[2][2]);
+    if (!hasSEdge && !hasWEdge && !cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x - 1])) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[0][2]);
     }
-    if (N && E && !cavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1])) {
-        cornerTiles.push(cavePitInterior.layers[0].grid[2][0]);
+    if (!hasSEdge && !hasEEdge && !cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x + 1])) {
+        decorationTiles.push(cavePitInterior.layers[0].grid[0][0]);
     }
-    if (S && W && !cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x - 1])) {
-        cornerTiles.push(cavePitInterior.layers[0].grid[0][2]);
-    }
-    if (S && E && !cavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x + 1])) {
-        cornerTiles.push(cavePitInterior.layers[0].grid[0][0]);
-    }
-    if (cornerTiles[0]) {
-        update(fieldLayer, {x, y}, cornerTiles[0]);
+    if (decorationTiles[0]) {
+        update(fieldLayer, {x, y}, decorationTiles[0]);
     } else {
         removeFieldDecorations();
     }
-    if (cornerTiles[1]) {
-        update(field2Layer, {x, y}, cornerTiles[1]);
+    if (decorationTiles[1]) {
+        update(field2Layer, {x, y}, decorationTiles[1]);
     } else {
         removeField2Decorations();
     }

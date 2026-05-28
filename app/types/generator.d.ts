@@ -100,6 +100,8 @@ interface RoomSkeleton {
     paths: RoomPath[]
 }
 
+type DoorData = EntranceDefinition & {w: number, h: number};
+
 interface TreeNode {
     type?: 'boss'|'bigChest'|'goal'|'trap'|'treasure'
     style?: GenerationStyle
@@ -146,8 +148,8 @@ interface TreeNode {
     childArea?: AreaDefinition
     childAreaSection?: AreaSection
     // The entrance definition for this node from its parent.
-    entranceDefinition?: EntranceDefinition
-    allEntranceDefinitions?: EntranceDefinition[]
+    entranceDefinition?: DoorData
+    allEntranceDefinitions?: DoorData[]
     // Unique node id
     id?: string
     skeleton?: RoomSkeleton

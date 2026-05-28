@@ -12,7 +12,10 @@ import {getOrAddLayer} from 'app/utils/layers';
 import SRandom from 'app/utils/SRandom';
 import {createSpecialCaveFloor} from 'app/generator/styles/cave';
 import {createSpecialStoneFloor} from 'app/generator/styles/stone';
-import {generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath} from 'app/generator/skeletons/basic';
+import {
+    generateBridgeRoom,
+    generateEmptyRoom, generatePitMaze, generateShortTunnel, generateVerticalPath
+} from 'app/generator/skeletons/basic';
 import {addDoorAndClearForegroundTiles, getEntranceDefintion, positionDoors} from 'app/generator/doors';
 import {populateTombBoss, populateTombGuardianRoom} from 'app/generator/rooms/tomb';
 import {pad} from 'app/utils/index';
@@ -628,10 +631,10 @@ function createZoneFromTree(props: {
                 type: node.entrance.type,
             });
             positionDoors(random, entranceDoorData, node);
-            addDoorAndClearForegroundTiles(entranceDoorData.definition, node.baseArea, node.childArea);
-            entranceDoorData.definition.targetZone = node.entrance.targetZone;
-            entranceDoorData.definition.targetObjectId = node.entrance.targetObjectId;
-            node.allEntranceDefinitions.push(entranceDoorData.definition);
+            addDoorAndClearForegroundTiles(entranceDoorData, node.baseArea, node.childArea);
+            entranceDoorData.targetZone = node.entrance.targetZone;
+            entranceDoorData.targetObjectId = node.entrance.targetObjectId;
+            node.allEntranceDefinitions.push(entranceDoorData);
         }
 
         const enemyDoors: string[] = [];
@@ -658,10 +661,10 @@ function createZoneFromTree(props: {
                     style: node.style,
                     type: node.coords.z < child.coords.z ? 'downstairs' : 'upstairs',
                 });
-                baseDoorData.definition.targetZone = zoneId;
-                baseDoorData.definition.targetObjectId = childDoorData.definition.id;
-                childDoorData.definition.targetZone = zoneId;
-                childDoorData.definition.targetObjectId = baseDoorData.definition.id;
+                baseDoorData.targetZone = zoneId;
+                baseDoorData.targetObjectId = childDoorData.id;
+                childDoorData.targetZone = zoneId;
+                childDoorData.targetObjectId = baseDoorData.id;
             } else if (node.coords.y + node.dimensions.h <= child.coords.y || child.coords.y + child.dimensions.h <= node.coords.y) {
                 baseDoorData = getEntranceDefintion({
                     id: parentId,
@@ -691,47 +694,47 @@ function createZoneFromTree(props: {
             }
             // Doors leading out of boss chambers should have status closedEnemy
             if (node.type === 'boss') {
-                baseDoorData.definition.status = 'closedEnemy';
+                baseDoorData.status = 'closedEnemy';
             }
             if (child.type === 'boss' || child.type === 'trap') {
-                childDoorData.definition.status = 'closedEnemy';
+                childDoorData.status = 'closedEnemy';
                 // Force enemy trap doors open when the player has no weapon to defeat the enemies
                 // so that they do not get softlocked in the room.
-                childDoorData.definition.openLogic = {logicKey: 'hasWeapon', isInverted: true};
+                childDoorData.openLogic = {logicKey: 'hasWeapon', isInverted: true};
             }
             if (child.requirements?.[0][0] === hasWeapon) {
-                baseDoorData.definition.status = 'closedEnemy';
-                enemyDoors.push(baseDoorData.definition.id);
+                baseDoorData.status = 'closedEnemy';
+                enemyDoors.push(baseDoorData.id);
             }
             if (child.requirements?.[0][0] === hasSmallKey) {
-                if (baseDoorData.definition.d === 'up' && node.type !== 'boss') {
-                    baseDoorData.definition.status = 'locked';
+                if (baseDoorData.d === 'up' && node.type !== 'boss') {
+                    baseDoorData.status = 'locked';
                 }
-                if (childDoorData.definition.d === 'up' && node.type !== 'boss') {
-                    childDoorData.definition.status = 'locked';
+                if (childDoorData.d === 'up' && node.type !== 'boss') {
+                    childDoorData.status = 'locked';
                 }
                 // Locked door pairs must share an id so they are unlocked together.
-                if (baseDoorData.definition.status === 'locked' && childDoorData.definition.status === 'locked') {
-                    childDoorData.definition.id = baseDoorData.definition.id;
+                if (baseDoorData.status === 'locked' && childDoorData.status === 'locked') {
+                    childDoorData.id = baseDoorData.id;
                 }
             }
             if (child.requirements?.[0][0] === hasBigKey) {
-                if (baseDoorData.definition.d === 'up' && node.type !== 'boss') {
-                    baseDoorData.definition.status = 'bigKeyLocked';
+                if (baseDoorData.d === 'up' && node.type !== 'boss') {
+                    baseDoorData.status = 'bigKeyLocked';
                 }
-                if (childDoorData.definition.d === 'up' && child.type !== 'boss') {
-                    childDoorData.definition.status = 'bigKeyLocked';
+                if (childDoorData.d === 'up' && child.type !== 'boss') {
+                    childDoorData.status = 'bigKeyLocked';
                 }
                 // Locked door pairs must share an id so they are unlocked together.
-                if (baseDoorData.definition.status === 'bigKeyLocked' && childDoorData.definition.status === 'bigKeyLocked') {
-                    childDoorData.definition.id = baseDoorData.definition.id;
+                if (baseDoorData.status === 'bigKeyLocked' && childDoorData.status === 'bigKeyLocked') {
+                    childDoorData.id = baseDoorData.id;
                 }
             }
             positionDoors(random, baseDoorData, node, childDoorData, child);
             if (child.requirements?.[0][0] === canRemoveLightStones || child.requirements?.[0][0] === canCross2Gaps) {
                 const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
                 const tiles = child.requirements?.[0][0] === canRemoveLightStones ? [6, 6, 7] : [4, 4, 4, 25];
-                const definition = baseDoorData.definition;
+                const definition = baseDoorData;
                 const isVertical = definition.d === 'up' || definition.d === 'down';
                 const yR = isVertical ? 3 : 2;
                 const xR = isVertical ? 2 : 3;
@@ -761,12 +764,12 @@ function createZoneFromTree(props: {
                     }
                 }
             }
-            //addDoorAndClearForegroundTiles(baseDoorData.definition, node.baseArea, node.childArea);
-            //addDoorAndClearForegroundTiles(childDoorData.definition, child.baseArea, child.childArea);
-            node.allEntranceDefinitions.push(baseDoorData.definition);
-            child.allEntranceDefinitions.push(childDoorData.definition);
+            //addDoorAndClearForegroundTiles(baseDoorData, node.baseArea, node.childArea);
+            //addDoorAndClearForegroundTiles(childDoorData, child.baseArea, child.childArea);
+            node.allEntranceDefinitions.push(baseDoorData);
+            child.allEntranceDefinitions.push(childDoorData);
 
-            child.entranceDefinition = childDoorData.definition;
+            child.entranceDefinition = childDoorData;
         }
         if (node.type === 'treasure') {
             node.lootType = 'money'
@@ -800,8 +803,14 @@ function createZoneFromTree(props: {
             node.minimumSlotCount++;
         }
 
+        if (!node.skeleton && random.mutate().random() < 0.2) {
+            node.skeleton = generateBridgeRoom(random, node);
+        }
         if (!node.skeleton && random.mutate().random() < 1) {
             node.skeleton = generateShortTunnel(random, node);
+        }
+        if (!node.skeleton && random.mutate().random() < 0.8) {
+            node.skeleton = generateBridgeRoom(random, node);
         }
         if (!node.skeleton && random.mutate().random() < 0.3) {
             node.skeleton = generateVerticalPath(random, node);

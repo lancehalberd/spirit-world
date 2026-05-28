@@ -1,5 +1,6 @@
 
 type Point = {x: number, y: number, z?: number};
+type Edge = {start: Point, end: Point};
 type Vector = {x: number, y: number, z?: number};
 type Coords = [number, number];
 

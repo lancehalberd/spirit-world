@@ -144,8 +144,14 @@ Graphics to Implement:
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
-
 Current tasks:
+    - Support angled cave pits with cavePitBrush
+    - Support angled cave wall -> angled cave pit wall transitions with cavePitBrush
+    - Support adding slots to generateBridgeRoom when large enough
+        - Maybe general required nodes to any rectangle of 2s provided in the original matrix.
+    - Update tree logic to prefer longer paths between required nodes when possible
+
+
     - Fix making a new zone, opening map and pressing W/S hits an infinite loop because of missing map data on the section.
         - Populate section data whenever adding new sections?
 

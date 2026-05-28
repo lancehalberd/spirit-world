@@ -1,8 +1,9 @@
+import {specialBrushes} from 'app/development/specialBrushes';
 import {applyNineSlice, slices} from 'app/generator/nineSlice';
 import {addCaveRoomFrame, applyCaveWalls, createCaveFloor} from 'app/generator/styles/cave';
 import {applyStoneWalls, createStoneFloor} from 'app/generator/styles/stone';
-
 import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
+import {generatePathMatrix} from 'app/generator/utils/matrixGenerators';
 import {directionMap} from 'app/utils/direction';
 import {getOrAddLayer, inheritAllLayerTilesFromParent} from 'app/utils/layers';
 
@@ -486,6 +487,67 @@ export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkelet
     } else {
         createCaveFloor(random, node.baseArea, section, node.childArea);
         applyCaveWalls(random, node.baseArea, section, node.childArea);
+    }
+
+    return {slots, paths};
+}
+
+
+export function generateBridgeRoom(random: SRandom, node: TreeNode): RoomSkeleton|undefined {
+    if (node.minimumSlotCount > 0) {
+        return;
+    }
+    addRoomFrame(random, node)
+    const section = node.baseAreaSection;
+    const innerRect = {
+        x: section.x + 2,
+        y: section.y + 3,
+        w: section.w - 3,
+        h: section.h - 4,
+    };
+    const slots: RoomSlot[] = [];
+    const paths: RoomPath[] = [];
+    if (innerRect.h <= 0 || innerRect.w <= 0) {
+        debugger;
+        return {slots, paths};
+    }
+    const matrix: number[][] = [];
+    for (let y = 0; y < innerRect.h; y++) {
+        matrix[y] = [];
+        for (let x = 0; x < innerRect.w; x++) {
+            matrix[y][x] = undefined;
+        }
+    }
+    for (const entrance of node.allEntranceDefinitions) {
+        // Convert door bounds to matrix coords.
+        const left = Math.floor((entrance.x) / 16 - innerRect.x);
+        const right = Math.floor((entrance.x + entrance.w) / 16 - innerRect.x);
+        const top = Math.floor((entrance.y) / 16 - innerRect.y);
+        const bottom = Math.floor((entrance.y + entrance.h) / 16 - innerRect.y);
+        if (entrance.d === 'down' || entrance.d === 'up') {
+            const row = entrance.d === 'up' ? 0 : innerRect.h - 1;
+            for (let column = left; column <= right; column++) {
+                matrix[row][column] = 2;
+            }
+        }
+        if (entrance.d === 'left' || entrance.d === 'right') {
+            const column = entrance.d === 'left' ? 0 : innerRect.w - 1;
+            for (let row = top; row <= bottom; row++) {
+                matrix[row][column] = 2;
+            }
+        }
+    }
+    const pitMatrix = generatePathMatrix({
+        random, matrix, pathRadius: 1, debug: false,
+    });
+
+    for (let y = 0; y < innerRect.h; y++) {
+        for (let x = 0; x < innerRect.w; x++) {
+            if (pitMatrix[y][x] === 0) {
+                const areaPoint = {x: 16 * (innerRect.x + x), y: 16 * (innerRect.y + y)};
+                specialBrushes.cavePitBrush.apply(node.baseArea, node.childArea, areaPoint, false);
+            }
+        }
     }
 
     return {slots, paths};

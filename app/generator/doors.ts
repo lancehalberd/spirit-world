@@ -7,17 +7,10 @@ interface DoorContext extends SlotContext {
     doorType: DoorType
 }
 
-export type DoorData = {
-    definition: EntranceDefinition
-    w: number
-    h: number
-}
-
-
 // TODO: support placing linked doors simultaneously.
 
 // This returns w/h for the entrance so we don't have to recompute it from the resulting definition.
-export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: CardinalDirection, style: GenerationStyle, type: DoorType} ): {definition: EntranceDefinition, w: number, h: number} {
+export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: CardinalDirection, style: GenerationStyle, type: DoorType} ): DoorData {
     let w = 32, h = 32;
     let computedStyle: string = 'stone';
     switch(style) {
@@ -61,7 +54,7 @@ export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: 
         w = 64;
         h = 16;
     }
-    const definition: EntranceDefinition = {
+    const definition: DoorData = {
         type: 'door',
         id,
         d,
@@ -69,10 +62,10 @@ export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: 
         style: computedStyle,
         x: 0,
         y: 0,
+        w, h,
     };
-    return {definition, w, h};
+    return definition;
 }
-
 
 export function addDoor(context: DoorContext): EntranceDefinition {
     const {random, zoneId, roomId, slot, area, alternateArea, doorType} = context;
@@ -186,9 +179,9 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
     if (childNode && childNode.coords.z !== baseNode.coords.z) {
         // Stair cases use specific slots so they won't collide with normal north doors.
         const tx = chooseStairDoorSlot(random, baseNode, childNode);
-        baseDoorData.definition.x = tx * 16 + 8 - baseDoorData.w / 2;
-        childDoorData.definition.x = tx * 16 + 8 - childDoorData.w / 2;
-    } else if (baseDoorData.definition.d === 'up' || baseDoorData.definition.d === 'down') {
+        baseDoorData.x = tx * 16 + 8 - baseDoorData.w / 2;
+        childDoorData.x = tx * 16 + 8 - childDoorData.w / 2;
+    } else if (baseDoorData.d === 'up' || baseDoorData.d === 'down') {
         // TODO: Handle ladders here
         let left = (baseAreaSection.x + 1) * 16;
         if (childAreaSection) {
@@ -199,11 +192,11 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
             right = Math.min(right, (childAreaSection.x + childAreaSection.w) * 16);
         }
         const cx = left + 0.5 * (right - left);
-        baseDoorData.definition.x = cx - baseDoorData.w / 2;
+        baseDoorData.x = cx - baseDoorData.w / 2;
         if (childDoorData) {
-            childDoorData.definition.x = cx - childDoorData.w / 2;
+            childDoorData.x = cx - childDoorData.w / 2;
         }
-    } else if (baseDoorData.definition.d === 'left' || baseDoorData.definition.d === 'right') {
+    } else if (baseDoorData.d === 'left' || baseDoorData.d === 'right') {
         // These don't have to be the actual top/bottom as long as they are the same distance from the center.
         let top = (baseAreaSection.y + 2) * 16;
         if (childAreaSection) {
@@ -215,34 +208,34 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
         }
         random.generateAndMutate();
         const cy = top + (bottom - top) / 2;
-        baseDoorData.definition.y = cy - baseDoorData.h / 2;
+        baseDoorData.y = cy - baseDoorData.h / 2;
         if (childDoorData) {
-            childDoorData.definition.y = cy - childDoorData.h / 2;
+            childDoorData.y = cy - childDoorData.h / 2;
         }
     }
-    if (baseDoorData.definition.d === 'up') {
-        baseDoorData.definition.y = baseAreaSection.y * 16 + 16;
+    if (baseDoorData.d === 'up') {
+        baseDoorData.y = baseAreaSection.y * 16 + 16;
         if (childDoorData) {
-            if (childDoorData.definition.d === 'down') {
-                childDoorData.definition.y = (childAreaSection.y + childAreaSection.h - 1) * 16;
+            if (childDoorData.d === 'down') {
+                childDoorData.y = (childAreaSection.y + childAreaSection.h - 1) * 16;
             } else {
-                childDoorData.definition.y = childAreaSection.y * 16 + 16;
+                childDoorData.y = childAreaSection.y * 16 + 16;
             }
         }
-    } else  if (baseDoorData.definition.d === 'down') {
-        baseDoorData.definition.y = (baseAreaSection.y + baseAreaSection.h - 1) * 16;
+    } else  if (baseDoorData.d === 'down') {
+        baseDoorData.y = (baseAreaSection.y + baseAreaSection.h - 1) * 16;
         if (childDoorData) {
-            childDoorData.definition.y = childAreaSection.y * 16 + 16;
+            childDoorData.y = childAreaSection.y * 16 + 16;
         }
-    } else  if (baseDoorData.definition.d === 'left') {
-        baseDoorData.definition.x = baseAreaSection.x * 16 + 16;
+    } else  if (baseDoorData.d === 'left') {
+        baseDoorData.x = baseAreaSection.x * 16 + 16;
         if (childDoorData) {
-            childDoorData.definition.x = (childAreaSection.x + childAreaSection.w - 1) * 16;
+            childDoorData.x = (childAreaSection.x + childAreaSection.w - 1) * 16;
         }
-    } else  if (baseDoorData.definition.d === 'right') {
-        baseDoorData.definition.x = (baseAreaSection.x + baseAreaSection.w - 1) * 16;
+    } else  if (baseDoorData.d === 'right') {
+        baseDoorData.x = (baseAreaSection.x + baseAreaSection.w - 1) * 16;
         if (childDoorData) {
-            childDoorData.definition.x = childAreaSection.x * 16 + 16;
+            childDoorData.x = childAreaSection.x * 16 + 16;
         }
     }
 }

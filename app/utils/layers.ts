@@ -49,7 +49,17 @@ export function addMissingLayer(
     }
     return addNewLayer(layerKey, definition.layers.length, definition, alternateDefinition);
 }
-
+export function getLayer(
+    layerKey: string,
+    definition: AreaDefinition,
+): AreaLayerDefinition|undefined {
+    for (const layer of definition.layers) {
+        if (layer.key === layerKey) {
+            return layer;
+        }
+    }
+    return undefined;
+}
 export function getOrAddLayer(
     layerKey: string,
     definition: AreaDefinition,
