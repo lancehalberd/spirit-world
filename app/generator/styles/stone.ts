@@ -1,5 +1,5 @@
-import { allTiles } from 'app/content/tiles';
-import { getOrAddLayer } from 'app/utils/layers';
+import {isTileSolid} from 'app/generator/utils/isTileSolid';
+import {getOrAddLayer} from 'app/utils/layers';
 
 
 const singleStoneTiles = [1237, 1238];
@@ -67,6 +67,7 @@ export function createSpecialStoneFloor(random: SRandom, area: AreaDefinition, r
     }
 }
 
+
 // Adds stone walls everywhere that is currently solid in the field layer.
 // This assumes stone wall height is 2, but this could be generalized to support taller stone walls.
 export function applyStoneWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
@@ -96,8 +97,7 @@ export function applyStoneWalls(random: SRandom, area: AreaDefinition, r: Rect, 
             debugger;
         }
         for (let x = r.x; x < r.x + r.w; x++) {
-            const fieldTile = allTiles[fieldTiles[y][x]];
-            if (!fieldTile?.behaviors?.solid) {
+            if (!isTileSolid(area, {x, y})) {
                 continue;
             }
             const v = solidChunks[y - 1]?.[x]?.v || {top: y, bottom: y + 1};
@@ -185,10 +185,10 @@ export function applyStoneWalls(random: SRandom, area: AreaDefinition, r: Rect, 
                 // Bottom part of south wall
                 if (x === h.left) {
                     solidChunks[y][x].isLeft = true;
-                    foregroundTiles[y][x] = 1212;
+                    fieldTiles[y][x] = 1212;
                 } else if (x === h.right - 1) {
                     solidChunks[y][x].isRight = true;
-                    foregroundTiles[y][x] = 1213;
+                    fieldTiles[y][x] = 1213;
                 } else {
                     fieldTiles[y][x] = [1208, 1209][parity];
                 }

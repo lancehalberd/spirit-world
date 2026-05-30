@@ -1,6 +1,5 @@
-import { getOrAddLayer } from 'app/utils/layers';
-import { allTiles } from 'app/content/tiles';
-
+import {isTileSolid} from 'app/generator/utils/isTileSolid';
+import {getOrAddLayer} from 'app/utils/layers';
 
 
 const caveFloorTile = 36;
@@ -60,7 +59,7 @@ export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r:
     }
 }
 
-export function addCaveRoomFrame(random: SRandom, node: TreeNode) {
+export function addCaveRoomFrame(random: SRandom, node: TreeNode): Rect {
     const fieldTiles = getOrAddLayer('field', node.baseArea, node.childArea).grid.tiles;
     const section = node.baseAreaSection;
     createCaveFloor(random, node.baseArea, section, node.childArea);
@@ -75,6 +74,12 @@ export function addCaveRoomFrame(random: SRandom, node: TreeNode) {
         }
     }
     applyCaveWalls(random, node.baseArea, section, node.childArea);
+    return {
+        x: section.x + 2,
+        y: section.y + 3,
+        w: section.w - 3,
+        h: section.h - 4,
+    };
 }
 
 // Adds cave walls everywhere that is currently solid in the field layer.
@@ -106,8 +111,7 @@ export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, a
             debugger;
         }
         for (let x = r.x; x < r.x + r.w; x++) {
-            const fieldTile = allTiles[fieldTiles[y][x]];
-            if (!fieldTile?.behaviors?.solid) {
+            if (!isTileSolid(area, {x, y})) {
                 continue;
             }
             const v = solidChunks[y - 1]?.[x]?.v || {top: y, bottom: y + 1};

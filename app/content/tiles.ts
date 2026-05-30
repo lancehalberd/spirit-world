@@ -50,10 +50,11 @@ import {
     cavePitHorizontalWalls,
     cavePitAngledWallsIn,
     cavePitAngledWallsOut,
+    angledCavePitTileSources,
 } from 'app/content/tiles/cavePits';
 import {allCrystalCavePitTileSources, crystalCaveWallToPitTileSources} from 'app/content/tiles/crystalCavePits';
 import {allCrystalCaveTileSources, crystalTransparentFloor} from 'app/content/tiles/crystalCaveTiles';
-import {allCrystalSpikeTiles} from 'app/content/tiles/crystalSpikes';
+import {allCrystalFloorSpikeTiles, allCrystalSpikeTiles} from 'app/content/tiles/crystalSpikes';
 import {allDesertTileSources} from 'app/content/tiles/desertTiles';
 import {allFancyStoneCeilingTileSources} from 'app/content/tiles/fancyStoneTiles';
 import {allFuturisticTileSources} from 'app/content/tiles/futuristicTiles';
@@ -1063,7 +1064,9 @@ addTiles([
     caveFloorPalette,
     // 'Abyss' between walls.
     singleTileSource('gfx/tiles/cavearranged2.png', { defaultLayer: 'foreground', isVeryTall: true, solid: true }, 0, 240),
-    deletedTiles(48),
+    ...allCrystalFloorSpikeTiles,
+    ...angledCavePitTileSources,
+    deletedTiles(21),
     spiritPlantsPalette,
     brightGrass,
     floorEyeTile,

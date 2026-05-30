@@ -1,6 +1,6 @@
 import {applyNineSlice, slices} from 'app/generator/nineSlice';
 import {applyCaveWalls} from 'app/generator/styles/cave';
-import {createStoneFloor, createSpecialStoneFloor} from 'app/generator/styles/stone';
+import {applyStoneWalls, createStoneFloor, createSpecialStoneFloor} from 'app/generator/styles/stone';
 import {chunkGenerators} from 'app/generator/chunks/tileChunkGeneratorHash';
 export {chunkGenerators} from 'app/generator/chunks/tileChunkGeneratorHash';
 
@@ -49,6 +49,9 @@ chunkGenerators.stoneFloor = {
 chunkGenerators.stoneRoom = combinedGenerator([chunkGenerators[`slices-outerStoneWalls`], chunkGenerators.stoneFloor]);
 chunkGenerators.caveWalls = {
     generate: applyCaveWalls
+};
+chunkGenerators.stoneWalls = {
+    generate: applyStoneWalls
 };
 chunkGenerators.specialStoneFloor = {
     minW: 3,

@@ -90,12 +90,19 @@ interface RoomSlot extends Rect {
     id: string
 }
 interface RoomPath extends Rect {
+    // Direction from source to target.
     d: CardinalDirection
     sourceId: string
     targetId: string
 }
 
 interface RoomSkeleton {
+    slots: RoomSlot[]
+    paths: RoomPath[]
+}
+
+interface MatrixSkeleton {
+    matrix: number[][]
     slots: RoomSlot[]
     paths: RoomPath[]
 }
@@ -127,7 +134,7 @@ interface TreeNode {
     // Can be set as a requirement when creating the tree or randomly added during generation.
     // Set to false to prevent the room from being randomly assigned a wide layout.
     wide?: boolean
-    // Similar to wide, inidicates this room is a full super tile in height.
+    // Similar to wide, indicates this room is a full super tile in height.
     tall?: boolean
     minimumSlotCount?: number
     populateRoom?: (context: {zoneId: string, random: SRandom}, node: TreeNode) => void
@@ -153,6 +160,7 @@ interface TreeNode {
     // Unique node id
     id?: string
     skeleton?: RoomSkeleton
+    hasKeyRequirement?: boolean
 }
 
 type NodeMap = {[key in string]: TreeNode};

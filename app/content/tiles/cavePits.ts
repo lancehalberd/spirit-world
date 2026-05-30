@@ -1,4 +1,4 @@
-import {BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT} from 'app/content/bitMasks';
+import {BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT, BITMAP_BOTTOM_RIGHT, BITMAP_BOTTOM_LEFT} from 'app/content/bitMasks';
 import {requireFrame} from 'app/utils/packedImages';
 
 const cavePitsImage = 'gfx/tiles/cavePits.png';
@@ -78,4 +78,27 @@ export const allCavePitTileSources: TileSource[] = [
     cavePits, // 6
     cavePitEdges, // 7
     // = 16
+];
+
+export const caveAngledPits: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame(cavePitsImage, {x: 80, y: 176, w: 64, h: 64}),
+    behaviors: {
+        '0x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_RIGHT, pitWall: true  },
+        '1x0': { defaultLayer: 'floor2', pitMap: BITMAP_BOTTOM_LEFT, pitWall: true},
+        '0x1': { defaultLayer: 'floor2', pit: true, pitWallMap: BITMAP_TOP_LEFT },
+        '1x1': { defaultLayer: 'floor2', pit: true, pitWallMap: BITMAP_TOP_RIGHT },
+        '2x3': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_RIGHT },
+        '3x3': { defaultLayer: 'floor2', pitMap: BITMAP_TOP_LEFT },
+    },
+    tileCoordinates: [
+        [0,0],[1,0],
+        [0,1],[1,1],
+        // Unused row
+                    [2, 3],[3, 3],
+    ],
+};
+
+export const angledCavePitTileSources: TileSource[] = [
+    caveAngledPits
 ];

@@ -5,7 +5,7 @@ import SRandom from 'app/utils/SRandom';
 let debugFailure = false, debugScale = 25;
 // 0 = hazard, 1 = non-hazard, 2 = connected to path, undefined tiles on the perimeter may be freely chosen by the generator.
 export function generatePathMatrix({
-    random, matrix, pathRadius = 1, rowCount, columnCount, debug = false
+    random, matrix, pathRadius = 1, rowCount, columnCount, debug = false, jitter = 0
 }: {
     random: SRandom
     matrix: (number | undefined)[][]
@@ -14,6 +14,7 @@ export function generatePathMatrix({
     rowCount?: number
     columnCount?: number
     debug?: boolean
+    jitter?: number
 }): (number | undefined)[][] {
     if (debug) {
         console.log('_seed', random._seed);
@@ -21,8 +22,8 @@ export function generatePathMatrix({
     }
     const h = matrix.length, w = matrix[0].length;
     const minRowHeight = 2 * (1 + pathRadius), minColumnWidth = 2 * (1 + pathRadius);
-    rowCount = Math.max(1, rowCount ?? 1, Math.floor(h / minRowHeight));
-    columnCount = Math.max(1, columnCount ?? 1, Math.floor(w / minColumnWidth));
+    rowCount = Math.max(1, Math.min(rowCount ?? 1, Math.floor(h / minRowHeight)));
+    columnCount = Math.max(1, Math.min(columnCount ?? 1, Math.floor(w / minColumnWidth)));
     const requiredVertices: Point[] = [];
     // 1. Create list of exit vertices from 2s found on the parameter.
     for (const edge of getMatrixEdgePoints(w, h)) {
@@ -54,8 +55,8 @@ export function generatePathMatrix({
     for (let row = 0; row < rowCount; row++) {
         for (let column = 0; column < columnCount; column++) {
             optionalVertices.push({
-                x: (column + 0.5) * columnWidth + (random.mutateAndGenerate() - 0.5) * (columnWidth - minColumnWidth),
-                y: (row + 0.5) * rowHeight + (random.mutateAndGenerate() - 0.5) * (rowHeight - minRowHeight),
+                x: (column + 0.5) * columnWidth + jitter * (random.mutateAndGenerate() - 0.5) * (columnWidth - minColumnWidth),
+                y: (row + 0.5) * rowHeight + jitter * (random.mutateAndGenerate() - 0.5) * (rowHeight - minRowHeight),
             });
         }
     }
@@ -90,9 +91,11 @@ export function generatePathMatrix({
             for (let i = 0; i <= steps; i++) {
                 const x = start + i * stepSize;
                 const tx = x | 0;
-                const y = edge.start.y + dy * (x - start) / (end - start);
+                if (tx < 0 || tx >= w) continue;
+                const y = edge.start.y + dy * (x - edge.start.x) / dx;
                 const top = Math.max(0, (y - pathRadius) | 0), bottom = Math.min(h - 1, (y + pathRadius) | 0);
                 for (let ty = top; ty <= bottom; ty++) {
+                    if (ty < 0 || ty >= h) continue;
                     if (Math.abs(y - (ty + 0.5)) <= pathRadius) {
                         try {
                             matrix[ty][tx] = matrix[ty][tx] ?? 1;
@@ -109,9 +112,11 @@ export function generatePathMatrix({
             for (let i = 0; i <= steps; i++) {
                 const y = start + i * stepSize;
                 const ty = y | 0;
-                const x = edge.start.x + dx * (y - start) / (end - start);
+                if (ty < 0 || ty >= h) continue;
+                const x = edge.start.x + dx * (y - edge.start.y) / dy;
                 const left = Math.max(0, (x - pathRadius) | 0), right = Math.min(w - 1, (x + pathRadius) | 0);
                 for (let tx = left; tx <= right; tx++) {
+                    if (tx < 0 || tx >= w) continue;
                     if (Math.abs(x - (tx + 0.5)) <= pathRadius) {
                         try {
                             matrix[ty][tx] = matrix[ty][tx] ?? 1;
@@ -126,6 +131,73 @@ export function generatePathMatrix({
     for (let y = 0; y < h; y++) {
         for (let x = 0; x < w; x++) {
             matrix[y][x] = matrix[y][x] ?? 0;
+        }
+    }
+    for (let i = 0; i < 10; i++) {
+        let changed = false;
+        for (let y = 0; y < h; y++) {
+            for (let x = 0; x < w; x++) {
+                if (matrix[y][x] === 2) continue;
+                let matches = 0;
+                const isPit = matrix[y][x] === 0;
+                const N = (matrix[y - 1]?.[x] === 0);
+                const S = (matrix[y + 1]?.[x] === 0);
+                const W = (matrix[y]?.[x - 1] === 0);
+                const E = (matrix[y]?.[x + 1] === 0);
+                if (isPit === N) matches++;
+                if (isPit === S) matches++;
+                if (isPit === E) matches++;
+                if (isPit === W) matches++;
+                if (matches <= 1) {
+                    if (isPit) {
+                        const NW = (matrix[y - 1]?.[x - 1] === 0);
+                        const NE = (matrix[y - 1]?.[x + 1] === 0);
+                        const SW = (matrix[y + 1]?.[x - 1] === 0);
+                        const SE = (matrix[y + 1]?.[x + 1] === 0);
+                        // Isolated pit is only smoothed out if there
+                        // are also no adjacent corner pits. If there
+                        // are corner pits, the pit brush will
+                        // already smooth the pit by adding angled pits.
+                        if (!NW && !NE && !SW && ! SE) {
+                            matrix[y][x] = 1;
+                            changed = true;
+                        }
+                    } else {
+                        // Isolated piece of land is smoothed out.
+                        matrix[y][x] = 0;
+                        changed = true;
+                    }
+                } else if (isPit && matches === 2 && N !== S) {
+                    const NW = (matrix[y - 1]?.[x - 1] === 0);
+                    const NE = (matrix[y - 1]?.[x + 1] === 0);
+                    const SW = (matrix[y + 1]?.[x - 1] === 0);
+                    const SE = (matrix[y + 1]?.[x + 1] === 0);
+                    // The above check means we are in a pattern like this, with some rotation:
+                    // ?1?
+                    // 100
+                    // ?0?
+                    // Replacing an interior pit corner with a non-pit tile will cause it to be turned into
+                    // an angled pit when the pit brush is applied.
+                    // This check is supposed to insure there are 5 contiguous non-pit tiles around the current
+                    // tile in an L shape like:
+                    // 111
+                    // 100
+                    // 100
+                    // By checking if each direction is a pit(0), in which case we don't care what the corners are
+                    // next to it, or that the corners next to it are not pits.
+                    if ((N || (!NW && !NE))
+                        && (S || (!SW && !SE))
+                        && (W || (!NW && !SW))
+                        && (E || (!NE && !SE))
+                    ) {
+                        matrix[y][x] = 1;
+                        changed = true;
+                    }
+                }
+            }
+        }
+        if (!changed) {
+            break;
         }
     }
     if (debug) {
@@ -278,7 +350,7 @@ function debugPathMatrix({
         context.arc(vertex.x * scale, vertex.y * scale, scale / 2, 0, 2 * Math.PI);
         context.stroke();
         context.textAlign = 'center';
-        context.fillText(pointString(vertex), vertex.x * scale, vertex.y * scale + scale);
+        context.fillText(pointString(vertex), vertex.x * scale, vertex.y * scale);
     }
     context.strokeStyle = '#F00'
     for (const vertex of requiredVertices) {
@@ -286,7 +358,7 @@ function debugPathMatrix({
         context.arc(vertex.x * scale, vertex.y * scale, scale / 2, 0, 2 * Math.PI);
         context.stroke();
         context.textAlign = 'center';
-        context.fillText(pointString(vertex), vertex.x * scale, vertex.y * scale + scale);
+        context.fillText(pointString(vertex), vertex.x * scale, vertex.y * scale);
     }
     debugCanvas(canvas, 1);
 }

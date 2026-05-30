@@ -57,7 +57,6 @@ export const floorCrystalSpikes: TileSource = {
         '0x2': {...baseFloorSpikeBehavior, touchHit: undefined},
         '2x2': {...baseFloorSpikeBehavior, touchHit: undefined},
     },
-    paletteTargets: [{key: 'spirit', x, y}],
 };
 
 x += 3;
@@ -87,4 +86,57 @@ export const allCrystalSpikeTiles: TileSource[] = [
     shortWallCrystalSpikes,
     shortWallTransitionCrystalSpikes,
     southernWallCrystalSpikes,
+];
+
+x = 0;
+y = 3;
+const floorSpikeConvexTiles: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/crystalFloorSpikes.png', {x: 0, y: 0, w: 48, h: 48}),
+    behaviors: {
+        'all': baseFloorSpikeBehavior,
+        // Just remove the touch hit on the corners for now as we don't support bitmaps for touch hit yet.
+        '0x0': {...baseFloorSpikeBehavior, touchHit: undefined},
+        '2x0': {...baseFloorSpikeBehavior, touchHit: undefined},
+        '0x2': {...baseFloorSpikeBehavior, touchHit: undefined},
+        '2x2': {...baseFloorSpikeBehavior, touchHit: undefined},
+    },
+    paletteTargets: [{key: 'spirit', x, y}],
+};
+
+y += 3;
+const floorSpikeInnerTiles: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/crystalFloorSpikes.png', {x: 0, y: 48, w: 32, h: 32}),
+    behaviors: {
+        'all': baseFloorSpikeBehavior,
+    },
+    paletteTargets: [{key: 'spirit', x, y}],
+};
+
+y += 2;
+const floorSpikeConcaveCorners: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/crystalFloorSpikes.png', {x: 0, y: 80, w: 32, h: 32}),
+    behaviors: {
+        'all': {defaultLayer: 'floor2', linkedOffset: 21},
+    },
+    paletteTargets: [{key: 'spirit', x, y}],
+};
+
+y += 2;
+const floorSpikeSquareCorners: TileSource = {
+    w: 16, h: 16,
+    source: requireFrame('gfx/tiles/crystalFloorSpikes.png', {x: 0, y: 112, w: 32, h: 32}),
+    behaviors: {
+        'all': {defaultLayer: 'floor2', linkedOffset: 21},
+    },
+    paletteTargets: [{key: 'spirit', x, y}],
+};
+
+export const allCrystalFloorSpikeTiles: TileSource[] = [
+    floorSpikeConvexTiles,
+    floorSpikeInnerTiles,
+    floorSpikeConcaveCorners,
+    floorSpikeSquareCorners
 ];

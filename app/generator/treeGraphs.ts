@@ -8,6 +8,7 @@ import {
 } from 'app/content/logic';
 import {populateAllSections} from 'app/content/sections';
 import {zones} from 'app/content/zones/zoneHash';
+import {specialBrushes} from 'app/development/specialBrushes';
 import {getOrAddLayer} from 'app/utils/layers';
 import SRandom from 'app/utils/SRandom';
 import {createSpecialCaveFloor} from 'app/generator/styles/cave';
@@ -417,11 +418,24 @@ function checkToExpandPlacedNode(
 
 }
 
+function nodeRequiresKey(node: TreeNode) {
+    if (node.hasKeyRequirement !== undefined) {
+        return node.hasKeyRequirement;
+    }
+    for (const combination of node.requirements ?? []) {
+        for (const requirement of combination) {
+            if (requirement === hasSmallKey || requirement === hasBigKey) {
+                return node.hasKeyRequirement = true;
+            }
+        }
+    }
+    return node.hasKeyRequirement = false;
+}
 
 function sortNodesWithEntranceDirectionsFirst(a: TreeNode, b: TreeNode): number {
-    const aHasRequirements = a.entranceDirections || a.requirements?.[0][0] === hasSmallKey || a.requirements?.[0][0] === hasBigKey;
-    const bHasRequirements = b.entranceDirections || b.requirements?.[0][0] === hasSmallKey || b.requirements?.[0][0] === hasBigKey;
-    if (aHasRequirements&& !bHasRequirements) {
+    const aHasRequirements = a.entranceDirections || nodeRequiresKey(a);
+    const bHasRequirements = b.entranceDirections || nodeRequiresKey(b);
+    if (aHasRequirements && !bHasRequirements) {
         return -1;
     }
     if (bHasRequirements && !aHasRequirements) {
@@ -806,17 +820,17 @@ function createZoneFromTree(props: {
         if (!node.skeleton && random.mutate().random() < 0.2) {
             node.skeleton = generateBridgeRoom(random, node);
         }
-        if (!node.skeleton && random.mutate().random() < 1) {
+        if (!node.skeleton && random.mutate().random() < 0.3) {
             node.skeleton = generateShortTunnel(random, node);
         }
         if (!node.skeleton && random.mutate().random() < 0.8) {
             node.skeleton = generateBridgeRoom(random, node);
         }
-        if (!node.skeleton && random.mutate().random() < 0.3) {
-            node.skeleton = generateVerticalPath(random, node);
-        }
         if (!node.skeleton && random.mutate().random() < 0.2) {
             node.skeleton = generatePitMaze(random, node);
+        }
+        if (!node.skeleton && random.mutate().random() < 0.2) {
+            node.skeleton = generateVerticalPath(random, node);
         }
         if (!node.skeleton) {
             node.skeleton = generateEmptyRoom(random, node);
@@ -830,108 +844,29 @@ function createZoneFromTree(props: {
 
         const roomDifficulty = node.depth || random.mutate().range(3, 5);
         let enemyDifficulty = 0;
-        if (node.skeleton) {
-            const {slots, paths} = node.skeleton;
-            for (let i = 0; i < slots.length; i++) {
-                const slot = slots[i];
-                if (node.lootType) {
-                    const w = Math.min(slot.w, 4);
-                    const h = Math.min(slot.h, 4);
-                    const x = Math.floor(slot.x + slot.w / 2 - w / 2);
-                    const y = Math.floor(slot.y + slot.h / 2 - h / 2);
-                    // TODO: if this gets complex, moves this to its own function for populating checks in slots.
-                    //   Call this function first with all slots in case it wants to add puzzle elements for the check.
-                    //   Indicate the number of free slots that can be used for the check, or just pass in a subset that is this long.
-                    if (node.style === 'stone') {
-                        createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
-                    } else {
-                        // Cave style is the default.
-                        createSpecialCaveFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
-                    }
-                    const definition: LootObjectDefinition = {
-                        type: 'chest',
-                        id: `${node.id}-smallKey`,
-                        status: (node.type !== 'bigChest' && enemyRequired) ? 'hiddenEnemy' : 'normal',
-                        x: (x + w / 2) * 16,
-                        y: (y + h / 2) * 16,
-                        lootType: node.lootType,
-                        lootLevel: node.lootLevel,
-                        lootAmount: node.lootAmount,
-                    }
-                    if (node.type === 'bigChest') {
-                        definition.type = 'bigChest';
-                        definition.x -= 16;
-                        definition.y -= 16;
-                    } else {
-                        definition.x -= 8;
-                        definition.y -= 8;
-                    }
-                    node.baseArea.objects.push(definition);
-                    delete node.lootType;
-                    continue;
-                }
-                const mustAddEnemy = enemyRequired && !enemyDifficulty;
-                if (mustAddEnemy || (enemyDifficulty < roomDifficulty && random.mutate().random() < 0.8)) {
-                    // TODO: Use enemies code to add an enemy that matches contextual requirements and difficulty.
-                    node.baseArea.objects.push({
-                        type: 'enemy',
-                        enemyType: node.baseArea.isSpiritWorld
-                            ? random.mutate().element(['plantFlame','plantFrost','plantStorm'])
-                            : random.mutate().element(['beetleHorned', 'snake', 'plant', 'beetleWinged']) ,
-                        id: `${node.id}-enemy`,
-                        d: 'down',
-                        status: 'normal',
-                        x: (slot.x + slot.w / 2) * 16 - 16,
-                        y: (slot.y + slot.h / 2) * 16 - 8,
-                    });
-                    enemyDifficulty++;
-                    continue;
-                }
-                const outerTile = random.mutate().element([0, 0, 2,2, 4, 5]);
-                const innerTile = random.mutate().element([0, 2,4,5]);
-                const r = random.mutate().range(1, 2);
-                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                const rect = pad(slot, -1);
-                for (let y = rect.y; y < rect.y + rect.h; y++) {
-                    for (let x = rect.x; x < rect.x + rect.w; x++) {
-                        if (fieldLayer.grid.tiles[y][x]) {
-                            continue;
-                        }
-                        if (y < rect.y + r || y >= rect.y + rect.h - r || x < rect.x + r || x >= rect.x + rect.w - r) {
-                            fieldLayer.grid.tiles[y][x] = outerTile;
-                        } else {
-                            fieldLayer.grid.tiles[y][x] = innerTile;
-                        }
-                    }
-                }
-            }
-            for (let i = 0; i < paths.length; i++) {
-                const path = paths[i];
-                if (random.mutate().random() < 0.2) {
-                    const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                    const tile = random.mutate().element([2,5]);
-                    for (let y = path.y; y < path.y + path.h; y++) {
-                        for (let x = path.x; x < path.x + path.w; x++) {
-                            fieldLayer.grid.tiles[y][x] = tile;
-                        }
-                    }
-                }
-            }
-        } /*else {
-            // This is the standard interior rect for rooms.
-            let slot = {
-                x: node.baseAreaSection.x + 2,
-                w: node.baseAreaSection.w - 3,
-                y: node.baseAreaSection.y + 3,
-                h: node.baseAreaSection.h - 4,
-            };
+        const {slots, paths} = node.skeleton;
+        for (let i = 0; i < slots.length; i++) {
+            const slot = slots[i];
             if (node.lootType) {
+                const w = Math.min(slot.w, 4);
+                const h = Math.min(slot.h, 4);
+                const x = Math.floor(slot.x + slot.w / 2 - w / 2);
+                const y = Math.floor(slot.y + slot.h / 2 - h / 2);
+                // TODO: if this gets complex, moves this to its own function for populating checks in slots.
+                //   Call this function first with all slots in case it wants to add puzzle elements for the check.
+                //   Indicate the number of free slots that can be used for the check, or just pass in a subset that is this long.
+                if (node.style === 'stone') {
+                    createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                } else {
+                    // Cave style is the default.
+                    createSpecialCaveFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                }
                 const definition: LootObjectDefinition = {
                     type: 'chest',
                     id: `${node.id}-smallKey`,
-                    status: 'normal',
-                    x: (node.baseAreaSection.x + node.baseAreaSection.w / 2) * 16,
-                    y: (node.baseAreaSection.y + node.baseAreaSection.h / 2) * 16,
+                    status: (node.type !== 'bigChest' && enemyRequired) ? 'hiddenEnemy' : 'normal',
+                    x: (x + w / 2) * 16,
+                    y: (y + h / 2) * 16,
                     lootType: node.lootType,
                     lootLevel: node.lootLevel,
                     lootAmount: node.lootAmount,
@@ -945,32 +880,64 @@ function createZoneFromTree(props: {
                     definition.y -= 8;
                 }
                 node.baseArea.objects.push(definition);
+                delete node.lootType;
+                continue;
             }
-            //console.log(random.nextSeed().random());
-            if (random.mutate().random() < 0.3) {
-                slot = pad(slot, -2);
-                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                for (let y = slot.y; y < slot.y + slot.h; y++) {
-                    for (let x = slot.x; x < slot.x + slot.w; x++) {
-                        if (y === slot.y || y === slot.y + slot.h - 1 || x === slot.x || x === slot.x + slot.w - 1) {
-                            fieldLayer.grid.tiles[y][x] = fieldLayer.grid.tiles[y][x] || 2;
+            const mustAddEnemy = enemyRequired && !enemyDifficulty;
+            if (mustAddEnemy || (enemyDifficulty < roomDifficulty && random.mutate().random() < 0.8)) {
+                // TODO: Use enemies code to add an enemy that matches contextual requirements and difficulty.
+                node.baseArea.objects.push({
+                    type: 'enemy',
+                    enemyType: node.baseArea.isSpiritWorld
+                        ? random.mutate().element(['plantFlame','plantFrost','plantStorm'])
+                        : random.mutate().element(['beetleHorned', 'snake', 'plant', 'beetleWinged']) ,
+                    id: `${node.id}-enemy`,
+                    d: 'down',
+                    status: 'normal',
+                    x: (slot.x + slot.w / 2) * 16 - 16,
+                    y: (slot.y + slot.h / 2) * 16 - 8,
+                });
+                enemyDifficulty++;
+                continue;
+            }
+            const outerTile = random.mutate().element([0, 0, 2,2, 4, 5]);
+            const innerTile = random.mutate().element([0, 2,4,5]);
+            const r = random.mutate().range(1, 2);
+            const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
+            const rect = pad(slot, -1);
+            for (let y = rect.y; y < rect.y + rect.h; y++) {
+                for (let x = rect.x; x < rect.x + rect.w; x++) {
+                    if (fieldLayer.grid.tiles[y][x]) {
+                        continue;
+                    }
+                    if (y < rect.y + r || y >= rect.y + rect.h - r || x < rect.x + r || x >= rect.x + rect.w - r) {
+                        if (outerTile === 4) {
+                            specialBrushes.cavePitBrush.apply(node.baseArea, node.childArea, {x: x * 16, y: y * 16}, false);
+                        } else {
+                            fieldLayer.grid.tiles[y][x] = outerTile;
+                        }
+                    } else {
+                        if (innerTile === 4) {
+                            specialBrushes.cavePitBrush.apply(node.baseArea, node.childArea, {x: x * 16, y: y * 16}, false);
+                        } else {
+                            fieldLayer.grid.tiles[y][x] = innerTile;
                         }
                     }
                 }
-            } else if (random.mutate().random() < 0.2) {
+            }
+        }
+        for (let i = 0; i < paths.length; i++) {
+            const path = paths[i];
+            if (random.mutate().random() < 0.2) {
                 const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                for (let y = slot.y; y < slot.y + slot.h; y++) {
-                    fieldLayer.grid.tiles[y][slot.x + 4] = fieldLayer.grid.tiles[y][slot.x + 2] || 2;
-                    fieldLayer.grid.tiles[y][slot.x + slot.w - 4 - 1] = fieldLayer.grid.tiles[y][slot.x + slot.w - 2 - 1] || 2;
-                }
-            } else if (random.mutate().random() < 0.2) {
-                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
-                for (let x = slot.x; x < slot.x + slot.w; x++) {
-                    fieldLayer.grid.tiles[slot.y + 2][x] = fieldLayer.grid.tiles[slot.y + 2][x] || 2;
-                    fieldLayer.grid.tiles[slot.y + slot.h - 2 - 1][x] = fieldLayer.grid.tiles[slot.y + slot.h - 2 - 1][x] || 2;
+                const tile = random.mutate().element([2,5]);
+                for (let y = path.y; y < path.y + path.h; y++) {
+                    for (let x = path.x; x < path.x + path.w; x++) {
+                        fieldLayer.grid.tiles[y][x] = tile;
+                    }
                 }
             }
-        }*/
+        }
     }
 
 
