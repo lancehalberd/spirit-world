@@ -1,6 +1,7 @@
 
 type CardinalDirection = 'up' | 'down' | 'left' | 'right';
-type Direction = CardinalDirection | 'upleft' | 'upright' | 'downleft' | 'downright'
+type DiagonalDirection = 'upleft' | 'upright' | 'downleft' | 'downright';
+type Direction = CardinalDirection | DiagonalDirection;
 
 interface ScreenShake {
     dx: number

@@ -1,21 +1,76 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { Blast } from 'app/content/effects/blast';
-import { Flame } from 'app/content/effects/flame';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {Blast} from 'app/content/effects/blast';
+import {Flame} from 'app/content/effects/flame';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {
-    squirrelAnimations,
-    squirrelFlameAnimations,
-    squirrelFrostAnimations,
-    squirrelStormAnimations,
     superElectricSquirrelAnimations
 } from 'app/content/enemyAnimations';
-import { lifeLootTable } from 'app/content/lootTables';
-import { directionMap, getCardinalDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
+import {lifeLootTable} from 'app/content/lootTables';
+import {createAnimation, drawFrame, drawSolidTintedFrame} from 'app/utils/animations';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {directionMap, getCardinalDirection, getDiagonalDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
 import {
     moveEnemyFull,
 } from 'app/utils/enemies';
-import { getVectorToNearbyTarget } from 'app/utils/target'
+import {allImagesLoaded} from 'app/utils/images';
+import {requireFrame} from 'app/utils/packedImages';
+import {getVectorToNearbyTarget} from 'app/utils/target'
+
+
+const squirrelLinesFrame = requireFrame('gfx/enemies/squirrel.png', {x: 0, y: 0, w: 128, h: 64});
+const squirrelTintFrame = requireFrame('gfx/enemies/squirrel.png', {x: 0, y: 64, w: 128, h: 64});
+
+const squirrelDownGeometry: FrameDimensions = {w: 32, h: 32, content: {x: 10, y: 14, w: 16, h: 16}};
+const squirrelUpGeometry: FrameDimensions = {w: 32, h: 32, content: {x: 9, y: 11, w: 16, h: 16}};
+const shadowOffset = {y: -1};
+
+const tintedSquirrelAnimations: {[key in string]: ActorAnimations} = {};
+export function createTintedSquirrelAnimations(color: string): ActorAnimations {
+    if (tintedSquirrelAnimations[color]) {
+        return tintedSquirrelAnimations[color];
+    }
+    const [canvas, context] = createCanvasAndContext(squirrelLinesFrame.w, squirrelLinesFrame.h);
+    // This part can only be done after all the images load, but we can return the empty frames immediately.
+    (async () => {
+        await allImagesLoaded();
+        drawSolidTintedFrame(context, {...squirrelTintFrame, color}, {x: 0, y: 0, w: 128, h: 64});
+        drawFrame(context, squirrelLinesFrame, {x: 0, y: 0, w: 128, h: 64});
+    })();
+    const squirrelDownRightIdleAnimation: FrameAnimation = createAnimation(canvas, squirrelDownGeometry, {cols: 1, y: 0});
+    const squirrelUpRightIdleAnimation: FrameAnimation = createAnimation(canvas, squirrelUpGeometry, {cols: 1, y: 1});
+    const squirrelDownRightAnimation: FrameAnimation = createAnimation(canvas, squirrelDownGeometry, {cols: 4, y: 0});
+    const squirrelUpRightAnimation: FrameAnimation = createAnimation(canvas, squirrelUpGeometry, {cols: 4, y: 1});
+    const squirrelDownRightJumpAnimation: FrameAnimation = createAnimation(canvas, squirrelDownGeometry, {cols: 1, y: 0, x: 3});
+    const squirrelUpRightJumpAnimation: FrameAnimation = createAnimation(canvas, squirrelUpGeometry, {cols: 1, y: 1, x: 3});
+    const animations: ActorAnimations = {
+        idle: {
+            upright: squirrelUpRightIdleAnimation,
+            downright: squirrelDownRightIdleAnimation,
+            upleft: squirrelUpRightIdleAnimation,
+            downleft: squirrelDownRightIdleAnimation,
+        },
+        move: {
+            upright: squirrelUpRightAnimation,
+            downright: squirrelDownRightAnimation,
+            upleft: squirrelUpRightAnimation,
+            downleft: squirrelDownRightAnimation,
+        },
+        jump: {
+            upright: squirrelUpRightJumpAnimation,
+            downright: squirrelDownRightJumpAnimation,
+            upleft: squirrelUpRightJumpAnimation,
+            downleft: squirrelDownRightJumpAnimation,
+        },
+    };
+    tintedSquirrelAnimations[color] = animations;
+    return animations;
+}
+
+const squirrelAnimations = createTintedSquirrelAnimations('#C85B0A');
+const squirrelFlameAnimations = createTintedSquirrelAnimations('#FF0000');
+const squirrelFrostAnimations = createTintedSquirrelAnimations('#66EDFF');
+const squirrelStormAnimations = createTintedSquirrelAnimations('#E0FF47');
 
 interface SquirrelParams {
     element: MagicElement
@@ -45,6 +100,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
         enemy.vx = enemy.speed * Math.cos(theta);
         enemy.vy = enemy.speed * Math.sin(theta);
         enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
+        enemy.fullDirection = getDiagonalDirection(enemy.vx, enemy.vy, enemy.fullDirection as DiagonalDirection);
         enemy.changeToAnimation('idle');
         enemy.setMode('run')
     } else if (enemy.mode === 'run') {
@@ -53,6 +109,7 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
         enemy.vx = enemy.speed * Math.cos(theta);
         enemy.vy = enemy.speed * Math.sin(theta);
         enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
+        enemy.fullDirection = getDiagonalDirection(enemy.vx, enemy.vy, enemy.fullDirection as DiagonalDirection);
         checkToSparkle(state, enemy);
         enemy.changeToAnimation('move');
         // Pause sometime after moving for 4 seconds. Max time is theoretically 12s, but is likely much sooner.
@@ -72,9 +129,10 @@ function updateSquirrel(this: void, state: GameState, enemy: Enemy<SquirrelParam
             enemy.vy = -enemy.vy;
         }
         enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
+        enemy.fullDirection = getDiagonalDirection(enemy.vx, enemy.vy, enemy.fullDirection);
         //enemy.changeToAnimation('idle');
     } else if (enemy.mode === 'jumping') {
-        enemy.changeToAnimation('climbing');
+        enemy.changeToAnimation('jump');
         checkToSparkle(state, enemy, 60);
         if (!moveEnemyFull(state, enemy, enemy.vx, 0, {})) {
             enemy.vx = -enemy.vx;
@@ -113,6 +171,8 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}: Point,
         enemy.vx = maxJumpSpeed * enemy.vx / mag;
         enemy.vy = maxJumpSpeed * enemy.vy / mag;
     }
+    enemy.d = getCardinalDirection(enemy.vx, enemy.vy);
+    enemy.fullDirection = getDiagonalDirection(enemy.vx, enemy.vy, enemy.fullDirection as DiagonalDirection);
     enemy.setMode('jumping');
     if (enemy.params.element) {
         const blast = new Blast({
@@ -224,6 +284,8 @@ function jumpOnHit(state: GameState, enemy: Enemy<SquirrelParams>, hit: HitPrope
 enemyDefinitions.squirrel = {
     naturalDifficultyRating: 1,
     animations: squirrelAnimations,
+    flipLeft: true,
+    shadowOffset,
     speed: 1.5,
     life: 2, touchHit: {damage: 1, source: null},
     lootTable: lifeLootTable,
@@ -245,6 +307,8 @@ enemyDefinitions.squirrel = {
 enemyDefinitions.squirrelFlame = {
     naturalDifficultyRating: 3,
     animations: squirrelFlameAnimations,
+    flipLeft: true,
+    shadowOffset,
     aggroRadius: 112,
     speed: 2.5,
     life: 5,
@@ -263,6 +327,8 @@ enemyDefinitions.squirrelFlame = {
 enemyDefinitions.squirrelFrost = {
     naturalDifficultyRating: 3,
     animations: squirrelFrostAnimations,
+    flipLeft: true,
+    shadowOffset,
     aggroRadius: 112,
     speed: 2,
     life: 6,
@@ -280,6 +346,8 @@ enemyDefinitions.squirrelFrost = {
 enemyDefinitions.squirrelStorm = {
     naturalDifficultyRating: 3,
     animations: squirrelStormAnimations,
+    flipLeft: true,
+    shadowOffset,
     acceleration: 0.2,
     aggroRadius: 112,
     speed: 3,

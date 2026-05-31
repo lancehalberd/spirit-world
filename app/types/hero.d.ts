@@ -45,6 +45,7 @@ interface Actor extends ObjectInstance {
     vy: number
     vz: number
     d: CardinalDirection
+    fullDirection?: Direction
     action?: Action
     actionDx?: number
     actionDy?: number

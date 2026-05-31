@@ -1,6 +1,8 @@
 
 const root2over2 = Math.sqrt(2) / 2;
 
+export const diagonalDirections: DiagonalDirection[] = ['upleft', 'upright', 'downleft', 'downright'];
+
 export const directionMap = {
     upleft: [-root2over2, -root2over2],
     up: [0, -1],
@@ -80,6 +82,16 @@ export function getBestCardinalDirection(dx: number, dy: number, currentDirectio
         return currentDirection;
     }
     return getCardinalDirection(dx, dy, currentDirection);
+}
+
+export function getDiagonalDirection(dx: number, dy: number, defaultDirection: DiagonalDirection): DiagonalDirection {
+    if (Math.abs(dy) < 0.2 && Math.abs(dx) < 0.2) {
+        return defaultDirection;
+    }
+    if (dy < 0) {
+        return dx < 0 ? 'upleft' : 'upright';
+    }
+    return dx < 0 ? 'downleft' : 'downright';
 }
 
 export function getCardinalDirection(dx: number, dy: number, defaultDirection: CardinalDirection = null): CardinalDirection {

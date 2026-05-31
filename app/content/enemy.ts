@@ -66,6 +66,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // code used internally.
     ignorePits = true;
     d: CardinalDirection;
+    fullDirection?: Direction;
     // Rotation is used for changing directions of certain sprites.
     rotation: number;
     spawnX: number;
@@ -316,7 +317,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.nextAnimationKey = nextAnimationKey;
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
-        const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];
+        const targetAnimation =  animationSet[this.fullDirection] || animationSet[this.d] || Object.values(animationSet)[0];
         if (!targetAnimation) {
             console.error(`No animation found for ${type} ${this.d}`, this.animations);
             debugger;
@@ -345,12 +346,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.changeToAnimation(animationKeys[index], animationKeys[index + 1]);
         return false;
     }
-    setAnimation(type: string, d: Direction, time: number = 0, nextAnimationKey?: string) {
+    setAnimation(type: string, d: Direction = this.fullDirection ?? this.d, time: number = 0, nextAnimationKey?: string) {
         this.currentAnimationKey = type;
         this.nextAnimationKey = nextAnimationKey;
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
-        this.currentAnimation = animationSet[d] || Object.values(animationSet)[0];
+        this.currentAnimation = animationSet[d] || animationSet[this.d] || Object.values(animationSet)[0];
         if (!this.currentAnimation) {
             console.error(`No animation found for ${type} ${this.d}`, this.animations);
             debugger;
@@ -617,7 +618,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 });
             }
             // Show the boss death animation.
-            this.setAnimation('death', this.d);
+            this.setAnimation('death');
             return;
         }
         const hitbox = this.getHitbox();
@@ -1055,8 +1056,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (this.invulnerableFrames) {
                 context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.time / 150));
             }
-            if ((this.d === 'right' && this.enemyDefinition.flipRight)
-                || (this.d === 'left' && this.enemyDefinition.flipLeft)
+            if (((this.d === 'right' || this.fullDirection === 'upright' || this.fullDirection === 'downright') && this.enemyDefinition.flipRight)
+                || ((this.d === 'left' || this.fullDirection === 'upleft' || this.fullDirection === 'downleft') && this.enemyDefinition.flipLeft)
             ) {
                 // Draw the frame reflected horizontally if we only have a left or a right frame.
                 if (frame.anchor) {
