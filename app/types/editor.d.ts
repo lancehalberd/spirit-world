@@ -60,10 +60,29 @@ type PropertyRow = (EditorProperty<any> | HTMLElement | string)[];
 
 type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];
 
+
+
+type OptionValueTypes = string | number | boolean;
+// The actual option values selected for a Special Brush
+interface BrushOptions {
+  [key: string]: OptionValueTypes
+}
+// The set of possible option values for a Special Brush
+type BrushOptionsValues<T extends BrushOptions> = {
+  [K in keyof T]?: T[K][]
+}
+interface SpecialBrush<O extends BrushOptions> {
+    options: BrushOptionsValues<O>
+    apply: (area: AreaDefinition, alternateArea: AreaDefinition, point: Point, options: O) => Point[]
+    modifyOptions?: (options: O, isShiftDown: boolean) => O
+}
+
+
 type SelectableDefinition = ObjectDefinition | VariantData;
 
-interface SpecialBrush {
-    apply: (area: AreaDefinition, alternateArea: AreaDefinition, point: Point, erase: boolean) => Point[]
+interface SpecialBrushSelection<T extends BrushOptions> {
+    brush: SpecialBrush<T>
+    options: T
 }
 
 type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select' | 'tileChunk' | 'variant';
@@ -73,7 +92,7 @@ interface EditingState {
     hasChanges: boolean
     isEditing: boolean
     brushType: 'palette' | 'special'
-    specialBrushKey?: string
+    specialBrushSettings?: SpecialBrushSelection<any>
     brush?: {[key: string]: TileGridDefinition}
     clipboardObjects?: SelectableDefinition[]
     needsRefresh?: boolean

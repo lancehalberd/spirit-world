@@ -96,14 +96,13 @@ interface RoomPath extends Rect {
     targetId: string
 }
 
-interface RoomSkeleton {
+interface RoomZone {
+    id: string
+    entranceIds: string[]
     slots: RoomSlot[]
-    paths: RoomPath[]
 }
-
-interface MatrixSkeleton {
-    matrix: number[][]
-    slots: RoomSlot[]
+interface RoomSkeleton {
+    zones: RoomZone[]
     paths: RoomPath[]
 }
 

@@ -8,9 +8,10 @@ import {
 } from 'app/development/propertyPanel';
 import {specialBrushes} from 'app/development/specialBrushes';
 import {TabContainer} from 'app/development/tabContainer';
+import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
 import {getState} from 'app/state';
 import {readImageFromFile} from 'app/utils/index';
-import {chunkGenerators} from 'app/generator/chunks/tileChunkGenerators';
+import {typedKeys} from 'app/utils/types';
 
 
 const toolTabContainer = new TabContainer<EditorToolType>('brush', [
@@ -144,6 +145,14 @@ function getTileChunkProperties(): PanelRows {
     return rows;
 }
 
+function defaultBrushOptions<T extends BrushOptions>(specialBrush: SpecialBrush<T>, currentOptions?: Partial<T>): T {
+    const defaultOptions: Partial<T> = {};
+    for (const key of typedKeys(specialBrush.options)) {
+        defaultOptions[key] = currentOptions?.[key] ?? specialBrush.options[key][0];
+    }
+    return defaultOptions as T;
+}
+
 
 function getBrushPaletteProperties(): PanelRows {
     const state = getState();
@@ -173,21 +182,44 @@ function getBrushPaletteProperties(): PanelRows {
             }
             editingState.brushType = key;
             editingState.needsRefresh = true;
-            if (key === 'special' && !editingState.specialBrushKey) {
-                editingState.specialBrushKey = Object.keys(specialBrushes)[0];
+            if (key === 'special' && !editingState.specialBrushSettings) {
+                const specialBrush = Object.values(specialBrushes)[0];
+                editingState.specialBrushSettings = {
+                    brush: specialBrush,
+                    options: defaultBrushOptions(specialBrush),
+                };
             }
         },
     }]);
     if (editingState.brushType === 'special') {
+        const specialBrush = editingState.specialBrushSettings?.brush;
+        const specialBrushKeys = typedKeys(specialBrushes);
+        const brushIndex = Object.values(specialBrushes).indexOf(specialBrush);
+        const specialBrushKey = specialBrushKeys[brushIndex] ?? specialBrushKeys[0];
         rows.push([{
             name: 'brush type',
-            value: editingState.specialBrushKey,
-            values: Object.keys(specialBrushes),
-            onChange(key: string) {
-                editingState.specialBrushKey = key;
+            value: specialBrushKey,
+            values: specialBrushKeys,
+            onChange(key: keyof typeof specialBrushes) {
+                editingState.specialBrushSettings = {
+                    brush: specialBrushes[specialBrushKey],
+                    options: defaultBrushOptions(specialBrushes[specialBrushKey], editingState.specialBrushSettings?.options),
+                }
                 editingState.needsRefresh = true;
             },
         }]);
+        if (specialBrush) {
+            for (const optionKey of Object.keys(specialBrush.options)) {
+                rows.push([{
+                    name: 'special-option-' + optionKey,
+                    value: editingState.specialBrushSettings.options[optionKey],
+                    values: specialBrush.options[optionKey],
+                    onChange(value: OptionValueTypes) {
+                        editingState.specialBrushSettings.options[optionKey] = value;
+                    },
+                }]);
+            }
+        }
     } else if (editingState.brushType === 'palette') {
         rows.push([{
             name: 'palette',

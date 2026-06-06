@@ -69,7 +69,12 @@ export function fillMatrixRect<V>(matrix: V[][], {x, y, w, h}: Rect, value: V) {
 
 export function generateEmptyRoom(random: SRandom, node: TreeNode): RoomSkeleton {
     addRoomFrame(random, node);
-    const slots: RoomSlot[] = [];
+    const singleZone: RoomZone = {
+        id: 'fullRoom',
+        slots: [],
+        entranceIds: node.allEntranceDefinitions.map(d => d.id),
+    };
+    const zones: RoomZone[] = [singleZone];
     const paths: RoomPath[] = [];
     const w = node.wide ? 6 : 4;
     const h = node.tall ? 6 : 4;
@@ -77,8 +82,8 @@ export function generateEmptyRoom(random: SRandom, node: TreeNode): RoomSkeleton
     const ys = node.tall ? [8, 16, 24] : [node.baseAreaSection.y + 7, node.baseAreaSection.y + 11];
     for (const y of ys) {
         for (const x of xs) {
-            slots.push({
-                id: 's-' + slots.length,
+            singleZone.slots.push({
+                id: 's-' + singleZone.slots.length,
                 x: x - w / 2,
                 y: y - h / 2,
                 w,
@@ -86,7 +91,7 @@ export function generateEmptyRoom(random: SRandom, node: TreeNode): RoomSkeleton
             });
         }
     }
-    return {slots, paths};
+    return {zones, paths};
 }
 
 // const pitTile = 4;
@@ -110,7 +115,12 @@ interface PitMazeConnection {
 
 export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
     const innerRect = addRoomFrame(random, node);
-    const slots: RoomSlot[] = [];
+    const singleZone: RoomZone = {
+        id: 'fullRoom',
+        slots: [],
+        entranceIds: node.allEntranceDefinitions.map(d => d.id),
+    };
+    const zones: RoomZone[] = [singleZone];
     const paths: RoomPath[] = [];
     const {baseArea, childArea, baseAreaSection: section} = node;
     const columnXValues = [];
@@ -122,7 +132,10 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
         }
         columnXValues.push(tx);
         for (let ty = innerRect.y; ty < innerRect.y + innerRect.h + 1; ty++) {
-            specialBrushes.cavePitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, false);
+            specialBrushes.pitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, {
+                style: 'cave',
+                smoothCorners: 'exterior',
+            });
         }
     }
     columnXValues.unshift(section.x + 1);
@@ -134,7 +147,10 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
         }
         rowYValues.push(ty);
         for (let tx = section.x; tx < section.x + section.w; tx++) {
-            specialBrushes.cavePitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, false);
+            specialBrushes.pitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, {
+                style: 'cave',
+                smoothCorners: 'exterior',
+            });
         }
     }
     rowYValues.unshift(section.y + 2);
@@ -235,7 +251,7 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
         }
         for (let y = 0; y < h - 1; y++) {
             for (let x = 0; x < w - 1; x++) {
-                const node = grid[y][x ];
+                const node = grid[y][x];
                 if (!node) {
                     continue;
                 }
@@ -282,11 +298,19 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
         if (dx) {
             const tx = columnXValues[Math.max(x, x + dx)];
             const ty = random.mutate().range(rowYValues[y] + 1, rowYValues[y + 1] - 1);
-            specialBrushes.cavePitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, true);
+            specialBrushes.pitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, {
+                delete: true,
+                style: 'cave',
+                smoothCorners: 'exterior',
+            });
         } else {
             const tx = random.mutate().range(columnXValues[x] + 1, columnXValues[x + 1] - 1);
             const ty = rowYValues[Math.max(y, y + dy)];
-            specialBrushes.cavePitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, true);
+            specialBrushes.pitBrush.apply(baseArea, childArea, {x: tx * 16, y: ty * 16}, {
+                delete: true,
+                style: 'cave',
+                smoothCorners: 'exterior',
+            });
         }
     }
 
@@ -298,21 +322,35 @@ export function generatePitMaze(random: SRandom, node: TreeNode): RoomSkeleton {
         const right = columnXValues[node.x + 1];
         const top = rowYValues[node.y] + 1;
         const bottom = rowYValues[node.y + 1];
-        slots.push({
-            id: 's-' + slots.length,
+        singleZone.slots.push({
+            id: 's-' + singleZone.slots.length,
             x: left,
             y: top,
             w: right - left,
             h: bottom - top,
         });
+        for (let y = top; y < bottom; y++) {
+            for (let x = left; x < right; x++) {
+                specialBrushes.pitBrush.apply(baseArea, childArea, {x: x * 16, y: y * 16}, {
+                delete: true,
+                style: 'cave',
+                smoothCorners: 'exterior',
+            });
+            }
+        }
     }
 
-    return {slots, paths};
+    return {zones, paths};
 }
 
 
 export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkeleton|undefined {
-    const slots: RoomSlot[] = [];
+    const singleZone: RoomZone = {
+        id: 'fullRoom',
+        slots: [],
+        entranceIds: node.allEntranceDefinitions.map(d => d.id),
+    };
+    const zones: RoomZone[] = [singleZone];
     const paths: RoomPath[] = [];
     const {baseArea, childArea} = node;
     const fieldTiles = getOrAddLayer('field', baseArea, childArea).grid.tiles;
@@ -392,7 +430,7 @@ export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkele
             y += h;
         }
         const h = getH();
-        slots.push({
+        singleZone.slots.push({
             id: `s-${i}`,
             x: innerRect.x,
             y,
@@ -422,14 +460,14 @@ export function generateVerticalPath(random: SRandom, node: TreeNode): RoomSkele
     }
     inheritAllLayerTilesFromParent(childArea);
 
-    return {slots, paths};
+    return {zones, paths};
 }
 
 export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkeleton|undefined {
     if (node.tall || node.allEntranceDefinitions.length < 2 || node.minimumSlotCount > 0) {
         return;
     }
-    const slots: RoomSlot[] = [];
+    const zones: RoomZone[] = [];
     const paths: RoomPath[] = [];
     let left = 1000, right = 0;
     const section = node.baseAreaSection;
@@ -494,7 +532,7 @@ export function generateShortTunnel(random: SRandom, node: TreeNode): RoomSkelet
         applyCaveWalls(random, node.baseArea, section, node.childArea);
     }
 
-    return {slots, paths};
+    return {zones, paths};
 }
 
 
@@ -503,11 +541,11 @@ export function generateBridgeRoom(random: SRandom, node: TreeNode): RoomSkeleto
         return;
     }
     const innerRect = addRoomFrame(random, node)
-    const slots: RoomSlot[] = [];
+    const zones: RoomZone[] = [];
     const paths: RoomPath[] = [];
     if (innerRect.h <= 0 || innerRect.w <= 0) {
         debugger;
-        return {slots, paths};
+        return {zones, paths};
     }
     const matrix: number[][] = [];
     for (let y = 0; y < innerRect.h + 1; y++) {
@@ -545,10 +583,13 @@ export function generateBridgeRoom(random: SRandom, node: TreeNode): RoomSkeleto
         for (let x = 0; x < matrix[y].length; x++) {
             if (pitMatrix[y][x] === 0) {
                 const areaPoint = {x: 16 * (innerRect.x - 1 + x), y: 16 * (innerRect.y + y)};
-                specialBrushes.cavePitBrush.apply(node.baseArea, node.childArea, areaPoint, false);
+                specialBrushes.pitBrush.apply(node.baseArea, node.childArea, areaPoint, {
+                    style: 'cave',
+                    smoothCorners: 'exterior',
+                });
             }
         }
     }
 
-    return {slots, paths};
+    return {zones, paths};
 }

@@ -76,9 +76,31 @@ const cavePitDecorationTiles: Set<number> = new Set([
     ...cavePitWallTiles[0],
 ]);
 
+interface PitBrushOptions extends BrushOptions {
+    // 'interior' replaces pit corners with angled tiles, 'exterior' replaces non-pit corners with angled tiles.
+    // TODO: Only 'exterior' is currently implemented
+    smoothCorners?: 'exterior'|'interior'
+    // Editor should allow toggling this by holding SHIFT
+    delete?: boolean
+    style: 'cave'|'crystalCave'|'vanara'|'futuristic'
+}
 
-const cavePitBrush: SpecialBrush = {
-    apply(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, erase = false): Point[] {
+
+const pitBrush: SpecialBrush<PitBrushOptions> = {
+    options: {
+        smoothCorners: ['exterior', 'interior'],
+        delete: [false, true],
+        style: ['cave'],
+    },
+    // Pressing SHIFT while using the pit brush in the editor toggles the delete flag.
+    modifyOptions(options: PitBrushOptions, isShiftDown: boolean) {
+        return {
+            ...options,
+            delete: isShiftDown ? !options.delete : !!options.delete,
+        };
+    },
+    apply(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, options: PitBrushOptions): Point[] {
+        const erase = !!options.delete;
         const updatedPoints: Point[] = [];
         const tx = (x / 16) | 0, ty = (y / 16) | 0;
         const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
@@ -352,6 +374,6 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
     return changed;
 }
 
-export const specialBrushes: {[key in string]: SpecialBrush} = {
-    cavePitBrush,
+export const specialBrushes = {
+    pitBrush
 };

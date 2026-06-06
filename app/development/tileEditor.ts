@@ -3,7 +3,6 @@ import {allTiles} from 'app/content/tiles';
 import {zones} from 'app/content/zones';
 import {getSelectionBounds, getChunkGeneratorSelectionBounds} from 'app/development/brushSelection';
 import {contextMenuState, editingState} from 'app/development/editingState';
-import {specialBrushes} from 'app/development/specialBrushes';
 import {getAreaMousePosition} from 'app/development/getAreaMousePosition';
 import {addMissingLayer} from 'app/utils/layers';
 import {
@@ -111,9 +110,11 @@ mainCanvas.addEventListener('mousemove', function () {
 function applySpecialBrush(state: GameState, x: number, y: number) {
     x += state.camera.x;
     y += state.camera.y;
-    const specialBrush = specialBrushes[editingState.specialBrushKey];
-    if (specialBrush) {
-        const updatedPoints = specialBrush.apply(state.areaInstance.definition, state.alternateAreaInstance.definition, {x, y}, isKeyboardKeyDown(KEY.SHIFT));
+    const brushSettings = editingState.specialBrushSettings;
+    if (brushSettings) {
+        const updatedPoints = brushSettings.brush.apply(state.areaInstance.definition, state.alternateAreaInstance.definition, {x, y},
+            brushSettings.brush.modifyOptions?.(brushSettings.options, isKeyboardKeyDown(KEY.SHIFT)) ?? brushSettings.options
+        );
         for (const point of updatedPoints) {
             resetTile(state, point);
         }

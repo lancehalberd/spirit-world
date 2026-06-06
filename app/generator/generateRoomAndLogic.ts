@@ -8,7 +8,12 @@ import {getOrAddLayer, inheritAllLayerTilesFromParent} from 'app/utils/layers';
 
 
 export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, alternateArea: AreaDefinition, section: Rect, rules: RoomGenerationRules): RoomSkeleton {
-    const slots: RoomSlot[] = [];
+    const singleZone: RoomZone = {
+        id: 'fullRoom',
+        slots: [],
+        entranceIds: [],
+    };
+    const zones: RoomZone[] = [singleZone];
     const paths: RoomPath[] = [];
     const baseArea = area.parentDefinition ? alternateArea : area;
     const childArea = area.parentDefinition ? area : alternateArea;
@@ -36,7 +41,7 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
     for (let i = 0; i < sectionHeights.length; i++) {
         const h = sectionHeights[i];
         if (i % 2 === 0) {
-            slots.unshift({
+            singleZone.slots.unshift({
                 id: `slot-${i / 2}`,
                 x: innerRect.x,
                 y,
@@ -103,7 +108,7 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
 
     inheritAllLayerTilesFromParent(childArea);
 
-    return {slots, paths};
+    return {zones, paths};
 }
 
 // TODO: Think of some templates for structuring rooms as multiple connected chunks and populate each chunk with content.
@@ -132,7 +137,7 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
     };
     const entrancesById: {[key: string]: EntranceDefinition} = {};
     // TODO: Support other style besides stone.
-    const {slots, paths} = generateTallRoomSkeleton(random, area, alternateArea, rect, rules);
+    const {zones, paths} = generateTallRoomSkeleton(random, area, alternateArea, rect, rules);
     const nodesById: {[key: string]: LogicNode} = {};
     nodesById.entrance = {
         zoneId,
@@ -142,13 +147,15 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
         exits: rules.entrances.map(entrance => ({objectId: entrance.id})),
         entranceIds: rules.entrances.map(entrance => entrance.id),
     };
-    for (const slot of slots) {
-        nodesById[slot.id] = {
-            zoneId,
-            nodeId: `${zoneId}-${roomId}-${slot.id}`,
-            checks: [],
-            paths: [],
-        };
+    for (const zone of zones) {
+        for (const slot of zone.slots) {
+            nodesById[slot.id] = {
+                zoneId,
+                nodeId: `${zoneId}-${roomId}-${zone.id}-${slot.id}`,
+                checks: [],
+                paths: [],
+            };
+        }
     }
     for (const path of paths) {
         const node = nodesById[path.sourceId];
@@ -207,77 +214,81 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
         // TODO: support other entrances
     }
     for (const checkRules of rules.checks) {
-        const slot = slots[slots.length - 1];
-        const node = nodesById[slot.id];
-        // Leave some s
-        const checkRect = pad(slot, - 1);
-        let checkLogic: LogicCheck;
-        // Currently we only support a single item requirement for checks.
-        if (checkRules.requiredItemSets[0][0] === 'teleportation') {
-            // Ring of rocks teleportation chunk:
-            // The chest is inside a ring of rocks that don't exist in the alternate world so
-            // the player can teleport inside to get the check.
-            // Any narrower than 4 and it is too difficult to teleport in. Any larger and there isn't enough
-            // room between the ring and the walls.
-            random.generateAndMutate();
-            const w = random.range(4, Math.min(7, checkRect.w));
-            random.generateAndMutate();
-            const h = random.range(4, Math.min(7, checkRect.h));
-            random.generateAndMutate();
-            const x = random.range(checkRect.x, checkRect.x + checkRect.w - w);
-            random.generateAndMutate();
-            const y = random.range(checkRect.y, checkRect.y + checkRect.h - h);
-            const chestX = random.range(x + 1, x + w - 2);
-            const chestY = random.range(y, y + h - 4);
-            // TODO: Add function for adding chest which includes style + option to add floor decorations.
-            area.objects.push({
-                type: 'chest',
-                id: checkRules.id,
-                status: 'normal',
-                x: chestX * 16,
-                y: chestY * 16,
-                lootType: checkRules.lootType,
-                lootAmount: checkRules.lootAmount,
-                lootLevel: checkRules.lootLevel,
-            });
-            const fieldLayer = getOrAddLayer('field', area, alternateArea);
-            const tiles = fieldLayer.grid.tiles;
-            for (let tY = y; tY < y + h; tY++) {
-                if (!tiles[tY]) {
-                    tiles[tY] = [];
-                }
-                for (let tX = x; tX < x + w; tX++) {
-                    if (tX === chestX && tY === chestY) {
-                        continue;
+        for (const zone of zones) {
+            const slot = zone.slots[zone.slots.length - 1];
+            const node = nodesById[slot.id];
+            // Leave some s
+            const checkRect = pad(slot, - 1);
+            let checkLogic: LogicCheck;
+            // Currently we only support a single item requirement for checks.
+            if (checkRules.requiredItemSets[0][0] === 'teleportation') {
+                // Ring of rocks teleportation chunk:
+                // The chest is inside a ring of rocks that don't exist in the alternate world so
+                // the player can teleport inside to get the check.
+                // Any narrower than 4 and it is too difficult to teleport in. Any larger and there isn't enough
+                // room between the ring and the walls.
+                random.generateAndMutate();
+                const w = random.range(4, Math.min(7, checkRect.w));
+                random.generateAndMutate();
+                const h = random.range(4, Math.min(7, checkRect.h));
+                random.generateAndMutate();
+                const x = random.range(checkRect.x, checkRect.x + checkRect.w - w);
+                random.generateAndMutate();
+                const y = random.range(checkRect.y, checkRect.y + checkRect.h - h);
+                const chestX = random.range(x + 1, x + w - 2);
+                const chestY = random.range(y, y + h - 4);
+                // TODO: Add function for adding chest which includes style + option to add floor decorations.
+                area.objects.push({
+                    type: 'chest',
+                    id: checkRules.id,
+                    status: 'normal',
+                    x: chestX * 16,
+                    y: chestY * 16,
+                    lootType: checkRules.lootType,
+                    lootAmount: checkRules.lootAmount,
+                    lootLevel: checkRules.lootLevel,
+                });
+                const fieldLayer = getOrAddLayer('field', area, alternateArea);
+                const tiles = fieldLayer.grid.tiles;
+                for (let tY = y; tY < y + h; tY++) {
+                    if (!tiles[tY]) {
+                        tiles[tY] = [];
                     }
-                    const isOutsideRow = tY === y || tY === y + h - 1;
-                    const isOutsideColumn = tX === x || tX === x + w - 1;
-                    if (isOutsideRow || isOutsideColumn) {
-                        tiles[tY][tX] = area.isSpiritWorld ? 189 : 10;
+                    for (let tX = x; tX < x + w; tX++) {
+                        if (tX === chestX && tY === chestY) {
+                            continue;
+                        }
+                        const isOutsideRow = tY === y || tY === y + h - 1;
+                        const isOutsideColumn = tX === x || tX === x + w - 1;
+                        if (isOutsideRow || isOutsideColumn) {
+                            tiles[tY][tX] = area.isSpiritWorld ? 189 : 10;
+                        }
                     }
                 }
+                checkLogic = orLogic(hasTeleportation, hasSomersault);
+            } else {
+                // If we don't know how to satisfy the requirements, or there are none,
+                // just put a check with no obstacles in.
+                const chestX = random.range(checkRect.x, checkRect.x + checkRect.w - 1);
+                const chestY = random.range(checkRect.y, checkRect.y + checkRect.h - 1);
+                area.objects.push({
+                    type: 'chest',
+                    id: checkRules.id,
+                    status: 'normal',
+                    x: chestX * 16,
+                    y: chestY * 16,
+                    lootType: checkRules.lootType,
+                    lootAmount: checkRules.lootAmount,
+                    lootLevel: checkRules.lootLevel,
+                });
             }
-            checkLogic = orLogic(hasTeleportation, hasSomersault);
-        } else {
-            // If we don't know how to satisfy the requirements, or there are none,
-            // just put a check with no obstacles in.
-            const chestX = random.range(checkRect.x, checkRect.x + checkRect.w - 1);
-            const chestY = random.range(checkRect.y, checkRect.y + checkRect.h - 1);
-            area.objects.push({
-                type: 'chest',
-                id: checkRules.id,
-                status: 'normal',
-                x: chestX * 16,
-                y: chestY * 16,
-                lootType: checkRules.lootType,
-                lootAmount: checkRules.lootAmount,
-                lootLevel: checkRules.lootLevel,
-            });
+            node.checks.push({objectId: checkRules.id, logic: checkLogic});
         }
-        node.checks.push({objectId: checkRules.id, logic: checkLogic});
     }
-    for (let i = 0; i < slots.length - 1; i++) {
-        fillSlotFromContext(context, slots[i]);
+    for (const zone of zones) {
+        for (const slot of zone.slots) {
+            fillSlotFromContext(context, slot);
+        }
     }
     const logicNodes: LogicNode[] = Object.values(nodesById);
     return {
