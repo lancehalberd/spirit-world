@@ -112,9 +112,17 @@ function applySpecialBrush(state: GameState, x: number, y: number) {
     y += state.camera.y;
     const brushSettings = editingState.specialBrushSettings;
     if (brushSettings) {
+        const initialLayerCount = state.areaInstance.definition.layers.length;
         const updatedPoints = brushSettings.brush.apply(state.areaInstance.definition, state.alternateAreaInstance.definition, {x, y},
             brushSettings.brush.modifyOptions?.(brushSettings.options, isKeyboardKeyDown(KEY.SHIFT)) ?? brushSettings.options
         );
+        // If a new layer was added, just refresh everything for simplicity.
+        // Refreshing everything is slow, but this typically only happens once per tool use.
+        if (state.areaInstance.definition.layers.length > initialLayerCount) {
+            refreshArea(state);
+            editingState.hasChanges = true;
+            return;
+        }
         for (const point of updatedPoints) {
             resetTile(state, point);
         }
@@ -123,13 +131,6 @@ function applySpecialBrush(state: GameState, x: number, y: number) {
 // TODO: make sure this applies material -> spirit mappings as well.
 function resetTile(state: GameState, {x, y}: Point) {
     const area = state.areaInstance;
-    // If a new layer was added, just refresh everything for simplicity.
-    // Refreshing everything is slow, but this typically only happens once per tool use.
-    if (area.definition.layers.length !== area.layers.length) {
-        refreshArea(state);
-        editingState.hasChanges = true;
-        return;
-    }
     for (const layer of area.layers) {
         try {
             layer.originalTiles[y][x] = layer.tiles[y][x] = allTiles[layer.definition.grid.tiles[y][x]];
