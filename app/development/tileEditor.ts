@@ -131,7 +131,11 @@ function resetTile(state: GameState, {x, y}: Point) {
         return;
     }
     for (const layer of area.layers) {
-        layer.originalTiles[y][x] = layer.tiles[y][x] = allTiles[layer.definition.grid.tiles[y][x]];
+        try {
+            layer.originalTiles[y][x] = layer.tiles[y][x] = allTiles[layer.definition.grid.tiles[y][x]];
+        } catch {
+            debugger;
+        }
         if (layer.definition.grid.mask) {
             layer.maskTiles[y][x] = allTiles[layer.definition.grid.mask[y][x]];
         }

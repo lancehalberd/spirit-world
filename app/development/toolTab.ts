@@ -211,7 +211,8 @@ function getBrushPaletteProperties(): PanelRows {
         if (specialBrush) {
             for (const optionKey of Object.keys(specialBrush.options)) {
                 rows.push([{
-                    name: 'special-option-' + optionKey,
+                    id: 'special-option-' + optionKey,
+                    name: optionKey,
                     value: editingState.specialBrushSettings.options[optionKey],
                     values: specialBrush.options[optionKey],
                     onChange(value: OptionValueTypes) {

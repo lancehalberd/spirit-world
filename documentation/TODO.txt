@@ -144,8 +144,8 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - support 'internal' smoothed corners on pit brush.
-    - support additional pit brush styles: 'crystalCave', 'vanara', 'futuristic'
+    - support additional pit brush styles: 'vanara', 'futuristic'
+    - support angled pits in 'crystalCave' + add pit brush
     - Support angled cave wall -> angled cave pit wall transitions with cavePitBrush
     - Support adding slots to generateBridgeRoom when large enough
         - Maybe general required nodes to any rectangle of 2s provided in the original matrix.

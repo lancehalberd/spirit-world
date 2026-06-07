@@ -1,96 +1,153 @@
 import {getLayer, getOrAddLayer} from 'app/utils/layers';
 
-const singlePitTileIndex = 4;
-const cavePitExterior: NineSlice = {
-    w: 3,
-    h: 3,
-    r: {x: 1, y: 1, w: 1, h: 1},
-    layers: [{
-        key: 'floor2',
-        grid: [
+type PitStyle = 'cave'|'crystalCave';//|'vanara'|'futuristic'
+
+interface PitTileDefinition {
+    singlePit: number
+    exterior: number[][]
+    interior: number[][]
+    angledPits?: number[][]
+    pitWalls?: number[][]
+    // Where these tiles are present north of a pit they will be replaced with tiles from pitWalls
+    walls?: Set<number>
+    // TL corner of the pit on the left, TR corner of the pit on the right
+    angledPitWalls?: number[][]
+    angledWalls?: Set<number>
+}
+interface PitTiles extends PitTileDefinition {
+    corePitTiles: Set<number>
+    allPitTiles: Set<number>
+    decorationTiles: Set<number>
+}
+
+function makePitTiles({singlePit, exterior, interior, angledPits, pitWalls, walls, angledPitWalls, angledWalls}: PitTileDefinition): PitTiles{
+    const corePitTiles: Set<number> = new Set([
+        singlePit,
+        ...exterior[0],
+        ...exterior[1],
+        ...exterior[2],
+        ...(pitWalls?.[1] ?? []),
+        ...(angledPitWalls?.[1] ?? []),
+        ...(angledPitWalls?.[2] ?? []),
+        // These are the full pit tiles that need to be placed below
+        // the inserted angled pit tiles on the top of angled pits.
+        ...(angledPits?.[1] ?? []),
+    ]);
+    const allPitTiles = new Set([
+        ...corePitTiles,
+        ...(angledPits?.[0] ?? []),
+        ...(angledPits?.[2] ?? []),
+    ]);
+    // Any tile that is added to field/field2 on top of pit tiles.
+    const decorationTiles: Set<number> = new Set([
+        ...allPitTiles,
+        ...interior[0],
+        ...interior[1],
+        ...interior[2],
+        ...(angledPitWalls?.[0] ?? []),
+        ...(pitWalls?.[0] ?? []),
+    ]);
+    return {
+        singlePit,
+        exterior,
+        interior,
+        angledPits,
+        pitWalls,
+        walls,
+        angledPitWalls,
+        angledWalls,
+        corePitTiles,
+        allPitTiles,
+        decorationTiles,
+    };
+}
+
+
+const pitStyles = {
+    cave: makePitTiles({
+        singlePit: 4,
+        exterior: [
             [336, 337, 338],
             [339, 340, 341],
             [342, 343, 344],
         ],
-    }],
-};
-const cavePitInterior: NineSlice = {
-    w: 3,
-    h: 3,
-    r: {x: 1, y: 1, w: 1, h: 1},
-    layers: [{
-        key: 'field',
-        grid: [
+        interior: [
             [345, 346, 347],
-            [348,   0, 349],
+            [348, undefined, 349],
             [350, 337, 351],
         ],
-    }],
+        angledPits: [
+            [79,80],
+            [81,82],
+            [83,84],
+        ],
+        pitWalls: [
+            [380, 381], // The wall section (field2 to cover but preserve the wall)
+            [382, 383], // The pit wall section (floor2)
+        ],
+        angledPitWalls: [
+            [384, 385], // This goes on top of the full wall tile (field2 to cover but preserve the wall)
+            [386, 387], // This is the start of the actual pit, floor2, clearing field+field2 or using for pit edge decorations.
+            [388, 389], // This is the bottom of the pit wall, if visible, floor 2
+        ],
+        walls: new Set([762, 763]),
+        angledWalls: new Set([758, 770, 755, 764, 767]),
+        /*angledWalls: [
+            [758,755],
+            [770,764],
+            [770,767],
+        ]*/
+    }),
+    crystalCave: makePitTiles({
+        singlePit: 317,
+        exterior: [
+            [352, 353, 354],
+            [355, 356, 357],
+            [358, 359, 360],
+        ],
+        interior: [
+            [361, 362, 363],
+            [364, undefined, 365],
+            [366, 353, 367],
+        ],
+        /*angledPits: [
+            [79,80],
+            [81,82],
+            [83,84],
+        ],*/
+        pitWalls: [
+            [1765, 1766], // The wall section (field2 to cover but preserve the wall)
+            [1767, 1768], // The pit wall section (floor2)
+        ],
+        angledPitWalls: [
+            [1769, 1770], // This goes on top of the full wall tile (field2 to cover but preserve the wall)
+            [1771, 1772], // This is the start of the actual pit, floor2, clearing field+field2 or using for pit edge decorations.
+            [1773, 1774], // This is the bottom of the pit wall, if visible, floor 2
+        ],
+        walls: new Set([991, 992]),
+        angledWalls: new Set([758, 770, 755, 764, 767]),
+        /*angledWalls: [
+            [758,755],
+            [770,764],
+            [770,767],
+        ]*/
+    }),
 };
-
-// Where these tiles are present north of a pit they will be replaced with cavePitWallTiles
-const caveWallTiles = new Set([762, 763]);
-const cavePitWallTiles = [
-    [380, 381], // The wall section (field2 to cover but preserve the wall)
-    [382, 383], // The pit wall section (floor2)
-];
-// TL corner on the left, TR corner on the right
-const cavePitAngledWallTiles = [
-    [384, 385], // This goes on top of the full wall tile (field2 to cover but preserve the wall)
-    [386, 387], // This is the start of the actual pit, floor2, clearing field+field2 or using for pit edge decorations.
-    [388, 389], // This is the bottom of the pit wall, if visible, floor 2
-];
-/*const caveAngledWallTiles = [
-    [758,755],
-    [770,764],
-    [770,767],
-];*/
-const caveAngledPitTiles = [
-    [79,80],
-    [81,82],
-    [83,84],
-];
-
-const coreCavePitTiles: Set<number> = new Set([
-    singlePitTileIndex,
-    336, 337, 338, 339, 340, 341, 342, 343, 344,
-    ...cavePitWallTiles[1],
-    ...cavePitAngledWallTiles[1],
-    ...cavePitAngledWallTiles[2],
-    // These are the full pit tiles that need to be placed below
-    // the inserted angled pit tiles on the top of angled pits.
-    ...caveAngledPitTiles[1],
-]);
-// The core cave pit tiles plus the angled pit tiles.
-// These are not considered "core" because they are added and
-// deleted by the brush based on the presence of surrounding pits.
-const allCavePitTiles = new Set([
-    ...coreCavePitTiles,
-    ...caveAngledPitTiles[0],
-    ...caveAngledPitTiles[2],
-]);
-const cavePitDecorationTiles: Set<number> = new Set([
-    ...coreCavePitTiles,
-    345, 346, 347, 348, 349, 350, 351,
-    ...cavePitAngledWallTiles[0],
-    ...cavePitWallTiles[0],
-]);
 
 interface PitBrushOptions extends BrushOptions {
     // 'interior' replaces pit corners with angled tiles, 'exterior' replaces non-pit corners with angled tiles.
-    // TODO: Only 'exterior' is currently implemented
-    smoothCorners?: 'exterior'|'interior'
-    // Editor should allow toggling this by holding SHIFT
+    smoothCorners?: 'none'|'exterior'|'interior'
     delete?: boolean
-    style: 'cave'|'crystalCave'|'vanara'|'futuristic'
+    style: PitStyle
 }
 
 
 const pitBrush: SpecialBrush<PitBrushOptions> = {
     options: {
-        smoothCorners: ['exterior', 'interior'],
+        smoothCorners: ['none', 'exterior', 'interior'],
         delete: [false, true],
-        style: ['cave'],
+        // TODO: support 'vanara', 'futuristic'
+        style: ['cave', 'crystalCave'],
     },
     // Pressing SHIFT while using the pit brush in the editor toggles the delete flag.
     modifyOptions(options: PitBrushOptions, isShiftDown: boolean) {
@@ -100,6 +157,7 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
         };
     },
     apply(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, options: PitBrushOptions): Point[] {
+        const pitTiles = pitStyles[options.style];
         const erase = !!options.delete;
         const updatedPoints: Point[] = [];
         const tx = (x / 16) | 0, ty = (y / 16) | 0;
@@ -107,16 +165,47 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
         if (ty < 0 || tx < 0 || ty >= floor2Layer.grid.h || tx >= floor2Layer.grid.w) {
             return updatedPoints;
         }
-        if (erase !== coreCavePitTiles.has(floor2Layer.grid.tiles[ty]?.[tx])) {
+        // This check attempts to short circuit tiles that are already pits, but the angled pits are ambiguous
+        // about whether they reperesent "pit" tiles depending on how the smoothing option is set, so we
+        // are just disabling this check.
+        //if (erase !== pitTiles.corePitTiles.has(floor2Layer.grid.tiles[ty]?.[tx]) || allC) {
+        //    return updatedPoints;
+        //}
+        if (!changeLayerTile(floor2Layer, {x: tx, y: ty}, erase ? 0 : pitTiles.singlePit)) {
             return updatedPoints;
         }
         updatedPoints.push({x: tx, y: ty});
-        changeLayerTile(floor2Layer, {x: tx, y: ty}, erase ? 0 : singlePitTileIndex);
+        if (options.smoothCorners !== 'none' && pitTiles.angledPits) {
+            const applyAngledPitFunction = options.smoothCorners === 'exterior' ? applyExteriorAngledPits : applyInteriorAngledPits;
+            for (const dy of [-1, 0, 1]) {
+                const y = ty + dy;
+                if (y < 0 || y >= floor2Layer.grid.h) {
+                    continue;
+                }
+                for (const dx of [-1, 0, 1]) {
+                    const x = tx + dx;
+                    if (x < 0 || x >= floor2Layer.grid.w) {
+                        continue;
+                    }
+                    if (applyAngledPitFunction(area, alternateArea, {x, y}, pitTiles)) {
+                        if (dx || dy) {
+                            updatedPoints.push({x, y});
+                        }
+                    }
+                }
+            }
+        }
         for (const dy of [-2, -1, 0, 1, 2]) {
             const y = ty + dy;
+            if (y < 0 || y >= floor2Layer.grid.h) {
+                continue;
+            }
             for (const dx of [-2, -1, 0, 1, 2]) {
                 const x = tx + dx;
-                if (setPitTiles(area, alternateArea, {x, y})) {
+                if (x < 0 || x >= floor2Layer.grid.w) {
+                    continue;
+                }
+                if (setPitTiles(area, alternateArea, {x, y}, pitTiles)) {
                     if (dx || dy) {
                         updatedPoints.push({x, y});
                     }
@@ -125,12 +214,18 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
         }
         for (const dy of [-2, -1, 0, 1, 2]) {
             const y = ty + dy;
+            if (y < 0 || y >= floor2Layer.grid.h) {
+                continue;
+            }
             for (const dx of [-2, -1, 0, 1, 2]) {
                 const x = tx + dx;
-                if (Math.abs(dx + dy) > 2) {
+                if (x < 0 || x >= floor2Layer.grid.w) {
                     continue;
                 }
-                if (setPitDecorationTiles(area, alternateArea, {x, y})) {
+                if (Math.abs(dx) + Math.abs(dy) > 3) {
+                    continue;
+                }
+                if (setPitDecorationTiles(area, alternateArea, {x, y}, pitTiles)) {
                     if (dx || dy) {
                         updatedPoints.push({x, y});
                     }
@@ -152,43 +247,90 @@ function changeLayerTile(layer: AreaLayerDefinition, {x, y}: Point, tile: number
     return true;
 }
 
-function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point): boolean {
+function clearPitTile(layer: AreaLayerDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
+    if (pitTiles.allPitTiles.has(layer.grid.tiles[y]?.[x])) {
+        return changeLayerTile(layer, {x, y}, 0);
+    }
+    return false;
+}
+
+function makeAngledPit(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles, pitSet: Set<number>, defaultValue: number): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+    const N = pitSet.has(floor2Layer.grid.tiles[y - 1]?.[x]);
+    const S = pitSet.has(floor2Layer.grid.tiles[y + 1]?.[x]);
+    const W = pitSet.has(floor2Layer.grid.tiles[y]?.[x - 1]);
+    const E = pitSet.has(floor2Layer.grid.tiles[y]?.[x + 1]);
+    // TODO: when placing a diagonal pit, check for a diagonal wall above it to merge with.
+    // Check to make this a diagonal pit if it borders exactly two pits that are on adjacent sides.
+    if (N && W && !S && !E) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[2][1]);
+    }
+    if (N && E && !S && !W) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[2][0]);
+    }
+    if (S && W && !N && !E) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[0][1]);
+    }
+    if (S && E && !N && !W) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[0][0]);
+    }
+    if (defaultValue !== 0) {
+        return changeLayerTile(floor2Layer, {x, y}, defaultValue);
+    }
+    return clearPitTile(floor2Layer, {x, y}, pitTiles);
+}
+
+function applyExteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
     const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
     if (y < 0 || x < 0 || y >= floor2Layer.grid.h || x >= floor2Layer.grid.w) {
         return false;
     }
-    const C = coreCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
-    const N = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
-    const S = coreCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
-    const W = coreCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x - 1]);
-    const E = coreCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x + 1]);
+    const C = pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
+    // Exterior angled pits only apply to non-core pit tiles.
+    if (C) {
+        return false;
+    }
+    return makeAngledPit(area, alternateArea, {x, y}, pitTiles, pitTiles.corePitTiles, 0);
+}
+
+function applyInteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+    if (y < 0 || x < 0 || y >= floor2Layer.grid.h || x >= floor2Layer.grid.w) {
+        return false;
+    }
+    const C = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
+    // Interior angled pits only apply to core pit tiles.
     if (!C) {
-        // Check to make this a diagonal pit if it borders exactly to pits that are on adjacent sides.
-        if (N && W && !S && !E) {
-            return changeLayerTile(floor2Layer, {x, y}, caveAngledPitTiles[2][1]);
-        }
-        if (N && E && !S && !W) {
-            return changeLayerTile(floor2Layer, {x, y}, caveAngledPitTiles[2][0]);
-        }
-        if (S && W && !N && !E) {
-            return changeLayerTile(floor2Layer, {x, y}, caveAngledPitTiles[0][1]);
-        }
-        if (S && E && !N && !W) {
-            return changeLayerTile(floor2Layer, {x, y}, caveAngledPitTiles[0][0]);
-        }
-        // Otherwise this tile is just a regular non-pit tile.
-        return changeLayerTile(floor2Layer, {x, y}, 0);
-        // TODO: Support adding diagonal pits if exactly 2 adjacent tiles are pits
-        //if (N && E && !S && !W) {
-        //    update(floor2Layer, {x, y}, )
-        //}
-        // TODO: when placing a diagonal pit, check for a diagonal wall above it to merge with.
+        return false;
+    }
+    return makeAngledPit(area, alternateArea, {x, y}, pitTiles, pitTiles.allPitTiles, pitTiles.singlePit);
+}
+
+function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+    if (y < 0 || x < 0 || y >= floor2Layer.grid.h || x >= floor2Layer.grid.w) {
+        return false;
+    }
+    const isAnyPitTile = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
+    const isCorePitTile = pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
+    // If these values do not match, it means this is an angled pit tile, in which case the correct
+    // tile should already be set here.
+    if (isCorePitTile !== isAnyPitTile) {
+        return false;
+    }
+    const N = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
+    const S = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
+    const W = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x - 1]);
+    const E = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x + 1]);
+    if (!isCorePitTile) {
+        // Tile is just a regular non-pit tile.
+        return clearPitTile(floor2Layer, {x, y}, pitTiles);
     }
     if (!N) {
         // If the tile above this is not a pit, check the field layer to see if it is a wall so we can
         // convert this pit into wall pit that matches with the wall.
-        if (caveWallTiles.has(getLayer('field', area)?.grid.tiles[y - 1]?.[x])) {
-            return changeLayerTile(floor2Layer, {x, y}, cavePitWallTiles[1][x % 2]);
+        if (pitTiles.walls.has(getLayer('field', area)?.grid.tiles[y - 1]?.[x])) {
+            return changeLayerTile(floor2Layer, {x, y}, pitTiles.pitWalls[1][x % 2]);
         }
     }
     // A pit without a full pit tile of it may have an angled pit tile placed north of it.
@@ -197,35 +339,15 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
     let needsNEdge = !N, needsSEdge = !S, needsWEdge = !W, needsEEdge = !E;
     // Checking for north angled pits has special handling because the angled pit wall bleeds into
     // the tile to the south, requiring a specific tile to be selected.
-    if (needsNEdge && !coreCavePitTiles.has(floor2Layer.grid.tiles[y - 2]?.[x])) {
-        const NW = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1]);
-        const NE = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1]);
-        if (!NW && NE) {
-            return changeLayerTile(floor2Layer, {x, y}, caveAngledPitTiles[1][0]);
-        }
-        if (!NE && NW) {
-            return changeLayerTile(floor2Layer, {x, y}, caveAngledPitTiles[1][1]);
-        }
+    if (floor2Layer.grid.tiles[y - 1]?.[x] === pitTiles.angledPits?.[0][0]) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[1][0]);
     }
-    // These edges may not actually be needed if an angled pit is inserted in that direction.
-    if (needsSEdge || needsWEdge || needsEEdge) {
-        const NW = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1]);
-        const NE = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1]);
-        const SW = coreCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x - 1]);
-        const SE = coreCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x + 1]);
-        if (needsSEdge && SW !== SE && !coreCavePitTiles.has(floor2Layer.grid.tiles[y + 2]?.[x])) {
-            needsSEdge = false;
-        }
-        if (needsWEdge && NW !== SW && !coreCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x - 2])) {
-            needsWEdge = false;
-        }
-        if (needsEEdge && NE !== SE && !coreCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x + 2])) {
-            needsEEdge = false;
-        }
+    if (floor2Layer.grid.tiles[y - 1]?.[x] === pitTiles.angledPits?.[0][1]) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[1][1]);
     }
     // Single isolated pit.
     if (needsNEdge && needsSEdge && needsEEdge && needsWEdge) {
-        return changeLayerTile(floor2Layer, {x, y}, singlePitTileIndex);
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.singlePit);
     }
     let row = 0, column = 0;
     if (!needsNEdge) {
@@ -234,7 +356,7 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
     if (!needsWEdge) {
         column = needsEEdge ? 2 : 1;
     }
-    return changeLayerTile(floor2Layer, {x, y}, cavePitExterior.layers[0].grid[row][column]);
+    return changeLayerTile(floor2Layer, {x, y}, pitTiles.exterior[row][column]);
 }
 /*function hasCeilingTile(area: AreaDefinition, {x, y}: Point) {
     // TODO: Improve this check if it is giving false positives.
@@ -242,7 +364,7 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
     return getLayer('foreground', area)?.grid.tiles[y]?.[x] !== 0
         || getLayer('foreground2', area)?.grid.tiles[y]?.[x] !== 0
 }*/
-function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point): boolean {
+function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
     let changed = false;
     function update(layer: AreaLayerDefinition, {x, y}: Point, tile: number) {
         changed = changeLayerTile(layer, {x, y}, tile) || changed;
@@ -252,72 +374,47 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
     const fieldLayer = getOrAddLayer('field', area, alternateArea);
     const field2Layer = getOrAddLayer('field2', area, alternateArea);
     function removeFieldDecorations() {
-        if (cavePitDecorationTiles.has(fieldLayer.grid.tiles[y]?.[x])) {
+        if (pitTiles.decorationTiles.has(fieldLayer.grid.tiles[y]?.[x])) {
             update(fieldLayer, {x, y}, 0);
         }
         return changed;
     }
     function removeField2Decorations() {
         const tile = field2Layer.grid.tiles[y]?.[x];
-        if (cavePitDecorationTiles.has(tile)) {
+        if (pitTiles.decorationTiles.has(tile)) {
             update(field2Layer, {x, y}, 0);
         }
         return changed;
     }
-    const C = coreCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
-    // Using allCavePitTiles here includes information about added angled tiles.
-    const S = allCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
+    const C = pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y]?.[x]);
+    // Using pitTiles.allPitTiles here includes information about added angled tiles.
+    const S = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x]);
     if (!C) {
         // Add or remove cave pit wall decorations depending on whether there is a pit to
         // the south.
         // TODO: this should also support angled pit walls.
-        if (S && caveWallTiles.has(fieldLayer.grid.tiles[y]?.[x])) {
-            changed = changeLayerTile(field2Layer, {x, y}, cavePitWallTiles[0][x % 2]);
+        if (S && pitTiles.walls.has(fieldLayer.grid.tiles[y]?.[x])) {
+            changed = changeLayerTile(field2Layer, {x, y}, pitTiles.pitWalls[0][x % 2]);
         } else {
             removeField2Decorations()
         }
-        /*if ((E || N || W) && hasCeilingTile(area, {x, y})) {
-            // TODO: set this to match pit edges instead of always using the interior pit tile.
-            console.log('Adding pit under ceiling', x, y);
-            changed = changeLayerTile(fieldLayer, {x, y}, cavePitExterior.layers[0].grid[1][1]) || changed;
-        } else {
-            removeFieldDecorations();
-        }*/
         removeFieldDecorations();
         return changed;
     }
-    const N = allCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
-    const W = allCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x - 1]);
-    const E = allCavePitTiles.has(floor2Layer.grid.tiles[y]?.[x + 1]);
+    const N = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
+    const W = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x - 1]);
+    const E = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x + 1]);
     let needsNEdge = !N, needsSEdge = !S, needsWEdge = !W, needsEEdge = !E;
-    /*if (needsNEdge || needsSEdge || needsWEdge || needsEEdge) {
-        const NW = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1]);
-        const NE = coreCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1]);
-        const SW = coreCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x - 1]);
-        const SE = coreCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x + 1]);
-        if (needsNEdge && NW !== NE) {
-            needsNEdge = false;
-        }
-        if (needsSEdge && SW !== SE) {
-            needsSEdge = false;
-        }
-        if (needsWEdge && NW !== SW) {
-            needsWEdge = false;
-        }
-        if (needsEEdge && NE !== SE) {
-            needsEEdge = false;
-        }
-    }*/
     // These flags will track which edges are part of the base pit sprite.
     let hasNEdge = false, hasSEdge = false, hasWEdge = false, hasEEdge = false;
-    if (caveWallTiles.has(fieldLayer.grid.tiles[y - 1]?.[x])) {
+    if (pitTiles.walls.has(fieldLayer.grid.tiles[y - 1]?.[x])) {
         hasNEdge = true;
     } else if (needsNEdge && needsSEdge && needsWEdge && needsEEdge) {
     // 0 adjacent pits, this is a single pit tile with no decorations.
         removeFieldDecorations();
         removeField2Decorations();
         return changed;
-    } else if (caveAngledPitTiles[1].includes(floor2Layer.grid.tiles[y]?.[x])) {
+    } else if (pitTiles.angledPits?.[1].includes(floor2Layer.grid.tiles[y]?.[x])) {
         needsNEdge = false;
     } else {
         if (needsNEdge) {
@@ -337,29 +434,41 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
         console.error('Unexpected missing North edge');
     }
     if (needsWEdge && !hasWEdge) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[1][2]);
+        decorationTiles.push(pitTiles.interior[1][2]);
         hasWEdge = true;
     }
     if (needsEEdge && !hasEEdge) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[1][0]);
+        decorationTiles.push(pitTiles.interior[1][0]);
         hasEEdge = true;
     }
     if (needsSEdge && !hasSEdge) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[0][1]);
+        decorationTiles.push(pitTiles.interior[0][1]);
         hasSEdge = true;
     }
     // Add any missing corners to the list of decorations needed.
-    if (!hasNEdge && !hasWEdge && !allCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1])) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[2][2]);
+    if (!hasNEdge && !hasWEdge
+        && !pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x - 1])
+        && floor2Layer.grid.tiles[y - 1]?.[x - 1] !== pitTiles.angledPits?.[0][0]
+    ) {
+        decorationTiles.push(pitTiles.interior[2][2]);
     }
-    if (!hasNEdge && !hasEEdge && !allCavePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1])) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[2][0]);
+    if (!hasNEdge && !hasEEdge
+        && !pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x + 1])
+        && floor2Layer.grid.tiles[y - 1]?.[x + 1] !== pitTiles.angledPits?.[0][1]
+    ) {
+        decorationTiles.push(pitTiles.interior[2][0]);
     }
-    if (!hasSEdge && !hasWEdge && !allCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x - 1])) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[0][2]);
+    if (!hasSEdge && !hasWEdge
+        && !pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x - 1])
+        && floor2Layer.grid.tiles[y + 1]?.[x - 1] !== pitTiles.angledPits?.[2][0]
+    ) {
+        decorationTiles.push(pitTiles.interior[0][2]);
     }
-    if (!hasSEdge && !hasEEdge && !allCavePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x + 1])) {
-        decorationTiles.push(cavePitInterior.layers[0].grid[0][0]);
+    if (!hasSEdge && !hasEEdge
+        && !pitTiles.corePitTiles.has(floor2Layer.grid.tiles[y + 1]?.[x + 1])
+        && floor2Layer.grid.tiles[y + 1]?.[x + 1] !== pitTiles.angledPits?.[2][1]
+    ) {
+        decorationTiles.push(pitTiles.interior[0][0]);
     }
     if (decorationTiles[0]) {
         update(fieldLayer, {x, y}, decorationTiles[0]);
