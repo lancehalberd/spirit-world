@@ -148,7 +148,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         context.restore();*/
 
     }
-    if (state.hero.shockDuration) {
+    if (state.hero.shockDuration > 0) {
         renderLightningRay(context, {x1: x + 8, x2: x + 8, y1: y + topCapHeight, y2: y + topCapHeight + 10 * state.hero.shockDuration / 1000, r: 2});
     }
 }

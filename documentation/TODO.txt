@@ -146,7 +146,6 @@ Graphics to Implement:
 Current tasks:
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush
-    - Support angled cave wall -> angled cave pit wall transitions with cavePitBrush
     - Support adding slots to generateBridgeRoom when large enough
         - Maybe general required nodes to any rectangle of 2s provided in the original matrix.
     - Update tree logic to prefer longer paths between required nodes when possible

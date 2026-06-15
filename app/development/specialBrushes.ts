@@ -12,7 +12,8 @@ interface PitTileDefinition {
     walls?: Set<number>
     // TL corner of the pit on the left, TR corner of the pit on the right
     angledPitWalls?: number[][]
-    angledWalls?: Set<number>
+    angledWallsNW?: Set<number>
+    angledWallsNE?: Set<number>
 }
 interface PitTiles extends PitTileDefinition {
     corePitTiles: Set<number>
@@ -20,7 +21,7 @@ interface PitTiles extends PitTileDefinition {
     decorationTiles: Set<number>
 }
 
-function makePitTiles({singlePit, exterior, interior, angledPits, pitWalls, walls, angledPitWalls, angledWalls}: PitTileDefinition): PitTiles{
+function makePitTiles({singlePit, exterior, interior, angledPits, pitWalls, walls, angledPitWalls, angledWallsNW, angledWallsNE}: PitTileDefinition): PitTiles{
     const corePitTiles: Set<number> = new Set([
         singlePit,
         ...exterior[0],
@@ -55,13 +56,13 @@ function makePitTiles({singlePit, exterior, interior, angledPits, pitWalls, wall
         pitWalls,
         walls,
         angledPitWalls,
-        angledWalls,
+        angledWallsNW,
+        angledWallsNE,
         corePitTiles,
         allPitTiles,
         decorationTiles,
     };
 }
-
 
 const pitStyles = {
     cave: makePitTiles({
@@ -91,12 +92,8 @@ const pitStyles = {
             [388, 389], // This is the bottom of the pit wall, if visible, floor 2
         ],
         walls: new Set([762, 763]),
-        angledWalls: new Set([758, 770, 755, 764, 767]),
-        /*angledWalls: [
-            [758,755],
-            [770,764],
-            [770,767],
-        ]*/
+        angledWallsNW: new Set([773,774,758,770]),
+        angledWallsNE: new Set([771,772,755,764,767]),
     }),
     crystalCave: makePitTiles({
         singlePit: 317,
@@ -125,7 +122,7 @@ const pitStyles = {
             [1773, 1774], // This is the bottom of the pit wall, if visible, floor 2
         ],
         walls: new Set([991, 992]),
-        angledWalls: new Set([758, 770, 755, 764, 767]),
+        //angledWalls: new Set([758, 770, 755, 764, 767]),
         /*angledWalls: [
             [758,755],
             [770,764],
@@ -339,11 +336,18 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
     let needsNEdge = !N, needsSEdge = !S, needsWEdge = !W, needsEEdge = !E;
     // Checking for north angled pits has special handling because the angled pit wall bleeds into
     // the tile to the south, requiring a specific tile to be selected.
-    if (floor2Layer.grid.tiles[y - 1]?.[x] === pitTiles.angledPits?.[0][0]) {
-        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[1][0]);
+    if (pitTiles.angledPits && floor2Layer.grid.tiles[y - 1]?.[x] === pitTiles.angledPits[0][0]) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits[1][0]);
     }
-    if (floor2Layer.grid.tiles[y - 1]?.[x] === pitTiles.angledPits?.[0][1]) {
-        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits?.[1][1]);
+    if (pitTiles.angledPits && floor2Layer.grid.tiles[y - 1]?.[x] === pitTiles.angledPits[0][1]) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPits[1][1]);
+    }
+    // If there is an angled pit wall north of this pit, continue the pattern down into this pit.
+    if (pitTiles.angledPitWalls && N && pitTiles.angledWallsNW?.has(getLayer('field', area)?.grid.tiles[y - 1]?.[x])) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPitWalls[2][0]);
+    }
+    if (N && pitTiles.angledWallsNE?.has(getLayer('field', area)?.grid.tiles[y - 1]?.[x])) {
+        return changeLayerTile(floor2Layer, {x, y}, pitTiles.angledPitWalls[2][1]);
     }
     // Single isolated pit.
     if (needsNEdge && needsSEdge && needsEEdge && needsWEdge) {
@@ -392,14 +396,22 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
     if (!C) {
         // Add or remove cave pit wall decorations depending on whether there is a pit to
         // the south.
-        // TODO: this should also support angled pit walls.
         if (S && pitTiles.walls.has(fieldLayer.grid.tiles[y]?.[x])) {
-            changed = changeLayerTile(field2Layer, {x, y}, pitTiles.pitWalls[0][x % 2]);
+            update(field2Layer, {x, y}, pitTiles.pitWalls[0][x % 2]);
+        } else if (S && pitTiles.angledWallsNW?.has(fieldLayer.grid.tiles[y]?.[x])) {
+            update(field2Layer, {x, y}, pitTiles.angledPitWalls[0][0]);
+        } else if (S && pitTiles.angledWallsNE?.has(fieldLayer.grid.tiles[y]?.[x])) {
+            update(field2Layer, {x, y}, pitTiles.angledPitWalls[0][1]);
         } else {
             removeField2Decorations()
         }
         removeFieldDecorations();
         return changed;
+    }
+    if (pitTiles.angledWallsNW?.has(fieldLayer.grid.tiles[y]?.[x])) {
+        return changeLayerTile(field2Layer, {x, y}, pitTiles.angledPitWalls[1][0]);
+    } else if (pitTiles.angledWallsNE?.has(fieldLayer.grid.tiles[y]?.[x])) {
+        return changeLayerTile(field2Layer, {x, y}, pitTiles.angledPitWalls[1][1]);
     }
     const N = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y - 1]?.[x]);
     const W = pitTiles.allPitTiles.has(floor2Layer.grid.tiles[y]?.[x - 1]);
@@ -407,10 +419,15 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
     let needsNEdge = !N, needsSEdge = !S, needsWEdge = !W, needsEEdge = !E;
     // These flags will track which edges are part of the base pit sprite.
     let hasNEdge = false, hasSEdge = false, hasWEdge = false, hasEEdge = false;
+    const decorationTiles: number[] = [];
     if (pitTiles.walls.has(fieldLayer.grid.tiles[y - 1]?.[x])) {
         hasNEdge = true;
+    } else if (pitTiles.angledWallsNW?.has(fieldLayer.grid.tiles[y - 1]?.[x])) {
+        hasNEdge = true;
+    } else if (pitTiles.angledWallsNE?.has(fieldLayer.grid.tiles[y - 1]?.[x])) {
+        hasNEdge = true;
     } else if (needsNEdge && needsSEdge && needsWEdge && needsEEdge) {
-    // 0 adjacent pits, this is a single pit tile with no decorations.
+        // 0 adjacent pits, this is a single pit tile with no decorations.
         removeFieldDecorations();
         removeField2Decorations();
         return changed;
@@ -428,7 +445,6 @@ function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefiniti
             hasEEdge = true;
         }
     }
-    const decorationTiles: number[] = [];
     // Add any missing edges to the list of decorations needed.
     if (needsNEdge && !hasNEdge) {
         console.error('Unexpected missing North edge');
