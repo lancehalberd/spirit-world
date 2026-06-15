@@ -178,6 +178,7 @@ const headMovementProperties: MovementProperties = {canFall: true, canSwim: true
 const handMovementProperties: MovementProperties = {canFall: true, canSwim: true, canMoveInLava: true, canPassMediumWalls: true};
 
 export function getJewelHitbox(enemy: Enemy): Rect|undefined {
+    const padding = 4;
     const hitbox = enemy.getHitbox();
     if (enemy.currentAnimationKey === 'slamming') {
         // The hand cannot be hit during the slamming animation.
@@ -191,7 +192,7 @@ export function getJewelHitbox(enemy: Enemy): Rect|undefined {
         if (enemy.d === 'right') {
             jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
         }
-        return jewelHitbox;
+        return pad(jewelHitbox, padding);
     } else if (enemy.currentAnimationKey === 'returning') {
         // The hand cannot be hit during the returning animation.
         const jewelX = 18;
@@ -204,7 +205,7 @@ export function getJewelHitbox(enemy: Enemy): Rect|undefined {
         if (enemy.d === 'right') {
             jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
         }
-        return jewelHitbox;
+        return pad(jewelHitbox, padding);
     } else if (enemy.currentAnimationKey === 'punching') {
         const jewelX = 28;
         const jewelHitbox = {
@@ -216,7 +217,7 @@ export function getJewelHitbox(enemy: Enemy): Rect|undefined {
         if (enemy.d === 'right') {
             jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
         }
-        return jewelHitbox;
+        return pad(jewelHitbox, padding);
     }
 }
 
@@ -262,7 +263,7 @@ export function onHitGolemHand(state: GameState, enemy: Enemy, hit: HitPropertie
         return {};
     }
     const jewelHitbox = getJewelHitbox(enemy);
-    const hitJewel = jewelHitbox ? isTargetHit(pad(jewelHitbox, 2), hit) : false;
+    const hitJewel = jewelHitbox ? isTargetHit(jewelHitbox, hit) : false;
     // hits only apply to the hand when the jewel is visible during the punching animation,
     // otherwise the hand would block hits from most directions.
     const hitHand = (!jewelHitbox || enemy.currentAnimationKey === 'punching') && isTargetHit(enemy.getTouchHitbox(), hit);
@@ -693,7 +694,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         }
     } else if (enemy.mode === 'cooldown') {
         enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
-        if (enemy.modeTime >= 1000 || enemy.params.enragedAttacks >= 1) {
+        if (enemy.modeTime >= 1500 || enemy.params.enragedAttacks >= 1) {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'slamHands') {
