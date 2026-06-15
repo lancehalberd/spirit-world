@@ -93,7 +93,7 @@ dialogueHash.ambrosia = {
                         if (state.randomizerState) {
                             return `{@ambrosia.firstQuest}`;
                         }
-                        return 'Did bring the peaches already?{@ambrosia.firstQuest}';
+                        return 'Did you bring the peaches already?{@ambrosia.firstQuest}';
                     },
                 },
                 {

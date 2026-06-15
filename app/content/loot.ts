@@ -268,11 +268,10 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
                 to throw your normal Chakram at the same time!`;
         case 'bow':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
-                return 'Press [B_TOOL] to shoot a magic arrow.'
+                return 'Spend Spirit Energy to shoot a magic arrow.'
                     + '{|}Use the bow to hit distant enemies and objects.';
             }
-            return `Press [B_TOOL] to shoot a magic arrow.
-                    {|}This magical bow applies your equipped element to every shot.
+            return `This magical bow applies your equipped element to every shot.
                     {|}Charge the bow to shoot multiple arrows at once.`;
         case 'clone':
             if (getLootLevel(state, {lootType, lootLevel}) === 1) {
@@ -397,17 +396,19 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
         case 'goldMailSchematics':
             return 'Bring these schematics to a certain armor smith to upgrade your Silver Mail';
         case 'silverOre':
-            return 'Maybe someone in the city can use this to make something.';
+            return `
+                Maybe someone in the city can use this to make something.
+                Check your backpack to see how many you've collected.`;
         case 'goldOre':
             return 'There must be someone in the world who can use this ore.';
         case 'peachBasket':
             return `You can hold extra peaches in this basket.
-                {|}Bring lots of peaches to Ambrosia for a reward.`;
+                {|}Bring lots of peaches to Ambrosia for a reward.
+                {|}Check your backpack to see how many peaches you've collected.`;
         case 'arDevice':
             return 'Wearing this device allows you to see into the Aether Realms.';
         case 'healthPotion':
-            return 'This concentrated brew will restore 10 hearts.' 
-            //but reduces your max health by 1 until you rest at a Fairy Statue.';
+            return 'This concentrated brew will restore 10 hearts.';
         case 'statusPotion': return 'This potion will make you immune to status effects for 1 minute.';
         case 'magicPotion': return 'Drink this potion to constantly regenerate your spirit energy for 1 minute.';
         case 'magicBeans': return 'These seeds will revive any dormant Daughter Trees you can find.'
