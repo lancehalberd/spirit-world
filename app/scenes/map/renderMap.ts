@@ -135,6 +135,7 @@ const frameSize = 24;
 const cursor = createAnimation('gfx/hud/cursortemp.png', {w: frameSize, h: frameSize}).frames[0];
 
 const [mapCanvas, mapContext] = createCanvasAndContext(192, 192);
+let drawBlinkingObjects: ((context: CanvasRenderingContext2D) => void)[] = [];
 
 function refreshWorldMap(state: GameState, zoneKey: string): void {
     const floorId = state.location.isSpiritWorld ? 'spirit' : 'material';
@@ -147,6 +148,7 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
     state.map.renderedFloorId = floorId;
 
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+    drawBlinkingObjects = [];
     const zone = zones[zoneKey];
     const grid = state.location.isSpiritWorld ? zone.floors[0].spiritGrid : zone.floors[0].grid;
     for (let row = 0; row < grid.length; row++) {
@@ -212,6 +214,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
 
 
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+    drawBlinkingObjects = [];
     const sections = dungeonMaps[mapId].floors[floorId].sections;
     const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
 
@@ -342,6 +345,12 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState, s
             x: innerDungeonMapRectangle.x + (state.areaSection.definition.mapX * 32 + (state.location.x - 16 * state.areaSection.x) * 4 / w - heroIcon.w / 2) | 0,
             y: innerDungeonMapRectangle.y + (state.areaSection.definition.mapY * 32 + (state.location.y - 16 * state.areaSection.y) * 4 / h  - heroIcon.h / 2) | 0,
         });
+        for (const drawBlinkingObject of drawBlinkingObjects) {
+            context.save();
+                context.translate(innerDungeonMapRectangle.x, innerDungeonMapRectangle.y);
+                drawBlinkingObject(context);
+            context.restore();
+        }
     }
     if (editingState.isEditing) {
         const hoverSection = isMouseDown() ? undefined : getSectionUnderMouse(state, scene);
@@ -439,7 +448,6 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
 
 
 export function renderMapObjects(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect, drawChests: boolean = false) {
-    const xScale = 4 / area.w, yScale = 4 / area.h;
     // Draw additional objects that we want to show on the map.
     context.save();
         context.translate(target.x, target.y);
@@ -521,87 +529,118 @@ export function renderMapObjects(context: CanvasRenderingContext2D, state: GameS
 
         // Special objects draw specific icons to the map, like unopened chests, stair cases, and locks.
         for (const object of specialObjectsToRender) {
-            let hitbox = object.getHitbox();
-            hitbox = {...hitbox, x: hitbox.x - source.x, y: hitbox.y - source.y};
-            if (object.definition?.type === 'keyBlock') {
-                if (!state.savedState.objectFlags[object.definition.id]) {
-                    if (object.definition?.status === 'bigKeyLocked') {
-                        drawFrame(context, bigLockFrame, {...bigLockFrame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
-                        });
-                    } else if (object.definition?.status === 'locked') {
-                        drawFrame(context, smallLockFrame, {...smallLockFrame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
-                        });
-                    } else {
-                        drawFrame(context, blockedFrame, {...blockedFrame,
-                            x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - blockedFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - blockedFrame.h / 2,
-                        });
-                    }
-                }
-            } else if (object.definition?.type === 'chest' || object.definition?.type === 'bigChest') {
-                // Only render graphics for chests if drawChests is true.
-                if (drawChests && !state.savedState.objectFlags[object.definition.id] && object.definition.lootType !== 'empty') {
-                    drawFrame(context, chestFrame, {...chestFrame,
-                        x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - chestFrame.w / 2,
-                        y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - chestFrame.h / 2,
-                    });
-                }
+            if (object.definition?.type === 'chest' && !drawChests) {
+                continue;
             }
-            if (object.definition?.type === 'door') {
-                // Do not render cracked doors unless they have already been opened.
-                const isOpened = state.savedState.objectFlags[object.definition.id];
-                if (object.definition.status === 'cracked' && !isOpened) {
+            if (object.definition?.type === 'bigChest') {
+                const isBigChestAvailable = object.definition?.type === 'bigChest' && !!state.savedState.dungeonInventories[state.location.logicalZoneKey]?.bigKey;
+                // If the player has the big key, make the icon for the big chest blink to grab their attention.
+                if (isBigChestAvailable) {
+                    drawBlinkingObjects.push((context: CanvasRenderingContext2D) => {
+                        context.save();
+                            context.translate(target.x, target.y);
+                            renderSpecialMapObject(context, state, area, target, source, object);
+                        context.restore();
+                    });
                     continue;
                 }
-                const isFrozen = evaluateLogicDefinition(state, object.definition.frozenLogic, false);
-                const isZoneDoor = object.definition.targetZone && object.definition.targetObjectId;
-                const wasClosed = object.definition.status === 'closed'
-                    || object.definition.status === 'closedSwitch'
-                    || object.definition.status === 'closedEnemy';
-                const doorStyle = doorStyles[object.definition.style] || doorStyles.cavern;
-                // Draws the door icon with some extra clamping logic to force it to be fully in view on the map
-                // for doors that are on the extrem edges, common for southern entrances or paths going off the edge of the area.
-                function drawDoorFrame(frame: Frame) {
-                    drawFrame(context, frame, {...frame,
-                        x: clamp(target.x + Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2, 0, 192 - frame.w) - target.x,
-                        y: clamp(target.y + Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2, 0, 192 - frame.h) - target.y,
-                    });
-                }
-                if (isFrozen && !getObjectStatus(state, object.definition, 'melted')) {
-                    drawDoorFrame(switchDoorFrame);
-                } else if (wasClosed && !isOpened) {
-                    // Ladders are hidden when closed, so do not draw them to the map.
-                    if (doorStyle.isLadderUp || doorStyle.isLadderDown) {
-                        continue;
-                    }
-                    const frame = (isZoneDoor ? switchDoorFrame : blockedFrame);
-                    drawDoorFrame(frame);
-                } else if (object.definition.status === 'locked' && !isOpened) {
-                    drawDoorFrame(smallLockFrame);
-                } else if (object.definition.status === 'bigKeyLocked' && !isOpened) {
-                    drawDoorFrame(bigLockFrame);
-                } else if (isZoneDoor) {
-                    let mapIcon: MapIcon = object.definition.mapIcon ?? doorStyle.mapIcon;
-                    if (!mapIcon && (object.definition.style === 'wideEntrance' || object.definition.style === 'pathEntrance')) {
-                        mapIcon = object.definition.d;
-                    }
-                    if (mapIcon === 'hidden') {
-                        continue;
-                    }
-                    const frame = mapIconMap[mapIcon] ?? doorFrame;
-                    drawDoorFrame(frame);
-                } else if (object.definition?.d === 'up' || object.definition?.d === 'down') {
-                    drawDoorFrame(verticalFrame);
-                } else {
-                    drawDoorFrame(horizontalFrame);
+                if (!drawChests) {
+                    continue;
                 }
             }
+            renderSpecialMapObject(context, state, area, target, source, object);
         }
     context.restore();
+}
+
+function renderSpecialMapObject(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect, object: ObjectInstance) {
+    const xScale = 4 / area.w, yScale = 4 / area.h;
+    let hitbox = object.getHitbox();
+    hitbox = {...hitbox, x: hitbox.x - source.x, y: hitbox.y - source.y};
+    if (object.definition?.type === 'keyBlock') {
+        if (!state.savedState.objectFlags[object.definition.id]) {
+            if (object.definition?.status === 'bigKeyLocked') {
+                drawFrame(context, bigLockFrame, {...bigLockFrame,
+                    x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - bigLockFrame.w / 2,
+                y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - bigLockFrame.h / 2,
+                });
+            } else if (object.definition?.status === 'locked') {
+                drawFrame(context, smallLockFrame, {...smallLockFrame,
+                    x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - smallLockFrame.w / 2,
+                y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - smallLockFrame.h / 2,
+                });
+            } else {
+                drawFrame(context, blockedFrame, {...blockedFrame,
+                    x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - blockedFrame.w / 2,
+                y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - blockedFrame.h / 2,
+                });
+            }
+        }
+    } else if (object.definition?.type === 'chest') {
+        // Only render graphics for chests if drawChests is true, or it is a big chest the player can open.
+        if (!state.savedState.objectFlags[object.definition.id] && object.definition.lootType !== 'empty') {
+            drawFrame(context, chestFrame, {...chestFrame,
+                x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - chestFrame.w / 2,
+                y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - chestFrame.h / 2,
+            });
+        }
+    } else if (object.definition?.type === 'bigChest') {
+        if (!state.savedState.objectFlags[object.definition.id] && object.definition.lootType !== 'empty') {
+            drawFrame(context, chestFrame, {...chestFrame,
+                x: Math.round((hitbox.x + hitbox.w / 2) * xScale) - chestFrame.w / 2,
+                y: Math.round((hitbox.y + hitbox.h / 2) * yScale) - chestFrame.h / 2,
+            });
+        }
+    }
+    if (object.definition?.type === 'door') {
+        // Do not render cracked doors unless they have already been opened.
+        const isOpened = state.savedState.objectFlags[object.definition.id];
+        if (object.definition.status === 'cracked' && !isOpened) {
+            return;
+        }
+        const isFrozen = evaluateLogicDefinition(state, object.definition.frozenLogic, false);
+        const isZoneDoor = object.definition.targetZone && object.definition.targetObjectId;
+        const wasClosed = object.definition.status === 'closed'
+            || object.definition.status === 'closedSwitch'
+            || object.definition.status === 'closedEnemy';
+        const doorStyle = doorStyles[object.definition.style] || doorStyles.cavern;
+        // Draws the door icon with some extra clamping logic to force it to be fully in view on the map
+        // for doors that are on the extrem edges, common for southern entrances or paths going off the edge of the area.
+        function drawDoorFrame(frame: Frame) {
+            drawFrame(context, frame, {...frame,
+                x: clamp(target.x + Math.round((hitbox.x + hitbox.w / 2) * xScale) - frame.w / 2, 0, 192 - frame.w) - target.x,
+                y: clamp(target.y + Math.round((hitbox.y + hitbox.h / 2) * yScale) - frame.h / 2, 0, 192 - frame.h) - target.y,
+            });
+        }
+        if (isFrozen && !getObjectStatus(state, object.definition, 'melted')) {
+            drawDoorFrame(switchDoorFrame);
+        } else if (wasClosed && !isOpened) {
+            // Ladders are hidden when closed, so do not draw them to the map.
+            if (doorStyle.isLadderUp || doorStyle.isLadderDown) {
+                return;
+            }
+            const frame = (isZoneDoor ? switchDoorFrame : blockedFrame);
+            drawDoorFrame(frame);
+        } else if (object.definition.status === 'locked' && !isOpened) {
+            drawDoorFrame(smallLockFrame);
+        } else if (object.definition.status === 'bigKeyLocked' && !isOpened) {
+            drawDoorFrame(bigLockFrame);
+        } else if (isZoneDoor) {
+            let mapIcon: MapIcon = object.definition.mapIcon ?? doorStyle.mapIcon;
+            if (!mapIcon && (object.definition.style === 'wideEntrance' || object.definition.style === 'pathEntrance')) {
+                mapIcon = object.definition.d;
+            }
+            if (mapIcon === 'hidden') {
+                return;
+            }
+            const frame = mapIconMap[mapIcon] ?? doorFrame;
+            drawDoorFrame(frame);
+        } else if (object.definition?.d === 'up' || object.definition?.d === 'down') {
+            drawDoorFrame(verticalFrame);
+        } else {
+            drawDoorFrame(horizontalFrame);
+        }
+    }
 }
 
 export function mouseCoordsToMapCoords({x, y}: {x: number, y: number}): {x: number, y: number} {

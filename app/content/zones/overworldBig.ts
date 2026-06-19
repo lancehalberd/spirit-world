@@ -3714,7 +3714,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "cavern", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTempleUpperEntrance", x: 444, y: 320, type: "door", style: "stoneDownstairs", targetZone: "riverTemple", targetObjectId: "riverTempleUpperEntrance", d: "up"},
         {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 880, y: 142, type: "loot", lootType: "peachOfImmortalityPiece"},
-        {status: "normal", id: "homeInstructions", x: 224, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{addCue [B_MAP] to view the map}", delay: 500, w: 96, h: 32},
+        {status: "normal", id: "homeInstructions", x: 224, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{addMapCue: [B_MAP] to view the map}", delay: 500, w: 96, h: 32},
         {status: "normal", id: "overworld:0:1x1-snake-0", x: 336, y: 96, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x1-snake-2", x: 192, y: 80, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x1-snake-3", x: 228, y: 440, type: "enemy", enemyType: "snake", d: "down", params: {}},

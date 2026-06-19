@@ -172,6 +172,7 @@ interface EnterLocationScriptEvent {
 interface AddTextCueScriptEvent {
     type: 'addTextCue'
     text: string
+    isMapCue?: boolean
 }
 
 interface RemoveTextCueScriptEvent {

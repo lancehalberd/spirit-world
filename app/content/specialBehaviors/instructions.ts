@@ -1,12 +1,19 @@
 import {addTextCue, findTextCue} from 'app/content/effects/textCue';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
-import {MAX_SPIRIT_RADIUS} from 'app/gameConstants';
+import {GAME_KEY, MAX_SPIRIT_RADIUS} from 'app/gameConstants';
 import {showMessage} from 'app/scriptEvents';
 import {pad} from 'app/utils/index';
+import {wasGameKeyPressed} from 'app/userInput';
+import {Narration} from 'app/content/objects/narration';
+
+function hideInstructions(state: GameState, narration: Narration) {
+    findTextCue(state).fadeOut();
+    narration.completed = true;
+}
 
 specialBehaviorsHash.runInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         const id = object.definition.id;
 
@@ -25,7 +32,7 @@ specialBehaviorsHash.runInstructions = {
 
 specialBehaviorsHash.rollInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         const id = object.definition.id;
 
@@ -34,6 +41,10 @@ specialBehaviorsHash.rollInstructions = {
         }
         if (!state.hero.savedData.passiveTools.roll && !state.hero.savedData.passiveTools.gloves) {
             helpText = `You need a new skill to continue ahead.[-]Press [B_MAP] to view your map.`;
+            if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+                hideInstructions(state, object);
+                return;
+            }
         }
         const textCue = findTextCue(state);
         if (!textCue && helpText && object.area === state.areaInstance) {
@@ -46,7 +57,7 @@ specialBehaviorsHash.rollInstructions = {
 
 specialBehaviorsHash.barrierBurstInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = 'Return here when you obtain the Spirit Cloak';
         let toolButton: string;
         if (state.hero.savedData.leftTool === 'cloak') {
@@ -78,7 +89,7 @@ specialBehaviorsHash.barrierBurstInstructions = {
 
 specialBehaviorsHash.staffInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         if (!state.savedState.objectFlags.hideStaffInstructions) {
             let toolButton: string;
@@ -109,7 +120,7 @@ specialBehaviorsHash.staffInstructions = {
 
 specialBehaviorsHash.spiritSightInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         if (!state.hero.savedData.passiveTools.spiritSight && state.savedState.objectFlags.spiritSightTraining) {
             helpText = 'Approach the pots.'
@@ -148,7 +159,7 @@ specialBehaviorsHash.spiritSightInstructions = {
 
 specialBehaviorsHash.teleportationInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         if (state.hero.savedData.passiveTools.teleportation && !state.savedState.objectFlags.teleportationTutorialSwitch) {
             helpText = 'Hold [B_MEDITATE] to project your Astral Body.'
@@ -170,7 +181,7 @@ specialBehaviorsHash.teleportationInstructions = {
 
 specialBehaviorsHash.barrierReflectInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = 'Return here when you obtain the Spirit Cloak';
         let toolButton: string;
         if (state.hero.savedData.leftTool === 'cloak') {
@@ -201,7 +212,7 @@ specialBehaviorsHash.barrierReflectInstructions = {
 
 specialBehaviorsHash.bowInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         let toolButton: string;
         if (state.hero.savedData.leftTool === 'bow') {
@@ -230,12 +241,16 @@ specialBehaviorsHash.bowInstructions = {
 
 specialBehaviorsHash.chestAndChakramInstructions = {
     type: 'narration',
-    update(state: GameState, object: ObjectInstance) {
+    update(state: GameState, object: Narration) {
         let helpText = '';
         if (!state.hero.savedData.weapon) {
             helpText = 'Face a chest from the south and press [B_PASSIVE] to open it';
         } else if (state.areaInstance.enemies.filter(e => e.isFromCurrentSection(state) && !e.isDefeated && e.status !== 'gone').length) {
             helpText = 'Press [B_WEAPON] to throw the chakram at enemies';
+            if (wasGameKeyPressed(state, GAME_KEY.WEAPON)) {
+                hideInstructions(state, object);
+                return;
+            }
         }
         const textCue = findTextCue(state);
         if (!textCue && helpText && object.area === state.areaInstance) {

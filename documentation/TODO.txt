@@ -145,11 +145,8 @@ Graphics to Implement:
 
 Current tasks:
     - Stream notes
-        - Hide Chakram help text after player throws the Chakram once.
-        - Hide Show map hint once the player opens the map.
         - Add "Drink potion" Yes/No dialogue box
         - Chakram blocked when throwing west along south wall.
-        - Make Big Chest icon blink if the player has the Big Key
         - Add Play Station controller icons.
         - Snake fireball in War Temple seems cutoff when shooting to the west.
         - Block exit from 2F key room in War Temple until the chest is opened.
@@ -163,6 +160,10 @@ Current tasks:
             The randomizer features two exclusive inventory options:
             Return - Allows you to return to your last save point or to the waterfall entrance. If you ever get stuck you can use this to escape, but there are also many clever ways to use it to save time if you are trying for a new record.
             Hint - If you are every unsure of what to do next, try using the hint option to get a small hint about where to check for a new reward. The hint will always describe a reward you can reach with your current tools.
+        - elemental transformation animation
+            - Make enemy invulnerable while transforming
+            - Show fixed frame
+            - fade white frame in over normal version, and then out over updated version.
 
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush

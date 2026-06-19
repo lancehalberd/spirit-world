@@ -31,6 +31,8 @@ export class TextCue implements EffectInstance {
     duration: number = this.props.duration ?? 3000;
     textFrames: Frame[][];
     isUsingKeyboard: boolean = false;
+    // Setting this flag will cause the cue to be hidden the next time the player presses the map button.
+    isMapCue: boolean = false;
     constructor(state: GameState, readonly props: TextCueProps) {
         // TextCue only supports a single page of messages.
         this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
@@ -45,6 +47,13 @@ export class TextCue implements EffectInstance {
     }
     update(state: GameState) {
         this.time += FRAME_LENGTH;
+        // This doesn't work because field objects aren't updated when the map key is pressed.
+        // So instead of this, showMapScene has logic to hide any text cues found with isMapCue true
+        /*if (this.isMapCue && wasGameKeyPressed(state, GAME_KEY.MAP)) {
+            this.done = true;
+            removeEffectFromArea(state, this);
+            return;
+        }*/
         // Update which keys are displayed if the player changes their input source while a message is already displayed.
         if (this.isUsingKeyboard !== state.isUsingKeyboard) {
             this.isUsingKeyboard = state.isUsingKeyboard;
@@ -121,15 +130,15 @@ export function removeTextCue(state: GameState, priority: number = 10000): boole
     return !effect;
 }
 
-export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): boolean {
+export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): TextCue|undefined {
     // Only add the new cue if it can override the previous one.
     if (removeTextCue(state, priority)) {
-        addEffectToArea(state, state.areaInstance, new TextCue(state, {
+        const textCue = new TextCue(state, {
             duration,
             priority,
             text,
-        }));
-        return true;
+        });
+        addEffectToArea(state, state.areaInstance, textCue);
+        return textCue;
     }
-    return false;
 }

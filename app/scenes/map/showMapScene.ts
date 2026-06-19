@@ -1,3 +1,4 @@
+import {findTextCue} from 'app/content/effects/textCue';
 import {dungeonMaps} from 'app/content/sections';
 import {isSceneActive, pushScene, sceneHash} from 'app/scenes/sceneHash';
 import {canPauseGame} from 'app/state';
@@ -12,6 +13,10 @@ import {updateSoundSettings} from 'app/utils/soundSettings';
 */
 export function showMapScene(state: GameState) {
     if (canPauseGame(state)) {
+        const textCue = findTextCue(state);
+        if (textCue?.isMapCue) {
+            textCue.fadeOut();
+        }
         const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
         if (dungeonMap) {
             sceneHash.map.floorIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);

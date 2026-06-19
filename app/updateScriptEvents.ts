@@ -123,7 +123,10 @@ export function updateScriptEvents(state: GameState): void {
                 break;
             }
             case 'addTextCue': {
-                addTextCue(state, event.text, 0, 0);
+                const textCue = addTextCue(state, event.text, 0, 0);
+                if (event.isMapCue) {
+                    textCue.isMapCue = true;
+                }
                 break;
             }
             case 'removeTextCue': {

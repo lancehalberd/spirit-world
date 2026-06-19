@@ -317,6 +317,11 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             events.push({ type: 'addTextCue', text });
             continue;
         }
+        if (actionToken.startsWith('addMapCue:')) {
+            const text = actionToken.substring('addMapCue:'.length);
+            events.push({ type: 'addTextCue', text, isMapCue: true });
+            continue;
+        }
         if (actionToken === 'removeCue') {
             events.push({ type: 'removeTextCue' });
             continue;

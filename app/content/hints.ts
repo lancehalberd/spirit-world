@@ -134,7 +134,7 @@ const missions: Mission[] = [
                 return `I've been out for a long time, maybe I should head home to the cave behind the waterfall.
                     {|}The waterfall is just north of the lake.
                     {|}On the other hand, maybe I should go to the forest to warn the Vanara about what that mysterious tree told me?
-                    {addCue: Press [B_MAP] to view the map}`;
+                    {addMapCue: Press [B_MAP] to view the map}`;
             } else {
                 return `I should tell my mom about what happened in the cave.
                     {|}I think I saw her by the pool at the entrance.`;
@@ -174,7 +174,7 @@ const missions: Mission[] = [
         getScript(state: GameState) {
             return `I should talk to the Vanara Elder about that tree and my strange powers.
                 {|}He lives in the woods to the southwest with the other Vanara.
-                {addCue: Press [B_MAP] to view the map}`
+                {addMapCue: Press [B_MAP] to view the map}`
         },
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.momElder;
@@ -190,7 +190,7 @@ const missions: Mission[] = [
         getScript(state: GameState) {
             return `The Vanara Elder said there was something I needed in his basement.
                 {|}He lives in the northwest tree in the forest.
-                {addCue: Press [B_MAP] to view the map}`
+                {addMapCue: Press [B_MAP] to view the map}`
         },
         isAvailable(state: GameState) {
             return !!state.savedState.objectFlags.elderTomb;
@@ -225,7 +225,7 @@ const missions: Mission[] = [
                 return `I should go ask my mom if she knows anything about what the Vanara Guardian
                     was talking about.
                     {|}He said she might help me find a way to "touch the spirit world".
-                    {addCue: Press [B_MAP] to view the map}`;
+                    {addMapCue: Press [B_MAP] to view the map}`;
             } else {
                 return `I think I saw my mom by the pool near the entrance.`;
             }

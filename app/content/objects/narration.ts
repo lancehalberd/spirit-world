@@ -18,6 +18,9 @@ export class Narration implements ObjectInstance {
     trigger: NarrationDefinition['trigger'] = this.definition.trigger || 'touch';
     time: number = 0;
     previewColor = 'yellow';
+    // This can be set to true to stop running special behavior updates.
+    // For example, this is set when the user uses the Chakram after Chakram instructions are shown.
+    completed: boolean = false;
     constructor(state: GameState, public definition: NarrationDefinition) {}
     isActive(state: GameState) {
         return this.status === 'gone';
@@ -44,6 +47,9 @@ export class Narration implements ObjectInstance {
         this.status = 'gone';
     }
     update(state: GameState) {
+        if (this.completed) {
+            return;
+        }
         if (this.status === 'gone') {
             if (this.definition.specialBehaviorKey && (!state.randomizerState || this.definition.important) && isObjectInCurrentSection(state, this)) {
                 const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNarrationBehavior;
