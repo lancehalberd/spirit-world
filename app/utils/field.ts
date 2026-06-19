@@ -501,7 +501,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             continue;
         }
         if (
-            (behavior?.cuttable > hit.damage || behavior?.solid)
+            (behavior?.cuttable > hit.damage || behavior?.solid === true)
             && (!behavior?.low || hit.cutsGround)
             //&& (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
         ) {

@@ -146,7 +146,6 @@ Graphics to Implement:
 Current tasks:
     - Stream notes
         - Add "Drink potion" Yes/No dialogue box
-        - Chakram blocked when throwing west along south wall.
         - Add Play Station controller icons.
         - Snake fireball in War Temple seems cutoff when shooting to the west.
         - Make idols stay vulernable longer when attacking during the first phase.

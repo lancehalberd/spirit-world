@@ -1,18 +1,18 @@
-import { makeSparkleAnimation } from 'app/content/effects/animationEffect';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { getLedgeDelta } from 'app/movement/getLedgeDelta';
-import { playAreaSound } from 'app/musicController';
-import { renderLightningCircle } from 'app/render/renderLightning';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/direction';
-import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
-import { boxesIntersect, isPointInShortRect, pad } from 'app/utils/index';
+import {makeSparkleAnimation} from 'app/content/effects/animationEffect';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta';
+import {playAreaSound} from 'app/musicController';
+import {renderLightningCircle} from 'app/render/renderLightning';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {directionMap, getDirection} from 'app/utils/direction';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {hitTargets} from 'app/utils/field';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {getChargeLevelAndElement} from 'app/utils/getChargeLevelAndElement';
+import {boxesIntersect, isPointInShortRect, pad} from 'app/utils/index';
 
 
-const chakramGeometry = {w: 16, h: 16, content: {x: 1, y: 1, w: 14, h: 14}};
+const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
 const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
 const goldChakramAnimation = createAnimation('gfx/chakram2.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
 
@@ -312,13 +312,6 @@ export class ThrownChakram implements EffectInstance {
         if (this.element === 'lightning') {
             const x = this.x + this.w / 2, y = this.y + this.h / 2;
             const r = this.chargeLevel > 1 ? 40 : 28;
-            /*context.beginPath();
-            context.arc(x, y, r, 0, 2 * Math.PI);
-            context.save();
-                context.globalAlpha *= 0.1;
-                context.fillStyle = 'yellow'
-                context.fill();
-            context.restore();*/
             renderLightningCircle(context, {x, y, r});
         }
     }
@@ -364,6 +357,10 @@ export class HeldChakram implements EffectInstance {
     getHitbox() {
         return this;
     }
+    getYDepth() {
+        // This is designed to render the chakram in front of the hero as long as its y value is greater than hero.y
+        return this.y + 16;
+    }
     throw(state: GameState) {
         const { chargeLevel, element } = getChargeLevelAndElement(state, this.hero, this.level);
         let throwDamage = this.level;
@@ -408,9 +405,10 @@ export class HeldChakram implements EffectInstance {
             returnSpeed = throwSpeed;
             throwSpeed += 2;
         }
+        const heroHitbox = this.hero.getHitbox();
         const chakram = new ThrownChakram({
-            x: this.hero.x + 3,
-            y: this.hero.y,
+            x: heroHitbox.x + heroHitbox.w / 2 - this.w / 2 + 8 * this.vx,
+            y: heroHitbox.y + heroHitbox.h / 2 - this.h / 2 + 8 * this.vy,
             vx: throwSpeed * this.vx,
             vy: throwSpeed * this.vy,
             returnSpeed,
@@ -436,16 +434,13 @@ export class HeldChakram implements EffectInstance {
         delete this.hero.heldChakram;
     }
     updatePosition() {
-        //if (this.vx && this.vy) {
-            // When aiming diagonally, place the chakram in the aimed direction.
-          //  this.x = this.hero.x + 3 + this.vx * 5;
-           // this.y = this.hero.y + this.vy * 5;
-        //} else {
-            // When aiming cardinally, place the chakram in the right hand.
-            this.x = this.hero.x + 3 - this.vy * 5 + this.vx * 5;
-            this.y = this.hero.y + this.vx * 5 + this.vy * 4;
-            this.z = this.hero.z;
-        //}
+        // The hero holds the chakram on his right side with his left hand while aiming.
+        const heroHitbox = this.hero.getHitbox();
+        const acrossOffset = 5;
+        const forwardOffset = 2;
+        this.x = heroHitbox.x + heroHitbox.w / 2 - this.w / 2 - this.vy * acrossOffset + this.vx * forwardOffset;
+        this.y = heroHitbox.y + heroHitbox.h / 2 - this.h / 2 + this.vx * acrossOffset + this.vy * forwardOffset;
+        this.z = this.hero.z;
     }
     update(state: GameState) {
         const maxChargeLevel = state.hero.getMaxChargeLevel(state);
