@@ -149,7 +149,6 @@ Current tasks:
         - Chakram blocked when throwing west along south wall.
         - Add Play Station controller icons.
         - Snake fireball in War Temple seems cutoff when shooting to the west.
-        - Block exit from 2F key room in War Temple until the chest is opened.
         - Make idols stay vulernable longer when attacking during the first phase.
         - Save state of ball puzzles whenever it makes sense.
         - Mushrooms can grow thorns over pit entrance objects.
@@ -164,6 +163,10 @@ Current tasks:
             - Make enemy invulnerable while transforming
             - Show fixed frame
             - fade white frame in over normal version, and then out over updated version.
+        - Add logic for drawing shadows to side doors
+            - Make this a property that can be toggled on.
+            - Draw grates when doors are closed, and tapered shadows when they are open
+            - Apply this to war temple side doors, and allow forcing open door on 2F when warTempleSmallKey2 is true.
 
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush
