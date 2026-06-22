@@ -3,6 +3,7 @@ import type {ChoiceScene} from 'app/scenes/choice/choiceScene';
 import type {DefeatedMenuScene} from 'app/scenes/defeated/defeatedMenuScene';
 import type {DefeatedScene} from 'app/scenes/defeated/defeatedScene';
 import type {FieldScene} from 'app/scenes/field/fieldScene';
+import type {FieldMenuScene} from 'app/scenes/fieldMenu/fieldMenuScene';
 import type {FileSelectScene} from 'app/scenes/fileSelect/fileSelectScene';
 import type {HudScene} from 'app/scenes/hud/hudScene';
 import type {IntroScene} from 'app/scenes/intro/introScene';
@@ -20,6 +21,7 @@ interface AllScenes {
     fileSelect: FileSelectScene
     hud: HudScene
     intro: IntroScene
+    mainMenu: FieldMenuScene
     map: MapScene
     prologue: PrologueScene
     randomizer: RandomizerScene
@@ -29,6 +31,14 @@ interface AllScenes {
 // Each scene
 export const sceneHash = {} as AllScenes;
 
+export function isSceneTypeInStack(state: GameState, sceneType: string) {
+    for (const scene of state.sceneStack) {
+        if (scene.sceneType === sceneType) {
+            return true;
+        }
+    }
+    return false;
+}
 export function isSceneActive(state: GameState, scene: GameScene): boolean {
     for (let i = state.sceneStack.length - 1; i >= 0; i--) {
         const currentScene = state.sceneStack[i];
@@ -36,6 +46,18 @@ export function isSceneActive(state: GameState, scene: GameScene): boolean {
             return true;
         }
         if (currentScene.blocksUpdates) {
+            return false;
+        }
+    }
+    return false;
+}
+export function isSceneInterctive(state: GameState, scene: GameScene): boolean {
+    for (let i = state.sceneStack.length - 1; i >= 0; i--) {
+        const currentScene = state.sceneStack[i];
+        if (currentScene === scene) {
+            return true;
+        }
+        if (currentScene.blocksUpdates || currentScene.blocksInput) {
             return false;
         }
     }

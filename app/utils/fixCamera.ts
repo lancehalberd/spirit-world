@@ -29,7 +29,7 @@ export function fixCamera(state: GameState): void {
 export function getCameraTarget(state: GameState): Point {
     const {section} = getAreaSize(state);
     const hero = (state.hero.spiritRadius > 0 && state.hero.astralProjection) || state.hero;
-    const focalPoint = state.scriptEvents.cameraTarget ?? {x: hero.x + 8, y: hero.y + 8};
+    const focalPoint = state.cutscene.cameraTarget ?? {x: hero.x + 8, y: hero.y + 8};
     let targetX = Math.floor(focalPoint.x - CANVAS_WIDTH / 2);
     // Constrain the camera to display only/center the current section.
     if (section.w >= CANVAS_WIDTH) {

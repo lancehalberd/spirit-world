@@ -1,4 +1,4 @@
-import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
+/*import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {getLoot} from 'app/content/objects/lootObject';
 import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
@@ -8,15 +8,14 @@ import {wasGameKeyPressed} from 'app/userInput';
 import {playSound} from 'app/utils/sounds';
 import {enterLocation} from 'app/utils/enterLocation';
 import {clearObjectFlag, setObjectFlag} from 'app/utils/objectFlags';
-import {saveGame} from 'app/utils/saveGame';
+import {saveGame} from 'app/utils/saveGame';*/
 
 
-
-export function updateScriptEvents(state: GameState): void {
+/*
+export function updateScriptEvents(state: GameState, ): void {
     state.scriptEvents.blockEventQueue = false;
-    state.scriptEvents.blockFieldUpdates = false;
-    state.scriptEvents.blockPlayerInput = false;
-    state.scriptEvents.blockPlayerUpdates = false;
+    state.scriptEvents.blocksUpdates = false;
+    state.scriptEvents.blocksInput = false;
     state.scriptEvents.handledInput = false;
     updateSkipCutscene(state);
     const activeEvents: ActiveScriptEvent[] = [];
@@ -48,14 +47,14 @@ export function updateScriptEvents(state: GameState): void {
                         break;
                     }
                 }
-                if (event.blockPlayerInput) {
-                    state.scriptEvents.blockPlayerInput = true;
+                if (event.blocksInput) {
+                    state.scriptEvents.blocksInput = true;
                 }
                 if (event.blockPlayerUpdates) {
                     state.scriptEvents.blockPlayerUpdates = true;
                 }
-                if (event.blockFieldUpdates) {
-                    state.scriptEvents.blockFieldUpdates = true;
+                if (event.blocksUpdates) {
+                    state.scriptEvents.blocksUpdates = true;
                 }
                 if (!finished) {
                     state.scriptEvents.blockEventQueue = true;
@@ -86,11 +85,11 @@ export function updateScriptEvents(state: GameState): void {
                     ...event,
                     time: state.time,
                 });
-                if (event.blockFieldUpdates) {
-                    state.scriptEvents.blockFieldUpdates = true;
+                if (event.blocksUpdates) {
+                    state.scriptEvents.blocksUpdates = true;
                 }
-                if (event.blockPlayerInput) {
-                    state.scriptEvents.blockPlayerInput = true;
+                if (event.blocksInput) {
+                    state.scriptEvents.blocksInput = true;
                 }
                 if (event.blockPlayerUpdates) {
                     state.scriptEvents.blockPlayerUpdates = true;
@@ -137,15 +136,15 @@ export function updateScriptEvents(state: GameState): void {
                 // Text cues and text choice cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
                 showChoiceScene(state, event.prompt, event.choices);
-                state.scriptEvents.blockFieldUpdates = true;
+                state.scriptEvents.blocksUpdates = true;
                 state.scriptEvents.blockEventQueue = true;
                 break;
             case 'showTextBox':
                 // Text cues and text box cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
-                showMessagePage(state, event.textPages, event.blockFieldUpdates);
+                showMessagePage(state, event.textPages, event.blocksUpdates);
                 // This blocks additional events+field updates from happening this frame.
-                state.scriptEvents.blockFieldUpdates = true;
+                state.scriptEvents.blocksUpdates = true;
                 state.scriptEvents.blockEventQueue = true;
                 break;
             case 'clearTextBox':
@@ -191,7 +190,7 @@ export function updateScriptEvents(state: GameState): void {
                 // Since this overwrites remaining events, don't continue processing events this frame.
                 state.scriptEvents.blockEventQueue = true;
                 // Block the player input so that the player doesn't move during the frame the event queue is blocked.
-                state.scriptEvents.blockPlayerInput = true;
+                state.scriptEvents.blocksInput = true;
                 break;
             case 'attemptPurchase':
                 if (event.cost <= state.hero.savedData.money) {
@@ -216,10 +215,10 @@ export function updateScriptEvents(state: GameState): void {
                 break;
             case 'enterLocation':
                 enterLocation(state, event.location);
-                state.scriptEvents.blockPlayerInput = true;
+                state.scriptEvents.blocksInput = true;
                 state.scriptEvents.blockEventQueue = true;
                 break;
         }
     }
 }
-
+*/

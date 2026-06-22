@@ -10,18 +10,20 @@ const messageWidth = 160;
 const messageRows = 4;
 
 function skipCutscene(state: GameState) {
-    const onSkipCutscene = state.scriptEvents.onSkipCutscene;
+    const onSkipCutscene = state.cutscene.onSkipCutscene;
     cleanState(state);
     onSkipCutscene?.(state);
 }
 
-export function updateSkipCutscene(state: GameState) {
-    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.scriptEvents.onSkipCutscene) {
-        if ((state.scriptEvents.skipTime ?? -2000) + 2000 > state.time) {
+export function updateSkipCutscene(state: GameState, scene?: ScriptScene) {
+    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.cutscene.onSkipCutscene) {
+        if ((state.cutscene.skipTime ?? -2000) + 2000 > state.time) {
             skipCutscene(state);
-            state.scriptEvents.handledInput = true;
+            if (scene) {
+                scene.blocksInput = true;
+            }
         } else {
-            state.scriptEvents.skipTime = state.time;
+            state.cutscene.skipTime = state.time;
         }
     }
 }

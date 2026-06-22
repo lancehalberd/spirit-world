@@ -3,9 +3,9 @@ import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {FRAME_LENGTH, RIVAL_NAME} from 'app/gameConstants';
 import {getMovementAnchor, moveActorTowardsLocation} from 'app/movement/moveActor';
 import {
-    appendCallback, appendScript, hideHUD,
-    runBlockingCallback, runPlayerBlockingCallback, showHUD, wait
+    hideHUD, runBlockingCallback, showHUD, wait
 } from 'app/scriptEvents';
+import {appendCallback, appendScript, appendScriptEvents} from 'app/scenes/script/scriptScene';
 import {updateGenericHeroState} from 'app/updateActor';
 import {faceTarget} from 'app/utils/actor';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
@@ -29,7 +29,7 @@ dialogueHash.elder = {
         tombRescue(state: GameState) {
             state.savedState.objectFlags.tombRivalRescued = true;
             //state.hero.action = null;
-            //state.scriptEvents.blockFieldUpdates = true;
+            //state.scriptEvents.blocksUpdates = true;
             //state.scriptEvents.handledInput = true;
             //state.hero.invulnerableFrames = 0;
             //state.hero.z = 0;
@@ -48,18 +48,17 @@ dialogueHash.elder = {
             rival.activeAbility = null;
             //rival.z = 0;
             rival.healthBarTime = -10000;
-            state.scriptEvents.overrideMusic = 'vanaraForestTheme';
+            appendScript(state, '{playTrack:vanaraForestTheme}');
             //rival.invulnerableFrames = 0;
             // Remove any attack effects on defeat.
             // rival.area.effects = rival.area.effects.filter(effect => !effect.isEnemyAttack);
             //rival.changeToAnimation('idle');
             saveGame(state);
             // Wait a moment for the battle to calm down.
-            state.scriptEvents.activeEvents.push({
+            appendScriptEvents(state, [{
                 type: 'wait',
-                blockPlayerInput: true,
-                time: 0,
-                callback(state: GameState) {
+                blocksInput: true,
+                callback(state: GameState, waitTime: number) {
                     if (state.areaInstance.effects.find(effect => effect.isEnemyAttack)) {
                         return true;
                     }
@@ -70,13 +69,14 @@ dialogueHash.elder = {
                         return true;
                     }
                     // Wait at least 1 second.
-                    return this.time > 1000;
+                    return waitTime < 1000;
                 }
-            });
+            }]);
             appendScript(state, '{removeCue}');
             appendScript(state, `That's enough!`);
+            let elder: NPC;
             appendCallback(state, (state: GameState) => {
-                const elder = createObjectInstance(state, {
+                elder = createObjectInstance(state, {
                     id: 'elder',
                     status: 'normal',
                     x: 64,
@@ -89,132 +89,113 @@ dialogueHash.elder = {
                 elder.hideDialogueMarker = true;
                 elder.speed = 1.5;
                 addObjectToArea(state, state.hero.area, elder);
-                state.scriptEvents.activeEvents.push({
-                    type: 'update',
-                    update(state: GameState): boolean {
-                        elder.animationTime += FRAME_LENGTH;
-                        if (moveNPCToTargetLocation(state, elder, 64, 208, 'move')) {
-                            return true;
-                        }
-                        elder.changeToAnimation('idle');
-                    },
-                });
-                state.scriptEvents.activeEvents.push({
-                    type: 'update',
-                    update(state: GameState): boolean {
-                        rival.animationTime += FRAME_LENGTH;
-                        if (moveEnemyToTargetLocation(state, rival, 64, 176, 'move')) {
-                            return true;
-                        }
-                        rival.d = 'down';
-                        rival.changeToAnimation('idle');
-                        return false;
-                    },
-                });
-                const anchor = getMovementAnchor(state.hero);
-                // Move the hero out of the line between where the rival and elder will stand during the cutscene.
-                const targetX = anchor.x < 60 ? Math.min(32, anchor.x) : Math.max(86, anchor.x);
-                // Make sure the hero is far enough south that the text box is render on the top half of the screen, otherwise
-                // the rival and the elder will be covered up.
-                const targetY = Math.max(175, Math.min(200, anchor.y));
-                runPlayerBlockingCallback(state, (state: GameState) => {
-                    state.hero.action = 'walking';
-                    // state.hero.d = 'down';
-                    state.hero.animationTime += FRAME_LENGTH;
-                    const heroIsMoving = moveActorTowardsLocation(state, state.hero, {x: targetX, y: targetY}, 1.5) > 0;
-                    if (heroIsMoving) {
+            });
+            appendScriptEvents(state, [{
+                type: 'update',
+                update(state: GameState): boolean {
+                    elder.animationTime += FRAME_LENGTH;
+                    if (moveNPCToTargetLocation(state, elder, 64, 208, 'move')) {
                         return true;
                     }
-                    delete state.hero.action;
-                    faceTarget(state, state.hero, elder);
-                });
-                state.scriptEvents.activeEvents.push({
-                    type: 'wait',
-                    time: 0,
-                    waitingOnActiveEvents: true,
-                    // Make sure the fight doesn't continue during this cutscene.
-                    blockFieldUpdates: true,
-                });
-                appendScript(state, `Elder, they were trying to break into our sacred burial grounds!`);
-                state.scriptEvents.queue.push({
-                    type: 'callback',
-                    callback(state: GameState) {
-                        faceTarget(state, elder, state.hero);
-                        elder.changeToAnimation('idle');
-                    }
-                });
-                appendScript(state, `Here, drink this.`);
-                appendCallback(state, () => {
-                    faceTarget(state, state.hero, elder);
-                });
-                wait(state, 1000);
-                appendCallback(state, () => {
-                    state.hero.life = state.hero.savedData.maxLife;
-                });
-                runBlockingCallback(state, () => {
-                    updateGenericHeroState(state, state.hero);
-                    return state.hero.displayLife < state.hero.life
-                });
-
-                wait(state, 500);
-                state.scriptEvents.queue.push({
-                    type: 'callback',
-                    callback(state: GameState) {
-                        elder.d = 'up';
-                        elder.changeToAnimation('idle');
-                    }
-                });
-                // We probably
-                appendScript(state, `${RIVAL_NAME}, you know you aren't supposed to use lethal force.
-                    {|}You should have come to me instead of fighting.`);
-                appendScript(state, `But...!`);
-                appendScript(state, `If you asked me you would know that they came with my blessing.`);
-                wait(state, 500);
-                appendCallback(state, (state: GameState) => {
-                    faceTarget(state, elder, state.hero);
                     elder.changeToAnimation('idle');
-                });
-                appendScript(state, `Child, I appologize, I should have told ${RIVAL_NAME} you would be coming.`);
-                appendCallback(state, (state: GameState) => {
-                    elder.d = 'up';
-                    elder.changeToAnimation('idle');
-                });
-                appendScript(state, `${RIVAL_NAME}, come with me back to the village and I will explain everything.`);
-
-                appendCallback(state, (state: GameState) => {
-                    state.scriptEvents.activeEvents.push({
-                        type: 'update',
-                        update(state: GameState): boolean {
-                            elder.animationTime += FRAME_LENGTH;
-                            if (moveNPCToTargetLocation(state, elder, 64, 300, 'move')) {
-                                return true;
-                            }
-                            removeObjectFromArea(state, elder);
-                            return false;
-                        },
-                    });
-                    state.scriptEvents.activeEvents.push({
-                        type: 'update',
-                        update(state: GameState): boolean {
-                            rival.animationTime += FRAME_LENGTH;
-                            if (moveEnemyToTargetLocation(state, rival, 64, 288, 'move')) {
-                                return true;
-                            }
-                            removeObjectFromArea(state, rival);
-                            delete state.scriptEvents.overrideMusic;
-                            showHUD(state);
-                            return false;
-                        },
-                    });
-                    state.scriptEvents.activeEvents.push({
-                        type: 'wait',
-                        time: 0,
-                        waitingOnActiveEvents: true,
-                        // Make sure the fight doesn't continue during this cutscene.
-                        blockFieldUpdates: true,
-                    });
-                });
+                },
+            }, {
+                type: 'update',
+                update(state: GameState): boolean {
+                    rival.animationTime += FRAME_LENGTH;
+                    if (moveEnemyToTargetLocation(state, rival, 64, 176, 'move')) {
+                        return true;
+                    }
+                    rival.d = 'down';
+                    rival.changeToAnimation('idle');
+                    return false;
+                },
+            }]);
+            const anchor = getMovementAnchor(state.hero);
+            // Move the hero out of the line between where the rival and elder will stand during the cutscene.
+            const targetX = anchor.x < 60 ? Math.min(32, anchor.x) : Math.max(86, anchor.x);
+            // Make sure the hero is far enough south that the text box is render on the top half of the screen, otherwise
+            // the rival and the elder will be covered up.
+            const targetY = Math.max(175, Math.min(200, anchor.y));
+            runBlockingCallback(state, (state: GameState) => {
+                state.hero.action = 'walking';
+                // state.hero.d = 'down';
+                state.hero.animationTime += FRAME_LENGTH;
+                const heroIsMoving = moveActorTowardsLocation(state, state.hero, {x: targetX, y: targetY}, 1.5) > 0;
+                if (heroIsMoving) {
+                    return true;
+                }
+                delete state.hero.action;
+                faceTarget(state, state.hero, elder);
             });
+            appendScript(state, `Elder, they were trying to break into our sacred burial grounds!`);
+            appendCallback(state, (state: GameState) => {
+                faceTarget(state, elder, state.hero);
+                elder.changeToAnimation('idle');
+            });
+            appendScript(state, `Here, drink this.`);
+            appendCallback(state, () => {
+                faceTarget(state, state.hero, elder);
+            });
+            wait(state, 1000);
+            appendCallback(state, () => {
+                state.hero.life = state.hero.savedData.maxLife;
+            });
+            runBlockingCallback(state, () => {
+                updateGenericHeroState(state, state.hero, false);
+                return state.hero.displayLife < state.hero.life
+            });
+
+            wait(state, 500);
+            appendCallback(state, () => {
+                elder.d = 'up';
+                elder.changeToAnimation('idle');
+            });
+            // We probably
+            appendScript(state, `${RIVAL_NAME}, you know you aren't supposed to use lethal force.
+                {|}You should have come to me instead of fighting.`);
+            appendScript(state, `But...!`);
+            appendScript(state, `If you asked me you would know that they came with my blessing.`);
+            wait(state, 500);
+            appendCallback(state, (state: GameState) => {
+                faceTarget(state, elder, state.hero);
+                elder.changeToAnimation('idle');
+            });
+            appendScript(state, `Child, I appologize, I should have told ${RIVAL_NAME} you would be coming.`);
+            appendCallback(state, (state: GameState) => {
+                elder.d = 'up';
+                elder.changeToAnimation('idle');
+            });
+            appendScript(state, `${RIVAL_NAME}, come with me back to the village and I will explain everything.`);
+
+            appendScriptEvents(state, [{
+                type: 'update',
+                update(state: GameState): boolean {
+                    elder.animationTime += FRAME_LENGTH;
+                    if (moveNPCToTargetLocation(state, elder, 64, 300, 'move')) {
+                        return true;
+                    }
+                    removeObjectFromArea(state, elder);
+                    return false;
+                },
+            },{
+                type: 'update',
+                update(state: GameState): boolean {
+                    rival.animationTime += FRAME_LENGTH;
+                    if (moveEnemyToTargetLocation(state, rival, 64, 288, 'move')) {
+                        return true;
+                    }
+                    removeObjectFromArea(state, rival);
+                    return false;
+                },
+            },{
+                type: 'wait',
+                waitingOnActiveEvents: true,
+                // Make sure the fight doesn't continue during this cutscene.
+                blocksUpdates: true,
+            }]);
+            appendScript(state, '{stopTrack}');
+            appendCallback(state, state => showHUD(state));
             return ``;
         },
     },

@@ -5,9 +5,12 @@ import {
 } from 'app/content/loot';
 import {useConsumable} from 'app/content/lootEffects';
 import {CHAKRAM_2_NAME} from 'app/gameConstants';
+import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
+import {hideMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
 import {showMapScene} from 'app/scenes/map/showMapScene';
+import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
 import {showSettingsScene} from 'app/scenes/settings/settingsScene';
-import {showMessage, showSimpleMessage} from 'app/scriptEvents';
+import {parseScriptAsTextPage, showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';
 import {fillRect, pad} from 'app/utils/index';
 import {isOverworldLocation} from 'app/utils/location';
@@ -64,7 +67,7 @@ export const peachMenuOption: MenuElement = {
         }
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showSimpleMessage(state, 'Collect 4 Peach Pieces to increase your life total.');
+        appendScript(state, 'Collect 4 Peach Pieces to increase your life total.');
         return false;
     },
     onUpgrade(state: GameState, toolIndex?: number) {
@@ -141,7 +144,7 @@ const chakramMenuOption: MenuElement = {
         }
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'weapon', lootLevel: 1}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'weapon', lootLevel: 1}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -173,7 +176,7 @@ const goldChakramMenuOption: MenuElement = {
         }
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'weapon', lootLevel: 2}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'weapon', lootLevel: 2}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -283,10 +286,10 @@ const armorMenuOption: MenuElement = {
     },
     onSelect(state: GameState, toolIndex?: number) {
         if (!state.hero.savedData.passiveTools.armor) {
-            showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'silverMailSchematics'}));
+            appendScript(state, getLootHelpMessage(state, {lootType: 'silverMailSchematics'}));
             return false;
         }
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'armor'}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'armor'}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -323,10 +326,10 @@ const crownMenuOption: MenuElement = {
     },
     onSelect(state: GameState, toolIndex?: number) {
         if (state.hero.savedData.passiveTools.phoenixCrown) {
-            showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'phoenixCrown'}));
+            appendScript(state, getLootHelpMessage(state, {lootType: 'phoenixCrown'}));
             return false;
         }
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'astralProjection'}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'astralProjection'}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -350,7 +353,7 @@ function getPassiveToolElement(state: GameState, passiveTool: PassiveTool, maxLe
             drawFrameCenteredAt(context, getLootFrame(state, {lootType: passiveTool}), this);
         },
         onSelect(state: GameState, toolIndex?: number) {
-            showSimpleMessage(state, getLootHelpMessage(state, {lootType: passiveTool}));
+            appendScript(state, getLootHelpMessage(state, {lootType: passiveTool}));
             return false;
         },
         onUpgrade(state: GameState) {
@@ -601,7 +604,7 @@ function getCollectibleMenuElement(state: GameState, collectible: Collectible): 
             drawCount(context, state.hero.savedData.collectibles[collectible], this);
         },
         onSelect(state: GameState, toolIndex?: number) {
-            showSimpleMessage(state, getLootHelpMessage(state, {lootType: collectible}));
+            appendScript(state, getLootHelpMessage(state, {lootType: collectible}));
             return false;
         },
         onUpgrade(state: GameState) {
@@ -621,7 +624,7 @@ const peachBasketMenuElement = {
     },
     onSelect(state: GameState, toolIndex?: number) {
         // TODO: If player has a peach in the basket "Eat a peach?" (restore one health and subtract one peach).
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'peachBasket'}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'peachBasket'}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -651,8 +654,24 @@ function getConsumableMenuElement(state: GameState, consumable: Consumable): Men
             drawFrameCenteredAt(context, getLootFrame(state, {lootType: consumable}), {x: this.x, y: this.y, w: this.w, h: this.h});
             drawCount(context, state.hero.savedData.consumables[consumable], this);
         },
-        onSelect(state: GameState, toolIndex?: number) {
-            useConsumable(state, consumable);
+        onSelect(state: GameState) {
+            const helpMessage = getLootHelpMessage(state, {lootType: consumable});
+            appendScript(state, helpMessage);
+            appendCallback(state, (state: GameState) => {
+                showChoiceScene(state, parseScriptAsTextPage(state, `Drink ${getLootName(state, {lootType: consumable})}?`),
+                [{
+                    text: 'No',
+                    activate: (state: GameState) => {
+                        return;
+                    },
+                },{
+                    text: 'Yes',
+                    activate: (state: GameState) => {
+                        useConsumable(state, consumable);
+                        hideMainMenuScene(state);
+                    },
+                }]);
+            });
             return false;
         },
         onUpgrade(state: GameState) {
@@ -686,7 +705,7 @@ const dungeonMapMenuOption: MenuElement = {
         drawFrameCenteredAt(context, mapFrame, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'map'}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'map'}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -702,7 +721,7 @@ const bigKeyMenuOption: MenuElement = {
         drawFrameCenteredAt(context, bigKeyFrame, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'bigKey'}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'bigKey'}));
         return false;
     },
     onUpgrade(state: GameState) {
@@ -719,7 +738,7 @@ const smallKeyMenuOption: MenuElement = {
         drawCount(context, getDungeonItems(state).smallKeys, this);
     },
     onSelect(state: GameState, toolIndex?: number) {
-        showSimpleMessage(state, getLootHelpMessage(state, {lootType: 'smallKey'}));
+        appendScript(state, getLootHelpMessage(state, {lootType: 'smallKey'}));
         return false;
     },
     onUpgrade(state: GameState) {

@@ -1,18 +1,11 @@
 import {findTextCue} from 'app/content/effects/textCue';
 import {dungeonMaps} from 'app/content/sections';
 import {isSceneActive, pushScene, sceneHash} from 'app/scenes/sceneHash';
-import {canPauseGame} from 'app/state';
+import {canOpenMenu} from 'app/state';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 
-/*
-            && !(
-                state.messagePage?.frames?.length
-                || state.defeatState.defeated
-                || state.scriptEvents.blockFieldUpdates
-            )
-*/
 export function showMapScene(state: GameState) {
-    if (canPauseGame(state)) {
+    if (canOpenMenu(state)) {
         const textCue = findTextCue(state);
         if (textCue?.isMapCue) {
             textCue.fadeOut();

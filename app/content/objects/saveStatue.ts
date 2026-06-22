@@ -1,6 +1,7 @@
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {objectHash} from 'app/content/objects/objectHash';
 import {setSpawnLocation} from 'app/content/spawnLocations';
+import {isScriptSceneInStack} from 'app/scenes/script/scriptScene';
 import {showMessage} from 'app/scriptEvents';
 import {drawFrameContentAt, getFrameHitbox} from 'app/utils/animations';
 import {requireFrame} from 'app/utils/packedImages';
@@ -42,7 +43,7 @@ export class SaveStatue implements ObjectInstance {
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         // Don't take actions that would start new scripts while running scripts.
-        if (state.scriptEvents.activeEvents.length || state.scriptEvents.queue.length) {
+        if (isScriptSceneInStack(state)) {
             return
         }
         if (this.status !== 'normal') {

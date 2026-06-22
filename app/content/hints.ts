@@ -1,7 +1,7 @@
 import {zones} from 'app/content/zones/zoneHash';
 import {isCheckTrash} from 'app/randomizer/checks';
 import {findObjectLocation, findReachableChecksFromStart} from 'app/randomizer/find';
-import {setScript} from 'app/scriptEvents';
+import {appendScript, isScriptSceneInStack} from 'app/scenes/script/scriptScene';
 import {getOverworldMapId} from 'app/utils/location';
 import Random from 'app/utils/Random';
 
@@ -579,25 +579,18 @@ const missions: Mission[] = [
 export function showHint(state: GameState): void {
     // Don't show hints while an active script is running.
     // In particular, don't show hints when a respawn hint is showing, which has higher priority than mission hints.
-    if (state.scriptEvents.activeEvents.length || state.scriptEvents.queue.length) {
+    if (isScriptSceneInStack(state)) {
         return;
     }
     if (state.randomizerState) {
-        setScript(state, getRandomizerHint(state.randomizerState, state));
+        appendScript(state, getRandomizerHint(state.randomizerState, state));
         return;
     }
     for (const mission of missions) {
         if (mission.isAvailable(state) && !mission.isResolved(state)) {
-            setScript(state, mission.getScript(state));
+            appendScript(state, mission.getScript(state));
             return;
         }
-    }
-    const flags = state.savedState.objectFlags;
-    if (!flags.voidTree) {
-        setScript(state, ``);
-    } else {
-        setScript(state, `Isn't there anywhere else interesting to go?
-            {|}Try adding ?seed=20 to the url to play the randomizer.`);
     }
 }
 

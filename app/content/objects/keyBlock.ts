@@ -1,11 +1,12 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
-import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
-import { activateTarget, getObjectStatus } from 'app/utils/objects';
-import { saveGame } from 'app/utils/saveGame';
+import {objectHash} from 'app/content/objects/objectHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {playAreaSound} from 'app/musicController';
+import {appendBlockInput} from 'app/scenes/script/scriptScene';
+import {showMessage} from 'app/scriptEvents';
+import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
+import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
+import {activateTarget, getObjectStatus} from 'app/utils/objects';
+import {saveGame} from 'app/utils/saveGame';
 
 
 const blockGeometry = {w: 32, h: 36, content: {x: 0, y: 4, w: 32, h: 32}};
@@ -85,12 +86,7 @@ export class KeyBlock implements ObjectInstance {
                 if (this.definition.targetObjectId) {
                     state.savedState.objectFlags[this.definition.targetObjectId] = true;
                 }
-                state.scriptEvents.activeEvents.push({
-                    type: 'wait',
-                    time: state.time,
-                    duration: blockedDuration,
-                    blockPlayerInput: true,
-                });
+                appendBlockInput(state, blockedDuration);
             }
         } else {
             console.error('Keyblock was missing an id', this);

@@ -37,11 +37,11 @@ export function addKeyboardShortcuts() {
         const isShiftDown = isKeyboardKeyDown(KEY.SHIFT);
         const keyCode: number = event.which;
 
-        if (isCommandDown && keyCode === KEY.BACK_SLASH) {
+        /*if (isCommandDown && keyCode === KEY.BACK_SLASH) {
             state.alwaysHideMenu = !state.alwaysHideMenu;
             event.preventDefault();
             return;
-        }
+        }*/
         if ((isCommandDown || isShiftDown) && keyCode === KEY.E) {
             toggleEditing(state);
             event.preventDefault();

@@ -144,6 +144,16 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Move all scripts off of state onto modular scriptScene
+        - Figure out what to do for cut scenes
+            - Figure out what to do about showHUD+hideHUD
+        - Move appendCallback to appendBlockingCallback
+        - How to deal with blockPlayerUpdates
+            - set in runPlayerBlockingCallback
+            - set in waitForCamera, but this seems like this could just block player inputs, and possibly field updates.
+            - set in waitForInput, only used from textCueWithInput uses  uses this. This could just be blocking player input though.
+
+
     - Stream notes
         - Add "Drink potion" Yes/No dialogue box
         - Add Play Station controller icons.
@@ -151,21 +161,21 @@ Current tasks:
         - Make idols stay vulernable longer when attacking during the first phase.
         - Save state of ball puzzles whenever it makes sense.
         - Mushrooms can grow thorns over pit entrance objects.
-        - Add HELP item to Randomizer menu
-            - In randomizer mode all the rewards have been shuffled and a certain number of empty or minor rewards have been replaced with Medals that grant Victory Points.
-            You can adjust the settings to generate different randomizer variations and control different aspects like randomizing area entrances and setting how many Victory Points must be collected and whether certain bosses are required to win.
-            Master the game by completing the dungeons and bosses under a variety of unusual circumstances.
-            The randomizer features two exclusive inventory options:
-            Return - Allows you to return to your last save point or to the waterfall entrance. If you ever get stuck you can use this to escape, but there are also many clever ways to use it to save time if you are trying for a new record.
-            Hint - If you are every unsure of what to do next, try using the hint option to get a small hint about where to check for a new reward. The hint will always describe a reward you can reach with your current tools.
-        - elemental transformation animation
-            - Make enemy invulnerable while transforming
-            - Show fixed frame
-            - fade white frame in over normal version, and then out over updated version.
-        - Add logic for drawing shadows to side doors
-            - Make this a property that can be toggled on.
-            - Draw grates when doors are closed, and tapered shadows when they are open
-            - Apply this to war temple side doors, and allow forcing open door on 2F when warTempleSmallKey2 is true.
+    - Add HELP item to Randomizer menu
+        - In randomizer mode all the rewards have been shuffled and a certain number of empty or minor rewards have been replaced with Medals that grant Victory Points.
+        You can adjust the settings to generate different randomizer variations and control different aspects like randomizing area entrances and setting how many Victory Points must be collected and whether certain bosses are required to win.
+        Master the game by completing the dungeons and bosses under a variety of unusual circumstances.
+        The randomizer features two exclusive inventory options:
+        Return - Allows you to return to your last save point or to the waterfall entrance. If you ever get stuck you can use this to escape, but there are also many clever ways to use it to save time if you are trying for a new record.
+        Hint - If you are every unsure of what to do next, try using the hint option to get a small hint about where to check for a new reward. The hint will always describe a reward you can reach with your current tools.
+    - elemental transformation animation
+        - Make enemy invulnerable while transforming
+        - Show fixed frame
+        - fade white frame in over normal version, and then out over updated version.
+    - Add logic for drawing shadows to side doors
+        - Make this a property that can be toggled on.
+        - Draw grates when doors are closed, and tapered shadows when they are open
+        - Apply this to war temple side doors, and allow forcing open door on 2F when warTempleSmallKey2 is true.
 
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush

@@ -11,7 +11,7 @@ specialBehaviorsHash.ephemeral = {
     },
     update(state: GameState, npc: NPC) {
         // Ephemeral NPCs fade away and disappear instead of cycling through dialog.
-        if (!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length && npc.hasFinishedDialog) {
+        if (/*!state.scriptEvents.activeEvents?.length && !state.scriptEvents.queue?.length && */npc.hasFinishedDialog) {
             npc.messageAlpha = npc.alpha = Math.max(npc.alpha - 0.05, 0);
             if (npc.alpha <= 0) {
                 removeObjectFromArea(state, npc);

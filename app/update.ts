@@ -19,18 +19,24 @@ export function update() {
     const state = getState();
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
+    // HUD opacity always updates currently.
+    if (state.hideHUD && state.hudOpacity > 0) {
+        state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
+    } else if (!state.hideHUD && state.hudOpacity < 1) {
+        state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
+    }
     // Make a copy of the scene stack before processing it so that we ignore any updates to the scene stack
     // this frame until the next frame.
     const sceneStack = [...state.sceneStack];
-    let blockInput = false;
+    let blocksInput = false;
     for (let i = sceneStack.length - 1; i >= 0; i--) {
         const scene = sceneStack[i];
         if (!scene) {
             debugger;
         }
-        scene.update?.(state, !blockInput);
-        if (!blockInput) {
-            blockInput = scene.blocksInput;
+        scene.update?.(state, !blocksInput);
+        if (!blocksInput) {
+            blocksInput = scene.blocksInput;
         }
         // Skip updating scenes below this if this scene blocks updates.
         if (scene.blocksUpdates) {

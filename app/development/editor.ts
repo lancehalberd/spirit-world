@@ -13,7 +13,7 @@ import {createObjectDefinition, combinedObjectTypes} from 'app/development/objec
 import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
 import {isDebugMode} from 'app/gameConstants';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
-import {isMainMenuSceneInStack, showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
+import {isMainMenuSceneInStack, showMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
 import {isMapSceneInStack, showMapScene} from 'app/scenes/map/showMapScene';
 import {enterLocation} from 'app/utils/enterLocation';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';

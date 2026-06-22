@@ -1,4 +1,5 @@
-import {appendScript, wait} from 'app/scriptEvents';
+import {wait} from 'app/scriptEvents';
+import {appendScript, clearScriptScenes} from 'app/scenes/script/scriptScene';
 import {enterLocation} from 'app/utils/enterLocation';
 
 
@@ -25,10 +26,8 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
     state.hero.vy = 0;
     state.hero.vz = 0;
     state.hero.d = state.hero.savedData.spawnLocation.d;
-    // Clear any script events that may have lingered from a previous state.
-    // Do this before entering the new location, which may trigger new events.
-    state.scriptEvents.queue = [];
-    state.scriptEvents.activeEvents = [];
+    // This will clear
+    clearScriptScenes(state);
     enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags});
     state.fadeLevel = (state.areaSection.dark || 0) / 100;
 

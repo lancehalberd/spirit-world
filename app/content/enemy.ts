@@ -11,7 +11,7 @@ import {playAreaSound} from 'app/musicController';
 import {getMappedLootData} from 'app/randomizer/utils';
 import {renderEnemyShadow} from 'app/renderActor';
 import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
-import {appendCallback} from 'app/scriptEvents';
+import {appendCallback, appendScriptEvents} from 'app/scenes/script/scriptScene';
 import {drawFrame, getFrame, isAnimationFinished} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
@@ -585,11 +585,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 allEnemies.filter(e => e.isFromCurrentSection(state)).forEach(object => object.showDeathAnimation(state));
 
                 // Freeze player from taking any action for ~3 seconds during the explosion
-                state.scriptEvents.queue.push({
+                appendScriptEvents(state, [{
                     type: 'wait',
                     duration: 3000,
-                    blockPlayerInput: true,
-                });
+                    blocksInput: true,
+                }]);
                 appendCallback(state, (state: GameState) => {
                     for (const enemy of allEnemies) {
                         if (enemy.isBoss) {

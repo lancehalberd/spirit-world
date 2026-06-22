@@ -12,15 +12,7 @@ import {showFieldScene} from 'app/scenes/field/showFieldScene';
  */
 export function cleanState(state: GameState) {
     state.screenShakes = [];
-    state.scriptEvents = {
-        activeEvents: [],
-        blockEventQueue: false,
-        blockFieldUpdates: false,
-        blockPlayerInput: false,
-        blockPlayerUpdates: false,
-        handledInput: false,
-        queue: [],
-    };
+    state.cutscene = {};
     state.hideHUD = false;
     delete state.camera.speed;
     delete state.hero.action;

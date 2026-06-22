@@ -7,8 +7,9 @@ import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showRandomizerScene} from 'app/scenes/randomizer/randomizerScene';
+import {appendScript, appendScriptEvents} from 'app/scenes/script/scriptScene';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
-import {parseScriptText, setScript} from 'app/scriptEvents';
+import {parseScriptText} from 'app/scriptEvents';
 import {getDefaultState} from 'app/state';
 import {bossNames} from 'app/utils/bosses';
 import {getShortZoneName } from 'app/utils/getFullZoneLocation';
@@ -350,7 +351,7 @@ function startNewRandomizerGame(state: GameState, scene: FileSelectScene): void 
     showRandomizerScene(state, state.savedState.savedRandomizerData);
     const {goal, total} = state.savedState.savedRandomizerData.goal?.victoryPoints ?? {};
     if (goal && total) {
-        setScript(state, `Find ${goal} of ${total} Victory Points then talk to your mom to win!`);
+        appendScript(state, `Find ${goal} of ${total} Victory Points then talk to your mom to win!`);
     }
 }
 function pushMenuStack(state: GameState, scene: FileSelectScene, mode: FileSelectScene['mode']) {
@@ -389,9 +390,11 @@ function selectSaveFile(state: GameState, scene: FileSelectScene): void {
         updateHeroMagicStats(state, true);
         returnToSpawnLocation(state);
         showFieldScene(state);
-        state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', false);
-        state.scriptEvents.queue.push({type: 'wait', duration: 1000});
-        state.scriptEvents.queue.push({type: 'clearTextBox'});
+        appendScriptEvents(state, [
+            ...parseScriptText(state, 'Waaaaah!', false),
+            {type: 'wait', duration: 1000},
+            {type: 'clearTextBox'},
+        ]);
         return;
     }
     setSaveFileToState(state, scene.cursorIndex, scene.gameMode);

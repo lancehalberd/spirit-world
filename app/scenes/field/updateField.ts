@@ -7,12 +7,11 @@ import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
 import {showPauseScene} from 'app/scenes/pause/pauseScene';
 import {showMapScene} from 'app/scenes/map/showMapScene';
-import {showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
+import {showMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
 import {showMessage} from 'app/scriptEvents';
 import {wasGameKeyPressed} from 'app/userInput';
 import {updateAllHeroes} from 'app/updateActor';
 import {updateCamera} from 'app/updateCamera';
-import {updateScriptEvents} from 'app/updateScriptEvents';
 import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
@@ -21,13 +20,6 @@ import {rectanglesOverlap} from 'app/utils/index';
 import {getFieldInstanceAndParts, removeObjectFromArea} from 'app/utils/objects';
 
 export function updateField(this: void, state: GameState, interactive: boolean) {
-    updateScriptEvents(state);
-    // Update the HUD opacity as long as script events can be run.
-    if (state.hideHUD && state.hudOpacity > 0) {
-        state.hudOpacity = Math.max(0, state.hudOpacity - FRAME_LENGTH / 400);
-    } else if (!state.hideHUD && state.hudOpacity < 1) {
-        state.hudOpacity = Math.min(1, state.hudOpacity + FRAME_LENGTH / 400);
-    }
     if (state.areaInstance?.needsLogicRefresh) {
         refreshAreaLogic(state, state.areaInstance);
     } else if (state.alternateAreaInstance?.needsLogicRefresh) {
@@ -37,9 +29,6 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
         refreshAreaIce(state, state.areaInstance);
     } else if (state.alternateAreaInstance?.needsIceRefresh) {
         refreshAreaIce(state, state.alternateAreaInstance);
-    }
-    if (state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput) {
-        return;
     }
     // If `refreshAreaLogic` started a transition effect, skip this update since we
     // don't want to perform field updates until the transition effect completes.

@@ -31,6 +31,7 @@ import {
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
 import {getDefaultSavedState} from 'app/savedState'
+import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
 import {getCloneMovementDeltas} from 'app/userInput';
 import {drawFrameAt, getFrame} from 'app/utils/animations';
 import {destroyClone} from 'app/utils/destroyClone';
@@ -298,7 +299,9 @@ export class Hero implements Actor {
         if (this.life <= 0) {
             return {};
         }
-        if (state.scriptEvents.blockPlayerInput) {
+        // Player cannot be hit while the field scene is ineractive.
+        // We may need to change this approach if we need to damage the player during a cutscene.
+        if (!isFieldSceneInteractive(state)) {
             return {};
         }
         if (this.action === 'getItem' || this.action === 'jumpingDown' || this.action === 'falling' || this.action === 'fallen') {
@@ -597,7 +600,7 @@ export class Hero implements Actor {
     }
 
     takeDamage(this: Hero, state: GameState, damage: number, iframeMultiplier = 1): void {
-        if (state.scriptEvents.blockPlayerInput) {
+        if (!isFieldSceneInteractive(state)) {
             return;
         }
         damage *= gameModifiers.globalDamageTaken;

@@ -335,7 +335,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (hero.action === 'meditating') {
-        if (isPlayerControlled && (isGameKeyDown(state, GAME_KEY.MEDITATE) || state.scriptEvents.blockPlayerInput)) {
+        if (isPlayerControlled && (isGameKeyDown(state, GAME_KEY.MEDITATE) || !interactive)) {
             // You can use the clone explosion ability only if a controllable clone exists
             // to either explode or switch to.
             if (hero.isUncontrollable
@@ -388,11 +388,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.action = null;
                 hero.chargingLeftTool = hero.chargingRightTool = false;
             }
-        } else if (hero.chargingLeftTool && ((!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) && !state.scriptEvents.blockPlayerInput) || !canCharge)) {
+        } else if (hero.chargingLeftTool && ((!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) && interactive) || !canCharge)) {
             useTool(state, hero, hero.savedData.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
             hero.action = null;
-        } else if (hero.chargingRightTool && ((!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) && !state.scriptEvents.blockPlayerInput) || !canCharge)) {
+        } else if (hero.chargingRightTool && ((!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) && interactive) || !canCharge)) {
             useTool(state, hero, hero.savedData.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
             hero.action = null;
@@ -426,7 +426,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
-        } else if (hero.heldChakram && !state.scriptEvents.blockPlayerInput && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
+        } else if (hero.heldChakram && interactive && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
             hero.action = 'attack';
             hero.animationTime = 0;
             hero.actionFrame = 0;
@@ -616,7 +616,6 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     return;
                 }
             }
-            // console.log([...state.scriptEvents.activeEvents], [...state.scriptEvents.queue]);
             if (hero.action !== 'knocked' && hero.action !== 'knockedHard' && !hero.bounce) {
                 // This works okay, but sometimes causes the hero to press up against diagonal walls when not pressing diagonally.
                 /*if (hero.slipping) {

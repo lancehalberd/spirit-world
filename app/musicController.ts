@@ -82,10 +82,6 @@ export const updateMusic = (state: GameState): void => {
     }
     // TODO: possibly preload tracks used after the end of the DEMO.
 
-    if (state.scriptEvents.overrideMusic) {
-        playTrack(state.scriptEvents.overrideMusic, 0);
-        return;
-    }
     const allBosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
         e => e.status !== 'gone' && e.definition.type === 'boss'
         && e.isFromCurrentSection(state)

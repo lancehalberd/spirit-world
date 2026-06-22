@@ -1,6 +1,6 @@
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
-import {appendScript} from 'app/scriptEvents';
+import {appendScript, appendScriptEvents} from 'app/scenes/script/scriptScene';
 import {saveGame} from 'app/utils/saveGame';
 import {extendSound} from 'app/utils/sounds';
 import {updateAllHeroes} from 'app/updateActor';
@@ -31,7 +31,7 @@ specialBehaviorsHash.craterLavaSwitch = {
             id: 'craterLava',
         });
         let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
-        state.scriptEvents.activeEvents.push({
+        appendScriptEvents(state, [{
             type: 'update',
             update(state: GameState) {
                 if (rumbleSoundReference) {
@@ -86,14 +86,12 @@ specialBehaviorsHash.craterLavaSwitch = {
                 rumbleSoundReference = undefined;
                 return false;
             }
-        });
-        state.scriptEvents.activeEvents.push({
+        },{
             type: 'wait',
-            time: 0,
             waitingOnActiveEvents: true,
             // Make sure the fight doesn't continue during this cutscene.
-            blockFieldUpdates: true,
-        });
+            blocksUpdates: true,
+        }]);
     },
 };
 
@@ -110,7 +108,7 @@ function drainFlameBeastLava(state: GameState) {
         id: 'craterLava',
     });
     let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
-    state.scriptEvents.activeEvents.push({
+    appendScriptEvents(state, [{
         type: 'update',
         update(state: GameState) {
             if (rumbleSoundReference) {
@@ -162,13 +160,11 @@ function drainFlameBeastLava(state: GameState) {
             rumbleSoundReference = undefined;
             return false;
         }
-    });
-    state.scriptEvents.activeEvents.push({
+    },{
         type: 'wait',
-        time: 0,
         waitingOnActiveEvents: true,
-        blockFieldUpdates: true,
-    });
+        blocksUpdates: true,
+    }]);
 }
 
 export function fillFlameBeastLava(state: GameState) {
@@ -181,7 +177,7 @@ export function fillFlameBeastLava(state: GameState) {
         id: 'craterLava',
     });
     let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
-    state.scriptEvents.activeEvents.push({
+    appendScriptEvents(state, [{
         type: 'update',
         update(state: GameState) {
             if (rumbleSoundReference) {
@@ -229,14 +225,7 @@ export function fillFlameBeastLava(state: GameState) {
             }
             return true;
         }
-    });
-    /*state.scriptEvents.activeEvents.push({
-        type: 'wait',
-        time: 0,
-        waitingOnActiveEvents: true,
-        blockFieldUpdates: true,
-        blockPlayerInput: true,
-    });*/
+    }]);
 }
 
 specialBehaviorsHash.craterLavaSwitch4 = {

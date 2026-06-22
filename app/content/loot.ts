@@ -155,7 +155,7 @@ export function getLootName(state: GameState, {lootType, lootLevel, lootAmount}:
             return 'Ancient Badge';
         case 'healthPotion': return 'Peach Nectar';
         case 'statusPotion': return 'Immunity Potion';
-        case 'magicPotion': return 'Spirit Elixer';
+        case 'magicPotion': return 'Spirit Elixir';
         case 'magicBeans': return 'Fortified Seeds'
         case 'aetherCrystal': return 'Aether Crystal'
         case 'silverOre': return 'Silver Ore';

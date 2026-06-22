@@ -185,10 +185,10 @@ export class HudScene implements GameScene {
             renderEditorHUD(context, state);
             return;
         }
-        if (state.hideHUD && state.scriptEvents.skipTime > state.time - 2000) {
+        if (state.hideHUD && state.cutscene.skipTime > state.time - 2000) {
             // RENDER SKIP? in bottom right
             context.save();
-                const t = state.time - state.scriptEvents.skipTime;
+                const t = state.time - state.cutscene.skipTime;
                 context.globalAlpha *= Math.max(0, Math.min(1, t / 100, (2000 - t) / 100));
                 drawOutlinedText(context, 'SKIP?',
                     CANVAS_WIDTH - 2,

@@ -260,9 +260,6 @@ export function clearKeyboardState(state: GameState) {
 }
 
 export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
-    if (state.scriptEvents.blockPlayerInput) {
-        return false;
-    }
     return state.keyboard.gameKeysPressed.has(keyCode);
 }
 
@@ -271,16 +268,16 @@ export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
 // the clone tool button without pressing any other buttons before releasing it. Note that it is okay if they
 // continue holding buttons that were already down when pressing the clone button.
 export function wasGameKeyPressedAndReleased(state: GameState, keyCode: number): boolean {
-    if (state.scriptEvents.blockPlayerInput) {
+    /*if (state.scriptEvents.blocksInput) {
         return false;
-    }
+    }*/
     return state.keyboard.mostRecentKeysPressed.has(keyCode) && state.keyboard.gameKeysReleased.has(keyCode);
 }
 
 export function isGameKeyDown(state: GameState, keyCode: number): boolean {
-    if (state.scriptEvents.blockPlayerInput) {
+    /*if (state.scriptEvents.blocksInput) {
         return false;
-    }
+    }*/
     return state.keyboard.gameKeysDown.has(keyCode);
 }
 
@@ -289,7 +286,7 @@ export function getMovementDeltas(state: GameState, force = false): [number, num
     if (editingState && (isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND))) {
         return [0, 0];
     }
-    if (!force && state.scriptEvents.blockPlayerInput) {
+    if (!force/* && state.scriptEvents.blocksInput*/) {
         return [0, 0];
     }
     const { gameKeyValues } = state.keyboard;
@@ -304,7 +301,7 @@ export function getMovementDeltas(state: GameState, force = false): [number, num
 }
 
 export function getCloneMovementDeltas(state: GameState, hero: Hero, force = false): [number, number] {
-    if (!force && state.scriptEvents.blockPlayerInput) {
+    if (!force/* && state.scriptEvents.blocksInput*/) {
         return [0, 0];
     }
     const [dx, dy] = getMovementDeltas(state, force);

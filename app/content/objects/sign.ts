@@ -1,9 +1,10 @@
-import { objectHash } from 'app/content/objects/objectHash';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { showMessage } from 'app/scriptEvents';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { requireFrame } from 'app/utils/packedImages';
+import {objectHash} from 'app/content/objects/objectHash';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {isScriptSceneInStack} from 'app/scenes/script/scriptScene';
+import {showMessage} from 'app/scriptEvents';
+import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
+import {requireFrame} from 'app/utils/packedImages';
 
 
 const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
@@ -169,7 +170,7 @@ export class Sign implements ObjectInstance {
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         // Don't take actions that would start new scripts while running scripts.
-        if (state.scriptEvents.activeEvents.length || state.scriptEvents.queue.length) {
+        if (isScriptSceneInStack(state)) {
             return
         }
         if (direction !== 'up' || this.status !== 'normal') {

@@ -1,7 +1,7 @@
 import {CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY} from 'app/gameConstants';
 import {dungeonMaps} from 'app/content/sections';
 import {editingState} from 'app/development/editingState';
-import {showMainMenuScene} from 'app/scenes/fieldMenu/mainMenuScene';
+import {showMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
 import {renderMap} from 'app/scenes/map/renderMap';
 import {sceneHash} from 'app/scenes/sceneHash';
 import {createCanvasBuffer} from 'app/utils/canvas';

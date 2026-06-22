@@ -1,7 +1,8 @@
 import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendCallback, appendScript, runBlockingCallback, runPlayerBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
+import {runBlockingCallback, runPlayerBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
+import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {updateCamera} from 'app/updateCamera';

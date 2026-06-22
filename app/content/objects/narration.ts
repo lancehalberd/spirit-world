@@ -1,7 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {setScript} from 'app/scriptEvents';
+import {appendScript} from 'app/scenes/script/scriptScene';
 import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 
@@ -42,7 +42,7 @@ export class Narration implements ObjectInstance {
         if (state.randomizerState && !this.definition.important) {
             return;
         }
-        setScript(state, this.definition.message);
+        appendScript(state, this.definition.message);
         saveObjectStatus(state, this.definition);
         this.status = 'gone';
     }

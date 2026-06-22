@@ -15,7 +15,8 @@ import {
     heroAnimations, treeStaffAnimations,
 } from 'app/render/heroAnimations';
 import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
-import {appendCallback, appendScript} from 'app/scriptEvents';
+import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
+import {appendBlockInput, appendCallback, appendScript} from 'app/scenes/script/scriptScene';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {drawFrameAt, getFrame} from 'app/utils/animations';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
@@ -728,12 +729,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy<Params>): void 
             moveRivalToArea(state, state.hero.area, enemy);
             // Add a small delay here to make sure the burst animation finishes before field updates
             // are blocked by the intro dialogue. Otherwise the effects will be frozen during the start of the scene.
-            state.scriptEvents.activeEvents.push({
-                type: 'wait',
-                time: state.time,
-                duration: 400,
-                blockPlayerInput: true,
-            });
+            appendBlockInput(state, 400);
             return;
         }
         updateSpiritRival(state, enemy);
@@ -745,7 +741,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy<Params>): void 
         appendScript(state, '{@rival.startSecondFight}');
     }
     // Don't run any update logic while cutscenes are playing.
-    if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length) {
+    if (!isFieldSceneInteractive(state)) {
         return;
     }
 
@@ -761,11 +757,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy<Params>): void 
             enemy.z = 0;
             enemy.healthBarTime = -10000;
             enemy.invulnerableFrames = 0;
-            state.scriptEvents.queue.push({
-                type: 'wait',
-                blockPlayerInput: true,
-                duration: 1000,
-            });
+            appendBlockInput(state, 1000);
             if (!state.bossRushState && !state.randomizerState && !state.savedState.objectFlags.skipRivalHelixStory) {
                 appendScript(state, '{@rival.lostSecondFight}');
             }
@@ -779,11 +771,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy<Params>): void 
             enemy.status = 'gone';
             checkIfAllEnemiesAreDefeated(state, state.hero.area);
             if (state.bossRushState) {
-                state.scriptEvents.queue.push({
-                    type: 'wait',
-                    blockPlayerInput: true,
-                    duration: 200,
-                });
+                appendBlockInput(state, 200);
                 appendCallback(state, (state: GameState) => {
                     onBossRushBossDefeated(state);
                 });

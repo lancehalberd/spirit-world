@@ -5,7 +5,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { zones } from 'app/content/zones';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderHeroShadow } from 'app/renderActor';
-import { appendCallback, appendScript } from 'app/scriptEvents';
+import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { updateAreaSection } from 'app/utils/area';
 import { playAreaSound } from 'app/musicController';

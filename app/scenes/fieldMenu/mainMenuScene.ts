@@ -16,17 +16,13 @@ import {
 import {GAME_KEY} from 'app/gameConstants';
 import {FieldMenuScene} from 'app/scenes/fieldMenu/fieldMenuScene';
 import {showMapScene} from 'app/scenes/map/showMapScene';
-import {showPauseScene} from 'app/scenes/pause/pauseScene';
 import {
     showBootsMenuScene,
     showElementsMenuScene,
     showMaterialsMenuScene,
 } from 'app/scenes/fieldMenu/subMenuScenes';
-import {pushScene} from 'app/scenes/sceneHash';
-import {canPauseGame} from 'app/state';
-import {KEY, isKeyboardKeyDown} from 'app/userInput';
+import {sceneHash} from 'app/scenes/sceneHash';
 import {drawFrameCenteredAt} from 'app/utils/animations';
-import {updateSoundSettings} from 'app/utils/soundSettings';
 import {wasGameKeyPressed} from 'app/userInput';
 
 
@@ -171,18 +167,4 @@ class MainMenuScene extends FieldMenuScene {
     }
 }
 
-const mainMenuScene = new MainMenuScene();
-export function showMainMenuScene(state: GameState) {
-    if (canPauseGame(state)) {
-        mainMenuScene.needsRefresh = true;
-        mainMenuScene.update(state, false);
-        pushScene(state, mainMenuScene);
-        updateSoundSettings(state);
-    } else if (isKeyboardKeyDown(KEY.SHIFT)){
-        showPauseScene(state);
-    }
-}
-
-export function isMainMenuSceneInStack(state: GameState) {
-    return state.sceneStack.includes(mainMenuScene);
-}
+sceneHash.mainMenu = new MainMenuScene();

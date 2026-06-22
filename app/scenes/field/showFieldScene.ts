@@ -1,4 +1,4 @@
-import {isSceneActive, sceneHash} from 'app/scenes/sceneHash';
+import {isSceneActive, isSceneInterctive, sceneHash} from 'app/scenes/sceneHash';
 
 export function showFieldScene(state: GameState) {
     state.sceneStack = [sceneHash.field, sceneHash.hud];
@@ -6,6 +6,10 @@ export function showFieldScene(state: GameState) {
 
 export function isFieldSceneActive(state: GameState): boolean {
     return isSceneActive(state, sceneHash.field);
+}
+
+export function isFieldSceneInteractive(state: GameState): boolean {
+    return isSceneInterctive(state, sceneHash.field);
 }
 
 export function isFieldSceneInStack(state: GameState): boolean {

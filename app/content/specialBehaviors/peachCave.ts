@@ -1,7 +1,8 @@
 import {refreshAreaLogic} from 'app/content/areas';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendCallback, appendScript, hideHUD, resetCamera, runPlayerBlockingCallback, showHUD, textCueWithInput, waitForCamera} from 'app/scriptEvents';
+import {appendCallback, appendScript, appendTextCueWithInput} from 'app/scenes/script/scriptScene';
+import {hideHUD, resetCamera, runPlayerBlockingCallback, showHUD, waitForCamera} from 'app/scriptEvents';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
 
@@ -70,7 +71,7 @@ specialBehaviorsHash.peachCave = {
                 // Move the player to a good y position before talking to the tree.
                 runPlayerBlockingCallback(state, (state: GameState) => {
                     state.camera.speed = 1;
-                    state.scriptEvents.cameraTarget = {x: 128, y: 32};
+                    state.cutscene.cameraTarget = {x: 128, y: 32};
                     const hero = state.hero;
                     if (hero.y === 136) {
                         hero.d = 'up';
@@ -89,7 +90,7 @@ specialBehaviorsHash.peachCave = {
                     return true;
                 });
                 waitForCamera(state);
-                textCueWithInput(state, 'Thank you for saving me.');
+                appendTextCueWithInput(state, 'Thank you for saving me.');
                 appendCallback(state, (state: GameState) => {
                     state.hero.action = 'knocked';
                     state.hero.vx = -0.5 * directionMap[state.hero.d][0];
@@ -98,15 +99,15 @@ specialBehaviorsHash.peachCave = {
                 });
                 appendScript(state, '{wait:500}');
                 appendScript(state, `"Woah, is this a magic tree?"`);
-                textCueWithInput(state, `I don't have much time, ...those creatures...`);
-                textCueWithInput(state, `Please warn the Vanara`);
-                textCueWithInput(state, `The Spirit Tree [-] may be in danger.`);
+                appendTextCueWithInput(state, `I don't have much time, ...those creatures...`);
+                appendTextCueWithInput(state, `Please warn the Vanara`);
+                appendTextCueWithInput(state, `The Spirit Tree [-] may be in danger.`);
                 appendScript(state, `"Wait, who are you? What-"`);
-                textCueWithInput(state, `You'll need...`);
+                appendTextCueWithInput(state, `You'll need...`);
                 appendCallback(state, (state: GameState) => {
                     peachTree.gatherEnergy(state);
                 });
-                textCueWithInput(state, `...last of my strength...`);
+                appendTextCueWithInput(state, `...last of my strength...`);
                 appendCallback(state, (state: GameState) => {
                     peachTree.growPeach(state);
                 });
@@ -118,7 +119,7 @@ specialBehaviorsHash.peachCave = {
                     }
                     return true;
                 });
-                textCueWithInput(state, `...the Fruit of Life.`);
+                appendTextCueWithInput(state, `...the Fruit of Life.`);
                 appendScript(state, '{flag:peachCaveTreeDied}{stopTrack}');
                 // Wait for the area to finish refreshing before resetting the camera and showing the HUD.
                 runPlayerBlockingCallback(state, (state: GameState) => {

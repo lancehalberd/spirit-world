@@ -8,7 +8,7 @@ import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {getLedgeDelta} from 'app/movement/getLedgeDelta'
 import {playAreaSound} from 'app/musicController';
 import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
-import {prependScript} from 'app/scriptEvents';
+import {prependScript} from 'app/scenes/script/scriptScene';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
 import {isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased} from 'app/useTool';
@@ -81,7 +81,7 @@ export function updateAllHeroes(this: void, state: GameState, interactive: boole
             state.hero.astralProjection = null;
         }
     }
-    if (!state.scriptEvents.blockPlayerUpdates) {
+    if (!state.cutscene.blockPlayerUpdates) {
         updateHero(state, state.hero, interactive);
         for (let i = 0; i < state.hero.clones.length; i++) {
             const clone = state.hero.clones[i];
@@ -120,7 +120,7 @@ export function updateHero(this: void, state: GameState, hero: Hero, interactive
     }
     // Currently unused as we have removed the particles from the clone explosion charge effect, but we might add it back later.
     updateHeroVisualEffects;//(state, hero);
-    updateGenericHeroState(state, hero);
+    updateGenericHeroState(state, hero, interactive);
 }
 
 export function updateHeroVisualEffects(this: void, state: GameState, hero: Hero) {
@@ -163,7 +163,7 @@ export function updateHeroVisualEffects(this: void, state: GameState, hero: Hero
     }
 }
 
-export function updateGenericHeroState(this: void, state: GameState, hero: Hero) {
+export function updateGenericHeroState(this: void, state: GameState, hero: Hero, interactive: boolean) {
     // Round to 1e-6 to ignore minor floating point errors.
     state.hero.life = ((state.hero.life * 1000000) | 0) / 1000000;
     if (hero.displayLife === undefined) {
@@ -200,7 +200,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         hero.isInvisible = false;
     }
     // End invisibility once the player lets go of the cloak tool.
-    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak') && !state.scriptEvents.blockPlayerInput) {
+    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak') && interactive) {
         hero.isInvisible = false;
     }
     if (hero.clones?.length && hero.savedData.leftTool !== 'clone' && hero.savedData.rightTool !== 'clone') {

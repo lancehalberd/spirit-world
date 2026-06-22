@@ -2,10 +2,12 @@ import {Rock} from 'app/content/effects/arrow';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations} from 'app/content/enemyAnimations';
-import {appendScript} from 'app/scriptEvents';
+import {appendScript} from 'app/scenes/script/scriptScene';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {editingState} from 'app/development/editingState';
 import {playAreaSound} from 'app/musicController';
+import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
+import {appendBlockInput} from 'app/scenes/script/scriptScene';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {
     moveEnemy,
@@ -246,7 +248,8 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         appendScript(state, '{@rival.startFirstFight}');
     }
     // Don't run any update logic while cutscenes are playing.
-    if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length) {
+    //if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length) {
+    if (!isFieldSceneInteractive(state)) {
         if (!enemy.activeAbility) {
             enemy.changeToAnimation('idle');
         }
@@ -263,11 +266,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
             enemy.z = 0;
             enemy.healthBarTime = -10000;
             enemy.invulnerableFrames = 0;
-            state.scriptEvents.queue.push({
-                type: 'wait',
-                blockPlayerInput: true,
-                duration: 1000,
-            });
+            appendBlockInput(state, 1000);
             if (!state.randomizerState && !state.savedState.objectFlags.skipRivalTombStory) {
                 appendScript(state, '{@rival.lostFirstFight}');
             }

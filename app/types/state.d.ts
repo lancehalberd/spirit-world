@@ -110,8 +110,6 @@ interface GameState {
     }
     mutationDuration?: number
     showControls: boolean
-    // This is mostly used for debugging animations.
-    alwaysHideMenu?: boolean
     keyboard: {
         gameKeyValues: number[]
         gameKeysDown: Set<number>
@@ -121,21 +119,14 @@ interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     }
-    scriptEvents: {
-        activeEvents: ActiveScriptEvent[]
-        blockEventQueue: boolean
-        blockFieldUpdates: boolean
-        blockPlayerInput: boolean
-        blockPlayerUpdates: boolean
-        cameraTarget?: Point
-        handledInput: boolean
-        overrideMusic?: TrackKey
-        queue: ScriptEvent[]
+    cutscene: {
         // This is the last time the player pressed the MENU button
         // during a cutscene. If they press it twice within 2 seconds
         // they will skip the cutscene.
         skipTime?: number
         onSkipCutscene?: (state: GameState) => void
+        blockPlayerUpdates?: boolean
+        cameraTarget?: Point
     }
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean

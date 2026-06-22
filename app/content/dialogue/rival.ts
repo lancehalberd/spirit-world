@@ -1,7 +1,8 @@
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {showTransitionScene} from 'app/scenes/transition/transitionScene';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
-import {appendCallback, appendScript, wait} from 'app/scriptEvents';
+import {wait} from 'app/scriptEvents';
+import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {moveActor} from 'app/movement/moveActor';
 import {updateCamera} from 'app/updateCamera';
@@ -93,7 +94,7 @@ dialogueHash.rival = {
                 time: 0,
                 waitingOnActiveEvents: true,
                 // Make sure the fight doesn't continue during this cutscene.
-                blockFieldUpdates: true,
+                blocksUpdates: true,
             });
             wait(state, 500);
             if (state.isDemoMode && !state.randomizerState) {

@@ -50,7 +50,7 @@ interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
     textPages: TextPage[]
     // This defaults to true.
-    blockFieldUpdates?: boolean
+    blocksUpdates?: boolean
 }
 interface ClearTextBoxScriptEvent {
     type: 'clearTextBox'
@@ -66,15 +66,11 @@ interface ClearTextBoxScriptEvent {
 interface WaitScriptEvent {
     type: 'wait'
     // Whether or not to block field updates while this event is active.
-    blockFieldUpdates?: boolean
+    blocksUpdates?: boolean
     // If this is true player input will be blocked while this event is active.
-    blockPlayerInput?: boolean
-    // If this is true player updates will be blocked while this event is active.
-    // This should be used when the script needs control the player behavior without
-    // interference from the default player behavior.
-    blockPlayerUpdates?: boolean
+    blocksInput?: boolean
     // If defined, wait will end once this callback returns false.
-    callback?: (state: GameState) => boolean
+    callback?: (state: GameState, waitTime: number) => boolean
     // If this is set the event is cleared after duration milliseconds.
     duration?: number
     // Any game keys set here will clear this event.
@@ -179,9 +175,13 @@ interface RemoveTextCueScriptEvent {
     type: 'removeTextCue'
 }
 
-interface UpdateActiveScriptEvent {
+interface UpdateScriptEvent {
     type: 'update'
-    update: (state: GameState) => boolean
+    update: (state: GameState, scene: ScriptScene) => boolean
+}
+
+interface UpdateActiveScriptEvent extends UpdateScriptEvent {
+    time: number
 }
 
 type ScriptEvent
@@ -205,6 +205,7 @@ type ScriptEvent
     | StartScreenShakeScriptEvent
     | StopScreenShakeScriptEvent
     | StopTrackScriptEvent
+    | UpdateScriptEvent
     | WaitScriptEvent
     ;
 

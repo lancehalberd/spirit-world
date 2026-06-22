@@ -98,14 +98,7 @@ export function getDefaultState(): GameState {
         hideHUD: false,
         hudTime: 0,
         hotLevel: 0,
-        scriptEvents: {
-            activeEvents: [],
-            blockEventQueue: false,
-            blockFieldUpdates: false,
-            blockPlayerInput: false,
-            blockPlayerUpdates: false,
-            handledInput: false,
-            queue: [],
+        cutscene: {
         },
         screenShakes: [],
         map: {
@@ -140,20 +133,14 @@ export function getState(): GameState {
 }
 window['getState'] = getState;
 
-export function shouldHideMenu(state: GameState): boolean {
-    return !!(
-        state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
-        || state.scriptEvents.blockFieldUpdates || state.scriptEvents.handledInput
-        || state.scriptEvents.blockPlayerInput
+export function canOpenMenu(state: GameState): boolean {
+    return !(
+        state.hero.isExitingDoor || state.hero.isControlledByObject
         || state.transitionState
         || state.nextAreaSection || state.nextAreaInstance
         || state.areaInstance.priorityObjects?.length
         || state.hero.action === 'falling' || state.hero.action === 'fallen'
         || state.hideHUD
     );
-}
-
-export function canPauseGame(state: GameState): boolean {
-    return state.alwaysHideMenu || !shouldHideMenu(state);
 }
 

@@ -45,7 +45,6 @@ export class ChoiceScene implements GameScene {
     }
     update(state: GameState, interactive: boolean) {
         if (wasConfirmKeyPressed(state)) {
-            state.scriptEvents.handledInput = true;
             // Make sure to close this before calling results, otherwise
             // this might clear scene changes added by the action.
             this.closeScene(state);

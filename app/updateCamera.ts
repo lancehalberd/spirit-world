@@ -83,7 +83,7 @@ export function updateCamera(state: GameState, speed?: number): void {
             // you to awkwardly screen transition back north after being pushed south.
             /*state.scriptEvents.activeEvents.push({
                 type: 'wait',
-                blockPlayerInput: true,
+                blocksInput: true,
                 duration: 2 * FRAME_LENGTH,
                 time: state.time,
             });*/
