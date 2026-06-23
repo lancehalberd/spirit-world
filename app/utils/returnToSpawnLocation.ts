@@ -1,5 +1,5 @@
-import {wait} from 'app/scriptEvents';
-import {appendScript, clearScriptScenes} from 'app/scenes/script/scriptScene';
+import {clearScriptScenes} from 'app/scenes/script/scriptScene';
+import {appendScript, wait} from 'app/scriptEvents';
 import {enterLocation} from 'app/utils/enterLocation';
 
 

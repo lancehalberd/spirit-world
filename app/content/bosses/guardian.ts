@@ -15,7 +15,7 @@ import {Indicator} from 'app/content/objects/indicator';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH} from 'app/gameConstants';
 import {guardianAnimations} from 'app/content/npcs/npcAnimations';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
-import {appendScript} from 'app/scenes/script/scriptScene';
+import {appendScript} from 'app/scriptEvents';
 import {createAnimation} from 'app/utils/animations';
 import {getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';

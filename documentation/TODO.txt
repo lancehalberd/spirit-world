@@ -152,6 +152,9 @@ Current tasks:
             - set in runPlayerBlockingCallback
             - set in waitForCamera, but this seems like this could just block player inputs, and possibly field updates.
             - set in waitForInput, only used from textCueWithInput uses  uses this. This could just be blocking player input though.
+        - Check appendInputBlockingCallback works in peachCave cutscene and Jade Champion cutscenes
+
+        showMessage -> prependScript -> ScriptScene -> getLoot -> LootGetAnimation -> showLootMessage -> showMessage
 
 
     - Stream notes

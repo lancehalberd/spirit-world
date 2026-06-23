@@ -1,6 +1,6 @@
 /*import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
-import {getLoot} from 'app/content/objects/lootObject';
+import {getLoot} from 'app/content/effects/lootGetAnimation';
 import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
 import {hideMessagePage, showMessagePage, updateSkipCutscene} from 'app/scenes/message/messageScene';
 import {followMessagePointer, prependScript} from 'app/scriptEvents';

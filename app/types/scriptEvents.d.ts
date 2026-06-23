@@ -160,11 +160,6 @@ interface StopScreenShakeScriptEvent {
     type: 'stopScreenShake'
     id: string
 }
-interface EnterLocationScriptEvent {
-    type: 'enterLocation'
-    location: ZoneLocation
-}
-
 interface AddTextCueScriptEvent {
     type: 'addTextCue'
     text: string
@@ -190,7 +185,6 @@ type ScriptEvent
     | CallbackScriptEvent
     | ClearFlagScriptEvent
     | ClearTextBoxScriptEvent
-    | EnterLocationScriptEvent
     | GainLootScriptEvent
     | PlaySoundScriptEvent
     | PlayTrackScriptEvent

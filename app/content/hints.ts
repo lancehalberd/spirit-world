@@ -1,7 +1,8 @@
 import {zones} from 'app/content/zones/zoneHash';
 import {isCheckTrash} from 'app/randomizer/checks';
 import {findObjectLocation, findReachableChecksFromStart} from 'app/randomizer/find';
-import {appendScript, isScriptSceneInStack} from 'app/scenes/script/scriptScene';
+import {isScriptSceneInStack} from 'app/scenes/script/scriptScene';
+import {appendScript} from 'app/scriptEvents';
 import {getOverworldMapId} from 'app/utils/location';
 import Random from 'app/utils/Random';
 

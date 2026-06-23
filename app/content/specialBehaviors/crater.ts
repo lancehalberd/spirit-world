@@ -1,6 +1,6 @@
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
-import {appendScript, appendScriptEvents} from 'app/scenes/script/scriptScene';
+import {appendScript, appendScriptEvents} from 'app/scriptEvents';
 import {saveGame} from 'app/utils/saveGame';
 import {extendSound} from 'app/utils/sounds';
 import {updateAllHeroes} from 'app/updateActor';

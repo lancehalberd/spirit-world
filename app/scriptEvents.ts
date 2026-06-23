@@ -1,7 +1,9 @@
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {showMessagePage} from 'app/scenes/message/messageScene';
-import {appendCallback, appendScriptEvents, prependScript} from 'app/scenes/script/scriptScene';
 import {getCameraTarget} from 'app/utils/fixCamera';
+import {GAME_KEY} from 'app/gameConstants';
 import {parseMessage, textScriptToString} from 'app/utils/parseMessage';
+import {parseScriptEvents} from 'app/scenes/script/parseScriptEvents';
 
 
 export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
@@ -27,18 +29,16 @@ export function wait(state: GameState, duration: number) {
     }]);
 }
 
-export function runBlockingCallback(state: GameState, updateCallback: (state: GameState, scene: ScriptScene) => boolean) {
+export function appendUpdateBlockingCallback(state: GameState, updateCallback: (state: GameState, scene: ScriptScene) => boolean) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        scene.activeEvents.push({
+        prependScriptEvents(state, [{
             type: 'update',
             update: updateCallback,
-        });
-        scene.activeEvents.push({
+        },{
             type: 'wait',
-            time: 0,
             waitingOnActiveEvents: true,
             blocksUpdates: true,
-        });
+        }]);
         // Make sure these block field updates as soon as this is appended and not on the next frame.
         scene.blocksUpdates = true;
         // Make sure no other scripts are processed until this finishes.
@@ -46,21 +46,18 @@ export function runBlockingCallback(state: GameState, updateCallback: (state: Ga
     });
 }
 
-export function runPlayerBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
+export function appendInputBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        scene.activeEvents.push({
+        prependScriptEvents(state, [{
             type: 'update',
             update: updateCallback,
-        });
-        scene.activeEvents.push({
+        },{
             type: 'wait',
-            time: 0,
             waitingOnActiveEvents: true,
             blocksInput: true,
-        });
+        }], scene);
         // Make sure these block player/field updates as soon as this is appended and not on the next frame.
-        state.cutscene.blockPlayerUpdates = true;
-        scene.blocksUpdates = true;
+        scene.blocksInput = true;
         // Make sure no other scripts are processed until this finishes.
         return true;
     });
@@ -82,7 +79,7 @@ export function resetCamera(state: GameState) {
 export function waitForCamera(state: GameState) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
         // Wait to reset the camera speed until it has reached its default target again.
-        scene.activeEvents.push({
+        prependScriptEvents(state, [{
             type: 'update',
             update(state: GameState, scene: ScriptScene) {
                 scene.blocksInput = true;
@@ -92,13 +89,11 @@ export function waitForCamera(state: GameState) {
                 }
                 return true;
             },
-        });
-        scene.activeEvents.push({
+        },{
             type: 'wait',
-            time: 0,
             waitingOnActiveEvents: true,
             blocksInput: true,
-        });
+        }], scene);
         // Make sure this blocks player/field updates as soon as this is appended and not on the next frame.
         scene.blocksInput = true;
         return true;
@@ -174,4 +169,115 @@ export function parseScriptAsTextPage(state: GameState, script: TextScript): Tex
         textPage.frames = [...textPage.frames, ...page.frames];
     }
     return textPage;
+}
+
+
+// All events to the front of the stack. These events may still be blocked by any active events in the current script scene.
+// Applies to the given script scene or appends a new script scene to the stack if none is provided.
+export function prependScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
+    if (!scriptScene) {
+        scriptScene = window.newScriptScene();
+        state.sceneStack.push(scriptScene);
+    }
+    scriptScene.queue = [
+        ...scriptEvents,
+        ...scriptScene.queue,
+    ];
+    // console.log('prependScript', [...state.scriptEvents.queue]);
+}
+
+// Parses a script and schedules it for immediate execution in the given script scene by prepending the parsed events.
+export function prependScript(state: GameState, script: TextScript, scriptScene?: ScriptScene): void {
+    prependScriptEvents(state, parseScriptEvents(state, script), scriptScene);
+}
+
+// Parses a script and schedules it for executation after existing script events complete.
+// If no script scene is provided, it will attempt to reuse any existing script scenes so that existing
+// events on those scenes will take precedence over the newly appended script.
+export function appendScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
+    if (!scriptScene) {
+        const topStackItem = state.sceneStack[state.sceneStack.length - 1];
+        if (topStackItem.sceneType === 'script') {
+            scriptScene = topStackItem as ScriptScene;
+        } else {
+            scriptScene = window.newScriptScene();
+            state.sceneStack.push(scriptScene);
+        }
+    }
+    scriptScene.queue = [
+        ...scriptScene.queue,
+        ...scriptEvents,
+    ];
+    // console.log('appendScript', [...state.scriptEvents.queue]);
+}
+
+export function appendScript(state: GameState, script: TextScript, scriptScene?: ScriptScene): void {
+    appendScriptEvents(state, parseScriptEvents(state, script), scriptScene);
+}
+
+export function appendCallback(state: GameState, callback: (state: GameState, scene?: ScriptScene) => void|boolean, scriptScene?: ScriptScene) {
+    appendScriptEvents(state, [{
+        type: 'callback',
+        callback,
+    }], scriptScene);
+}
+
+export function appendBlockInput(state: GameState, duration: number) {
+    appendScriptEvents(state, [{
+        type: 'wait',
+        blocksInput: true,
+        duration,
+    }]);
+}
+
+export function followMessagePointer(state: GameState, pointer: string, scriptScene?: ScriptScene) {
+    if (!pointer) {
+        return;
+    }
+    const [dialogueKey, optionKey] = pointer.split('.');
+    const dialogueSet = dialogueHash[dialogueKey];
+    if (!dialogueSet) {
+        console.error('Missing dialogue set', dialogueKey, pointer);
+        return;
+    }
+    const randomizedScript = state.randomizerState?.items?.dialogueReplacements?.[dialogueKey]?.[optionKey];
+    const script = randomizedScript ?? dialogueSet.mappedOptions[optionKey];
+    // Empty string script does nothing.
+    if (script === '') {
+        return;
+    }
+    if (!script) {
+        console.error('Missing dialogue option',  dialogueSet.mappedOptions, optionKey);
+        return;
+    }
+    prependScript(state, script, scriptScene);
+}
+
+
+
+
+function appendWaitForInput(state: GameState, duration = 0, scene?: ScriptScene) {
+    appendCallback(state, (state: GameState, scene: ScriptScene) => {
+        scene.activeEvents.push({
+            type: 'wait',
+            time: duration,
+            keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
+            blocksInput: true,
+        });
+        return true;
+    }, scene);
+    /*appendCallback(state, (state) => {
+        const waitScene = new WaitScene();
+        waitScene.startTime = state.time;
+        waitScene.duration = duration;
+        waitScene.keys = [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU];
+        waitScene.blocksInput = true;
+        return true;
+    });*/
+}
+
+export function appendTextCueWithInput(state: GameState, text: string, duration?: number, scene?: ScriptScene) {
+    appendScript(state, `{addCue:${text}}`, scene);
+    appendWaitForInput(state, duration, scene);
+    appendScript(state, `{removeCue}`, scene);
 }

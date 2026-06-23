@@ -8,7 +8,7 @@ import {CHAKRAM_2_NAME} from 'app/gameConstants';
 import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
 import {hideMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
 import {showMapScene} from 'app/scenes/map/showMapScene';
-import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
+import {appendCallback, appendScript} from 'app/scriptEvents';
 import {showSettingsScene} from 'app/scenes/settings/settingsScene';
 import {parseScriptAsTextPage, showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameCenteredAt} from 'app/utils/animations';

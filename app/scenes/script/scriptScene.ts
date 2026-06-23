@@ -1,13 +1,11 @@
 import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
-import {getLoot} from 'app/content/objects/lootObject';
-import {GAME_KEY} from 'app/gameConstants';
+import {getLoot} from 'app/content/effects/lootGetAnimation';
 import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
 import {hideMessagePage, showMessagePage, updateSkipCutscene} from 'app/scenes/message/messageScene';
-import {parseScriptEvents} from 'app/scenes/script/parseScriptEvents';
 import {isSceneTypeInStack} from 'app/scenes/sceneHash';
+import {followMessagePointer, prependScript} from 'app/scriptEvents';
 import {wasGameKeyPressed} from 'app/userInput';
-import {enterLocation} from 'app/utils/enterLocation';
 import {removeElementFromArray} from 'app/utils/index';
 import {clearObjectFlag, setObjectFlag} from 'app/utils/objectFlags';
 import {saveGame} from 'app/utils/saveGame';
@@ -66,31 +64,6 @@ import {playSound, playTrack} from 'app/utils/sounds';
 }*/
 
 
-export function appendWaitForInput(state: GameState, duration = 0, scene?: ScriptScene) {
-    appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        scene.activeEvents.push({
-            type: 'wait',
-            time: duration,
-            keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
-            blocksInput: true,
-        });
-        return true;
-    }, scene);
-    /*appendCallback(state, (state) => {
-        const waitScene = new WaitScene();
-        waitScene.startTime = state.time;
-        waitScene.duration = duration;
-        waitScene.keys = [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU];
-        waitScene.blocksInput = true;
-        return true;
-    });*/
-}
-
-export function appendTextCueWithInput(state: GameState, text: string, duration?: number, scene?: ScriptScene) {
-    appendScript(state, `{addCue:${text}}`, scene);
-    appendWaitForInput(state, duration, scene);
-    appendScript(state, `{removeCue}`, scene);
-}
 
 export class ScriptScene implements GameScene {
     sceneType = 'script';
@@ -297,10 +270,6 @@ export class ScriptScene implements GameScene {
                         type: 'fade',
                     };
                     return;
-                case 'enterLocation':
-                    enterLocation(state, event.location);
-                    this.blocksInput = true;
-                    return;
             }
         }
         // Remove the script scene wants it is finished.
@@ -318,88 +287,6 @@ export class ScriptScene implements GameScene {
     }
 }
 
-// All events to the front of the stack. These events may still be blocked by any active events in the current script scene.
-// Applies to the given script scene or appends a new script scene to the stack if none is provided.
-export function prependScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
-    if (!scriptScene) {
-        scriptScene = new ScriptScene();
-        state.sceneStack.push(scriptScene);
-    }
-    scriptScene.queue = [
-        ...scriptEvents,
-        ...scriptScene.queue,
-    ];
-    // console.log('prependScript', [...state.scriptEvents.queue]);
-}
-
-// Parses a script and schedules it for immediate execution in the given script scene by prepending the parsed events.
-export function prependScript(state: GameState, script: TextScript, scriptScene?: ScriptScene): void {
-    prependScriptEvents(state, parseScriptEvents(state, script), scriptScene);
-}
-
-// Parses a script and schedules it for executation after existing script events complete.
-// If no script scene is provided, it will attempt to reuse any existing script scenes so that existing
-// events on those scenes will take precedence over the newly appended script.
-export function appendScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
-    if (!scriptScene) {
-        const topStackItem = state.sceneStack[state.sceneStack.length - 1];
-        if (topStackItem instanceof ScriptScene) {
-            scriptScene = topStackItem;
-        } else {
-            scriptScene = new ScriptScene();
-            state.sceneStack.push(scriptScene);
-        }
-    }
-    scriptScene.queue = [
-        ...scriptScene.queue,
-        ...scriptEvents,
-    ];
-    // console.log('appendScript', [...state.scriptEvents.queue]);
-}
-
-export function appendScript(state: GameState, script: TextScript, scriptScene?: ScriptScene): void {
-    appendScriptEvents(state, parseScriptEvents(state, script), scriptScene);
-}
-
-export function appendCallback(state: GameState, callback: (state: GameState, scene?: ScriptScene) => void|boolean, scriptScene?: ScriptScene) {
-    appendScriptEvents(state, [{
-        type: 'callback',
-        callback,
-    }], scriptScene);
-}
-
-export function appendBlockInput(state: GameState, duration: number) {
-    appendScriptEvents(state, [{
-        type: 'wait',
-        blocksInput: true,
-        duration,
-    }]);
-}
-
-export function followMessagePointer(state: GameState, pointer: string, scriptScene?: ScriptScene) {
-    if (!pointer) {
-        return;
-    }
-    const [dialogueKey, optionKey] = pointer.split('.');
-    const dialogueSet = dialogueHash[dialogueKey];
-    if (!dialogueSet) {
-        console.error('Missing dialogue set', dialogueKey, pointer);
-        return;
-    }
-    const randomizedScript = state.randomizerState?.items?.dialogueReplacements?.[dialogueKey]?.[optionKey];
-    const script = randomizedScript ?? dialogueSet.mappedOptions[optionKey];
-    // Empty string script does nothing.
-    if (script === '') {
-        return;
-    }
-    if (!script) {
-        console.error('Missing dialogue option',  dialogueSet.mappedOptions, optionKey);
-        return;
-    }
-    prependScript(state, script, scriptScene);
-}
-
-
 export function isScriptSceneInStack(state: GameState) {
     return isSceneTypeInStack(state, 'script');
 }
@@ -415,6 +302,10 @@ export function clearScriptScenes(state: GameState) {
     }
     state.sceneStack = sceneStack;
 }
+
+// I prefer not to have circular imports, exporting this globally seems like
+// the simplest way to avoid circular dependencies like ScriptScene -> getLoot -> showLootMessage -> prependScript => new ScriptScene()
+window.newScriptScene = () => new ScriptScene();
 
 class _ScriptScene extends ScriptScene {}
 declare global {

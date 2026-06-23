@@ -1,8 +1,7 @@
 import {refreshAreaLogic} from 'app/content/areas';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendCallback, appendScript, appendTextCueWithInput} from 'app/scenes/script/scriptScene';
-import {hideHUD, resetCamera, runPlayerBlockingCallback, showHUD, waitForCamera} from 'app/scriptEvents';
+import {appendCallback, appendScript, appendTextCueWithInput, hideHUD, resetCamera, appendInputBlockingCallback, showHUD, waitForCamera} from 'app/scriptEvents';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
 
@@ -69,7 +68,7 @@ specialBehaviorsHash.peachCave = {
                 });
                 appendScript(state, '{wait:800');
                 // Move the player to a good y position before talking to the tree.
-                runPlayerBlockingCallback(state, (state: GameState) => {
+                appendInputBlockingCallback(state, (state: GameState) => {
                     state.camera.speed = 1;
                     state.cutscene.cameraTarget = {x: 128, y: 32};
                     const hero = state.hero;
@@ -111,7 +110,7 @@ specialBehaviorsHash.peachCave = {
                 appendCallback(state, (state: GameState) => {
                     peachTree.growPeach(state);
                 });
-                runPlayerBlockingCallback(state, (state: GameState) => {
+                appendInputBlockingCallback(state, (state: GameState) => {
                     state.areaSection.dark = Math.min(90, state.areaSection.dark + 0.5);
                     //state.areaInstance.dark = Math.min(90, state.areaInstance.dark + 0.5);
                     if (peachTree.specialStatus === 'dead') {
@@ -122,7 +121,7 @@ specialBehaviorsHash.peachCave = {
                 appendTextCueWithInput(state, `...the Fruit of Life.`);
                 appendScript(state, '{flag:peachCaveTreeDied}{stopTrack}');
                 // Wait for the area to finish refreshing before resetting the camera and showing the HUD.
-                runPlayerBlockingCallback(state, (state: GameState) => {
+                appendInputBlockingCallback(state, (state: GameState) => {
                     if (state.nextAreaInstance) {
                         return true;
                     }

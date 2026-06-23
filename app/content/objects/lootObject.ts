@@ -1,26 +1,24 @@
 import {renderIndicator} from 'app/content/objects/indicator';
 import {objectHash} from 'app/content/objects/objectHash';
-import {getLootFrame, getLootShadowFrame, showLootMessage} from 'app/content/loot';
+import {getLootFrame, getLootShadowFrame} from 'app/content/loot';
 import {lootEffects} from 'app/content/lootEffects';
 import {editingState} from 'app/development/editingState';
 import {CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
 import {getMappedLootData} from 'app/randomizer/utils';
 import {showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrame, drawFrameAt, getFrameHitbox} from 'app/utils/animations';
-import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {pad, boxesIntersect} from 'app/utils/index';
-import {getLootLevel} from 'app/utils/loot';
 import {setObjectFlag} from 'app/utils/objectFlags';
 import {addObjectToArea, getObjectStatus, removeObjectFromArea} from 'app/utils/objects';
 import {saveGame} from 'app/utils/saveGame';
 import {drawARFont} from 'app/utils/smallFont';
 import {playSound} from 'app/utils/sounds';
+import {getActualLootDefinition, getLoot} from 'app/content/effects/lootGetAnimation';
 
 
 /*const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;*/
 
-type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
 
 function rollItem(table: LootTable) {
     const roll = Math.random() * table.totalWeight;
@@ -57,83 +55,6 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
     }
 }
 
-export class LootGetAnimation implements EffectInstance {
-    definition: LootObjectDefinition = null;
-    behaviors = {
-        solid: true,
-        brightness: 1,
-        lightRadius: 16,
-    };
-    frame: Frame;
-    loot: AnyLootDefinition;
-    lootLevel: number;
-    animationTime: number = 0;
-    isEffect = <const>true;
-    x: number;
-    y: number;
-    z: number;
-    status: ObjectStatus = 'normal';
-    constructor(state: GameState, loot: AnyLootDefinition) {
-        this.loot = loot;
-        // The frame and loot level need to be calculated in the constructor before the loot effect is
-        // applied, which would cause progressive loot to show the wrong frame/message.
-        this.frame = getLootFrame(state, loot);
-        this.lootLevel = getLootLevel(state, this.loot);
-        if (loot.type === 'bigChest') {
-            this.x = loot.x + chestOpenedFrame.w - this.frame.w / 2;
-            this.y = loot.y + 16;
-        } else if (loot.type === 'chest') {
-            this.x = loot.x + chestOpenedFrame.w / 2 - this.frame.w / 2;
-            this.y = loot.y + 8;
-        } else {
-            this.x = state.hero.x + state.hero.w / 2 - this.frame.w / 2;
-            this.y = state.hero.y - 4;
-        }
-        this.z = 8;
-    }
-    getHitbox(state: GameState) {
-        return { x: this.x, y: this.y - this.z, w: 16, h: 16};
-    }
-    update(state: GameState) {
-        if (this.z < 20) {
-            this.z += 0.5;
-        }
-        this.animationTime += FRAME_LENGTH;
-        if (this.animationTime === 100) {
-            if (this.loot.lootType === 'empty' || this.loot.lootType === 'unknown') {
-
-            } else if (this.loot.lootType === 'peachOfImmortalityPiece' || this.loot.lootType === 'money'
-                || this.loot.lootType === 'smallKey' || this.loot.lootType === 'map' || this.loot.lootType === 'peach'
-            ) {
-                const audioInstance = playSound('smallSuccessChime');
-                if (!audioInstance) {
-                    console.log(this);
-                    debugger;
-                }
-            } else {
-                const audioInstance = playSound('bigSuccessChime');
-                if (!audioInstance) {
-                    console.log(this);
-                    debugger;
-                }
-            }
-        }
-        if (this.animationTime === 1000) {
-            // Calculate the loot level immediately so that the
-            showLootMessage(state, this.loot);
-        } else if (this.animationTime > 1000) {
-            removeEffectFromArea(state, this);
-        }
-    }
-    render(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = this.frame;
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
-    }
-    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = this.frame;
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
-    }
-}
 
 
 export class LootObject implements ObjectInstance {
@@ -283,58 +204,6 @@ export class LootObject implements ObjectInstance {
     }
 }
 
-function getActualLootDefinition(this: void, state: GameState, definition: AnyLootDefinition): AnyLootDefinition {
-    const lootData = getMappedLootData(state.randomizerState, definition);
-    if (lootData.lootType === 'spiritPower') {
-        if (!state.hero.savedData.passiveTools.spiritSight) {
-            return {
-                ...definition,
-                ...lootData,
-                lootType: 'spiritSight',
-            };
-        } else if (!state.hero.savedData.passiveTools.astralProjection) {
-            return {
-                ...definition,
-                ...lootData,
-                lootType: 'astralProjection',
-            };
-        }
-        return {
-            ...definition,
-            ...lootData,
-            lootType: 'teleportation',
-        };
-    }
-    if (lootData.lootType === 'secondChance' && state.hero.savedData.hasRevive) {
-        return {
-            ...definition,
-            ...lootData,
-            lootType: 'money',
-            lootAmount: 50,
-        };
-    }
-    return {
-        ...definition,
-        ...lootData,
-    };
-}
-
-export function getLoot(this: void, state: GameState, definition: AnyLootDefinition): void {
-    definition = getActualLootDefinition(state, definition);
-    if (!definition.lootType || definition.lootType === 'empty') {
-        return;
-    }
-    const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
-    state.hero.action = 'getItem';
-    const lootAnimation = new LootGetAnimation(state, definition);
-    // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
-    onPickup(state, definition);
-    addEffectToArea(state, state.hero.area, lootAnimation);
-    state.hero.area.priorityObjects.push([lootAnimation]);
-    // Refresh the area in case acquiring the item has change the logic of the area.
-    state.areaInstance.needsLogicRefresh = true;
-    saveGame(state);
-}
 
 // Simple loot drop doesn't show the loot animation when collected.
 interface LootDropDefinition extends LootObjectDefinition {

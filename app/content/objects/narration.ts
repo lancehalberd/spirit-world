@@ -1,7 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendScript} from 'app/scenes/script/scriptScene';
+import {appendScript} from 'app/scriptEvents';
 import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 

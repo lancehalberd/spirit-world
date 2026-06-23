@@ -6,6 +6,7 @@ interface IElectronAPI {
 interface Window {
   version: string
   electronAPI: IElectronAPI
+  newScriptScene: () => ScriptScene
   [key: string]: any;
 }
 

@@ -1,8 +1,7 @@
 import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {runBlockingCallback, runPlayerBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
-import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
+import {appendCallback, appendScript, appendUpdateBlockingCallback, appendInputBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {updateCamera} from 'app/updateCamera';
@@ -36,7 +35,7 @@ dialogueHash.jadeChampion = {
             // Move the player to a good x,y position before talking to the Jade Champion.
             // target coordinates: { x: 134, y: 446 }
             // FIX, TODO: camera movement is jerky
-            runBlockingCallback(state, (state: GameState) => {
+            appendUpdateBlockingCallback(state, (state: GameState) => {
                 const hero = state.hero;
                 // fix x coordinate
                 if (hero.x === 134) {
@@ -56,7 +55,7 @@ dialogueHash.jadeChampion = {
                 updateCamera(state);
                 return true;
             });
-            runBlockingCallback(state, (state: GameState) => {
+            appendUpdateBlockingCallback(state, (state: GameState) => {
                 const hero = state.hero;
                 // fix y coordinate
                 if (hero.y === 446) {
@@ -82,7 +81,7 @@ dialogueHash.jadeChampion = {
             // 2: { x: 142, y: 348 }
             // end: { x: 142, y: 424 }
             // 1
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 200, 348, 'move')) {
                     return true;
@@ -90,7 +89,7 @@ dialogueHash.jadeChampion = {
                 jadeChampion.changeToAnimation('idle');
             });
             // 2
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 142, 348, 'move')) {
                     return true;
@@ -98,7 +97,7 @@ dialogueHash.jadeChampion = {
                 jadeChampion.changeToAnimation('idle');
             });
             // end
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 142, 424, 'move')) {
                     return true;
@@ -112,7 +111,7 @@ dialogueHash.jadeChampion = {
                 {|}Just stay away from the Spirit Gate or I'll have to kick you out myself.`);
             // JC teleports away
             appendScript(state, '{wait:500}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (jadeChampion.currentAnimationKey !== 'cast') {
                     jadeChampion.changeToAnimation('cast');

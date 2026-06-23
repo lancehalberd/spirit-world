@@ -2,12 +2,11 @@ import {Rock} from 'app/content/effects/arrow';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations} from 'app/content/enemyAnimations';
-import {appendScript} from 'app/scenes/script/scriptScene';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {editingState} from 'app/development/editingState';
 import {playAreaSound} from 'app/musicController';
 import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
-import {appendBlockInput} from 'app/scenes/script/scriptScene';
+import {appendBlockInput, appendScript} from 'app/scriptEvents';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {
     moveEnemy,

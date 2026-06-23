@@ -5,8 +5,8 @@ import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {Spark} from 'app/content/effects/spark';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
+import {getLoot} from 'app/content/effects/lootGetAnimation';
 import {rivalAnimations, rivalSpiritAnimations} from 'app/content/enemyAnimations';
-import {getLoot} from 'app/content/objects/lootObject';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
@@ -16,7 +16,7 @@ import {
 } from 'app/render/heroAnimations';
 import {onBossRushBossDefeated} from 'app/scenes/bossRush/showBossRushScene';
 import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
-import {appendBlockInput, appendCallback, appendScript} from 'app/scenes/script/scriptScene';
+import {appendBlockInput, appendCallback, appendScript} from 'app/scriptEvents';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {drawFrameAt, getFrame} from 'app/utils/animations';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';

@@ -1,10 +1,11 @@
-import { refreshAreaLogic } from 'app/content/areas';
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { Sign } from 'app/content/objects/sign';
-import { StaffTower } from 'app/content/objects/staffTower';
-import { showMessage } from 'app/scriptEvents';
-import { saveGame } from 'app/utils/saveGame';
+import {refreshAreaLogic} from 'app/content/areas';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {Sign} from 'app/content/objects/sign';
+import {StaffTower} from 'app/content/objects/staffTower';
+import {showMessage} from 'app/scriptEvents';
+import {enterLocation} from 'app/utils/enterLocation';
+import {saveGame} from 'app/utils/saveGame';
 
 
 specialBehaviorsHash.staffTower = {
@@ -89,7 +90,16 @@ dialogueHash.towerTeleporter = {
     mappedOptions: {
         // Use this when we can enable terminal for the astral projection.
         failToTeleport: `ERROR ACQUIRING TARGET FOR TRANSFER.`,
-        teleport: `{teleport}`,
+        teleport(state: GameState) {
+            enterLocation(state, {
+                ...state.location,
+                x: state.hero.x,
+                y: state.hero.y,
+                d: state.hero.d,
+                isSpiritWorld: !state.location.isSpiritWorld,
+            });
+            return '';
+        },
     },
     options: [],
 };

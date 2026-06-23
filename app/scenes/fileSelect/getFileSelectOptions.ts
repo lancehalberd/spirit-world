@@ -7,7 +7,7 @@ import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showRandomizerScene} from 'app/scenes/randomizer/randomizerScene';
-import {appendScript, appendScriptEvents} from 'app/scenes/script/scriptScene';
+import {appendScript, appendScriptEvents} from 'app/scriptEvents';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
 import {parseScriptText} from 'app/scriptEvents';
 import {getDefaultState} from 'app/state';

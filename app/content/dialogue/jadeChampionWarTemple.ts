@@ -2,7 +2,7 @@ import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {cutSceneWalkToLocation} from 'app/movement/moveActor';
-import {appendCallback, appendScript, runPlayerBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
+import {appendCallback, appendScript, appendInputBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
@@ -11,7 +11,7 @@ import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
 
 function npcAndHeroTeleportAnimation(state: GameState, npc: NPC) {
     appendScript(state, '{wait:500}');
-    runPlayerBlockingCallback(state, (state: GameState) => {
+    appendInputBlockingCallback(state, (state: GameState) => {
         npc.animationTime += FRAME_LENGTH;
         if (npc.currentAnimationKey !== 'idle') {
             npc.changeToAnimation('idle');
@@ -19,7 +19,7 @@ function npcAndHeroTeleportAnimation(state: GameState, npc: NPC) {
         }
     });
     appendScript(state, '{wait:100}');
-    runPlayerBlockingCallback(state, (state: GameState) => {
+    appendInputBlockingCallback(state, (state: GameState) => {
         state.hero.animationTime += FRAME_LENGTH;
         state.hero.d = 'down';
         if (state.hero.action !== 'kneel') {
@@ -28,7 +28,7 @@ function npcAndHeroTeleportAnimation(state: GameState, npc: NPC) {
         }
     });
     appendScript(state, '{wait:500}');
-    runPlayerBlockingCallback(state, (state: GameState) => {
+    appendInputBlockingCallback(state, (state: GameState) => {
         npc.animationTime += FRAME_LENGTH;
         if (npc.currentAnimationKey !== 'cast') {
             npc.changeToAnimation('cast');
@@ -80,7 +80,7 @@ dialogueHash.jadeChampionWarTemple = {
             appendCallback(state, (state: GameState) => {
                 addObjectToArea(state, state.hero.area, jadeChampion);
             });
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.speed = 1;
                 jadeChampion.animationTime += FRAME_LENGTH;
                 state.hero.animationTime += FRAME_LENGTH;
@@ -95,7 +95,7 @@ dialogueHash.jadeChampionWarTemple = {
             });
             appendScript(state, '{wait:500}');
             appendScript(state, `Stop right there!`);
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.speed = 1.75;
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 234, 476, 'move')) {
@@ -103,7 +103,7 @@ dialogueHash.jadeChampionWarTemple = {
                 }
                 jadeChampion.changeToAnimation('idle');
             });
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 234, 396, 'move')) {
                     return true;
@@ -117,7 +117,7 @@ dialogueHash.jadeChampionWarTemple = {
                 {|}Come with me.
                 `
             );
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 256, 400, 'move')) {
                     return true;
@@ -151,7 +151,7 @@ dialogueHash.jadeChampionWarTemple = {
                 });
             });
             appendScript(state, '{playTrack:grandPriestTheme}{wait:100}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 220, 346, 'move')) {
                     return true;
@@ -159,7 +159,7 @@ dialogueHash.jadeChampionWarTemple = {
                 jadeChampion.changeToAnimation('idle', 'up');
             });
             appendScript(state, '{wait:50}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 254, 300, 'move')) {
                     return true;
@@ -172,7 +172,7 @@ dialogueHash.jadeChampionWarTemple = {
                 state.hero.d = 'up';
             });
             appendScript(state, '{wait:500}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 208, 276, 'move')) {
                     return true;
@@ -195,7 +195,7 @@ dialogueHash.jadeChampionWarTemple = {
             // Return this Vanara to the borders of our Holy City. This is my command.
             // JC: Yes, Grand Priest.
             // JC approaches the hero and teleports them to the Holy City
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 300, 'move')) {
                     return true;
@@ -206,7 +206,7 @@ dialogueHash.jadeChampionWarTemple = {
                 {|}...
                 {|}...[-] [-]...I see...
                 {|}It is clear that you do not know of what I speak.`);
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
                     return true;
@@ -217,7 +217,7 @@ dialogueHash.jadeChampionWarTemple = {
             // JC is shocked, steps forward slightly to speak
             // JC resting: 208, 276
             // NPC talking: 256, 300
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = 1.5;
                 if (moveNPCToTargetLocation(state, jadeChampion, 224, 286, 'move')) {
@@ -227,7 +227,7 @@ dialogueHash.jadeChampionWarTemple = {
             });
             appendScript(state, `But this child was in the War Temple when the Beasts vanished!
                 {|}That can't be a coincidence.`);
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 286, 'move')) {
                     return true;
@@ -238,7 +238,7 @@ dialogueHash.jadeChampionWarTemple = {
             appendScript(state, `Peace, Champion. Nothing that happens is merely a coincidence.
                 {|}That doesn't mean that this Vanara is responsible.`);
             appendScript(state, '{wait:500}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
                     return true;
@@ -254,7 +254,7 @@ dialogueHash.jadeChampionWarTemple = {
             });
             appendScript(state, '{wait:500}');
             // JC is angered to speech again, steps forward all of the way
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = 1.5;
                 if (moveNPCToTargetLocation(state, jadeChampion, 256, 300, 'move')) {
@@ -264,7 +264,7 @@ dialogueHash.jadeChampionWarTemple = {
             });
             appendScript(state, `It is my duty as the Jade Champion to protect the Spirit World!
                 {|}I cannot let a Vanara child roam it freely.`);
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 240, 'move')) {
                     return true;
@@ -274,7 +274,7 @@ dialogueHash.jadeChampionWarTemple = {
             appendScript(state, `Silence! The commands of the Spirit King are beyond the understanding of us mortals.`);
             appendScript(state, '{wait:500}');
             // JC is chastised, returns to her resting spot
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = .75;
                 if (moveNPCToTargetLocation(state, jadeChampion, 208, 276, 'move')) {
@@ -283,7 +283,7 @@ dialogueHash.jadeChampionWarTemple = {
                 jadeChampion.changeToAnimation('idle', 'right');
             });
             appendScript(state, '{wait:500}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 grandPriest.speed = 1;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 276, 'move')) {
@@ -294,7 +294,7 @@ dialogueHash.jadeChampionWarTemple = {
             appendScript(state, `Champion, seek out the Spirit Beasts.
                 {|}The Spirit Gods shall watch the Vanara child themselves.`);
             appendScript(state, '{wait:300}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 grandPriest.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, grandPriest, 256, 250, 'move')) {
                     return true;
@@ -304,7 +304,7 @@ dialogueHash.jadeChampionWarTemple = {
             appendScript(state, `Return this Vanara to the gates of our Holy City.
                 {|}This is my command.`);
             appendScript(state, '{wait:500}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = 1;
                 if (moveNPCToTargetLocation(state, jadeChampion, 256, 300, 'move')) {
@@ -317,7 +317,7 @@ dialogueHash.jadeChampionWarTemple = {
             appendScript(state, '{wait:700}');
             appendScript(state, `Yes, Grand Priest.`);
             appendScript(state, '{wait:300}');
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = 1.25;
                 if (moveNPCToTargetLocation(state, jadeChampion, 220, 332, 'move')) {
@@ -327,7 +327,7 @@ dialogueHash.jadeChampionWarTemple = {
             });
             appendScript(state, `Come child, I will take you out of the city.`);
             // JC and hero position for teleport
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = 1.25;
                 if (moveNPCToTargetLocation(state, jadeChampion, 240, 332, 'move')) {
@@ -359,7 +359,7 @@ dialogueHash.jadeChampionWarTemple = {
             });
             appendScript(state, `Farewell. Please try not to cause any further trouble, little one.`);
             // JC walks back into the city, then vanishes
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 jadeChampion.speed = 1.25;
                 if (moveNPCToTargetLocation(state, jadeChampion, 100, -40, 'move')) {

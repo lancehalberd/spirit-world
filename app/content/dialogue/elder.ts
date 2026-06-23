@@ -3,9 +3,9 @@ import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {FRAME_LENGTH, RIVAL_NAME} from 'app/gameConstants';
 import {getMovementAnchor, moveActorTowardsLocation} from 'app/movement/moveActor';
 import {
-    hideHUD, runBlockingCallback, showHUD, wait
+    hideHUD, appendUpdateBlockingCallback, showHUD, wait
 } from 'app/scriptEvents';
-import {appendCallback, appendScript, appendScriptEvents} from 'app/scenes/script/scriptScene';
+import {appendCallback, appendScript, appendScriptEvents} from 'app/scriptEvents';
 import {updateGenericHeroState} from 'app/updateActor';
 import {faceTarget} from 'app/utils/actor';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
@@ -117,7 +117,7 @@ dialogueHash.elder = {
             // Make sure the hero is far enough south that the text box is render on the top half of the screen, otherwise
             // the rival and the elder will be covered up.
             const targetY = Math.max(175, Math.min(200, anchor.y));
-            runBlockingCallback(state, (state: GameState) => {
+            appendUpdateBlockingCallback(state, (state: GameState) => {
                 state.hero.action = 'walking';
                 // state.hero.d = 'down';
                 state.hero.animationTime += FRAME_LENGTH;
@@ -141,7 +141,7 @@ dialogueHash.elder = {
             appendCallback(state, () => {
                 state.hero.life = state.hero.savedData.maxLife;
             });
-            runBlockingCallback(state, () => {
+            appendUpdateBlockingCallback(state, () => {
                 updateGenericHeroState(state, state.hero, false);
                 return state.hero.displayLife < state.hero.life
             });

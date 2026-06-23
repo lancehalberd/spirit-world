@@ -1,7 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {setSpawnLocation} from 'app/content/spawnLocations';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendScript} from 'app/scenes/script/scriptScene';
+import {appendScript} from 'app/scriptEvents';
 import {createAnimation, drawFrameContentAt, drawFrameContentReflectedAt, getFrame, getFrameHitbox} from 'app/utils/animations';
 import {directionMap} from 'app/utils/direction';
 import {isPointInShortRect} from 'app/utils/index';

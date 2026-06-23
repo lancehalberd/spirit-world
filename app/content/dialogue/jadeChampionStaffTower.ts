@@ -3,8 +3,7 @@ import {JadeChampion} from 'app/content/objects/jadeChampion';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {moveActorTowardsLocation} from 'app/movement/moveActor';
 import {playAreaSound} from 'app/musicController';
-import {runPlayerBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
-import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
+import {appendCallback, appendScript, appendInputBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
 import {saveGame} from 'app/utils/saveGame';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
@@ -49,7 +48,7 @@ dialogueHash.jadeChampionStaffTower = {
             // Find the Jade Champion NPC object.
             const jadeChampion = findObjectInstanceById(state.hero.area, 'jadeChampion') as NPC;
             jadeChampion.speed = 1.75;
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 state.hero.action = 'walking';
                 state.hero.d = 'down';
                 state.hero.animationTime += FRAME_LENGTH;
@@ -62,7 +61,7 @@ dialogueHash.jadeChampionStaffTower = {
             });
             appendScript(state, '{wait:200}');
             appendScript(state, `This is it, I can sense the Storm Beast just above us!`);
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
 
                 const jadeChampionIsMoving = moveNPCToTargetLocation(state, jadeChampion, 472, 536, 'move') > 0;
@@ -87,7 +86,7 @@ dialogueHash.jadeChampionStaffTower = {
                 }
             });
             // Approach the first wall.
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 472, 488, 'move')) {
                     return true;
@@ -95,7 +94,7 @@ dialogueHash.jadeChampionStaffTower = {
                 state.hero.d = 'up';
             });
             // The jade champion should become transparent at this point.
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.alpha = 0.3 + 0.2 * Math.cos(jadeChampion.animationTime / 100);
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 472, 436, 'move', {canPassWalls: true})) {
@@ -103,7 +102,7 @@ dialogueHash.jadeChampionStaffTower = {
                 }
             });
             // Jade champion stops flickering once she moves past the wall.
-            runPlayerBlockingCallback(state, (state: GameState) => {
+            appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.alpha = 1
                 jadeChampion.animationTime += FRAME_LENGTH;
                 if (moveNPCToTargetLocation(state, jadeChampion, 472, 300, 'move', {canPassWalls: true})) {

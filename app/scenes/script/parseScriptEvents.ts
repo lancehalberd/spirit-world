@@ -32,19 +32,6 @@ export function parseScriptEvents(state: GameState, script: TextScript): ScriptE
             events.push({ type: 'rest' });
             continue;
         }
-        if (actionToken === 'teleport') {
-            events.push({
-                type: 'enterLocation',
-                location: {
-                    ...state.location,
-                    x: state.hero.x,
-                    y: state.hero.y,
-                    d: state.hero.d,
-                    isSpiritWorld: !state.location.isSpiritWorld,
-                },
-            });
-            continue;
-        }
         // {screenShake:2:0:2200}
         if (actionToken.startsWith('screenShake:')) {
             const paramToken = actionToken.substring('screenShake:'.length);

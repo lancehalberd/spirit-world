@@ -2,7 +2,7 @@ import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {showTransitionScene} from 'app/scenes/transition/transitionScene';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
 import {wait} from 'app/scriptEvents';
-import {appendCallback, appendScript} from 'app/scenes/script/scriptScene';
+import {appendCallback, appendScript, appendScriptEvents} from 'app/scriptEvents';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {moveActor} from 'app/movement/moveActor';
 import {updateCamera} from 'app/updateCamera';
@@ -51,7 +51,7 @@ dialogueHash.rival = {
             // Make the character walk north to get the rival on the screen.
             if (state.hero.y > 96) {
                 // Entering from the south, the hero walks north until the Rival is in frame.
-                state.scriptEvents.activeEvents.push({
+                appendScriptEvents(state, [{
                     type: 'update',
                     update(state: GameState): boolean {
                         const hero = state.hero;
@@ -66,12 +66,12 @@ dialogueHash.rival = {
                         updateCamera(state);
                         return true;
                     },
-                });
+                }]);
             } else {
                 // Entering from the north, the hero just walks south through the Rival.
                 // This is not ideal, but we will probably remove the rival fight when you
                 // enter the Helix from the top so it isn't worth worrying about.
-                state.scriptEvents.activeEvents.push({
+                appendScriptEvents(state, [{
                     type: 'update',
                     update(state: GameState): boolean {
                         const hero = state.hero;
@@ -87,15 +87,14 @@ dialogueHash.rival = {
                         updateCamera(state);
                         return true;
                     },
-                });
+                }]);
             }
-            state.scriptEvents.activeEvents.push({
+            appendScriptEvents(state, [{
                 type: 'wait',
-                time: 0,
                 waitingOnActiveEvents: true,
                 // Make sure the fight doesn't continue during this cutscene.
                 blocksUpdates: true,
-            });
+            }]);
             wait(state, 500);
             if (state.isDemoMode && !state.randomizerState) {
                 if (!state.settings.isRandomizerUnlocked) {

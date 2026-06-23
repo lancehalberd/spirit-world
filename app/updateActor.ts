@@ -8,7 +8,7 @@ import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {getLedgeDelta} from 'app/movement/getLedgeDelta'
 import {playAreaSound} from 'app/musicController';
 import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
-import {prependScript} from 'app/scenes/script/scriptScene';
+import {prependScript} from 'app/scriptEvents';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
 import {isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased} from 'app/useTool';

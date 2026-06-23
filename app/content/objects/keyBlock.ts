@@ -1,8 +1,7 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {playAreaSound} from 'app/musicController';
-import {appendBlockInput} from 'app/scenes/script/scriptScene';
-import {showMessage} from 'app/scriptEvents';
+import {appendBlockInput, showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
 import {activateTarget, getObjectStatus} from 'app/utils/objects';
