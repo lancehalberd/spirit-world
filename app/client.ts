@@ -8,19 +8,21 @@ export * from 'app/development/tests';
 export * from 'app/development/tileEditor';
 export * from 'app/scenes/scenes';
 
-import { addContextMenuListeners } from 'app/development/contextMenu';
-import { editingState } from 'app/development/editingState';
-import { refreshEditor } from 'app/development/editor';
+import {addContextMenuListeners} from 'app/development/contextMenu';
+import {editingState} from 'app/development/editingState';
+import {refreshEditor} from 'app/development/editor';
 
 export * from 'app/generator/treeGraphs';
 
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { update } from 'app/update';
-import { render } from 'app/render';
-import { populateAllSections} from 'app/content/sections';
-import { populateAllDialogue} from 'app/content/dialogue/dialogueList';
-import { getState } from 'app/state';
-import { updateMusic } from 'app/musicController';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {update} from 'app/update';
+import {render} from 'app/render';
+import {populateAllSections} from 'app/content/sections';
+import {populateAllDialogue} from 'app/content/dialogue/dialogueList';
+import {getState} from 'app/state';
+import {updateMusic} from 'app/musicController';
+
+export * from 'app/content/objects/clone';
 
 export * from 'app/development/packFont';
 

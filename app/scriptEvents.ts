@@ -18,6 +18,7 @@ export function showHUD(state: GameState) {
     // show HUD to tell player that control of their character has returned
     appendCallback(state, (state: GameState) => {
         state.hideHUD = false;
+        state.cutscene = {};
     });
 }
 
@@ -28,7 +29,51 @@ export function wait(state: GameState, duration: number) {
         blocksUpdates: true,
     }]);
 }
+function noop() {}
+// Schedules a callback to disable updates on the given set of targets.
+export function appendDisableUpdatesForTargets(state: GameState, targets: Target[]) {
+    appendCallback(state, (state: GameState) => {
+        for (const target of targets) {
+            if (target.update && target.update !== noop) {
+                target.disabledUpdate = target.update;
+                // If update is an instance method, running `delete target.update` will just restore it to the instance method,
+                // so we need to assign something like a noop if we actually want to disable the function.
+                target.update = noop;
+            }
+        }
+    });
+}
+export function appendEnableUpdatesForTargets(state: GameState, targets: Target[]) {
+    appendCallback(state, (state: GameState) => {
+        for (const target of targets) {
+            if (target.disabledUpdate) {
+                target.update = target.disabledUpdate;
+                delete target.disabledUpdate;
+            }
+        }
+    });
+}
 
+// Append an event to the script queue that will run an update function blocking further script events in the queue until
+// it returns false.
+// This does not block updates or inputs for the reset of the scene stack.
+export function appendScriptBlockingCallback(state: GameState, updateCallback: (state: GameState, scene: ScriptScene) => boolean) {
+    appendCallback(state, (state: GameState, scene: ScriptScene) => {
+        prependScriptEvents(state, [{
+            type: 'update',
+            update: updateCallback,
+        },{
+            type: 'wait',
+            waitingOnActiveEvents: true,
+        }]);
+        // Make sure no other scripts are processed until this finishes.
+        return true;
+    });
+}
+
+// Append an event to the script queue that will run an update function blocking further script events in the queue until
+// it returns false.
+// This blocks updates for the rest of the scene stack entirely.
 export function appendUpdateBlockingCallback(state: GameState, updateCallback: (state: GameState, scene: ScriptScene) => boolean) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
         prependScriptEvents(state, [{
@@ -46,8 +91,13 @@ export function appendUpdateBlockingCallback(state: GameState, updateCallback: (
     });
 }
 
+// Append an event to the script queue that will run an update function blocking further script events in the queue until
+// it returns false.
+// This blocks inputs to the rest of the scene stack.
 export function appendInputBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
+        // These new events will be processed immediately this frame
+        // but the 'wait' action will prevent any further events from being processed.
         prependScriptEvents(state, [{
             type: 'update',
             update: updateCallback,
@@ -58,31 +108,27 @@ export function appendInputBlockingCallback(state: GameState, updateCallback: (s
         }], scene);
         // Make sure these block player/field updates as soon as this is appended and not on the next frame.
         scene.blocksInput = true;
-        // Make sure no other scripts are processed until this finishes.
-        return true;
     });
 }
 
-export function resetCamera(state: GameState) {
+export function appendResetAndWaitForCamera(state: GameState) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
         // Reset the camera back to its default target.
         delete state.cutscene.cameraTarget;
-        // Wait to reset the camera speed until it has reached its default target again.
-        waitForCamera(state);
-        appendCallback(state, (state) => {
-            delete state.camera.speed;
-        });
-        return true;
+    });
+    // Wait to reset the camera speed until it has reached its default target again.
+    appendWaitForCamera(state);
+    appendCallback(state, (state) => {
+        delete state.camera.speed;
     });
 }
 
-export function waitForCamera(state: GameState) {
+export function appendWaitForCamera(state: GameState) {
     appendCallback(state, (state: GameState, scene: ScriptScene) => {
         // Wait to reset the camera speed until it has reached its default target again.
         prependScriptEvents(state, [{
             type: 'update',
             update(state: GameState, scene: ScriptScene) {
-                scene.blocksInput = true;
                 const cameraTarget = getCameraTarget(state);
                 if (state.camera.x === cameraTarget.x && state.camera.y === cameraTarget.y) {
                     return false;
@@ -94,9 +140,6 @@ export function waitForCamera(state: GameState) {
             waitingOnActiveEvents: true,
             blocksInput: true,
         }], scene);
-        // Make sure this blocks player/field updates as soon as this is appended and not on the next frame.
-        scene.blocksInput = true;
-        return true;
     });
 }
 

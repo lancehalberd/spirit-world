@@ -100,7 +100,7 @@ export class ScriptScene implements GameScene {
                     if (event.waitingOnActiveEvents && !activeEventCountSinceLastWaitEvent) {
                         break;
                     }
-                    if (event.callback && !event.callback(state, state.time - event.time)) {
+                    if (event.callback && !event.callback(state, state.time - event.time, this)) {
                         break;
                     }
                     let finished = false;
@@ -137,7 +137,7 @@ export class ScriptScene implements GameScene {
             //console.log('Running event', event.type, event);
             switch (event.type) {
                 case 'callback':
-                    if (event.callback(state)) {
+                    if (event.callback(state, this)) {
                         // Don't process the rest of the queue as long as callback
                         // returns a truthy value.
                         return;

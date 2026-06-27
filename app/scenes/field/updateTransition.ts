@@ -2,21 +2,14 @@ import {
     FRAME_LENGTH,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     FAST_FADE_IN_DURATION, FAST_FADE_OUT_DURATION,
-    GAME_KEY,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     MUTATE_DURATION, WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
-import {showPauseScene} from 'app/scenes/pause/pauseScene';
 import {updateCamera} from 'app/updateCamera';
-import {isKeyboardKeyDown, KEY, wasGameKeyPressed} from 'app/userInput';
 import {enterLocation} from 'app/utils/enterLocation';
 
 
 export function updateTransition(state: GameState) {
-    if (isKeyboardKeyDown(KEY.SHIFT) && wasGameKeyPressed(state, GAME_KEY.MENU)) {
-        showPauseScene(state);
-        return;
-    }
     state.transitionState.time += FRAME_LENGTH;
     if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
         if (state.hero.z > state.transitionState.nextLocation.z) {

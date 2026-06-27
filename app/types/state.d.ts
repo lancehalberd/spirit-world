@@ -125,7 +125,6 @@ interface GameState {
         // they will skip the cutscene.
         skipTime?: number
         onSkipCutscene?: (state: GameState) => void
-        blockPlayerUpdates?: boolean
         cameraTarget?: Point
     }
     isUsingKeyboard?: boolean

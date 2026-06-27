@@ -144,17 +144,14 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Move all scripts off of state onto modular scriptScene
-        - Figure out what to do for cut scenes
-            - Figure out what to do about showHUD+hideHUD
-        - Move appendCallback to appendBlockingCallback
-        - How to deal with blockPlayerUpdates
-            - set in runPlayerBlockingCallback
-            - set in waitForCamera, but this seems like this could just block player inputs, and possibly field updates.
-            - set in waitForInput, only used from textCueWithInput uses  uses this. This could just be blocking player input though.
-        - Check appendInputBlockingCallback works in peachCave cutscene and Jade Champion cutscenes
+    - Review and fix cutscene issues
+        - Hero gains control briefly after walking north.
+        - Hero gains control briefly after peach falls.
+    - Clone movement incorrect because it relies on clones being updated before the hero to change directions
+        - add a heading param to clones that is set any time you press the clone button based on relative rotation of clones to hero.
+            - heading is "forward"|"left"|"right"|"backward"
 
-        showMessage -> prependScript -> ScriptScene -> getLoot -> LootGetAnimation -> showLootMessage -> showMessage
+    - Check behavior of clones during each cutscene, consider despawning clones as part of prepareForCutScene or hideHUD.
 
 
     - Stream notes

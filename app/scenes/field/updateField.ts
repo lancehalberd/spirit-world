@@ -5,14 +5,13 @@ import {setEquippedElement} from 'app/utils/menu';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {addAmbientEffects} from 'app/scenes/field/addAmbientEffects';
-import {showPauseScene} from 'app/scenes/pause/pauseScene';
-import {showMapScene} from 'app/scenes/map/showMapScene';
+import {isFieldSceneActive, isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
 import {showMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
+import {showMapScene} from 'app/scenes/map/showMapScene';
 import {showMessage} from 'app/scriptEvents';
 import {wasGameKeyPressed} from 'app/userInput';
 import {updateAllHeroes} from 'app/updateActor';
 import {updateCamera} from 'app/updateCamera';
-import {KEY, isKeyboardKeyDown} from 'app/userInput';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {getCompositeBehaviors} from 'app/utils/getBehaviors';
 import {refreshAreaIce} from 'app/utils/refreshAreaIce';
@@ -32,22 +31,26 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
     }
     // If `refreshAreaLogic` started a transition effect, skip this update since we
     // don't want to perform field updates until the transition effect completes.
-    if (state.transitionState) {
+    if (state.transitionState || !isFieldSceneActive(state)) {
         return;
+    }
+    // Refreshing the area may have paused updates/interactions on the field that
+    // we should apply immediately to prevent the player from being able to take
+    // actions on unintended frames.
+    if (!isFieldSceneActive(state)) {
+        return;
+    }
+    if (interactive && !isFieldSceneInteractive(state)) {
+        interactive = false;
     }
     // The map isn't useful during boss rush so we use it to show a quit menu.
     if (interactive && state.bossRushState && wasGameKeyPressed(state, GAME_KEY.MAP)) {
         showMessage(state, '{@bossRushVanara.quitMenu}');
         return;
     }
-    if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-        if (isKeyboardKeyDown(KEY.SHIFT)) {
-            showPauseScene(state);
-            return;
-        } else if (interactive) {
-            showMainMenuScene(state);
-            return;
-        }
+    if (interactive && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        showMainMenuScene(state);
+        return;
     }
     if (interactive && wasGameKeyPressed(state, GAME_KEY.MAP)) {
         showMapScene(state);
@@ -91,7 +94,7 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
                 priorityObjects.splice(i--, 1);
                 continue;
             }
-            priorityObjects[i].update?.(state);
+            priorityObjects[i].update?.(state, interactive);
         }
         if (priorityObjects.length) {
             state.areaInstance.priorityObjects.push(priorityObjects);
@@ -108,13 +111,13 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
     }
     removeDefeatedEnemies(state, state.alternateAreaInstance);
     removeDefeatedEnemies(state, state.areaInstance);
-    updateAreaObjects(state, state.areaInstance);
+    updateAreaObjects(state, state.areaInstance, interactive);
     if (state.nextAreaInstance) {
-        updateAreaObjects(state, state.nextAreaInstance);
+        updateAreaObjects(state, state.nextAreaInstance, interactive);
     }
-    updateAreaObjects(state, state.alternateAreaInstance);
+    updateAreaObjects(state, state.alternateAreaInstance, interactive);
 }
-export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
+export function updateAreaObjects(this: void, state: GameState, area: AreaInstance, interactive: boolean) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
         return;
     }
@@ -173,7 +176,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         ) {
             continue;
         }
-        object.update?.(state);
+        object.update?.(state, interactive);
         if (object.area && !object.ignorePits && object.getHitbox) {
             object.groundHeight = 0;
             const hitbox = object.getHitbox();
@@ -258,7 +261,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         ) {
             continue;
         }
-        effect.update?.(state);
+        effect.update?.(state, interactive);
     }
 }
 

@@ -18,3 +18,8 @@ export class AstralProjection extends Hero {
         this.z = 0;
     }
 }
+
+window.AstralProjection = AstralProjection;
+declare global {
+    export type AstralProjectionClass = typeof AstralProjection;
+}

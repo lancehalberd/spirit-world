@@ -1,9 +1,35 @@
 import {refreshAreaLogic} from 'app/content/areas';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {appendCallback, appendScript, appendTextCueWithInput, hideHUD, resetCamera, appendInputBlockingCallback, showHUD, waitForCamera} from 'app/scriptEvents';
+import {
+    appendCallback,
+    appendDisableUpdatesForTargets,
+    appendEnableUpdatesForTargets,
+    appendInputBlockingCallback,
+    appendScript,
+    appendTextCueWithInput,
+    hideHUD,
+    appendResetAndWaitForCamera,
+    showHUD,
+    appendWaitForCamera,
+} from 'app/scriptEvents';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
+// import {updateHero} from 'app/updateActor';
+
+function appendKnockHero(state: GameState) {
+    appendCallback(state, (state: GameState) => {
+        state.hero.action = 'knocked';
+        state.hero.vx = -0.5 * directionMap[state.hero.d][0];
+        state.hero.vy = -0.5 * directionMap[state.hero.d][1];
+        state.hero.vz = 2;
+    });
+    appendInputBlockingCallback(state, (state: GameState) => {
+        //updateHero(state, state.hero, false);
+        return state.hero.action === 'knocked';
+    });
+    appendScript(state, '{wait:400');
+}
 
 specialBehaviorsHash.peachCave = {
     type: 'area',
@@ -19,7 +45,6 @@ specialBehaviorsHash.peachCave = {
     onRefreshLogic(state: GameState, area: AreaInstance) {
         // After the peach tree dies, it has the same behavior as other peach trees,
         // which are all dead when you initially find them.
-
         let peachTree: PeachTree|undefined;
         for (const object of area.objects) {
             if (object instanceof PeachTree) {
@@ -60,13 +85,10 @@ specialBehaviorsHash.peachCave = {
                     delete peachTree.specialStatus;
                 });
                 // Hero jumps back a bit in surprise at the bushes being destroyed
-                appendCallback(state, (state: GameState) => {
-                    state.hero.action = 'knocked';
-                    state.hero.vx = -0.5 * directionMap[state.hero.d][0];
-                    state.hero.vy = -0.5 * directionMap[state.hero.d][1];
-                    state.hero.vz = 2;
-                });
-                appendScript(state, '{wait:800');
+                appendKnockHero(state);
+                // Disable updates on the hero while the script moves them.
+                // TODO: Check if this needs to be for hero+clones
+                appendDisableUpdatesForTargets(state, [state.hero]);
                 // Move the player to a good y position before talking to the tree.
                 appendInputBlockingCallback(state, (state: GameState) => {
                     state.camera.speed = 1;
@@ -88,15 +110,10 @@ specialBehaviorsHash.peachCave = {
                     }
                     return true;
                 });
-                waitForCamera(state);
+                appendEnableUpdatesForTargets(state, [state.hero]);
+                appendWaitForCamera(state);
                 appendTextCueWithInput(state, 'Thank you for saving me.');
-                appendCallback(state, (state: GameState) => {
-                    state.hero.action = 'knocked';
-                    state.hero.vx = -0.5 * directionMap[state.hero.d][0];
-                    state.hero.vy = -0.5 * directionMap[state.hero.d][1];
-                    state.hero.vz = 2;
-                });
-                appendScript(state, '{wait:500}');
+                appendKnockHero(state);
                 appendScript(state, `"Woah, is this a magic tree?"`);
                 appendTextCueWithInput(state, `I don't have much time, ...those creatures...`);
                 appendTextCueWithInput(state, `Please warn the Vanara`);
@@ -122,12 +139,12 @@ specialBehaviorsHash.peachCave = {
                 appendScript(state, '{flag:peachCaveTreeDied}{stopTrack}');
                 // Wait for the area to finish refreshing before resetting the camera and showing the HUD.
                 appendInputBlockingCallback(state, (state: GameState) => {
-                    if (state.nextAreaInstance) {
+                    if (state.nextAreaInstance || state.transitionState) {
                         return true;
                     }
                     return false;
                 });
-                resetCamera(state);
+                appendResetAndWaitForCamera(state);
                 showHUD(state);
             }
         } else if (peachTree) {

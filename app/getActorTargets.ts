@@ -1,4 +1,3 @@
-import {Hero} from 'app/content/hero';
 import {isPixelInShortRect} from 'app/utils/index';
 import {getObjectBehaviors, getObjectAndParts} from 'app/utils/objects';
 import {moveObject} from 'app/movement/moveObject';
@@ -91,7 +90,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
                 continue;
             }
             // thrown clones are not interactive or solid.
-            if (object instanceof Hero && object.action === 'thrown') {
+            if (object instanceof window.Hero && object.action === 'thrown') {
                 continue;
             }
             const hitbox = object.getHitbox();

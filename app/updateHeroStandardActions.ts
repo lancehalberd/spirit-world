@@ -2,7 +2,6 @@ import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {HeldChakram} from 'app/content/effects/thrownChakram';
 import {setEquippedBoots} from 'app/utils/menu';
 import {CloneExplosionEffect} from 'app/content/effects/CloneExplosionEffect';
-import {AstralProjection} from 'app/content/objects/astralProjection';
 import {allTiles} from 'app/content/tiles';
 import {zones} from 'app/content/zones';
 import {EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS} from 'app/gameConstants';
@@ -353,7 +352,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (hero.savedData.passiveTools.astralProjection && hero.area.alternateArea) {
                     // Astral projection cannot be summoned when spirit sight radius is limited by obstacles.
                     if (!hero.astralProjection && hero.maxSpiritRadius === MAX_SPIRIT_RADIUS) {
-                        hero.astralProjection = new AstralProjection(state, hero);
+                        hero.astralProjection = new window.AstralProjection(state, hero);
                         addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
                     }
                 }

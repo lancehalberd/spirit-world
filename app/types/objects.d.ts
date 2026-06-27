@@ -78,6 +78,9 @@ interface BaseFieldInstance {
     // Set this to true to always update this every frame even when the hero is meditating.
     neverSkipFrames?: boolean
     getDrawPriority?: (state: GameState) => DrawPriority
+    update?: (state: GameState, interactive: boolean) => void
+    // Temporary place to store the update method when disabling it.
+    disabledUpdate?: (state: GameState, interactive: boolean) => void
     render: (context: CanvasRenderingContext2D, state: GameState) => void
     // This has reduced opacity when objects have high z value.
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
@@ -178,7 +181,6 @@ interface ObjectInstance extends BaseFieldInstance {
     // When the hero grabs an object and attempts to move.
     onPull?: (state: GameState, direction: Direction, hero: Hero) => void
     pullingHeroDirection?: Direction
-    update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
     isAllyTarget?: boolean
@@ -212,7 +214,6 @@ interface EffectInstance extends BaseFieldInstance {
     getYDepth?: () => number
     // The calculated yDepth for the object. This is update once per frame before rendering.
     yDepth?: number
-    update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
     isAllyTarget?: boolean

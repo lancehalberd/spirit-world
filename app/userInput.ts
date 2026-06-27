@@ -286,9 +286,9 @@ export function getMovementDeltas(state: GameState, force = false): [number, num
     if (editingState && (isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND))) {
         return [0, 0];
     }
-    if (!force/* && state.scriptEvents.blocksInput*/) {
+    /*if (!force && state.scriptEvents.blocksInput) {
         return [0, 0];
-    }
+    }*/
     const { gameKeyValues } = state.keyboard;
     let dy = gameKeyValues[GAME_KEY.DOWN] - gameKeyValues[GAME_KEY.UP];
     if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
@@ -301,9 +301,9 @@ export function getMovementDeltas(state: GameState, force = false): [number, num
 }
 
 export function getCloneMovementDeltas(state: GameState, hero: Hero, force = false): [number, number] {
-    if (!force/* && state.scriptEvents.blocksInput*/) {
+    /*if (!force && state.scriptEvents.blocksInput) {
         return [0, 0];
-    }
+    }*/
     const [dx, dy] = getMovementDeltas(state, force);
     const controlledHero = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero;
     if (controlledHero.d === hero.d) {

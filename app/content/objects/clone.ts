@@ -1,15 +1,18 @@
-import { FieldAnimationEffect, splashAnimation } from 'app/content/effects/animationEffect';
-import { Hero } from 'app/content/hero';
+import {FieldAnimationEffect, splashAnimation} from 'app/content/effects/animationEffect';
+import {Hero} from 'app/content/hero';
 
-import { renderHeroShadow } from 'app/renderActor';
-import { destroyClone } from 'app/utils/destroyClone';
-import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateCardinalDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
+import {renderHeroShadow} from 'app/renderActor';
+import {destroyClone} from 'app/utils/destroyClone';
+import {carryMap, directionMap, directionToLeftRotationsFromRight, rotateCardinalDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
 
 
 export class Clone extends Hero {
     canPressSwitches = true;
+    // Rotation offset relative to the hero that gets set when this clone is picked up.
     carryRotationOffset: number;
+    // Rotation offset relative to the hero that gets set any time the clone tool button is pressed.
+    rotationOffset: number;
     ignorePits = true;
     cannotSwapTo = false;
     uncontrollable = false;
@@ -40,7 +43,7 @@ export class Clone extends Hero {
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         renderHeroShadow(context, state, this);
     }
-    update(state: GameState) {
+    update(state: GameState, interactive?: boolean) {
         if (this.carrier) {
             if (this.carrier.area === this.area) {
                 this.updateCoords(state);
@@ -53,7 +56,9 @@ export class Clone extends Hero {
         }
         if (this.swimming && (this.isUncontrollable || state.hero.savedData.equippedBoots === 'ironBoots')) {
             this.drown(state);
+            return;
         }
+        super.update(state, interactive);
     }
     drown(state: GameState) {
         const hitbox = this.getHitbox();
@@ -81,4 +86,9 @@ export class Clone extends Hero {
         this.z = -offset.y;
         this.d = rotateCardinalDirection(this.carrier.d, this.carryRotationOffset);
     }
+}
+
+window.Clone = Clone;
+declare global {
+    export type CloneClass = typeof Clone;
 }

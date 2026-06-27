@@ -107,7 +107,7 @@ export const nimbusCloudMenuOption: MenuElement = {
     },
     onSelect(state: GameState, toolIndex?: number) {
         showMessage(state, '{@nimbusCloud.chooseDestination}');
-        return true;
+        return false;
     },
     onUpgrade(state: GameState) {
         state.hero.savedData.passiveTools.nimbusCloud = (state.hero.savedData.passiveTools.nimbusCloud + 1) % 2;
@@ -203,7 +203,7 @@ const returnMenuOption: MenuElement = {
     },
     onSelect(state: GameState, toolIndex?: number) {
         showMessage(state, '{@nimbusCloud.returnMenu}');
-        return true;
+        return false;
     },
 };
 
@@ -216,7 +216,7 @@ const helpMenuOption: MenuElement = {
     },
     onSelect(state: GameState, toolIndex?: number) {
         showHint(state);
-        return true;
+        return false;
     },
 };
 

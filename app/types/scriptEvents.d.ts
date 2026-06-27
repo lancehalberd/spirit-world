@@ -70,7 +70,7 @@ interface WaitScriptEvent {
     // If this is true player input will be blocked while this event is active.
     blocksInput?: boolean
     // If defined, wait will end once this callback returns false.
-    callback?: (state: GameState, waitTime: number) => boolean
+    callback?: (state: GameState, waitTime: number, scene: ScriptScene) => boolean
     // If this is set the event is cleared after duration milliseconds.
     duration?: number
     // Any game keys set here will clear this event.
@@ -100,7 +100,7 @@ interface SetFlagScriptEvent {
 }
 interface CallbackScriptEvent {
     type: 'callback'
-    callback: (state: GameState) => void|boolean
+    callback: (state: GameState, scene: ScriptScene) => void|boolean
 }
 interface ClearFlagScriptEvent {
     type: 'clearFlag'

@@ -140,7 +140,7 @@ export class StaffTower implements ObjectInstance {
         }
         return hitbox;
     }
-    update(state: GameState) {
+    update(state: GameState, interactive: boolean) {
         this.animationTime += FRAME_LENGTH;
         if (this.specialStatus === 'deploying') {
             state.hero.isControlledByObject = true;
@@ -191,7 +191,7 @@ export class StaffTower implements ObjectInstance {
         } else {
             // Do not update the door during the animations, it might overlap the character
             // and trigger entering the door.
-            this.door.update(state);
+            this.door.update(state, interactive);
         }
         // Need to udpate the door during animations that move the tower.
         this.door.x = this.x + 70;

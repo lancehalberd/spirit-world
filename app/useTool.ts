@@ -1,14 +1,12 @@
-import { playAreaSound } from 'app/musicController';
-import { isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased } from 'app/userInput';
-import { Arrow } from 'app/content/effects/arrow';
-import { Clone }  from 'app/content/objects/clone';
-import { gameModifiers, GAME_KEY } from 'app/gameConstants';
-import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
-import { addEffectToArea } from 'app/utils/effects';
-import { getChargeLevelAndElement, getElement } from 'app/utils/getChargeLevelAndElement';
-import { addObjectToArea } from 'app/utils/objects';
-import { swapHeroStates } from 'app/utils/swapHeroStates';
-
+import {playAreaSound} from 'app/musicController';
+import {isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased} from 'app/userInput';
+import {Arrow} from 'app/content/effects/arrow';
+import {gameModifiers, GAME_KEY} from 'app/gameConstants';
+import {directionMap, getDirection, rotateDirection} from 'app/utils/direction';
+import {addEffectToArea} from 'app/utils/effects';
+import {getChargeLevelAndElement, getElement} from 'app/utils/getChargeLevelAndElement';
+import {addObjectToArea} from 'app/utils/objects';
+import {swapHeroStates} from 'app/utils/swapHeroStates';
 
 
 export function useTool(
@@ -189,7 +187,7 @@ export function useTool(
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
-                const clone = new Clone(state.hero);
+                const clone = new window.Clone(state.hero);
                 state.hero.clones.push(clone);
                 addObjectToArea(state, state.areaInstance, clone);
                 clone.isUncontrollable = true;
@@ -209,7 +207,7 @@ export function useTool(
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
                 for (let i = 0; i < maxClones && i < state.hero.life - 1; i++) {
-                    const clone = new Clone(state.hero);
+                    const clone = new window.Clone(state.hero);
                     state.hero.clones.push(clone);
                     addObjectToArea(state, state.areaInstance, clone);
                     // Switch to the new clone immediately

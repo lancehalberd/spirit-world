@@ -29,12 +29,12 @@ function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedS
                     applySavedState(state, cloneDeep(spawnLocations[name].savedState));
                 }
                 cleanState(state);
+                showFieldScene(state);
                 setSpawnLocation(state, spawnLocations[name].location);
                 returnToSpawnLocation(state);
                 if (spawnLocations[name].savedState.savedHeroData.life) {
                     state.hero.life = spawnLocations[name].savedState.savedHeroData.life;
                 }
-                showFieldScene(state);
             }
         }
     });

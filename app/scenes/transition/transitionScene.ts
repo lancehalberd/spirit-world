@@ -1,6 +1,4 @@
-import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
-import {showPauseScene} from 'app/scenes/pause/pauseScene';
-import {KEY, isKeyboardKeyDown, wasGameKeyPressed} from 'app/userInput';
+import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH} from 'app/gameConstants';
 import {createCanvasBuffer, drawCanvas, mainCanvas} from 'app/utils/canvas';
 import {removeElementFromArray} from 'app/utils/index';
 
@@ -20,8 +18,6 @@ interface TransitionProps {
     onSwitch?: (state: GameState, transitionScene: TransitionScene) => void
 }
 
-// This simple pause scene will display when the player attempts to pause the game when
-// the field menu should not be displayed.
 export class TransitionScene implements GameScene {
     blocksInput = true;
     blocksRenders = false;
@@ -30,9 +26,6 @@ export class TransitionScene implements GameScene {
     props: TransitionProps
     transitionTime = 0;
     update(state: GameState, interactive: boolean) {
-        if (interactive && wasGameKeyPressed(state, GAME_KEY.MENU) && isKeyboardKeyDown(KEY.SHIFT)) {
-            showPauseScene(state);
-        }
         this.transitionTime += FRAME_LENGTH;
         const hideDuration = this.props.duration / 2;
         // Switch the scene stack at the halfway mark.

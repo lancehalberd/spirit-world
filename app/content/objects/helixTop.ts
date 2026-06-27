@@ -63,9 +63,9 @@ export class HelixTop implements ObjectInstance {
         // Currently this is relative to the top of the image
         return this.y + helixTopFrame.content.h;
     }
-    update(state: GameState) {
+    update(state: GameState, interactive: boolean) {
         this.door.area = this.area;
-        this.door.update(state);
+        this.door.update(state, interactive);
     }
     // Make sure door area gets set as soon as this object is added to an area.
     onInitialize(state: GameState, isActiveArea: boolean) {

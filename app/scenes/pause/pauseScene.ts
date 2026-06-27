@@ -37,3 +37,6 @@ const pauseScene = new PauseScene();
 export function showPauseScene(state: GameState) {
     pushScene(state, pauseScene);
 }
+export function isGamePaused(state: GameState) {
+    return state.sceneStack.includes(pauseScene)
+}

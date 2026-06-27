@@ -1,13 +1,21 @@
 
 interface IElectronAPI {
-  loadPreferences: () => Promise<void>,
+  loadPreferences: () => Promise<void>
 }
 
 interface Window {
   version: string
   electronAPI: IElectronAPI
   newScriptScene: () => ScriptScene
-  [key: string]: any;
+  // Hack to avoid certain circular imports that are difficult to resolve.
+  // Importing some classes results in circular dependencies that seem intractible.
+  // Moving the classes to window allows instantiating and checking instanceof without
+  // direct imports.
+  AstralProjection: AstralProjectionClass
+  Clone: CloneClass
+  Enemy: EnemyClass
+  Hero: HeroClass
+  [key: string]: any
 }
 
 type Collection<T> = {[key:string]: T} | Array<T> | Set<T>;

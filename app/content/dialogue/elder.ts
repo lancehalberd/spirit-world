@@ -6,13 +6,13 @@ import {
     hideHUD, appendUpdateBlockingCallback, showHUD, wait
 } from 'app/scriptEvents';
 import {appendCallback, appendScript, appendScriptEvents} from 'app/scriptEvents';
-import {updateGenericHeroState} from 'app/updateActor';
 import {faceTarget} from 'app/utils/actor';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
-import {saveGame} from 'app/utils/saveGame';
 import {moveEnemyToTargetLocation} from 'app/utils/enemies';
+import {updateGenericHeroState} from 'app/utils/hero';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {addObjectToArea, removeObjectFromArea, removeObjectFromAreaById} from 'app/utils/objects';
+import {saveGame} from 'app/utils/saveGame';
 
 
 function getRivalBoss(state: GameState): Enemy {

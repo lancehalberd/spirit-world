@@ -9,8 +9,9 @@ import {getChargedArrowAnimation} from 'app/content/effects/arrow';
 import {ThrownObject} from 'app/content/effects/thrownObject';
 import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
+import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
+import {getLedgeDelta} from 'app/movement/getLedgeDelta'
 import {playAreaSound} from 'app/musicController';
-
 import {getSpiritFrame} from 'app/render/astralProjectionAnimations';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
@@ -32,6 +33,8 @@ import {
 } from 'app/renderActor';
 import {getDefaultSavedState} from 'app/savedState'
 import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
+import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
+import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
 import {getCloneMovementDeltas} from 'app/userInput';
 import {drawFrameAt, getFrame} from 'app/utils/animations';
 import {destroyClone} from 'app/utils/destroyClone';
@@ -39,7 +42,9 @@ import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {trackEnemyDealtDamage} from 'app/utils/enemyDamageTracking';
 import {directionMap, getDirection} from 'app/utils/field';
 import {getChargeLevelAndElement, getElement} from 'app/utils/getChargeLevelAndElement';
+import {updateGenericHeroState} from 'app/utils/hero';
 import {boxesIntersect, clamp, cloneDeep, mergeDeep} from 'app/utils/index';
+import {getTargetingAnchor} from 'app/utils/target';
 
 const throwSpeed = 6;
 
@@ -1098,9 +1103,94 @@ export class Hero implements Actor {
             this.magicRegenCooldownLimit * gameModifiers.spiritEnergyCooldown,
         );
     }
+
+    update(state: GameState, interactive?: boolean) {
+        // Don't update the hero if they aren't currently in any area.
+        if (!this.area) {
+            return;
+        }
+        this.justRespawned = false;
+        // If the hero is performing some special action with logic that overrides default actions,
+        // for example, falling into a pit, or transitioning between screens, this function will handle
+        // the update and return `true`, indicating that normal behavior should be suspended.
+        const blockNormalActions = updateHeroSpecialActions(state, this, interactive);
+        if (!blockNormalActions) {
+            // This update relates to hero performing or completing actions + movement.
+            updateHeroStandardActions(state, this, interactive);
+            if (!this.area) {
+                return;
+            }
+            checkForEnemyDamage(state, this);
+            // Mostly don't check for pits/damage when the player cannot control themselves
+            if (!this.isAstralProjection) {
+                checkForFloorEffects(state, this);
+            }
+        }
+        // Currently unused as we have removed the particles from the clone explosion charge effect, but we might add it back later.
+        //updateHeroVisualEffects;//(state, hero);
+        updateGenericHeroState(state, this, interactive);
+    }
+}
+
+
+function checkForEnemyDamage(state: GameState, hero: Hero) {
+    if (hero.action === 'roll' || hero.action === 'getItem' || hero.invulnerableFrames > 0 || state.hero.isInvisible) {
+        return;
+    }
+    if (!hero.area) {
+        debugger;
+    }
+    const heroHitbox = hero.getHitbox();
+    for (const enemy of hero.area.objects) {
+        if (!(enemy instanceof window.Enemy) || enemy.invulnerableFrames > 0
+            || enemy.status === 'hidden' || enemy.status === 'gone' || enemy.status === 'off'
+            || enemy.mode === 'hidden'
+            || enemy.isDefeated
+        ) {
+            continue;
+        }
+        const touchHit = enemy.enemyDefinition.touchDamage
+            ? { damage: enemy.enemyDefinition.touchDamage } : enemy.touchHit;
+        if (!touchHit) {
+            continue;
+        }
+        const enemyHitbox = enemy.getTouchHitbox();
+        if (boxesIntersect(heroHitbox, enemyHitbox)
+            && getLedgeDelta(state, hero.area, hero.getAnchorPoint(), getTargetingAnchor(enemy)) === 0
+        ) {
+            let dx = (heroHitbox.x + heroHitbox.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
+            let dy = (heroHitbox.y + heroHitbox.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);
+            if (!dx && !dy) {
+                dx = -directionMap[hero.d][0];
+                dy = -directionMap[hero.d][1];
+            } else {
+                const mag = Math.sqrt(dx*dx + dy*dy);
+                dx /= mag;
+                dy /= mag;
+            }
+            const hitResult = hero.onHit(state, {
+                ...touchHit,
+                source: enemy,
+                knockback: {
+                    // vx: - 4 * directionMap[hero.d][0],
+                    // vy: - 4 * directionMap[hero.d][1],
+                    vx: 4 * dx,
+                    vy: 4 * dy,
+                    vz: 2,
+                },
+            });
+
+            if (hitResult.returnHit) {
+                enemy.onHit(state, hitResult.returnHit);
+            } else if (hitResult.knockback) {
+                enemy.knockBack(state, hitResult.knockback);
+            }
+        }
+    }
 }
 
 class _Hero extends Hero {}
 declare global {
     export interface Hero extends _Hero {}
+    export type HeroClass = typeof Hero
 }

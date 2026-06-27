@@ -24,7 +24,7 @@ export class DefeatedScene implements GameScene {
         this.time += FRAME_LENGTH;
         for (const effect of state.areaInstance.effects) {
             if (effect.drawPriority === 'background-special' || effect.drawPriority === 'foreground-special') {
-                effect.update?.(state);
+                effect.update?.(state, false);
             }
         }
         if (this.time === 1000) {

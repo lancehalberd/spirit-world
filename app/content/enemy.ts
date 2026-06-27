@@ -1229,7 +1229,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
 objectHash.enemy = Enemy;
 objectHash.boss = Enemy;
 
+window.Enemy = Enemy;
+
 class _Enemy<T> extends Enemy<T> {}
 declare global {
     export interface Enemy<T=any> extends _Enemy<T> {}
+    export type EnemyClass = typeof Enemy;
 }

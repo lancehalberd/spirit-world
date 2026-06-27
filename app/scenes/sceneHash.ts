@@ -30,6 +30,7 @@ interface AllScenes {
 
 // Each scene
 export const sceneHash = {} as AllScenes;
+window.sceneHash = sceneHash;
 
 export function isSceneTypeInStack(state: GameState, sceneType: string) {
     for (const scene of state.sceneStack) {
