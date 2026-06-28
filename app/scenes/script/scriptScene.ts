@@ -31,6 +31,11 @@ export class ScriptScene implements GameScene {
         let activeEventCountSinceLastWaitEvent = 0;
         let blockEventQueue = false;
         updateSkipCutscene(state, this);
+        // If a cutscene is skipped, this script scene will have been removed and
+        // should no longer process any events.
+        if (!state.sceneStack.includes(this)) {
+            return;
+        }
         for (const event of currentActiveEvents) {
             switch (event.type) {
                 case 'update': {
@@ -196,8 +201,9 @@ export class ScriptScene implements GameScene {
                     const script = randomizedScript ?? dialogueSet.mappedOptions[event.scriptKey];
                     prependScript(state, script, this);
                     // Block the player input so that the player doesn't move during the frame the event queue is blocked.
-                    this.blocksInput = true;
-                    return;
+                    //this.blocksInput = true;
+                    //return;
+                    break;
                 case 'attemptPurchase':
                     if (event.cost <= state.hero.savedData.money) {
                         state.hero.savedData.money -= event.cost;
@@ -205,8 +211,11 @@ export class ScriptScene implements GameScene {
                     } else {
                         followMessagePointer(state, event.failScript, this);
                     }
+                    // I don't think this comment is correct, to avoid awkward scripting gaps, we should
+                    // immediately process any events that were added when followMessagePointer was called:
                     // Since this overwrites remaining events, don't continue processing events this frame.
-                    return;
+                    //return;
+                    break;
                 case 'rest':
                     state.transitionState = {
                         callback() {
