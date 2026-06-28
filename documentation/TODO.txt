@@ -145,7 +145,7 @@ Graphics to Implement:
 
 Current tasks:
     - Review and fix cutscene issues
-        - Elder rescue is showing text before movement completes.
+        - Appears possible to show text after skipping cutscene if you skip on the exact wrong frame.
     - Clone movement incorrect because it relies on clones being updated before the hero to change directions
         - add a heading param to clones that is set any time you press the clone button based on relative rotation of clones to hero.
             - heading is "forward"|"left"|"right"|"backward"

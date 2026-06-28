@@ -58,57 +58,41 @@ export function appendEnableUpdatesForTargets(state: GameState, targets: Target[
 // it returns false.
 // This does not block updates or inputs for the reset of the scene stack.
 export function appendScriptBlockingCallback(state: GameState, updateCallback: (state: GameState, scene: ScriptScene) => boolean) {
-    appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        prependScriptEvents(state, [{
-            type: 'update',
-            update: updateCallback,
-        },{
-            type: 'wait',
-            waitingOnActiveEvents: true,
-        }]);
-        // Make sure no other scripts are processed until this finishes.
-        return true;
-    });
+    appendScriptEvents(state, [{
+        type: 'update',
+        update: updateCallback,
+    },{
+        type: 'wait',
+        waitingOnActiveEvents: true,
+    }]);
 }
 
 // Append an event to the script queue that will run an update function blocking further script events in the queue until
 // it returns false.
 // This blocks updates for the rest of the scene stack entirely.
 export function appendUpdateBlockingCallback(state: GameState, updateCallback: (state: GameState, scene: ScriptScene) => boolean) {
-    appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        prependScriptEvents(state, [{
-            type: 'update',
-            update: updateCallback,
-        },{
-            type: 'wait',
-            waitingOnActiveEvents: true,
-            blocksUpdates: true,
-        }]);
-        // Make sure these block field updates as soon as this is appended and not on the next frame.
-        scene.blocksUpdates = true;
-        // Make sure no other scripts are processed until this finishes.
-        return true;
-    });
+    appendScriptEvents(state, [{
+        type: 'update',
+        update: updateCallback,
+    },{
+        type: 'wait',
+        waitingOnActiveEvents: true,
+        blocksUpdates: true,
+    }]);
 }
 
 // Append an event to the script queue that will run an update function blocking further script events in the queue until
 // it returns false.
 // This blocks inputs to the rest of the scene stack.
 export function appendInputBlockingCallback(state: GameState, updateCallback: (state: GameState) => boolean) {
-    appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        // These new events will be processed immediately this frame
-        // but the 'wait' action will prevent any further events from being processed.
-        prependScriptEvents(state, [{
-            type: 'update',
-            update: updateCallback,
-        },{
-            type: 'wait',
-            waitingOnActiveEvents: true,
-            blocksInput: true,
-        }], scene);
-        // Make sure these block player/field updates as soon as this is appended and not on the next frame.
-        scene.blocksInput = true;
-    });
+    appendScriptEvents(state, [{
+        type: 'update',
+        update: updateCallback,
+    },{
+        type: 'wait',
+        waitingOnActiveEvents: true,
+        blocksInput: true,
+    }]);
 }
 
 export function appendResetAndWaitForCamera(state: GameState) {
@@ -124,23 +108,20 @@ export function appendResetAndWaitForCamera(state: GameState) {
 }
 
 export function appendWaitForCamera(state: GameState) {
-    appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        // Wait to reset the camera speed until it has reached its default target again.
-        prependScriptEvents(state, [{
-            type: 'update',
-            update(state: GameState, scene: ScriptScene) {
-                const cameraTarget = getCameraTarget(state);
-                if (state.camera.x === cameraTarget.x && state.camera.y === cameraTarget.y) {
-                    return false;
-                }
-                return true;
-            },
-        },{
-            type: 'wait',
-            waitingOnActiveEvents: true,
-            blocksInput: true,
-        }], scene);
-    });
+    appendScriptEvents(state, [{
+        type: 'update',
+        update(state: GameState, scene: ScriptScene) {
+            const cameraTarget = getCameraTarget(state);
+            if (state.camera.x === cameraTarget.x && state.camera.y === cameraTarget.y) {
+                return false;
+            }
+            return true;
+        },
+    },{
+        type: 'wait',
+        waitingOnActiveEvents: true,
+        blocksInput: true,
+    }]);
 }
 
 export function parseScriptText(state: GameState, text: TextScript, blocksUpdates = true): ShowTextBoxScriptEvent[] {
@@ -163,7 +144,7 @@ export function showMessage(
     if (!message){
         return;
     }
-    prependScript(state, textScriptToString(state, message));
+    appendScript(state, textScriptToString(state, message));
 }
 
 // Shows a message box ignoring any additional scripting elements.
@@ -217,7 +198,7 @@ export function parseScriptAsTextPage(state: GameState, script: TextScript): Tex
 
 // All events to the front of the stack. These events may still be blocked by any active events in the current script scene.
 // Applies to the given script scene or appends a new script scene to the stack if none is provided.
-export function prependScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
+function prependScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
     if (!scriptScene) {
         scriptScene = new window.ScriptScene();
         state.sceneStack.push(scriptScene);

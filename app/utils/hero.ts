@@ -4,7 +4,7 @@ import {editingState} from 'app/development/editingState';
 import {FRAME_LENGTH, gameModifiers} from 'app/gameConstants';
 import {playAreaSound} from 'app/musicController';
 import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
-import {prependScript} from 'app/scriptEvents';
+import {appendScript} from 'app/scriptEvents';
 import {isToolButtonPressed} from 'app/useTool';
 import {isUnderwater} from 'app/utils/actor';
 import {removeAllClones} from 'app/utils/area';
@@ -166,7 +166,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         ) {
             state.hero.life = 0.01;
             // The elder rescues you from defeat by the rival if certain conditions are met.
-            prependScript(state, '{@elder.tombRescue}');
+            appendScript(state, '{@elder.tombRescue}');
         } else {
             showDefeatedScene(state);
         }
