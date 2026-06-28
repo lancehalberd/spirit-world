@@ -22,6 +22,7 @@ import {populateAllDialogue} from 'app/content/dialogue/dialogueList';
 import {getState} from 'app/state';
 import {updateMusic} from 'app/musicController';
 
+export * from 'app/content/objects/astralProjection';
 export * from 'app/content/objects/clone';
 
 export * from 'app/development/packFont';

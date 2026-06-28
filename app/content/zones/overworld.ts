@@ -5832,6 +5832,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:0x1-elementalFrost-0", logicKey: "frozenLake", x: 360, y: 64, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-elementalFrost-1", logicKey: "frozenLake", x: 404, y: 396, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-elementalFrost-2", logicKey: "frozenLake", x: 376, y: 284, type: "enemy", enemyType: "elementalFrost", d: "down", params: {}},
+        {status: "normal", id: "forestNorthEntranceSpirit", x: 112, y: 496, type: "door", style: "pathEntrance", targetZone: "forest", targetObjectId: "forestNorthEntranceSpirit", d: "down", mapIcon: "hidden"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 38, mapId: 'overworldSpirit', floorId: '1F', mapX: 0, mapY: 2},

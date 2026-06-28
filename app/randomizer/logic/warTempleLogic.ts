@@ -153,7 +153,7 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleKeyMarker',
         paths: [{nodeId: 'warTempleStairs2', logic: hasWeapon}],
-        checks: [{objectId: 'warTemple:1:1x0-smallKey-0', logic: hasWeapon}],
+        checks: [{objectId: 'warTempleSmallKey2', logic: hasWeapon}],
         entranceIds: ['warTempleKeyMarker'],
     },
     {

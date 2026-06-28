@@ -1,7 +1,7 @@
 import {
     andLogic, canCross2Gaps, canHitCrystalSwitches, canRemoveLightStones,
     hasCloudBoots, hasWeapon, hasCatEyes, hasIce, hasInvisibility,
-    hasMediumRange, hasBow, hasIronBoots, hasNimbusCloud,
+    hasMediumRange, hasBow, hasIronBoots, hasNimbusCloud, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
 
@@ -199,9 +199,19 @@ export const forestNodes: LogicNode[] = [
         paths: [
             {nodeId: 'forestTempleNorthwestTreeEntrance', logic: canCross2Gaps},
             {nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
+            {nodeId: 'forestNorthEntranceSpirit', logic: hasTeleportation},
         ],
         entranceIds: ['forestTempleNorthLadder'],
         exits: [{ objectId: 'forestTempleNorthLadder' }],
+    },
+    {
+        zoneId,
+        nodeId: 'forestNorthEntranceSpirit',
+        paths: [
+            {nodeId: 'forestTempleNorthLadder', logic: hasTeleportation},
+        ],
+        entranceIds: ['forestNorthEntranceSpirit'],
+        exits: [{ objectId: 'forestNorthEntranceSpirit' }],
     },
     {
         zoneId,

@@ -12,10 +12,15 @@ const ignoredZones = new Set([
 
 // This solves the same problem as ignoredZones except for
 // zones that are connected to outside zones.
+// TODO: Can we remove this list and the above list replace it with groups of zones
+// that are considered the same like forest+overworld, treeVillage+forestTemple,
+// and holySanctum+fireSanction+iceSanctum+lightningSanctum+holySanctumBack, tree+void?
 const disabledDoors = new Set([
     // Currently we do not randomize entrances between "outside" areas.
     'overworld:forestNorthEntrance',
     'forest:forestNorthEntrance',
+    'overworld:forestNorthEntranceSpirit',
+    'forest:forestNorthEntranceSpirit',
     'overworld:forestTowerEntrance',
     'forest:forestTowerEntrance',
     'overworld:forestEastEntrance',

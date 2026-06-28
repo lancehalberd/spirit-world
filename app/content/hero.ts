@@ -1196,6 +1196,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
     }
 }
 
+window.Hero = Hero;
 class _Hero extends Hero {}
 declare global {
     export interface Hero extends _Hero {}

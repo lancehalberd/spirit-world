@@ -42,7 +42,7 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
         const h = sectionHeights[i];
         if (i % 2 === 0) {
             singleZone.slots.unshift({
-                id: `slot-${i / 2}`,
+                id: `${singleZone.id}-slot-${i / 2}`,
                 x: innerRect.x,
                 y,
                 w: innerRect.w,
@@ -50,9 +50,9 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
                 d: 'up',
             });
         } else {
-            const targetId = `slot-${(i - 1) / 2}`;
+            const targetId = `${singleZone.id}-slot-${(i - 1) / 2}`;
             // The last set of paths are connected to the entrance.
-            const sourceId = (i + 1 < sectionCount) ? `slot-${(i + 1) / 2}` : 'entrance';
+            const sourceId = (i + 1 < sectionCount) ? `${singleZone.id}-slot-${(i + 1) / 2}` : 'entrance';
             paths.push({
                 targetId,
                 sourceId,
@@ -151,7 +151,7 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
         for (const slot of zone.slots) {
             nodesById[slot.id] = {
                 zoneId,
-                nodeId: `${zoneId}-${roomId}-${zone.id}-${slot.id}`,
+                nodeId: `${zoneId}-${roomId}-${slot.id}`,
                 checks: [],
                 paths: [],
             };

@@ -255,13 +255,25 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'spiritShopLightningBlessing' },
         ],
         paths: [
-            { nodeId: 'overworldMain', logic: canUseTeleporters },
-            { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
+            {nodeId: 'overworldMain', logic: canUseTeleporters},
+            {nodeId: 'mainSpiritWorld', logic: hasCloudBoots},
+            // The north entrance to the forest in the spirit world is blocked
+            // but it can still be reached using teleportation.
+            {nodeId: 'overworldNorthForestEntrance', logic: hasTeleportation},
             // It is not possible to move the large elephant statue out of the way
             // way with the Tower Staff.
             { nodeId: 'westSpiritWorldMountain', logic: hasMitts },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
+    },
+    {
+        zoneId,
+        nodeId: 'overworldNorthForestEntrance',
+        paths: [
+            {nodeId: 'westSpiritWorld', logic: hasTeleportation},
+        ],
+        entranceIds: ['forestNorthEntranceSpirit'],
+        exits: [{ objectId: 'forestNorthEntranceSpirit' }],
     },
     // This is the top of the cliffs east of the river.
     {
