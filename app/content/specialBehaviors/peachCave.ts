@@ -15,7 +15,6 @@ import {
 } from 'app/scriptEvents';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
-// import {updateHero} from 'app/updateActor';
 
 function appendKnockHero(state: GameState) {
     appendCallback(state, (state: GameState) => {

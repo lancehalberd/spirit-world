@@ -6,7 +6,6 @@ interface IElectronAPI {
 interface Window {
   version: string
   electronAPI: IElectronAPI
-  newScriptScene: () => ScriptScene
   // Hack to avoid certain circular imports that are difficult to resolve.
   // Importing some classes results in circular dependencies that seem intractible.
   // Moving the classes to window allows instantiating and checking instanceof without
@@ -15,6 +14,7 @@ interface Window {
   Clone: CloneClass
   Enemy: EnemyClass
   Hero: HeroClass
+  ScriptScene: ScriptSceneClass
   [key: string]: any
 }
 

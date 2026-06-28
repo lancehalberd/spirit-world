@@ -145,8 +145,7 @@ Graphics to Implement:
 
 Current tasks:
     - Review and fix cutscene issues
-        - Hero gains control briefly after walking north.
-        - Hero gains control briefly after peach falls.
+        - Elder rescue is showing text before movement completes.
     - Clone movement incorrect because it relies on clones being updated before the hero to change directions
         - add a heading param to clones that is set any time you press the clone button based on relative rotation of clones to hero.
             - heading is "forward"|"left"|"right"|"backward"

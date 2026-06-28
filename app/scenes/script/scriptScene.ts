@@ -11,59 +11,6 @@ import {clearObjectFlag, setObjectFlag} from 'app/utils/objectFlags';
 import {saveGame} from 'app/utils/saveGame';
 import {playSound, playTrack} from 'app/utils/sounds';
 
-/*class CallbackScene implements GameScene {
-    callback: (state: GameState, scene: CallbackScene) => boolean
-    update(state: GameState, interactive: boolean) {
-        // This event will continue running until the update returns false.
-        if (!this.callback(state, this)) {
-            removeElementFromArray(state.sceneStack, this);
-
-        }
-    }
-}*/
-
-/*class WaitScene implements GameScene {
-    blocksInput = false;
-    blocksUpdates = false;
-    duration: number = 0;
-    startTime: number = 0;
-    keys: number[] = [];
-    onComplete: (state: GameState) => void
-    removeScene(state: GameState) {
-        removeElementFromArray(state.sceneStack, this);
-        this.onComplete?.(state);
-    }
-    update(state: GameState, interactive: boolean) {
-        // This event will continue running until the update returns false.
-        if (this.duration && state.time - this.startTime >= this.duration) {
-            return this.removeScene(state);
-        }
-        //if (event.waitingOnActiveEvents && !activeEventCountSinceLastWaitEvent) {
-        //    return this.removeScene(state);
-        //}
-        //if (event.callback && !event.callback(state)) {
-        //    break;
-        //}
-        for (const gameKey of (this.keys || [])) {
-            if (wasGameKeyPressed(state, gameKey)) {
-                // We always block input on the same frame input was handled by the script.
-                // Note that this should still apply this frame even though the scene is removed
-                // from the stack because it is already being processed this frame.
-                this.blocksInput = true;
-                return this.removeScene(state);
-            }
-        }
-    }
-    // TODO: Not sure what to do with this one yet, should review all examples that use this.
-    // If this is true, this wait will be cleared once there are no active script events
-    // between it and any other 'wait' events.
-    // waitingOnActiveEvents?: boolean
-    // TODO: Probably going to move this to CallbackScene instead
-    // If defined, wait will end once this callback returns false.
-    //callback?: (state: GameState) => boolean
-}*/
-
-
 
 export class ScriptScene implements GameScene {
     sceneType = 'script';
@@ -305,9 +252,10 @@ export function clearScriptScenes(state: GameState) {
 
 // I prefer not to have circular imports, exporting this globally seems like
 // the simplest way to avoid circular dependencies like ScriptScene -> getLoot -> showLootMessage -> prependScript => new ScriptScene()
-window.newScriptScene = () => new ScriptScene();
+window.ScriptScene = ScriptScene;
 
 class _ScriptScene extends ScriptScene {}
 declare global {
     export interface ScriptScene extends _ScriptScene {}
+    export type ScriptSceneClass = typeof ScriptScene
 }

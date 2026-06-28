@@ -219,7 +219,7 @@ export function parseScriptAsTextPage(state: GameState, script: TextScript): Tex
 // Applies to the given script scene or appends a new script scene to the stack if none is provided.
 export function prependScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
     if (!scriptScene) {
-        scriptScene = window.newScriptScene();
+        scriptScene = new window.ScriptScene();
         state.sceneStack.push(scriptScene);
     }
     scriptScene.queue = [
@@ -243,7 +243,7 @@ export function appendScriptEvents(state: GameState, scriptEvents: ScriptEvent[]
         if (topStackItem.sceneType === 'script') {
             scriptScene = topStackItem as ScriptScene;
         } else {
-            scriptScene = window.newScriptScene();
+            scriptScene = new window.ScriptScene();
             state.sceneStack.push(scriptScene);
         }
     }
@@ -300,23 +300,12 @@ export function followMessagePointer(state: GameState, pointer: string, scriptSc
 
 
 function appendWaitForInput(state: GameState, duration = 0, scene?: ScriptScene) {
-    appendCallback(state, (state: GameState, scene: ScriptScene) => {
-        scene.activeEvents.push({
-            type: 'wait',
-            time: duration,
-            keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
-            blocksInput: true,
-        });
-        return true;
-    }, scene);
-    /*appendCallback(state, (state) => {
-        const waitScene = new WaitScene();
-        waitScene.startTime = state.time;
-        waitScene.duration = duration;
-        waitScene.keys = [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU];
-        waitScene.blocksInput = true;
-        return true;
-    });*/
+    appendScriptEvents(state, [{
+        type: 'wait',
+        duration,
+        keys: [GAME_KEY.WEAPON, GAME_KEY.PASSIVE_TOOL, GAME_KEY.MENU],
+        blocksInput: true,
+    }], scene);
 }
 
 export function appendTextCueWithInput(state: GameState, text: string, duration?: number, scene?: ScriptScene) {

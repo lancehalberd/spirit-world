@@ -33,6 +33,7 @@ import {
 } from 'app/renderActor';
 import {getDefaultSavedState} from 'app/savedState'
 import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
+import {isScriptSceneInStack} from 'app/scenes/script/scriptScene';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
 import {getCloneMovementDeltas} from 'app/userInput';
@@ -1108,6 +1109,9 @@ export class Hero implements Actor {
         // Don't update the hero if they aren't currently in any area.
         if (!this.area) {
             return;
+        }
+        if (interactive && isScriptSceneInStack(state)) {
+            console.log('interactive Hero.update while script scene is active.');
         }
         this.justRespawned = false;
         // If the hero is performing some special action with logic that overrides default actions,
