@@ -296,10 +296,15 @@ export function cutSceneWalkToLocation(
     const dx = x - anchor.x, dy = y - anchor.y;
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag <= 0.01) {
+        delete hero.defaultAction;
         return 0;
     }
     hero.d = getCardinalDirection(dx, dy, hero.d);
-    hero.action = 'walking';
+    if (hero.defaultAction !== 'walking') {
+        hero.defaultAction = 'walking';
+        delete hero.action;
+        hero.animationTime = 0;
+    }
     if (mag > speed) {
         hero.x += speed * dx / mag;
         hero.y += speed * dy / mag;
@@ -307,7 +312,7 @@ export function cutSceneWalkToLocation(
     }
     hero.x += dx;
     hero.y += dy;
-    delete hero.action;
+    delete hero.defaultAction;
     return 0;
 }
 

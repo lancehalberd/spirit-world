@@ -2,8 +2,10 @@ import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {showMessagePage} from 'app/scenes/message/messageScene';
 import {getCameraTarget} from 'app/utils/fixCamera';
 import {GAME_KEY} from 'app/gameConstants';
+import {wasGameKeyPressed} from 'app/userInput';
 import {parseMessage, textScriptToString} from 'app/utils/parseMessage';
 import {parseScriptEvents} from 'app/scenes/script/parseScriptEvents';
+import {cleanState} from 'app/utils/state';
 
 
 export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
@@ -22,6 +24,25 @@ export function showHUD(state: GameState) {
     });
 }
 
+function skipCutscene(state: GameState) {
+    const onSkipCutscene = state.cutscene.onSkipCutscene;
+    enableUpdatesForTargets(state, [...disabledUpdateTargets]);
+    cleanState(state);
+    onSkipCutscene?.(state);
+}
+
+export function updateSkipCutscene(state: GameState, scene?: ScriptScene): boolean {
+    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.cutscene.onSkipCutscene) {
+        if ((state.cutscene.skipTime ?? -2000) + 2000 > state.time) {
+            skipCutscene(state);
+            return true;
+        } else {
+            state.cutscene.skipTime = state.time;
+        }
+    }
+    return false;
+}
+
 export function wait(state: GameState, duration: number) {
     appendScriptEvents(state, [{
         type: 'wait',
@@ -29,6 +50,16 @@ export function wait(state: GameState, duration: number) {
         blocksUpdates: true,
     }]);
 }
+export function waitForTransition(state: GameState) {
+    appendInputBlockingCallback(state, (state: GameState) => {
+        if (state.nextAreaInstance || state.transitionState) {
+            return true;
+        }
+        return false;
+    });
+}
+
+const disabledUpdateTargets: Set<Target> = new Set();
 function noop() {}
 // Schedules a callback to disable updates on the given set of targets.
 export function appendDisableUpdatesForTargets(state: GameState, targets: Target[]) {
@@ -39,18 +70,23 @@ export function appendDisableUpdatesForTargets(state: GameState, targets: Target
                 // If update is an instance method, running `delete target.update` will just restore it to the instance method,
                 // so we need to assign something like a noop if we actually want to disable the function.
                 target.update = noop;
+                disabledUpdateTargets.add(target);
             }
         }
     });
 }
+function enableUpdatesForTargets(state: GameState, targets: Target[]) {
+    for (const target of targets) {
+        if (target.disabledUpdate) {
+            target.update = target.disabledUpdate;
+            delete target.disabledUpdate;
+            disabledUpdateTargets.delete(target);
+        }
+    }
+}
 export function appendEnableUpdatesForTargets(state: GameState, targets: Target[]) {
     appendCallback(state, (state: GameState) => {
-        for (const target of targets) {
-            if (target.disabledUpdate) {
-                target.update = target.disabledUpdate;
-                delete target.disabledUpdate;
-            }
-        }
+        enableUpdatesForTargets(state, targets);
     });
 }
 

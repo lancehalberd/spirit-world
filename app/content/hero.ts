@@ -77,6 +77,8 @@ export class Hero implements Actor {
     vz: number = 0;
     groundHeight = 0;
     d: CardinalDirection = 'down';
+    // If set the hero will revert to this action when action is falsey.
+    defaultAction?: Action
     action?: Action;
     actionDx?: number;
     actionDy?: number;
@@ -814,8 +816,9 @@ export class Hero implements Actor {
             return;
         }
         const hero = this;
+        const action = this.action || this.defaultAction;
         // 'sinkingInLava' action is currently unused, lava ground just does a lot of damage instead.
-        if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
+        if (action === 'falling' || action === 'sinkingInLava') {
 
             if (hero.isOverClouds) {
                 if (hero.animationTime < FRAME_LENGTH * cloudPoofAnimation.frameDuration) {
@@ -828,7 +831,7 @@ export class Hero implements Actor {
             }
             return;
         }
-        if (hero.action === 'fallen' || hero.action === 'sankInLava') {
+        if (action === 'fallen' || action === 'sankInLava') {
             return;
         }
         this.renderChargingBehind(context, state);
@@ -847,7 +850,7 @@ export class Hero implements Actor {
         if (shouldDrawBow && drawBowUnderHero) {
             this.renderBow(context, state, bowDirection);
         }
-        if (hero.action === 'usingStaff' && hero.d === 'up') {
+        if (action === 'usingStaff' && hero.d === 'up') {
             this.renderStaff(context, state, hero.d);
         }
         this.renderHeroFrame(context, state);
@@ -857,7 +860,7 @@ export class Hero implements Actor {
         if (shouldDrawBow && !drawBowUnderHero) {
             this.renderBow(context, state, bowDirection);
         }
-        if (hero.action === 'usingStaff' && hero.d !== 'up') {
+        if (action === 'usingStaff' && hero.d !== 'up') {
             this.renderStaff(context, state, hero.d);
         }
         if (hero.pickUpTile) {

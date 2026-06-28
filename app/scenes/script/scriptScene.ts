@@ -2,7 +2,7 @@ import {addTextCue, removeTextCue} from 'app/content/effects/textCue';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {getLoot} from 'app/content/effects/lootGetAnimation';
 import {showChoiceScene} from 'app/scenes/choice/showChoiceScene';
-import {hideMessagePage, showMessagePage, updateSkipCutscene} from 'app/scenes/message/messageScene';
+import {hideMessagePage, showMessagePage} from 'app/scenes/message/messageScene';
 import {isSceneTypeInStack} from 'app/scenes/sceneHash';
 import {followMessagePointer, prependScript} from 'app/scriptEvents';
 import {wasGameKeyPressed} from 'app/userInput';
@@ -30,7 +30,6 @@ export class ScriptScene implements GameScene {
         this.activeEvents = [];
         let activeEventCountSinceLastWaitEvent = 0;
         let blockEventQueue = false;
-        updateSkipCutscene(state, this);
         // If a cutscene is skipped, this script scene will have been removed and
         // should no longer process any events.
         if (!state.sceneStack.includes(this)) {

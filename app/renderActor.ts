@@ -31,6 +31,7 @@ export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak
 
 let lastPullAnimation: AnimationSet = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
+    const heroAction = hero.action || hero.defaultAction;
     let animations: ActorAnimations['idle'];
     const defeatedScene = getActiveDefeatedScene(state);
     if (defeatedScene) {
@@ -56,18 +57,18 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         if (grabAnimationTime < grabAnimation.duration) {
             return getFrame(grabAnimation, grabAnimationTime);
         }
-        if (hero.action === 'walking') {
+        if (heroAction === 'walking') {
             return getFrame(heroCarryAnimations.move[hero.d], hero.animationTime);
         }
         return getFrame(heroCarryAnimations.idle[hero.d], hero.animationTime);
     }
-    if (hero.explosionTime > 0 && hero.action !== 'thrown' && hero.action !== 'falling') {
+    if (hero.explosionTime > 0 && heroAction !== 'thrown' && heroAction !== 'falling') {
         if (hero.isUncontrollable) {
             return getFrame(heroAnimations.detonate.down, hero.explosionTime);
         }
         return getFrame(heroAnimations.detonate.down, hero.explosionTime);
     }
-    switch (hero.action) {
+    switch (heroAction) {
         case 'usingStaff':
             const jumpAnimation = heroAnimations.staffJump[hero.d];
             if (hero.animationTime < jumpAnimation.duration) {
@@ -182,8 +183,9 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
 }
 
 export function renderHeroBarrier(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
+    const heroAction = hero.action || hero.defaultAction;
     // Don't render the shield when the full player sprite isn't rendered.
-    if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
+    if (heroAction === 'falling' || heroAction === 'sinkingInLava') {
         return;
     }
     let frame = getFrame(spiritBarrierAnimation, state.fieldTime);
@@ -276,6 +278,7 @@ export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, 
     if (state.scene == 'bossRush') {
         return;
     }*/
+    const heroAction = hero.action || hero.defaultAction;
 
     if (hero.wading && !hero.swimming) {
         const frame = getFrame(wadingAnimation, hero.animationTime);
@@ -284,15 +287,15 @@ export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, 
     }
 
     if (!forceDraw && (
-        hero.action === 'fallen' || hero.action === 'falling'
-        || hero.action === 'sinkingInLava'  || hero.action === 'sankInLava'
-        || hero.action === 'climbing'
+        heroAction === 'fallen' || heroAction === 'falling'
+        || heroAction === 'sinkingInLava'  || heroAction === 'sankInLava'
+        || heroAction === 'climbing'
         || hero.swimming || hero.wading
     )) {
         return;
     }
     const z = Math.floor(hero.z - hero.groundHeight);
-    if (!isHeroFloating(state, hero) && hero.action !== 'knocked' && hero.savedData.equippedBoots === 'cloudBoots' && z >= 1 && z <= MAX_FLOAT_HEIGHT) {
+    if (!isHeroFloating(state, hero) && heroAction !== 'knocked' && hero.savedData.equippedBoots === 'cloudBoots' && z >= 1 && z <= MAX_FLOAT_HEIGHT) {
         context.save();
             context.translate((hero.x | 0) + 8, (hero.y | 0) + 13);
             context.scale(1, 0.5);

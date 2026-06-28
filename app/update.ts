@@ -1,8 +1,9 @@
 import {FRAME_LENGTH, GAME_KEY, isDebugMode} from 'app/gameConstants';
 import {initializeGame} from 'app/initialize';
 import {isGamePaused, showPauseScene} from 'app/scenes/pause/pauseScene';
-import {updateKeyboardState} from 'app/userInput';
+import {updateSkipCutscene} from 'app/scriptEvents';
 import {getState} from 'app/state';
+import {updateKeyboardState} from 'app/userInput';
 import {areAllImagesLoaded} from 'app/utils/images';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 import {KEY, isKeyboardKeyDown, wasGameKeyPressed} from 'app/userInput';
@@ -31,6 +32,12 @@ export function update() {
     if (isDebugMode && wasGameKeyPressed(state, GAME_KEY.MENU) && isKeyboardKeyDown(KEY.SHIFT) && !isGamePaused(state)) {
         // This is a noop if the game is already paused.
         showPauseScene(state);
+        return;
+    }
+    if (updateSkipCutscene(state)) {
+        // Do not process any updates on the same frame a cutscene was skipped just to be safe.
+        // At the very least we should block input on this frame to avoid opening the menu since the player
+        // pressed the MENU button this frame to skip the cutscene.
         return;
     }
     // Make a copy of the scene stack before processing it so that we ignore any updates to the scene stack

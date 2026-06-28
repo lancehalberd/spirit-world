@@ -16,6 +16,7 @@ export function cleanState(state: GameState) {
     state.hideHUD = false;
     delete state.camera.speed;
     delete state.hero.action;
+    delete state.hero.defaultAction;
     delete state.transitionState;
     removeTextCue(state);
     showFieldScene(state);

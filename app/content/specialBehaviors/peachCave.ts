@@ -1,10 +1,7 @@
 import {refreshAreaLogic} from 'app/content/areas';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
-import {FRAME_LENGTH} from 'app/gameConstants';
 import {
     appendCallback,
-    appendDisableUpdatesForTargets,
-    appendEnableUpdatesForTargets,
     appendInputBlockingCallback,
     appendScript,
     appendTextCueWithInput,
@@ -12,6 +9,7 @@ import {
     appendResetAndWaitForCamera,
     showHUD,
     appendWaitForCamera,
+    waitForTransition,
 } from 'app/scriptEvents';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {PeachTree} from 'app/content/objects/peachTree';
@@ -85,9 +83,6 @@ specialBehaviorsHash.peachCave = {
                 });
                 // Hero jumps back a bit in surprise at the bushes being destroyed
                 appendKnockHero(state);
-                // Disable updates on the hero while the script moves them.
-                // TODO: Check if this needs to be for hero+clones
-                appendDisableUpdatesForTargets(state, [state.hero]);
                 // Move the player to a good y position before talking to the tree.
                 appendInputBlockingCallback(state, (state: GameState) => {
                     state.camera.speed = 1;
@@ -95,11 +90,16 @@ specialBehaviorsHash.peachCave = {
                     const hero = state.hero;
                     if (hero.y === 136) {
                         hero.d = 'up';
-                        delete hero.action;
+                        delete hero.defaultAction;
                         return false;
                     }
-                    hero.action = 'walking';
-                    hero.animationTime += FRAME_LENGTH;
+                    // By default the hero action will be cleared every frame during its update.
+                    // Setting defaultAction will keep it in the walking animation when the action is falsey.
+                    if (hero.defaultAction !== 'walking') {
+                        delete hero.action;
+                        hero.defaultAction = 'walking';
+                        hero.animationTime = 0;
+                    }
                     if (hero.y < 136) {
                         hero.d = 'down';
                         hero.y = Math.min(hero.y + 1, 136);
@@ -109,7 +109,6 @@ specialBehaviorsHash.peachCave = {
                     }
                     return true;
                 });
-                appendEnableUpdatesForTargets(state, [state.hero]);
                 appendWaitForCamera(state);
                 appendTextCueWithInput(state, 'Thank you for saving me.');
                 appendKnockHero(state);
@@ -137,12 +136,7 @@ specialBehaviorsHash.peachCave = {
                 appendTextCueWithInput(state, `...the Fruit of Life.`);
                 appendScript(state, '{flag:peachCaveTreeDied}{stopTrack}');
                 // Wait for the area to finish refreshing before resetting the camera and showing the HUD.
-                appendInputBlockingCallback(state, (state: GameState) => {
-                    if (state.nextAreaInstance || state.transitionState) {
-                        return true;
-                    }
-                    return false;
-                });
+                waitForTransition(state);
                 appendResetAndWaitForCamera(state);
                 showHUD(state);
             }

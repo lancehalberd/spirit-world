@@ -2,7 +2,7 @@ import {addBurstEffect} from 'app/content/effects/animationEffect';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {cutSceneWalkToLocation} from 'app/movement/moveActor';
-import {appendCallback, appendScript, appendInputBlockingCallback, hideHUD, showHUD} from 'app/scriptEvents';
+import {appendCallback, appendScript, appendInputBlockingCallback, hideHUD, showHUD, waitForTransition} from 'app/scriptEvents';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {moveNPCToTargetLocation} from 'app/utils/npc';
 import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
@@ -150,6 +150,7 @@ dialogueHash.jadeChampionWarTemple = {
                     }
                 });
             });
+            waitForTransition(state);
             appendScript(state, '{playTrack:grandPriestTheme}{wait:100}');
             appendInputBlockingCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;
@@ -351,6 +352,7 @@ dialogueHash.jadeChampionWarTemple = {
                     },
                 });
             });
+            waitForTransition(state);
             appendScript(state, '{wait:700}');
             appendCallback(state, (state: GameState) => {
                 jadeChampion.animationTime += FRAME_LENGTH;

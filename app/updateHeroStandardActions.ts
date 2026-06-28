@@ -481,9 +481,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.actionDx = 0;
                 hero.actionDy = 0;
                 // The swimming animation doesn't restart when switching between stationary and moving.
-                if (!isFloating && !isSinking) {
-                    hero.animationTime = 0;
-                }
+                // This causes the hero to not animate while walking during cutscenes, and seems unnecessary
+                // since animation time is not significant when no action is set.
+                //if (!isFloating && !isSinking) {
+                //    hero.animationTime = 0;
+                //}
             }
         }
     }
@@ -495,7 +497,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
-            hero.animationTime = 0;
+            // This breaks walking animations during cutscenes and doesn't seem necessary since
+            // animationTime should be set to 0 when starting new actions.
+            // hero.animationTime = 0;
         }
     }
     if (hero.heldChakram?.area === hero.area && hero.action !== 'charging') {
@@ -509,7 +513,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     let velocityDecay = 0;
-    let moveEffectivness = 1;
+    let moveEffectiveness = 1;
     //let maxSpeed = 2.5;
     if (hero.bounce) {
         // This happens, for example when the hero hits an enemy while holding the chakram.
@@ -518,33 +522,33 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.bounce = null;
         } else {
             velocityDecay = 0.98;
-            moveEffectivness = 1 / 20;
+            moveEffectiveness = 1 / 20;
         }
     } else if (hero.slipping || hero.swimming || isFloating) {
         if (isFloating || hero.swimming) {
             // Max speed ~5/6, average handling.
             velocityDecay = 0.85;
-            moveEffectivness = 1 / 8;
+            moveEffectiveness = 1 / 8;
         } else if (hero.savedData.equippedBoots === 'cloudBoots') {
             if (hero.savedData.equipment.cloudBoots >= 2) {
                 // Max speed ~2, but better handling + acceleration
                 velocityDecay = 0.9;
-                moveEffectivness = 1 / 5;
+                moveEffectiveness = 1 / 5;
             } else {
                 // Max speed ~2
                 velocityDecay = 0.95;
-                moveEffectivness = 1 / 10;
+                moveEffectiveness = 1 / 10;
             }
         } else {
             // Max speed ~2.5, with very poor handling.
             velocityDecay = 0.99;
-            moveEffectivness = 1 / 40;
+            moveEffectiveness = 1 / 40;
         }
     }
     hero.vx *= velocityDecay;
     hero.vy *= velocityDecay;
-    hero.vx += dx * moveEffectivness;
-    hero.vy += dy * moveEffectivness;
+    hero.vx += dx * moveEffectiveness;
+    hero.vy += dy * moveEffectiveness;
 
     const minSpeed = hero.action === 'pushing' ? 2 : 0.2;
     // If dx/dy is set and the player is not moving backwards, make sure velocity is set high enough to trigger movement.
