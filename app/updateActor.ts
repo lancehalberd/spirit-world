@@ -52,8 +52,11 @@ export function updateAllHeroes(this: void, state: GameState, interactive: boole
     // Any time the tool button is pressed we recalculate the relative heading of each clone which will be used for controlling
     // the rotation applied to the controls for the clone until the clone button is pressed again.
     // This is what allows having each clone and hero move in different relative directions for the same controller input.
-    if (state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
-        // TODO: set the heading for each clone here based on its current direction relative to the hero.
+    state.hero.rotationOffset = 0;
+    if (state.hero.clones.length && wasToolButtonPressed(state, 'clone')) {
+        for (const clone of state.hero.clones) {
+            clone.updateRotationOffset(state);
+        }
     }
     // Destroy existing astral projection if it isn't in the right area.
     if (state.hero.astralProjection && state.hero.astralProjection.area !== state.hero.area.alternateArea) {

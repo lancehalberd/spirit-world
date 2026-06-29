@@ -144,14 +144,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Review and fix cutscene issues
-    - Clone movement incorrect because it relies on clones being updated before the hero to change directions
-        - add a heading param to clones that is set any time you press the clone button based on relative rotation of clones to hero.
-            - heading is "forward"|"left"|"right"|"backward"
-
-    - Check behavior of clones during each cutscene, consider despawning clones as part of prepareForCutScene or hideHUD.
-
-
     - Stream notes
         - Add "Drink potion" Yes/No dialogue box
         - Add Play Station controller icons.
@@ -174,6 +166,7 @@ Current tasks:
         - Make this a property that can be toggled on.
         - Draw grates when doors are closed, and tapered shadows when they are open
         - Apply this to war temple side doors, and allow forcing open door on 2F when warTempleSmallKey2 is true.
+    - Check behavior of clones during each cutscene, consider despawning clones as part of prepareForCutScene or hideHUD.
 
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush

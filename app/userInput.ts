@@ -268,27 +268,18 @@ export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
 // the clone tool button without pressing any other buttons before releasing it. Note that it is okay if they
 // continue holding buttons that were already down when pressing the clone button.
 export function wasGameKeyPressedAndReleased(state: GameState, keyCode: number): boolean {
-    /*if (state.scriptEvents.blocksInput) {
-        return false;
-    }*/
     return state.keyboard.mostRecentKeysPressed.has(keyCode) && state.keyboard.gameKeysReleased.has(keyCode);
 }
 
 export function isGameKeyDown(state: GameState, keyCode: number): boolean {
-    /*if (state.scriptEvents.blocksInput) {
-        return false;
-    }*/
     return state.keyboard.gameKeysDown.has(keyCode);
 }
 
-export function getMovementDeltas(state: GameState, force = false): [number, number] {
+export function getMovementDeltas(state: GameState): [number, number] {
     // This prevent accidentally moving left when pressing "CTRL+A" while editing, for example.
     if (editingState && (isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND))) {
         return [0, 0];
     }
-    /*if (!force && state.scriptEvents.blocksInput) {
-        return [0, 0];
-    }*/
     const { gameKeyValues } = state.keyboard;
     let dy = gameKeyValues[GAME_KEY.DOWN] - gameKeyValues[GAME_KEY.UP];
     if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
@@ -300,23 +291,20 @@ export function getMovementDeltas(state: GameState, force = false): [number, num
     return [dx, dy];
 }
 
-export function getCloneMovementDeltas(state: GameState, hero: Hero, force = false): [number, number] {
-    /*if (!force && state.scriptEvents.blocksInput) {
-        return [0, 0];
-    }*/
-    const [dx, dy] = getMovementDeltas(state, force);
-    const controlledHero = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero;
-    if (controlledHero.d === hero.d) {
+export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, number] {
+    const [dx, dy] = getMovementDeltas(state);
+    if (!hero.rotationOffset) {
         return [dx, dy];
     }
-    if ((controlledHero.d === 'left' && hero.d === 'up') || (controlledHero.d === 'up' && hero.d === 'right') ||
-        (controlledHero.d === 'right' && hero.d === 'down') || (controlledHero.d === 'down' && hero.d === 'left')) {
-        return [-dy, dx];
-    }
-    if ((controlledHero.d === 'left' && hero.d === 'down') || (controlledHero.d === 'up' && hero.d === 'left') ||
-        (controlledHero.d === 'right' && hero.d === 'up') || (controlledHero.d === 'down' && hero.d === 'right')) {
+    if (hero.rotationOffset === 1) {
+        // 90 degrees CCW (remember that +y is down so this may appear flipped from a canonical coordinate system).
         return [dy, -dx];
     }
+    if (hero.rotationOffset === 3) {
+        // 270 degrees CCW
+        return [-dy, dx];
+    }
+    // rotationOffset === 2 // 180 degrees
     return [-dx, -dy];
 }
 

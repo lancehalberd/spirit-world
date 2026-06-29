@@ -3,7 +3,7 @@ import {Hero} from 'app/content/hero';
 
 import {renderHeroShadow} from 'app/renderActor';
 import {destroyClone} from 'app/utils/destroyClone';
-import {carryMap, directionMap, directionToLeftRotationsFromRight, rotateCardinalDirection} from 'app/utils/direction';
+import {carryMap, directionMap, getLeftRotationsDelta, rotateCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
 
 
@@ -11,8 +11,6 @@ export class Clone extends Hero {
     canPressSwitches = true;
     // Rotation offset relative to the hero that gets set when this clone is picked up.
     carryRotationOffset: number;
-    // Rotation offset relative to the hero that gets set any time the clone tool button is pressed.
-    rotationOffset: number;
     ignorePits = true;
     cannotSwapTo = false;
     uncontrollable = false;
@@ -36,7 +34,7 @@ export class Clone extends Hero {
         this.carrier = hero;
         // Track the clone rotation relative to the hero picking it up so we can rotate it correctly if the hero
         // changes directions.
-        this.carryRotationOffset = directionToLeftRotationsFromRight[this.d] - directionToLeftRotationsFromRight[hero.d];
+        this.carryRotationOffset = getLeftRotationsDelta(hero.d, this.d);
         this.wading = false;
         hero.pickUpObject = this;
     }

@@ -1059,7 +1059,7 @@ function updateTargetPractice(state: GameState) {
 
 function getHeroPosition(state: GameState, gameState: TargetPracticeState): Rect {
     const cursorSpeed = 3;
-    const [dx, dy] = getMovementDeltas(state, true);
+    const [dx, dy] = getMovementDeltas(state);
     const cursorSize = 16;
     let diag_movement = 1;
     if (dx != 0 && dy != 0) {diag_movement = 0.7}

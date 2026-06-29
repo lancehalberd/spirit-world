@@ -53,6 +53,11 @@ export function rotateCardinalDirection(d: CardinalDirection, leftRotations: num
     return leftRotationsFromRightToDirection[newRotation] as CardinalDirection;
 }
 
+// Returns an integer value from 0-3 left turns representing 90 degrees a turn.
+export function getLeftRotationsDelta(source: CardinalDirection, target: CardinalDirection): number {
+    // console.log(directionToLeftRotationsFromRight[target] + target + '-' + directionToLeftRotationsFromRight[source] + source);
+    return ((directionToLeftRotationsFromRight[target] - directionToLeftRotationsFromRight[source] + 8) % 8) / 2;
+}
 
 // 15, 4, 4,
 // This is a map of offsets used to animate an object being picked up by the player, and is designed for use with a

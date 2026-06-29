@@ -1221,7 +1221,7 @@ function updateTargetPractice(state: GameState) {
 
 function getHeroPosition(state: GameState, gameState: TargetPracticeState, restrictMovement: boolean = false): Rect {
     const cursorSpeed = 1.5;
-    const [dx, dy] = getMovementDeltas(state, true);
+    const [dx, dy] = getMovementDeltas(state);
     const cursorSize = 16;
 
     let minY = gameState.screen.y;

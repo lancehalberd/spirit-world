@@ -38,10 +38,10 @@ import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {updateHeroStandardActions} from 'app/updateHeroStandardActions';
 import {getCloneMovementDeltas} from 'app/userInput';
 import {drawFrameAt, getFrame} from 'app/utils/animations';
+import {directionMap, getDirection, getLeftRotationsDelta} from 'app/utils/direction';
 import {destroyClone} from 'app/utils/destroyClone';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {trackEnemyDealtDamage} from 'app/utils/enemyDamageTracking';
-import {directionMap, getDirection} from 'app/utils/field';
 import {getChargeLevelAndElement, getElement} from 'app/utils/getChargeLevelAndElement';
 import {updateGenericHeroState} from 'app/utils/hero';
 import {boxesIntersect, clamp, cloneDeep, mergeDeep} from 'app/utils/index';
@@ -106,6 +106,8 @@ export class Hero implements Actor {
     // If this is set; the actor is being carried by a hero/clone.
     carrier?: Hero;
     explosionTime?: number;
+    // Rotation offset relative to the hero that gets set any time the clone tool button is pressed.
+    rotationOffset: number;
     pickUpFrame?: number;
     pickUpObject?: ObjectInstance;
     pickUpTile?: FullTile;
@@ -686,7 +688,10 @@ export class Hero implements Actor {
             state.hero.spiritRadius = 0;
         }
     }
-
+    updateRotationOffset(state: GameState) {
+        const controlledHero = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero;
+        this.rotationOffset = getLeftRotationsDelta(controlledHero.d, this.d);
+    }
     renderBow(this: Hero, context: CanvasRenderingContext2D, state: GameState, bowDirection: Direction): void {
         const isChargingBow = this.toolOnCooldown !== 'bow';
         const bowAnimationTime = isChargingBow ? 0 : (200 - this.toolCooldown);

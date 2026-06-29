@@ -5,7 +5,7 @@ import {TargetPracticeState} from './fps_types';
 
 export function updateHeroPosition(state: GameState, gameState: TargetPracticeState) {
     const cursorSpeed = 3.5;
-    const [dx, dy] = getMovementDeltas(state, true);
+    const [dx, dy] = getMovementDeltas(state);
     const cursorSize = 16;
     
     let diagMultiplier = (dx !== 0 && dy !== 0) ? 0.7 : 1;
