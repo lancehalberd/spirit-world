@@ -13,13 +13,8 @@ const equipBootsMessage = '{|}Press [B_MENU] to open your menu.'
     + '{|}Press [B_WEAPON] again to unequip them.';
 
 function getEquipElementMessage(state: GameState) {
-    if (state.isUsingKeyboard) {
-        return '{|}Press [B_MENU] to open your menu.'
-            + '{|}Select an element and press [B_WEAPON] to equip it.'
-            + '{|}Press [B_WEAPON] again to unequip the element.'
-            + '{|}The equipped element will be applied to your charged attacks and certain skills.';
-    }
-    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.';
+    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.'
+        + '{|}The equipped element will be applied to your charged attacks and certain skills.';
 }
 
 function getChargeMessage(state: GameState) {

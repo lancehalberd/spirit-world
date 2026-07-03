@@ -307,7 +307,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attackTriggerTime: 
                 enemy.changeToAnimation('warning');
             } else if (enemy.modeTime === 800) {
                 enemy.changeToAnimation('wake', 'idle');
-            } else if (enemy.modeTime >= 1000) {
+            } else if (enemy.modeTime >= 1400) {
                 enemy.setMode('attack');
                 enemy.shielded = false;
             }

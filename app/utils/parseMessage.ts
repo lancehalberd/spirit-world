@@ -1,5 +1,5 @@
 import {GAME_KEY} from 'app/gameConstants';
-import {simpleWhiteFont, keyboardMap, xboxMap} from 'app/utils/simpleWhiteFont';
+import {simpleWhiteFont, keyboardMap, playStationMap, xboxMap} from 'app/utils/simpleWhiteFont';
 
 const font = simpleWhiteFont;
 
@@ -14,6 +14,9 @@ function getActiveControllerMaps(state: GameState) {
     }
     if (state.isUsingXbox) {
         return [xboxMap];
+    }
+    if (state.isUsingPlayStation) {
+        return [playStationMap];
     }
     return [xboxMap, keyboardMap];
 }

@@ -137,11 +137,12 @@ export const xboxMap = {
     [GAME_KEY.MEDITATE]: [xbox_r2],
 };
 
-export const psMap = {
+export const playStationMap = {
     [GAME_KEY.UP]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.DOWN]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.LEFT]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.RIGHT]: [ps_dpad, characterMap['/'], ps_leftStick],
+    // TODO: use distinct frames once they are available.
     [GAME_KEY.MENU]: [ps_start],
     [GAME_KEY.MAP]: [ps_start],
     [GAME_KEY.WEAPON]: [ps_x],
@@ -170,6 +171,22 @@ export const keyboardMap = {
     [GAME_KEY.ROLL]: [keyboard_j],
     [GAME_KEY.MEDITATE]: [keyboard_k],
 };
+
+export function getInputFramesMap(state: GameState) {
+    if (state.isUsingXbox) {
+        return xboxMap;
+    }
+    if (state.isUsingPlayStation) {
+        return playStationMap;
+    }
+    if (state.isUsingKeyboard) {
+        return keyboardMap;
+    }
+}
+
+export function getInputFrames(state: GameState, key: number): Frame[] {
+    return getInputFramesMap(state)[key];
+}
 
 interface TextOptions {
     maxWidth: number

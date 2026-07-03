@@ -354,7 +354,7 @@ export class Flame implements EffectInstance, Props {
     }
 }
 
-const fireballNorthAnimation = createAnimation('gfx/effects/fireball.png', {w: 16, h: 16, content: {x: 4, y: 0, w: 8, h: 8}}, {cols: 4});
+const fireballNorthAnimation = createAnimation('gfx/effects/fireball.png', {w: 16, h: 16, content: {x: 4, y: 1, w: 8, h: 8}}, {cols: 4});
 const fireballNortheastAnimation = createAnimation('gfx/effects/fireball.png', {w: 16, h: 16, content: {x: 7, y: 1, w: 8, h: 8}}, {y: 1, cols: 4});
 
 const fireballSize = {w: 8, h: 8};
@@ -374,15 +374,16 @@ export class Fireball extends Flame {
         this.w = w * this.scale;
         this.h = h * this.scale;
     }
+    // Disabled this as it causes the fireball hitbox to unintuitively hit walls to the north when snakes shoot east/west.
     // Fireball hits where the flame appears, it doesn't visually appear in a different place than the hit box.
-    getHitbox() {
+    /*getHitbox() {
         return {
             x: (this.x - this.w / 2) | 0,
             y: (this.y - this.z - this.h / 2) | 0,
             w: this.w | 0,
             h: this.h | 0,
         };
-    }
+    }*/
     render(context: CanvasRenderingContext2D, state: GameState) {
         const direction = getDirection(this.vx, this.vy, true, 'up', 0.0001);
         const animation = ['up', 'down', 'left', 'right'].includes(direction)

@@ -144,11 +144,8 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add new PS create/options graphics.
     - Stream notes
-        - Add "Drink potion" Yes/No dialogue box
-        - Add Play Station controller icons.
-        - Snake fireball in War Temple seems cutoff when shooting to the west.
-        - Make idols stay vulernable longer when attacking during the first phase.
         - Save state of ball puzzles whenever it makes sense.
         - Mushrooms can grow thorns over pit entrance objects.
     - Add HELP item to Randomizer menu

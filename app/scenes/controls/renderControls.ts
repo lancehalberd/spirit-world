@@ -1,14 +1,12 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { drawFrameAt } from 'app/utils/animations';
-import { fillRect } from 'app/utils/index';
-import { drawText } from 'app/utils/simpleWhiteFont';
-import { keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
-import { GAME_KEY } from 'app/gameConstants';
+import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
+import {drawFrameAt} from 'app/utils/animations';
+import {fillRect} from 'app/utils/index';
+import {drawText} from 'app/utils/simpleWhiteFont';
+import {getInputFrames, keyboardMap, xboxMap} from 'app/utils/simpleWhiteFont';
+import {GAME_KEY} from 'app/gameConstants';
 
 
-function renderControlFrames(context: CanvasRenderingContext2D, state: GameState, key: number, p: Point, reverse = false): Rect {
-    const isUsingKeyboard = reverse ? !state.isUsingKeyboard : state.isUsingKeyboard;
-    const frames = isUsingKeyboard ? keyboardMap[key] : xboxMap[key];
+function renderControlFrames(context: CanvasRenderingContext2D, state: GameState, key: number, p: Point, frames = getInputFrames(state, key)): Rect {
     let {x, y} = p;
     const r = {x, y, w: 0, h: 0};
     for (const frame of frames) {
@@ -145,7 +143,7 @@ export function renderControls(context: CanvasRenderingContext2D, state: GameSta
     y += 30;*/
 
     y = 200;
-    r = renderControlFrames(context, state, GAME_KEY.UP, {x: 40, y}, true);
+    r = renderControlFrames(context, state, GAME_KEY.UP, {x: 40, y}, state.isUsingKeyboard ? xboxMap[GAME_KEY.UP] : keyboardMap[GAME_KEY.UP]);
     drawText(context, state.isUsingKeyboard ? 'Gamepad controls' : 'Keyboard controls', r.x + r.w + 2, r.y + r.h / 2, {
         textBaseline: 'middle',
         textAlign: 'left',

@@ -26,7 +26,7 @@ const fireBallAbility: EnemyAbility<boolean> = {
         ).target;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: boolean) {
-        const hitbox = enemy.getHitbox(state);
+        const hitbox = enemy.getHitbox();
         const [dx, dy] = directionMap[enemy.d];
         const flame = new Fireball({
             x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
@@ -48,7 +48,7 @@ const fireBallAbility: EnemyAbility<boolean> = {
         const [dx, dy] = directionMap[enemy.d];
         fireball.scale = Math.min(1, fireball.scale + 0.05);
         fireball.updateSize();
-        const hitbox = enemy.getHitbox(state);
+        const hitbox = enemy.getHitbox();
         fireball.x = hitbox.x + hitbox.w / 2 + dx * 3 * hitbox.w / 4;
         fireball.y = hitbox.y + hitbox.h / 2 + dy * 3 * hitbox.h / 4;
     },

@@ -117,9 +117,25 @@ function buttonIsPressed(button: number|{pressed: boolean}): boolean {
 const keysDown: boolean[] = [];
 // Read controller id using something like: navigator.getGamepads()[0].id
 // Chrome ps4: "Wireless Controller (STANDARD GAMEPAD Vendor: 054c Product: 05c4)"
+// Chrome ps5: "dualsense wireless controller (standard gamepad vendor: 054c product: 0ce6)"
 // Chrome xbox: "Xbox 360 Controller (XInput STANDARD GAMEPAD)"
 // Firefox xbox: "xinput"
-let lastInput: 'keyboard' | 'gamepad' = null;
+function getGamePadType(id: string): 'xbox'|'playstation' {
+    id = id.toLowerCase();
+    if (id.includes("xbox") || id.includes("xinput")) {
+        return 'xbox';
+    } else if (
+        id.includes("playstation")
+        || id.includes("dualsense")
+        || id.includes("05c4")
+        || id.includes("0ce6")
+    ) {
+        return 'playstation';
+    }
+    return 'xbox';
+}
+
+let lastInput: 'keyboard' | 'xbox' | 'playstation' = null;
 export function isKeyboardKeyDown(keyCode: number): boolean {
     if (keysDown[keyCode]) {
         lastInput = 'keyboard';
@@ -144,7 +160,7 @@ function isGamepadGamekeyPressed(gameKey: number) {
             }
             if (value) {
                 if (value >= ANALOG_THRESHOLD) {
-                    lastInput = 'gamepad';
+                    lastInput = getGamePadType(gamepad.id);
                 }
                 return value;
             }
@@ -235,12 +251,15 @@ export function updateKeyboardState(state: GameState) {
         mostRecentKeysPressed = gameKeysPressed;
     }
     state.keyboard = { gameKeyValues, gameKeysDown, gameKeysPressed, gameKeysReleased, mostRecentKeysPressed };
-    if (lastInput === 'gamepad') {
-        state.isUsingKeyboard = false;
+    state.isUsingKeyboard = false;
+    state.isUsingPlayStation = false;
+    state.isUsingXbox = false;
+    if (lastInput === 'xbox') {
         state.isUsingXbox = true;
+    } else if (lastInput === 'playstation') {
+        state.isUsingPlayStation = true;
     } else if (lastInput === 'keyboard') {
         state.isUsingKeyboard = true;
-        state.isUsingXbox = false;
     }
 }
 

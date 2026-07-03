@@ -129,6 +129,7 @@ interface GameState {
     }
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean
+    isUsingPlayStation?: boolean
     // used to ease the darkness effect in and out
     fadeLevel: number
     // used to ease HUD in and out

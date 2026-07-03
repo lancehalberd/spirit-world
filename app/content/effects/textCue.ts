@@ -2,6 +2,7 @@ import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH} from 'app/gameConstants';
 import {parseMessage} from 'app/utils/parseMessage';
 import {drawFrame} from 'app/utils/animations';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
+import {getInputFramesMap} from 'app/utils/simpleWhiteFont';
 
 
 const characterWidth = 8;
@@ -30,13 +31,13 @@ export class TextCue implements EffectInstance {
     priority: number = this.props.priority ?? 0;
     duration: number = this.props.duration ?? 3000;
     textFrames: Frame[][];
-    isUsingKeyboard: boolean = false;
+    inputFramesMap: {[key in string]: Frame[]};
     // Setting this flag will cause the cue to be hidden the next time the player presses the map button.
     isMapCue: boolean = false;
     constructor(state: GameState, readonly props: TextCueProps) {
         // TextCue only supports a single page of messages.
         this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
-        this.isUsingKeyboard = state.isUsingKeyboard;
+        this.inputFramesMap = getInputFramesMap(state);
     }
     fadeOut() {
         if (this.duration === 0) {
@@ -55,8 +56,9 @@ export class TextCue implements EffectInstance {
             return;
         }*/
         // Update which keys are displayed if the player changes their input source while a message is already displayed.
-        if (this.isUsingKeyboard !== state.isUsingKeyboard) {
-            this.isUsingKeyboard = state.isUsingKeyboard;
+        const currentMap = getInputFramesMap(state);
+        if (this.inputFramesMap !== currentMap) {
+            this.inputFramesMap = currentMap;
             this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
         }
         if (this.duration && this.time >= this.duration) {
