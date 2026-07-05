@@ -164,8 +164,6 @@ export function getSavedObjectPosition(state: GameState, definition: ObjectDefin
     return false;
 }
 
-
-
 export function saveObjectStatus(state: GameState, definition: ObjectDefinition, flag: boolean | number | number[] = true, suffix: SaveFlagSuffix = ''): void {
     const treatment = getObjectSaveTreatment(definition, suffix);
     const fullKey =  definition.id + (suffix ? '-' + suffix : '');
@@ -193,6 +191,14 @@ export function saveObjectStatus(state: GameState, definition: ObjectDefinition,
             state.areaInstance.needsLogicRefresh = true;
         }
         saveGame(state);
+    }
+}
+
+export function getAreaObjectById(area: AreaInstance, id: string): ObjectInstance|undefined {
+    for (const object of [...area.objects, ...area.alternateArea.objects]) {
+        if (object.definition?.id === id) {
+            return object;
+        }
     }
 }
 
@@ -262,7 +268,6 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
     }
 }
 
-
 export function deactivateTarget(state: GameState, target: ObjectInstance): void {
     if (target.onDeactivate) {
         if (target.onDeactivate(state)) {
@@ -284,7 +289,6 @@ export function getObjectAndParts(state: GameState, object: ObjectInstance): Obj
     return objectAndParts;
 }
 
-
 export function getFieldInstanceAndParts(state: GameState, object: ObjectInstance|EffectInstance): (ObjectInstance|EffectInstance)[] {
     const objectAndParts = [object];
     const parts = (object.getParts?.(state) || []);
@@ -292,4 +296,11 @@ export function getFieldInstanceAndParts(state: GameState, object: ObjectInstanc
         objectAndParts.push(...getFieldInstanceAndParts(state, part));
     }
     return objectAndParts;
+}
+
+export function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {
+    if (!area) {
+        return [];
+    }
+    return area.objects.filter(object => types.includes(object.type)).map(object => object.id).filter(id => id);
 }

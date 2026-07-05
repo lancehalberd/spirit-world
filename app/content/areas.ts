@@ -515,6 +515,12 @@ export function createAreaInstance(state: GameState, location: ZoneLocation, isA
     return instance;
 }
 
+export function initializeComplexObjects(state: GameState, area: AreaInstance, isActiveArea: boolean) {
+    for (const object of [...area.objects, ...area.alternateArea.objects]) {
+        object.onInitializeAlternateArea?.(state, isActiveArea);
+    }
+}
+
 export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
     if (!area) {
         return;
@@ -726,6 +732,8 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     delete state.map.restoreOriginalTiles;
     for (const object of objectsToInitialize) {
         initializeObject(state, object, true);
+        // Call this immediately as we know both areas are updated already.
+        object.onInitializeAlternateArea?.(state, true)
     }
     checkIfAllEnemiesAreDefeated(state, area);
 }
@@ -801,6 +809,8 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
     }
     for (const object of objectsToInitialize) {
         initializeObject(state, object, true);
+        // Call this immediately as we know both areas are updated already.
+        object.onInitializeAlternateArea?.(state, true)
     }
     applyVariantsToArea(state, area);
 }

@@ -1,4 +1,4 @@
-import {activateTarget} from 'app/utils/objects'
+import {activateTarget, getTargetObjectIdsByTypesAndArea} from 'app/utils/objects'
 
 
 export function areAllSwitchesActivated(state: GameState, area: AreaInstance, definition: BaseSwitchDefinition): boolean {
@@ -32,23 +32,16 @@ export function checkIfAllSwitchesAreActivated(
     return true;
 }
 
-function getTargetObjectIdsByTypesAndArea(area: AreaInstance, types: ObjectType[]): string[] {
-    if (!area) {
-        return [];
-    }
-    return area.objects.filter(object => types.includes(object.definition?.type)).map(object => object.definition?.id).filter(id => id);
-}
-
 const switchTargetTypes: ObjectType[] = [
     'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'keyBlock',
     'narration', 'pitEntrance', 'shieldingUnit',
     'teleporter', 'torch', 'escalator', 'airStream', 'anode',
 ];
 
-export function getSwitchTargetIds(area: AreaInstance): string[] {
+export function getSwitchTargetIds(area: AreaDefinition, alternateArea: AreaDefinition): string[] {
     return [...new Set([
         'none',
         ...getTargetObjectIdsByTypesAndArea(area, switchTargetTypes),
-        ...getTargetObjectIdsByTypesAndArea(area.alternateArea, switchTargetTypes),
+        ...getTargetObjectIdsByTypesAndArea(alternateArea, switchTargetTypes),
     ])];
 }

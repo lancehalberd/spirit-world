@@ -65,7 +65,7 @@ variantHash.switch = {
             key: 'targetObjectId',
             defaultValue: '',
             getValues(state: GameState) {
-                return getSwitchTargetIds(state.areaInstance);
+                return getSwitchTargetIds(state.areaInstance.definition, state.alternateAreaInstance.definition);
             },
         },
     ],

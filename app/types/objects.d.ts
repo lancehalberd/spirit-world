@@ -96,6 +96,9 @@ interface BaseFieldInstance {
     // isActiveArea will be set to false when this object is being initialized in an inactive area,
     // for example areas initialized when drawing maps.
     onInitialize?: (state: GameState, isActiveArea: boolean) => void
+    // Initialization method called on objects only after both the current and alternate area have
+    // been populated with objects.
+    onInitializeAlternateArea?: (state: GameState, isActiveArea: boolean) => void
     // Flag used to prevent reinitializing objects when they are moved between area instances
     // during are logic refreshes.
     isInitialized?: boolean;
@@ -455,6 +458,10 @@ interface BaseObjectDefinition extends LogicDefinition {
     saveStatus?: 'forever' | 'zone' | 'never'
     // If this is set to 'zone' the object will keep its last position when the area refreshes.
     savePosition?: 'forever' | 'zone' | 'never'
+    // For objects that are associated with targets in puzzles, such as rolling balls are with rolling ball goals,
+    // this can be set so that if the target status is true, the object will spawn in the solved state, for example,
+    // the rolling ball will spawn slotted into the goal.
+    saveTarget?: string
     // Key for the associated special behaviors from the specialBehaviors hash.
     specialBehaviorKey?: string
     // Whether this is a spirit object.

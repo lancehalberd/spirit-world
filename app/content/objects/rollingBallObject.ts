@@ -6,7 +6,7 @@ import {moveObject} from 'app/movement/moveObject';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
 import {directionMap, hitTargets} from 'app/utils/field';
-import {getObjectStatus, removeObjectFromArea, saveObjectStatus} from 'app/utils/objects';
+import {getAreaObjectById, getObjectStatus, removeObjectFromArea, saveObjectStatus} from 'app/utils/objects';
 import {extendSound} from 'app/utils/sounds';
 
 
@@ -52,6 +52,16 @@ export class RollingBallObject implements ObjectInstance {
                 }
             }
             this.status = 'normal';
+        }
+    }
+    // Spawn this ball in the target slot if it should (has target slot that has been saved as activated).
+    onInitialize(state: GameState){
+        if (!this.definition.saveTarget) {
+            return;
+        }
+        const targetGoal = getAreaObjectById(this.area, this.definition.saveTarget);
+        if (targetGoal.definition?.type === 'ballGoal' && getObjectStatus(state, this.definition)) {
+            this.socketInBallGoal(state, targetGoal as BallGoal);
         }
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -119,6 +129,28 @@ export class RollingBallObject implements ObjectInstance {
             this.startRollingSound(state);
             if (this.linkedObject) {
                 this.linkedObject.startRollingSound(state);
+            }
+        }
+    }
+    socketInBallGoal(state: GameState, goal: BallGoal) {
+        goal.activate?.(state);
+        // The activated BallGoal will render the ball in the depression, so we remove
+        // the original ball from the area.
+        removeObjectFromArea(state, this);
+        if (this.linkedObject) {
+            this.linkedObject.stopRollingSound(state);
+            const linkedGoal = goal.linkedObject;
+            if (linkedGoal) {
+                linkedGoal.activate?.(state);
+                removeObjectFromArea(state, this.linkedObject);
+            } else {
+                // If there is no alternate goal, the alternate ball is just stuck in place.
+                // This looks bad so we should avoid it.
+                this.linkedObject.rollDirection = null;
+                this.linkedObject.stuck = true;
+                // Lock it the position of the socket in this case.
+                this.linkedObject.x = goal.x;
+                this.linkedObject.y = goal.y;
             }
         }
     }
@@ -252,26 +284,7 @@ export class RollingBallObject implements ObjectInstance {
                 if (Math.abs(this.x - object.x) <= 4 && Math.abs(this.y - object.y) <= 4) {
                     this.stopRollingSound(state);
                     playAreaSound(state, this.area, 'rollingBallSocket');
-                    (object as BallGoal).activate(state);
-                    // The activated BallGoal will render the ball in the depression, so we remove
-                    // the original ball from the area.
-                    removeObjectFromArea(state, this);
-                    if (this.linkedObject) {
-                        this.linkedObject.stopRollingSound(state);
-                        const linkedGoal = (object as BallGoal).linkedObject;
-                        if (linkedGoal) {
-                            linkedGoal.activate(state);
-                            removeObjectFromArea(state, this.linkedObject);
-                        } else {
-                            // If there is no alternate goal, the alternate ball is just stuck in place.
-                            // This looks bad so we should avoid it.
-                            this.linkedObject.rollDirection = null;
-                            this.linkedObject.stuck = true;
-                            // Lock it the position of the socket in this case.
-                            this.linkedObject.x = object.x;
-                            this.linkedObject.y = object.y;
-                        }
-                    }
+                    this.socketInBallGoal(state, object as BallGoal);
                     return;
                 }
             }

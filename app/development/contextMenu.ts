@@ -405,6 +405,9 @@ function renderCurrentFloor(state: GameState): void {
                 ...state.location,
                 areaGridCoords: {x: column, y: row},
             });
+            // Note that this does not create the alternate area so this skips complex object updates.
+            // This is not currently an issue, but may make the area look a bit different than how
+            // it would finally appear when actually playing the game.
             checkToRedrawTiles(areaInstance);
             drawEntireFrame(state, areaInstance, 0);
             areas.push(areaInstance);

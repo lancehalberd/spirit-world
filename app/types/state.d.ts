@@ -75,6 +75,8 @@ interface GameState {
     reviveTime: number
     gameHasBeenInitialized: boolean
     lastTimeRendered: number
+    areaSet?: AreaSet
+    nextAreaSet?: AreaSet
     alternateAreaInstance?: AreaInstance
     areaInstance?: AreaInstance
     surfaceAreaInstance?: AreaInstance

@@ -519,5 +519,18 @@ interface AreaInstance {
     needsLogicRefresh?: boolean
     needsIceRefresh?: boolean[][]|true
 }
+interface AreaSet {
+    // The currently active area
+    current: AreaInstance
+    // The
+    alernate: AreaInstance
+    // Surface or underwater areas connected to this area.
+    // At most one of these will be set at once.
+    // (Alternatively, we could always set both and one would be equal to current)
+    surface?: AreaInstance
+    underwater?: AreaInstance
 
+    areaSection?: AreaSectionInstance
+    alternateAreaSection?: AreaSectionInstance
+}
 

@@ -1,5 +1,5 @@
 import {
-    createAreaInstance, getAreaFromLocation, linkObjects, setConnectedAreas,
+    createAreaInstance, getAreaFromLocation, initializeComplexObjects,linkObjects, setConnectedAreas,
 } from 'app/content/areas';
 import {zones} from 'app/content/zones';
 import {editingState} from 'app/development/editingState';
@@ -158,12 +158,13 @@ export function enterLocation(
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
         || createAreaInstance(state, state.location, true);
-
     state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
         || createAreaInstance(state, alternateLocation, true);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);
+    initializeComplexObjects(state, state.areaInstance, true);
+
     state.hero.area = state.areaInstance;
     state.hero.areaTime = 0;
     // Don't let magic become infinitely negative while being drained.

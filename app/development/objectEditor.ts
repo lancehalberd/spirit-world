@@ -2,37 +2,37 @@ import {
     findZoneTargets,
     linkObject,
 } from 'app/content/areas';
-import { bossTypes } from 'app/content/bosses';
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import {bossTypes} from 'app/content/bosses';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {logicHash, evaluateLogicDefinition} from 'app/content/logic';
-import { bellStyles } from 'app/content/objects/bell';
-import { decorationTypes } from 'app/content/objects/decoration';
-import { escalatorStyles } from 'app/content/objects/escalator';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { doorStyles } from 'app/content/objects/doorStyles';
-import { stairsStyles } from 'app/content/objects/stairs';
-import { torchStyles } from 'app/content/objects/torch';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { enemyTypes } from 'app/content/enemies';
-import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
-import { pushPullObjectStyles } from 'app/content/objects/pushPullObject'
-import { signStyles } from 'app/content/objects/sign';
-import { getLootFrame } from 'app/content/loot';
-import { lightningBarrierStyles } from 'app/content/objects/lightningBarrier';
-import { pitStyles } from 'app/content/objects/pitEntrance';
-import { turretStyles } from 'app/content/objects/wallTurret';
-import { zones } from 'app/content/zones';
-import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
-import { editingState } from 'app/development/editingState';
-import { getLogicProperties } from 'app/development/zoneEditor';
-import { getState } from 'app/state';
-import { createObjectInstance } from 'app/utils/createObjectInstance';
+import {bellStyles} from 'app/content/objects/bell';
+import {decorationTypes} from 'app/content/objects/decoration';
+import {escalatorStyles} from 'app/content/objects/escalator';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {doorStyles} from 'app/content/objects/doorStyles';
+import {stairsStyles} from 'app/content/objects/stairs';
+import {torchStyles} from 'app/content/objects/torch';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {enemyTypes} from 'app/content/enemies';
+import {npcBehaviors, npcStyles} from 'app/content/objects/npc';
+import {pushPullObjectStyles} from 'app/content/objects/pushPullObject'
+import {signStyles} from 'app/content/objects/sign';
+import {getLootFrame} from 'app/content/loot';
+import {lightningBarrierStyles} from 'app/content/objects/lightningBarrier';
+import {pitStyles} from 'app/content/objects/pitEntrance';
+import {turretStyles} from 'app/content/objects/wallTurret';
+import {zones} from 'app/content/zones';
+import {ObjectPalette, ObjectPaletteItem} from 'app/development/objectPalette';
+import {editingState} from 'app/development/editingState';
+import {getLogicProperties} from 'app/development/zoneEditor';
+import {getState} from 'app/state';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {enterLocation} from 'app/utils/enterLocation';
 import {isPointInShortRect, removeElementFromArray} from 'app/utils/index';
 import {allLootTypes, doesLootRequireAmount, doesLootRequireLevel} from 'app/utils/loot';
-import { addObjectToArea, initializeObject, removeObjectFromArea } from 'app/utils/objects';
+import {addObjectToArea, getTargetObjectIdsByTypesAndArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
 import {isDefinitionFromSection} from 'app/utils/sections';
-import { getSwitchTargetIds } from 'app/utils/switches';
+import {getSwitchTargetIds} from 'app/utils/switches';
 import {isKeyboardKeyDown, KEY} from 'app/userInput'
 
 
@@ -508,7 +508,6 @@ export function createObjectDefinition(
         case 'cathode':
         case 'flameTurret':
         case 'peachTree':
-        case 'rollingBall':
         case 'saveStatue':
         case 'shieldingUnit':
         case 'trampoline':
@@ -516,6 +515,13 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 saveStatus: definition.saveStatus,
+                type: definition.type,
+            };
+        case 'rollingBall':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                saveTarget: definition.saveTarget,
                 type: definition.type,
             };
         case 'waterPot':
@@ -634,20 +640,13 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
     return combinedObjectIds.flat().filter(id => id);
 }
 
-function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {
-    if (!area) {
-        return [];
-    }
-    return area.objects.filter(object => types.includes(object.type)).map(object => object.id).filter(id => id);
-}
-
-export function getSwitchTargetProperties(
+function getSwitchTargetProperties(
     state: GameState,
     editingState: EditingState,
     object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | HeavyFloorSwitchDefinition | KeyBlockDefinition
 ): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = getSwitchTargetIds(state.areaInstance);
+    const objectIds = getSwitchTargetIds(state.areaInstance.definition, state.alternateAreaInstance.definition);
 
     if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
         delete object.targetObjectId;
@@ -800,6 +799,36 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                         delete linkedDefinition.savePosition;
                     } else {
                         linkedDefinition.savePosition = savePosition;
+                    }
+                    updateObjectInstance(state, linkedDefinition);
+                }
+            },
+        });
+    }
+    if (object.type === 'rollingBall') {
+        const ballGoalIds = [...new Set([
+            'none',
+            ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['ballGoal']),
+            ...getTargetObjectIdsByTypesAndArea(state.alternateAreaInstance.definition, ['ballGoal']),
+        ])];
+        rows.push({
+            name: 'Save Target',
+            value: object.saveTarget ?? 'none',
+            values: ballGoalIds,
+            onChange(id: string) {
+                if (id === 'none'){
+                    delete object.saveTarget;
+                } else {
+                    object.saveTarget = id;
+                }
+                updateObjectInstance(state, object);
+                // Keep this flag in sync with the linked object, if any.
+                const linkedDefinition = object.linked && getLinkedDefinition(state.areaInstance.alternateArea.definition, object);
+                if (linkedDefinition) {
+                    if (id === 'none'){
+                        delete linkedDefinition.saveTarget;
+                    } else {
+                        linkedDefinition.saveTarget = id;
                     }
                     updateObjectInstance(state, linkedDefinition);
                 }
@@ -2144,6 +2173,9 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
         checkToAddLinkedObject(state, area, object);
     }
     linkObject(newObject);
+    if (newObject.area?.alternateArea) {
+        newObject.onInitializeAlternateArea?.(state, true);
+    }
     // If the current area has special behaviors, apply it in case it effects the updated object.
     if (area.definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[area.definition.specialBehaviorKey] as SpecialAreaBehavior;
