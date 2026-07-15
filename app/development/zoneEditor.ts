@@ -1,26 +1,27 @@
 import {
     getAreaInstanceFromLocation, setConnectedAreas,
 } from 'app/content/areas';
-import { logicHash } from 'app/content/logic';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { zones } from 'app/content/zones';
-import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
-import { replaceMapSections } from 'app/development/sections';
-import { TabContainer } from 'app/development/tabContainer';
-import { renderPropertyRows } from 'app/development/propertyPanel';
-import { editingState } from 'app/development/editingState';
-import { tagElement } from 'app/dom';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { checkToRedrawTiles, drawRemainingFrames } from 'app/scenes/field/renderField';
-import { getState } from 'app/state';
-import { updateAreaSection } from 'app/utils/area';
-import { createCanvasAndContext } from 'app/utils/canvas';
-import { enterLocation } from 'app/utils/enterLocation';
-import { everyAreaInZone } from 'app/utils/every';
-import { fixCamera } from 'app/utils/fixCamera';
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
-import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
-import { getMousePosition, isMouseDown } from 'app/utils/mouse';
+import {logicHash} from 'app/content/logic';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {zones} from 'app/content/zones';
+import {exportZoneToClipboard, importZone, serializeZone} from 'app/development/exportZone';
+import {replaceMapSections} from 'app/development/sections';
+import {TabContainer} from 'app/development/tabContainer';
+import {renderPropertyRows} from 'app/development/propertyPanel';
+import {editingState} from 'app/development/editingState';
+import {refreshArea} from 'app/development/utils';
+import {tagElement} from 'app/dom';
+import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
+import {checkToRedrawTiles, drawRemainingFrames} from 'app/scenes/field/renderField';
+import {getState} from 'app/state';
+import {updateAreaSection} from 'app/utils/area';
+import {createCanvasAndContext} from 'app/utils/canvas';
+import {enterLocation} from 'app/utils/enterLocation';
+import {everyAreaInZone} from 'app/utils/every';
+import {fixCamera} from 'app/utils/fixCamera';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
+import {readFromFile, saveToFile, scaleRect} from 'app/utils/index';
+import {getMousePosition, isMouseDown} from 'app/utils/mouse';
 
 
 const fullSection = {x: 0, y: 0, w: 32, h: 32};
@@ -72,10 +73,6 @@ mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
   jumpToMinimapLocation();
 }
 
-function refreshArea(state: GameState) {
-    enterLocation(state, state.location, {instant: true});
-}
-
 function jumpToMinimapLocation() {
     const [x, y] = getMousePosition(mapOverlayCanvas);
     const state = getState();
@@ -98,7 +95,7 @@ function jumpToMinimapLocation() {
           x: pixelX,
           y: pixelY,
           z: 0,
-        }, {instant: true});
+        });
     } else {
         state.location.x = pixelX;
         state.location.y = pixelY;
@@ -310,7 +307,7 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
         }
     }
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 0.3)';
-    const area = state.nextAreaInstance || state.areaInstance;
+    const area = state.nextAreaSet?.current || state.areaSet?.current;
     renderAreaToMinimap(state, area, state.location.areaGridCoords);
     const cameraX = Math.floor(state.location.areaGridCoords.x * w * tileScale + state.camera.x * pixelScale - area.cameraOffset.x * pixelScale);
     const cameraY = Math.floor(state.location.areaGridCoords.y * h * tileScale + state.camera.y * pixelScale - area.cameraOffset.y * pixelScale);
@@ -357,7 +354,7 @@ export function getImportExportProperties(): PanelRows {
 export function getBehaviorProperties(scope: 'zone'|'area'|'section'): PanelRows {
     const state = getState();
     let rows: PanelRows = [];
-    let scopedObject: AreaBehaviorLogic = state.areaSection.definition;
+    let scopedObject: AreaBehaviorLogic = state.areaSet?.areaSection.definition;
     if (scope === 'zone') {
         scopedObject = state.zone;
         rows.push({
@@ -401,20 +398,20 @@ export function getBehaviorProperties(scope: 'zone'|'area'|'section'): PanelRows
         });
     }
     if (scope === 'area') {
-        scopedObject = state.areaInstance.definition;
+        scopedObject = state.areaSet?.current.definition;
         const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
             key => specialBehaviorsHash[key].type === 'area'
         );
         if (specialBehaviorKeys.length) {
             rows.push({
                 name: 'Special Behavior',
-                value: state.areaInstance.definition.specialBehaviorKey || 'none',
+                value: state.areaSet?.current.definition.specialBehaviorKey || 'none',
                 values: ['none', ...specialBehaviorKeys],
                 onChange(specialBehaviorKey: string) {
                     if (specialBehaviorKey === 'none') {
-                        delete state.areaInstance.definition.specialBehaviorKey;
+                        delete state.areaSet.current.definition.specialBehaviorKey;
                     } else {
-                        state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
+                        state.areaSet.current.definition.specialBehaviorKey = specialBehaviorKey;
                     }
                     refreshArea(state);
                 },
@@ -616,14 +613,13 @@ export function getZoneProperties(): PanelRows {
                 state.location.isSpiritWorld = isSpiritWorld;
                 state.location = getFullZoneLocation(state.location);
                 editingState.spirit = isSpiritWorld;
-                const tempInstance = state.areaInstance;
+                const tempInstance = state.areaSet?.current;
                 state.areaGrid = isSpiritWorld ? state.floor.spiritGrid : state.floor.grid;
-                state.areaInstance = state.alternateAreaInstance;
-                state.alternateAreaInstance = tempInstance;
-                state.hero.area = state.areaInstance;
+                state.areaSet.current = state.areaSet?.alternate;
+                state.areaSet.alternate = tempInstance;
+                state.hero.area = state.areaSet?.current;
                 setConnectedAreas(state, tempInstance);
                 updateAreaSection(state, true);
-                //enterLocation(state, state.location);
                 editingState.needsRefresh = true;
             }
         }
@@ -713,14 +709,14 @@ export function getZoneProperties(): PanelRows {
             // Mostly this is because it is annoying to have to update it in both places
             // when we almost always intend for them to be the same anyway.
             const newCurrentSections = scaledSections.map(section => ({...section}));
-            replaceMapSections(state, state.location, state.areaInstance.definition.sections || [], newCurrentSections);
-            state.areaInstance.definition.sections = newCurrentSections;
+            replaceMapSections(state, state.location, state.areaSet?.current.definition.sections || [], newCurrentSections);
+            state.areaSet.current.definition.sections = newCurrentSections;
             const newAlternateSections = scaledSections.map(section => ({...section}));
             replaceMapSections(state, {
                 ...state.location,
                 isSpiritWorld: !state.location.isSpiritWorld,
-            }, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
-            state.alternateAreaInstance.definition.sections = newAlternateSections;
+            }, state.areaSet?.alternate.definition.sections || [], newAlternateSections);
+            state.areaSet.alternate.definition.sections = newAlternateSections;
             updateAreaSection(state, true);
             return 'Change Layout';
         }

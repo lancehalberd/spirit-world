@@ -320,7 +320,7 @@ function updateSupportStormBeast(state: GameState, enemy: Enemy<StormBeastParams
         }
         return;
     }
-    const nonSupportBosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+    const nonSupportBosses = [...state.areaSet?.current.enemies, ...state.areaSet?.alternate.enemies].filter(
         e => e.status !== 'gone' && e.definition.type === 'boss' && !e.params.isSupporting
         && e.isFromCurrentSection(state)
     ) as Enemy[];
@@ -394,7 +394,7 @@ function updateStormBeast(state: GameState, enemy: Enemy<StormBeastParams>): voi
     const stormHeart = getStormHeart(state, enemy.area);
     if (enemy.mode === 'hidden') {
         // Stay hidden until the player enters the same area and damages the storm heart(or no heart is present).
-        if (enemy.area === state.areaInstance && (!stormHeart || stormHeart?.life < stormHeart?.maxLife)) {
+        if (enemy.area === state.areaSet?.current && (!stormHeart || stormHeart?.life < stormHeart?.maxLife)) {
             const { section } = getAreaSize(state);
             enemy.status = 'normal';
             enemy.setMode('enter');
@@ -407,7 +407,7 @@ function updateStormBeast(state: GameState, enemy: Enemy<StormBeastParams>): voi
     }
     // When the hero is in the other world, the boss moves to the center of the area and casts spells
     // targeting the hero in the other world.
-    if (enemy.mode !== 'regenerate' && enemy.mode !== 'transform' && enemy.area !== state.areaInstance) {
+    if (enemy.mode !== 'regenerate' && enemy.mode !== 'transform' && enemy.area !== state.areaSet?.current) {
         enemy.setMode('attackOtherWorld');
         const { section } = getAreaSize(state);
         const t = {x: section.x + section.w / 2, y: section.y + section.h / 2};
@@ -421,7 +421,7 @@ function updateStormBeast(state: GameState, enemy: Enemy<StormBeastParams>): voi
         return;
     }
     // Leave the screen when the hero returns.
-    if (enemy.mode === 'attackOtherWorld' && enemy.area === state.areaInstance) {
+    if (enemy.mode === 'attackOtherWorld' && enemy.area === state.areaSet?.current) {
         leaveScreen(enemy);
         return;
     }

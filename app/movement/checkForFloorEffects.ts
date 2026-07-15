@@ -14,7 +14,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         {x: hitbox.x, y: hitbox.y + hitbox.h - 1},
         {x: hitbox.x + hitbox.w - 1, y: hitbox.y + hitbox.h - 1},
     ];
-    const pointBehaviors = checkPoints.map(point => getCompositeBehaviors(state, hero.area, point, state.nextAreaInstance));
+    const pointBehaviors = checkPoints.map(point => getCompositeBehaviors(state, hero.area, point, state.nextAreaSet?.current));
     let topBehaviors: TileBehaviors[] = [];
     hero.groundHeight = 0;
     for (const behaviors of pointBehaviors) {
@@ -131,7 +131,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             hero.canFloat = false;
         }
     }
-    if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
+    if (hero.isOverPit && !state.nextAreaSet?.areaSection && !state.nextAreaSet?.current) {
         if (hero.z <= 0 && hero.action !== 'roll') {
             const behaviorGrid = hero.area.behaviorGrid;
             const tileSize = 16;

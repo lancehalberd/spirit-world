@@ -19,7 +19,7 @@ import {isHeroFloating, isHeroSinking, isUnderwater} from 'app/utils/actor';
 import {destroyClone} from 'app/utils/destroyClone';
 import {destroyTile} from 'app/utils/destroyTile';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
-import {enterLocation} from 'app/utils/enterLocation';
+import {transitionToLocation} from 'app/utils/enterLocation';
 import {
     canTeleportToCoords,
     directionMap,
@@ -173,19 +173,19 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             // The larger this negative value, the more they can "stick" to the bottom if they fall very fast.
             hero.vz = Math.max(hero.vz, -2);
         }
-        if (hero.z >= 24 && hero.vz >= 0 && state.surfaceAreaInstance && !state.nextAreaInstance && !state.nextAreaSection) {
+        if (hero.z >= 24 && hero.vz >= 0 && state.areaSet?.surface && !state.nextAreaSet?.current && !state.nextAreaSet?.areaSection) {
             // You can only surface in areas of deep water, that is, where you would be swimming.
             const testHero = hero.getCopy();
             testHero.z = 0;
-            testHero.area = state.surfaceAreaInstance;
+            testHero.area = state.areaSet?.surface;
             // Remove equipment from test hero in case it prevents them from swimming (like cloud boots).
             testHero.savedData.equippedBoots = 'leatherBoots';
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
             if (testHero.swimming
-                && isTileOpen(state, state.surfaceAreaInstance, {x: hero.x, y: hero.y})
+                && isTileOpen(state, state.areaSet?.surface, {x: hero.x, y: hero.y})
             ) {
-                enterLocation(state, {
+                transitionToLocation(state, {
                     ...state.location,
                     zoneKey: state.zone.surfaceKey,
                     floor: 0,
@@ -214,11 +214,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
 
-    if (hero.swimming && hero.savedData.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
-        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y})
+    if (hero.swimming && hero.savedData.equippedBoots === 'ironBoots' && state.areaSet?.underwater &&
+        isTileOpen(state, state.areaSet?.underwater, {x: hero.x, y: hero.y})
     ) {
         if (hero === state.hero) {
-            enterLocation(state, {
+            transitionToLocation(state, {
                 ...state.location,
                 floor: zones[state.zone.underwaterKey].floors.length - 1,
                 zoneKey: state.zone.underwaterKey,
@@ -927,10 +927,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.spiritRadius = 0;
                 hero.maxSpiritRadius = MAX_SPIRIT_RADIUS;
                 const hitbox = hero.getMovementHitbox();
-                //if (state.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
+                //if (state.areaSet?.areaSection?.isFoggy || !canTeleportToCoords(state, state.hero.area.alternateArea, {x: hero.x, y: hero.y})) {
                 // Astral Projection will be valid as long as at least 2 corners are open. This mostly prevents spawning the projection
                 // completely stuck inside walls.
-                if (state.areaSection?.isFoggy || !areNPointsOpen(state, state.hero.area.alternateArea, [
+                if (state.areaSet?.areaSection?.isFoggy || !areNPointsOpen(state, state.hero.area.alternateArea, [
                     {x: hitbox.x + 2, y: hitbox.y + 2},
                     {x: hitbox.x + hitbox.w - 3, y: hitbox.y + 2},
                     {x: hitbox.x + 2, y: hitbox.y + hitbox.h - 3},

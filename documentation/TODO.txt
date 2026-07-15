@@ -146,7 +146,24 @@ Graphics to Implement:
 Current tasks:
     - Add new PS create/options graphics.
 
+Creating a new area instance from scratch:
+
+Resetting a section inside of an initialized+dirty area instance:
+
     - Refactor how current + next area area stored on state
+        - TODO: fix diving/surfacing transitions to use existing areas on the current set, rather than nextAreaSet on transition state.
+        - TODO: always create current+alternate pairs together and call initialize after objets are populated in both instances.
+            - When scrolling to a new area
+            - When entering an area from an entrance
+            - When showing the area preview for a save file
+                -> this uses returnToSpawnLocation(state, preserveZoneFlags=true) internally
+                    -> enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags})
+            - When loading a new save file
+            - Enering area from script events
+            - Entering area from nimbus cloud
+            - Entering area when respawning after defeat
+            - Entering area when transitioning between worlds
+            - Entering area when transitioning between underwater/surface
         - Problem: Inconsistent availability of area+alternate area (and also underwater/surface area).
         - Proposal, add AreaSet that tracks all related areas in a single object and make sure they are updated together:
             {

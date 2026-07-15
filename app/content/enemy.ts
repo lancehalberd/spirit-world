@@ -535,9 +535,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (!this.checkIfDefeated(state)) {
             this.makeSound(state, damageSound);
         }
-        if (this.area !== state.areaInstance) {
+        if (this.area !== state.areaSet?.current) {
             if (this.isDefeated && !this.isBoss) {
-                addEffectToArea(state, state.areaInstance, new FieldAnimationEffect({
+                addEffectToArea(state, state.areaSet?.current, new FieldAnimationEffect({
                     animation: enemyDeathAnimation,
                     x: this.x,
                     y: this.y,
@@ -613,7 +613,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                         if (lootData.lootType && lootData.lootType !== 'empty') {
                             getLoot(state, bossDefinition);
                         } else {
-                            state.areaInstance.needsLogicRefresh = true;
+                            state.currentAreaNeedsLogicRefresh = true;
                         }
                     }
                 });
@@ -664,8 +664,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         });
         // Always show the explosion in the player's instance so that the animation
         // is always visible.
-        addEffectToArea(state, state.areaInstance, explosionAnimation);
-        playAreaSound(state, state.areaInstance, 'enemyDeath');
+        addEffectToArea(state, state.areaSet?.current, explosionAnimation);
+        playAreaSound(state, state.areaSet?.current, 'enemyDeath');
     }
     shouldReset(state: GameState) {
         return true;
@@ -695,7 +695,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }
         }
         const ability = this.abilities.find(a => a.definition === definition);
-        if (definition.globalCooldownSection === state.areaSection && definition.globalCooldownExpiration > state.fieldTime) {
+        if (definition.globalCooldownSection === state.areaSet?.areaSection && definition.globalCooldownExpiration > state.fieldTime) {
             return false;
         }
         if (!ability || !(ability.charges > 0)) {
@@ -729,7 +729,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     useAbility(state: GameState, ability: EnemyAbilityWithCharges, target: any) {
         const definition = ability.definition;
         if (definition.globalCooldown) {
-            definition.globalCooldownSection = state.areaSection;
+            definition.globalCooldownSection = state.areaSet?.areaSection;
             definition.globalCooldownExpiration = state.fieldTime + definition.globalCooldown;
         }
         ability.charges--;

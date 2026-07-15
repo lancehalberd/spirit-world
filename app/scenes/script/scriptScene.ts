@@ -173,7 +173,7 @@ export class ScriptScene implements GameScene {
                     saveGame(state);
                     break;
                 case 'refreshAreaLogic':
-                    state.areaInstance.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     break;
                 case 'gainLoot':
                     getLoot(state, {type: 'dialogueLoot', ...event.lootDefinition});
@@ -221,6 +221,7 @@ export class ScriptScene implements GameScene {
                             state.hero.life = state.hero.savedData.maxLife;
                         },
                         nextLocation: state.location,
+                        nextAreaSet: state.areaSet,
                         time: 0,
                         type: 'fade',
                     };

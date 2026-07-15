@@ -516,14 +516,13 @@ interface AreaInstance {
     allyTargets: (EffectInstance | ObjectInstance)[]
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
-    needsLogicRefresh?: boolean
     needsIceRefresh?: boolean[][]|true
 }
 interface AreaSet {
     // The currently active area
     current: AreaInstance
-    // The
-    alernate: AreaInstance
+    // The alternate area for the active area.
+    alternate: AreaInstance
     // Surface or underwater areas connected to this area.
     // At most one of these will be set at once.
     // (Alternatively, we could always set both and one would be equal to current)

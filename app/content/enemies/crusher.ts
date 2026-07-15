@@ -70,7 +70,7 @@ enemyDefinitions.crusher = {
             if (enemy.z <= 0) {
                 enemy.z = 0;
                 enemy.makeSound(state, 'bossDeath');
-                if (enemy.area === state.areaInstance) {
+                if (enemy.area === state.areaSet?.current) {
                     addScreenShake(state, 0, 3);
                 }
                 addSlamEffect(state, enemy);

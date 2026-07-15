@@ -82,7 +82,7 @@ export const updateMusic = (state: GameState): void => {
     }
     // TODO: possibly preload tracks used after the end of the DEMO.
 
-    const allBosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+    const allBosses = [...state.areaSet?.current.enemies, ...state.areaSet?.alternate.enemies].filter(
         e => e.status !== 'gone' && e.definition.type === 'boss'
         && e.isFromCurrentSection(state)
     ) as Enemy[];
@@ -171,7 +171,7 @@ export const updateMusic = (state: GameState): void => {
     } else if (location.zoneKey === 'warTemple') {
         // Don't change music during transitions since the logic below that depends on x/y locations
         // may be invalid during transitions.
-        if (state.nextAreaInstance || state.nextAreaSection) {
+        if (state.nextAreaSet) {
             return;
         }
         // There is one frame after the transition finishes where the coordinates can be out
@@ -252,7 +252,7 @@ export function playAreaSound(state: GameState, area: AreaInstance, key: string)
     if (!isFieldSceneActive(state)) {
         return;
     }
-    if (!key || state.areaInstance !== area) {
+    if (!key || state.areaSet?.current !== area) {
         return;
     }
     return playSound(key);
@@ -264,7 +264,7 @@ export function playObjectSound(state: GameState, object: ObjectInstance | Effec
     if (!isFieldSceneActive(state)) {
         return;
     }
-    if (!key || !object.area || state.areaInstance !== object.area) {
+    if (!key || !object.area || state.areaSet?.current !== object.area) {
         return;
     }
     if (!isObjectInCurrentSection(state, object)) {

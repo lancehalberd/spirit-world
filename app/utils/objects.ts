@@ -180,16 +180,12 @@ export function saveObjectStatus(state: GameState, definition: ObjectDefinition,
     if (flag !== false && hash[fullKey] !== flag) {
         hash[fullKey] = flag;
         // This was added on 2026-04-12 in case it causes regression.
-        if (state.areaInstance) {
-            state.areaInstance.needsLogicRefresh = true;
-        }
+        state.currentAreaNeedsLogicRefresh = true;
         saveGame(state);
     } else if (flag === false && hash[fullKey]) {
         delete hash[fullKey];
         // This was added on 2026-04-12 in case it causes regression.
-        if (state.areaInstance) {
-            state.areaInstance.needsLogicRefresh = true;
-        }
+        state.currentAreaNeedsLogicRefresh = true;
         saveGame(state);
     }
 }
@@ -249,7 +245,7 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
     playChime = playChime && isObjectInCurrentSection(state, target);
     if (target.onActivate) {
         if (target.onActivate(state) && playChime) {
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
         return;
     }
@@ -257,13 +253,13 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
         changeObjectStatus(state, target, 'normal');
         saveObjectStatus(state, target.definition, true);
         if (playChime) {
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
     } else if (target.status === 'closedSwitch') {
         changeObjectStatus(state, target, 'normal');
         saveObjectStatus(state, target.definition, true);
         if (playChime) {
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
     }
 }
@@ -271,7 +267,7 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
 export function deactivateTarget(state: GameState, target: ObjectInstance): void {
     if (target.onDeactivate) {
         if (target.onDeactivate(state)) {
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
         return;
     }

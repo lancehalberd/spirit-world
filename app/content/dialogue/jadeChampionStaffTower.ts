@@ -117,7 +117,7 @@ dialogueHash.jadeChampionStaffTower = {
                     crushingPower: 2,
                     source: jadeChampion,
                 });
-                playAreaSound(state, state.areaInstance, 'rockShatter');
+                playAreaSound(state, state.areaSet?.current, 'rockShatter');
                 removeObjectFromArea(state, jadeChampion);
                 state.savedState.objectFlags.jadeChampionStaffTowerTop = true;
                 saveGame(state);

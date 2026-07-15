@@ -424,7 +424,7 @@ function updateLargeOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
                     break;
                 }
             }
-        } else if (state.areaInstance === enemy.area) {
+        } else if (state.areaSet?.current === enemy.area) {
             // Randomly attack from the small orbs when no target is nearby,
             // as long as the hero is in this world.
             enemy.params.shockwaveTimer = 2000;

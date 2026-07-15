@@ -1,6 +1,6 @@
 
 export function getSelectionBounds(state: GameState, x1: number, y1: number, x2: number, y2: number): {L: number, R: number, T: number, B: number} {
-    const layerDefinition = state.areaInstance.definition.layers[0];
+    const layerDefinition = state.areaSet?.current.definition.layers[0];
     if (!layerDefinition || !layerDefinition.grid) {
         return {L: 0, R: 0, T: 0, B: 0};
     }
@@ -16,7 +16,7 @@ export function getSelectionBounds(state: GameState, x1: number, y1: number, x2:
 }
 
 export function getChunkGeneratorSelectionBounds(state: GameState, generator: ChunkGenerator, x1: number, y1: number, x2: number, y2: number): {L: number, R: number, T: number, B: number} {
-    const layerDefinition = state.areaInstance.definition.layers[0];
+    const layerDefinition = state.areaSet?.current.definition.layers[0];
     if (!layerDefinition || !layerDefinition.grid) {
         return {L: 0, R: 0, T: 0, B: 0};
     }

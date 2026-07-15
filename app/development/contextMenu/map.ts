@@ -8,8 +8,8 @@ import {isOverworldZoneKey} from 'app/utils/location';
 export function getMapOptions(state: GameState, selectedSections: number[]): MenuOption[] {
     const areAllSectionsHidden = selectedSections.every(index => allSections[index].section.hideMap);
     let mapIds = Object.keys(dungeonMaps);
-    if (!isOverworldZoneKey(state.areaSection.definition.mapId)) {
-        mapIds = [state.areaSection.definition.mapId, ...mapIds.filter(mapId => mapId !== state.areaSection.definition.mapId)];
+    if (!isOverworldZoneKey(state.areaSet?.areaSection.definition.mapId)) {
+        mapIds = [state.areaSet?.areaSection.definition.mapId, ...mapIds.filter(mapId => mapId !== state.areaSet?.areaSection.definition.mapId)];
     }
     return [
         {

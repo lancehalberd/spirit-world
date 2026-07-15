@@ -180,7 +180,7 @@ export class Door implements ObjectInstance {
         // For a door you can walk through, we need to check if the section on the other side is hot.
         if (!this.targetObjectId || !this.targetZone) {
             // This logic is only valid if this door is at the same coordinates as the current super tile.
-            if (this.area !== state.areaInstance && this.area !== state.alternateAreaInstance) {
+            if (this.area !== state.areaSet?.current && this.area !== state.areaSet?.alternate) {
                 return;
             }
             // This is a fairly crude way of choosing a point in the section that the player ought to be
@@ -252,7 +252,7 @@ export class Door implements ObjectInstance {
             `);
             debugger;
         }
-        return this.area && (state.hero.area === this.area || state.nextAreaInstance === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
+        return this.area && (state.hero.area === this.area || state.nextAreaSet?.current === this.area) && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     isHeroTriggeringDoor(state: GameState) {
         // Hero does not trigger doors while falling. This avoid an edge case where falling into a pit
@@ -601,7 +601,7 @@ export class Door implements ObjectInstance {
             }
         }
         if (state.hero.renderParent == this) {
-            if (this.area === state.nextAreaInstance) {
+            if (this.area === state.nextAreaSet?.current) {
                 // The hero's coordinates are always relative to `this.area`, so we need to
                 // adjust by the door's camera offset if it is part of the next area during a transition.
                 context.save();

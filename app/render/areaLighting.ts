@@ -34,12 +34,12 @@ const waterSurfaceGranularity = 2;
 const surfaceLightIntensity = 0.3;
 export function updateWaterSurfaceCanvas(state: GameState, baseArea: AreaInstance): void {
     let underwaterArea: AreaInstance, surfaceArea: AreaInstance;
-    if (state.transitionState?.type === 'diving' && state.transitionState?.nextAreaInstance) {
-        underwaterArea = state.transitionState.nextAreaInstance;
-        surfaceArea = state.areaInstance;
-    } else if (state.transitionState?.type === 'surfacing' && state.transitionState?.nextAreaInstance) {
-        underwaterArea = state.areaInstance;
-        surfaceArea = state.transitionState.nextAreaInstance;
+    if (state.transitionState?.type === 'diving' && state.transitionState?.nextAreaSet) {
+        underwaterArea = state.transitionState.nextAreaSet.current;
+        surfaceArea = state.areaSet?.current;
+    } else if (state.transitionState?.type === 'surfacing' && state.transitionState?.nextAreaSet) {
+        underwaterArea = state.areaSet?.current;
+        surfaceArea = state.transitionState.nextAreaSet.current;
     } else {
         underwaterArea = getConnectedUnderwaterArea(state, baseArea) || baseArea;
         surfaceArea = getConnectedSurfaceArea(state, baseArea) || baseArea;
@@ -157,7 +157,7 @@ export function updateLightingCanvas(area: AreaInstance): void {
 }
 
 export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextAreaInstance?: AreaInstance) {
-    if (state.surfaceAreaInstance && !area.waterSurfaceCanvas) {
+    if (state.areaSet?.surface && !area.waterSurfaceCanvas) {
         updateWaterSurfaceCanvas(state, area);
     }
     if (!area.waterSurfaceCanvas) {
@@ -172,7 +172,7 @@ export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: 
             0, 0, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
         if (nextAreaInstance) {
-            if (state.surfaceAreaInstance && !nextAreaInstance.waterSurfaceCanvas) {
+            if (state.areaSet?.surface && !nextAreaInstance.waterSurfaceCanvas) {
                 updateWaterSurfaceCanvas(state, nextAreaInstance);
             }
             if (nextAreaInstance.waterSurfaceCanvas) {

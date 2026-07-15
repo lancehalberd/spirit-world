@@ -99,7 +99,7 @@ export function getLoot(this: void, state: GameState, definition: AnyLootDefinit
     addEffectToArea(state, state.hero.area, lootAnimation);
     state.hero.area.priorityObjects.push([lootAnimation]);
     // Refresh the area in case acquiring the item has change the logic of the area.
-    state.areaInstance.needsLogicRefresh = true;
+    state.currentAreaNeedsLogicRefresh = true;
     saveGame(state);
 }
 

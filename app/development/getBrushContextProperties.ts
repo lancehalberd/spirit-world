@@ -1,20 +1,17 @@
 import {logicHash} from 'app/content/logic';
 import {editingState} from 'app/development/editingState';
+import {refreshArea} from 'app/development/utils';
 import {layersInOrder} from 'app/gameConstants';
-import {enterLocation} from 'app/utils/enterLocation';
 import {addNewLayer, getDrawPriority} from 'app/utils/layers';
 
-function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
-}
 
 export function getBrushContextProperties(state: GameState): PanelRows {
     let rows: PanelRows = [];
-    for (let i = 0; i < state.areaInstance.definition.layers.length; i++) {
-        const definition = state.areaInstance.definition.layers[i];
-        const alternateDefinition = state.areaInstance.alternateArea.definition.layers[i];
-        const layer: AreaLayer | null = state.areaInstance.layers.find(layer => layer.definition === definition);
-        const alternateLayer: AreaLayer | null = state.areaInstance.alternateArea.layers.find(layer => layer.definition === alternateDefinition);
+    for (let i = 0; i < state.areaSet?.current.definition.layers.length; i++) {
+        const definition = state.areaSet?.current.definition.layers[i];
+        const alternateDefinition = state.areaSet?.current.alternateArea.definition.layers[i];
+        const layer: AreaLayer | null = state.areaSet?.current.layers.find(layer => layer.definition === definition);
+        const alternateLayer: AreaLayer | null = state.areaSet?.current.alternateArea.layers.find(layer => layer.definition === alternateDefinition);
         let row: PropertyRow = [
         {
             name: '',
@@ -79,14 +76,14 @@ export function getBrushContextProperties(state: GameState): PanelRows {
             },
         });
         // Deleting all layers can causes errors, so don't allow it.
-        if (state.areaInstance.definition.layers.length > 1) {
+        if (state.areaSet?.current.definition.layers.length > 1) {
             row.push({
                 name: 'X',
                 id: `layer-${i}-delete`,
                 onClick() {
-                    state.areaInstance.definition.layers.splice(i, 1);
-                    if (state.areaInstance.alternateArea.definition.layers) {
-                        state.areaInstance.alternateArea.definition.layers.splice(i, 1);
+                    state.areaSet?.current.definition.layers.splice(i, 1);
+                    if (state.areaSet?.current.alternateArea.definition.layers) {
+                        state.areaSet?.current.alternateArea.definition.layers.splice(i, 1);
                     }
                     refreshArea(state);
                 },
@@ -114,12 +111,12 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                     if (i <= 0) {
                         return;
                     }
-                    state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
-                    state.areaInstance.definition.layers[i - 1] = definition;
-                    if (state.areaInstance.alternateArea.definition.layers) {
-                        state.areaInstance.alternateArea.definition.layers[i]
-                            = state.areaInstance.alternateArea.definition.layers[i - 1];
-                        state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
+                    state.areaSet.current.definition.layers[i] = state.areaSet.current.definition.layers[i - 1];
+                    state.areaSet.current.definition.layers[i - 1] = definition;
+                    if (state.areaSet.current.alternateArea.definition.layers) {
+                        state.areaSet.current.alternateArea.definition.layers[i]
+                            = state.areaSet.current.alternateArea.definition.layers[i - 1];
+                        state.areaSet.current.alternateArea.definition.layers[i - 1] = alternateDefinition;
                     }
                     refreshArea(state);
                 },
@@ -128,14 +125,14 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                 name: 'v',
                 id: `layer-${i}-down`,
                 onClick() {
-                    if (i >= state.areaInstance.definition.layers.length - 1) {
+                    if (i >= state.areaSet.current.definition.layers.length - 1) {
                         return;
                     }
-                    state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
-                    state.areaInstance.definition.layers[i + 1] = definition;
-                    if (state.areaInstance.alternateArea.definition.layers) {
-                        state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
-                        state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
+                    state.areaSet.current.definition.layers[i] = state.areaSet.current.definition.layers[i + 1];
+                    state.areaSet.current.definition.layers[i + 1] = definition;
+                    if (state.areaSet.current.alternateArea.definition.layers) {
+                        state.areaSet.current.alternateArea.definition.layers[i] = state.areaSet.current.alternateArea.definition.layers[i + 1];
+                        state.areaSet.current.alternateArea.definition.layers[i + 1] = alternateDefinition;
                     }
                     refreshArea(state);
                 },
@@ -235,7 +232,7 @@ export function getBrushContextProperties(state: GameState): PanelRows {
     rows.push({
         name: 'Add Layer',
         onClick() {
-            const definition = state.areaInstance.definition;
+            const definition = state.areaSet?.current.definition;
             const lastLayer = definition.layers[definition.layers.length - 1];
             const previousLayerKey = editingState.selectedLayerKey || lastLayer.key;
             const previousLayerIndex = definition.layers.findIndex(layer => layer.key === previousLayerKey);
@@ -249,7 +246,7 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                     key = 'layer-' + definition.layers.length;
                 }
             }
-            addNewLayer(key, previousLayerIndex + 1, state.areaInstance.definition, state.alternateAreaInstance.definition);
+            addNewLayer(key, previousLayerIndex + 1, state.areaSet?.current.definition, state.areaSet?.alternate.definition);
             // Calling this will instantiate the area again and place the player back in their current location.
             if (editingState.selectedLayerKey) {
                 editingState.selectedLayerKey = key;

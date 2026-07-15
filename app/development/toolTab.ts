@@ -228,8 +228,8 @@ function getBrushPaletteProperties(): PanelRows {
             values: [...Object.keys(paletteHash), ...Object.keys(sourcePalettes)],
             onChange(key: string) {
                 editingState.paletteKey = key;
-                state.areaInstance.tilesDrawn = [];
-                state.areaInstance.checkToRedrawTiles = true;
+                state.areaSet.current.tilesDrawn = [];
+                state.areaSet.current.checkToRedrawTiles = true;
                 editingState.needsRefresh = true;
             },
         },{
@@ -245,8 +245,8 @@ function getBrushPaletteProperties(): PanelRows {
                     grid: [],
                 };
                 editingState.paletteKey = fileName;
-                state.areaInstance.tilesDrawn = [];
-                state.areaInstance.checkToRedrawTiles = true;
+                state.areaSet.current.tilesDrawn = [];
+                state.areaSet.current.checkToRedrawTiles = true;
                 editingState.needsRefresh = true;
             },
         }]);

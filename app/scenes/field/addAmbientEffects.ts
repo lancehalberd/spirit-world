@@ -16,20 +16,20 @@ export function addAmbientEffects(this: void, state: GameState) {
             }
             points = Random.shuffle(points);
         }
-        //const x = (state.fieldTime * 56 / FRAME_LENGTH) % (state.areaInstance.w * 16);
-        //const y = (state.fieldTime * 88 / FRAME_LENGTH) % (state.areaInstance.h * 16);
+        //const x = (state.fieldTime * 56 / FRAME_LENGTH) % (state.areaSet?.current.w * 16);
+        //const y = (state.fieldTime * 88 / FRAME_LENGTH) % (state.areaSet?.current.h * 16);
 
         const {x, y} = points.pop();
-        for (let sy = 0; sy < state.areaInstance.h / 16; sy++) {
-            for (let sx = 0; sx < state.areaInstance.w / 16; sx++) {
-                addAmbientEffectToPoint(state, state.areaInstance, {x: 256 * sx + x, y: 256 * sy + y});
+        for (let sy = 0; sy < state.areaSet?.current.h / 16; sy++) {
+            for (let sx = 0; sx < state.areaSet?.current.w / 16; sx++) {
+                addAmbientEffectToPoint(state, state.areaSet?.current, {x: 256 * sx + x, y: 256 * sy + y});
             }
         }
     }
-    /*addAmbientEffectToPoint(state, state.areaInstance, points.pop()
+    /*addAmbientEffectToPoint(state, state.areaSet?.current, points.pop()
         {
-            x: (Math.random() * 16 * state.areaInstance.w),
-            y: (Math.random() * 16 * state.areaInstance.h)
+            x: (Math.random() * 16 * state.areaSet?.current.w),
+            y: (Math.random() * 16 * state.areaSet?.current.h)
         }
     );*/
 }
@@ -114,12 +114,12 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
             }))));
         }
     }
-    if (state.areaInstance === area && state.areaSection?.isHot) {
+    if (state.areaSet?.current === area && state.areaSet?.areaSection?.isHot) {
         const sparkle = addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'fire' });
         sparkle.drawPriority = 'foreground';
         return;
     }
-    if (state.areaInstance === area && state.areaSection?.isCorrosive && Math.random() < 0.2) {
+    if (state.areaSet?.current === area && state.areaSet?.areaSection?.isCorrosive && Math.random() < 0.2) {
         const sparkle = addAnimationEffectToBackground(state, area, Random.element(iceSparkleAnimations), {x, y});
         // const sparkle = addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'ice' });
         sparkle.drawPriority = 'foreground';

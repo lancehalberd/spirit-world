@@ -74,7 +74,7 @@ export function useTool(
                 vy: speed * directionMap[direction][1],
                 source: hero,
             });
-            addEffectToArea(state, state.areaInstance, arrow);
+            addEffectToArea(state, state.areaSet?.current, arrow);
             if (isUpgradedBow && chargeLevel >= 1) {
                 direction = rotateDirection(direction, -1/2);
                 arrow = new Arrow({
@@ -86,7 +86,7 @@ export function useTool(
                     source: hero,
                 });
                 playAreaSound(state, hero.area, 'arrow');
-                addEffectToArea(state, state.areaInstance, arrow);
+                addEffectToArea(state, state.areaSet?.current, arrow);
                 direction = rotateDirection(direction, 1);
                 arrow = new Arrow({
                     ...baseArrowProps,
@@ -97,7 +97,7 @@ export function useTool(
                     source: hero,
                 });
                 playAreaSound(state, hero.area, 'arrow');
-                addEffectToArea(state, state.areaInstance, arrow);
+                addEffectToArea(state, state.areaSet?.current, arrow);
             }
             if (chargeLevel >= 2) {
                 direction = hero.d;
@@ -114,7 +114,7 @@ export function useTool(
                     delay: 100,
                     source: hero,
                 });
-                addEffectToArea(state, state.areaInstance, arrow);
+                addEffectToArea(state, state.areaSet?.current, arrow);
                 if (isUpgradedBow) {
                     direction = rotateDirection(direction, -1/2);
                     arrow = new Arrow({
@@ -126,7 +126,7 @@ export function useTool(
                         delay: 100,
                         source: hero,
                     });
-                    addEffectToArea(state, state.areaInstance, arrow);
+                    addEffectToArea(state, state.areaSet?.current, arrow);
                     direction = rotateDirection(direction, 1);
                     arrow = new Arrow({
                         ...baseArrowProps,
@@ -137,7 +137,7 @@ export function useTool(
                         delay: 100,
                         source: hero,
                     });
-                    addEffectToArea(state, state.areaInstance, arrow);
+                    addEffectToArea(state, state.areaSet?.current, arrow);
                 }
             }
             return;
@@ -189,7 +189,7 @@ export function useTool(
                 hero.cloneToolReleased = false;
                 const clone = new window.Clone(state.hero);
                 state.hero.clones.push(clone);
-                addObjectToArea(state, state.areaInstance, clone);
+                addObjectToArea(state, state.areaSet?.current, clone);
                 clone.isUncontrollable = true;
                 clone.explosionTime = 0;
                 clone.onGrab(state, hero.d, hero);
@@ -209,7 +209,7 @@ export function useTool(
                 for (let i = 0; i < maxClones && i < state.hero.life - 1; i++) {
                     const clone = new window.Clone(state.hero);
                     state.hero.clones.push(clone);
-                    addObjectToArea(state, state.areaInstance, clone);
+                    addObjectToArea(state, state.areaSet?.current, clone);
                     // Switch to the new clone immediately
                     swapHeroStates(state.hero, clone);
                 }
@@ -221,7 +221,7 @@ export function useTool(
                 hero.activeStaff.recall(state);
                 hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
-                playAreaSound(state, state.areaInstance, 'menuTick');
+                playAreaSound(state, state.areaSet?.current, 'menuTick');
                 return;
             }
             if (hero.activeStaff?.area) {

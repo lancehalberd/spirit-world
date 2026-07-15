@@ -16,7 +16,7 @@ import {saveGame} from 'app/utils/saveGame';
 
 
 function getRivalBoss(state: GameState): Enemy {
-    const rival = state.areaInstance.enemies.find(t => t.definition?.id === 'tombRivalBoss') as Enemy;
+    const rival = state.areaSet?.current.enemies.find(t => t.definition?.id === 'tombRivalBoss') as Enemy;
     if (!rival) {
         console.error('Could not find tombRivalBoss');
     }
@@ -41,7 +41,7 @@ dialogueHash.elder = {
             }
             hideHUD(state, (state: GameState) => {
                 removeObjectFromArea(state, rival);
-                removeObjectFromAreaById(state, state.areaInstance, 'elder');
+                removeObjectFromAreaById(state, state.areaSet?.current, 'elder');
                 state.hero.life = state.hero.savedData.maxLife;
             });
             state.hero.prepareForCutScene();
@@ -59,7 +59,7 @@ dialogueHash.elder = {
                 type: 'wait',
                 blocksInput: true,
                 callback(state: GameState, waitTime: number) {
-                    if (state.areaInstance.effects.find(effect => effect.isEnemyAttack)) {
+                    if (state.areaSet?.current.effects.find(effect => effect.isEnemyAttack)) {
                         return true;
                     }
                     if (state.hero.invulnerableFrames > 0 || rival.invulnerableFrames > 0

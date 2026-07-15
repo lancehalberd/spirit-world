@@ -132,7 +132,7 @@ function updateReset(state: GameState, gameState:TargetPracticeState, savedState
             Object.assign(savedState, getNewTargetPracticeSavedState());
             saveGame(state);
             gameState.scene = 'shop';
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
     }
 }

@@ -4,7 +4,7 @@ import {bossRushConditions, getBossRushOptions} from 'app/scenes/bossRush/bossRu
 import {bossSpawnPoints, getSavedBossRushData, startNextBoss} from 'app/scenes/bossRush/showBossRushScene';
 import {renderBossRushMenu, renderConditionsMenu} from "app/scenes/bossRush/renderBossRush";
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
-import {updateTransition} from 'app/scenes/field/updateTransition';
+//import {updateTransition} from 'app/scenes/field/updateTransition';
 // import {playTrack} from "app/utils/sounds";
 import {
     wasGameKeyPressed,
@@ -24,9 +24,10 @@ export class BossRushScene implements GameScene {
     conditionsIndex = 0;
     bossRushIndex = 0;
     update(state: GameState, interactive: boolean) {
-        if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
-            updateTransition(state);
-        }
+        // I don't think this is necessary any more
+        //if (state.transitionState && !state.areaSet?.current?.priorityObjects?.length) {
+        //    updateTransition(state, state.transitionState);
+        //}
         if (!interactive) {
             return;
         }

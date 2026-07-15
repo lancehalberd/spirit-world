@@ -290,7 +290,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         if (gameState.ammo <= 0) {
-            playAreaSound(state, state.areaInstance, 'error');
+            playAreaSound(state, state.areaSet?.current, 'error');
         } else {
             gameState.shotsFired++;
             
@@ -314,7 +314,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
             if (!hitTarget) {
                 gameState.ammo--;
                 gameState.missedShots++;
-                playAreaSound(state, state.areaInstance, 'missedShot');
+                playAreaSound(state, state.areaSet?.current, 'missedShot');
             }
         }
     }

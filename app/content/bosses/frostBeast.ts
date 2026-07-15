@@ -234,10 +234,10 @@ enemyDefinitions.frostHeart = {
 };
 
 function isUnderwaterHeart(state: GameState, enemy: Enemy): boolean {
-    if (state.surfaceAreaInstance) {
-        return enemy.area !== state.surfaceAreaInstance;
+    if (state.areaSet?.surface) {
+        return enemy.area !== state.areaSet?.surface;
     }
-    return enemy.area === state.underwaterAreaInstance;
+    return enemy.area === state.areaSet?.underwater;
 }
 
 enemyDefinitions.frostBeast = {
@@ -299,12 +299,12 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
     // The surface+underwater heart are actually two bosses in two different areas that
     // are combined as if a single boss. Simlarly for the serpents.
     let surfaceHeart, underwaterHeart;
-    if (state.surfaceAreaInstance) {
-        surfaceHeart = getFrostHeart(state, state.surfaceAreaInstance);
+    if (state.areaSet?.surface) {
+        surfaceHeart = getFrostHeart(state, state.areaSet?.surface);
         underwaterHeart = enemy;
-    } else if (state.underwaterAreaInstance) {
+    } else if (state.areaSet?.underwater) {
         surfaceHeart = enemy;
-        underwaterHeart = getFrostHeart(state, state.underwaterAreaInstance);
+        underwaterHeart = getFrostHeart(state, state.areaSet?.underwater);
     }
     // Make sure the heart displays the correct animation.
     if (surfaceHeart && surfaceHeart.animations !== frostHeartSurfaceAnimations) {
@@ -541,12 +541,12 @@ function throwLandMineGrenade(state: GameState, enemy: Enemy) {
 
 function updateFrostSerpent(state: GameState, enemy: Enemy): void {
     let surfaceSerpent, underwaterSerpent;
-    if (state.surfaceAreaInstance) {
-        surfaceSerpent = getFrostSerpent(state, state.surfaceAreaInstance);
+    if (state.areaSet?.surface) {
+        surfaceSerpent = getFrostSerpent(state, state.areaSet?.surface);
         underwaterSerpent = enemy;
-    } else if (state.underwaterAreaInstance) {
+    } else if (state.areaSet?.underwater) {
         surfaceSerpent = enemy;
-        underwaterSerpent = getFrostSerpent(state, state.underwaterAreaInstance);
+        underwaterSerpent = getFrostSerpent(state, state.areaSet?.underwater);
     }
     // If either serpent is defeated, both are defeated.
     if (isEnemyDefeated(surfaceSerpent) || isEnemyDefeated(underwaterSerpent)) {

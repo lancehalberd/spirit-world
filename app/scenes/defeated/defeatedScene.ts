@@ -22,14 +22,14 @@ export class DefeatedScene implements GameScene {
             //return;
         }
         this.time += FRAME_LENGTH;
-        for (const effect of state.areaInstance.effects) {
+        for (const effect of state.areaSet?.current.effects) {
             if (effect.drawPriority === 'background-special' || effect.drawPriority === 'foreground-special') {
                 effect.update?.(state, false);
             }
         }
         if (this.time === 1000) {
             const hitbox = state.hero.getHitbox();
-            addDustBurst(state, state.areaInstance,
+            addDustBurst(state, state.areaSet?.current,
                 hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, state.hero.z);
         }
         // Add 0.5s pause afer showing menu before taking input so that players don't accidentally take action.
@@ -43,7 +43,7 @@ export class DefeatedScene implements GameScene {
             // and starts regaining life.
             if (this.time === 2400) {
                 const hitbox = state.hero.getHitbox();
-                addReviveBurst(state, state.areaInstance,
+                addReviveBurst(state, state.areaSet?.current,
                     hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, state.hero.z);
             }
             if (this.time < 2500) {
@@ -99,14 +99,14 @@ export class DefeatedScene implements GameScene {
         context.restore();
         context.save();
             // render the hero + special effects on top of the dark background.
-            translateContextForAreaAndCamera(context, state, state.areaInstance);
-            for (const effect of state.areaInstance.objectsToRender) {
+            translateContextForAreaAndCamera(context, state, state.areaSet?.current);
+            for (const effect of state.areaSet?.current.objectsToRender) {
                 if (effect.drawPriority === 'background-special') {
                     effect.render?.(context, state);
                 }
             }
             state.hero.render(context, state);
-            for (const effect of state.areaInstance.objectsToRender) {
+            for (const effect of state.areaSet?.current.objectsToRender) {
                 if (effect.drawPriority === 'foreground-special') {
                     effect.render?.(context, state);
                 }

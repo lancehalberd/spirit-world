@@ -61,7 +61,7 @@ export class SaveStatue implements ObjectInstance {
         });
         state.hero.burnDamage = 0;
         state.hero.life = state.hero.savedData.maxLife;
-        if (state.hero.magicRegen > 0 && (!state.areaSection.isCorrosive || state.hero.savedData.passiveTools.waterBlessing)) {
+        if (state.hero.magicRegen > 0 && (!state.areaSet?.areaSection.isCorrosive || state.hero.savedData.passiveTools.waterBlessing)) {
             state.hero.magic = state.hero.maxMagic;
             state.hero.magicRegenCooldown = 0;
         }

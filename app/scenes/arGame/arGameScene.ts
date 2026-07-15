@@ -33,7 +33,7 @@ export class ARGameScene implements GameScene {
     blocksUpdates = false;
     closeScene(state: GameState) {
         state.arState.active = false;
-        state.areaInstance.needsLogicRefresh = true;
+        state.currentAreaNeedsLogicRefresh = true;
         // Some games hide the HUD, so make sure we show it again on quitting.
         state.hideHUD = false;
         showFieldScene(state);
@@ -68,7 +68,7 @@ export class ARGameScene implements GameScene {
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
         context.save();
-            translateContextForAreaAndCamera(context, state, state.areaInstance);
+            translateContextForAreaAndCamera(context, state, state.areaSet?.current);
             this.game.render(context, state);
         context.restore();
     }
@@ -97,5 +97,5 @@ export function showARGameScene(state: GameState, gameId: ARGameID) {
     arScene.game.start(state);
     state.sceneStack = [sceneHash.field, arScene, sceneHash.hud, arHudScene];
     state.arState.active = true;
-    state.areaInstance.needsLogicRefresh = true;
+    state.currentAreaNeedsLogicRefresh = true;
 }

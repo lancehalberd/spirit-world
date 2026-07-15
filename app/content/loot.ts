@@ -466,9 +466,9 @@ export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmou
             return showMessage(state, getMessage + '{item:peachOfImmortality}');
         
         case 'staff':
-            if (state.hero.savedData.activeTools.staff & 2) {
+            if (state.hero.savedData.activeTools.staff & 2 && state.areaSet?.current) {
                 // Refresh the location to hide the tower.
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             // Use default handling for first staff.
             break;

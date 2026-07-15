@@ -1,7 +1,7 @@
-import { renderPropertyRows } from 'app/development/propertyPanel';
-import { TabContainer } from 'app/development/tabContainer';
-import { getState } from 'app/state';
-import { enterLocation } from 'app/utils/enterLocation';
+import {renderPropertyRows} from 'app/development/propertyPanel';
+import {TabContainer} from 'app/development/tabContainer';
+import {refreshArea} from 'app/development/utils';
+import {getState} from 'app/state';
 import {findAllZoneFlags} from 'app/utils/findAllZoneFlags';
 
 
@@ -54,8 +54,7 @@ function getProgressProperties() {
                     delete state.savedState.objectFlags[key];
                     state.location.x = state.hero.x;
                     state.location.y = state.hero.y;
-                    // Calling this will instantiate the area again and place the player back in their current location.
-                    enterLocation(state, state.location, {instant: true});
+                    refreshArea(state);
                     // Only a single key can be added/updated each frame, so stop on update.
                     return;
                 }
@@ -63,8 +62,7 @@ function getProgressProperties() {
             for (const key of keys) {
                 if (!state.savedState.objectFlags[key]) {
                     state.savedState.objectFlags[key] = true;
-                    // Calling this will instantiate the area again and place the player back in their current location.
-                    enterLocation(state, state.location, {instant: true});
+                    refreshArea(state);
                     // Only a single key can be added/updated each frame, so stop on update.
                     return;
                 }

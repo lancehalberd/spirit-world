@@ -9,7 +9,7 @@ specialBehaviorsHash.tombEntranceSwitch = {
         // who is guarding the tomb, becomes enraged triggering a small boss fight.
         if (!state.savedState.objectFlags.tombRivalEnraged) {
             state.savedState.objectFlags.tombRivalEnraged = true;
-            object.area.needsLogicRefresh = true;
+            state.currentAreaNeedsLogicRefresh = true;
             saveGame(state);
         }
     },

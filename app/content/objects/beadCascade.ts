@@ -347,7 +347,7 @@ export class BeadSection implements ObjectInstance {
                         hero.actionDy = 0.75;
                         hero.d = 'right';
                     } else {
-                        const speed = state.nextAreaInstance ? 0.75 : 4;
+                        const speed = state.nextAreaSet?.current ? 0.75 : 4;
                         hero.y += speed;
                         hero.actionDy = speed;
                         hero.d = 'up';

@@ -79,12 +79,12 @@ enemyDefinitions.lightningDrone = {
             }
         }
         enemy.shielded = enemy.mode !== 'discharge';
-        if (enemy.area !== state.areaInstance) {
+        if (enemy.area !== state.areaSet?.current) {
             const hitbox = enemy.getHitbox(state);
             if (enemy.modeTime % 60 === 0) {
-                addSparkleAnimation(state, state.areaInstance, hitbox, { element: 'lightning' });
+                addSparkleAnimation(state, state.areaSet?.current, hitbox, { element: 'lightning' });
             }
-            hitTargets(state, state.areaInstance, {
+            hitTargets(state, state.areaSet?.current, {
                 damage: 4,
                 element: 'lightning',
                 hitbox,

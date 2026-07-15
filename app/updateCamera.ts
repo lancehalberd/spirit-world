@@ -1,21 +1,25 @@
 import {
     getAreaInstanceFromLocation, linkObjects,
-    setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
-import { editingState } from 'app/development/editingState';
+import {evaluateLogicDefinition} from 'app/content/logic'
+import {editingState} from 'app/development/editingState';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
-import { updateAreaSection } from 'app/utils/area';
-import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
-import { getAreaSize } from 'app/utils/getAreaSize';
-import { addEffectToArea } from 'app/utils/effects';
+import {cleanupHeroFromArea, setAreaSection} from 'app/utils/area';
+import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
+import {createObjectInstance} from 'app/utils/createObjectInstance';
+import {findObjectInstanceByDefinition} from 'app/utils/findObjectInstanceById';
+import {getAreaSize} from 'app/utils/getAreaSize';
+import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {getCameraTarget} from 'app/utils/fixCamera';
-import { addObjectToArea } from 'app/utils/objects';
-import { isObjectInsideTarget } from 'app/utils/index';
+import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
+import {isObjectInsideTarget} from 'app/utils/index';
+import {resetTileBehavior} from 'app/utils/tileBehavior';
+import {applyVariantsToArea} from 'app/utils/variants';
 
 const cameraSpeed = 10;
 export function updateCamera(state: GameState, speed?: number): void {
     if (!speed) {
-        if (state.hero.action === 'jumpingDown' && !state.nextAreaSection && !state.nextAreaInstance) {
+        if (state.hero.action === 'jumpingDown' && !state.nextAreaSet) {
             speed = 4;
         } else {
             speed = editingState.isEditing ? 20 : (state.camera.speed ?? cameraSpeed);
@@ -23,59 +27,59 @@ export function updateCamera(state: GameState, speed?: number): void {
     }
     const { w, h, section } = getAreaSize(state);
     // Quickly move the character to the desired initial position for displaying the next area.
-    if (state.nextAreaInstance) {
+    if (state.nextAreaSet?.current && state.nextAreaSet.current !== state.areaSet.current) {
         let finished = true;
-        if (state.nextAreaInstance.cameraOffset.x < 0 && state.camera.x > -CANVAS_WIDTH) {
+        if (state.nextAreaSet.current.cameraOffset.x < 0 && state.camera.x > -CANVAS_WIDTH) {
             state.camera.x = Math.max(state.camera.x - speed, -CANVAS_WIDTH);
             finished = false;
         }
-        if (state.nextAreaInstance.cameraOffset.x > 0 && state.camera.x < w) {
+        if (state.nextAreaSet.current.cameraOffset.x > 0 && state.camera.x < w) {
             state.camera.x = Math.min(state.camera.x + speed, w);
             finished = false;
         }
-        if (state.nextAreaInstance.cameraOffset.y < 0 && state.camera.y > -CANVAS_HEIGHT) {
+        if (state.nextAreaSet.current.cameraOffset.y < 0 && state.camera.y > -CANVAS_HEIGHT) {
             state.camera.y = Math.max(state.camera.y - speed, -CANVAS_HEIGHT);
             finished = false;
         }
-        if (state.nextAreaInstance.cameraOffset.y > 0 && state.camera.y < h) {
+        if (state.nextAreaSet.current.cameraOffset.y > 0 && state.camera.y < h) {
             state.camera.y = Math.min(state.camera.y + speed, h);
             finished = false;
         }
         if (finished) {
             // Null out references to canvas/context in case that helps GC them faster.
             if (!editingState.isEditing) {
-                for (const frame of state.areaInstance.backgroundFrames) {
+                for (const frame of state.areaSet.current.backgroundFrames) {
                     frame.canvas = null;
                     frame.context = null;
                 }
             }
             // The held chakram can transition between areas with the hero.
-            for (const object of state.areaInstance.objects) {
+            for (const object of state.areaSet.current.objects) {
                 if (object.changesAreas) {
-                    addObjectToArea(state, state.nextAreaInstance, object);
-                    object.x -= state.nextAreaInstance.cameraOffset.x;
-                    object.y -= state.nextAreaInstance.cameraOffset.y;
+                    addObjectToArea(state, state.nextAreaSet.current, object);
+                    object.x -= state.nextAreaSet.current.cameraOffset.x;
+                    object.y -= state.nextAreaSet.current.cameraOffset.y;
                 }
             }
-            for (const effect of state.areaInstance.effects) {
+            for (const effect of state.areaSet.current.effects) {
                 if (effect.changesAreas) {
-                    addEffectToArea(state, state.nextAreaInstance, effect);
-                    effect.x -= state.nextAreaInstance.cameraOffset.x;
-                    effect.y -= state.nextAreaInstance.cameraOffset.y;
+                    addEffectToArea(state, state.nextAreaSet.current, effect);
+                    effect.x -= state.nextAreaSet.current.cameraOffset.x;
+                    effect.y -= state.nextAreaSet.current.cameraOffset.y;
                 }
             }
-            const lastAreaInstance = state.areaInstance;
-            state.areaInstance = state.nextAreaInstance;
-            state.hero.x -= state.areaInstance.cameraOffset.x;
-            state.hero.y -= state.areaInstance.cameraOffset.y;
-            state.camera.x -= state.areaInstance.cameraOffset.x;
-            state.camera.y -= state.areaInstance.cameraOffset.y;
+            //const lastAreaInstance = state.areaSet.current;
+            state.areaSet = state.nextAreaSet;
+            state.hero.x -= state.areaSet.current.cameraOffset.x;
+            state.hero.y -= state.areaSet.current.cameraOffset.y;
+            state.camera.x -= state.areaSet.current.cameraOffset.x;
+            state.camera.y -= state.areaSet.current.cameraOffset.y;
             // This is done in updateAreaSection.
             //state.hero.safeD = state.hero.d;
             //state.hero.safeX = state.hero.x;
             //state.hero.safeY = state.hero.y;
-            state.areaInstance.cameraOffset = {x: 0, y: 0};
-            state.nextAreaInstance = null;
+            state.areaSet.current.cameraOffset = {x: 0, y: 0};
+            delete state.nextAreaSet;
             // We don't seem to need this any more, but let's preserve it for a bit
             // in case we see issues with super tile transitions again.
             // An old bug used to be that you could briefly move after screen transition
@@ -88,23 +92,25 @@ export function updateCamera(state: GameState, speed?: number): void {
                 time: state.time,
             });*/
 
-            state.alternateAreaInstance = getAreaInstanceFromLocation(
+            state.areaSet.alternate = getAreaInstanceFromLocation(
                 state,
                 {...state.location, isSpiritWorld: !state.location.isSpiritWorld}
             );
-            state.areaInstance.alternateArea = state.alternateAreaInstance;
-            state.alternateAreaInstance.alternateArea = state.areaInstance;
-            linkObjects(state);
-            updateAreaSection(state, true);
-            setConnectedAreas(state, lastAreaInstance);
-            state.hero.area = state.areaInstance;
+            state.areaSet.current.alternateArea = state.areaSet.alternate;
+            state.areaSet.alternate.alternateArea = state.areaSet.current;
+            //This should have been done prior to initializing objects.
+            //linkObjects(state);
+            // This should be done when the area set was generated
+            //updateAreaSection(state, true);
+            //setConnectedAreas(state, lastAreaInstance);
+            state.hero.area = state.areaSet.current;
             if (editingState.isEditing) {
                 editingState.needsRefresh = true;
-                state.areaInstance.tilesDrawn = [];
-                state.areaInstance.checkToRedrawTiles = true;
+                state.areaSet.current.tilesDrawn = [];
+                state.areaSet.current.checkToRedrawTiles = true;
             }
-            checkIfAllEnemiesAreDefeated(state, state.areaInstance);
-            checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
+            checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
+            checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
 
             // Make sure to remove renderParent from the hero for any objects that are
             // no longer being rendered.
@@ -125,11 +131,102 @@ export function updateCamera(state: GameState, speed?: number): void {
     } else if (state.camera.y > target.y) {
         state.camera.y = Math.max(state.camera.y - speed, target.y);
     }
+
     // Switch to the next area as soon as the screen is displayed entirely in the new section.
     // section is for the next area section, if one is present.
-    if (state.nextAreaSection && isObjectInsideTarget({
+    if (state.nextAreaSet?.areaSection && isObjectInsideTarget({
         x: state.camera.x, y: state.camera.y, w: CANVAS_WIDTH, h: CANVAS_HEIGHT
     }, section)) {
-        switchToNextAreaSection(state);
+        // Cleanup the previous sections now that they are completely offscreen.
+        resetSection(state, state.areaSet.current, state.areaSet.areaSection);
+        resetSection(state, state.areaSet.alternate, state.areaSet.alternateAreaSection);
+        linkObjects(state);
+        cleanupHeroFromArea(state);
+        // Swap to the next area set
+        state.areaSet = state.nextAreaSet;
+        delete state.nextAreaSet;
+        setAreaSection(state, state.areaSet.areaSection);
+        editingState.needsRefresh = true;
+        state.hero.safeD = state.hero.d;
+        state.hero.safeX = state.hero.x;
+        state.hero.safeY = state.hero.y;
+        checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
+        checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
     }
+}
+
+
+function resetSection(state: GameState, area: AreaInstance, section: Rect): void {
+    // First reset tiles that need to be reset.
+    // This is done before objects since some objects will update the tiles under them.
+    for (let y = 0; y < section.h; y++) {
+        const row = section.y + y;
+        for (let x = 0; x < section.w; x++) {
+            const column = section.x + x;
+            for (const layer of area.layers) {
+                layer.tiles[row][column] = layer.originalTiles[row][column];
+            }
+            resetTileBehavior(area, {x: column, y: row});
+            if (area.tilesDrawn[row]?.[column]) {
+                area.tilesDrawn[row][column] = false;
+            }
+        }
+    }
+    area.checkToRedrawTiles = true;
+    // Remove effects unless they update during the transition, like the held chakram.
+    for (const effect of [...area.effects]) {
+        if (!effect.updateDuringTransition) {
+            removeEffectFromArea(state, effect);
+        }
+    }
+    const l = section.x * 16;
+    const t = section.y * 16;
+    // Objects will be initialized after all objects are added to the area since some object initialization will depend on
+    // other objects, for example beds/cocoons placing target NPC objects inside of them.
+    const objectsToInitialize: ObjectInstance[] = [];
+    // Remove any objects from that area that should be reset.
+    // This will permanently remove any objects that reset and don't have definitions, like loot drops.
+    for (const object of [...area.objects]) {
+        // We only want to use definitions from the area itself, not transient objects like minions.
+        const definition = area.definition.objects[area.definition.objects.indexOf(object.definition)];
+        // Only update objects defined in this section
+        if (definition?.x >= l + section.w * 16 || definition?.x < l || definition?.y >= t + section.h * 16 || definition?.y < t) {
+            continue;
+        }
+        if (object.alwaysReset || object.shouldReset && object.shouldReset(state)) {
+            removeObjectFromArea(state, object);
+            // Transient effects or minions summoned by a boss should just be despawned when reset.
+            if (definition) {
+                if (!evaluateLogicDefinition(state, definition)) {
+                    continue;
+                }
+                const object = createObjectInstance(state, definition);
+                addObjectToArea(state, area, object);
+                objectsToInitialize.push(object);
+            }
+        }
+    }
+    // Reset objects in the section that should be reset.
+    for (let i = 0; i < area.definition.objects.length; i++) {
+        const definition = area.definition.objects[i];
+        // Ignore objects defined outside of this section.
+        if (definition.x >= l + section.w * 16 || definition.x < l || definition.y >= t + section.h * 16 || definition.y < t) {
+            continue;
+        }
+        if (!evaluateLogicDefinition(state, definition)) {
+            continue;
+        }
+        let object = findObjectInstanceByDefinition(area, definition, true);
+        if (!object) {
+            object = createObjectInstance(state, definition);
+            if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
+                addObjectToArea(state, area, object);
+                objectsToInitialize.push(object);
+            }
+        }
+    }
+    for (const object of objectsToInitialize) {
+        initializeObject(state, object, true);
+    }
+    applyVariantsToArea(state, area);
 }

@@ -12,7 +12,7 @@ import {saveSettings} from 'app/utils/saveSettings';
 
 
 function getRivalBoss(state: GameState): Enemy {
-    const rival = state.areaInstance.enemies.find(t => t.definition.enemyType === 'rival2') as Enemy;
+    const rival = state.areaSet?.current.enemies.find(t => t.definition.enemyType === 'rival2') as Enemy;
     if (!rival) {
         console.error('Could not find rival2');
     }

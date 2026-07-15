@@ -50,20 +50,20 @@ export class MapScene implements GameScene {
             this.closeScene(state);
             return;
         }
-        const floorKeys = Object.keys(dungeonMaps[state.areaSection?.definition.mapId]?.floors || {});
+        const floorKeys = Object.keys(dungeonMaps[state.areaSet?.areaSection?.definition.mapId]?.floors || {});
         const showFullMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map || editingState.isEditing;
         let safety = 0;
         if (floorKeys.length > 1 && wasGameKeyPressed(state, GAME_KEY.UP)) {
             do {
                 this.floorIndex = (this.floorIndex + 1) % floorKeys.length;
             } while (++safety < 1000 && !showFullMap
-                && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorKeys[this.floorIndex]].sections?.find(section => isSectionExplored(state, section)));
+                && !dungeonMaps[state.areaSet?.areaSection?.definition.mapId]?.floors[floorKeys[this.floorIndex]].sections?.find(section => isSectionExplored(state, section)));
             editingState.selectedSections = [];
         } else if (floorKeys.length > 1 && wasGameKeyPressed(state, GAME_KEY.DOWN)) {
             do {
                 this.floorIndex = (this.floorIndex + floorKeys.length - 1) % floorKeys.length;
             } while (++safety < 1000 && !showFullMap
-                && !dungeonMaps[state.areaSection?.definition.mapId]?.floors[floorKeys[this.floorIndex]]?.sections?.find(section => isSectionExplored(state, section)));
+                && !dungeonMaps[state.areaSet?.areaSection?.definition.mapId]?.floors[floorKeys[this.floorIndex]]?.sections?.find(section => isSectionExplored(state, section)));
             editingState.selectedSections = [];
         }
         if (safety > 500) {

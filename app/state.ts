@@ -137,8 +137,8 @@ export function canOpenMenu(state: GameState): boolean {
     return !(
         state.hero.isExitingDoor || state.hero.isControlledByObject
         || state.transitionState
-        || state.nextAreaSection || state.nextAreaInstance
-        || state.areaInstance.priorityObjects?.length
+        || state.nextAreaSet || state.nextAreaSet
+        || state.areaSet.current.priorityObjects?.length
         || state.hero.action === 'falling' || state.hero.action === 'fallen'
         || state.hideHUD
     );

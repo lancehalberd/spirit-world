@@ -1,11 +1,14 @@
-import {scrollToArea} from 'app/content/areas';
+import {createAreaInstance} from 'app/content/areas';
 import {editingState} from 'app/development/editingState';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {wasToolButtonPressed, wasToolButtonPressedAndReleased} from 'app/useTool';
-import {setNextAreaSection } from 'app/utils/area';
+import {getAreaSectionInstance, removeAllClones} from 'app/utils/area';
 import {getAreaSize} from 'app/utils/getAreaSize';
+import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {updatePrimaryHeroState} from 'app/utils/hero';
+import {isPointInShortRect} from 'app/utils/index';
 import {removeObjectFromArea} from 'app/utils/objects';
+import {exploreSection} from 'app/utils/sections';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
 
 export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
@@ -143,9 +146,7 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         // Falling in this location will transition you to the forest temple zone.
         || (state.location.zoneKey === 'forest' && state.location.isSpiritWorld);
     // Do not trigger the scrolling transition when traveling through a zone door.
-    if ((!editingState.isEditing && !canTransitionSafely)
-        || state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor
-    ) {
+    if ((!editingState.isEditing && !canTransitionSafely) || state.nextAreaSet || isMovingThroughZoneDoor) {
         return;
     }
 
@@ -158,20 +159,20 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             x: (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length,
             y: state.location.areaGridCoords.y,
         };
-        scrollToArea(state, state.location, 'left');
+        scrollToNewArea(state, state.location, 'left');
         return;
     } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
         state.location.areaGridCoords = {
             x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
             y: state.location.areaGridCoords.y,
         };
-        scrollToArea(state, state.location, 'right');
+        scrollToNewArea(state, state.location, 'right');
         return;
     } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
-        setNextAreaSection(state, 'left');
+        scrollToNewSection(state, 'left');
         return;
     } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
-        setNextAreaSection(state, 'right');
+        scrollToNewSection(state, 'right');
         return;
     }
     //const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
@@ -181,16 +182,69 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             x: state.location.areaGridCoords.x,
             y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
         };
-        scrollToArea(state, state.location, 'up');
+        scrollToNewArea(state, state.location, 'up');
     } else if (hero.y + hero.h > h && isHeroMovingDown) {
         state.location.areaGridCoords = {
             x: state.location.areaGridCoords.x,
             y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
         };
-        scrollToArea(state, state.location, 'down');
+        scrollToNewArea(state, state.location, 'down');
     } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
-        setNextAreaSection(state, 'up');
+        scrollToNewSection(state, 'up');
     } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {
-        setNextAreaSection(state, 'down');
+        scrollToNewSection(state, 'down');
+    }
+}
+
+function scrollToNewArea(state: GameState, location: ZoneLocation, direction: Direction): void {
+    //console.log('scrollToArea', direction);
+    removeAllClones(state);
+    state.nextAreaSet = {
+        current: createAreaInstance(state, location, true),
+        alternate: createAreaInstance(state, {...location, isSpiritWorld: !location.isSpiritWorld}, true),
+    };
+    if (direction === 'up') {
+        state.nextAreaSet.current.cameraOffset.y = -state.nextAreaSet?.current.h * 16;
+    }
+    if (direction === 'down') {
+        state.nextAreaSet.current.cameraOffset.y = state.areaSet?.current.h * 16;
+    }
+    if (direction === 'left') {
+        state.nextAreaSet.current.cameraOffset.x = -state.nextAreaSet?.current.w * 16;
+    }
+    if (direction === 'right') {
+        state.nextAreaSet.current.cameraOffset.x = state.areaSet?.current.w * 16;
+    }
+    state.location = getFullZoneLocation(location);
+}
+
+function scrollToNewSection(state: GameState, d: Direction): void {
+    //console.log('setNextAreaSection', d);
+    removeAllClones(state);
+    state.nextAreaSet = {...state.areaSet};
+    delete state.nextAreaSet.areaSection;
+    const hero = state.hero;
+    let x = hero.x / 16;
+    let y = hero.y / 16;
+    if (d === 'right') {
+        x += hero.w / 16;
+    }
+    if (d === 'down') {
+        y += hero.h / 16;
+    }
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    x = Math.min(w - 1, Math.max(1, x));
+    y = Math.min(h - 1, Math.max(1, y));
+    for (const section of state.areaSet.current.definition.sections) {
+        if (isPointInShortRect(x, y, section)) {
+            state.nextAreaSet.areaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, section);
+            exploreSection(state, section.index);
+            break;
+        }
+    }
+    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
+    // currently in any of the defined sections for this area.
+    if (!state.nextAreaSet.areaSection) {
+        state.nextAreaSet.areaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, state.areaSet.current.definition.sections[0]);
     }
 }

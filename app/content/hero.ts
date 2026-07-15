@@ -458,7 +458,7 @@ export class Hero implements Actor {
                     this.frozenDuration = duration;
                     this.vx = this.vy = 0;
                 }
-                playAreaSound(state, state.areaInstance, 'freeze');
+                playAreaSound(state, state.areaSet?.current, 'freeze');
                 // ice hits remove burns.
                 this.burnDuration = 0;
             }
@@ -552,7 +552,7 @@ export class Hero implements Actor {
         addEffectToArea(state, this.area, this.activeBarrierBurst);
     }
     fallIntoPit(state: GameState) {
-        playAreaSound(state, state.areaInstance, 'fall');
+        playAreaSound(state, state.areaSet?.current, 'fall');
         this.throwHeldObject(state);
         this.heldChakram?.throw(state);
         this.endInvisibility(state);
@@ -621,9 +621,9 @@ export class Hero implements Actor {
             // When the player has frozen hearts, all damage just destroys those hearts.
             const targetValue = Math.max(0, Math.ceil(this.savedData.ironSkinLife) - 2);
             damage = 2 * (this.savedData.ironSkinLife - targetValue);
-            //playAreaSound(state, state.areaInstance, 'rockShatter');
-            //playAreaSound(state, state.areaInstance, 'freeze');
-            //playAreaSound(state, state.areaInstance, 'pickUpObject');
+            //playAreaSound(state, state.areaSet?.current, 'rockShatter');
+            //playAreaSound(state, state.areaSet?.current, 'freeze');
+            //playAreaSound(state, state.areaSet?.current, 'pickUpObject');
             //addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 8,
             //    [...lightStoneParticles, ...heavyStoneParticles],
             //    {numberParticles}, 4
@@ -640,10 +640,10 @@ export class Hero implements Actor {
             if (state.hero.savedData.ironSkinLife >= damage) {
                 state.hero.savedData.ironSkinLife -= damage;
                 if (damage >= 1) {
-                    playAreaSound(state, state.areaInstance, 'rockShatter');
+                    playAreaSound(state, state.areaSet?.current, 'rockShatter');
                 } else {
                     // Play a different sound for small amounts of damage.
-                    playAreaSound(state, state.areaInstance, 'pickUpObject');
+                    playAreaSound(state, state.areaSet?.current, 'pickUpObject');
                 }
 
                 // Iframes are only for the clone taking the damage.
@@ -655,7 +655,7 @@ export class Hero implements Actor {
             } else {
                 damage -= 2 * state.hero.savedData.ironSkinLife;
                 // Always play the full sound when the last of the iron skin barrier is destroyed.
-                playAreaSound(state, state.areaInstance, 'rockShatter');
+                playAreaSound(state, state.areaSet?.current, 'rockShatter');
                 state.hero.savedData.ironSkinLife = 0;
             }
         }
@@ -663,7 +663,7 @@ export class Hero implements Actor {
         // any damage the hero or any clone take destroys it.
         // If there are no controllable clones, damage will only kill the
         // uncontrollably ones, never the primary clone the player is controlling.
-        playAreaSound(state, state.areaInstance, 'ouch');
+        playAreaSound(state, state.areaSet?.current, 'ouch');
         if (state.hero.clones.filter(clone => !clone.isUncontrollable).length
             || this !== state.hero
         ) {

@@ -1,13 +1,10 @@
 import {variantHash} from 'app/content/variants/variantHash';
 import {editingState} from 'app/development/editingState';
+import {refreshArea} from 'app/development/utils';
 import {getState} from 'app/state';
-import {enterLocation} from 'app/utils/enterLocation';
 
 const variantTypes = Object.keys(variantHash) as VariantType[];
 
-function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
-}
 
 export function getVariantTypeSelector(): PanelRows {
     const variantData = editingState.selectedVariantData;
@@ -150,7 +147,7 @@ function uniqueVariantId(state: GameState, prefix: string, location: ZoneLocatio
     const { zoneKey, floor, areaGridCoords: {x, y}, isSpiritWorld} = location;
     prefix = `${zoneKey}:${isSpiritWorld ? 's' : ''}${floor}:${x}x${y}-${prefix}`;
     const area = (location.isSpiritWorld === state.location.isSpiritWorld)
-        ? state.areaInstance : state.alternateAreaInstance;
+        ? state.areaSet?.current : state.areaSet?.alternate;
     while (area.definition.variants?.some(o => o.id === `${prefix}-${i}`)) {
         i++;
     }
@@ -158,8 +155,8 @@ function uniqueVariantId(state: GameState, prefix: string, location: ZoneLocatio
 }
 
 export function addVariantToArea(state: GameState, editingState: EditingState, variantData: VariantData, addToArea = false) {
-    state.areaInstance.definition.variants = state.areaInstance.definition.variants || [];
-    state.areaInstance.definition.variants.push(variantData);
+    state.areaSet.current.definition.variants = state.areaSet?.current.definition.variants || [];
+    state.areaSet.current.definition.variants.push(variantData);
 }
 
 export function createVariantDataAtScreenCoords(state: GameState, editingState: EditingState, x: number, y: number): VariantData {
@@ -198,7 +195,7 @@ export function fixVariantPosition(variantData: VariantData): void {
 }
 
 export function isVariantSelected(state: GameState, editingState: EditingState): boolean {
-    return !!state.areaInstance.definition.variants?.includes(editingState.selectedVariantData);
+    return !!state.areaSet?.current.definition.variants?.includes(editingState.selectedVariantData);
 }
 /*
 export function onMouseDownSelectVariant(state: GameState, editingState: EditingState, x: number, y: number): boolean {
@@ -210,7 +207,7 @@ export function onMouseDownSelectVariant(state: GameState, editingState: Editing
         }
     }
     if (!isVariantSelected(state, editingState)) {
-        for (const variantData of (state.areaInstance.definition.variants || [])) {
+        for (const variantData of (state.areaSet?.current.definition.variants || [])) {
             if (isPointInVariant(state, x, y, variantData)) {
                 editingState.selectedVariantData = variantData;
                 changedSelection = true;

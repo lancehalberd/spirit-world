@@ -29,15 +29,15 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         return;
     }
     // Unselect objects that are no longer in the current area.
-    if (editingState.selectedObject?.id && !state.areaInstance.definition.objects.find(o => o === editingState.selectedObject)) {
+    if (editingState.selectedObject?.id && !state.areaSet?.current.definition.objects.find(o => o === editingState.selectedObject)) {
         unselectObject(editingState, editingState.selectedObject);
     }
-    if (editingState.selectedVariantData?.id && !state.areaInstance.definition.variants?.find(o => o === editingState.selectedVariantData)) {
+    if (editingState.selectedVariantData?.id && !state.areaSet?.current.definition.variants?.find(o => o === editingState.selectedVariantData)) {
         unselectObject(editingState, editingState.selectedVariantData);
     }
-    renderEditorArea(context, state, state.areaInstance);
-    if (state.nextAreaInstance) {
-        renderEditorArea(context, state, state.nextAreaInstance);
+    renderEditorArea(context, state, state.areaSet?.current);
+    if (state.nextAreaSet?.current) {
+        renderEditorArea(context, state, state.nextAreaSet?.current);
     }
     renderZoneEditor(context, state, editingState);
 }
@@ -98,7 +98,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             context.restore();
         }
         // Tool previews are only drawn for the current area.
-        if (area === state.areaInstance) {
+        if (area === state.areaSet?.current) {
             if (editingState.tool === 'tileChunk') {
                 const generator = chunkGenerators[editingState.tileChunkKey];
                 const w = 16, h = 16;
@@ -160,7 +160,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     context.clearRect(rectangle.x * 16, rectangle.y * 16, rectangle.w * 16, rectangle.h * 16);
 
                     // Create the combined set of layer + brush keys for building the preview.
-                    const allLayerKeys = state.areaInstance.layers.map(l => l.key);
+                    const allLayerKeys = state.areaSet?.current.layers.map(l => l.key);
                     // Include extra layer keys. Eventually painting will add extra layers if they are on the brush.
                     for (let key in editingState.brush) {
                         if (key !== 'none' && !allLayerKeys.includes(key)) {
@@ -179,12 +179,12 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                             allLayerKeys.push('foreground');
                         }
                     }
-                    const selectedLayer = state.areaInstance.definition.layers.find(l => l.key === editingState.selectedLayerKey);
+                    const selectedLayer = state.areaSet?.current.definition.layers.find(l => l.key === editingState.selectedLayerKey);
                     // Draw background layers, then foreground layers.
                     for (const priorityToDraw of ['background', 'foreground']) {
                         for (const layerKey of allLayerKeys) {
-                            const currentLayer = state.areaInstance.definition.layers.find(l => l.key === layerKey);
-                            const parentLayer = state.areaInstance.definition.parentDefinition?.layers?.find(l => l.key === layerKey);
+                            const currentLayer = state.areaSet?.current.definition.layers.find(l => l.key === layerKey);
+                            const parentLayer = state.areaSet?.current.definition.parentDefinition?.layers?.find(l => l.key === layerKey);
                             let brush: TileGridDefinition = null, defaultBrush: TileGridDefinition = null;
                             if (currentLayer && currentLayer === selectedLayer) {
                                 brush = editingState.brush[layerKey] || editingState.brush.none;
@@ -226,7 +226,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 for (const selectedObject of editingState.selectedObjects) {
                     let target: Rect;
                     if (isObject(selectedObject)) {
-                        if (!state.areaInstance.definition.objects.includes(selectedObject)) {
+                        if (!state.areaSet?.current.definition.objects.includes(selectedObject)) {
                             continue;
                         }
                         const instance = createObjectInstance(state, selectedObject);
@@ -245,7 +245,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                             };
                         }
                     } else if (isVariant(selectedObject)) {
-                        if (!state.areaInstance.definition.variants?.includes(selectedObject)) {
+                        if (!state.areaSet?.current.definition.variants?.includes(selectedObject)) {
                             continue;
                         }
                         target = selectedObject;

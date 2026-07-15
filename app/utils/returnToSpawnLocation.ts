@@ -28,8 +28,8 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
     state.hero.d = state.hero.savedData.spawnLocation.d;
     // This will clear
     clearScriptScenes(state);
-    enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags});
-    state.fadeLevel = (state.areaSection.dark || 0) / 100;
+    enterLocation(state, state.hero.savedData.spawnLocation, {preserveZoneFlags});
+    state.fadeLevel = (state.areaSet?.areaSection.dark || 0) / 100;
 
 
     // Don't display hints in randomizer mode.

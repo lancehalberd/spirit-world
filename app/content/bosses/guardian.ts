@@ -356,7 +356,7 @@ const growingThornsAbility: EnemyAbility<Target> = {
         if (!guardian) {
             return;
         }
-        rumbleSoundReference = playAreaSound(state, state.areaInstance, 'rumble');
+        rumbleSoundReference = playAreaSound(state, state.areaSet?.current, 'rumble');
         state.screenShakes.push({
             dx: 0.7,
             dy: 0.7,
@@ -609,7 +609,7 @@ const guardian: EnemyDefinition<GuardianParams> = {
             if (enemy.params.staggerHits >= 4 || enemy.params.staggerDamage >= 6) {
                 enemy.setMode('recoverFromStaggered');
             }
-        } else if (enemy.area !== state.areaInstance) {
+        } else if (enemy.area !== state.areaSet?.current) {
             staggerGuardian(state, enemy);
         }
         return result;
@@ -661,17 +661,17 @@ const guardian: EnemyDefinition<GuardianParams> = {
 enemyDefinitions.guardian = guardian;
 
 function getGuardian(state: GameState): Enemy<GuardianParams> {
-    return state.areaInstance.enemies.find(o =>
+    return state.areaSet?.current.enemies.find(o =>
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
-    ) || state.areaInstance.alternateArea.enemies.find(o =>
+    ) || state.areaSet?.current.alternateArea.enemies.find(o =>
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
     );
 }
 
 function getProjection(state: GameState): Enemy<ProjectionParams> {
-    return state.areaInstance.enemies.find(o =>
+    return state.areaSet?.current.enemies.find(o =>
         o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
-    ) || state.areaInstance.alternateArea.enemies.find(o =>
+    ) || state.areaSet?.current.alternateArea.enemies.find(o =>
         o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
     );
 }
@@ -1384,7 +1384,7 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
             projection.setMode('regenerate');
             projection.params.regenerationRate = staggerRegenerationRate;
             enemy.setMode('normal');
-            moveGuardianToArea(state, state.areaInstance.alternateArea, enemy);
+            moveGuardianToArea(state, state.areaSet?.current.alternateArea, enemy);
             //addBurstEffect(state, enemy, state.hero.area);
             teleportToNextMarker(state, enemy);
             // Once the Guardian is below 80% health it will enrage any time it takes a certain

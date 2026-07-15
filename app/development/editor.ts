@@ -3,19 +3,17 @@ import {bossTypes} from 'app/content/bosses';
 import {enemyTypes} from 'app/content/enemies';
 import {editingState} from 'app/development/editingState';
 import {getBrushContextProperties} from 'app/development/getBrushContextProperties';
-import {getObjectProperties} from 'app/development/objectEditor';
+import {createObjectDefinition, combinedObjectTypes, getObjectProperties} from 'app/development/objectEditor';
 import {renderProgressTabContainer} from 'app/development/progressEditor';
-import {displayPanel} from 'app/development/propertyPanel';
+import {displayPanel, displayPropertyPanel, hideAllPropertyPanels} from 'app/development/propertyPanel'
 import {renderToolTabContainer} from 'app/development/toolTab';
-import {checkToRefreshMinimap, renderZoneTabContainer} from 'app/development/zoneEditor';
-import {displayPropertyPanel, hideAllPropertyPanels} from 'app/development/propertyPanel';
-import {createObjectDefinition, combinedObjectTypes} from 'app/development/objectEditor';
+import {refreshArea} from 'app/development/utils';
 import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
+import {checkToRefreshMinimap, renderZoneTabContainer} from 'app/development/zoneEditor';
 import {isDebugMode} from 'app/gameConstants';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {isMainMenuSceneInStack, showMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
 import {isMapSceneInStack, showMapScene} from 'app/scenes/map/showMapScene';
-import {enterLocation} from 'app/utils/enterLocation';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {isFieldSceneInStack} from 'app/scenes/field/showFieldScene';
 import {cleanState} from 'app/utils/state';
@@ -58,8 +56,8 @@ function startEditing(state: GameState) {
         );
     }
     refreshEditor(state);
-    state.areaInstance.tilesDrawn = [];
-    state.areaInstance.checkToRedrawTiles = true;
+    state.areaSet.current.tilesDrawn = [];
+    state.areaSet.current.checkToRedrawTiles = true;
     const wasShowingMenu = isMainMenuSceneInStack(state);
     const wasShowingMap = isMapSceneInStack(state);
     cleanState(state);
@@ -139,11 +137,11 @@ function stopEditing(state: GameState) {
     hideAllPropertyPanels();
     if (editingState.selectedLayerKey) {
         delete editingState.selectedLayerKey;
-        enterLocation(state, state.location, {instant: true});
+        refreshArea(state, true);
     }
-    state.areaInstance.tilesDrawn = [];
-    state.areaInstance.checkToRedrawTiles = true;
-    state.areaInstance.needsLogicRefresh = true;
+    state.areaSet.current.tilesDrawn = [];
+    state.areaSet.current.checkToRedrawTiles = true;
+    state.currentAreaNeedsLogicRefresh = true;
 }
 
 export function refreshEditor(state: GameState) {
@@ -151,11 +149,11 @@ export function refreshEditor(state: GameState) {
         return editingState;
     }
     editingState.needsRefresh = false;
-    if (!state.areaInstance.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)) {
+    if (!state.areaSet.current.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)) {
         delete editingState.selectedLayerKey;
     }
     if (editingState.tool === 'replace' && !editingState.selectedLayerKey) {
-        editingState.selectedLayerKey = state.areaInstance.definition.layers[0].key;
+        editingState.selectedLayerKey = state.areaSet.current.definition.layers[0].key;
     }
     applyToolToSelectedObject();
     checkToRefreshMinimap(state);

@@ -12,7 +12,7 @@ import {
 import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
 import {getBackgroundFrame} from 'app/utils/area';
 import {createCanvasAndContext, drawCanvas} from 'app/utils/canvas';
-import {enterLocation} from 'app/utils/enterLocation';
+import {transitionToLocation} from 'app/utils/enterLocation';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {getTileBehaviorsAndObstacles} from 'app/utils/getBehaviors';
 import {isObjectInsideTarget, pad} from 'app/utils/index';
@@ -151,7 +151,7 @@ export class Teleporter implements ObjectInstance {
             return;
         }
         if (!this.definition.targetZone) {
-            enterLocation(state, {
+            transitionToLocation(state, {
                 ...state.location,
                 x: hero.x,
                 y: hero.y,
@@ -264,7 +264,7 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
     const spiritAlpha = 1;
     const x = hitbox.w / 2;
     const y = hitbox.h / 2
-    const area = state.alternateAreaInstance;
+    const area = state.areaSet?.alternate;
     spiritContext.save();
         spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
         const gradient = spiritContext.createRadialGradient(x, y, 0, x, y, hitbox.w / 2);

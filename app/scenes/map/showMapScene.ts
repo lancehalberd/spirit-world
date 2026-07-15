@@ -10,11 +10,11 @@ export function showMapScene(state: GameState) {
         if (textCue?.isMapCue) {
             textCue.fadeOut();
         }
-        const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
+        const dungeonMap = dungeonMaps[state.areaSet?.areaSection?.definition.mapId];
         if (dungeonMap) {
-            sceneHash.map.floorIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
+            sceneHash.map.floorIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSet?.areaSection.definition.floorId);
             if (sceneHash.map.floorIndex < 0) {
-                console.error('Could not find map floor', state.areaSection.definition.floorId, 'in', Object.keys(dungeonMap.floors));
+                console.error('Could not find map floor', state.areaSet?.areaSection.definition.floorId, 'in', Object.keys(dungeonMap.floors));
                 sceneHash.map.floorIndex = 0;
                 debugger;
             }

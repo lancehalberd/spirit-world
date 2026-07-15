@@ -30,7 +30,7 @@ function rollItem(table: LootTable) {
 export function dropItemFromTable(state: GameState, area: AreaInstance, lootTable: LootTable, x: number, y: number) {
     // Items only drop in the current area.
     // Dropping items that the player cannot pick up gives a lot of people FOMO.
-    if (area !== state.areaInstance) {
+    if (area !== state.areaSet?.current) {
         return;
     }
     const item = rollItem(lootTable);
@@ -93,7 +93,7 @@ export class LootObject implements ObjectInstance {
             return false;
         }
         // Visible if it is in the current area instance
-        if (this.area === state.areaInstance) {
+        if (this.area === state.areaSet?.current) {
             return true;
         }
         if (state.hero.action === 'meditating') {

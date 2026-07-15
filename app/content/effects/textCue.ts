@@ -113,7 +113,7 @@ export class TextCue implements EffectInstance {
 }
 
 export function findTextCue(state: GameState): TextCue | undefined {
-    for (const effect of state.areaInstance.effects) {
+    for (const effect of state.areaSet?.current.effects) {
         if (effect instanceof TextCue) {
             return effect;
         }
@@ -121,7 +121,7 @@ export function findTextCue(state: GameState): TextCue | undefined {
 }
 
 export function removeTextCue(state: GameState, priority: number = 10000): boolean {
-    if (!state.areaInstance) {
+    if (!state.areaSet?.current) {
         return false;
     }
     const effect = findTextCue(state);
@@ -140,7 +140,7 @@ export function addTextCue(state: GameState, text: string, duration = 3000, prio
             priority,
             text,
         });
-        addEffectToArea(state, state.areaInstance, textCue);
+        addEffectToArea(state, state.areaSet?.current, textCue);
         return textCue;
     }
 }

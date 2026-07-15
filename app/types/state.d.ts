@@ -50,9 +50,40 @@ interface DungeonInventory {
     totalSmallKeys: number
 }
 
-type TransitionType = 'circle' | 'fade' | 'fastFade' | 'portal' | 'diving' | 'surfacing' | 'mutating';
+type TransitionType = 'circle' | 'fade' | 'fastFade' | 'portal' | 'diving' | 'surfacing';
 
 type GameMode = 'normal'|'randomizer'|'test';
+
+interface MutationState {
+    duration: number
+    nextAreaSet: AreaSet
+    time: number
+    patternCanvas?: HTMLCanvasElement
+    patternContext?: CanvasRenderingContext2D
+    underCanvas?: HTMLCanvasElement
+}
+
+interface TransitionState {
+    // The location to switch to after the current screen wipe transition.
+    nextLocation: ZoneLocation
+    // This is used for rendering the next area when diving/surfacing.
+    // It is also used to avoid recreating areas when teleporting between spirit+material worlds.
+    //nextAreaInstance?: AreaInstance
+    //nextAreaSection?: AreaSectionInstance
+    // This is used to avoid recreating areas then teleporting between spirit+material worlds.
+    //nextAlternateAreaInstance?: AreaInstance
+    time: number
+    callback: () => void
+    patternCanvas?: HTMLCanvasElement
+    patternContext?: CanvasRenderingContext2D
+    pattern?: CanvasPattern
+    underCanvas?: HTMLCanvasElement
+    type: TransitionType
+    // Color to fade to, defaults to black.
+    fadeColor?: string
+    // The targetZ value for the hero after the transition.
+    targetZ?: number
+}
 
 interface GameState {
     sceneStack: GameScene[]
@@ -77,40 +108,23 @@ interface GameState {
     lastTimeRendered: number
     areaSet?: AreaSet
     nextAreaSet?: AreaSet
-    alternateAreaInstance?: AreaInstance
+    // Set to true to trigger a logic refresh for the current area on the next update.
+    currentAreaNeedsLogicRefresh?: boolean
+    /*alternateAreaInstance?: AreaInstance
     areaInstance?: AreaInstance
     surfaceAreaInstance?: AreaInstance
     underwaterAreaInstance?: AreaInstance
     areaSection?: AreaSectionInstance
     alternateAreaSection?: AreaSectionInstance
     nextAreaInstance?: AreaInstance
-    nextAreaSection?: AreaSectionInstance
+    nextAreaSection?: AreaSectionInstance*/
     zone: Zone
     floor: Floor
     areaGrid: AreaGrid
     location: FullZoneLocation
-    transitionState?: {
-        // The location to switch to after the current screen wipe transition.
-        nextLocation: ZoneLocation
-        // This is used for rendering the next area when diving/surfacing.
-        // It is also used to avoid recreating areas when teleporting between spirit+material worlds.
-        nextAreaInstance?: AreaInstance
-        nextAreaSection?: AreaSectionInstance
-        // This is used to avoid recreating areas then teleporting between spirit+material worlds.
-        nextAlternateAreaInstance?: AreaInstance
-        time: number
-        callback: () => void
-        patternCanvas?: HTMLCanvasElement
-        patternContext?: CanvasRenderingContext2D
-        pattern?: CanvasPattern
-        underCanvas?: HTMLCanvasElement
-        type: TransitionType
-        // Color to fade to, defaults to black.
-        fadeColor?: string
-        // The targetZ value for the hero after the transition.
-        targetZ?: number
-    }
+    transitionState?: TransitionState
     mutationDuration?: number
+    mutationState?: MutationState
     showControls: boolean
     keyboard: {
         gameKeyValues: number[]

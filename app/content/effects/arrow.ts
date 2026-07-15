@@ -427,7 +427,7 @@ export class Arrow implements EffectInstance, Projectile {
                 // we should update this logic to make sure it is balanced.
                 this.damage *= (hitResult.returnHit?.damage || 1);
                 if (this.hybridWorlds) {
-                    playAreaSound(state, state.areaInstance, 'blockAttack');
+                    playAreaSound(state, state.areaSet?.current, 'blockAttack');
                 } else {
                     playAreaSound(state, this.area, 'blockAttack');
                 }

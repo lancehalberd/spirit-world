@@ -462,7 +462,7 @@ function updateFallEffect(state: GameState, effect: FieldAnimationEffect) {
     let onPitWall = false, isOnSingleTilePit = false;
     let dx = 0, dy = 0;
     for (const p of checkPoints) {
-        const behaviors = getCompositeBehaviors(state, effect.area, p, state.nextAreaInstance);
+        const behaviors = getCompositeBehaviors(state, effect.area, p, state.nextAreaSet?.current);
         if (behaviors.pitWall) {
             onPitWall = true;
         }

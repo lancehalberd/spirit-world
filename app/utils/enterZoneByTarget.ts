@@ -9,7 +9,7 @@ import {findObjectLocation} from 'app/randomizer/find';
 import {updateAreaSection} from 'app/utils/area';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
-import {enterLocation} from 'app/utils/enterLocation';
+import {enterLocation, transitionToLocation} from 'app/utils/enterLocation';
 import {findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import {fixCamera} from 'app/utils/fixCamera';
 import {checkToUpdateSpawnLocation} from 'app/content/spawnLocations';
@@ -41,7 +41,7 @@ export function enterZoneByTarget(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
-    const objectLocation = findObjectLocation(state, zoneKey, targetObjectId, state.areaInstance.definition.isSpiritWorld, skipObject, true);
+    const objectLocation = findObjectLocation(state, zoneKey, targetObjectId, state.areaSet?.current.definition.isSpiritWorld, skipObject, true);
     if (!objectLocation) {
         return false;
     }
@@ -50,7 +50,7 @@ export function enterZoneByTarget(
     // move to the new location without a transition and just have the camera pan to the new location.
     // TODO: This should probably be updated  to check that this is the same AreaSection rather than AreaInstance, otherwise it could
     // cause some bad transitions when transitioning between two sections that happen to be in the same area instance.
-    if (!transitionType && !instant && state.areaInstance.definition === targetAreaDefinition) {
+    if (!transitionType && !instant && state.areaSet?.current.definition === targetAreaDefinition) {
         onEnterLocation(state, targetObjectId, {doNotFixCamera: true, skipObject, callback});
         return true;
     }
@@ -61,12 +61,17 @@ export function enterZoneByTarget(
         checkToUpdateSpawnLocation(state);
         checkToUpdateSpawnLocation(state, objectLocation);
     }
-    enterLocation(state, objectLocation, {
-        instant,
-        callback: () => onEnterLocation(state, targetObjectId, {skipObject, callback}),
-        transitionType,
-        transitionColor,
-    });
+    if (instant) {
+        enterLocation(state, objectLocation, {
+            callback: () => onEnterLocation(state, targetObjectId, {skipObject, callback}),
+        });
+    } else {
+        transitionToLocation(state, objectLocation, {
+            callback: () => onEnterLocation(state, targetObjectId, {skipObject, callback}),
+            transitionType,
+            transitionColor,
+        });
+    }
     return true;
 }
 
@@ -79,7 +84,7 @@ function onEnterLocation(
         doNotFixCamera,
     }: OptionalEnterZoneByTargetParams = {}
 ) {
-    const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]);
+    const target = findEntranceById(state, state.areaSet?.current, targetObjectId, [skipObject]);
     if (target?.getHitbox) {
         const hitbox = target.getHitbox(state);
         state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
@@ -95,7 +100,7 @@ function onEnterLocation(
     const definition = target.definition as EntranceDefinition|MarkerDefinition;
     if (definition.locationCue) {
         const textCue = new TextCue(state, { text: definition.locationCue});
-        addEffectToArea(state, state.areaInstance, textCue);
+        addEffectToArea(state, state.areaSet?.current, textCue);
     }
     // Entering via a door requires some special logic to orient the
     // character to the door properly.
@@ -117,9 +122,9 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
     const hero = state.hero;
     hero.isUsingDoor = true;
     hero.isExitingDoor = true;
-    const target = findEntranceById(state, state.areaInstance, targetObjectId, [skipObject]) as Door;
+    const target = findEntranceById(state, state.areaSet?.current, targetObjectId, [skipObject]) as Door;
     if (!target){
-        console.error(state.areaInstance.objects);
+        console.error(state.areaSet?.current.objects);
         console.error(targetObjectId);
         debugger;
     }
@@ -159,9 +164,9 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
 function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjectId: string) {
     const hero = state.hero;
     hero.isUsingDoor = true;
-    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as Teleporter;
+    const target = findObjectInstanceById(state.areaSet?.current, targetObjectId) as Teleporter;
     if (!target){
-        console.error(state.areaInstance.objects);
+        console.error(state.areaSet?.current.objects);
         console.error(targetObjectId);
         debugger;
     } else {
@@ -172,9 +177,9 @@ function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjec
 }
 
 function enterZoneByDreamPodCallback(this: void, state: GameState, targetObjectId: string) {
-    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as DreamPod;
+    const target = findObjectInstanceById(state.areaSet?.current, targetObjectId) as DreamPod;
     if (!target){
-        console.error(state.areaInstance.objects);
+        console.error(state.areaSet?.current.objects);
         console.error(targetObjectId);
         debugger;
     } else {

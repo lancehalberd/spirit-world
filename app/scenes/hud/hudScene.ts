@@ -37,7 +37,7 @@ const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h:
 const [hudCanvas, hudContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
 
 export function renderHudEffects(context: CanvasRenderingContext2D, state: GameState): void {
-    for (const effects of (state.areaInstance?.effects || [])) {
+    for (const effects of (state.areaSet?.current?.effects || [])) {
         if (effects.drawPriority === 'hud' || effects.getDrawPriority?.(state) === 'hud') {
             effects.render(context, state);
         }
@@ -337,7 +337,7 @@ export class HudScene implements GameScene {
         });
 
         // Show boss health bars from both realms.
-        const bossesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+        const bossesWithHealthBars = [...state.areaSet?.current.enemies, ...state.areaSet?.alternate.enemies].filter(
             e => e.status !== 'gone' && e.definition.type === 'boss'
                 && e.isFromCurrentSection(state) && e.healthBarTime >= 100
         ) as Enemy[];
@@ -355,7 +355,7 @@ export class HudScene implements GameScene {
             y -= 6;
         }
         // Show up to 4 minion health bars above the boss health bar.
-        const otherEnemiesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+        const otherEnemiesWithHealthBars = [...state.areaSet?.current.enemies, ...state.areaSet?.alternate.enemies].filter(
             e => e.status !== 'gone' && e.definition.type !== 'boss' && e.enemyDefinition.showHealthBar
                 && e.isFromCurrentSection(state) && e.healthBarTime >= 100
         ).slice(0, 4);

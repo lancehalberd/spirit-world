@@ -129,15 +129,15 @@ class StandardTarget implements FpsTarget {
                 gameState.score += this.points * 2;
                 // Create bullseye visual effect
                 createBullseyeEffect(this.x, this.y, gameState);
-                playAreaSound(state, state.areaInstance, 'hitBullseye');
+                playAreaSound(state, state.areaSet?.current, 'hitBullseye');
             } else {
                 gameState.score += this.points;
-                playAreaSound(state, state.areaInstance, 'hitShot');
+                playAreaSound(state, state.areaSet?.current, 'hitShot');
             }
             gameState.score = Math.max(gameState.score, 0);
             this.hitTime = 300;
         } else {
-            playAreaSound(state, state.areaInstance, 'rockShatter');
+            playAreaSound(state, state.areaSet?.current, 'rockShatter');
     }
 }
 }
@@ -260,10 +260,10 @@ class AlternatingTarget extends StandardTarget {
         this.hitTime = 300;
         
         if (this.currentPoints > 0) {
-            playAreaSound(state, state.areaInstance, 'hitShot');
+            playAreaSound(state, state.areaSet?.current, 'hitShot');
         }
         else {
-            playAreaSound(state, state.areaInstance, 'error')
+            playAreaSound(state, state.areaSet?.current, 'error')
         }
     }
 }
@@ -313,7 +313,7 @@ class BonusTarget extends StandardTarget {
         gameState.shotsHit++;
         this.hitTime = 300;
         
-        playAreaSound(state, state.areaInstance, 'hitShot');
+        playAreaSound(state, state.areaSet?.current, 'hitShot');
     }
 } 
 
@@ -353,7 +353,7 @@ class ExplosiveTarget extends StandardTarget {
         if (this.hitTime !== undefined) return;
         const explosionPoints = handleExplosion(gameState, savedState, this);
         gameState.score += explosionPoints;
-        playAreaSound(state, state.areaInstance, 'bossDeath');
+        playAreaSound(state, state.areaSet?.current, 'bossDeath');
         gameState.shotsHit++;
         this.hitTime = 300;
     }

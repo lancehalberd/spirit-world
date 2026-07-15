@@ -24,10 +24,10 @@ import {turretStyles} from 'app/content/objects/wallTurret';
 import {zones} from 'app/content/zones';
 import {ObjectPalette, ObjectPaletteItem} from 'app/development/objectPalette';
 import {editingState} from 'app/development/editingState';
+import {refreshArea} from 'app/development/utils';
 import {getLogicProperties} from 'app/development/zoneEditor';
 import {getState} from 'app/state';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
-import {enterLocation} from 'app/utils/enterLocation';
 import {isPointInShortRect, removeElementFromArray} from 'app/utils/index';
 import {allLootTypes, doesLootRequireAmount, doesLootRequireLevel} from 'app/utils/loot';
 import {addObjectToArea, getTargetObjectIdsByTypesAndArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
@@ -38,9 +38,6 @@ import {isKeyboardKeyDown, KEY} from 'app/userInput'
 
 type PartialObjectDefinitionWithType = Partial<ObjectDefinition> & {type: ObjectType};
 
-function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
-}
 
 function createObjectPaletteItem<T extends string>(type: T, instance: ObjectInstance): ObjectPaletteItem<T> {
     return {
@@ -61,7 +58,7 @@ function createObjectPaletteItem<T extends string>(type: T, instance: ObjectInst
                 if (scale < 1) {
                     context.scale(scale, scale);
                 }
-                instance.area = state.areaInstance;
+                instance.area = state.areaSet?.current;
                 instance.status = 'normal';
                 instance.render(context, state);
             context.restore();
@@ -646,7 +643,7 @@ function getSwitchTargetProperties(
     object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | HeavyFloorSwitchDefinition | KeyBlockDefinition
 ): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = getSwitchTargetIds(state.areaInstance.definition, state.alternateAreaInstance.definition);
+    const objectIds = getSwitchTargetIds(state.areaSet?.current.definition, state.areaSet?.alternate.definition);
 
     if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
         delete object.targetObjectId;
@@ -730,7 +727,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
 }
 
 export function isObjectSelected(state: GameState, editingState: EditingState): boolean {
-    return !!state.areaInstance.definition.objects.includes(editingState.selectedObject);
+    return !!state.areaSet?.current.definition.objects.includes(editingState.selectedObject);
 }
 
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
@@ -793,7 +790,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 }
                 updateObjectInstance(state, object);
                 // Keep this flag in sync with the linked object, if any.
-                const linkedDefinition = object.linked && getLinkedDefinition(state.areaInstance.alternateArea.definition, object);
+                const linkedDefinition = object.linked && getLinkedDefinition(state.areaSet?.current.alternateArea.definition, object);
                 if (linkedDefinition) {
                     if (savePosition === 'default'){
                         delete linkedDefinition.savePosition;
@@ -808,8 +805,8 @@ export function getObjectProperties(state: GameState, editingState: EditingState
     if (object.type === 'rollingBall') {
         const ballGoalIds = [...new Set([
             'none',
-            ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['ballGoal']),
-            ...getTargetObjectIdsByTypesAndArea(state.alternateAreaInstance.definition, ['ballGoal']),
+            ...getTargetObjectIdsByTypesAndArea(state.areaSet?.current.definition, ['ballGoal']),
+            ...getTargetObjectIdsByTypesAndArea(state.areaSet?.alternate.definition, ['ballGoal']),
         ])];
         rows.push({
             name: 'Save Target',
@@ -823,7 +820,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 }
                 updateObjectInstance(state, object);
                 // Keep this flag in sync with the linked object, if any.
-                const linkedDefinition = object.linked && getLinkedDefinition(state.areaInstance.alternateArea.definition, object);
+                const linkedDefinition = object.linked && getLinkedDefinition(state.areaSet?.current.alternateArea.definition, object);
                 if (linkedDefinition) {
                     if (id === 'none'){
                         delete linkedDefinition.saveTarget;
@@ -962,7 +959,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 }
             }
             if (supportedTypes.includes(object.decorationType)) {
-                const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance]);
+                const ids = getUniqueObjectIdsForAreas(state, [state.areaSet?.current]);
                 rows.push({
                     name: 'target',
                     value: object.targetObjectId ?? 'none',
@@ -1395,7 +1392,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'indicator': {
-            const ids = getUniqueObjectIdsForAreas(state, [state.areaInstance, state.alternateAreaInstance]);
+            const ids = getUniqueObjectIdsForAreas(state, [state.areaSet?.current, state.areaSet?.alternate]);
             rows.push({
                 name: 'target',
                 value: object.targetObjectId ?? 'none',
@@ -1820,8 +1817,8 @@ export function isObject(o: SelectableDefinition): o is ObjectDefinition {
 // we check if the current selection is still valid for the current area.
 export function isSelectionValid(state: GameState, editingState: EditingState): boolean {
     const firstObject = editingState.selectedObjects[0];
-    return isObject(firstObject) && state.areaInstance.definition.objects.includes(firstObject)
-        || isVariant(firstObject) && state.areaInstance.definition.variants?.includes(firstObject);
+    return isObject(firstObject) && state.areaSet?.current.definition.objects.includes(firstObject)
+        || isVariant(firstObject) && state.areaSet?.current.definition.variants?.includes(firstObject);
 }
 
 export function anonymizeSelectedObject(editingState: EditingState) {
@@ -1888,10 +1885,10 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     const isShiftDown = isKeyboardKeyDown(KEY.SHIFT);
     if (event.which === KEY.A && isCommandDown) {
         const state = getState();
-        editingState.selectedObjects = [...state.areaInstance.definition.objects, ...(state.areaInstance.definition.variants ?? [])];
+        editingState.selectedObjects = [...state.areaSet?.current.definition.objects, ...(state.areaSet?.current.definition.variants ?? [])];
         // Unless shift is also held, only select elements from the current section.
         if (!isShiftDown) {
-            editingState.selectedObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSection))
+            editingState.selectedObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSet?.areaSection))
         }
         const lastSelectedObject = (editingState.selectedObjects.filter(isObject)[0]);
         if (lastSelectedObject) {
@@ -1912,7 +1909,7 @@ function getObjectDirectlyUnderPoint(state: GameState, editingState: EditingStat
     const backgroundObjects: ObjectDefinition[] = [];
     const spriteObjects: ObjectDefinition[] = [];
     const foregroundObjects: ObjectDefinition[] = [];
-    for (const object of [...state.areaInstance.definition.objects].reverse()) {
+    for (const object of [...state.areaSet?.current.definition.objects].reverse()) {
         if (object.drawPriority === 'background') {
             backgroundObjects.push(object);
         } else if (object.drawPriority === 'foreground') {
@@ -1931,7 +1928,7 @@ function getObjectDirectlyUnderPoint(state: GameState, editingState: EditingStat
     }
     // Variants define an area in which objects are created so it is convenient to consider them
     // "under" other objects, like they are part of the floor.
-    for (const variantData of (state.areaInstance.definition.variants || [])) {
+    for (const variantData of (state.areaSet?.current.definition.variants || [])) {
         if (isPointInVariant(state, x, y, variantData)) {
             return variantData;
         }
@@ -2033,7 +2030,7 @@ export function onMouseDragObject(state: GameState, editingState: EditingState, 
         const oldX = selectedObject.x, oldY = selectedObject.y;
         // Object definitions are implicitly linked by type + location which means we must get a reference to the linked object
         // before we move the base object, otherwise it won't be found at the new location.
-        const linkedDefinition = isObject(selectedObject) && selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, selectedObject);
+        const linkedDefinition = isObject(selectedObject) && selectedObject.linked && getLinkedDefinition(state.areaSet?.alternate.definition, selectedObject);
         selectedObject.x = Math.round(selectedObject._dragStartX + deltaX);
         selectedObject.y = Math.round(selectedObject._dragStartY + deltaY);
         if (isObject(selectedObject)) {
@@ -2044,7 +2041,7 @@ export function onMouseDragObject(state: GameState, editingState: EditingState, 
                     linkedDefinition.x = selectedObject.x;
                     linkedDefinition.y = selectedObject.y;
                     //console.log(linkedDefinition);
-                    updateObjectInstance(state, linkedDefinition, linkedDefinition, state.alternateAreaInstance);
+                    updateObjectInstance(state, linkedDefinition, linkedDefinition, state.areaSet?.alternate);
                 }
                 updateObjectInstance(state, selectedObject);
             }
@@ -2073,7 +2070,7 @@ export function uniqueId(state: GameState, prefix: string, location: ZoneLocatio
     const { zoneKey, floor, areaGridCoords: {x, y}, isSpiritWorld} = location;
     prefix = `${zoneKey}:${isSpiritWorld ? 's' : ''}${floor}:${x}x${y}-${prefix}`;
     const area = (location.isSpiritWorld === state.location.isSpiritWorld)
-        ? state.areaInstance : state.alternateAreaInstance;
+        ? state.areaSet?.current : state.areaSet?.alternate;
     while (area.definition.objects.some(o => o.id === `${prefix}-${i}`)) {
         i++;
     }
@@ -2148,7 +2145,7 @@ function checkToAddLinkedObject(state: GameState, area: AreaInstance, definition
 export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null, create: boolean = false): ObjectInstance {
     editingState.hasChanges = true;
     if (!area) {
-        area = state.areaInstance;
+        area = state.areaSet?.current;
     }
     const definitionIndex = area.definition.objects.findIndex(d => d === (oldDefinition || object));
     if (definitionIndex >= 0) {
@@ -2168,14 +2165,12 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
     }
     const newObject = createObjectInstance(state, object);
     addObjectToArea(state, area, newObject);
-    initializeObject(state, newObject, true);
-    if (area === state.areaInstance && state.alternateAreaInstance) {
+    if (area === state.areaSet.current) {
         checkToAddLinkedObject(state, area, object);
     }
     linkObject(newObject);
-    if (newObject.area?.alternateArea) {
-        newObject.onInitializeAlternateArea?.(state, true);
-    }
+    // This is after linkObject logic to be consistent
+    initializeObject(state, newObject, true);
     // If the current area has special behaviors, apply it in case it effects the updated object.
     if (area.definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[area.definition.specialBehaviorKey] as SpecialAreaBehavior;
@@ -2185,14 +2180,14 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
 }
 
 export function deleteObject(state: GameState, object: ObjectDefinition): void {
-    let index = state.areaInstance.definition.objects.indexOf(object);
+    let index = state.areaSet?.current.definition.objects.indexOf(object);
     if (index >= 0) {
-        state.areaInstance.definition.objects.splice(index, 1);
+        state.areaSet?.current.definition.objects.splice(index, 1);
     }
     // Remove the associated ObjectInstance if one exists.
-    index = state.areaInstance.objects.findIndex(o => o.definition === object);
+    index = state.areaSet?.current.objects.findIndex(o => o.definition === object);
     if (index >= 0) {
-        removeObjectFromArea(state, state.areaInstance.objects[index]);
+        removeObjectFromArea(state, state.areaSet?.current.objects[index]);
     }
 }
 
@@ -2223,7 +2218,7 @@ export function renderObjectPreview(
     if (object.renderPreview) {
         object.renderPreview(context, object.getHitbox(state));
     } else {
-        object.area = state.areaInstance;
+        object.area = state.areaSet?.current;
         // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
         if (object.status === 'hidden' || object.status === 'gone' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             object.status = 'normal';

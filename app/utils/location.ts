@@ -34,7 +34,7 @@ export function isOverworldZoneKey(zoneKey: string): zoneKey is OverworldZoneKey
 }
 
 export function getOverworldMapId(state: GameState): OverworldMapZoneKey|undefined {
-    for (const zoneKey of [state.location.zoneKey, state.areaSection?.definition?.mapId]) {
+    for (const zoneKey of [state.location.zoneKey, state.areaSet?.areaSection?.definition?.mapId]) {
         if (isOverworldZoneKey(zoneKey)) {
             if (zoneKey === 'underwater') {
                 return 'overworld';

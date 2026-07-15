@@ -69,7 +69,7 @@ export class HeavyFloorSwitch implements ObjectInstance {
         saveObjectStatus(state, this.definition, true);
         if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
             // Refresh the area to update layer logic, for example drainging lava in the crater.
-            state.areaInstance.needsLogicRefresh = true;
+            state.currentAreaNeedsLogicRefresh = true;
         }
         if (this.definition.specialBehaviorKey) {
             const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSwitchBehavior;

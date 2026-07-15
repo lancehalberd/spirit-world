@@ -1,4 +1,3 @@
-import {refreshAreaLogic} from 'app/content/areas';
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {LightningAnimationEffect} from 'app/content/effects/lightningAnimationEffect';
 import {Door} from 'app/content/objects/door';
@@ -21,7 +20,7 @@ import {
 } from 'app/utils/direction';
 import {destroyClone} from 'app/utils/destroyClone';
 import {addEffectToArea} from 'app/utils/effects';
-import {enterLocation} from 'app/utils/enterLocation';
+import {transitionToLocation} from 'app/utils/enterLocation';
 import {
     breakBrittleTilesInRect,
     canSomersaultToCoords,
@@ -49,7 +48,7 @@ let sommersaultCount = 0;
 function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true) {
     const {section} = getAreaSize(state);
     let best: ObjectInstance = null, bestDistance: number;
-    for (const object of state.areaInstance.objects) {
+    for (const object of state.areaSet?.current.objects) {
         if (object.definition?.type !== 'spawnMarker') {
             continue;
         }
@@ -81,11 +80,11 @@ export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, 
     if (vz > -3 || state.hero.savedData.equippedBoots === 'cloudBoots' || hero !== state.hero) {
         return false;
     }
-    if (hero.swimming && state.underwaterAreaInstance &&
-        isTileOpen(state, state.underwaterAreaInstance, {x: hero.x, y: hero.y})
+    if (hero.swimming && state.areaSet?.underwater &&
+        isTileOpen(state, state.areaSet?.underwater, {x: hero.x, y: hero.y})
     ) {
         playSound('waterJump');
-        enterLocation(state, {
+        transitionToLocation(state, {
             ...state.location,
             floor: zones[state.zone.underwaterKey].floors.length - 1,
             zoneKey: state.zone.underwaterKey,
@@ -105,7 +104,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     const isPrimaryHero = hero === state.hero;
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
-    if (isPrimaryHero && state.nextAreaInstance) {
+    if (isPrimaryHero && state.nextAreaSet?.current) {
         // The player will lose all velocity while entering an area if they release the direction they are moving.
         const [dx, dy] = getCloneMovementDeltas(state, hero);
         if (dx * hero.vx <= 0) hero.vx = 0;
@@ -113,13 +112,13 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // If we see issues with the screen transition code for super tiles,
         // update this logic to match the section transition code below and stop
         // the player at exactly the threshold.
-        if (state.nextAreaInstance.cameraOffset.x) {
+        if (state.nextAreaSet?.current.cameraOffset.x) {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
             // otherwise horizontal doors won't work as expected.
-            hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
+            hero.x += 0.75 * state.nextAreaSet?.current.cameraOffset.x / Math.abs(state.nextAreaSet?.current.cameraOffset.x);
         }
-        if (state.nextAreaInstance.cameraOffset.y) {
-            const dy = state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+        if (state.nextAreaSet?.current.cameraOffset.y) {
+            const dy = state.nextAreaSet?.current.cameraOffset.y / Math.abs(state.nextAreaSet?.current.cameraOffset.y);
             if (dy > 0 && hero.y < (state.zone.areaSize?.h ?? 32) * 16 + 18) {
                 hero.y += 0.7;
             } else if (dy < 0 && hero.y > -18) {
@@ -191,7 +190,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         let onPitWall = false, isOnSingleTilePit = false;
         let dx = 0, dy = 0;
         for (const p of checkPoints) {
-            const behaviors = getCompositeBehaviors(state, hero.area, p, state.nextAreaInstance);
+            const behaviors = getCompositeBehaviors(state, hero.area, p, state.nextAreaSet?.current);
             if (behaviors.pitWall) {
                 onPitWall = true;
             }
@@ -259,7 +258,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero === state.hero && towerZones.includes(state.location.zoneKey) && state.location.floor > 0) {
             // Simply logic for falling between floors, automatically falls to the next lower floor index
             // and then snaps to the closest spawn marker to prevent landing at an invalid location.
-            enterLocation(state, {
+            transitionToLocation(state, {
                 ...state.location,
                 z: CANVAS_HEIGHT,
                 floor: (state.location.floor - 1),
@@ -291,7 +290,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 const tx = targetAreaWidth + px * targetWidth;
                 // This is anywhere in the top two tiles.
                 const ty = py * targetHeight;
-                enterLocation(state, {
+                transitionToLocation(state, {
                     zoneKey: 'forest',
                     floor: 0,
                     areaGridCoords: {
@@ -312,7 +311,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 });
                 return true;
             }
-            enterLocation(state, {
+            transitionToLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,
                 areaGridCoords: state.location.areaGridCoords,
@@ -352,8 +351,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // These px/py values are scaled to be 0-1 over the area that you can actually fall through
             // in order to maximally cover possible locations to fall in the dungeon.
             // This was the old logic for calculating px/py when the forest was a single super tile.
-            //const px = (hero.x - 48) / (state.areaInstance.w * 16 - 80);
-            //const py = (hero.y - 48) / (state.areaInstance.h * 16 - 112);
+            //const px = (hero.x - 48) / (state.areaSet?.current.w * 16 - 80);
+            //const py = (hero.y - 48) / (state.areaSet?.current.h * 16 - 112);
             const forestAreaSize = zones.forestTemple.areaSize ?? {w: 32, h: 32};
             const forestAreaWidth = forestAreaSize.w * 16, forestAreaHeight = forestAreaSize.h * 16;
             const forestWidth = forestAreaWidth * zones.forest.floors[0].grid[0].length;
@@ -368,7 +367,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const templeHeight = templeAreaHeight * zones.forestTemple.floors[0].grid.length;
             const tx = px * templeWidth;
             const ty = py * templeHeight;
-            enterLocation(state, {
+            transitionToLocation(state, {
                 zoneKey: 'forestTemple',
                 floor: 0,
                 areaGridCoords: {
@@ -431,7 +430,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Automatically move the hero forward in the direction set by the door, ignoring obstacles.
         // Reduce speed to the regular screen transition speed if the player transitions screens while
         // moving through the door.
-        const speed = isUsingStairs ? 0.75 : (state.nextAreaInstance ? 0.75 : 2);
+        const speed = isUsingStairs ? 0.75 : (state.nextAreaSet?.current ? 0.75 : 2);
         hero.x += speed * hero.actionDx;
         hero.y += speed * hero.actionDy;
         // Make the hero fall to the ground while using doors.
@@ -444,7 +443,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // They are no longer intersecting the door object
         // They are in an open tile.
         //const touchingTarget = hero.actionTarget
-        //    && (hero.actionTarget.area === state.areaInstance || hero.actionTarget.area === state.nextAreaInstance)
+        //    && (hero.actionTarget.area === state.areaSet?.current || hero.actionTarget.area === state.nextAreaSet?.current)
         //    && boxesIntersect(hero.getMovementHitbox(), hero.actionTarget.getOffsetHitbox());
         if (door && !door.area) {
             console.error(`
@@ -592,20 +591,20 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.z <= groundZ) {
             // This is supposed to protect against landing slightly outside of the area causing the player to take damage
             // as if they landed somewhere invalid but it seems like it might not be needed with fixes to isPointOpen.
-            /*if (!state.nextAreaInstance) {
+            /*if (!state.nextAreaSet?.current) {
                 const movementHitbox = hero.getMovementHitbox();
                 // Snap player to the current area if they are not currently transitioning. Otherwise they will
                 // land outside of the area which is invalid for landing causing them to take damage and
                 // respawn at their last safe location.
                 if (movementHitbox.x < 0) {
                     hero.x -= movementHitbox.x;
-                } else if (movementHitbox.x + movementHitbox.w > 16 * state.areaInstance.w ) {
-                    hero.x -= ((movementHitbox.x + movementHitbox.w) - 16 * state.areaInstance.w);
+                } else if (movementHitbox.x + movementHitbox.w > 16 * state.areaSet?.current.w ) {
+                    hero.x -= ((movementHitbox.x + movementHitbox.w) - 16 * state.areaSet?.current.w);
                 }
                 if (movementHitbox.y < 0) {
                     hero.y -= movementHitbox.y
-                } else if (movementHitbox.y + movementHitbox.h > 16 * state.areaInstance.h ) {
-                    hero.y -= ((movementHitbox.y + movementHitbox.h) - 16 * state.areaInstance.h);
+                } else if (movementHitbox.y + movementHitbox.h > 16 * state.areaSet?.current.h ) {
+                    hero.y -= ((movementHitbox.y + movementHitbox.h) - 16 * state.areaSet?.current.h);
                 }
             }*/
             hero.z = groundZ
@@ -790,7 +789,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 if (towerLocation && onTowerMarker) {
                     state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
                     state.hero.savedData.activeTools.staff &= ~2;
-                    refreshAreaLogic(state, hero.area);
+                    // TODO: confirm this doesn't break the tower transition,
+                    // this used to call the refresh method directly.
+                    state.currentAreaNeedsLogicRefresh = true;
                     saveGame(state);
                     return;
                 }
@@ -816,7 +817,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             let baseTarget: Rect = staff.getAttackHitbox();
             if (!staff.isInvalid && !hero.canceledStaffPlacement) {
                 hero.activeStaff = staff;
-                addObjectToArea(state, state.areaInstance, staff);
+                addObjectToArea(state, state.areaSet?.current, staff);
             } else if (staff.staffBonked) {
                 // Staff does no damage, hero is knocked back.
                 const [dx, dy] = directionMap[staff.direction];
@@ -855,8 +856,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     baseTarget = {x: hero.x + 16, y: hero.y, w: 48, h: 16};
                 }
             }
-            playAreaSound(state, state.areaInstance, 'bossDeath');
-            hitTargets(state, state.areaInstance, {
+            playAreaSound(state, state.areaSet?.current, 'bossDeath');
+            hitTargets(state, state.areaSet?.current, {
                 damage: 4 * staffLevel,
                 hitbox: pad(baseTarget, 2),
                 hitEnemies: true,
@@ -869,8 +870,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 canDamageSpikeyShells: true,
                 source: hero,
             });
-            breakBrittleTilesInRect(state, state.areaInstance, pad(baseTarget, 2))
-            hitTargets(state, state.areaInstance, {
+            breakBrittleTilesInRect(state, state.areaSet?.current, pad(baseTarget, 2))
+            hitTargets(state, state.areaSet?.current, {
                 hitbox: baseTarget,
                 hitTiles: true,
                 crushingPower,
@@ -1112,7 +1113,7 @@ function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {
-        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaSet?.current);
         if (tileBehavior.solid) {
             return false
         }
@@ -1126,7 +1127,7 @@ function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero, dx =
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {
-        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaSet?.current);
         if (tileBehavior.isSouthernWall) {
             return true
         }
@@ -1139,7 +1140,7 @@ function isHeroOnVeryTallWall(this: void, state: GameState, hero: Hero): boolean
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
     for (const point of points) {
-        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        const {tileBehavior} = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaSet?.current);
         if (tileBehavior.isVeryTall && tileBehavior.solid === true) {
             return true
         }

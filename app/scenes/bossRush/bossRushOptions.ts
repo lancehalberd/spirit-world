@@ -65,7 +65,7 @@ export const bossRushConditions: BossRushCondition[] = [
 ];
 
 function getBoss(state: GameState, boss: BossType): Enemy {
-    return state.areaInstance.objects.find(o => (o.definition as BossObjectDefinition).enemyType === boss) as Enemy;
+    return state.areaSet?.current.objects.find(o => (o.definition as BossObjectDefinition).enemyType === boss) as Enemy;
 }
 
 
@@ -108,7 +108,7 @@ function fixBeetlePreview(state: GameState) {
         y: state.camera.y + 24,
     });*/
     boss.setMode('preview');
-    addObjectToArea(state, state.areaInstance, boss);
+    addObjectToArea(state, state.areaSet?.current, boss);
 }
 
 function fixGuardianPreview(state: GameState) {
@@ -126,7 +126,7 @@ function fixGuardianPreview(state: GameState) {
     boss.x = 256 - boss.w;
     boss.y = 256 - boss.h / 2;
     boss.setMode('preview');
-    addObjectToArea(state, state.areaInstance, boss);
+    addObjectToArea(state, state.areaSet?.current, boss);
 }
 function fixFlameBeastPreview(state: GameState) {
     const boss = getBoss(state, 'flameBeast');
@@ -202,7 +202,7 @@ export const allBossRushOptions: BossRushOption[] = [
             boss.x = 256;
             boss.y = 256 + 48;
             // Destroy the ice where the serpent emerges.
-            hitTargets(state, state.areaInstance, {
+            hitTargets(state, state.areaSet?.current, {
                 element: 'fire',
                 hitCircle: {
                     x: boss.x + boss.w / 2,

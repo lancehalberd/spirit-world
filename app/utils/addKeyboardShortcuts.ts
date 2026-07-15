@@ -2,6 +2,7 @@ import {zones} from 'app/content/zones/zoneHash';
 import {editingState} from 'app/development/editingState';
 import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
+import {refreshArea} from 'app/development/utils';
 import {isObject, isSelectionValid, isVariant, updateObjectInstance} from 'app/development/objectEditor';
 import {addVariantToArea} from 'app/development/variantEditor';
 import {toggleControlsScene} from 'app/scenes/controls/controlsScene';
@@ -13,10 +14,6 @@ import {cloneDeep} from 'app/utils/index';
 import {isDefinitionFromSection} from 'app/utils/sections';
 import {cleanState} from 'app/utils/state';
 
-
-function refreshArea(state: GameState, doNotRefreshEditor = false) {
-    enterLocation(state, state.location, {instant: true, doNotRefreshEditor});
-}
 
 export function addKeyboardShortcuts() {
     document.addEventListener('keydown', function(event: KeyboardEvent) {
@@ -60,15 +57,15 @@ export function addKeyboardShortcuts() {
                 return;
             }
             const nextArea: AreaInstance = isShiftDown
-                ? (state.surfaceAreaInstance || state.underwaterAreaInstance)
-                : state.alternateAreaInstance;
+                ? (state.areaSet.surface || state.areaSet.underwater)
+                : state.areaSet.alternate;
             if (nextArea) {
                 enterLocation(state, {
                     ...nextArea.location,
                     x: state.hero.x,
                     y: state.hero.y,
                     z: 0,
-                }, {instant: true});
+                });
             }
             event.preventDefault();
         }
@@ -82,7 +79,7 @@ export function addKeyboardShortcuts() {
             if (isSelectionValid(state, editingState)) {
                 for (const object of editingState.selectedObjects) {
                     // The source section will be relative to the section the user is looking at when they initiate the copy action.
-                    object._sourceSection = state.areaSection;
+                    object._sourceSection = state.areaSet?.areaSection;
                     // Using the section the objects are actually from turns out to be unintutive.
                     // object._sourceSection = getAreaSectionForDefinition(state, object);
                 }
@@ -90,7 +87,7 @@ export function addKeyboardShortcuts() {
                     editingState.clipboardObjects = editingState.selectedObjects.map(cloneDeep);
                 } else {
                     editingState.clipboardObjects 
-                        = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSection))
+                        = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSet?.areaSection))
                                                       .map(cloneDeep);
                 }
             } else {
@@ -107,7 +104,7 @@ export function addKeyboardShortcuts() {
                     if (isShiftDown) {
                         // If shift is held down, everything is copied relative to the super tile and we ignore any section restrictions
                         if (isObject(pastedObject)) {
-                            updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaInstance, true);
+                            updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaSet?.current, true);
                         } else if (isVariant(pastedObject)) {
                             addVariantToArea(state, editingState, cloneDeep(pastedObject));
                             areaNeedsRefresh = true;
@@ -118,16 +115,16 @@ export function addKeyboardShortcuts() {
                         // off the edges of super tiles.
                         pastedObject = {
                             ...pastedObject,
-                            x: pastedObject.x - 16 * pastedObject._sourceSection.x + 16 * state.areaSection.x,
-                            y: pastedObject.y - 16 * pastedObject._sourceSection.y + 16 * state.areaSection.y,
+                            x: pastedObject.x - 16 * pastedObject._sourceSection.x + 16 * state.areaSet?.areaSection.x,
+                            y: pastedObject.y - 16 * pastedObject._sourceSection.y + 16 * state.areaSet?.areaSection.y,
                         };
                         // Skip this object if it would be pasted outside of the current section.
-                        if (!isDefinitionFromSection(pastedObject, state.areaSection)) {
-                            console.log('not in section:', pastedObject, state.areaSection);
+                        if (!isDefinitionFromSection(pastedObject, state.areaSet?.areaSection)) {
+                            console.log('not in section:', pastedObject, state.areaSet?.areaSection);
                             continue;
                         }
                         if (isObject(pastedObject)) {
-                            updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaInstance, true);
+                            updateObjectInstance(state, cloneDeep(pastedObject), null, state.areaSet?.current, true);
                         } else if (isVariant(pastedObject)) {
                             addVariantToArea(state, editingState, cloneDeep(pastedObject));
                             areaNeedsRefresh = true;
@@ -153,16 +150,14 @@ export function addKeyboardShortcuts() {
             delete state.savedState.dungeonInventories[state.location.logicalZoneKey];
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location, {instant: true});
+            refreshArea(state);
             cleanState(state);
             event.preventDefault();
         } else if (keyCode === KEY.R) {
             // Reset the current screen as if you left and returned to it.
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location, {instant: true});
+            refreshArea(state);
             event.preventDefault();
         }
     });
@@ -170,7 +165,7 @@ export function addKeyboardShortcuts() {
 
 export function defeatAllEnemies() {
     const state = getState();
-    const allEnemies = [...state.areaInstance?.enemies, ...state.alternateAreaInstance?.enemies];
+    const allEnemies = [...state.areaSet?.current?.enemies, ...state.areaSet?.alternate?.enemies];
     for (const enemy of allEnemies) {
         if (enemy.isFromCurrentSection(state)) {
             enemy.showDeathAnimation(state);

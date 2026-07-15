@@ -1,10 +1,10 @@
-import {refreshAreaLogic} from 'app/content/areas';
+import {refreshCurrentAreaLogic} from 'app/content/areas';
 import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {Sign} from 'app/content/objects/sign';
 import {StaffTower} from 'app/content/objects/staffTower';
 import {showMessage} from 'app/scriptEvents';
-import {enterLocation} from 'app/utils/enterLocation';
+import {transitionToLocation} from 'app/utils/enterLocation';
 import {saveGame} from 'app/utils/saveGame';
 
 
@@ -91,7 +91,7 @@ dialogueHash.towerTeleporter = {
         // Use this when we can enable terminal for the astral projection.
         failToTeleport: `ERROR ACQUIRING TARGET FOR TRANSFER.`,
         teleport(state: GameState) {
-            enterLocation(state, {
+            transitionToLocation(state, {
                 ...state.location,
                 x: state.hero.x,
                 y: state.hero.y,
@@ -217,9 +217,9 @@ specialBehaviorsHash.towerExteriorTerminal = {
                         delete state.hero.savedData.rightTool;
                     }
                 }
-                refreshAreaLogic(state, state.hero.area, true);
+                refreshCurrentAreaLogic(state, 0);
                 saveGame(state);
-                for (const object of state.areaInstance.objects) {
+                for (const object of state.areaSet?.current.objects) {
                     if (object.definition.type === 'staffTower') {
                         (object as StaffTower).deploy(state);
                         return '';
@@ -255,7 +255,7 @@ dialogueHash.towerExteriorTerminal = {
     key: 'towerTeleporter',
     mappedOptions: {
         collapse(state: GameState) {
-            for (const object of state.areaInstance.objects) {
+            for (const object of state.areaSet?.current.objects) {
                 if (object.definition.type === 'staffTower') {
                     (object as StaffTower).collapse(state);
                     return '';

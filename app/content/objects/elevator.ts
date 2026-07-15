@@ -1,19 +1,19 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {evaluateLogicDefinition} from 'app/content/logic';
-import { TextCue } from 'app/content/effects/textCue';
-import { objectHash } from 'app/content/objects/objectHash';
-import { zones } from 'app/content/zones';
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { renderHeroShadow } from 'app/renderActor';
+import {TextCue} from 'app/content/effects/textCue';
+import {objectHash} from 'app/content/objects/objectHash';
+import {zones} from 'app/content/zones';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {renderHeroShadow} from 'app/renderActor';
 import {appendCallback, appendScript} from 'app/scriptEvents';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { updateAreaSection } from 'app/utils/area';
-import { playAreaSound } from 'app/musicController';
-import { createCanvasAndContext, drawCanvas, debugCanvas } from 'app/utils/canvas';
-import { addEffectToArea } from 'app/utils/effects';
-import { enterLocation } from 'app/utils/enterLocation';
-import { fixCamera } from 'app/utils/fixCamera';
-import { isPixelInShortRect } from 'app/utils/index';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {updateAreaSection} from 'app/utils/area';
+import {playAreaSound} from 'app/musicController';
+import {createCanvasAndContext, drawCanvas, debugCanvas} from 'app/utils/canvas';
+import {addEffectToArea} from 'app/utils/effects';
+import {transitionToLocation} from 'app/utils/enterLocation';
+import {fixCamera} from 'app/utils/fixCamera';
+import {isPixelInShortRect} from 'app/utils/index';
 
 const [floorSlot, floorPitMask, floorPit, /*floorPit2*/, platformInFloor, ring, platform ] = createAnimation('gfx/tiles/futuristic.png',
     {w: 112, h: 110}, {left: 0, top: 728, cols: 7}
@@ -178,7 +178,6 @@ export class Elevator implements ObjectInstance {
                     state,
                     state.location.zoneKey,
                     0,
-                    false,
                 );
             }
         }
@@ -206,7 +205,6 @@ export class Elevator implements ObjectInstance {
                         state,
                         state.location.zoneKey,
                         this.definition.floor + this.targetDelta,
-                        false,
                     );
                 }
             } else if (this.targetDelta < 0) {
@@ -216,7 +214,6 @@ export class Elevator implements ObjectInstance {
                         state,
                         state.location.zoneKey,
                         this.definition.floor + this.targetDelta,
-                        false,
                     );
                 }
             } else if (this.elevatorY < 0) {
@@ -503,12 +500,11 @@ class ElevatorCallTerminal implements ObjectInstance {
     }
 }
 
-export function enterZoneByElevator(
+function enterZoneByElevator(
     this: void,
     state: GameState,
     zoneKey: string,
     targetFloor: number,
-    instant: boolean = true,
     callback: (state: GameState) => void = null
 ): boolean {
     const zone = zones[zoneKey];
@@ -516,15 +512,14 @@ export function enterZoneByElevator(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
-    const objectLocation = findElevatorLocation(state, zoneKey, targetFloor, state.areaInstance.definition.isSpiritWorld, true);
+    const objectLocation = findElevatorLocation(state, zoneKey, targetFloor, state.areaSet?.current.definition.isSpiritWorld, true);
     if (!objectLocation) {
         return false;
     }
     //console.log('enterZoneByElevator', targetFloor, objectLocation);
-    enterLocation(state, objectLocation, {
-        instant,
+    transitionToLocation(state, objectLocation, {
         callback: () => {
-            const elevator = findElevatorForFloor(state.areaInstance, targetFloor);
+            const elevator = findElevatorForFloor(state.areaSet?.current, targetFloor);
             const hitbox = elevator.getLandingHitbox();
             state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
             state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 16;
@@ -537,7 +532,7 @@ export function enterZoneByElevator(
             // TODO: Make this generic so the elevator can be used in other areas, particularly generated areas.
             const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];
             const textCue = new TextCue(state, { text: 'Tower ' + floorName });
-            addEffectToArea(state, state.areaInstance, textCue);
+            addEffectToArea(state, state.areaSet?.current, textCue);
             // This means the player just dropped the elevator to the basement.
             if (elevator.specialStatus === 'stuck') {
                 elevator.specialStatus = 'crashed';

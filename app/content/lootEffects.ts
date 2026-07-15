@@ -87,10 +87,10 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         ) {
             gainCollectible(state, 'peach');
             // TODO: Consider a different sound effect for collecting a peach
-            playAreaSound(state, state.areaInstance, 'drink');
+            playAreaSound(state, state.areaSet?.current, 'drink');
         } else {
             state.hero.life = Math.min(state.hero.life + 1, state.hero.savedData.maxLife);
-            playAreaSound(state, state.areaInstance, 'drink');
+            playAreaSound(state, state.areaSet?.current, 'drink');
         }
     },
     peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {

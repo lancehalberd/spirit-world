@@ -21,7 +21,7 @@ specialBehaviorsHash.craterLavaSwitch = {
         // the lava don't appear until the animation completes.
         state.savedState.objectFlags.craterLava1Objects = false;
         state.savedState.objectFlags.craterLavaAnimation1_1 = true;
-        object.area.needsLogicRefresh = true;
+        state.currentAreaNeedsLogicRefresh = true;
         state.mutationDuration = 200;
         // appendScript(state, '{startScreenShake:2:0:craterLava}');
         state.screenShakes.push({
@@ -30,7 +30,7 @@ specialBehaviorsHash.craterLavaSwitch = {
             startTime: state.fieldTime,
             id: 'craterLava',
         });
-        let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
+        let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble');
         appendScriptEvents(state, [{
             type: 'update',
             update(state: GameState) {
@@ -47,37 +47,37 @@ specialBehaviorsHash.craterLavaSwitch = {
                 if (state.savedState.objectFlags.craterLavaAnimation1_1) {
                     delete state.savedState.objectFlags.craterLavaAnimation1_1;
                     state.savedState.objectFlags.craterLavaAnimation1_2 = true;
-                    object.area.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_2) {
                     delete state.savedState.objectFlags.craterLavaAnimation1_2;
                     state.savedState.objectFlags.craterLavaAnimation1_3 = true;
-                    object.area.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_3) {
                     delete state.savedState.objectFlags.craterLavaAnimation1_3;
                     state.savedState.objectFlags.craterLavaAnimation1_4 = true;
-                    object.area.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_4) {
                     delete state.savedState.objectFlags.craterLavaAnimation1_4;
                     state.savedState.objectFlags.craterLavaAnimation1_5 = true;
-                    object.area.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_5) {
                     delete state.savedState.objectFlags.craterLavaAnimation1_5;
                     state.savedState.objectFlags.craterLavaAnimation1_6 = true;
-                    object.area.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_6) {
                     delete state.savedState.objectFlags.craterLavaAnimation1_6;
                     state.savedState.objectFlags.craterLava1Objects = true;
-                    object.area.needsLogicRefresh = true;
+                    state.currentAreaNeedsLogicRefresh = true;
                     return true;
                 }
                 delete state.mutationDuration;
@@ -99,7 +99,7 @@ specialBehaviorsHash.craterLavaSwitch = {
 function drainFlameBeastLava(state: GameState) {
     state.savedState.objectFlags.craterLava4 = true;
     state.savedState.objectFlags.craterLavaAnimation4_1 = true;
-    state.areaInstance.needsLogicRefresh = true;
+    state.currentAreaNeedsLogicRefresh = true;
     state.mutationDuration = 200;
     state.screenShakes.push({
         dx: 0.7,
@@ -107,7 +107,7 @@ function drainFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
-    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
+    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble');
     appendScriptEvents(state, [{
         type: 'update',
         update(state: GameState) {
@@ -124,13 +124,13 @@ function drainFlameBeastLava(state: GameState) {
             if (state.savedState.objectFlags.craterLavaAnimation4_1) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_1;
                 state.savedState.objectFlags.craterLavaAnimation4_2 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_2) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_2;
                 state.savedState.objectFlags.craterLavaAnimation4_3 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_3) {
@@ -138,18 +138,18 @@ function drainFlameBeastLava(state: GameState) {
                 state.savedState.objectFlags.craterLavaAnimation4_4 = true;
                 // This is the frame the lava reaches the floor.
                 state.savedState.objectFlags.craterLava4Objects = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_4) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_4;
                 state.savedState.objectFlags.craterLavaAnimation4_5 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_5) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_5;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
                 return true;
             }
             delete state.mutationDuration;
@@ -176,7 +176,7 @@ export function fillFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
-    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaInstance, 'rumble');
+    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble');
     appendScriptEvents(state, [{
         type: 'update',
         update(state: GameState) {
@@ -187,34 +187,34 @@ export function fillFlameBeastLava(state: GameState) {
             // Do nothing if the game is still running a transition.
             if (timeElapsed === 2000) {
                 state.savedState.objectFlags.craterLavaAnimation4_5 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             if (timeElapsed >= 3000 && state.savedState.objectFlags.craterLavaAnimation4_5) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_5;
                 state.savedState.objectFlags.craterLavaAnimation4_4 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             if (timeElapsed >= 4000 && state.savedState.objectFlags.craterLavaAnimation4_4) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_4;
                 // This is the frame the lava starts rising vertically.
                 delete state.savedState.objectFlags.craterLava4Objects;
                 state.savedState.objectFlags.craterLavaAnimation4_3 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             if (timeElapsed >= 4800 && state.savedState.objectFlags.craterLavaAnimation4_3) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_3;
                 state.savedState.objectFlags.craterLavaAnimation4_2 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             if (timeElapsed >= 5600 && state.savedState.objectFlags.craterLavaAnimation4_2) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_2;
                 state.savedState.objectFlags.craterLavaAnimation4_1 = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             if (timeElapsed >= 6400 && state.savedState.objectFlags.craterLavaAnimation4_1) {
                 delete state.savedState.objectFlags.craterLavaAnimation4_1;
                 delete state.savedState.objectFlags.craterLava4;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
             if (timeElapsed >= 7000) {
                 delete state.mutationDuration;

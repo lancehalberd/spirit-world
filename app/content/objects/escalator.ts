@@ -206,7 +206,7 @@ export class Escalator implements ObjectInstance {
                 }
                 if (hero.actionTarget === this) {
                     hero.isControlledByObject = true;
-                    speed = state.nextAreaInstance ? 0.75 : speed;
+                    speed = state.nextAreaSet?.current ? 0.75 : speed;
                     hero.actionDx = speed * dx;
                     hero.actionDy = speed * dy;
                     hero.x += hero.actionDx;

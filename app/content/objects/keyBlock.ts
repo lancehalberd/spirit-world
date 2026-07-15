@@ -159,7 +159,7 @@ export class KeyBlock implements ObjectInstance {
                     const target = findObjectInstanceById(this.area, this.definition.targetObjectId, false);
                     activateTarget(state, target, true);
                 }
-                this.area.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             }
         }
     }

@@ -6,7 +6,7 @@ dialogueHash.tombGuardian = {
     key: 'tombGuardian',
     mappedOptions: {
         teleport: (state: GameState) => {
-            const guardian = state.areaInstance.objects.find(t => t.definition?.id === 'cocoonGuardian') as NPC;
+            const guardian = state.areaSet?.current.objects.find(t => t.definition?.id === 'cocoonGuardian') as NPC;
             addBurstEffect(state, guardian);
             removeObjectFromArea(state, guardian);
             return '';

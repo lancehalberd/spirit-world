@@ -18,11 +18,11 @@ export function exploreSection(state: GameState, sectionIndex: number) {
 
 
 export function isObjectInCurrentSection(state: GameState, object: ObjectInstance | EffectInstance): boolean {
-    const areaSection = state.nextAreaSection || state.areaSection;
+    const areaSection = state.nextAreaSet?.areaSection || state.areaSet?.areaSection;
     // We will make the object count as in the current section if it is linked to an object in the current area
     // so that linked doors can still trigger the secret chime when they are triggered from the atlernate area.
     // We can add a more specific fix for this if this turns out to be a bad change.
-    return (object.area === state.areaInstance || object.linkedObject?.area === state.areaInstance)
+    return (object.area === state.areaSet?.current || object.linkedObject?.area === state.areaSet?.current)
         && rectanglesOverlap(getSectionRect(areaSection), object.getHitbox());
 }
 
@@ -43,11 +43,11 @@ export function isDefinitionFromSection(object: SelectableDefinition, section: A
 }
 
 export function getAreaSectionForDefinition(state: GameState, object: SelectableDefinition): AreaSection {
-    for (const section of state.areaInstance.definition.sections) {
+    for (const section of state.areaSet?.current.definition.sections) {
         if (isPixelInShortRect(object.x, object.y, getSectionRect(section))) {
             return section;
         }
     }
-    console.warn("Object was outside of all defined sections", object, state.areaInstance.definition.sections);
-    return state.areaInstance.definition.sections[0];
+    console.warn("Object was outside of all defined sections", object, state.areaSet?.current.definition.sections);
+    return state.areaSet?.current.definition.sections[0];
 }

@@ -2,16 +2,15 @@ import {evaluateLogicDefinition} from 'app/content/logic';
 import {allTiles} from 'app/content/tiles';
 import {zones} from 'app/content/zones';
 import {editingState} from 'app/development/editingState';
-import {cleanupHeroFromArea, getAreaSectionInstance, removeAllClones, setAreaSection} from 'app/utils/area';
+import {MUTATE_DURATION} from 'app/gameConstants';
+import {getAreaSectionInstance, setAreaSection} from 'app/utils/area';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {createCanvasAndContext} from 'app/utils/canvas';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
-import {findObjectInstanceByDefinition} from 'app/utils/findObjectInstanceById';
 import {getAreaDimensions} from 'app/utils/getAreaSize';
-import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {initializeAreaLayerTiles, initializeAreaTiles} from 'app/utils/layers';
 import {mapTile} from 'app/utils/mapTile';
 import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
@@ -158,16 +157,16 @@ export function getAreaInstanceFromLocation(state: GameState, location: ZoneLoca
 
 // Sets global reference to either underwaterAreaInstance or surfaceAreaInstance if the current area is connected to another
 // area through an underwater/surface location relationship. Also sets the current area as underwater if a surface area is set.
-export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
-    state.underwaterAreaInstance = getConnectedUnderwaterArea(state, state.areaInstance, lastAreaInstance);
-    if (state.underwaterAreaInstance) {
-        state.underwaterAreaInstance.surfaceArea = state.areaInstance;
+export function setConnectedAreas(state: GameState, lastAreaInstance?: AreaInstance) {
+    state.areaSet.underwater = getConnectedUnderwaterArea(state, state.areaSet.current, lastAreaInstance);
+    if (state.areaSet.underwater) {
+        state.areaSet.underwater.surfaceArea = state.areaSet.current;
     }
-    state.surfaceAreaInstance = getConnectedSurfaceArea(state, state.areaInstance, lastAreaInstance);
-    if (state.surfaceAreaInstance) {
-        state.surfaceAreaInstance.underwaterArea = state.areaInstance;
+    state.areaSet.surface = getConnectedSurfaceArea(state, state.areaSet.current, lastAreaInstance);
+    if (state.areaSet.surface) {
+        state.areaSet.surface.underwaterArea = state.areaSet.current;
     }
-    state.areaInstance.underwater = !!state.zone.surfaceKey && !state.location.isSpiritWorld;
+    state.areaSet.current.underwater = !!state.zone.surfaceKey && !state.location.isSpiritWorld;
 }
 
 // Get and memoize the connected underwater area for the given area, returning null if there is none.
@@ -227,8 +226,8 @@ export function getConnectedSurfaceArea(state: GameState, area: AreaInstance, la
     return area.surfaceArea;
 }
 
-export function linkObjects(state: GameState): void {
-    for (const object of [...state.areaInstance.objects, ...state.alternateAreaInstance.objects]) {
+export function linkObjects(state: GameState, areaSet: AreaSet = state.areaSet): void {
+    for (const object of [...areaSet?.current.objects, ...areaSet?.alternate.objects]) {
         linkObject(object);
     }
 }
@@ -266,7 +265,7 @@ export function findZoneTargets(
     for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
         for (let floor = 0; floor < zone.floors.length; floor++) {
             // Search the corresponding spirit/material world before checking in the alternate world.
-            const areaGrids = state.areaInstance.definition.isSpiritWorld
+            const areaGrids = state.areaSet?.current.definition.isSpiritWorld
                 ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
                 : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
             const areaGrid = areaGrids[worldIndex];
@@ -287,44 +286,6 @@ export function findZoneTargets(
     }
     return results;
 }
-
-export function scrollToArea(state: GameState, location: ZoneLocation, direction: Direction): void {
-    //console.log('scrollToArea', direction);
-    removeAllClones(state);
-    state.nextAreaInstance = createAreaInstance(state, location, true);
-    if (direction === 'up') {
-        state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.h * 16;
-    }
-    if (direction === 'down') {
-        state.nextAreaInstance.cameraOffset.y = state.areaInstance.h * 16;
-    }
-    if (direction === 'left') {
-        state.nextAreaInstance.cameraOffset.x = -state.nextAreaInstance.w * 16;
-    }
-    if (direction === 'right') {
-        state.nextAreaInstance.cameraOffset.x = state.areaInstance.w * 16;
-    }
-    state.location = getFullZoneLocation(location);
-}
-
-export function switchToNextAreaSection(state: GameState): void {
-    if (!state.nextAreaSection || state.areaSection === state.nextAreaSection) {
-        state.nextAreaSection = null;
-        return;
-    }
-    refreshSection(state, state.areaInstance, state.areaSection);
-    refreshSection(state, state.alternateAreaInstance, state.areaSection);
-    linkObjects(state);
-    setAreaSection(state, state.nextAreaSection);
-    editingState.needsRefresh = true;
-    cleanupHeroFromArea(state);
-    state.hero.safeD = state.hero.d;
-    state.hero.safeX = state.hero.x;
-    state.hero.safeY = state.hero.y;
-    checkIfAllEnemiesAreDefeated(state, state.areaInstance);
-    checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
-}
-
 
 export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][] {
     if (!tileNumbers) {
@@ -515,21 +476,17 @@ export function createAreaInstance(state: GameState, location: ZoneLocation, isA
     return instance;
 }
 
-export function initializeComplexObjects(state: GameState, area: AreaInstance, isActiveArea: boolean) {
-    for (const object of [...area.objects, ...area.alternateArea.objects]) {
-        object.onInitializeAlternateArea?.(state, isActiveArea);
-    }
-}
 
-export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
+export function refreshCurrentAreaLogic(state: GameState, mutationDuration = state.mutationDuration ?? MUTATE_DURATION): void {
+    state.currentAreaNeedsLogicRefresh = false;
+    const area = state.areaSet.current;
     if (!area) {
         return;
     }
-    const wasHot = state.areaSection?.isHot;
-    if (state.areaSection) {
-        setAreaSection(state, getAreaSectionInstance(state, state.zone, area.definition, state.areaSection.definition));
+    const wasHot = state.areaSet.areaSection?.isHot;
+    if (state.areaSet.areaSection) {
+        setAreaSection(state, getAreaSectionInstance(state, state.zone, area.definition, state.areaSet.areaSection.definition));
     }
-    area.needsLogicRefresh = false;
     let lastLayerIndex = -1, refreshBehavior = false;
     for (let i = 0; i < area.definition.layers.length; i++) {
         const layerDefinition = area.definition.layers[i];
@@ -585,7 +542,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     for (let instance of [area, area.alternateArea]) {
         if (refreshBehavior) {
             state.map.needsRefresh = true;
-            state.fadeLevel = (state.areaSection.dark ?? 0) / 100;
+            state.fadeLevel = (state.areaSet.areaSection.dark ?? 0) / 100;
             // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
             // state.hero.vx = state.hero.vy = 0;
             const nextAreaInstance = createAreaInstance(state, instance.location, true);
@@ -612,31 +569,29 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 }
             }
             // If this is the instance currently being viewed, then apply either fast or normal transition logic.
-            if (state.areaInstance === instance) {
-                if (fastRefresh) {
-                    state.areaInstance = nextAreaInstance;
-                    state.hero.area = state.areaInstance;
+            if (state.areaSet.current === instance) {
+                if (mutationDuration <= 0) {
+                    state.areaSet.current = nextAreaInstance;
+                    state.hero.area = state.areaSet.current;
                 } else {
-                    state.transitionState = {
-                        callback: () => null,
-                        nextLocation: {
-                            ...state.location,
-                            x: state.hero.x,
-                            y: state.hero.y,
-                        },
+                    state.mutationState = {
                         time: 0,
-                        type: 'mutating',
-                        nextAreaInstance,
+                        duration: mutationDuration,
+                        nextAreaSet: {
+                            current: nextAreaInstance,
+                            // This will get replaced by the updated alternate area in the block below.
+                            alternate: state.areaSet.alternate,
+                        },
                     };
                 }
-            } else if (state.alternateAreaInstance === instance) {
-                if (fastRefresh) {
-                    state.alternateAreaInstance = nextAreaInstance;
+            } else if (state.areaSet.alternate === instance) {
+                if (mutationDuration <= 0) {
+                    state.areaSet.alternate = nextAreaInstance;
                 } else {
-                    if (!state.transitionState) {
+                    if (!state.mutationState) {
                         debugger;
                     }
-                    state.transitionState.nextAlternateAreaInstance = nextAreaInstance;
+                    state.mutationState.nextAreaSet.alternate = nextAreaInstance;
                 }
             }
 
@@ -679,7 +634,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         }
 
         // If the heat level of the room changed, hit all the tiles with fire to melt any ice.
-        if (!wasHot && state.areaSection?.isHot) {
+        if (!wasHot && state.areaSet.areaSection?.isHot) {
             hitTargets(state, instance, {hitbox: {x: 0, y: 0, w: 2000, h: 2000}, hitTiles: true, element: 'fire', source: null});
         }
 
@@ -732,86 +687,22 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     delete state.map.restoreOriginalTiles;
     for (const object of objectsToInitialize) {
         initializeObject(state, object, true);
-        // Call this immediately as we know both areas are updated already.
-        object.onInitializeAlternateArea?.(state, true)
     }
     checkIfAllEnemiesAreDefeated(state, area);
+    checkIfAllEnemiesAreDefeated(state, area.alternateArea);
 }
 
-export function refreshSection(state: GameState, area: AreaInstance, section: Rect): void {
-    // First reset tiles that need to be reset.
-    // This is done before objects since some objects will update the tiles under them.
-    for (let y = 0; y < section.h; y++) {
-        const row = section.y + y;
-        for (let x = 0; x < section.w; x++) {
-            const column = section.x + x;
-            for (const layer of area.layers) {
-                layer.tiles[row][column] = layer.originalTiles[row][column];
-            }
-            resetTileBehavior(area, {x: column, y: row});
-            if (area.tilesDrawn[row]?.[column]) {
-                area.tilesDrawn[row][column] = false;
-            }
-        }
-    }
-    area.checkToRedrawTiles = true;
-    // Remove effects unless they update during the transition, like the held chakram.
-    for (const effect of [...area.effects]) {
-        if (!effect.updateDuringTransition) {
-            removeEffectFromArea(state, effect);
-        }
-    }
-    const l = section.x * 16;
-    const t = section.y * 16;
-    // Objects will be initialized after all objects are added to the area since some object initialization will depend on
-    // other objects, for example beds/cocoons placing target NPC objects inside of them.
-    const objectsToInitialize: ObjectInstance[] = [];
-    // Remove any objects from that area that should be reset.
-    // This will permanently remove any objects that reset and don't have definitions, like loot drops.
-    for (const object of [...area.objects]) {
-        // We only want to use definitions from the area itself, not transient objects like minions.
-        const definition = area.definition.objects[area.definition.objects.indexOf(object.definition)];
-        // Only update objects defined in this section
-        if (definition?.x >= l + section.w * 16 || definition?.x < l || definition?.y >= t + section.h * 16 || definition?.y < t) {
-            continue;
-        }
-        if (object.alwaysReset || object.shouldReset && object.shouldReset(state)) {
-            removeObjectFromArea(state, object);
-            // Transient effects or minions summoned by a boss should just be despawned when reset.
-            if (definition) {
-                if (!evaluateLogicDefinition(state, definition)) {
-                    continue;
-                }
-                const object = createObjectInstance(state, definition);
-                addObjectToArea(state, area, object);
-                objectsToInitialize.push(object);
-            }
-        }
-    }
-    // Reset objects in the section that should be reset.
-    for (let i = 0; i < area.definition.objects.length; i++) {
-        const definition = area.definition.objects[i];
-        // Ignore objects defined outside of this section.
-        if (definition.x >= l + section.w * 16 || definition.x < l || definition.y >= t + section.h * 16 || definition.y < t) {
-            continue;
-        }
-        if (!evaluateLogicDefinition(state, definition)) {
-            continue;
-        }
-        let object = findObjectInstanceByDefinition(area, definition, true);
-        if (!object) {
-            object = createObjectInstance(state, definition);
-            if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
-                addObjectToArea(state, area, object);
-                objectsToInitialize.push(object);
-            }
-        }
-    }
-    for (const object of objectsToInitialize) {
-        initializeObject(state, object, true);
-        // Call this immediately as we know both areas are updated already.
-        object.onInitializeAlternateArea?.(state, true)
-    }
-    applyVariantsToArea(state, area);
-}
 
+export function initializeAreaSet(state: GameState, areaSet: AreaSet, isActiveArea: boolean) {
+    // TODO: figure out what needs to be done for variants.
+
+    // TODO: If necessary, add `onBeforeLinkObjects`, if some objects require running code before linking,
+    // for example, if an object had initialization logic to move it around independent of initial linked objects
+    // that may cause it to link with a different object afterwards.
+    linkObjects(state);
+    for (const object of [...areaSet.current.objects, ...areaSet.alternate.objects]) {
+        initializeObject(state, object, isActiveArea);
+    }
+    checkIfAllEnemiesAreDefeated(state, areaSet.current);
+    checkIfAllEnemiesAreDefeated(state, areaSet.alternate);
+}

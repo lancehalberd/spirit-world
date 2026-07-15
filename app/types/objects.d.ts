@@ -96,9 +96,6 @@ interface BaseFieldInstance {
     // isActiveArea will be set to false when this object is being initialized in an inactive area,
     // for example areas initialized when drawing maps.
     onInitialize?: (state: GameState, isActiveArea: boolean) => void
-    // Initialization method called on objects only after both the current and alternate area have
-    // been populated with objects.
-    onInitializeAlternateArea?: (state: GameState, isActiveArea: boolean) => void
     // Flag used to prevent reinitializing objects when they are moved between area instances
     // during are logic refreshes.
     isInitialized?: boolean;

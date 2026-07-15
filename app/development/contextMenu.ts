@@ -113,8 +113,8 @@ export function getContextMenu(): MenuOption[] {
     const state = getState()
     // Special context menu for editing map sections when the map is shown with the editor enabled.
     if (isMapSceneActive(state) && editingState.isEditing && !overworldKeys.has(state.location.zoneKey)) {
-        const selectedSections = overworldKeys.has(state.areaSection?.mapId)
-            ? [state.areaSection.index] : editingState.selectedSections;
+        const selectedSections = overworldKeys.has(state.areaSet?.areaSection?.mapId)
+            ? [state.areaSet?.areaSection.index] : editingState.selectedSections;
         if (selectedSections.length) {
             return getMapOptions(state, selectedSections);
         }
@@ -145,7 +145,7 @@ export function getContextMenu(): MenuOption[] {
                 const state = getState();
                 const sx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
                 const sy = Math.floor((state.camera.y + lastContextClick[1]) / 16);
-                console.log(state.areaInstance.behaviorGrid?.[sy]?.[sx]);
+                console.log(state.areaSet?.current.behaviorGrid?.[sy]?.[sx]);
             }
         });
         options.push({
@@ -157,7 +157,7 @@ export function getContextMenu(): MenuOption[] {
                     y: state.camera.y + lastContextClick[1],
                 };
                 console.log(point);
-                console.log(getCompositeBehaviors(state, state.areaInstance, point, state.nextAreaInstance));
+                console.log(getCompositeBehaviors(state, state.areaSet?.current, point, state.nextAreaSet?.current));
             }
         });
         options.push({
@@ -167,7 +167,7 @@ export function getContextMenu(): MenuOption[] {
                 const tx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
                 const ty = Math.floor((state.camera.y + lastContextClick[1]) / 16);
                 console.log(tx, ty);
-                for (const layer of state.areaInstance.layers) {
+                for (const layer of state.areaSet?.current.layers) {
                     console.log(layer.key, layer.tiles[ty][tx]);
                     if (layer.maskTiles?.[ty]?.[tx]) {
                         console.log(layer.key + '-mask', layer.maskTiles[ty]?.[tx]);
@@ -181,7 +181,7 @@ export function getContextMenu(): MenuOption[] {
                 const state = getState();
                 const x = (state.camera.x + lastContextClick[0]);
                 const y = (state.camera.y + lastContextClick[1]);
-                for (const object of state.areaInstance.objects) {
+                for (const object of state.areaSet?.current.objects) {
                     if (isPointInShortRect(x, y, object.getHitbox())) {
                         console.log(object);
                     }

@@ -52,7 +52,7 @@ export function wait(state: GameState, duration: number) {
 }
 export function waitForTransition(state: GameState) {
     appendInputBlockingCallback(state, (state: GameState) => {
-        if (state.nextAreaInstance || state.transitionState) {
+        if (state.nextAreaSet || state.transitionState) {
             return true;
         }
         return false;

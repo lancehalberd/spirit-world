@@ -421,11 +421,11 @@ class StandardTarget implements Target {
         if (this.currentHits >= this.maxHits) {
             gameState.score = Math.max(gameState.score + this.points, 0);
             this.hitTime = 300;
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
         
         else {
-            playAreaSound(state, state.areaInstance, 'rockShatter')
+            playAreaSound(state, state.areaSet?.current, 'rockShatter')
         }
     }
 }
@@ -548,10 +548,10 @@ class AlternatingTarget extends StandardTarget {
         this.hitTime = 300;
         
        if (this.currentPoints > 0) {
-            playAreaSound(state, state.areaInstance, 'hitShot');
+            playAreaSound(state, state.areaSet?.current, 'hitShot');
         }
         else {
-            playAreaSound(state, state.areaInstance, 'error')
+            playAreaSound(state, state.areaSet?.current, 'error')
         }
     }
 }
@@ -601,7 +601,7 @@ class BonusTarget extends StandardTarget {
         gameState.shotsHit++;
         this.hitTime = 300;
         
-        playAreaSound(state, state.areaInstance, 'secretChime');
+        playAreaSound(state, state.areaSet?.current, 'secretChime');
     }
 } 
 
@@ -641,7 +641,7 @@ class ExplosiveTarget extends StandardTarget {
         if (this.hitTime !== undefined) return;
         const explosionPoints = handleExplosion(gameState, savedState, this);
         gameState.score += explosionPoints;
-        playAreaSound(state, state.areaInstance, 'bossDeath');
+        playAreaSound(state, state.areaSet?.current, 'bossDeath');
         gameState.shotsHit++;
         this.hitTime = 300;
     }
@@ -857,9 +857,9 @@ function updateShop(state: GameState, gameState: TargetPracticeState, savedState
                 savedState.points -= cost;
                 savedState.unlocks[activeItem.key] = level + 1;
                 saveGame(state);
-                playAreaSound(state, state.areaInstance, 'secretChime');
+                playAreaSound(state, state.areaSet?.current, 'secretChime');
             } else {
-                playAreaSound(state, state.areaInstance, 'error');
+                playAreaSound(state, state.areaSet?.current, 'error');
             }
         } else if (level > 0 && activeItem.levelKey) {
             startLevel(state, gameState, activeItem.levelKey);
@@ -1025,7 +1025,7 @@ function fireBullet(state: GameState, gameState: TargetPracticeState, savedState
     gameState.reloadTime = Math.max(100, 300 - (savedState.unlocks.reload ?? 0) * 50);
     gameState.lastShotTime = 200;
     
-    playAreaSound(state, state.areaInstance, 'menuTick');
+    playAreaSound(state, state.areaSet?.current, 'menuTick');
 }
 
 function handleTargetCollisions(gameState: TargetPracticeState): void {
@@ -1485,7 +1485,7 @@ function updateReset(state: GameState, gameState:TargetPracticeState, savedState
             Object.assign(savedState, getNewTargetPracticeSavedState());
             saveGame(state);
             gameState.scene = 'shop';
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
         }
     }
 }

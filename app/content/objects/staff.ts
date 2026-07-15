@@ -89,7 +89,7 @@ export class Staff implements ObjectInstance {
     hero: Hero;
     constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4, level = 1, crushingPower }: Props) {
         // Note this assumes the staff is always added to the area the hero is in.
-        this.area = state.areaInstance;
+        this.area = state.areaSet?.current;
         this.animations = treeStaffAnimations;
         if (level > 1) {
             this.animations = this.area.definition.isSpiritWorld ? lightTowerStaffAnimations : darkTowerStaffAnimations;

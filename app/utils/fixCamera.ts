@@ -6,17 +6,17 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 // This logic needs to be kept up to date with the target location logic in `updateCamera`.
 export function fixCamera(state: GameState): void {
     const { w, h } = getAreaSize(state);
-    if (state.nextAreaInstance) {
-        if (state.nextAreaInstance.cameraOffset.x < 0 && state.camera.x > -CANVAS_WIDTH) {
+    if (state.nextAreaSet?.current) {
+        if (state.nextAreaSet?.current.cameraOffset.x < 0 && state.camera.x > -CANVAS_WIDTH) {
             state.camera.x = -CANVAS_WIDTH;
         }
-        if (state.nextAreaInstance.cameraOffset.x > 0 && state.camera.x < w) {
+        if (state.nextAreaSet?.current.cameraOffset.x > 0 && state.camera.x < w) {
             state.camera.x = w;
         }
-        if (state.nextAreaInstance.cameraOffset.y < 0 && state.camera.y > -CANVAS_HEIGHT) {
+        if (state.nextAreaSet?.current.cameraOffset.y < 0 && state.camera.y > -CANVAS_HEIGHT) {
             state.camera.y = -CANVAS_HEIGHT;
         }
-        if (state.nextAreaInstance.cameraOffset.y > 0 && state.camera.y < h) {
+        if (state.nextAreaSet?.current.cameraOffset.y > 0 && state.camera.y < h) {
             state.camera.y = h;
         }
         return;

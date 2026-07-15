@@ -21,9 +21,9 @@ specialBehaviorsHash.runInstructions = {
             helpText = `Hold [B_PASSIVE] to run.[-]Running uses Spirit Energy.`;
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -47,9 +47,9 @@ specialBehaviorsHash.rollInstructions = {
             }
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -79,9 +79,9 @@ specialBehaviorsHash.barrierBurstInstructions = {
             helpText = '';
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -109,9 +109,9 @@ specialBehaviorsHash.staffInstructions = {
             }
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -124,7 +124,7 @@ specialBehaviorsHash.spiritSightInstructions = {
         let helpText = '';
         if (!state.hero.savedData.passiveTools.spiritSight && state.savedState.objectFlags.spiritSightTraining) {
             helpText = 'Approach the pots.'
-            const pot = state.areaInstance.objects.find(o => o.definition?.id === 'tombEscapePot');
+            const pot = state.areaSet?.current.objects.find(o => o.definition?.id === 'tombEscapePot');
             const isCloseToPots = pot && state.hero.overlaps(pad(pot.getHitbox(), 16));
             if (isCloseToPots) {
                 helpText = 'Hold [B_MEDITATE] to concentrate on the pot.';
@@ -149,9 +149,9 @@ specialBehaviorsHash.spiritSightInstructions = {
             }
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -171,9 +171,9 @@ specialBehaviorsHash.teleportationInstructions = {
             }
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -202,9 +202,9 @@ specialBehaviorsHash.barrierReflectInstructions = {
             helpText = '';
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -231,9 +231,9 @@ specialBehaviorsHash.bowInstructions = {
             helpText = '';
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
@@ -245,7 +245,7 @@ specialBehaviorsHash.chestAndChakramInstructions = {
         let helpText = '';
         if (!state.hero.savedData.weapon) {
             helpText = 'Face a chest from the south and press [B_PASSIVE] to open it';
-        } else if (state.areaInstance.enemies.filter(e => e.isFromCurrentSection(state) && !e.isDefeated && e.status !== 'gone').length) {
+        } else if (state.areaSet?.current.enemies.filter(e => e.isFromCurrentSection(state) && !e.isDefeated && e.status !== 'gone').length) {
             helpText = 'Press [B_WEAPON] to throw the chakram at enemies';
             if (wasGameKeyPressed(state, GAME_KEY.WEAPON)) {
                 hideInstructions(state, object);
@@ -253,9 +253,9 @@ specialBehaviorsHash.chestAndChakramInstructions = {
             }
         }
         const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaSet?.current) {
             addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },

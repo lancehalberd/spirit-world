@@ -226,7 +226,7 @@ enemyDefinitions.stormHeart = stormHeart;
 
 function updateStormHeart(this: void, state: GameState, enemy: Enemy<StormHeartParams>): void {
     if (enemy.mode === 'waiting') {
-        if (enemy.area === state.areaInstance && enemy.life < enemy.maxLife) {
+        if (enemy.area === state.areaSet?.current && enemy.life < enemy.maxLife) {
             enemy.setMode('choose');
         }
         enemy.healthBarTime = 0;

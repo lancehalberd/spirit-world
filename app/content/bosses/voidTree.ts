@@ -359,7 +359,7 @@ function chooseNewHeart(state: GameState, enemy: Enemy, fastRefresh = false) {
     for (const activeHeart of enemy.params.chosenHearts) {
         delete state.savedState.objectFlags[activeHeart];
     }
-    state.areaInstance.needsLogicRefresh = true;
+    state.currentAreaNeedsLogicRefresh = true;
 }
 
 function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
@@ -423,7 +423,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
             if (otherEnemy.life <= 0 && !otherEnemy.isDefeated) {
                 otherEnemy.showDeathAnimation(state);
                 saveObjectStatus(state, otherEnemy.definition);
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             } else {
                 if (otherEnemy.definition.enemyType === 'voidStone') {
                     hasStone = true;
@@ -589,7 +589,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.z <= 0) {
             enemy.z = 0;
             enemy.makeSound(state, 'bossDeath');
-            if (enemy.area === state.areaInstance) {
+            if (enemy.area === state.areaSet?.current) {
                 addScreenShake(state, 0, 2);
             }
             addSlamEffect(state, enemy);
@@ -609,7 +609,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.z <= 0) {
             enemy.z = 0;
             enemy.makeSound(state, 'bossDeath');
-            if (enemy.area === state.areaInstance) {
+            if (enemy.area === state.areaSet?.current) {
                 addScreenShake(state, 0, 3);
             }
             addSlamEffect(state, enemy);
@@ -626,7 +626,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         accelerateInDirection(state, enemy, {x: 0, y: 1});
         if (!moveEnemy(state, enemy, enemy.vx, enemy.vy)) {
             enemy.makeSound(state, 'bossDeath');
-            if (enemy.area === state.areaInstance) {
+            if (enemy.area === state.areaSet?.current) {
                 addScreenShake(state, 0, 3);
             }
             enemy.params.stunTime = 1500;

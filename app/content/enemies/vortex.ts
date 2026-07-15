@@ -1,21 +1,21 @@
-import { FieldAnimationEffect, splashAnimation } from 'app/content/effects/animationEffect';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { omniAnimation } from 'app/content/enemyAnimations';
-import { Hero } from 'app/content/hero';
-import { zones } from 'app/content/zones/zoneHash';
+import {FieldAnimationEffect, splashAnimation} from 'app/content/effects/animationEffect';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {omniAnimation} from 'app/content/enemyAnimations';
+import {Hero} from 'app/content/hero';
+import {zones} from 'app/content/zones/zoneHash';
 import {FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
-import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/movement/moveActor';
+import {getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor} from 'app/movement/moveActor';
 import {getLedgeDelta} from 'app/movement/getLedgeDelta';
-import { isUnderwater } from 'app/utils/actor';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { addEffectToArea } from 'app/utils/effects';
+import {isUnderwater} from 'app/utils/actor';
+import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
+import {addEffectToArea} from 'app/utils/effects';
 import {
     accelerateInDirection,
     moveEnemy,
 } from 'app/utils/enemies';
-import { enterLocation } from 'app/utils/enterLocation';
-import { isTileOpen } from 'app/utils/field';
-import { removeObjectFromArea } from 'app/utils/objects';
+import {transitionToLocation} from 'app/utils/enterLocation';
+import {isTileOpen} from 'app/utils/field';
+import {removeObjectFromArea} from 'app/utils/objects';
 import {
     getVectorToNearbyTarget,
     getVectorToTarget,
@@ -77,10 +77,10 @@ enemyDefinitions.vortex = {
                     hero.heldChakram?.throw(state);
                     // The vortex will send the player down into the underwater instance if one is defined for this area.
                     if (hero === state.hero
-                        && state.underwaterAreaInstance
-                        && isTileOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canMoveInLava: false})
+                        && state.areaSet?.underwater
+                        && isTileOpen(state, state.areaSet?.underwater, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canMoveInLava: false})
                     ) {
-                        enterLocation(state, {
+                        transitionToLocation(state, {
                             ...state.location,
                             floor: zones[state.zone.underwaterKey].floors.length - 1,
                             zoneKey: state.zone.underwaterKey,

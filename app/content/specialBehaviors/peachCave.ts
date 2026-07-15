@@ -1,4 +1,4 @@
-import {refreshAreaLogic} from 'app/content/areas';
+import {refreshCurrentAreaLogic} from 'app/content/areas';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {
     appendCallback,
@@ -58,7 +58,7 @@ specialBehaviorsHash.peachCave = {
         if (state.savedState.objectFlags.peachCaveBoss) {
             if (state.randomizerState) {
                 state.savedState.objectFlags.peachCaveTreeDied = true;
-                state.areaInstance.needsLogicRefresh = true;
+                state.currentAreaNeedsLogicRefresh = true;
             } else {
                 if (!peachTree) {
                     return;
@@ -67,13 +67,13 @@ specialBehaviorsHash.peachCave = {
                 hideHUD(state, (state: GameState) => {
                     state.hero.y = 136;
                     state.savedState.objectFlags.peachCaveTreeDied = true;
-                    refreshAreaLogic(state, state.areaInstance, true);
+                    refreshCurrentAreaLogic(state, 0);
                 });
                 state.hero.prepareForCutScene();
                 appendScript(state, '{playTrack:vanaraDreamTheme}{wait:500');
                 // Clear all the bushes to unblock player movement and give some extra loot before they all disappear.
                 appendCallback(state, () => {
-                    hitTargets(state, state.areaInstance, {
+                    hitTargets(state, state.areaSet?.current, {
                         damage: 1,
                         hitbox: {x: 0, y: 0, w: 256, h: 256},
                         hitTiles: true,
@@ -126,8 +126,8 @@ specialBehaviorsHash.peachCave = {
                     peachTree.growPeach(state);
                 });
                 appendInputBlockingCallback(state, (state: GameState) => {
-                    state.areaSection.dark = Math.min(90, state.areaSection.dark + 0.5);
-                    //state.areaInstance.dark = Math.min(90, state.areaInstance.dark + 0.5);
+                    state.areaSet.areaSection.dark = Math.min(90, state.areaSet?.areaSection.dark + 0.5);
+                    //state.areaSet?.current.dark = Math.min(90, state.areaSet?.current.dark + 0.5);
                     if (peachTree.specialStatus === 'dead') {
                         return false;
                     }

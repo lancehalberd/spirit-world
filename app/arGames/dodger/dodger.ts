@@ -486,9 +486,9 @@ function updateShop(state: GameState, gameState:DodgerState, savedState: DodgerS
                 savedState.points -= cost;
                 savedState.unlocks[activeItem.key] = level + 1;
                 saveGame(state);
-                playAreaSound(state, state.areaInstance, 'secretChime');
+                playAreaSound(state, state.areaSet?.current, 'secretChime');
             } else {
-                playAreaSound(state, state.areaInstance, 'error');
+                playAreaSound(state, state.areaSet?.current, 'error');
             }
         } else if (level > 0 && activeItem.levelKey) {
             startLevel(state, gameState, activeItem.levelKey);
@@ -681,7 +681,7 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
         const target = gameState.targets[i];
         target.update(state, gameState);
         if (target.activeTime >= target.targetTime) {
-            playAreaSound(state, state.areaInstance, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime');
             gameState.score++;
             gameState.targets.splice(i--, 1);
             gameState.life = Math.min(gameState.maxLife, gameState.life + (savedState.unlocks.heal ?? 0) * 0.5);
@@ -701,14 +701,14 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
                 gameState.life--;
                 gameState.invulnerableTime = 100 + (savedState.unlocks.shield ?? 0) * 80;
                 gameState.timesHit++;
-                playAreaSound(state, state.areaInstance, 'ouch');
+                playAreaSound(state, state.areaSet?.current, 'ouch');
                 if (gameState.life <= 0) {
                     gameState.life = 0;
                     gameState.scene = 'results';
                     saveGame(state);
                 }
             } else {
-                playAreaSound(state, state.areaInstance, 'reflect');
+                playAreaSound(state, state.areaSet?.current, 'reflect');
             }
             gameState.bullets.splice(i--, 1);
             continue;
