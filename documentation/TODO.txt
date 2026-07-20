@@ -149,6 +149,8 @@ Current tasks:
 Creating a new area instance from scratch:
 
 Resetting a section inside of an initialized+dirty area instance:
+    - Fix: Menu stays open after confirming Nimbus Cloud location.
+
     - Thrive AR Game
         - Starts in base world
             - AR Stairs take player to higher levels that replace base field graphics with biome graphics based on tile behavior.
@@ -165,6 +167,7 @@ Resetting a section inside of an initialized+dirty area instance:
                 -> this uses returnToSpawnLocation(state, preserveZoneFlags=true) internally
                     -> enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags})
             - When loading a new save file
+            - When falling into an area
             - Enering area from script events
             - Entering area from nimbus cloud
             - Entering area when respawning after defeat

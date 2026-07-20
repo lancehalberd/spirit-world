@@ -69,7 +69,10 @@ export function updateCamera(state: GameState, speed?: number): void {
             //const lastAreaInstance = state.areaSet.current;
             state.areaSet = state.nextAreaSet;
             delete state.nextAreaSet;
-            exploreSection(state, state.nextAreaSet.currentSection.index);
+            exploreSection(state, state.areaSet.currentSection.index);
+            applyCurrentAreaSection(state);
+            checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
+            checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
             state.hero.x -= state.areaSet.current.cameraOffset.x;
             state.hero.y -= state.areaSet.current.cameraOffset.y;
             state.camera.x -= state.areaSet.current.cameraOffset.x;
@@ -108,8 +111,6 @@ export function updateCamera(state: GameState, speed?: number): void {
                 state.areaSet.current.tilesDrawn = [];
                 state.areaSet.current.checkToRedrawTiles = true;
             }
-            checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
-            checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
 
             // Make sure to remove renderParent from the hero for any objects that are
             // no longer being rendered.
@@ -144,14 +145,14 @@ export function updateCamera(state: GameState, speed?: number): void {
         // Swap to the next area set
         state.areaSet = state.nextAreaSet;
         delete state.nextAreaSet;
-        exploreSection(state, state.nextAreaSet.currentSection.index);
+        exploreSection(state, state.areaSet.currentSection.index);
         applyCurrentAreaSection(state);
+        checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
+        checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
         editingState.needsRefresh = true;
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
-        checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
-        checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
     }
 }
 

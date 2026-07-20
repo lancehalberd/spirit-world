@@ -96,41 +96,6 @@ export function getAreaSectionInstanceForLocation(state: GameState, location: Zo
     return getAreaSectionInstanceForPoint(state, zones[location.zoneKey], getAreaFromLocation(location), location.x / 16, location.y / 16);
 }
 
-/*export function updateAreaSection(state: GameState): void {
-    if (!state.areaSet) {
-        return;
-    }
-    //console.log('updateAreaSection', state.hero.x, state.hero.y);
-    //const lastAreaSection = state.areaSet?.currentSection;
-    let newAreaSection: AreaSectionInstance;
-    const {w, h} = state.zone.areaSize;
-    // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
-    // returns false for points on the edge of the rectangle.
-    const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
-    const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
-    for (const section of state.areaSet.current.definition.sections) {
-        if (isPointInShortRect(x, y, section)) {
-            newAreaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, section);
-            exploreSection(state, section.index);
-            break;
-        }
-    }
-    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
-    // currently in any of the defined sections for this area.
-    if (!newAreaSection) {
-        newAreaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, state.areaSet.current.definition.sections[0]);
-        state.hero.x = clamp(state.hero.x, newAreaSection.x * 16, (newAreaSection.x + newAreaSection.w - 1) * 16);
-        state.hero.y = clamp(state.hero.y, newAreaSection.y * 16, (newAreaSection.y + newAreaSection.h - 1) * 16);
-    }
-    state.areaSet.currentSection = newAreaSection;
-    applyCurrentAreaSection(state);
-    editingState.needsRefresh = true;
-    // if (newArea || lastAreaSection !== state.areaSet.currentSection) {
-    if (state.areaSet.alternate) {
-        state.areaSet.alternateSection = getAreaSectionInstanceForPoint(state, state.zone, state.areaSet?.alternate.definition, x, y);
-    }
-}*/
-
 export function getAreaSectionInstance(
     state: GameState,
     zone: Zone,

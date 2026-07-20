@@ -194,33 +194,26 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
     }
 }
 
-function scrollToNewArea(state: GameState, location: ZoneLocation, direction: Direction): void {
+function scrollToNewArea(state: GameState, location: ZoneLocation, d: CardinalDirection): void {
     //console.log('scrollToArea', direction);
     removeAllClones(state);
+    // Location is given relative to the current area, so we have to apply offsets to
+    // make it relative to the new area to find the correct section in the new area.
+    location.x -= directionMap[d][0] * state.areaSet.current.w * 16;
+    location.y -= directionMap[d][1] * state.areaSet.current.h * 16;
     state.nextAreaSet = getAreaSetForLocation(state, location);
-    if (direction === 'up') {
-        state.nextAreaSet.current.cameraOffset.y = -state.nextAreaSet?.current.h * 16;
-    }
-    if (direction === 'down') {
-        state.nextAreaSet.current.cameraOffset.y = state.areaSet?.current.h * 16;
-    }
-    if (direction === 'left') {
-        state.nextAreaSet.current.cameraOffset.x = -state.nextAreaSet?.current.w * 16;
-    }
-    if (direction === 'right') {
-        state.nextAreaSet.current.cameraOffset.x = state.areaSet?.current.w * 16;
-    }
+    state.nextAreaSet.current.cameraOffset.x += directionMap[d][0] * state.areaSet.current.w * 16;
+    state.nextAreaSet.current.cameraOffset.y += directionMap[d][1] * state.areaSet.current.h * 16;
     state.location = getFullZoneLocation(location);
 }
 
-function scrollToNewSection(state: GameState, d: Direction): void {
+function scrollToNewSection(state: GameState, d: CardinalDirection): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
     // TODO: Make sure this doesn't reset the current section.
     state.nextAreaSet = getAreaSetForLocation(state, {
         ...state.location,
-        x: state.hero.x + directionMap[d][0],
-        y: state.hero.y + directionMap[d][1],
+        x: state.hero.x + 32 * directionMap[d][0],
+        y: state.hero.y + 32 * directionMap[d][1],
     }, state.areaSet);
-
 }

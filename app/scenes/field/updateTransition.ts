@@ -41,6 +41,7 @@ export function updateTransition(state: GameState, transitionState: TransitionSt
             state.hero.z = Math.min(transitionState.nextLocation.z, state.hero.z + 2.5);
         }
         if (transitionState.time === WATER_TRANSITION_DURATION) {
+            switchToTransitionLocation(state, transitionState);
             delete state.transitionState;
         }
     } else if (transitionState.type === 'portal') {

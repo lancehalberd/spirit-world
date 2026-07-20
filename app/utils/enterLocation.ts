@@ -17,6 +17,31 @@ interface OptionalTransitionToLocationParams {
     transitionColor?: string
 }
 
+export function diveToUnderwaterLocation(state: GameState) {
+    transitionToLocation(state, {
+        ...state.location,
+        floor: zones[state.zone.underwaterKey].floors.length - 1,
+        zoneKey: state.zone.underwaterKey,
+        x: state.hero.x,
+        y: state.hero.y,
+        z: 24,
+    });
+    state.hero.swimming = false;
+    state.hero.wading = false;
+}
+
+export function riseToSurfaceLocation(state: GameState) {
+    transitionToLocation(state, {
+        ...state.location,
+        zoneKey: state.zone.surfaceKey,
+        floor: 0,
+        x: state.hero.x,
+        y: state.hero.y,
+        z: 0,
+    });
+    state.hero.swimming = true;
+}
+
 export function transitionToLocation(
     state: GameState,
     location: ZoneLocation,
@@ -36,6 +61,9 @@ export function transitionToLocation(
         state.hero.action = null;
     }
     state.hero.spiritRadius = 0;
+    if (!location.zoneKey) {
+        debugger;
+    }
     state.transitionState = {
         callback,
         nextLocation: location,
@@ -58,13 +86,13 @@ export function transitionToLocation(
     } else if (transitionType === 'fastFade') {
         state.transitionState.type = 'fastFade';
         state.transitionState.time = Math.min(state.transitionState.time, FAST_FADE_OUT_DURATION - FRAME_LENGTH);
-    }  else if (state.areaSet?.underwater && state.zone.underwaterKey === location.zoneKey) {
+    }  else if (state.areaSet.underwater && state.zone.underwaterKey === location.zoneKey) {
         state.transitionState.type = 'diving';
         //state.transitionState.nextAreaSet.current = state.areaSet?.underwater;
         //state.transitionState.nextAreaSet.areaSection = getAreaSectionInstanceForPoint(state, newZone, state.areaSet?.underwater.definition, x, y);
         // TODO: Check if removing this breaks anything.
         // state.hero.vx = state.hero.vy = 0;
-    } else if (state.zone.surfaceKey === location.zoneKey) {
+    } else if (state.areaSet.surface && state.zone.surfaceKey === location.zoneKey) {
         state.transitionState.type = 'surfacing';
         //state.transitionState.nextAreaSet.current = state.areaSet?.surface;
         //state.transitionState.nextAreaSet.areaSection = getAreaSectionInstanceForPoint(state, newZone, state.areaSet?.surface.definition, x, y);
@@ -185,9 +213,11 @@ export function enterLocation(
         cleanupHeroFromArea(state);
     }
     state.areaSet = getAreaSetForLocation(state, state.location, doNotReuseAreas ? undefined : state.areaSet);
-    state.hero.area = state.areaSet?.current;
-    exploreSection(state, state.nextAreaSet.currentSection.index);
+    state.hero.area = state.areaSet.current;
+    exploreSection(state, state.areaSet.currentSection.index);
     applyCurrentAreaSection(state);
+    checkIfAllEnemiesAreDefeated(state, state.areaSet.current);
+    checkIfAllEnemiesAreDefeated(state, state.areaSet.alternate);
     state.hero.areaTime = 0;
     // Don't let magic become infinitely negative while being drained.
     // We could also set magic to at least 0 during any zone transition instead of this.
@@ -217,7 +247,6 @@ export function enterLocation(
         state.fadeLevel = (state.areaSet?.currentSection.dark || 0) / 100;
     }
     fixCamera(state);
-    checkIfAllEnemiesAreDefeated(state, state.areaSet?.current);
     if (editingState.isEditing && !doNotRefreshEditor) {
         editingState.needsRefresh = true;
     }

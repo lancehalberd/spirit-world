@@ -608,8 +608,6 @@ export function initializeAreaSet(state: GameState, areaSet: AreaSet, isActiveAr
         }
         refreshAreaIce(state, area);
     }
-    checkIfAllEnemiesAreDefeated(state, areaSet.current);
-    checkIfAllEnemiesAreDefeated(state, areaSet.alternate);
 }
 
 // Gets an AreaInstance for a given location, reusing any existing AreaInstance for the location
@@ -622,7 +620,7 @@ export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation
                 oldAreaSet.underwater, oldAreaSet.alternateUnderwater,
                 oldAreaSet.surface, oldAreaSet.alternateSurface,
         ]) {
-            if (area.definition === definition) {
+            if (area?.definition === definition) {
                 return area;
             }
         }
@@ -636,9 +634,9 @@ export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation
 // Note in this last case, individual area sections inside of a super tile are still refreshed, but this happens
 // when they are scrolled entirely offscreen when the player leaves them, not when the player enters them.
 export function getAreaSetForLocation(state: GameState, location: ZoneLocation, oldAreaSet?: AreaSet): AreaSet {
-    const current = getOrCreateAreaInstance(state, location);
+    const current = getOrCreateAreaInstance(state, location, state.areaSet);
     const alternateLocation = {...location, isSpiritWorld: !location.isSpiritWorld};
-    const alternate = getOrCreateAreaInstance(state, alternateLocation);
+    const alternate = getOrCreateAreaInstance(state, alternateLocation, state.areaSet);
     current.alternateArea = alternate;
     alternate.alternateArea = current;
     const areaSet: AreaSet = {
@@ -677,7 +675,7 @@ export function getAreaSetForLocation(state: GameState, location: ZoneLocation, 
         areaSet.surface.underwaterArea = current;
         current.surfaceArea = areaSet.surface;
         areaSet.surfaceSection = getAreaSectionInstanceForLocation(state, surfaceLocation);
-        const alternateSurfaceLocation = {...underwaterLocation, isSpiritWorld: !location.isSpiritWorld};
+        const alternateSurfaceLocation = {...surfaceLocation, isSpiritWorld: !location.isSpiritWorld};
         areaSet.alternateSurface = getOrCreateAreaInstance(state, alternateSurfaceLocation, oldAreaSet);
         areaSet.alternateSurface.underwaterArea = alternate;
         alternate.surfaceArea = areaSet.alternateSurface;

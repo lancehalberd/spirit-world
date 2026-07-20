@@ -2,7 +2,6 @@ import {FieldAnimationEffect, splashAnimation} from 'app/content/effects/animati
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {omniAnimation} from 'app/content/enemyAnimations';
 import {Hero} from 'app/content/hero';
-import {zones} from 'app/content/zones/zoneHash';
 import {FRAME_LENGTH, MAX_FLOAT_HEIGHT} from 'app/gameConstants';
 import {getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor} from 'app/movement/moveActor';
 import {getLedgeDelta} from 'app/movement/getLedgeDelta';
@@ -13,7 +12,7 @@ import {
     accelerateInDirection,
     moveEnemy,
 } from 'app/utils/enemies';
-import {transitionToLocation} from 'app/utils/enterLocation';
+import {diveToUnderwaterLocation} from 'app/utils/enterLocation';
 import {isTileOpen} from 'app/utils/field';
 import {removeObjectFromArea} from 'app/utils/objects';
 import {
@@ -80,16 +79,7 @@ enemyDefinitions.vortex = {
                         && state.areaSet?.underwater
                         && isTileOpen(state, state.areaSet?.underwater, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canMoveInLava: false})
                     ) {
-                        transitionToLocation(state, {
-                            ...state.location,
-                            floor: zones[state.zone.underwaterKey].floors.length - 1,
-                            zoneKey: state.zone.underwaterKey,
-                            x: hero.x,
-                            y: hero.y,
-                            z: 24,
-                        });
-                        hero.swimming = false;
-                        hero.wading = false;
+                        diveToUnderwaterLocation(state);
                         hero.vz = -3;
                     } else {
                         hero.fallIntoPit(state);

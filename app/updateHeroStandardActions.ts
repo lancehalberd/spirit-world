@@ -3,7 +3,6 @@ import {HeldChakram} from 'app/content/effects/thrownChakram';
 import {setEquippedBoots} from 'app/utils/menu';
 import {CloneExplosionEffect} from 'app/content/effects/CloneExplosionEffect';
 import {allTiles} from 'app/content/tiles';
-import {zones} from 'app/content/zones';
 import {EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS} from 'app/gameConstants';
 import {getActorTargets} from 'app/getActorTargets';
 import {playAreaSound} from 'app/musicController';
@@ -19,7 +18,7 @@ import {isHeroFloating, isHeroSinking, isUnderwater} from 'app/utils/actor';
 import {destroyClone} from 'app/utils/destroyClone';
 import {destroyTile} from 'app/utils/destroyTile';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
-import {transitionToLocation} from 'app/utils/enterLocation';
+import {diveToUnderwaterLocation, riseToSurfaceLocation} from 'app/utils/enterLocation';
 import {
     canTeleportToCoords,
     directionMap,
@@ -185,15 +184,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (testHero.swimming
                 && isTileOpen(state, state.areaSet?.surface, {x: hero.x, y: hero.y})
             ) {
-                transitionToLocation(state, {
-                    ...state.location,
-                    zoneKey: state.zone.surfaceKey,
-                    floor: 0,
-                    x: hero.x,
-                    y: hero.y,
-                    z: 0,
-                });
-                hero.swimming = true;
+                riseToSurfaceLocation(state);
                 return;
             }
         }
@@ -218,16 +209,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         isTileOpen(state, state.areaSet?.underwater, {x: hero.x, y: hero.y})
     ) {
         if (hero === state.hero) {
-            transitionToLocation(state, {
-                ...state.location,
-                floor: zones[state.zone.underwaterKey].floors.length - 1,
-                zoneKey: state.zone.underwaterKey,
-                x: hero.x,
-                y: hero.y,
-                z: 24,
-            });
-            hero.swimming = false;
-            hero.wading = false;
+            diveToUnderwaterLocation(state);
         }
         return;
     }

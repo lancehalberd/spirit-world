@@ -83,12 +83,13 @@ function getDefaultLayers(w: number, h: number): AreaLayerDefinition[] {
 
 export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     const zone = zones[location.zoneKey];
+    if (!zone) {
+        debugger;
+    }
     const floor = zone.floors[location.floor];
     const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
     const alternateGrid = location.isSpiritWorld ? floor.grid : floor.spiritGrid;
     const {w, h} = zone.areaSize;
-
-
     const {x, y} = location.areaGridCoords;
     if (!grid[y]) {
         grid[y] = [];

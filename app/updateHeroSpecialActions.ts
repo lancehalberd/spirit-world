@@ -19,7 +19,7 @@ import {
 } from 'app/utils/direction';
 import {destroyClone} from 'app/utils/destroyClone';
 import {addEffectToArea} from 'app/utils/effects';
-import {enterLocation, transitionToLocation} from 'app/utils/enterLocation';
+import {diveToUnderwaterLocation, enterLocation, transitionToLocation} from 'app/utils/enterLocation';
 import {
     breakBrittleTilesInRect,
     canSomersaultToCoords,
@@ -44,7 +44,7 @@ const rollSpeed = [
 
 let sommersaultCount = 0;
 
-function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true) {
+function fallOnClosestSpawnMarker(state: GameState, hero: Hero, inSection = true) {
     const {section} = getAreaSize(state);
     let best: ObjectInstance = null, bestDistance: number;
     for (const object of state.areaSet?.current.objects) {
@@ -75,6 +75,9 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
         }
         fixCamera(state);
     }
+    hero.action = 'knocked';
+    hero.z = CANVAS_HEIGHT;
+    hero.isAirborn = true;
 }
 
 export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, vz: number): boolean {
@@ -85,16 +88,7 @@ export function checkToFallUnderWater(this: void, state: GameState, hero: Hero, 
         isTileOpen(state, state.areaSet?.underwater, {x: hero.x, y: hero.y})
     ) {
         playSound('waterJump');
-        transitionToLocation(state, {
-            ...state.location,
-            floor: zones[state.zone.underwaterKey].floors.length - 1,
-            zoneKey: state.zone.underwaterKey,
-            x: hero.x,
-            y: hero.y,
-            z: 24,
-        });
-        hero.swimming = false;
-        hero.wading = false;
+        diveToUnderwaterLocation(state);
         hero.vz = Math.min(-2, vz + 1.5);
         return true;
     }
@@ -105,7 +99,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     const isPrimaryHero = hero === state.hero;
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
-    if (isPrimaryHero && state.nextAreaSet?.current) {
+    if (isPrimaryHero && state.nextAreaSet?.current && state.nextAreaSet.current !== state.areaSet.current) {
         // The player will lose all velocity while entering an area if they release the direction they are moving.
         const [dx, dy] = getCloneMovementDeltas(state, hero);
         if (dx * hero.vx <= 0) hero.vx = 0;
@@ -113,13 +107,13 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // If we see issues with the screen transition code for super tiles,
         // update this logic to match the section transition code below and stop
         // the player at exactly the threshold.
-        if (state.nextAreaSet?.current.cameraOffset.x) {
+        if (state.nextAreaSet.current.cameraOffset.x) {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
             // otherwise horizontal doors won't work as expected.
-            hero.x += 0.75 * state.nextAreaSet?.current.cameraOffset.x / Math.abs(state.nextAreaSet?.current.cameraOffset.x);
+            hero.x += 0.75 * state.nextAreaSet.current.cameraOffset.x / Math.abs(state.nextAreaSet.current.cameraOffset.x);
         }
-        if (state.nextAreaSet?.current.cameraOffset.y) {
-            const dy = state.nextAreaSet?.current.cameraOffset.y / Math.abs(state.nextAreaSet?.current.cameraOffset.y);
+        if (state.nextAreaSet.current.cameraOffset.y) {
+            const dy = state.nextAreaSet.current.cameraOffset.y / Math.abs(state.nextAreaSet.current.cameraOffset.y);
             if (dy > 0 && hero.y < (state.zone.areaSize?.h ?? 32) * 16 + 18) {
                 hero.y += 0.7;
             } else if (dy < 0 && hero.y > -18) {
@@ -261,13 +255,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // and then snaps to the closest spawn marker to prevent landing at an invalid location.
             transitionToLocation(state, {
                 ...state.location,
-                z: CANVAS_HEIGHT,
                 floor: (state.location.floor - 1),
             }, {
                 callback: () => {
-                    hero.action = 'knocked';
-                    hero.isAirborn = true;
-                    moveToClosestSpawnMarker(state, hero, false);
+                    fallOnClosestSpawnMarker(state, hero, false);
                 },
             });
             return true;
@@ -300,14 +291,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     },
                     x: tx % targetAreaWidth,
                     y: ty % targetAreaHeight,
-                    z: CANVAS_HEIGHT,
                     d: hero.d,
                     isSpiritWorld: state.location.isSpiritWorld,
                 }, {
                     callback: () => {
-                        hero.action = 'knocked';
-                        hero.isAirborn = true;
-                        moveToClosestSpawnMarker(state, hero, false);
+                        fallOnClosestSpawnMarker(state, hero, false);
                     },
                 });
                 return true;
@@ -318,14 +306,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 areaGridCoords: state.location.areaGridCoords,
                 x: hero.x,
                 y: hero.y,
-                z: CANVAS_HEIGHT,
                 d: hero.d,
                 isSpiritWorld: state.location.isSpiritWorld,
             }, {
                 callback: () => {
-                    hero.action = 'knocked';
-                    hero.isAirborn = true;
-                    moveToClosestSpawnMarker(state, hero);
+                    fallOnClosestSpawnMarker(state, hero);
                 },
             });
             return true;
@@ -377,14 +362,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 },
                 x: tx % templeAreaWidth,
                 y: ty % templeAreaHeight,
-                z: CANVAS_HEIGHT,
                 d: hero.d,
                 isSpiritWorld: state.location.isSpiritWorld,
             }, {
                 callback: () => {
-                    hero.action = 'knocked';
-                    hero.isAirborn = true;
-                    moveToClosestSpawnMarker(state, hero, false);
+                    fallOnClosestSpawnMarker(state, hero, false);
                 },
             });
             return true;
