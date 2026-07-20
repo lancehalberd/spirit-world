@@ -113,8 +113,8 @@ export function getContextMenu(): MenuOption[] {
     const state = getState()
     // Special context menu for editing map sections when the map is shown with the editor enabled.
     if (isMapSceneActive(state) && editingState.isEditing && !overworldKeys.has(state.location.zoneKey)) {
-        const selectedSections = overworldKeys.has(state.areaSet?.areaSection?.mapId)
-            ? [state.areaSet?.areaSection.index] : editingState.selectedSections;
+        const selectedSections = overworldKeys.has(state.areaSet?.currentSection?.mapId)
+            ? [state.areaSet?.currentSection.index] : editingState.selectedSections;
         if (selectedSections.length) {
             return getMapOptions(state, selectedSections);
         }
@@ -393,7 +393,7 @@ function renderCurrentFloor(state: GameState): void {
     const isEditing = editingState.isEditing;
     // Temporarily disable editing to turn off special rendering for editing.
     editingState.isEditing = false;
-    const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
+    const areaSize = state.zone.areaSize;
     const floor = state.zone.floors[state.location.floor];
     const grid = state.location.isSpiritWorld ? floor.spiritGrid : floor.grid;
     const [canvas, context] = createCanvasAndContext(16 * areaSize.w * grid[0].length, 16 * areaSize.h * grid.length);

@@ -1,4 +1,3 @@
-import {getAreaFromLocation} from 'app/content/areas';
 import {TextCue} from 'app/content/effects/textCue';
 import {Door} from 'app/content/objects/door';
 import {DreamPod} from 'app/content/objects/dreamPod';
@@ -6,12 +5,12 @@ import {Teleporter} from 'app/content/objects/teleporter';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {zones} from 'app/content/zones';
 import {findObjectLocation} from 'app/randomizer/find';
-import {updateAreaSection} from 'app/utils/area';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
 import {addEffectToArea} from 'app/utils/effects';
 import {enterLocation, transitionToLocation} from 'app/utils/enterLocation';
 import {findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import {fixCamera} from 'app/utils/fixCamera';
+import {getAreaSectionInstanceForLocation} from 'app/utils/sections';
 import {checkToUpdateSpawnLocation} from 'app/content/spawnLocations';
 
 
@@ -45,12 +44,11 @@ export function enterZoneByTarget(
     if (!objectLocation) {
         return false;
     }
-    const targetAreaDefinition = getAreaFromLocation(objectLocation);
-    // If we are entering the area we are already in and no override transitionType is specified,
+    // If we are entering the area section we are already in and no override transitionType is specified,
     // move to the new location without a transition and just have the camera pan to the new location.
-    // TODO: This should probably be updated  to check that this is the same AreaSection rather than AreaInstance, otherwise it could
-    // cause some bad transitions when transitioning between two sections that happen to be in the same area instance.
-    if (!transitionType && !instant && state.areaSet?.current.definition === targetAreaDefinition) {
+    if (!transitionType && !instant
+        && state.areaSet?.currentSection.definition === getAreaSectionInstanceForLocation(state, objectLocation).definition
+    ) {
         onEnterLocation(state, targetObjectId, {doNotFixCamera: true, skipObject, callback});
         return true;
     }
@@ -91,7 +89,9 @@ function onEnterLocation(
         // subtract 1 here to account for the hero's movement hitbox being 1px lower than
         // its normal hitbox. Without this, the movement hitbox will not perfectly match 16x16 targets.
         state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 1;
-        updateAreaSection(state, true);
+        state.hero.safeD = state.hero.d;
+        state.hero.safeX = state.hero.x;
+        state.hero.safeY = state.hero.y;
         checkForFloorEffects(state, state.hero);
         if (!doNotFixCamera) {
             fixCamera(state);

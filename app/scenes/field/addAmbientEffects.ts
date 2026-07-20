@@ -114,12 +114,12 @@ function addAmbientEffectToPoint(this: void, state: GameState, area: AreaInstanc
             }))));
         }
     }
-    if (state.areaSet?.current === area && state.areaSet?.areaSection?.isHot) {
+    if (state.areaSet?.current === area && state.areaSet?.currentSection?.isHot) {
         const sparkle = addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'fire' });
         sparkle.drawPriority = 'foreground';
         return;
     }
-    if (state.areaSet?.current === area && state.areaSet?.areaSection?.isCorrosive && Math.random() < 0.2) {
+    if (state.areaSet?.current === area && state.areaSet?.currentSection?.isCorrosive && Math.random() < 0.2) {
         const sparkle = addAnimationEffectToBackground(state, area, Random.element(iceSparkleAnimations), {x, y});
         // const sparkle = addSparkleAnimation(state, area, {x, y, w: 1, h: 1}, { element: 'ice' });
         sparkle.drawPriority = 'foreground';

@@ -1,6 +1,6 @@
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
-import {playAreaSound} from 'app/musicController';
 import {isPixelInShortRect} from 'app/utils/index';
+import {playAreaSound} from 'app/utils/playSound';
 import {saveGame} from 'app/utils/saveGame';
 import {isObjectInCurrentSection} from 'app/utils/sections';
 

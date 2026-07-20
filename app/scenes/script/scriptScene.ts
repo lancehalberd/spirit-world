@@ -221,7 +221,6 @@ export class ScriptScene implements GameScene {
                             state.hero.life = state.hero.savedData.maxLife;
                         },
                         nextLocation: state.location,
-                        nextAreaSet: state.areaSet,
                         time: 0,
                         type: 'fade',
                     };

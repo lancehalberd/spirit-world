@@ -6,8 +6,6 @@ const baseVariantRandom = (state: GameState) => SRandom.seed(state.variantSeed);
 
 
 const materialArea: AreaDefinition = {
-    w: 32,
-    h: 32,
     layers: [],
     objects: [],
     sections: [
@@ -24,6 +22,7 @@ const spiritArea: AreaDefinition = {
 };
 zones.warPalaceWestRoom = {
     key: 'warPalaceWestRoom',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [[materialArea]],

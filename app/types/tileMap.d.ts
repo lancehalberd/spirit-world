@@ -447,8 +447,7 @@ interface Zone extends AreaBehaviorLogic {
     floors: Floor[]
     // How large each area is in this zone. Since each floor is on a grid, areas must have consistent sizes in order
     // to be laid out without gaps between them.
-    // If this is not set, a default value of {w: 32, h: 32} is assumed.
-    areaSize?: {w: number, h: number}
+    areaSize: {w: number, h: number}
 }
 
 interface Floor {
@@ -484,7 +483,7 @@ interface AreaInstance {
     tilesDrawn: boolean[][]
     // Tracks which area frames have been drawn since the last time checkToRedrawTiles was set.
     drawnFrames: Set<AreaFrame>
-    underwater?: boolean
+    isUnderwater?: boolean
     layers: AreaLayer[]
     effects: EffectInstance[]
     objects: ObjectInstance[]
@@ -518,18 +517,32 @@ interface AreaInstance {
     neutralTargets: (EffectInstance | ObjectInstance)[]
     needsIceRefresh?: boolean[][]|true
 }
+
+// The entire set of areas that may need to persist during gameplay.
+// Switching between the material+spirit worlds does not cause area sections to refresh
+// and similarly for surface/underwater pairs.
+// Many objects are linked between material+spirit worlds and must have both areas initialized
+// in order to function.
+// Linking objects between surface/underwater pairs is not implemented, but may be supported in the future
+// and there is special support to effectively link surface/underwater versions of the Frost Beast bosses.
+// Tile behaviors in the surface effect how lighting is rendered underwater.
 interface AreaSet {
     // The currently active area
     current: AreaInstance
+    currentSection: AreaSectionInstance
     // The alternate area for the active area.
     alternate: AreaInstance
+    alternateSection: AreaSectionInstance
     // Surface or underwater areas connected to this area.
-    // At most one of these will be set at once.
-    // (Alternatively, we could always set both and one would be equal to current)
-    surface?: AreaInstance
-    underwater?: AreaInstance
-
-    areaSection?: AreaSectionInstance
-    alternateAreaSection?: AreaSectionInstance
+    // These will be null when there is no connected surface area.
+    surface: AreaInstance|null
+    surfaceSection: AreaSectionInstance|null
+    alternateSurface: AreaInstance|null
+    alternateSurfaceSection: AreaSectionInstance|null
+    // These will be null when there is no connected underwater area.
+    underwater: AreaInstance|null
+    underwaterSection: AreaSectionInstance|null
+    alternateUnderwater: AreaInstance|null
+    alternateUnderwaterSection: AreaSectionInstance|null
 }
 

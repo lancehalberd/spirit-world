@@ -1,4 +1,9 @@
+import {evaluateLogicDefinition} from 'app/content/logic';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {zones} from 'app/content/zones/zoneHash';
+import {getAreaFromLocation} from 'app/utils/area';
 import {rectanglesOverlap, isPixelInShortRect} from 'app/utils/index';
+
 
 export function isSectionExplored(state: GameState, sectionIndex: number): boolean {
     const numberIndex = (sectionIndex / 32) | 0;
@@ -16,9 +21,8 @@ export function exploreSection(state: GameState, sectionIndex: number) {
     }
 }
 
-
 export function isObjectInCurrentSection(state: GameState, object: ObjectInstance | EffectInstance): boolean {
-    const areaSection = state.nextAreaSet?.areaSection || state.areaSet?.areaSection;
+    const areaSection = state.nextAreaSet?.currentSection || state.areaSet?.currentSection;
     // We will make the object count as in the current section if it is linked to an object in the current area
     // so that linked doors can still trigger the secret chime when they are triggered from the atlernate area.
     // We can add a more specific fix for this if this turns out to be a bad change.
@@ -50,4 +54,128 @@ export function getAreaSectionForDefinition(state: GameState, object: Selectable
     }
     console.warn("Object was outside of all defined sections", object, state.areaSet?.current.definition.sections);
     return state.areaSet?.current.definition.sections[0];
+}
+
+// Used to be `setAreaSection`, but now `areaSet.currentSection` should only be updated when creating
+// the full area set so that it is updated with all sections in the current area set.
+export function applyCurrentAreaSection(state: GameState): void {
+    if (state.areaSet.currentSection.isAstral) {
+        state.hero.isAstralProjection = true;
+    } else {
+        if (state.hero.isAstralProjection) {
+            state.hero.isAstralProjection = false;
+            state.hero.z = state.hero.groundHeight;
+        }
+    }
+}
+
+function isPointInAreaSection(tx: number, ty: number, zone: Zone, section: AreaSection): boolean {
+    const {w, h} = zone.areaSize;
+    const isXValid = (tx < 0 && section.x <= 0)
+        || (tx >= section.x && tx < section.x + section.w)
+        || (tx >= w && section.x + section.w >= w);
+    if (!isXValid) {
+        return false;
+    }
+    const isYValid = (ty < 0 && section.y <= 0)
+        || (ty >= section.y && ty < section.y + section.h)
+        || (ty >= h && section.y + section.h >= h);
+    return isYValid;
+}
+
+export function getAreaSectionInstanceForPoint(state: GameState, zone: Zone, area: AreaDefinition, tx: number, ty: number): AreaSectionInstance {
+    for (const section of area.sections) {
+        if (isPointInAreaSection(tx, ty, zone, section)) {
+            return getAreaSectionInstance(state, zone, area, section);
+        }
+    }
+    return getAreaSectionInstance(state, state.zone, area, area.sections[0]);
+}
+
+export function getAreaSectionInstanceForLocation(state: GameState, location: ZoneLocation) {
+    return getAreaSectionInstanceForPoint(state, zones[location.zoneKey], getAreaFromLocation(location), location.x / 16, location.y / 16);
+}
+
+/*export function updateAreaSection(state: GameState): void {
+    if (!state.areaSet) {
+        return;
+    }
+    //console.log('updateAreaSection', state.hero.x, state.hero.y);
+    //const lastAreaSection = state.areaSet?.currentSection;
+    let newAreaSection: AreaSectionInstance;
+    const {w, h} = state.zone.areaSize;
+    // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
+    // returns false for points on the edge of the rectangle.
+    const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
+    const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
+    for (const section of state.areaSet.current.definition.sections) {
+        if (isPointInShortRect(x, y, section)) {
+            newAreaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, section);
+            exploreSection(state, section.index);
+            break;
+        }
+    }
+    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
+    // currently in any of the defined sections for this area.
+    if (!newAreaSection) {
+        newAreaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, state.areaSet.current.definition.sections[0]);
+        state.hero.x = clamp(state.hero.x, newAreaSection.x * 16, (newAreaSection.x + newAreaSection.w - 1) * 16);
+        state.hero.y = clamp(state.hero.y, newAreaSection.y * 16, (newAreaSection.y + newAreaSection.h - 1) * 16);
+    }
+    state.areaSet.currentSection = newAreaSection;
+    applyCurrentAreaSection(state);
+    editingState.needsRefresh = true;
+    // if (newArea || lastAreaSection !== state.areaSet.currentSection) {
+    if (state.areaSet.alternate) {
+        state.areaSet.alternateSection = getAreaSectionInstanceForPoint(state, state.zone, state.areaSet?.alternate.definition, x, y);
+    }
+}*/
+
+export function getAreaSectionInstance(
+    state: GameState,
+    zone: Zone,
+    area: AreaDefinition,
+    definition: AreaSection = {x: 0, y: 0, w: area.w, h: area.h}
+): AreaSectionInstance {
+    const section = {
+        ...definition,
+        definition,
+        dark: definition.dark ?? area.dark ?? zone.dark ?? 0,
+        isFoggy: evaluateLogicDefinition(state, definition.fogLogic ?? area.fogLogic ?? zone.fogLogic, false),
+        isHot: evaluateLogicDefinition(state, definition.hotLogic ?? area.hotLogic ?? zone.hotLogic, false),
+        isAstral: evaluateLogicDefinition(state, definition.astralLogic ?? area.astralLogic ?? zone.astralLogic, false),
+        isCorrosive: evaluateLogicDefinition(state, definition.corrosiveLogic ?? area.corrosiveLogic ?? zone.corrosiveLogic, false),
+    };
+    if (area.specialBehaviorKey) {
+        const specialBehavior = specialBehaviorsHash[area.specialBehaviorKey] as SpecialAreaBehavior;
+        specialBehavior?.applyToSection(state, section);
+    }
+    return section;
+}
+
+export function refreshCurrentAreaSectionInstances(
+    state: GameState,
+) {
+    refreshCurrentAreaSectionInstance(state, state.areaSet.currentSection, state.areaSet.current);
+    refreshCurrentAreaSectionInstance(state, state.areaSet.alternateSection, state.areaSet.alternate);
+    refreshCurrentAreaSectionInstance(state, state.areaSet.underwaterSection, state.areaSet.underwater);
+    refreshCurrentAreaSectionInstance(state, state.areaSet.alternateUnderwaterSection, state.areaSet.alternateUnderwater);
+    refreshCurrentAreaSectionInstance(state, state.areaSet.surfaceSection, state.areaSet.surface);
+    refreshCurrentAreaSectionInstance(state, state.areaSet.alternateSurfaceSection, state.areaSet.alternateSurface);
+}
+
+export function refreshCurrentAreaSectionInstance(
+    state: GameState,
+    sectionInstance: AreaSectionInstance|null,
+    areaInstance: AreaInstance|null,
+) {
+    if (!sectionInstance) {
+        return;
+    }
+    const sectionDefinition = sectionInstance.definition;
+    const areaDefinition = areaInstance.definition;
+    sectionInstance.isFoggy = evaluateLogicDefinition(state, sectionDefinition.fogLogic ?? areaDefinition.fogLogic ?? state.zone.fogLogic, false);
+    sectionInstance.isHot = evaluateLogicDefinition(state, sectionDefinition.hotLogic ?? areaDefinition.hotLogic ?? state.zone.hotLogic, false);
+    sectionInstance.isAstral = evaluateLogicDefinition(state, sectionDefinition.astralLogic ?? areaDefinition.astralLogic ?? state.zone.astralLogic, false);
+    sectionInstance.isCorrosive = evaluateLogicDefinition(state, sectionDefinition.corrosiveLogic ?? areaDefinition.corrosiveLogic ?? state.zone.corrosiveLogic, false);
 }

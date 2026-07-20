@@ -537,7 +537,7 @@ function replaceTiles(state: GameState, x: number, y: number): void {
     const parentLayer = state.areaSet?.current.definition.parentDefinition?.layers?.find(l => l.key === layer.key)
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
-    const r = state.areaSet?.areaSection;
+    const r = state.areaSet?.currentSection;
     for (let y = r.y; y < r.y + r.h; y++) {
         for (let x = r.x; x < r.x + r.w; x++) {
             const t = layer.tiles[y][x];
@@ -621,11 +621,11 @@ export function selectAllTiles() {
         if (editingState.selectedLayerKey) {
             const layerDefinition = state.areaSet?.current.definition.layers.find(l => l.key === editingState.selectedLayerKey);
             editingState.brush = {
-                none: getTileGridFromLayer(layerDefinition, state.areaSet?.areaSection),
+                none: getTileGridFromLayer(layerDefinition, state.areaSet?.currentSection),
             };
         } else {
             for (const layer of state.areaSet?.current.definition.layers) {
-                editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSet?.areaSection);
+                editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSet?.currentSection);
             }
         }
         updateBrushCanvas(editingState.brush);
@@ -633,7 +633,7 @@ export function selectAllTiles() {
     }
     if (editingState.tool === 'tileChunk') {
         editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
-        chunkGenerators[editingState.tileChunkKey].generate(SRandom.seed(Math.random()), state.areaSet?.current.definition, state.areaSet?.areaSection, state.areaSet?.alternate.definition);
+        chunkGenerators[editingState.tileChunkKey].generate(SRandom.seed(Math.random()), state.areaSet?.current.definition, state.areaSet?.currentSection, state.areaSet?.alternate.definition);
         refreshArea(state);
         editingState.hasChanges = true;
     }

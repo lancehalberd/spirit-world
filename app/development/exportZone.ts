@@ -159,7 +159,7 @@ export function serializeZone(zone: Zone) {
 
     lines.push(`zones.${zone.key} = {`);
     lines.push(`    key: '${zone.key}',`);
-    const {w, h} = zone.areaSize ?? {w:32, h: 32};
+    const {w, h} = zone.areaSize;
     lines.push(`    areaSize: {w: ${w}, h: ${h}},`);
     if (zone.surfaceKey) {
         lines.push(`    surfaceKey: '${zone.surfaceKey}',`);

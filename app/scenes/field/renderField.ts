@@ -97,7 +97,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
         renderSurfaceLighting(context, state, state.areaSet.current, state.nextAreaSet?.current);
         renderFieldForeground(context, state, state.areaSet.current, state.nextAreaSet?.current);
         renderWaterOverlay(context, state);
-        renderHeatOverlay(context, state, state.areaSet.areaSection);
+        renderHeatOverlay(context, state, state.areaSet.currentSection);
         renderSpiritOverlay(context, state);
         renderAreaLighting(context, state, state.areaSet.current, state.nextAreaSet?.current);
     removeScreenShakes(context, state);
@@ -1008,7 +1008,7 @@ export function renderMutation(context: CanvasRenderingContext2D, state: GameSta
         renderAreaObjectsAfterHero(underContext, state, area);
         renderSurfaceLighting(underContext, state, area);
         renderFieldForeground(underContext, state, area);
-        renderHeatOverlay(underContext, state, mutationState.nextAreaSet.areaSection);
+        renderHeatOverlay(underContext, state, mutationState.nextAreaSet.currentSection);
         renderAreaLighting(underContext, state, area);
     }
     /*const offsets = [0, 4, 2, 6, 1, 5, 3, 7];
@@ -1040,27 +1040,28 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             if (!state.transitionState.patternCanvas) {
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
-                renderArea(patternContext, state, state.transitionState.nextAreaSet.current, false);
-                if (state.transitionState.type === 'diving') {
+                if (state.transitionState.type === 'diving' && state.areaSet.underwater) {
+                    renderArea(patternContext, state, state.areaSet.underwater, false);
                     patternContext.save();
-                        translateContextForAreaAndCamera(patternContext, state, state.transitionState.nextAreaSet.current);
+                        translateContextForAreaAndCamera(patternContext, state, state.areaSet.underwater);
                         renderHeroShadow(patternContext, state, state.hero, true);
                     patternContext.restore();
-                    renderAreaLighting(patternContext, state, state.transitionState.nextAreaSet.current);
-                    renderSurfaceLighting(patternContext, state, state.transitionState.nextAreaSet.current);
-                } else {
-                    renderHeatOverlay(patternContext, state, state.transitionState.nextAreaSet.areaSection);
+                    renderAreaLighting(patternContext, state, state.areaSet.underwater);
+                    renderSurfaceLighting(patternContext, state, state.areaSet.underwater);
+                } else if (state.transitionState.type === 'surfacing' && state.areaSet.surface) {
+                    renderArea(patternContext, state, state.areaSet.surface, false);
+                    renderHeatOverlay(patternContext, state, state.areaSet.surfaceSection);
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
             const p = Math.min(1, state.transitionState.time / WATER_TRANSITION_DURATION);
-            if (state.transitionState.type === 'surfacing') {
+            if (state.transitionState.type === 'surfacing' && state.areaSet.surface) {
                 context.save();
                     context.translate(0, dz + 24);
                     renderStandardFieldStackWithoutWaterOverlay(context, state, false);
                 context.restore();
                 context.save();
-                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaSet.current);
+                    translateContextForAreaAndCamera(context, state, state.areaSet.surface);
                     state.hero.render(context, state);
                 context.restore();
                 context.save();
@@ -1077,17 +1078,17 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 context.restore();
                 context.save();
                     context.globalAlpha *= p * p;
-                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaSet.current);
+                    translateContextForAreaAndCamera(context, state, state.areaSet.surface);
                     state.hero.render(context, state);
                 context.restore();
-            } else {
+            } else if (state.transitionState.type === 'diving' && state.areaSet.underwater) {
                 context.save();
                     context.translate(0, dz);
                     context.fillStyle = state.transitionState.pattern;
                     context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 context.restore();
                 context.save();
-                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaSet.current);
+                    translateContextForAreaAndCamera(context, state, state.areaSet.underwater);
                     state.hero.render(context, state);
                 context.restore();
                 context.save();
@@ -1103,7 +1104,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 context.restore();
                 context.save();
                     context.globalAlpha *= (1 - p) * (1 - p);
-                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaSet.current);
+                    translateContextForAreaAndCamera(context, state, state.areaSet.underwater);
                     state.hero.render(context, state);
                 context.restore();
             }
@@ -1125,7 +1126,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
                 renderArea(patternContext, state, state.areaSet.alternate, true);
-                renderHeatOverlay(patternContext, state, state.areaSet.alternateAreaSection);
+                renderHeatOverlay(patternContext, state, state.areaSet.alternateSection);
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
             context.save();

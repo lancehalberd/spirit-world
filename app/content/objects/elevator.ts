@@ -7,13 +7,12 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {renderHeroShadow} from 'app/renderActor';
 import {appendCallback, appendScript} from 'app/scriptEvents';
 import {createAnimation, drawFrame, getFrame} from 'app/utils/animations';
-import {updateAreaSection} from 'app/utils/area';
-import {playAreaSound} from 'app/musicController';
 import {createCanvasAndContext, drawCanvas, debugCanvas} from 'app/utils/canvas';
 import {addEffectToArea} from 'app/utils/effects';
 import {transitionToLocation} from 'app/utils/enterLocation';
 import {fixCamera} from 'app/utils/fixCamera';
 import {isPixelInShortRect} from 'app/utils/index';
+import {playAreaSound} from 'app/utils/playSound';
 
 const [floorSlot, floorPitMask, floorPit, /*floorPit2*/, platformInFloor, ring, platform ] = createAnimation('gfx/tiles/futuristic.png',
     {w: 112, h: 110}, {left: 0, top: 728, cols: 7}
@@ -524,10 +523,14 @@ function enterZoneByElevator(
             state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
             state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2 - 16;
             state.hero.d = 'up';
+            state.hero.safeD = state.hero.d;
+            state.hero.safeX = state.hero.x;
+            state.hero.safeY = state.hero.y;
             state.hero.renderParent = elevator;
             state.hero.isControlledByObject = true;
             elevator.callToCurrentFloor(state);
-            updateAreaSection(state, true);
+            //updateAreaSection(state);
+            //cleanupHeroFromArea(state);
             fixCamera(state);
             // TODO: Make this generic so the elevator can be used in other areas, particularly generated areas.
             const floorName = ['B1', '1F', '2F', '3F', '4F', '5F'][elevator.definition.floor];

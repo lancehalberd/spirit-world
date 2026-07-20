@@ -280,7 +280,7 @@ function drawBrushLayerPreview(
     rectangle: Rect,
 ): void {
     const frameIndex = Math.floor(Date.now() * 6 / 1000) % 6;
-    const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
+    const areaSize = state.zone.areaSize;
     const w = 16, h = 16;
     for (let y = 0; y < rectangle.h; y++) {
         const ty = rectangle.y + y;

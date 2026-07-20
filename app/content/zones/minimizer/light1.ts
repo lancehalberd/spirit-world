@@ -557,6 +557,7 @@ const sf0_0x0: AreaDefinition = null;
 const sf0_0x1: AreaDefinition = null;
 zones.light1 = {
     key: 'light1',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [

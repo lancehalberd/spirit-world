@@ -1888,7 +1888,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         editingState.selectedObjects = [...state.areaSet?.current.definition.objects, ...(state.areaSet?.current.definition.variants ?? [])];
         // Unless shift is also held, only select elements from the current section.
         if (!isShiftDown) {
-            editingState.selectedObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSet?.areaSection))
+            editingState.selectedObjects = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSet?.currentSection))
         }
         const lastSelectedObject = (editingState.selectedObjects.filter(isObject)[0]);
         if (lastSelectedObject) {

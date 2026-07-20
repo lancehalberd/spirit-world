@@ -1,17 +1,15 @@
-import {
-    createAreaInstance, getAreaFromLocation, linkObjects, setConnectedAreas,
-} from 'app/content/areas';
+import {cleanupHeroFromArea, getAreaSetForLocation} from 'app/content/areas';
 import {zones} from 'app/content/zones';
 import {editingState} from 'app/development/editingState';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {FADE_OUT_DURATION, FAST_FADE_OUT_DURATION, FRAME_LENGTH} from 'app/gameConstants';
-import {cleanupHeroFromArea, getAreaSectionInstanceForPoint, updateAreaSection} from 'app/utils/area'
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {fixCamera} from 'app/utils/fixCamera';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {removeObjectFromArea} from 'app/utils/objects';
+import {applyCurrentAreaSection, exploreSection} from 'app/utils/sections';
 
 interface OptionalTransitionToLocationParams {
     callback?: () => void
@@ -46,14 +44,13 @@ export function transitionToLocation(
         // Note this only works for 'fade'+'fastFade' transition and needs some additional logic to correctly support other transitions.
         time: Math.min(state.transitionState?.time ?? 0, FADE_OUT_DURATION - FRAME_LENGTH),
         type: 'fade',
-        nextAreaSet: {...state.areaSet},
     };
-    const newZone = zones[location.zoneKey];
-    const {w, h} = newZone.areaSize ?? {w: 32, h: 32};
+    //const newZone = zones[location.zoneKey];
+    //const {w, h} = newZone.areaSize;
     // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
     // returns false for points on the edge of the rectangle.
-    const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
-    const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
+    //const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
+    //const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
     if (transitionType === 'circle') {
         state.transitionState.type = 'circle';
     } else if (transitionType === 'fade') {
@@ -63,18 +60,30 @@ export function transitionToLocation(
         state.transitionState.time = Math.min(state.transitionState.time, FAST_FADE_OUT_DURATION - FRAME_LENGTH);
     }  else if (state.areaSet?.underwater && state.zone.underwaterKey === location.zoneKey) {
         state.transitionState.type = 'diving';
-        state.transitionState.nextAreaSet.current = state.areaSet?.underwater;
-        state.transitionState.nextAreaSet.areaSection = getAreaSectionInstanceForPoint(state, newZone, state.areaSet?.underwater.definition, x, y);
-        state.hero.vx = state.hero.vy = 0;
+        //state.transitionState.nextAreaSet.current = state.areaSet?.underwater;
+        //state.transitionState.nextAreaSet.areaSection = getAreaSectionInstanceForPoint(state, newZone, state.areaSet?.underwater.definition, x, y);
+        // TODO: Check if removing this breaks anything.
+        // state.hero.vx = state.hero.vy = 0;
     } else if (state.zone.surfaceKey === location.zoneKey) {
         state.transitionState.type = 'surfacing';
-        state.transitionState.nextAreaSet.current = state.areaSet?.surface;
-        state.transitionState.nextAreaSet.areaSection = getAreaSectionInstanceForPoint(state, newZone, state.areaSet?.surface.definition, x, y);
-        state.hero.vx = state.hero.vy = 0;
+        //state.transitionState.nextAreaSet.current = state.areaSet?.surface;
+        //state.transitionState.nextAreaSet.areaSection = getAreaSectionInstanceForPoint(state, newZone, state.areaSet?.surface.definition, x, y);
+        // TODO: Check if removing this breaks anything.
+        //state.hero.vx = state.hero.vy = 0;
         //console.log(state.transitionState.nextAreaSection);
         //console.log(state.transitionState.nextAreaSection.isFoggy);
-    } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
+    } else if (state.location.isSpiritWorld !== location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
         state.transitionState.type = 'portal';
+        // Bring the held chakram with you.
+        if (state.hero.heldChakram) {
+            removeEffectFromArea(state, state.hero.heldChakram);
+            addEffectToArea(state, state.areaSet.alternate, state.hero.heldChakram);
+        }
+        if (state.hero.activeBarrierBurst) {
+            // console.log('transferring barrier burst to new area');
+            removeEffectFromArea(state, state.hero.activeBarrierBurst);
+            addEffectToArea(state, state.areaSet.alternate, state.hero.activeBarrierBurst);
+        }
     } else if (state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
         if (location.zoneKey === 'dream' || state.location.zoneKey === 'dream') {
             state.transitionState.fadeColor = '#FFF';
@@ -85,10 +94,11 @@ export function transitionToLocation(
     if (transitionColor) {
         state.transitionState.fadeColor = transitionColor;
     }
-    const targetAreaDefinition = getAreaFromLocation(location);
-    if (state.areaSet?.alternate.definition === targetAreaDefinition) {
-        state.transitionState.nextAreaSet.current = state.areaSet?.alternate;
-        state.transitionState.nextAreaSet.alternate = state.areaSet?.current;
+    /*if (state.areaSet.alternate.definition === getAreaFromLocation(location)) {
+        state.transitionState.nextAreaSet = {
+            current: state.areaSet?.alternate,
+            alternate: state.areaSet?.current,
+        }
         // Bring the held chakram with you.
         if (state.hero.heldChakram) {
             removeEffectFromArea(state, state.hero.heldChakram);
@@ -99,13 +109,16 @@ export function transitionToLocation(
             removeEffectFromArea(state, state.hero.activeBarrierBurst);
             addEffectToArea(state, state.transitionState.nextAreaSet.current, state.hero.activeBarrierBurst);
         }
-    }
+    }*/
 }
 
 interface OptionalEnterLocationParams {
     callback?: () => void
     isMutation?: boolean
     isEndOfTransition?: boolean
+    // Setting this to true will create brand new area instances instead of reusing
+    // instances in the current area set.
+    doNotReuseAreas?: boolean
     doNotRefreshEditor?: boolean
     preserveZoneFlags?: boolean
 }
@@ -117,6 +130,7 @@ export function enterLocation(
         isEndOfTransition = false,
         isMutation = false,
         doNotRefreshEditor = false,
+        doNotReuseAreas = false,
         preserveZoneFlags = false,
     }: OptionalEnterLocationParams = {}
 ): void {
@@ -166,24 +180,14 @@ export function enterLocation(
     };
     state.location = getFullZoneLocation(state.location);
 
-    const alternateLocation = {...state.location, isSpiritWorld: !state.location.isSpiritWorld};
-
     // Remove all clones on changing areas.
     if (!isMutation) {
         cleanupHeroFromArea(state);
     }
-    const lastAreaInstance = state.areaSet?.current;
-    // Use the existing area instances on the transition state if any are present.
-    state.areaSet.current = state.transitionState?.nextAreaSet?.current
-        || createAreaInstance(state, state.location, true);
-    state.areaSet.alternate = state.transitionState?.nextAreaSet?.alternate
-        || createAreaInstance(state, alternateLocation, true);
-    state.areaSet.current.alternateArea = state.areaSet?.alternate;
-    state.areaSet.alternate.alternateArea = state.areaSet?.current;
-    linkObjects(state);
-    // TODO: initialize objects
-
+    state.areaSet = getAreaSetForLocation(state, state.location, doNotReuseAreas ? undefined : state.areaSet);
     state.hero.area = state.areaSet?.current;
+    exploreSection(state, state.nextAreaSet.currentSection.index);
+    applyCurrentAreaSection(state);
     state.hero.areaTime = 0;
     // Don't let magic become infinitely negative while being drained.
     // We could also set magic to at least 0 during any zone transition instead of this.
@@ -207,13 +211,12 @@ export function enterLocation(
             }*/
         }
     }
-    updateAreaSection(state, !isMutation);
+    //updateAreaSection(state);
     if (!isEndOfTransition) {
-        state.hotLevel = state.areaSet?.areaSection.isHot ? 1 : 0;
-        state.fadeLevel = (state.areaSet?.areaSection.dark || 0) / 100;
+        state.hotLevel = state.areaSet?.currentSection.isHot ? 1 : 0;
+        state.fadeLevel = (state.areaSet?.currentSection.dark || 0) / 100;
     }
     fixCamera(state);
-    setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaSet?.current);
     if (editingState.isEditing && !doNotRefreshEditor) {
         editingState.needsRefresh = true;

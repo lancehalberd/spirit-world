@@ -108,10 +108,10 @@ function isPointOpen(
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
     // Point is not considered open if it is not in either the current or next area section.
-    if (!state.areaSet?.areaSection || tx < state.areaSet?.areaSection.x || tx >= state.areaSet?.areaSection.x + state.areaSet?.areaSection.w
-        || ty < state.areaSet?.areaSection.y || ty >= state.areaSet?.areaSection.y + state.areaSet?.areaSection.h) {
-        if (!state.nextAreaSet?.areaSection || tx < state.nextAreaSet?.areaSection.x || tx >= state.nextAreaSet?.areaSection.x + state.nextAreaSet?.areaSection.w
-            || ty < state.nextAreaSet?.areaSection.y || ty >= state.nextAreaSet?.areaSection.y + state.nextAreaSet?.areaSection.h) {
+    if (!state.areaSet?.currentSection || tx < state.areaSet?.currentSection.x || tx >= state.areaSet?.currentSection.x + state.areaSet?.currentSection.w
+        || ty < state.areaSet?.currentSection.y || ty >= state.areaSet?.currentSection.y + state.areaSet?.currentSection.h) {
+        if (!state.nextAreaSet?.currentSection || tx < state.nextAreaSet?.currentSection.x || tx >= state.nextAreaSet?.currentSection.x + state.nextAreaSet?.currentSection.w
+            || ty < state.nextAreaSet?.currentSection.y || ty >= state.nextAreaSet?.currentSection.y + state.nextAreaSet?.currentSection.h) {
             return false;
         }
     }
@@ -587,7 +587,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             resetTileBehavior(area, target);
         } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
             // Cannot freeze generic ground tiles in hot areas.
-            && !state.areaSet?.areaSection?.isHot
+            && !state.areaSet?.currentSection?.isHot
             // Only attackes that hit allies freeze most ground tiles. Attacks from the player should only freeze water tiles
             // and any ground tiles that are useful to freeze.
             && (hit.hitAllies

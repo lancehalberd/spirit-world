@@ -1,14 +1,12 @@
-import {createAreaInstance} from 'app/content/areas';
+import {getAreaSetForLocation, removeAllClones} from 'app/content/areas';
 import {editingState} from 'app/development/editingState';
 import {updateHeroSpecialActions} from 'app/updateHeroSpecialActions';
 import {wasToolButtonPressed, wasToolButtonPressedAndReleased} from 'app/useTool';
-import {getAreaSectionInstance, removeAllClones} from 'app/utils/area';
+import {directionMap} from 'app/utils/direction';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {updatePrimaryHeroState} from 'app/utils/hero';
-import {isPointInShortRect} from 'app/utils/index';
 import {removeObjectFromArea} from 'app/utils/objects';
-import {exploreSection} from 'app/utils/sections';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
 
 export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
@@ -199,10 +197,7 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
 function scrollToNewArea(state: GameState, location: ZoneLocation, direction: Direction): void {
     //console.log('scrollToArea', direction);
     removeAllClones(state);
-    state.nextAreaSet = {
-        current: createAreaInstance(state, location, true),
-        alternate: createAreaInstance(state, {...location, isSpiritWorld: !location.isSpiritWorld}, true),
-    };
+    state.nextAreaSet = getAreaSetForLocation(state, location);
     if (direction === 'up') {
         state.nextAreaSet.current.cameraOffset.y = -state.nextAreaSet?.current.h * 16;
     }
@@ -221,30 +216,11 @@ function scrollToNewArea(state: GameState, location: ZoneLocation, direction: Di
 function scrollToNewSection(state: GameState, d: Direction): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
-    state.nextAreaSet = {...state.areaSet};
-    delete state.nextAreaSet.areaSection;
-    const hero = state.hero;
-    let x = hero.x / 16;
-    let y = hero.y / 16;
-    if (d === 'right') {
-        x += hero.w / 16;
-    }
-    if (d === 'down') {
-        y += hero.h / 16;
-    }
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
-    x = Math.min(w - 1, Math.max(1, x));
-    y = Math.min(h - 1, Math.max(1, y));
-    for (const section of state.areaSet.current.definition.sections) {
-        if (isPointInShortRect(x, y, section)) {
-            state.nextAreaSet.areaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, section);
-            exploreSection(state, section.index);
-            break;
-        }
-    }
-    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
-    // currently in any of the defined sections for this area.
-    if (!state.nextAreaSet.areaSection) {
-        state.nextAreaSet.areaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, state.areaSet.current.definition.sections[0]);
-    }
+    // TODO: Make sure this doesn't reset the current section.
+    state.nextAreaSet = getAreaSetForLocation(state, {
+        ...state.location,
+        x: state.hero.x + directionMap[d][0],
+        y: state.hero.y + directionMap[d][1],
+    }, state.areaSet);
+
 }

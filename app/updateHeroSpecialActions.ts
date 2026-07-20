@@ -11,7 +11,6 @@ import {getSectionBoundingBox, moveActor} from 'app/movement/moveActor';
 import {playAreaSound} from 'app/musicController';
 import {cloudPoofAnimation, fallAnimation, heroAnimations} from 'app/render/heroAnimations';
 import {isUnderwater} from 'app/utils/actor';
-import {updateAreaSection} from 'app/utils/area';
 import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
 import {
     directionMap,
@@ -20,7 +19,7 @@ import {
 } from 'app/utils/direction';
 import {destroyClone} from 'app/utils/destroyClone';
 import {addEffectToArea} from 'app/utils/effects';
-import {transitionToLocation} from 'app/utils/enterLocation';
+import {enterLocation, transitionToLocation} from 'app/utils/enterLocation';
 import {
     breakBrittleTilesInRect,
     canSomersaultToCoords,
@@ -70,7 +69,9 @@ function moveToClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
         // its normal hitbox. Without this, the movement hitbox will not perfectly match 16x16 targets.
         hero.y = best.y - 1;
         if (!inSection) {
-            updateAreaSection(state, true);
+            // TODO: Change this to just update the sections as the current approach unnecessarily
+            // initializes all the areas twice.
+            enterLocation(state, {...state.location, x: hero.x, y: hero.y});
         }
         fixCamera(state);
     }
@@ -276,12 +277,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // The southwest corner of the sky is over the forest tile in the overwrld, which is
             // not a valid location and represents the top right portion of the forest area.
             if (state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
-                const sourceAreaSize = zones.sky.areaSize ?? {w: 32, h: 32};
+                const sourceAreaSize = zones.sky.areaSize;
                 const sourceAreaWidth = sourceAreaSize.w * 16, sourceAreaHeight = sourceAreaSize.h * 16;
                 // We ignore the area grid coords since the source is entirely within a single area tile
                 const px = hero.x / sourceAreaWidth;
                 const py = hero.y / sourceAreaHeight;
-                const targetAreaSize = zones.forest.areaSize ?? {w: 32, h: 32};
+                const targetAreaSize = zones.forest.areaSize;
                 const targetAreaWidth = targetAreaSize.w * 16, targetAreaHeight = targetAreaSize.h * 16;
                 // The entire forest is 3x3, but we target only the top right 2x2 block.
                 const targetWidth = 2 * targetAreaWidth;
@@ -353,7 +354,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // This was the old logic for calculating px/py when the forest was a single super tile.
             //const px = (hero.x - 48) / (state.areaSet?.current.w * 16 - 80);
             //const py = (hero.y - 48) / (state.areaSet?.current.h * 16 - 112);
-            const forestAreaSize = zones.forestTemple.areaSize ?? {w: 32, h: 32};
+            const forestAreaSize = zones.forestTemple.areaSize;
             const forestAreaWidth = forestAreaSize.w * 16, forestAreaHeight = forestAreaSize.h * 16;
             const forestWidth = forestAreaWidth * zones.forest.floors[0].grid[0].length;
             const forestHeight = forestAreaHeight * zones.forest.floors[0].grid.length;
@@ -361,7 +362,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const px = (state.location.areaGridCoords.x * forestAreaWidth + hero.x) / forestWidth;
             const py = (state.location.areaGridCoords.y * forestAreaHeight + hero.y) / forestHeight;
 
-            const templeAreaSize = zones.forestTemple.areaSize ?? {w: 32, h: 32};
+            const templeAreaSize = zones.forestTemple.areaSize;
             const templeAreaWidth = templeAreaSize.w * 16, templeAreaHeight = templeAreaSize.h * 16;
             const templeWidth = templeAreaWidth * zones.forestTemple.floors[0].grid[0].length;
             const templeHeight = templeAreaHeight * zones.forestTemple.floors[0].grid.length;

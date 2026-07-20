@@ -1,7 +1,7 @@
 
 export function getAreaSize(state: GameState): {w: number, h: number, section: Rect} {
-    const area = state.areaSet?.current;
-    const areaSection = state.nextAreaSet?.areaSection || state.areaSet?.areaSection;
+    const area = state.areaSet.current;
+    const areaSection = state.nextAreaSet?.currentSection || state.areaSet.currentSection;
     return {
         w: 16 * area.w,
         h: 16 * area.h,
@@ -11,7 +11,7 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: R
             w: areaSection.w * 16,
             h: areaSection.h * 16,
         },
-    }
+    };
 }
 
 export function getAreaDimensions(definition: AreaDefinition, zone: Zone|null): {w: number, h: number} {

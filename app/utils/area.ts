@@ -1,106 +1,141 @@
-import {evaluateLogicDefinition} from 'app/content/logic';
-import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
-import {exploreSection} from 'app/utils/sections';
+import {zones} from 'app/content/zones/zoneHash';
+//import {exploreSection} from 'app/utils/sections';
 import {editingState} from 'app/development/editingState';
-import {clamp, isPointInShortRect} from 'app/utils/index';
-import {removeObjectFromArea} from 'app/utils/objects';
+//import {clamp, isPointInShortRect} from 'app/utils/index';
+import {initializeAreaTiles} from 'app/utils/layers';
+import {getAreaDimensions} from 'app/utils/getAreaSize';
 
-
-export function removeAllClones(state: GameState): void {
-    for (const clone of state.hero.clones) {
-        removeObjectFromArea(state, clone);
+function getDefaultArea(w: number, h: number): AreaDefinition {
+    if (!w || !h) {
+        debugger;
     }
-    state.hero.clones = []
+    return {
+        default: true,
+        layers: getDefaultLayers(w, h),
+        objects: [],
+        sections: [{ x: 0, y: 0, w, h}],
+    };
 }
 
-export function setAreaSection(state: GameState, areaSection: AreaSectionInstance): void {
-    state.areaSet.areaSection = areaSection;
-    if (state.areaSet.areaSection.isAstral) {
-        state.hero.isAstralProjection = true;
-    } else {
-        if (state.hero.isAstralProjection) {
-            state.hero.isAstralProjection = false;
-            state.hero.z = state.hero.groundHeight;
-        }
-    }
+function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
+    const parentDefinition = getAreaFromLocation({...location, isSpiritWorld: false});
+    const definition: AreaDefinition = {
+        default: true,
+        parentDefinition,
+        isSpiritWorld: true,
+        layers: parentDefinition.layers.map(copyLayerTemplate),
+        objects: [],
+        // Spirit world sections should match their parent definition, otherwise the
+        // camera will not be aligned correctly when switching back and forth.
+        sections: parentDefinition.sections.map(section => ({
+            ...section,
+            index: undefined,
+            // Default is based on the parent section mapId, if present.
+            mapId: section.mapId ? section.mapId + 'Spirit' : undefined
+        })),
+    };
+    return definition;
 }
 
-export function getAreaSectionInstanceForPoint(state: GameState, zone: Zone, area: AreaDefinition, x: number, y: number): AreaSectionInstance {
-    for (const section of area.sections) {
-        if (isPointInShortRect(x, y, section)) {
-            return getAreaSectionInstance(state, zone, area, section);
-        }
+function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefinition {
+    if (!layer.grid.w || !layer.grid.h) {
+        debugger;
     }
-    return getAreaSectionInstance(state, state.zone, area, area.sections[0]);
+    return {
+        ...layer,
+        drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
+        grid: {
+            ...layer.grid,
+            // The matrix of tiles
+            tiles: [],
+            mask: [],
+        },
+    };
 }
 
-export function updateAreaSection(state: GameState, newArea: boolean): void {
-    if (!state.areaSet) {
+function getDefaultLayers(w: number, h: number): AreaLayerDefinition[] {
+    if (!w || !h) {
+        debugger;
+    }
+    return [
+        {
+            key: 'floor',
+            grid: {
+                // The dimensions of the grid.
+                w,
+                h,
+                // The matrix of tiles
+                tiles: [],
+            },
+        },
+        {
+            key: 'field',
+            grid: {
+                // The dimensions of the grid.
+                w,
+                h,
+                // The matrix of tiles
+                tiles: [],
+            },
+        },
+    ];
+}
+
+export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
+    const zone = zones[location.zoneKey];
+    const floor = zone.floors[location.floor];
+    const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
+    const alternateGrid = location.isSpiritWorld ? floor.grid : floor.spiritGrid;
+    const {w, h} = zone.areaSize;
+
+
+    const {x, y} = location.areaGridCoords;
+    if (!grid[y]) {
+        grid[y] = [];
+    }
+    if (!grid[y][x]) {
+        grid[y][x] =
+            initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h));
+        return addMissingSection(zone, grid[y][x], alternateGrid[y]?.[x]);
+    } else if (!grid[y][x].layers) {
+        populateLayersFromAlternateArea(zone, grid[y][x], alternateGrid[y]?.[x]);
+        return addMissingSection(zone, grid[y][x], alternateGrid[y]?.[x]);
+    }
+    return grid[y][x];
+}
+
+export function populateLayersFromAlternateArea(zone: Zone|null, area: AreaDefinition, alternateArea: AreaDefinition) {
+    if (area.layers) {
         return;
     }
-    //console.log('updateAreaSection', state.hero.x, state.hero.y);
-    //const lastAreaSection = state.areaSet?.areaSection;
-    let newAreaSection: AreaSectionInstance;
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
-    // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
-    // returns false for points on the edge of the rectangle.
-    const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
-    const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
-    for (const section of state.areaSet.current.definition.sections) {
-        if (isPointInShortRect(x, y, section)) {
-            newAreaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, section);
-            exploreSection(state, section.index);
-            break;
+    if (alternateArea?.layers) {
+        area.layers = alternateArea.layers.map(copyLayerTemplate);
+    } else {
+        const {w, h} = getAreaDimensions(area, zone);
+        area.layers = getDefaultLayers(w, h);
+    }
+    initializeAreaTiles(area);
+}
+
+export function addMissingSection(zone: Zone, area: AreaDefinition, alternateArea?: AreaDefinition): AreaDefinition {
+    if (!area.w || !area.h) {
+        const {w, h} = getAreaDimensions(area, zone);
+        area.w = w;
+        area.h = h;
+    }
+    if (!area.sections?.length) {
+        if (alternateArea?.sections?.length) {
+            area.sections = alternateArea.sections.map(({x, y, w, h}) => ({x, y, w, h}));
+        } else {
+            area.sections = [{
+                x: 0,
+                y: 0,
+                w: area.w,
+                h: area.h
+            }];
         }
     }
-    // This can sometimes happen when editing, but shouldn't normally happen. Just assign the current section to the first if the hero is not
-    // currently in any of the defined sections for this area.
-    if (!newAreaSection) {
-        newAreaSection = getAreaSectionInstance(state, state.zone, state.areaSet.current.definition, state.areaSet.current.definition.sections[0]);
-        state.hero.x = clamp(state.hero.x, newAreaSection.x * 16, (newAreaSection.x + newAreaSection.w - 1) * 16);
-        state.hero.y = clamp(state.hero.y, newAreaSection.y * 16, (newAreaSection.y + newAreaSection.h - 1) * 16);
-    }
-    setAreaSection(state, newAreaSection);
-    editingState.needsRefresh = true;
-    // if (newArea || lastAreaSection !== state.areaSet.areaSection) {
-    if (newArea) {
-        cleanupHeroFromArea(state);
-        state.hero.safeD = state.hero.d;
-        state.hero.safeX = state.hero.x;
-        state.hero.safeY = state.hero.y;
-    }
-    if (state.areaSet.alternate) {
-        state.areaSet.alternateAreaSection = getAreaSectionInstanceForPoint(state, state.zone, state.areaSet?.alternate.definition, x, y);
-    }
-}
-
-export function getAreaSectionInstance(
-    state: GameState,
-    zone: Zone,
-    area: AreaDefinition,
-    definition: AreaSection = {x: 0, y: 0, w: area.w, h: area.h}
-): AreaSectionInstance {
-    const section = {
-        ...definition,
-        definition,
-        dark: definition.dark ?? area.dark ?? zone.dark ?? 0,
-        isFoggy: evaluateLogicDefinition(state, definition.fogLogic ?? area.fogLogic ?? zone.fogLogic, false),
-        isHot: evaluateLogicDefinition(state, definition.hotLogic ?? area.hotLogic ?? zone.hotLogic, false),
-        isAstral: evaluateLogicDefinition(state, definition.astralLogic ?? area.astralLogic ?? zone.astralLogic, false),
-        isCorrosive: evaluateLogicDefinition(state, definition.corrosiveLogic ?? area.corrosiveLogic ?? zone.corrosiveLogic, false),
-    };
-    if (area.specialBehaviorKey) {
-        const specialBehavior = specialBehaviorsHash[area.specialBehaviorKey] as SpecialAreaBehavior;
-        specialBehavior?.applyToSection(state, section);
-    }
-    return section;
-}
-
-export function cleanupHeroFromArea(state: GameState): void {
-    for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.activeStaff?.remove(state);
-    }
-    removeAllClones(state);
+    return area;
 }
 
 export const BG_FRAME_DURATION = 160, BG_FRAME_COUNT = 6;

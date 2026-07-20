@@ -1,3 +1,4 @@
+import {removeAllClones} from 'app/content/areas';
 import {addSparkleAnimation} from 'app/content/effects/animationEffect';
 import {AirBubbles} from 'app/content/objects/airBubbles';
 import {editingState} from 'app/development/editingState';
@@ -7,7 +8,6 @@ import {showDefeatedScene} from 'app/scenes/defeated/showDefeatedScene';
 import {appendScript} from 'app/scriptEvents';
 import {isToolButtonPressed} from 'app/useTool';
 import {isUnderwater} from 'app/utils/actor';
-import {removeAllClones} from 'app/utils/area';
 import {pad} from 'app/utils/index';
 
 
@@ -29,7 +29,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero,
         }
     }
     // Hero takes one damage every half second while in a hot room.
-    if (!editingState.isEditing && state.areaSet?.areaSection?.isHot) {
+    if (!editingState.isEditing && state.areaSet?.currentSection?.isHot) {
         hero.applyBurn(state, 1, 500);
     }
     // Life is restored as soon as it is visibly lost in the Dream world.
@@ -208,7 +208,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     const isHoldingBreath = isUnderwater(state, state.hero);
     // Corrosive areas drain mana unless you have the water blessing.
-    let waterDrainingMagicSpeed = (isHoldingBreath || state.areaSet?.areaSection?.isCorrosive) ? 1 : 0;
+    let waterDrainingMagicSpeed = (isHoldingBreath || state.areaSet?.currentSection?.isCorrosive) ? 1 : 0;
     if (state.hero.savedData.passiveTools.waterBlessing >= 2) {
         waterDrainingMagicSpeed = 0;
     } else if (state.hero.savedData.passiveTools.waterBlessing >= 1) {
@@ -226,7 +226,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             // a depleted spirit recharge point.
             state.hero.actualMagicRegen = 0;
         }
-    } else if (state.areaSet?.areaSection?.isCorrosive) {
+    } else if (state.areaSet?.currentSection?.isCorrosive) {
         state.hero.actualMagicRegen = Math.min(-20 * waterDrainingMagicSpeed, isInvisible ? state.hero.actualMagicRegen : 0);
     } else if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-2 * waterDrainingMagicSpeed, isInvisible ? state.hero.actualMagicRegen : 0);
@@ -249,7 +249,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.shockDuration -= FRAME_LENGTH;
     } else if (state.hero.magicRegenCooldown > 0 && !preventCooldownRegeneration) {
         // Foggy areas double spirit energy cooldown.
-        const cooldownRecoverSpeed = state.areaSet?.areaSection?.isFoggy ? FRAME_LENGTH / 2 : FRAME_LENGTH;
+        const cooldownRecoverSpeed = state.areaSet?.currentSection?.isFoggy ? FRAME_LENGTH / 2 : FRAME_LENGTH;
         const recoveryFactor = Math.max(0, (state.hero.magicRegenCooldown - cooldownRecoverSpeed)) / state.hero.magicRegenCooldown;
         state.hero.recentMagicSpent = recoveryFactor * state.hero.recentMagicSpent;
         state.hero.magicRegenCooldown -= cooldownRecoverSpeed;
@@ -288,8 +288,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
         let targetLightRadius = 20, minLightRadius = 20;
-        if (state.areaSet?.areaSection.dark) {
-            const coefficient = Math.max(1, 80 / state.areaSet?.areaSection.dark);
+        if (state.areaSet?.currentSection.dark) {
+            const coefficient = Math.max(1, 80 / state.areaSet?.currentSection.dark);
             minLightRadius *= coefficient;
             if (state.hero.savedData.passiveTools.trueSight > 0) {
                 // True sight gives better vision and consumes less spirit energy.

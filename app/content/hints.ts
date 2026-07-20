@@ -614,7 +614,7 @@ window.getMapTargets = getMapTargets;
 
 export function convertLocationToMapCoordinates(location: ZoneLocation & {object?: ObjectDefinition}): {x: number, y: number} {
     const zone = zones[location.zoneKey];
-    const {w, h} = zone.areaSize ?? {w: 32, h: 32};
+    const {w, h} = zone.areaSize;
     const pixel = {
         x: location.areaGridCoords.x * w * 16 + location.x,
         y: location.areaGridCoords.y * h * 16 + location.y,

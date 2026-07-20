@@ -87,10 +87,10 @@ export function getTileBehaviors(
         definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
     }
     const tileBehavior = {...(definedBehavior || {})};
-    if (!state.areaSet?.areaSection || tx < state.areaSet?.areaSection.x || tx >= state.areaSet?.areaSection.x + state.areaSet?.areaSection.w
-        || ty < state.areaSet?.areaSection.y || ty >= state.areaSet?.areaSection.y + state.areaSet?.areaSection.h) {
+    if (!state.areaSet?.currentSection || tx < state.areaSet?.currentSection.x || tx >= state.areaSet?.currentSection.x + state.areaSet?.currentSection.w
+        || ty < state.areaSet?.currentSection.y || ty >= state.areaSet?.currentSection.y + state.areaSet?.currentSection.h) {
         // Tiles are not considered out of bounds during screen transitions.
-        tileBehavior.outOfBounds = !nextArea && !state.nextAreaSet?.areaSection;
+        tileBehavior.outOfBounds = !nextArea && !state.nextAreaSet?.currentSection;
     }
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
     if (tileBehavior.solid !== true && tileBehavior.solid) {
@@ -149,8 +149,8 @@ export function getTileBehaviorsAndObstacles(
         definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
     }
     const tileBehavior = {...(definedBehavior || {})};
-    if (!state.areaSet?.areaSection || tx < state.areaSet?.areaSection.x || tx >= state.areaSet?.areaSection.x + state.areaSet?.areaSection.w
-        || ty < state.areaSet?.areaSection.y || ty >= state.areaSet?.areaSection.y + state.areaSet?.areaSection.h) {
+    if (!state.areaSet?.currentSection || tx < state.areaSet?.currentSection.x || tx >= state.areaSet?.currentSection.x + state.areaSet?.currentSection.w
+        || ty < state.areaSet?.currentSection.y || ty >= state.areaSet?.currentSection.y + state.areaSet?.currentSection.h) {
         tileBehavior.outOfBounds = true;
     }
     const sy = (y | 0) % 16;

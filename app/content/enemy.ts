@@ -695,7 +695,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }
         }
         const ability = this.abilities.find(a => a.definition === definition);
-        if (definition.globalCooldownSection === state.areaSet?.areaSection && definition.globalCooldownExpiration > state.fieldTime) {
+        if (definition.globalCooldownSection === state.areaSet?.currentSection && definition.globalCooldownExpiration > state.fieldTime) {
             return false;
         }
         if (!ability || !(ability.charges > 0)) {
@@ -729,7 +729,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     useAbility(state: GameState, ability: EnemyAbilityWithCharges, target: any) {
         const definition = ability.definition;
         if (definition.globalCooldown) {
-            definition.globalCooldownSection = state.areaSet?.areaSection;
+            definition.globalCooldownSection = state.areaSet?.currentSection;
             definition.globalCooldownExpiration = state.fieldTime + definition.globalCooldown;
         }
         ability.charges--;

@@ -103,8 +103,8 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
                 y: r.y + (mapCoordinates.y - heroIcon.h / 2) | 0,
             });
         }
-    } else if (state.areaSet?.areaSection?.definition.entranceId) {
-        const location = findObjectLocation(state, state.areaSet?.areaSection?.definition.mapId, state.areaSet?.areaSection?.definition.entranceId, state.location.isSpiritWorld);
+    } else if (state.areaSet?.currentSection?.definition.entranceId) {
+        const location = findObjectLocation(state, state.areaSet?.currentSection?.definition.mapId, state.areaSet?.currentSection?.definition.entranceId, state.location.isSpiritWorld);
         if (location && state.time % 1000 <= 600) {
             const mapCoordinates = convertLocationToMapCoordinates(location);
             drawFrame(context, heroIcon, {
@@ -216,7 +216,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
     drawBlinkingObjects = [];
     const sections = dungeonMaps[mapId].floors[floorId].sections;
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    const {w, h} = state.zone.areaSize;
 
     // Compute shared date for rendering the sections for this map.
     const sectionRenderData: SectionRenderData[] = [];
@@ -317,12 +317,12 @@ const floorMarkerRectangle = {
 function getSelectedFloorId(state: GameState, scene: MapScene): string {
     // This happens when visiting an unpopulated super tile, for example when a new super tile is created in the editor
     // or a super tile is never edited after being created.
-    if (!state.areaSet?.areaSection?.definition?.mapId) {
-        initializeSection(state.areaSet?.areaSection.definition, state.location);
+    if (!state.areaSet?.currentSection?.definition?.mapId) {
+        initializeSection(state.areaSet?.currentSection.definition, state.location);
     }
-    const map = dungeonMaps[state.areaSet?.areaSection?.definition.mapId];
+    const map = dungeonMaps[state.areaSet?.currentSection?.definition.mapId];
     if (!map) {
-        console.error('Could not find dungeon map for', state.areaSet?.areaSection?.definition.mapId);
+        console.error('Could not find dungeon map for', state.areaSet?.currentSection?.definition.mapId);
         return '1F';
     }
     const floorIds = Object.keys(map.floors);
@@ -334,16 +334,16 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState, s
     const selectedFloorId = getSelectedFloorId(state, scene);
     drawMapFrame(context, fullDungeonMapRectangle);
     // Refresh the dungeon map if necessary
-    refreshDungeonMap(state, state.areaSet?.areaSection?.definition.mapId, selectedFloorId);
+    refreshDungeonMap(state, state.areaSet?.currentSection?.definition.mapId, selectedFloorId);
     // Draw the dungeon map to the screen
     drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, innerDungeonMapRectangle);
     // Draw the flashing hero icon on top of the dungeon map if the hero is currently on the displayed floor.
     const {w, h} = state.areaSet?.current;
-    if (state.time % 1000 <= 600 && state.areaSet?.areaSection.definition.floorId === selectedFloorId) {
+    if (state.time % 1000 <= 600 && state.areaSet?.currentSection.definition.floorId === selectedFloorId) {
         drawFrame(context, heroIcon, {
             ...heroIcon,
-            x: innerDungeonMapRectangle.x + (state.areaSet?.areaSection.definition.mapX * 32 + (state.location.x - 16 * state.areaSet?.areaSection.x) * 4 / w - heroIcon.w / 2) | 0,
-            y: innerDungeonMapRectangle.y + (state.areaSet?.areaSection.definition.mapY * 32 + (state.location.y - 16 * state.areaSet?.areaSection.y) * 4 / h  - heroIcon.h / 2) | 0,
+            x: innerDungeonMapRectangle.x + (state.areaSet?.currentSection.definition.mapX * 32 + (state.location.x - 16 * state.areaSet?.currentSection.x) * 4 / w - heroIcon.w / 2) | 0,
+            y: innerDungeonMapRectangle.y + (state.areaSet?.currentSection.definition.mapY * 32 + (state.location.y - 16 * state.areaSet?.currentSection.y) * 4 / h  - heroIcon.h / 2) | 0,
         });
         for (const drawBlinkingObject of drawBlinkingObjects) {
             context.save();
@@ -391,14 +391,14 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState, s
     // Render the floor markers with hero marker + selected floor cursor
     const r = floorMarkerRectangle;
     const rowHeight = 24;
-    const floorIds = Object.keys(dungeonMaps[state.areaSet?.areaSection?.definition.mapId].floors || {});
+    const floorIds = Object.keys(dungeonMaps[state.areaSet?.currentSection?.definition.mapId].floors || {});
     const selectedFloorIndex = scene.floorIndex % floorIds.length;
     const hasMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map;
     let y = r.y + r.h;
     for (let floor = 0; floor < floorIds.length; floor++) {
         if (!hasMap
             && !editingState.isEditing
-            && !dungeonMaps[state.areaSet?.areaSection?.definition.mapId]?.floors[floorIds[floor]].sections?.find(section => isSectionExplored(state, section))) {
+            && !dungeonMaps[state.areaSet?.currentSection?.definition.mapId]?.floors[floorIds[floor]].sections?.find(section => isSectionExplored(state, section))) {
             continue;
         }
         drawText(context, floorIds[floor], r.x + 12, y - rowHeight / 2, {
@@ -406,7 +406,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState, s
             textAlign: 'center',
             size: 16,
         });
-        if (state.time % 1000 <= 600 && floorIds[floor] === state.areaSet?.areaSection.definition.floorId) {
+        if (state.time % 1000 <= 600 && floorIds[floor] === state.areaSet?.currentSection.definition.floorId) {
             drawFrame(context, heroIcon, {
                 ...heroIcon,
                 x: r.x + 20 - (heroIcon.w / 2) | 0,
@@ -660,7 +660,7 @@ export function getSectionUnderMouse(state: GameState, scene: MapScene): AreaSec
     y -= innerDungeonMapRectangle.y;
     for (const sectionIndex of [...sections].reverse()) {
         const section = allSections[sectionIndex].section;
-        const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
+        const areaSize = state.zone.areaSize;
         if (isPointInShortRect(x, y, {
             x: section.mapX * 32,
             y: section.mapY * 32,
@@ -675,7 +675,7 @@ export function getDisplayedMapSections(state: GameState, scene: MapScene): numb
     if (!isMapSceneActive(state)) {
         return;
     }
-    const mapId = state.areaSet?.areaSection?.definition.mapId;
+    const mapId = state.areaSet?.currentSection?.definition.mapId;
     if (overworldKeys.has(mapId)) {
         return [];
     }

@@ -1,5 +1,5 @@
-import {getAreaFromLocation} from 'app/content/areas';
 import {zones} from 'app/content/zones/zoneHash';
+import {getAreaFromLocation} from 'app/utils/area';
 import {isOverworldZoneKey} from 'app/utils/location';
 
 

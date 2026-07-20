@@ -131,7 +131,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             hero.canFloat = false;
         }
     }
-    if (hero.isOverPit && !state.nextAreaSet?.areaSection && !state.nextAreaSet?.current) {
+    if (hero.isOverPit && !state.nextAreaSet?.currentSection && !state.nextAreaSet?.current) {
         if (hero.z <= 0 && hero.action !== 'roll') {
             const behaviorGrid = hero.area.behaviorGrid;
             const tileSize = 16;

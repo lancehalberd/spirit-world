@@ -1,18 +1,16 @@
-import {
-    getAreaInstanceFromLocation, linkObjects,
-} from 'app/content/areas';
+import {cleanupHeroFromArea, linkObjects} from 'app/content/areas';
 import {evaluateLogicDefinition} from 'app/content/logic'
 import {editingState} from 'app/development/editingState';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
-import {cleanupHeroFromArea, setAreaSection} from 'app/utils/area';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
 import {findObjectInstanceByDefinition} from 'app/utils/findObjectInstanceById';
 import {getAreaSize} from 'app/utils/getAreaSize';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {getCameraTarget} from 'app/utils/fixCamera';
-import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
 import {isObjectInsideTarget} from 'app/utils/index';
+import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
+import {applyCurrentAreaSection, exploreSection} from 'app/utils/sections';
 import {resetTileBehavior} from 'app/utils/tileBehavior';
 import {applyVariantsToArea} from 'app/utils/variants';
 
@@ -70,16 +68,18 @@ export function updateCamera(state: GameState, speed?: number): void {
             }
             //const lastAreaInstance = state.areaSet.current;
             state.areaSet = state.nextAreaSet;
+            delete state.nextAreaSet;
+            exploreSection(state, state.nextAreaSet.currentSection.index);
             state.hero.x -= state.areaSet.current.cameraOffset.x;
             state.hero.y -= state.areaSet.current.cameraOffset.y;
             state.camera.x -= state.areaSet.current.cameraOffset.x;
             state.camera.y -= state.areaSet.current.cameraOffset.y;
-            // This is done in updateAreaSection.
-            //state.hero.safeD = state.hero.d;
-            //state.hero.safeX = state.hero.x;
-            //state.hero.safeY = state.hero.y;
             state.areaSet.current.cameraOffset = {x: 0, y: 0};
-            delete state.nextAreaSet;
+            state.hero.area = state.areaSet.current;
+            cleanupHeroFromArea(state);
+            state.hero.safeD = state.hero.d;
+            state.hero.safeX = state.hero.x;
+            state.hero.safeY = state.hero.y;
             // We don't seem to need this any more, but let's preserve it for a bit
             // in case we see issues with super tile transitions again.
             // An old bug used to be that you could briefly move after screen transition
@@ -92,18 +92,17 @@ export function updateCamera(state: GameState, speed?: number): void {
                 time: state.time,
             });*/
 
-            state.areaSet.alternate = getAreaInstanceFromLocation(
+            /*state.areaSet.alternate = getAreaInstanceFromLocation(
                 state,
                 {...state.location, isSpiritWorld: !state.location.isSpiritWorld}
             );
             state.areaSet.current.alternateArea = state.areaSet.alternate;
-            state.areaSet.alternate.alternateArea = state.areaSet.current;
+            state.areaSet.alternate.alternateArea = state.areaSet.current;*/
             //This should have been done prior to initializing objects.
             //linkObjects(state);
             // This should be done when the area set was generated
             //updateAreaSection(state, true);
             //setConnectedAreas(state, lastAreaInstance);
-            state.hero.area = state.areaSet.current;
             if (editingState.isEditing) {
                 editingState.needsRefresh = true;
                 state.areaSet.current.tilesDrawn = [];
@@ -134,18 +133,19 @@ export function updateCamera(state: GameState, speed?: number): void {
 
     // Switch to the next area as soon as the screen is displayed entirely in the new section.
     // section is for the next area section, if one is present.
-    if (state.nextAreaSet?.areaSection && isObjectInsideTarget({
+    if (state.nextAreaSet?.currentSection && isObjectInsideTarget({
         x: state.camera.x, y: state.camera.y, w: CANVAS_WIDTH, h: CANVAS_HEIGHT
     }, section)) {
         // Cleanup the previous sections now that they are completely offscreen.
-        resetSection(state, state.areaSet.current, state.areaSet.areaSection);
-        resetSection(state, state.areaSet.alternate, state.areaSet.alternateAreaSection);
+        resetSection(state, state.areaSet.current, state.areaSet.currentSection);
+        resetSection(state, state.areaSet.alternate, state.areaSet.alternateSection);
         linkObjects(state);
         cleanupHeroFromArea(state);
         // Swap to the next area set
         state.areaSet = state.nextAreaSet;
         delete state.nextAreaSet;
-        setAreaSection(state, state.areaSet.areaSection);
+        exploreSection(state, state.nextAreaSet.currentSection.index);
+        applyCurrentAreaSection(state);
         editingState.needsRefresh = true;
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;

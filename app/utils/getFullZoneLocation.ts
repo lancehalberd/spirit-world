@@ -1,6 +1,6 @@
 
 export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
-    const { zoneKey, isSpiritWorld, areaGridCoords } = location;
+    const {zoneKey, isSpiritWorld, areaGridCoords} = location;
     // There is one frame after the transition finishes where the coordinates can be out
     // of range, but work correctly if taken mod 512.
     // const x = (location.x + 512) % 512; // This isn't needed so far.

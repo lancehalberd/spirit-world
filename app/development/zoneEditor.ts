@@ -1,6 +1,4 @@
-import {
-    getAreaInstanceFromLocation, setConnectedAreas,
-} from 'app/content/areas';
+import {getAreaInstanceFromLocation} from 'app/content/areas';
 import {logicHash} from 'app/content/logic';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {zones} from 'app/content/zones';
@@ -14,11 +12,9 @@ import {tagElement} from 'app/dom';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
 import {checkToRedrawTiles, drawRemainingFrames} from 'app/scenes/field/renderField';
 import {getState} from 'app/state';
-import {updateAreaSection} from 'app/utils/area';
 import {createCanvasAndContext} from 'app/utils/canvas';
 import {enterLocation} from 'app/utils/enterLocation';
 import {everyAreaInZone} from 'app/utils/every';
-import {fixCamera} from 'app/utils/fixCamera';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {readFromFile, saveToFile, scaleRect} from 'app/utils/index';
 import {getMousePosition, isMouseDown} from 'app/utils/mouse';
@@ -76,7 +72,7 @@ mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
 function jumpToMinimapLocation() {
     const [x, y] = getMousePosition(mapOverlayCanvas);
     const state = getState();
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    const {w, h} = state.zone.areaSize;
 
     const gridRow = Math.floor(y / h / tileScale);
     const gridColumn = Math.floor(x / w / tileScale);
@@ -85,7 +81,7 @@ function jumpToMinimapLocation() {
     if (gridRow >= state.areaGrid.length && gridColumn >= state.areaGrid[0].length) {
         return;
     }
-    if (state.location.areaGridCoords.x !== gridColumn || state.location.areaGridCoords.y !== gridRow) {
+    //if (state.location.areaGridCoords.x !== gridColumn || state.location.areaGridCoords.y !== gridRow) {
         enterLocation(state, {
           zoneKey: state.location.zoneKey,
           floor: state.location.floor,
@@ -96,14 +92,14 @@ function jumpToMinimapLocation() {
           y: pixelY,
           z: 0,
         });
-    } else {
+    /*} else {
         state.location.x = pixelX;
         state.location.y = pixelY;
         state.hero.x = pixelX;
         state.hero.y = pixelY;
         fixCamera(state);
-        updateAreaSection(state, false);
-    }
+        updateAreaSection(state);
+    }*/
 }
 
 const minimapContainer = tagElement('div');
@@ -182,7 +178,7 @@ export function renderZoneTabContainer(): HTMLElement {
     return zoneTabContainer.element;
 }
 export function getMinimapSize(state: GameState): {w: number, h: number} {
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    const {w, h} = state.zone.areaSize;
     return {
         w: state.areaGrid[0].length * w * tileScale,
         h: state.areaGrid.length * h * tileScale,
@@ -209,7 +205,7 @@ export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCo
         let safety = 0;
         while (drawRemainingFrames(state, area, 0) && safety++ < 100);
     }
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    const {w, h} = state.zone.areaSize;
     mapContext.drawImage(area.backgroundFrames[0].canvas,
         0, 0, w * 16, h * 16,
         gridCoords.x * w * tileScale, gridCoords.y * h * tileScale, w * tileScale, h * tileScale
@@ -253,7 +249,7 @@ export function checkToRefreshMinimap(state: GameState, forceRefresh = false): v
 }
 
 export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
-    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    const {w, h} = state.zone.areaSize;
     mapOverlayContext.clearRect(0, 0, mapOverlayCanvas.width, mapOverlayCanvas.height);
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)';
     // Draw edges separating screens.
@@ -354,7 +350,7 @@ export function getImportExportProperties(): PanelRows {
 export function getBehaviorProperties(scope: 'zone'|'area'|'section'): PanelRows {
     const state = getState();
     let rows: PanelRows = [];
-    let scopedObject: AreaBehaviorLogic = state.areaSet?.areaSection.definition;
+    let scopedObject: AreaBehaviorLogic = state.areaSet?.currentSection.definition;
     if (scope === 'zone') {
         scopedObject = state.zone;
         rows.push({
@@ -484,6 +480,7 @@ export function getZoneProperties(): PanelRows {
             }
             const zone: Zone = {
                 key: newZoneKey,
+                areaSize: {w: 32, h: 32},
                 floors: [
                     {
                         grid: [[null]],
@@ -613,14 +610,35 @@ export function getZoneProperties(): PanelRows {
                 state.location.isSpiritWorld = isSpiritWorld;
                 state.location = getFullZoneLocation(state.location);
                 editingState.spirit = isSpiritWorld;
-                const tempInstance = state.areaSet?.current;
-                state.areaGrid = isSpiritWorld ? state.floor.spiritGrid : state.floor.grid;
-                state.areaSet.current = state.areaSet?.alternate;
-                state.areaSet.alternate = tempInstance;
+                enterLocation(state, state.location);
+                /*state.areaGrid = isSpiritWorld ? state.floor.spiritGrid : state.floor.grid;
+                // Swap all the areas/sections on the current area set.
+                state.areaSet.current = state.areaSet.current.alternateArea;
+                state.areaSet.alternate = state.areaSet.alternate.alternateArea;
+                let tempSection = state.areaSet.currentSection;
+                state.areaSet.currentSection = state.areaSet.alternateSection;
+                state.areaSet.alternateSection = tempSection;
+                if (state.areaSet.underwater) {
+                    state.areaSet.underwater = state.areaSet.underwater.alternateArea;
+                    state.areaSet.alternateUnderwater = state.areaSet.alternateUnderwater.alternateArea;
+                    tempSection = state.areaSet.underwaterSection;
+                    state.areaSet.underwaterSection = state.areaSet.alternateUnderwaterSection;
+                    state.areaSet.alternateUnderwaterSection = tempSection;
+                }
+                if (state.areaSet.surface) {
+                    state.areaSet.surface = state.areaSet.surface.alternateArea;
+                    state.areaSet.alternateSurface = state.areaSet.alternateSurface.alternateArea;
+                    tempSection = state.areaSet.surfaceSection;
+                    state.areaSet.surfaceSection = state.areaSet.alternateSurfaceSection;
+                    state.areaSet.alternateSurfaceSection = tempSection;
+                }
                 state.hero.area = state.areaSet?.current;
-                setConnectedAreas(state, tempInstance);
-                updateAreaSection(state, true);
-                editingState.needsRefresh = true;
+                updateAreaSection(state);
+                cleanupHeroFromArea(state);
+                state.hero.safeD = state.hero.d;
+                state.hero.safeX = state.hero.x;
+                state.hero.safeY = state.hero.y;
+                editingState.needsRefresh = true;*/
             }
         }
     });
@@ -684,7 +702,7 @@ export function getZoneProperties(): PanelRows {
         value: 'Change Layout',
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: SectionLayout) {
-            const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
+            const areaSize = state.zone.areaSize;
             const scaledSections = sectionLayouts[sectionType].map(section => {
                 let {x, y, w, h} = section;
                 if (x > 0) {
@@ -717,7 +735,12 @@ export function getZoneProperties(): PanelRows {
                 isSpiritWorld: !state.location.isSpiritWorld,
             }, state.areaSet?.alternate.definition.sections || [], newAlternateSections);
             state.areaSet.alternate.definition.sections = newAlternateSections;
-            updateAreaSection(state, true);
+            enterLocation(state, state.location, {doNotRefreshEditor: true});
+            //updateAreaSection(state);
+            //cleanupHeroFromArea(state);
+            //state.hero.safeD = state.hero.d;
+            //state.hero.safeX = state.hero.x;
+            //state.hero.safeY = state.hero.y;
             return 'Change Layout';
         }
     });

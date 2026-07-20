@@ -126,7 +126,7 @@ specialBehaviorsHash.peachCave = {
                     peachTree.growPeach(state);
                 });
                 appendInputBlockingCallback(state, (state: GameState) => {
-                    state.areaSet.areaSection.dark = Math.min(90, state.areaSet?.areaSection.dark + 0.5);
+                    state.areaSet.currentSection.dark = Math.min(90, state.areaSet?.currentSection.dark + 0.5);
                     //state.areaSet?.current.dark = Math.min(90, state.areaSet?.current.dark + 0.5);
                     if (peachTree.specialStatus === 'dead') {
                         return false;

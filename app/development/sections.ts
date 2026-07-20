@@ -1,7 +1,7 @@
-import { getAreaFromLocation } from 'app/content/areas';
-import { allSections, dungeonMaps, getNextFreeId } from 'app/content/sections';
-import { editingState } from 'app/development/editingState';
-import { overworldKeys } from 'app/gameConstants';
+import {allSections, dungeonMaps, getNextFreeId} from 'app/content/sections';
+import {editingState} from 'app/development/editingState';
+import {overworldKeys} from 'app/gameConstants';
+import {getAreaFromLocation} from 'app/utils/area';
 
 
 export function initializeSection(section: AreaSection, location: ZoneLocation) {

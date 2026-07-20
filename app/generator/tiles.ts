@@ -1,4 +1,4 @@
-import {populateLayersFromAlternateArea} from 'app/content/areas';
+import {populateLayersFromAlternateArea} from 'app/utils/area';
 import {getOrAddLayer} from 'app/utils/layers';
 import {mapTileIndex} from 'app/utils/mapTile';
 

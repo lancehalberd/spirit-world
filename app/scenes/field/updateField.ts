@@ -69,13 +69,13 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
             state.screenShakes.splice(i--, 1);
         }
     }
-    const targetFadeLevel = Math.max(state.areaSet?.areaSection?.dark ?? 0, state.nextAreaSet?.areaSection?.dark ?? 0) / 100;
+    const targetFadeLevel = Math.max(state.areaSet?.currentSection?.dark ?? 0, state.nextAreaSet?.currentSection?.dark ?? 0) / 100;
     if (state.fadeLevel < targetFadeLevel) {
         state.fadeLevel = Math.min(state.fadeLevel + 0.01, targetFadeLevel);
     } else if (state.fadeLevel > targetFadeLevel){
         state.fadeLevel = Math.max(state.fadeLevel - 0.01, targetFadeLevel);
     }
-    const targetHotLevel = ((!state.nextAreaSet?.areaSection && state.areaSet?.areaSection?.isHot) || state.nextAreaSet?.areaSection?.isHot) ? 1 : 0;
+    const targetHotLevel = ((!state.nextAreaSet?.currentSection && state.areaSet?.currentSection?.isHot) || state.nextAreaSet?.currentSection?.isHot) ? 1 : 0;
     if (state.hotLevel < targetHotLevel) {
         state.hotLevel = Math.min(state.hotLevel + 0.05, targetHotLevel);
     } else if (state.hotLevel > targetHotLevel){
@@ -119,7 +119,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
         return;
     }
-    const isScreenTransitioning = state.nextAreaSet?.current || state.nextAreaSet?.areaSection;
+    const isScreenTransitioning = state.nextAreaSet?.current || state.nextAreaSet?.currentSection;
     // Time passes slowly for everything but the astral projection while meditating.
     const skipModulus = state.hero.savedData.passiveTools.spiritSight ? 100 : 40;
     const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % skipModulus) >= 20;

@@ -79,7 +79,7 @@ export function addKeyboardShortcuts() {
             if (isSelectionValid(state, editingState)) {
                 for (const object of editingState.selectedObjects) {
                     // The source section will be relative to the section the user is looking at when they initiate the copy action.
-                    object._sourceSection = state.areaSet?.areaSection;
+                    object._sourceSection = state.areaSet?.currentSection;
                     // Using the section the objects are actually from turns out to be unintutive.
                     // object._sourceSection = getAreaSectionForDefinition(state, object);
                 }
@@ -87,7 +87,7 @@ export function addKeyboardShortcuts() {
                     editingState.clipboardObjects = editingState.selectedObjects.map(cloneDeep);
                 } else {
                     editingState.clipboardObjects 
-                        = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSet?.areaSection))
+                        = editingState.selectedObjects.filter(object => isDefinitionFromSection(object, state.areaSet?.currentSection))
                                                       .map(cloneDeep);
                 }
             } else {
@@ -115,12 +115,12 @@ export function addKeyboardShortcuts() {
                         // off the edges of super tiles.
                         pastedObject = {
                             ...pastedObject,
-                            x: pastedObject.x - 16 * pastedObject._sourceSection.x + 16 * state.areaSet?.areaSection.x,
-                            y: pastedObject.y - 16 * pastedObject._sourceSection.y + 16 * state.areaSet?.areaSection.y,
+                            x: pastedObject.x - 16 * pastedObject._sourceSection.x + 16 * state.areaSet?.currentSection.x,
+                            y: pastedObject.y - 16 * pastedObject._sourceSection.y + 16 * state.areaSet?.currentSection.y,
                         };
                         // Skip this object if it would be pasted outside of the current section.
-                        if (!isDefinitionFromSection(pastedObject, state.areaSet?.areaSection)) {
-                            console.log('not in section:', pastedObject, state.areaSet?.areaSection);
+                        if (!isDefinitionFromSection(pastedObject, state.areaSet?.currentSection)) {
+                            console.log('not in section:', pastedObject, state.areaSet?.currentSection);
                             continue;
                         }
                         if (isObject(pastedObject)) {

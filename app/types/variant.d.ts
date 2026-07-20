@@ -47,7 +47,8 @@ interface VariantDefinition {
     fields?: VariantField[]
     // Defaults to 4
     gridSize?: number
-    // This will return false if this variant is incompatbile with the provided data.
-    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData): boolean
+    // This will return false if this variant is incompatible with the provided data.
+    // Otherwise it will return an array of instances added to the area.
+    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData): false|BaseFieldInstance[]
     getLogic(style: string, random: SRandom, data: VariantData): LogicCheck
 }

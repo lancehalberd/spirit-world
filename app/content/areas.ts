@@ -3,7 +3,7 @@ import {allTiles} from 'app/content/tiles';
 import {zones} from 'app/content/zones';
 import {editingState} from 'app/development/editingState';
 import {MUTATE_DURATION} from 'app/gameConstants';
-import {getAreaSectionInstance, setAreaSection} from 'app/utils/area';
+import {getAreaFromLocation} from 'app/utils/area';
 import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
 import {createCanvasAndContext} from 'app/utils/canvas';
 import {createObjectInstance} from 'app/utils/createObjectInstance';
@@ -11,162 +11,39 @@ import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeat
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {hitTargets} from 'app/utils/field';
 import {getAreaDimensions} from 'app/utils/getAreaSize';
-import {initializeAreaLayerTiles, initializeAreaTiles} from 'app/utils/layers';
+import {initializeAreaLayerTiles} from 'app/utils/layers';
 import {mapTile} from 'app/utils/mapTile';
 import {addObjectToArea, initializeObject, removeObjectFromArea} from 'app/utils/objects';
 import {refreshAreaIce} from 'app/utils/refreshAreaIce';
+import {applyCurrentAreaSection, getAreaSectionInstanceForLocation, refreshCurrentAreaSectionInstances} from 'app/utils/sections';
 import {applyLayerToBehaviorGrid, resetTileBehavior} from 'app/utils/tileBehavior';
 import {applyVariantsToArea} from 'app/utils/variants';
-
-export function getDefaultArea(w: number, h: number): AreaDefinition {
-    if (!w || !h) {
-        debugger;
-    }
-    return {
-        default: true,
-        layers: getDefaultLayers(w, h),
-        objects: [],
-        sections: [{ x: 0, y: 0, w, h}],
-    };
-}
-
-export function getDefaultLayers(w: number, h: number): AreaLayerDefinition[] {
-    if (!w || !h) {
-        debugger;
-    }
-    return [
-        {
-            key: 'floor',
-            grid: {
-                // The dimensions of the grid.
-                w,
-                h,
-                // The matrix of tiles
-                tiles: [],
-            },
-        },
-        {
-            key: 'field',
-            grid: {
-                // The dimensions of the grid.
-                w,
-                h,
-                // The matrix of tiles
-                tiles: [],
-            },
-        },
-    ];
-}
-
-export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefinition {
-    if (!layer.grid.w || !layer.grid.h) {
-        debugger;
-    }
-    return {
-        ...layer,
-        drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
-        grid: {
-            ...layer.grid,
-            // The matrix of tiles
-            tiles: [],
-            mask: [],
-        },
-    };
-}
-
-export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
-    const parentDefinition = getAreaFromLocation({...location, isSpiritWorld: false});
-    const definition: AreaDefinition = {
-        default: true,
-        parentDefinition,
-        isSpiritWorld: true,
-        layers: parentDefinition.layers.map(copyLayerTemplate),
-        objects: [],
-        // Spirit world sections should match their parent definition, otherwise the
-        // camera will not be aligned correctly when switching back and forth.
-        sections: parentDefinition.sections.map(section => ({
-            ...section,
-            index: undefined,
-            // Default is based on the parent section mapId, if present.
-            mapId: section.mapId ? section.mapId + 'Spirit' : undefined
-        })),
-    };
-    return definition;
-}
-
-export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
-    const zone = zones[location.zoneKey];
-    const floor = zone.floors[location.floor];
-    const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
-    const alternateGrid = location.isSpiritWorld ? floor.grid : floor.spiritGrid;
-    const {w, h} = zone.areaSize ?? {w: 32, h: 32};
-
-
-    const {x, y} = location.areaGridCoords;
-    if (!grid[y]) {
-        grid[y] = [];
-    }
-    if (!grid[y][x]) {
-        grid[y][x] =
-            initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h));
-        return addMissingSection(zone, grid[y][x], alternateGrid[y]?.[x]);
-    } else if (!grid[y][x].layers) {
-        populateLayersFromAlternateArea(zone, grid[y][x], alternateGrid[y]?.[x]);
-        return addMissingSection(zone, grid[y][x], alternateGrid[y]?.[x]);
-    }
-    return grid[y][x];
-}
-
-export function addMissingSection(zone: Zone, area: AreaDefinition, alternateArea?: AreaDefinition): AreaDefinition {
-    if (!area.w || !area.h) {
-        const {w, h} = getAreaDimensions(area, zone);
-        area.w = w;
-        area.h = h;
-    }
-    if (!area.sections?.length) {
-        if (alternateArea?.sections?.length) {
-            area.sections = alternateArea.sections.map(({x, y, w, h}) => ({x, y, w, h}));
-        } else {
-            area.sections = [{
-                x: 0,
-                y: 0,
-                w: area.w,
-                h: area.h
-            }];
-        }
-    }
-    return area;
-}
-
-export function populateLayersFromAlternateArea(zone: Zone|null, area: AreaDefinition, alternateArea: AreaDefinition) {
-    if (area.layers) {
-        return;
-    }
-    if (alternateArea?.layers) {
-        area.layers = alternateArea.layers.map(copyLayerTemplate);
-    } else {
-        const {w, h} = getAreaDimensions(area, zone);
-        area.layers = getDefaultLayers(w, h);
-    }
-    initializeAreaTiles(area);
-}
 
 export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
     return createAreaInstance(state, location, isActiveArea);
 }
 
-// Sets global reference to either underwaterAreaInstance or surfaceAreaInstance if the current area is connected to another
-// area through an underwater/surface location relationship. Also sets the current area as underwater if a surface area is set.
-export function setConnectedAreas(state: GameState, lastAreaInstance?: AreaInstance) {
-    state.areaSet.underwater = getConnectedUnderwaterArea(state, state.areaSet.current, lastAreaInstance);
-    if (state.areaSet.underwater) {
-        state.areaSet.underwater.surfaceArea = state.areaSet.current;
+export function getConnectedUnderwaterLocation(state: GameState, location: ZoneLocation): ZoneLocation|null {
+    const underwaterZoneKey = zones[location.zoneKey].underwaterKey;
+    if (!underwaterZoneKey || location.floor > 0) {
+        return null;
     }
-    state.areaSet.surface = getConnectedSurfaceArea(state, state.areaSet.current, lastAreaInstance);
-    if (state.areaSet.surface) {
-        state.areaSet.surface.underwaterArea = state.areaSet.current;
+    return {
+        ...location,
+        floor: zones[underwaterZoneKey].floors.length - 1,
+        zoneKey: underwaterZoneKey,
+    };
+}
+export function getConnectedSurfaceLocation(state: GameState, location: ZoneLocation): ZoneLocation|null {
+    const surfaceZoneKey = zones[location.zoneKey].surfaceKey;
+    if (!surfaceZoneKey || location.floor !== zones[location.zoneKey].floors.length - 1) {
+        return null;
     }
-    state.areaSet.current.underwater = !!state.zone.surfaceKey && !state.location.isSpiritWorld;
+    return {
+        ...location,
+        floor: 0,
+        zoneKey: surfaceZoneKey,
+    };
 }
 
 // Get and memoize the connected underwater area for the given area, returning null if there is none.
@@ -196,6 +73,7 @@ export function getConnectedUnderwaterArea(state: GameState, area: AreaInstance,
     }
     return area.underwaterArea;
 }
+
 
 // Get and memoize the connected surface area for the given area, returning null if there is none.
 export function getConnectedSurfaceArea(state: GameState, area: AreaInstance, lastAreaInstance?: AreaInstance): AreaInstance|null {
@@ -227,8 +105,17 @@ export function getConnectedSurfaceArea(state: GameState, area: AreaInstance, la
 }
 
 export function linkObjects(state: GameState, areaSet: AreaSet = state.areaSet): void {
-    for (const object of [...areaSet?.current.objects, ...areaSet?.alternate.objects]) {
-        linkObject(object);
+    for (const area of [
+            areaSet.current, areaSet.alternate,
+            areaSet.underwater, areaSet.alternateUnderwater,
+            areaSet.surface, areaSet.alternateSurface,
+    ]) {
+        if (!area) {
+            continue;
+        }
+        for (const object of area.objects) {
+            linkObject(object);
+        }
     }
 }
 export function linkObject(object: ObjectInstance): void {
@@ -457,36 +344,35 @@ export function createAreaInstance(state: GameState, location: ZoneLocation, isA
     for (const layer of instance.layers) {
         applyLayerToBehaviorGrid(behaviorGrid, layer);
     }
-    const newObjectInstances: ObjectInstance[] = [];
+    //const newObjectInstances: ObjectInstance[] = [];
     for (const object of definition.objects.filter(object => evaluateLogicDefinition(state, object))) {
         const objectInstance = createObjectInstance(state, object);
         addObjectToArea(state, instance, objectInstance);
-        newObjectInstances.push(objectInstance);
+        //newObjectInstances.push(objectInstance);
     }
-    for (const objectInstance of newObjectInstances) {
+    /*for (const objectInstance of newObjectInstances) {
         initializeObject(state, objectInstance, isActiveArea);
-    }
+    }*/
     // instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
-    if (definition.specialBehaviorKey) {
+    /*if (definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
         specialBehavior?.apply(state, instance);
-    }
+    }*/
     addRecentArea(instance);
-    refreshAreaIce(state, instance);
+    // refreshAreaIce(state, instance);
     return instance;
 }
 
 
 export function refreshCurrentAreaLogic(state: GameState, mutationDuration = state.mutationDuration ?? MUTATE_DURATION): void {
     state.currentAreaNeedsLogicRefresh = false;
-    const area = state.areaSet.current;
+    const area = state.areaSet?.current;
     if (!area) {
         return;
     }
-    const wasHot = state.areaSet.areaSection?.isHot;
-    if (state.areaSet.areaSection) {
-        setAreaSection(state, getAreaSectionInstance(state, state.zone, area.definition, state.areaSet.areaSection.definition));
-    }
+    const wasHot = state.areaSet.currentSection.isHot;
+    refreshCurrentAreaSectionInstances(state);
+    applyCurrentAreaSection(state);
     let lastLayerIndex = -1, refreshBehavior = false;
     for (let i = 0; i < area.definition.layers.length; i++) {
         const layerDefinition = area.definition.layers[i];
@@ -542,7 +428,7 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
     for (let instance of [area, area.alternateArea]) {
         if (refreshBehavior) {
             state.map.needsRefresh = true;
-            state.fadeLevel = (state.areaSet.areaSection.dark ?? 0) / 100;
+            state.fadeLevel = (state.areaSet.currentSection.dark ?? 0) / 100;
             // This was causing the player to stutter during lava fill on Flame Beast, do we need this?
             // state.hero.vx = state.hero.vy = 0;
             const nextAreaInstance = createAreaInstance(state, instance.location, true);
@@ -577,10 +463,13 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
                     state.mutationState = {
                         time: 0,
                         duration: mutationDuration,
+                        // The new area set is the same as the current one except for the updated instances
+                        // of the current and alternate areas that were refreshed.
                         nextAreaSet: {
+                            ...state.areaSet,
                             current: nextAreaInstance,
-                            // This will get replaced by the updated alternate area in the block below.
-                            alternate: state.areaSet.alternate,
+                            // The alternate area will get updated in the following branch during the second
+                            // pass through the enclosing for loop.
                         },
                     };
                 }
@@ -634,7 +523,7 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
         }
 
         // If the heat level of the room changed, hit all the tiles with fire to melt any ice.
-        if (!wasHot && state.areaSet.areaSection?.isHot) {
+        if (!wasHot && state.areaSet.currentSection?.isHot) {
             hitTargets(state, instance, {hitbox: {x: 0, y: 0, w: 2000, h: 2000}, hitTiles: true, element: 'fire', source: null});
         }
 
@@ -694,15 +583,129 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
 
 
 export function initializeAreaSet(state: GameState, areaSet: AreaSet, isActiveArea: boolean) {
-    // TODO: figure out what needs to be done for variants.
+    // Currently variants are applied during createAreaInstance before tile behaviors are merged in the behavior grid.
+    // Both of those actions could be moved into here, potentially.
 
     // TODO: If necessary, add `onBeforeLinkObjects`, if some objects require running code before linking,
     // for example, if an object had initialization logic to move it around independent of initial linked objects
     // that may cause it to link with a different object afterwards.
-    linkObjects(state);
-    for (const object of [...areaSet.current.objects, ...areaSet.alternate.objects]) {
-        initializeObject(state, object, isActiveArea);
+    linkObjects(state, areaSet);
+    for (const area of [
+            areaSet.current, areaSet.alternate,
+            areaSet.underwater, areaSet.alternateUnderwater,
+            areaSet.surface, areaSet.alternateSurface,
+    ]) {
+        if (!area) {
+            continue;
+        }
+        // Note this is a noop for all objects that have already been initialized.
+        for (const object of area.objects) {
+            initializeObject(state, object, isActiveArea);
+        }
+        if (area.definition.specialBehaviorKey) {
+            const specialBehavior = specialBehaviorsHash[area.definition.specialBehaviorKey] as SpecialAreaBehavior;
+            specialBehavior?.apply(state, area);
+        }
+        refreshAreaIce(state, area);
     }
     checkIfAllEnemiesAreDefeated(state, areaSet.current);
     checkIfAllEnemiesAreDefeated(state, areaSet.alternate);
+}
+
+// Gets an AreaInstance for a given location, reusing any existing AreaInstance for the location
+// that is present on a given area set.
+export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation, oldAreaSet?: AreaSet) {
+    const definition = getAreaFromLocation(location);
+    if (oldAreaSet) {
+        for (const area of [
+                oldAreaSet.current, oldAreaSet.alternate,
+                oldAreaSet.underwater, oldAreaSet.alternateUnderwater,
+                oldAreaSet.surface, oldAreaSet.alternateSurface,
+        ]) {
+            if (area.definition === definition) {
+                return area;
+            }
+        }
+    }
+    return createAreaInstance(state, location, true);
+}
+
+// Creates and initializes an area set for a given location, reusing area instances from an existing provided area set when possible,
+// which will prevent re-initializing areas when moving between locations inside the same area set, such as when
+// traveling between material+spirit realms, surfacing+diving, or scrolling between sections in the same super tile.
+// Note in this last case, individual area sections inside of a super tile are still refreshed, but this happens
+// when they are scrolled entirely offscreen when the player leaves them, not when the player enters them.
+export function getAreaSetForLocation(state: GameState, location: ZoneLocation, oldAreaSet?: AreaSet): AreaSet {
+    const current = getOrCreateAreaInstance(state, location);
+    const alternateLocation = {...location, isSpiritWorld: !location.isSpiritWorld};
+    const alternate = getOrCreateAreaInstance(state, alternateLocation);
+    current.alternateArea = alternate;
+    alternate.alternateArea = current;
+    const areaSet: AreaSet = {
+        current,
+        currentSection: getAreaSectionInstanceForLocation(state, location),
+        alternate,
+        alternateSection: getAreaSectionInstanceForLocation(state, alternateLocation),
+        underwater: null,
+        underwaterSection: null,
+        alternateUnderwater: null,
+        alternateUnderwaterSection: null,
+        surface: null,
+        surfaceSection: null,
+        alternateSurface: null,
+        alternateSurfaceSection: null,
+    };
+    const underwaterLocation = getConnectedUnderwaterLocation(state, location);
+    if (underwaterLocation) {
+        areaSet.underwater = getOrCreateAreaInstance(state, underwaterLocation, oldAreaSet);
+        areaSet.underwater.surfaceArea = current;
+        current.underwaterArea = areaSet.underwater;
+        areaSet.underwaterSection = getAreaSectionInstanceForLocation(state, underwaterLocation);
+        const alternateUnderwaterLocation = {...underwaterLocation, isSpiritWorld: !location.isSpiritWorld};
+        areaSet.alternateUnderwater = getOrCreateAreaInstance(state, alternateUnderwaterLocation, oldAreaSet);
+        areaSet.alternateUnderwater.surfaceArea = alternate;
+        alternate.underwaterArea = areaSet.alternateUnderwater;
+        areaSet.alternateUnderwaterSection = getAreaSectionInstanceForLocation(state, alternateUnderwaterLocation);
+        areaSet.underwater.alternateArea = areaSet.alternateUnderwater;
+        areaSet.alternateUnderwater.alternateArea = areaSet.underwater;
+        areaSet.underwater.isUnderwater = !underwaterLocation.isSpiritWorld;
+        areaSet.alternateUnderwater.isUnderwater = !alternateUnderwaterLocation.isSpiritWorld;
+    }
+    const surfaceLocation = getConnectedSurfaceLocation(state, location);
+    if (surfaceLocation) {
+        areaSet.surface = getOrCreateAreaInstance(state, surfaceLocation, oldAreaSet);
+        areaSet.surface.underwaterArea = current;
+        current.surfaceArea = areaSet.surface;
+        areaSet.surfaceSection = getAreaSectionInstanceForLocation(state, surfaceLocation);
+        const alternateSurfaceLocation = {...underwaterLocation, isSpiritWorld: !location.isSpiritWorld};
+        areaSet.alternateSurface = getOrCreateAreaInstance(state, alternateSurfaceLocation, oldAreaSet);
+        areaSet.alternateSurface.underwaterArea = alternate;
+        alternate.surfaceArea = areaSet.alternateSurface;
+        areaSet.alternateSurfaceSection = getAreaSectionInstanceForLocation(state, alternateSurfaceLocation);
+        areaSet.surface.alternateArea = areaSet.alternateSurface;
+        areaSet.alternateSurface.alternateArea = areaSet.surface;
+        areaSet.surface.isUnderwater = false;
+        areaSet.alternateSurface.isUnderwater = false;
+        current.isUnderwater = !location.isSpiritWorld;
+        alternate.isUnderwater = !alternateLocation.isSpiritWorld;
+    } else {
+        current.isUnderwater = false;
+        alternate.isUnderwater = false;
+    }
+    initializeAreaSet(state, areaSet, true);
+    return areaSet;
+}
+
+export function removeAllClones(state: GameState): void {
+    for (const clone of state.hero.clones) {
+        removeObjectFromArea(state, clone);
+    }
+    state.hero.clones = []
+}
+
+export function cleanupHeroFromArea(state: GameState): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.activeStaff?.remove(state);
+    }
+    removeAllClones(state);
 }

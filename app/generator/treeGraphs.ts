@@ -454,6 +454,7 @@ function createZoneFromTree(props: {
     const {entrance, random, zoneId, tree, constraints} = props;
     const zone: Zone = {
         key: zoneId,
+        areaSize: {w: 32, h: 32},
         floors: [],
     };
     normalizeTree(random, tree);
@@ -571,8 +572,6 @@ function createZoneFromTree(props: {
                 const baseSection = {x: (x % 2) * 16, y: (y % 2) * 16, w: 16, h: 16};
                 const childSection = {x: (x % 2) * 16, y: (y % 2) * 16, w: 16, h: 16};
                 grid[gY][gX] = grid[gY][gX] || {
-                    w: 32,
-                    h: 32,
                     layers: [],
                     objects: [],
                     sections: [],
@@ -595,15 +594,15 @@ function createZoneFromTree(props: {
                 if (!node.baseArea) {
                     if (node.dimensions.w === 2) {
                         baseSection.x = 0;
-                        baseSection.w = 32;
+                        baseSection.w = zone.areaSize.w;
                         childSection.x = 0;
-                        childSection.w = 32;
+                        childSection.w = zone.areaSize.w;
                     }
                     if (node.dimensions.h === 2) {
                         baseSection.y = 0;
-                        baseSection.h = 32;
+                        baseSection.h = zone.areaSize.h;
                         childSection.y = 0;
-                        childSection.h = 32;
+                        childSection.h = zone.areaSize.h;
                     }
                     node.baseArea = grid[gY][gX];
                     node.childArea = spiritGrid[gY][gX];

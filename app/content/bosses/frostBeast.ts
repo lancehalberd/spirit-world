@@ -221,7 +221,7 @@ enemyDefinitions.frostHeart = {
             enemy.playBlockSound(state);
             return { hit: true };
         }
-        if (enemy.area.underwater) {
+        if (enemy.area.isUnderwater) {
             hit.damage /= 2;
         }
         // Use the default hit behavior, the attack will be blocked if the shield is still up.
@@ -277,7 +277,7 @@ enemyDefinitions.frostBeast = {
 };
 
 function isFrostBeastHidden(enemy: Enemy) {
-    return (enemy.area?.underwater && !enemy.params.submerged) || (!enemy.area?.underwater && enemy.params.submerged);
+    return (enemy.area?.isUnderwater && !enemy.params.submerged) || (!enemy.area?.isUnderwater && enemy.params.submerged);
 }
 
 function getFrostHeart(state: GameState, area: AreaInstance): Enemy<FrostHeartParams> {
@@ -340,7 +340,7 @@ function updateFrostHeart(state: GameState, enemy: Enemy<FrostHeartParams>): voi
     // Mark that this was the last active heart.
     enemy.params.active = true;
     // The frost heart does nothing when attacking it from under the water.
-    if (enemy.area.underwater) {
+    if (enemy.area.isUnderwater) {
         enemy.params.shieldLevel = 0;
         enemy.shielded = false;
         return;
@@ -457,7 +457,7 @@ function useFrostVortex(state: GameState, enemy: Enemy, radius: number, baseThet
 
 
 function renderIceShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<FrostHeartParams>): void {
-    if (enemy.area?.underwater) {
+    if (enemy.area?.isUnderwater) {
         return;
     }
     // Make sure we wait for the final shield animation to finish before we stop rendering the shield.
@@ -564,7 +564,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         underwaterSerpent.params.submerged = true;
         enemy.params.submerged = true;
     }
-    if (enemy.params.submerged !== enemy.area.underwater) {
+    if (enemy.params.submerged !== enemy.area.isUnderwater) {
         delete enemy.touchHit;
     } else {
         enemy.touchHit = enemy.enemyDefinition.touchHit;
@@ -579,7 +579,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
             enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
             if (enemy.modeTime % 500 === 0) {
                 enemy.life += 0.5;
-                if (enemy.area.underwater) {
+                if (enemy.area.isUnderwater) {
                     enemy.life += 0.5;
                 }
             }
@@ -605,7 +605,7 @@ function updateFrostSerpent(state: GameState, enemy: Enemy): void {
         }
     }
     // The frost heart does nothing when attacking it from under the water.
-    if (enemy.area.underwater) {
+    if (enemy.area.isUnderwater) {
         if (isEnraged) {
             // Surface when enraged.
             if (enemy.params.submerged) {

@@ -42,8 +42,9 @@ function addCrystalSwitch(state: GameState, area: AreaInstance, data: VariantDat
     });
     switchObject.alwaysReset = true;
     addObjectToArea(state, area, switchObject);
+    return switchObject;
 }
-function addFloorTile(state: GameState, area: AreaInstance, data: VariantData<SwitchFields>, style: string, suffix: string, x: number, y: number) {
+function addFloorSwitch(state: GameState, area: AreaInstance, data: VariantData<SwitchFields>, style: string, suffix: string, x: number, y: number) {
     const switchObject = new FloorSwitch(state, {
         type: 'floorSwitch',
         id: `${data.id}-${suffix}`,
@@ -56,6 +57,7 @@ function addFloorTile(state: GameState, area: AreaInstance, data: VariantData<Sw
     })
     switchObject.alwaysReset = true;
     addObjectToArea(state, area, switchObject);
+    return switchObject
 }
 
 variantHash.switch = {
@@ -70,14 +72,15 @@ variantHash.switch = {
         },
     ],
     gridSize: 4,
-    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData<SwitchFields>): boolean {
+    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData<SwitchFields>): false|BaseFieldInstance[] {
         switch (style){
             case 'burst': {
-                addCrystalSwitch(state, area, data, style, 'switch1', data.x + data.w / 2 - 8, data.y + data.h / 2 - 40);
-                addCrystalSwitch(state, area, data, style, 'switch2', data.x + data.w / 2 - 8, data.y + data.h / 2 + 24);
-                addCrystalSwitch(state, area, data, style, 'switch3', data.x + data.w / 2 - 40, data.y + data.h / 2 - 8);
-                addCrystalSwitch(state, area, data, style, 'switch4', data.x + data.w / 2 + 24, data.y + data.h / 2 - 8);
-                return true;
+                return [
+                    addCrystalSwitch(state, area, data, style, 'switch1', data.x + data.w / 2 - 8, data.y + data.h / 2 - 40),
+                    addCrystalSwitch(state, area, data, style, 'switch2', data.x + data.w / 2 - 8, data.y + data.h / 2 + 24),
+                    addCrystalSwitch(state, area, data, style, 'switch3', data.x + data.w / 2 - 40, data.y + data.h / 2 - 8),
+                    addCrystalSwitch(state, area, data, style, 'switch4', data.x + data.w / 2 + 24, data.y + data.h / 2 - 8),
+                ];
             }
             case 'flame':
             case 'frost':
@@ -85,33 +88,33 @@ variantHash.switch = {
                 const x = random.range(data.x, data.x + data.w - 16);
                 random.generateAndMutate();
                 const y = random.range(data.y, data.y + data.h - 16);
-                addCrystalSwitch(state, area, data, style, 'switch', x, y);
-                return true;
+                return [addCrystalSwitch(state, area, data, style, 'switch', x, y)];
             }
             case 'tile': {
                 const x = random.range(data.x, data.x + data.w - 16);
                 random.generateAndMutate();
                 const y = random.range(data.y, data.y + data.h - 16);
-                addFloorTile(state, area, data, style, 'switch', x, y);
-                return true;
+                return [addFloorSwitch(state, area, data, style, 'switch', x, y)];
             }
             case 'fourTiles': {
                 if (data.w >= data.h) {
                     const cx = data.x + data.w / 2;
                     const y = random.range(data.y, data.y + data.h - 16);
-                    addFloorTile(state, area, data, style, 'switch', cx - 32, y);
-                    addFloorTile(state, area, data, style, 'switch', cx - 16, y);
-                    addFloorTile(state, area, data, style, 'switch', cx, y);
-                    addFloorTile(state, area, data, style, 'switch', cx + 16, y);
-                } else {
-                    const x = random.range(data.x, data.x + data.w - 16);
-                    const cy = data.y + data.h / 2;
-                    addFloorTile(state, area, data, style, 'switch', x, cy - 32);
-                    addFloorTile(state, area, data, style, 'switch', x, cy - 16);
-                    addFloorTile(state, area, data, style, 'switch', x, cy);
-                    addFloorTile(state, area, data, style, 'switch', x, cy + 16);
+                    return [
+                        addFloorSwitch(state, area, data, style, 'switch', cx - 32, y),
+                        addFloorSwitch(state, area, data, style, 'switch', cx - 16, y),
+                        addFloorSwitch(state, area, data, style, 'switch', cx, y),
+                        addFloorSwitch(state, area, data, style, 'switch', cx + 16, y),
+                    ];
                 }
-                return true;
+                const x = random.range(data.x, data.x + data.w - 16);
+                const cy = data.y + data.h / 2;
+                return [
+                    addFloorSwitch(state, area, data, style, 'switch', x, cy - 32),
+                    addFloorSwitch(state, area, data, style, 'switch', x, cy - 16),
+                    addFloorSwitch(state, area, data, style, 'switch', x, cy),
+                    addFloorSwitch(state, area, data, style, 'switch', x, cy + 16),
+                ];
             }
         }
         return false;

@@ -32,7 +32,7 @@ function fillLayerRect(random: SRandom, area: AreaInstance, layerKey: string, r:
 variantHash.blockedPath = {
     styles: ['smallGap', 'bigGap', 'rocks', 'heavyRocks', 'crackedGround'],
     gridSize: 16,
-    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData): boolean {
+    applyToArea(style: string, random: SRandom, state: GameState, area: AreaInstance, data: VariantData): false|BaseFieldInstance[] {
         const r = toTileRect(data);
         switch (style){
             case 'smallGap': {
@@ -49,11 +49,11 @@ variantHash.blockedPath = {
                         h: Math.min(r.h, 2),
                     }, [allTiles[4]]);
                 }
-                return true;
+                return [];
             }
             case 'bigGap': {
                 fillLayerRect(random, area, 'floor2', r, [allTiles[4]]);
-                return true;
+                return [];
             }
             case 'heavyRocks': {
                 if (area.definition.isSpiritWorld) {
@@ -61,7 +61,7 @@ variantHash.blockedPath = {
                 } else {
                     fillLayerRect(random, area, 'field', r, [allTiles[8], allTiles[9]]);
                 }
-                return true;
+                return [];
             }
             case 'rocks': {
                 if (area.definition.isSpiritWorld) {
@@ -69,7 +69,7 @@ variantHash.blockedPath = {
                 } else {
                     fillLayerRect(random, area, 'field', r, [allTiles[6], allTiles[7]]);
                 }
-                return true;
+                return [];
             }
             case 'crackedGround': {
                 if (area.definition.isSpiritWorld) {
@@ -77,7 +77,7 @@ variantHash.blockedPath = {
                 } else {
                     fillLayerRect(random, area, 'floor2', r, [allTiles[25]]);
                 }
-                return true;
+                return [];
             }
         }
         return false;
