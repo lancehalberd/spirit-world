@@ -54,6 +54,7 @@ dialogueHash.jadeChampionWarTemple = {
             // hide HUD to show that player isn't controllable
             hideHUD(state, (state: GameState) => {
                 enterZoneByTarget(state, 'overworld', 'holyCityCentralGateMarker', {
+                    instant: true,
                     callback: (state) => {
                         if (state.hero.renderParent) {
                             delete state.hero.renderParent;

@@ -149,8 +149,6 @@ Current tasks:
 Creating a new area instance from scratch:
 
 Resetting a section inside of an initialized+dirty area instance:
-    - Fix: Menu stays open after confirming Nimbus Cloud location.
-
     - Thrive AR Game
         - Starts in base world
             - AR Stairs take player to higher levels that replace base field graphics with biome graphics based on tile behavior.

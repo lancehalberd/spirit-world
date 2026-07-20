@@ -1,8 +1,9 @@
-import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 
-import { addBurstEffect } from 'app/content/effects/animationEffect';
-import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
-import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import {addBurstEffect} from 'app/content/effects/animationEffect';
+import {hideMainMenuScene} from 'app/scenes/fieldMenu/showMainMenuScene';
+import {enterZoneByTarget} from 'app/utils/enterZoneByTarget';
+import {returnToSpawnLocation} from 'app/utils/returnToSpawnLocation';
 
 export const defaultZoneEntranceMap: {[key in LogicalZoneKey]?: string} = {
     'peachCave': 'overworld:peachCaveTopEntrance',
@@ -65,6 +66,7 @@ export function getZoneEntranceMap() {
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
     if (enterZoneByTarget(state, zoneKey, markerId, {instant: true})) {
         burstIntoLocation(state);
+        hideMainMenuScene(state);
     }
     return '';
 }
