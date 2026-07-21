@@ -190,6 +190,14 @@ export function saveObjectStatus(state: GameState, definition: ObjectDefinition,
     }
 }
 
+export function getAreaObjectByTypeAndId(area: AreaInstance, type: ObjectType, id: string): ObjectInstance|undefined {
+    for (const object of [...area.objects, ...area.alternateArea.objects]) {
+        if (object.definition?.type === type && object.definition?.id === id) {
+            return object;
+        }
+    }
+}
+
 export function getAreaObjectById(area: AreaInstance, id: string): ObjectInstance|undefined {
     for (const object of [...area.objects, ...area.alternateArea.objects]) {
         if (object.definition?.id === id) {

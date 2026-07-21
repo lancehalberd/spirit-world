@@ -157,23 +157,11 @@ Resetting a section inside of an initialized+dirty area instance:
             - Level 6+ require giving up the ability to disable the AR device at will (the game will allow disabling haptics at AR save points)
         - Essentially a hack n slash ARPG. Defeating real enemies will release AR spirits that merge into AR monsters based on the monsters combined and the current biome. AR monsters have stats that scale with level. Player gains experience and can level up gaining more power in the AR game
 
-    - Refactor how current + next area area stored on state
-        - TODO: Verify all area transitions still work as expected.
-            - When scrolling to a new area
-            - When entering an area from an entrance
-            - When showing the area preview for a save file
-                -> this uses returnToSpawnLocation(state, preserveZoneFlags=true) internally
-                    -> enterLocation(state, state.hero.savedData.spawnLocation, {instant: true, preserveZoneFlags})
-            - When loading a new save file
-            - When falling into an area
-            - Enering area from script events
-            - Entering area from nimbus cloud
-            - Entering area when respawning after defeat
-            - Entering area when transitioning between worlds
-            - Entering area when transitioning between underwater/surface
+    - Add scene fade transition after either option is selected from the defeated menu.
+
+    - MC hair is showing over doorway in cocoon upstairs+downstairs when exiting.
 
     - Stream notes
-        - Save state of ball puzzles whenever it makes sense.
         - Mushrooms can grow thorns over pit entrance objects.
     - Add HELP item to Randomizer menu
         - In randomizer mode all the rewards have been shuffled and a certain number of empty or minor rewards have been replaced with Medals that grant Victory Points.

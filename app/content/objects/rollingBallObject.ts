@@ -6,7 +6,7 @@ import {moveObject} from 'app/movement/moveObject';
 import {playAreaSound, stopAreaSound} from 'app/musicController';
 import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
 import {directionMap, hitTargets} from 'app/utils/field';
-import {getAreaObjectById, getObjectStatus, removeObjectFromArea, saveObjectStatus} from 'app/utils/objects';
+import {getAreaObjectById, getAreaObjectByTypeAndId, getObjectStatus, removeObjectFromArea, saveObjectStatus} from 'app/utils/objects';
 import {extendSound} from 'app/utils/sounds';
 
 
@@ -59,9 +59,15 @@ export class RollingBallObject implements ObjectInstance {
         if (!this.definition.saveTarget) {
             return;
         }
-        const targetGoal = getAreaObjectById(this.area, this.definition.saveTarget);
-        if (targetGoal.definition?.type === 'ballGoal' && getObjectStatus(state, this.definition)) {
-            this.socketInBallGoal(state, targetGoal as BallGoal);
+        const targetGoal = getAreaObjectByTypeAndId(this.area, 'ballGoal', this.definition.saveTarget) as BallGoal;
+        if (!targetGoal) {
+            debugger;
+            getAreaObjectByTypeAndId(this.area, 'ballGoal', this.definition.saveTarget);
+            return;
+        }
+        const targetGoalTarget = getAreaObjectById(this.area, targetGoal.definition.targetObjectId)
+        if (targetGoalTarget && getObjectStatus(state, targetGoalTarget.definition)) {
+            this.socketInBallGoal(state, targetGoal);
         }
     }
     changeStatus(state: GameState, status: ObjectStatus): void {

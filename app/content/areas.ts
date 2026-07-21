@@ -599,7 +599,9 @@ export function initializeAreaSet(state: GameState, areaSet: AreaSet, isActiveAr
             continue;
         }
         // Note this is a noop for all objects that have already been initialized.
-        for (const object of area.objects) {
+        // It is important to copy this array since some objects may be removed during initialization,
+        // such as rolling balls.
+        for (const object of [...area.objects]) {
             initializeObject(state, object, isActiveArea);
         }
         if (area.definition.specialBehaviorKey) {
