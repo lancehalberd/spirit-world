@@ -636,9 +636,9 @@ export function getOrCreateAreaInstance(state: GameState, location: ZoneLocation
 // Note in this last case, individual area sections inside of a super tile are still refreshed, but this happens
 // when they are scrolled entirely offscreen when the player leaves them, not when the player enters them.
 export function getAreaSetForLocation(state: GameState, location: ZoneLocation, oldAreaSet?: AreaSet): AreaSet {
-    const current = getOrCreateAreaInstance(state, location, state.areaSet);
+    const current = getOrCreateAreaInstance(state, location, oldAreaSet);
     const alternateLocation = {...location, isSpiritWorld: !location.isSpiritWorld};
-    const alternate = getOrCreateAreaInstance(state, alternateLocation, state.areaSet);
+    const alternate = getOrCreateAreaInstance(state, alternateLocation, oldAreaSet);
     current.alternateArea = alternate;
     alternate.alternateArea = current;
     const areaSet: AreaSet = {

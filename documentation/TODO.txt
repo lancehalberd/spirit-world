@@ -157,10 +157,6 @@ Resetting a section inside of an initialized+dirty area instance:
             - Level 6+ require giving up the ability to disable the AR device at will (the game will allow disabling haptics at AR save points)
         - Essentially a hack n slash ARPG. Defeating real enemies will release AR spirits that merge into AR monsters based on the monsters combined and the current biome. AR monsters have stats that scale with level. Player gains experience and can level up gaining more power in the AR game
 
-    - Add scene fade transition after either option is selected from the defeated menu.
-
-    - MC hair is showing over doorway in cocoon upstairs+downstairs when exiting.
-
     - Stream notes
         - Mushrooms can grow thorns over pit entrance objects.
     - Add HELP item to Randomizer menu
@@ -179,6 +175,8 @@ Resetting a section inside of an initialized+dirty area instance:
         - Draw grates when doors are closed, and tapered shadows when they are open
         - Apply this to war temple side doors, and allow forcing open door on 2F when warTempleSmallKey2 is true.
     - Check behavior of clones during each cutscene, consider despawning clones as part of prepareForCutScene or hideHUD.
+
+    - Add scene fade transition after either option is selected from the defeated menu.
 
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush

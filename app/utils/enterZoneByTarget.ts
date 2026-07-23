@@ -128,19 +128,15 @@ function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: s
         console.error(targetObjectId);
         debugger;
     }
-    // When passing horizontally through narrow doors, we need to start 3px lower than usual.
+    // Make sure the MC's y position is low enough that the top of their head doesn't peak over the foreground
+    // frame when exiting doors.
     if (target.definition.type === 'door') {
         const hitbox = target.style.getHitbox(target);
-        // When exiting new style doors, the MCs head appears above the frame, so start them lower.
-        if (hitbox.w === 64 && target.definition.d === 'up') {
+        if (target.definition.d === 'up') {
+            // When exiting new style doors, the MCs head appears above the frame, so start them lower.
             hero.y += 6;
-        }
-        // This is for old 32x32 side doors.
-        if (hitbox.h === 32 && target.definition.d !== 'down') {
-            hero.y += 3;
-        }
-        // This is for new side doors.
-        if (hitbox.h === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
+        } else if (hitbox.h === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
+            // This is for new side doors.
             hero.y += 8;
         }
         hero.renderParent = target;
