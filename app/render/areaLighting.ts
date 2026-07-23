@@ -1,4 +1,3 @@
-//import {getConnectedSurfaceArea, getConnectedUnderwaterArea} from 'app/content/areas';
 import {Hero} from 'app/content/hero';
 import {editingState} from 'app/development/editingState';
 import {
@@ -33,19 +32,8 @@ const waterSurfaceGranularity = 2;
 
 const surfaceLightIntensity = 0.3;
 export function updateWaterSurfaceCanvas(state: GameState, baseArea: AreaInstance): void {
-    /*let underwaterArea: AreaInstance, surfaceArea: AreaInstance;
-    if (state.transitionState?.type === 'diving' && state.transitionState?.nextAreaSet) {
-        underwaterArea = state.transitionState.nextAreaSet.current;
-        surfaceArea = state.areaSet?.current;
-    } else if (state.transitionState?.type === 'surfacing' && state.transitionState?.nextAreaSet) {
-        underwaterArea = state.areaSet?.current;
-        surfaceArea = state.transitionState.nextAreaSet.current;
-    } else {
-        underwaterArea = getConnectedUnderwaterArea(state, baseArea) || baseArea;
-        surfaceArea = getConnectedSurfaceArea(state, baseArea) || baseArea;
-    }*/
     const surfaceArea = state.areaSet.surface, underwaterArea = state.areaSet.underwater;
-    if (!surfaceArea || !underwaterArea || underwaterArea === surfaceArea) {
+    if (!surfaceArea || !underwaterArea) {
         return;
     }
     if (!underwaterArea.waterSurfaceCanvas) {

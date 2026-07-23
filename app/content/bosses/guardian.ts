@@ -367,7 +367,7 @@ const growingThornsAbility: EnemyAbility<Target> = {
         const count = 6 + 8 * (1 - guardian.life / guardian.maxLife);
         const anchor = getTargetingAnchor(target);
         let coords = getTilesInCircle(enemy.area, {x: anchor.x, y: anchor.y, r: 56}).map(p => ({x: p.x * 16 + 8, y: p.y * 16 + 8}));
-        coords = coords.filter(p => GrowingThorn.canGrowAtPoint(enemy.area, p));
+        coords = coords.filter(p => GrowingThorn.canGrowAtPoint(state, enemy.area, p));
         for (const point of Random.elements(coords, count)) {
             const thorns = new GrowingThorn({
                 x: point.x,

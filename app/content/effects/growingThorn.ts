@@ -50,7 +50,7 @@ export class GrowingThorn implements EffectInstance, Props {
             const ty = (this.y / 16) | 0;
             // If the hero cuts the ground mid animation, cover and uncover it immediately
             // to show the particle effects and cut ground tile.
-            if (canCoverTile(this.area, tx, ty, thornsTilesIndex)) {
+            if (canCoverTile(state, this.area, tx, ty, thornsTilesIndex)) {
                 coverTile(state, this.area, tx, ty, thornsTilesIndex, this.source);
                 uncoverTile(state, this.area, tx, ty);
             }
@@ -58,10 +58,10 @@ export class GrowingThorn implements EffectInstance, Props {
         }
         return {};
     }
-    isInvald() {
+    isInvald(state: GameState) {
         const tx = (this.x / 16) | 0;
         const ty = (this.y / 16) | 0;
-        return !canCoverTile(this.area, tx, ty, thornsTilesIndex) || GrowingThorn.isSpotTaken(this.area, this, this);
+        return !canCoverTile(state, this.area, tx, ty, thornsTilesIndex) || GrowingThorn.isSpotTaken(this.area, this, this);
     }
     // Thorns look bad if they stack up on the same spot so we will remove a thorn that gets
     // added to a spot that already has thorns growing in it.
@@ -71,7 +71,7 @@ export class GrowingThorn implements EffectInstance, Props {
         // Cancel the effect if the tile becomes invalid.
         const tx = (this.x / 16) | 0;
         const ty = (this.y / 16) | 0;
-        if (this.isInvald()) {
+        if (this.isInvald(state)) {
             removeEffectFromArea(state, this);
             return;
         }
@@ -108,7 +108,8 @@ export class GrowingThorn implements EffectInstance, Props {
     cleanup(state: GameState) {
         const tx = (this.x / 16) | 0;
         const ty = (this.y / 16) | 0;
-        if (canCoverTile(this.area, tx, ty, thornsTilesIndex)) {
+        //if (canCoverTile(state, this.area, tx, ty, thornsTilesIndex)) {
+        if (!this.isInvald(state)) {
             coverTile(state, this.area, tx, ty, thornsTilesIndex, this.source);
             if (this.animationTime <= growingThornsAnimation.duration / 2) {
                 uncoverTile(state, this.area, tx, ty);
@@ -128,9 +129,9 @@ export class GrowingThorn implements EffectInstance, Props {
         return false;
     }
 
-    static canGrowAtPoint(area: AreaInstance, {x, y}: Point) {
+    static canGrowAtPoint(state: GameState, area: AreaInstance, {x, y}: Point) {
         const tx = ((x - 8) / 16) | 0;
         const ty = ((y - 8) / 16) | 0;
-        return canCoverTile(area, tx, ty, thornsTilesIndex) && !GrowingThorn.isSpotTaken(area, {x: tx, y: ty});
+        return canCoverTile(state, area, tx, ty, thornsTilesIndex) && !GrowingThorn.isSpotTaken(area, {x: tx, y: ty});
     }
 }

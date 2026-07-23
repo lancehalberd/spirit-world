@@ -146,6 +146,35 @@ function isPointOpen(
     if (tileBehavior?.pit && !movementProperties.canFall) {
         return false;
     }
+    return !isPointBlockedByObject(state, area, {x, y, z}, movementProperties);
+    /*for (const object of area.objects) {
+        if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            continue;
+        }
+        if (movementProperties.excludedObjects?.has(object)) {
+            continue;
+        }
+        // Object behaviors can return pixel precision behaviors using the x/y parameters.
+        const behaviors = getObjectBehaviors(state, object, x, y);
+        if (object.getHitbox && (behaviors?.solid || (!movementProperties.canFall && behaviors?.pit))) {
+            return false;
+        }
+    }*/
+    // Not sure why we have a special check for the hero here.
+    /*if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
+        if (isPixelInShortRect(x, y, state.hero)) {
+            return false;
+        }
+    }*/
+    //return true;
+}
+
+function isPointBlockedByObject(
+    state: GameState,
+    area: AreaInstance,
+    {x, y, z}: {x: number, y: number, z?: number},
+    movementProperties: MovementProperties,
+): boolean {
     for (const object of area.objects) {
         if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
@@ -155,17 +184,11 @@ function isPointOpen(
         }
         // Object behaviors can return pixel precision behaviors using the x/y parameters.
         const behaviors = getObjectBehaviors(state, object, x, y);
-        if (object.getHitbox && behaviors?.solid) {
-            return false;
+        if (behaviors?.solid || (!movementProperties.canFall && behaviors?.pit)) {
+            return true;
         }
     }
-    // Not sure why we have a special check for the hero here.
-    /*if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
-        if (isPixelInShortRect(x, y, state.hero)) {
-            return false;
-        }
-    }*/
-    return true;
+    return false;
 }
 
 function getHitTiles(area: AreaInstance, hit: HitProperties): TileCoords[] {
@@ -832,13 +855,21 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
     }
 }
 
-export function canCoverTile(area: AreaInstance, tx: number, ty: number, coverTile: number): boolean {
+export function canCoverTile(state: GameState, area: AreaInstance, tx: number, ty: number, coverTile: number,
+    movementProperties: MovementProperties = {canFall: false}
+): boolean {
     const topLayer = getLayerToCover(area, tx, ty);
     if (!topLayer) {
         return false;
     }
     const currentIndex = topLayer.tiles[ty][tx]?.index || 0;
-    return currentIndex !== coverTile;
+    if (currentIndex === coverTile) {
+        return false;
+    }
+    return !isPointBlockedByObject(state, area, {x: tx * 16, y: ty * 16,}, movementProperties)
+        && !isPointBlockedByObject(state, area, {x: tx * 16 + 15, y: ty * 16,}, movementProperties)
+        && !isPointBlockedByObject(state, area, {x: tx * 16, y: ty * 16 + 15,}, movementProperties)
+        && !isPointBlockedByObject(state, area, {x: tx * 16 + 15, y: ty * 16 + 15,}, movementProperties);
 }
 
 export function getLayerToCover(area: AreaInstance, tx: number, ty: number): AreaLayer|undefined {

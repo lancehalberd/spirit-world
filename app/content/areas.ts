@@ -46,64 +46,6 @@ export function getConnectedSurfaceLocation(state: GameState, location: ZoneLoca
     };
 }
 
-// Get and memoize the connected underwater area for the given area, returning null if there is none.
-export function getConnectedUnderwaterArea(state: GameState, area: AreaInstance, lastAreaInstance?: AreaInstance): AreaInstance|null {
-    if (area.underwaterArea || area.underwaterArea === null) {
-        return area.underwaterArea;
-    }
-    const underwaterZoneKey = zones[area.location.zoneKey].underwaterKey;
-    if (!underwaterZoneKey || area.location.floor > 0) {
-        area.underwaterArea = null;
-        return null;
-    }
-    const underwaterLocation: ZoneLocation = {
-        ...area.location,
-        floor: zones[underwaterZoneKey].floors.length - 1,
-        zoneKey: underwaterZoneKey,
-    };
-    const underwaterAreaDefinition = getAreaFromLocation(underwaterLocation);
-    if (!underwaterAreaDefinition) {
-        debugger;
-    }
-    // Keep using the existing instance if one is present.
-    if (lastAreaInstance?.definition === underwaterAreaDefinition) {
-        area.underwaterArea = lastAreaInstance;
-    } else {
-        area.underwaterArea = createAreaInstance(state, underwaterLocation);
-    }
-    return area.underwaterArea;
-}
-
-
-// Get and memoize the connected surface area for the given area, returning null if there is none.
-export function getConnectedSurfaceArea(state: GameState, area: AreaInstance, lastAreaInstance?: AreaInstance): AreaInstance|null {
-    if (area.surfaceArea || area.surfaceArea === null) {
-        return area.surfaceArea;
-    }
-    const currentZone = zones[area.location.zoneKey];
-    const surfaceZoneKey = currentZone.surfaceKey;
-    if (!surfaceZoneKey || area.location.floor !== currentZone.floors.length - 1) {
-        area.surfaceArea = null;
-        return null;
-    }
-    const surfaceLocation: ZoneLocation = {
-        ...area.location,
-        floor: 0,
-        zoneKey: surfaceZoneKey,
-    };
-    const surfaceAreaDefinition = getAreaFromLocation(surfaceLocation)
-    if (!surfaceAreaDefinition) {
-        debugger;
-    }
-    // Keep using the existing instance if one is present.
-    if (lastAreaInstance?.definition === surfaceAreaDefinition) {
-        area.surfaceArea = lastAreaInstance;
-    } else {
-        area.surfaceArea = createAreaInstance(state, surfaceLocation);
-    }
-    return area.surfaceArea;
-}
-
 export function linkObjects(state: GameState, areaSet: AreaSet = state.areaSet): void {
     for (const area of [
             areaSet.current, areaSet.alternate,
