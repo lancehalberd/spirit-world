@@ -18,6 +18,7 @@ export function cleanState(state: GameState) {
     delete state.hero.action;
     delete state.hero.defaultAction;
     delete state.transitionState;
+    delete state.mutationState;
     removeTextCue(state);
     showFieldScene(state);
 }

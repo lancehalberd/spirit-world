@@ -148,4 +148,8 @@ export function refreshCurrentAreaSectionInstance(
     sectionInstance.isHot = evaluateLogicDefinition(state, sectionDefinition.hotLogic ?? areaDefinition.hotLogic ?? state.zone.hotLogic, false);
     sectionInstance.isAstral = evaluateLogicDefinition(state, sectionDefinition.astralLogic ?? areaDefinition.astralLogic ?? state.zone.astralLogic, false);
     sectionInstance.isCorrosive = evaluateLogicDefinition(state, sectionDefinition.corrosiveLogic ?? areaDefinition.corrosiveLogic ?? state.zone.corrosiveLogic, false);
+    if (areaDefinition.specialBehaviorKey) {
+        const specialBehavior = specialBehaviorsHash[areaDefinition.specialBehaviorKey] as SpecialAreaBehavior;
+        specialBehavior?.applyToSection(state, sectionInstance);
+    }
 }

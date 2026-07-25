@@ -41,7 +41,7 @@ specialBehaviorsHash.craterLavaSwitch = {
                 // such as slamming the staff.
                 updateAllHeroes(state, false);
                 // Wait for the current transition to complete before starting the next.
-                if (state.transitionState) {
+                if (state.mutationState) {
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_1) {
@@ -118,7 +118,7 @@ function drainFlameBeastLava(state: GameState) {
             // such as slamming the staff.
             updateAllHeroes(state, false);
             // Wait for the current transition to complete before starting the next.
-            if (state.transitionState) {
+            if (state.mutationState) {
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_1) {
@@ -163,7 +163,6 @@ function drainFlameBeastLava(state: GameState) {
     },{
         type: 'wait',
         waitingOnActiveEvents: true,
-        blocksUpdates: true,
     }]);
 }
 

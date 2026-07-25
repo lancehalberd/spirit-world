@@ -398,7 +398,19 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
             }
             // If this is the instance currently being viewed, then apply either fast or normal transition logic.
             if (state.areaSet.current === instance) {
-                if (mutationDuration <= 0) {
+                state.mutationState = {
+                    time: 0,
+                    duration: mutationDuration,
+                    // The new area set is the same as the current one except for the updated instances
+                    // of the current and alternate areas that were refreshed.
+                    nextAreaSet: {
+                        ...state.areaSet,
+                        current: nextAreaInstance,
+                        // The alternate area will get updated in the following branch during the second
+                        // pass through the enclosing for loop.
+                    },
+                };
+                /*if (mutationDuration <= 0) {
                     state.areaSet.current = nextAreaInstance;
                     state.hero.area = state.areaSet.current;
                 } else {
@@ -414,16 +426,20 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
                             // pass through the enclosing for loop.
                         },
                     };
-                }
+                }*/
             } else if (state.areaSet.alternate === instance) {
-                if (mutationDuration <= 0) {
+                if (!state.mutationState) {
+                    debugger;
+                }
+                state.mutationState.nextAreaSet.alternate = nextAreaInstance;
+                /*if (mutationDuration <= 0) {
                     state.areaSet.alternate = nextAreaInstance;
                 } else {
                     if (!state.mutationState) {
                         debugger;
                     }
                     state.mutationState.nextAreaSet.alternate = nextAreaInstance;
-                }
+                }*/
             }
 
             // Copy the objects from the current area and then apply the object logic update code that follows below.

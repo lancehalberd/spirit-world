@@ -29,13 +29,7 @@ export function updateField(this: void, state: GameState, interactive: boolean) 
     }
     // If `refreshAreaLogic` started a transition effect, skip this update since we
     // don't want to perform field updates until the transition effect completes.
-    if (state.transitionState || !isFieldSceneActive(state)) {
-        return;
-    }
-    // Refreshing the area may have paused updates/interactions on the field that
-    // we should apply immediately to prevent the player from being able to take
-    // actions on unintended frames.
-    if (!isFieldSceneActive(state)) {
+    if (state.transitionState || state.mutationState || !isFieldSceneActive(state)) {
         return;
     }
     if (interactive && !isFieldSceneInteractive(state)) {

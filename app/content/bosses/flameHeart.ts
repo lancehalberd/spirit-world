@@ -136,7 +136,8 @@ function updateFlameHeart(state: GameState, enemy: Enemy): void {
     } else {
         enemy.behaviors = {solid: true, touchHit: { damage: 4, element: 'fire', source: enemy}};
     }
-    enemy.z = 6;
+    // Height of 6 will make it possible to hit this from over the cliff, so let's keep this at 5 for now.
+    enemy.z = 5;
     // The heart is now considered enraged as long as it is covered in lava.
     const isEnraged = !isExposed;
     const target = getVectorToNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);

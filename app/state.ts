@@ -137,6 +137,9 @@ export function canOpenMenu(state: GameState): boolean {
     return !(
         state.hero.isExitingDoor || state.hero.isControlledByObject
         || state.transitionState
+        // Let's experiment with allowing the player to open menu during mutations
+        // so they can change items during lava draining sections of the Flame Beast fight.
+        /*|| state.mutationState*/
         || state.nextAreaSet || state.nextAreaSet
         || state.areaSet.current.priorityObjects?.length
         || state.hero.action === 'falling' || state.hero.action === 'fallen'

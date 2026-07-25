@@ -2,10 +2,8 @@ import {dialogueHash} from 'app/content/dialogue/dialogueHash';
 import {showMessagePage} from 'app/scenes/message/messageScene';
 import {getCameraTarget} from 'app/utils/fixCamera';
 import {GAME_KEY} from 'app/gameConstants';
-import {wasGameKeyPressed} from 'app/userInput';
 import {parseMessage, textScriptToString} from 'app/utils/parseMessage';
 import {parseScriptEvents} from 'app/scenes/script/parseScriptEvents';
-import {cleanState} from 'app/utils/state';
 
 
 export function hideHUD(state: GameState, onSkipCutscene: (state: GameState) => void) {
@@ -24,25 +22,6 @@ export function showHUD(state: GameState) {
     });
 }
 
-function skipCutscene(state: GameState) {
-    const onSkipCutscene = state.cutscene.onSkipCutscene;
-    enableUpdatesForTargets(state, [...disabledUpdateTargets]);
-    cleanState(state);
-    onSkipCutscene?.(state);
-}
-
-export function updateSkipCutscene(state: GameState, scene?: ScriptScene): boolean {
-    if (state.hideHUD && wasGameKeyPressed(state, GAME_KEY.MENU) && state.cutscene.onSkipCutscene) {
-        if ((state.cutscene.skipTime ?? -2000) + 2000 > state.time) {
-            skipCutscene(state);
-            return true;
-        } else {
-            state.cutscene.skipTime = state.time;
-        }
-    }
-    return false;
-}
-
 export function wait(state: GameState, duration: number) {
     appendScriptEvents(state, [{
         type: 'wait',
@@ -52,7 +31,7 @@ export function wait(state: GameState, duration: number) {
 }
 export function waitForTransition(state: GameState) {
     appendInputBlockingCallback(state, (state: GameState) => {
-        if (state.nextAreaSet || state.transitionState) {
+        if (state.nextAreaSet || state.transitionState || state.mutationState) {
             return true;
         }
         return false;
@@ -75,7 +54,9 @@ export function appendDisableUpdatesForTargets(state: GameState, targets: Target
         }
     });
 }
-function enableUpdatesForTargets(state: GameState, targets: Target[]) {
+
+// Enables for all disabled targets by default.
+export function enableUpdatesForTargets(state: GameState, targets: Target[] = [...disabledUpdateTargets]) {
     for (const target of targets) {
         if (target.disabledUpdate) {
             target.update = target.disabledUpdate;

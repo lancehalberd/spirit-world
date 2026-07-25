@@ -30,11 +30,11 @@ export class Narration implements ObjectInstance {
             this.runScript(state);
         }
     }
-    onInitialize(state: GameState, isActiveArea: boolean): void {
+    /*onInitialize(state: GameState, isActiveArea: boolean): void {
         if (isActiveArea && this.status !== 'gone' && this.trigger === 'enterSection') {
             this.runScript(state);
         }
-    }
+    }*/
     getHitbox(state?: GameState): Rect {
         return { x: this.x, y: this.y, w: this.definition.w, h: this.definition.h };
     }
@@ -47,6 +47,10 @@ export class Narration implements ObjectInstance {
         this.status = 'gone';
     }
     update(state: GameState) {
+        // This used to be set in `onInitialize`, but that was too early, so we are trying here instead.
+        if (this.status !== 'gone' && this.trigger === 'enterSection') {
+            this.runScript(state);
+        }
         if (this.completed) {
             return;
         }

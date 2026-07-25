@@ -33,6 +33,7 @@ export class FieldScene implements GameScene {
         }
         if (state.mutationState && !state.areaSet.current.priorityObjects?.length) {
             renderMutation(context, state, state.mutationState);
+            return;
         }
         renderStandardFieldStack(context, state);
         renderEditor(context, state);

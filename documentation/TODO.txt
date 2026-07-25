@@ -146,9 +146,6 @@ Graphics to Implement:
 Current tasks:
     - Add new PS create/options graphics.
 
-Creating a new area instance from scratch:
-
-Resetting a section inside of an initialized+dirty area instance:
     - Thrive AR Game
         - Starts in base world
             - AR Stairs take player to higher levels that replace base field graphics with biome graphics based on tile behavior.
@@ -157,8 +154,6 @@ Resetting a section inside of an initialized+dirty area instance:
             - Level 6+ require giving up the ability to disable the AR device at will (the game will allow disabling haptics at AR save points)
         - Essentially a hack n slash ARPG. Defeating real enemies will release AR spirits that merge into AR monsters based on the monsters combined and the current biome. AR monsters have stats that scale with level. Player gains experience and can level up gaining more power in the AR game
 
-    - Stream notes
-        - Mushrooms can grow thorns over pit entrance objects.
     - Add HELP item to Randomizer menu
         - In randomizer mode all the rewards have been shuffled and a certain number of empty or minor rewards have been replaced with Medals that grant Victory Points.
         You can adjust the settings to generate different randomizer variations and control different aspects like randomizing area entrances and setting how many Victory Points must be collected and whether certain bosses are required to win.

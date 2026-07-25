@@ -1,12 +1,14 @@
 import {FRAME_LENGTH, GAME_KEY, isDebugMode} from 'app/gameConstants';
 import {initializeGame} from 'app/initialize';
 import {isGamePaused, showPauseScene} from 'app/scenes/pause/pauseScene';
-import {updateSkipCutscene} from 'app/scriptEvents';
 import {getState} from 'app/state';
 import {updateKeyboardState} from 'app/userInput';
 import {areAllImagesLoaded} from 'app/utils/images';
 import {updateSoundSettings} from 'app/utils/soundSettings';
 import {KEY, isKeyboardKeyDown, wasGameKeyPressed} from 'app/userInput';
+import {finishMutation, finishTransition} from 'app/utils/enterLocation';
+import {cleanState} from 'app/utils/state';
+import {enableUpdatesForTargets} from 'app/scriptEvents'
 
 let isGameInitialized = false;
 export function update() {
@@ -34,7 +36,7 @@ export function update() {
         showPauseScene(state);
         return;
     }
-    if (updateSkipCutscene(state)) {
+    if (!isGamePaused(state) && updateSkipCutscene(state)) {
         // Do not process any updates on the same frame a cutscene was skipped just to be safe.
         // At the very least we should block input on this frame to avoid opening the menu since the player
         // pressed the MENU button this frame to skip the cutscene.
@@ -58,4 +60,30 @@ export function update() {
             break;
         }
     }
+}
+
+function skipCutscene(state: GameState) {
+    const onSkipCutscene = state.cutscene.onSkipCutscene;
+    enableUpdatesForTargets(state);
+    if (state.mutationState) {
+        finishMutation(state);
+    }
+    if (state.transitionState) {
+        const applyEnvironmentChangesGradually = false;
+        finishTransition(state, applyEnvironmentChangesGradually);
+    }
+    cleanState(state);
+    onSkipCutscene?.(state);
+}
+
+export function updateSkipCutscene(state: GameState, scene?: ScriptScene): boolean {
+    if (state.cutscene.onSkipCutscene && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        if ((state.cutscene.skipTime ?? -2000) + 2000 > state.time) {
+            skipCutscene(state);
+            return true;
+        } else {
+            state.cutscene.skipTime = state.time;
+        }
+    }
+    return false;
 }

@@ -5,7 +5,7 @@ import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     FAST_FADE_IN_DURATION, FAST_FADE_OUT_DURATION,
-    CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
+    CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
 import {renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas} from 'app/render/areaLighting';
@@ -77,7 +77,10 @@ export function updateSpiritCanvas(state: GameState, radius: number, maxRadius: 
 function applyScreenShakes(context: CanvasRenderingContext2D, state: GameState) {
     context.save();
     for (const screenShake of state.screenShakes) {
-        const t = state.fieldTime + (state.transitionState?.time || 0) - screenShake.startTime;
+        // Make sure screenshakes continue across screen transition/mutations even though they pause fieldTime.
+        // Note: We might only want this during mutations, since this was probably added for the lava draining mutations
+        // that are accomponied by screen shakes.
+        const t = state.fieldTime + (state.transitionState?.time || state.mutationState?.time || 0) - screenShake.startTime;
         // If endTime is falsey, p stays at 1 the entire time.
         const p = screenShake.endTime
             ? Math.max(0, (1 - t / (screenShake.endTime - screenShake.startTime)))
@@ -1025,7 +1028,7 @@ export function renderMutation(context: CanvasRenderingContext2D, state: GameSta
     context.save();
         applyScreenShakes(context, state);
         context.drawImage(mutationState.underCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        context.globalAlpha *= Math.max(0, (MUTATE_DURATION - mutationState.time) / MUTATE_DURATION);
+        context.globalAlpha *= Math.max(0, (mutationState.duration - mutationState.time) / mutationState.duration);
         context.drawImage(mutationState.patternCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         removeScreenShakes(context, state);
     context.restore();

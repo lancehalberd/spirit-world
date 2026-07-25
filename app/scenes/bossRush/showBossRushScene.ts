@@ -58,7 +58,8 @@ export function startNextBoss(state: GameState): void {
             transitionColor: '#FFF',
             newStack: [sceneHash.field, sceneHash.hud],
             onSwitch(state: GameState) {
-                delete state.transitionState;
+                // This shouldn't be needed since we are using transition scene instead of field transitions.
+                // delete state.transitionState;
                 enterZoneByTarget(state, 'bossRush', markerId, {instant: true});
                 fixCamera(state);
             },

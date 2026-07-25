@@ -4,6 +4,7 @@ import {editingState} from 'app/development/editingState';
 import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {FADE_OUT_DURATION, FAST_FADE_OUT_DURATION, FRAME_LENGTH} from 'app/gameConstants';
+import {updateCamera} from 'app/updateCamera';
 import {checkIfAllEnemiesAreDefeated} from 'app/utils/checkIfAllEnemiesAreDefeated';
 import {addEffectToArea, removeEffectFromArea} from 'app/utils/effects';
 import {fixCamera} from 'app/utils/fixCamera';
@@ -40,6 +41,36 @@ export function riseToSurfaceLocation(state: GameState) {
         z: 0,
     });
     state.hero.swimming = true;
+}
+
+export function finishMutation(state: GameState) {
+    if (!state.mutationState) {
+        return;
+    }
+    // The current area set will be reused when generating the new area set
+    // so we need to update it here to make sure it has the updated areas and
+    // not the stale versions.
+    state.areaSet = state.mutationState.nextAreaSet;
+    enterLocation(state, {
+            ...state.location,
+            x: state.hero.x,
+            y: state.hero.y,
+        }, {
+        isMutation: true,
+    });
+    updateCamera(state);
+    delete state.mutationState;
+}
+
+export function finishTransition(state: GameState, applyEnvironmentChangesGradually: boolean, preserveTransitionState = false) {
+    enterLocation(state, state.transitionState.nextLocation, {
+        applyEnvironmentChangesGradually,
+        callback: state.transitionState.callback,
+    });
+    updateCamera(state);
+    if (!preserveTransitionState) {
+        delete state.transitionState;
+    }
 }
 
 export function transitionToLocation(
@@ -143,7 +174,7 @@ export function transitionToLocation(
 interface OptionalEnterLocationParams {
     callback?: () => void
     isMutation?: boolean
-    isEndOfTransition?: boolean
+    applyEnvironmentChangesGradually?: boolean
     // Setting this to true will create brand new area instances instead of reusing
     // instances in the current area set.
     doNotReuseAreas?: boolean
@@ -155,7 +186,7 @@ export function enterLocation(
     location: ZoneLocation,
     {
         callback,
-        isEndOfTransition = false,
+        applyEnvironmentChangesGradually = false,
         isMutation = false,
         doNotRefreshEditor = false,
         doNotReuseAreas = false,
@@ -242,7 +273,7 @@ export function enterLocation(
         }
     }
     //updateAreaSection(state);
-    if (!isEndOfTransition) {
+    if (!applyEnvironmentChangesGradually) {
         state.hotLevel = state.areaSet?.currentSection.isHot ? 1 : 0;
         state.fadeLevel = (state.areaSet?.currentSection.dark || 0) / 100;
     }

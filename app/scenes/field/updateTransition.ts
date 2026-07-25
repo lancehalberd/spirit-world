@@ -5,31 +5,14 @@ import {
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     WATER_TRANSITION_DURATION,
 } from 'app/gameConstants';
-import {updateCamera} from 'app/updateCamera';
-import {enterLocation} from 'app/utils/enterLocation';
+import {finishTransition, finishMutation} from 'app/utils/enterLocation';
 
 
 export function updateMutation(state: GameState, mutationState: MutationState) {
     mutationState.time += FRAME_LENGTH;
-    if (mutationState.time === mutationState.duration) {
-        enterLocation(state, {
-                ...state.location,
-                x: state.hero.x,
-                y: state.hero.y,
-            }, {
-            isMutation: true,
-        });
-        updateCamera(state);
-        delete state.mutationState;
+    if (mutationState.time >= mutationState.duration) {
+        finishMutation(state);
     }
-}
-
-function switchToTransitionLocation(state: GameState, transitionState: TransitionState) {
-    enterLocation(state, transitionState.nextLocation, {
-        isEndOfTransition: true,
-        callback: transitionState.callback,
-    });
-    updateCamera(state);
 }
 
 export function updateTransition(state: GameState, transitionState: TransitionState) {
@@ -41,26 +24,34 @@ export function updateTransition(state: GameState, transitionState: TransitionSt
             state.hero.z = Math.min(transitionState.nextLocation.z, state.hero.z + 2.5);
         }
         if (transitionState.time === WATER_TRANSITION_DURATION) {
-            switchToTransitionLocation(state, transitionState);
-            delete state.transitionState;
+            const applyEnvironmentChangesGradually = true;
+            finishTransition(state, applyEnvironmentChangesGradually);
         }
     } else if (transitionState.type === 'portal') {
         if (transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
-            switchToTransitionLocation(state, transitionState);
-            delete state.transitionState;
+            const applyEnvironmentChangesGradually = true;
+            finishTransition(state, applyEnvironmentChangesGradually);
         }
     } else if (transitionState.type === 'fade' || transitionState.type === 'fastFade') {
         const isFast = transitionState.type === 'fastFade';
         const fadeInDuration = isFast ? FAST_FADE_IN_DURATION : FADE_IN_DURATION;
         const fadeOutDuration = isFast ? FAST_FADE_OUT_DURATION : FADE_OUT_DURATION;
         if (transitionState.time === fadeOutDuration) {
-            switchToTransitionLocation(state, transitionState);
+            // Since we cut fully to black, we should apply environment changes instantly.
+            const applyEnvironmentChangesGradually = false;
+            // The transition isn't finished yet so we cannot delete transitionState yet.
+            const preserveTransitionState = true;
+            finishTransition(state, applyEnvironmentChangesGradually, preserveTransitionState);
         } else if (transitionState.time > fadeOutDuration + fadeInDuration) {
             delete state.transitionState;
         }
     } else {
         if (transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
-            switchToTransitionLocation(state, transitionState);
+            // Since we cut fully to black, we should apply environment changes instantly.
+            const applyEnvironmentChangesGradually = false;
+            // The transition isn't finished yet so we cannot delete transitionState yet.
+            const preserveTransitionState = true;
+            finishTransition(state, applyEnvironmentChangesGradually, preserveTransitionState);
         } else if (transitionState.time > CIRCLE_WIPE_OUT_DURATION + CIRCLE_WIPE_IN_DURATION) {
             delete state.transitionState;
         }
