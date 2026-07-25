@@ -826,10 +826,21 @@ export function renderAreaObjectsBeforeHero(
                 object.alternateRenderWarning?.(context, state);
             }
         }
-        if (!state.hero.renderParent && state.hero.area === area) {
+        // Older shadow drawing logic
+        /*if (!state.hero.renderParent && state.hero.area === area) {
             if (area === state.areaSet.current && !editingState.isEditing) {
                 renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
             } else if (state.mutationState && area === state.mutationState.nextAreaSet.current) {
+                renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
+            }
+        }*/
+        const nextArea = state.nextAreaSet?.current ?? state.mutationState?.nextAreaSet.current;
+        if (!state.hero.renderParent
+            && !editingState.isEditing
+            && (state.areaSet.current === area || nextArea === area)
+        ) {
+            // Rendering the shadow while diving is handled in the renderTransition logic.
+            if (!(state.transitionState?.type === 'diving')) {
                 renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
             }
         }
@@ -1035,30 +1046,32 @@ export function renderMutation(context: CanvasRenderingContext2D, state: GameSta
 }
 
 export function renderTransition(context: CanvasRenderingContext2D, state: GameState, transitionState: TransitionState) {
-    if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
-        const dz = state.transitionState.nextLocation.z - state.hero.z;
-        if (state.transitionState.time <= WATER_TRANSITION_DURATION) {
+    if (transitionState.type === 'diving' || transitionState.type === 'surfacing') {
+        const dz = transitionState.nextLocation.z - state.hero.z;
+        if (transitionState.time <= WATER_TRANSITION_DURATION) {
             context.fillStyle = 'black';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            if (!state.transitionState.patternCanvas) {
+            if (!transitionState.patternCanvas) {
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
-                state.transitionState.patternCanvas = patternCanvas;
-                if (state.transitionState.type === 'diving' && state.areaSet.underwater) {
+                transitionState.patternCanvas = patternCanvas;
+                if (transitionState.type === 'diving' && state.areaSet.underwater) {
                     renderArea(patternContext, state, state.areaSet.underwater, false);
                     patternContext.save();
                         translateContextForAreaAndCamera(patternContext, state, state.areaSet.underwater);
+                        // Note renderHeroShadow has special logic internally to render the shadow correctly
+                        // for this transition.
                         renderHeroShadow(patternContext, state, state.hero, true);
                     patternContext.restore();
                     renderAreaLighting(patternContext, state, state.areaSet.underwater);
                     renderSurfaceLighting(patternContext, state, state.areaSet.underwater);
-                } else if (state.transitionState.type === 'surfacing' && state.areaSet.surface) {
+                } else if (transitionState.type === 'surfacing' && state.areaSet.surface) {
                     renderArea(patternContext, state, state.areaSet.surface, false);
                     renderHeatOverlay(patternContext, state, state.areaSet.surfaceSection);
                 }
-                state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
+                transitionState.pattern = context.createPattern(transitionState.patternCanvas, 'repeat');
             }
-            const p = Math.min(1, state.transitionState.time / WATER_TRANSITION_DURATION);
-            if (state.transitionState.type === 'surfacing' && state.areaSet.surface) {
+            const p = Math.min(1, transitionState.time / WATER_TRANSITION_DURATION);
+            if (transitionState.type === 'surfacing' && state.areaSet.surface) {
                 context.save();
                     context.translate(0, dz + 24);
                     renderStandardFieldStackWithoutWaterOverlay(context, state, false);
@@ -1076,7 +1089,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 context.save();
                     context.globalAlpha *= p * p;
                     context.translate(0, dz);
-                    context.fillStyle = state.transitionState.pattern;
+                    context.fillStyle = transitionState.pattern;
                     context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 context.restore();
                 context.save();
@@ -1084,10 +1097,10 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                     translateContextForAreaAndCamera(context, state, state.areaSet.surface);
                     state.hero.render(context, state);
                 context.restore();
-            } else if (state.transitionState.type === 'diving' && state.areaSet.underwater) {
+            } else if (transitionState.type === 'diving' && state.areaSet.underwater) {
                 context.save();
                     context.translate(0, dz);
-                    context.fillStyle = state.transitionState.pattern;
+                    context.fillStyle = transitionState.pattern;
                     context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
                 context.restore();
                 context.save();
@@ -1114,28 +1127,28 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
         } else {
             context.save();
                 translateContextForAreaAndCamera(context, state, state.areaSet.current);
-                context.fillStyle = state.transitionState.pattern;
+                context.fillStyle = transitionState.pattern;
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         }
         renderAreaLighting(context, state, state.areaSet.current);
         return;
-    } else if (state.transitionState.type === 'portal') {
+    } else if (transitionState.type === 'portal') {
         renderStandardFieldStack(context, state);
         const x = state.hero.x + state.hero.w / 2 - state.camera.x + state.areaSet.current.cameraOffset.x;
         const y = state.hero.y + 2 - state.camera.y + state.areaSet.current.cameraOffset.y;
-        if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
-            if (!state.transitionState.patternCanvas) {
+        if (transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+            if (!transitionState.patternCanvas) {
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
-                state.transitionState.patternCanvas = patternCanvas;
+                transitionState.patternCanvas = patternCanvas;
                 renderArea(patternContext, state, state.areaSet.alternate, true);
                 renderHeatOverlay(patternContext, state, state.areaSet.alternateSection);
-                state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
+                transitionState.pattern = context.createPattern(transitionState.patternCanvas, 'repeat');
             }
             context.save();
-                const p = state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
+                const p = transitionState.time / CIRCLE_WIPE_OUT_DURATION;
                 const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 1.5 * Math.max(0, Math.min(1, p));
-                context.fillStyle = state.transitionState.pattern;
+                context.fillStyle = transitionState.pattern;
                 context.beginPath();
                 context.arc(x, y, radius, 0, 2 * Math.PI);
                 context.fill();
@@ -1143,26 +1156,26 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
         } else {
             context.save();
                 translateContextForAreaAndCamera(context, state, state.areaSet.current);
-                context.fillStyle = state.transitionState.pattern;
+                context.fillStyle = transitionState.pattern;
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         }
-    } else if (state.transitionState.type === 'fade' || state.transitionState.type === 'fastFade') {
-        const isFast = state.transitionState.type === 'fastFade';
+    } else if (transitionState.type === 'fade' || transitionState.type === 'fastFade') {
+        const isFast = transitionState.type === 'fastFade';
         const fadeInDuration = isFast ? FAST_FADE_IN_DURATION : FADE_IN_DURATION;
         const fadeOutDuration = isFast ? FAST_FADE_OUT_DURATION : FADE_OUT_DURATION;
         renderStandardFieldStack(context, state);
-        const fadeColor = state.transitionState.fadeColor ?? '#000';
-        if (state.transitionState.time <= fadeOutDuration) {
+        const fadeColor = transitionState.fadeColor ?? '#000';
+        if (transitionState.time <= fadeOutDuration) {
             context.save();
-                const p = Math.min(1, 1.5 * state.transitionState.time / fadeOutDuration);
+                const p = Math.min(1, 1.5 * transitionState.time / fadeOutDuration);
                 context.globalAlpha = p;
                 context.fillStyle = fadeColor
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         } else {
             context.save();
-                const alpha = 1.5 - 1.5 * (state.transitionState.time - fadeOutDuration) / fadeInDuration;
+                const alpha = 1.5 - 1.5 * (transitionState.time - fadeOutDuration) / fadeInDuration;
                 context.globalAlpha = Math.max(0, Math.min(1, alpha));
                 context.fillStyle = fadeColor;
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -1172,9 +1185,9 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
         renderStandardFieldStack(context, state);
         const x = state.hero.x + state.hero.w / 2 - state.camera.x;
         const y = state.hero.y + 2 - state.camera.y;
-        if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+        if (transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
             context.save();
-                const p = 1 - 1.5 * state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
+                const p = 1 - 1.5 * transitionState.time / CIRCLE_WIPE_OUT_DURATION;
                 const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * Math.max(0, Math.min(1, p));
                 context.fillStyle = '#000';
                 context.beginPath();
@@ -1184,7 +1197,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             context.restore();
         } else {
             context.save();
-                const p = 1.5 * (state.transitionState.time - CIRCLE_WIPE_OUT_DURATION) / CIRCLE_WIPE_IN_DURATION - 0.5;
+                const p = 1.5 * (transitionState.time - CIRCLE_WIPE_OUT_DURATION) / CIRCLE_WIPE_IN_DURATION - 0.5;
                 const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * Math.max(0, Math.min(1, p));
                 context.fillStyle = '#000';
                 context.beginPath();

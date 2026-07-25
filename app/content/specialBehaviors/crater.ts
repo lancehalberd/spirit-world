@@ -39,9 +39,9 @@ specialBehaviorsHash.craterLavaSwitch = {
                 }
                 // Keep updating the hero (with controls disabled), to avoid getting stuck in an awkward frame
                 // such as slamming the staff.
-                updateAllHeroes(state, false);
                 // Wait for the current transition to complete before starting the next.
                 if (state.mutationState) {
+                    updateAllHeroes(state, false);
                     return true;
                 }
                 if (state.savedState.objectFlags.craterLavaAnimation1_1) {
@@ -89,8 +89,6 @@ specialBehaviorsHash.craterLavaSwitch = {
         },{
             type: 'wait',
             waitingOnActiveEvents: true,
-            // Make sure the fight doesn't continue during this cutscene.
-            blocksUpdates: true,
         }]);
     },
 };
@@ -116,9 +114,9 @@ function drainFlameBeastLava(state: GameState) {
             }
             // Keep updating the hero (with controls disabled), to avoid getting stuck in an awkward frame
             // such as slamming the staff.
-            updateAllHeroes(state, false);
             // Wait for the current transition to complete before starting the next.
             if (state.mutationState) {
+                updateAllHeroes(state, false);
                 return true;
             }
             if (state.savedState.objectFlags.craterLavaAnimation4_1) {

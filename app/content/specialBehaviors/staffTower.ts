@@ -219,6 +219,10 @@ specialBehaviorsHash.towerExteriorTerminal = {
                 }
                 refreshCurrentAreaLogic(state, 0);
                 saveGame(state);
+                // Currently this works as expected because changing the tower location doesn't update any
+                // layers, which means refreshCurrentAreaLogic happens without a mutation. If this were not
+                // the case, it is probable the tower will only be present on state.mutationState.nextAreaSet.current.object
+                // so the below loop would fail to find it as is.
                 for (const object of state.areaSet?.current.objects) {
                     if (object.definition.type === 'staffTower') {
                         (object as StaffTower).deploy(state);

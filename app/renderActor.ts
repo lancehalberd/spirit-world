@@ -306,12 +306,16 @@ export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, 
             context.fill();
         context.restore();
     }
-    const frame = (hero.z >= hero.groundHeight + 4) ? smallShadowFrame : shadowFrame;
+    // hero.z is adjusted during the water transitions, but the hero visually has a fixed z value of 24.
+    const isWaterTransition = (state.transitionState?.type === 'diving' || state.transitionState?.type === 'surfacing');
+    const heroZ = isWaterTransition ? 24 : hero.z;
+    const frame = (heroZ >= hero.groundHeight + 4) ? smallShadowFrame : shadowFrame;
     if (frame === smallShadowFrame) {
         // When the hero is high off the ground, it is intuitive to use their shadow to judge where their hitbox is.
         // However, the shadow is normally not centered in the hitbox, so to work around these, we gradually center
         // the hero's shadow as they get further from the ground.
-        const zOffet = Math.max(0, Math.min(6, (hero.z - hero.groundHeight - 4)/ 2));
+        //const zOffet = Math.max(0, Math.min(6, (hero.z - hero.groundHeight - 4)/ 2));
+        const zOffet = Math.max(0, Math.min(6, (heroZ - hero.groundHeight) / 2));
         drawFrame(context, frame, { ...frame, x: hero.x, y: hero.y - 3 - Y_OFF - hero.groundHeight - zOffet});
     } else {
         drawFrame(context, frame, { ...frame, x: hero.x, y: hero.y - 3 - Y_OFF - hero.groundHeight });
