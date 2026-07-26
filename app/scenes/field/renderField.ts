@@ -843,6 +843,11 @@ export function renderAreaObjectsBeforeHero(
             if (!(state.transitionState?.type === 'diving')) {
                 renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
             }
+        } else if (state.transitionState?.type === 'portal') {
+            // The above branch doesn't render the shadow for portal transitions because transition use `nextAreaLocation`
+            // rather than `nextAreaSet`. We always want to draw the shadow in both worlds for portal transitions,
+            // and there shouldn't be any other areas being rendered during portal transitions.
+            renderObjectWithEffects(context, state, state.hero, () => renderHeroShadow(context, state, state.hero));
         }
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
@@ -1137,29 +1142,21 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
         renderStandardFieldStack(context, state);
         const x = state.hero.x + state.hero.w / 2 - state.camera.x + state.areaSet.current.cameraOffset.x;
         const y = state.hero.y + 2 - state.camera.y + state.areaSet.current.cameraOffset.y;
-        if (transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
-            if (!transitionState.patternCanvas) {
-                const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
-                transitionState.patternCanvas = patternCanvas;
-                renderArea(patternContext, state, state.areaSet.alternate, true);
-                renderHeatOverlay(patternContext, state, state.areaSet.alternateSection);
-                transitionState.pattern = context.createPattern(transitionState.patternCanvas, 'repeat');
-            }
-            context.save();
-                const p = transitionState.time / CIRCLE_WIPE_OUT_DURATION;
-                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 1.5 * Math.max(0, Math.min(1, p));
-                context.fillStyle = transitionState.pattern;
-                context.beginPath();
-                context.arc(x, y, radius, 0, 2 * Math.PI);
-                context.fill();
-            context.restore();
-        } else {
-            context.save();
-                translateContextForAreaAndCamera(context, state, state.areaSet.current);
-                context.fillStyle = transitionState.pattern;
-                context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            context.restore();
+        if (!transitionState.patternCanvas) {
+            const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+            transitionState.patternCanvas = patternCanvas;
+            renderArea(patternContext, state, state.areaSet.alternate, true);
+            renderHeatOverlay(patternContext, state, state.areaSet.alternateSection);
+            transitionState.pattern = context.createPattern(transitionState.patternCanvas, 'repeat');
         }
+        context.save();
+            const p = Math.min(1, transitionState.time / CIRCLE_WIPE_OUT_DURATION);
+            const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 1.5 * Math.max(0, Math.min(1, p));
+            context.fillStyle = transitionState.pattern;
+            context.beginPath();
+            context.arc(x, y, radius, 0, 2 * Math.PI);
+            context.fill();
+        context.restore();
     } else if (transitionState.type === 'fade' || transitionState.type === 'fastFade') {
         const isFast = transitionState.type === 'fastFade';
         const fadeInDuration = isFast ? FAST_FADE_IN_DURATION : FADE_IN_DURATION;
