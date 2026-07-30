@@ -144,8 +144,6 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add new PS create/options graphics.
-
     - Thrive AR Game
         - Starts in base world
             - AR Stairs take player to higher levels that replace base field graphics with biome graphics based on tile behavior.

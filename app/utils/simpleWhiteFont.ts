@@ -60,7 +60,7 @@ const [
     xbox_start, xbox_select, xbox_dpad,
     /*xbox_rightStick*/, xbox_leftStick,
     xbox_r1, xbox_l1, xbox_r2, xbox_l2,
-    ps_dpad, ps_start,
+    ps_dpad, /*ps_start_old*/,
     /*ps_rightStick*/, ps_leftStick,
     ps_x, ps_circle, ps_square, ps_triangle,
     ps_r1, ps_l1, ps_r2, ps_l2,
@@ -80,12 +80,14 @@ const [
     keyboard_i,
     keyboard_o,
     keyboard_m,
-] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 51}).frames;
+    ps_start,
+    ps_select,
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 53}).frames;
 
 const narrowFrames = [
     xbox_y, xbox_b, xbox_a, xbox_x, xbox_start, xbox_select,
     xbox_r2, xbox_l2,
-    ps_x, ps_circle, ps_square, ps_triangle, ps_start,
+    ps_x, ps_circle, ps_square, ps_triangle,
 ];
 for (const narrowFrame of narrowFrames) {
     narrowFrame.x += 5;
@@ -144,7 +146,7 @@ export const playStationMap = {
     [GAME_KEY.RIGHT]: [ps_dpad, characterMap['/'], ps_leftStick],
     // TODO: use distinct frames once they are available.
     [GAME_KEY.MENU]: [ps_start],
-    [GAME_KEY.MAP]: [ps_start],
+    [GAME_KEY.MAP]: [ps_select],
     [GAME_KEY.WEAPON]: [ps_x],
     [GAME_KEY.PASSIVE_TOOL]: [ps_circle],
     [GAME_KEY.LEFT_TOOL]: [ps_square],

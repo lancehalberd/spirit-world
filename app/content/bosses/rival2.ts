@@ -739,6 +739,7 @@ function updateRival2(this: void, state: GameState, enemy: Enemy<Params>): void 
         enemy.healthBarTime = 0;
         enemy.params.introduced = true;
         appendScript(state, '{@rival.startSecondFight}');
+        return;
     }
     // Don't run any update logic while cutscenes are playing.
     if (!isFieldSceneInteractive(state)) {
