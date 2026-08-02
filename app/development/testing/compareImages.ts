@@ -32,8 +32,11 @@ export function compareCanvases(actualCanvas: HTMLCanvasElement, expectedCanvas:
             || actualData.data[i + 3] !== expectedData.data[i + 3]
         ) {
             matches = false;
-            // Opaque black indicates a mismatched pixel; everything else stays fully transparent.
+            // Opaque red indicates a mismatched pixel; everything else stays fully transparent.
+            diffImageData.data[i] = 255;
             diffImageData.data[i + 3] = 255;
+        } else {
+            diffImageData.data[i + 3] = 200;
         }
     }
     diffContext.putImageData(diffImageData, 0, 0);

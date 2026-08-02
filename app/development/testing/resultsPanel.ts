@@ -82,8 +82,8 @@ function buildFailureRow(failure: FailureEntry): HTMLElement {
     const label = tagElement('div', 'screenshot-test-row-label', goldenName);
 
     for (const canvas of [goldenCanvas, actualCanvas, diffCanvas]) {
-        canvas.style.width = `${canvas.width * 2}px`;
-        canvas.style.height = `${canvas.height * 2}px`;
+        canvas.style.width = `${canvas.width * 3}px`;
+        canvas.style.height = `${canvas.height * 3}px`;
         canvas.style.imageRendering = 'pixelated';
     }
     goldenCanvas.className = 'screenshot-test-row-canvas';
@@ -99,7 +99,7 @@ function buildFailureRow(failure: FailureEntry): HTMLElement {
     const diffCheckbox = document.createElement('input');
     diffCheckbox.type = 'checkbox';
     diffCheckbox.addEventListener('change', () => {
-        diffCanvas.style.display = diffCheckbox.checked ? '' : 'none';
+        diffCanvas.style.display = diffCheckbox.checked ? 'block' : 'none';
     });
     const diffLabel = tagElement('label', 'screenshot-test-row-diff-label');
     diffLabel.append(diffCheckbox, document.createTextNode(' Show differences'));
