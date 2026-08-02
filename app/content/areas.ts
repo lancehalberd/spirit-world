@@ -141,22 +141,25 @@ export function getOrCreateAreaInstanceFromLocation(state: GameState, location: 
             return area;
         }
     }
-    return createAreaInstance(state, location);
+    // console.log('Could not find existing instance for location', location, editingState.recentAreas);
+    return getAreaSetForLocation(state, location).current;
 }
 
 export function addRecentArea(areaInstance: AreaInstance): void {
     const index = editingState.recentAreas.findIndex(area => area.definition === areaInstance.definition);
     if (index >= 0) {
-        editingState.recentAreas.splice(index, 1, areaInstance);
-    } else {
-        editingState.recentAreas.unshift(areaInstance);
-        while(editingState.recentAreas.length > 20) {
-            editingState.recentAreas.pop();
-        }
+        editingState.recentAreas.splice(index, 1);
+    }
+    editingState.recentAreas.unshift(areaInstance);
+    // This is designed to hold up to 3x3 map x [surface, underwater] x [material, spirit]
+    while(editingState.recentAreas.length > 36) {
+        editingState.recentAreas.pop();
     }
 }
 
-export function createAreaInstance(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
+// This should not be used directly externally because it does not fully initialize areas. Instead
+// getAreaSetForLocation(state, location).current can be used.
+function createAreaInstance(state: GameState, location: ZoneLocation, isActiveArea: boolean = false): AreaInstance {
     const definition = getAreaFromLocation(location);
     for (const variant of (definition.variants ?? [])) {
         variant._editorType = 'variant';

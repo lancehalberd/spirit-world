@@ -1,3 +1,4 @@
+import {screenshotTestState} from 'app/development/testing/pauseState';
 import {FRAME_LENGTH, GAME_KEY, isDebugMode} from 'app/gameConstants';
 import {initializeGame} from 'app/initialize';
 import {isGamePaused, showPauseScene} from 'app/scenes/pause/pauseScene';
@@ -12,6 +13,11 @@ import {enableUpdatesForTargets} from 'app/scriptEvents'
 
 let isGameInitialized = false;
 export function update() {
+    // Freeze the live game entirely while a screenshot test run is in progress so it cannot
+    // race with the isolated GameState objects the tests construct and render.
+    if (screenshotTestState.isRunning) {
+        return;
+    }
     // Don't run the main loop until everything necessary is initialized.
     if (!isGameInitialized) {
         if (areAllImagesLoaded())  {

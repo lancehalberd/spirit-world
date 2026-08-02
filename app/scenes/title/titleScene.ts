@@ -36,6 +36,11 @@ function getTitleOptions(state: GameState): string[] {
     return titleMenu;
 }
 
+// Draw white title text as a dropshadow and gold title text on top of it
+// in top left corner of screen
+const goldText = requireImage('gfx/titleAssets/spiritquest-title-pixelperfect.png');
+const whiteText = requireImage('gfx/titleAssets/spiritquest-titlewhite-pixelperfect.png')
+
 export class TitleScene implements GameScene {
     blocksInput = true;
     blocksUpdates = true;
@@ -122,10 +127,6 @@ export class TitleScene implements GameScene {
             y += 20;
         }
 
-        // Draw white title text as a dropshadow and gold title text on top of it
-        // in top left corner of screen
-        const goldText = requireImage('gfx/titleAssets/spiritquest-title-pixelperfect.png');
-        const whiteText = requireImage('gfx/titleAssets/spiritquest-titlewhite-pixelperfect.png')
 
         const spiritWordDimensions = {x: 0, y: 0, height: 20, width: 52};
         const spiritWordDestination = {x: 26, y: 8, multiplier: 3}

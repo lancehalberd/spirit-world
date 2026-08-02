@@ -1,5 +1,6 @@
-import { saveSettings } from 'app/utils/saveSettings';
-import { setSoundSettings } from 'app/utils/sounds';
+import {saveSettings} from 'app/utils/saveSettings';
+import {setSoundSettings} from 'app/utils/sounds';
+import {screenshotTestState} from 'app/development/testing/pauseState';
 
 export function toggleAllSounds(state: GameState) {
     state.settings.muteAllSounds = !state.settings.muteAllSounds;
@@ -30,6 +31,10 @@ export function getSoundSettings(state: GameState): SoundSettings {
 }
 
 export function updateSoundSettings(state: GameState) {
+    // Make sure screenshot tests don't update current sound settings.
+    if (screenshotTestState.isRunning) {
+        return;
+    }
     setSoundSettings(getSoundSettings(state));
 }
 

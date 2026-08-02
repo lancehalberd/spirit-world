@@ -1,4 +1,4 @@
-import {createAreaInstance} from 'app/content/areas';
+import {getAreaSetForLocation} from 'app/content/areas';
 import {setSpawnLocation} from 'app/content/spawnLocations';
 import {getMapOptions} from 'app/development/contextMenu/map';
 import {getTestStateContextMenuOption} from 'app/development/contextMenu/setState';
@@ -401,10 +401,10 @@ function renderCurrentFloor(state: GameState): void {
     const areas: AreaInstance[] = [];
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, {
+            const areaInstance = getAreaSetForLocation(state, {
                 ...state.location,
                 areaGridCoords: {x: column, y: row},
-            });
+            }).current;
             // Note that this does not create the alternate area so this skips complex object updates.
             // This is not currently an issue, but may make the area look a bit different than how
             // it would finally appear when actually playing the game.

@@ -285,6 +285,10 @@ export function deactivateTarget(state: GameState, target: ObjectInstance): void
 }
 
 export function getObjectAndParts(state: GameState, object: ObjectInstance): ObjectInstance[] {
+    if (!object) {
+        debugger;
+        return [];
+    }
     const objectAndParts = [object];
     const parts = (object.getParts?.(state) || []);
     for (const part of parts) {

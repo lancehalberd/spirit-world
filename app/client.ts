@@ -5,12 +5,15 @@ export * from 'app/content/dialogue';
 export * from 'app/content/variants';
 export * from 'app/content/specialBehaviors';
 export * from 'app/development/tests';
+export * from 'app/development/testing/tests/allTests';
+export * from 'app/development/testing/runner';
 export * from 'app/development/tileEditor';
 export * from 'app/scenes/scenes';
 
 import {addContextMenuListeners} from 'app/development/contextMenu';
 import {editingState} from 'app/development/editingState';
 import {refreshEditor} from 'app/development/editor';
+import {screenshotTestState} from 'app/development/testing/pauseState';
 
 export * from 'app/generator/treeGraphs';
 
@@ -90,11 +93,16 @@ populateAllDialogue();
 
 function renderLoop() {
     try {
+        window.requestAnimationFrame(renderLoop);
+        // Freeze the live render loop while a screenshot test run is in progress so it cannot
+        // draw over/interleave with the isolated canvases the tests render to.
+        if (screenshotTestState.isRunning) {
+            return;
+        }
         const state = getState();
         if (editingState.isEditing && editingState.needsRefresh) {
             refreshEditor(state);
         }
-        window.requestAnimationFrame(renderLoop);
         render();
         updateMusic(state);
     } catch (e) {

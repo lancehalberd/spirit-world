@@ -196,3 +196,99 @@
     from {bottom: 30px; opacity: 1;}
     to {bottom: 0; opacity: 0;}
 }
+
+/* Screenshot tests */
+
+.screenshot-test-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    background-color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+    color: white;
+}
+
+.screenshot-test-missing-canvas {
+    border: 2px solid white;
+}
+
+.screenshot-test-missing-controls {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.screenshot-test-strip-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    background-color: rgba(0, 0, 0, 0.9);
+    font-family: sans-serif;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    box-sizing: border-box;
+}
+
+.screenshot-test-strip-close {
+    align-self: flex-end;
+    margin-bottom: 8px;
+}
+
+.screenshot-test-strip {
+    width: 100%;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.screenshot-test-row {
+    border: 1px solid white;
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.screenshot-test-row-label {
+    font-weight: bold;
+}
+
+.screenshot-test-row-images {
+    display: flex;
+    gap: 8px;
+}
+
+.screenshot-test-row-actual-container {
+    position: relative;
+}
+
+.screenshot-test-row-diff-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    opacity: 0.85;
+}
+
+.screenshot-test-row-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}

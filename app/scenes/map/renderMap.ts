@@ -1,4 +1,4 @@
-import {createAreaInstance, getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
+import {getAreaSetForLocation, getOrCreateAreaInstanceFromLocation} from 'app/content/areas';
 import {convertLocationToMapCoordinates, getMapTargets} from 'app/content/hints';
 import {decorationTypes} from 'app/content/objects/decoration';
 import {doorStyles } from 'app/content/objects/doorStyles';
@@ -153,21 +153,21 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
     const grid = state.location.isSpiritWorld ? zone.floors[0].spiritGrid : zone.floors[0].grid;
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, {
+            const areaInstance = getAreaSetForLocation(state, {
                 zoneKey,
                 floor: 0,
                 areaGridCoords: {x: column, y: row},
                 isSpiritWorld: state.location.isSpiritWorld,
                 // These properties aren't used in this context.
                 x: 0, y: 0, d: 'down',
-            });
+            }).current;
             renderActualMapTile(mapContext, state, areaInstance,
                 {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
         }
     }
     for (let row = 0; row < grid.length; row++) {
         for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = createAreaInstance(state, {
+            const areaInstance = getOrCreateAreaInstanceFromLocation(state, {
                 zoneKey,
                 floor: 0,
                 areaGridCoords: {x: column, y: row},
@@ -251,7 +251,9 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
                 w: section.w * 16 * 4 / w,
                 h: section.h * 16 * 4 / h,
             },
-            area: editingState.isEditing ? getOrCreateAreaInstanceFromLocation(state, sectionData.location) : createAreaInstance(state, sectionData.location),
+            area: editingState.isEditing
+                ? getOrCreateAreaInstanceFromLocation(state, sectionData.location)
+                : getAreaSetForLocation(state, sectionData.location).current,
         });
     }
 

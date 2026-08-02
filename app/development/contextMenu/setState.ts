@@ -17,24 +17,32 @@ import {setSaveSlot} from 'app/utils/saveGame';
 import {cleanState} from 'app/utils/state';
 
 
+export function applySpawnLocationToState(state: GameState, location: ZoneLocation, savedState?: SavedState) {
+    // Switch to the test save slot to avoid overriding player data.
+    setSaveSlot(state, -1);
+    if (savedState) {
+        applySavedState(state, cloneDeep(savedState));
+    }
+    cleanState(state);
+    showFieldScene(state);
+    setSpawnLocation(state, location);
+    returnToSpawnLocation(state);
+    if (savedState?.savedHeroData?.life) {
+        state.hero.life = savedState.savedHeroData.life;
+    }
+}
+
 function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedState = false) {
     return Object.keys(spawnLocations).map(name => {
         return {
             label: `${name}`,
             onSelect() {
                 const state = getState();
-                // Switch to the test save slot to avoid overriding player data.
-                setSaveSlot(state, -1);
-                if (useSavedState) {
-                    applySavedState(state, cloneDeep(spawnLocations[name].savedState));
-                }
-                cleanState(state);
-                showFieldScene(state);
-                setSpawnLocation(state, spawnLocations[name].location);
-                returnToSpawnLocation(state);
-                if (spawnLocations[name].savedState.savedHeroData.life) {
-                    state.hero.life = spawnLocations[name].savedState.savedHeroData.life;
-                }
+                applySpawnLocationToState(
+                    state,
+                    spawnLocations[name].location,
+                    useSavedState ? spawnLocations[name].savedState : undefined,
+                );
             }
         }
     });
