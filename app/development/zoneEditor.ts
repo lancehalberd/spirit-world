@@ -427,19 +427,20 @@ export function getBehaviorProperties(scope: 'zone'|'area'|'section'): PanelRows
             refreshArea(state);
         }
     });
-    rows = [...rows, ...getLogicProperties(state, 'Drains Spirit?', scopedObject.corrosiveLogic, updatedLogic => {
+    const noun = {zone: 'Zone', area: 'Area', section: 'Section'}[scope];
+    rows = [...rows, ...getLogicProperties(state, `${noun} Drains Spirit?`, scopedObject.corrosiveLogic, updatedLogic => {
         scopedObject.corrosiveLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Section Hot?', scopedObject.hotLogic, updatedLogic => {
+    rows = [...rows, ...getLogicProperties(state, `Is ${noun} Hot?`, scopedObject.hotLogic, updatedLogic => {
         scopedObject.hotLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Section Foggy?', scopedObject.fogLogic, updatedLogic => {
+    rows = [...rows, ...getLogicProperties(state, `Is ${noun} Foggy?`, scopedObject.fogLogic, updatedLogic => {
         scopedObject.fogLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Section Astral?', scopedObject.astralLogic, updatedLogic => {
+    rows = [...rows, ...getLogicProperties(state, `Is ${noun} Astral?`, scopedObject.astralLogic, updatedLogic => {
         scopedObject.astralLogic = updatedLogic;
         refreshArea(state);
     })];

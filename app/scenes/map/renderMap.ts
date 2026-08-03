@@ -181,7 +181,7 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
         }
     }
     // TODO: make this read the fog logic for the forest instead of this specific key.
-    if (zoneKey === 'forest' && !state.savedState.objectFlags.elementalBeastsEscaped) {
+    if (zoneKey === 'forest' && !state.savedState.objectFlags.elementalBeastsEscaped && !state.location.isSpiritWorld) {
         mapContext.save();
             mapContext.fillStyle = mapContext.createPattern(fogCanvas, 'repeat');
             //mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);

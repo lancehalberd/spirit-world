@@ -107,44 +107,37 @@ export function getAreaSectionInstance(
     area: AreaDefinition,
     definition: AreaSection = {x: 0, y: 0, w: area.w, h: area.h}
 ): AreaSectionInstance {
-    const section = {
+    const section: AreaSectionInstance = {
         ...definition,
         definition,
-        dark: definition.dark ?? area.dark ?? zone.dark ?? 0,
-        isFoggy: evaluateLogicDefinition(state, definition.fogLogic ?? area.fogLogic ?? zone.fogLogic, false),
-        isHot: evaluateLogicDefinition(state, definition.hotLogic ?? area.hotLogic ?? zone.hotLogic, false),
-        isAstral: evaluateLogicDefinition(state, definition.astralLogic ?? area.astralLogic ?? zone.astralLogic, false),
-        isCorrosive: evaluateLogicDefinition(state, definition.corrosiveLogic ?? area.corrosiveLogic ?? zone.corrosiveLogic, false),
     };
-    if (area.specialBehaviorKey) {
-        const specialBehavior = specialBehaviorsHash[area.specialBehaviorKey] as SpecialAreaBehavior;
-        specialBehavior?.applyToSection(state, section);
-    }
+    refreshAreaSectionInstance(state, section, area);
     return section;
 }
 
 export function refreshCurrentAreaSectionInstances(
     state: GameState,
 ) {
-    refreshCurrentAreaSectionInstance(state, state.areaSet.currentSection, state.areaSet.current);
-    refreshCurrentAreaSectionInstance(state, state.areaSet.alternateSection, state.areaSet.alternate);
-    refreshCurrentAreaSectionInstance(state, state.areaSet.underwaterSection, state.areaSet.underwater);
-    refreshCurrentAreaSectionInstance(state, state.areaSet.alternateUnderwaterSection, state.areaSet.alternateUnderwater);
-    refreshCurrentAreaSectionInstance(state, state.areaSet.surfaceSection, state.areaSet.surface);
-    refreshCurrentAreaSectionInstance(state, state.areaSet.alternateSurfaceSection, state.areaSet.alternateSurface);
+    refreshAreaSectionInstance(state, state.areaSet.currentSection, state.areaSet.current?.definition);
+    refreshAreaSectionInstance(state, state.areaSet.alternateSection, state.areaSet.alternate?.definition);
+    refreshAreaSectionInstance(state, state.areaSet.underwaterSection, state.areaSet.underwater?.definition);
+    refreshAreaSectionInstance(state, state.areaSet.alternateUnderwaterSection, state.areaSet.alternateUnderwater?.definition);
+    refreshAreaSectionInstance(state, state.areaSet.surfaceSection, state.areaSet.surface?.definition);
+    refreshAreaSectionInstance(state, state.areaSet.alternateSurfaceSection, state.areaSet.alternateSurface?.definition);
 }
 
-export function refreshCurrentAreaSectionInstance(
+function refreshAreaSectionInstance(
     state: GameState,
     sectionInstance: AreaSectionInstance|null,
-    areaInstance: AreaInstance|null,
+    areaDefinition?: AreaDefinition,
 ) {
-    if (!sectionInstance) {
+    if (!sectionInstance || !areaDefinition) {
         return;
     }
     const sectionDefinition = sectionInstance.definition;
-    const areaDefinition = areaInstance.definition;
-    sectionInstance.isFoggy = evaluateLogicDefinition(state, sectionDefinition.fogLogic ?? areaDefinition.fogLogic ?? state.zone.fogLogic, false);
+    // Spirit World is not allowed to be foggy. If this is ever an issue, remove this check and just apply isFoggy logic
+    // to each material world area of the forest instead of putting it directly on the zone.
+    sectionInstance.isFoggy = !areaDefinition.isSpiritWorld && evaluateLogicDefinition(state, sectionDefinition.fogLogic ?? areaDefinition.fogLogic ?? state.zone.fogLogic, false);
     sectionInstance.isHot = evaluateLogicDefinition(state, sectionDefinition.hotLogic ?? areaDefinition.hotLogic ?? state.zone.hotLogic, false);
     sectionInstance.isAstral = evaluateLogicDefinition(state, sectionDefinition.astralLogic ?? areaDefinition.astralLogic ?? state.zone.astralLogic, false);
     sectionInstance.isCorrosive = evaluateLogicDefinition(state, sectionDefinition.corrosiveLogic ?? areaDefinition.corrosiveLogic ?? state.zone.corrosiveLogic, false);

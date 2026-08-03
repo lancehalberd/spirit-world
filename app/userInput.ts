@@ -300,6 +300,11 @@ export function getMovementDeltas(state: GameState): [number, number] {
         return [0, 0];
     }
     const { gameKeyValues } = state.keyboard;
+    // This will happen if the keyboard state was never updated, and occurs in some screenshots tests
+    // that don't run the normal update loop before doing things like spawning in new areas.
+    if (!gameKeyValues.length) {
+        return [0, 0];
+    }
     let dy = gameKeyValues[GAME_KEY.DOWN] - gameKeyValues[GAME_KEY.UP];
     if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
     let dx = gameKeyValues[GAME_KEY.RIGHT] - gameKeyValues[GAME_KEY.LEFT];
