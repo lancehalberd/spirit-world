@@ -22,13 +22,14 @@ export function returnToSpawnLocation(state: GameState, preserveZoneFlags = fals
     state.hero.activeStaff = null;
     state.hero.frozenDuration = 0;
     state.hero.burnDuration = 0;
+    state.hero.shockDuration = 0;
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;
     state.hero.d = state.hero.savedData.spawnLocation.d;
     // This will clear
     clearScriptScenes(state);
-    enterLocation(state, state.hero.savedData.spawnLocation, {preserveZoneFlags});
+    enterLocation(state, state.hero.savedData.spawnLocation, {preserveZoneFlags, doNotReuseAreas: true});
     state.fadeLevel = (state.areaSet?.currentSection.dark || 0) / 100;
 
 

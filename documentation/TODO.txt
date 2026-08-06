@@ -169,8 +169,6 @@ Current tasks:
         - Apply this to war temple side doors, and allow forcing open door on 2F when warTempleSmallKey2 is true.
     - Check behavior of clones during each cutscene, consider despawning clones as part of prepareForCutScene or hideHUD.
 
-    - Add scene fade transition after either option is selected from the defeated menu.
-
     - support additional pit brush styles: 'vanara', 'futuristic'
     - support angled pits in 'crystalCave' + add pit brush
     - Support adding slots to generateBridgeRoom when large enough

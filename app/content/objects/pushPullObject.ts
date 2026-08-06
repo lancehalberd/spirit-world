@@ -203,6 +203,9 @@ export class PushPullObject implements ObjectInstance {
         this.ignorePits = this.pushSpeed > 4;
     }
     update(state: GameState) {
+        if (this.linkedObject && (!this.linkedObject.area || this.linkedObject.status !== 'normal')) {
+            delete this.linkedObject;
+        }
         // Move for `pushAmount` pixels after getting hit by a projectile.
         if (this.pushAmount > 0) {
             this.pushAmount = Math.max(0, this.pushAmount - this.pushSpeed);

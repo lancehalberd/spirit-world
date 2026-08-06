@@ -1,6 +1,7 @@
 import {CANVAS_HEIGHT, CANVAS_WIDTH, GAME_KEY} from 'app/gameConstants';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {sceneHash} from 'app/scenes/sceneHash';
+import {showTransitionScene} from 'app/scenes/transition/transitionScene';
 import {fillRect, pad} from 'app/utils/index';
 import {drawText} from 'app/utils/simpleWhiteFont';
 import {
@@ -34,14 +35,23 @@ export class DefeatedMenuScene implements GameScene {
             this.cursorIndex = (this.cursorIndex + 1) % 2;
             playSound('menuTick');
         } else if (wasConfirmKeyPressed(state)) {
-            if (this.cursorIndex === 0) {
-                fixProgressFlagsOnLoad(state);
-                fixSpawnLocationOnLoad(state);
-                returnToSpawnLocation(state);
-                showFieldScene(state);
-            } else if (this.cursorIndex === 1) {
-                showTitleScene(state);
-            }
+            showTransitionScene(state,
+                {
+                    transitionType: 'fade',
+                    onSwitch: (state: GameState, transitionScene) => {
+                        if (this.cursorIndex === 0) {
+                            fixProgressFlagsOnLoad(state);
+                            fixSpawnLocationOnLoad(state);
+                            returnToSpawnLocation(state);
+                            showFieldScene(state);
+                            state.sceneStack.push(transitionScene);
+                        } else {
+                            showTitleScene(state);
+                            state.sceneStack.push(transitionScene);
+                        }
+                    },
+                },
+            );
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
