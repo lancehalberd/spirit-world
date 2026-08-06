@@ -5,6 +5,7 @@ import {createAnimation, drawFrame} from 'app/utils/animations';
 import {createCanvasAndContext} from 'app/utils/canvas';
 import {directionMap} from 'app/utils/field';
 import {getAreaSize} from 'app/utils/getAreaSize';
+import {getObjectStatus} from 'app/utils/objects';
 
 const underFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}).frames[0];
 const overFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}, {x: 1}).frames[0];
@@ -81,6 +82,14 @@ export class WallTurret implements ObjectInstance {
         this.fireOffset = this.definition.fireOffset || 0;
         this.fireInterval *= 1 / gameModifiers.trapSpeed;
         this.fireOffset *= 1 / gameModifiers.trapSpeed;
+        this.refreshLogic(state);
+    }
+    refreshLogic(state: GameState) {
+        // Setting the flag associated with this turret will cause it to toggle
+        // away from its default status.
+        if (getObjectStatus(state, this.definition)) {
+            this.status = this.definition.status === 'normal' ? 'off' : 'normal';
+        }
     }
     getHitbox(state: GameState) {
         return this;

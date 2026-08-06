@@ -132,6 +132,18 @@ export function removeTextCue(state: GameState, priority: number = 10000): boole
     return !effect;
 }
 
+export function fadeTextCue(state: GameState): boolean {
+    if (!state.areaSet?.current) {
+        return false;
+    }
+    const effect = findTextCue(state);
+    if (effect) {
+        effect.fadeOut();
+        return true;
+    }
+    return !effect;
+}
+
 export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): TextCue|undefined {
     // Only add the new cue if it can override the previous one.
     if (removeTextCue(state, priority)) {

@@ -11,6 +11,7 @@ Spirit World is a browser-based, Zelda-like adventure game rendered on a low-res
 - Install: `nvm use && npm install` (Node version pinned in `.nvmrc`)
 - Run locally: `npm start` — runs webpack (watch mode) and the express server concurrently. Visit `http://localhost:3000`; wait for the initial webpack compile to finish before the page will work.
 - Run pieces separately: `npm run webpack` (watch-compiles `app/` → `public/client.js`), `npm run server` (serves `public/`, port 3000 or `$PORT`)
+- `public/client.js` is webpack's compiled build output (checked in so the static server has something to serve), not hand-written source — never read, edit, or review it; the real source is under `app/`.
 - Type-check without emitting: `npx tsc --noEmit` (webpack/ts-loader type-checks on build already, but this is faster for a standalone check)
 - Find dead exports: `npx ts-unused-exports tsconfig.json`
 - There is no test suite (`npm test` is a stub) and no configured linter/formatter.

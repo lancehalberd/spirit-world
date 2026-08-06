@@ -144,6 +144,12 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Fix hero is rendering over door frames when scrolling north inside a section (first transition in back of tomb for example).
+
+    - Text cues don't fade out nicely when transitiont
+        - Move Text cues to a state outside of the area so it can render and update independent of the field.
+        - Restrict to a single text cue.
+
     - Thrive AR Game
         - Starts in base world
             - AR Stairs take player to higher levels that replace base field graphics with biome graphics based on tile behavior.

@@ -8,6 +8,7 @@ import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {updatePrimaryHeroState} from 'app/utils/hero';
 import {removeObjectFromArea} from 'app/utils/objects';
 import {swapHeroStates} from 'app/utils/swapHeroStates';
+import {fadeTextCue}  from 'app/content/effects/textCue';
 
 export function updateAllHeroes(this: void, state: GameState, interactive: boolean) {
     // Skip this if the hero isn't currently part of any area.
@@ -197,6 +198,7 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
 function scrollToNewArea(state: GameState, location: ZoneLocation, d: CardinalDirection): void {
     //console.log('scrollToArea', direction);
     removeAllClones(state);
+    fadeTextCue(state);
     // Location is given relative to the current area, so we have to apply offsets to
     // make it relative to the new area to find the correct section in the new area.
     location.x -= directionMap[d][0] * state.areaSet.current.w * 16;
@@ -210,6 +212,7 @@ function scrollToNewArea(state: GameState, location: ZoneLocation, d: CardinalDi
 function scrollToNewSection(state: GameState, d: CardinalDirection): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
+    fadeTextCue(state);
     // TODO: Make sure this doesn't reset the current section.
     state.nextAreaSet = getAreaSetForLocation(state, {
         ...state.location,

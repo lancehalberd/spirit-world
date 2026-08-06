@@ -32,24 +32,24 @@ specialBehaviorsHash.runInstructions = {
 
 specialBehaviorsHash.rollInstructions = {
     type: 'narration',
-    update(state: GameState, object: Narration) {
+    update(state: GameState, narration: Narration) {
         let helpText = '';
-        const id = object.definition.id;
-
-        if (state.hero.savedData.passiveTools.roll && !state.savedState.objectFlags[id]) {
+        let isMapCue = false;
+        if (!state.hero.savedData.hasRevive) {
+            helpText = `Visit a Fairy Statue if you want a Second Chance.`;
+        } else if (state.hero.savedData.passiveTools.roll && !state.savedState.objectFlags.tombRollInstructions) {
             helpText = `Press [B_ROLL] to roll through hazards.`;
         }
         if (!state.hero.savedData.passiveTools.roll && !state.hero.savedData.passiveTools.gloves) {
             helpText = `You need a new skill to continue ahead.[-]Press [B_MAP] to view your map.`;
-            if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
-                hideInstructions(state, object);
-                return;
-            }
+            isMapCue = true;
+            narration.completed = true;
         }
-        const textCue = findTextCue(state);
-        if (!textCue && helpText && object.area === state.areaSet?.current) {
-            addTextCue(state, helpText, 0);
-        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaSet?.current)) {
+        let textCue = findTextCue(state);
+        if (!textCue && helpText && narration.area === state.areaSet?.current) {
+            textCue = addTextCue(state, helpText, 0);
+            textCue.isMapCue = isMapCue;
+        } else if (textCue && (textCue.props.text !== helpText || narration.area !== state.areaSet?.current)) {
             textCue.fadeOut();
         }
     },
