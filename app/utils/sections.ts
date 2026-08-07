@@ -135,6 +135,7 @@ function refreshAreaSectionInstance(
         return;
     }
     const sectionDefinition = sectionInstance.definition;
+    sectionInstance.dark = areaDefinition.dark ?? areaDefinition.dark ?? state.zone.dark ?? 0,
     // Spirit World is not allowed to be foggy. If this is ever an issue, remove this check and just apply isFoggy logic
     // to each material world area of the forest instead of putting it directly on the zone.
     sectionInstance.isFoggy = !areaDefinition.isSpiritWorld && evaluateLogicDefinition(state, sectionDefinition.fogLogic ?? areaDefinition.fogLogic ?? state.zone.fogLogic, false);
