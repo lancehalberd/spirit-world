@@ -43,7 +43,7 @@ function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefinition {
     }
     return {
         ...layer,
-        drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
+        drawPriority: layer.drawPriority ?? (layer.key.startsWith('foreground') ? 'foreground' : 'background'),
         grid: {
             ...layer.grid,
             // The matrix of tiles
