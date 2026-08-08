@@ -69,8 +69,7 @@ function fallOnClosestSpawnMarker(state: GameState, hero: Hero, inSection = true
         // its normal hitbox. Without this, the movement hitbox will not perfectly match 16x16 targets.
         hero.y = best.y - 1;
         if (!inSection) {
-            // TODO: Change this to just update the sections as the current approach unnecessarily
-            // initializes all the areas twice.
+            // Fix the current sections. This should reuse the existing area objects.
             enterLocation(state, {...state.location, x: hero.x, y: hero.y});
         }
         fixCamera(state);

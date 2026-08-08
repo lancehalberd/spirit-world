@@ -453,35 +453,7 @@ export class Door implements ObjectInstance {
         if (!this.heroCanEnter(state)) {
             return;
         }
-        const heroIsTouchingDoor = this.isHeroTriggeringDoor(state);
-        //const heroIsTouchingDoor = boxesIntersect(hero.getMovementHitbox(), this.getOffsetHitbox());
-        if (heroIsTouchingDoor &&
-            // If the hero has no action target, have the door control them as soon as they touch it
-            (!hero.actionTarget || (hero.actionTarget !== this && !hero.isExitingDoor))
-        ) {
-            // When doorways come in pairs, we set `isExitingDoor` to true when control
-            // passes from the entrance door to the door they are exiting from.
-            if (hero.actionTarget && hero.actionTarget !== this) {
-                hero.isExitingDoor = true;
-            }
-            hero.isUsingDoor = true;
-            hero.renderParent = this;
-            hero.actionFrame = 0;
-            hero.actionTarget = this;
-            hero.actionDx = 0;
-            hero.actionDy = 0;
-            hero.vx = 0;
-            hero.vy = 0;
-            if (hero.isExitingDoor) {
-                // When exiting a door, always move in the opposite direction the door is facing.
-                hero.actionDx = -directionMap[this.definition.d][0];
-                hero.actionDy = -directionMap[this.definition.d][1];
-            } else if (this.definition.d === 'up' || this.definition.d === 'down') {
-                hero.actionDy = (hero.y + hero.h / 2 < this.y + 16) ? 1 : -1;
-            } else {
-                hero.actionDx = (hero.x + hero.w / 2 < this.x + 16) ? 1 : -1;
-            }
-        }
+        this.checkToStartControllingHero(state);
         if (hero.actionTarget === this) {
             // Some logic like code to prevent bouncing between screens resets these to 0, so make sure to
             // fix them if this ever happens.
@@ -534,6 +506,48 @@ export class Door implements ObjectInstance {
                     hero.actionDy = -directionMap[this.definition.d][1];
                 }
             }
+        }
+    }
+    checkToStartControllingHero(state: GameState) {
+        // Do nothing if the hero isn't touching the door.
+        if (!this.isHeroTriggeringDoor(state)) {
+            return;
+        }
+        const hero = state.hero;
+        // Do nothing if this door is already controlling the hero.
+        if (hero.actionTarget === this) {
+            return;
+        }
+        // Never take control once the hero starts exiting from a door.
+        if (hero.actionTarget && hero.isExitingDoor) {
+            return;
+        }
+        // When the hero is moving north through a door, wait until the hero has fully cleared the door
+        // before taking control otherwise the hero will render over the frame of the northern door.
+        if (hero.actionTarget && hero.actionTarget.definition.d === 'up' && hero.actionTarget.isHeroTriggeringDoor?.(state)) {
+            return;
+        }
+        // When doorways come in pairs, we set `isExitingDoor` to true when control
+        // passes from the entrance door to the door they are exiting from.
+        if (hero.actionTarget && hero.actionTarget !== this) {
+            hero.isExitingDoor = true;
+        }
+        hero.isUsingDoor = true;
+        hero.renderParent = this;
+        hero.actionFrame = 0;
+        hero.actionTarget = this;
+        hero.actionDx = 0;
+        hero.actionDy = 0;
+        hero.vx = 0;
+        hero.vy = 0;
+        if (hero.isExitingDoor) {
+            // When exiting a door, always move in the opposite direction the door is facing.
+            hero.actionDx = -directionMap[this.definition.d][0];
+            hero.actionDy = -directionMap[this.definition.d][1];
+        } else if (this.definition.d === 'up' || this.definition.d === 'down') {
+            hero.actionDy = (hero.y + hero.h / 2 < this.y + 16) ? 1 : -1;
+        } else {
+            hero.actionDx = (hero.x + hero.w / 2 < this.x + 16) ? 1 : -1;
         }
     }
     travelToZone(state: GameState) {
@@ -629,12 +643,17 @@ export class Door implements ObjectInstance {
                     }
                 }
             }
+
         }
         if (this.style.renderAfterHero) {
             this.style.renderAfterHero(context, state, this);
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        // North facing doors are not drawn to the foreground. Doing so causes the following problems:
+        // door frames render in front of hero when falling in front of the door, or swimming in front of the door.
+        // Door frames render over waterfalls that are supposd to cover the door.
+        // Door frames render over enemies/effects with high z values that are in front of the door.
         if (this.definition.d === 'up') {
             return;
         }

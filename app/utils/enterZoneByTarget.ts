@@ -2,7 +2,6 @@ import {TextCue} from 'app/content/effects/textCue';
 import {Door} from 'app/content/objects/door';
 import {DreamPod} from 'app/content/objects/dreamPod';
 import {Teleporter} from 'app/content/objects/teleporter';
-import {checkForFloorEffects} from 'app/movement/checkForFloorEffects';
 import {zones} from 'app/content/zones';
 import {findObjectLocation} from 'app/randomizer/find';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
@@ -92,7 +91,10 @@ function onEnterLocation(
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
-        checkForFloorEffects(state, state.hero);
+        // Call enterLocation in case the section needs to be corrected after updating
+        // the hero position. For example, Staff Tower anchor point can be in a different
+        // section that the actual door object. This should reuse the existing area objects.
+        enterLocation(state, {...state.location, x: state.hero.x, y: state.hero.y});
         if (!doNotFixCamera) {
             fixCamera(state);
         }
