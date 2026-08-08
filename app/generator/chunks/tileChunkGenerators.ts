@@ -2,17 +2,17 @@ import {applyNineSlice, slices} from 'app/generator/nineSlice';
 import {applyCaveWalls} from 'app/generator/styles/cave';
 import {applyStoneWalls, createStoneFloor, createSpecialStoneFloor} from 'app/generator/styles/stone';
 import {chunkGenerators} from 'app/generator/chunks/tileChunkGeneratorHash';
-export {chunkGenerators} from 'app/generator/chunks/tileChunkGeneratorHash';
 
 export * from 'app/generator/chunks/trees';
+export {chunkGenerators} from 'app/generator/chunks/tileChunkGeneratorHash';
 
 
 function combinedGenerator(generators: ChunkGenerator[]): ChunkGenerator {
     const newGenerator: ChunkGenerator = {
-        generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
+        generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
             for (const generator of generators) {
                 random.generateAndMutate();
-                generator.generate(random, area, r, alternateArea);
+                generator.generate(random, area, r, alternateArea, zone);
             }
         }
     }
@@ -38,8 +38,8 @@ for (const key of Object.keys(slices) as (keyof typeof slices)[]) {
     chunkGenerators[`slices-${key}`] = {
         minW: slice.w,
         minH: slice.h,
-        generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
-            applyNineSlice(random, slice, r, area, alternateArea);
+        generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
+            applyNineSlice(random, slice, r, area, alternateArea, zone);
         },
     };
 }

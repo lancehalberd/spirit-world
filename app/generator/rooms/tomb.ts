@@ -1,5 +1,6 @@
-import { getOrAddLayer } from 'app/utils/layers';
-import { addRoomFrame } from 'app/generator/skeletons/basic';
+import {zones} from 'app/content/zones/zoneHash';
+import {getOrAddLayer} from 'app/utils/layers';
+import {addRoomFrame} from 'app/generator/skeletons/basic';
 
 
 interface ZoneGeneratorParams {
@@ -8,7 +9,8 @@ interface ZoneGeneratorParams {
 }
 
 export function populateTombBoss({zoneId, random}: ZoneGeneratorParams, node: TreeNode) {
-    addRoomFrame(random, node);
+    const zone = zones[zoneId];
+    addRoomFrame(random, node, zone);
     const cx = (node.baseAreaSection.x + node.baseAreaSection.w / 2) * 16 + 8;
     node.baseArea.objects.push({
         type: 'boss',
@@ -23,7 +25,8 @@ export function populateTombBoss({zoneId, random}: ZoneGeneratorParams, node: Tr
 }
 
 export function populateTombGuardianRoom({zoneId, random}: ZoneGeneratorParams, node: TreeNode) {
-    addRoomFrame(random, node);
+    const zone = zones[zoneId];
+    addRoomFrame(random, node, zone);
     // TODO: Add eye decorations in front of exit door
     // TODO: Add decorations around portal
     // TODO: Add decorations around pots+portal switch
@@ -60,7 +63,7 @@ export function populateTombGuardianRoom({zoneId, random}: ZoneGeneratorParams, 
         node.childArea.objects.push({type: 'floorSwitch', targetObjectId: 'tombSpiritExit', toggleOnRelease: true, spirit: true, x: x + dx * 4 * 16 - 8, y});
     }
 
-    const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
+    const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea, zone);
     const stoneTiles = [6, 6, 7];
     for (y = node.baseAreaSection.y + 6; y <= node.baseAreaSection.y + 7; y++) {
         for (x = node.baseAreaSection.x + 2; x < node.baseAreaSection.x + node.baseAreaSection.w - 1; x++) {

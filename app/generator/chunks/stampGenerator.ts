@@ -8,9 +8,9 @@ export function stampGenerator(stamp: Stamp) {
         minH: stamp.h,
         maxW: stamp.w,
         maxH: stamp.h,
-        generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
+        generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
             for (const layerKey of Object.keys(stamp.layers)) {
-                const layer = getOrAddLayer(layerKey, area, alternateArea);
+                const layer = getOrAddLayer(layerKey, area, alternateArea, zone);
                 for (let y = r.y; y < r.y + stamp.h; y++) {
                     if (y < 0) {
                         continue;

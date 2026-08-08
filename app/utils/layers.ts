@@ -1,15 +1,16 @@
-import { allTiles } from 'app/content/tiles';
-import { layersInOrder } from 'app/gameConstants';
-import { getAreaDimensions } from 'app/utils/getAreaSize';
-import { mapTileIndex } from 'app/utils/mapTile';
+import {allTiles} from 'app/content/tiles';
+import {layersInOrder} from 'app/gameConstants';
+import {getAreaDimensions} from 'app/utils/getAreaSize';
+import {mapTileIndex} from 'app/utils/mapTile';
 
 export function addNewLayer(
     layerKey: string,
     layerIndex: number,
     definition: AreaDefinition,
     alternateDefinition: AreaDefinition,
+    zone: Zone,
 ): AreaLayerDefinition {
-    const areaSize = getAreaDimensions(definition, null);
+    const areaSize = getAreaDimensions(definition, zone);
     const layerDefinition: AreaLayerDefinition = {
         drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
         key: layerKey,
@@ -40,14 +41,15 @@ export function addMissingLayer(
     layerKey: string,
     definition: AreaDefinition,
     alternateDefinition: AreaDefinition,
+    zone: Zone,
 ): AreaLayerDefinition {
     const layerIndex = layersInOrder.indexOf(layerKey);
     for (let i = 0; i < definition.layers.length; i++) {
         if (layersInOrder.indexOf(definition.layers[i].key) > layerIndex) {
-            return addNewLayer(layerKey, i, definition, alternateDefinition);
+            return addNewLayer(layerKey, i, definition, alternateDefinition, zone);
         }
     }
-    return addNewLayer(layerKey, definition.layers.length, definition, alternateDefinition);
+    return addNewLayer(layerKey, definition.layers.length, definition, alternateDefinition, zone);
 }
 export function getLayer(
     layerKey: string,
@@ -64,28 +66,29 @@ export function getOrAddLayer(
     layerKey: string,
     definition: AreaDefinition,
     alternateDefinition: AreaDefinition,
+    zone: Zone,
 ) {
     for (const layer of definition.layers) {
         if (layer.key === layerKey) {
             return layer;
         }
     }
-    return addMissingLayer(layerKey, definition, alternateDefinition);
+    return addMissingLayer(layerKey, definition, alternateDefinition, zone);
 }
 
-export function inheritAllLayerTilesFromParent(area: AreaDefinition, r?: Rect) {
+export function inheritAllLayerTilesFromParent(area: AreaDefinition, zone: Zone, r?: Rect) {
     const parentLayers = area.parentDefinition?.layers;
     for (const layer of (parentLayers || [])) {
-        inheritLayerTilesFromParent(layer.key, area, r);
+        inheritLayerTilesFromParent(layer.key, area, zone, r);
     }
 }
 
-export function inheritLayerTilesFromParent(layerKey: string, area: AreaDefinition, r?: Rect) {
+export function inheritLayerTilesFromParent(layerKey: string, area: AreaDefinition, zone: Zone, r?: Rect) {
     const parentLayer = area.parentDefinition?.layers?.find(l => l.key === layerKey);
     if (!parentLayer) {
         return;
     }
-    const childLayer = getOrAddLayer(layerKey, area, area.parentDefinition);
+    const childLayer = getOrAddLayer(layerKey, area, area.parentDefinition, zone);
     const childTiles = childLayer.grid.tiles;
     r = r || {x: 0, y: 0, w: childLayer.grid.w, h: childLayer.grid.h};
     for (let y = r.y; y < r.y + r.h; y++) {

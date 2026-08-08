@@ -1,4 +1,5 @@
-import { clearTileInOneWorld } from 'app/generator/tiles';
+import {zones} from 'app/content/zones/zoneHash';
+import {clearTileInOneWorld} from 'app/generator/tiles';
 
 
 type DoorType = 'door'|'upstairs'|'downstairs'|'ladder';
@@ -69,6 +70,7 @@ export function getEntranceDefintion({id = '', d, style, type}: {id: string, d: 
 
 export function addDoor(context: DoorContext): EntranceDefinition {
     const {random, zoneId, roomId, slot, area, alternateArea, doorType} = context;
+    const zone = zones[zoneId];
     // TODO: support other styles
     let d = slot.d, style = 'stone';
     if (doorType === 'upstairs') {
@@ -107,8 +109,8 @@ export function addDoor(context: DoorContext): EntranceDefinition {
         // Clear the foreground tiles from around the door.
         for (let y = 0; y < 2; y++) {
             for (let x = 0; x < 4; x++) {
-                clearTileInOneWorld(area, alternateArea, 'foreground', tx + x, ty - 1 + y);
-                clearTileInOneWorld(area, alternateArea, 'foreground2', tx + x, ty - 1 + y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground', tx + x, ty - 1 + y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground2', tx + x, ty - 1 + y);
             }
         }
     } else if (d === 'up') {
@@ -124,8 +126,8 @@ export function addDoor(context: DoorContext): EntranceDefinition {
         // Clear the foreground tiles from around the door.
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 2; x++) {
-                clearTileInOneWorld(area, alternateArea, 'foreground', tx + x, ty + y);
-                clearTileInOneWorld(area, alternateArea, 'foreground2', tx + x, ty + y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground', tx + x, ty + y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground2', tx + x, ty + y);
             }
         }
     } else if (d === 'right') {
@@ -136,8 +138,8 @@ export function addDoor(context: DoorContext): EntranceDefinition {
         // Clear the foreground tiles from around the door.
         for (let y = 0; y < 4; y++) {
             for (let x = 0; x < 2; x++) {
-                clearTileInOneWorld(area, alternateArea, 'foreground', tx - 1 + x, ty + y);
-                clearTileInOneWorld(area, alternateArea, 'foreground2', tx - 1 + x, ty + y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground', tx - 1 + x, ty + y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground2', tx - 1 + x, ty + y);
             }
         }
     }
@@ -240,7 +242,7 @@ export function positionDoors(random: SRandom, baseDoorData: DoorData, baseNode:
     }
 }
 
-export function addDoorAndClearForegroundTiles(definition: EntranceDefinition, area: AreaDefinition, alternateArea: AreaDefinition) {
+export function addDoorAndClearForegroundTiles(definition: EntranceDefinition, area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone) {
     area.objects.push(definition);
 
     if (definition.style !== 'ladderDown' && definition.d === 'down') {
@@ -249,8 +251,8 @@ export function addDoorAndClearForegroundTiles(definition: EntranceDefinition, a
         // Clear the foreground tiles from around the door.
         for (let y = top; y < bottom; y++) {
             for (let x = left; x < right; x++) {
-                clearTileInOneWorld(area, alternateArea, 'foreground', x, y);
-                clearTileInOneWorld(area, alternateArea, 'foreground2', x, y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground', x, y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground2', x, y);
             }
         }
     } else if (definition.d === 'left') {
@@ -259,8 +261,8 @@ export function addDoorAndClearForegroundTiles(definition: EntranceDefinition, a
         // Clear the foreground tiles from around the door.
         for (let y = top; y < bottom; y++) {
             for (let x = left; x < right; x++) {
-                clearTileInOneWorld(area, alternateArea, 'foreground', x, y);
-                clearTileInOneWorld(area, alternateArea, 'foreground2', x, y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground', x, y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground2', x, y);
             }
         }
     } else if (definition.d === 'right') {
@@ -269,8 +271,8 @@ export function addDoorAndClearForegroundTiles(definition: EntranceDefinition, a
         // Clear the foreground tiles from around the door.
         for (let y = top; y < bottom; y++) {
             for (let x = left; x < right; x++) {
-                clearTileInOneWorld(area, alternateArea, 'foreground', x, y);
-                clearTileInOneWorld(area, alternateArea, 'foreground2', x, y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground', x, y);
+                clearTileInOneWorld(area, alternateArea, zone, 'foreground2', x, y);
             }
         }
     }

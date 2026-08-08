@@ -94,23 +94,31 @@ function removeScreenShakes(context: CanvasRenderingContext2D, state: GameState)
     context.restore();
 }
 
+// Gets the next area only if it is distinct from the current area.
+function getDistinctNextArea(state: GameState): AreaInstance|undefined {
+    const nextArea = state.nextAreaSet?.current;
+    return nextArea !== state.areaSet.current ? nextArea : undefined;
+}
+
 export function renderStandardFieldStack(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
+    const nextArea = getDistinctNextArea(state);
     applyScreenShakes(context, state);
         renderField(context, state, renderHero);
-        renderSurfaceLighting(context, state, state.areaSet.current, state.nextAreaSet?.current);
-        renderFieldForeground(context, state, state.areaSet.current, state.nextAreaSet?.current);
+        renderSurfaceLighting(context, state, state.areaSet.current, nextArea);
+        renderFieldForeground(context, state, state.areaSet.current, nextArea);
         renderWaterOverlay(context, state);
         renderHeatOverlay(context, state, state.areaSet.currentSection);
         renderSpiritOverlay(context, state);
-        renderAreaLighting(context, state, state.areaSet.current, state.nextAreaSet?.current);
+        renderAreaLighting(context, state, state.areaSet.current, nextArea);
     removeScreenShakes(context, state);
 }
 export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
+    const nextArea = getDistinctNextArea(state);
     renderField(context, state, renderHero);
-    renderSurfaceLighting(context, state, state.areaSet.current, state.nextAreaSet?.current);
-    renderFieldForeground(context, state, state.areaSet.current, state.nextAreaSet?.current);
+    renderSurfaceLighting(context, state, state.areaSet.current, nextArea);
+    renderFieldForeground(context, state, state.areaSet.current, nextArea);
     renderSpiritOverlay(context, state);
-    renderAreaLighting(context, state, state.areaSet.current, state.nextAreaSet?.current);
+    renderAreaLighting(context, state, state.areaSet.current, nextArea);
 }
 
 export function translateContextForAreaAndCamera(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

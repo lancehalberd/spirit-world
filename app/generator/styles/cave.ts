@@ -9,9 +9,9 @@ const openEye = 52;
 const rectangle = 53;
 
 
-export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
-    const floorLayer = getOrAddLayer('floor', area, alternateArea);
-    const floor2Tiles = getOrAddLayer('floor2', area, alternateArea).grid.tiles;
+export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
+    const floorLayer = getOrAddLayer('floor', area, alternateArea, zone);
+    const floor2Tiles = getOrAddLayer('floor2', area, alternateArea, zone).grid.tiles;
     const floorTiles = floorLayer.grid.tiles;
     // Limit the rectangle to the bounds of the area.
     const x =  Math.max(0, r.x), y = Math.max(0, r.y);
@@ -32,9 +32,9 @@ export function createCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, 
     }
 }
 
-export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
-    const floorLayer = getOrAddLayer('floor', area, alternateArea);
-    const floor2Tiles = getOrAddLayer('floor2', area, alternateArea).grid.tiles;
+export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
+    const floorLayer = getOrAddLayer('floor', area, alternateArea, zone);
+    const floor2Tiles = getOrAddLayer('floor2', area, alternateArea, zone).grid.tiles;
     const floorTiles = floorLayer.grid.tiles;
     // Limit the rectangle to the bounds of the area.
     const x =  Math.max(0, r.x), y = Math.max(0, r.y);
@@ -59,10 +59,10 @@ export function createSpecialCaveFloor(random: SRandom, area: AreaDefinition, r:
     }
 }
 
-export function addCaveRoomFrame(random: SRandom, node: TreeNode): Rect {
-    const fieldTiles = getOrAddLayer('field', node.baseArea, node.childArea).grid.tiles;
+export function addCaveRoomFrame(random: SRandom, node: TreeNode, zone: Zone): Rect {
+    const fieldTiles = getOrAddLayer('field', node.baseArea, node.childArea, zone).grid.tiles;
     const section = node.baseAreaSection;
-    createCaveFloor(random, node.baseArea, section, node.childArea);
+    createCaveFloor(random, node.baseArea, section, node.childArea, zone);
     for (const x of [section.x, section.x + 1, section.x + section.w - 1]) {
         for (let y = section.y; y < section.y + section.h; y++) {
             fieldTiles[y][x] = 57;
@@ -73,7 +73,7 @@ export function addCaveRoomFrame(random: SRandom, node: TreeNode): Rect {
             fieldTiles[y][x] = 57;
         }
     }
-    applyCaveWalls(random, node.baseArea, section, node.childArea);
+    applyCaveWalls(random, node.baseArea, section, node.childArea, zone);
     return {
         x: section.x + 2,
         y: section.y + 3,
@@ -84,10 +84,10 @@ export function addCaveRoomFrame(random: SRandom, node: TreeNode): Rect {
 
 // Adds cave walls everywhere that is currently solid in the field layer.
 // This assumes cave wall height is 2, but this could be generalized to support taller cave walls.
-export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
-    const fieldLayer = getOrAddLayer('field', area, alternateArea);
-    const foregroundLayer = getOrAddLayer('foreground', area, alternateArea);
-    const foreground2Layer = getOrAddLayer('foreground2', area, alternateArea);
+export function applyCaveWalls(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
+    const fieldLayer = getOrAddLayer('field', area, alternateArea, zone);
+    const foregroundLayer = getOrAddLayer('foreground', area, alternateArea, zone);
+    const foreground2Layer = getOrAddLayer('foreground2', area, alternateArea, zone);
     const fieldTiles = fieldLayer.grid.tiles;
     const foregroundTiles = foregroundLayer.grid.tiles;
     const foreground2Tiles = foreground2Layer.grid.tiles;

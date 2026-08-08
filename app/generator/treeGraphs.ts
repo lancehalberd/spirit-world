@@ -644,7 +644,7 @@ function createZoneFromTree(props: {
                 type: node.entrance.type,
             });
             positionDoors(random, entranceDoorData, node);
-            addDoorAndClearForegroundTiles(entranceDoorData, node.baseArea, node.childArea);
+            addDoorAndClearForegroundTiles(entranceDoorData, node.baseArea, node.childArea, zone);
             entranceDoorData.targetZone = node.entrance.targetZone;
             entranceDoorData.targetObjectId = node.entrance.targetObjectId;
             node.allEntranceDefinitions.push(entranceDoorData);
@@ -745,7 +745,7 @@ function createZoneFromTree(props: {
             }
             positionDoors(random, baseDoorData, node, childDoorData, child);
             if (child.requirements?.[0][0] === canRemoveLightStones || child.requirements?.[0][0] === canCross2Gaps) {
-                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
+                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea, zone);
                 const tiles = child.requirements?.[0][0] === canRemoveLightStones ? [6, 6, 7] : [4, 4, 4, 25];
                 const definition = baseDoorData;
                 const isVertical = definition.d === 'up' || definition.d === 'down';
@@ -798,7 +798,7 @@ function createZoneFromTree(props: {
         if (node.populateRoom) {
             node.populateRoom({zoneId, random}, node);
             for (const definition of node.allEntranceDefinitions) {
-                addDoorAndClearForegroundTiles(definition, node.baseArea, node.childArea);
+                addDoorAndClearForegroundTiles(definition, node.baseArea, node.childArea, zone);
             }
             continue;
         }
@@ -817,36 +817,36 @@ function createZoneFromTree(props: {
         }
 
         if (!node.skeleton && random.mutate().random() < 0.2) {
-            node.skeleton = generateBridgeRoom(random, node);
+            node.skeleton = generateBridgeRoom(random, node, zone);
         }
         if (!node.skeleton && random.mutate().random() < 0.3) {
-            node.skeleton = generateShortTunnel(random, node);
+            node.skeleton = generateShortTunnel(random, node, zone);
         }
         if (!node.skeleton && random.mutate().random() < 0.8) {
-            node.skeleton = generateBridgeRoom(random, node);
+            node.skeleton = generateBridgeRoom(random, node, zone);
         }
         if (!node.skeleton && random.mutate().random() < 0.2) {
-            node.skeleton = generatePitMaze(random, node);
+            node.skeleton = generatePitMaze(random, node, zone);
         }
         if (!node.skeleton && random.mutate().random() < 0.2) {
-            node.skeleton = generateVerticalPath(random, node);
+            node.skeleton = generateVerticalPath(random, node, zone);
         }
         if (!node.skeleton) {
-            node.skeleton = generateEmptyRoom(random, node);
+            node.skeleton = generateEmptyRoom(random, node, zone);
         }
 
         // Add doors to the area after the skeletons are generated so that the foreground tiles
         // are correctly cleaned up around the door.
         for (const definition of node.allEntranceDefinitions) {
-            addDoorAndClearForegroundTiles(definition, node.baseArea, node.childArea);
+            addDoorAndClearForegroundTiles(definition, node.baseArea, node.childArea, zone);
         }
 
         const roomDifficulty = node.depth || random.mutate().range(3, 5);
         let enemyDifficulty = 0;
-        const {zones, paths} = node.skeleton;
-        for (const zone of zones) {
-            for (let i = 0; i < zone.slots.length; i++) {
-                const slot = zone.slots[i];
+        const {roomZones, paths} = node.skeleton;
+        for (const roomZone of roomZones) {
+            for (let i = 0; i < roomZone.slots.length; i++) {
+                const slot = roomZone.slots[i];
                 if (node.lootType) {
                     const w = Math.min(slot.w, 4);
                     const h = Math.min(slot.h, 4);
@@ -856,10 +856,10 @@ function createZoneFromTree(props: {
                     //   Call this function first with all slots in case it wants to add puzzle elements for the check.
                     //   Indicate the number of free slots that can be used for the check, or just pass in a subset that is this long.
                     if (node.style === 'stone') {
-                        createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                        createSpecialStoneFloor(random, node.baseArea, {x, y, w, h}, node.childArea, zone);
                     } else {
                         // Cave style is the default.
-                        createSpecialCaveFloor(random, node.baseArea, {x, y, w, h}, node.childArea);
+                        createSpecialCaveFloor(random, node.baseArea, {x, y, w, h}, node.childArea, zone);
                     }
                     const definition: LootObjectDefinition = {
                         type: 'chest',
@@ -903,7 +903,7 @@ function createZoneFromTree(props: {
                 const outerTile = random.mutate().element([0, 0, 2,2, 4, 5]);
                 const innerTile = random.mutate().element([0, 2,4,5]);
                 const r = random.mutate().range(1, 2);
-                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
+                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea, zone);
                 const rect = pad(slot, -1);
                 for (let y = rect.y; y < rect.y + rect.h; y++) {
                     for (let x = rect.x; x < rect.x + rect.w; x++) {
@@ -912,7 +912,7 @@ function createZoneFromTree(props: {
                         }
                         if (y < rect.y + r || y >= rect.y + rect.h - r || x < rect.x + r || x >= rect.x + rect.w - r) {
                             if (outerTile === 4) {
-                                specialBrushes.pitBrush.apply(node.baseArea, node.childArea, {x: x * 16, y: y * 16}, {
+                                specialBrushes.pitBrush.apply(node.baseArea, node.childArea, zone, {x: x * 16, y: y * 16}, {
                                     style: 'cave',
                                     smoothCorners: 'exterior',
                                 });
@@ -921,7 +921,7 @@ function createZoneFromTree(props: {
                             }
                         } else {
                             if (innerTile === 4) {
-                                specialBrushes.pitBrush.apply(node.baseArea, node.childArea, {x: x * 16, y: y * 16}, {
+                                specialBrushes.pitBrush.apply(node.baseArea, node.childArea, zone, {x: x * 16, y: y * 16}, {
                                     style: 'cave',
                                     smoothCorners: 'exterior',
                                 });
@@ -936,7 +936,7 @@ function createZoneFromTree(props: {
         for (let i = 0; i < paths.length; i++) {
             const path = paths[i];
             if (random.mutate().random() < 0.2) {
-                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea);
+                const fieldLayer = getOrAddLayer('field', node.baseArea, node.childArea, zone);
                 const tile = random.mutate().element([2,5]);
                 for (let y = path.y; y < path.y + path.h; y++) {
                     for (let x = path.x; x < path.x + path.w; x++) {

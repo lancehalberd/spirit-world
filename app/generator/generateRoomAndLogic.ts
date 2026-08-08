@@ -1,4 +1,5 @@
 import {orLogic, hasTeleportation, hasSomersault} from 'app/content/logic';
+import {zones} from 'app/content/zones/zoneHash';
 import {addDoor} from 'app/generator/doors';
 import {applyNineSlice, slices} from 'app/generator/nineSlice';
 import {fillSlotFromContext} from 'app/generator/slots/basic';
@@ -7,18 +8,18 @@ import {pad} from 'app/utils/index';
 import {getOrAddLayer, inheritAllLayerTilesFromParent} from 'app/utils/layers';
 
 
-export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, alternateArea: AreaDefinition, section: Rect, rules: RoomGenerationRules): RoomSkeleton {
+export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, section: Rect, rules: RoomGenerationRules): RoomSkeleton {
     const singleZone: RoomZone = {
         id: 'fullRoom',
         slots: [],
         entranceIds: [],
     };
-    const zones: RoomZone[] = [singleZone];
+    const roomZones: RoomZone[] = [singleZone];
     const paths: RoomPath[] = [];
     const baseArea = area.parentDefinition ? alternateArea : area;
     const childArea = area.parentDefinition ? area : alternateArea;
 
-    chunkGenerators.stoneRoom.generate(random, baseArea, section, childArea);
+    chunkGenerators.stoneRoom.generate(random, baseArea, section, childArea, zone);
     const innerRect = {
         x: section.x + 1,
         y: section.y + 3,
@@ -87,28 +88,28 @@ export function generateTallRoomSkeleton(random: SRandom, area: AreaDefinition, 
                     y,
                     w: cx - (innerRect.x + 1) + 1,
                     h,
-                }, baseArea, childArea);
+                }, baseArea, childArea, zone);
                 applyNineSlice(random, slices.innerStoneWalls, {
                     x: cx + 1,
                     y,
                     w: innerRect.x + innerRect.w - 1 - (cx + 1),
                     h,
-                }, baseArea, childArea);
+                }, baseArea, childArea, zone);
             } else {
                 applyNineSlice(random, slices.innerStoneWalls, {
                     x: innerRect.x + 1,
                     y,
                     w: innerRect.w - 2,
                     h,
-                }, baseArea, childArea);
+                }, baseArea, childArea, zone);
             }
         }
         y += h;
     }
 
-    inheritAllLayerTilesFromParent(childArea);
+    inheritAllLayerTilesFromParent(childArea, zone);
 
-    return {zones, paths};
+    return {roomZones, paths};
 }
 
 // TODO: Think of some templates for structuring rooms as multiple connected chunks and populate each chunk with content.
@@ -125,7 +126,8 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
 } {
     // Always make the left column abyss tiles so that the magic bar doesn't cover up anything important.
     const {random, zoneId, roomId, area, alternateArea, baseArea, childArea, section, rules} = context;
-    const foregroundLayer = getOrAddLayer('foreground', baseArea, childArea);
+    const zone = zones[zoneId];
+    const foregroundLayer = getOrAddLayer('foreground', baseArea, childArea, zone);
     for (let y = 0; y < section.h; y++) {
         foregroundLayer.grid.tiles[y][0] = 57;
     }
@@ -137,18 +139,18 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
     };
     const entrancesById: {[key: string]: EntranceDefinition} = {};
     // TODO: Support other style besides stone.
-    const {zones, paths} = generateTallRoomSkeleton(random, area, alternateArea, rect, rules);
+    const {roomZones, paths} = generateTallRoomSkeleton(random, area, alternateArea, zone, rect, rules);
     const nodesById: {[key: string]: LogicNode} = {};
     nodesById.entrance = {
         zoneId,
-        nodeId: `${zoneId}-entrance`,
+        nodeId: `${zoneId}-${roomId}-entrance`,
         checks: [],
         paths: [],
         exits: rules.entrances.map(entrance => ({objectId: entrance.id})),
         entranceIds: rules.entrances.map(entrance => entrance.id),
     };
-    for (const zone of zones) {
-        for (const slot of zone.slots) {
+    for (const roomZone of roomZones) {
+        for (const slot of roomZone.slots) {
             nodesById[slot.id] = {
                 zoneId,
                 nodeId: `${zoneId}-${roomId}-${slot.id}`,
@@ -214,8 +216,8 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
         // TODO: support other entrances
     }
     for (const checkRules of rules.checks) {
-        for (const zone of zones) {
-            const slot = zone.slots[zone.slots.length - 1];
+        for (const roomZone of roomZones) {
+            const slot = roomZone.slots[roomZone.slots.length - 1];
             const node = nodesById[slot.id];
             // Leave some s
             const checkRect = pad(slot, - 1);
@@ -248,7 +250,7 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
                     lootAmount: checkRules.lootAmount,
                     lootLevel: checkRules.lootLevel,
                 });
-                const fieldLayer = getOrAddLayer('field', area, alternateArea);
+                const fieldLayer = getOrAddLayer('field', area, alternateArea, zone);
                 const tiles = fieldLayer.grid.tiles;
                 for (let tY = y; tY < y + h; tY++) {
                     if (!tiles[tY]) {
@@ -285,8 +287,8 @@ export function generateRoomAndLogic(context: RoomGeneratorContext): { //random:
             node.checks.push({objectId: checkRules.id, logic: checkLogic});
         }
     }
-    for (const zone of zones) {
-        for (const slot of zone.slots) {
+    for (const roomZone of roomZones) {
+        for (const slot of roomZone.slots) {
             fillSlotFromContext(context, slot);
         }
     }

@@ -153,12 +153,12 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
             delete: isShiftDown ? !options.delete : !!options.delete,
         };
     },
-    apply(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, options: PitBrushOptions): Point[] {
+    apply(area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, {x, y}: Point, options: PitBrushOptions): Point[] {
         const pitTiles = pitStyles[options.style];
         const erase = !!options.delete;
         const updatedPoints: Point[] = [];
         const tx = (x / 16) | 0, ty = (y / 16) | 0;
-        const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+        const floor2Layer = getOrAddLayer('floor2', area, alternateArea, zone);
         if (ty < 0 || tx < 0 || ty >= floor2Layer.grid.h || tx >= floor2Layer.grid.w) {
             return updatedPoints;
         }
@@ -184,7 +184,7 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
                     if (x < 0 || x >= floor2Layer.grid.w) {
                         continue;
                     }
-                    if (applyAngledPitFunction(area, alternateArea, {x, y}, pitTiles)) {
+                    if (applyAngledPitFunction(area, alternateArea, zone, {x, y}, pitTiles)) {
                         if (dx || dy) {
                             updatedPoints.push({x, y});
                         }
@@ -202,7 +202,7 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
                 if (x < 0 || x >= floor2Layer.grid.w) {
                     continue;
                 }
-                if (setPitTiles(area, alternateArea, {x, y}, pitTiles)) {
+                if (setPitTiles(area, alternateArea, zone, {x, y}, pitTiles)) {
                     if (dx || dy) {
                         updatedPoints.push({x, y});
                     }
@@ -222,7 +222,7 @@ const pitBrush: SpecialBrush<PitBrushOptions> = {
                 if (Math.abs(dx) + Math.abs(dy) > 3) {
                     continue;
                 }
-                if (setPitDecorationTiles(area, alternateArea, {x, y}, pitTiles)) {
+                if (setPitDecorationTiles(area, alternateArea, zone, {x, y}, pitTiles)) {
                     if (dx || dy) {
                         updatedPoints.push({x, y});
                     }
@@ -251,8 +251,8 @@ function clearPitTile(layer: AreaLayerDefinition, {x, y}: Point, pitTiles: PitTi
     return false;
 }
 
-function makeAngledPit(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles, pitSet: Set<number>, defaultValue: number): boolean {
-    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+function makeAngledPit(area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, {x, y}: Point, pitTiles: PitTiles, pitSet: Set<number>, defaultValue: number): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea, zone);
     const N = pitSet.has(floor2Layer.grid.tiles[y - 1]?.[x]);
     const S = pitSet.has(floor2Layer.grid.tiles[y + 1]?.[x]);
     const W = pitSet.has(floor2Layer.grid.tiles[y]?.[x - 1]);
@@ -277,8 +277,8 @@ function makeAngledPit(area: AreaDefinition, alternateArea: AreaDefinition, {x, 
     return clearPitTile(floor2Layer, {x, y}, pitTiles);
 }
 
-function applyExteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
-    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+function applyExteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, {x, y}: Point, pitTiles: PitTiles): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea, zone);
     if (y < 0 || x < 0 || y >= floor2Layer.grid.h || x >= floor2Layer.grid.w) {
         return false;
     }
@@ -287,11 +287,11 @@ function applyExteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefini
     if (C) {
         return false;
     }
-    return makeAngledPit(area, alternateArea, {x, y}, pitTiles, pitTiles.corePitTiles, 0);
+    return makeAngledPit(area, alternateArea, zone, {x, y}, pitTiles, pitTiles.corePitTiles, 0);
 }
 
-function applyInteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
-    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+function applyInteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, {x, y}: Point, pitTiles: PitTiles): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea, zone);
     if (y < 0 || x < 0 || y >= floor2Layer.grid.h || x >= floor2Layer.grid.w) {
         return false;
     }
@@ -300,11 +300,11 @@ function applyInteriorAngledPits(area: AreaDefinition, alternateArea: AreaDefini
     if (!C) {
         return false;
     }
-    return makeAngledPit(area, alternateArea, {x, y}, pitTiles, pitTiles.allPitTiles, pitTiles.singlePit);
+    return makeAngledPit(area, alternateArea, zone, {x, y}, pitTiles, pitTiles.allPitTiles, pitTiles.singlePit);
 }
 
-function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
-    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
+function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, {x, y}: Point, pitTiles: PitTiles): boolean {
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea, zone);
     if (y < 0 || x < 0 || y >= floor2Layer.grid.h || x >= floor2Layer.grid.w) {
         return false;
     }
@@ -368,15 +368,15 @@ function setPitTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}
     return getLayer('foreground', area)?.grid.tiles[y]?.[x] !== 0
         || getLayer('foreground2', area)?.grid.tiles[y]?.[x] !== 0
 }*/
-function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefinition, {x, y}: Point, pitTiles: PitTiles): boolean {
+function setPitDecorationTiles(area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, {x, y}: Point, pitTiles: PitTiles): boolean {
     let changed = false;
     function update(layer: AreaLayerDefinition, {x, y}: Point, tile: number) {
         changed = changeLayerTile(layer, {x, y}, tile) || changed;
         return changed;
     }
-    const floor2Layer = getOrAddLayer('floor2', area, alternateArea);
-    const fieldLayer = getOrAddLayer('field', area, alternateArea);
-    const field2Layer = getOrAddLayer('field2', area, alternateArea);
+    const floor2Layer = getOrAddLayer('floor2', area, alternateArea, zone);
+    const fieldLayer = getOrAddLayer('field', area, alternateArea, zone);
+    const field2Layer = getOrAddLayer('field2', area, alternateArea, zone);
     function removeFieldDecorations() {
         if (pitTiles.decorationTiles.has(fieldLayer.grid.tiles[y]?.[x])) {
             update(fieldLayer, {x, y}, 0);

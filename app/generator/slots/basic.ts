@@ -1,6 +1,6 @@
-
-import { applyNineSlice, slices } from 'app/generator/nineSlice';
-import { getOrAddLayer, inheritAllLayerTilesFromParent, inheritLayerTilesFromParent } from 'app/utils/layers';
+import {zones} from 'app/content/zones/zoneHash';
+import {applyNineSlice, slices} from 'app/generator/nineSlice';
+import {getOrAddLayer, inheritAllLayerTilesFromParent, inheritLayerTilesFromParent} from 'app/utils/layers';
 
 const planterSlot: SlotGenerator = {
     isValid(context: SlotContext) {
@@ -8,8 +8,9 @@ const planterSlot: SlotGenerator = {
     },
     apply(context: SlotContext) {
         const {random, zoneId, roomId, area, baseArea, childArea, slot} = context;
-        const floorLayer = getOrAddLayer('floor', baseArea, childArea);
-        const fieldLayer = getOrAddLayer('field', baseArea, childArea);
+        const zone = zones[zoneId];
+        const floorLayer = getOrAddLayer('floor', baseArea, childArea, zone);
+        const fieldLayer = getOrAddLayer('field', baseArea, childArea, zone);
         const cx = slot.x + Math.floor((slot.w - 1) / 2);
         for (let y = slot.y; y < slot.y + slot.h; y++) {
             for (let x = slot.x; x < slot.x + slot.w; x++) {
@@ -26,8 +27,8 @@ const planterSlot: SlotGenerator = {
                 fieldLayer.grid.tiles[y][x] = 2;
             }
         }
-        inheritLayerTilesFromParent('floor', childArea, slot);
-        inheritLayerTilesFromParent('field', childArea, slot);
+        inheritLayerTilesFromParent('floor', childArea, zone, slot);
+        inheritLayerTilesFromParent('field', childArea, zone, slot);
         area.objects.push({
             type: 'enemy',
             enemyType: area.isSpiritWorld ? random.element(['plantFlame','plantFrost','plantStorm']) : 'plant',
@@ -45,6 +46,8 @@ const raisedPlanterSlot: SlotGenerator = {
         return context.slot.w >= 7 && context.slot.h >= 5;
     },
     apply(context: SlotContext) {
+        const {random, zoneId, roomId, area, baseArea, childArea, slot} = context;
+        const zone = zones[zoneId];
         // High chance to split a single raised planter into two if there is enough room in the slot.
         if (context.slot.w >= 13 && context.random.generateAndMutate() < 0.8) {
             raisedPlanterSlot.apply({
@@ -66,8 +69,7 @@ const raisedPlanterSlot: SlotGenerator = {
             });
             return;
         }
-        const {random, zoneId, roomId, area, baseArea, childArea, slot} = context;
-        const floorLayer = getOrAddLayer('floor', baseArea, childArea);
+        const floorLayer = getOrAddLayer('floor', baseArea, childArea, zone);
         for (let y = slot.y + 1; y < slot.y + slot.h - 2; y++) {
             for (let x = slot.x + 2; x < slot.x + slot.w - 2; x++) {
                 floorLayer.grid.tiles[y][x] = 1216;
@@ -78,15 +80,15 @@ const raisedPlanterSlot: SlotGenerator = {
             y: slot.y + 1,
             w: slot.w - 2,
             h: slot.h - 3,
-        }, baseArea, childArea);
-        const fieldLayer = getOrAddLayer('field', baseArea, childArea);
+        }, baseArea, childArea, zone);
+        const fieldLayer = getOrAddLayer('field', baseArea, childArea, zone);
         const y = slot.y + slot.h - 2;
         for (let x = slot.x + 2; x < slot.x + slot.w - 2; x++) {
             fieldLayer.grid.tiles[y][x] = [1204,1203][x % 2];
         }
         fieldLayer.grid.tiles[y][slot.x + 1] = 708;
         fieldLayer.grid.tiles[y][slot.x + slot.w - 2] = 709;
-        inheritAllLayerTilesFromParent(childArea, slot);
+        inheritAllLayerTilesFromParent(childArea, zone, slot);
         random.generateAndMutate();
         area.objects.push({
             type: 'enemy',

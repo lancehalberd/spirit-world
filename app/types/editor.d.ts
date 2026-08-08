@@ -73,7 +73,7 @@ type BrushOptionsValues<T extends BrushOptions> = {
 }
 interface SpecialBrush<O extends BrushOptions> {
     options: BrushOptionsValues<O>
-    apply: (area: AreaDefinition, alternateArea: AreaDefinition, point: Point, options: O) => Point[]
+    apply: (area: AreaDefinition, alternateArea: AreaDefinition, zone: Zone, point: Point, options: O) => Point[]
     modifyOptions?: (options: O, isShiftDown: boolean) => O
 }
 

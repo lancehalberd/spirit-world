@@ -73,7 +73,7 @@ type ChunkGenerator = {
     minH?: number
     maxW?: number
     maxH?: number
-    generate: (random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) => void
+    generate: (random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) => void
     renderPreview?: (context: CanvasRenderingContext2D, random: SRandom, area: AreaInstance, r: Rect, alternateArea: AreaInstance) => void
 }
 
@@ -102,7 +102,7 @@ interface RoomZone {
     slots: RoomSlot[]
 }
 interface RoomSkeleton {
-    zones: RoomZone[]
+    roomZones: RoomZone[]
     paths: RoomPath[]
 }
 

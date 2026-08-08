@@ -130,14 +130,14 @@ function createDelveGauntlet() {
                     y: baseEntranceDefinition.y + y,
                     targetObjectId: entranceId,
                     locationCue: `${sectionIndex + 1} - ${subSectionIndex + 1}`,
-                }, spiritArea.parentDefinition, spiritArea);
+                }, spiritArea.parentDefinition, spiritArea, zone);
                 addDoorAndClearForegroundTiles({
                     ...baseExitDefinition,
                     id: exitId,
                     x: baseExitDefinition.x + x,
                     y: baseExitDefinition.y + y,
                     targetObjectId: exitId,
-                }, spiritArea.parentDefinition, spiritArea);
+                }, spiritArea.parentDefinition, spiritArea, zone);
 
                 const lootType = randomLoot.pop();
                 if (lootType && lootType !== 'empty') {

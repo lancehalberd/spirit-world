@@ -246,7 +246,7 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                     key = 'layer-' + definition.layers.length;
                 }
             }
-            addNewLayer(key, previousLayerIndex + 1, state.areaSet?.current.definition, state.areaSet?.alternate.definition);
+            addNewLayer(key, previousLayerIndex + 1, state.areaSet.current.definition, state.areaSet.alternate.definition, state.zone);
             // Calling this will instantiate the area again and place the player back in their current location.
             if (editingState.selectedLayerKey) {
                 editingState.selectedLayerKey = key;

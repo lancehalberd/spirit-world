@@ -65,8 +65,8 @@ const largeTreeTilePriority = [
 chunkGenerators.largeTree = {
     minW: 6, maxW: 6,
     minH: 5, maxH: 5,
-    generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition) {
-        const fieldLayer = getOrAddLayer('field', area, alternateArea);
+    generate(random: SRandom, area: AreaDefinition, r: Rect, alternateArea: AreaDefinition, zone: Zone) {
+        const fieldLayer = getOrAddLayer('field', area, alternateArea, zone);
         for (let y = r.y; y < r.y + r.h; y++) {
             if (y < 0) {
                 continue;
@@ -91,7 +91,7 @@ chunkGenerators.largeTree = {
                 fieldLayer.grid.tiles[y][x] = tileIndex;
             }
         }
-        const foregroundLayer = getOrAddLayer('foreground', area, alternateArea);
+        const foregroundLayer = getOrAddLayer('foreground', area, alternateArea, zone);
         for (let y = r.y; y < r.y + r.h; y++) {
             if (y < 0) {
                 continue;
@@ -138,7 +138,7 @@ chunkGenerators.largeTree = {
 
                 // The foreground layer is occupied. We will either place this tile on foreground2,
                 // or move the existing tile to foreground2 and place this tile underneath on the foreground.
-                const foreground2Layer = getOrAddLayer('foreground2', area, alternateArea);
+                const foreground2Layer = getOrAddLayer('foreground2', area, alternateArea, zone);
 
                 if (!foreground2Layer.grid.tiles[y]) {
                     foreground2Layer.grid.tiles[y] = [];
@@ -162,7 +162,7 @@ chunkGenerators.largeTree = {
                     newTile = currentTile;
                     currentTile = foreground2Layer.grid.tiles[y][x];
                 }
-                const foreground3Layer = getOrAddLayer('foreground3', area, alternateArea);
+                const foreground3Layer = getOrAddLayer('foreground3', area, alternateArea, zone);
                 foreground3Layer.grid.tiles[y][x] = newTile
             }
         }

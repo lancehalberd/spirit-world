@@ -108,13 +108,13 @@ function applySpecialBrush(state: GameState, x: number, y: number) {
     y += state.camera.y;
     const brushSettings = editingState.specialBrushSettings;
     if (brushSettings) {
-        const initialLayerCount = state.areaSet?.current.definition.layers.length;
-        const updatedPoints = brushSettings.brush.apply(state.areaSet?.current.definition, state.areaSet?.alternate.definition, {x, y},
+        const initialLayerCount = state.areaSet.current.definition.layers.length;
+        const updatedPoints = brushSettings.brush.apply(state.areaSet.current.definition, state.areaSet.alternate.definition, state.zone, {x, y},
             brushSettings.brush.modifyOptions?.(brushSettings.options, isKeyboardKeyDown(KEY.SHIFT)) ?? brushSettings.options
         );
         // If a new layer was added, just refresh everything for simplicity.
         // Refreshing everything is slow, but this typically only happens once per tool use.
-        if (state.areaSet?.current.definition.layers.length > initialLayerCount) {
+        if (state.areaSet.current.definition.layers.length > initialLayerCount) {
             refreshArea(state);
             editingState.hasChanges = true;
             return;
@@ -126,7 +126,7 @@ function applySpecialBrush(state: GameState, x: number, y: number) {
 }
 // TODO: make sure this applies material -> spirit mappings as well.
 function resetTile(state: GameState, {x, y}: Point) {
-    const area = state.areaSet?.current;
+    const area = state.areaSet.current;
     for (const layer of area.layers) {
         try {
             layer.originalTiles[y][x] = layer.tiles[y][x] = allTiles[layer.definition.grid.tiles[y][x]];
@@ -232,7 +232,7 @@ document.addEventListener('mouseup', (event) => {
         const {L, R, T, B} = getChunkGeneratorSelectionBounds(state, generator, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
         editingState.dragOffset = null;
         const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};
-        generator.generate(SRandom.seed(Math.random()), state.areaSet?.current.definition, r, state.areaSet?.alternate.definition);
+        generator.generate(SRandom.seed(Math.random()), state.areaSet.current.definition, r, state.areaSet.alternate.definition, state.zone);
         refreshArea(state);
         editingState.hasChanges = true;
         return;
@@ -282,7 +282,7 @@ function onMouseDownObject(state: GameState, editingState: EditingState, x: numb
     newObject.x -= (frame.content?.w || frame.w) / 2;
     newObject.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, newObject);
-    updateObjectInstance(state, newObject, null, state.areaSet?.current, true);
+    updateObjectInstance(state, newObject, null, state.areaSet.current, true);
     if (!isKeyboardKeyDown(KEY.SHIFT)) {
         setEditingTool('select');
         editingState.selectedObject = newObject;
@@ -305,7 +305,7 @@ function deleteTile(x: number, y: number): void {
     const state = getState();
     const ty = Math.floor((state.camera.y + y) / 16);
     const tx = Math.floor((state.camera.x + x) / 16);
-    const area = state.areaSet?.current;
+    const area = state.areaSet.current;
     if (editingState.selectedLayerKey) {
         deleteTileFromLayer(tx, ty, area, area.layers.find(layer => layer.key === editingState.selectedLayerKey));
     } else {
@@ -360,15 +360,15 @@ function updateBrushSelection(x: number, y: number): void {
     // If command is held down, we will copy the mapped tiles in the spirit world instead of copying the empty tiles.
     const isCommandDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
     if (editingState.selectedLayerKey) {
-        const layerDefinition = state.areaSet?.current.definition.layers.find(layer => layer.key === editingState.selectedLayerKey);
-        const parentLayerDefinition = (isCommandDown && state.areaSet?.current.definition.isSpiritWorld)
-            ? state.areaSet?.current.alternateArea.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)
+        const layerDefinition = state.areaSet.current.definition.layers.find(layer => layer.key === editingState.selectedLayerKey);
+        const parentLayerDefinition = (isCommandDown && state.areaSet.current.definition.isSpiritWorld)
+            ? state.areaSet.current.alternateArea.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)
             : undefined;
         editingState.brush.none = getTileGridFromLayer(layerDefinition, rectangle, parentLayerDefinition);
     } else {
-        for (const layerDefinition of state.areaSet?.current.definition.layers) {
-            const parentLayerDefinition = (isCommandDown && state.areaSet?.current.definition.isSpiritWorld)
-                ? state.areaSet?.current.alternateArea.definition.layers.find(layer => layer.key === layerDefinition.key)
+        for (const layerDefinition of state.areaSet.current.definition.layers) {
+            const parentLayerDefinition = (isCommandDown && state.areaSet.current.definition.isSpiritWorld)
+                ? state.areaSet.current.alternateArea.definition.layers.find(layer => layer.key === layerDefinition.key)
                 : undefined;
             editingState.brush[layerDefinition.key] = getTileGridFromLayer(layerDefinition, rectangle, parentLayerDefinition);
         }
@@ -381,7 +381,7 @@ function drawBrush(targetX: number, targetY: number): void {
     const sampleGrid = Object.values(editingState.brush)[0];
     const sx = Math.floor((state.camera.x + targetX + 8) / 16 - sampleGrid.w / 2);
     const sy = Math.floor((state.camera.y + targetY + 8) / 16 - sampleGrid.h / 2);
-    let area = state.areaSet?.current;
+    let area = state.areaSet.current;
     // If no layer is currently selected, iterate over the brush contents
     // and add any missing layers necessary to complete the draw operation
     // before we attempt to draw.
@@ -396,21 +396,21 @@ function drawBrush(targetX: number, targetY: number): void {
                         let fullTile = allTiles[tile];
                         const defaultLayer = fullTile ? (fullTile.behaviors?.defaultLayer || 'floor') : 'field';
                         if (!area.definition.layers.find(layer => layer.key === defaultLayer)) {
-                            addMissingLayer(defaultLayer, area.definition, area.alternateArea.definition);
+                            addMissingLayer(defaultLayer, area.definition, area.alternateArea.definition, state.zone);
                             addedNewLayer = true;
                         }
                     }
                 }
             } else {
                 if (!area.definition.layers.find(layer => layer.key === layerKey)) {
-                    addMissingLayer(layerKey, area.definition, area.alternateArea.definition);
+                    addMissingLayer(layerKey, area.definition, area.alternateArea.definition, state.zone);
                     addedNewLayer = true;
                 }
             }
         }
         if (addedNewLayer) {
             refreshArea(state);
-            area = state.areaSet?.current;
+            area = state.areaSet.current;
         }
     }
     for (const layer of area.layers) {
@@ -533,17 +533,17 @@ function replaceTiles(state: GameState, x: number, y: number): void {
         return;
     }
     const brushTiles = editingState.brush.none.tiles;
-    const layer = state.areaSet?.current.layers.find(l => l.key === editingState.selectedLayerKey);
-    const parentLayer = state.areaSet?.current.definition.parentDefinition?.layers?.find(l => l.key === layer.key)
+    const layer = state.areaSet.current.layers.find(l => l.key === editingState.selectedLayerKey);
+    const parentLayer = state.areaSet.current.definition.parentDefinition?.layers?.find(l => l.key === layer.key)
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
-    const r = state.areaSet?.currentSection;
+    const r = state.areaSet.currentSection;
     for (let y = r.y; y < r.y + r.h; y++) {
         for (let x = r.x; x < r.x + r.w; x++) {
             const t = layer.tiles[y][x];
             if (t === tile && Math.random() <= editingState.replacePercentage / 100) {
                 const paintTile = brushTiles[y % brushTiles.length][x % brushTiles[0].length];
-                paintSingleTile(state.areaSet?.current, layer, parentLayer, x, y, paintTile);
+                paintSingleTile(state.areaSet.current, layer, parentLayer, x, y, paintTile);
             }
         }
     }
@@ -619,13 +619,13 @@ export function selectAllTiles() {
     if (editingState.tool === 'brush') {
         editingState.brush = {};
         if (editingState.selectedLayerKey) {
-            const layerDefinition = state.areaSet?.current.definition.layers.find(l => l.key === editingState.selectedLayerKey);
+            const layerDefinition = state.areaSet.current.definition.layers.find(l => l.key === editingState.selectedLayerKey);
             editingState.brush = {
-                none: getTileGridFromLayer(layerDefinition, state.areaSet?.currentSection),
+                none: getTileGridFromLayer(layerDefinition, state.areaSet.currentSection),
             };
         } else {
-            for (const layer of state.areaSet?.current.definition.layers) {
-                editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSet?.currentSection);
+            for (const layer of state.areaSet.current.definition.layers) {
+                editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSet.currentSection);
             }
         }
         updateBrushCanvas(editingState.brush);
@@ -633,7 +633,11 @@ export function selectAllTiles() {
     }
     if (editingState.tool === 'tileChunk') {
         editingState.tileChunkKey || Object.keys(chunkGenerators)[0];
-        chunkGenerators[editingState.tileChunkKey].generate(SRandom.seed(Math.random()), state.areaSet?.current.definition, state.areaSet?.currentSection, state.areaSet?.alternate.definition);
+        chunkGenerators[editingState.tileChunkKey].generate(
+            SRandom.seed(Math.random()),
+            state.areaSet.current.definition, state.areaSet.currentSection,
+            state.areaSet.alternate.definition, state.zone,
+        );
         refreshArea(state);
         editingState.hasChanges = true;
     }
@@ -667,10 +671,10 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         }
         let areaNeedsRefresh = false;
         for (const selectedObject of editingState.selectedObjects) {
-            if (isObject(selectedObject) && state.areaSet?.current.definition.objects.includes(selectedObject)) {
+            if (isObject(selectedObject) && state.areaSet.current.definition.objects.includes(selectedObject)) {
                 deleteObject(state, selectedObject);
-            }  else if (isVariant(selectedObject) && state.areaSet?.current.definition.variants?.includes(selectedObject)) {
-                removeElementFromArray(state.areaSet?.current.definition.variants, selectedObject);
+            }  else if (isVariant(selectedObject) && state.areaSet.current.definition.variants?.includes(selectedObject)) {
+                removeElementFromArray(state.areaSet.current.definition.variants, selectedObject);
                 // Variants update areas in ways that cannot be reversed so we just have to recreate the area when they
                 // are removed.
                 areaNeedsRefresh = true;
