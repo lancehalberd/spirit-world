@@ -152,6 +152,10 @@ Current tasks:
         - Fade chest instructions out when obtaining the chakram.
         - Restrict to a single text cue.
 
+    - Make Elder visible sigh instead of using "*sigh*" dialogue
+        - Add new south facing sigh animation
+        - Add script for moving player south of the elder for this dialogue so that he always faces south while talking to him.
+
     - Thrive AR Game
         - Starts in base world
             - AR Stairs take player to higher levels that replace base field graphics with biome graphics based on tile behavior.
