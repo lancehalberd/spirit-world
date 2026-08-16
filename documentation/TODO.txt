@@ -144,7 +144,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix editor money previews don't show or apply the amount
+    - Fix I hear unnecessary door opening sound effects when traveling between doors in tomb B2 that are already open.
 
     - Text cues don't fade out nicely when transitiont
         - Move Text cues to a state outside of the area so it can render and update independent of the field.

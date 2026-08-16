@@ -182,7 +182,7 @@ export const combinedObjectTypes: ObjectType[] = [
 ];
 export const doorTypes: ObjectType[] = ['door', 'helixTop', 'staffTower'];
 
-function setLootData(definition: LootData) {
+function fixLootData(definition: LootData) {
     if (doesLootRequireAmount(definition.lootType)) {
         definition.lootAmount = definition.lootAmount || 1;
     } else {
@@ -330,11 +330,13 @@ export function createObjectDefinition(
                 id: definition.id || uniqueId(state, bossType),
                 enemyType: bossType,
                 lootType,
+                lootAmount: definition.lootAmount,
+                lootLevel: definition.lootLevel,
                 d: definition.d || 'down',
                 saveStatus: definition.saveStatus,
                 params,
             };
-            setLootData(bossDefinition);
+            fixLootData(bossDefinition);
 
             return bossDefinition;
         }
@@ -483,11 +485,13 @@ export function createObjectDefinition(
                 type: definition.type,
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
+                lootAmount: definition.lootAmount,
+                lootLevel: definition.lootLevel,
             };
             if (definition.type === 'shopItem') {
                 lootDefinition.price = definition.price || 100;
             }
-            setLootData(lootDefinition);
+            fixLootData(lootDefinition);
             return lootDefinition;
         }
         case 'movingPlatform':
