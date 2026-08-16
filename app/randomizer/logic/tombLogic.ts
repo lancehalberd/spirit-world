@@ -105,7 +105,7 @@ export const tombNodes: LogicNode[] = [
             {loot: {type: 'dialogueLoot', id: 'tomb:0:1x0-npc-0', lootType: 'spiritSight'}, progressFlags: ['tombBackDoor']},
         ],
         paths: [
-            {nodeId: 'tombCocoonEntrance', logic: canRemoveLightStones},
+            {nodeId: 'tombCocoonEntrance', logic: andLogic(canRemoveLightStones, canCross2Gaps)},
         ],
         entranceIds: [
             // This teleporter gets removed once the user has teleportation so it is permanently out of logic.
