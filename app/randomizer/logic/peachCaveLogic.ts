@@ -31,7 +31,7 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'peachCave:stairsUp',
-        checks: [{ objectId: 'peachCave:0:0x0-money-0' }],
+        checks: [{ objectId: 'peachCaveMoney1' }],
         paths: [
             { nodeId: 'peachCaveBottom' },
         ],
@@ -41,8 +41,9 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'peachCave:stairsDown',
+        checks: [{ objectId: 'peachCaveMoney2' }],
         paths: [
-            { nodeId: 'peachCaveBoss', logic: hasWeapon },
+            {nodeId: 'peachCaveBoss'},
         ],
         entranceIds: ['peachCave:stairsDown'],
         exits: [{ objectId: 'peachCave:stairsDown' }],
