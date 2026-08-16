@@ -10,6 +10,7 @@ import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {showTransitionScene} from 'app/scenes/transition/transitionScene';
 import {sceneHash} from 'app/scenes/sceneHash';
+import {appendScript} from 'app/scriptEvents';
 import {CANVAS_WIDTH, CANVAS_HEIGHT} from 'app/gameConstants';
 import {wasGameKeyPressed} from 'app/userInput';
 import {fillRect, pad} from 'app/utils/index';
@@ -158,7 +159,12 @@ export class RandomizerScene implements GameScene {
                     returnToSpawnLocation(state);
                     const oldStack = [...state.sceneStack];
                     showFieldScene(state);
-                    showTransitionScene(state, {oldStack, transitionType: 'fade', transitionColor: '#FFF'});
+                    showTransitionScene(state, {oldStack, transitionType: 'fade', transitionColor: '#FFF', onComplete: (state:GameState) => {
+                        const {goal, total} = state.savedState.savedRandomizerData.goal?.victoryPoints ?? {};
+                        if (goal && total) {
+                            appendScript(state, `Find ${goal} of ${total} Victory Points then talk to your mom to win!`);
+                        }
+                    }});
                     // Use the same fade effect as the dream world when starting/loading a randomizer game.
                 }
 

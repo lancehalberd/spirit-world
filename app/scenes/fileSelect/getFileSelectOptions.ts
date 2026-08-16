@@ -7,7 +7,7 @@ import {updateHeroMagicStats} from 'app/render/spiritBar';
 import {showFieldScene} from 'app/scenes/field/showFieldScene';
 import {setSaveFileToState} from 'app/scenes/fileSelect/setSaveFileToState';
 import {showRandomizerScene} from 'app/scenes/randomizer/randomizerScene';
-import {appendScript, appendScriptEvents} from 'app/scriptEvents';
+import {appendScriptEvents} from 'app/scriptEvents';
 import {showTitleScene} from 'app/scenes/title/showTitleScene';
 import {parseScriptText} from 'app/scriptEvents';
 import {getDefaultState} from 'app/state';
@@ -69,7 +69,6 @@ const cancelDeleteOption = simpleOption('CANCEL', (state: GameState, scene: File
 
 const confirmDeleteOption = simpleOption('DELETE', (state: GameState, scene: FileSelectScene) => {
     scene.mode = 'select';
-    console.log('deleting', state.savedGameIndex);
     const initialLength = scene.savedGames.length;
     if (scene.gameMode === 'randomizer') {
         scene.savedGames.splice(state.savedGameIndex, 1);
@@ -349,10 +348,6 @@ function startNewRandomizerGame(state: GameState, scene: FileSelectScene): void 
     state.hero.savedData.spawnLocation = SPAWN_LOCATION_WATERFALL_VILLAGE;
     state.savedState.savedRandomizerData = scene.randomizerConfig;
     showRandomizerScene(state, state.savedState.savedRandomizerData);
-    const {goal, total} = state.savedState.savedRandomizerData.goal?.victoryPoints ?? {};
-    if (goal && total) {
-        appendScript(state, `Find ${goal} of ${total} Victory Points then talk to your mom to win!`);
-    }
 }
 function pushMenuStack(state: GameState, scene: FileSelectScene, mode: FileSelectScene['mode']) {
     scene.menuStack.push({cursorIndex: scene.cursorIndex, mode: scene.mode});

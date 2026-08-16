@@ -16,6 +16,8 @@ interface TransitionProps {
     duration: number
     // Called once after switching to the new stack.
     onSwitch?: (state: GameState, transitionScene: TransitionScene) => void
+    // Called once after the transition state is removed from the stack.
+    onComplete?: (state: GameState, transitionScene: TransitionScene) => void
 }
 
 export class TransitionScene implements GameScene {
@@ -40,6 +42,7 @@ export class TransitionScene implements GameScene {
             // This does not set the entire sceneStack in case the scene stack was manually adjusted
             // in the `this.props.onSwitch` call.
             removeElementFromArray(state.sceneStack, this);
+            this.props.onComplete?.(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState): void {
@@ -104,6 +107,7 @@ export function showTransitionScene(state: GameState, {
     transitionType = 'fade',
     transitionColor = '#000',
     duration = 1000,
+    onComplete,
     onSwitch,
 }: Partial<TransitionProps>, transitionScene = new TransitionScene()): TransitionScene {
     // If we are reusing an existing transition scene in progress,
@@ -125,7 +129,7 @@ export function showTransitionScene(state: GameState, {
         transitionScene.transitionTime = 0;
     }
     transitionScene.props = {
-        oldStack, newStack, activeStack, transitionType, transitionColor, duration, onSwitch
+        oldStack, newStack, activeStack, transitionType, transitionColor, duration, onComplete, onSwitch
     };
     state.sceneStack = [...oldStack, transitionScene, ...activeStack];
     return transitionScene;

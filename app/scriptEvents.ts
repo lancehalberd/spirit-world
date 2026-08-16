@@ -164,6 +164,20 @@ export function showMessage(
     appendScript(state, textScriptToString(state, message));
 }
 
+// Like `showMessage`, but inserts the message immediately ahead of any events already queued
+// on the current script scene instead of after them. Used for messages triggered asynchronously
+// mid-script, such as the loot pickup message shown after the loot get animation completes, which
+// must appear before whatever dialogue is already queued to follow the item tag that granted it.
+export function prependMessage(
+    state: GameState,
+    message: TextScript,
+): void {
+    if (!message){
+        return;
+    }
+    prependScript(state, textScriptToString(state, message));
+}
+
 // Shows a message box ignoring any additional scripting elements.
 // This allows us to effectively show messages outside of contexts where scripts run, for example
 // when showing messages from the inventory.
@@ -214,11 +228,16 @@ export function parseScriptAsTextPage(state: GameState, script: TextScript): Tex
 
 
 // All events to the front of the stack. These events may still be blocked by any active events in the current script scene.
-// Applies to the given script scene or appends a new script scene to the stack if none is provided.
+// Applies to the given script scene, reuses an existing script scene on top of the stack, or pushes a new script scene if neither is available.
 function prependScriptEvents(state: GameState, scriptEvents: ScriptEvent[], scriptScene?: ScriptScene): void {
     if (!scriptScene) {
-        scriptScene = new window.ScriptScene();
-        state.sceneStack.push(scriptScene);
+        const topStackItem = state.sceneStack[state.sceneStack.length - 1];
+        if (topStackItem.sceneType === 'script') {
+            scriptScene = topStackItem as ScriptScene;
+        } else {
+            scriptScene = new window.ScriptScene();
+            state.sceneStack.push(scriptScene);
+        }
     }
     scriptScene.queue = [
         ...scriptEvents,

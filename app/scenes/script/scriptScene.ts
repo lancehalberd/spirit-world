@@ -259,7 +259,7 @@ export function clearScriptScenes(state: GameState) {
 }
 
 // I prefer not to have circular imports, exporting this globally seems like
-// the simplest way to avoid circular dependencies like ScriptScene -> getLoot -> showLootMessage -> prependScript => new ScriptScene()
+// the simplest way to avoid circular dependencies like ScriptScene -> getLoot -> prependShowLootMessage -> prependScript => new ScriptScene()
 window.ScriptScene = ScriptScene;
 
 class _ScriptScene extends ScriptScene {}

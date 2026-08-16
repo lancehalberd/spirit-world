@@ -144,8 +144,12 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Fix editor money previews don't show or apply the amount
+
     - Text cues don't fade out nicely when transitiont
         - Move Text cues to a state outside of the area so it can render and update independent of the field.
+        - Render text cues over the field menu+map
+        - Fade chest instructions out when obtaining the chakram.
         - Restrict to a single text cue.
 
     - Thrive AR Game

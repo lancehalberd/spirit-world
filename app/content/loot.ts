@@ -1,5 +1,5 @@
 import {CHAKRAM_2_NAME} from 'app/gameConstants';
-import {showMessage} from 'app/scriptEvents';
+import {prependMessage} from 'app/scriptEvents';
 import {createAnimation} from 'app/utils/animations';
 import {createCanvasAndContext} from 'app/utils/canvas';
 import {getLootLevel} from 'app/utils/loot';
@@ -416,15 +416,15 @@ export function getLootHelpMessage(state: GameState, {lootType, lootLevel, lootA
     return '';
 }
 
-export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): void {
+export function prependShowLootMessage(state: GameState, {lootType, lootLevel, lootAmount}: LootData): void {
     // Skip instructions during the randomizer.
     if (state.randomizerState) {
         if (lootType === 'peachOfImmortalityPiece' && state.hero.savedData.collectibles.peachOfImmortalityPiece === 0) {
-            showMessage(state, '{item:peachOfImmortality}');
+            prependMessage(state, '{item:peachOfImmortality}');
             return;
         }
         if (lootType === 'peachOfImmortality' && !state.hero.savedData.passiveTools.catEyes) {
-            showMessage(state, '{item:catEyes}');
+            prependMessage(state, '{item:catEyes}');
             return;
         }
         return;
@@ -432,39 +432,39 @@ export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmou
     const getMessage = getLootGetMessage(state, {lootType, lootLevel, lootAmount});
     switch (lootType) {
         case 'bigKey':
-            return showMessage(state, getMessage
+            return prependMessage(state, getMessage
                 + '{|}This key can open all the special locks in this area!');
         case 'smallKey':
             if (!state.savedState.objectFlags.readSmallKeyMessage) {
                 state.savedState.objectFlags.readSmallKeyMessage = true;
-                return showMessage(state, getMessage + '{|}Use it to unlock one locked door.');
+                return prependMessage(state, getMessage + '{|}Use it to unlock one locked door.');
             }
             return;
         case 'map':
-            return showMessage(state, getMessage
+            return prependMessage(state, getMessage
                 + '{|}Press [B_MAP] to see the full map of this area!');
         case 'peachOfImmortality':
             if (!state.hero.savedData.passiveTools.catEyes) {
-                return showMessage(state, `
+                return prependMessage(state, `
                     ${getMessage}
                     {|} Your health has increased and you feel a strange energy...
                     {wait:200}{item:catEyes}`
                 );
             }
-            return showMessage(state, `${getMessage}{|} Your maximum health has increased!`);
+            return prependMessage(state, `${getMessage}{|} Your maximum health has increased!`);
         case 'peachOfImmortalityPiece':
             if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 1) {
-                return showMessage(state, getMessage + '{|}Find three more to increase your health!');
+                return prependMessage(state, getMessage + '{|}Find three more to increase your health!');
             }
             if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 2) {
-                return showMessage(state, getMessage + '{|}Find two more to increase your health!');
+                return prependMessage(state, getMessage + '{|}Find two more to increase your health!');
             }
             if (state.hero.savedData.collectibles.peachOfImmortalityPiece === 3) {
-                return showMessage(state, getMessage + '{|}Find one more to increase your health!');
+                return prependMessage(state, getMessage + '{|}Find one more to increase your health!');
             }
             // Finding the 4th slice grants a full peach of immortality.
-            return showMessage(state, getMessage + '{item:peachOfImmortality}');
-        
+            return prependMessage(state, getMessage + '{item:peachOfImmortality}');
+
         case 'staff':
             if (state.hero.savedData.activeTools.staff & 2 && state.areaSet?.current) {
                 // Refresh the location to hide the tower.
@@ -475,7 +475,7 @@ export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmou
         case 'secondChance':
             if (!state.savedState.objectFlags.readSecondChanceMessage) {
                 state.savedState.objectFlags.readSecondChanceMessage = true;
-                return showMessage(state, 'You have been blessed with a Second Chance!'
+                return prependMessage(state, 'You have been blessed with a Second Chance!'
                     + '{|}If you are defeated you will be revived one time.');
             }
             return;
@@ -483,9 +483,9 @@ export function showLootMessage(state: GameState, {lootType, lootLevel, lootAmou
     const helpMessage = getLootHelpMessage(state, {lootType, lootLevel, lootAmount});
     if (getMessage) {
         if (helpMessage) {
-            return showMessage(state, getMessage + '{|}' + helpMessage);
+            return prependMessage(state, getMessage + '{|}' + helpMessage);
         }
-        return showMessage(state, getMessage);
+        return prependMessage(state, getMessage);
     }
 }
 

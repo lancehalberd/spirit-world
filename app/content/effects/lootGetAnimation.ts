@@ -1,4 +1,4 @@
-import {getLootFrame, showLootMessage} from 'app/content/loot';
+import {getLootFrame, prependShowLootMessage} from 'app/content/loot';
 import {lootEffects} from 'app/content/lootEffects';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {getMappedLootData} from 'app/randomizer/utils';
@@ -70,8 +70,9 @@ export class LootGetAnimation implements EffectInstance {
             }
         }
         if (this.animationTime === 1000) {
-            // Calculate the loot level immediately so that the
-            showLootMessage(state, this.loot);
+            // This script is prepended since the loot message should show before any existing scripts
+            // after the item was granted run again.
+            prependShowLootMessage(state, this.loot);
         } else if (this.animationTime > 1000) {
             removeEffectFromArea(state, this);
         }
