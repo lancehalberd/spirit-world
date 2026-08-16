@@ -120,6 +120,11 @@ export class Door implements ObjectInstance {
     // One place this comes up is randomized entrances connected to staff tower exterior entrances
     // when the tower is not currently placed.
     isTargetMissing = false;
+    // Doors are frequently destroyed and recreated as sections are reset while scrolling between
+    // screens (they have `alwaysReset = true`). This flag stays false until the fresh instance has
+    // resolved its status for the first time, so `changeStatus` knows to stay silent while it is just
+    // reflecting already-persisted state rather than a live transition the player should hear.
+    hasResolvedInitialStatus: boolean = false;
     constructor(state: GameState, public definition: EntranceDefinition) {
         if (this.definition.d === 'up' && this.definition.price) {
             this.definition.status = 'closed';
@@ -132,6 +137,7 @@ export class Door implements ObjectInstance {
         this.targetObjectId = targetObjectId;
         // Event if a mapped entrance is defined, it may not have a status set, so default to the original status.
         this.refreshLogic(state);
+        this.hasResolvedInitialStatus = true;
     }
     refreshLogic(state: GameState) {
         this.isTargetMissing = false;
@@ -309,6 +315,11 @@ export class Door implements ObjectInstance {
             saveObjectStatus(state, this.definition, true);
         }
         if (!this.area) {
+            return;
+        }
+        // Don't play open/close sounds while resolving the status a freshly (re)created door instance
+        // should already have, since that isn't a transition the player is meant to witness.
+        if (!this.hasResolvedInitialStatus) {
             return;
         }
         if (!wasOpen && isOpen) {

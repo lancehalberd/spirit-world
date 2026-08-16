@@ -144,7 +144,7 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix I hear unnecessary door opening sound effects when traveling between doors in tomb B2 that are already open.
+    - Fix pot linkage is no longer applied correctly for the war temple pot puzzle.
 
     - Text cues don't fade out nicely when transitiont
         - Move Text cues to a state outside of the area so it can render and update independent of the field.
