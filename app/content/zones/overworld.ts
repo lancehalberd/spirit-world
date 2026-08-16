@@ -473,7 +473,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "overworld:0:0x0-squirrel-1", x: 288, y: 352, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-plant-0", x: 156, y: 40, type: "enemy", enemyType: "plant", d: "down", params: {}},
         {status: "active", id: "", x: 208, y: 392, type: "torch", style: "firePit"},
-        {status: "normal", id: "", x: 304, y: 392, type: "torch", style: "firePit"},
+        {status: "normal", id: "", x: 304, y: 380, type: "torch", style: "firePit"},
         {status: "closed", id: "tombBackDoor", x: 200, y: 320, type: "door", style: "cavernDownstairs", d: "up", targetZone: "tomb", targetObjectId: "tombBackDoor"},
         {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 18, y: 256, type: "staffTower", style: "ground", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up", linked: true},
         {status: "normal", id: "", x: 176, y: 432, type: "spawnMarker", linked: true, spirit: false},
