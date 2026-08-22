@@ -92,6 +92,7 @@ dialogueHash.nimbusCloud = {
         returnToLastSave: (state: GameState) => {
             returnToSpawnLocation(state);
             burstIntoLocation(state);
+            hideMainMenuScene(state);
             return '';
         },
         chooseDestination: (state: GameState) => {
@@ -131,6 +132,7 @@ dialogueHash.nimbusCloud = {
         returnToEntrance: (state: GameState) => {
             const [zoneKey, ...rest] = zoneEntranceMap[state.location.logicalZoneKey].split(':', );
             enterZoneByTarget(state, zoneKey, rest.join(':'));
+            hideMainMenuScene(state);
             return '';
         },
         // Material world destinations

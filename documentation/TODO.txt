@@ -159,6 +159,8 @@ Current tasks:
 
     - Fix: Chakram shouldn't be able to hit enemies while player is jumping down from cliffs.
 
+    - Fix: When cancelling the "Quit" option, you should land on the setting menu, not the field menu.
+
     - Make Elder visible sigh instead of using "*sigh*" dialogue
         - Add new south facing sigh animation
         - Add script for moving player south of the elder for this dialogue so that he always faces south while talking to him.
