@@ -18,7 +18,7 @@ specialBehaviorsHash.warTempleEntranceSwitch = {
 
 specialBehaviorsHash.warTempleEntrancePot = {
     type: 'pushPull',
-    apply(state: GameState, object: ObjectInstance) {
+    onBeforeLinkObjects(state: GameState, object: ObjectInstance) {
         const offsets = [[0, 0], [16, 0], [0, 16]];
         if (object.definition.id === 'overworldWarTemplePotA') {
             const [x, y] = warTempleRandom(state).addSeed(3).element(offsets);
@@ -35,7 +35,7 @@ specialBehaviorsHash.warTempleEntrancePot = {
 
 specialBehaviorsHash.warTempleSpiritPot = {
     type: 'pushPull',
-    apply(state: GameState, object: ObjectInstance) {
+    onBeforeLinkObjects(state: GameState, object: ObjectInstance) {
         const index = warTempleRandom(state).addSeed(5).range(0, 3);
         if (object.definition.id === 'warTemplePot' + index) {
             removeObjectFromArea(state, object);
@@ -44,17 +44,14 @@ specialBehaviorsHash.warTempleSpiritPot = {
                 type: 'indicator', id: 'potIndicator', status: 'normal',
                 targetObjectId: object.definition.id,  x: object.x, y: object.y
             });
-            // The alternate area isn't defined in time to add it here, so this will cause the
-            // indicator to swap worlds when possible.
-            indicator.swapWorlds = true;
-            addObjectToArea(state, object.area, indicator);
+            addObjectToArea(state, object.area.alternateArea, indicator);
         }
     }
 };
 
 specialBehaviorsHash.warTempleCrackedPot = {
     type: 'tippable',
-    apply(state: GameState, object: ObjectInstance) {
+    onBeforeLinkObjects(state: GameState, object: ObjectInstance) {
         const offsets = [[0, 0], [16, -16], [16, 16], [32, 0]];
         const [x, y] = warTempleRandom(state).addSeed(3).element(offsets);
         object.x = object.definition.x + x;

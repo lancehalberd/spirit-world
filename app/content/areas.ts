@@ -47,6 +47,25 @@ export function getConnectedSurfaceLocation(state: GameState, location: ZoneLoca
 }
 
 export function linkObjects(state: GameState, areaSet: AreaSet = state.areaSet): void {
+    // Apply any special object behavior that needs to occur before objects are linked.
+    for (const area of [
+            areaSet.current, areaSet.alternate,
+            areaSet.underwater, areaSet.alternateUnderwater,
+            areaSet.surface, areaSet.alternateSurface,
+    ]) {
+        if (!area) {
+            continue;
+        }
+        for (const object of [...area.objects]) {
+            // Make sure onBeforeLinkObjects is only run once per object initialization.
+            if (object.isInitialized) {
+                continue;
+            }
+            const specialBehavior = specialBehaviorsHash[object.definition?.specialBehaviorKey] as BaseSpecialObjectBehavior<any>;
+            specialBehavior?.onBeforeLinkObjects?.(state, object);
+        }
+    }
+    // Actually link the objects.
     for (const area of [
             areaSet.current, areaSet.alternate,
             areaSet.underwater, areaSet.alternateUnderwater,
@@ -70,6 +89,8 @@ export function linkObject(object: ObjectInstance): void {
     if (linkedObject) {
         linkedObject.linkedObject = object;
         object.linkedObject = linkedObject;
+    } else {
+        delete object.linkedObject;
     }
 }
 
@@ -535,6 +556,7 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
         //console.log('new instance', instance.objects.map( o => o.definition?.id ));
     }
     delete state.map.restoreOriginalTiles;
+    linkObjects(state, state.mutationState?.nextAreaSet ?? state.areaSet);
     for (const object of objectsToInitialize) {
         initializeObject(state, object, true);
     }
@@ -546,10 +568,7 @@ export function refreshCurrentAreaLogic(state: GameState, mutationDuration = sta
 export function initializeAreaSet(state: GameState, areaSet: AreaSet, isActiveArea: boolean) {
     // Currently variants are applied during createAreaInstance before tile behaviors are merged in the behavior grid.
     // Both of those actions could be moved into here, potentially.
-
-    // TODO: If necessary, add `onBeforeLinkObjects`, if some objects require running code before linking,
-    // for example, if an object had initialization logic to move it around independent of initial linked objects
-    // that may cause it to link with a different object afterwards.
+    // Link objects.
     linkObjects(state, areaSet);
     for (const area of [
             areaSet.current, areaSet.alternate,

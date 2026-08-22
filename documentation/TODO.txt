@@ -144,13 +144,20 @@ Graphics to Implement:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix pot linkage is no longer applied correctly for the war temple pot puzzle.
-
-    - Text cues don't fade out nicely when transitiont
+    - Text cues don't fade out nicely during transitions
         - Move Text cues to a state outside of the area so it can render and update independent of the field.
         - Render text cues over the field menu+map
         - Fade chest instructions out when obtaining the chakram.
         - Restrict to a single text cue.
+        - Map cues from hints should show over the field menu.
+            - Map cues from hints should be on a 2 second timer.
+        - Finished instructions should not hide unrelated cues.
+            - This is low priority since only the hint map cues compete currently, and the above addresses most issues with this.
+
+    - Make field sounds less audible the further away they are:
+        100% on screen, dropping to 0% after 8 * 16 = 144 pixels
+
+    - Fix: Chakram shouldn't be able to hit enemies while player is jumping down from cliffs.
 
     - Make Elder visible sigh instead of using "*sigh*" dialogue
         - Add new south facing sigh animation

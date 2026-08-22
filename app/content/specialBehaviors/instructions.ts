@@ -67,7 +67,11 @@ specialBehaviorsHash.barrierBurstInstructions = {
         }
         if (toolButton) {
             if (state.hero.hasBarrier) {
-                helpText = `Hold ${toolButton} to use the Barrier Burst Technique`;
+                if (state.savedState.objectFlags.cocoonBackPortalEnter) {
+                    helpText = `The barrier can reflect enemy projectiles`;
+                } else {
+                    helpText = `Hold ${toolButton} to use the Barrier Burst Technique`;
+                }
             } else {
                 helpText = `Tap ${toolButton} to create a Spirit Barrier`;
             }

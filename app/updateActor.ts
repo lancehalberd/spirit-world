@@ -213,7 +213,6 @@ function scrollToNewSection(state: GameState, d: CardinalDirection): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
     fadeTextCue(state);
-    // TODO: Make sure this doesn't reset the current section.
     state.nextAreaSet = getAreaSetForLocation(state, {
         ...state.location,
         x: state.hero.x + 32 * directionMap[d][0],

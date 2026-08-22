@@ -758,47 +758,53 @@ interface BaseSpecialBehavior<T> {
     onRefreshLogic?: (state: GameState, object: T, fresh?: boolean) => void
 }
 
+interface BaseSpecialObjectBehavior<T> extends BaseSpecialBehavior<T> {
+    // This is called directly before all objects are linked in the area.
+    // This should be used for logic that could impact which objects are linked.
+    onBeforeLinkObjects?: (state: GameState, object: T) => void
+}
 
-interface SpecialDoorBehavior extends BaseSpecialBehavior<Door> {
+
+interface SpecialDoorBehavior extends BaseSpecialObjectBehavior<Door> {
     type: 'door'
 }
-interface SpecialLootBehavior extends BaseSpecialBehavior<ObjectInstance> {
+interface SpecialLootBehavior extends BaseSpecialObjectBehavior<ObjectInstance> {
     type: 'loot'
 }
-interface SpecialEnemyBehavior extends BaseSpecialBehavior<Enemy> {
+interface SpecialEnemyBehavior extends BaseSpecialObjectBehavior<Enemy> {
     type: 'enemy'
 }
 
-interface SpecialSignBehavior extends BaseSpecialBehavior<Sign> {
+interface SpecialSignBehavior extends BaseSpecialObjectBehavior<Sign> {
     type: 'sign'
     onRead?: (state: GameState, object: Sign) => void
 }
 
-interface SpecialElevatorBehavior extends BaseSpecialBehavior<Elevator> {
+interface SpecialElevatorBehavior extends BaseSpecialObjectBehavior<Elevator> {
     type: 'elevator'
 }
 
-interface SpecialSwitchBehavior extends BaseSpecialBehavior<ObjectInstance> {
+interface SpecialSwitchBehavior extends BaseSpecialObjectBehavior<ObjectInstance> {
     // This could be extended for floor switches and other switches.
     type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal' | 'heavyFloorSwitch'
     onActivate?: (state: GameState, object: ObjectInstance) => void
 }
 
-interface SpecialPushPullBehavior extends BaseSpecialBehavior<ObjectInstance> {
+interface SpecialPushPullBehavior extends BaseSpecialObjectBehavior<ObjectInstance> {
     type: 'pushPull',
 }
 
-interface SpecialTippableBehavior extends BaseSpecialBehavior<ObjectInstance> {
+interface SpecialTippableBehavior extends BaseSpecialObjectBehavior<ObjectInstance> {
     type: 'tippable',
 }
 
-interface SpecialNarrationBehavior extends BaseSpecialBehavior<ObjectInstance> {
+interface SpecialNarrationBehavior extends BaseSpecialObjectBehavior<ObjectInstance> {
     type: 'narration'
     update?: (state: GameState, object: ObjectInstance) => void
 }
 
 
-interface SpecialNpcBehavior extends BaseSpecialBehavior<NPC> {
+interface SpecialNpcBehavior extends BaseSpecialObjectBehavior<NPC> {
     type: 'npc'
     update?: (state: GameState, object: NPC) => void
 }
