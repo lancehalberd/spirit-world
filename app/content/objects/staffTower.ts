@@ -82,7 +82,7 @@ export class StaffTower implements ObjectInstance {
         this.animationTime = 0;
         // Prevent the hero from moving while the tower collapses.
         state.hero.isControlledByObject = true;
-        this.rumbleSoundReference = playAreaSound(state, state.areaSet?.current, 'rumble');
+        this.rumbleSoundReference = playAreaSound(state, state.areaSet?.current, 'rumble', null);
         state.screenShakes = [{dx: 1, dy: 0, startTime: state.fieldTime}];
     }
     deploy(state: GameState) {
@@ -153,8 +153,8 @@ export class StaffTower implements ObjectInstance {
                 this.y = Math.min(this.y + 6, this.definition.y);
             } else {
                 state.screenShakes = [{dx: 0, dy: 5, startTime: state.fieldTime, endTime: state.fieldTime + 1000}];
-                playAreaSound(state, state.areaSet?.current, 'bossDeath');
-                playAreaSound(state, state.areaSet?.current, 'cloneExplosion');
+                playAreaSound(state, state.areaSet?.current, 'bossDeath', null);
+                playAreaSound(state, state.areaSet?.current, 'cloneExplosion', null);
                 delete this.specialStatus;
                 // Should destroy anything the tower lands on that isn't immune to physical damage.
                 hitTargets(state, this.area, {

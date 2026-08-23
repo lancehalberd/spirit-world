@@ -53,7 +53,7 @@ export class BarrierBurstEffect implements EffectInstance {
     }
     update(state: GameState) {
         if (this.animationTime === 0) {
-            playAreaSound(state, this.area, 'enemyDeath');
+            playAreaSound(state, this.area, 'enemyDeath', {x: this.x, y: this.y});
         }
         this.x = this.source.x + 8;
         this.y = this.source.y + 8;

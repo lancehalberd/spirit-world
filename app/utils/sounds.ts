@@ -183,7 +183,7 @@ export function extendSound(instance: AudioInstance) {
     }
 }
 
-export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime): AudioInstance|undefined {
+export function playSound(key: string, seekTime: number = 0, force = false, startTime = audioContext.currentTime, volumeMultiplier = 1): AudioInstance|undefined {
     const sound = sounds.get(key);
     if (!sound) {
         throw new Error('Tried to play missing sound ' + key);
@@ -191,6 +191,9 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
     }
     if (isNaN(seekTime) || isNaN(startTime)) {
         debugger;
+        return;
+    }
+    if (volumeMultiplier <= 0) {
         return;
     }
     // Make sure sound.key gets populated for any sound before it is used.
@@ -223,7 +226,7 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
             if (instance.sound.loop) {
                 instance.scheduledStopTime = targetTime + EXTEND_EFFECT_DURATION;
             }
-            const volume = Math.min(1, sound.volume);
+            const volume = Math.min(1, sound.volume * volumeMultiplier);
             instance.gainNode.connect(soundEffectGainNode);
             // Add a tiny ramp to all SFX to prevent clicking at start/end of sound
             // if the middle of a clip is used.
@@ -242,7 +245,17 @@ export function playSound(key: string, seekTime: number = 0, force = false, star
                 endTime: sound.duration ? targetTime + sound.duration : undefined,
             };
             sound.instances.push(instance);
-            instance.customStop = sound.play(soundEffectGainNode, targetTime - seekTime);
+            // Synth sounds write directly to their target node's gain rather than exposing
+            // an AudioInstance.gainNode, so attenuate by inserting a gain node ahead of them
+            // when this sound isn't at full volume.
+            let playTarget = soundEffectGainNode;
+            if (volumeMultiplier < 1) {
+                const volumeGainNode = audioContext.createGain();
+                volumeGainNode.gain.setValueAtTime(volumeMultiplier, targetTime);
+                volumeGainNode.connect(soundEffectGainNode);
+                playTarget = volumeGainNode;
+            }
+            instance.customStop = sound.play(playTarget, targetTime - seekTime);
             if (instance.customStop) {
                 instance.scheduledStopTime = targetTime + EXTEND_EFFECT_DURATION;
             }

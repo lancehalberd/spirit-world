@@ -71,7 +71,6 @@ enemyDefinitions.sentryBot = {
             if (enemy.modeTime === chargeTime - 180) {
                 const cx = hitbox.x + hitbox.w / 2;
                 const cy = hitbox.y + hitbox.h / 2;
-                playAreaSound(state, enemy.area, 'laser');
                 const laser = new LaserBeam({
                     sx: cx, sy: cy,
                     tx: enemy.params.targetX, ty: enemy.params.targetY,
@@ -80,6 +79,7 @@ enemyDefinitions.sentryBot = {
                     visualPadding: 1,
                     drawLaser: drawJitteryLaser,
                 });
+                playAreaSound(state, enemy.area, 'laser', laser.getHitRay(state));
                 // This ability overrides the default laser sounds.
                 laser.muteSounds = true;
                 addEffectToArea(state, enemy.area, laser);

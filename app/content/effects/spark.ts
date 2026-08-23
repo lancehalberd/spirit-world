@@ -155,7 +155,7 @@ export class Spark implements EffectInstance, Props {
             return;
         }
         if (this.soundKey, this.animationTime === 0) {
-            playAreaSound(state, this.area, this.soundKey);
+            playAreaSound(state, this.area, this.soundKey, {x: this.x, y: this.y});
         }
         if (this.props.target && isTargetVisible(state, this, this.props.target)) {
             const {x, y} = getVectorToTarget(state, this, this.props.target);

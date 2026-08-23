@@ -1,4 +1,4 @@
-import { drawARFont } from 'app/utils/smallFont';
+﻿import { drawARFont } from 'app/utils/smallFont';
 import { wasGameKeyPressed } from 'app/userInput';
 import { GAME_KEY } from 'app/gameConstants';
 import { boxesIntersect, pad } from 'app/utils/index';
@@ -132,7 +132,7 @@ function updateReset(state: GameState, gameState:TargetPracticeState, savedState
             Object.assign(savedState, getNewTargetPracticeSavedState());
             saveGame(state);
             gameState.scene = 'shop';
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
     }
 }

@@ -127,7 +127,7 @@ export class CrystalSwitch implements ObjectInstance {
         if (this.status === 'active' && !(this.timeLimit && this.timeLeft < this.timeLimit - 200)) {
             return;
         }
-        playAreaSound(state, this.area, 'activateCrystalSwitch');
+        playAreaSound(state, this.area, 'activateCrystalSwitch', {x: this.x, y: this.y});
         this.status = 'active';
         saveObjectStatus(state, this.definition);
         this.animationTime = 0;
@@ -163,7 +163,7 @@ export class CrystalSwitch implements ObjectInstance {
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
-                playAreaSound(state, this.area, 'deactivateCrystalSwitch');
+                playAreaSound(state, this.area, 'deactivateCrystalSwitch', {x: this.x, y: this.y});
             }
         }
     }

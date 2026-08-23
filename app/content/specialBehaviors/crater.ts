@@ -30,7 +30,7 @@ specialBehaviorsHash.craterLavaSwitch = {
             startTime: state.fieldTime,
             id: 'craterLava',
         });
-        let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble');
+        let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble', null);
         appendScriptEvents(state, [{
             type: 'update',
             update(state: GameState) {
@@ -105,7 +105,7 @@ function drainFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
-    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble');
+    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble', null);
     appendScriptEvents(state, [{
         type: 'update',
         update(state: GameState) {
@@ -173,7 +173,7 @@ export function fillFlameBeastLava(state: GameState) {
         startTime: state.fieldTime,
         id: 'craterLava',
     });
-    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble');
+    let rumbleSoundReference: AudioInstance|undefined = playAreaSound(state, state.areaSet?.current, 'rumble', null);
     appendScriptEvents(state, [{
         type: 'update',
         update(state: GameState) {

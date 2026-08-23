@@ -1,6 +1,6 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {playAreaSound} from 'app/musicController';
+import {playObjectSound} from 'app/musicController';
 import {appendBlockInput, showMessage} from 'app/scriptEvents';
 import {createAnimation, drawFrameAt, getFrame} from 'app/utils/animations';
 import {findObjectInstanceById} from 'app/utils/findObjectInstanceById';
@@ -101,10 +101,10 @@ export class KeyBlock implements ObjectInstance {
         const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
         if (this.status === 'locked' && dungeonInventory?.smallKeys) {
             dungeonInventory.smallKeys--;
-            playAreaSound(state, this.area, 'switch');
+            playObjectSound(state, this, 'switch');
             return this.onActivate(state);
         } else if (this.status === 'bigKeyLocked' && dungeonInventory?.bigKey) {
-            playAreaSound(state, this.area, 'switch');
+            playObjectSound(state, this, 'switch');
             return this.onActivate(state);
         } else {
             return false;
@@ -147,11 +147,11 @@ export class KeyBlock implements ObjectInstance {
             this.animationTime += FRAME_LENGTH;
             if (this.definition.status === 'closed') {
                 if (this.animationTime === 20) {
-                    playAreaSound(state, this.area, 'keyBlockScraping');
+                    playObjectSound(state, this, 'keyBlockScraping');
                 }
             } else {
                 if (this.animationTime === 800) {
-                    playAreaSound(state, this.area, 'keyBlockScraping');
+                    playObjectSound(state, this, 'keyBlockScraping');
                 }
             }
             if (this.animationTime === blockedDuration) {

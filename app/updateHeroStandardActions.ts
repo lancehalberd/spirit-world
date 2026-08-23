@@ -298,7 +298,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (hero.area && hero.explosionTime >= EXPLOSION_TIME) {
                     hero.action = null;
                     hero.explosionTime = 0;
-                    playAreaSound(state, hero.area, 'cloneExplosion');
+                    playAreaSound(state, hero.area, 'cloneExplosion', {x: hero.x, y: hero.y});
                     addEffectToArea(state, hero.area, new CloneExplosionEffect({
                         x: hero.x + hero.w / 2,
                         y: hero.y + hero.h / 2,
@@ -660,7 +660,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 return;
             } else {
                 // This needs to be played in the area with the main hero, not the astral projection.
-                playAreaSound(state, state.hero.area, 'error');
+                playAreaSound(state, state.hero.area, 'error', {x: state.hero.x, y: state.hero.y});
             }
         }
     }
@@ -815,7 +815,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 const behavior = tile?.behaviors;
                 if (behavior?.pickupWeight <= glovesLevel) {
                     hero.pickUpTile = behavior.pickupTile ? allTiles[behavior.pickupTile] : tile;
-                    playAreaSound(state, hero.area, 'pickUpObject');
+                    playAreaSound(state, hero.area, 'pickUpObject', {x: closestLiftableTileCoords.x * 16, y: closestLiftableTileCoords.y * 16});
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                     if (behavior.linkableTiles) {
                         const alternateLayer = hero.area.alternateArea.layers.find(l => l.key === layer.key);
@@ -882,7 +882,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.actionDy = directionMap[direction][1];
             return;
         } else {
-            playAreaSound(state, hero.area, 'error');
+            playAreaSound(state, hero.area, 'error', {x: hero.x, y: hero.y});
         }
     }
     if (

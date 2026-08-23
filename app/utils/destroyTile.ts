@@ -19,7 +19,7 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
     const underTile = behavior?.underTile || 0;
     layer.tiles[target.y][target.x] = allTiles[underTile];
     if (!noParticles && behavior.breakSound) {
-        playAreaSound(state, area, behavior.breakSound);
+        playAreaSound(state, area, behavior.breakSound, {x: target.x * 16 + 8, y: target.y * 16 + 8});
     }
 
     resetTileBehavior(area, target);

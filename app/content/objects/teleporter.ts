@@ -129,7 +129,7 @@ export class Teleporter implements ObjectInstance {
             return;
         } else if (this.wasUnderObject) {
             this.wasUnderObject = false;
-            playAreaSound(state, this.area, 'secretChime');
+            playAreaSound(state, this.area, 'secretChime', null);
         }
         const targetRadius = this.getTargetRadius(state);
         if (this.actualRadius < targetRadius) {

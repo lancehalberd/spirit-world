@@ -434,15 +434,15 @@ export function addFieldAnimation(state: GameState, area: AreaInstance, animatio
 }
 
 export function addSplashAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
-    playAreaSound(state, area, 'waterSplash');
+    playAreaSound(state, area, 'waterSplash', {x, y});
     return addFieldAnimation(state, area, splashAnimation, {x: x - 8, y: y - 8});
 }
 export function addObjectFallAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
-    playAreaSound(state, area, 'fall');
+    playAreaSound(state, area, 'fall', {x, y});
     return addFieldAnimation(state, area, objectFallAnimation, {x: x - 8, y: y - 8}, {update: updateFallEffect});
 }
 export function addEnemyFallAnimation(state: GameState, area: AreaInstance, {x, y}: Point) {
-    playAreaSound(state, area, 'fall');
+    playAreaSound(state, area, 'fall', {x, y});
     return addFieldAnimation(state, area, enemyFallAnimation, {x: x - 8, y: y - 8}, {update: updateFallEffect});
 }
 // This logic matches similar logic in updateHeroSpecialAction, but this version uses a smaller hitbox.
@@ -515,7 +515,7 @@ export function addBurstEffect(this: void, state: GameState, actor: Actor, area:
         y: hitbox.y + hitbox.h / 2 - burstAnimation.frames[0].h / 2,
     });
     addEffectToArea(state, area, animation);
-    playAreaSound(state, area, 'airBurst');
+    playAreaSound(state, area, 'airBurst', hitbox);
 }
 
 /**

@@ -141,7 +141,7 @@ export class PitEntrance implements ObjectInstance {
             this.wasUnderObject = false;
             // Play the secret chime when this pit is first discovered if it is actually an entrance.
             if (this.definition.targetZone, this.definition.targetObjectId) {
-                playAreaSound(state, this.area, 'secretChime');
+                playAreaSound(state, this.area, 'secretChime', null);
             }
         }
         const hero = state.hero;

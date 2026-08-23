@@ -1,6 +1,6 @@
 import {objectHash} from 'app/content/objects/objectHash';
 import {FRAME_LENGTH} from 'app/gameConstants';
-import {playAreaSound} from 'app/musicController';
+import {playObjectSound} from 'app/musicController';
 import {hitTargets} from 'app/utils/field';
 import {getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import SRandom from 'app/utils/SRandom';
@@ -118,7 +118,7 @@ export class Torch implements ObjectInstance {
         } else if (this.status === 'normal' && hit.element === 'fire') {
             this.status = 'active';
             this.behaviors.element = 'fire';
-            playAreaSound(state, this.area, 'lightFlame');
+            playObjectSound(state, this, 'lightFlame');
         }
         return { hit: true, pierced: true, setElement: this.behaviors.element };
     }

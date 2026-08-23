@@ -108,7 +108,7 @@ export class ThrownObject implements EffectInstance {
     breakOnImpact(state: GameState) {
         if (!this.broken) {
             this.broken = true;
-            playAreaSound(state, this.area, this.behaviors.breakSound);
+            playAreaSound(state, this.area, this.behaviors.breakSound, {x: this.x + this.frame.w / 2, y: this.y + this.frame.h / 2});
             addParticleAnimations(state, this.area,
                 this.x + this.frame.w / 2, 
                 this.y + this.frame.h / 2,

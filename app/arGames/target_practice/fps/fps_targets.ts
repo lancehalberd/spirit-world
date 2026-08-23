@@ -1,4 +1,4 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
+﻿import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawARFont } from 'app/utils/smallFont';
 import { playAreaSound } from 'app/musicController';
 import { TargetPracticeState, TargetPracticeSavedState, FpsTarget, BullseyeEffect } from './fps_types';
@@ -129,15 +129,15 @@ class StandardTarget implements FpsTarget {
                 gameState.score += this.points * 2;
                 // Create bullseye visual effect
                 createBullseyeEffect(this.x, this.y, gameState);
-                playAreaSound(state, state.areaSet?.current, 'hitBullseye');
+                playAreaSound(state, state.areaSet?.current, 'hitBullseye', null);
             } else {
                 gameState.score += this.points;
-                playAreaSound(state, state.areaSet?.current, 'hitShot');
+                playAreaSound(state, state.areaSet?.current, 'hitShot', null);
             }
             gameState.score = Math.max(gameState.score, 0);
             this.hitTime = 300;
         } else {
-            playAreaSound(state, state.areaSet?.current, 'rockShatter');
+            playAreaSound(state, state.areaSet?.current, 'rockShatter', null);
     }
 }
 }
@@ -260,10 +260,10 @@ class AlternatingTarget extends StandardTarget {
         this.hitTime = 300;
         
         if (this.currentPoints > 0) {
-            playAreaSound(state, state.areaSet?.current, 'hitShot');
+            playAreaSound(state, state.areaSet?.current, 'hitShot', null);
         }
         else {
-            playAreaSound(state, state.areaSet?.current, 'error')
+            playAreaSound(state, state.areaSet?.current, 'error', null)
         }
     }
 }
@@ -313,7 +313,7 @@ class BonusTarget extends StandardTarget {
         gameState.shotsHit++;
         this.hitTime = 300;
         
-        playAreaSound(state, state.areaSet?.current, 'hitShot');
+        playAreaSound(state, state.areaSet?.current, 'hitShot', null);
     }
 } 
 
@@ -353,7 +353,7 @@ class ExplosiveTarget extends StandardTarget {
         if (this.hitTime !== undefined) return;
         const explosionPoints = handleExplosion(gameState, savedState, this);
         gameState.score += explosionPoints;
-        playAreaSound(state, state.areaSet?.current, 'bossDeath');
+        playAreaSound(state, state.areaSet?.current, 'bossDeath', null);
         gameState.shotsHit++;
         this.hitTime = 300;
     }

@@ -85,7 +85,7 @@ export class Frost implements EffectInstance, Props {
             return;
         }
         if (this.soundKey && this.animationTime === this.delay) {
-            playAreaSound(state, this.area, this.soundKey);
+            playAreaSound(state, this.area, this.soundKey, {x: this.x, y: this.y});
         }
         this.x += this.vx;
         this.y += this.vy;

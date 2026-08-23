@@ -253,7 +253,7 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
     playChime = playChime && isObjectInCurrentSection(state, target);
     if (target.onActivate) {
         if (target.onActivate(state) && playChime) {
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
         return;
     }
@@ -261,13 +261,13 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
         changeObjectStatus(state, target, 'normal');
         saveObjectStatus(state, target.definition, true);
         if (playChime) {
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
     } else if (target.status === 'closedSwitch') {
         changeObjectStatus(state, target, 'normal');
         saveObjectStatus(state, target.definition, true);
         if (playChime) {
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
     }
 }
@@ -275,7 +275,7 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
 export function deactivateTarget(state: GameState, target: ObjectInstance): void {
     if (target.onDeactivate) {
         if (target.onDeactivate(state)) {
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
         return;
     }

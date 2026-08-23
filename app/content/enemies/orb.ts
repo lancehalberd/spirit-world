@@ -1,21 +1,20 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { LightningBolt } from 'app/content/effects/lightningBolt';
-import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import { addRadialSparks } from 'app/content/effects/spark';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { certainLifeLootTable } from 'app/content/lootTables';
-import { Enemy } from 'app/content/enemy';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {LightningBolt} from 'app/content/effects/lightningBolt';
+import {Blast} from 'app/content/effects/blast';
+import {addRadialSparks} from 'app/content/effects/spark';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
+import {certainLifeLootTable} from 'app/content/lootTables';
+import {Enemy} from 'app/content/enemy';
 
-import { omniAnimation } from 'app/content/enemyAnimations';
-import { FRAME_LENGTH } from 'app/gameConstants';
-// import { renderDamageWarning } from 'app/render/renderDamageWarning';
-import { renderLightningRay } from 'app/render/renderLightning'
-import { createAnimation } from 'app/utils/animations';
-import { addEffectToArea } from 'app/utils/effects';
-import { isEnemyMissing, moveEnemyFull, moveEnemyToTargetLocation } from 'app/utils/enemies';
-import { hitTargets } from 'app/utils/field';
+import {omniAnimation} from 'app/content/enemyAnimations';
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {renderLightningRay} from 'app/render/renderLightning'
+import {createAnimation} from 'app/utils/animations';
+import {addEffectToArea} from 'app/utils/effects';
+import {isEnemyMissing, moveEnemyFull, moveEnemyToTargetLocation} from 'app/utils/enemies';
+import {hitTargets} from 'app/utils/field';
 import {addObjectToArea} from 'app/utils/objects';
-import { getVectorToNearbyTarget, getVectorToHitbox, getVectorToTarget } from 'app/utils/target';
+import {getVectorToNearbyTarget, getVectorToHitbox, getVectorToTarget} from 'app/utils/target';
 
 const orbAnimation = createAnimation('gfx/tiles/futuristic.png', {w: 12, h: 12}, {left: 18, top: 979});
 const largeOrbAnimation = createAnimation('gfx/enemies/largeOrb.png', {w: 48, h: 48}, {left: 0, top: 0});
@@ -106,27 +105,12 @@ const baseOrbDefinition: Partial<EnemyDefinition<OrbProps>> = {
                 //const otherHitbox = otherEnemy.getHitbox();
                 //const ocx = otherHitbox.x + otherHitbox.w / 2, ocy = otherHitbox.y + otherHitbox.h / 2;
                 if (v.mag < beamDistance) {
-                    /*renderDamageWarning(context, {
-                        circle: getBlastCircle(enemy, otherEnemy),
-                        duration: 1000,
-                        time: 0,
-                    });*/
                     renderHalfBeam(context, enemy, otherEnemy)
-                    /*renderLightningRay(context, {
-                        x1: cx, y1: cy,
-                        x2: (cx + ocx) / 2, y2: (cy + ocy) / 2,
-                        r: 4,
-                    }, 2, 20);*/
                 } else if (v.mag < warningDistance) {
 
                     const p = 1 - (v.mag - beamDistance) / (warningDistance - beamDistance);
                     context.save();
                         context.globalAlpha *= 0.3 * p;
-                        /*renderDamageWarning(context, {
-                            circle: getBlastCircle(enemy, otherEnemy, p),
-                            duration: 1000,
-                            time: 0,
-                        });*/
                         renderLightningRay(context, {
                             x1: enemy.x + 6, y1: enemy.y + 6 - enemy.z,
                             x2: enemy.x + 6 + p * v.x * beamDistance / 2, y2:enemy.y + 6 - enemy.z + p * v.y * beamDistance / 2,
@@ -448,7 +432,6 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
     const hitbox = enemy.getHitbox();
     if (enemy.params.largeOrb) {
         if (isEnemyMissing(enemy.area, enemy.params.largeOrb)) {
-            console.log("Removing large orb");
             enemy.params.largeOrb.params.smallOrbs = [];
             delete enemy.params.largeOrb;
         }
@@ -525,12 +508,16 @@ function updateSmallOrb(this: void, state: GameState, enemy: Enemy<OrbProps>) {
 
                 // Create an electric discharge in the spirit world.
                 const blastCircle = getBlastCircle(enemy, otherEnemy);
-                const discharge = new LightningDischarge({
+                const discharge = new Blast({
                     x: blastCircle.x,
                     y: blastCircle.y,
                     tellDuration: 400,
                     radius: blastCircle.r,
-                    hitEnemies: false,
+                    hitProperties: {
+                        hitEnemies: false,
+                    },
+                    element: 'lightning',
+                    damage: 4,
                     source: enemy,
                 });
                 addEffectToArea(state, enemy.area, discharge);

@@ -486,9 +486,9 @@ function updateShop(state: GameState, gameState:DodgerState, savedState: DodgerS
                 savedState.points -= cost;
                 savedState.unlocks[activeItem.key] = level + 1;
                 saveGame(state);
-                playAreaSound(state, state.areaSet?.current, 'secretChime');
+                playAreaSound(state, state.areaSet?.current, 'secretChime', null);
             } else {
-                playAreaSound(state, state.areaSet?.current, 'error');
+                playAreaSound(state, state.areaSet?.current, 'error', null);
             }
         } else if (level > 0 && activeItem.levelKey) {
             startLevel(state, gameState, activeItem.levelKey);
@@ -681,7 +681,7 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
         const target = gameState.targets[i];
         target.update(state, gameState);
         if (target.activeTime >= target.targetTime) {
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
             gameState.score++;
             gameState.targets.splice(i--, 1);
             gameState.life = Math.min(gameState.maxLife, gameState.life + (savedState.unlocks.heal ?? 0) * 0.5);
@@ -701,14 +701,14 @@ function updateLevel(state: GameState, gameState:DodgerState, savedState: Dodger
                 gameState.life--;
                 gameState.invulnerableTime = 100 + (savedState.unlocks.shield ?? 0) * 80;
                 gameState.timesHit++;
-                playAreaSound(state, state.areaSet?.current, 'ouch');
+                playAreaSound(state, state.areaSet?.current, 'ouch', null);
                 if (gameState.life <= 0) {
                     gameState.life = 0;
                     gameState.scene = 'results';
                     saveGame(state);
                 }
             } else {
-                playAreaSound(state, state.areaSet?.current, 'reflect');
+                playAreaSound(state, state.areaSet?.current, 'reflect', null);
             }
             gameState.bullets.splice(i--, 1);
             continue;

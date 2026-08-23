@@ -111,7 +111,7 @@ export class Elevator implements ObjectInstance {
         state.hero.savedData.equippedBoots = 'leatherBoots';
         appendCallback(state, (state: GameState) => {
             this.elevatorY = -4;
-            playAreaSound(state, this.area, 'bossDeath');
+            playAreaSound(state, this.area, 'bossDeath', null);
             state.screenShakes.push({
                 dx: 0, dy: 1, startTime: state.fieldTime, endTime: state.fieldTime + 500
             });
@@ -123,7 +123,7 @@ export class Elevator implements ObjectInstance {
         appendScript(state, '{wait:1000}');
         appendCallback(state, (state: GameState) => {
             this.elevatorY -= 12;
-            playAreaSound(state, this.area, 'bossDeath');
+            playAreaSound(state, this.area, 'bossDeath', null);
             state.screenShakes.push({
                 dx: 0, dy: 1, startTime: state.fieldTime, endTime: state.fieldTime + 500
             });
@@ -135,7 +135,7 @@ export class Elevator implements ObjectInstance {
         appendScript(state, '{wait:1500}');
         appendCallback(state, (state: GameState) => {
             this.specialStatus = 'falling';
-            playAreaSound(state, this.area, 'bossDeath');
+            playAreaSound(state, this.area, 'bossDeath', null);
             state.screenShakes.push({
                 dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 500
             });
@@ -184,7 +184,7 @@ export class Elevator implements ObjectInstance {
             if (this.elevatorY > 0) {
                 this.elevatorY = Math.max(0, this.elevatorY - 8);
                 if (this.elevatorY === 0) {
-                    playAreaSound(state, this.area, 'bossDeath');
+                    playAreaSound(state, this.area, 'bossDeath', null);
                     state.screenShakes.push({
                         dx: 2, dy: 4, startTime: state.fieldTime, endTime: state.fieldTime + 500
                     });

@@ -356,7 +356,7 @@ const growingThornsAbility: EnemyAbility<Target> = {
         if (!guardian) {
             return;
         }
-        rumbleSoundReference = playAreaSound(state, state.areaSet?.current, 'rumble');
+        rumbleSoundReference = playAreaSound(state, state.areaSet?.current, 'rumble', null);
         state.screenShakes.push({
             dx: 0.7,
             dy: 0.7,

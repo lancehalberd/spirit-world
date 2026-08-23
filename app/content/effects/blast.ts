@@ -88,21 +88,23 @@ export class Blast implements EffectInstance {
             }
         }
         if (this.animationTime < this.tellDuration && this.animationTime === FRAME_LENGTH) {
+            const soundSource: Circle = {x: this.x, y: this.y, r: this.radius};
             if (this.element === 'fire') {
-                playAreaSound(state, this.area, 'lightFlame');
+                playAreaSound(state, this.area, 'lightFlame', soundSource);
             } else {
-                this.chargeSound = playAreaSound(state, this.area, 'chargeLaser');
+                this.chargeSound = playAreaSound(state, this.area, 'chargeLaser', soundSource);
             }
         } else if (this.animationTime === this.tellDuration) {
+            const soundSource: Circle = {x: this.x, y: this.y, r: this.radius};
             this.stopChargeSound(state);
             if (this.element === 'fire') {
-                playAreaSound(state, this.area, 'lightFlame');
+                playAreaSound(state, this.area, 'lightFlame', soundSource);
             } else if (this.element === 'ice') {
-                playAreaSound(state, this.area, 'freeze');
+                playAreaSound(state, this.area, 'freeze', soundSource);
             } else if (this.element === 'lightning') {
-                playAreaSound(state, this.area, 'sparkBurst');
+                playAreaSound(state, this.area, 'sparkBurst', soundSource);
             } else {
-                playAreaSound(state, this.area, 'airBlast');
+                playAreaSound(state, this.area, 'airBlast', soundSource);
             }
         }
         if (this.animationTime % 40 === 0 && this.animationTime < this.tellDuration - Math.min(200, this.tellDuration / 3)) {

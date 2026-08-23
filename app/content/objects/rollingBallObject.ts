@@ -3,7 +3,7 @@ import {objectHash} from 'app/content/objects/objectHash';
 import {lightStoneParticles} from 'app/content/tiles/constants';
 import {FRAME_LENGTH} from 'app/gameConstants';
 import {moveObject} from 'app/movement/moveObject';
-import {playAreaSound, stopAreaSound} from 'app/musicController';
+import {playAreaSound, playObjectSound, stopAreaSound} from 'app/musicController';
 import {createAnimation, drawFrame, drawFrameAt, getFrame} from 'app/utils/animations';
 import {directionMap, hitTargets} from 'app/utils/field';
 import {getAreaObjectById, getAreaObjectByTypeAndId, getObjectStatus, removeObjectFromArea, saveObjectStatus} from 'app/utils/objects';
@@ -99,7 +99,7 @@ export class RollingBallObject implements ObjectInstance {
         // go through them.
         // Another option would be for it to bounce the staff back instead.
         if (isStaff && isBonk) {
-            playAreaSound(state, this.area, 'rockShatter');
+            playObjectSound(state, this, 'rockShatter');
             addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 0, lightStoneParticles);
             removeObjectFromArea(state, this);
             return {hit: true};
@@ -248,7 +248,7 @@ export class RollingBallObject implements ObjectInstance {
         return !stopped;
     }
     startRollingSound(state: GameState) {
-        this.soundReference = playAreaSound(state, this.area, 'rollingBall');
+        this.soundReference = playObjectSound(state, this, 'rollingBall');
     }
     stopRollingSound(state: GameState) {
         if (this.soundReference) {
@@ -279,7 +279,7 @@ export class RollingBallObject implements ObjectInstance {
                     this.linkedObject.y = this.y;
                     this.linkedObject.stopRollingSound(state);
                 }
-                playAreaSound(state, this.area, 'rollingBallHit');
+                playObjectSound(state, this, 'rollingBallHit');
             }
         }
         if (this.z <= 0) {
@@ -289,7 +289,7 @@ export class RollingBallObject implements ObjectInstance {
                 }
                 if (Math.abs(this.x - object.x) <= 4 && Math.abs(this.y - object.y) <= 4) {
                     this.stopRollingSound(state);
-                    playAreaSound(state, this.area, 'rollingBallSocket');
+                    playObjectSound(state, this, 'rollingBallSocket');
                     this.socketInBallGoal(state, object as BallGoal);
                     return;
                 }
@@ -305,7 +305,9 @@ export class RollingBallObject implements ObjectInstance {
                     startTime: state.fieldTime,
                     endTime: state.fieldTime + 200,
                 });
-                playAreaSound(state, this.area, 'bossDeath');
+                // This sound accompanies a screenshake, so it should always play
+                // full volume.
+                playAreaSound(state, state.areaSet.current, 'bossDeath', null);
                 hitTargets(state, this.area, {
                     damage: 2,
                     direction: this.rollDirection,

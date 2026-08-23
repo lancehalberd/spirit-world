@@ -40,6 +40,6 @@ export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstanc
     if (playChime) {
         // The player should always hear this, but we still need to use `playAreaSound`
         // to prevent this from playing from the preview during save selection.
-        playAreaSound(state, state.areaSet?.current, 'secretChime');
+        playAreaSound(state, state.areaSet?.current, 'secretChime', null);
     }
 }

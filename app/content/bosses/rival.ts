@@ -4,7 +4,6 @@ import {FRAME_LENGTH} from 'app/gameConstants';
 import {rivalAnimations} from 'app/content/enemyAnimations';
 import {removeTextCue} from 'app/content/effects/textCue';
 import {editingState} from 'app/development/editingState';
-import {playAreaSound} from 'app/musicController';
 import {isFieldSceneInteractive} from 'app/scenes/field/showFieldScene';
 import {appendBlockInput, appendScript} from 'app/scriptEvents';
 import {directionMap, getCardinalDirection} from 'app/utils/direction';
@@ -130,7 +129,7 @@ const staffSwingAbility: EnemyAbility<CardinalDirection> = {
         enemy.changeToAnimation('prepareStaffSwing');
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: CardinalDirection): void {
-        playAreaSound(state, enemy.area, 'staffSwing');
+        enemy.makeSound(state, 'staffSwing');
         enemy.changeToAnimation('staffSwing', 'idle');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
         // enemy.makeSound(state, 'bossDeath');

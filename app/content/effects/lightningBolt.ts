@@ -61,7 +61,7 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime === FRAME_LENGTH) {
-            playAreaSound(state, this.area, 'spawnThunderCloud');
+            playAreaSound(state, this.area, 'spawnThunderCloud', {x: this.x, y: this.y});
         }
         this.x += this.vx;
         this.y += this.vy;
@@ -80,8 +80,8 @@ export class LightningBolt implements EffectInstance, LightningBoltProps {
         } else if (strikeTime === 0) {
             // A lightning bolt is added at strike time.
             this.lastBolt = {x: this.x, y: this.y};
-            playAreaSound(state, this.area, 'lightningStrike');
-            playAreaSound(state, this.area, 'sparkBurst');
+            playAreaSound(state, this.area, 'lightningStrike', {x: this.lastBolt.x, y: this.lastBolt.y});
+            playAreaSound(state, this.area, 'sparkBurst', {x: this.lastBolt.x, y: this.lastBolt.y});
         } else if (this.lastBolt && strikeTime === LIGHTNING_ANIMATION_DURATION && this.shockWaves) {
             // The lightning bolt releases sparks when they hit.
             addRadialSparks(

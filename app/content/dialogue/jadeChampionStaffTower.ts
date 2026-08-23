@@ -117,7 +117,9 @@ dialogueHash.jadeChampionStaffTower = {
                     crushingPower: 2,
                     source: jadeChampion,
                 });
-                playAreaSound(state, state.areaSet?.current, 'rockShatter');
+                // Technically this has a location, but we want to make sure the player hears this sound clearly
+                // so we don't assign it a location.
+                playAreaSound(state, state.areaSet?.current, 'rockShatter', null);
                 removeObjectFromArea(state, jadeChampion);
                 state.savedState.objectFlags.jadeChampionStaffTowerTop = true;
                 saveGame(state);

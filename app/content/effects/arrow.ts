@@ -325,7 +325,7 @@ export class Arrow implements EffectInstance, Projectile {
             return;
         }
         if (!this.blocked && !this.stuckFrames && this.soundKey && this.animationTime === this.delay) {
-            playAreaSound(state, this.area, this.soundKey);
+            playAreaSound(state, this.area, this.soundKey, {x: this.x, y: this.y});
         }
         if (this.ax) {
             this.vx += this.ax;
@@ -427,9 +427,9 @@ export class Arrow implements EffectInstance, Projectile {
                 // we should update this logic to make sure it is balanced.
                 this.damage *= (hitResult.returnHit?.damage || 1);
                 if (this.hybridWorlds) {
-                    playAreaSound(state, state.areaSet?.current, 'blockAttack');
+                    playAreaSound(state, state.areaSet?.current, 'blockAttack', {x: this.x, y: this.y});
                 } else {
-                    playAreaSound(state, this.area, 'blockAttack');
+                    playAreaSound(state, this.area, 'blockAttack', {x: this.x, y: this.y});
                 }
                 this.direction = getDirection(this.vx, this.vy, true);
                 return;

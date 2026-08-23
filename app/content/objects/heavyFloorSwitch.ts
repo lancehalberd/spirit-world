@@ -1,11 +1,11 @@
-import { renderIndicator } from 'app/content/objects/indicator';
-import { objectHash } from 'app/content/objects/objectHash';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { playAreaSound } from 'app/musicController';
-import { createAnimation, drawFrameContentAt } from 'app/utils/animations';
-import { rectanglesOverlap } from 'app/utils/index';
-import { getObjectStatus, saveObjectStatus} from 'app/utils/objects';
-import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
+import {renderIndicator} from 'app/content/objects/indicator';
+import {objectHash} from 'app/content/objects/objectHash';
+import {specialBehaviorsHash} from 'app/content/specialBehaviors/specialBehaviorsHash';
+import {playObjectSound} from 'app/musicController';
+import {createAnimation, drawFrameContentAt} from 'app/utils/animations';
+import {rectanglesOverlap} from 'app/utils/index';
+import {getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import {checkIfAllSwitchesAreActivated} from 'app/utils/switches';
 
 
 const [
@@ -75,7 +75,7 @@ export class HeavyFloorSwitch implements ObjectInstance {
             const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSwitchBehavior;
             specialBehavior?.onActivate?.(state, this);
         }
-        playAreaSound(state, this.area, 'switch');
+        playObjectSound(state, this, 'switch');
         checkIfAllSwitchesAreActivated(state, this.area, this.definition);
     }
 
@@ -90,7 +90,7 @@ export class HeavyFloorSwitch implements ObjectInstance {
         const isDepressed = this.isDepressed(state);
         // Make a small noise when the switch becomes partially depressed.
         if (this.wasDepressed !== isDepressed) {
-            playAreaSound(state, this.area, 'smallSwitch');
+            playObjectSound(state, this, 'smallSwitch');
         }
         this.wasDepressed = isDepressed;
     }

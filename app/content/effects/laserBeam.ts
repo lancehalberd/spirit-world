@@ -138,7 +138,7 @@ export class LaserBeam implements EffectInstance, Props {
         }
         if (this.tellDuration > 0) {
             if (!this.muteSounds && !this.audioInstance) {
-                this.audioInstance = playAreaSound(state, this.area, 'chargeLaser');
+                this.audioInstance = playAreaSound(state, this.area, 'chargeLaser', this.getHitRay(state));
             }
             this.tellDuration -= FRAME_LENGTH;
             return;
@@ -146,7 +146,7 @@ export class LaserBeam implements EffectInstance, Props {
         if (!this.muteSounds && this.animationTime === 0 && this.duration > 0) {
             // Stop the charge sound if it is playing.
             this.stopSounds(state);
-            this.audioInstance = playAreaSound(state, this.area, 'fireLaser');
+            this.audioInstance = playAreaSound(state, this.area, 'fireLaser', this.getHitRay(state));
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime <= this.duration) {

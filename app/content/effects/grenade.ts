@@ -58,7 +58,7 @@ export class Grenade implements EffectInstance, Props {
     persistsAfterSource = true;
     constructor(public props: Props) {}
     onInitialize(state: GameState) {
-        playAreaSound(state, this.area, 'grenade');
+        playAreaSound(state, this.area, 'grenade', {x: this.x, y: this.y});
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -81,7 +81,7 @@ export class Grenade implements EffectInstance, Props {
     }
     // The default behavior is to just create a blast.
     defaultActivate(state: GameState) {
-        playAreaSound(state, this.area, 'grenadeExplosion');
+        playAreaSound(state, this.area, 'grenadeExplosion', {x: this.x, y: this.y});
         const blast = new Blast({
             x: this.x,
             y: this.y,

@@ -333,7 +333,7 @@ enemyDefinitions.snakeStorm = {
         }
         if (enemy.modeTime >= 400) {
             if (enemy.modeTime === 400) {
-                playAreaSound(state, enemy.area, 'sparkBurst');
+                playAreaSound(state, enemy.area, 'sparkBurst', {x: enemy.x, y: enemy.y});
             }
             enemy.changeToAnimation('move');
             // Lightning snake will stop when it is lined up with the hero on harder difficulties.

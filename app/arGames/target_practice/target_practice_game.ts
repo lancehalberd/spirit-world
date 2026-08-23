@@ -1,4 +1,4 @@
-import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
+﻿import {CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH, GAME_KEY} from 'app/gameConstants';
 import {heroArIcon} from 'app/render/heroAnimations';
 import {drawFrame} from 'app/utils/animations';
 import {boxesIntersect, pad} from 'app/utils/index';
@@ -421,11 +421,11 @@ class StandardTarget implements Target {
         if (this.currentHits >= this.maxHits) {
             gameState.score = Math.max(gameState.score + this.points, 0);
             this.hitTime = 300;
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
         
         else {
-            playAreaSound(state, state.areaSet?.current, 'rockShatter')
+            playAreaSound(state, state.areaSet?.current, 'rockShatter', null)
         }
     }
 }
@@ -548,10 +548,10 @@ class AlternatingTarget extends StandardTarget {
         this.hitTime = 300;
         
        if (this.currentPoints > 0) {
-            playAreaSound(state, state.areaSet?.current, 'hitShot');
+            playAreaSound(state, state.areaSet?.current, 'hitShot', null);
         }
         else {
-            playAreaSound(state, state.areaSet?.current, 'error')
+            playAreaSound(state, state.areaSet?.current, 'error', null)
         }
     }
 }
@@ -601,7 +601,7 @@ class BonusTarget extends StandardTarget {
         gameState.shotsHit++;
         this.hitTime = 300;
         
-        playAreaSound(state, state.areaSet?.current, 'secretChime');
+        playAreaSound(state, state.areaSet?.current, 'secretChime', null);
     }
 } 
 
@@ -641,7 +641,7 @@ class ExplosiveTarget extends StandardTarget {
         if (this.hitTime !== undefined) return;
         const explosionPoints = handleExplosion(gameState, savedState, this);
         gameState.score += explosionPoints;
-        playAreaSound(state, state.areaSet?.current, 'bossDeath');
+        playAreaSound(state, state.areaSet?.current, 'bossDeath', null);
         gameState.shotsHit++;
         this.hitTime = 300;
     }
@@ -857,9 +857,9 @@ function updateShop(state: GameState, gameState: TargetPracticeState, savedState
                 savedState.points -= cost;
                 savedState.unlocks[activeItem.key] = level + 1;
                 saveGame(state);
-                playAreaSound(state, state.areaSet?.current, 'secretChime');
+                playAreaSound(state, state.areaSet?.current, 'secretChime', null);
             } else {
-                playAreaSound(state, state.areaSet?.current, 'error');
+                playAreaSound(state, state.areaSet?.current, 'error', null);
             }
         } else if (level > 0 && activeItem.levelKey) {
             startLevel(state, gameState, activeItem.levelKey);
@@ -1025,7 +1025,7 @@ function fireBullet(state: GameState, gameState: TargetPracticeState, savedState
     gameState.reloadTime = Math.max(100, 300 - (savedState.unlocks.reload ?? 0) * 50);
     gameState.lastShotTime = 200;
     
-    playAreaSound(state, state.areaSet?.current, 'menuTick');
+    playAreaSound(state, state.areaSet?.current, 'menuTick', null);
 }
 
 function handleTargetCollisions(gameState: TargetPracticeState): void {
@@ -1485,7 +1485,7 @@ function updateReset(state: GameState, gameState:TargetPracticeState, savedState
             Object.assign(savedState, getNewTargetPracticeSavedState());
             saveGame(state);
             gameState.scene = 'shop';
-            playAreaSound(state, state.areaSet?.current, 'secretChime');
+            playAreaSound(state, state.areaSet?.current, 'secretChime', null);
         }
     }
 }

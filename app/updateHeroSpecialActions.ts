@@ -838,7 +838,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     baseTarget = {x: hero.x + 16, y: hero.y, w: 48, h: 16};
                 }
             }
-            playAreaSound(state, state.areaSet?.current, 'bossDeath');
+            playAreaSound(state, state.areaSet?.current, 'bossDeath', {x: hero.x, y: hero.y});
             hitTargets(state, state.areaSet?.current, {
                 damage: 4 * staffLevel,
                 hitbox: pad(baseTarget, 2),

@@ -5,7 +5,7 @@ import {stormHeartAnimations} from 'app/content/bosses/stormHeart';
 import {FlameWall} from 'app/content/effects/flameWall';
 import {shootFrostInCone} from 'app/content/effects/frost';
 import {LaserBeam} from 'app/content/effects/laserBeam';
-import {LightningDischarge} from 'app/content/effects/lightningDischarge';
+import {Blast} from 'app/content/effects/blast';
 import {addArcOfShockWaves, addRadialShockWaves} from 'app/content/effects/shockWave';
 import {addRadialSparks} from 'app/content/effects/spark';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
@@ -235,12 +235,13 @@ const dischargeAbility: EnemyAbility<NearbyTargetType> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         const hitbox = enemy.getHitbox(state);
-        const discharge = new LightningDischarge({
+        const discharge = new Blast({
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2,
             damage: 4,
             tellDuration: 3000,
             radius: 128,
+            element: 'lightning',
             boundSource: enemy,
             source: enemy,
         });

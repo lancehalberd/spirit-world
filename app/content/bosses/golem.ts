@@ -4,7 +4,7 @@ import {LaserBeam} from 'app/content/effects/laserBeam';
 import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {Enemy} from 'app/content/enemy';
 import {editingState} from 'app/development/editingState';
-import {playAreaSound, stopAreaSound} from 'app/musicController';
+import {stopAreaSound} from 'app/musicController';
 import {renderDamageWarning} from 'app/render/renderDamageWarning';
 import {createAnimation, drawFrame} from 'app/utils/animations';
 import {
@@ -614,7 +614,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.setMode('strafeSlamHands');
             } else {
                 enemy.setMode('chargeStrafeLaser');
-                enemy.params.chargeSoundParams = playAreaSound(state, enemy.area, 'chargeLaser');
+                enemy.params.chargeSoundParams = enemy.makeSound(state, 'chargeLaser');
             }
         }
     } else if (enemy.mode === 'chargeStrafeLaser') {
@@ -672,7 +672,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.useTaunt(state, 'flurry');
             } else {
                 enemy.setMode('chargeLaser');
-                enemy.params.chargeSoundParams = playAreaSound(state, enemy.area, 'chargeLaser');
+                enemy.params.chargeSoundParams = enemy.makeSound(state, 'chargeLaser');
                 if (hands.length) {
                     enemy.useTaunt(state, 'protect');
                 }

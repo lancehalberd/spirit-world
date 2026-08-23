@@ -420,11 +420,11 @@ export class HeldChakram implements EffectInstance {
             chargeLevel,
         });
         if (chakram.speed >= 12) {
-            playAreaSound(state, this.area, 'strongChakram');
+            playAreaSound(state, this.area, 'strongChakram', {x: chakram.x, y: chakram.y});
         } else if (chakram.speed >= 6) {
-            playAreaSound(state, this.area, 'normalChakram');
+            playAreaSound(state, this.area, 'normalChakram', {x: chakram.x, y: chakram.y});
         } else {
-            playAreaSound(state, this.area, 'weakChakram');
+            playAreaSound(state, this.area, 'weakChakram', {x: chakram.x, y: chakram.y});
         }
         this.hero.vx -= chakram.vx / 4;
         this.hero.vy -= chakram.vy / 4;
@@ -447,11 +447,11 @@ export class HeldChakram implements EffectInstance {
         // Only play the held sound if they actually hold the chakram for a moment.
         // This also happens to be the exact time that damage is doubled with level one charge.
         if (maxChargeLevel && this.animationTime === 300) {
-            playAreaSound(state, this.area, 'chakramCharge1');
+            playAreaSound(state, this.area, 'chakramCharge1', {x: this.x, y: this.y});
         }
         // Play a second sound when damage is doubled using the base charge (level 0).
         if (!maxChargeLevel && this.animationTime === 600) {
-            playAreaSound(state, this.area, 'chakramCharge1');
+            playAreaSound(state, this.area, 'chakramCharge1', {x: this.x, y: this.y});
             const cx = this.w / 2, cy = this.h / 2;
             this.sparkles.push(makeSparkleAnimation(state, {x: cx + 2, y: cy + 2, w: 1, h: 1}, { target: this, delay: 0 }));
             this.sparkles.push(makeSparkleAnimation(state, {x: cx - 3, y: cy + 3, w: 1, h: 1}, { target: this, delay: 80 }));
@@ -525,7 +525,7 @@ export class HeldChakram implements EffectInstance {
             }
             const enemyHitbox = enemy.getTouchHitbox();
             if (boxesIntersect(this, enemyHitbox)) {
-                playAreaSound(state, this.area, 'blockAttack');
+                playAreaSound(state, this.area, 'blockAttack', {x: this.x, y: this.y});
                 let dx = (this.x + this.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
                 let dy = (this.y + this.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);
                 if (!dx && !dy) {

@@ -169,7 +169,7 @@ const crystalBurstAbility: EnemyAbility<true> = {
 };
 
 function playChargeSound(state: GameState, enemy: Enemy<Params>) {
-    enemy.params.chargeAudioInstance = playAreaSound(state, enemy.area.alternateArea, 'chargeSpell');
+    enemy.params.chargeAudioInstance = playAreaSound(state, enemy.area.alternateArea, 'chargeSpell', enemy.getHitbox());
 }
 function stopChargeSound(state: GameState, enemy: Enemy<Params>) {
     if (enemy.params.chargeAudioInstance) {

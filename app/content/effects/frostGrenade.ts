@@ -63,12 +63,12 @@ export class FrostGrenade implements EffectInstance, Props {
         }
     }
     onInitialize(state: GameState) {
-        playAreaSound(state, this.area, 'grenade');
+        playAreaSound(state, this.area, 'grenade', {x: this.x, y: this.y});
     }
     // The default behavior is to just create an ice blast, but this can be changed in
     // the props to do other things.
     defaultActivate(state: GameState) {
-        playAreaSound(state, this.area, 'freeze');
+        playAreaSound(state, this.area, 'freeze', {x: this.x, y: this.y});
         const frostBlast = new Blast({
             x: this.x,
             y: this.y,

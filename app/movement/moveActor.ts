@@ -201,7 +201,7 @@ function moveActorInDirection(
             if (actor.pickUpObject || actor.pickUpTile) {
                 (actor as Hero).throwHeldObject?.(state);
             }
-            playAreaSound(state, state.areaSet?.current, 'fall');
+            playAreaSound(state, state.areaSet?.current, 'fall', {x: actor.x, y: actor.y});
             actor.jumpingTime = 0;
             if (actor.action === 'thrown' || actor.action === 'knocked' || actor.action === 'knockedHard') {
                 actor.action = 'jumpingDown';

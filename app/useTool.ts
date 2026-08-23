@@ -20,7 +20,7 @@ export function useTool(
     switch (tool) {
         case 'bow': {
             if (state.hero.magic <= 0) {
-                playAreaSound(state, hero.area, 'error');
+                playAreaSound(state, hero.area, 'error', {x: hero.x, y: hero.y});
                 return;
             }
 
@@ -65,7 +65,7 @@ export function useTool(
                 z: hero.z,
                 style: 'spirit',
             }
-            playAreaSound(state, hero.area, 'arrow');
+            playAreaSound(state, hero.area, 'arrow', {x: hero.x, y: hero.y});
             let arrow = new Arrow({
                 ...baseArrowProps,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
@@ -85,7 +85,7 @@ export function useTool(
                     vy: speed * directionMap[direction][1],
                     source: hero,
                 });
-                playAreaSound(state, hero.area, 'arrow');
+                playAreaSound(state, hero.area, 'arrow', {x: hero.x, y: hero.y});
                 addEffectToArea(state, state.areaSet?.current, arrow);
                 direction = rotateDirection(direction, 1);
                 arrow = new Arrow({
@@ -96,7 +96,7 @@ export function useTool(
                     vy: speed * directionMap[direction][1],
                     source: hero,
                 });
-                playAreaSound(state, hero.area, 'arrow');
+                playAreaSound(state, hero.area, 'arrow', {x: hero.x, y: hero.y});
                 addEffectToArea(state, state.areaSet?.current, arrow);
             }
             if (chargeLevel >= 2) {
@@ -155,7 +155,7 @@ export function useTool(
             //    magicCost += 5;
             //}
             if (state.hero.magic < magicCost) {
-                playAreaSound(state, hero.area, 'error');
+                playAreaSound(state, hero.area, 'error', {x: hero.x, y: hero.y});
                 return;
             }
             state.hero.spendMagic(state, magicCost);
@@ -171,12 +171,12 @@ export function useTool(
             }
             */
             hero.hasBarrier = true;
-            playAreaSound(state, hero.area, 'createBarrier');
+            playAreaSound(state, hero.area, 'createBarrier', {x: hero.x, y: hero.y});
             return;
         }
         case 'clone': {
             if (state.hero.magic <= 0 || state.hero.life <= 1) {
-                playAreaSound(state, hero.area, 'error');
+                playAreaSound(state, hero.area, 'error', {x: hero.x, y: hero.y});
                 return;
             }
             const maxClones = (state.hero.savedData.activeTools.clone & 2) ? 2 : 1;
@@ -221,14 +221,14 @@ export function useTool(
                 hero.activeStaff.recall(state);
                 hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
-                playAreaSound(state, state.areaSet?.current, 'menuTick');
+                playAreaSound(state, state.areaSet?.current, 'menuTick', {x: hero.x, y: hero.y});
                 return;
             }
             if (hero.activeStaff?.area) {
                 return;
             }
             if (state.hero.magic <= 0) {
-                playAreaSound(state, hero.area, 'error');
+                playAreaSound(state, hero.area, 'error', {x: hero.x, y: hero.y});
                 return;
             }
             state.hero.spendMagic(state, 10);

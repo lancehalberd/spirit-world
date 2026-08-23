@@ -1,4 +1,4 @@
-import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
+﻿import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { wasGameKeyPressed } from 'app/userInput';
 import { playAreaSound } from 'app/musicController';
 import { updateHeroPosition } from './fps_utility';
@@ -290,7 +290,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
     
     if (wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         if (gameState.ammo <= 0) {
-            playAreaSound(state, state.areaSet?.current, 'error');
+            playAreaSound(state, state.areaSet?.current, 'error', null);
         } else {
             gameState.shotsFired++;
             
@@ -314,7 +314,7 @@ function updateLevel(state: GameState, gameState: TargetPracticeState, savedStat
             if (!hitTarget) {
                 gameState.ammo--;
                 gameState.missedShots++;
-                playAreaSound(state, state.areaSet?.current, 'missedShot');
+                playAreaSound(state, state.areaSet?.current, 'missedShot', null);
             }
         }
     }

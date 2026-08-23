@@ -93,7 +93,7 @@ export class VineSprout implements ObjectInstance {
     }
     grow(state: GameState) {
         saveObjectStatus(state, this.definition);
-        playAreaSound(state, this.area, 'secretChime');
+        playAreaSound(state, this.area, 'secretChime', null);
         saveGame(state);
         this.sprouting = true;
         this.animationTime = 0;

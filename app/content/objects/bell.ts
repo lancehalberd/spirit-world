@@ -10,27 +10,27 @@ const bellFrame: Frame = bellAnimation.frames[0];
 export const bellStyles = {
     bellA4: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellA4');
+            playAreaSound(state, bell.area, 'bellA4', {x: bell.x, y: bell.y});
         }
     },
     bellB4: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellB4');
+            playAreaSound(state, bell.area, 'bellB4', {x: bell.x, y: bell.y});
         }
     },
     bellC5: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellC5');
+            playAreaSound(state, bell.area, 'bellC5', {x: bell.x, y: bell.y});
         }
     },
     bellD5: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellD5');
+            playAreaSound(state, bell.area, 'bellD5', {x: bell.x, y: bell.y});
         }
     },
     bellE5: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellE5');
+            playAreaSound(state, bell.area, 'bellE5', {x: bell.x, y: bell.y});
         }
     },
 };
@@ -63,7 +63,7 @@ export class Bell implements ObjectInstance {
             style.playSound(state, this);
             this.animationTime = 0;
         } else {
-            playAreaSound(state, this.area, 'blockAttack');
+            playAreaSound(state, this.area, 'blockAttack', {x: this.x, y: this.y});
         }
         return {
             stopped: true,

@@ -665,7 +665,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // Always show the explosion in the player's instance so that the animation
         // is always visible.
         addEffectToArea(state, state.areaSet?.current, explosionAnimation);
-        playAreaSound(state, state.areaSet?.current, 'enemyDeath');
+        playAreaSound(state, state.areaSet?.current, 'enemyDeath', this.getHitbox());
     }
     shouldReset(state: GameState) {
         return true;
@@ -1186,7 +1186,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         context.restore();
     }
     makeSound(state: GameState, soundKey: string) {
-        playAreaSound(state, this.area, soundKey);
+        return playAreaSound(state, this.area, soundKey, this.getHitbox());
     }
     // Update the scale of the enemy without moving the center of its feet.
     changeScale(scale: number): void {

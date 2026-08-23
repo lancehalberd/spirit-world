@@ -170,7 +170,7 @@ export class FlameWall implements EffectInstance, Props {
                 }
             }
         } else if (this.animationTime % 100 === 20 && this.animationTime < 400) {
-            playAreaSound(state, this.area, 'lightFlame');
+            playAreaSound(state, this.area, 'lightFlame', {x: this.x, y: this.y});
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

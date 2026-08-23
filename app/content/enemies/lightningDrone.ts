@@ -1,16 +1,16 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import {addSparkleAnimation} from 'app/content/effects/animationEffect';
+import {Blast} from 'app/content/effects/blast';
+import {enemyDefinitions} from 'app/content/enemies/enemyHash';
 import {
     droneAnimations,
 } from 'app/content/enemyAnimations';
-import { lifeLootTable } from 'app/content/lootTables';
-import { addEffectToArea } from 'app/utils/effects';
+import {lifeLootTable} from 'app/content/lootTables';
+import {addEffectToArea} from 'app/utils/effects';
 import {
     moveEnemyToTargetLocation,
     paceRandomly,
 } from 'app/utils/enemies';
-import { hitTargets } from 'app/utils/field';
+import {hitTargets} from 'app/utils/field';
 import {
     getMovementAnchor,
     getVectorToMovementTarget,
@@ -39,7 +39,7 @@ enemyDefinitions.lightningDrone = {
     naturalDifficultyRating: 4,
     animations: droneAnimations,
     flying: true, acceleration: 0.2, aggroRadius: 112, speed: 2,
-    life: 4, touchHit: { damage: 2, element: 'lightning', source: null},
+    life: 4, touchHit: {damage: 2, element: 'lightning', source: null},
     lootTable: lifeLootTable,
     immunities: ['lightning'],
     update(this: void, state: GameState, enemy: Enemy) {
@@ -57,11 +57,13 @@ enemyDefinitions.lightningDrone = {
                 if (moveEnemyToTargetLocation(state, enemy, enemy.params.targetX, enemy.params.targetY, 'idle') === 0) {
                     enemy.setMode('discharge');
                     const hitbox = enemy.getHitbox(state);
-                    const discharge = new LightningDischarge({
+                    const discharge = new Blast({
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                         tellDuration: chargeTime,
                         radius: dischargeRadius,
+                        element: 'lightning',
+                        damage: 4,
                         boundSource: enemy,
                         source: enemy,
                     });

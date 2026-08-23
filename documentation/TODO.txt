@@ -159,6 +159,8 @@ Current tasks:
 
     - Fix: When cancelling the "Quit" option, you should land on the setting menu, not the field menu.
 
+    - Fix: small orb could be knocked into walls (frozen when I observed this), but cannot normally move into walls.
+
     - Make Elder visible sigh instead of using "*sigh*" dialogue
         - Add new south facing sigh animation
         - Add script for moving player south of the elder for this dialogue so that he always faces south while talking to him.

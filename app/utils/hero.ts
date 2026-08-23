@@ -25,7 +25,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero,
         hero.displayLife = Math.min(hero.life, hero.displayLife + 0.1);
         if (hero.displayLife % 1 < oldModValue) {
             //console.log(hero.displayLife);
-            playAreaSound(state, state.areaSet?.current, 'heart');
+            playAreaSound(state, state.areaSet?.current, 'heart', null);
         }
     }
     // Hero takes one damage every half second while in a hot room.

@@ -138,11 +138,11 @@ export class Escalator implements ObjectInstance {
         } else if (hit.element === 'ice' && this.status !== 'frozen') {
             this.status = 'frozen';
             this.behaviors.slippery = true;
-            playAreaSound(state, this.area, 'freeze');
+            playAreaSound(state, this.area, 'freeze', this.getHitbox());
         }
         return {};
     }
-    getHitbox(state: GameState) {
+    getHitbox() {
         return this.definition;
     }
     getHitboxForMovingObjects(state: GameState) {

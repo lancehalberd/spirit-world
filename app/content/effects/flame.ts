@@ -161,7 +161,7 @@ export class Flame implements EffectInstance, Props {
     }
     update(state: GameState) {
         if (this.soundKey && !this.destroyed && this.animationTime === 0) {
-            playAreaSound(state, this.area, this.soundKey);
+            playAreaSound(state, this.area, this.soundKey, {x: this.x, y: this.y});
         }
         if (this.destroyed) {
             this.animationTime += FRAME_LENGTH;

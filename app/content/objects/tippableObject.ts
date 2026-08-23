@@ -1,11 +1,11 @@
-import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { objectHash } from 'app/content/objects/objectHash';
-import { moveLinkedObject, PushPullObject } from 'app/content/objects/pushPullObject'
-import { FRAME_LENGTH } from 'app/gameConstants';
-import { playAreaSound } from 'app/musicController';
-import { createAnimation, drawFrameAt, drawFrameReflectedAt, getFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import {addParticleAnimations} from 'app/content/effects/animationEffect';
+import {objectHash} from 'app/content/objects/objectHash';
+import {moveLinkedObject, PushPullObject} from 'app/content/objects/pushPullObject'
+import {FRAME_LENGTH} from 'app/gameConstants';
+import {playObjectSound} from 'app/musicController';
+import {createAnimation, drawFrameAt, drawFrameReflectedAt, getFrame} from 'app/utils/animations';
+import {directionMap} from 'app/utils/field';
+import {addObjectToArea, removeObjectFromArea} from 'app/utils/objects';
 
 
 const particleFrames: Frame[] = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 6, cols: 5}).frames;
@@ -64,7 +64,7 @@ export class TippableObject implements ObjectInstance {
         if (this.shattered || this.fallDirection || this.fallingInPlace) {
             return;
         }
-        playAreaSound(state, this.area, 'freeze');
+        playObjectSound(state, this, 'freeze');
         const frozenPot = new FrozenPotObject(
             state,
             {
