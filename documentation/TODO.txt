@@ -146,16 +146,14 @@ Graphics to Implement:
 Current tasks:
     - Text cues don't fade out nicely during transitions
         - Move Text cues to a state outside of the area so it can render and update independent of the field.
-        - Render text cues over the field menu+map
+            - Possibly on the scene stack so we can support multiple orders.
+        - Text cue for map instructions should render over field/map scenes so it can fade out after it is pressed and display over the field menu.
+            - Map cue from hints should fade out over 2 seconds.
+        - Text cues for locations should probably be under the map/field menu, but might be okay to have over them.
         - Fade chest instructions out when obtaining the chakram.
-        - Restrict to a single text cue.
-        - Map cues from hints should show over the field menu.
-            - Map cues from hints should be on a 2 second timer.
+            - So this one would need to be on to keep running during the loot get animation + loot dialogue
         - Finished instructions should not hide unrelated cues.
             - This is low priority since only the hint map cues compete currently, and the above addresses most issues with this.
-
-    - Make field sounds less audible the further away they are:
-        100% on screen, dropping to 0% after 8 * 16 = 144 pixels
 
     - Fix: Chakram shouldn't be able to hit enemies while player is jumping down from cliffs.
 
