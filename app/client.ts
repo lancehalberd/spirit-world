@@ -24,6 +24,11 @@ import {populateAllSections} from 'app/content/sections';
 import {populateAllDialogue} from 'app/content/dialogue/dialogueList';
 import {getState} from 'app/state';
 import {updateMusic} from 'app/musicController';
+export * from 'app/utils/instruments/bell';
+export * from 'app/utils/instruments/harp';
+export * from 'app/utils/instruments/hihat';
+export * from 'app/utils/instruments/zeldaSquare';
+export * from 'app/utils/instruments/instrumentPlayer';
 
 export * from 'app/content/objects/astralProjection';
 export * from 'app/content/objects/clone';

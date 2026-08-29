@@ -1,9 +1,8 @@
-import {noteFrequencies} from './noteFrequencies';
 import {editingState} from 'app/development/editingState';
 import {isFieldSceneActive} from 'app/scenes/field/showFieldScene';
 import {clamp, removeElementFromArray} from 'app/utils/index';
 
-const sounds = new Map<string, GameSound>();
+export const sounds = new Map<string, GameSound>();
 window.sounds = sounds;
 const tracks = new Map<string, GameTrack>();
 window.tracks = tracks;
@@ -616,7 +615,7 @@ window.requireTrack = requireTrack;
 window.requireSoundEffect = requireSoundEffect;
 
 // Safari uses webkitAudioContext instead of AudioContext.
-const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
+export const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
 window['audioContext'] = audioContext;
 
 let pinkNoiseNode: AudioWorkletNode;
@@ -736,40 +735,6 @@ function createGainEnvelope(volume: number, decay: number, time: number, duratio
     return gainNode;
 }
 
-
-function playBellSound(
-    inputFrequencies: number[],
-    volume: number,
-    duration: number,
-    destination: AudioNode,
-    time = audioContext.currentTime
-) {
-    const combinedGainedNode = audioContext.createGain();
-    combinedGainedNode.connect(destination);
-    combinedGainedNode.gain.value = volume;
-
-    const frequencies = Float32Array.from(inputFrequencies);
-    const attackTime = 0.003;
-    let frequencyVolume = 0.5;
-    let fadeDuration = duration - attackTime;
-    for (const frequency of frequencies) {
-        const gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(0, time);
-        gainNode.gain.linearRampToValueAtTime(frequencyVolume, time + attackTime);
-        gainNode.gain.setValueAtTime(frequencyVolume, time + attackTime);
-        gainNode.gain.linearRampToValueAtTime(0, time + attackTime + fadeDuration);
-        const oscillator = audioContext.createOscillator();
-        oscillator.frequency.value = frequency;
-        oscillator.type = 'sine';
-        oscillator.connect(gainNode);
-        oscillator.start(time);
-        oscillator.stop(time + duration);
-        frequencyVolume *= 0.5;
-        fadeDuration *= 0.75;
-        gainNode.connect(combinedGainedNode);
-    }
-}
-
 sounds.set('reflect', {
     play(target: AudioNode, time: number) {
         playBeeps([2000, 8000, 4000], .01, this.duration, {}, target, time);
@@ -859,8 +824,6 @@ sounds.set('createBarrier', {
 });
 sounds.set('barrierBurst', {
     play(target: AudioNode, time: number) {
-        target = audioContext.destination
-        time = audioContext.currentTime;
         const noiseGainNode = audioContext.createGain();
         noiseGainNode.gain.setValueAtTime(0, time);
         noiseGainNode.gain.linearRampToValueAtTime(0.2, time + 0.1);
@@ -1559,23 +1522,3 @@ function audioCallback(callback: () => void, time: number) {
         callback();
     };
 }
-
-// Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
-const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];
-
-function getBellFrequencies(baseFrequency: number): number[] {
-    return bellFrequencies.map(n => baseFrequency * n);
-}
-
-const notes = Object.keys(noteFrequencies) as (keyof typeof noteFrequencies)[];
-
-notes.forEach((noteName) => {
-    sounds.set(`bell${noteName}`, {
-        play(target: AudioNode, time: number) {
-            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, this.duration, target, time);
-        },
-        duration: 2,
-        instanceLimit: 5,
-        instances: [],
-    });
-});

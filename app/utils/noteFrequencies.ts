@@ -108,3 +108,19 @@ export const noteFrequencies = {
     As8: 7458.62,
     B8: 7902.13,
 };
+
+export function majorScale(allNotes: number[], baseNote: number): number[] {
+    return allNotes.filter((x, i) => [0, 2, 4, 5, 7, 9, 11].includes((i - baseNote + 11) % 12));
+}
+
+export const frequencies: {[key: string]: number[]} = {};
+frequencies.western = Object.values(noteFrequencies);
+frequencies.midWestern = Object.values(noteFrequencies).slice(36, 72);
+frequencies.cMajor = majorScale(frequencies.midWestern, 0);
+// @ts-ignore
+window['frequencies'] = frequencies;
+
+declare global {
+    export type Note = keyof typeof noteFrequencies;
+}
+export const notes = Object.keys(noteFrequencies) as Note[];
