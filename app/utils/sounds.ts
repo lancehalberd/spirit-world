@@ -638,7 +638,7 @@ async function registerAndCreateAudioWorklets(): Promise<void> {
 registerAndCreateAudioWorklets();
 
 const masterGainNode = audioContext.createGain();
-const trackGainNode = audioContext.createGain();
+export const trackGainNode = audioContext.createGain();
 const soundEffectGainNode = audioContext.createGain();
 trackGainNode.connect(masterGainNode);
 soundEffectGainNode.connect(masterGainNode);

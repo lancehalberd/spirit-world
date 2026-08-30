@@ -29,6 +29,9 @@ export * from 'app/utils/instruments/harp';
 export * from 'app/utils/instruments/hihat';
 export * from 'app/utils/instruments/zeldaSquare';
 export * from 'app/utils/instruments/instrumentPlayer';
+export * from 'app/content/music/testSong';
+
+import {updateMusicTrackPlayback} from 'app/utils/music/musicTrackPlayer';
 
 export * from 'app/content/objects/astralProjection';
 export * from 'app/content/objects/clone';
@@ -110,6 +113,7 @@ function renderLoop() {
         }
         render();
         updateMusic(state);
+        updateMusicTrackPlayback();
     } catch (e) {
         console.log(e);
         debugger;
