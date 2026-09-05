@@ -1,6 +1,7 @@
 import {audioContext} from 'app/utils/sounds';
 import {instruments} from 'app/utils/instruments/instrumentHash';
 import {createWhiteNoiseSource, getRandomNoiseOffset} from 'app/utils/instruments/noiseBuffer';
+import {getWaveformGain} from 'app/utils/instruments/waveformGain';
 
 // Two components, matching the common "drum body + snares" split for synthesized snares:
 // - A pitched "body": two triangle oscillators (a fifth-ish apart, ratio ~1.89) through a
@@ -24,6 +25,7 @@ function makeDistortionCurve(amount: number): Float32Array {
 }
 const distortionCurve = makeDistortionCurve(50);
 const bodyFrequencyRatios = [1, 1.89];
+const bodyWaveformGain = getWaveformGain('triangle');
 
 function playSnareSound({frequency, volume, time, destination, duration}: InstrumentPlayNoteParams) {
     const bodyDuration = Math.min(duration, 0.1);
@@ -34,7 +36,7 @@ function playSnareSound({frequency, volume, time, destination, duration}: Instru
         const shaper = audioContext.createWaveShaper();
         shaper.curve = distortionCurve;
         const gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(volume * 0.5, time);
+        gainNode.gain.setValueAtTime(volume * 0.5 * bodyWaveformGain, time);
         gainNode.gain.linearRampToValueAtTime(0, time + bodyDuration);
         oscillator.connect(shaper);
         shaper.connect(gainNode);

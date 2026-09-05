@@ -2,7 +2,7 @@ export const musicTrackHash: {[key: string]: MusicTrackDefinition} = {};
 
 declare global {
     export interface NoteEvent {
-        // Note name (e.g. 'A4') or raw frequency in Hz.
+        // Note name (e.g. 'A4'). Use `frequency` instead for a raw frequency in Hz.
         note?: Note
         // Exact frequency to use if note is not defined.
         frequency?: number
@@ -21,7 +21,7 @@ declare global {
         instrument: InstrumentName
         // 0-1 mix level for this part, defaults to 1.
         volume?: number
-        // The following fields can defing default note/frequency/beats/duration for Note Events in this part.
+        // The following fields can define default note/frequency/beats/duration for Note Events in this part.
         note?: Note
         frequency?: number
         beats?: number
@@ -37,7 +37,9 @@ declare global {
         loop?: boolean
         // Defaults to 0.
         loopStartBeat?: number
-        // Defaults to the end of the last note across all parts.
+        // Defaults to the smallest whole number of beats containing every note's start beat
+        // (see getTrackEndBeat in musicTrackPlayer.ts) - deliberately independent of note length,
+        // so a note can ring past the loop point without lengthening the loop itself.
         loopEndBeat?: number
     }
 }

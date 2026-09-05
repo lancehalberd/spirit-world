@@ -1,4 +1,5 @@
 import {audioContext} from 'app/utils/sounds';
+import {getWaveformGain} from 'app/utils/instruments/waveformGain';
 
 interface PlaySimpleSoundParams {
     destination: AudioNode
@@ -32,7 +33,7 @@ export function playSimpleSound({
     pitchNode,
 }: PlaySimpleSoundParams) {
     const combinedGainNode = audioContext.createGain();
-    combinedGainNode.gain.value = volume;
+    combinedGainNode.gain.value = volume * getWaveformGain(oscillatorType);
     let lastNode = combinedGainNode;
 
     if (bandpassFrequency) {

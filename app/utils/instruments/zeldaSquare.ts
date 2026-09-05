@@ -5,7 +5,7 @@ import {playSimpleSound, vibratoNode} from 'app/utils/instruments/playSimpleSoun
 function playZeldaSquare({frequency, volume, time, destination, duration}: InstrumentPlayNoteParams) {
     playSimpleSound({
         frequencies: [frequency],
-        volume,
+        volume: volume * 0.25,
         duration,
         time,
         destination,

@@ -11,7 +11,7 @@ musicTrackHash.bossTheme = {
     parts: [
         {
             instrument: 'kick',
-            beats: 1,
+            beats: 0.5,
             note: 'A1',
             notes: [
                 {beat: 0},
@@ -28,7 +28,7 @@ musicTrackHash.bossTheme = {
         },
         {
             instrument: 'snare',
-            volume: 0.6,
+            volume: 0.5,
             notes: [
                 {beat: 1, beats: 0.15, note: 'G3'},
                 {beat: 3, beats: 0.15, note: 'G3'},
@@ -38,7 +38,7 @@ musicTrackHash.bossTheme = {
         },
         {
             instrument: 'hihat',
-            volume: 1,
+            volume: 0.5,
             duration: .05,
             note: 'C6',
             notes: [
@@ -75,7 +75,7 @@ musicTrackHash.bossTheme = {
         },
         {
             instrument: 'zeldaSquare',
-            volume: 0.1,
+            volume: 0.5,
             notes: [
                 {beat: 0, beats: 0.5, note: 'A4'},
                 {beat: 0.5, beats: 0.25, note: 'G4'},

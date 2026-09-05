@@ -36,6 +36,11 @@ interface TrackPlaybackState {
 // Usually just one entry, but a fading-out track and its incoming replacement briefly overlap.
 let activePlaybacks: TrackPlaybackState[] = [];
 
+// The loop length is deliberately based only on where notes *start*, not how long they ring -
+// some instruments (a sustained pad, a long bell decay) shouldn't be forced to fit inside a
+// single beat at high BPM just because that's where the loop wraps. A note that rings past the
+// loop point simply keeps sounding on its own schedule, overlapping into the next pass; nothing
+// here ever stops a note early.
 function getTrackEndBeat(definition: MusicTrackDefinition): number {
     let maxBeat = 0;
     for (const part of definition.parts) {
@@ -157,6 +162,7 @@ export function updateMusicTrackPlayback(): void {
                     });
                 } catch (e) {
                     debugger;
+                    throw e;
                 }
                 partState.nextNoteIndex++;
             }

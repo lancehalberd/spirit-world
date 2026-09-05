@@ -1,5 +1,6 @@
 import {audioContext} from 'app/utils/sounds';
 import {instruments} from 'app/utils/instruments/instrumentHash';
+import {getWaveformGain} from 'app/utils/instruments/waveformGain';
 
 // A punchy low voice for ostinato/bassline parts: a sawtooth carries the harmonic "growl",
 // a sine an octave below adds sub-bass weight, and a lowpass keeps the overall tone warm
@@ -18,10 +19,11 @@ function playBassNote({frequency, volume, time, destination, duration}: Instrume
     ];
     const normalizedVolume = volume / voices.length;
     for (const [oscFrequency, oscType, oscVolume] of voices) {
+        const voiceVolume = oscVolume * normalizedVolume * getWaveformGain(oscType);
         const gainNode = audioContext.createGain();
         gainNode.gain.setValueAtTime(0, time);
-        gainNode.gain.linearRampToValueAtTime(oscVolume * normalizedVolume, time + attackTime);
-        gainNode.gain.setValueAtTime(oscVolume * normalizedVolume, time + duration - releaseTime);
+        gainNode.gain.linearRampToValueAtTime(voiceVolume, time + attackTime);
+        gainNode.gain.setValueAtTime(voiceVolume, time + duration - releaseTime);
         gainNode.gain.linearRampToValueAtTime(0, time + duration);
         const oscillator = audioContext.createOscillator();
         oscillator.type = oscType;
