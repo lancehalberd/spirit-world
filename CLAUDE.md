@@ -76,6 +76,7 @@ This directory exists but has no tracked files. UI/menu/HUD code actually lives 
 ### Deeper dives
 - [documentation/architecture-randomizer-generator.md](documentation/architecture-randomizer-generator.md) — the randomizer (item/entrance placement solver) and the procedural room generator. Both are fully integrated into the main game, not separate entry points.
 - [documentation/architecture-rendering.md](documentation/architecture-rendering.md) — the render pipeline in detail: layers, camera easing, lighting/fog, canvas setup.
+- [documentation/architecture-audio-synthesis.md](documentation/architecture-audio-synthesis.md) — the Web Audio instrument/music-track system: note/track data model, the lookahead scheduler, crossfading, and synthesis lessons learned per instrument.
 - `documentation/` also holds design notes, playtester feedback, and randomizer/zone-design references (not code) — check here for design intent before making gameplay-affecting changes.
 
 ## Keeping this file current

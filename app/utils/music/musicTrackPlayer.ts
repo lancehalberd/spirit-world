@@ -8,6 +8,8 @@ import {audioContext, trackGainNode} from 'app/utils/sounds';
 const SCHEDULE_AHEAD_TIME = 0.2;
 // Small buffer before playback actually starts, so the first note isn't scheduled in the past.
 const START_DELAY = 0.1;
+// Matches the crossfade ramp time `playTrack` uses for the mp3-based tracks in app/utils/sounds.ts.
+const DEFAULT_FADE_DURATION = 1;
 
 interface PartPlaybackState {
     part: MusicPart
@@ -23,85 +25,150 @@ interface TrackPlaybackState {
     loopStartBeat: number
     loopEndBeat: number
     parts: PartPlaybackState[]
+    // Each playback gets its own gain node (feeding into trackGainNode) so it can be faded
+    // in/out independently of any other track that happens to be playing at the same time.
+    gainNode: GainNode
+    // Set once this playback is fading out. Once audioContext.currentTime passes this, the
+    // playback is dropped: no further notes are scheduled for it and its gain node is disconnected.
+    stopAtTime?: number
 }
 
-let currentPlayback: TrackPlaybackState | undefined;
+// Usually just one entry, but a fading-out track and its incoming replacement briefly overlap.
+let activePlaybacks: TrackPlaybackState[] = [];
 
 function getTrackEndBeat(definition: MusicTrackDefinition): number {
     let maxBeat = 0;
     for (const part of definition.parts) {
         for (const note of part.notes) {
-            maxBeat = Math.max(maxBeat, note.beat + note.duration);
+            maxBeat = Math.max(maxBeat, Math.floor(note.beat + 1));
         }
     }
     return maxBeat;
 }
 
-export function playMusicTrack(key: string): void {
+function fadeOutPlayback(playback: TrackPlaybackState, fadeDuration: number): void {
+    if (playback.stopAtTime !== undefined) {
+        return;
+    }
+    const now = audioContext.currentTime;
+    const currentVolume = playback.gainNode.gain.value;
+    playback.gainNode.gain.cancelScheduledValues(now);
+    if (fadeDuration > 0) {
+        playback.gainNode.gain.setValueAtTime(currentVolume, now);
+        playback.gainNode.gain.linearRampToValueAtTime(0, now + fadeDuration);
+        playback.stopAtTime = now + fadeDuration;
+    } else {
+        playback.gainNode.gain.setValueAtTime(0, now);
+        playback.stopAtTime = now;
+    }
+}
+
+interface PlayMusicTrackOptions {
+    // Seconds to fade the new track in over, and to fade any currently playing track(s) out over.
+    // Pass 0 for a hard cut.
+    fadeDuration?: number
+}
+
+export function playMusicTrack(key: string, {fadeDuration = DEFAULT_FADE_DURATION}: PlayMusicTrackOptions = {}): void {
     const definition = musicTrackHash[key];
     if (!definition) {
         throw new Error(`No music track defined for key: ${key}`);
     }
-    currentPlayback = {
+    // Don't restart a track that is already playing (and not already on its way out).
+    if (activePlaybacks.some(playback => playback.definition.key === key && playback.stopAtTime === undefined)) {
+        return;
+    }
+    for (const playback of activePlaybacks) {
+        fadeOutPlayback(playback, fadeDuration);
+    }
+    const startTime = audioContext.currentTime + START_DELAY;
+    const gainNode = audioContext.createGain();
+    gainNode.connect(trackGainNode);
+    if (fadeDuration > 0) {
+        gainNode.gain.setValueAtTime(0, startTime);
+        gainNode.gain.linearRampToValueAtTime(1, startTime + fadeDuration);
+    } else {
+        gainNode.gain.setValueAtTime(1, startTime);
+    }
+    activePlaybacks.push({
         definition,
-        startTime: audioContext.currentTime + START_DELAY,
+        startTime,
         secondsPerBeat: 60 / definition.bpm,
         loopStartBeat: definition.loopStartBeat ?? 0,
         loopEndBeat: definition.loopEndBeat ?? getTrackEndBeat(definition),
         parts: definition.parts.map(part => ({part, nextNoteIndex: 0, loopOffset: 0})),
-    };
+        gainNode,
+    });
 }
 
-export function stopMusicTrack(): void {
-    currentPlayback = undefined;
+export function stopMusicTrack(fadeDuration = DEFAULT_FADE_DURATION): void {
+    for (const playback of activePlaybacks) {
+        fadeOutPlayback(playback, fadeDuration);
+    }
 }
 
 export function isMusicTrackPlaying(): boolean {
-    return !!currentPlayback;
+    return activePlaybacks.some(playback => playback.stopAtTime === undefined);
 }
 
 // Schedules any notes that fall within the lookahead window. Call this once per frame (it is
 // cheap to call when nothing is playing or no notes are currently due).
 export function updateMusicTrackPlayback(): void {
-    if (!currentPlayback) {
+    if (!activePlaybacks.length) {
         return;
     }
-    const {definition, startTime, secondsPerBeat, loopStartBeat, loopEndBeat} = currentPlayback;
-    const loopLengthBeats = loopEndBeat - loopStartBeat;
-    const scheduleUntil = audioContext.currentTime + SCHEDULE_AHEAD_TIME;
-    for (const partState of currentPlayback.parts) {
-        const {part} = partState;
-        while (true) {
-            if (partState.nextNoteIndex >= part.notes.length) {
-                if (!definition.loop || loopLengthBeats <= 0) {
+    const now = audioContext.currentTime;
+    const scheduleUntil = now + SCHEDULE_AHEAD_TIME;
+    for (const playback of activePlaybacks) {
+        const {definition, startTime, secondsPerBeat, loopStartBeat, loopEndBeat, gainNode} = playback;
+        const loopLengthBeats = loopEndBeat - loopStartBeat;
+        for (const partState of playback.parts) {
+            const {part} = partState;
+            const partDuration = part.beats ? part.beats * secondsPerBeat : part.duration ?? secondsPerBeat;
+            while (true) {
+                if (partState.nextNoteIndex >= part.notes.length) {
+                    // Don't start another loop iteration once this playback is fading out;
+                    // just let its already-scheduled notes finish under the fade.
+                    if (!definition.loop || loopLengthBeats <= 0 || playback.stopAtTime !== undefined) {
+                        break;
+                    }
+                    const loopStartIndex = part.notes.findIndex(note => note.beat >= loopStartBeat);
+                    if (loopStartIndex === -1) {
+                        break;
+                    }
+                    partState.nextNoteIndex = loopStartIndex;
+                    partState.loopOffset += loopLengthBeats * secondsPerBeat;
+                    continue;
+                }
+                const note = part.notes[partState.nextNoteIndex];
+                const noteTime = startTime + partState.loopOffset + note.beat * secondsPerBeat;
+                if (noteTime >= scheduleUntil) {
                     break;
                 }
-                const loopStartIndex = part.notes.findIndex(note => note.beat >= loopStartBeat);
-                if (loopStartIndex === -1) {
-                    break;
+                try {
+                    const noteDuration = note.beats ? note.beats * secondsPerBeat : note.duration;
+                    playNote({
+                        destination: gainNode,
+                        time: noteTime,
+                        instrument: part.instrument,
+                        noteOrFrequency: note.note ?? note.frequency ?? part.note ?? part.frequency,
+                        volume: (note.volume ?? 1) * (part.volume ?? 1),
+                        duration: noteDuration ?? partDuration,
+                    });
+                } catch (e) {
+                    debugger;
                 }
-                partState.nextNoteIndex = loopStartIndex;
-                partState.loopOffset += loopLengthBeats * secondsPerBeat;
-                continue;
+                partState.nextNoteIndex++;
             }
-            const note = part.notes[partState.nextNoteIndex];
-            const noteTime = startTime + partState.loopOffset + note.beat * secondsPerBeat;
-            if (noteTime >= scheduleUntil) {
-                break;
-            }
-            if (note.note !== undefined) {
-                playNote({
-                    destination: trackGainNode,
-                    time: noteTime,
-                    instrument: part.instrument,
-                    noteOrFrequency: note.note,
-                    volume: (note.volume ?? 1) * (part.volume ?? 1),
-                    duration: note.duration * secondsPerBeat,
-                });
-            }
-            partState.nextNoteIndex++;
         }
     }
+    activePlaybacks = activePlaybacks.filter(playback => {
+        if (playback.stopAtTime !== undefined && playback.stopAtTime <= now) {
+            playback.gainNode.disconnect(trackGainNode);
+            return false;
+        }
+        return true;
+    });
 }
 
 window['playMusicTrack'] = playMusicTrack;
