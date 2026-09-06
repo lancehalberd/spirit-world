@@ -12,5 +12,5 @@ declare global {
     export interface Instrument {
         playNote: (params: InstrumentPlayNoteParams) => void
     }
-    export type InstrumentName = 'bell'|'harp'|'hihat'|'zeldaSquare'|'kick'|'snare'|'bass';
+    export type InstrumentName = 'bell'|'harp'|'hihat'|'zeldaSquare'|'kick'|'snare'|'bass'|'piano';
 }

@@ -31,9 +31,12 @@ export * from 'app/utils/instruments/zeldaSquare';
 export * from 'app/utils/instruments/kick';
 export * from 'app/utils/instruments/snare';
 export * from 'app/utils/instruments/bass';
+export * from 'app/utils/instruments/piano';
 export * from 'app/utils/instruments/instrumentPlayer';
 export * from 'app/content/music/testSong';
 export * from 'app/content/music/bossTheme';
+export * from 'app/content/music/memoryTheme';
+export * from 'app/content/music/spookyTheme';
 
 import {updateMusicTrackPlayback} from 'app/utils/music/musicTrackPlayer';
 
