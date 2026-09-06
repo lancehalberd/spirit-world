@@ -116,6 +116,32 @@ export function isMusicTrackPlaying(): boolean {
     return activePlaybacks.some(playback => playback.stopAtTime === undefined);
 }
 
+export interface MusicTrackPlaybackPosition {
+    key: string
+    // Elapsed beats since this playback started, ignoring looping.
+    rawBeat: number
+    // Current beat position, wrapped into [loopStartBeat, loopEndBeat) once the loop has been
+    // reached. Equal to rawBeat before that point.
+    beat: number
+}
+
+// Playback position of the currently active (not fading out) track, for driving a UI playhead
+// (see app/development/trackViewer.ts). Returns null if nothing is playing.
+export function getMusicTrackPlaybackPosition(): MusicTrackPlaybackPosition | null {
+    const playback = activePlaybacks.find(p => p.stopAtTime === undefined);
+    if (!playback) {
+        return null;
+    }
+    const {definition, startTime, secondsPerBeat, loopStartBeat, loopEndBeat} = playback;
+    const rawBeat = Math.max(0, (audioContext.currentTime - startTime) / secondsPerBeat);
+    let beat = rawBeat;
+    const loopLength = loopEndBeat - loopStartBeat;
+    if (definition.loop && loopLength > 0 && beat > loopStartBeat) {
+        beat = loopStartBeat + (beat - loopStartBeat) % loopLength;
+    }
+    return {key: definition.key, rawBeat, beat};
+}
+
 // Schedules any notes that fall within the lookahead window. Call this once per frame (it is
 // cheap to call when nothing is playing or no notes are currently due).
 export function updateMusicTrackPlayback(): void {

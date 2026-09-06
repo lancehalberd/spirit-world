@@ -125,4 +125,8 @@ interface EditingState {
     showWallsOpacity: number
     showHitboxes?: boolean
     showRenderPerformance?: boolean
+    // Key of the music track currently shown in the track viewer (app/development/trackViewer.ts),
+    // or unset when the viewer is closed. Set while the viewer is open so musicController can
+    // suppress normal BGM without stopping the note-based track being inspected.
+    trackViewerKey?: string
 }

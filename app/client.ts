@@ -13,6 +13,7 @@ export * from 'app/scenes/scenes';
 import {addContextMenuListeners} from 'app/development/contextMenu';
 import {editingState} from 'app/development/editingState';
 import {refreshEditor} from 'app/development/editor';
+import {refreshTrackViewer} from 'app/development/trackViewer';
 import {screenshotTestState} from 'app/development/testing/pauseState';
 
 export * from 'app/generator/treeGraphs';
@@ -121,6 +122,7 @@ function renderLoop() {
         render();
         updateMusic(state);
         updateMusicTrackPlayback();
+        refreshTrackViewer();
     } catch (e) {
         console.log(e);
         debugger;

@@ -292,3 +292,86 @@
     align-items: center;
     gap: 12px;
 }
+
+/* Music track viewer (app/development/trackViewer.ts) - a piano-roll debug tool, shift+M while
+   the level editor is open. Kept visually distinct (dark) from the light pp-container panels
+   since a note grid reads better with light-on-dark rows. */
+.track-viewer {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    z-index: 20;
+    background-color: #111;
+    color: #EEE;
+    font-family: arial;
+    font-size: 13px;
+    border: 1px solid #555;
+    box-shadow: 2px 2px 10px black;
+}
+
+.track-viewer-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background-color: #222;
+    border-bottom: 1px solid #555;
+}
+
+.track-viewer-position {
+    flex-grow: 1;
+    font-family: monospace;
+}
+
+.track-viewer-close {
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 2px 8px;
+}
+
+.track-viewer-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 4px 8px;
+    background-color: #1b1b1b;
+    border-bottom: 1px solid #444;
+}
+
+.track-viewer-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.track-viewer-swatch {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.track-viewer-scroll {
+    max-height: 40vh;
+    overflow: auto;
+    position: relative;
+}
+
+.track-viewer-grid {
+    position: relative;
+}
+
+.track-viewer-canvas {
+    display: block;
+}
+
+.track-viewer-playhead {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    background-color: #FFEB3B;
+    pointer-events: none;
+}

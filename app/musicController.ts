@@ -1,3 +1,4 @@
+import {editingState} from 'app/development/editingState';
 import {getFullZoneLocation} from 'app/utils/getFullZoneLocation';
 import {
     fadeOutPlayingTracks,
@@ -14,6 +15,13 @@ const requiredTracks: Set<string> = new Set();
 
 export const updateMusic = (state: GameState): void => {
     if (!state?.gameHasBeenInitialized) {
+        return;
+    }
+    // The track viewer (app/development/trackViewer.ts) is inspecting a note-based track
+    // directly via playMusicTrack - don't let normal zone/boss BGM logic fight it for the
+    // speakers. updateMusicTrackPlayback (called unconditionally in the render loop) keeps
+    // scheduling the inspected track's notes regardless of what happens here.
+    if (editingState.trackViewerKey) {
         return;
     }
     updateAudio(state);

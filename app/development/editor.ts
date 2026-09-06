@@ -7,6 +7,7 @@ import {createObjectDefinition, combinedObjectTypes, getObjectProperties} from '
 import {renderProgressTabContainer} from 'app/development/progressEditor';
 import {displayPanel, displayPropertyPanel, hideAllPropertyPanels} from 'app/development/propertyPanel'
 import {renderToolTabContainer} from 'app/development/toolTab';
+import {closeTrackViewer} from 'app/development/trackViewer';
 import {refreshArea} from 'app/development/utils';
 import {getVariantProperties, isVariantSelected} from 'app/development/variantEditor';
 import {checkToRefreshMinimap, renderZoneTabContainer} from 'app/development/zoneEditor';
@@ -135,6 +136,7 @@ function startEditing(state: GameState) {
 
 function stopEditing(state: GameState) {
     hideAllPropertyPanels();
+    closeTrackViewer();
     if (editingState.selectedLayerKey) {
         delete editingState.selectedLayerKey;
         refreshArea(state, true);
