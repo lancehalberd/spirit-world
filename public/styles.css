@@ -155,7 +155,7 @@
     border-radius: 2px; /* Rounded borders */
     padding: 16px; /* Padding */
     position: fixed; /* Sit on top of the screen */
-    z-index: 1; /* Add a z-index if needed */
+    z-index: 30; /* Above .track-viewer (z-index 20) so export/copy confirmations aren't hidden behind it */
     left: 50%; /* Center the snackbar */
     bottom: 30px; /* 30px from the bottom */
 }
@@ -312,6 +312,7 @@
 
 .track-viewer-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
     padding: 4px 8px;
@@ -324,11 +325,15 @@
     font-family: monospace;
 }
 
-.track-viewer-close {
+.track-viewer-volume {
+    width: 70px;
+}
+
+.track-viewer-button {
     cursor: pointer;
-    font-size: 16px;
+    font-size: 13px;
     line-height: 1;
-    padding: 2px 8px;
+    padding: 3px 8px;
 }
 
 .track-viewer-legend {
@@ -344,6 +349,49 @@
     display: flex;
     align-items: center;
     gap: 4px;
+    cursor: pointer;
+    padding: 1px 4px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+}
+
+.track-viewer-legend-item.is-active {
+    border-color: #FFEB3B;
+}
+
+.track-viewer-legend-item.is-hidden,
+.track-viewer-legend-item.is-muted {
+    opacity: 0.5;
+}
+
+.track-viewer-zoom-label {
+    font-family: monospace;
+    font-size: 11px;
+    color: #AAA;
+}
+
+.track-viewer-section-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    background-color: #1f1f1f;
+    border-bottom: 1px solid #444;
+}
+
+.track-viewer-section-name {
+    width: 10em;
+}
+
+.track-viewer-toggle {
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 1;
+    padding: 1px 3px;
+    background: #333;
+    border: 1px solid #555;
+    border-radius: 3px;
 }
 
 .track-viewer-swatch {
@@ -351,6 +399,26 @@
     width: 10px;
     height: 10px;
     border-radius: 2px;
+}
+
+.track-viewer-edit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px;
+    background-color: #262626;
+    border-bottom: 1px solid #444;
+}
+
+.track-viewer-edit-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.track-viewer-edit-number {
+    width: 4.5em;
 }
 
 .track-viewer-scroll {
@@ -363,13 +431,41 @@
     position: relative;
 }
 
+.track-viewer-ruler {
+    position: relative;
+    height: 16px;
+    background-color: #262626;
+    border-bottom: 1px solid #444;
+}
+
+.track-viewer-ruler-band {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 16px;
+    padding-left: 3px;
+    background-color: #3a3a3a;
+    border: 1px solid #555;
+    border-top: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.track-viewer-ruler-band.is-active {
+    background-color: #55503a;
+    border-color: #FFEB3B;
+}
+
 .track-viewer-canvas {
     display: block;
+    cursor: crosshair;
 }
 
 .track-viewer-playhead {
     position: absolute;
-    top: 0;
     left: 0;
     width: 2px;
     background-color: #FFEB3B;

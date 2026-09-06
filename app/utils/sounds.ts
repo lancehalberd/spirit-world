@@ -640,8 +640,14 @@ registerAndCreateAudioWorklets();
 const masterGainNode = audioContext.createGain();
 export const trackGainNode = audioContext.createGain();
 const soundEffectGainNode = audioContext.createGain();
+// Connects straight to masterGainNode, bypassing trackGainNode - so the track viewer
+// (app/development/trackViewer.ts) can keep playing a track it's inspecting even while the game's
+// own music is muted/turned down (trackGainNode.gain is what setSoundSettings adjusts for that).
+// Its own gain is the track viewer's independent volume control, not tied to any game setting.
+export const trackViewerGainNode = audioContext.createGain();
 trackGainNode.connect(masterGainNode);
 soundEffectGainNode.connect(masterGainNode);
+trackViewerGainNode.connect(masterGainNode);
 masterGainNode.connect(audioContext.destination);
 
 function playBeeps(inputFrequencies: number[], volume: number, duration: number,

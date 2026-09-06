@@ -2,7 +2,7 @@ import {zones} from 'app/content/zones/zoneHash';
 import {editingState} from 'app/development/editingState';
 import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
-import {toggleTrackViewer} from 'app/development/trackViewer';
+import {deleteSelectedNote, toggleTrackViewer, toggleTrackViewerPlayback} from 'app/development/trackViewer';
 import {refreshArea} from 'app/development/utils';
 import {isObject, isSelectionValid, isVariant, updateObjectInstance} from 'app/development/objectEditor';
 import {addVariantToArea} from 'app/development/variantEditor';
@@ -54,6 +54,16 @@ export function addKeyboardShortcuts() {
         }
         if (isShiftDown && keyCode === KEY.M) {
             toggleTrackViewer();
+            event.preventDefault();
+            return;
+        }
+        if (keyCode === KEY.SPACE && editingState.trackViewerKey) {
+            toggleTrackViewerPlayback();
+            event.preventDefault();
+            return;
+        }
+        if ((keyCode === KEY.DELETE || keyCode === KEY.BACK_SPACE) && editingState.trackViewerKey) {
+            deleteSelectedNote();
             event.preventDefault();
             return;
         }
