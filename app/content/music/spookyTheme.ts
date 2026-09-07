@@ -28,7 +28,6 @@ const bassOstinato: MusicSection = {
         {beat: 28, beats: 1.65, note: 'F2'},
         {beat: 29.65, beats: 0.35, note: 'F2'},
         {beat: 30, beats: 2, note: 'C2'},
-        {beat: 160, beats: 0.75, note: 'E4'},
     ],
 };
 const themeMelody: MusicSection = {
@@ -156,6 +155,7 @@ const bridgeMelody: MusicSection = {
         {beat: 30, beats: 0.75, note: 'F4'},
         {beat: 30.75, beats: 0.75, note: 'E4'},
         {beat: 31.5, beats: 0.5, note: 'C4'},
+        {beat: 32, beats: 0.75, note: 'E4'},
         {beat: 32.75, beats: 0.75, note: 'Ds4'},
         {beat: 33.5, beats: 0.5, note: 'B3'},
     ],

@@ -53,6 +53,12 @@ const MIN_NOTE_BEATS = 0.05;
 // the ability to be moved just because their edges are close together.
 const RESIZE_EDGE_PX = 4;
 const RESIZE_CENTER_EXCLUSION_PX = 5;
+// How strongly to dim a note that doesn't belong to its part's active section (see
+// getActivePlacement) - a visual cue so a note that's technically in the wrong section (e.g.
+// pasted/added while a different section was intended) stands out as an outlier rather than
+// blending in, since a single such note can otherwise silently balloon that section's ruler band
+// and playhead-match range (see getPlacementBeatRange) far beyond where it actually belongs.
+const INACTIVE_SECTION_ALPHA = 0.35;
 const PART_COLORS = [
     '#4FC3F7', '#FF8A65', '#AED581', '#BA68C8',
     '#FFD54F', '#4DB6AC', '#F06292', '#90A4AE',
@@ -856,7 +862,12 @@ function drawGridContents(definition: MusicTrackDefinition): void {
             return;
         }
         const color = PART_COLORS[partIndex % PART_COLORS.length];
+        // Computed once per part per draw (not per note) - which placement counts as "active" can
+        // itself depend on the full set of notes (it follows the playhead), so this has to be
+        // resolved before dimming any individual note.
+        const activePlacement = getActivePlacement(part);
         for (const placement of part.placements ?? []) {
+            const isActiveSection = placement === activePlacement;
             for (const note of placement.section.notes) {
                 const index = getPitchIndex(note.note ?? part.note, note.frequency ?? part.frequency);
                 if (index === null) {
@@ -867,7 +878,7 @@ function drawGridContents(definition: MusicTrackDefinition): void {
                 const w = Math.max(2, getNoteBeats(note, part, definition.bpm) * pixelsPerBeat - 1);
                 const y = (gridMaxIndex - index) * ROW_HEIGHT;
                 const h = ROW_HEIGHT - 1;
-                context.globalAlpha = note.volume ?? 1;
+                context.globalAlpha = (note.volume ?? 1) * (isActiveSection ? 1 : INACTIVE_SECTION_ALPHA);
                 context.fillStyle = color;
                 context.fillRect(x, y, w, h);
                 context.globalAlpha = 1;
@@ -1125,10 +1136,19 @@ function refreshSectionIndicator(): void {
 
 // Called every render frame (see client.ts) - cheap no-op when the viewer isn't open.
 export function refreshTrackViewer(): void {
-    if (!editingState.trackViewerKey) {
+    const definition = musicTrackHash[editingState.trackViewerKey];
+    if (!definition) {
         return;
     }
     refreshSectionIndicator();
+    // Redraws the note grid every frame (not just after an edit) so the active-section dimming
+    // (see INACTIVE_SECTION_ALPHA) stays in sync as the playhead moves and changes which section
+    // counts as active - the whole point of that dimming is to make an out-of-place note stand out
+    // while scrubbing/playing, not just after the fact. Cheap enough at this canvas's size/note
+    // counts to just always do it rather than tracking whether anything actually changed.
+    if (gridCanvas && gridContext) {
+        drawGridContents(definition);
+    }
     if (!playheadElement) {
         return;
     }
