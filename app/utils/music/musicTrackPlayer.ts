@@ -303,6 +303,12 @@ export function updateMusicTrackPlayback(): void {
             // playMusicTrack calls populatePartNotes on every part before any playback reaches
             // this scheduling loop.
             const partNotes = part.notes!;
+            // Guards against spinning forever below if a part genuinely has no notes at all
+            // within [loopStartBeat, loopEndBeat) - wrapping would just keep finding nothing and
+            // wrapping again, endlessly, in the same synchronous call. One wrap per tick is
+            // normal; a second one immediately after means this part has nothing to offer this
+            // time around, so give up until the next tick instead of hanging the frame.
+            let consecutiveWraps = 0;
             while (true) {
                 // Find the smallest note beat still ahead of what's already been scheduled - see
                 // the scheduledThroughBeat comment on PartPlaybackState for why this re-scans
@@ -313,15 +319,25 @@ export function updateMusicTrackPlayback(): void {
                         nextBeat = note.beat;
                     }
                 }
-                if (nextBeat === Infinity) {
-                    // Don't start another loop iteration once this playback is fading out;
-                    // just let its already-scheduled notes finish under the fade.
-                    if (!definition.loop || loopLengthBeats <= 0 || playback.stopAtTime !== undefined) {
+                // loopEndBeat is a hard cutoff, not just "wherever the notes happen to end": a
+                // note at or past it - whether because it was dragged out there, is left over
+                // from a bigger loop range that got narrowed (see the track viewer's loop
+                // handles), or the part simply has nothing left - must not play before wrapping.
+                // Relying on "array exhausted" alone (the old check) meant a single stray note
+                // past the intended loop end would keep the whole part playing past the loop
+                // marker instead of cutting off there.
+                const canLoop = definition.loop && loopLengthBeats > 0 && playback.stopAtTime === undefined;
+                if (canLoop && (nextBeat === Infinity || nextBeat >= loopEndBeat)) {
+                    if (++consecutiveWraps > 1) {
                         break;
                     }
                     partState.scheduledThroughBeat = loopStartBeat - LOOP_EPSILON;
                     partState.loopOffset += loopLengthBeats * secondsPerBeat;
                     continue;
+                }
+                if (nextBeat === Infinity) {
+                    // Not looping (or fading out) and nothing left to schedule.
+                    break;
                 }
                 const noteTime = startTime + partState.loopOffset + nextBeat * secondsPerBeat;
                 if (noteTime >= scheduleUntil) {
@@ -351,6 +367,7 @@ export function updateMusicTrackPlayback(): void {
                     }
                 }
                 partState.scheduledThroughBeat = nextBeat;
+                consecutiveWraps = 0;
             }
         }
     }

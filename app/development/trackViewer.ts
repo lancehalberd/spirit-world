@@ -1,7 +1,8 @@
 import {editingState} from 'app/development/editingState';
 import {tagElement} from 'app/dom';
-import {exportMusicTrackToClipboard} from 'app/development/exportMusicTrack';
+import {exportMusicTrackToClipboard, toIdentifier} from 'app/development/exportMusicTrack';
 import {getState} from 'app/state';
+import {instruments} from 'app/utils/instruments/instrumentHash';
 import {playNote} from 'app/utils/instruments/instrumentPlayer';
 import {noteFrequencies, notes} from 'app/utils/noteFrequencies';
 import {composePlacements} from 'app/utils/music/composeSections';
@@ -39,8 +40,12 @@ import {
 // it: already-scheduled notes finish playing, and the next tick just picks up whatever the array
 // now contains.
 
-const ROW_HEIGHT = 7;
+const ROW_HEIGHT = 14;
 const RULER_HEIGHT = 16;
+const LOOP_RULER_HEIGHT = 14;
+// Smallest allowed gap between loopStartBeat and loopEndBeat when dragging their handles - purely
+// to keep the loop from collapsing to zero/negative length, not a musically meaningful minimum.
+const LOOP_MIN_GAP_BEATS = 1;
 const ZOOM_MIN = 4;
 const ZOOM_MAX = 64;
 const ZOOM_STEP = 4;
@@ -53,6 +58,21 @@ const MIN_NOTE_BEATS = 0.05;
 // the ability to be moved just because their edges are close together.
 const RESIZE_EDGE_PX = 4;
 const RESIZE_CENTER_EXCLUSION_PX = 5;
+// Always-blank beats rendered past the last actual content (or the loop end, whichever is
+// further), so there's somewhere to right-click-add a note when extending the final section of a
+// part or track - unlike a gap *between* two sections (see the toolbar's "insert beats"), nothing
+// mechanically marks where the last section "ends", so this is the only room to grow into without
+// first adding a note somewhere else to stake out the space.
+const TRAILING_BLANK_BEATS = 16;
+// Minimum vertical range always shown (chromatic index, see notes/noteFrequencies.ts) - C2 to C6,
+// four octaves - regardless of whether the track has any notes in it yet. A fixed floor rather
+// than shrinking to fit content (which used to make the window shrink vertically the moment a
+// first note was placed) - vertical space is cheap here, so there's little benefit to a tighter
+// fit, and a stable range is less disorienting to work in than one that resizes under you. Actual
+// content is still allowed to widen *beyond* this floor (see the Math.min/max below) - it's a
+// minimum, not a hard clamp.
+const DEFAULT_MIN_PITCH_INDEX = 24;
+const DEFAULT_MAX_PITCH_INDEX = 72;
 // How strongly to dim a note that doesn't belong to its part's active section (see
 // getActivePlacement) - a visual cue so a note that's technically in the wrong section (e.g.
 // pasted/added while a different section was intended) stands out as an outlier rather than
@@ -74,7 +94,17 @@ let sectionNameInput: HTMLInputElement = null;
 // refreshSectionIndicator can toggle the highlight each frame without a full renderPanel.
 let rulerBandElements: {element: HTMLElement, placement: MusicSectionPlacement}[] = [];
 
-let pixelsPerBeat = 16;
+// Loop-range drag handles (see renderLoopRuler) - live-updated during a drag without a full
+// renderPanel, same reasoning as the note-drag path.
+let loopStartHandle: HTMLElement = null;
+let loopEndHandle: HTMLElement = null;
+let loopRegionElement: HTMLElement = null;
+// Which handle (if any) is currently being dragged, and the loop-end value to fall back to while
+// dragging if the track has never had an explicit loopEndBeat (see getEffectiveLoopBounds).
+let loopDragMode: 'start' | 'end' = null;
+let loopDragDefaultEnd = 0;
+
+let pixelsPerBeat = 32;
 // Tracked so renderPanel can rescale a preserved scroll position when zoom changes - otherwise the
 // same raw scrollLeft would point at a different beat after pixelsPerBeat changes.
 let lastPixelsPerBeat = pixelsPerBeat;
@@ -178,6 +208,8 @@ export function closeTrackViewer(): void {
     dragState = null;
     noteHitRegions = [];
     rulerBandElements = [];
+    loopStartHandle = loopEndHandle = loopRegionElement = null;
+    loopDragMode = null;
 }
 
 // Ensures every part of `definition` has a `placements` list, synthesizing a single default
@@ -194,6 +226,83 @@ function normalizeTrackPlacements(definition: MusicTrackDefinition): void {
             part.placements = [{section, offset: 0}];
         }
     });
+}
+
+// Removes a whole MusicPart and re-keys every bit of per-part-index state (hidden/muted sets,
+// the active-placement-per-part map, the current selection, activePartIndex itself) so it still
+// points at the same *parts* afterward - removing part N shifts every later part's index down by
+// one, and nothing above would otherwise know to follow along. Does not restart playback itself -
+// see the restartPlaybackPreservingPosition call at this function's call site.
+function removePartAt(definition: MusicTrackDefinition, partIndex: number): void {
+    definition.parts.splice(partIndex, 1);
+    hiddenPartIndices = reindexSetAfterRemoval(hiddenPartIndices, partIndex);
+    mutedPartIndices = reindexSetAfterRemoval(mutedPartIndices, partIndex);
+    // setPlaybackMutedParts attaches the Set *by reference* to the live playback - reindexing just
+    // above created a new Set object, so it has to be reattached or the live playback would keep
+    // muting by the old (now-stale) indices until the next restart.
+    setPlaybackMutedParts(mutedPartIndices);
+    const reindexedPlacements = new Map<number, number>();
+    for (const [index, value] of activePlacementIndexByPart) {
+        if (index < partIndex) {
+            reindexedPlacements.set(index, value);
+        } else if (index > partIndex) {
+            reindexedPlacements.set(index - 1, value);
+        }
+    }
+    activePlacementIndexByPart = reindexedPlacements;
+    if (selectedNote) {
+        if (selectedNote.partIndex === partIndex) {
+            selectedNote = null;
+        } else if (selectedNote.partIndex > partIndex) {
+            selectedNote = {...selectedNote, partIndex: selectedNote.partIndex - 1};
+        }
+    }
+    activePartIndex = Math.max(0, Math.min(activePartIndex, definition.parts.length - 1));
+}
+
+function reindexSetAfterRemoval(indices: Set<number>, removedIndex: number): Set<number> {
+    const result = new Set<number>();
+    for (const index of indices) {
+        if (index < removedIndex) {
+            result.add(index);
+        } else if (index > removedIndex) {
+            result.add(index - 1);
+        }
+    }
+    return result;
+}
+
+// Creates a new, empty track (no parts yet - see the legend's "+ Part" button) and opens it.
+function createNewTrack(): void {
+    const name = window.prompt('New track name:', 'newTrack');
+    if (!name) {
+        return;
+    }
+    // Track keys end up as a `musicTrackHash.<key>` property access both live and in exported
+    // source (see exportMusicTrack.ts), so this needs to be a valid identifier, not just unique.
+    const usedKeys = new Set(Object.keys(musicTrackHash));
+    const baseKey = toIdentifier(name);
+    let key = baseKey;
+    let suffix = 2;
+    while (usedKeys.has(key)) {
+        key = `${baseKey}${suffix++}`;
+    }
+    musicTrackHash[key] = {
+        key,
+        bpm: 120,
+        loop: true,
+        // A track can't hold any content without at least one part - see createPart.
+        parts: [createPart()],
+    };
+    openTrack(key);
+}
+
+// A freshly created MusicPart, with no placements yet (normalizeTrackPlacements synthesizes an
+// empty default section for it the moment the track is opened/re-rendered). Shared by
+// createNewTrack and the legend's "+ Part" button.
+function createPart(): MusicPart {
+    const defaultInstrument = (Object.keys(instruments)[0] ?? 'piano') as InstrumentName;
+    return {instrument: defaultInstrument, volume: 1, placements: []};
 }
 
 function openTrack(key: string): void {
@@ -235,6 +344,24 @@ function startPlayback(key: string): void {
     playMusicTrack(key, {fadeDuration: 0, destination: trackViewerGainNode});
     setPlaybackMutedParts(mutedPartIndices);
     pauseMusicTrack(0);
+}
+
+// Restarts playback from scratch while preserving the current position and paused/playing state.
+// Needed specifically for structural changes to the parts array itself (adding/removing a whole
+// MusicPart, or changing bpm/loop bounds) - a live playback can't pick those up on its own, since
+// musicTrackPlayer snapshots definition.parts (and bpm-derived secondsPerBeat, and loop bounds)
+// into its own scheduling state once, at playMusicTrack time (see TrackPlaybackState in
+// musicTrackPlayer.ts). Mutating fields *within* an existing part (notes, instrument, placements'
+// offsets) doesn't need this - the scheduler already reads those fresh every tick.
+function restartPlaybackPreservingPosition(key: string): void {
+    const wasPaused = isMusicTrackPaused();
+    const rawBeat = getMusicTrackPlaybackPosition()?.rawBeat ?? 0;
+    stopMusicTrack(0);
+    startPlayback(key);
+    seekMusicTrackPlayback(rawBeat);
+    if (!wasPaused) {
+        resumeMusicTrack(0);
+    }
 }
 
 // Toggles play/pause for whatever track is currently open - bound to the header button and the
@@ -346,6 +473,46 @@ function getPartEndBeat(part: MusicPart, bpm: number): number {
     return Math.max(0, ...part.placements.map(placement => getPlacementBeatRange(placement, part, bpm).end));
 }
 
+// "Extends a section": there's no stored length on a section/placement, just wherever its notes
+// happen to reach (see getPlacementBeatRange), so making more room for one to grow into means
+// mechanically pushing everything *after* it later instead. Inserts `amount` beats of empty room
+// at global beat `atGlobalBeat`, shifting every placement in every part that starts at or after
+// that point forward by `amount` - except `keepPlacement` itself (the section the room is being
+// made after, which never shifts) - and the track's loop boundaries if they fall at or after the
+// insertion point too, so the loop doesn't decouple from the content it's supposed to bound. Shifts
+// every part, not just the active one, so parts stay in sync with each other.
+function insertBeatsIntoTrack(
+    definition: MusicTrackDefinition, atGlobalBeat: number, amount: number, keepPlacement: MusicSectionPlacement
+): void {
+    for (const part of definition.parts) {
+        for (const placement of part.placements ?? []) {
+            if (placement !== keepPlacement && placement.offset >= atGlobalBeat) {
+                placement.offset += amount;
+            }
+        }
+        recomposePart(part);
+    }
+    if (definition.loopStartBeat != null && definition.loopStartBeat >= atGlobalBeat) {
+        definition.loopStartBeat += amount;
+    }
+    if (definition.loopEndBeat != null && definition.loopEndBeat >= atGlobalBeat) {
+        definition.loopEndBeat += amount;
+    }
+}
+
+// The loop range actually shown/dragged - loopStartBeat/loopEndBeat are both optional on
+// MusicTrackDefinition (an unset end just means "loop after the last beat"), but the ruler needs
+// concrete positions to draw handles at. `defaultEnd` (the track's current content end, from
+// renderPanel's grid-geometry pass) stands in for an unset loopEndBeat purely for display/initial
+// handle position - dragging either handle commits a real value to the definition, same as typing
+// into any other field here.
+function getEffectiveLoopBounds(definition: MusicTrackDefinition, defaultEnd: number): {start: number, end: number} {
+    return {
+        start: definition.loopStartBeat ?? 0,
+        end: definition.loopEndBeat ?? defaultEnd,
+    };
+}
+
 // Resolves a note's pitch to a fractional index into `notes` (chromatic, C0 = 0) for vertical
 // placement - fractional so a raw `frequency` (rather than a named `note`) still places
 // reasonably instead of being skipped.
@@ -422,6 +589,38 @@ function renderPanel(): void {
     }
     select.onchange = () => openTrack(select.value);
     header.append(select);
+
+    const newTrackButton = tagElement('button', 'track-viewer-button', 'New Track');
+    newTrackButton.title = 'Create a new, empty track and open it';
+    newTrackButton.onclick = () => createNewTrack();
+    header.append(newTrackButton);
+
+    const bpmInput = document.createElement('input');
+    bpmInput.type = 'number';
+    bpmInput.min = '1';
+    bpmInput.step = '1';
+    bpmInput.className = 'track-viewer-edit-number';
+    bpmInput.value = `${definition.bpm}`;
+    bpmInput.onchange = () => {
+        const value = parseFloat(bpmInput.value);
+        if (!isNaN(value) && value > 0) {
+            definition.bpm = value;
+            restartPlaybackPreservingPosition(key);
+        }
+        renderPanel();
+    };
+    header.append(labeledControl('bpm', bpmInput));
+
+    const loopToggle = document.createElement('input');
+    loopToggle.type = 'checkbox';
+    loopToggle.checked = !!definition.loop;
+    loopToggle.title = 'Loop this track';
+    loopToggle.onchange = () => {
+        definition.loop = loopToggle.checked;
+        restartPlaybackPreservingPosition(key);
+        renderPanel();
+    };
+    header.append(labeledControl('loop', loopToggle));
 
     const playPauseButton = tagElement('button', 'track-viewer-button', isMusicTrackPaused() ? '▶' : '⏸');
     playPauseButton.title = 'Play/pause (space)';
@@ -504,7 +703,44 @@ function renderPanel(): void {
         const swatch = tagElement('span', 'track-viewer-swatch');
         swatch.style.backgroundColor = PART_COLORS[i % PART_COLORS.length];
         item.append(swatch);
-        item.append(document.createTextNode(`${part.instrument}${part.volume != null ? ` (${part.volume})` : ''}`));
+
+        const instrumentSelect = document.createElement('select');
+        instrumentSelect.className = 'track-viewer-instrument-select';
+        for (const instrumentName of Object.keys(instruments) as InstrumentName[]) {
+            const option = document.createElement('option');
+            option.value = instrumentName;
+            option.textContent = instrumentName;
+            option.selected = instrumentName === part.instrument;
+            instrumentSelect.append(option);
+        }
+        instrumentSelect.title = "Change this part's instrument";
+        // Mutating part.instrument directly is picked up live by the scheduler on the very next
+        // note (see PartPlaybackState in musicTrackPlayer.ts) - no restart needed, unlike
+        // add/remove-part below.
+        instrumentSelect.onclick = (event) => event.stopPropagation();
+        instrumentSelect.onchange = (event) => {
+            event.stopPropagation();
+            part.instrument = instrumentSelect.value as InstrumentName;
+            renderPanel();
+        };
+        item.append(instrumentSelect);
+        if (part.volume != null) {
+            item.append(document.createTextNode(` (${part.volume})`));
+        }
+
+        const deletePartButton = tagElement('button', 'track-viewer-toggle', '🗑');
+        deletePartButton.title = 'Remove this part';
+        deletePartButton.onclick = (event) => {
+            event.stopPropagation();
+            if (!window.confirm(`Remove the "${part.instrument}" part? This can't be undone.`)) {
+                return;
+            }
+            removePartAt(definition, i);
+            restartPlaybackPreservingPosition(key);
+            renderPanel();
+        };
+        item.append(deletePartButton);
+
         if (isHidden) {
             item.classList.add('is-hidden');
         }
@@ -513,6 +749,16 @@ function renderPanel(): void {
         }
         legend.append(item);
     });
+    const addPartButton = tagElement('button', 'track-viewer-button', '+ Part');
+    addPartButton.title = 'Add a new part';
+    addPartButton.onclick = () => {
+        definition.parts.push(createPart());
+        activePartIndex = definition.parts.length - 1;
+        normalizeTrackPlacements(definition);
+        restartPlaybackPreservingPosition(key);
+        renderPanel();
+    };
+    legend.append(addPartButton);
     panelElement.append(legend);
 
     const activePart = definition.parts[activePartIndex];
@@ -529,8 +775,11 @@ function renderPanel(): void {
     // isn't populated until something actually plays this track - see populatePartNotes,
     // composeSections.ts) - the viewer never needs `notes` itself.
     let maxNoteBeat = 0;
-    let minPitchIndex = 48;
-    let maxPitchIndex = 48;
+    // Seeded with the fixed floor (see DEFAULT_MIN/MAX_PITCH_INDEX) rather than +/-Infinity, so
+    // content within that range doesn't narrow the view - only content *outside* it grows the
+    // view further, via the Math.min/max below.
+    let minPitchIndex = DEFAULT_MIN_PITCH_INDEX;
+    let maxPitchIndex = DEFAULT_MAX_PITCH_INDEX;
     for (const part of definition.parts) {
         for (const placement of part.placements ?? []) {
             for (const note of placement.section.notes) {
@@ -544,7 +793,10 @@ function renderPanel(): void {
             }
         }
     }
-    const maxBeat = Math.max(definition.loopEndBeat ?? 0, maxNoteBeat);
+    // TRAILING_BLANK_BEATS beyond the last actual content/loop end - see its own comment - so
+    // there's always room to add a note past the end of the final section, not just in gaps
+    // between sections (which "insert beats" already covers).
+    const maxBeat = Math.max(definition.loopEndBeat ?? 0, maxNoteBeat) + TRAILING_BLANK_BEATS;
     gridMinIndex = Math.floor(minPitchIndex) - 2;
     gridMaxIndex = Math.ceil(maxPitchIndex) + 2;
     gridWidth = Math.ceil(maxBeat * pixelsPerBeat) + pixelsPerBeat;
@@ -552,7 +804,9 @@ function renderPanel(): void {
 
     const gridInner = tagElement('div', 'track-viewer-grid');
     gridInner.style.width = `${gridWidth}px`;
-    gridInner.style.height = `${RULER_HEIGHT + gridHeight}px`;
+    gridInner.style.height = `${LOOP_RULER_HEIGHT + RULER_HEIGHT + gridHeight}px`;
+
+    gridInner.append(renderLoopRuler(definition, maxNoteBeat));
 
     if (activePart) {
         gridInner.append(renderSectionRuler(activePart, definition.bpm));
@@ -568,7 +822,7 @@ function renderPanel(): void {
     gridInner.append(gridCanvas);
 
     playheadElement = tagElement('div', 'track-viewer-playhead');
-    playheadElement.style.top = `${RULER_HEIGHT}px`;
+    playheadElement.style.top = `${LOOP_RULER_HEIGHT + RULER_HEIGHT}px`;
     playheadElement.style.height = `${gridHeight}px`;
     gridInner.append(playheadElement);
 
@@ -683,7 +937,124 @@ function renderSectionToolbar(part: MusicPart, bpm: number): HTMLElement {
     };
     toolbar.append(removeButton);
 
+    const insertLengthInput = document.createElement('input');
+    insertLengthInput.type = 'number';
+    insertLengthInput.min = '0.25';
+    insertLengthInput.step = '0.25';
+    insertLengthInput.value = '4';
+    insertLengthInput.className = 'track-viewer-edit-number';
+    toolbar.append(labeledControl('insert beats', insertLengthInput));
+
+    const insertButton = tagElement('button', 'track-viewer-button', 'Insert') as HTMLButtonElement;
+    insertButton.title = "Insert this many beats of empty room right after the active section's "
+        + 'own content, shifting every later section (in every part) forward to make room';
+    insertButton.disabled = !initialActivePlacement;
+    insertButton.onclick = () => {
+        const activePlacement = getActivePlacement(part);
+        const amount = parseFloat(insertLengthInput.value);
+        if (!activePlacement || isNaN(amount) || amount <= 0) {
+            return;
+        }
+        const definition = musicTrackHash[editingState.trackViewerKey];
+        const atGlobalBeat = getPlacementBeatRange(activePlacement, part, definition.bpm).end;
+        insertBeatsIntoTrack(definition, atGlobalBeat, amount, activePlacement);
+        restartPlaybackPreservingPosition(editingState.trackViewerKey);
+        renderPanel();
+    };
+    toolbar.append(insertButton);
+
     return toolbar;
+}
+
+// A shaded region with two draggable flag handles marking loopStartBeat/loopEndBeat - the same
+// "loop brace on a ruler" idiom most DAWs use for setting a loop/punch range. Track-level (not
+// per-part), so unlike the section ruler this renders once regardless of which part is active.
+// Dragging a handle updates the definition live (so the region/handle track the mouse and the
+// canvas's loop markers - see drawVerticalMarker calls in drawGridContents - move with them), but
+// only restarts playback once, on release (see onDocumentLoopHandleUp) - restarting on every
+// mousemove would be wasteful and could click/pop repeatedly during the drag.
+function renderLoopRuler(definition: MusicTrackDefinition, defaultLoopEnd: number): HTMLElement {
+    const ruler = tagElement('div', 'track-viewer-loop-ruler');
+    const {start, end} = getEffectiveLoopBounds(definition, defaultLoopEnd);
+
+    loopRegionElement = tagElement('div', 'track-viewer-loop-region');
+    ruler.append(loopRegionElement);
+
+    loopStartHandle = tagElement('div', 'track-viewer-loop-handle track-viewer-loop-handle-start');
+    loopStartHandle.onmousedown = (event) => startLoopHandleDrag(event, 'start', defaultLoopEnd);
+    ruler.append(loopStartHandle);
+
+    loopEndHandle = tagElement('div', 'track-viewer-loop-handle track-viewer-loop-handle-end');
+    loopEndHandle.onmousedown = (event) => startLoopHandleDrag(event, 'end', defaultLoopEnd);
+    ruler.append(loopEndHandle);
+
+    positionLoopHandles(start, end);
+    return ruler;
+}
+
+function positionLoopHandles(start: number, end: number): void {
+    // Centers each handle on its beat position (CSS gives them a fixed width - see .track-viewer-
+    // loop-handle) rather than having its left edge start exactly there.
+    const HANDLE_WIDTH_PX = 8;
+    if (loopStartHandle) {
+        loopStartHandle.style.left = `${start * pixelsPerBeat - HANDLE_WIDTH_PX / 2}px`;
+        loopStartHandle.title = `Loop start: beat ${round3(start)} (drag to adjust)`;
+    }
+    if (loopEndHandle) {
+        loopEndHandle.style.left = `${end * pixelsPerBeat - HANDLE_WIDTH_PX / 2}px`;
+        loopEndHandle.title = `Loop end: beat ${round3(end)} (drag to adjust)`;
+    }
+    if (loopRegionElement) {
+        loopRegionElement.style.left = `${start * pixelsPerBeat}px`;
+        loopRegionElement.style.width = `${Math.max(0, (end - start) * pixelsPerBeat)}px`;
+    }
+}
+
+function startLoopHandleDrag(event: MouseEvent, mode: 'start' | 'end', defaultLoopEnd: number): void {
+    if (event.button !== 0) {
+        return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    loopDragMode = mode;
+    loopDragDefaultEnd = defaultLoopEnd;
+    document.addEventListener('mousemove', onDocumentLoopHandleMove);
+    document.addEventListener('mouseup', onDocumentLoopHandleUp);
+}
+
+function onDocumentLoopHandleMove(event: MouseEvent): void {
+    if (!loopDragMode || !gridCanvas) {
+        return;
+    }
+    const definition = musicTrackHash[editingState.trackViewerKey];
+    if (!definition) {
+        return;
+    }
+    const {x} = canvasEventPoint(gridCanvas, event);
+    const beat = snapBeat(Math.max(0, x / pixelsPerBeat));
+    const {start, end} = getEffectiveLoopBounds(definition, loopDragDefaultEnd);
+    if (loopDragMode === 'start') {
+        definition.loopStartBeat = Math.max(0, Math.min(beat, end - LOOP_MIN_GAP_BEATS));
+    } else {
+        definition.loopEndBeat = Math.max(beat, start + LOOP_MIN_GAP_BEATS);
+    }
+    const updated = getEffectiveLoopBounds(definition, loopDragDefaultEnd);
+    positionLoopHandles(updated.start, updated.end);
+    drawGridContents(definition);
+}
+
+function onDocumentLoopHandleUp(): void {
+    if (!loopDragMode) {
+        return;
+    }
+    loopDragMode = null;
+    document.removeEventListener('mousemove', onDocumentLoopHandleMove);
+    document.removeEventListener('mouseup', onDocumentLoopHandleUp);
+    const key = editingState.trackViewerKey;
+    if (key) {
+        restartPlaybackPreservingPosition(key);
+    }
+    renderPanel();
 }
 
 // A row of colored bands, one per placement in the active part's timeline, positioned/sized to

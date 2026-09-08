@@ -157,7 +157,8 @@ const bridgeMelody: MusicSection = {
         {beat: 31.5, beats: 0.5, note: 'C4'},
         {beat: 32, beats: 0.75, note: 'E4'},
         {beat: 32.75, beats: 0.75, note: 'Ds4'},
-        {beat: 33.5, beats: 0.5, note: 'B3'},
+        {beat: 33.5, beats: 0.5, note: 'Cs4'},
+        {beat: 34, beats: 2, note: 'As3'},
     ],
 };
 const pianoPlacements: MusicSectionPlacement[] = [
@@ -314,15 +315,11 @@ const bridgeAccompaniment: MusicSection = {
         {beat: 32, beats: 0.75, note: 'C3'},
         {beat: 32, beats: 0.75, note: 'E3'},
         {beat: 32, beats: 0.75, note: 'G3'},
-        {beat: 32.75, beats: 0.75, note: 'B2'},
-        {beat: 32.75, beats: 0.75, note: 'Ds3'},
-        {beat: 32.75, beats: 0.75, note: 'Fs3'},
-        {beat: 33.5, beats: 0.5, note: 'B2'},
-        {beat: 33.5, beats: 0.5, note: 'Ds3'},
-        {beat: 33.5, beats: 0.5, note: 'Fs3'},
+        {beat: 32.75, beats: 1.25, note: 'B2'},
+        {beat: 32.75, beats: 1.25, note: 'Ds3'},
+        {beat: 32.75, beats: 1.25, note: 'Fs3'},
         {beat: 34, beats: 2, note: 'D3'},
         {beat: 34, beats: 2, note: 'G3'},
-        {beat: 34, beats: 2, note: 'As3'},
     ],
 };
 const bridgeCoda: MusicSection = {

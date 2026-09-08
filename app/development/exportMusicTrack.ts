@@ -22,7 +22,10 @@ function roundNumber(value: number): number {
     return Math.round(value * 1000) / 1000;
 }
 
-function toIdentifier(key: string): string {
+// Exported for reuse when the track viewer sanitizes a user-typed name into a musicTrackHash key
+// (app/development/trackViewer.ts) - same constraint (a valid JS identifier), since both end up as
+// the right-hand side of a `something.<name>` property access in generated/live code.
+export function toIdentifier(key: string): string {
     const cleaned = key.replace(/[^a-zA-Z0-9_$]/g, '');
     return /^[a-zA-Z_$]/.test(cleaned) ? cleaned : `section${cleaned}`;
 }

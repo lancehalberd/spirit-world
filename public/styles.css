@@ -300,6 +300,7 @@
     position: fixed;
     left: 8px;
     right: 8px;
+    top: 8px;
     bottom: 8px;
     z-index: 20;
     background-color: #111;
@@ -308,6 +309,11 @@
     font-size: 13px;
     border: 1px solid #555;
     box-shadow: 2px 2px 10px black;
+    /* Header/legend/toolbar/edit rows take their natural height; the grid (.track-viewer-scroll)
+       is the only flex-grow child, so it expands to fill whatever's left of the viewport instead
+       of capping at a fixed vh and scrolling sooner than it needs to. */
+    display: flex;
+    flex-direction: column;
 }
 
 .track-viewer-header {
@@ -401,6 +407,10 @@
     border-radius: 2px;
 }
 
+.track-viewer-instrument-select {
+    max-width: 90px;
+}
+
 .track-viewer-edit {
     display: flex;
     flex-wrap: wrap;
@@ -422,13 +432,52 @@
 }
 
 .track-viewer-scroll {
-    max-height: 40vh;
+    flex: 1 1 auto;
+    /* Flex items default to min-height:auto, which stops them shrinking below their content's
+       natural size - without overriding it here, this would just grow to fit the grid instead of
+       clipping/scrolling within the space flex-grow gave it above. */
+    min-height: 0;
     overflow: auto;
     position: relative;
 }
 
 .track-viewer-grid {
     position: relative;
+}
+
+.track-viewer-loop-ruler {
+    position: relative;
+    height: 14px;
+    background-color: #1f2620;
+    border-bottom: 1px solid #444;
+    overflow: visible;
+}
+
+.track-viewer-loop-region {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: rgba(76, 175, 80, 0.25);
+    pointer-events: none;
+}
+
+.track-viewer-loop-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    cursor: ew-resize;
+    z-index: 1;
+}
+
+.track-viewer-loop-handle-start {
+    background-color: #4CAF50;
+    border-radius: 0 0 3px 3px;
+}
+
+.track-viewer-loop-handle-end {
+    background-color: #F44336;
+    border-radius: 0 0 3px 3px;
 }
 
 .track-viewer-ruler {
