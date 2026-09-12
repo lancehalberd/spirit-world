@@ -229,5 +229,6 @@ function playPianoNote({frequency, volume, time, destination, duration}: Instrum
 }
 
 instruments.piano = {
-    playNote: playPianoNote
+    playNote: playPianoNote,
+    defaultAuditionDuration: 0.4,
 };

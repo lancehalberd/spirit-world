@@ -71,5 +71,8 @@ function playSnareSound({frequency, volume, time, destination, duration}: Instru
 }
 
 instruments.snare = {
-    playNote: playSnareSound
+    playNote: playSnareSound,
+    // playSnareSound already clamps its own body/noise envelopes to <=0.2s regardless of the
+    // `duration` it's given, so anything at or above that sounds identical.
+    defaultAuditionDuration: 0.2,
 };

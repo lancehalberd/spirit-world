@@ -36,6 +36,7 @@ export * from 'app/utils/instruments/piano';
 export * from 'app/utils/instruments/instrumentPlayer';
 export * from 'app/content/music/bossTheme';
 export * from 'app/content/music/memoryTheme';
+export * from 'app/content/music/minorMelody';
 export * from 'app/content/music/naomi';
 export * from 'app/content/music/spookyTheme';
 

@@ -2,7 +2,10 @@ import {zones} from 'app/content/zones/zoneHash';
 import {editingState} from 'app/development/editingState';
 import {exportZoneToClipboard} from 'app/development/exportZone';
 import {toggleEditing} from 'app/development/editor';
-import {deleteSelectedNote, toggleTrackViewer, toggleTrackViewerPlayback} from 'app/development/trackViewer';
+import {
+    copySelectedNotes, cutSelectedNotes, deleteSelectedNotes, pasteClipboardNotes, toggleTrackViewer,
+    toggleTrackViewerPlayback,
+} from 'app/development/trackViewer';
 import {refreshArea} from 'app/development/utils';
 import {isObject, isSelectionValid, isVariant, updateObjectInstance} from 'app/development/objectEditor';
 import {addVariantToArea} from 'app/development/variantEditor';
@@ -63,7 +66,26 @@ export function addKeyboardShortcuts() {
             return;
         }
         if ((keyCode === KEY.DELETE || keyCode === KEY.BACK_SPACE) && editingState.trackViewerKey) {
-            deleteSelectedNote();
+            deleteSelectedNotes();
+            event.preventDefault();
+            return;
+        }
+        // Copy/cut/paste of selected notes in the track viewer - handled here (rather than falling
+        // through to the zone-editor copy/paste below) whenever the track viewer is open, so it
+        // doesn't also trigger exportZoneToClipboard or paste zone objects while the panel has
+        // focus.
+        if (editingState.trackViewerKey && isCommandDown && keyCode === KEY.C) {
+            copySelectedNotes();
+            event.preventDefault();
+            return;
+        }
+        if (editingState.trackViewerKey && isCommandDown && keyCode === KEY.X) {
+            cutSelectedNotes();
+            event.preventDefault();
+            return;
+        }
+        if (editingState.trackViewerKey && isCommandDown && keyCode === KEY.V) {
+            pasteClipboardNotes();
             event.preventDefault();
             return;
         }

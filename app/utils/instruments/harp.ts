@@ -84,5 +84,6 @@ function playHarpNote({frequency, volume, time, destination, duration}: Instrume
 }
 
 instruments.harp = {
-    playNote: playHarpNote
+    playNote: playHarpNote,
+    defaultAuditionDuration: 0.4,
 };

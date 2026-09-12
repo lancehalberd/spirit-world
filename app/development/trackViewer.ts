@@ -16,9 +16,10 @@ import {
 // A piano-roll style debug/editing tool for note-based music tracks
 // (app/utils/music/musicTrackHash.ts), so a track can be inspected/heard part-by-part and fixed
 // up directly instead of guessing from ear alone what's wrong. Supports: viewing all parts on a
-// shared beat/pitch grid with a live playhead (click empty space to seek it), hiding/muting
-// individual parts, adding/selecting/dragging/resizing/deleting notes, and exporting the track
-// back out as pasteable TS source.
+// shared beat/pitch grid with a live playhead (drag the loop ruler bar to seek it), hiding/muting
+// individual parts, adding/selecting/dragging/resizing/deleting/copying notes (single or
+// multi-selected - see the SELECTION comment below), and exporting the track back out as pasteable
+// TS source.
 //
 // Opened/closed with shift+M while the level editor is active (see addKeyboardShortcuts.ts).
 // While open, editingState.trackViewerKey tells musicController to suppress normal zone/boss BGM
@@ -33,6 +34,22 @@ import {
 // flat note array) gets a single default placement synthesized the first time it's opened here
 // (see normalizeTrackPlacements) so every part always has *some* section to add notes into.
 //
+// SELECTION: click-drag on empty grid space draws a rectangle and selects every note it overlaps
+// (see selectionDragState/onDocumentSelectionDragMove); a plain click with no drag just selects
+// whatever single note (if any) is under the cursor, same as before multi-select existed. Selection
+// is restricted to a single part for now (selectedPartIndex/selectedNotes) - rectangle-selecting
+// always reads from the *active* part, matching what right-click-add and the section toolbar act
+// on. Dragging any already-selected note moves the whole selection together (see the `group` field
+// on DragState); copy/cut/paste (see copySelectedNotes/pasteClipboardNotes) always reads from the
+// selection's part and always writes into whatever part is active at paste time, not back into the
+// note's original part - the natural next step (multi-part selection, paste-back-to-origin) is the
+// same shape as the tile-layer copy/paste problem elsewhere in the editor, deferred for now since
+// this tool only supports single-part selection.
+//
+// Seeking the playhead used to be a click-drag on the grid itself; that gesture now belongs to
+// rectangle-select, so seeking moved to the loop-range ruler bar instead (any click there that
+// isn't on one of its two drag handles - see renderLoopRuler).
+//
 // LIVE EDITING: note add/delete/move/resize never restarts playback. musicTrackPlayer's scheduler
 // re-scans each part's notes by beat every tick rather than trusting a persisted index (see
 // PartPlaybackState in musicTrackPlayer.ts), specifically so replacing `part.notes` out from under
@@ -43,6 +60,7 @@ import {
 const ROW_HEIGHT = 14;
 const RULER_HEIGHT = 16;
 const LOOP_RULER_HEIGHT = 14;
+const PIANO_KEYS_WIDTH = 64;
 // Smallest allowed gap between loopStartBeat and loopEndBeat when dragging their handles - purely
 // to keep the loop from collapsing to zero/negative length, not a musically meaningful minimum.
 const LOOP_MIN_GAP_BEATS = 1;
@@ -73,11 +91,13 @@ const TRAILING_BLANK_BEATS = 16;
 // minimum, not a hard clamp.
 const DEFAULT_MIN_PITCH_INDEX = 24;
 const DEFAULT_MAX_PITCH_INDEX = 72;
-// How strongly to dim a note that doesn't belong to its part's active section (see
-// getActivePlacement) - a visual cue so a note that's technically in the wrong section (e.g.
-// pasted/added while a different section was intended) stands out as an outlier rather than
-// blending in, since a single such note can otherwise silently balloon that section's ruler band
-// and playhead-match range (see getPlacementBeatRange) far beyond where it actually belongs.
+// How strongly to dim a note that isn't in the *active part's* active section (see
+// getActivePlacement/drawGridContents) - every other part's notes are dimmed unconditionally, since
+// only one part/section pair is ever "active" at a time. A visual cue so a note that's technically
+// in the wrong section (e.g. pasted/added while a different section was intended) stands out as an
+// outlier rather than blending in, since a single such note can otherwise silently balloon that
+// section's ruler band and playhead-match range (see getPlacementBeatRange) far beyond where it
+// actually belongs.
 const INACTIVE_SECTION_ALPHA = 0.35;
 const PART_COLORS = [
     '#4FC3F7', '#FF8A65', '#AED581', '#BA68C8',
@@ -104,6 +124,10 @@ let loopRegionElement: HTMLElement = null;
 let loopDragMode: 'start' | 'end' = null;
 let loopDragDefaultEnd = 0;
 
+// Whether the mouse is held down over the piano keyboard sidebar, so notes can be auditioned by
+// dragging across keys (to find a pitch by ear) in addition to a plain click - see renderPianoKeys.
+let isPianoKeyPointerDown = false;
+
 let pixelsPerBeat = 32;
 // Tracked so renderPanel can rescale a preserved scroll position when zoom changes - otherwise the
 // same raw scrollLeft would point at a different beat after pixelsPerBeat changes.
@@ -127,7 +151,21 @@ let activePartIndex = 0;
 // Which placement (by index into that part's `placements` array) new notes get added to and the
 // section toolbar (new/duplicate/detach/remove/rename) acts on, per part.
 let activePlacementIndexByPart: Map<number, number> = new Map();
-let selectedNote: {partIndex: number, note: NoteEvent} = null;
+// The part every currently-selected note belongs to, and the selected notes themselves (empty when
+// nothing's selected) - see the file-level SELECTION comment. Always use clearSelection() to empty
+// this rather than assigning selectedNotes = [] directly, so selectedPartIndex stays in sync.
+let selectedPartIndex: number = null;
+let selectedNotes: NoteEvent[] = [];
+// Notes copied/cut via copySelectedNotes/cutSelectedNotes, beat-shifted so the earliest one is at
+// beat 0 - pasteClipboardNotes re-anchors them at the current playhead position in whatever part is
+// active at paste time. Deliberately not reset by openTrack/closeTrackViewer - a copy should survive
+// switching tracks, same as a real clipboard.
+let noteClipboard: NoteEvent[] = [];
+
+function clearSelection(): void {
+    selectedPartIndex = null;
+    selectedNotes = [];
+}
 
 interface NoteHitRegion {
     partIndex: number
@@ -156,18 +194,31 @@ interface DragState {
     // replays the note when the pitch actually changes rather than on every mousemove tick.
     lastAuditionedPitchIndex: number
     moved: boolean
+    // Present only for a 'move' drag started on a note that's already part of a multi-note
+    // selection - every entry (including the dragged note itself) is carried by the same
+    // global-beat/pitch delta as the drag progresses (see onDocumentMouseMove), so the whole
+    // selection moves together instead of just the note under the cursor. A per-note snapshot
+    // rather than reading placement.offset live because different selected notes can belong to
+    // different placements (different sections), each with its own offset.
+    group?: {note: NoteEvent, placement: MusicSectionPlacement, startGlobalBeat: number, startPitchIndex: number}[]
 }
 let dragState: DragState = null;
-// A drag ends with a mouseup, which is followed by a synthetic 'click' on the same element
-// regardless of how far the mouse moved in between - without this, every note-drag would also
-// fire the empty-space click handler's seek (the note is rarely still under the cursor after
-// being dragged). Set by onDocumentMouseUp when a real drag happened; consumed by the very next
-// click on the canvas.
-let suppressNextClick = false;
-// Set while dragging on empty space, so the playhead scrubs continuously with the mouse instead of
-// only jumping once on release (see onDocumentScrubMove/onDocumentScrubEnd). The eventual 'click'
-// still fires its own seek + deselect once the mouse is released - redundant with the last scrub
-// move, but harmless, so nothing here needs to suppress it.
+
+// A rectangle-select drag in progress on empty grid space (see attachCanvasInteractions' mousedown
+// and onDocumentSelectionDragMove) - canvas coordinates of the drag's start and current point.
+// selectionDragRect is what drawGridContents actually renders each frame; kept separate from
+// selectionDragState (which also tracks "is a drag active at all") so a drag that never moves can
+// still be told apart from a plain click (see onDocumentSelectionDragUp).
+interface SelectionDragState {
+    startCanvasX: number
+    startCanvasY: number
+}
+let selectionDragState: SelectionDragState = null;
+let selectionDragRect: {x0: number, y0: number, x1: number, y1: number} = null;
+
+// Set while dragging on the loop ruler bar (see renderLoopRuler), so the playhead scrubs
+// continuously with the mouse instead of only jumping once on release (see
+// onDocumentScrubMove/onDocumentScrubEnd).
 let isScrubbingPlayhead = false;
 
 // Cached grid geometry, set once per renderPanel call and reused by the live-drag redraw path
@@ -204,8 +255,10 @@ export function closeTrackViewer(): void {
     panelElement?.remove();
     panelElement = playheadElement = positionLabel = zoomLabel = scrollElement = sectionNameInput = null;
     gridCanvas = gridContext = null;
-    selectedNote = null;
+    clearSelection();
     dragState = null;
+    selectionDragState = null;
+    selectionDragRect = null;
     noteHitRegions = [];
     rulerBandElements = [];
     loopStartHandle = loopEndHandle = loopRegionElement = null;
@@ -250,11 +303,11 @@ function removePartAt(definition: MusicTrackDefinition, partIndex: number): void
         }
     }
     activePlacementIndexByPart = reindexedPlacements;
-    if (selectedNote) {
-        if (selectedNote.partIndex === partIndex) {
-            selectedNote = null;
-        } else if (selectedNote.partIndex > partIndex) {
-            selectedNote = {...selectedNote, partIndex: selectedNote.partIndex - 1};
+    if (selectedPartIndex != null) {
+        if (selectedPartIndex === partIndex) {
+            clearSelection();
+        } else if (selectedPartIndex > partIndex) {
+            selectedPartIndex -= 1;
         }
     }
     activePartIndex = Math.max(0, Math.min(activePartIndex, definition.parts.length - 1));
@@ -322,8 +375,10 @@ function openTrack(key: string): void {
     mutedPartIndices = new Set();
     activePartIndex = 0;
     activePlacementIndexByPart = new Map();
-    selectedNote = null;
+    clearSelection();
     dragState = null;
+    selectionDragState = null;
+    selectionDragRect = null;
     followPlayhead = true;
     // So renderPanel's scroll-position-preservation starts fresh at 0 for the newly opened track
     // instead of carrying over wherever the previous track happened to be scrolled to.
@@ -384,6 +439,46 @@ function snapBeat(beat: number): number {
     return Math.round(beat / BEAT_SNAP) * BEAT_SNAP;
 }
 
+// Floors (not rounds) to the grid, used only when placing a brand-new note (see the contextmenu
+// handler in attachCanvasInteractions) - as long as the grid isn't wider than the note's own length
+// (see getSnapGridForDuration, which guarantees this), flooring keeps the note's start at or before
+// the click, so the cursor always ends up inside the note it just placed rather than to its right.
+function floorBeatToGrid(beat: number, grid: number): number {
+    return Math.floor(beat / grid) * grid;
+}
+
+// Picks a default length for a brand-new note by borrowing from whatever's nearby in the same
+// section (in local-beat terms, same space as placement.section.notes) rather than always falling
+// back to a fixed length regardless of context - continuing the previous note's rhythm is far more
+// often what's wanted than an arbitrary default. Prefers the nearest *preceding* note (continuing
+// forward makes more sense than picking up whatever comes after); falls back to the nearest
+// following note if nothing precedes the click (an empty section, or clicking before its first
+// note); falls back to the part's own default length if the section has no notes at all yet.
+function getDefaultNewNoteBeats(part: MusicPart, placement: MusicSectionPlacement, localBeat: number, bpm: number): number {
+    let preceding: NoteEvent = null;
+    let following: NoteEvent = null;
+    for (const note of placement.section.notes) {
+        if (note.beat <= localBeat) {
+            if (!preceding || note.beat > preceding.beat) {
+                preceding = note;
+            }
+        } else if (!following || note.beat < following.beat) {
+            following = note;
+        }
+    }
+    const reference = preceding ?? following;
+    return reference ? getNoteBeats(reference, part, bpm) : (part.beats ?? 1);
+}
+
+// Half the new note's own (default) length, per the idea that beat-snap precision should scale
+// with the note being placed: a run of quarter notes shouldn't invite 16th-note-precision placement
+// errors, while a run of 16ths still needs finer-than-16th snapping to land cleanly between them.
+// Floored well below MIN_NOTE_BEATS so a very short reference note can't produce a grid finer than
+// any note is even allowed to be.
+function getSnapGridForDuration(beats: number): number {
+    return Math.max(MIN_NOTE_BEATS, beats * 0.5);
+}
+
 // Recomputes a part's playable `notes` from its `placements` after any edit. Never restarts
 // playback - see the file-level "LIVE EDITING" comment.
 function recomposePart(part: MusicPart): void {
@@ -400,36 +495,106 @@ function removeNoteFromPart(part: MusicPart, note: NoteEvent): void {
     }
 }
 
-// Deletes whatever note is currently selected, if any - shared by the edit row's Delete button and
-// the delete/backspace hotkey (see addKeyboardShortcuts.ts). A no-op if nothing is selected, so the
+// Finds whichever placement of `part` currently owns `note`, or null if it's not (any longer) part
+// of this part at all - used to resolve each selected note's own offset when starting a group move
+// (see DragState.group), since different selected notes can belong to different placements.
+function findNotePlacement(part: MusicPart, note: NoteEvent): MusicSectionPlacement | null {
+    return (part.placements ?? []).find(placement => placement.section.notes.includes(note)) ?? null;
+}
+
+// Deletes every currently-selected note, if any - shared by the edit row's Delete button and the
+// delete/backspace hotkey (see addKeyboardShortcuts.ts). A no-op if nothing is selected, so the
 // hotkey is safe to wire up unconditionally whenever the track viewer is open.
-export function deleteSelectedNote(): void {
-    if (!selectedNote || !editingState.trackViewerKey) {
+export function deleteSelectedNotes(): void {
+    if (!selectedNotes.length || selectedPartIndex == null) {
         return;
     }
     const definition = musicTrackHash[editingState.trackViewerKey];
-    const {partIndex, note} = selectedNote;
-    const part = definition.parts[partIndex];
+    const part = definition.parts[selectedPartIndex];
     if (!part) {
         return;
     }
-    removeNoteFromPart(part, note);
-    selectedNote = null;
+    for (const note of selectedNotes) {
+        removeNoteFromPart(part, note);
+    }
+    const partIndex = selectedPartIndex;
+    clearSelection();
     commitNoteEdit(partIndex);
+}
+
+// Copies every currently-selected note (beat-shifted so the earliest is at beat 0) to the note
+// clipboard - shared by cutSelectedNotes and the copy hotkey (see addKeyboardShortcuts.ts). A no-op
+// if nothing is selected; leaves the existing clipboard contents untouched in that case.
+export function copySelectedNotes(): void {
+    if (!selectedNotes.length) {
+        return;
+    }
+    const minBeat = Math.min(...selectedNotes.map(note => note.beat));
+    noteClipboard = selectedNotes.map(note => ({...note, beat: round3(note.beat - minBeat)}));
+}
+
+// Copies then deletes every currently-selected note - the cut hotkey (see addKeyboardShortcuts.ts).
+export function cutSelectedNotes(): void {
+    if (!selectedNotes.length) {
+        return;
+    }
+    copySelectedNotes();
+    deleteSelectedNotes();
+}
+
+// Pastes a copy of whatever's in the note clipboard into the *active* part's active placement -
+// always the active part, even if the notes were copied from a different one (see the file-level
+// SELECTION comment) - anchored so the earliest pasted note lands at the current playhead beat. A
+// no-op if the clipboard is empty or there's no active part/placement to paste into. Selects the
+// pasted notes afterward so they can be immediately nudged/deleted if the paste needs adjusting.
+export function pasteClipboardNotes(): void {
+    if (!noteClipboard.length || !editingState.trackViewerKey) {
+        return;
+    }
+    const definition = musicTrackHash[editingState.trackViewerKey];
+    const part = definition.parts[activePartIndex];
+    const placement = part && getActivePlacement(part);
+    if (!part || !placement) {
+        return;
+    }
+    const position = getMusicTrackPlaybackPosition();
+    const anchorGlobalBeat = (position && position.key === editingState.trackViewerKey)
+        ? snapBeat(position.beat) : 0;
+    const pasted: NoteEvent[] = noteClipboard.map(note => {
+        const newNote: NoteEvent = {...note, beat: Math.max(0, anchorGlobalBeat + note.beat - placement.offset)};
+        placement.section.notes.push(newNote);
+        return newNote;
+    });
+    selectedPartIndex = activePartIndex;
+    selectedNotes = pasted;
+    commitNoteEdit(activePartIndex);
 }
 
 // Resolves which of `part`'s placements is "active" - the target for right-click-add and the
 // section toolbar, and what the section-name field/ruler highlight display. Priority: whatever
 // section the selected note belongs to (if any - selecting a note pins the display to it), else
-// whichever section the playhead currently sits over (so the display tracks playback as it moves
-// through the song), else whatever the user last explicitly picked by clicking a ruler band, else
-// the first placement.
+// whatever the user last explicitly picked by clicking a ruler band (see renderSectionRuler) or via
+// New/Duplicate/Remove in the section toolbar, else whichever section the playhead currently sits
+// over (so the display still tracks playback by default when nothing's been explicitly picked),
+// else the first placement.
+//
+// Explicit picks used to rank *below* the playhead match, so clicking a ruler band while the
+// playhead happened to be sitting inside a different section had no visible effect - the playhead
+// match kept winning every render. A deliberate seek (see the loop ruler's mousedown handler)
+// clears every part's explicit pick so playhead-tracking resumes from there, rather than the pick
+// being sticky forever the instant any band is ever clicked.
 function getActivePlacement(part: MusicPart): MusicSectionPlacement | null {
-    if (selectedNote && selectedNote.partIndex === activePartIndex) {
-        const owning = (part.placements ?? []).find(placement => placement.section.notes.includes(selectedNote.note));
+    if (selectedNotes.length && selectedPartIndex === activePartIndex) {
+        // Multiple selected notes can span more than one placement (a rectangle can cover two
+        // adjacent sections) - the first one just picks a reasonable placement to display/act on.
+        const owning = findNotePlacement(part, selectedNotes[0]);
         if (owning) {
             return owning;
         }
+    }
+    const explicitIndex = activePlacementIndexByPart.get(activePartIndex);
+    if (explicitIndex != null && part.placements?.[explicitIndex]) {
+        return part.placements[explicitIndex];
     }
     const definition = musicTrackHash[editingState.trackViewerKey];
     const position = definition && getMusicTrackPlaybackPosition();
@@ -442,8 +607,7 @@ function getActivePlacement(part: MusicPart): MusicSectionPlacement | null {
             return atPlayhead;
         }
     }
-    const index = activePlacementIndexByPart.get(activePartIndex) ?? 0;
-    return part.placements?.[index] ?? null;
+    return part.placements?.[0] ?? null;
 }
 
 // The [start, end) global-beat range a placement's notes actually occupy. Deliberately NOT
@@ -552,18 +716,27 @@ function round3(value: number): number {
     return Math.round(value * 1000) / 1000;
 }
 
-// Plays a single note immediately, at its own pitch/duration/volume, through the same
-// trackViewerGainNode the track's own playback uses. Only called while paused (see call sites) -
-// while actually playing, the note is already audible as part of the mix, and playing it again on
-// top would just sound like a doubled/echoed note.
-function auditionNote(note: NoteEvent, part: MusicPart, bpm: number): void {
+// Hard ceiling on how long an audition (see auditionNote) is ever allowed to sound, regardless of
+// what an instrument's own defaultAuditionDuration is set to - previewing a note should never tie
+// up the speakers for long, even if some future instrument sets an unreasonably high default.
+const MAX_AUDITION_DURATION = 0.5;
+
+// Plays a single note immediately at its own pitch/volume, through the same trackViewerGainNode the
+// track's own playback uses - called (most call sites only while paused; the piano keyboard
+// sidebar's click-to-play always) whenever an edit gesture (select/create/drag a note, click a
+// piano key) should let you hear the pitch you're choosing. Deliberately ignores the note's own
+// authored beats/duration - always using the playing part's instrument's own
+// defaultAuditionDuration instead (capped at MAX_AUDITION_DURATION) - so previewing a long held
+// note doesn't tie up the speakers for its full length.
+function auditionNote(note: NoteEvent, part: MusicPart): void {
+    const duration = Math.min(instruments[part.instrument]?.defaultAuditionDuration ?? 0.4, MAX_AUDITION_DURATION);
     playNote({
         destination: trackViewerGainNode,
         time: audioContext.currentTime,
         instrument: part.instrument,
         noteOrFrequency: note.note ?? note.frequency ?? part.note ?? part.frequency,
         volume: (note.volume ?? 1) * (part.volume ?? 1),
-        duration: getNoteBeats(note, part, bpm) * (60 / bpm),
+        duration,
     });
 }
 
@@ -826,8 +999,12 @@ function renderPanel(): void {
     playheadElement.style.height = `${gridHeight}px`;
     gridInner.append(playheadElement);
 
+    const bodyRow = tagElement('div', 'track-viewer-body');
+    bodyRow.append(renderPianoKeys(definition));
+    bodyRow.append(gridInner);
+
     scrollElement = tagElement('div', 'track-viewer-scroll');
-    scrollElement.append(gridInner);
+    scrollElement.append(bodyRow);
     panelElement.append(scrollElement);
 
     document.body.append(panelElement);
@@ -966,6 +1143,84 @@ function renderSectionToolbar(part: MusicPart, bpm: number): HTMLElement {
     return toolbar;
 }
 
+// True for the five sharps per octave (Cs/Ds/Fs/Gs/As) - everything else is a white key. Relies on
+// sharp-only note names (see noteFrequencies.ts - there are no flat spellings to also match).
+function isBlackKeyNote(noteName: string): boolean {
+    return noteName.includes('s');
+}
+
+// A vertical piano keyboard along the left edge, one key per row of the grid (gridMinIndex to
+// gridMaxIndex, same ROW_HEIGHT), purely so it's easier to judge a note's pitch at a glance than
+// counting C-shaded rows. Sticky-positioned (see .track-viewer-keys) so it stays in view while
+// scrolling horizontally through a long track, but still scrolls normally with the grid
+// vertically, since the two are laid out side by side inside the same scroll container (see
+// renderPanel's .track-viewer-body) rather than the keys living in some separately-scrolled pane
+// that would need to be kept in sync by hand.
+// Clicking a key plays that pitch on the active part's instrument, at whatever default
+// length/volume that part's other notes would fall back to (see auditionNote/getNoteBeats) - there
+// being no actual note to read those from is exactly what makes it "the part's default".
+function renderPianoKeys(definition: MusicTrackDefinition): HTMLElement {
+    const keys = tagElement('div', 'track-viewer-keys');
+    keys.style.width = `${PIANO_KEYS_WIDTH}px`;
+    keys.style.height = `${LOOP_RULER_HEIGHT + RULER_HEIGHT + gridHeight}px`;
+
+    const part = definition.parts[activePartIndex];
+    for (let index = gridMinIndex; index <= gridMaxIndex; index++) {
+        const noteName = notes[index];
+        if (!noteName) {
+            continue;
+        }
+        const isBlack = isBlackKeyNote(noteName);
+        const top = LOOP_RULER_HEIGHT + RULER_HEIGHT + (gridMaxIndex - index) * ROW_HEIGHT;
+        // Real piano keys: black keys are narrower than the row they sit in, so the rest of that
+        // row is genuinely white background, not empty space - without this backing div the gap
+        // beside a black key showed the (dark) sidebar background instead, making the black key
+        // look wider than its actual (smaller) clickable area.
+        if (isBlack) {
+            const backing = tagElement('div', 'track-viewer-key track-viewer-key-white');
+            backing.style.top = `${top}px`;
+            backing.style.height = `${ROW_HEIGHT}px`;
+            backing.style.pointerEvents = 'none';
+            keys.append(backing);
+        }
+        const key = tagElement('div', `track-viewer-key ${isBlack ? 'track-viewer-key-black' : 'track-viewer-key-white'}`);
+        key.style.top = `${top}px`;
+        key.style.height = `${ROW_HEIGHT}px`;
+        if (part) {
+            key.title = `Play ${noteName} on ${part.instrument}`;
+            const play = () => auditionNote({beat: 0, note: noteName}, part);
+            // Play on press (not click) so it feels like a real key, and also play again on
+            // mouseenter while the button is still down elsewhere on the keyboard - lets you drag
+            // across keys to scan for a pitch by ear (see isPianoKeyPointerDown).
+            key.addEventListener('mousedown', () => {
+                isPianoKeyPointerDown = true;
+                document.addEventListener('mouseup', onPianoKeyPointerUp);
+                play();
+            });
+            key.addEventListener('mouseenter', () => {
+                if (isPianoKeyPointerDown) {
+                    play();
+                }
+            });
+        } else {
+            key.classList.add('is-disabled');
+            key.title = 'Add a part to hear this pitch';
+        }
+        // Labeling every C makes the octaves easy to count, matching the shaded C rows already
+        // drawn on the grid itself (see drawGridContents).
+        if (!isBlack && noteName.startsWith('C')) {
+            key.append(tagElement('span', 'track-viewer-key-label', noteName));
+        }
+        keys.append(key);
+    }
+    return keys;
+}
+
+function onPianoKeyPointerUp(): void {
+    isPianoKeyPointerDown = false;
+    document.removeEventListener('mouseup', onPianoKeyPointerUp);
+}
+
 // A shaded region with two draggable flag handles marking loopStartBeat/loopEndBeat - the same
 // "loop brace on a ruler" idiom most DAWs use for setting a loop/punch range. Track-level (not
 // per-part), so unlike the section ruler this renders once regardless of which part is active.
@@ -976,6 +1231,27 @@ function renderSectionToolbar(part: MusicPart, bpm: number): HTMLElement {
 function renderLoopRuler(definition: MusicTrackDefinition, defaultLoopEnd: number): HTMLElement {
     const ruler = tagElement('div', 'track-viewer-loop-ruler');
     const {start, end} = getEffectiveLoopBounds(definition, defaultLoopEnd);
+
+    // Seeking the playhead lives here now rather than on the grid itself, which needed left-drag
+    // freed up for rectangle-select (see the file-level SELECTION comment). Only reached for a
+    // click that isn't on a handle - both handles' own mousedown (see startLoopHandleDrag) call
+    // stopPropagation before this ever fires, and the loop region overlay has pointer-events:none
+    // (see .track-viewer-loop-region) so it never blocks a click from reaching the ruler itself.
+    ruler.addEventListener('mousedown', (event: MouseEvent) => {
+        if (event.button !== 0 || !gridCanvas) {
+            return;
+        }
+        event.preventDefault();
+        const {x} = canvasEventPoint(gridCanvas, event);
+        seekMusicTrackPlayback(Math.max(0, x / pixelsPerBeat));
+        // A deliberate seek clears every part's explicit section pick (see getActivePlacement) so
+        // the display goes back to following wherever the playhead lands - otherwise a pick made
+        // before this seek would keep overriding it indefinitely.
+        activePlacementIndexByPart = new Map();
+        isScrubbingPlayhead = true;
+        document.addEventListener('mousemove', onDocumentScrubMove);
+        document.addEventListener('mouseup', onDocumentScrubEnd);
+    });
 
     loopRegionElement = tagElement('div', 'track-viewer-loop-region');
     ruler.append(loopRegionElement);
@@ -1059,8 +1335,9 @@ function onDocumentLoopHandleUp(): void {
 
 // A row of colored bands, one per placement in the active part's timeline, positioned/sized to
 // match the grid below (same pixelsPerBeat, same horizontal scroll). Click a band to explicitly
-// pick it as the active placement (see getActivePlacement) - note that a selected note or the
-// playhead being over a *different* section takes priority over this pick, per getActivePlacement.
+// pick it as the active placement (see getActivePlacement) - sticks until a different note/band is
+// selected or the playhead is deliberately seeked elsewhere (see the loop ruler's mousedown
+// handler), per getActivePlacement's priority order.
 function renderSectionRuler(part: MusicPart, bpm: number): HTMLElement {
     const ruler = tagElement('div', 'track-viewer-ruler');
     const activePlacement = getActivePlacement(part);
@@ -1085,78 +1362,114 @@ function renderSectionRuler(part: MusicPart, bpm: number): HTMLElement {
     return ruler;
 }
 
-// A row of pitch/beat/length controls for the selected note, or null if nothing is selected.
-// Clears a stale selection (e.g. the note was just deleted from another code path) defensively.
+// A row of controls for the current selection, or null if nothing is selected. A single selected
+// note gets full pitch/beat/length controls, same as before multi-select existed; more than one
+// gets whatever edits make sense applied to the whole selection at once (currently just length -
+// pitch/beat are inherently per-note, see the drag-to-move gesture for moving/transposing a
+// selection together instead). Clears a stale selection (e.g. a note was deleted from another code
+// path) defensively.
 function renderEditRow(definition: MusicTrackDefinition): HTMLElement {
-    if (!selectedNote) {
+    if (!selectedNotes.length || selectedPartIndex == null) {
         return null;
     }
-    const {partIndex, note} = selectedNote;
+    const partIndex = selectedPartIndex;
     const part = definition.parts[partIndex];
-    const stillPresent = part?.placements?.some(placement => placement.section.notes.includes(note));
+    const stillPresent = part?.placements
+        && selectedNotes.every(note => part.placements.some(placement => placement.section.notes.includes(note)));
     if (!part || !stillPresent) {
-        selectedNote = null;
+        clearSelection();
         return null;
     }
 
     const row = tagElement('div', 'track-viewer-edit');
-    row.append(document.createTextNode(`${part.instrument}: `));
 
-    const pitchSelect = document.createElement('select');
-    for (const noteName of notes) {
-        const option = document.createElement('option');
-        option.value = noteName;
-        option.textContent = noteName;
-        pitchSelect.append(option);
+    if (selectedNotes.length === 1) {
+        const note = selectedNotes[0];
+        row.append(document.createTextNode(`${part.instrument}: `));
+
+        const pitchSelect = document.createElement('select');
+        for (const noteName of notes) {
+            const option = document.createElement('option');
+            option.value = noteName;
+            option.textContent = noteName;
+            pitchSelect.append(option);
+        }
+        const currentIndex = getPitchIndex(note.note ?? part.note, note.frequency ?? part.frequency);
+        pitchSelect.value = notes[Math.round(currentIndex ?? 48)] ?? notes[48];
+        pitchSelect.onchange = () => {
+            note.note = pitchSelect.value as Note;
+            delete note.frequency;
+            if (isMusicTrackPaused()) {
+                auditionNote(note, part);
+            }
+            commitNoteEdit(partIndex);
+        };
+        row.append(labeledControl('pitch', pitchSelect));
+
+        const beatInput = document.createElement('input');
+        beatInput.type = 'number';
+        beatInput.step = '0.05';
+        beatInput.className = 'track-viewer-edit-number';
+        beatInput.value = `${round3(note.beat)}`;
+        beatInput.onchange = () => {
+            const value = parseFloat(beatInput.value);
+            if (!isNaN(value)) {
+                note.beat = Math.max(0, value);
+            }
+            commitNoteEdit(partIndex);
+        };
+        row.append(labeledControl('beat', beatInput));
+
+        const lengthInput = document.createElement('input');
+        lengthInput.type = 'number';
+        lengthInput.step = '0.05';
+        lengthInput.className = 'track-viewer-edit-number';
+        lengthInput.value = `${round3(getNoteBeats(note, part, definition.bpm))}`;
+        lengthInput.onchange = () => {
+            const value = parseFloat(lengthInput.value);
+            if (!isNaN(value) && value > 0) {
+                setNoteBeats(note, value, definition.bpm);
+            }
+            commitNoteEdit(partIndex);
+        };
+        row.append(labeledControl('length (beats)', lengthInput));
+
+        const deleteButton = tagElement('button', 'track-viewer-button', 'Delete');
+        deleteButton.title = 'Delete this note (delete/backspace)';
+        deleteButton.onclick = () => deleteSelectedNotes();
+        row.append(deleteButton);
+    } else {
+        row.append(document.createTextNode(`${part.instrument}: ${selectedNotes.length} notes selected `));
+
+        // Blank (rather than an arbitrary one of them) when the selection doesn't already share a
+        // single length, so committing an unchanged blank field can't silently overwrite it.
+        const lengths = new Set(selectedNotes.map(note => round3(getNoteBeats(note, part, definition.bpm))));
+        const lengthInput = document.createElement('input');
+        lengthInput.type = 'number';
+        lengthInput.step = '0.05';
+        lengthInput.className = 'track-viewer-edit-number';
+        lengthInput.placeholder = 'mixed';
+        lengthInput.value = lengths.size === 1 ? `${[...lengths][0]}` : '';
+        lengthInput.onchange = () => {
+            const value = parseFloat(lengthInput.value);
+            if (!isNaN(value) && value > 0) {
+                for (const note of selectedNotes) {
+                    setNoteBeats(note, value, definition.bpm);
+                }
+            }
+            commitNoteEdit(partIndex);
+        };
+        row.append(labeledControl('length (beats)', lengthInput));
+
+        const deleteButton = tagElement('button', 'track-viewer-button', 'Delete All');
+        deleteButton.title = 'Delete all selected notes (delete/backspace)';
+        deleteButton.onclick = () => deleteSelectedNotes();
+        row.append(deleteButton);
     }
-    const currentIndex = getPitchIndex(note.note ?? part.note, note.frequency ?? part.frequency);
-    pitchSelect.value = notes[Math.round(currentIndex ?? 48)] ?? notes[48];
-    pitchSelect.onchange = () => {
-        note.note = pitchSelect.value as Note;
-        delete note.frequency;
-        if (isMusicTrackPaused()) {
-            auditionNote(note, part, definition.bpm);
-        }
-        commitNoteEdit(partIndex);
-    };
-    row.append(labeledControl('pitch', pitchSelect));
-
-    const beatInput = document.createElement('input');
-    beatInput.type = 'number';
-    beatInput.step = '0.05';
-    beatInput.className = 'track-viewer-edit-number';
-    beatInput.value = `${round3(note.beat)}`;
-    beatInput.onchange = () => {
-        const value = parseFloat(beatInput.value);
-        if (!isNaN(value)) {
-            note.beat = Math.max(0, value);
-        }
-        commitNoteEdit(partIndex);
-    };
-    row.append(labeledControl('beat', beatInput));
-
-    const lengthInput = document.createElement('input');
-    lengthInput.type = 'number';
-    lengthInput.step = '0.05';
-    lengthInput.className = 'track-viewer-edit-number';
-    lengthInput.value = `${round3(getNoteBeats(note, part, definition.bpm))}`;
-    lengthInput.onchange = () => {
-        const value = parseFloat(lengthInput.value);
-        if (!isNaN(value) && value > 0) {
-            setNoteBeats(note, value, definition.bpm);
-        }
-        commitNoteEdit(partIndex);
-    };
-    row.append(labeledControl('length (beats)', lengthInput));
-
-    const deleteButton = tagElement('button', 'track-viewer-button', 'Delete');
-    deleteButton.title = 'Delete this note (delete/backspace)';
-    deleteButton.onclick = () => deleteSelectedNote();
-    row.append(deleteButton);
 
     const deselectButton = tagElement('button', 'track-viewer-button', '×');
     deselectButton.onclick = () => {
-        selectedNote = null;
+        clearSelection();
         renderPanel();
     };
     row.append(deselectButton);
@@ -1228,17 +1541,22 @@ function drawGridContents(definition: MusicTrackDefinition): void {
     }
 
     noteHitRegions = [];
+    const selectedSet = new Set(selectedNotes);
     definition.parts.forEach((part, partIndex) => {
         if (hiddenPartIndices.has(partIndex)) {
             return;
         }
         const color = PART_COLORS[partIndex % PART_COLORS.length];
-        // Computed once per part per draw (not per note) - which placement counts as "active" can
-        // itself depend on the full set of notes (it follows the playhead), so this has to be
-        // resolved before dimming any individual note.
-        const activePlacement = getActivePlacement(part);
+        const isSelectedPart = partIndex === selectedPartIndex;
+        // Full opacity is reserved for the currently active *part's* active placement only - every
+        // other part's notes always render dimmed, even if the playhead happens to be sitting over
+        // one of their own sections. getActivePlacement is only meaningful for the active part
+        // anyway (its playhead-match/explicit-pick fallbacks both key off activePartIndex, not
+        // `part`'s own index), so it's not even called for the rest.
+        const isActivePart = partIndex === activePartIndex;
+        const activePlacement = isActivePart ? getActivePlacement(part) : null;
         for (const placement of part.placements ?? []) {
-            const isActiveSection = placement === activePlacement;
+            const isActiveSection = isActivePart && placement === activePlacement;
             for (const note of placement.section.notes) {
                 const index = getPitchIndex(note.note ?? part.note, note.frequency ?? part.frequency);
                 if (index === null) {
@@ -1253,7 +1571,7 @@ function drawGridContents(definition: MusicTrackDefinition): void {
                 context.fillStyle = color;
                 context.fillRect(x, y, w, h);
                 context.globalAlpha = 1;
-                if (selectedNote && selectedNote.partIndex === partIndex && selectedNote.note === note) {
+                if (isSelectedPart && selectedSet.has(note)) {
                     context.strokeStyle = '#FFFFFF';
                     context.lineWidth = 1;
                     context.strokeRect(x + 0.5, y + 0.5, Math.max(1, w - 1), Math.max(1, h - 1));
@@ -1262,6 +1580,18 @@ function drawGridContents(definition: MusicTrackDefinition): void {
             }
         }
     });
+
+    if (selectionDragRect) {
+        const rx = Math.min(selectionDragRect.x0, selectionDragRect.x1);
+        const ry = Math.min(selectionDragRect.y0, selectionDragRect.y1);
+        const rw = Math.abs(selectionDragRect.x1 - selectionDragRect.x0);
+        const rh = Math.abs(selectionDragRect.y1 - selectionDragRect.y0);
+        context.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        context.fillRect(rx, ry, rw, rh);
+        context.strokeStyle = 'rgba(255, 255, 255, 0.6)';
+        context.lineWidth = 1;
+        context.strokeRect(rx + 0.5, ry + 0.5, rw, rh);
+    }
 }
 
 function canvasEventPoint(canvas: HTMLCanvasElement, event: MouseEvent): {x: number, y: number} {
@@ -1303,7 +1633,7 @@ function classifyEdit(region: NoteHitRegion, canvasX: number): 'move' | 'resize-
 
 function attachCanvasInteractions(canvas: HTMLCanvasElement, definition: MusicTrackDefinition): void {
     canvas.addEventListener('mousemove', (event: MouseEvent) => {
-        if (dragState || isScrubbingPlayhead) {
+        if (dragState || isScrubbingPlayhead || selectionDragState) {
             return;
         }
         const {x, y} = canvasEventPoint(canvas, event);
@@ -1322,12 +1652,13 @@ function attachCanvasInteractions(canvas: HTMLCanvasElement, definition: MusicTr
         const {x, y} = canvasEventPoint(canvas, event);
         const hit = findHit(x, y);
         if (!hit) {
-            // Empty space: scrub the playhead continuously for as long as the mouse is held (see
-            // onDocumentScrubMove) rather than only jumping once on release.
-            seekMusicTrackPlayback(Math.max(0, x / pixelsPerBeat));
-            isScrubbingPlayhead = true;
-            document.addEventListener('mousemove', onDocumentScrubMove);
-            document.addEventListener('mouseup', onDocumentScrubEnd);
+            // Empty space: drag a selection rectangle (see onDocumentSelectionDragMove) - seeking
+            // the playhead now lives on the loop ruler bar instead (see renderLoopRuler).
+            event.preventDefault();
+            selectionDragState = {startCanvasX: x, startCanvasY: y};
+            selectionDragRect = {x0: x, y0: y, x1: x, y1: y};
+            document.addEventListener('mousemove', onDocumentSelectionDragMove);
+            document.addEventListener('mouseup', onDocumentSelectionDragUp);
             return;
         }
         event.preventDefault();
@@ -1336,12 +1667,23 @@ function attachCanvasInteractions(canvas: HTMLCanvasElement, definition: MusicTr
         // so the legend/toolbar/ruler switch to match what you clicked instead of staying on
         // whatever part was active before.
         activePartIndex = hit.partIndex;
-        selectedNote = {partIndex: hit.partIndex, note: hit.note};
-        if (isMusicTrackPaused()) {
-            auditionNote(hit.note, part, definition.bpm);
+        const editMode = classifyEdit(hit, x);
+        // Dragging a note that's already part of a multi-note selection moves the whole selection
+        // together (see DragState.group) instead of collapsing it down to just this one note -
+        // otherwise a plain click elsewhere always replaces the selection with just the note (or
+        // nothing) under the cursor.
+        const isGroupDrag = editMode === 'move' && selectedPartIndex === hit.partIndex
+            && selectedNotes.length > 1 && selectedNotes.includes(hit.note);
+        if (!isGroupDrag) {
+            selectedPartIndex = hit.partIndex;
+            selectedNotes = [hit.note];
         }
+        if (isMusicTrackPaused()) {
+            auditionNote(hit.note, part);
+        }
+        const startPitchIndex = getPitchIndex(hit.note.note ?? part.note, hit.note.frequency ?? part.frequency) ?? 48;
         dragState = {
-            mode: classifyEdit(hit, x),
+            mode: editMode,
             partIndex: hit.partIndex,
             placement: hit.placement,
             note: hit.note,
@@ -1350,28 +1692,22 @@ function attachCanvasInteractions(canvas: HTMLCanvasElement, definition: MusicTr
             startCanvasY: y,
             startBeat: hit.note.beat,
             startBeats: getNoteBeats(hit.note, part, definition.bpm),
-            startPitchIndex: getPitchIndex(hit.note.note ?? part.note, hit.note.frequency ?? part.frequency) ?? 48,
-            lastAuditionedPitchIndex: getPitchIndex(hit.note.note ?? part.note, hit.note.frequency ?? part.frequency) ?? 48,
+            startPitchIndex,
+            lastAuditionedPitchIndex: startPitchIndex,
             moved: false,
+            group: isGroupDrag ? selectedNotes.map(note => {
+                const placement = findNotePlacement(part, note) ?? hit.placement;
+                return {
+                    note,
+                    placement,
+                    startGlobalBeat: note.beat + placement.offset,
+                    startPitchIndex: getPitchIndex(note.note ?? part.note, note.frequency ?? part.frequency) ?? 48,
+                };
+            }) : undefined,
         };
         canvas.style.cursor = dragState.mode === 'move' ? 'grabbing' : 'ew-resize';
         document.addEventListener('mousemove', onDocumentMouseMove);
         document.addEventListener('mouseup', onDocumentMouseUp);
-    });
-
-    canvas.addEventListener('click', (event: MouseEvent) => {
-        if (suppressNextClick) {
-            suppressNextClick = false;
-            return;
-        }
-        const {x, y} = canvasEventPoint(canvas, event);
-        if (findHit(x, y)) {
-            // Already selected on mousedown above.
-            return;
-        }
-        seekMusicTrackPlayback(Math.max(0, x / pixelsPerBeat));
-        selectedNote = null;
-        renderPanel();
     });
 
     canvas.addEventListener('contextmenu', (event: MouseEvent) => {
@@ -1380,9 +1716,10 @@ function attachCanvasInteractions(canvas: HTMLCanvasElement, definition: MusicTr
         const hit = findHit(x, y);
         if (hit) {
             activePartIndex = hit.partIndex;
-            selectedNote = {partIndex: hit.partIndex, note: hit.note};
+            selectedPartIndex = hit.partIndex;
+            selectedNotes = [hit.note];
             if (isMusicTrackPaused()) {
-                auditionNote(hit.note, definition.parts[hit.partIndex], definition.bpm);
+                auditionNote(hit.note, definition.parts[hit.partIndex]);
             }
             renderPanel();
             return;
@@ -1392,14 +1729,21 @@ function attachCanvasInteractions(canvas: HTMLCanvasElement, definition: MusicTr
         if (!part || !placement) {
             return;
         }
-        const globalBeat = Math.max(0, snapBeat(x / pixelsPerBeat));
+        const rawGlobalBeat = Math.max(0, x / pixelsPerBeat);
+        const rawLocalBeat = Math.max(0, rawGlobalBeat - placement.offset);
+        const defaultBeats = getDefaultNewNoteBeats(part, placement, rawLocalBeat, definition.bpm);
+        const globalBeat = Math.max(0, floorBeatToGrid(rawGlobalBeat, getSnapGridForDuration(defaultBeats)));
         const localBeat = Math.max(0, globalBeat - placement.offset);
-        const pitchIndex = Math.max(0, Math.min(notes.length - 1, Math.round(gridMaxIndex - y / ROW_HEIGHT)));
-        const newNote: NoteEvent = {beat: localBeat, beats: part.beats ?? 1, note: notes[pitchIndex]};
+        // Floored the same way as the beat above (and for the same reason) - gridMaxIndex - index
+        // is a row's *top* edge in row-count terms, so flooring y/ROW_HEIGHT picks whichever row
+        // the cursor is actually within rather than whichever row's center it's closest to.
+        const pitchIndex = Math.max(0, Math.min(notes.length - 1, gridMaxIndex - Math.floor(y / ROW_HEIGHT)));
+        const newNote: NoteEvent = {beat: localBeat, beats: defaultBeats, note: notes[pitchIndex]};
         placement.section.notes.push(newNote);
-        selectedNote = {partIndex: activePartIndex, note: newNote};
+        selectedPartIndex = activePartIndex;
+        selectedNotes = [newNote];
         if (isMusicTrackPaused()) {
-            auditionNote(newNote, part, definition.bpm);
+            auditionNote(newNote, part);
         }
         commitNoteEdit(activePartIndex);
     });
@@ -1422,16 +1766,39 @@ function onDocumentMouseMove(event: MouseEvent): void {
 
     if (mode === 'move') {
         const newGlobalBeat = snapBeat(startGlobalBeat + deltaX / pixelsPerBeat);
-        note.beat = Math.max(0, newGlobalBeat - placement.offset);
         const newPitchIndex = Math.max(0, Math.min(notes.length - 1,
             Math.round(dragState.startPitchIndex - deltaY / ROW_HEIGHT)));
-        note.note = notes[newPitchIndex];
-        delete note.frequency;
-        // Only re-audition when the drag actually crosses into a new pitch, not on every
-        // mousemove tick (most of which don't change the row at all).
-        if (newPitchIndex !== dragState.lastAuditionedPitchIndex && isMusicTrackPaused()) {
-            dragState.lastAuditionedPitchIndex = newPitchIndex;
-            auditionNote(note, dragState.part, bpm);
+        if (dragState.group) {
+            // One uniform beat/pitch delta (from the dragged note's own movement) applied to every
+            // selected note, each clamped against the *group's* earliest beat/extreme pitch rather
+            // than each note's own - so the selection can't bunch up or lose its shape as soon as
+            // any one member would otherwise go below beat 0 or off the top/bottom of the grid.
+            let beatDelta = newGlobalBeat - startGlobalBeat;
+            let pitchDelta = newPitchIndex - dragState.startPitchIndex;
+            const minStartGlobalBeat = Math.min(...dragState.group.map(g => g.startGlobalBeat));
+            beatDelta = Math.max(beatDelta, -minStartGlobalBeat);
+            const minStartPitch = Math.min(...dragState.group.map(g => g.startPitchIndex));
+            const maxStartPitch = Math.max(...dragState.group.map(g => g.startPitchIndex));
+            pitchDelta = Math.max(-minStartPitch, Math.min(notes.length - 1 - maxStartPitch, pitchDelta));
+            for (const g of dragState.group) {
+                g.note.beat = Math.max(0, g.startGlobalBeat + beatDelta - g.placement.offset);
+                g.note.note = notes[g.startPitchIndex + pitchDelta];
+                delete g.note.frequency;
+            }
+            if (pitchDelta !== 0 && newPitchIndex !== dragState.lastAuditionedPitchIndex && isMusicTrackPaused()) {
+                dragState.lastAuditionedPitchIndex = newPitchIndex;
+                auditionNote(note, dragState.part);
+            }
+        } else {
+            note.beat = Math.max(0, newGlobalBeat - placement.offset);
+            note.note = notes[newPitchIndex];
+            delete note.frequency;
+            // Only re-audition when the drag actually crosses into a new pitch, not on every
+            // mousemove tick (most of which don't change the row at all).
+            if (newPitchIndex !== dragState.lastAuditionedPitchIndex && isMusicTrackPaused()) {
+                dragState.lastAuditionedPitchIndex = newPitchIndex;
+                auditionNote(note, dragState.part);
+            }
         }
     } else if (mode === 'resize-left') {
         const endGlobalBeat = startGlobalBeat + dragState.startBeats;
@@ -1454,22 +1821,61 @@ function onDocumentMouseUp(): void {
     if (dragState) {
         if (dragState.moved) {
             recomposePart(dragState.part);
-            suppressNextClick = true;
-            // renderPanel() below replaces the canvas that received this drag's mousedown with a
-            // new element, so the synthetic 'click' that normally follows mouseup may land on the
-            // (now-detached) old canvas and never reach the new one's listener at all - fall back
-            // to clearing the flag on a timeout so it can't wrongly suppress some later click.
-            setTimeout(() => { suppressNextClick = false; }, 0);
         }
         dragState = null;
         renderPanel();
     }
 }
 
-// Continues the playhead scrub started in the canvas 'mousedown' handler for as long as the mouse
-// stays down over empty space - deliberately cheap (just the seek itself) rather than a renderPanel
-// per mousemove; the playhead position updates on its own via the normal per-frame
-// refreshTrackViewer, same as during ordinary playback.
+// Continues the rectangle-selection drag started in the canvas 'mousedown' handler, redrawing the
+// marquee (selectionDragRect, see drawGridContents) as the mouse moves - the actual note selection
+// itself is only resolved once, on release (see onDocumentSelectionDragUp).
+function onDocumentSelectionDragMove(event: MouseEvent): void {
+    if (!selectionDragState || !gridCanvas) {
+        return;
+    }
+    const {x, y} = canvasEventPoint(gridCanvas, event);
+    selectionDragRect = {x0: selectionDragState.startCanvasX, y0: selectionDragState.startCanvasY, x1: x, y1: y};
+    drawGridContents(musicTrackHash[editingState.trackViewerKey]);
+}
+
+function onDocumentSelectionDragUp(): void {
+    document.removeEventListener('mousemove', onDocumentSelectionDragMove);
+    document.removeEventListener('mouseup', onDocumentSelectionDragUp);
+    if (!selectionDragState) {
+        return;
+    }
+    const rect = selectionDragRect;
+    selectionDragState = null;
+    selectionDragRect = null;
+    // A click with no real movement: just deselect, same as clicking empty space always did before
+    // multi-select existed.
+    if (!rect || (Math.abs(rect.x1 - rect.x0) < 2 && Math.abs(rect.y1 - rect.y0) < 2)) {
+        clearSelection();
+        renderPanel();
+        return;
+    }
+    const rx = Math.min(rect.x0, rect.x1);
+    const ry = Math.min(rect.y0, rect.y1);
+    const rw = Math.abs(rect.x1 - rect.x0);
+    const rh = Math.abs(rect.y1 - rect.y0);
+    // Restricted to the active part (see the file-level SELECTION comment), regardless of which
+    // parts' notes visually fall within the rectangle.
+    const matches = noteHitRegions.filter(region => region.partIndex === activePartIndex
+        && region.x < rx + rw && region.x + region.w > rx && region.y < ry + rh && region.y + region.h > ry);
+    if (matches.length) {
+        selectedPartIndex = activePartIndex;
+        selectedNotes = matches.map(region => region.note);
+    } else {
+        clearSelection();
+    }
+    renderPanel();
+}
+
+// Continues the playhead scrub started in the loop ruler's 'mousedown' handler for as long as the
+// mouse stays down - deliberately cheap (just the seek itself) rather than a renderPanel per
+// mousemove; the playhead position updates on its own via the normal per-frame refreshTrackViewer,
+// same as during ordinary playback.
 function onDocumentScrubMove(event: MouseEvent): void {
     if (!isScrubbingPlayhead || !gridCanvas) {
         return;

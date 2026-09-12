@@ -43,5 +43,6 @@ function playBassNote({frequency, volume, time, destination, duration}: Instrume
 }
 
 instruments.bass = {
-    playNote: playBassNote
+    playNote: playBassNote,
+    defaultAuditionDuration: 0.3,
 };

@@ -39,5 +39,6 @@ function playKickSound({frequency, volume, time, destination, duration}: Instrum
 }
 
 instruments.kick = {
-    playNote: playKickSound
+    playNote: playKickSound,
+    defaultAuditionDuration: 0.3,
 };

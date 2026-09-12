@@ -17,5 +17,6 @@ function playZeldaSquare({frequency, volume, time, destination, duration}: Instr
 }
 
 instruments.zeldaSquare = {
-    playNote: playZeldaSquare
+    playNote: playZeldaSquare,
+    defaultAuditionDuration: 0.3,
 };

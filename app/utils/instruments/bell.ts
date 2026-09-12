@@ -45,7 +45,11 @@ function getBellFrequencies(baseFrequency: number): number[] {
 instruments.bell = {
     playNote({frequency, destination, duration, volume, time}) {
         playBellSound(getBellFrequencies(frequency), volume, duration, destination, time);
-    }
+    },
+    // Bells ring long by nature - the highest of the per-instrument defaults (still subject to the
+    // 0.5s hard cap - see Instrument.defaultAuditionDuration) so a preview still reads as "a bell"
+    // rather than an abruptly muted chime.
+    defaultAuditionDuration: 0.5,
 }
 
 notes.forEach((noteName) => {

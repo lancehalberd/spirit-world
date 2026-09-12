@@ -314,6 +314,18 @@
        of capping at a fixed vh and scrolling sooner than it needs to. */
     display: flex;
     flex-direction: column;
+    /* The panel is full of click-and-drag surfaces (piano keys, notes, loop handles, the ruler
+       scrub bar) - without this, dragging across them can select surrounding text, and the browser
+       then interprets the next drag as "move the selected text" instead of the intended gesture.
+       Re-enabled below for actual text/number inputs, which still need normal selection. */
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.track-viewer input,
+.track-viewer select {
+    user-select: text;
+    -webkit-user-select: text;
 }
 
 .track-viewer-header {
@@ -441,6 +453,75 @@
     position: relative;
 }
 
+.track-viewer-body {
+    display: flex;
+    align-items: flex-start;
+    /* Sized entirely by its children (the keys column plus the grid) - this element itself just
+       needs to not wrap them onto separate lines. */
+    width: max-content;
+}
+
+.track-viewer-keys {
+    /* Sticks to the left edge of .track-viewer-scroll's visible area while scrolling
+       horizontally, but still moves normally with vertical scroll, since only `left` is set here
+       - exactly what's needed to keep the keyboard aligned with the grid's rows without also
+       pinning it to one vertical scroll position. */
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    flex-shrink: 0;
+    background-color: #111;
+    border-right: 1px solid #555;
+}
+
+.track-viewer-key {
+    position: absolute;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.track-viewer-key.is-disabled {
+    cursor: default;
+}
+
+.track-viewer-key-white {
+    background-color: #e8e8e8;
+    border-bottom: 1px solid #999;
+}
+
+.track-viewer-key-white:hover {
+    background-color: #ffe9a0;
+}
+
+.track-viewer-key-black {
+    left: auto;
+    width: 60%;
+    background-color: #1a1a1a;
+    border: 1px solid #000;
+    border-right: none;
+    /* Sits on top of a full-width white backing div (see renderPianoKeys) so the narrower black
+       key's actual clickable boundary is visually obvious instead of blending into the sidebar's
+       dark background. */
+    z-index: 1;
+}
+
+.track-viewer-key-black:hover {
+    background-color: #7a5c1e;
+}
+
+.track-viewer-key-label {
+    position: absolute;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 9px;
+    font-family: monospace;
+    color: #555;
+    pointer-events: none;
+}
+
 .track-viewer-grid {
     position: relative;
 }
@@ -451,6 +532,9 @@
     background-color: #1f2620;
     border-bottom: 1px solid #444;
     overflow: visible;
+    /* Clicking/dragging here seeks the playhead (see renderLoopRuler in trackViewer.ts) - the grid
+       itself is reserved for rectangle-select instead. */
+    cursor: crosshair;
 }
 
 .track-viewer-loop-region {

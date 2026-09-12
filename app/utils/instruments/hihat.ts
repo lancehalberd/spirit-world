@@ -37,5 +37,6 @@ function playHihatSound({frequency, volume, time, destination, duration}: Instru
 }
 
 instruments.hihat = {
-    playNote: playHihatSound
+    playNote: playHihatSound,
+    defaultAuditionDuration: 0.15,
 };
